@@ -146,10 +146,18 @@ def schema_apply(db_conn, target_schema: Schema):
 
     Returns True when successful.
     """
+    schema_cursor = db_conn.cursor()
+
+    # make sure the schema exists in the database
+    create_schema = psycopg2.sql.SQL("CREATE SCHEMA IF NOT EXISTS {0}").format(
+        psycopg2.sql.Identifier(target_schema.name)
+    )
+    schema_cursor.execute(create_schema)
+    db_conn.commit()
+
     schema = db_schema(db_conn, target_schema.name)
 
     results = ExceptionAggregator(errors=[InapplicableChangeException])
-    schema_cursor = db_conn.cursor()
 
     for name, col in target_schema.columns.items():
         results.call(schema_apply_column, schema_cursor, schema, col)
