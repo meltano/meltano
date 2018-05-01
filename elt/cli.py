@@ -2,9 +2,10 @@ import psycopg2
 import getpass
 import os
 import datetime
+import logging
 
 from enum import Enum
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentTypeError
 
 
 class OptionEnum(Enum):
@@ -35,6 +36,16 @@ class Password:
 
     def __str__(self):
         return self.value
+
+
+class LogLevel:
+    LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+
+    def parse(value):
+        log_level_int = getattr(logging, value, logging.INFO)
+        # check the logging log_level_choices have not changed from our expected values
+        assert isinstance(log_level_int, int)
+        return log_level_int
 
 
 class DateWindow:
@@ -125,3 +136,11 @@ def parser_output(parser: ArgumentParser):
     parser.add_argument('-F', '--output-file',
                         dest="output_file",
                         help="Specifies the output to write the output to.")
+
+
+def parser_logging(parser: ArgumentParser):
+    parser.add_argument('--log-level',
+                        dest="log_level",
+                        type=LogLevel.parse,
+                        default=logging.INFO,
+                        help="Specifies the log level.")

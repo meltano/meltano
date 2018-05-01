@@ -1,3 +1,4 @@
+import logging
 import psycopg2
 import psycopg2.sql
 import psycopg2.extras
@@ -126,7 +127,7 @@ def db_schema(db_conn, schema_name) -> Schema:
     cursor = db_conn.cursor()
 
     cursor.execute("""
-    SELECT table_schema, table_name, column_name, udt_name::regtype as data_type, is_nullable = 'YES', NULL as is_mapping_key
+    SELECT table_schema, table_name, column_name, data_type, is_nullable = 'YES', NULL as is_mapping_key
     FROM information_schema.columns
     WHERE table_schema = %s
     ORDER BY ordinal_position;
@@ -176,7 +177,7 @@ def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[Schema
     )
 
     if SchemaDiff.COLUMN_OK in diff:
-        print("[{}]: {}".format(column.column_name, diff))
+        logging.debug("[{}]: {}".format(column.column_name, diff))
 
     if SchemaDiff.COLUMN_CHANGED in diff:
         raise InapplicableChangeException(diff)

@@ -1,4 +1,6 @@
+import sys
 import psycopg2
+import logging
 
 from functools import reduce
 
@@ -35,3 +37,9 @@ def compose(*fs):
     :return: I{callable} taking 1 argument.
     """
     return reduce(lambda f, g: lambda x: f(g(x)), fs, lambda x: x)
+
+
+def setup_logging(args):
+    logging.basicConfig(stream=sys.stdout,
+                        format="[%(levelname)s][%(asctime)s] %(message)s",
+                        level=int(args.log_level))
