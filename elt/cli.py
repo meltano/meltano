@@ -49,12 +49,11 @@ class LogLevel:
 
 
 class DateWindow:
-    @classmethod
     def parse_date(value):
         if value is None:
             return datetime.date.today()
 
-        return datetime.strptime("%Y-%m-%d", value)
+        return datetime.datetime.strptime(value, "%Y-%m-%d")
 
     def __init__(self, args, formatter=datetime.datetime.isoformat):
         self.formatter = formatter
