@@ -1,11 +1,29 @@
+import functools
+import logging
+
+from enum import Enum
+
+
+class ExitCode(int, Enum):
+    OK = 0
+    FAIL = 1
+    NO_RETRY = 2
+
+
 class Error(Exception):
     """Base exception for ELT errors."""
+
+    def exit_code(self):
+        return ExitCode.FAIL
 
 
 class ExtractError(Error):
     """
     Error in the extraction process, like API errors.
     """
+
+    def exit_code(self):
+        return ExitCode.NO_RETRY
 
 
 def aggregate(error_cls):
@@ -45,6 +63,9 @@ class SchemaError(Error):
 class InapplicableChangeError(SchemaError):
     """Raise for inapplicable schema changes."""
 
+    def exit_code(self):
+        return ExitCode.NO_RETRY
+
 
 # TODO: use as a context manager instead
 class ExceptionAggregator:
@@ -69,8 +90,26 @@ class ExceptionAggregator:
                 raise e
 
     def raise_aggregate(self):
-        aggregate_type = self.etype.Aggregate if hasattr(self.etype, "Aggregate") else AggregateError
+        aggregate_type = AggregateError
+
+        if hasattr(self.etype, "Aggregate"):
+            aggregate_type = self.etype.Aggregate
 
         if len(self.failures):
             exceptions = map(lambda f: f[0], self.failures)
             raise aggregate_type(exceptions)
+
+
+def with_error_exit_code(main):
+    @functools.wraps(main)
+    def f(*args, **kwargs):
+        try:
+            main(*args, **kwargs)
+        except Error as err:
+            logging.error(err)
+            exit(err.exit_code())
+        except Exception as e:
+            logging.error(e)
+            exit(ExitCode.FAIL)
+
+    return f
