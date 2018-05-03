@@ -8,6 +8,23 @@ class ExtractError(Error):
     """
 
 
+def aggregate(error_cls):
+    class Aggregate(error_cls):
+        """Aggregate multiple sub-exceptions."""
+
+        def __init__(self, exceptions: []):
+            self.exceptions = exceptions
+
+        def __str__(self):
+            return "\n".join((str(e) for e in self.exceptions))
+
+    error_cls.Aggregate = Aggregate
+    return error_cls
+
+
+AggregateError = aggregate(Exception)
+
+
 @aggregate
 class ImportError(Error):
     """
@@ -25,20 +42,6 @@ class SchemaError(Error):
 
 class InapplicableChangeError(SchemaError):
     """Raise for inapplicable schema changes."""
-
-
-def aggregate(error_cls):
-    class Aggregate(error_cls):
-        """Aggregate multiple sub-exceptions."""
-
-        def __init__(self, exceptions: []):
-            self.exceptions = exceptions
-
-        def __str__(self):
-            return "\n".join((str(e) for e in self.exceptions))
-
-    error_cls.Aggregate = Aggregate
-    return error_cls
 
 
 # TODO: use as a context manager instead
@@ -64,6 +67,8 @@ class ExceptionAggregator:
                 raise e
 
     def raise_aggregate(self):
+        aggregate_type = self.etype.Aggregate or AggregateError
+
         if len(self.failures):
             exceptions = map(lambda f: f[0], self.failures)
-            raise self.etype.Aggregate(exceptions)
+            raise aggregate_type(exceptions)
