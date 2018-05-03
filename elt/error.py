@@ -18,7 +18,9 @@ def aggregate(error_cls):
         def __str__(self):
             return "\n".join((str(e) for e in self.exceptions))
 
-    error_cls.Aggregate = Aggregate
+    if error_cls != Exception:
+        error_cls.Aggregate = Aggregate
+
     return error_cls
 
 
@@ -67,7 +69,7 @@ class ExceptionAggregator:
                 raise e
 
     def raise_aggregate(self):
-        aggregate_type = self.etype.Aggregate or AggregateError
+        aggregate_type = self.etype.Aggregate if hasattr(self.etype, "Aggregate") else AggregateError
 
         if len(self.failures):
             exceptions = map(lambda f: f[0], self.failures)
