@@ -6,6 +6,7 @@ import psycopg2.extras
 from typing import Sequence, Callable, Set
 from enum import Enum
 from collections import OrderedDict, namedtuple
+from elt.error import ExceptionAggregator, InapplicableChangeError
 
 
 class DBType(str, Enum):

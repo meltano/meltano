@@ -5,7 +5,7 @@ import datetime
 import logging
 
 from enum import Enum
-from argparse import ArgumentParser, ArgumentTypeError
+from argparse import ArgumentParser
 
 
 class OptionEnum(Enum):
