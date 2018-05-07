@@ -62,6 +62,8 @@ class DBType(str, Enum):
     ArrayOfInteger = Integer + '[]'
     ArrayOfLong = Long + '[]'
     ArrayOfString = String + '[]'
+    UUID = 'UUID'
+    ArrayOfUUID = UUID + '[]'
 
 
 class SchemaDiff(Enum):
