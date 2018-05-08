@@ -1,3 +1,4 @@
+import logging
 import psycopg2
 import psycopg2.sql
 import psycopg2.extras
@@ -5,49 +6,7 @@ import psycopg2.extras
 from typing import Sequence, Callable, Set
 from enum import Enum
 from collections import OrderedDict, namedtuple
-
-
-class SchemaException(Exception):
-    """Base exception for schema errors."""
-
-
-class InapplicableChangeException(SchemaException):
-    """Raise for inapplicable schema changes."""
-
-
-class AggregateException(SchemaException):
-    """Aggregate multiple sub-exceptions."""
-
-    def __init__(self, exceptions: Sequence[SchemaException]):
-        self.exceptions = exceptions
-
-
-class ExceptionAggregator:
-    def __init__(self, errors=Sequence[Exception]):
-        self.success = []
-        self.failures = []
-        self.errors = errors
-
-    def recognize_exception(self, e: Exception) -> bool:
-        EType = type(e)
-        return EType in self.errors
-
-    def call(self, callable: Callable, *args, **kwargs):
-        params = (args, kwargs)
-        try:
-            ret = callable(*args, **kwargs)
-            self.success.append(params)
-            return ret
-        except Exception as e:
-            if self.recognize_exception(e):
-                self.failures.append((e, params))
-            else:
-                raise e
-
-    def raise_aggregate(self) -> AggregateException:
-        if len(self.failures):
-            exceptions = map(lambda f: f[0], self.failures)
-            raise AggregateException(exceptions)
+from elt.error import ExceptionAggregator, InapplicableChangeError
 
 
 class DBType(str, Enum):
@@ -169,7 +128,7 @@ def schema_apply(db_conn, target_schema: Schema):
 
     schema = db_schema(db_conn, target_schema.name)
 
-    results = ExceptionAggregator(errors=[InapplicableChangeException])
+    results = ExceptionAggregator(InapplicableChangeError)
     schema_cursor = db_conn.cursor()
 
     for name, col in target_schema.columns.items():
@@ -197,10 +156,10 @@ def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[Schema
     )
 
     if SchemaDiff.COLUMN_OK in diff:
-        print("[{}]: {}".format(column.column_name, diff))
+        logging.debug("[{}]: {}".format(column.column_name, diff))
 
     if SchemaDiff.COLUMN_CHANGED in diff:
-        raise InapplicableChangeException(diff)
+        raise InapplicableChangeError(diff)
 
     if SchemaDiff.TABLE_MISSING in diff:
         stmt = "CREATE TABLE {}.{} (__row_id SERIAL PRIMARY KEY)"

@@ -2,6 +2,7 @@ import psycopg2
 import psycopg2.sql
 import re
 import json
+import logging
 
 
 def write_to_db_from_csv(db_conn, csv_file, *,
@@ -32,13 +33,13 @@ def write_to_db_from_csv(db_conn, csv_file, *,
                     psycopg2.sql.Identifier(n) for n in header.split(',')
                 )
             )
-            print(copy_query.as_string(cursor))
-            print("Copying file")
+            logging.debug(copy_query.as_string(cursor))
+            logging.info("Copying file")
             cursor.copy_expert(sql=copy_query, file=file)
             db_conn.commit()
             cursor.close()
         except psycopg2.Error as err:
-            print(err)
+            logging.error(err)
 
 
 def upsert_to_db_from_csv(db_conn, csv_file, *,
@@ -69,7 +70,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                 table,
             )
             cursor.execute(create_table)
-            print(create_table.as_string(cursor))
+            logging.debug(create_table.as_string(cursor))
             db_conn.commit()
 
             # Import into TMP Table
@@ -80,8 +81,8 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                     psycopg2.sql.Identifier(n) for n in header.split(','),
                 ),
             )
-            print(copy_query.as_string(cursor))
-            print("Copying File")
+            logging.debug(copy_query.as_string(cursor))
+            logging.info("Copying File")
             cursor.copy_expert(sql=copy_query, file=file)
             db_conn.commit()
 
@@ -106,7 +107,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                 psycopg2.sql.SQL(set_strings),
             )
             cursor.execute(update_query)
-            print(update_query.as_string(cursor))
+            logging.debug(update_query.as_string(cursor))
             db_conn.commit()
 
             # Drop temporary table
@@ -115,10 +116,10 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                 tmp_table,
             )
 
-            print(drop_query.as_string(cursor))
+            logging.debug(drop_query.as_string(cursor))
             cursor.execute(drop_query)
             db_conn.commit()
             cursor.close()
 
         except psycopg2.Error as err:
-            print(err)
+            logging.error(err)
