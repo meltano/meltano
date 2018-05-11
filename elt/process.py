@@ -6,6 +6,7 @@ import logging
 
 
 def write_to_db_from_csv(db_conn, csv_file, *,
+                         primary_key,
                          table_schema,
                          table_name):
     """
@@ -21,14 +22,25 @@ def write_to_db_from_csv(db_conn, csv_file, *,
             header = next(file).rstrip().lower()
             schema = psycopg2.sql.Identifier(table_schema)
             table = psycopg2.sql.Identifier(table_name)
-
+            tmp_table = psycopg2.sql.Identifier(table_name + "_tmp")
             cursor = db_conn.cursor()
 
+            # Create temp table
+            create_table = psycopg2.sql.SQL("CREATE TEMP TABLE {0} AS SELECT * FROM {1}.{2} LIMIT 0").format(
+                tmp_table,
+                schema,
+                table,
+            )
+            cursor.execute(create_table)
+            logging.debug(create_table.as_string(cursor))
+            db_conn.commit()
+
+            # insert into temp table
             copy_query = psycopg2.sql.SQL(
                 "COPY {0}.{1} ({2}) FROM STDIN WITH DELIMITER AS ',' NULL AS 'null' CSV"
             ).format(
-                schema,
-                table,
+                psycopg2.sql.Identifier("pg_temp"),
+                tmp_table,
                 psycopg2.sql.SQL(', ').join(
                     psycopg2.sql.Identifier(n) for n in header.split(',')
                 )
@@ -36,7 +48,31 @@ def write_to_db_from_csv(db_conn, csv_file, *,
             logging.debug(copy_query.as_string(cursor))
             logging.info("Copying file")
             cursor.copy_expert(sql=copy_query, file=file)
+
+            # migrate to real table
+            update_query = psycopg2.sql.SQL("INSERT INTO {0}.{1} ({2}) SELECT {2} FROM {3}.{4} ON CONFLICT ({5}) DO NOTHING").format(
+                schema,
+                table,
+                psycopg2.sql.SQL(', ').join(
+                    psycopg2.sql.Identifier(n) for n in header.split(',')
+                ),
+                psycopg2.sql.Identifier("pg_temp"),
+                tmp_table,
+                psycopg2.sql.Identifier(primary_key),
+            )
+            cursor.execute(update_query)
+            logging.debug(update_query.as_string(cursor))
             db_conn.commit()
+
+            # Drop temporary table
+            drop_query = psycopg2.sql.SQL("DROP TABLE {0}.{1}").format(
+                psycopg2.sql.Identifier("pg_temp"),
+                tmp_table,
+            )
+            logging.debug(drop_query.as_string(cursor))
+            cursor.execute(drop_query)
+            db_conn.commit()
+
             cursor.close()
         except psycopg2.Error as err:
             logging.error(err)
