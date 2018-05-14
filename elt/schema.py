@@ -49,9 +49,10 @@ class Schema:
     def column_key(column: Column):
         return (column.table_name, column.column_name)
 
-    def __init__(self, name, columns: Sequence[Column] = []):
+    def __init__(self, name, columns: Sequence[Column] = [], primary_key_name='__row_id'):
         self.name = name
         self.tables = set()
+        self.primary_key_name = primary_key_name
         self.columns = OrderedDict()
 
         for column in columns:
@@ -79,7 +80,7 @@ class Schema:
         return {SchemaDiff.COLUMN_OK}
 
 
-def db_schema(db_conn, schema_name) -> Schema:
+def db_schema(db_conn, schema_name, primary_key_name='__row_id') -> Schema:
     """
     :db_conn: psycopg2 db_connection
     :schema: database schema
@@ -94,7 +95,7 @@ def db_schema(db_conn, schema_name) -> Schema:
     """, (schema_name,))
 
     columns = map(Column._make, cursor.fetchall())
-    return Schema(schema_name, columns)
+    return Schema(schema_name, columns, primary_key_name=primary_key_name)
 
 
 def ensure_schema_exists(db_conn, schema_name):
@@ -126,7 +127,8 @@ def schema_apply(db_conn, target_schema: Schema):
     """
     ensure_schema_exists(db_conn, target_schema.name)
 
-    schema = db_schema(db_conn, target_schema.name)
+    schema = db_schema(db_conn, target_schema.name,
+                       primary_key_name=target_schema.primary_key_name)
 
     results = ExceptionAggregator(InapplicableChangeError)
     schema_cursor = db_conn.cursor()
@@ -155,17 +157,21 @@ def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[Schema
         psycopg2.sql.Identifier(column.table_name),
     )
 
-    if SchemaDiff.COLUMN_OK in diff:
-        logging.debug("[{}]: {}".format(column.column_name, diff))
-
     if SchemaDiff.COLUMN_CHANGED in diff:
         raise InapplicableChangeError(diff)
 
     if SchemaDiff.TABLE_MISSING in diff:
-        stmt = "CREATE TABLE {}.{} (__row_id SERIAL PRIMARY KEY)"
-        sql = psycopg2.sql.SQL(stmt).format(*identifier)
+        stmt = "CREATE TABLE {}.{} ({} SERIAL PRIMARY KEY)"
+        sql = psycopg2.sql.SQL(stmt).format(
+            *identifier,
+            psycopg2.sql.Identifier(schema.primary_key_name)
+        )
+        logging.debug("Creating table {}.{}".format(*identifier))
         db_cursor.execute(sql)
         schema.add_table(column)
+
+    if SchemaDiff.COLUMN_OK not in diff:
+        logging.debug("[{}]: {}".format(column.column_name, diff))
 
     if SchemaDiff.COLUMN_MISSING in diff:
         stmt = "ALTER TABLE {}.{} ADD COLUMN {} %s"

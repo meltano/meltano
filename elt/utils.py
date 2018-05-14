@@ -3,6 +3,8 @@ import psycopg2
 import logging
 
 from functools import reduce
+from elt.job import describe_schema
+from elt.schema import schema_apply
 
 
 db_config_keys = [
@@ -43,3 +45,13 @@ def setup_logging(args):
     logging.basicConfig(stream=sys.stdout,
                         format="[%(levelname)s][%(asctime)s] %(message)s",
                         level=int(args.log_level))
+
+
+def setup_db(args):
+    with db_open(**vars(args)) as db:
+        schema_apply(db, describe_schema())
+
+
+def setup_elt(args):
+    setup_logging(args)
+    setup_db(args)

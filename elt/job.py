@@ -3,6 +3,31 @@ import json
 
 from psycopg2.sql import Identifier, SQL, Placeholder
 from enum import Enum
+from elt.schema import Schema, Column, DBType
+from functools import partial
+
+
+PG_SCHEMA = 'meltano'
+PG_TABLE = 'job_runs'
+PRIMARY_KEY = 'id'
+
+
+def describe_schema() -> Schema:
+    def job_column(name, data_type, is_nullable=False):
+        return Column(table_name=PG_TABLE,
+                      table_schema=PG_SCHEMA,
+                      column_name=name,
+                      data_type=data_type.value,
+                      is_nullable=is_nullable,
+                      is_mapping_key=False)
+
+    return Schema(PG_SCHEMA, [
+        job_column('elt_uri', DBType.String),
+        job_column('state', DBType.String),
+        job_column('started_at', DBType.Timestamp, is_nullable=True),
+        job_column('ended_at', DBType.Timestamp, is_nullable=True),
+        job_column('payload', DBType.JSON, is_nullable=True),
+    ], primary_key_name='id')
 
 
 class State(Enum):
