@@ -3,6 +3,7 @@ import json
 
 from psycopg2.sql import Identifier, SQL, Placeholder
 from enum import Enum
+from elt.db import DB
 from elt.schema import Schema, Column, DBType
 from elt.error import Error
 from functools import partial
@@ -121,35 +122,32 @@ class Job:
         }
 
     @classmethod
-    def save(self, cursor, job, commit=False):
+    def save(self, job):
         job_serial = job.__dict__()
         columns, values = (job_serial.keys(), job_serial.values())
 
         insert = SQL(("INSERT INTO {}.{} ({}) "
                       "VALUES ({}) "))
 
-        cursor.execute(
-            insert.format(
-                *self.identifier(),
-                SQL(",").join(map(Identifier, columns)),
-                SQL(",").join(Placeholder() * len(values)),
-            ),
-            list(values),
-        )
+        with DB.open() as db, db.cursor() as cursor:
+            cursor.execute(
+                insert.format(
+                    *self.identifier(),
+                    SQL(",").join(map(Identifier, columns)),
+                    SQL(",").join(Placeholder() * len(values)),
+                    ),
+                list(values),
+            )
+            db.commit()
 
-        if commit:
-            cursor.commit()
-
-        return True
+        return job
 
     @classmethod
-    def for_elt(self, cursor, elt_uri, limit=100):
+    def for_elt(self, elt_uri, limit=100):
         fetch = SQL(("SELECT elt_uri, state, started_at, ended_at, payload FROM {}.{} "
                      "WHERE elt_uri = %s "
                      "ORDER BY started_at DESC "
                      "LIMIT %s ")).format(*self.identifier())
-
-        cursor.execute(fetch, (elt_uri, limit))
 
         def as_job(row):
             return Job(row[0],
@@ -158,4 +156,6 @@ class Job:
                        ended_at=row[3],
                        payload=row[4])
 
-        return list(map(as_job, cursor.fetchall()))
+        with DB.open() as db, db.cursor() as cursor:
+            cursor.execute(fetch, (elt_uri, limit))
+            return list(map(as_job, cursor.fetchall()))

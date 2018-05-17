@@ -3,29 +3,6 @@ import psycopg2
 import logging
 
 from functools import reduce
-from elt.job import describe_schema
-from elt.schema import schema_apply
-
-
-db_config_keys = [
-    "host",
-    "port",
-    "user",
-    "password",
-    "database",
-]
-
-
-class db_open:
-    def __init__(self, **kwargs):
-        self.config = {k: kwargs[k] for k in db_config_keys}
-
-    def __enter__(self, **kwargs):
-        self.connection = psycopg2.connect(**self.config)
-        return self.connection
-
-    def __exit__(self, type, value, traceback):
-        self.connection.close()
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
@@ -45,13 +22,3 @@ def setup_logging(args):
     logging.basicConfig(stream=sys.stdout,
                         format="[%(levelname)s][%(asctime)s] %(message)s",
                         level=int(args.log_level))
-
-
-def setup_db(args):
-    with db_open(**vars(args)) as db:
-        schema_apply(db, describe_schema())
-
-
-def setup_elt(args):
-    setup_logging(args)
-    setup_db(args)

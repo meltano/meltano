@@ -9,20 +9,20 @@ def sample_job(payload={}):
                payload=payload)
 
 
-def test_save(dbcursor):
-    assert(Job.save(dbcursor, sample_job()))
+def test_save(db):
+    assert(Job.save(sample_job()))
 
 
-def test_load(dbcursor):
+def test_load(db):
     for i in range(0, 10):
-        Job.save(dbcursor, sample_job({'key': i}))
+        Job.save(sample_job({'key': i}))
 
-    jobs = Job.for_elt(dbcursor, 'elt://bizops/sample-elt')
+    jobs = Job.for_elt('elt://bizops/sample-elt')
     [print(x.__dict__()) for x in jobs]
     assert(len(jobs) == 10)
 
 
-def test_transit(dbcursor):
+def test_transit(db):
     j = sample_job()
 
     transition = j.transit(State.RUNNING)
@@ -33,4 +33,4 @@ def test_transit(dbcursor):
     assert(transition == (State.RUNNING, State.SUCCESS))
     j.ended_at = datetime.utcnow()
 
-    Job.save(dbcursor, j)
+    Job.save(j)
