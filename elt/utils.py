@@ -3,6 +3,7 @@ import psycopg2
 import logging
 
 from functools import reduce
+from elt.db import DB
 
 
 # from https://github.com/jonathanj/compose/blob/master/compose.py
@@ -17,6 +18,11 @@ def compose(*fs):
     """
     return reduce(lambda f, g: lambda x: f(g(x)), fs, lambda x: x)
 
+def setup_db(args=None):
+    if args is None:
+        DB.setup()
+    else:
+        DB.setup(**vars(args))
 
 def setup_logging(args):
     logging.basicConfig(stream=sys.stdout,

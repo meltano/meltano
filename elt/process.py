@@ -8,7 +8,8 @@ import logging
 def write_to_db_from_csv(db_conn, csv_file, *,
                          primary_key,
                          table_schema,
-                         table_name):
+                         table_name,
+                         header_transform=lambda x: x):
     """
     Write to Postgres DB from a CSV
 
@@ -81,7 +82,8 @@ def write_to_db_from_csv(db_conn, csv_file, *,
 def upsert_to_db_from_csv(db_conn, csv_file, *,
                           primary_key,
                           table_schema,
-                          table_name):
+                          table_name,
+                          header_transform=lambda x: x):
     """
     Upsert to Postgres DB from a CSV
 
@@ -114,7 +116,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                 psycopg2.sql.Identifier("pg_temp"),
                 tmp_table,
                 psycopg2.sql.SQL(', ').join(
-                    psycopg2.sql.Identifier(n) for n in header.split(','),
+                    psycopg2.sql.Identifier(header_transform(n)) for n in header.split(','),
                 ),
             )
             logging.debug(copy_query.as_string(cursor))

@@ -59,7 +59,7 @@ class State(Enum):
 
 class Job:
     """
-    Represents a Job at a certain state (JobState).
+    Represents a Job at a certain state (State).
     """
     schema_name = PG_SCHEMA
     table_name = PG_TABLE
@@ -69,10 +69,12 @@ class Job:
         return map(Identifier, (self.schema_name, self.table_name))
 
     def __init__(self, elt_uri,
+                 id=None,
                  state=State.IDLE,
                  started_at=None,
                  ended_at=None,
                  payload={}):
+        self.id = id
         self.elt_uri = elt_uri
         self._state = state
         self._started_at = started_at
@@ -138,7 +140,6 @@ class Job:
                     ),
                 list(values),
             )
-            db.commit()
 
         return job
 

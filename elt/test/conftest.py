@@ -2,16 +2,17 @@ import os
 import pytest
 import psycopg2
 import psycopg2.sql as sql
+import logging
 
 from elt.db import DB
 
 class NoCommitConnection(psycopg2.extensions.connection):
     def commit(self):
-        pass
+        print("db.commit() bypass for pytest")
 
 
 @pytest.fixture(scope='session')
-def db_args(request):
+def db_setup(request):
     args = {
         'database': "pytest",
         'host': os.getenv("PG_ADDRESS"),
@@ -19,15 +20,15 @@ def db_args(request):
         'user': os.getenv("PG_USERNAME"),
         'password': os.getenv("PG_PASSWORD"),
     }
-    DB.register(**args)
     DB.set_connection_class(NoCommitConnection)
+    DB.setup(**args)
 
 @pytest.fixture()
-def db(request, db_args):
+def db(request, db_setup):
     connection = DB.connect()
 
     def teardown():
-        connection.close()
+        connection.rollback()
 
     request.addfinalizer(teardown)
     return connection
