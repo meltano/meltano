@@ -49,11 +49,12 @@ class Schema:
     def column_key(column: Column):
         return (column.table_name, column.column_name)
 
-    def __init__(self, name, columns: Sequence[Column] = [], primary_key_name='__row_id'):
+    def __init__(self, name, columns: Sequence[Column] = [],
+                 primary_key_name='__row_id'):
         self.name = name
         self.tables = set()
-        self.primary_key_name = primary_key_name
         self.columns = OrderedDict()
+        self.primary_key_name = primary_key_name
 
         for column in columns:
             self.tables.add(Schema.table_key(column))
@@ -80,7 +81,7 @@ class Schema:
         return {SchemaDiff.COLUMN_OK}
 
 
-def db_schema(db_conn, schema_name, primary_key_name='__row_id') -> Schema:
+def db_schema(db_conn, schema_name) -> Schema:
     """
     :db_conn: psycopg2 db_connection
     :schema: database schema
@@ -95,7 +96,7 @@ def db_schema(db_conn, schema_name, primary_key_name='__row_id') -> Schema:
     """, (schema_name,))
 
     columns = map(Column._make, cursor.fetchall())
-    return Schema(schema_name, columns, primary_key_name=primary_key_name)
+    return Schema(schema_name, columns)
 
 
 def ensure_schema_exists(db_conn, schema_name):
@@ -127,14 +128,14 @@ def schema_apply(db_conn, target_schema: Schema):
     """
     ensure_schema_exists(db_conn, target_schema.name)
 
-    schema = db_schema(db_conn, target_schema.name,
-                       primary_key_name=target_schema.primary_key_name)
+    schema = db_schema(db_conn, target_schema.name)
 
     results = ExceptionAggregator(InapplicableChangeError)
     schema_cursor = db_conn.cursor()
 
     for name, col in target_schema.columns.items():
-        results.call(schema_apply_column, schema_cursor, schema, col)
+        results.call(schema_apply_column,
+                     schema_cursor, schema, target_schema, col)
 
     results.raise_aggregate()
 
@@ -142,13 +143,18 @@ def schema_apply(db_conn, target_schema: Schema):
     db_conn.commit()
 
 
-def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[SchemaDiff]:
+def schema_apply_column(db_cursor,
+                        schema: Schema,
+                        target_schema: Schema,
+                        column: Column) -> Set[SchemaDiff]:
     """
     Apply the schema to the current database connection
     adapting tables as it goes. Currently only supports
     adding new columns.
 
     :cursor: A database connection
+    :schema: Source schema (database)
+    :target_schema: Target schema (to apply)
     :column: the column to apply
     """
     diff = schema.column_diff(column)
@@ -157,21 +163,18 @@ def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[Schema
         psycopg2.sql.Identifier(column.table_name),
     )
 
+    if SchemaDiff.COLUMN_OK in diff:
+        logging.debug("[{}]: {}".format(column.column_name, diff))
+
     if SchemaDiff.COLUMN_CHANGED in diff:
         raise InapplicableChangeError(diff)
 
     if SchemaDiff.TABLE_MISSING in diff:
         stmt = "CREATE TABLE {}.{} ({} SERIAL PRIMARY KEY)"
-        sql = psycopg2.sql.SQL(stmt).format(
-            *identifier,
-            psycopg2.sql.Identifier(schema.primary_key_name)
-        )
-        logging.debug("Creating table {}.{}".format(*identifier))
+        sql = psycopg2.sql.SQL(stmt).format(*identifier,
+                                            psycopg2.sql.Identifier(target_schema.primary_key_name))
         db_cursor.execute(sql)
         schema.add_table(column)
-
-    if SchemaDiff.COLUMN_OK not in diff:
-        logging.debug("[{}]: {}".format(column.column_name, diff))
 
     if SchemaDiff.COLUMN_MISSING in diff:
         stmt = "ALTER TABLE {}.{} ADD COLUMN {} %s"

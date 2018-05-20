@@ -1,5 +1,11 @@
 import psycopg2
 import os
+import contextlib
+
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
+
 
 db_config_keys = [
     "host",
@@ -8,6 +14,15 @@ db_config_keys = [
     "password",
     "database",
 ]
+
+
+def engine_uri(**db_config):
+    return "postgresql://{user}:{password}@{host}:{port}/{database}".format(**db_config)
+
+
+SystemModel = declarative_base(metadata=MetaData(schema='meltano'))
+Model = declarative_base()
+Session = sessionmaker()
 
 
 class DB:
@@ -20,12 +35,14 @@ class DB:
     }
     connection_class = psycopg2.extensions.connection
     _connection = None
+    _engine = None
 
     @classmethod
     def setup(self, open_persistent=False, **kwargs):
         self.db_config.update({k: kwargs[k] for k in db_config_keys if k in kwargs})
-        # self._engine = create_engine(self.engine_uri())
         self._connection = self.connect()
+        self._engine = create_engine(engine_uri(**self.db_config), creator=self.connect)
+        Session.configure(bind=self._engine)
 
     @classmethod
     def connect(self):
@@ -36,12 +53,12 @@ class DB:
                                 connection_factory=self.connection_class)
 
     @classmethod
-    def open(self):
-        return db_open()
+    def session(self):
+        return session_open()
 
     @classmethod
-    def engine_uri():
-       return "postgresql://{username}:{password}@{host}:{port}/{database}".format(**self.db_config)
+    def open(self):
+        return db_open()
 
     @classmethod
     def set_connection_class(self, cls):
@@ -49,16 +66,31 @@ class DB:
 
     @classmethod
     def close(self):
-        if self.connection is not None:
-            self.connection.close()
+        if self.engine is not None:
+            self._engine.dispose()
 
-class db_open:
-    def __enter__(self):
-        self.connection = DB.connect()
-        return self.connection
 
-    def __exit__(self, ex_type, ex_value, traceback):
-        if ex_value is None:
-            self.connection.commit()
-        else:
-            self.connection.rollback()
+@contextlib.contextmanager
+def db_open():
+    """Provide a raw connection in a transaction"""
+    connection = DB.connect()
+    try:
+        yield connection
+        connection.commit()
+    except:
+        connection.rollback()
+        raise
+
+
+@contextlib.contextmanager
+def session_open():
+    """Provide a transactional scope around a series of operations."""
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
