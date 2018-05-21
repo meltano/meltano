@@ -1,6 +1,7 @@
 import psycopg2
 import json
 import sqlalchemy.types as types
+import logging
 
 from psycopg2.sql import Identifier, SQL, Placeholder
 from enum import Enum
@@ -51,6 +52,10 @@ class Job(SystemModel):
     ended_at = Column(types.DateTime)
     payload = Column(types.JSON)
 
+    def __init__(self, **kwargs):
+        kwargs['state'] = kwargs.get('state', State.IDLE)
+        super().__init__(**kwargs)
+
     def transit(self, state: State) -> (State, State):
         transition = (self.state, state)
 
@@ -58,6 +63,7 @@ class Job(SystemModel):
             raise ImpossibleTransitionError(transition)
 
         self.state = state
+        logging.debug("Job {} → {}.".format(self, state))
         return transition
 
     def __repr__(self):

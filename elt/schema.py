@@ -190,7 +190,6 @@ def schema_apply_column(db_cursor,
         if column.is_mapping_key:
             constraint = "{table}_{column}_mapping_key".format(table=column.table_name,
                                                                column=column.column_name)
-
             stmt = "ALTER TABLE {}.{} ADD CONSTRAINT {} UNIQUE ({})"
             sql = psycopg2.sql.SQL(stmt).format(
                 *identifier,
