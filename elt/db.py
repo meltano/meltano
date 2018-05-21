@@ -1,9 +1,12 @@
 import psycopg2
 import os
 import contextlib
+import logging
+
+from psycopg2.extras import LoggingConnection
 
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -22,7 +25,9 @@ def engine_uri(**db_config):
 
 SystemModel = declarative_base(metadata=MetaData(schema='meltano'))
 Model = declarative_base()
-Session = sessionmaker()
+
+session_factory = sessionmaker()
+Session = scoped_session(session_factory)
 
 
 class DB:
@@ -33,7 +38,7 @@ class DB:
         'password': os.getenv('PG_PASSWORD'),
         'database': os.getenv('PG_DATABASE'),
     }
-    connection_class = psycopg2.extensions.connection
+    connection_class = LoggingConnection
     _connection = None
     _engine = None
 
@@ -46,11 +51,20 @@ class DB:
 
     @classmethod
     def connect(self):
+        """
+        Non thread-safe singleton database connection.
+        """
         if self._connection is not None:
             return self._connection
 
-        return psycopg2.connect(**self.db_config,
+        conn = psycopg2.connect(**self.db_config,
                                 connection_factory=self.connection_class)
+        conn.initialize(logging.getLogger(__name__))
+        return conn
+
+    @classmethod
+    def engine(self):
+        return self._engine
 
     @classmethod
     def session(self):
@@ -72,8 +86,9 @@ class DB:
 
 @contextlib.contextmanager
 def db_open():
-    """Provide a raw connection in a transaction"""
+    """Provide a raw connection in a transaction."""
     connection = DB.connect()
+
     try:
         yield connection
         connection.commit()
@@ -92,5 +107,3 @@ def session_open():
     except:
         session.rollback()
         raise
-    finally:
-        session.close()

@@ -1,4 +1,5 @@
 import elt.error
+import logging
 
 
 def do_raise(error_type, *args):
@@ -14,7 +15,7 @@ def test_aggregate_default():
     try:
         aggregator.raise_aggregate()
     except Exception as e:
-        print(str(e))
+        logging.info(str(e))
 
 
 def test_aggregate_custom():
@@ -30,7 +31,7 @@ def test_aggregate_custom():
     try:
         aggregator.raise_aggregate()
     except CustomError as custom:
-        print(str(custom))
+        logging.info(str(custom))
     except elt.error.Error as err:
         raise "Catched by the elt.error.Error clause."
     except Exception as e:

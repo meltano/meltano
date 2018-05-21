@@ -10,26 +10,31 @@ def sample_job(payload={}):
                payload=payload)
 
 
-def test_save(db):
+def test_save(session):
+    job = sample_job()
+    session.add(job)
+    session.commit()
+
+    assert(job.id > 0)
+
+
+def test_save_raw(db):
     job = sample_job()
     Job.save(job)
-    assert(job)
+
+    assert(job.id > 0)
 
 
-def test_load(db):
-    with DB.session() as session:
-        [session.add(sample_job({'key': i})) for i in range(0, 10)]
-        import pdb; pdb.set_trace()
-        session.flush()
+def test_load(session):
+    [session.add(sample_job({'key': i})) for i in range(0, 10)]
+    session.commit()
 
-    import pdb; pdb.set_trace()
-    with DB.session() as s:
-        jobs = s.query(Job).filter_by(elt_uri='elt://bizops/sample-elt')
+    jobs = session.query(Job).filter_by(elt_uri='elt://bizops/sample-elt')
 
     assert(len(jobs.all()) == 10)
 
 
-def test_transit(db):
+def test_transit(session):
     j = sample_job()
 
     transition = j.transit(State.RUNNING)
@@ -40,4 +45,4 @@ def test_transit(db):
     assert(transition == (State.RUNNING, State.SUCCESS))
     j.ended_at = datetime.utcnow()
 
-    Job.save(j)
+    session.add(j)
