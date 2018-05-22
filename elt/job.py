@@ -9,7 +9,8 @@ from functools import partial
 from elt.db import DB, SystemModel
 from elt.schema import Schema, Column as SchemaColumn, DBType
 from elt.error import Error
-from sqlalchemy import Column
+from sqlalchemy import inspect, Column
+from sqlalchemy.ext.mutable import MutableDict
 
 
 PG_SCHEMA = 'meltano'
@@ -50,7 +51,7 @@ class Job(SystemModel):
     state = Column(types.Enum(State))
     started_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
-    payload = Column(types.JSON)
+    payload = Column(MutableDict.as_mutable(types.JSON))
 
     def __init__(self, **kwargs):
         kwargs['state'] = kwargs.get('state', State.IDLE)
