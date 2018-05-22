@@ -31,10 +31,11 @@ class ImpossibleTransitionError(Error):
 
 
 class State(Enum):
-    SUCCESS = (2, ())
-    FAIL = (3, ())
-    RUNNING = (1, ('SUCCESS', 'FAIL'))
     IDLE = (0, ('RUNNING', 'FAIL'))
+    RUNNING = (1, ('SUCCESS', 'FAIL'))
+    SUCCESS = (2, ())
+    FAIL = (3, ('RUNNING',))
+    DEAD = (4, ())
 
     def transitions(self):
         return self.value[1]
@@ -59,6 +60,9 @@ class Job(SystemModel):
 
     def transit(self, state: State) -> (State, State):
         transition = (self.state, state)
+
+        if self.state is state:
+            return transition
 
         if state.name not in self.state.transitions():
             raise ImpossibleTransitionError(transition)
