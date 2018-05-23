@@ -43,6 +43,10 @@ Column = namedtuple('Column', [
 
 
 class Schema:
+    def mapping_key_name(column: Column):
+        return "{}_{}_mapping_key".format(column.table_name,
+                                          column.column_name)
+
     def table_key(column: Column):
         return column.table_name
 
@@ -92,6 +96,7 @@ def db_schema(db_conn, schema_name) -> Schema:
     SELECT table_schema, table_name, column_name, udt_name::regtype as data_type, is_nullable = 'YES', NULL as is_mapping_key
     FROM information_schema.columns
     WHERE table_schema = %s
+    AND column_name != '__row_id'
     ORDER BY ordinal_position;
     """, (schema_name,))
 
@@ -135,7 +140,10 @@ def schema_apply(db_conn, target_schema: Schema):
 
     for name, col in target_schema.columns.items():
         results.call(schema_apply_column,
-                     schema_cursor, schema, target_schema, col)
+                     schema_cursor,
+                     schema,
+                     target_schema,
+                     col)
 
     results.raise_aggregate()
 
@@ -157,6 +165,7 @@ def schema_apply_column(db_cursor,
     :target_schema: Target schema (to apply)
     :column: the column to apply
     """
+
     diff = schema.column_diff(column)
     identifier = (
         psycopg2.sql.Identifier(column.table_schema),
@@ -188,12 +197,10 @@ def schema_apply_column(db_cursor,
         db_cursor.execute(sql)
 
         if column.is_mapping_key:
-            constraint = "{table}_{column}_mapping_key".format(table=column.table_name,
-                                                               column=column.column_name)
             stmt = "ALTER TABLE {}.{} ADD CONSTRAINT {} UNIQUE ({})"
             sql = psycopg2.sql.SQL(stmt).format(
                 *identifier,
-                psycopg2.sql.Identifier(constraint),
+                psycopg2.sql.Identifier(Schema.mapping_key_name(column)),
                 psycopg2.sql.Identifier(column.column_name),
             )
             db_cursor.execute(sql)
