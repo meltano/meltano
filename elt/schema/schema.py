@@ -85,10 +85,8 @@ class Schema:
         if column.is_mapping_key and not db_col.is_mapping_key:
             return {SchemaDiff.COLUMN_MAPPING_KEY_MISSING}
 
-        if column.data_type != db_col.data_type \
-          or column.is_nullable != db_col.is_nullable:
+        if column.data_type != db_col.data_type:
             return {SchemaDiff.COLUMN_CHANGED}
-
 
         return {SchemaDiff.COLUMN_OK}
 
@@ -192,7 +190,7 @@ def schema_apply_column(db_cursor,
         logging.debug("[{}]: {}".format(column.column_name, diff))
 
     if SchemaDiff.COLUMN_CHANGED in diff:
-        raise InapplicableChangeError(diff)
+        raise InapplicableChangeError("{}: {}".format(column, diff))
 
     if SchemaDiff.TABLE_MISSING in diff:
         stmt = "CREATE TABLE {}.{} ({} SERIAL PRIMARY KEY)"
