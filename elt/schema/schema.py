@@ -29,7 +29,8 @@ class SchemaDiff(Enum):
     COLUMN_OK = 1
     COLUMN_CHANGED = 2
     COLUMN_MISSING = 3
-    TABLE_MISSING = 4
+    COLUMN_MAPPING_KEY_MISSING = 4
+    TABLE_MISSING = 5
 
 
 Column = namedtuple('Column', [
@@ -75,12 +76,19 @@ class Schema:
             return {SchemaDiff.TABLE_MISSING, SchemaDiff.COLUMN_MISSING}
 
         if column_key not in self.columns:
-            return {SchemaDiff.COLUMN_MISSING}
+            diffs = {SchemaDiff.COLUMN_MISSING}
+            if column.is_mapping_key: diffs.add(SchemaDiff.COLUMN_MAPPING_KEY_MISSING)
+            return diffs
 
         db_col = self.columns[column_key]
+
+        if column.is_mapping_key and not db_col.is_mapping_key:
+            return {SchemaDiff.COLUMN_MAPPING_KEY_MISSING}
+
         if column.data_type != db_col.data_type \
           or column.is_nullable != db_col.is_nullable:
             return {SchemaDiff.COLUMN_CHANGED}
+
 
         return {SchemaDiff.COLUMN_OK}
 
@@ -93,10 +101,18 @@ def db_schema(db_conn, schema_name) -> Schema:
     cursor = db_conn.cursor()
 
     cursor.execute("""
-    SELECT table_schema, table_name, column_name, udt_name::regtype as data_type, is_nullable = 'YES', NULL as is_mapping_key
-    FROM information_schema.columns
-    WHERE table_schema = %s
-    AND column_name != '__row_id'
+    SELECT c.table_schema,
+           c.table_name,
+           c.column_name,
+           c.udt_name::regtype as data_type,
+           is_nullable = 'YES',
+           (SELECT true FROM information_schema.table_constraints tc
+            WHERE tc.constraint_name = format('%%s_%%s_mapping_key', c.table_name, c.column_name)
+            AND tc.table_name = c.table_name
+            AND tc.table_schema = c.table_schema) as is_mapping_key
+    FROM information_schema.columns c
+    WHERE c.table_schema = %s
+    AND c.column_name != '__row_id'
     ORDER BY ordinal_position;
     """, (schema_name,))
 
@@ -196,13 +212,13 @@ def schema_apply_column(db_cursor,
         )
         db_cursor.execute(sql)
 
-        if column.is_mapping_key:
-            stmt = "ALTER TABLE {}.{} ADD CONSTRAINT {} UNIQUE ({})"
-            sql = psycopg2.sql.SQL(stmt).format(
-                *identifier,
-                psycopg2.sql.Identifier(Schema.mapping_key_name(column)),
-                psycopg2.sql.Identifier(column.column_name),
-            )
-            db_cursor.execute(sql)
+    if SchemaDiff.COLUMN_MAPPING_KEY_MISSING in diff:
+        stmt = "ALTER TABLE {}.{} ADD CONSTRAINT {} UNIQUE ({})"
+        sql = psycopg2.sql.SQL(stmt).format(
+            *identifier,
+            psycopg2.sql.Identifier(Schema.mapping_key_name(column)),
+            psycopg2.sql.Identifier(column.column_name),
+        )
+        db_cursor.execute(sql)
 
     return diff
