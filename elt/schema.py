@@ -179,7 +179,9 @@ def schema_apply_column(db_cursor, schema: Schema, column: Column) -> Set[Schema
         db_cursor.execute(sql)
 
         if column.is_mapping_key:
-            constraint = "mapping_key_{}".format(column.column_name)
+            constraint = "{table}_{column}_mapping_key".format(table=column.table_name,
+                                                               column=column.column_name)
+
             stmt = "ALTER TABLE {}.{} ADD CONSTRAINT {} UNIQUE ({})"
             sql = psycopg2.sql.SQL(stmt).format(
                 *identifier,
