@@ -146,7 +146,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
             cursor.copy_expert(sql=copy_query, file=file)
             db_conn.commit()
 
-            update_columns = [col for col in columns.split(',') if col != primary_key]
+            update_columns = [col for col in header.split(',') if col != primary_key]
             update_query = psycopg2.sql.SQL("INSERT INTO {0}.{1} ({2}) SELECT {2} FROM {3}.{4} ON CONFLICT ({5}) DO UPDATE SET {6}").format(
                 schema,
                 table,

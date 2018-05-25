@@ -110,6 +110,6 @@ def with_error_exit_code(main):
             exit(err.exit_code())
         except Exception as e:
             logging.error(e)
-            exit(ExitCode.FAIL)
+            raise e
 
     return f

@@ -43,7 +43,7 @@ class DB:
     _engine = None
 
     @classmethod
-    def setup(self, open_persistent=False, **kwargs):
+    def setup(self, **kwargs):
         self.db_config.update({k: kwargs[k] for k in db_config_keys if k in kwargs})
         self._connection = self.connect()
         self._engine = create_engine(engine_uri(**self.db_config), creator=self.connect)
