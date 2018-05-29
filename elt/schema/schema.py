@@ -73,7 +73,12 @@ class Schema:
         column_key = Schema.column_key(column)
 
         if table_key not in self.tables:
-            return {SchemaDiff.TABLE_MISSING, SchemaDiff.COLUMN_MISSING}
+            if column.is_mapping_key:
+                return {SchemaDiff.TABLE_MISSING,
+                        SchemaDiff.COLUMN_MISSING,
+                        SchemaDiff.COLUMN_MAPPING_KEY_MISSING}
+            else:
+                return {SchemaDiff.TABLE_MISSING, SchemaDiff.COLUMN_MISSING}
 
         if column_key not in self.columns:
             diffs = {SchemaDiff.COLUMN_MISSING}
