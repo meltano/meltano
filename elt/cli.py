@@ -19,6 +19,18 @@ class OptionEnum(Enum):
         return hash(self.value)
 
 
+class ActionEnum(Enum):
+    @classmethod
+    def from_str(cls, name):
+        return cls[name.upper()]
+
+    def __str__(self):
+        return self.value[0]
+
+    def __call__(self, args):
+        return self.value[1](args)
+
+
 class ExportOutput(OptionEnum):
     DB = "db"
     FILE = "file"
