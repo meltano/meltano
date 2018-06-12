@@ -6,7 +6,7 @@ import psycopg2.extras
 from typing import Sequence, Callable, Set
 from enum import Enum
 from collections import OrderedDict, namedtuple
-from elt.error import ExceptionAggregator, InapplicableChangeError
+from elt.error import ExceptionAggregator, SchemaError, InapplicableChangeError
 
 
 class DBType(str, Enum):
@@ -94,6 +94,12 @@ class Schema:
             return {SchemaDiff.COLUMN_CHANGED}
 
         return {SchemaDiff.COLUMN_OK}
+
+    def __getitem__(self, column_key):
+        try:
+            return self.columns[column_key]
+        except KeyError as e:
+            raise SchemaError("{}.{} is missing.".format(*column_key))
 
 
 def db_schema(db_conn, schema_name) -> Schema:

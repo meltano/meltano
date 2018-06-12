@@ -60,6 +60,7 @@ class SchemaError(Error):
     """Base exception for schema errors."""
 
 
+@aggregate
 class InapplicableChangeError(SchemaError):
     """Raise for inapplicable schema changes."""
 
@@ -96,7 +97,7 @@ class ExceptionAggregator:
             aggregate_type = self.etype.Aggregate
 
         if len(self.failures):
-            exceptions = map(lambda f: f[0], self.failures)
+            exceptions = [f[0] for f in self.failures]
             raise aggregate_type(exceptions)
 
 
@@ -106,10 +107,10 @@ def with_error_exit_code(main):
         try:
             main(*args, **kwargs)
         except Error as err:
-            logging.error(err)
+            logging.error(str(err))
             exit(err.exit_code())
         except Exception as e:
-            logging.error(e)
+            logging.error(str(e))
             raise e
 
     return f
