@@ -1,4 +1,4 @@
-import elt.schema.serializer as serializer
+import elt.schema.serializers.meltano as serializer
 
 from functools import partial
 from itertools import chain

@@ -1,12 +1,17 @@
 import argparse
+import sys
 
 from enum import Enum
 from elt.cli import ActionEnum, OptionEnum, parser_logging
 from elt.utils import setup_logging
 
+from elt.schema.serializers.singer import load
+from elt.schema.serializers.meltano import dump
+
 
 def action_convert(args):
-    pass
+    schema = load("singer", sys.stdin)
+    dump(sys.stdout, schema)
 
 
 class SchemaType(OptionEnum):
