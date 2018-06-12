@@ -68,6 +68,11 @@ class Schema:
     def add_table(self, column: Column):
         self.tables.add(Schema.table_key(column))
 
+    def add_column(self, column: Column):
+        self.add_table(column)
+        # TODO: raise on onverwrite?
+        self.columns[Schema.column_key(column)] = column
+
     def column_diff(self, column: Column) -> Set[SchemaDiff]:
         table_key = Schema.table_key(column)
         column_key = Schema.column_key(column)
