@@ -1,0 +1,12 @@
+[[source]]
+verify_ssl = true
+url = "https://pypi.org/simple"
+name = "pypi"
+
+[packages]
+"psycopg2-binary" = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.5"
