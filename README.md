@@ -43,3 +43,13 @@ From the shell:
 >>> from app import db
 >>> db.create_all()
 ```
+```
+pipenv install
+```
+
+## Run API For Real
+
+```
+cd api
+flask run
+```
