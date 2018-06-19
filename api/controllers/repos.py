@@ -12,7 +12,7 @@ from git import Repo
 
 from models.projects import Project
 from models.data import (
-  Model, Explore, View, Dimension, Measure
+  Model, Explore, View, Dimension, Measure, Join
 )
 
 bp = Blueprint('repos', __name__, url_prefix='/repos')
@@ -99,13 +99,12 @@ def db_import():
     if(file['_file_type'] == 'view'):
       file_view = file['views'][0]
       new_view_settings = {}
-      if 'label' in new_view_settings:
+      if 'label' in file_view:
         new_view_settings['label'] = file_view['label']
-      if 'sql_table_name' in new_view_settings:
+      if 'sql_table_name' in file_view:
         new_view_settings['sql_table_name'] = file_view['sql_table_name']
-      new_view_settings['_view'] = file_view['_view']
       new_view_settings = json.dumps(new_view_settings)
-      new_view = View(new_view_settings)
+      new_view = View(file_view['_view'], new_view_settings)
       for dimension in file_view['dimensions']:
         new_dimension_settings = {}
         if 'hidden' in dimension:
@@ -118,11 +117,10 @@ def db_import():
           new_dimension_settings['type'] = dimension['type']
         if 'sql' in dimension:
           new_dimension_settings['sql'] = dimension['sql']
-        new_dimension_settings['_dimension'] = dimension['_dimension']
         new_dimension_settings['_type'] = dimension['_type']
         new_dimension_settings['_n'] = dimension['_n']
         new_dimension_settings = json.dumps(new_dimension_settings)
-        new_dimension = Dimension(new_dimension_settings)
+        new_dimension = Dimension(dimension['_dimension'], new_dimension_settings)
         new_view.dimensions.append(new_dimension)
         db.session.add(new_dimension)
         new_view.dimensions.append(new_dimension)
@@ -134,28 +132,59 @@ def db_import():
       model_settings['label'] = model['label']
     model_settings['include'] = model['include']
     model_settings['connection'] = model['connection']
-    model_settings['_model'] = model['_model']
     model_settings['_type'] = model['_type']
 
     model_settings = json.dumps(model_settings)
-    new_model = Model(model_settings)
+    new_model = Model(model['_model'], model_settings)
+
+    # Set the explores for the model
     if len(model['explores']):
       for explore in model['explores']:
         explore_settings = {}
         if 'label' in explore:
           explore_settings['label'] = explore['label']
+        if 'view_label' in explore:
+          explore_settings['view_label'] = explore['view_label']
         if 'description' in explore:
           explore_settings['description'] = explore['description']
-        explore_settings['_explore'] = explore['_explore']
         explore_settings['_type'] = explore['_type']
 
-
-
         explore_settings = json.dumps(explore_settings)
-        new_explore = Explore(explore_settings)
+        new_explore = Explore(explore['_explore'], explore_settings)
+
+        # Set the view for the explore
+        # Name the explore from `from` or from name of explore itself
+        view_name = explore.get('from', explore['_explore'])
+        connected_view = View.query.filter_by(name=view_name).first()
+        new_explore.views.append(connected_view)
+        if 'joins' in explore:
+          explore_joins = explore['joins']
+          for join in explore_joins:
+            explore_join_settings = {}
+            if 'view_label' in join:
+              explore_join_settings['view_label'] = join['view_label']
+            if 'type' in join:
+              explore_join_settings['type'] = join['type']
+            if 'relationship' in join:
+              explore_join_settings['relationship'] = join['relationship']
+            if 'sql_on' in join:
+              explore_join_settings['sql_on'] = join['sql_on']
+            if 'type' in join:
+              explore_join_settings['type'] = join['type']
+
+            new_explore_join = Join(join['_join'], explore_join_settings)
+            new_explore.joins.append(new_explore_join)
+            db.session.add(new_explore_join)
+
         new_model.explores.append(new_explore)
         db.session.add(new_explore)
+
     db.session.add(new_model)
   # project = Project(name=name, git_url=git_url)
   db.session.commit()
   return jsonify({'result': True})
+
+@bp.route('/test', methods=['GET'])
+def db_test():
+  explore = Explore.query.first()
+  return jsonify({'explore': {'name': explore.name, 'settings': explore.settings}})
