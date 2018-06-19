@@ -5,9 +5,11 @@ class Project(Base):
 
   __tablename__ = 'project'
   name = db.Column(db.String(128),  nullable=False)
+  git_url = db.Column(db.String(), nullable=False)
 
-  def __init__(self, name):
+  def __init__(self, name, git_url):
     self.name = name
+    self.git_url = git_url
 
   def __repr__(self):
     return '<Project %r>' % (self.name)

@@ -10,6 +10,8 @@ flask = "*"
 "psycopg2" = "*"
 "psycopg2-binary" = "*"
 flask-cors = "*"
+gitpython = "*"
+markdown = "*"
 
 [dev-packages]
 

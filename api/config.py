@@ -13,7 +13,6 @@ POSTGRES_USER = get_env_variable("POSTGRES_USER")
 POSTGRES_PASSWORD = get_env_variable("POSTGRES_PASSWORD")
 POSTGRES_DB = get_env_variable("POSTGRES_DB")
 ENV = 'development'
-DEBUG = True
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 

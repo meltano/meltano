@@ -5,4 +5,8 @@ export default {
   index() {
     return axios.get(utils.buildUrl('projects'));
   },
+
+  add(payload) {
+    return axios.post(utils.buildUrl('projects', 'new'), payload);
+  },
 };
