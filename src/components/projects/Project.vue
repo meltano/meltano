@@ -41,7 +41,7 @@ import { mapState, mapGetters } from 'vuex';
 export default {
   name: 'Project',
   created() {
-    this.getProjects();
+    this.getProjects(true);
   },
   computed: {
     ...mapState('projects', {

@@ -17,4 +17,8 @@ export default {
   update() {
     return axios.get(utils.buildUrl('repos', 'update'));
   },
+
+  models() {
+    return axios.get(utils.buildUrl('repos', 'models'));
+  },
 };

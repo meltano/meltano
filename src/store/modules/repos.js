@@ -6,6 +6,8 @@ const state = {
   loadingValidation: false,
   loadingUpdate: false,
   importResults: {},
+  models: [],
+  navbarClicked: false,
   errors: [],
   blobs: {
     dashboards:
@@ -45,6 +47,7 @@ const actions = {
       });
   },
 
+
   getBlob({ commit }, blob) {
     repoApi.blob(blob.hexsha)
       .then((data) => {
@@ -69,9 +72,31 @@ const actions = {
         state.loadingUpdate = false;
       });
   },
+
+  getModels({ commit }) {
+    repoApi.models()
+      .then((data) => {
+        commit('setModels', data.data);
+      });
+  },
+
+  navbarHideDropdown({ commit }) {
+    commit('setHiddenDropdown');
+  },
 };
 
 const mutations = {
+  setHiddenDropdown() {
+    state.navbarClicked = true;
+    setTimeout(() => {
+      state.navbarClicked = false;
+    }, 500);
+  },
+
+  setModels(_, models) {
+    state.models = models;
+  },
+
   setRepoBlobs(_, { blobs }) {
     state.blobs = blobs;
   },

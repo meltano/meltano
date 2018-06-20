@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="columns">
-        <aside class="sidebar column is-one-quarter menu has-background-white-bis">
+        <aside class="fixed-sidebar column is-one-quarter menu has-background-white-bis">
           <div class="level">
             <a
               href="#"
@@ -119,18 +119,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.sidebar {
-  position: fixed;
-  overflow: scroll;
-  top: 72px;
-  bottom: 0;
-  left: 0;
-}
-
 .content {
   padding: 10px;
   position: fixed;
-  top: 72px;
+  top: 52px;
   left: 430px;
   right: 0;
   bottom: 0;

@@ -48,6 +48,46 @@ class Explore(BaseLook):
   def __repr__(self):
     return '<Explore %i>' % (self.id)
 
+  def serializable(self, include_dimensions_and_measures=False):
+    this_explore = {}
+    this_explore['settings'] = self.settings
+    this_explore['name'] = self.name
+    this_explore_model = {}
+    this_explore_model['settings'] = self.model.settings
+    this_explore_model['name'] = self.model.name
+    this_explore['model'] = this_explore_model
+    this_explore['views'] = []
+    this_explore['joins'] = []
+    this_explore['unique_name'] = 'explore_{}'.format(self.name)
+    for view in self.views:
+      this_view = {}
+      this_view['name'] = view.name
+      this_view['settings'] = view.settings
+      this_view['unique_name'] = 'view_{}'.format(view.name)
+      if include_dimensions_and_measures:
+        this_view['dimensions'] = []
+        for dimension in view.dimensions:
+          this_dimension = {}
+          this_dimension['name'] = dimension.name
+          this_dimension['settings'] = dimension.settings
+          this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
+          this_view['dimensions'].append(this_dimension)
+
+        this_view['measures'] = []
+        for measure in view.measures:
+          this_measure = {}
+          this_measure['name'] = measure.name
+          this_measure['settings'] = measure.settings
+          this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+          this_view['measures'].append(this_measure)
+      this_explore['views'].append(this_view)
+    for join in self.joins:
+      this_join = {}
+      this_join['name'] = join.name
+      this_join['settings'] = join.settings
+      this_explore['joins'].append(this_join)
+    return this_explore
+
 class Join(BaseLook):
   __tablename__ = 'join'
 

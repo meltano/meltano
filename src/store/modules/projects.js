@@ -12,13 +12,13 @@ const getters = {
 };
 
 const actions = {
-  getProjects(context) {
+  getProjects(context, withRepo = false) {
     projectApi.index()
       .then((data) => {
         context.commit('setProjects', {
           project: data.data,
         });
-        if (context.state.project.git_url) {
+        if (withRepo && context.state.project.git_url) {
           this.dispatch('repos/getRepo');
         }
       });

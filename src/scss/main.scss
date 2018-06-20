@@ -24,3 +24,11 @@ $primary-invert: $pink-invert;
 */
 
 @import "../../node_modules/bulma/bulma";
+
+.fixed-sidebar {
+  position: fixed;
+  overflow: scroll;
+  top: 52px;
+  bottom: 0;
+  left: 0;
+}

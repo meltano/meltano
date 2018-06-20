@@ -4,8 +4,9 @@ from .base import Base
 class Project(Base):
 
   __tablename__ = 'project'
-  name = db.Column(db.String(128),  nullable=False)
+  name = db.Column(db.String(128), nullable=False)
   git_url = db.Column(db.String(), nullable=False)
+  validated = db.Column(db.Boolean(), default=False)
 
   def __init__(self, name, git_url):
     self.name = name

@@ -103,27 +103,49 @@ def db_import():
         new_view_settings['label'] = file_view['label']
       if 'sql_table_name' in file_view:
         new_view_settings['sql_table_name'] = file_view['sql_table_name']
-      new_view_settings = json.dumps(new_view_settings)
       new_view = View(file_view['_view'], new_view_settings)
-      for dimension in file_view['dimensions']:
-        new_dimension_settings = {}
-        if 'hidden' in dimension:
-          new_dimension_settings['hidden'] = dimension['hidden']
-        if 'primary_key' in dimension:
-          new_dimension_settings['primary_key'] = dimension['primary_key']
-        if 'label' in dimension:
-          new_dimension_settings['label'] = dimension['label']
-        if 'type' in dimension:
-          new_dimension_settings['type'] = dimension['type']
-        if 'sql' in dimension:
-          new_dimension_settings['sql'] = dimension['sql']
-        new_dimension_settings['_type'] = dimension['_type']
-        new_dimension_settings['_n'] = dimension['_n']
-        new_dimension_settings = json.dumps(new_dimension_settings)
-        new_dimension = Dimension(dimension['_dimension'], new_dimension_settings)
-        new_view.dimensions.append(new_dimension)
-        db.session.add(new_dimension)
-        new_view.dimensions.append(new_dimension)
+
+      # Add dimensions for view
+      if 'dimensions' in file_view:
+        for dimension in file_view['dimensions']:
+          new_dimension_settings = {}
+          if 'hidden' in dimension:
+            new_dimension_settings['hidden'] = dimension['hidden']
+          if 'primary_key' in dimension:
+            new_dimension_settings['primary_key'] = dimension['primary_key']
+          if 'label' in dimension:
+            new_dimension_settings['label'] = dimension['label']
+          if 'type' in dimension:
+            new_dimension_settings['type'] = dimension['type']
+          if 'sql' in dimension:
+            new_dimension_settings['sql'] = dimension['sql']
+          new_dimension_settings['_type'] = dimension['_type']
+          new_dimension_settings['_n'] = dimension['_n']
+          new_dimension = Dimension(dimension['_dimension'], new_dimension_settings)
+          new_view.dimensions.append(new_dimension)
+          db.session.add(new_dimension)
+          new_view.dimensions.append(new_dimension)
+
+      # Add measures for view
+      if 'measures' in file_view:
+        for measure in file_view['measures']:
+          new_measure_settings = {}
+          if 'hidden' in measure:
+            new_measure_settings['hidden'] = measure['hidden']
+          if 'value_format' in measure:
+            new_measure_settings['value_format'] = measure['value_format']
+          if 'label' in measure:
+            new_measure_settings['label'] = measure['label']
+          if 'type' in measure:
+            new_measure_settings['type'] = measure['type']
+          if 'sql' in measure:
+            new_measure_settings['sql'] = measure['sql']
+          new_measure_settings['_type'] = measure['_type']
+          new_measure_settings['_n'] = measure['_n']
+          new_measure = Measure(measure['_measure'], new_measure_settings)
+          new_view.measures.append(new_measure)
+          db.session.add(new_measure)
+          new_view.measures.append(new_measure)
       db.session.add(new_view)
   # process models
   for model in models:
@@ -134,7 +156,6 @@ def db_import():
     model_settings['connection'] = model['connection']
     model_settings['_type'] = model['_type']
 
-    model_settings = json.dumps(model_settings)
     new_model = Model(model['_model'], model_settings)
 
     # Set the explores for the model
@@ -149,7 +170,6 @@ def db_import():
           explore_settings['description'] = explore['description']
         explore_settings['_type'] = explore['_type']
 
-        explore_settings = json.dumps(explore_settings)
         new_explore = Explore(explore['_explore'], explore_settings)
 
         # Set the view for the explore
@@ -163,6 +183,8 @@ def db_import():
             explore_join_settings = {}
             if 'view_label' in join:
               explore_join_settings['view_label'] = join['view_label']
+            if 'label' in join:
+              explore_join_settings['label'] = join['label']
             if 'type' in join:
               explore_join_settings['type'] = join['type']
             if 'relationship' in join:
@@ -188,3 +210,51 @@ def db_import():
 def db_test():
   explore = Explore.query.first()
   return jsonify({'explore': {'name': explore.name, 'settings': explore.settings}})
+
+@bp.route('/models', methods=['GET'])
+def models():
+  models = Model.query.all()
+  models_json = []
+  for model in models:
+    this_model = {}
+    this_model['settings'] = model.settings
+    this_model['name'] = model.name
+    this_model['explores'] = []
+    for explore in model.explores:
+      this_explore = {}
+      this_explore['settings'] = explore.settings
+      this_explore['name'] = explore.name
+      this_explore['link'] = '/explore/{}/{}'.format(model.name, explore.name)
+      this_explore['views'] = []
+      this_explore['joins'] = []
+      for view in explore.views:
+        this_view = {}
+        this_view['name'] = view.name
+        this_view['settings'] = view.settings
+        this_explore['views'].append(this_view)
+      for join in explore.joins:
+        this_join = {}
+        this_join['name'] = join.name
+        this_join['settings'] = join.settings
+        this_explore['joins'].append(this_join)
+
+      this_model['explores'].append(this_explore)
+    models_json.append(this_model)
+  return jsonify(models_json)
+
+@bp.route('/explores', methods=['GET'])
+def explores():
+  explores = Explore.query.all()
+  explores_json = []
+  for explore in explores:
+    explores_json.append(explore.serializable())
+  return jsonify(explores_json)
+
+@bp.route('/explores/<model_name>/<explore_name>', methods=['GET'])
+def explore_read(model_name, explore_name):
+  explore = Explore.query\
+            .join(Model, Explore.model_id == Model.id)\
+            .filter(Model.name == model_name)\
+            .filter(Explore.name == explore_name)\
+            .first()
+  return jsonify(explore.serializable(True))
