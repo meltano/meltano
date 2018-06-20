@@ -40,6 +40,12 @@
         </div>
         <router-link to="/repo" class="navbar-item">{{project.name}}</router-link>
       </div>
+      <div class="navbar-end">
+        <router-link to="/settings"
+        class="navbar-item navbar-child">
+          Settings
+        </router-link>
+      </div>
     </div>
   </nav>
 </template>

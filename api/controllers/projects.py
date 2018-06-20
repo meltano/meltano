@@ -3,6 +3,7 @@ from flask import (
 )
 
 from models.projects import Project
+from models.projects import Settings
 from app import db
 
 bp = Blueprint('projects', __name__, url_prefix='/projects')
@@ -17,7 +18,10 @@ def add():
   incoming = request.get_json()
   name = incoming.get('name')
   git_url = incoming.get('git_url')
+  settings = Settings()
   project = Project(name=name, git_url=git_url)
+  project.settings = settings
+  db.session.add(settings)
   db.session.add(project)
   db.session.commit()
 

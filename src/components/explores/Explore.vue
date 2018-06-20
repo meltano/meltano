@@ -1,62 +1,64 @@
 <template>
 <div class="container">
-  <div class="columns">
-    <nav class="panel column is-one-quarter">
-      <p class="panel-heading">
-        {{explore.settings.label}}
-      </p>
-      <div class="panel-block">
-        <p class="control">
-          <input class="input is-small" type="text" placeholder="search">
+  <section class="section">
+    <div class="columns">
+      <nav class="panel column is-one-quarter">
+        <p class="panel-heading">
+          {{explore.settings.label}}
         </p>
-      </div>
-      <div class="inner-scroll">
-        <template v-for="(view, index) in explore.views">
-        <a class="panel-block
-                panel-block-heading
-                has-background-white-ter
-                has-text-grey
-                is-expandable"
-                :class="{'is-collapsed': view.collapsed}"
-                :key="view.unique_name"
-                @click="viewRowClicked(index)">
-          {{view | printable | underscoreToSpace | titleCase}}
-        </a>
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <a class="panel-block
-                panel-block-heading
-                has-background-white"
-                v-if="!view.collapsed">
-          Dimensions
-        </a>
-        <a class="panel-block"
-            v-for="dimension in view.dimensions"
-            :key="dimension.unique_name"
-            v-if="!view.collapsed">
-          {{dimension | printable | underscoreToSpace | titleCase}}
-        </a>
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <a class="panel-block
-                panel-block-heading
-                has-background-white"
-                v-if="!view.collapsed">
-          Measures
-        </a>
-        <a class="panel-block"
-                v-for="measure in view.measures"
-                :key="measure.unique_name"
-                v-if="!view.collapsed">
-          {{measure | printable | underscoreToSpace | titleCase}}
-        </a>
-        </template>
-      </div>
-      <div class="panel-block">
-        <button class="button is-link is-outlined is-fullwidth">
-          reset all filters
-        </button>
-      </div>
-    </nav>
-  </div>
+        <div class="panel-block">
+          <p class="control">
+            <input class="input is-small" type="text" placeholder="search">
+          </p>
+        </div>
+        <div class="inner-scroll">
+          <template v-for="(view, index) in explore.views">
+          <a class="panel-block
+                  panel-block-heading
+                  has-background-white-ter
+                  has-text-grey
+                  is-expandable"
+                  :class="{'is-collapsed': view.collapsed}"
+                  :key="view.unique_name"
+                  @click="viewRowClicked(index)">
+            {{view | printable | underscoreToSpace | titleCase}}
+          </a>
+          <!-- eslint-disable-next-line vue/require-v-for-key -->
+          <a class="panel-block
+                  panel-block-heading
+                  has-background-white"
+                  v-if="!view.collapsed">
+            Dimensions
+          </a>
+          <a class="panel-block"
+              v-for="dimension in view.dimensions"
+              :key="dimension.unique_name"
+              v-if="!view.collapsed">
+            {{dimension | printable | underscoreToSpace | titleCase}}
+          </a>
+          <!-- eslint-disable-next-line vue/require-v-for-key -->
+          <a class="panel-block
+                  panel-block-heading
+                  has-background-white"
+                  v-if="!view.collapsed">
+            Measures
+          </a>
+          <a class="panel-block"
+                  v-for="measure in view.measures"
+                  :key="measure.unique_name"
+                  v-if="!view.collapsed">
+            {{measure | printable | underscoreToSpace | titleCase}}
+          </a>
+          </template>
+        </div>
+        <div class="panel-block">
+          <button class="button is-link is-outlined is-fullwidth">
+            reset all filters
+          </button>
+        </div>
+      </nav>
+    </div>
+  </section>
 </div>
 </template>
 <script>
@@ -95,10 +97,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.panel {
-  margin-top: 10px;
-}
-
 .panel-block {
   &.panel-block-heading {
     padding: 0.25rem 0.5rem;

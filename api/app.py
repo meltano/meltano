@@ -15,8 +15,10 @@ db = SQLAlchemy(app)
 
 from controllers import projects
 from controllers import repos
+from controllers import settings
 app.register_blueprint(projects.bp)
 app.register_blueprint(repos.bp)
+app.register_blueprint(settings.bp)
 
 @app.route("/")
 def hello():

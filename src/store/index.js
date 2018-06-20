@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import projects from './modules/projects';
 import repos from './modules/repos';
 import explores from './modules/explores';
+import settings from './modules/settings';
 
 Vue.use(Vuex);
 
@@ -13,6 +14,7 @@ export default new Vuex.Store({
     projects,
     repos,
     explores,
+    settings,
   },
   string: debug,
 });

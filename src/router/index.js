@@ -4,6 +4,7 @@ import Project from '@/components/projects/Project';
 import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
 import Explore from '@/components/explores/Explore';
+import Settings from '@/components/settings/Settings';
 
 Vue.use(Router);
 
@@ -33,6 +34,11 @@ export default new Router({
       path: '/explore/:model/:explore',
       name: '',
       component: Explore,
+    },
+    {
+      path: '/settings',
+      name: '',
+      component: Settings,
     },
   ],
 });
