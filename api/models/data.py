@@ -64,6 +64,7 @@ class Explore(BaseLook):
       this_view['name'] = view.name
       this_view['settings'] = view.settings
       this_view['unique_name'] = 'view_{}'.format(view.name)
+      this_view['collapsed'] = True
       if include_dimensions_and_measures:
         this_view['dimensions'] = []
         for dimension in view.dimensions:

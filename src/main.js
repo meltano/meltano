@@ -20,5 +20,12 @@ Vue.filter('capitalize', (value) => {
   return newVal.charAt(0).toUpperCase() + newVal.slice(1);
 });
 
+Vue.filter('titleCase', value => value
+  .replace(
+    /\w\S*/g, txt => txt
+      .charAt(0)
+      .toUpperCase() + txt.substr(1)
+      .toLowerCase()));
+
 Vue.filter('camelToRegular', value => value.replace(/([A-Z])/g, ' $1'));
 Vue.filter('underscoreToSpace', value => value.replace(/_/g, ' '));

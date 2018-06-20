@@ -6,6 +6,7 @@ const state = {
       label: 'loading...',
     },
   },
+  selected: [],
 };
 
 const getters = {};
@@ -17,11 +18,19 @@ const actions = {
         commit('setExplore', data.data);
       });
   },
+
+  expandRow({ commit }, index) {
+    commit('toggleCollapsed', index);
+  },
 };
 
 const mutations = {
   setExplore(_, exploreData) {
     state.explore = exploreData;
+  },
+
+  toggleCollapsed(_, index) {
+    state.explore.views[index].collapsed = !state.explore.views[index].collapsed;
   },
 };
 
