@@ -2,11 +2,12 @@ import os
 import markdown
 import subprocess
 import json
+import psycopg2
 
 from app import db
 
 from flask import (
-  Blueprint, jsonify, request, config, current_app
+  Blueprint, jsonify, config, current_app
 )
 from git import Repo
 
@@ -91,9 +92,9 @@ def db_import():
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
   
-  
   models = j['models']
   files = j['files']
+  print(models)
   # process views
   for file in files:
     if(file['_file_type'] == 'view'):
@@ -176,7 +177,7 @@ def db_import():
         # Name the explore from `from` or from name of explore itself
         view_name = explore.get('from', explore['_explore'])
         connected_view = View.query.filter_by(name=view_name).first()
-        new_explore.views.append(connected_view)
+        new_explore.view = connected_view
         if 'joins' in explore:
           explore_joins = explore['joins']
           for join in explore_joins:
@@ -225,13 +226,11 @@ def models():
       this_explore['settings'] = explore.settings
       this_explore['name'] = explore.name
       this_explore['link'] = '/explore/{}/{}'.format(model.name, explore.name)
-      this_explore['views'] = []
+      this_view = {}
+      this_view['name'] = explore.view.name
+      this_view['settings'] = explore.view.settings
+      this_explore['views'] = this_view
       this_explore['joins'] = []
-      for view in explore.views:
-        this_view = {}
-        this_view['name'] = view.name
-        this_view['settings'] = view.settings
-        this_explore['views'].append(this_view)
       for join in explore.joins:
         this_join = {}
         this_join['name'] = join.name

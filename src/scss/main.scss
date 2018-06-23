@@ -32,3 +32,10 @@ $primary-invert: $pink-invert;
   bottom: 0;
   left: 0;
 }
+
+.ellipsis{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

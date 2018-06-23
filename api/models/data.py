@@ -20,11 +20,6 @@ class Model(BaseLook):
   def __repr__(self):
     return '<Model %i>' % (self.id)
 
-explore_view = db.Table('explore_view',
-    db.Column('explore_id', db.Integer, db.ForeignKey('explore.id'), primary_key=True),
-    db.Column('view_id', db.Integer, db.ForeignKey('view.id'), primary_key=True)
-)
-
 class Explore(BaseLook):
 
   __tablename__ = 'explore'
@@ -33,11 +28,10 @@ class Explore(BaseLook):
     db.ForeignKey('model.id'), nullable=False)
   model = db.relationship('Model',
     backref=db.backref('explores', lazy=True))
-  views = db.relationship(
-    "View",
-    secondary=explore_view,
-    lazy='dynamic',
-    back_populates="explores")
+  view_id = db.Column(db.Integer,
+    db.ForeignKey('view.id'), nullable=False)
+  view = db.relationship('View',
+    backref=db.backref('explores', lazy=True))
   joins = db.relationship('Join',
     backref='explore',
     lazy=True)
@@ -56,32 +50,33 @@ class Explore(BaseLook):
     this_explore_model['settings'] = self.model.settings
     this_explore_model['name'] = self.model.name
     this_explore['model'] = this_explore_model
-    this_explore['views'] = []
     this_explore['joins'] = []
     this_explore['unique_name'] = 'explore_{}'.format(self.name)
-    for view in self.views:
-      this_view = {}
-      this_view['name'] = view.name
-      this_view['settings'] = view.settings
-      this_view['unique_name'] = 'view_{}'.format(view.name)
-      this_view['collapsed'] = True
-      if include_dimensions_and_measures:
-        this_view['dimensions'] = []
-        for dimension in view.dimensions:
-          this_dimension = {}
-          this_dimension['name'] = dimension.name
-          this_dimension['settings'] = dimension.settings
-          this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
-          this_view['dimensions'].append(this_dimension)
+    this_view = {}
+    this_view['name'] = self.view.name
+    this_view['settings'] = self.view.settings
+    this_view['unique_name'] = 'view_{}'.format(self.view.name)
+    this_view['collapsed'] = True
+    if include_dimensions_and_measures:
+      this_view['dimensions'] = []
+      for dimension in self.view.dimensions:
+        this_dimension = {}
+        this_dimension['name'] = dimension.name
+        this_dimension['settings'] = dimension.settings
+        this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
+        this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
+        this_dimension['selected'] = False
+        this_view['dimensions'].append(this_dimension)
 
-        this_view['measures'] = []
-        for measure in view.measures:
-          this_measure = {}
-          this_measure['name'] = measure.name
-          this_measure['settings'] = measure.settings
-          this_measure['unique_name'] = 'measure_{}'.format(measure.name)
-          this_view['measures'].append(this_measure)
-      this_explore['views'].append(this_view)
+      this_view['measures'] = []
+      for measure in self.view.measures:
+        this_measure = {}
+        this_measure['name'] = measure.name
+        this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
+        this_measure['settings'] = measure.settings
+        this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+        this_view['measures'].append(this_measure)
+      this_explore['view'] = this_view
     for join in self.joins:
       this_join = {}
       this_join['name'] = join.name
@@ -102,12 +97,6 @@ class Join(BaseLook):
 class View(BaseLook):
 
   __tablename__ = 'view'
-
-  explores = db.relationship(
-    "Explore",
-    secondary=explore_view,
-    lazy='dynamic',
-    back_populates="views")
 
   def __init__(self, name, settings):
     super().__init__(name, settings)

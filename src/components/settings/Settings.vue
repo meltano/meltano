@@ -13,22 +13,49 @@
       <section class="section">
         <h2 class="title">Connections</h2>
         <p v-if="!hasConnections">No Database Connections</p>
-        <ul>
-          <li v-for="connection in settings.connections" :key="connection.host">{{connection}}</li>
-        </ul>
+        <div class="columns is-multiline is-mobile">
+          <div class="column is-half"
+                v-for="connection in settings.connections"
+                :key="connection.host">
+            <div class="card">
+              <header class="card-header">
+                <p class="card-header-title">
+                  {{connection.name}}
+                </p>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <p>
+                    <strong>Dialect</strong>
+                    <span class="is-pulled-right">{{connection.dialect}}</span>
+                  </p>
+                  <p>
+                    <strong>Username</strong>
+                    <span class="is-pulled-right">{{connection.username}}</span>
+                  </p>
+                  <p>
+                    <strong>Host</strong>
+                    <span class="ellipsis is-pulled-right"
+                            :title="connection.host">
+                      {{connection.host}}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       <section class="section">
         <h2 class="title">New Database Connection</h2>
-        <div class="field">
-          <div class="control">
-            <input class="input" type="text" placeholder="Name">
+        <div class="field is-grouped">
+          <div class="control is-expanded">
+            <input class="input" type="text" placeholder="Name" v-model="connectionName">
           </div>
-        </div>
-
-        <div class="field">
           <div class="control">
             <div class="select">
-              <select>
+              <select v-model="connectionDialect">
+                <option value="" disabled selected>Dialect</option>
                 <option value="postgresql">PostgreSQL</option>
                 <option value="mysql">MySQL</option>
               </select>
@@ -38,25 +65,40 @@
 
         <div class="field is-grouped">
           <p class="control is-expanded">
-            <input class="input" type="text" placeholder="Host">
+            <input class="input"
+                    type="text"
+                    placeholder="Host"
+                    v-model="connectionHost">
           </p>
           <p class="control">
-            <input class="input" type="text" placeholder="Port">
+            <input class="input"
+                    type="text"
+                    placeholder="Port"
+                    v-model="connectionPort">
           </p>
         </div>
 
         <div class="field is-grouped">
           <p class="control is-expanded">
-            <input class="input" type="text" placeholder="Username">
+            <input class="input"
+                    type="text"
+                    placeholder="Username"
+                    v-model="connectionUsername">
           </p>
           <p class="control is-expanded">
-            <input class="input" type="password" placeholder="Password">
+            <input class="input"
+                    type="password"
+                    placeholder="Password"
+                    v-model="connectionPassword">
           </p>
         </div>
 
         <div class="field">
           <div class="control">
-            <button class="button is-link">Save Connection</button>
+            <button class="button is-link"
+                      @click.prevent="submitConnectionForm">
+              Save Connection
+            </button>
           </div>
         </div>
       </section>
@@ -69,9 +111,22 @@ import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'Settings',
+
+  data() {
+    return {
+      connectionName: '',
+      connectionDialect: '',
+      connectionHost: '',
+      connectionPort: '',
+      connectionUsername: '',
+      connectionPassword: '',
+    };
+  },
+
   created() {
     this.$store.dispatch('settings/getSettings');
   },
+
   computed: {
     ...mapState('settings', [
       'settings',
@@ -79,6 +134,25 @@ export default {
     ...mapGetters('settings', [
       'hasConnections',
     ]),
+  },
+
+  methods: {
+    submitConnectionForm() {
+      this.$store.dispatch('settings/saveNewConnection', {
+        name: this.connectionName,
+        dialect: this.connectionDialect,
+        host: this.connectionHost,
+        port: this.connectionPort,
+        username: this.connectionUsername,
+        password: this.connectionPassword,
+      });
+      this.connectionName = '';
+      this.connectionDialect = '';
+      this.connectionHost = '';
+      this.connectionPort = '';
+      this.connectionUsername = '';
+      this.connectionPassword = '';
+    },
   },
 };
 </script>

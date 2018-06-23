@@ -12,44 +12,44 @@
           </p>
         </div>
         <div class="inner-scroll">
-          <template v-for="(view, index) in explore.views">
           <a class="panel-block
                   panel-block-heading
                   has-background-white-ter
                   has-text-grey
                   is-expandable"
-                  :class="{'is-collapsed': view.collapsed}"
-                  :key="view.unique_name"
-                  @click="viewRowClicked(index)">
-            {{view | printable | underscoreToSpace | titleCase}}
+                  :class="{'is-collapsed': explore.view.collapsed}"
+                  :key="explore.view.unique_name"
+                  @click="viewRowClicked()">
+            {{currentExploreLabel}}
           </a>
           <!-- eslint-disable-next-line vue/require-v-for-key -->
           <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="!view.collapsed">
+                  v-if="!explore.view.collapsed">
             Dimensions
           </a>
           <a class="panel-block"
-              v-for="dimension in view.dimensions"
+              v-for="dimension in explore.view.dimensions"
               :key="dimension.unique_name"
-              v-if="!view.collapsed">
-            {{dimension | printable | underscoreToSpace | titleCase}}
+              v-if="!explore.view.collapsed && !dimension.settings.hidden"
+              @click="dimensionSelected(dimension)"
+              :class="{'is-active': dimension.selected}">
+            {{dimension.label}}
           </a>
           <!-- eslint-disable-next-line vue/require-v-for-key -->
           <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="!view.collapsed">
+                  v-if="!explore.view.collapsed">
             Measures
           </a>
           <a class="panel-block"
-                  v-for="measure in view.measures"
+                  v-for="measure in explore.view.measures"
                   :key="measure.unique_name"
-                  v-if="!view.collapsed">
-            {{measure | printable | underscoreToSpace | titleCase}}
+                  v-if="!explore.view.collapsed">
+            {{measure.label}}
           </a>
-          </template>
         </div>
         <div class="panel-block">
           <button class="button is-link is-outlined is-fullwidth">
@@ -57,12 +57,19 @@
           </button>
         </div>
       </nav>
+      <div class="column">
+        <div class="level">
+          <div class="level-item level-right">
+            <a class="button is-primary" @click="runQuery">Run</a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 </div>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'Explore',
@@ -71,11 +78,6 @@ export default {
       model: this.$route.params.model,
       explore: this.$route.params.explore,
     });
-  },
-  filters: {
-    printable(value) {
-      return value.settings.view_label ? value.settings.view_label : value.name;
-    },
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('explores/getExplore', {
@@ -87,11 +89,26 @@ export default {
   computed: {
     ...mapState('explores', [
       'explore',
+      'selectedDimensions',
+      'currentModel',
+      'currentExplore',
+    ]),
+    ...mapGetters('explores', [
+      'currentModelLabel',
+      'currentExploreLabel',
     ]),
   },
   methods: {
-    viewRowClicked(viewIndex) {
-      this.$store.dispatch('explores/expandRow', viewIndex);
+    viewRowClicked() {
+      this.$store.dispatch('explores/expandRow');
+    },
+
+    dimensionSelected(dimension) {
+      this.$store.dispatch('explores/toggleDimension', dimension);
+    },
+
+    runQuery() {
+      this.$store.dispatch('explores/runQuery');
     },
   },
 };
