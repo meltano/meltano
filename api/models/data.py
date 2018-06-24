@@ -75,6 +75,7 @@ class Explore(BaseLook):
         this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
         this_measure['settings'] = measure.settings
         this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+        this_measure['selected'] = False
         this_view['measures'].append(this_measure)
       this_explore['view'] = this_view
     for join in self.joins:

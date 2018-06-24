@@ -78,6 +78,15 @@
           </p>
         </div>
 
+        <div class="field">
+          <p class="control">
+            <input class="input"
+                    type="text"
+                    placeholder="Database"
+                    v-model="connectionDatabase">
+          </p>
+        </div>
+
         <div class="field is-grouped">
           <p class="control is-expanded">
             <input class="input"
@@ -115,6 +124,7 @@ export default {
   data() {
     return {
       connectionName: '',
+      connectionDatabase: '',
       connectionDialect: '',
       connectionHost: '',
       connectionPort: '',
@@ -140,6 +150,7 @@ export default {
     submitConnectionForm() {
       this.$store.dispatch('settings/saveNewConnection', {
         name: this.connectionName,
+        database: this.connectionDatabase,
         dialect: this.connectionDialect,
         host: this.connectionHost,
         port: this.connectionPort,

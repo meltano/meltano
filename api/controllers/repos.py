@@ -94,7 +94,6 @@ def db_import():
   
   models = j['models']
   files = j['files']
-  print(models)
   # process views
   for file in files:
     if(file['_file_type'] == 'view'):

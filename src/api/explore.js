@@ -6,7 +6,7 @@ export default {
     return axios.get(utils.buildUrl('repos/explores', `${model}/${explore}`));
   },
 
-  run(model, explore, data) {
-    return axios.post(utils.buildUrl('sql', `${model}/${explore}`), data);
+  get_sql(model, explore, data) {
+    return axios.post(utils.buildUrl('sql/get', `${model}/${explore}`), data);
   },
 };

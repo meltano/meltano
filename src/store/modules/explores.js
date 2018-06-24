@@ -10,8 +10,12 @@ const state = {
   },
   currentModel: '',
   currentExplore: '',
-  currentQuery: '',
+  results: [],
+  keys: [],
+  currentDataTab: 'data',
   selectedDimensions: {},
+  currentSQL: '',
+  limit: 3,
 };
 
 const getters = {
@@ -20,6 +24,22 @@ const getters = {
   },
   currentExploreLabel() {
     return utils.titleCase(state.currentModel);
+  },
+
+  isDataTab() {
+    return state.currentDataTab === 'data';
+  },
+
+  isResultsTab() {
+    return state.currentDataTab === 'results';
+  },
+
+  isSQLTab() {
+    return state.currentDataTab === 'sql';
+  },
+
+  currentLimit() {
+    return state.limit;
   },
 };
 
@@ -42,32 +62,66 @@ const actions = {
     commit('toggleDimensionSelected', dimension);
   },
 
-  runQuery({ commit }) {
+  toggleMeasure({ commit }, measure) {
+    commit('toggleMeasureSelected', measure);
+  },
+
+  limitSet({ commit }, limit) {
+    commit('setLimit', limit);
+  },
+
+  getSQL({ commit }, { run }) {
     const baseView = state.explore.view;
     const dimensions = baseView
       .dimensions
       .filter(d => d.selected)
       .map(d => d.name);
+    const measures = baseView
+      .measures
+      .filter(m => m.selected)
+      .map(m => m.name);
+
     const postData = {
       view: baseView.name,
       dimensions,
+      measures,
+      limit: state.limit,
+      run,
     };
-    exploreApi.run(state.currentModel, state.currentExplore, postData)
+    exploreApi.get_sql(state.currentModel, state.currentExplore, postData)
       .then((data) => {
-        commit('queryResults', data.data);
+        if (run) {
+          commit('setQueryResults', data.data);
+        } else {
+          commit('setSQLResults', data.data);
+        }
       });
+  },
+
+  switchCurrentTab({ commit }, tab) {
+    commit('setCurrentTab', tab);
   },
 };
 
 const mutations = {
 
-  queryResults(_, results) {
-    state.currentQuery = results.query;
+  setSQLResults(_, results) {
+    state.currentSQL = results.sql;
+  },
+
+  setQueryResults(_, results) {
+    state.results = results.results;
+    state.keys = results.keys;
   },
 
   toggleDimensionSelected(_, dimension) {
     const selectedDimension = dimension;
     selectedDimension.selected = !dimension.selected;
+  },
+
+  toggleMeasureSelected(_, measure) {
+    const selectedMeasure = measure;
+    selectedMeasure.selected = !measure.selected;
   },
 
   selectedDimensions(_, dimensions) {
@@ -82,6 +136,14 @@ const mutations = {
 
   toggleCollapsed() {
     state.explore.view.collapsed = !state.explore.view.collapsed;
+  },
+
+  setCurrentTab(_, tab) {
+    state.currentDataTab = tab;
+  },
+
+  setLimit(_, limit) {
+    state.limit = limit;
   },
 };
 

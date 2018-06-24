@@ -47,7 +47,9 @@
           <a class="panel-block"
                   v-for="measure in explore.view.measures"
                   :key="measure.unique_name"
-                  v-if="!explore.view.collapsed">
+                  v-if="!explore.view.collapsed"
+                  @click="measureSelected(measure)"
+                  :class="{'is-active': measure.selected}">
             {{measure.label}}
           </a>
         </div>
@@ -61,6 +63,54 @@
         <div class="level">
           <div class="level-item level-right">
             <a class="button is-primary" @click="runQuery">Run</a>
+          </div>
+        </div>
+        <div class="level">
+          <h2>Filter</h2>
+        </div>
+        <div class="level has-background-white-ter data-toggles">
+          <div class="level-left">
+            <div class="buttons has-addons level-item">
+              <span class="button"
+                    :class="{'is-active': isResultsTab}"
+                    @click="setCurrentTab('results')">Results</span>
+              <span class="button"
+                    :class="{'is-active': isSQLTab}"
+                    @click="setCurrentTab('sql')">SQL</span>
+            </div>
+          </div>
+          <div class="level-right">
+            <div class="level-item">
+              <div class="field">
+                <div class="control">
+                  <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-item" v-if="isResultsTab">
+            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+              <thead>
+                <th v-for="key in keys" :key="key">
+                  {{key}}
+                </th>
+              </thead>
+              <tbody>
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
+                <tr v-for="result in results">
+                  <td v-for="key in keys" :key="key">
+                    {{result[key]}}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="level">
+          <div class="level-item" v-if="isSQLTab">
+            <code>{{currentSQL}}</code>
           </div>
         </div>
       </div>
@@ -92,11 +142,28 @@ export default {
       'selectedDimensions',
       'currentModel',
       'currentExplore',
+      'currentSQL',
+      'keys',
+      'results',
+
     ]),
     ...mapGetters('explores', [
       'currentModelLabel',
       'currentExploreLabel',
+      'isDataTab',
+      'isResultsTab',
+      'isSQLTab',
     ]),
+
+    limit: {
+      get() {
+        return this.$store.getters['explores/currentLimit'];
+      },
+      set(value) {
+        this.$store.dispatch('explores/limitSet', value);
+        this.$store.dispatch('explores/getSQL', { run: false });
+      },
+    },
   },
   methods: {
     viewRowClicked() {
@@ -105,10 +172,20 @@ export default {
 
     dimensionSelected(dimension) {
       this.$store.dispatch('explores/toggleDimension', dimension);
+      this.$store.dispatch('explores/getSQL', { run: false });
+    },
+
+    measureSelected(measure) {
+      this.$store.dispatch('explores/toggleMeasure', measure);
+      this.$store.dispatch('explores/getSQL', { run: false });
     },
 
     runQuery() {
-      this.$store.dispatch('explores/runQuery');
+      this.$store.dispatch('explores/getSQL', { run: true });
+    },
+
+    setCurrentTab(tab) {
+      this.$store.dispatch('explores/switchCurrentTab', tab);
     },
   },
 };
@@ -139,6 +216,10 @@ export default {
     position: absolute;
     right: 0;
   }
+}
+
+.data-toggles {
+  padding: 1.5rem;
 }
 
 .inner-scroll {

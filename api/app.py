@@ -19,6 +19,7 @@ from controllers import settings
 from controllers import sql
 app.register_blueprint(projects.bp)
 app.register_blueprint(repos.bp)
+app.register_blueprint(settings.bp)
 app.register_blueprint(sql.bp)
 
 @app.route("/")
