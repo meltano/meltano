@@ -39,3 +39,19 @@ $primary-invert: $pink-invert;
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+.is-expandable::after {
+  content: "-";
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 0;
+}
+
+.is-collapsed::after {
+  content: "+";
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  right: 0;
+}

@@ -12,9 +12,12 @@ const state = {
   currentExplore: '',
   results: [],
   keys: [],
-  currentDataTab: 'data',
+  loadingQuery: false,
+  currentDataTab: 'sql',
   selectedDimensions: {},
   currentSQL: '',
+  filtersOpen: false,
+  dataOpen: true,
   limit: 3,
 };
 
@@ -88,10 +91,12 @@ const actions = {
       limit: state.limit,
       run,
     };
+    if (run) state.loadingQuery = true;
     exploreApi.get_sql(state.currentModel, state.currentExplore, postData)
       .then((data) => {
         if (run) {
           commit('setQueryResults', data.data);
+          state.loadingQuery = false;
         } else {
           commit('setSQLResults', data.data);
         }
@@ -101,9 +106,25 @@ const actions = {
   switchCurrentTab({ commit }, tab) {
     commit('setCurrentTab', tab);
   },
+
+  toggleFilterOpen({ commit }) {
+    commit('setFilterToggle');
+  },
+
+  toggleDataOpen({ commit }) {
+    commit('setDataToggle');
+  },
 };
 
 const mutations = {
+
+  setFilterToggle() {
+    state.filtersOpen = !state.filtersOpen;
+  },
+
+  setDataToggle() {
+    state.dataOpen = !state.dataOpen;
+  },
 
   setSQLResults(_, results) {
     state.currentSQL = results.sql;

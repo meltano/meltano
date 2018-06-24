@@ -62,12 +62,67 @@
       <div class="column">
         <div class="level">
           <div class="level-item level-right">
-            <a class="button is-primary" @click="runQuery">Run</a>
+            <a class="button is-primary"
+              :class="{'is-loading': loadingQuery}"
+              @click="runQuery">Run</a>
           </div>
         </div>
-        <div class="level">
-          <h2>Filter</h2>
+        <template v-if="explore.settings.has_filters">
+        <div class="level
+        has-background-grey-darker
+        section-header
+        has-text-white-bis
+        is-expandable"
+        @click="toggleFilterOpen"
+        :class="{'is-collapsed': !filtersOpen}">Filters</div>
+        <div class="level has-background-white-ter filter-item"
+              v-for="filter in explore.settings.always_filter.filters"
+              :key="filter.field"
+              v-if="filtersOpen">
+          <div class="columns level-left level-item">
+            <span class="column is-1 tag is-info">Required</span>
+            <div class="column is-5">
+              <strong>{{filter.explore_label}}</strong>
+              <span>{{filter.label}}</span>
+              <span>({{filter.type}})</span>
+            </div>
+            <div class="column is-6">
+              <div class="columns" v-if="filter.type == 'yesno'">
+                <div class="column is-6">
+                  <div class="select">
+                    <select>
+                      <option value="1">is any value</option>
+                      <option value="0">is</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="column is-6">
+                  <div class="select">
+                    <select>
+                      <option value="1">Yes</option>
+                      <option value="0">No</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="field" v-if="filter.type == 'string'">
+                <select-dropdown
+                  :placeholder="filter.field"
+                  @focused="inputFocused">
+                </select-dropdown>
+              </div>
+            </div>
+          </div>
         </div>
+        </template>
+        <div class="level
+        has-background-grey-darker
+        section-header
+        has-text-white-bis
+        is-expandable"
+        @click="toggleDataOpen"
+        :class="{'is-collapsed': !dataOpen}">Data</div>
+        <template v-if="dataOpen">
         <div class="level has-background-white-ter data-toggles">
           <div class="level-left">
             <div class="buttons has-addons level-item">
@@ -113,6 +168,7 @@
             <code>{{currentSQL}}</code>
           </div>
         </div>
+        </template>
       </div>
     </div>
   </section>
@@ -120,6 +176,7 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import SelectDropdown from '../SelectDropdown';
 
 export default {
   name: 'Explore',
@@ -128,6 +185,9 @@ export default {
       model: this.$route.params.model,
       explore: this.$route.params.explore,
     });
+  },
+  components: {
+    SelectDropdown,
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('explores/getExplore', {
@@ -145,7 +205,9 @@ export default {
       'currentSQL',
       'keys',
       'results',
-
+      'loadingQuery',
+      'filtersOpen',
+      'dataOpen',
     ]),
     ...mapGetters('explores', [
       'currentModelLabel',
@@ -166,6 +228,8 @@ export default {
     },
   },
   methods: {
+    inputFocused() {},
+
     viewRowClicked() {
       this.$store.dispatch('explores/expandRow');
     },
@@ -187,6 +251,14 @@ export default {
     setCurrentTab(tab) {
       this.$store.dispatch('explores/switchCurrentTab', tab);
     },
+
+    toggleFilterOpen() {
+      this.$store.dispatch('explores/toggleFilterOpen');
+    },
+
+    toggleDataOpen() {
+      this.$store.dispatch('explores/toggleDataOpen');
+    },
   },
 };
 </script>
@@ -200,25 +272,24 @@ export default {
       background: white;
     }
   }
-
-  &.is-expandable::after {
-    content: "-";
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    right: 0;
-  }
-
-  &.is-collapsed::after {
-    content: "+";
-    width: 20px;
-    height: 20px;
-    position: absolute;
-    right: 0;
-  }
 }
 
 .data-toggles {
+  padding: 1.5rem;
+}
+
+.section-header {
+  padding: 0.25rem;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+
+  &.is-expandable::after {
+    right: 30px;
+    text-align: center;
+    margin-top: -7px;
+  }
+}
+.filter-item {
   padding: 1.5rem;
 }
 

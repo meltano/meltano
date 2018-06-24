@@ -168,6 +168,8 @@ def db_import():
           explore_settings['view_label'] = explore['view_label']
         if 'description' in explore:
           explore_settings['description'] = explore['description']
+        if 'always_filter' in explore:
+          explore_settings['always_filter'] = explore['always_filter']
         explore_settings['_type'] = explore['_type']
 
         new_explore = Explore(explore['_explore'], explore_settings)
@@ -255,4 +257,20 @@ def explore_read(model_name, explore_name):
             .filter(Model.name == model_name)\
             .filter(Explore.name == explore_name)\
             .first()
-  return jsonify(explore.serializable(True))
+  explore_json = explore.serializable(True)
+  explore_json['settings']['has_filters'] = False
+  if 'always_filter' in explore_json['settings']:
+    explore_json['settings']['has_filters'] = True
+    for a_filter in explore_json['settings']['always_filter']['filters']:
+      dimensions = explore_json['view']['dimensions']
+      for dimension in dimensions:
+        if dimension['name'] == a_filter['field']:
+          a_filter['explore_label'] = a_filter['_explore'].title()
+          a_filter['type'] = dimension['settings']['type']
+          if 'label' in dimension['settings']:
+            a_filter['label'] = dimension['settings']['label']
+          else:
+            a_filter['label'] = ' '.join(dimension['name'].split('_')).title()
+          a_filter['sql'] = dimension['settings']['sql']
+          break
+  return jsonify(explore_json)

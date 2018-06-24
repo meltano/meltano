@@ -158,6 +158,7 @@ export default {
         password: this.connectionPassword,
       });
       this.connectionName = '';
+      this.connectionDatabase = '';
       this.connectionDialect = '';
       this.connectionHost = '';
       this.connectionPort = '';
