@@ -1,9 +1,10 @@
-import sys
-import psycopg2
-import logging
 import re
+import sys
+import logging
 
+from requests.auth import HTTPBasicAuth
 from functools import reduce
+
 from elt.db import DB
 
 
@@ -18,6 +19,7 @@ def compose(*fs):
     :return: I{callable} taking 1 argument.
     """
     return reduce(lambda f, g: lambda x: f(g(x)), fs, lambda x: x)
+
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
 def slugify(s):
@@ -58,13 +60,19 @@ def slugify(s):
 
     return s
 
+
 def setup_db(args=None):
     if args is None:
         DB.setup()
     else:
         DB.setup(**vars(args))
 
+
 def setup_logging(args):
     logging.basicConfig(stream=sys.stdout,
                         format="[%(levelname)s][%(asctime)s] %(message)s",
                         level=int(args.log_level))
+
+
+def get_basic_auth(user, token):
+    return HTTPBasicAuth(user, token)

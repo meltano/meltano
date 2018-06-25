@@ -1,9 +1,9 @@
-import psycopg2
 import getpass
 import os
-import datetime
 import logging
+import typing
 
+from datetime import timedelta, datetime, date, time
 from enum import Enum
 from argparse import ArgumentParser
 
@@ -41,6 +41,7 @@ class Password:
 class LogLevel:
     LOG_LEVEL_STRINGS = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
 
+    @staticmethod
     def parse(value):
         log_level_int = getattr(logging, value, logging.INFO)
         # check the logging log_level_choices have not changed from our expected values
@@ -49,34 +50,28 @@ class LogLevel:
 
 
 class DateWindow:
-    def parse_date(value):
-        if value is None:
-            return datetime.date.today()
-
-        return datetime.datetime.strptime(value, "%Y-%m-%d")
-
-    def __init__(self, args, formatter=datetime.datetime.isoformat):
+    def __init__(self, args, formatter=datetime.isoformat):
         self.formatter = formatter
-
-        if args.days is not None:
-            today = datetime.date.today()
-            days = lambda d: datetime.timedelta(days=d)
-
+        if args.days:
+            today = date.today()
             # Tomorrow at 00:00:00 UTC
-            self.end = datetime.datetime.combine(today + days(1),
-                                                 datetime.time())
-
+            self.end = datetime.combine(today + timedelta(days=1), time())
             # N days ago at 00:00:00 UTC
-            self.start = datetime.datetime.combine(today - days(args.days),
-                                                   datetime.time())
+            self.start = datetime.combine(today - timedelta(days=args.days), time())
         else:
             self.start = DateWindow.parse_date(args.start)
             self.end = DateWindow.parse_date(args.end)
 
+    @staticmethod
+    def parse_date(value):
+        if value is None:
+            return date.today()
+        return datetime.strptime(value, "%Y-%m-%d")
+
     def range(self):
         return (self.start, self.end)
 
-    def formatted_range(self):
+    def formatted_range(self) -> typing.Iterable:
         return map(self.formatter, self.range())
 
 

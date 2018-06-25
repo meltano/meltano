@@ -44,13 +44,16 @@ Column = namedtuple('Column', [
 
 
 class Schema:
+    @staticmethod
     def mapping_key_name(column: Column):
         return "{}_{}_mapping_key".format(column.table_name,
                                           column.column_name)
 
+    @staticmethod
     def table_key(column: Column):
         return column.table_name
 
+    @staticmethod
     def column_key(column: Column):
         return (column.table_name, column.column_name)
 

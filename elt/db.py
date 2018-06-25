@@ -24,7 +24,6 @@ def engine_uri(**db_config):
 
 
 SystemModel = declarative_base(metadata=MetaData(schema='meltano'))
-Model = declarative_base()
 
 session_factory = sessionmaker()
 Session = scoped_session(session_factory)
