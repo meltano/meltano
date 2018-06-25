@@ -13,3 +13,31 @@ class SqlHelper():
       return 'GROUP BY {}'.format(', '.join([str(x) for x in list(range(1,length+1))]))
     else:
       return ''
+
+  def filter_by(self, filter_by, table):
+    base_sqls = [];
+    for key, val in filter_by.items():
+      table_name = key.replace('${TABLE}', table)
+      selections = val['selections']
+      if not len(selections):
+        continue
+      is_single = len(selections) == 1 
+      base_sql = ''
+      modifier = ''
+      if 'modifier' not in val:
+        modifier = 'equal'
+      else:
+        modifier = val['modifier']
+      if modifier == 'equal':
+        print('modifier is equal')
+        if is_single:
+          print('is single')
+          base_sql = "({} = '{}')".format(table_name, selections[0])
+        else:
+          print('else')
+          selections = ["'{}'".format(selection) for selection in selections]
+          fields = ', '.join(selections)
+          base_sql = '(({} IN ({})))'.format(table_name, fields)
+      base_sqls.append(base_sql)
+    print(base_sqls)
+    return 'WHERE {}'.format(' AND '.join(base_sqls))

@@ -81,35 +81,31 @@
               v-if="filtersOpen">
           <div class="columns level-left level-item">
             <span class="column is-1 tag is-info">Required</span>
-            <div class="column is-5">
+            <div class="column is-2">
               <strong>{{filter.explore_label}}</strong>
               <span>{{filter.label}}</span>
               <span>({{filter.type}})</span>
             </div>
-            <div class="column is-6">
-              <div class="columns" v-if="filter.type == 'yesno'">
-                <div class="column is-6">
-                  <div class="select">
-                    <select>
-                      <option value="1">is any value</option>
-                      <option value="0">is</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="column is-6">
-                  <div class="select">
-                    <select>
-                      <option value="1">Yes</option>
-                      <option value="0">No</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+            <div class="column is-9">
+              <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
               <div class="field" v-if="filter.type == 'string'">
                 <select-dropdown
                   :placeholder="filter.field"
-                  @focused="inputFocused">
+                  :field="filter.sql"
+                  :dropdownList="getResultsFromDistinct(filter.sql)"
+                  :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
+                  @focused="inputFocused(filter.sql)"
+                  @selected="dropdownSelected"
+                  @modifierChanged="modifierChanged">
                 </select-dropdown>
+              </div>
+              <div class="tags selected-filters">
+                <template v-for="selected in getSelectionsFromDistinct(filter.sql)">
+                  <span class="tag is-link" :key="selected">
+                    {{selected}}
+                    <button class="delete is-small"></button>
+                  </span>
+                </template>
               </div>
             </div>
           </div>
@@ -146,7 +142,16 @@
         </div>
         <div class="level">
           <div class="level-item" v-if="isResultsTab">
-            <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+            <div class="notification is-info" v-if="!hasResults">
+              No results
+            </div>
+            <table class="table
+                is-bordered
+                is-striped
+                is-narrow
+                is-hoverable
+                is-fullwidth"
+                v-if="hasResults">
               <thead>
                 <th v-for="key in keys" :key="key">
                   {{key}}
@@ -177,6 +182,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import SelectDropdown from '../SelectDropdown';
+import YesNoFilter from '../filters/YesNoFilter';
 
 export default {
   name: 'Explore',
@@ -188,6 +194,7 @@ export default {
   },
   components: {
     SelectDropdown,
+    YesNoFilter,
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('explores/getExplore', {
@@ -210,11 +217,16 @@ export default {
       'dataOpen',
     ]),
     ...mapGetters('explores', [
+      'hasResults',
       'currentModelLabel',
       'currentExploreLabel',
       'isDataTab',
       'isResultsTab',
       'isSQLTab',
+      'getDistinctsForField',
+      'getResultsFromDistinct',
+      'getKeyFromDistinct',
+      'getSelectionsFromDistinct',
     ]),
 
     limit: {
@@ -228,7 +240,11 @@ export default {
     },
   },
   methods: {
-    inputFocused() {},
+    inputFocused(field) {
+      if (!this.getDistinctsForField(field)) {
+        this.$store.dispatch('explores/getDistinct', field);
+      }
+    },
 
     viewRowClicked() {
       this.$store.dispatch('explores/expandRow');
@@ -258,6 +274,22 @@ export default {
 
     toggleDataOpen() {
       this.$store.dispatch('explores/toggleDataOpen');
+    },
+
+    dropdownSelected(item, field) {
+      this.$store.dispatch('explores/addDistinctSelection', {
+        item,
+        field,
+      });
+      this.$store.dispatch('explores/getSQL', { run: false });
+    },
+
+    modifierChanged(item, field) {
+      this.$store.dispatch('explores/addDistinctModifier', {
+        item,
+        field,
+      });
+      this.$store.dispatch('explores/getSQL', { run: false });
     },
   },
 };
@@ -299,5 +331,10 @@ export default {
   border-left: 1px solid #dbdbdb;
   border-right: 1px solid #dbdbdb;
   overflow: scroll;
+}
+
+.selected-filters {
+  padding: 1.5rem;
+  padding-left: 0;
 }
 </style>

@@ -18,6 +18,11 @@ from models.data import (
 
 connections = {}
 
+def default(obj):
+  if isinstance(obj, Decimal):
+      return str(obj)
+  raise TypeError("Object of type '%s' is not JSON serializable" % type(obj).__name__)
+
 def update_connections():
   current_connections = Settings.query.first().settings['connections']
   for connection in current_connections:
@@ -48,7 +53,10 @@ def get_sql(model_name, explore_name):
   view = View.query.filter(View.name == view_name).first()
   incoming_dimensions = incoming_json['dimensions']
   incoming_measures = incoming_json['measures']
+  incoming_filters = incoming_json['filters']
   group_by = sqlHelper.group_by(incoming_dimensions, incoming_measures)
+  filter_by = sqlHelper.filter_by(incoming_filters, explore_name)
+  print(filter_by)
   to_run = incoming_json['run']
   base_table = view.settings['sql_table_name']
   measures = filter(lambda x: x.name in incoming_measures, view.measures)
@@ -68,17 +76,33 @@ def get_sql(model_name, explore_name):
 
   order_by = ''
 
-  base_sql = 'SELECT {} FROM {} AS {} {} {} LIMIT {};'.format(', '.join(to_join), base_table, explore_name, group_by, order_by, limit);
+  base_sql = 'SELECT {} FROM {} AS {} {} {} {} LIMIT {};'.format(', '.join(to_join), base_table, explore_name, filter_by, group_by, order_by, limit);
   # base_sql = ' '.join(base_sql.split())
-  def default(obj):
-    if isinstance(obj, Decimal):
-        return str(obj)
-    raise TypeError("Object of type '%s' is not JSON serializable" % type(obj).__name__)
 
   if to_run:
     engine = connections[model.settings['connection']]['engine']
     results = engine.execute(base_sql)
     results = [dict(row) for row in results]
-    return json.dumps({'sql': base_sql, 'results': results, 'keys': list(results[0].keys())}, default=default)
+    base_dict = {'sql': base_sql, 'results': results}
+    if not len(results):
+      base_dict['empty'] = True
+    else:
+      base_dict['empty'] = False
+      base_dict['keys'] = list(results[0].keys())
+    return json.dumps(base_dict, default=default)
   else:
     return json.dumps({'sql': base_sql}, default=default)
+
+@bp.route('/distinct/<model_name>/<explore_name>', methods=['POST'])
+def get_distinct_field_name(model_name, explore_name):
+  update_connections()
+  incoming_json = request.get_json()
+  field_name = incoming_json['field'].replace('${TABLE}', explore_name)
+  model = Model.query.filter(Model.name == model_name).first()
+  explore = Explore.query.filter(Explore.name == explore_name).first()
+  base_table = explore.view.settings['sql_table_name']
+  base_sql = 'SELECT DISTINCT {} FROM {} AS {} ORDER BY {}'.format(field_name, base_table, explore_name, field_name)
+  engine = connections[model.settings['connection']]['engine']
+  results = engine.execute(base_sql)
+  results = [dict(row) for row in results]
+  return json.dumps({'sql': base_sql, 'results': results, 'keys': list(results[0].keys())}, default=default)

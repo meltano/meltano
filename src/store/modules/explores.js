@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import exploreApi from '../../api/explore';
 import utils from '../../api/utils';
 
@@ -19,9 +20,39 @@ const state = {
   filtersOpen: false,
   dataOpen: true,
   limit: 3,
+  distincts: {},
 };
 
 const getters = {
+  hasResults() {
+    return !!state.results.length;
+  },
+  getDistinctsForField: () => field => state.distincts[field],
+  getResultsFromDistinct: () => (field) => {
+    const thisDistinct = state.distincts[field];
+    if (!thisDistinct) {
+      return null;
+    }
+    return thisDistinct.results;
+  },
+  getKeyFromDistinct: () => (field) => {
+    const thisDistinct = state.distincts[field];
+    if (!thisDistinct) {
+      return null;
+    }
+    return thisDistinct.keys[0];
+  },
+  getSelectionsFromDistinct: () => (field) => {
+    const thisDistinct = state.distincts[field];
+    if (!thisDistinct) {
+      return [];
+    }
+    const thisDistinctSelections = thisDistinct.selections;
+    if (!thisDistinctSelections) {
+      return [];
+    }
+    return thisDistinctSelections;
+  },
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
@@ -84,15 +115,23 @@ const actions = {
       .filter(m => m.selected)
       .map(m => m.name);
 
+    const filters = JSON.parse(JSON.stringify(state.distincts));
+    const filtersKeys = Object.keys(filters);
+    filtersKeys.forEach((prop) => {
+      delete filters[prop].results;
+      delete filters[prop].sql;
+    });
+
     const postData = {
       view: baseView.name,
       dimensions,
       measures,
       limit: state.limit,
+      filters,
       run,
     };
     if (run) state.loadingQuery = true;
-    exploreApi.get_sql(state.currentModel, state.currentExplore, postData)
+    exploreApi.getSql(state.currentModel, state.currentExplore, postData)
       .then((data) => {
         if (run) {
           commit('setQueryResults', data.data);
@@ -101,6 +140,24 @@ const actions = {
           commit('setSQLResults', data.data);
         }
       });
+  },
+
+  getDistinct({ commit }, field) {
+    exploreApi.getDistinct(state.currentModel, state.currentExplore, field)
+      .then((data) => {
+        commit('setDistincts', {
+          data: data.data,
+          field,
+        });
+      });
+  },
+
+  addDistinctSelection({ commit }, data) {
+    commit('setSelectedDistincts', data);
+  },
+
+  addDistinctModifier({ commit }, data) {
+    commit('setModifierDistincts', data);
   },
 
   switchCurrentTab({ commit }, tab) {
@@ -117,6 +174,23 @@ const actions = {
 };
 
 const mutations = {
+
+  setDistincts(_, { data, field }) {
+    Vue.set(state.distincts, field, data);
+  },
+
+  setSelectedDistincts(_, { item, field }) {
+    if (!state.distincts[field].selections) {
+      Vue.set(state.distincts[field], 'selections', []);
+    }
+    if (state.distincts[field].selections.indexOf(item) === -1) {
+      state.distincts[field].selections.push(item);
+    }
+  },
+
+  setModifierDistincts(_, { item, field }) {
+    Vue.set(state.distincts[field], 'modifier', item);
+  },
 
   setFilterToggle() {
     state.filtersOpen = !state.filtersOpen;

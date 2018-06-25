@@ -6,7 +6,11 @@ export default {
     return axios.get(utils.buildUrl('repos/explores', `${model}/${explore}`));
   },
 
-  get_sql(model, explore, data) {
+  getSql(model, explore, data) {
     return axios.post(utils.buildUrl('sql/get', `${model}/${explore}`), data);
+  },
+
+  getDistinct(model, explore, field) {
+    return axios.post(utils.buildUrl('sql/distinct', `${model}/${explore}`), { field });
   },
 };
