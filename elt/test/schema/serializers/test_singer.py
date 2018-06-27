@@ -151,9 +151,7 @@ def test_loads():
 """
 
     schema = serializer.loads("singer", singer_catalog)
-
     assert(len(schema.tables) == 1)
-    import pdb; pdb.set_trace()
 
 
 def test_load():
@@ -162,5 +160,3 @@ def test_load():
     schema = serializer.load("singer", open(singer_catalog_path))
     assert(len(schema.tables) > 20)
     assert("Usage_Ping_Data__c" in schema.tables)
-
-    import pdb; pdb.set_trace()
