@@ -1,6 +1,7 @@
 import json
 import sqlalchemy
 import psycopg2
+import re
 from decimal import Decimal
 
 from app import db
@@ -56,15 +57,14 @@ def get_sql(model_name, explore_name):
   incoming_filters = incoming_json['filters']
   group_by = sqlHelper.group_by(incoming_dimensions, incoming_measures)
   filter_by = sqlHelper.filter_by(incoming_filters, explore_name)
-  print(filter_by)
   to_run = incoming_json['run']
   base_table = view.settings['sql_table_name']
-  measures = filter(lambda x: x.name in incoming_measures, view.measures)
-
   dimensions = filter(lambda x: x.name in incoming_dimensions, view.dimensions)
   dimensions = map(lambda x: x.settings['sql'].replace("${TABLE}", explore_name), dimensions)
   dimensions = ', '.join(map(lambda x: '{}'.format(x), dimensions))
   
+  measures = filter(lambda x: x.name in incoming_measures, view.measures)
+  set_measures = list(measures)
   measures = filter(lambda x: x.name in incoming_measures, view.measures)
   measures = ', '.join([sqlHelper.get_func(x.settings['type'], explore_name, x.settings['sql']) for x in measures])
   to_join = []
@@ -74,6 +74,11 @@ def get_sql(model_name, explore_name):
   if measures:
     to_join.append(measures)
 
+  set_measures = ([m.settings for m in set_measures])
+  measures_as_dict = {}
+  for settings in set_measures:
+    new_key = re.sub(r'\$\{[A-Za-z]+\}.', '', settings['sql']).rstrip()
+    measures_as_dict[new_key] = settings
   order_by = ''
 
   base_sql = 'SELECT {} FROM {} AS {} {} {} {} LIMIT {};'.format(', '.join(to_join), base_table, explore_name, filter_by, group_by, order_by, limit);
@@ -82,6 +87,7 @@ def get_sql(model_name, explore_name):
   if to_run:
     engine = connections[model.settings['connection']]['engine']
     results = engine.execute(base_sql)
+    
     results = [dict(row) for row in results]
     base_dict = {'sql': base_sql, 'results': results}
     if not len(results):
@@ -89,6 +95,7 @@ def get_sql(model_name, explore_name):
     else:
       base_dict['empty'] = False
       base_dict['keys'] = list(results[0].keys())
+      base_dict['measures'] = measures_as_dict
     return json.dumps(base_dict, default=default)
   else:
     return json.dumps({'sql': base_sql}, default=default)

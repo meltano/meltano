@@ -29,15 +29,13 @@ class SqlHelper():
       else:
         modifier = val['modifier']
       if modifier == 'equal':
-        print('modifier is equal')
         if is_single:
-          print('is single')
           base_sql = "({} = '{}')".format(table_name, selections[0])
         else:
-          print('else')
           selections = ["'{}'".format(selection) for selection in selections]
           fields = ', '.join(selections)
           base_sql = '(({} IN ({})))'.format(table_name, fields)
       base_sqls.append(base_sql)
-    print(base_sqls)
+    if not len(base_sqls):
+      return ''
     return 'WHERE {}'.format(' AND '.join(base_sqls))

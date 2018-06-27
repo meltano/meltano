@@ -153,16 +153,24 @@
                 is-fullwidth"
                 v-if="hasResults">
               <thead>
-                <th v-for="key in keys" :key="key">
+                <th v-for="key in keys"
+                    :key="key"
+                    :class="{'has-background-warning': isColumnSelectedMeasure(key)}">
                   {{key}}
                 </th>
               </thead>
               <tbody>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <tr v-for="result in results">
-                  <td v-for="key in keys" :key="key">
+                  <template v-for="key in keys">
+                  <td :key="key" v-if="isColumnSelectedMeasure(key)">
+
+                    {{getFormattedValue(resultMeasures[key]['value_format'], result[key])}}
+                  </td>
+                  <td :key="key" v-else>
                     {{result[key]}}
                   </td>
+                  </template>
                 </tr>
               </tbody>
             </table>
@@ -180,6 +188,7 @@
 </div>
 </template>
 <script>
+import 'ssf';
 import { mapState, mapGetters } from 'vuex';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
@@ -212,6 +221,7 @@ export default {
       'currentSQL',
       'keys',
       'results',
+      'resultMeasures',
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
@@ -227,6 +237,8 @@ export default {
       'getResultsFromDistinct',
       'getKeyFromDistinct',
       'getSelectionsFromDistinct',
+      'isColumnSelectedMeasure',
+      'getFormattedValue',
     ]),
 
     limit: {

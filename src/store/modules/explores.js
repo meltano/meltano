@@ -1,3 +1,4 @@
+import SSF from 'ssf';
 import Vue from 'vue';
 import exploreApi from '../../api/explore';
 import utils from '../../api/utils';
@@ -13,6 +14,7 @@ const state = {
   currentExplore: '',
   results: [],
   keys: [],
+  resultMeasures: {},
   loadingQuery: false,
   currentDataTab: 'sql',
   selectedDimensions: {},
@@ -53,6 +55,12 @@ const getters = {
     }
     return thisDistinctSelections;
   },
+  isColumnSelectedMeasure: () => columnName => columnName in state.resultMeasures,
+
+  getFormattedValue: () => (fmt, value) => {
+    return SSF.format(fmt, Number(value));
+  },
+
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
@@ -207,6 +215,7 @@ const mutations = {
   setQueryResults(_, results) {
     state.results = results.results;
     state.keys = results.keys;
+    state.resultMeasures = results.measures;
   },
 
   toggleDimensionSelected(_, dimension) {
