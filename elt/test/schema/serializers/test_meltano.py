@@ -1,8 +1,7 @@
-import elt.schema.serializers.meltano as serializer
-
 from functools import partial
 from itertools import chain
 from elt.schema import Schema, DBType, Column
+from elt.schema.serializers.meltano import MeltanoSerializer
 
 
 def sample_schema(table_names=()):
@@ -37,7 +36,7 @@ def sample_schema(table_names=()):
 
 def test_dumps():
     schema = sample_schema(table_names=('entity01', 'entity02'))
-    yaml = serializer.dumps(schema)
+    yaml = MeltanoSerializer(schema).dumps()
 
     assert(yaml)
 
@@ -48,13 +47,14 @@ entity01:
   long: bigint
   text: text
   entity01_long_mapping_key: long
-"""
-    schema = serializer.loads('yaml', yaml_schema)
+""
+    schema = MeltanoSerializer('yaml').loads(yaml_schema).schema
     assert(len(schema.columns.values()) == 3)
 
 
 def test_idempotent():
     schema = sample_schema(table_names=('entity01', 'entity02'))
-    schema2 = serializer.loads('pytest', serializer.dumps(schema))
+    serializer = MeltanoSerializer(schema)
+    schema2 = MeltanoSerializer(schema.name).loads(serializer.dumps()).schema
 
     assert(len(schema.tables) == len(schema2.tables))
