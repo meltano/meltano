@@ -5,12 +5,12 @@ from enum import Enum
 from elt.cli import ActionEnum, OptionEnum, parser_logging
 from elt.utils import setup_logging
 
-from elt.schema.serializers.singer import load
-from elt.schema.serializers.meltano import dump
+from elt.schema.serializers.singer import SingerSerializer
+from elt.schema.serializers.meltano import MeltanoSerializer
 
 
 def action_convert(args):
-    schema = load("singer", sys.stdin)
+    schema = load(, sys.stdin)
     dump(sys.stdout, schema)
 
 

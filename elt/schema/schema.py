@@ -3,7 +3,7 @@ import psycopg2
 import psycopg2.sql
 import psycopg2.extras
 
-from typing import Sequence, Callable, Set
+from typing import Sequence, Callable, Set, Union
 from enum import Enum
 from collections import OrderedDict, namedtuple
 from elt.error import ExceptionAggregator, InapplicableChangeError
@@ -44,6 +44,8 @@ Column = namedtuple('Column', [
 
 
 class Schema:
+    Basis = Union[str, 'Schema']
+
     def mapping_key_name(column: Column):
         return "{}_{}_mapping_key".format(column.table_name,
                                           column.column_name)
@@ -53,6 +55,13 @@ class Schema:
 
     def column_key(column: Column):
         return (column.table_name, column.column_name)
+
+    @classmethod
+    def extend(cls, schema_or_name: Basis):
+        if isinstance(schema_or_name, Schema):
+            return schema_or_name
+
+        return Schema(schema_or_name)
 
     def __init__(self, name, columns: Sequence[Column] = [],
                  primary_key_name='__row_id'):

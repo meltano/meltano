@@ -1,8 +1,11 @@
-import elt.schema.serializers.kettle as kettle
+from elt.schema.serializers.kettle import KettleSerializer
 
 
 def test_config():
-    schema = kettle.loads("sfdc", SAMPLE_KETTLE_CONFIG)
+    schema = KettleSerializer("sfdc") \
+      .loads(SAMPLE_KETTLE_CONFIG) \
+      .loads(SAMPLE_KETTLE_CONFIG_EXTRA) \
+      .schema
 
     import pdb; pdb.set_trace()
 
@@ -90,6 +93,29 @@ SAMPLE_KETTLE_CONFIG = """<?xml version="1.0" encoding="UTF-8"?>
         <idlookup>N</idlookup>
         <type>Date</type>
         <format>yyyy-MM-dd'T'HH:mm:ss'.000'XXX</format>
+      </field>
+    </fields>
+  </step>
+</transformation>
+"""
+
+SAMPLE_KETTLE_CONFIG_EXTRA = """<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <step>
+    <name>Insert / Update</name>
+    <type>InsertUpdate</type>
+  </step>
+  <step>
+    <name>Salesforce Input</name>
+    <type>SalesforceInput</type>
+    <module>User</module>
+    <fields>
+      <field>
+        <name>Extra field</name>
+        <field>extra_field</field>
+        <idlookup>N</idlookup>
+        <type>String</type>
+        <format />
       </field>
     </fields>
   </step>
