@@ -4,19 +4,21 @@ import sys
 from enum import Enum
 from elt.cli import ActionEnum, OptionEnum, parser_logging
 from elt.utils import setup_logging
-
-from elt.schema.serializers.singer import SingerSerializer
-from elt.schema.serializers.meltano import MeltanoSerializer
+from elt.schema.serializers import serializer_for
 
 
 def action_convert(args):
-    schema = load(, sys.stdin)
-    dump(sys.stdout, schema)
+    input = serializer_for(args.source, args.schema)
+    schema = input.load(sys.stdin).schema
+
+    output = serializer_for(args.destination, schema)
+    output.dump(sys.stdout)
 
 
 class SchemaType(OptionEnum):
     MELTANO = "meltano"
-    SINGER = "singer"
+    KETTLE = "kettle"
+    # SINGER = "singer"
 
 
 class Actions(ActionEnum):
@@ -28,11 +30,16 @@ def parse():
 
     parser_logging(parser)
 
+    parser.add_argument('-S', '--schema',
+                        required=True,
+                        help="Schema name")
+
+
     parser.add_argument('-s',
                         dest="source",
                         type=SchemaType,
                         choices=list(SchemaType),
-                        required=True,
+                        default=SchemaType.MELTANO,
                         help="Specifies input schema type.")
 
     parser.add_argument('-d',

@@ -7,9 +7,10 @@ from .base import Serializer
 
 data_type_map = {
     'String': DBType.String,
-    'Number': DBType.Long,
+    'Number': DBType.Double,
     'Boolean': DBType.Boolean,
-    'Date': DBType.Date
+    'Date': DBType.Date,
+    'Integer': DBType.Long,
 }
 
 
@@ -45,7 +46,7 @@ class KettleSerializer(Serializer):
 
         dt_type = data_type_map[raw_type]
 
-        # date time can have a timezone or not, it depends on the format
+        # either a `date` or a `timestamp`: it depends on the format
         if dt_type == DBType.Date:
             dt_type = dt_type if raw_format == "yyyy-MM-dd" else DBType.Timestamp
 
