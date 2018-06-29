@@ -5,6 +5,10 @@ import json
 import logging
 
 
+def read_header(file):
+    return next(file).rstrip().lower().replace('"', '')
+
+
 def write_to_db_from_csv(db_conn, csv_file, *,
                          primary_key,
                          table_schema,
@@ -19,7 +23,7 @@ def write_to_db_from_csv(db_conn, csv_file, *,
     with open(csv_file, 'r') as file:
         try:
             # Get header row, remove new lines, lowercase
-            header = next(file).rstrip().lower()
+            header = read_header(file)
             schema = psycopg2.sql.Identifier(table_schema)
             table = psycopg2.sql.Identifier(table_name)
             tmp_table = psycopg2.sql.Identifier(table_name + "_tmp")
@@ -37,7 +41,7 @@ def write_to_db_from_csv(db_conn, csv_file, *,
 
             # insert into temp table
             copy_query = psycopg2.sql.SQL(
-                "COPY {0}.{1} ({2}) FROM STDIN WITH DELIMITER AS ',' NULL AS 'null' CSV"
+                "COPY {0}.{1} ({2}) FROM STDIN WITH (DELIMITER ',', NULL '', FORCE_NULL ({2}), FORMAT csv)"
             ).format(
                 psycopg2.sql.Identifier("pg_temp"),
                 tmp_table,
@@ -124,7 +128,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
     with open(csv_file, 'r') as file:
         try:
             # Get header row, remove new lines, lowercase
-            header = next(file).rstrip().lower()
+            header = read_header(file)
             cursor = db_conn.cursor()
 
             schema = psycopg2.sql.Identifier(table_schema)
@@ -134,7 +138,7 @@ def upsert_to_db_from_csv(db_conn, csv_file, *,
                                                                   table_name))
 
             # Import into TMP Table
-            copy_query = psycopg2.sql.SQL("COPY {0}.{1} ({2}) FROM STDIN WITH DELIMITER AS ',' NULL AS 'null' CSV").format(
+            copy_query = psycopg2.sql.SQL("COPY {0}.{1} ({2}) FROM STDIN WITH (DELIMITER ',', NULL '', FORCE_NULL ({2}), FORMAT csv)").format(
                 psycopg2.sql.Identifier("pg_temp"),
                 tmp_table,
                 psycopg2.sql.SQL(', ').join(
