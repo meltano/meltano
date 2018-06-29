@@ -17,10 +17,10 @@ class Serializer:
         raise NotImplementedError
 
     def load(self, reader: TextIO) -> 'Serializer':
-        return loads(reader.read())
+        return self.loads(reader.read())
 
     def dumps(self) -> str:
         raise NotImplementedError
 
     def dump(self, writer: TextIO):
-        writer.write(self.dumps(self.schema))
+        writer.write(self.dumps())
