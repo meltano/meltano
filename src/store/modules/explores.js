@@ -21,6 +21,7 @@ const state = {
   currentSQL: '',
   filtersOpen: false,
   dataOpen: true,
+  chartsOpen: false,
   limit: 3,
   distincts: {},
 };
@@ -55,11 +56,15 @@ const getters = {
     }
     return thisDistinctSelections;
   },
+
+  getChartYAxis() {
+    const measures = Object.keys(state.resultMeasures);
+    return measures;
+  },
+
   isColumnSelectedMeasure: () => columnName => columnName in state.resultMeasures,
 
-  getFormattedValue: () => (fmt, value) => {
-    return SSF.format(fmt, Number(value));
-  },
+  getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
@@ -147,6 +152,9 @@ const actions = {
         } else {
           commit('setSQLResults', data.data);
         }
+      })
+      .catch((e) => {
+        console.log('e', e);
       });
   },
 
@@ -179,6 +187,10 @@ const actions = {
   toggleDataOpen({ commit }) {
     commit('setDataToggle');
   },
+
+  toggleChartsOpen({ commit }) {
+    commit('setChartToggle');
+  },
 };
 
 const mutations = {
@@ -206,6 +218,10 @@ const mutations = {
 
   setDataToggle() {
     state.dataOpen = !state.dataOpen;
+  },
+
+  setChartToggle() {
+    state.chartsOpen = !state.chartsOpen;
   },
 
   setSQLResults(_, results) {

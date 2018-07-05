@@ -60,28 +60,26 @@
         </div>
       </nav>
       <div class="column">
-        <div class="level">
-          <div class="level-item level-right">
-            <a class="button is-primary"
+        <div class="columns">
+          <div class="column">
+            <a class="button is-primary is-pulled-right"
               :class="{'is-loading': loadingQuery}"
               @click="runQuery">Run</a>
           </div>
         </div>
         <template v-if="explore.settings.has_filters">
-        <div class="level
-        has-background-grey-darker
+        <div class="has-background-grey-darker
         section-header
         has-text-white-bis
         is-expandable"
         @click="toggleFilterOpen"
         :class="{'is-collapsed': !filtersOpen}">Filters</div>
-        <div class="level has-background-white-ter filter-item"
+        <div class="has-background-white-ter filter-item"
               v-for="filter in explore.settings.always_filter.filters"
               :key="filter.field"
               v-if="filtersOpen">
-          <div class="columns level-left level-item">
-            <span class="column is-1 tag is-info">Required</span>
-            <div class="column is-2">
+          <div class="columns">
+            <div class="column is-3">
               <strong>{{filter.explore_label}}</strong>
               <span>{{filter.label}}</span>
               <span>({{filter.type}})</span>
@@ -111,37 +109,45 @@
           </div>
         </div>
         </template>
-        <div class="level
-        has-background-grey-darker
+
+        <!-- charts tab -->
+        <div class="has-background-grey-darker
+        section-header
+        has-text-white-bis
+        is-expandable"
+        @click="toggleChartsOpen"
+        :class="{'is-collapsed': !chartsOpen}">Charts</div>
+        <template v-if="chartsOpen">
+          <div class="has-background-white-ter chart-toggles">
+            <chart></chart>
+          </div>
+        </template>
+
+        <!-- results/SQL tab -->
+        <div class="has-background-grey-darker
         section-header
         has-text-white-bis
         is-expandable"
         @click="toggleDataOpen"
         :class="{'is-collapsed': !dataOpen}">Data</div>
         <template v-if="dataOpen">
-        <div class="level has-background-white-ter data-toggles">
-          <div class="level-left">
-            <div class="buttons has-addons level-item">
-              <span class="button"
-                    :class="{'is-active': isResultsTab}"
-                    @click="setCurrentTab('results')">Results</span>
-              <span class="button"
-                    :class="{'is-active': isSQLTab}"
-                    @click="setCurrentTab('sql')">SQL</span>
+        <div class="has-background-white-ter data-toggles">
+          <div class="field is-pulled-right">
+            <div class="control">
+              <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
             </div>
           </div>
-          <div class="level-right">
-            <div class="level-item">
-              <div class="field">
-                <div class="control">
-                  <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-                </div>
-              </div>
-            </div>
+          <div class="buttons has-addons">
+            <span class="button"
+                  :class="{'is-active': isResultsTab}"
+                  @click="setCurrentTab('results')">Results</span>
+            <span class="button"
+                  :class="{'is-active': isSQLTab}"
+                  @click="setCurrentTab('sql')">SQL</span>
           </div>
         </div>
-        <div class="level">
-          <div class="level-item" v-if="isResultsTab">
+        <div class="">
+          <div class="" v-if="isResultsTab">
             <div class="notification is-info" v-if="!hasResults">
               No results
             </div>
@@ -164,7 +170,6 @@
                 <tr v-for="result in results">
                   <template v-for="key in keys">
                   <td :key="key" v-if="isColumnSelectedMeasure(key)">
-
                     {{getFormattedValue(resultMeasures[key]['value_format'], result[key])}}
                   </td>
                   <td :key="key" v-else>
@@ -176,8 +181,8 @@
             </table>
           </div>
         </div>
-        <div class="level">
-          <div class="level-item" v-if="isSQLTab">
+        <div class="">
+          <div class="" v-if="isSQLTab && currentSQL">
             <code>{{currentSQL}}</code>
           </div>
         </div>
@@ -192,6 +197,7 @@ import 'ssf';
 import { mapState, mapGetters } from 'vuex';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
+import Chart from './Chart';
 
 export default {
   name: 'Explore',
@@ -204,6 +210,7 @@ export default {
   components: {
     SelectDropdown,
     YesNoFilter,
+    Chart,
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('explores/getExplore', {
@@ -225,6 +232,7 @@ export default {
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
+      'chartsOpen',
     ]),
     ...mapGetters('explores', [
       'hasResults',
@@ -239,6 +247,7 @@ export default {
       'getSelectionsFromDistinct',
       'isColumnSelectedMeasure',
       'getFormattedValue',
+      'getChartYAxis',
     ]),
 
     limit: {
@@ -286,6 +295,10 @@ export default {
 
     toggleDataOpen() {
       this.$store.dispatch('explores/toggleDataOpen');
+    },
+
+    toggleChartsOpen() {
+      this.$store.dispatch('explores/toggleChartsOpen');
     },
 
     dropdownSelected(item, field) {

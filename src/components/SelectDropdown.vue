@@ -9,6 +9,17 @@
             <option value="" disabled selected>Select modifier</option>
             <option value="equal">is equal to</option>
             <option value="contains">contains</option>
+            <option value="startswith">starts with</option>
+            <option value="endswith">ends with</option>
+            <option value="isblank">is blank</option>
+            <option value="isnull">is null</option>
+            <option value="" disabled></option>
+            <option value="isnotequalto">is not equal to</option>
+            <option value="doesnotcontain">does not contain</option>
+            <option value="doesnotstartwith">does not start with</option>
+            <option value="doesnotendwith">does not end with</option>
+            <option value="isnotblank">is not blank</option>
+            <option value="isnotnull">is not null</option>
           </select>
         </div>
       </div>

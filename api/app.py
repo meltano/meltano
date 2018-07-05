@@ -1,5 +1,8 @@
 import os
-from flask import Flask
+import logging
+import datetime
+from logging.handlers import RotatingFileHandler
+from flask import Flask, request
 from flask import jsonify
 
 from flask_sqlalchemy import SQLAlchemy
@@ -12,6 +15,19 @@ if os.environ['FLASK_ENV'] == 'development':
   CORS(app)
 
 db = SQLAlchemy(app)
+
+logger = logging.getLogger('melt_logger')
+handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=2000, backupCount=10)
+logger.addHandler(handler)
+now = str(datetime.datetime.utcnow().strftime('%b %d %Y %I:%M:%S:%f'))
+logger.warning('Melt started at: {}'.format(now))
+
+@app.before_request
+def before_request():
+  print('before_request')
+  print(request.remote_addr)
+  logger.info('[{}] request: {}'.format(request.remote_addr, now))
+  print('Logging!')
 
 from controllers import projects
 from controllers import repos

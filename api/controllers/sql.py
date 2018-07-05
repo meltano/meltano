@@ -55,11 +55,12 @@ def get_sql(model_name, explore_name):
   incoming_dimensions = incoming_json['dimensions']
   incoming_measures = incoming_json['measures']
   incoming_filters = incoming_json['filters']
-  group_by = sqlHelper.group_by(incoming_dimensions, incoming_measures)
+  group_by = sqlHelper.group_by(incoming_dimensions)
   filter_by = sqlHelper.filter_by(incoming_filters, explore_name)
   to_run = incoming_json['run']
   base_table = view.settings['sql_table_name']
   dimensions = filter(lambda x: x.name in incoming_dimensions, view.dimensions)
+  set_dimensions = dimensions
   dimensions = map(lambda x: x.settings['sql'].replace("${TABLE}", explore_name), dimensions)
   dimensions = ', '.join(map(lambda x: '{}'.format(x), dimensions))
   
@@ -74,6 +75,7 @@ def get_sql(model_name, explore_name):
   if measures:
     to_join.append(measures)
 
+  set_dimensions = ([d.settings for d in set_dimensions])
   set_measures = ([m.settings for m in set_measures])
   measures_as_dict = {}
   for settings in set_measures:
@@ -82,12 +84,11 @@ def get_sql(model_name, explore_name):
   order_by = ''
 
   base_sql = 'SELECT {} FROM {} AS {} {} {} {} LIMIT {};'.format(', '.join(to_join), base_table, explore_name, filter_by, group_by, order_by, limit);
-  # base_sql = ' '.join(base_sql.split())
 
   if to_run:
     engine = connections[model.settings['connection']]['engine']
     results = engine.execute(base_sql)
-    
+    print(results)
     results = [dict(row) for row in results]
     base_dict = {'sql': base_sql, 'results': results}
     if not len(results):
