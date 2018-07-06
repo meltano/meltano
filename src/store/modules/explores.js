@@ -38,6 +38,11 @@ const getters = {
     }
     return thisDistinct.results;
   },
+  hasJoins() {
+    return !!(state.explore.joins && state.explore.joins.length);
+  },
+  joinIsExpanded: () => join => join.expanded,
+  getLabelForJoin: () => join => ('view_label' in join.settings ? join.settings.view_label : join.name),
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -105,6 +110,23 @@ const actions = {
     commit('toggleCollapsed');
   },
 
+  expandJoinRow({ commit }, join) {
+    // already fetched dimensions
+    commit('toggleJoinOpen', join);
+    if (join.dimensions.length) return;
+    exploreApi.getView(join.name)
+      .then((data) => {
+        commit('setJoinDimensions', {
+          join,
+          dimensions: data.data.dimensions,
+        });
+        commit('setJoinMeasures', {
+          join,
+          measures: data.data.measures,
+        });
+      });
+  },
+
   toggleDimension({ commit }, dimension) {
     commit('toggleDimensionSelected', dimension);
   },
@@ -153,9 +175,7 @@ const actions = {
           commit('setSQLResults', data.data);
         }
       })
-      .catch((e) => {
-        console.log('e', e);
-      });
+      .catch(() => {});
   },
 
   getDistinct({ commit }, field) {
@@ -197,6 +217,21 @@ const mutations = {
 
   setDistincts(_, { data, field }) {
     Vue.set(state.distincts, field, data);
+  },
+
+  setJoinDimensions(_, { join, dimensions }) {
+    const thisJoin = join;
+    thisJoin.dimensions = dimensions;
+  },
+
+  setJoinMeasures(_, { join, measures }) {
+    const thisJoin = join;
+    thisJoin.measures = measures;
+  },
+
+  toggleJoinOpen(_, join) {
+    const thisJoin = join;
+    thisJoin.collapsed = !thisJoin.collapsed;
   },
 
   setSelectedDistincts(_, { item, field }) {

@@ -81,6 +81,8 @@ class Explore(BaseLook):
     for join in self.joins:
       this_join = {}
       this_join['name'] = join.name
+      this_join['collapsed'] = True
+      this_join['dimensions'] = []
       this_join['settings'] = join.settings
       this_explore['joins'].append(this_join)
     return this_explore
@@ -104,6 +106,30 @@ class View(BaseLook):
 
   def __repr__(self):
     return '<View %i>' % (self.id)
+
+  def serializable(self, include_dimensions_and_measures=False):
+    this_view = {}
+    this_view['name'] = self.name
+    this_view['settings'] = self.settings
+    this_view['dimensions'] = []
+    for dimension in self.dimensions:
+      this_dimension = {}
+      this_dimension['name'] = dimension.name
+      this_dimension['settings'] = dimension.settings
+      this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
+      this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
+      this_dimension['selected'] = False
+      this_view['dimensions'].append(this_dimension)
+    this_view['measures'] = []
+    for measure in self.measures:
+      this_measure = {}
+      this_measure['name'] = measure.name
+      this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
+      this_measure['settings'] = measure.settings
+      this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+      this_measure['selected'] = False
+      this_view['measures'].append(this_measure)
+    return this_view
 
 class Dimension(BaseLook):
 

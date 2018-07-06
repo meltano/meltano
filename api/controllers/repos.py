@@ -250,6 +250,11 @@ def explores():
     explores_json.append(explore.serializable())
   return jsonify(explores_json)
 
+@bp.route('/views/<view_name>', methods=['GET'])
+def view_read(view_name):
+  view = View.query.filter(View.name == view_name).first()
+  return jsonify(view.serializable(True))
+
 @bp.route('/explores/<model_name>/<explore_name>', methods=['GET'])
 def explore_read(model_name, explore_name):
   explore = Explore.query\

@@ -12,21 +12,66 @@
           </p>
         </div>
         <div class="inner-scroll">
-          <a class="panel-block
+          <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
+          <template v-if="hasJoins">
+            <template v-for="join in explore.joins">
+              <a
+                class="panel-block
+                panel-block-heading
+                has-background-white-ter
+                has-text-grey
+                is-expandable"
+                :class="{'is-collapsed': join.collapsed}"
+                :key="join.name"
+                @click="joinRowClicked(join)">
+                  {{getLabelForJoin(join)}}
+              </a>
+              <template v-if="!join.collapsed">
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
+                <a class="panel-block
                   panel-block-heading
-                  has-background-white-ter
-                  has-text-grey
-                  is-expandable"
-                  :class="{'is-collapsed': explore.view.collapsed}"
-                  :key="explore.view.unique_name"
-                  @click="viewRowClicked()">
-            {{currentExploreLabel}}
-          </a>
-          <!-- eslint-disable-next-line vue/require-v-for-key -->
-          <a class="panel-block
+                  has-background-white" v-if="join.dimensions.length">
+                  Dimensions
+                </a>
+                <template v-for="dimension in join.dimensions">
+                  <a class="panel-block"
+                    v-if="!dimension.settings.hidden"
+                    :key="dimension.unique_name">
+                  {{dimension.label}}
+                  </a>
+                </template>
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
+                <a class="panel-block
                   panel-block-heading
-                  has-background-white"
-                  v-if="!explore.view.collapsed">
+                  has-background-white" v-if="join.measures.length">
+                  Measures
+                </a>
+                <template v-for="measure in join.measures">
+                  <a class="panel-block"
+                    v-if="!measure.settings.hidden"
+                    :key="measure.unique_name">
+                  {{measure.label}}
+                  </a>
+                </template>
+              </template>
+            </template>
+          </template>
+          <template v-else>
+          <a
+              class="panel-block
+              panel-block-heading
+              has-background-white-ter
+              has-text-grey
+              is-expandable"
+              :class="{'is-collapsed': explore.view.collapsed}"
+              @click="viewRowClicked">
+                {{explore.settings.label}}
+              </a>
+          </template>
+          <a class="panel-block
+              panel-block-heading
+              has-background-white"
+              v-if="!explore.view.collapsed">
             Dimensions
           </a>
           <a class="panel-block"
@@ -248,6 +293,8 @@ export default {
       'isColumnSelectedMeasure',
       'getFormattedValue',
       'getChartYAxis',
+      'hasJoins',
+      'getLabelForJoin',
     ]),
 
     limit: {
@@ -269,6 +316,10 @@ export default {
 
     viewRowClicked() {
       this.$store.dispatch('explores/expandRow');
+    },
+
+    joinRowClicked(join) {
+      this.$store.dispatch('explores/expandJoinRow', join);
     },
 
     dimensionSelected(dimension) {

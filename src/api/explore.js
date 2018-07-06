@@ -13,4 +13,8 @@ export default {
   getDistinct(model, explore, field) {
     return axios.post(utils.buildUrl('sql/distinct', `${model}/${explore}`), { field });
   },
+
+  getView(view) {
+    return axios.get(utils.buildUrl('repos/views', `${view}`));
+  },
 };
