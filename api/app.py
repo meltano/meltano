@@ -24,10 +24,7 @@ logger.warning('Melt started at: {}'.format(now))
 
 @app.before_request
 def before_request():
-  print('before_request')
-  print(request.remote_addr)
   logger.info('[{}] request: {}'.format(request.remote_addr, now))
-  print('Logging!')
 
 from controllers import projects
 from controllers import repos

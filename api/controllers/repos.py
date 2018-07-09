@@ -100,9 +100,9 @@ def db_import():
       file_view = file['views'][0]
       new_view_settings = {}
       if 'label' in file_view:
-        new_view_settings['label'] = file_view['label']
+        new_view_settings['label'] = file_view['label'].strip()
       if 'sql_table_name' in file_view:
-        new_view_settings['sql_table_name'] = file_view['sql_table_name']
+        new_view_settings['sql_table_name'] = file_view['sql_table_name'].strip()
       new_view = View(file_view['_view'], new_view_settings)
 
       # Add dimensions for view
@@ -114,11 +114,11 @@ def db_import():
           if 'primary_key' in dimension:
             new_dimension_settings['primary_key'] = dimension['primary_key']
           if 'label' in dimension:
-            new_dimension_settings['label'] = dimension['label']
+            new_dimension_settings['label'] = dimension['label'].strip()
           if 'type' in dimension:
-            new_dimension_settings['type'] = dimension['type']
+            new_dimension_settings['type'] = dimension['type'].strip()
           if 'sql' in dimension:
-            new_dimension_settings['sql'] = dimension['sql']
+            new_dimension_settings['sql'] = dimension['sql'].strip()
           new_dimension_settings['_type'] = dimension['_type']
           new_dimension_settings['_n'] = dimension['_n']
           new_dimension = Dimension(dimension['_dimension'], new_dimension_settings)
@@ -133,14 +133,14 @@ def db_import():
           if 'hidden' in measure:
             new_measure_settings['hidden'] = measure['hidden']
           if 'value_format' in measure:
-            new_measure_settings['value_format'] = measure['value_format']
+            new_measure_settings['value_format'] = measure['value_format'].strip()
           if 'label' in measure:
-            new_measure_settings['label'] = measure['label']
+            new_measure_settings['label'] = measure['label'].strip()
           if 'type' in measure:
-            new_measure_settings['type'] = measure['type']
+            new_measure_settings['type'] = measure['type'].strip()
           if 'sql' in measure:
-            new_measure_settings['sql'] = measure['sql']
-          new_measure_settings['_type'] = measure['_type']
+            new_measure_settings['sql'] = measure['sql'].strip()
+          new_measure_settings['_type'] = measure['_type'].strip()
           new_measure_settings['_n'] = measure['_n']
           new_measure = Measure(measure['_measure'], new_measure_settings)
           new_view.measures.append(new_measure)

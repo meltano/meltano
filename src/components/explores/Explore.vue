@@ -30,26 +30,32 @@
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a class="panel-block
                   panel-block-heading
-                  has-background-white" v-if="join.dimensions.length">
+                  has-background-white"
+                  v-if="showJoinDimensionMeasureHeader(join.dimensions)">
                   Dimensions
                 </a>
                 <template v-for="dimension in join.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.settings.hidden"
-                    :key="dimension.unique_name">
+                    :key="dimension.unique_name"
+                    :class="{'is-active': dimension.selected}"
+                    @click="joinDimensionSelected(join, dimension)">
                   {{dimension.label}}
                   </a>
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a class="panel-block
                   panel-block-heading
-                  has-background-white" v-if="join.measures.length">
+                  has-background-white"
+                  v-if="showJoinDimensionMeasureHeader(join.measures)">
                   Measures
                 </a>
                 <template v-for="measure in join.measures">
                   <a class="panel-block"
                     v-if="!measure.settings.hidden"
-                    :key="measure.unique_name">
+                    :key="measure.unique_name"
+                    :class="{'is-active': measure.selected}"
+                    @click="joinMeasureSelected(join, measure)">
                   {{measure.label}}
                   </a>
                 </template>
@@ -68,35 +74,36 @@
                 {{explore.settings.label}}
               </a>
           </template>
-          <a class="panel-block
-              panel-block-heading
-              has-background-white"
-              v-if="!explore.view.collapsed">
-            Dimensions
-          </a>
-          <a class="panel-block"
-              v-for="dimension in explore.view.dimensions"
-              :key="dimension.unique_name"
-              v-if="!explore.view.collapsed && !dimension.settings.hidden"
-              @click="dimensionSelected(dimension)"
-              :class="{'is-active': dimension.selected}">
-            {{dimension.label}}
-          </a>
-          <!-- eslint-disable-next-line vue/require-v-for-key -->
-          <a class="panel-block
-                  panel-block-heading
-                  has-background-white"
-                  v-if="!explore.view.collapsed">
-            Measures
-          </a>
-          <a class="panel-block"
-                  v-for="measure in explore.view.measures"
-                  :key="measure.unique_name"
-                  v-if="!explore.view.collapsed"
-                  @click="measureSelected(measure)"
-                  :class="{'is-active': measure.selected}">
-            {{measure.label}}
-          </a>
+          <template v-if="!explore.view.collapsed">
+            <a class="panel-block
+                panel-block-heading
+                has-background-white"
+                v-if="showJoinDimensionMeasureHeader(explore.view.dimensions)">
+              Dimensions
+            </a>
+            <a class="panel-block"
+                v-for="dimension in explore.view.dimensions"
+                :key="dimension.unique_name"
+                v-if="!dimension.settings.hidden"
+                @click="dimensionSelected(dimension)"
+                :class="{'is-active': dimension.selected}">
+              {{dimension.label}}
+            </a>
+            <!-- eslint-disable-next-line vue/require-v-for-key -->
+            <a class="panel-block
+                    panel-block-heading
+                    has-background-white"
+                    v-if="showJoinDimensionMeasureHeader(explore.view.measures)">
+              Measures
+            </a>
+            <a class="panel-block"
+                    v-for="measure in explore.view.measures"
+                    :key="measure.unique_name"
+                    @click="measureSelected(measure)"
+                    :class="{'is-active': measure.selected}">
+              {{measure.label}}
+            </a>
+          </template>
         </div>
         <div class="panel-block">
           <button class="button is-link is-outlined is-fullwidth">
@@ -104,7 +111,7 @@
           </button>
         </div>
       </nav>
-      <div class="column">
+      <div class="column is-three-quarters">
         <div class="columns">
           <div class="column">
             <a class="button is-primary is-pulled-right"
@@ -176,6 +183,12 @@
         @click="toggleDataOpen"
         :class="{'is-collapsed': !dataOpen}">Data</div>
         <template v-if="dataOpen">
+        <div class="notification is-danger" v-if="hasSQLError">
+          <button class="delete" @click="resetErrorMessage"></button>
+          <ul>
+            <li v-for="error in sqlErrorMessage" :key="error">{{error}}</li>
+          </ul>
+        </div>
         <div class="has-background-white-ter data-toggles">
           <div class="field is-pulled-right">
             <div class="control">
@@ -191,42 +204,8 @@
                   @click="setCurrentTab('sql')">SQL</span>
           </div>
         </div>
-        <div class="">
-          <div class="" v-if="isResultsTab">
-            <div class="notification is-info" v-if="!hasResults">
-              No results
-            </div>
-            <table class="table
-                is-bordered
-                is-striped
-                is-narrow
-                is-hoverable
-                is-fullwidth"
-                v-if="hasResults">
-              <thead>
-                <th v-for="key in keys"
-                    :key="key"
-                    :class="{'has-background-warning': isColumnSelectedMeasure(key)}">
-                  {{key}}
-                </th>
-              </thead>
-              <tbody>
-                <!-- eslint-disable-next-line vue/require-v-for-key -->
-                <tr v-for="result in results">
-                  <template v-for="key in keys">
-                  <td :key="key" v-if="isColumnSelectedMeasure(key)">
-                    {{getFormattedValue(resultMeasures[key]['value_format'], result[key])}}
-                  </td>
-                  <td :key="key" v-else>
-                    {{result[key]}}
-                  </td>
-                  </template>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="">
+        <ResultTable></ResultTable>
+        <div>
           <div class="" v-if="isSQLTab && currentSQL">
             <code>{{currentSQL}}</code>
           </div>
@@ -239,7 +218,8 @@
 </template>
 <script>
 import 'ssf';
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
@@ -253,6 +233,7 @@ export default {
     });
   },
   components: {
+    ResultTable,
     SelectDropdown,
     YesNoFilter,
     Chart,
@@ -271,16 +252,14 @@ export default {
       'currentModel',
       'currentExplore',
       'currentSQL',
-      'keys',
-      'results',
-      'resultMeasures',
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
       'chartsOpen',
+      'hasSQLError',
+      'sqlErrorMessage',
     ]),
     ...mapGetters('explores', [
-      'hasResults',
       'currentModelLabel',
       'currentExploreLabel',
       'isDataTab',
@@ -290,11 +269,10 @@ export default {
       'getResultsFromDistinct',
       'getKeyFromDistinct',
       'getSelectionsFromDistinct',
-      'isColumnSelectedMeasure',
-      'getFormattedValue',
       'getChartYAxis',
       'hasJoins',
       'getLabelForJoin',
+      'showJoinDimensionMeasureHeader',
     ]),
 
     limit: {
@@ -328,6 +306,16 @@ export default {
     },
 
     measureSelected(measure) {
+      this.$store.dispatch('explores/toggleMeasure', measure);
+      this.$store.dispatch('explores/getSQL', { run: false });
+    },
+
+    joinDimensionSelected(join, dimension) {
+      this.$store.dispatch('explores/toggleDimension', dimension);
+      this.$store.dispatch('explores/getSQL', { run: false });
+    },
+
+    joinMeasureSelected(join, measure) {
       this.$store.dispatch('explores/toggleMeasure', measure);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
@@ -367,6 +355,9 @@ export default {
       });
       this.$store.dispatch('explores/getSQL', { run: false });
     },
+    ...mapActions('explores', [
+      'resetErrorMessage',
+    ]),
   },
 };
 </script>
@@ -412,5 +403,8 @@ export default {
 .selected-filters {
   padding: 1.5rem;
   padding-left: 0;
+}
+code {
+  white-space: pre;
 }
 </style>

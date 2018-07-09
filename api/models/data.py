@@ -1,3 +1,4 @@
+import uuid
 from app import db
 from .base import Base
 
@@ -51,11 +52,11 @@ class Explore(BaseLook):
     this_explore_model['name'] = self.model.name
     this_explore['model'] = this_explore_model
     this_explore['joins'] = []
-    this_explore['unique_name'] = 'explore_{}'.format(self.name)
+    this_explore['unique_name'] = 'explore_{}_{}'.format(self.name, uuid.uuid4())
     this_view = {}
     this_view['name'] = self.view.name
     this_view['settings'] = self.view.settings
-    this_view['unique_name'] = 'view_{}'.format(self.view.name)
+    this_view['unique_name'] = 'view_{}_{}'.format(self.view.name, uuid.uuid4())
     this_view['collapsed'] = True
     if include_dimensions_and_measures:
       this_view['dimensions'] = []
@@ -64,7 +65,7 @@ class Explore(BaseLook):
         this_dimension['name'] = dimension.name
         this_dimension['settings'] = dimension.settings
         this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
-        this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
+        this_dimension['unique_name'] = 'dimension_{}_{}'.format(dimension.name, uuid.uuid4())
         this_dimension['selected'] = False
         this_view['dimensions'].append(this_dimension)
 
@@ -74,7 +75,7 @@ class Explore(BaseLook):
         this_measure['name'] = measure.name
         this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
         this_measure['settings'] = measure.settings
-        this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+        this_measure['unique_name'] = 'measure_{}_{}'.format(measure.name, uuid.uuid4())
         this_measure['selected'] = False
         this_view['measures'].append(this_measure)
       this_explore['view'] = this_view
@@ -117,7 +118,7 @@ class View(BaseLook):
       this_dimension['name'] = dimension.name
       this_dimension['settings'] = dimension.settings
       this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
-      this_dimension['unique_name'] = 'dimension_{}'.format(dimension.name)
+      this_dimension['unique_name'] = 'dimension_{}_{}'.format(dimension.name, uuid.uuid4())
       this_dimension['selected'] = False
       this_view['dimensions'].append(this_dimension)
     this_view['measures'] = []
@@ -126,7 +127,7 @@ class View(BaseLook):
       this_measure['name'] = measure.name
       this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
       this_measure['settings'] = measure.settings
-      this_measure['unique_name'] = 'measure_{}'.format(measure.name)
+      this_measure['unique_name'] = 'measure_{}_{}'.format(measure.name, uuid.uuid4())
       this_measure['selected'] = False
       this_view['measures'].append(this_measure)
     return this_view
@@ -139,6 +140,12 @@ class Dimension(BaseLook):
     db.ForeignKey('view.id'), nullable=False)
   view = db.relationship('View',
     backref=db.backref('dimensions', lazy=True))
+
+  @property
+  def table_column_name(self):
+    if 'sql' in self.settings:
+      return self.settings['sql'].replace('${TABLE}', self.view.name).rstrip()
+    return '{}.{}'.format(self.view.name, self.name).rstrip()
 
   def __init__(self, name, settings):
     super().__init__(name, settings)

@@ -10,6 +10,8 @@ const state = {
     },
     view: {},
   },
+  hasSQLError: false,
+  sqlErrorMessage: [],
   currentModel: '',
   currentExplore: '',
   results: [],
@@ -24,13 +26,18 @@ const state = {
   chartsOpen: false,
   limit: 3,
   distincts: {},
+  sortColumn: null,
+  sortDesc: false,
 };
 
 const getters = {
   hasResults() {
+    if (!state.results) return false;
     return !!state.results.length;
   },
+
   getDistinctsForField: () => field => state.distincts[field],
+
   getResultsFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -38,9 +45,15 @@ const getters = {
     }
     return thisDistinct.results;
   },
+
   hasJoins() {
     return !!(state.explore.joins && state.explore.joins.length);
   },
+
+  isColumnSorted: () => key => state.sortColumn === key,
+
+  showJoinDimensionMeasureHeader: () => arr => !!(arr && arr.length),
+
   joinIsExpanded: () => join => join.expanded,
   getLabelForJoin: () => join => ('view_label' in join.settings ? join.settings.view_label : join.name),
   getKeyFromDistinct: () => (field) => {
@@ -63,6 +76,7 @@ const getters = {
   },
 
   getChartYAxis() {
+    if (!state.resultMeasures) return [];
     const measures = Object.keys(state.resultMeasures);
     return measures;
   },
@@ -157,10 +171,40 @@ const actions = {
       delete filters[prop].sql;
     });
 
+    const joins = state.explore
+      .joins
+      .map((j) => {
+        const newJoin = {};
+        newJoin.name = j.name;
+        if (j.dimensions) {
+          newJoin.dimensions = j.dimensions
+            .filter(d => d.selected)
+            .map(d => d.name);
+          if (!newJoin.dimensions.length) delete newJoin.dimensions;
+        }
+        if (j.measures) {
+          newJoin.measures = j.measures
+            .filter(m => m.selected)
+            .map(m => m.name);
+          if (!newJoin.measures.length) delete newJoin.measures;
+        }
+        return newJoin;
+      })
+      .filter(j => !!(j.dimensions || j.measures));
+
+    let order = null;
+
+    if (state.sortColumn) {
+      order = state.sortColumn;
+    }
+
     const postData = {
       view: baseView.name,
       dimensions,
       measures,
+      joins,
+      order,
+      desc: state.sortDesc,
       limit: state.limit,
       filters,
       run,
@@ -170,12 +214,20 @@ const actions = {
       .then((data) => {
         if (run) {
           commit('setQueryResults', data.data);
+          commit('setSQLResults', data.data);
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', data.data);
         }
       })
-      .catch(() => {});
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
+
+  resetErrorMessage({ commit }) {
+    commit('setErrorState');
   },
 
   getDistinct({ commit }, field) {
@@ -211,9 +263,23 @@ const actions = {
   toggleChartsOpen({ commit }) {
     commit('setChartToggle');
   },
+
+  sortBy({ commit }, key) {
+    commit('setSortColumn', key);
+  },
 };
 
 const mutations = {
+
+  setSortColumn(context, key) {
+    if (state.sortColumn === key) {
+      state.sortDesc = !state.sortDesc;
+    }
+    state.sortColumn = key;
+    this.dispatch('explores/getSQL', {
+      run: true,
+    });
+  },
 
   setDistincts(_, { data, field }) {
     Vue.set(state.distincts, field, data);
@@ -267,6 +333,21 @@ const mutations = {
     state.results = results.results;
     state.keys = results.keys;
     state.resultMeasures = results.measures;
+  },
+
+  setSqlErrorMessage(_, e) {
+    state.hasSQLError = true;
+    if (!e.response) {
+      state.sqlErrorMessage = ['Something went wrong on our end. We\'ll check our error logs and get back to you.'];
+      return;
+    }
+    const error = e.response.data;
+    state.sqlErrorMessage = [error.code, error.orig, error.statement];
+  },
+
+  setErrorState() {
+    state.hasSQLError = false;
+    state.sqlErrorMessage = [];
   },
 
   toggleDimensionSelected(_, dimension) {
