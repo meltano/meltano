@@ -18,7 +18,6 @@ def action_convert(args):
 class SchemaType(OptionEnum):
     MELTANO = "meltano"
     KETTLE = "kettle"
-    # SINGER = "singer"
 
 
 class Actions(ActionEnum):
