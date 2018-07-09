@@ -160,7 +160,7 @@ def ensure_schema_exists(db_conn, schema_name):
     create_schema = psycopg2.sql.SQL("CREATE SCHEMA IF NOT EXISTS {}").format(schema_identifier)
     cursor.execute(create_schema)
 
-    for group_identifier in map(psycopg2.sql.Identifier, ("analytics",)):
+    for group_identifier in map(psycopg2.sql.Identifier, ("readonly", "analytics")):
         grant_usage_schema = psycopg2.sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA {} GRANT USAGE ON TABLES TO {}").format(schema_identifier, group_identifier)
         grant_select_schema = psycopg2.sql.SQL("ALTER DEFAULT PRIVILEGES IN SCHEMA {} GRANT SELECT ON TABLES TO {}").format(schema_identifier, group_identifier)
 
