@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from distutils.core import setup
 
-setup(name='meltano-extract-common',
+setup(name='meltano-common',
       version='0.1.0-alpha0',
       description='Meltano Extract framework.',
       author='Micaël Bergeron',
