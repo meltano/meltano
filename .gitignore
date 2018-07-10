@@ -4,7 +4,10 @@
 *.DS_Store
 *.idea
 *.csv
-*.egg_info
+*.egg_info/
 tmp_log.txt
 .env
 .vscode/
+build/
+dist/
+.pytest_cache/
