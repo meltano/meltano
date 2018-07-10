@@ -9,8 +9,10 @@ setup(name='meltano-extract-common',
       url='https://gitlab.com/meltano/meltano',
       packages=['elt'],
       install_requires=[
+          "psycopg2>=2.7.4",
           "configparser",
           "SQLAlchemy",
-          "psycopg2>=2.7.4"
+          "pandas",
+          "pyarrow"
       ]
      )
