@@ -21,16 +21,15 @@ cache:
 before_script:
   - pip install pipenv
   - pipenv run python --version
-  - . `pipenv --venv`/bin/activate # pipenv shell spawns a subshell
-  - pip install cython
+  - pipenv run  install cython
   - pipenv install --dev
-  - pipenv install -e .
+  - pipenv run pip install -e .
 
 test:
   script:
-  - pip install flake8  # you can also use tox
-  - tox -e py35,flake8
-  - pytest 
+  - pipenv run pip install flake8  # you can also use tox
+  - pipenv run tox -e py35,flake8
+  - pipenv run pytest 
 
 .run:
   script:
