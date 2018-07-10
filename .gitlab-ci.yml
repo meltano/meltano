@@ -21,7 +21,7 @@ cache:
 before_script:
   - pip install pipenv
   - pipenv run python --version
-  - pipenv run  install cython
+  - pipenv run pip install cython
   - pipenv install --dev
   - pipenv run pip install -e .
 
