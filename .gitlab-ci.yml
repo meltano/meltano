@@ -56,3 +56,17 @@ test:
     - public
   only:
   - master
+
+publish:
+  stage: deploy
+  before_script:
+  - [[ -z "$PYPIRC" ]] && { echo "PYPIRC must be set."; exit 1; }
+  - echo "$PYPIRC" > ~/.pypirc
+  - pip install twine 
+  script:
+  - python setup.py sdist
+  - twine upload dist/*
+  only:
+  - master
+  when: manual
+  
