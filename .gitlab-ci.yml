@@ -20,7 +20,7 @@ cache:
 
 before_script:
   - python -V               # Print out python version for debugging
-  - pip install pipenv
+  - pip install cython pipenv
   - pipenv install --dev
   - pip install -e .
   - pipenv shell
