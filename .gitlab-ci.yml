@@ -60,7 +60,6 @@ test:
 publish:
   stage: deploy
   before_script:
-  - [[ -z "$PYPIRC" ]] && { echo "PYPIRC must be set."; exit 1; }
   - echo "$PYPIRC" > ~/.pypirc
   - pip install twine 
   script:
