@@ -20,11 +20,11 @@ cache:
 
 before_script:
   - python -V               # Print out python version for debugging
-  - pip install virtualenv
+  - pip install pipenv
   - . `pipenv --venv`/bin/activate
   - pip install cython
   - pipenv install --dev
-  - pip install -e .
+  - pipenv install -e .
 
 test:
   script:
