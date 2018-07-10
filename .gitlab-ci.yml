@@ -1,7 +1,7 @@
 # This file is a template, and might need editing before it works on your project.
 # Official language image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/python/tags/
-image: python:latest
+image: python:3.5-jessie
 
 # Change pip's cache directory to be inside the project directory since we can
 # only cache local items.
@@ -20,10 +20,11 @@ cache:
 
 before_script:
   - python -V               # Print out python version for debugging
-  - pip install cython pipenv
+  - pip install pipenv
+  - pipenv shell
+  - pip install cython
   - pipenv install --dev
   - pip install -e .
-  - pipenv shell
 
 test:
   script:
