@@ -27,8 +27,7 @@ before_script:
 
 test:
   script:
-  - pipenv run pip install flake8  # you can also use tox
-  - pipenv run tox -e py35,flake8
+  - pipenv run flake8
   - pipenv run pytest 
 
 .run:
