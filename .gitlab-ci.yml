@@ -25,11 +25,17 @@ before_script:
   - pipenv install --dev
   - pipenv run pip install -e .
 
-test:
+lint:
+  stage: test
   script:
   - pipenv run flake8
-  - pipenv run pytest 
+  allow_failure: true
 
+test:
+  script:
+  - pipenv run pytest 
+  allow_failure: true
+ 
 .run:
   script:
   - python setup.py bdist_wheel
