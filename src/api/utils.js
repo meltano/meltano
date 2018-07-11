@@ -25,9 +25,11 @@ export default {
   },
 
   getColor(i) {
+    // assume they are the same length;
+    const colorLength = this.colors.backgroundColor.length;
     return {
-      backgroundColor: this.colors.backgroundColor[i],
-      borderColor: this.colors.borderColor[i],
+      backgroundColor: this.colors.backgroundColor[i % colorLength],
+      borderColor: this.colors.borderColor[i % colorLength],
     };
   },
 

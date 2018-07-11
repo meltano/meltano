@@ -36,6 +36,20 @@ export default {
             yAxes: [{
               ticks: {
                 beginAtZero: true,
+                callback: function callback(value, index, values) {
+                  // total/amount of label = x
+                  // show labels every 20 when greater than 20
+                  const total = values.length;
+                  const amount = 20;
+                  const every = parseInt(total / amount, 10);
+                  if (values.length > amount) {
+                    if (index % every === 0) {
+                      return value;
+                    }
+                    return '';
+                  }
+                  return value;
+                },
               },
             }],
           },

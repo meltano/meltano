@@ -81,6 +81,24 @@
                 v-if="showJoinDimensionMeasureHeader(explore.view.dimensions)">
               Dimensions
             </a>
+            <template v-for="dimensionGroup in explore.view.dimension_groups">
+              <a class="panel-block dimension-group"
+                  :key="dimensionGroup.unique_name"
+                  v-if="!dimensionGroup.settings.hidden"
+                  @click="dimensionGroupSelected(dimensionGroup)"
+                  :class="{'is-active': dimensionGroup.selected}">
+                {{dimensionGroup.label}}
+              </a>
+              <template v-for="timeframe in dimensionGroup.timeframes">
+                <a class="panel-block indented"
+                    :key="timeframe.name"
+                    @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
+                    v-if="dimensionGroup.selected"
+                    :class="{'is-active': timeframe.selected}">
+                  {{timeframe.label}}
+                </a>
+              </template>
+            </template>
             <a class="panel-block"
                 v-for="dimension in explore.view.dimensions"
                 :key="dimension.unique_name"
@@ -305,6 +323,18 @@ export default {
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
+    dimensionGroupSelected(dimensionGroup) {
+      this.$store.dispatch('explores/toggleDimensionGroup', dimensionGroup);
+    },
+
+    dimensionGroupTimeframeSelected(dimensionGroup, timeframe) {
+      this.$store.dispatch('explores/toggleDimensionGroupTimeframe', {
+        dimensionGroup,
+        timeframe,
+      });
+      this.$store.dispatch('explores/getSQL', { run: false });
+    },
+
     measureSelected(measure) {
       this.$store.dispatch('explores/toggleMeasure', measure);
       this.$store.dispatch('explores/getSQL', { run: false });
@@ -363,12 +393,45 @@ export default {
 </script>
 <style lang="scss" scoped>
 .panel-block {
+  position: relative;
+  &.indented {
+    padding-left: 1.75rem;
+  }
   &.panel-block-heading {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     font-weight: bold;
     &:hover {
       background: white;
+    }
+  }
+
+  &.dimension-group {
+    &::after {
+      border: 3px solid #363636;
+      border-radius: 2px;
+      border-right: 0;
+      border-top: 0;
+      content: " ";
+      display: block;
+      height: 0.625em;
+      margin-top: -0.321em;
+      pointer-events: none;
+      position: absolute;
+      top: 50%;
+      -webkit-transform: rotate(-134deg);
+      transform: rotate(-134deg);
+      -webkit-transform-origin: center;
+      transform-origin: center;
+      width: 0.625em;
+      right: 7%;
+    }
+    &.is-active {
+      &::after {
+        margin-top: -0.4375em;
+        -webkit-transform: rotate(-45deg);
+        transform: rotate(-45deg);
+      }
     }
   }
 }

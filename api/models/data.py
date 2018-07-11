@@ -69,6 +69,17 @@ class Explore(BaseLook):
         this_dimension['selected'] = False
         this_view['dimensions'].append(this_dimension)
 
+      this_view['dimension_groups'] = []
+      for dimension_group in self.view.dimension_groups:
+        this_dimension_group = {}
+        this_dimension_group['name'] = dimension_group.name
+        this_dimension_group['settings'] = dimension_group.settings
+        this_dimension_group['label'] = dimension_group.settings.get('label', ' '.join(dimension_group.name.split('_')).title())
+        this_dimension_group['unique_name'] = 'dimension_group_{}_{}'.format(dimension_group.name, uuid.uuid4())
+        this_dimension_group['selected'] = False
+        this_dimension_group['timeframes'] = [{'label':tf.title().replace('*', ''), 'name': tf, 'selected': False} for tf in dimension_group.settings['timeframes']]
+        this_view['dimension_groups'].append(this_dimension_group)
+
       this_view['measures'] = []
       for measure in self.view.measures:
         this_measure = {}
@@ -152,6 +163,21 @@ class Dimension(BaseLook):
     
   def __repr__(self):
     return '<Dimension %i>' % (self.id)
+
+class DimensionGroup(BaseLook):
+
+  __tablename__ = 'dimension_group'
+
+  view_id = db.Column(db.Integer,
+    db.ForeignKey('view.id'), nullable=False)
+  view = db.relationship('View',
+    backref=db.backref('dimension_groups', lazy=True))
+
+  def __init__(self, name, settings):
+    super().__init__(name, settings)
+    
+  def __repr__(self):
+    return '<DimensionGroup %i>' % (self.id)
 
 class Measure(BaseLook):
 

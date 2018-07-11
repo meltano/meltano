@@ -1,14 +1,53 @@
 import re
 from sqlalchemy import String, cast
-from models.data import View, Dimension, Measure, Join
+from models.data import View, Dimension, DimensionGroup, Measure, Join
 
 class SqlHelper():
 
-  def get_func(self, t, table, sql):
-    if t.lower() == 'sum':
+  def dimension_groups(self, view_name, explore_name, dimension_groups):
+    base_sqls = []
+    for dimension_group in dimension_groups:
+      dimension_group_queried = DimensionGroup.query\
+        .join(View, DimensionGroup.view_id == View.id)\
+        .filter(View.name == view_name)\
+        .filter(DimensionGroup.name == dimension_group['name'])\
+        .first()
+
+      print('TOTAL RIGHT: {}'.format(dimension_group_queried))
+
+      name = dimension_group['name']
+      for timeframe in dimension_group['timeframes']:
+        if timeframe == 'date*':
+          base_sqls.append('DATE({}.{} ) AS "{}.{}_date"'\
+            .format(explore_name, name,\
+              explore_name, name))
+        elif timeframe == 'month*':
+          base_sqls.append('TO_CHAR(DATE_TRUNC(\'month\', {}.{} ), \'YYYY-MM\') AS "{}.{}_month"'\
+            .format(explore_name, name,\
+              explore_name, name))
+        elif timeframe == 'week*':
+          base_sqls.append('TO_CHAR(DATE_TRUNC(\'week\', {}.{} ), \'YYYY-MM-DD\') AS "{}.{}_week"'\
+            .format(explore_name, name,\
+              explore_name, name))
+        elif timeframe == 'year*':
+          base_sqls.append('EXTRACT(YEAR FROM {}.{} )::integer AS "{}.{}_year"'\
+            .format(explore_name, name,\
+              explore_name, name))
+    return ',\n'.join(base_sqls)
+
+  def get_func(self, name, t, table, sql):
+    func = t.lower()
+    print(func)
+    if func == 'sum':
       return self.sum(table, sql)
-    if t.lower() == 'count':
+    elif func == 'count':
       return self.count(table, sql)
+    elif func == 'number':
+      return self.number(name, table, sql)
+
+  def number(self, name, table, sql):
+    replaced_sql = sql.replace('${TABLE}', table);
+    return '{} AS "{}.{}"'.format(replaced_sql, table, name)
 
   def sum(self, table, sql):
     table_name = sql.replace('${TABLE}', table)
@@ -25,15 +64,16 @@ class SqlHelper():
     return 'COUNT(DISTINCT {}) AS "{}.count"'\
       .format(table_name, primary_key.view.name)
 
-  def group_by(self, joins, dimensions):
+  def group_by(self, joins, dimensions, timeframes):
     length = 0
-    if joins or dimensions:
+    if joins or dimensions or timeframes:
       if joins:
         for join in joins:
           if 'dimensions' in join:
             length = length + len(join['dimensions'])
       elif dimensions:
         length = len(list(dimensions))
+      length = len(timeframes) + length
       return 'GROUP BY {}'.format(', '.join([str(x) for x in list(range(1,length+1))]))
     else:
       return ''
@@ -98,7 +138,7 @@ class SqlHelper():
 
       if view.name != joined_view:
         queried_view = related_view
-      
+
       queried_dimension = Dimension.query\
         .join(View, Dimension.view_id == View.id)\
         .filter(Dimension.name == joined_dimension)\

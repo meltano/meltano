@@ -2,7 +2,9 @@ import json
 import sqlalchemy
 import psycopg2
 import re
+from collections import OrderedDict
 from decimal import Decimal
+from datetime import date, datetime
 
 from app import db
 
@@ -22,7 +24,9 @@ connections = {}
 def default(obj):
   if isinstance(obj, Decimal):
       return str(obj)
-  raise TypeError("Object of type '%s' is not JSON serializable" % type(obj).__name__)
+  elif isinstance(obj, (datetime, date)):
+    return obj.isoformat()
+  raise TypeError("Object of type '%s' is not JSON serialize-able" % type(obj).__name__)
 
 def update_connections():
   current_connections = Settings.query.first().settings['connections']
@@ -54,9 +58,14 @@ def get_sql(model_name, explore_name):
   view = View.query.filter(View.name == view_name).first()
   incoming_dimensions = incoming_json['dimensions']
   incoming_joins = incoming_json['joins']
+  incoming_dimension_groups = incoming_json['dimension_groups']
   incoming_measures = incoming_json['measures']
   incoming_filters = incoming_json['filters']
-  group_by = sqlHelper.group_by(incoming_joins, incoming_dimensions)
+  # get all timeframes
+  timeframes = [t['timeframes'] for t in incoming_dimension_groups]
+  # flatten list of timeframes
+  timeframes = [y for x in timeframes for y in x]
+  group_by = sqlHelper.group_by(incoming_joins, incoming_dimensions, timeframes)
   filter_by = sqlHelper.filter_by(incoming_filters, explore_name)
   to_run = incoming_json['run']
   base_table = view.settings['sql_table_name']
@@ -64,11 +73,12 @@ def get_sql(model_name, explore_name):
   set_dimensions = dimensions
   dimensions = map(lambda x: x.settings['sql'].replace("${TABLE}", explore_name), dimensions)
   dimensions = ',\n\t '.join(map(lambda x: '{}'.format(x), dimensions))
+  dimension_groups = sqlHelper.dimension_groups(view.name, explore_name, incoming_dimension_groups)
   
   measures = filter(lambda x: x.name in incoming_measures, view.measures)
   set_measures = list(measures)
   measures = filter(lambda x: x.name in incoming_measures, view.measures)
-  measures = ',\n\t '.join([sqlHelper.get_func(x.settings['type'], explore_name, x.settings['sql']) for x in measures])
+  measures = ',\n\t '.join([sqlHelper.get_func(x.name, x.settings['type'], explore_name, x.settings['sql']) for x in measures])
 
   join_dimensions = sqlHelper.join_dimensions(incoming_joins)
   join_measures = sqlHelper.join_measures(incoming_joins)
@@ -78,12 +88,15 @@ def get_sql(model_name, explore_name):
   if join_measures:
     measures = join_measures
 
+
   join_sql = sqlHelper.joins_by(incoming_joins, view)
 
   to_join = []
   
   if dimensions:
     to_join.append(dimensions)
+  if dimension_groups:
+    to_join.append(dimension_groups)
   if measures:
     to_join.append(measures)
 
@@ -97,17 +110,24 @@ def get_sql(model_name, explore_name):
   incoming_order = incoming_json['order']
   incoming_order_desc = incoming_json['desc']
   order_by = 'ORDER BY {}'.format(incoming_order) if incoming_order else ''
+
   if incoming_order_desc:
     order_by = '{} DESC'.format(order_by)
 
   base_sql = 'SELECT\n\t{}\nFROM {} AS {} \n{} {} \n{} \n{} \nLIMIT {};'.format(',\n '.join(to_join), base_table, explore_name, filter_by, join_sql, group_by, order_by, limit);
   if to_run:
+    db_to_connect = model.settings['connection']
+    if not db_to_connect in connections:
+      return jsonify({'error': True, 'code': 'Missing connection details to {}. Create a connection to {} in the settings.'.format(db_to_connect, db_to_connect)}), 422
     engine = connections[model.settings['connection']]['engine']
+
     try:
       results = engine.execute(base_sql)
     except sqlalchemy.exc.DBAPIError as e:
       return jsonify({'error': True, 'code': e.code, 'orig': e.orig.diag.message_primary, 'statement': e.statement}), 422
-    results = [dict(row) for row in results]
+
+    results = [OrderedDict(row) for row in results]
+
     base_dict = {'sql': base_sql, 'results': results, 'error': False}
     if not len(results):
       base_dict['empty'] = True

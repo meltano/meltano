@@ -13,7 +13,7 @@ from git import Repo
 
 from models.projects import Project
 from models.data import (
-  Model, Explore, View, Dimension, Measure, Join
+  Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 )
 
 bp = Blueprint('repos', __name__, url_prefix='/repos')
@@ -87,8 +87,6 @@ def lint():
 def db_import():
   repo_url = Project.query.first().git_url
   command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
-  # with open('./tmp/output.json', "w") as outfile:
-  #   subprocess.call(command, stdout=outfile)
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
   
@@ -125,6 +123,29 @@ def db_import():
           new_view.dimensions.append(new_dimension)
           db.session.add(new_dimension)
           new_view.dimensions.append(new_dimension)
+
+      if 'dimension_groups' in file_view:
+        for dimension_group in file_view['dimension_groups']:
+          new_dimension_group_settings = {}
+          if 'timeframes' in dimension_group:
+            new_dimension_group_settings['timeframes'] = dimension_group['timeframes']
+          if 'sql' in dimension_group:
+            new_dimension_group_settings['sql'] = dimension_group['sql']
+          if 'type' in dimension_group:
+            new_dimension_group_settings['type'] = dimension_group['type']
+          if 'label' in dimension_group:
+            new_dimension_group_settings['label'] = dimension_group['label']
+          if 'convert_tz' in dimension_group:
+            new_dimension_group_settings['convert_tz'] = dimension_group['convert_tz']
+          if 'description' in dimension_group:
+            new_dimension_group_settings['description'] = dimension_group['description']
+
+          new_dimension_group_settings['_n'] = dimension_group['_n']
+          new_dimension_group_settings['_type'] = dimension_group['_type']
+          new_dimension_group = DimensionGroup(dimension_group['_dimension_group'],\
+            new_dimension_group_settings)
+          new_view.dimension_groups.append(new_dimension_group)
+          db.session.add(new_dimension_group)
 
       # Add measures for view
       if 'measures' in file_view:

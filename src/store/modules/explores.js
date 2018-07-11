@@ -145,6 +145,14 @@ const actions = {
     commit('toggleDimensionSelected', dimension);
   },
 
+  toggleDimensionGroup({ commit }, dimensionGroup) {
+    commit('toggleDimensionGroupSelected', dimensionGroup);
+  },
+
+  toggleDimensionGroupTimeframe({ commit }, dimensionGroupObj) {
+    commit('toggleDimensionGroupTimeframeSelected', dimensionGroupObj);
+  },
+
   toggleMeasure({ commit }, measure) {
     commit('toggleMeasureSelected', measure);
   },
@@ -154,6 +162,7 @@ const actions = {
   },
 
   getSQL({ commit }, { run }) {
+    this.dispatch('explores/resetErrorMessage');
     const baseView = state.explore.view;
     const dimensions = baseView
       .dimensions
@@ -194,13 +203,24 @@ const actions = {
 
     let order = null;
 
+    const dimensionGroups = baseView
+      .dimension_groups
+      .map(dg => ({
+        name: dg.name,
+        timeframes: dg.timeframes
+          .filter(tf => tf.selected)
+          .map(tf => tf.name),
+      }))
+      .filter(dg => dg.timeframes.length);
+
     if (state.sortColumn) {
-      order = state.sortColumn;
+      order = state.keys.indexOf(state.sortColumn) + 1;
     }
 
     const postData = {
       view: baseView.name,
       dimensions,
+      dimension_groups: dimensionGroups,
       measures,
       joins,
       order,
@@ -353,6 +373,16 @@ const mutations = {
   toggleDimensionSelected(_, dimension) {
     const selectedDimension = dimension;
     selectedDimension.selected = !dimension.selected;
+  },
+
+  toggleDimensionGroupSelected(_, dimensionGroup) {
+    const selectedDimensionGroup = dimensionGroup;
+    selectedDimensionGroup.selected = !selectedDimensionGroup.selected;
+  },
+
+  toggleDimensionGroupTimeframeSelected(_, { timeframe }) {
+    const selectedTimeframe = timeframe;
+    selectedTimeframe.selected = !selectedTimeframe.selected;
   },
 
   toggleMeasureSelected(_, measure) {

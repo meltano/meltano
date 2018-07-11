@@ -21,7 +21,7 @@ SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-# SQLALCHEMY_ECHO=True
+SQLALCHEMY_ECHO=True
 
 THREADS_PER_PAGE = 2
 
