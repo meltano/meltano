@@ -1,0 +1,5 @@
+test_table:
+  whitelisted:
+    - id: integer
+    - age: integer
+    - name: character varying
