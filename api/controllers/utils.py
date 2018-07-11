@@ -13,8 +13,6 @@ class SqlHelper():
         .filter(DimensionGroup.name == dimension_group['name'])\
         .first()
 
-      print('TOTAL RIGHT: {}'.format(dimension_group_queried))
-
       name = dimension_group['name']
       for timeframe in dimension_group['timeframes']:
         if timeframe == 'date*':
@@ -61,7 +59,7 @@ class SqlHelper():
       .first()
     
     table_name = primary_key.settings['sql'].replace('${TABLE}', primary_key.view.name)
-    return 'COUNT(DISTINCT {}) AS "{}.count"'\
+    return 'COUNT({}) AS "{}.count"'\
       .format(table_name, primary_key.view.name)
 
   def group_by(self, joins, dimensions, timeframes):
@@ -107,7 +105,7 @@ class SqlHelper():
           
           for measure in queried_measures:
             sql = measure.settings['sql'] if 'sql' in measure.settings else None
-            measures.append(self.get_func(measure.settings['type'], join['name'], sql))
+            measures.append(self.get_func(measure.name, measure.settings['type'], join['name'], sql))
       if len(measures):
         return ",\n\t ".join(measures)
     return None
