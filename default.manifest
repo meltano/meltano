@@ -1,0 +1,33 @@
+billing:
+  attributes: 
+    - alias: invoice_id
+      input:
+        name invoice_id
+	type: string
+      metadata:
+        is_pkey: yes
+    - alias: customer_id
+      input:
+        name: customer_id
+	type: string
+      
+  "end_time",
+  "line_items",
+  "start_time",
+  "status_status",
+  "total_bandwidth",
+  "total_bandwidth_cost",
+  "total_bandwidth_units",
+  "total_commit_shortfall",
+  "total_cost",
+  "total_cost_before_discount",
+  "total_discount",
+  "total_discount_amount",
+  "total_extras",
+  "total_extras_cost",
+  "total_incurred_cost",
+  "total_overage",
+  "total_percentile",
+  "total_percentile_cost",
+  "total_requests",
+  "total_requests_cost"

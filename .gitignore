@@ -1,0 +1,14 @@
+*/__pycache__
+*/config/environment.conf
+*/config/dbconfig.py
+*/config/mailcfg.py
+*/data-integration/system/karaf/caches/*
+*.log
+*.pyc
+*.DS_Store
+*.idea
+*.csv
+tmp_log.txt
+.env
+.vscode/
+*.egg-info/

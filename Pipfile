@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+SQLAlchemy = "*"
+"aiohttp" = "*"
+"psycopg2" = "==2.7.4"
+"meltano-common" = ">=0.3.0-dev"
+
+[dev-packages]
+"flake8" = "*"
+"autopep8" = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.6"
