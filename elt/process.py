@@ -90,8 +90,17 @@ def csv_to_temp_table(db_conn, csv_path, *,
                       table_schema,
                       table_name,
                       csv_options={}):
-    with open(csv_path, 'r') as csv_file, \
-         db_conn.cursor() as cursor:
+    with open(csv_path, 'r') as csv_file:
+        csv_file_to_temp_table(db_conn, csv_file,
+                               table_schema=table_schema,
+                               table_name=table_name,
+                               csv_options=csv_options)
+
+def csv_file_to_temp_table(db_conn, csv_file, *,
+                           table_schema,
+                           table_name,
+                           csv_options={}):
+    with db_conn.cursor() as cursor:
         header = read_header(csv_file)
         tmp_table_name = create_tmp_table(db_conn,
                                           table_schema,
@@ -172,20 +181,35 @@ def integrate_csv(db_conn, csv_path, *,
     :param csv_path: name of CSV that you wish to write to table of same name
     :return:
     """
-    try:
-        logging.info("Importing {} as {}...".format(csv_path, table_name))
-        tmp_table_name = csv_to_temp_table(db_conn, csv_path,
-                                            table_schema=table_schema,
-                                            table_name=table_name,
-                                            csv_options=csv_options)
+    logging.info("Importing {} as {}...".format(csv_path, table_name))
+    with open(csv_path, 'r') as csv_file:
+        return integrate_csv_file(db_conn, csv_file,
+                                  table_schema=table_schema,
+                                  table_name=table_name,
+                                  primary_key=primary_key,
+                                  csv_options=csv_options,
+                                  update_action="NOTHING")
 
-        with open(csv_path, 'r') as csv_file:
-            header = read_header(csv_file)
+
+def integrate_csv_file(db_conn, csv_file, *,
+                       primary_key,
+                       table_schema,
+                       table_name,
+                       csv_options={},
+                       update_action="NOTHING"):
+    try:
+        tmp_table_name = csv_file_to_temp_table(db_conn, csv_file,
+                                                table_schema=table_schema,
+                                                table_name=table_name,
+                                                csv_options=csv_options)
+
+        csv_file.seek(0)
+        header = read_header(csv_file)
 
         schema, tmp_schema, table, tmp_table = identifiers(table_schema,
-                                                            "pg_temp",
-                                                            table_name,
-                                                            tmp_table_name)
+                                                           "pg_temp",
+                                                           table_name,
+                                                           tmp_table_name)
 
         update_columns = [col for col in header.split(',') if col != primary_key]
         query_stmt = """
