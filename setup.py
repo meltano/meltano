@@ -2,8 +2,8 @@
 from setuptools import setup, find_packages
 
 setup(name='meltano-common',
-      version='0.1.0-alpha0',
-      description='Meltano Extract framework.',
+      version='0.2.0-dev',
+      description='Meltano shared module.',
       author='Micaël Bergeron',
       author_email='mbergeron@gitlab.com',
       url='https://gitlab.com/meltano/meltano',
@@ -14,6 +14,7 @@ setup(name='meltano-common',
           "SQLAlchemy",
           "pandas",
           "pyarrow",
-          "pyyaml"
+          "pyyaml",
+          "requests"
       ]
      )
