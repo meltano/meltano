@@ -3,11 +3,11 @@ import pandas
 import io
 
 from abc import ABC, abstractmethod
-from elt.db import DB
-from elt.load import MeltanoLoader
-from elt import MeltanoService, MeltanoEntity
-from elt.stream import MeltanoStream
-from elt.process import integrate_csv_file # TODO: remove me
+from meltano.db import DB
+from meltano.load import MeltanoLoader
+from meltano import MeltanoService, MeltanoEntity
+from meltano.stream import MeltanoStream
+from meltano.process import integrate_csv_file # TODO: remove me
 
 
 class PostgreSQLLoader(MeltanoLoader):
@@ -18,11 +18,9 @@ class PostgreSQLLoader(MeltanoLoader):
         memcsv = io.StringIO()
         data.to_csv(memcsv, index=False)
 
-        print(memcsv.getvalue())
-
         with DB.open() as db:
             integrate_csv_file(db, memcsv,
-                               primary_key='name',
-                               table_name=entity.schema['table_name'],
-                               table_schema=entity.schema['schema_name'],
-                               update_action="UPDATE")
+                               primary_key=entity.primary_key,
+                               table_name=entity.table_name,
+                               table_schema=entity.schema_name,
+                               update_action=update_action)

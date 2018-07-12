@@ -1,3 +1,0 @@
-SQLAlchemy
-psycopg2>=2.7.4
-meltano-common==0.1.0a1

@@ -1,9 +1,0 @@
-elt/service.py
-meltano/service.py
-meltano/load/postgresql/__main__.py
-meltano/load/postgresql/loader.py
-meltano_load_postgresql.egg-info/PKG-INFO
-meltano_load_postgresql.egg-info/SOURCES.txt
-meltano_load_postgresql.egg-info/dependency_links.txt
-meltano_load_postgresql.egg-info/requires.txt
-meltano_load_postgresql.egg-info/top_level.txt
