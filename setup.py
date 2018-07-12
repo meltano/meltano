@@ -7,7 +7,7 @@ setup(name='meltano-load-postgresql',
       author='Meltano Team & Contributor',
       author_email='meltano@gitlab.com',
       url='https://gitlab.com/meltano/meltano',
-      packages=['meltano_load_postgresql'],
+      packages=['meltano.load.postgresql'],
       install_requires=[
           "SQLAlchemy",
           "psycopg2>=2.7.4",

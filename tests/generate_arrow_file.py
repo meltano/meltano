@@ -32,8 +32,8 @@ table = table.replace_schema_metadata(metadata={
 })
 
 # write to stdout
-#sink = os.fdopen(sys.stdout.fileno(), "wb")
-sink = open("test.arrow", "wb")
+sink = os.fdopen(sys.stdout.fileno(), "wb")
+#sink = open("test.arrow", "wb")
 #sink = pa.BufferOutputStream()
 writer = pa.RecordBatchStreamWriter(sink, table.schema)
 

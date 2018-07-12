@@ -3,11 +3,12 @@ import pandas
 import io
 
 from abc import ABC, abstractmethod
-from meltano.db import DB
-from meltano.load import MeltanoLoader
-from meltano import MeltanoService, MeltanoEntity
+from meltano.load.base import MeltanoLoader
+from meltano.common.db import DB
+from meltano.common.service import MeltanoService
+from meltano.common.entity import MeltanoEntity
+from meltano.common.process import integrate_csv_file # TODO: remove me
 from meltano.stream import MeltanoStream
-from meltano.process import integrate_csv_file # TODO: remove me
 
 
 class PostgreSQLLoader(MeltanoLoader):

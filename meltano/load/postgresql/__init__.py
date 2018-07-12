@@ -1,4 +1,4 @@
-from meltano import MeltanoService
+from meltano.common.service import MeltanoService
 from .loader import PostgreSQLLoader
 
 

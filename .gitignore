@@ -11,4 +11,4 @@
 tmp_log.txt
 .env
 .vscode/
-*.egg_info/
+*.egg-info/

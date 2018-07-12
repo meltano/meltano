@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 SQLAlchemy = "*"
 "psycopg2" = "==2.7.4"
-"meltano-common" = "==0.1.0a1"
+"meltano-common" = ">=0.2.0-dev"
 
 [dev-packages]
 "flake8" = "*"
