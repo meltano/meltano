@@ -1,4 +1,4 @@
-from elt.schema.serializers import MeltanoSerializer
+from meltano.schema.serializers import MeltanoSerializer
 
 class MeltanoService:
     loaders = dict()

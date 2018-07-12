@@ -6,9 +6,9 @@ import logging
 from psycopg2.sql import Identifier, SQL, Placeholder
 from enum import Enum
 from functools import partial
-from elt.db import DB, SystemModel
-from elt.schema import Schema, Column as SchemaColumn, DBType
-from elt.error import Error
+from meltano.db import DB, SystemModel
+from meltano.schema import Schema, Column as SchemaColumn, DBType
+from meltano.error import Error
 from sqlalchemy import inspect, Column
 from sqlalchemy.ext.mutable import MutableDict
 
@@ -22,7 +22,6 @@ class InconsistentStateError(Error):
     """
     Occur upon a wrong operation for the current state.
     """
-
 
 class ImpossibleTransitionError(Error):
     """

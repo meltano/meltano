@@ -6,7 +6,7 @@ import psycopg2.extras
 from typing import Sequence, Callable, Set, Union
 from enum import Enum
 from collections import OrderedDict, namedtuple
-from elt.error import ExceptionAggregator, SchemaError, InapplicableChangeError
+from meltano.error import ExceptionAggregator, SchemaError, InapplicableChangeError
 
 
 class DBType(str, Enum):

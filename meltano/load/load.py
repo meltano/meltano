@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from elt import MeltanoService, MeltanoEntity
-from elt.stream import MeltanoStream
+from meltano import MeltanoService, MeltanoEntity
+from meltano.stream import MeltanoStream
 
 
 class MeltanoLoader(ABC):

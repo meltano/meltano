@@ -1,4 +1,4 @@
-import elt.error
+import meltano.error
 import logging
 
 
@@ -7,7 +7,7 @@ def do_raise(error_type, *args):
 
 
 def test_aggregate_default():
-    aggregator = elt.error.ExceptionAggregator(Exception)
+    aggregator = meltano.error.ExceptionAggregator(Exception)
 
     for i in range(0, 10):
         aggregator.call(do_raise, Exception, "Error {}".format(i))
@@ -19,11 +19,11 @@ def test_aggregate_default():
 
 
 def test_aggregate_custom():
-    @elt.error.aggregate
-    class CustomError(elt.error.Error):
+    @meltano.error.aggregate
+    class CustomError(meltano.error.Error):
         pass
 
-    aggregator = elt.error.ExceptionAggregator(CustomError)
+    aggregator = meltano.error.ExceptionAggregator(CustomError)
 
     for i in range(0, 10):
         aggregator.call(do_raise, CustomError, "Error {}".format(i))
@@ -32,7 +32,7 @@ def test_aggregate_custom():
         aggregator.raise_aggregate()
     except CustomError as custom:
         logging.info(str(custom))
-    except elt.error.Error as err:
-        raise "Catched by the elt.error.Error clause."
+    except meltano.error.Error as err:
+        raise "Catched by the meltano.error.Error clause."
     except Exception as e:
         raise "Catched by the Exception clause."

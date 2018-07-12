@@ -6,6 +6,7 @@ import logging
 
 
 def read_header(file):
+    file.seek(0)
     return next(file).rstrip().lower().replace('"', '')
 
 
@@ -95,6 +96,7 @@ def csv_to_temp_table(db_conn, csv_path, *,
                                table_schema=table_schema,
                                table_name=table_name,
                                csv_options=csv_options)
+
 
 def csv_file_to_temp_table(db_conn, csv_file, *,
                            table_schema,
@@ -203,9 +205,7 @@ def integrate_csv_file(db_conn, csv_file, *,
                                                 table_name=table_name,
                                                 csv_options=csv_options)
 
-        csv_file.seek(0)
         header = read_header(csv_file)
-
         schema, tmp_schema, table, tmp_table = identifiers(table_schema,
                                                            "pg_temp",
                                                            table_name,

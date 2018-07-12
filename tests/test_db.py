@@ -1,4 +1,4 @@
-from elt.db import DB
+from meltano.db import DB
 
 
 def test_connect():

@@ -2,9 +2,9 @@ import argparse
 import sys
 
 from enum import Enum
-from elt.cli import ActionEnum, OptionEnum, parser_logging
-from elt.utils import setup_logging
-from elt.schema.serializers import serializer_for
+from meltano.cli import ActionEnum, OptionEnum, parser_logging
+from meltano.utils import setup_logging
+from meltano.schema.serializers import serializer_for
 
 
 def action_convert(args):

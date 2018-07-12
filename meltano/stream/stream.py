@@ -1,5 +1,5 @@
-from elt import MeltanoService
-from elt.schema import Schema
+from meltano import MeltanoService
+from meltano.schema import Schema
 
 from .writer import MeltanoStreamWriter
 from .reader import MeltanoStreamReader

@@ -4,7 +4,7 @@ import psycopg2
 import psycopg2.sql as sql
 import logging
 
-from elt.db import DB, Session
+from meltano.db import DB, Session
 from sqlalchemy import MetaData
 
 logging.basicConfig(level=logging.INFO)

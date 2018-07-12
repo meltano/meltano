@@ -4,7 +4,7 @@ import re
 
 from typing import Generator
 from functools import partial
-from elt.schema import Schema, Column
+from meltano.schema import Schema, Column
 from .base import Serializer
 
 

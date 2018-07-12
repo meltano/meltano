@@ -2,7 +2,7 @@ import abc
 
 from typing.io import TextIO
 from typing import Union
-from elt.schema import Schema
+from meltano.schema import Schema
 
 
 class Serializer:

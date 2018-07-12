@@ -4,7 +4,7 @@ import logging
 import json
 import pyarrow as pa
 
-from elt import MeltanoEntity
+from meltano import MeltanoEntity
 
 
 class MeltanoStreamReader:

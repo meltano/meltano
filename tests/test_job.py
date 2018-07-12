@@ -1,7 +1,7 @@
 import pytest
 
-from elt.db import DB
-from elt.job import Job, State
+from meltano.db import DB
+from meltano.job import Job, State
 from datetime import datetime
 
 def sample_job(payload={}):
