@@ -20,7 +20,7 @@ class PostgreSQLLoader(MeltanoLoader):
 
         with DB.open() as db:
             integrate_csv_file(db, memcsv,
-                               primary_key=entity.primary_key,
-                               table_name=entity.table_name,
-                               table_schema=entity.schema_name,
-                               update_action=update_action)
+                               primary_key='id',
+                               table_name=entity.schema['table_name'],
+                               table_schema=entity.schema['schema_name'],
+                               update_action="NOTHING")

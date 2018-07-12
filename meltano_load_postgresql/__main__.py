@@ -3,12 +3,12 @@ import sys
 import argparse
 import logging
 
-from meltano.load.postgresql import PostgreSQLLoader
 from meltano import MeltanoService
 from meltano.schema import Schema
 from meltano.cli import parser_db_conn, parser_logging
 from meltano.utils import setup_logging, setup_db
 from meltano.stream import MeltanoStream
+from meltano_load_postgresql import PostgreSQLLoader
 
 
 def parse():
