@@ -6,11 +6,11 @@ import logging
 from psycopg2.sql import Identifier, SQL, Placeholder
 from enum import Enum
 from functools import partial
-from meltano.db import DB, SystemModel
-from meltano.schema import Schema, Column as SchemaColumn, DBType
-from meltano.error import Error
 from sqlalchemy import inspect, Column
 from sqlalchemy.ext.mutable import MutableDict
+from meltano.schema import Schema, Column as SchemaColumn, DBType
+from .error import Error
+from .db import DB, SystemModel
 
 
 PG_SCHEMA = 'meltano'

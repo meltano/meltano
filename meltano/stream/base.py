@@ -1,15 +1,8 @@
-from meltano import MeltanoService
 from meltano.schema import Schema
+from meltano.common.service import MeltanoService
 
 from .writer import MeltanoStreamWriter
 from .reader import MeltanoStreamReader
-
-
-class MeltanoLoader:
-    pass
-
-class MeltanoExtractor:
-    pass
 
 
 class MeltanoStream:
@@ -23,10 +16,10 @@ class MeltanoStream:
         self.fd = fd
         self.schema = schema
 
-    def create_reader(self, loader: MeltanoLoader):
+    def create_reader(self, loader: 'MeltanoLoader'):
         return MeltanoStreamReader(self, loader)
 
-    def create_writer(self, extractor: MeltanoExtractor):
+    def create_writer(self, extractor: 'MeltanoExtractor'):
         """
         Send a DataFrame to the stream.
         """

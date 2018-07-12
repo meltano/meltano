@@ -4,7 +4,6 @@ import contextlib
 import logging
 
 from psycopg2.extras import LoggingConnection
-
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base

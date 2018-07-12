@@ -4,7 +4,7 @@
 *.DS_Store
 *.idea
 *.csv
-*.egg_info/
+*.egg-info/
 tmp_log.txt
 .env
 .vscode/

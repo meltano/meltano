@@ -7,7 +7,11 @@ setup(name='meltano-common',
       author='Meltano Team & Contributors',
       author_email='meltano@gitlab.com',
       url='https://gitlab.com/meltano/meltano',
-      packages=find_packages(),
+      packages=[
+          'meltano.schema',
+          'meltano.stream',
+          'meltano.common',
+      ],
       install_requires=[
           "psycopg2>=2.7.4",
           "configparser",

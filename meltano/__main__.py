@@ -2,8 +2,8 @@ import argparse
 import sys
 
 from enum import Enum
-from meltano.cli import ActionEnum, OptionEnum, parser_logging
-from meltano.utils import setup_logging
+from meltano.common.cli import ActionEnum, OptionEnum, parser_logging
+from meltano.common.utils import setup_logging
 from meltano.schema.serializers import serializer_for
 
 

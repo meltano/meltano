@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from meltano import MeltanoService, MeltanoEntity
+from meltano.common.service import MeltanoService
+from meltano.common.entity import MeltanoEntity
 from meltano.stream import MeltanoStream
 
 
