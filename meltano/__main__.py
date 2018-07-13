@@ -8,7 +8,7 @@ from meltano.stream import MeltanoStream
 
 
 service = MeltanoService()
-print(service.auto_discover())
+# print(service.auto_discover())
 
 @click.group()
 def root():
