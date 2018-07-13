@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='meltano',
       version='0.1.0-dev0',
@@ -7,9 +7,14 @@ setup(name='meltano',
       author='Meltano Team & Contributor',
       author_email='meltano@gitlab.com',
       url='https://gitlab.com/meltano/meltano',
-      packages=['meltano.submodule'],
+      packages=['meltano'],
       install_requires=[
           "meltano-common==0.2.0-dev",
           "fire"
-      ]
+      ],
+      entry_points={
+          'console_scripts': [
+              "meltano = meltano.cli:main"
+          ]
+       }
      )

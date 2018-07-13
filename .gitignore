@@ -3,6 +3,7 @@
 */config/dbconfig.py
 */config/mailcfg.py
 */data-integration/system/karaf/caches/*
+*.egg-info/
 *.log
 *.pyc
 *.DS_Store

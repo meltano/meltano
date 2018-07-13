@@ -14,6 +14,7 @@ service = MeltanoService()
 def root():
     pass
 
+
 @root.command()
 @click.argument('extractor')
 def extract(extractor):
@@ -41,6 +42,6 @@ def load(loader):
     logging.info("Integration complete.")
 
 
-if __name__ == '__main__':
+def main():
     logging.basicConfig(level=logging.DEBUG)
     root()
