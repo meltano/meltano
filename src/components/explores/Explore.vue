@@ -187,7 +187,52 @@
         is-expandable"
         @click="toggleChartsOpen"
         :class="{'is-collapsed': !chartsOpen}">Charts</div>
+
         <template v-if="chartsOpen">
+          <div class="field has-addons chart-buttons">
+            <p class="control">
+              <a class="button is-small" @click="setChartType('BarChart')">
+                <span class="icon is-small">
+                  <font-awesome-icon icon="chart-bar" style="color:white;"></font-awesome-icon>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small">
+                <span class="icon is-small" @click="setChartType('LineChart')">
+                  <font-awesome-icon icon="chart-line" style="color:white;"></font-awesome-icon>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small">
+                <span class="icon is-small" @click="setChartType('AreaChart')">
+                  <font-awesome-icon icon="chart-area" style="color:white;"></font-awesome-icon>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small">
+                <span class="icon is-small" @click="setChartType('ScatterChart')">
+                  <font-awesome-icon icon="dot-circle" style="color:white;"></font-awesome-icon>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small">
+                <span class="icon is-small" @click="setChartType('pie')">
+                  <font-awesome-icon icon="chart-pie" style="color:white;"></font-awesome-icon>
+                </span>
+              </a>
+            </p>
+            <p class="control">
+              <a class="button is-small" @click="setChartType('number')">
+                <span class="icon is-small" style="color:white;font-weight: bold;">
+                  9
+                </span>
+              </a>
+            </p>
+          </div>
           <div class="has-background-white-ter chart-toggles">
             <chart></chart>
           </div>
@@ -216,7 +261,7 @@
           <div class="buttons has-addons">
             <span class="button"
                   :class="{'is-active': isResultsTab}"
-                  @click="setCurrentTab('results')">Results</span>
+                  @click="setCurrentTab('results')">Results ({{numResults}})</span>
             <span class="button"
                   :class="{'is-active': isSQLTab}"
                   @click="setCurrentTab('sql')">SQL</span>
@@ -282,6 +327,7 @@ export default {
       'currentExploreLabel',
       'isDataTab',
       'isResultsTab',
+      'numResults',
       'isSQLTab',
       'getDistinctsForField',
       'getResultsFromDistinct',
@@ -308,6 +354,10 @@ export default {
       if (!this.getDistinctsForField(field)) {
         this.$store.dispatch('explores/getDistinct', field);
       }
+    },
+
+    setChartType(chartType) {
+      this.$store.dispatch('explores/setChartType', chartType);
     },
 
     viewRowClicked() {
@@ -469,5 +519,14 @@ export default {
 }
 code {
   white-space: pre;
+}
+.chart-buttons {
+  margin-top: -34px;
+  margin-left: 70px;
+  width: 20%;
+
+  .button {
+    background: transparent;
+  }
 }
 </style>

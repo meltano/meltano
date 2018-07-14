@@ -2,7 +2,7 @@
   <nav class="navbar is-info">
     <div class="navbar-brand">
       <a class="navbar-item" href="#">
-        <img src="../assets/logo.png" alt="Melt: data analytics for all" width="112" height="28">
+        <logo></logo>
       </a>
       <div class="navbar-burger burger" data-target="meltnavbar-transparent">
         <span></span>
@@ -51,9 +51,13 @@
 </template>
 <script>
 import { mapState } from 'vuex';
+import Logo from './Logo';
 
 export default {
   name: 'MainNav',
+  components: {
+    Logo,
+  },
   created() {
     this.$store.dispatch('projects/getProjects');
     this.$store.dispatch('repos/getModels');
@@ -85,6 +89,9 @@ export default {
 };
 </script>
 <style lang="scss">
+.navbar.is-info {
+  background: #464ACB;
+}
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
 }

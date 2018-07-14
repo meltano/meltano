@@ -24,6 +24,7 @@ const state = {
   filtersOpen: false,
   dataOpen: true,
   chartsOpen: false,
+  chartType: 'BarChart',
   limit: 3,
   distincts: {},
   sortColumn: null,
@@ -34,6 +35,11 @@ const getters = {
   hasResults() {
     if (!state.results) return false;
     return !!state.results.length;
+  },
+
+  numResults() {
+    if (!state.results) return 0;
+    return state.results.length;
   },
 
   getDistinctsForField: () => field => state.distincts[field],
@@ -159,6 +165,10 @@ const actions = {
 
   limitSet({ commit }, limit) {
     commit('setLimit', limit);
+  },
+
+  setChartType({ commit }, chartType) {
+    commit('setChartType', chartType);
   },
 
   getSQL({ commit }, { run }) {
@@ -290,6 +300,10 @@ const actions = {
 };
 
 const mutations = {
+
+  setChartType(context, chartType) {
+    state.chartType = chartType;
+  },
 
   setSortColumn(context, key) {
     if (state.sortColumn === key) {
