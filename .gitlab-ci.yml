@@ -67,8 +67,8 @@ publish:
   - pip install twine 
   script:
   - python setup.py sdist
-  - twine upload dist/*
+  - twine upload  --repository-url https://pypi.org dist/*
   only:
   - master
+  - dev
   when: manual
-  
