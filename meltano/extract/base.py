@@ -1,18 +1,31 @@
-from meltano.stream import MeltanoStream
+import pandas as pd
+import asyncio
+
+from typing import Sequence
+from abc import ABC, abstractmethod
+from meltano.stream.writer import MeltanoStreamWriter
+from meltano.common.entity import MeltanoEntity
 
 
 class MeltanoExtractor:
-    def __init__(self, stream: MeltanoStream, service: 'MeltanoService'):
+    def __init__(self, writer: MeltanoStreamWriter, service: 'MeltanoService'):
         self.service = service
-        self.stream = stream
+        self.writer = writer
 
-
-    async def extract_all(self):
+    @abstractmethod
+    async def entities(self):
+        """
+        Generates a list of MeltanoEntity from the data source.
+        """
         pass
 
+    @abstractmethod
+    async def extract(self, entity: MeltanoEntity):
+        """
+        Generate DataFrame for a specified entity.
+        """
+        pass
 
-    def send_all(self):
-        writer = self.stream.create_writer(self)
-        #self.start_extract()
-        writer.send_all()
-        #self.end_extract()
+    def run(self):
+        loop = asyncio.get_event_loop()
+        self.writer.send_all(loop, self)

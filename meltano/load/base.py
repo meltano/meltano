@@ -1,13 +1,15 @@
+import asyncio
+
 from abc import ABC, abstractmethod
 from meltano.common.service import MeltanoService
 from meltano.common.entity import MeltanoEntity
-from meltano.stream import MeltanoStream
+from meltano.stream.reader import MeltanoStreamReader
 
 
 class MeltanoLoader(ABC):
-    def __init__(self, stream: MeltanoStream, service: MeltanoService):
+    def __init__(self, reader: MeltanoStreamReader, service: MeltanoService):
         self.service = service
-        self.stream = stream
+        self.reader = reader
 
     def start_load(self):
         pass
@@ -19,8 +21,8 @@ class MeltanoLoader(ABC):
     def end_load(self):
         pass
 
-    def receive(self):
-        reader = self.stream.create_reader(self)
+    def run(self):
+        loop = asyncio.get_event_loop()
         self.start_load()
-        reader.read()
+        self.reader.read_all(loop, self)
         self.end_load()

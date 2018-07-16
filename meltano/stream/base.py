@@ -6,21 +6,17 @@ from .reader import MeltanoStreamReader
 
 
 class MeltanoStream:
-    """
-    Reads data serialized using the `MeltanoSink` writer.
-    """
-    def __init__(self, fd, schema: Schema):
+    def __init__(self, fd):
         """
         fd: file descriptor to use, it should be non-blocking.
         """
         self.fd = fd
-        self.schema = schema
 
-    def create_reader(self, loader: 'MeltanoLoader'):
-        return MeltanoStreamReader(self, loader)
+    def create_reader(self):
+        return MeltanoStreamReader(self)
 
-    def create_writer(self, extractor: 'MeltanoExtractor'):
+    def create_writer(self):
         """
         Send a DataFrame to the stream.
         """
-        return MeltanoStreamWriter(self, extractor)
+        return MeltanoStreamWriter(self)
