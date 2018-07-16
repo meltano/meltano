@@ -19,6 +19,7 @@ setup(name='meltano-common',
           "pandas",
           "pyarrow",
           "pyyaml",
-          "requests"
+          "requests",
+          "attrs"
       ]
      )

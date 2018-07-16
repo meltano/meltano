@@ -36,10 +36,7 @@ class MeltanoStreamReader:
 
         loop = asyncio.get_event_loop()
         loop.add_reader(tap, self.integrate, tap, loop)
-
-        self.loader.start_load()
         loop.run_forever()
-        self.loader.end_load()
 
     def read_metadata(self, reader) -> MeltanoEntity:
         raw_metadata = reader.schema.metadata[b'meltano']

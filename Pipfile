@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 configparser = "*"
 SQLAlchemy = "*"
+attrs = ">=17.0"
 "psycopg2" = ">=2.7.4"
 
 [dev-packages]
@@ -14,4 +15,4 @@ SQLAlchemy = "*"
 pytest = "*"
 
 [requires]
-python_version = "3.5"
+python_version = "3.6"

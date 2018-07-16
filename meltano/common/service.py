@@ -1,4 +1,7 @@
+import re
+
 from meltano.schema.serializers import MeltanoSerializer
+
 
 class MeltanoService:
     loaders = dict()
@@ -19,6 +22,12 @@ class MeltanoService:
 
     def create_extractor(self, extractor_uri, stream):
         return MeltanoService.extractors[extractor_uri](stream, self)
+
+    def auto_discover(self):
+        packages = pkg_resources.AvailableDistributions()  # scan sys.path
+        addons = filter(lambda pkg: re.search(r'meltano-(load|extract)-\w+'))
+
+        return list(map(importlib.import_module, addons))
 
     def load_schema(self, schema_name, schema_file):
         serializer = MeltanoSerializer(schema_name)

@@ -23,4 +23,4 @@ class MeltanoStream:
         """
         Send a DataFrame to the stream.
         """
-        raise NotImplementedError()
+        return MeltanoStreamWriter(self, extractor)

@@ -60,9 +60,6 @@ def parse():
 def main(args):
     args.action(args)
 
-
-if __name__ == '__main__':
-    args = parse()
-
-    setup_logging(args)
-    main(args)
+args = parse()
+setup_logging(args)
+main(args)
