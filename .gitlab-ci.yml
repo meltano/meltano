@@ -70,5 +70,5 @@ publish:
   - twine upload dist/*
   only:
   - master
+  - dev
   when: manual
-  
