@@ -1,27 +1,18 @@
-# This file is a template, and might need editing before it works on your project.
-# Official language image. Look for the different tagged releases at:
-# https://hub.docker.com/r/library/python/tags/
-image: python:latest
-
-# Change pip's cache directory to be inside the project directory since we can
-# only cache local items.
+image: python:3.6
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
-# Pip's cache doesn't store the python packages
-# https://pip.pypa.io/en/stable/reference/pip_install/#caching
-#
-# If you want to also cache the installed packages, you have to install
-# them in a virtualenv and cache it as well.
-
-image: python:3.6
+stages:
+    - test
+    - publish
+    - build
 
 cache:
   paths:
     - .cache/pip
     - venv/
 
-before_script:
+.pipenv_install: &pipenv_install
   - pip install pipenv
   - pipenv run python --version
   - pipenv run pip install cython
@@ -30,24 +21,17 @@ before_script:
 
 lint:
   stage: test
+  before_script: *pipenv_install
   script:
   - pipenv run flake8
   allow_failure: true
 
 test:
+  stage: test
+  before_script: *pipenv_install
   script:
   - pipenv run pytest 
   allow_failure: true
- 
-.run:
-  script:
-  - python setup.py bdist_wheel
-  # an alternative approach is to install and run:
-  - pip install dist/*
-  # run the command here
-  artifacts:
-    paths:
-    - dist/*.whl
 
 .pages:
   script:
@@ -61,9 +45,8 @@ test:
   - master
 
 publish:
-  stage: deploy
+  stage: publish
   before_script:
-  - echo "$PYPIRC" > ~/.pypirc
   - pip install twine 
   script:
   - python setup.py sdist
@@ -72,3 +55,31 @@ publish:
   - master
   - dev
   when: manual
+
+dev_build_meltano_cli:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano-cli:$CI_COMMIT_REF_NAME .
+  - docker push $CI_REGISTRY_IMAGE/meltano-cli:$CI_COMMIT_REF_NAME
+  except:
+  - master
+
+publish_build_meltano_cli:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano-cli:latest .
+  - docker push $CI_REGISTRY_IMAGE/meltano-cli:latest
+  only:
+  - master

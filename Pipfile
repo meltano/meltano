@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 configparser = "*"
 click = "*"
-meltano-common = ">=0.2.0-dev"
+meltano-common = "*"
 
 [dev-packages]
 "flake8" = "*"
@@ -14,4 +14,4 @@ meltano-common = ">=0.2.0-dev"
 pytest = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.6.6"
