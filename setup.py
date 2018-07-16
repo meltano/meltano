@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='meltano',
-      version='0.1.0-dev0',
+      version='0.3.0-dev',
       description='Meltano data science framework.',
       author='Meltano Team & Contributor',
       author_email='meltano@gitlab.com',
