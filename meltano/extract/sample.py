@@ -23,10 +23,10 @@ class SampleExtractor(MeltanoExtractor):
         yield ['a', 'b', 'c']
 
     async def extract(self, entity):
-        logging.debug(f"Extracting data for {entity}")
-        for i in range(10000):
-            await asyncio.sleep(0)
-            yield sample_data(i, ['a', 'b', 'c'])
+        # logging.debug(f"Extracting data for {entity}")
+        for i in range(1000):
+            await asyncio.sleep(3)
+            yield sample_data(i, entity)
 
 
 MeltanoService.register_extractor("com.meltano.extract.sample", SampleExtractor)

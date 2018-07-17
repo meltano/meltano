@@ -7,15 +7,12 @@ class MeltanoStreamWriter:
         self.chunksize = chunksize
         self.stream = stream
 
-    def send(self, sink, data):
-        writer = pa.RecordBatchStreamWriter(sink, data.schema)
+    def write(self, entity, frame):
+        data = self.encode(entity, frame)
+
+        writer = pa.RecordBatchStreamWriter(self._sink, data.schema)
         writer.write_table(data, chunksize=self.chunksize)
         writer.close()
-
-    async def write(self, sink, extractor):
-        async for entity in extractor.entities():
-            async for frame in extractor.extract(entity):
-                self.send(sink, self.encode(entity, frame))
 
     def encode(self, entity, frame, **metadata):
         page = pa.Table.from_pandas(frame, preserve_index=False)
@@ -28,8 +25,8 @@ class MeltanoStreamWriter:
 
         return page
 
-    def send_all(self, loop, extractor: 'MeltanoExtractor'):
-        with open(self.stream.fd, 'wb') as sink:
-            loop.run_until_complete(
-                self.write(sink, extractor)
-            )
+    def open(self):
+        self._sink = open(self.stream.fd, 'wb')
+
+    def close(self):
+        self._sink.close()
