@@ -13,24 +13,20 @@ class SqlHelper():
         .filter(DimensionGroup.name == dimension_group['name'])\
         .first()
 
-      name = dimension_group['name']
+      name = dimension_group_queried.table_column_name
       for timeframe in dimension_group['timeframes']:
         if timeframe == 'date*':
-          base_sqls.append('DATE({}.{} ) AS "{}.{}_date"'\
-            .format(explore_name, name,\
-              explore_name, name))
+          base_sqls.append('DATE({}) AS "{}_date"'\
+            .format(name, name))
         elif timeframe == 'month*':
-          base_sqls.append('TO_CHAR(DATE_TRUNC(\'month\', {}.{} ), \'YYYY-MM\') AS "{}.{}_month"'\
-            .format(explore_name, name,\
-              explore_name, name))
+          base_sqls.append('TO_CHAR(DATE_TRUNC(\'month\', {} ), \'YYYY-MM\') AS "{}_month"'\
+            .format(name, name))
         elif timeframe == 'week*':
-          base_sqls.append('TO_CHAR(DATE_TRUNC(\'week\', {}.{} ), \'YYYY-MM-DD\') AS "{}.{}_week"'\
-            .format(explore_name, name,\
-              explore_name, name))
+          base_sqls.append('TO_CHAR(DATE_TRUNC(\'week\', {} ), \'YYYY-MM-DD\') AS "{}_week"'\
+            .format(name, name))
         elif timeframe == 'year*':
-          base_sqls.append('EXTRACT(YEAR FROM {}.{} )::integer AS "{}.{}_year"'\
-            .format(explore_name, name,\
-              explore_name, name))
+          base_sqls.append('EXTRACT(YEAR FROM {} )::integer AS "{}_year"'\
+            .format(name, name))
     return ',\n'.join(base_sqls)
 
   def get_func(self, name, t, table, sql):

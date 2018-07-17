@@ -90,6 +90,14 @@ def db_import():
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
   
+  # db.session.query(Explore).delete()
+  # db.session.query(Model).delete()
+  # db.session.query(View).delete()
+  # db.session.query(Dimension).delete()
+  # db.session.query(DimensionGroup).delete()
+  # db.session.query(Measure).delete()
+  # db.session.query(Join).delete()
+
   models = j['models']
   files = j['files']
   # process views

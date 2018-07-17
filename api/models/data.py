@@ -35,6 +35,7 @@ class Explore(BaseLook):
     backref=db.backref('explores', lazy=True))
   joins = db.relationship('Join',
     backref='explore',
+    cascade='all,delete',
     lazy=True)
 
   def __init__(self, name, settings):
@@ -175,6 +176,12 @@ class DimensionGroup(BaseLook):
 
   def __init__(self, name, settings):
     super().__init__(name, settings)
+
+  @property
+  def table_column_name(self):
+    if 'sql' in self.settings:
+      return self.settings['sql'].replace('${TABLE}', self.view.name).rstrip()
+    return '{}.{}'.format(self.view.name, self.name).rstrip()
     
   def __repr__(self):
     return '<DimensionGroup %i>' % (self.id)

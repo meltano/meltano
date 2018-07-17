@@ -62,7 +62,7 @@
               </template>
             </template>
           </template>
-          <template v-else>
+          <template>
           <a
               class="panel-block
               panel-block-heading
@@ -71,7 +71,12 @@
               is-expandable"
               :class="{'is-collapsed': explore.view.collapsed}"
               @click="viewRowClicked">
-                {{explore.settings.label}}
+                <template v-if="hasJoins">
+                  {{explore.settings.view_label}}
+                </template>
+                <template v-else>
+                  {{explore.settings.label}}
+                </template>
               </a>
           </template>
           <template v-if="!explore.view.collapsed">
