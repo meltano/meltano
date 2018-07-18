@@ -7,6 +7,7 @@ from decimal import Decimal
 from datetime import date, datetime
 
 from app import db
+# from app import connector
 
 from flask import (
   Blueprint, jsonify, request
@@ -18,6 +19,9 @@ from models.projects import Project, Settings
 from models.data import (
   Model, Explore, View, Dimension, Measure, Join
 )
+
+# _connections = Settings.query.first().settings['connections']
+# connector.add_connections(_connections)
 
 connections = {}
 

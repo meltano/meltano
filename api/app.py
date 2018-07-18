@@ -8,6 +8,8 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
+from external_connector import ExternalConnector
+
 app = Flask(__name__)
 
 app.config.from_object('config')
@@ -15,6 +17,8 @@ if os.environ['FLASK_ENV'] == 'development':
   CORS(app)
 
 db = SQLAlchemy(app)
+
+# connector = ExternalConnector()
 
 logger = logging.getLogger('melt_logger')
 handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=2000, backupCount=10)
@@ -34,7 +38,6 @@ app.register_blueprint(projects.bp)
 app.register_blueprint(repos.bp)
 app.register_blueprint(settings.bp)
 app.register_blueprint(sql.bp)
-
 
 @app.route("/")
 def hello():
