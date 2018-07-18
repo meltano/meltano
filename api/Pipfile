@@ -4,7 +4,6 @@ verify_ssl = true
 url = "https://pypi.org/simple"
 
 [packages]
-flask-sqlalchemy = "*"
 sqlalchemy = "*"
 flask = "*"
 "psycopg2" = "*"
@@ -12,6 +11,8 @@ flask = "*"
 flask-cors = "*"
 gitpython = "*"
 markdown = "*"
+flask-sqlalchemy = "*"
+pypika = "*"
 
 [dev-packages]
 

@@ -35,6 +35,7 @@ app.register_blueprint(repos.bp)
 app.register_blueprint(settings.bp)
 app.register_blueprint(sql.bp)
 
+
 @app.route("/")
 def hello():
   return jsonify({"hello": 1})
