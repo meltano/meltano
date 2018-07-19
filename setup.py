@@ -10,6 +10,7 @@ setup(
     url='https://gitlab.com/meltano/meltano',
     packages=[
         'meltano.schema',
+        'meltano.schema.serializers',
         'meltano.stream',
         'meltano.common',
     ],
