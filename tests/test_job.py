@@ -1,7 +1,6 @@
 import pytest
 
-from meltano.db import DB
-from meltano.job import Job, State
+from meltano.common.job import Job, State
 from datetime import datetime
 
 def sample_job(payload={}):
