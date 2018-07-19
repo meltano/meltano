@@ -3,7 +3,7 @@ import logging
 import json
 import pyarrow as pa
 
-from meltano.common.entity import MeltanoEntity
+from meltano.common.entity import Entity
 
 
 class MeltanoStreamReader:
@@ -21,9 +21,9 @@ class MeltanoStreamReader:
                     break
 
                 reader = pa.open_stream(stream)
-                metadata = self.read_metadata(reader)
                 for batch in reader:
-                    loader.load(metadata, batch.to_pandas())
+                    metadata = self.read_metadata(reader)
+                    loader.integrate(metadata, batch)
         except Exception as e:
             logging.error("Stream cannot be read: {}".format(e))
         finally:
@@ -34,9 +34,8 @@ class MeltanoStreamReader:
             loop.add_reader(tap, self.integrate, tap, loader, loop)
             loop.run_forever()
 
-    def read_metadata(self, reader) -> MeltanoEntity:
+    def read_metadata(self, reader) -> Entity:
         raw_metadata = reader.schema.metadata[b'meltano']
         raw_metadata = json.loads(raw_metadata.decode("utf-8"))
 
-        # return self.service.entities[raw_metadata['entity_name']]
-        return MeltanoEntity(raw_metadata)
+        return raw_metadata

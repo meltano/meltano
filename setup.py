@@ -20,6 +20,7 @@ setup(
         "pandas",
         "pyarrow",
         "pyyaml",
+        "yamlordereddictloader",
         "requests",
         "attrs"
     ]
