@@ -13,6 +13,8 @@ setup(
         'meltano.schema.serializers',
         'meltano.stream',
         'meltano.common',
+        'meltano.load',
+        'meltano.extract'
     ],
     install_requires=[
         "psycopg2>=2.7.4",
