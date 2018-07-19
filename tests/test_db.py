@@ -1,4 +1,4 @@
-from meltano.db import DB
+from meltano.common.db import DB
 
 
 def test_connect():
