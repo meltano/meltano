@@ -1,8 +1,9 @@
 import asyncio
+import pyarrow
 
 from abc import ABC, abstractmethod
 from meltano.common.service import MeltanoService
-from meltano.common.entity import MeltanoEntity
+from meltano.common.entity import Entity
 from meltano.stream.reader import MeltanoStreamReader
 
 
@@ -15,8 +16,14 @@ class MeltanoLoader(ABC):
         pass
 
     @abstractmethod
-    def load(self, entity: MeltanoEntity, data):
+    def load(self, entity: Entity, data):
         pass
+
+    def integrate(self, metadata, batch):
+        #entity = self.service.entities[metadata['entity_id']]
+        entity = Entity(metadata['entity_name'])
+
+        return self.load(entity, batch.to_pandas())
 
     def end_load(self):
         pass

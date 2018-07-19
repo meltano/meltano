@@ -5,7 +5,7 @@ import logging
 from typing import Sequence
 from abc import ABC, abstractmethod
 from meltano.stream.writer import MeltanoStreamWriter
-from meltano.common.entity import MeltanoEntity
+from meltano.common.entity import Entity
 
 
 class MeltanoExtractor:
@@ -16,12 +16,12 @@ class MeltanoExtractor:
     @abstractmethod
     async def entities(self):
         """
-        Generates a list of MeltanoEntity from the data source.
+        Generates a list of Entity from the data source.
         """
         pass
 
     @abstractmethod
-    async def extract(self, entity: MeltanoEntity):
+    async def extract(self, entity: Entity):
         """
         Generates DataFrames for a specified entity.
         """

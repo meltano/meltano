@@ -4,7 +4,9 @@ import pandas as pd
 import json
 import logging
 
+from itertools import count
 from meltano.common.service import MeltanoService
+from meltano.common.entity import Entity
 from meltano.extract.base import MeltanoExtractor
 
 
@@ -20,13 +22,11 @@ def sample_data(i, columns):
 
 class SampleExtractor(MeltanoExtractor):
     async def entities(self):
-        yield ['a', 'b', 'c']
+        yield Entity('Sample')
 
     async def extract(self, entity):
-        # logging.debug(f"Extracting data for {entity}")
-        for i in range(1000):
-            await asyncio.sleep(3)
-            yield sample_data(i, entity)
+        for i in count():
+            yield sample_data(i, ['a', 'b', 'c'])
 
 
 MeltanoService.register_extractor("com.meltano.extract.sample", SampleExtractor)
