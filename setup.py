@@ -9,8 +9,8 @@ setup(name='meltano',
       url='https://gitlab.com/meltano/meltano',
       packages=['meltano'],
       install_requires=[
-          "meltano-common==0.2.0-dev",
-          "fire"
+          "meltano-common",
+          "click"
       ],
       entry_points={
           'console_scripts': [
