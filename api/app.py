@@ -18,7 +18,7 @@ if os.environ['FLASK_ENV'] == 'development':
 
 db = SQLAlchemy(app)
 
-# connector = ExternalConnector()
+connector = ExternalConnector()
 
 logger = logging.getLogger('melt_logger')
 handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=2000, backupCount=10)
@@ -45,6 +45,10 @@ def hello():
 
 @app.route("/drop_it_like_its_hot")
 def reset_db():
-  db.drop_all()
+  try:
+    db.drop_all()
+  except sqlalchemy.exc.OperationalError as err:
+    logging.error("Failed drop database.")
+    
   db.create_all()
   return jsonify({"dropped_it":"like_its_hot"})

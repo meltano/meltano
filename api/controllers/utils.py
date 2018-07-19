@@ -1,8 +1,23 @@
 import re
 from sqlalchemy import String, cast
 from models.data import View, Dimension, DimensionGroup, Measure, Join
+from pypika import Query, Table, Field
 
 class SqlHelper():
+
+  def table(self, name, alias):
+    (schema, name) = name.split('.')
+    return Table(name, schema=schema, alias=alias)
+
+  def field(self, name, table):
+    table = self.table(table)
+    return Field(name, table)
+
+  def dimension(self, d, table):
+    d.settings['sql'].replace("${TABLE}", table)
+
+  def fields(self, fields, table):
+    return [self.field(f, table) for f in fields]
 
   def dimension_groups(self, view_name, explore_name, dimension_groups):
     base_sqls = []

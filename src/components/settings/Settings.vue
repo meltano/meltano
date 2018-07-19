@@ -79,7 +79,7 @@
         </div>
 
         <div class="field is-grouped">
-          <p class="control">
+          <p class="control is-expanded">
             <input class="input"
                     type="text"
                     placeholder="Database"

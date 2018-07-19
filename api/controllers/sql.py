@@ -6,8 +6,9 @@ from collections import OrderedDict
 from decimal import Decimal
 from datetime import date, datetime
 
+from pypika import Query, Table, Field
+
 from app import db
-# from app import connector
 
 from flask import (
   Blueprint, jsonify, request
@@ -19,9 +20,6 @@ from models.projects import Project, Settings
 from models.data import (
   Model, Explore, View, Dimension, Measure, Join
 )
-
-# _connections = Settings.query.first().settings['connections']
-# connector.add_connections(_connections)
 
 connections = {}
 
@@ -117,6 +115,16 @@ def get_sql(model_name, explore_name):
 
   if incoming_order_desc:
     order_by = '{} DESC'.format(order_by)
+
+
+  table = sqlHelper.table(base_table, explore_name)
+  fields = sqlHelper.fields(incoming_dimensions, explore_name)
+
+  q = Query\
+    .from_(table)\
+    .select(*fields, explore_name)
+  print(str(q))
+
 
   base_sql = 'SELECT\n\t{}\nFROM {} AS {} \n{} {} \n{} \n{} \nLIMIT {};'.format(',\n '.join(to_join), base_table, explore_name, filter_by, join_sql, group_by, order_by, limit);
   if to_run:
