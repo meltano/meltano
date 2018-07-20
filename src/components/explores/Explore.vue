@@ -285,7 +285,6 @@
 </div>
 </template>
 <script>
-import 'ssf';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
