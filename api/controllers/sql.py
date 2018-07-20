@@ -117,15 +117,6 @@ def get_sql(model_name, explore_name):
     order_by = '{} DESC'.format(order_by)
 
 
-  table = sqlHelper.table(base_table, explore_name)
-  fields = sqlHelper.fields(incoming_dimensions, explore_name)
-
-  q = Query\
-    .from_(table)\
-    .select(*fields, explore_name)
-  print(str(q))
-
-
   base_sql = 'SELECT\n\t{}\nFROM {} AS {} \n{} {} \n{} \n{} \nLIMIT {};'.format(',\n '.join(to_join), base_table, explore_name, filter_by, join_sql, group_by, order_by, limit);
   if to_run:
     db_to_connect = model.settings['connection']

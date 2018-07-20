@@ -1,5 +1,6 @@
 import SSF from 'ssf';
 import Vue from 'vue';
+import sqlFormatter from 'sql-formatter';
 import exploreApi from '../../api/explore';
 import utils from '../../api/utils';
 
@@ -112,6 +113,10 @@ const getters = {
 
   currentLimit() {
     return state.limit;
+  },
+
+  formattedSql() {
+    return sqlFormatter.format(state.currentSQL);
   },
 };
 

@@ -275,7 +275,7 @@
         <ResultTable></ResultTable>
         <div>
           <div class="" v-if="isSQLTab && currentSQL">
-            <code>{{currentSQL}}</code>
+            <code>{{formattedSql}}</code>
           </div>
         </div>
         </template>
@@ -342,6 +342,7 @@ export default {
       'hasJoins',
       'getLabelForJoin',
       'showJoinDimensionMeasureHeader',
+      'formattedSql',
     ]),
 
     limit: {
