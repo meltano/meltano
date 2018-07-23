@@ -205,6 +205,9 @@ def integrate_csv_file(db_conn, csv_file, *,
                                                 table_name=table_name,
                                                 csv_options=csv_options)
 
+        csv_file.seek(0)
+        header = read_header(csv_file)
+
         header = read_header(csv_file)
         schema, tmp_schema, table, tmp_table = identifiers(table_schema,
                                                            "pg_temp",
