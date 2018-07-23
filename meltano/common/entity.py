@@ -49,19 +49,16 @@ class Attribute:
 
 
 class Entity:
-    def __init__(self, alias, attributes=[], metadata={}):
-        self.schema = {
-            'table_name': "test_table",
-            'schema_name': "test_schema"
-        }
-        self.alias = alias
+    def __init__(self, name, alias=None, attributes=[], metadata={}):
+        self.name = name
+        self.alias = alias or name.lower()
         self.attributes = attributes
         self.metadata = metadata
 
     def __repr__(self):
         out = io.StringIO()
 
-        out.write("{}:".format(self.alias))
+        out.write("{} as {}:".format(self.name, self.alias))
         [out.write("\n\t{}".format(attr)) for attr in self.attributes]
 
         return out.getvalue()

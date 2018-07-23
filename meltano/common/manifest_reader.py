@@ -24,7 +24,9 @@ class ManifestReader:
         attributes = [self.parse_attribute(attr) \
                       for attr in entity_def['attributes']]
 
-        return Entity(entity_name, attributes=attributes)
+        return Entity(entity_name,
+                      alias=entity_def.get('alias'),
+                      attributes=attributes)
 
     def parse_attribute(self, attribute_def) -> Attribute:
         input, output = map(self.parse_transient_attribute, (
@@ -33,7 +35,7 @@ class ManifestReader:
         ))
 
         return Attribute(attribute_def['alias'], input, output,
-                         metadata=attribute_def['metadata'])
+                         metadata=attribute_def.get('metadata', {}))
 
     def parse_transient_attribute(self, transient_attribute_def) -> TransientAttribute:
         if transient_attribute_def is None:

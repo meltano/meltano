@@ -4,7 +4,6 @@ import logging
 
 from requests.auth import HTTPBasicAuth
 from functools import reduce
-
 from .db import DB
 
 
@@ -19,6 +18,14 @@ def compose(*fs):
     :return: I{callable} taking 1 argument.
     """
     return reduce(lambda f, g: lambda x: f(g(x)), fs, lambda x: x)
+
+
+def pop_all(keys, d: dict):
+    return dict(map(lambda k: (k, d.pop(k)), keys))
+
+
+def get_all(keys, d: dict, default=None):
+    return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html

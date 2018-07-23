@@ -25,12 +25,16 @@ class ManifestWriter:
                   default_flow_style=False)
 
     def raw_entity(self, entity):
-        return {
+        raw_entity = {
+            'alias': entity.alias,
             'attributes': [
                 self.raw_attribute(attr) \
                 for attr in entity.attributes
             ]
         }
+
+        return raw_entity
+
 
     def raw_attribute(self, attribute):
         raw_attribute = {
