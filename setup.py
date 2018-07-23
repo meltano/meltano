@@ -25,6 +25,7 @@ setup(
         "pyyaml",
         "yamlordereddictloader",
         "requests",
-        "attrs"
+        "attrs",
+        "aiohttp"
     ]
 )
