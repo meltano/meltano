@@ -52,6 +52,9 @@ class FastlyExtractor(MeltanoExtractor):
     """
     Extractor for the Fastly Billing API
     """
+
+    source_name = "fastly"
+
     def create_session(self):
         headers = {
             'Fastly-Key': os.getenv("FASTLY_API_TOKEN"),
