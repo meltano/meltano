@@ -16,14 +16,14 @@ class MeltanoLoader(ABC):
         pass
 
     @abstractmethod
-    def load(self, entity: Entity, data):
+    def load(self, source_name, entity: Entity, data):
         pass
 
     def integrate(self, metadata, batch):
-        #entity = self.service.entities[metadata['entity_id']]
-        entity = Entity(metadata['entity_name'])
+        source, alias = metadata['entity_id'].split(':')[-2:] # two last part
+        entity = self.service.get_entity(metadata['entity_id'])
 
-        return self.load(entity, batch.to_pandas())
+        return self.load(source, entity, batch.to_pandas())
 
     def end_load(self):
         pass

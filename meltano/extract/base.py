@@ -9,7 +9,11 @@ from meltano.common.entity import Entity
 
 
 class MeltanoExtractor:
-    def __init__(self, writer: MeltanoStreamWriter, service: 'MeltanoService'):
+    source_name = None
+
+    def __init__(self, writer: MeltanoStreamWriter, service: 'MeltanoService',
+                 source_name=None):
+        self.source_name = source_name or self.__class__.source_name
         self.service = service
         self.writer = writer
 
@@ -29,7 +33,7 @@ class MeltanoExtractor:
 
     async def extract_entity(self, entity):
         async for frame in self.extract(entity):
-            self.writer.write(entity, frame)
+            self.writer.write(self.source_name, entity, frame)
 
     async def extract_all(self, loop, entities):
         tasks = []

@@ -10,8 +10,8 @@ class MeltanoStreamWriter:
         self.chunksize = chunksize
         self.stream = stream
 
-    def write(self, entity, frame):
-        data = self.encode(entity, frame)
+    def write(self, source_name, entity, frame):
+        data = self.encode(source_name, entity, frame)
 
         writer = pa.RecordBatchStreamWriter(self._sink, data.schema)
         writer.write_table(data)
@@ -35,7 +35,7 @@ class MeltanoStreamWriter:
 
         return df
 
-    def encode(self, entity, frame, **metadata):
+    def encode(self, source_name, entity, frame, **metadata):
         page = pa.Table.from_pandas(self.normalize_df(frame),
                                     schema=entity.as_pa_schema(),
                                     preserve_index=False)
@@ -43,7 +43,7 @@ class MeltanoStreamWriter:
         page = page.replace_schema_metadata(metadata={
             'meltano': json.dumps({
                 'entity_name': entity.alias,
-                'entity_uri': "com.meltano.{}.{}".format("fastly", entity.alias),
+                'entity_id': "urn:com.meltano:entity:{}:{}".format(source_name, entity.alias),
             })
         })
 

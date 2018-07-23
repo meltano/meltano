@@ -2,9 +2,11 @@ from meltano.schema import Schema, Column, DBType
 
 
 class Manifest:
-    def __init__(self, version, source_name, entities=[]):
-        self.version = version
+    __version__ = '1.0'
+
+    def __init__(self, source_name, version=None, entities=[]):
         self.source_name = source_name
+        self.version = version or Manifest.__version__
         self.entities = entities
 
     def as_schema(self):

@@ -1,4 +1,5 @@
 import json
+import os
 import pandas as pd
 
 from itertools import count
@@ -26,7 +27,7 @@ class JSONLoader(MeltanoLoader):
 
         return next(self.filenames[basename])
 
-    def load(self, entity: Entity, data):
+    def load(self, source_name, entity: Entity, data):
         data.to_json(self.filename(entity.alias), orient='records')
 
 
