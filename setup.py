@@ -11,6 +11,6 @@ setup(name='meltano-load-postgresql',
       install_requires=[
           "SQLAlchemy",
           "psycopg2>=2.7.4",
-          "meltano-common==0.2.0-dev"
+          "meltano-common"
       ]
      )
