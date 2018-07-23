@@ -1,14 +1,18 @@
-image: python:latest
-
+image: python:3.6
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
+
+stages:
+    - test
+    - publish
+    - build
 
 cache:
   paths:
     - .cache/pip
     - venv/
 
-before_script:
+.pipenv_install: &pipenv_install
   - pip install pipenv
   - pipenv run python --version
   - pipenv run pip install cython
@@ -17,11 +21,14 @@ before_script:
 
 lint:
   stage: test
+  before_script: *pipenv_install
   script:
   - pipenv run flake8
   allow_failure: true
 
 test:
+  stage: test
+  before_script: *pipenv_install
   script:
   - pipenv run pytest 
   allow_failure: true
@@ -48,7 +55,7 @@ test:
   - master
 
 publish:
-  stage: deploy
+  stage: publish
   before_script:
   - pip install twine 
   script:
@@ -58,3 +65,31 @@ publish:
   - master
   - dev
   when: manual
+
+dev_build_meltano_cli:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano-cli:$CI_COMMIT_REF_NAME .
+  - docker push $CI_REGISTRY_IMAGE/meltano-cli:$CI_COMMIT_REF_NAME
+  except:
+  - master
+
+publish_build_meltano_cli:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano-cli:latest .
+  - docker push $CI_REGISTRY_IMAGE/meltano-cli:latest
+  only:
+  - master

@@ -1,0 +1,38 @@
+version: '1.0'
+extractors:
+  stripe:
+    version: '>=2.1.*' # package version to fetch
+    manifest: sfdc/manifest.yml # could default to `<extractor>/manifest.yml`
+    env:
+      API_VERSION: '2.0'
+  marketo:
+    version: '=1.0.3'
+    manifest: marketo/manifest.yml
+transformers:
+  bumblebee: {} # this is a joke
+  pseudonymize:
+    strategy: SHA256+MD5
+loaders:
+  postgresql:
+    version: ">=2.0"
+    env:
+      PGUSERNAME: $PG_USERNAME
+      PGHOST: $PG_HOST
+  bigquery:
+    version: ">=1.0"
+    env: 
+      SERVICE_ACCOUNT: $BQ_SERVICE_ACCOUNT
+      PROJECT: $BQ_PROJECT
+  csv:
+    version: "0.1.0-dev0"
+    args:
+      output_dir: /tmp/meltano-loader-csv # same as --output-dir=/tmp/meltano-loader-csv
+pipelines: # we could shortcut the invocation by creating named pipelines
+  stripe:
+    extractor: stripe
+    transformers:
+      pseudonymizer: 
+        - "security[red]"
+        - user.* 
+    loader: postgresql
+  stripe_csv: stripe | bumblebee | csv # <extractor> | <transformer>, ... | <loader>

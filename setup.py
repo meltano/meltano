@@ -17,6 +17,7 @@ setup(
         'meltano.extract'
     ],
     install_requires=[
+        "click",
         "psycopg2>=2.7.4",
         "configparser",
         "SQLAlchemy",
@@ -27,5 +28,10 @@ setup(
         "requests",
         "attrs",
         "aiohttp"
-    ]
+    ],
+    entry_points={
+        'console_scripts': [
+            "meltano = meltano.cli:main"
+        ]
+    }
 )
