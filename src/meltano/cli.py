@@ -45,9 +45,12 @@ def describe(manifest):
 @click.argument('extractor')
 @click.argument('output')
 def discover(extractor, output):
-    extractor = load_extractor(extractor)
-    manifest = Manifest(output, extractor,
-                        entities=extractor.discover_entities())
+    extractor_name = extractor
+
+    extractor = load_extractor(extractor_name)
+    import pdb; pdb.set_trace()
+    entities = extractor.discover_entities()
+    manifest = Manifest('test', entities=entities)
 
     with open(output + ".yaml", 'w') as out:
         writer = ManifestWriter(out)

@@ -4,7 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-"-e ." = "*"  # installs dep spesified in the `install_requires` part of the setup.py
+"-e src/" = "*"  # installs dep spesified in the `install_requires` part of the setup.py
+
 [dev-packages]
 "flake8" = "*"
 "autopep8" = "*"

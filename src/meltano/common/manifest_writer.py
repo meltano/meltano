@@ -9,6 +9,7 @@ class ManifestWriter:
     def __init__(self, file):
         self.file = file
 
+
     def write(self, manifest: Manifest):
         entities = [
             (entity.alias, self.raw_entity(entity)) \
@@ -20,9 +21,11 @@ class ManifestWriter:
             *entities
         ])
 
+        import pdb; pdb.set_trace()
         yaml.dump(raw_manifest, self.file,
                   Dumper=yamlordereddictloader.SafeDumper,
                   default_flow_style=False)
+
 
     def raw_entity(self, entity):
         raw_entity = {
@@ -49,6 +52,7 @@ class ManifestWriter:
             raw_attribute['metadata'] = attribute.metadata
 
         return raw_attribute
+
 
     def raw_transient_attribute(self, transient_attribute):
         return {

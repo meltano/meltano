@@ -18,7 +18,9 @@ class ManifestReader:
         entities = [self.parse_entity(entity_name, entity_def) \
                     for entity_name, entity_def in raw_manifest.items()]
 
-        return Manifest(version, self.source_name, entities)
+        return Manifest(self.source_name,
+                        version=version,
+                        entities=entities)
 
     def parse_entity(self, entity_name, entity_def) -> Entity:
         attributes = [self.parse_attribute(attr) \

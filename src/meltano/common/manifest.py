@@ -6,7 +6,7 @@ class Manifest:
 
     def __init__(self, source_name, version=None, entities=[]):
         self.source_name = source_name
-        self.version = version or Manifest.__version__
+        self.version = version or self.__class__.__version__
         self.entities = entities
 
     def as_schema(self):

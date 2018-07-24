@@ -90,7 +90,7 @@ class FastlyExtractor(MeltanoExtractor):
         async def drain(generator):
             results = []
             async for result in generator:
-                import pdb; pdb.set_trace()
+                results.append(result)
             return results
 
         loop = asyncio.get_event_loop()

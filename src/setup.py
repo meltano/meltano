@@ -8,14 +8,7 @@ setup(
     author='Meltano Team & Contributors',
     author_email='meltano@gitlab.com',
     url='https://gitlab.com/meltano/meltano',
-    packages=[
-        'meltano.schema',
-        'meltano.schema.serializers',
-        'meltano.stream',
-        'meltano.common',
-        'meltano.load',
-        'meltano.extract'
-    ],
+    packages=find_packages(),
     install_requires=[
         "click",
         "psycopg2>=2.7.4",
