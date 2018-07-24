@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='meltano',
-    version='0.2.0-dev',
+    version='0.1.0-dev',
     description='Meltano framework.',
     author='Meltano Team & Contributors',
     author_email='meltano@gitlab.com',

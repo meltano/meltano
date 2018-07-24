@@ -3,6 +3,7 @@ import importlib
 import sys
 import logging
 import functools
+import os
 
 from meltano.common.service import MeltanoService
 from meltano.common.manifest_reader import ManifestReader
@@ -12,6 +13,7 @@ from meltano.common.db import DB
 from meltano.common.utils import setup_db, pop_all
 from meltano.schema import schema_apply
 from meltano.stream import MeltanoStream
+from meltano.cli.params import MANIFEST_TYPE
 
 
 service = MeltanoService()
@@ -42,11 +44,6 @@ def build_loader(name):
     stream = MeltanoStream(sys.stdin.fileno())
     loader = service.create_loader("com.meltano.load.{}".format(name), stream.create_reader())
     return loader
-
-
-def build_manifest(source, manifest_path):
-    with open(manifest_path, 'r') as file:
-        return ManifestReader(source).load(file)
 
 
 def register_manifest(manifest):
@@ -83,7 +80,6 @@ def db_options(func):
     @click.password_option(envvar='PG_PASSWORD')
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        import pdb; pdb.set_trace()
         config = pop_all(("schema", "host", "port", "database", "table_name", "user", "password"), kwargs)
         DB.setup(**config)
         return func(*args, **kwargs)
@@ -117,11 +113,9 @@ def discover(extractor, source_name):
 
 @root.command()
 @click.argument('extractor')
-@click.argument('manifest')
+@click.argument('manifest', type=MANIFEST_TYPE)
 def extract(extractor, manifest):
-    source, _ = manifest.split(".")
-
-    register_manifest(build_manifest(source, manifest))
+    register_manifest(manifest)
     extractor = build_extractor(extractor)
 
     logging.info("Extracting data...")
@@ -131,11 +125,9 @@ def extract(extractor, manifest):
 
 @root.command()
 @click.argument('loader')
-@click.argument('manifest')
+@click.argument('manifest', type=MANIFEST_TYPE)
 def load(loader, manifest):
-    source, _ = manifest.split(".")
-
-    register_manifest(build_manifest(source, manifest))
+    register_manifest(manifest)
     loader = build_loader(loader)
 
     logging.info("Waiting for data...")
@@ -145,15 +137,7 @@ def load(loader, manifest):
 
 @root.command()
 @db_options
-@click.argument('manifest')
+@click.argument('manifest', type=MANIFEST_TYPE)
 def apply_schema(manifest):
-    source, _ = manifest.split(".")
-    manifest = build_manifest(source, manifest)
-
     with DB.open() as db:
         schema_apply(db, manifest.as_schema())
-
-
-def main():
-    logging.basicConfig(level=logging.DEBUG)
-    root()

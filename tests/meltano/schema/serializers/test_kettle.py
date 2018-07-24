@@ -7,8 +7,6 @@ def test_config():
       .loads(SAMPLE_KETTLE_CONFIG_EXTRA) \
       .schema
 
-    import pdb; pdb.set_trace()
-
     assert(("User", "Id") in schema.columns)
     assert(("User", "LastName") in schema.columns)
 

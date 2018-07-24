@@ -21,7 +21,6 @@ class ManifestWriter:
             *entities
         ])
 
-        import pdb; pdb.set_trace()
         yaml.dump(raw_manifest, self.file,
                   Dumper=yamlordereddictloader.SafeDumper,
                   default_flow_style=False)

@@ -83,7 +83,6 @@ class FastlyExtractor(MeltanoExtractor):
         """
         async with self.create_session() as session:
             billing = await self.req(session, "billing/v2/year/2018/month/06")
-            # import pdb; pdb.set_trace()
             yield df_to_entity("Billing", billing)
 
     def discover_entities(self):
