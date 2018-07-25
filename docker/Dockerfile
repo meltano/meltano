@@ -1,7 +1,8 @@
-FROM registry.gitlab.com/meltano/meltano-load-postgresql
+FROM python:3.6.6
 
-ADD ../../meltano-extract-fastly /app/extract/fastly
+RUN set -ex && pip3 install pipenv --upgrade
 
-RUN pip install /app/extract/fastly
+ADD src/meltano /app/
+WORKDIR /app
 
-CMD set -o pipefail && meltano extract fastly | meltano load postgresql
+RUN pip install .
