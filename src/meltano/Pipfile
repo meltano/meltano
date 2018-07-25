@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+"b7287bc" = {path = "./src", editable = true}
+
+[dev-packages]
+"flake8" = "*"
+"autopep8" = "*"
+pytest = "*"
+
+[requires]
+python_version = "3.6"

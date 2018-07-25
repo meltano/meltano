@@ -1,0 +1,22 @@
+version: '3.1'
+services:
+  db:
+    container_name: meltano-dw
+    build: docker/warehouse
+    image: meltano/dw:devenv
+    environment:
+      POSTGRES_DB: $PG_DATABASE
+      POSTGRES_USER: $PG_USERNAME
+      POSTGRES_PASSWORD: $PG_PASSWORD
+    ports:
+      - 5432:5432
+  elt:
+    container_name: meltano-elt
+    build: docker/elt
+    image: registry.gitlab.com/meltano/meltano-elt/extract:devenv
+    command: tail -f /dev/null # keep running
+    # command: pipenv shell
+    volumes:
+      - .:/meltano
+    depends_on:
+      - db
