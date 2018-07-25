@@ -2,6 +2,7 @@ import re
 from sqlalchemy import String, cast
 from .substitution import Substitution
 from .aggregate import Aggregate
+from .date import Date
 from models.data import View, Dimension, DimensionGroup, Measure, Join
 from pypika import Query, Table, Field
 
@@ -33,7 +34,9 @@ class SqlHelper():
     dimensions = list(filter(lambda x: x.name in incoming_dimensions, view.dimensions))
     measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
     table = self.table(base_table, explore.name)
+    dimension_groups = self.dimension_groups(view_name, incoming_dimension_groups, table)
     dimensions = self.dimensions(dimensions, table)
+    dimensions = dimensions + dimension_groups
     measures = self.measures(measures, table)
     return self.get_query(from_=table, dimensions=dimensions, measures=measures)
 
@@ -56,6 +59,21 @@ class SqlHelper():
   def field_from_measure(self, m, table):
     aggregate = Aggregate(m, table)
     return aggregate.sql
+
+  def dimension_groups(self, view_name, dimension_groups, table):
+    fields = []
+    for dimension_group in dimension_groups:
+      dimension_group_queried = DimensionGroup.query\
+        .join(View, DimensionGroup.view_id == View.id)\
+        .filter(View.name == view_name)\
+        .filter(DimensionGroup.name == dimension_group['name'])\
+        .first()
+      (_table, name) = dimension_group_queried.table_column_name.split('.')
+      for timeframe in dimension_group['timeframes']:
+        d = Date(timeframe, table, name)
+        fields.append(d.sql)
+    return fields
+
 
   def get_query(self, from_, dimensions, measures):
     select = dimensions + measures
