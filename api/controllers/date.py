@@ -19,5 +19,5 @@ class Date():
       alias = '{}_week'.format((field.get_sql().replace('_', '')))
       self.sql = fn.ToChar(DateTrunc('week', field), 'YYYY-MM-DD', alias=alias)
     elif timeframe == 'year*':
-      fields.append('EXTRACT(YEAR FROM {} )::integer AS "{}_year"'\
-        .format(name, name))
+      alias = '{}_year'.format((field.get_sql().replace('_', '')))
+      self.sql = fn.Extract('YEAR', field, alias=alias)
