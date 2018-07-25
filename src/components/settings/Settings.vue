@@ -7,11 +7,36 @@
       </p>
       <ul class="menu-list">
         <li><a>Connections</a></li>
+        <li><a>Deploy Keys</a></li>
       </ul>
     </aside>
     <div class="column section">
       <section class="section">
-        <h2 class="title">Connections</h2>
+        <h2 class="title">Deploy Keys</h2>
+        <!-- <h2 class="title">Connections</h2> -->
+        <div class="columns is-multiline is-mobile">
+          <div class="column is-half">
+            <div class="card">
+              <header class="card-header">
+                <p class="card-header-title">
+                  GitLab Deploy Key
+                </p>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <p>
+                    <strong>Title</strong>
+                    <span class="is-pulled-right">GL Deploy</span>
+                  </p>
+                  <p>
+                    <strong>Key</strong>
+                    <span class="is-pulled-right">**************</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <p v-if="!hasConnections">No Database Connections</p>
         <div class="columns is-multiline is-mobile">
           <div class="column is-half"
