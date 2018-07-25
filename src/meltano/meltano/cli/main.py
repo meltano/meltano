@@ -21,8 +21,8 @@ service = MeltanoService()
 
 
 def build_extractor(name):
-    # this should register the module
     try:
+        # this should register the module
         importlib.import_module("meltano.extract.{}".format(name))
     except ImportError as e:
         logging.error("Cannot find the extractor {0}, you might need to install it (meltano-extract-{0})".format(name))

@@ -10,6 +10,7 @@ class MeltanoStreamReader:
     def __init__(self, stream):
         self.stream = stream
 
+
     def integrate(self, stream, loader, loop):
         """
         Read a DataFrame from the stream.
@@ -29,10 +30,13 @@ class MeltanoStreamReader:
         finally:
             loop.stop()
 
+
     def read_all(self, loop, loader: 'MeltanoLoader'):
         with open(self.stream.fd, 'rb') as tap:
+            # TODO add error handling
             loop.add_reader(tap, self.integrate, tap, loader, loop)
             loop.run_forever()
+
 
     def read_metadata(self, reader) -> Entity:
         raw_metadata = reader.schema.metadata[b'meltano']

@@ -24,8 +24,10 @@ class SampleExtractor(MeltanoExtractor):
     async def entities(self):
         yield Entity('Sample')
 
+
     async def extract(self, entity):
         for i in count():
+            await asyncio.sleep(1)
             yield sample_data(i, ['a', 'b', 'c'])
 
 

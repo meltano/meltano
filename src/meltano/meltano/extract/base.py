@@ -11,11 +11,13 @@ from meltano.common.entity import Entity
 class MeltanoExtractor:
     source_name = None
 
+
     def __init__(self, writer: MeltanoStreamWriter, service: 'MeltanoService',
                  source_name=None):
         self.source_name = source_name or self.__class__.source_name
         self.service = service
         self.writer = writer
+
 
     @abstractmethod
     async def entities(self):
@@ -24,6 +26,7 @@ class MeltanoExtractor:
         """
         pass
 
+
     @abstractmethod
     async def extract(self, entity: Entity):
         """
@@ -31,9 +34,11 @@ class MeltanoExtractor:
         """
         pass
 
+
     async def extract_entity(self, entity):
         async for frame in self.extract(entity):
             self.writer.write(self.source_name, entity, frame)
+
 
     async def extract_all(self, loop, entities):
         tasks = []
@@ -50,8 +55,10 @@ class MeltanoExtractor:
             logging.info("Shutting down")
             self.writer.close()
 
+
     def run(self):
         try:
+            # TODO: add error handling
             loop = asyncio.get_event_loop()
             loop.run_until_complete(
                 self.extract_all(loop, self.entities)

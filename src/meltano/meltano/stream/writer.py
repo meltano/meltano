@@ -10,12 +10,14 @@ class MeltanoStreamWriter:
         self.chunksize = chunksize
         self.stream = stream
 
+
     def write(self, source_name, entity, frame):
         data = self.encode(source_name, entity, frame)
 
         writer = pa.RecordBatchStreamWriter(self._sink, data.schema)
         writer.write_table(data)
         writer.close()
+
 
     # TODO: this should be inferred from the Entity at some point
     # there also might be some other transformations that could be done
@@ -35,6 +37,7 @@ class MeltanoStreamWriter:
 
         return df
 
+
     def encode(self, source_name, entity, frame, **metadata):
         page = pa.Table.from_pandas(self.normalize_df(frame),
                                     schema=entity.as_pa_schema(),
@@ -49,8 +52,11 @@ class MeltanoStreamWriter:
 
         return page
 
+
+    # TODO: use a context manager
     def open(self):
         self._sink = open(self.stream.fd, 'wb')
+
 
     def close(self):
         self._sink.close()

@@ -18,6 +18,7 @@ from meltano.common.entity import Entity, Attribute, TransientAttribute
 
 URL = "https://api.fastly.com/"
 
+
 # TODO: refactor to utils
 pandas_to_dbtype = {
     np.dtype('object'): DBType.String,
@@ -29,6 +30,7 @@ pandas_to_dbtype = {
     np.dtype('int8'): DBType.Integer,
     np.dtype('datetime64'): DBType.Timestamp
 }
+
 
 # TODO: refactor to utils
 def df_to_entity(alias, df):
@@ -55,6 +57,7 @@ class FastlyExtractor(MeltanoExtractor):
 
     source_name = "fastly"
 
+
     def create_session(self):
         headers = {
             'Fastly-Key': os.getenv("FASTLY_API_TOKEN"),
@@ -63,8 +66,10 @@ class FastlyExtractor(MeltanoExtractor):
         session = aiohttp.ClientSession(headers=headers)
         return session
 
+
     def url(self, endpoint):
         return "".join((URL, endpoint))
+
 
     # TODO: refactor this out in a HTTP loader
     async def req(self, session, endpoint, payload={}):
@@ -76,6 +81,7 @@ class FastlyExtractor(MeltanoExtractor):
 
             return json_normalize(await resp.json())
 
+
     # TODO: refactor this out in a discovery component
     async def entities(self):
         """
@@ -84,6 +90,7 @@ class FastlyExtractor(MeltanoExtractor):
         async with self.create_session() as session:
             billing = await self.req(session, "billing/v2/year/2018/month/06")
             yield df_to_entity("Billing", billing)
+
 
     def discover_entities(self):
         async def drain(generator):
@@ -98,6 +105,7 @@ class FastlyExtractor(MeltanoExtractor):
         )
 
         return entities
+
 
     async def extract(self, entity):
         async with self.create_session() as session:
