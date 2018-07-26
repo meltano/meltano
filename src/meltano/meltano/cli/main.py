@@ -15,6 +15,16 @@ from meltano.schema import schema_apply
 from meltano.stream import MeltanoStream
 from meltano.cli.params import MANIFEST_TYPE
 
+# Convention:
+#   source_name:
+#     - --source-name
+#     - manifest basename
+#     - extractor_name
+#
+#   schema_name:
+#     - --schema, -S
+#     - source_name
+#
 
 service = MeltanoService()
 # print(service.auto_discover())
@@ -70,9 +80,6 @@ def db_options(func):
                   default=lambda: os.getenv('USER', ''),
                   help="Database to import the data to.")
 
-    @click.option('-T', '--table', 'table_name',
-                  help="Table to import the data to.")
-
     @click.option('-u', '--user',
                   envvar='PG_USERNAME',
                   default=lambda: os.getenv('USER', ''),
@@ -124,6 +131,7 @@ def extract(extractor, manifest):
 
 
 @root.command()
+@db_options
 @click.argument('loader')
 @click.argument('manifest', type=MANIFEST_TYPE)
 def load(loader, manifest):
