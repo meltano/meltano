@@ -217,7 +217,6 @@ const actions = {
       .filter(j => !!(j.dimensions || j.measures));
 
     let order = null;
-
     const dimensionGroups = baseView
       .dimension_groups
       .map(dg => ({
