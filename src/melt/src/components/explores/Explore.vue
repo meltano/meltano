@@ -447,6 +447,10 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+code {
+  white-space: pre;
+  word-wrap: break-word;
+}
 .panel-block {
   position: relative;
   &.indented {
@@ -521,9 +525,6 @@ export default {
 .selected-filters {
   padding: 1.5rem;
   padding-left: 0;
-}
-code {
-  white-space: pre;
 }
 .chart-buttons {
   margin-top: -34px;
