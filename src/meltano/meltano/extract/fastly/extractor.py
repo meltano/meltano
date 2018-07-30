@@ -82,7 +82,6 @@ class FastlyExtractor(MeltanoExtractor):
             return json_normalize(await resp.json())
 
 
-    # TODO: refactor this out in a discovery component
     async def entities(self):
         """
         Generates a list of Entity object for entity auto-discovery
@@ -92,6 +91,7 @@ class FastlyExtractor(MeltanoExtractor):
             yield df_to_entity("Billing", billing)
 
 
+    # TODO: refactor this out in a discovery component
     def discover_entities(self):
         async def drain(generator):
             results = []

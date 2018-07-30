@@ -84,10 +84,11 @@ def db_options(func):
                   envvar='PG_USERNAME',
                   default=lambda: os.getenv('USER', ''),
                   help="Specifies the user to connect to the database with.")
+
     @click.password_option(envvar='PG_PASSWORD')
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        config = pop_all(("schema", "host", "port", "database", "table_name", "user", "password"), kwargs)
+        config = pop_all(("schema", "host", "port", "database", "user", "password"), kwargs)
         DB.setup(**config)
         return func(*args, **kwargs)
     return wrapper
