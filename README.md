@@ -48,12 +48,12 @@ Meltano uses GitLab CI/CD to setup and maintain its stack, so software and scrip
 ### Evolution from an internal project, to a community, to open core
 
 1. We are building Meltano to solve a problem that GitLab share with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
-2. Next we'll focus on building a community around Meltano with more users and regular contributiors to the code base.
+2. Next we'll focus on building a community around Meltano with more users and regular contributors to the code base.
 3. Right now Meltano is completely open source. After we have a community we'll introduce propietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
 
 ## Roadmap
 
-1. MVC
+1. [MVC](https://gitlab.com/meltano/meltano/issues/10)
   * [Horizontal slice of ELT sources](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=✓&state=opened&label_name[]=elt): Salesforce, Marketo, NetSuite, Zuora, etc.
   * [Data Pipeline](https://gitlab.com/meltano/meltano/issues?label_name[]=pipeline): container, CI pipeline, review apps
 2. Data Model and Visualization
