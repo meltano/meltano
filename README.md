@@ -32,6 +32,8 @@ In addition, believe that the information a business uses to make decisions must
 - [Issue board](https://gitlab.com/meltano/meltano/boards/528368?=)
 - [Functional Group Update (PDF format)](https://drive.google.com/open?id=1oNiCtHkorYKq19kx8CwGr8Z7QCjVQiOj)  
 - [Functional Group Update (Keynote format)](https://drive.google.com/open?id=1WmleHjP41nsxszGV50ionZKx-b2X3PvF)
+- [Blog post](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/)
+- [Hacker News discussion](https://news.ycombinator.com/item?id=17667399)
 
 ## Approach
 
