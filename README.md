@@ -46,7 +46,7 @@ For many companies GitLab serves as the single data store for their engineering 
 3. Market lifecycle, the complete go-to-market lifecycle with the user/customer jouney.
 
 ### Meltano is business intelligence (BI) as code.
-Meltano uses GitLab CI/CD to setup and maintain its stack, so software and scripts required are checked into SCM with the attendant benefits: full version control, history, easy collaboration and reviews. Automated management of the BI environment means it is easy to make alterations, re-deploy in the event of an issue or outage, as well as provision new environments for different uses like a staging server.
+Meltano uses GitLab CI/CD to setup and maintain its stack, so software and scripts required are checked into SCM with the attendant benefits: full version control, history, easy collaboration and reviews. Automated management of the BI environment means it is easy to make alterations, re-deploy in the event of an issue or outage, as well as provision new environments for different uses like a development branch or staging server.
 
 ### Evolution from an internal project, to a community, to open core
 
