@@ -100,3 +100,28 @@ build_meltano:
     DOCKERFILE: ./docker/Dockerfile
   only:
   - master
+
+meltano_base:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME -f images/base.Dockerfile .
+  - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME
+
+meltano_full:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - sed -i '2s/.*/FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME/' -f images/full.Dockerfile .
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME
+  - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME
