@@ -16,8 +16,8 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Add backend python code
-ADD analyze/api /analyze
-WORKDIR /analyze
+ADD analyze/api /analyze/app
+WORKDIR /analyze/app
 
 # -- Install dependencies:
 RUN pipenv install --deploy --system
