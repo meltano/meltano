@@ -82,7 +82,7 @@ publish:
   - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
   - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
-dev_build_meltano:
+.dev_build_meltano:
   <<: *docker_build
   image: docker:latest
   variables:
@@ -92,7 +92,7 @@ dev_build_meltano:
   except:
   - master
 
-build_meltano:
+.build_meltano:
   <<: *docker_build
   variables:
     DOCKER_DRIVER: overlay2
