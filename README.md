@@ -600,6 +600,14 @@ HAVING count(*) > 1
 - The output of dbt test should be pasted into MRs
 - Any failing tests should be fixed or explained prior to requesting a review
 
+#### Docker Compose
+
+1. Clone the repo
+1. Customize the MELTANO directories as needed
+1. From the main project directory, run `docker-compose up`
+1. In your browser, navigate to `localhost:5000/drop_it_like_its_hot` to reset the schema of the database
+1. Then navigate to `localhost:5000`. Click on add project, and specify `/meltano/model`
+
 # Contributing to Meltano
 
 We welcome contributions and improvements, please see the [contribution guidelines](CONTRIBUTING.md)
