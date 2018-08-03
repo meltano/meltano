@@ -5,6 +5,7 @@ variables:
 stages:
     - test
     - publish
+    - build_base
     - build
 
 cache:
@@ -103,7 +104,7 @@ build_meltano:
 
 meltano_base:
   image: docker:latest
-  stage: build
+  stage: build_base
   variables:
     DOCKER_DRIVER: overlay2
   services:
@@ -123,5 +124,5 @@ meltano_full:
   script:
   - sed -i '2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME?' images/full.Dockerfile
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME -f images/base.Dockerfile .
   - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME

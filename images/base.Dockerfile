@@ -16,7 +16,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Add backend python code
-ADD analyze/app /analyze
+ADD analyze/api /analyze
 WORKDIR /analyze
 
 # -- Install dependencies:
