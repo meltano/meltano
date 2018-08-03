@@ -124,5 +124,5 @@ meltano_full:
   script:
   - sed -i '2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME?' images/full.Dockerfile
   - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME -f images/base.Dockerfile .
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME -f images/full.Dockerfile .
   - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME
