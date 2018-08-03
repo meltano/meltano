@@ -16,7 +16,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Add backend python code
-ADD src/meltano-analyze/api /meltano-analyze
+ADD app/meltano-analyze/api /meltano-analyze
 WORKDIR /meltano-analyze
 
 # -- Install dependencies:
@@ -29,7 +29,7 @@ RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
     yarn
 
 # -- Build the static assets
-ADD src/meltano-analyze /tmp
+ADD app/meltano-analyze /tmp
 
 RUN cd /tmp && \
     yarn && \
