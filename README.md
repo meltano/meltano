@@ -34,6 +34,8 @@ In addition, believe that the information a business uses to make decisions must
 - [Functional Group Update (Keynote format)](https://drive.google.com/open?id=1WmleHjP41nsxszGV50ionZKx-b2X3PvF)
 - [Blog post](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/)
 - [Hacker News discussion](https://news.ycombinator.com/item?id=17667399)
+- [Call with Hacker News commenter](https://www.youtube.com/watch?v=F8tEDq3K_pE)
+- [Article in SD times](https://sdtimes.com/data/gitlab-to-create-tool-for-data-teams/)
 
 ## Approach
 
