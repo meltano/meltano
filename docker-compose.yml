@@ -1,0 +1,31 @@
+version: '3.1'
+services:
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: changeme
+    expose:
+      - "5432"
+
+  meltano-base:
+    build: 
+      dockerfile: app/images/base.Dockerfile
+      context: .
+    image: meltano/meltano:base
+
+  meltano-full:
+    build: 
+      dockerfile: app/images/full.Dockerfile
+      context: .
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeme
+      POSTGRES_URL: postgres
+      LOG_PATH: meltano-analyze.log
+      FLASK_ENV: production
+    ports:
+      - "5000:5000"
+    image: meltano:full
+
