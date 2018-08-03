@@ -3,8 +3,8 @@ FROM meltano/meltano:base
 
 # -- Clone to get the transformations
 RUN git clone https://gitlab.com/meltano/analytics.git /tmp && \
-	mv /tmp/elt/dbt /transformations
+	mv /tmp/elt/dbt /meltano/transformations
 
 
 # -- Clone default GitLab ML files into /analyze
-RUN git clone https://gitlab.com/meltano/looker /model
+RUN git clone https://gitlab.com/meltano/looker /meltano/model
