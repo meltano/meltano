@@ -7,4 +7,4 @@ RUN git clone https://gitlab.com/meltano/analytics.git /tmp && \
 
 
 # -- Clone default GitLab ML files into /analyze
-RUN git clone https://gitlab.com/meltano/looker /analyze
+RUN git clone https://gitlab.com/meltano/looker /model
