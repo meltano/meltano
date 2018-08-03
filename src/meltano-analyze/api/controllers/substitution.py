@@ -22,41 +22,42 @@ class Substitution():
     else:
       self.type = dimension.settings['type']
 
-    self.outer_pattern = r'(\$\{[\w\.]*\})'
-    self.inner_pattern = r'\$\{([\w\.]*)\}'
-    self.substitutionType = SubstitutionType.unknown
-    self.getSubstitutionType()
-    self.placeholders = self.placeholder_match()
-    self.setSql()
+    self.substitution_type = SubstitutionType.unknown
+    self.get_substitution_type()
+    self.placeholders = Substitution.placeholder_match(self.input)
+    self.set_sql()
 
 
-  def getSubstitutionType(self):
-    # trying guess the substitutionType in a cheap way
+  def get_substitution_type(self):
+    # trying guess the substitution_type in a cheap way
     if '.' in self.input and '${TABLE}' not in self.input:
       if 'SQL_TABLE_NAME' in self.input:
-        self.substitutionType = SubstitutionType.view_sql_table_name
+        self.substitution_type = SubstitutionType.view_sql_table_name
       else:
-        self.substitutionType = SubstitutionType.view_dimension
+        self.substitution_type = SubstitutionType.view_dimension
     elif '${TABLE}' in self.input:
-      self.substitutionType = SubstitutionType.table
+      self.substitution_type = SubstitutionType.table
     elif ' ' not in self.input:
-      self.substitutionType = SubstitutionType.dimension
+      self.substitution_type = SubstitutionType.dimension
     else:
-      self.substitutionType = SubstitutionType.unknown
+      self.substitution_type = SubstitutionType.unknown
 
-  def placeholder_match(self):
-    outer_results = re.findall(self.outer_pattern, self.input);
-    inner_results = re.findall(self.inner_pattern, self.input);
+  @staticmethod
+  def placeholder_match(input_):
+    outer_pattern = r'(\$\{[\w\.]*\})'
+    inner_pattern = r'\$\{([\w\.]*)\}'
+    outer_results = re.findall(outer_pattern, input_);
+    inner_results = re.findall(inner_pattern, input_);
     Results = namedtuple('Results', 'inner outer')
     return Results(inner=inner_results, outer=outer_results)
 
-  def setSql(self):
-    if self.substitutionType is SubstitutionType.table:
-      self.setSqlTableType()
+  def set_sql(self):
+    if self.substitution_type is SubstitutionType.table:
+      self.set_sql_table_type()
     else:
-      raise Exception('Substitution Type {} not implemented yet'.format(self.substitutionType.value))
+      raise Exception('Substitution Type {} not implemented yet'.format(self.substitution_type.value))
 
-  def setSqlTableType(self):
+  def set_sql_table_type(self):
     self.sql = self.input.replace(self.placeholders.outer[0], self.table._table_name)
     (table, field) = self.sql.split('.')
     self.alias = self.sql

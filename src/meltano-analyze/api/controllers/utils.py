@@ -3,6 +3,7 @@ from sqlalchemy import String, cast
 from .substitution import Substitution
 from .aggregate import Aggregate
 from .date import Date
+# from .join import Join as JoinQuery
 from models.data import View, Dimension, DimensionGroup, Measure, Join
 from pypika import Query, Table, Field
 
@@ -27,6 +28,7 @@ class SqlHelper():
     incoming_dimension_groups = incoming_json['dimension_groups']
     incoming_measures = incoming_json['measures']
     incoming_filters = incoming_json['filters']
+    incoming_joins = incoming_json['joins']
     # get all timeframes
     timeframes = [t['timeframes'] for t in incoming_dimension_groups]
     # flatten list of timeframes
@@ -34,6 +36,7 @@ class SqlHelper():
     dimensions = list(filter(lambda x: x.name in incoming_dimensions, view.dimensions))
     measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
     table = self.table(base_table, explore.name)
+    # joins = self.joins(incoming_joins, table)
     dimension_groups = self.dimension_groups(view_name, incoming_dimension_groups, table)
     dimensions = self.dimensions(dimensions, table)
     dimensions = dimensions + dimension_groups
@@ -59,6 +62,15 @@ class SqlHelper():
   def field_from_measure(self, m, table):
     aggregate = Aggregate(m, table)
     return aggregate.sql
+
+  def joins(self, joins, table):
+    if len(joins):
+      for join in joins:
+        queried_join = Join.query\
+          .filter(Join.name == join['name'])\
+          .first()
+        join = JoinQuery(queried_join, view, table)
+
 
   def dimension_groups(self, view_name, dimension_groups, table):
     fields = []

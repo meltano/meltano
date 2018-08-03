@@ -69,7 +69,7 @@ def get_sql(model_name, explore_name):
     engine = connections[model.settings['connection']]['engine']
 
     try:
-      results = engine.execute(base_sql)
+      results = engine.execute(outgoing_sql)
     except sqlalchemy.exc.DBAPIError as e:
       return jsonify({'error': True, 'code': e.code, 'orig': e.orig.diag.message_primary, 'statement': e.statement}), 422
 

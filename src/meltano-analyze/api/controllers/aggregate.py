@@ -6,6 +6,7 @@ class AggregateType(Enum):
   unknown = 'UNKNOWN'
   count = 'count'
   sum = 'sum'
+  number = 'number'
 
 class Aggregate():
   def __init__(self, measure, table):
@@ -25,6 +26,9 @@ class Aggregate():
     elif type_ == AggregateType.count.value:
       self.aggregateType = AggregateType.count
       self.setAggregateSQLCount()
+    elif type_ == AggregateType.number.value:
+      self.aggregateType = AggregateType.number
+      self.setAggregateSQLNumber()
     else:
       self.aggregateType = AggregateType.unknown
       raise Exception('Aggregate Type {} not implemented yet'.format(type_))
@@ -34,3 +38,6 @@ class Aggregate():
 
   def setAggregateSQLCount(self):
     self.sql = fn.Coalesce(fn.Count(self.sql), 0, alias=self.substitution.alias)
+
+  def setAggregateSQLNumber(self):
+    self.sql.alias = self.substitution.alias
