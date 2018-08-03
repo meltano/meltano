@@ -16,25 +16,25 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Add backend python code
-ADD api /app
-WORKDIR /app
+ADD analyze/app /analyze
+WORKDIR /analyze
 
 # -- Install dependencies:
 RUN pipenv install --deploy --system
 
 # -- Install the needed nodejs dependencies that the python code shells out to
 RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
-	mv node-lookml-parser parser && \
-	cd parser && \
-	yarn
+    mv node-lookml-parser parser && \
+    cd parser && \
+    yarn
 
 # -- Build the static assets
-ADD . /tmp
+ADD analyze /tmp
 
 RUN cd /tmp && \
     yarn && \
     yarn run build && \
-    mv /tmp/dist /app/static-assets && \
+    mv /tmp/dist /analyze/app/static-assets && \
     rm -rf /tmp
 
-CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/app/static-assets"]
+CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/analyze/app/static-assets"]
