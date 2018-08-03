@@ -16,8 +16,8 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Add backend python code
-ADD app/meltano-analyze/api /meltano-analyze
-WORKDIR /meltano-analyze
+ADD app/api /meltano/app
+WORKDIR /meltano/app
 
 # -- Install dependencies:
 RUN pipenv install --deploy --system
@@ -29,12 +29,12 @@ RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
     yarn
 
 # -- Build the static assets
-ADD app/meltano-analyze /tmp
+ADD app /tmp
 
 RUN cd /tmp && \
     yarn && \
     yarn run build && \
-    mv /tmp/dist /meltano-analyze/static-assets && \
+    mv /tmp/dist /meltano/app/static-assets && \
     rm -rf /tmp
 
-CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/meltano-analyze/static-assets"]
+CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/meltano/app/static-assets", "--static-index", "index.html"]
