@@ -39,8 +39,6 @@ spec:
             value: melt.log
           - name: FLASK_ENV
             value: production
-          - name: API_URL
-            value: /api
           ports:
             - name: http
               containerPort: 5000

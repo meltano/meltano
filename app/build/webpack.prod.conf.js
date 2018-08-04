@@ -34,6 +34,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
+    new webpack.DefinePlugin({"API_URL": JSON.stringify(process.env.API_URL)}),
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {
