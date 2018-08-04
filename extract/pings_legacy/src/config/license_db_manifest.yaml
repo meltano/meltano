@@ -1,0 +1,112 @@
+add_ons:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM add_ons
+    WHERE updated_at >= CURRENT_TIMESTAMP - interval '{days} day'
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'add_ons'
+  export_table_schema:
+    id: integer
+    name: character varying
+    code: character varying
+    created_at: timestamp without time zone
+    updated_at: timestamp without time zone
+  export_table_primary_key: id
+granted_add_ons:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM granted_add_ons
+    WHERE updated_at >= CURRENT_TIMESTAMP - interval '{days} day'
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'granted_add_ons'
+  export_table_schema:
+    id: integer
+    license_id: integer
+    add_on_id: integer
+    quantity: integer
+    created_at: timestamp without time zone
+    updated_at: timestamp without time zone
+  export_table_primary_key: id
+licenses:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM licenses
+    WHERE updated_at >= CURRENT_TIMESTAMP - interval '{days} day'
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'licenses'
+  export_table_schema:
+    id: integer
+    company: character varying
+    users_count: integer
+    expires_at: date
+    recurly_subscription_id: character varying
+    plan_name: character varying
+    starts_at: date
+    zuora_subscription_id: character varying
+    previous_users_count: integer
+    trueup_quantity: integer
+    trueup_from: date
+    trueup_to: date
+    plan_code: character varying
+    trial: boolean
+    created_at: timestamp without time zone
+    updated_at: timestamp without time zone
+  export_table_primary_key: id
+plans:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM plans
+    WHERE updated_at >= CURRENT_TIMESTAMP - interval '{days} day'
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'plans'
+  export_table_schema:
+    id: integer
+    recurly_code: character varying
+    users_count: integer
+    created_at: timestamp without time zone
+    updated_at: timestamp without time zone
+    recurly_name: character varying
+  export_table_primary_key: id
+users:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM users
+    WHERE updated_at >= CURRENT_TIMESTAMP - interval '{days} day'
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'users'
+  export_table_schema:
+    id: integer
+    email: character varying
+    sign_in_count: integer
+    current_sign_in_at: timestamp without time zone
+    last_sign_in_at: timestamp without time zone
+    current_sign_in_ip: character varying
+    last_sign_in_ip: character varying
+    failed_attempts: integer
+    locked_at: timestamp without time zone
+    created_at: timestamp without time zone
+    updated_at: timestamp without time zone
+    provider: character varying
+    uid: character varying
+  export_table_primary_key: id
+schema_migrations:
+  import_db: LICENSE_DB
+  import_query: >
+    SELECT *
+    FROM schema_migrations
+  export_db: EXPORT_DB
+  export_schema: 'license'
+  export_table: 'schema_migrations'
+  export_table_schema:
+    version: character varying
+  export_table_primary_key: version

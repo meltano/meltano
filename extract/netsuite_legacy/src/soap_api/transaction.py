@@ -1,0 +1,202 @@
+import os
+import json
+import datetime
+
+import schema.transaction as transaction_schema
+from soap_api.utils import fetch_attribute, merge_transform_results
+
+class Transaction:
+    schema = transaction_schema
+    name = 'transaction'
+    name_plural = 'transactions'
+
+
+    def __init__(self, netsuite_soap_client):
+        # The core soap client used to make all the requests
+        self.client = netsuite_soap_client
+
+        self.sales_transactions_namespace = self.client.type_factory(
+                'urn:sales_{}.transactions.webservices.netsuite.com'.format(
+                    os.getenv("NETSUITE_ENDPOINT")
+                )
+            )
+
+
+    def transaction_search_params(self, start_time=None, end_time=None):
+        TransactionSearch = self.sales_transactions_namespace.TransactionSearchAdvanced
+
+        if start_time is not None and end_time is not None:
+            return TransactionSearch(
+                criteria={
+                    'basic': {
+                        'lastModifiedDate': {
+                          'operator': 'within',
+                          'searchValue': start_time,
+                          'searchValue2': end_time,
+                        },
+                        'type': {
+                          'operator': 'anyOf',
+                          'searchValue': self.schema.TRANSACTION_TYPES,
+                        },
+                    }
+                }
+            )
+        else:
+            return TransactionSearch(
+                criteria={
+                    'basic': {
+                        'type': {
+                          'operator': 'anyOf',
+                          'searchValue': self.schema.TRANSACTION_TYPES,
+                        },
+                    }
+                }
+            )
+
+
+    def extract(self):
+        """
+        Extract all the Transaction records from NetSuite
+
+        Returns all the records found as a list
+        """
+        transaction_search = self.transaction_search_params()
+
+        return self.client.fetch_all_records_for_type(transaction_search)
+
+
+    def extract_incremental(self, start_time=None, end_time=None, searchResult=None):
+        """
+        Incremental Extract for looping over search Result pages
+
+        If called without an initial searchResult, then a new search is initiated
+        Otherwise, it follows the previous searchResult's query and fetches the next page.
+
+        The SearchResult envelope is returned (so that status, pageIndex, etc are included)
+         or None when the whole process is finished (no more pages to fetch)
+        """
+
+        if searchResult is None:
+            # New search
+            transaction_search = self.transaction_search_params(start_time, end_time)
+
+            return self.client.search_incremental(transaction_search)
+        elif searchResult.status.isSuccess \
+          and searchResult.pageIndex is not None \
+          and searchResult.totalPages is not None \
+          and searchResult.pageIndex < searchResult.totalPages:
+            # There are more pages to be fetched
+            return self.client.search_more(searchResult)
+        else:
+            # Search has finished
+            return None
+
+
+    def transform(self, records):
+        """
+        Transform a set of records extracted from NetSuite to be ready to be imported
+
+        NetSuite Records as provided by the API have a lot of Reference records
+        or nested structures.
+
+        This method flattens the extracted records and transforms them to
+        exactly the schema we need in order to import them in the Data Warehouse
+
+        As results from API calls for a specific entity may have nested support
+         entities inside them that we also want to store, this method returns
+         a list of all the extracted data and the entities they belong to.
+
+        Returns all the transformed records as a list of {entity, data} dicts.
+        e.g. [{'entity': Transaction, 'data': ...},
+              {'entity': Expenses, 'data': ...}, .. etc ..]
+        """
+        related_entities = []
+        flat_records = []
+
+        for record in records:
+            flat_record = {
+                "internal_id": record['internalId'],
+                "transaction_type": None,
+
+                "imported_at": datetime.datetime.now().isoformat(),
+            }
+
+            # Iterate through all the attributes defined in schema.COLUMN_MAPPINGS
+            #  and map each 'in' attribute to the 'out' attribute(s)
+            for column_map in self.schema.COLUMN_MAPPINGS:
+                # Extract the attributes and data for the given attribute
+                extraction_result = fetch_attribute(self, record, column_map)
+
+                # Add the attributes to this entity's record
+                flat_record.update( extraction_result['attributes'] )
+
+                # Add the related_entities returned to the rest of the related_entities
+                merge_transform_results(related_entities, extraction_result['related_entities'])
+
+            flat_records.append(flat_record)
+
+        # Merge the Current entity's results with the related_entities and return the result
+        merge_transform_results(related_entities, [{'entity': Transaction, 'data': flat_records}])
+
+        return related_entities
+
+
+    def extract_type(self, start_time=None, end_time=None, searchResult=None):
+        """
+        Only extract the Transaction {internalId, type} for a given date interval
+
+        Used for getting the Transaction Type for Transactions fetched without
+         column restrictions specified (it is not returned by default)
+        """
+        result = None
+
+        # This is a special search operation that needs the returnSearchColumns
+        #  set to true.
+        # Update the settings only during this operation and set them back when you are done.
+        old_returnSearchColumns = self.client.search_preferences['returnSearchColumns']
+        self.client.search_preferences['returnSearchColumns'] = True
+
+        if searchResult is None:
+            # New search - Set the TransactionSearchAdvanced params
+            TransactionSearch = self.sales_transactions_namespace.TransactionSearchAdvanced
+
+            if start_time is not None and end_time is not None:
+                transaction_search = TransactionSearch(
+                    columns={
+                        'basic': {
+                          'internalId' : {},
+                          'type' : {},
+                        }
+                    },
+
+                    criteria={
+                        'basic': {
+                            'lastModifiedDate': {
+                              'operator': 'within',
+                              'searchValue': start_time,
+                              'searchValue2': end_time,
+                            },
+                            'type': {
+                              'operator': 'anyOf',
+                              'searchValue': self.schema.TRANSACTION_TYPES,
+                            },
+                        }
+                    }
+                )
+            else:
+                # Do not permit Extracting Types over all records
+                return None
+
+            result = self.client.search_incremental(transaction_search)
+        elif searchResult.status.isSuccess \
+          and searchResult.pageIndex is not None \
+          and searchResult.totalPages is not None \
+          and searchResult.pageIndex < searchResult.totalPages:
+            # There are more pages to be fetched
+            result = self.client.search_more(searchResult)
+        else:
+            # Search has finished
+            result = None
+
+        self.client.search_preferences['returnSearchColumns'] = old_returnSearchColumns
+        return result

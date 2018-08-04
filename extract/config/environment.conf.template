@@ -1,0 +1,19 @@
+[ZUORA]
+username   = $ZUORA_USERNAME
+password   = $FIXED_ZUORA_PASSWORD
+url        = $ZUORA_URL
+partner_id = $ZUORA_PARTNER_ID
+project_id = $ZUORA_PROJECT_ID
+
+[POSTGRES]
+user     = $PG_USERNAME
+pass     = $PG_PASSWORD
+host     = $PG_ADDRESS
+database = $PG_DATABASE
+port     = $PG_PORT
+
+[LOGGING]
+loggerName   = zuora_export
+fileName     = $CI_PROJECT_DIR/elt/logs/zuora_export.log
+fileLevel    = DEBUG
+consoleLevel = DEBUG

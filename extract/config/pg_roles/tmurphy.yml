@@ -1,0 +1,8 @@
+tmurphy:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+          - tmurphy_scratch

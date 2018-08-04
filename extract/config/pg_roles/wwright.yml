@@ -1,0 +1,12 @@
+wwright:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    privileges:
+        schemas:
+            write:
+                - historical
+    owns:
+        schemas:
+          - wwright_scratch

@@ -1,0 +1,10 @@
+*/__pycache__
+*.log
+*.pyc
+*.DS_Store
+*.idea
+*.csv
+*.egg_info
+tmp_log.txt
+.env
+.vscode/

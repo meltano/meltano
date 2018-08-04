@@ -1,0 +1,894 @@
+account:
+  accountcode__c: text
+  accountnumber: text
+  additionalemailaddresses: text
+  allowinvoiceedit: boolean
+  autopay: boolean
+  balance: numeric
+  batch: text
+  billcycleday: integer
+  billtocontactid: text
+  communicationprofileid: text
+  conversionrate__c: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  creditbalance: numeric
+  crmid: text
+  currency: text
+  customerservicerepname: text
+  defaultpaymentmethodid: text
+  entity__c: text
+  id: character varying
+  invoicedeliveryprefsemail: boolean
+  invoicedeliveryprefsprint: boolean
+  invoicetemplateid: text
+  lastinvoicedate: date
+  name: character varying
+  notes: text
+  parent__c: text
+  parentid: text
+  paymentgateway: text
+  paymentterm: text
+  purchaseordernumber: text
+  salesrepname: text
+  soldtocontactid: text
+  status: text
+  taxexemptcertificateid: text
+  taxexemptcertificatetype: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  account_id_mapping_key: id
+accountingcode:
+  category: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  glaccountname: text
+  glaccountnumber: text
+  id: text
+  name: text
+  notes: text
+  status: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  accountingcode_id_mapping_key: id
+accountingperiod:
+  createdbyid: text
+  createddate: timestamp without time zone
+  enddate: timestamp without time zone
+  fiscalyear: text
+  id: text
+  name: text
+  startdate: timestamp without time zone
+  status: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  accountingperiod_id_mapping_key: id
+amendment:
+  autorenew: boolean
+  code: text
+  contracteffectivedate: date
+  createdbyid: text
+  createddate: timestamp without time zone
+  currentterm: integer
+  customeracceptancedate: date
+  description: text
+  effectivedate: date
+  id: text
+  name: text
+  renewalsetting: text
+  renewalterm: integer
+  serviceactivationdate: date
+  status: text
+  subscriptionid: text
+  termstartdate: date
+  termtype: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  amendment_id_mapping_key: id
+communicationprofile:
+  createdbyid: text
+  createddate: timestamp without time zone
+  description: text
+  id: text
+  profilename: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  communicationprofile_id_mapping_key: id
+contact:
+  accountid: text
+  address1: text
+  address2: text
+  city: text
+  country: text
+  county: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  description: text
+  fax: text
+  firstname: text
+  homephone: text
+  id: text
+  lastname: text
+  mobilephone: text
+  nickname: text
+  otherphone: text
+  otherphonetype: text
+  personalemail: text
+  postalcode: text
+  state: text
+  taxregion: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  workemail: text
+  workphone: text
+  contact_id_mapping_key: id
+creditbalanceadjustment:
+  accountid: text
+  accountingcode: text
+  adjustmentdate: date
+  amount: numeric
+  cancelledon: date
+  comment: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  ext1: numeric
+  ext2: numeric
+  ext3: numeric
+  ext4: date
+  ext5: date
+  ext6: text
+  ext7: text
+  id: text
+  number: text
+  reasoncode: text
+  referenceid: text
+  sourcetransactionid: text
+  sourcetransactionnumber: text
+  sourcetransactiontype: text
+  status: text
+  transferredtoaccounting: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  creditbalanceadjustment_id_mapping_key: id
+invoice:
+  accountid: text
+  adjustmentamount: numeric
+  amount: numeric
+  amountwithouttax: numeric
+  balance: numeric
+  comments: text
+  createdbyid: text
+  createddate: text
+  creditbalanceadjustmentamount: numeric
+  duedate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  ext8: text
+  ext9: text
+  id: text
+  includesonetime: boolean
+  includesrecurring: boolean
+  includesusage: boolean
+  invoicedate: date
+  invoicenumber: text
+  lastemailsentdate: date
+  paymentamount: numeric
+  postedby: text
+  posteddate: timestamp without time zone
+  refundamount: numeric
+  source: text
+  sourceid: text
+  status: text
+  targetdate: date
+  taxamount: numeric
+  taxexemptamount: numeric
+  transferredtoaccounting: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  invoice_id_mapping_key: id
+invoiceadjustment:
+  accountid: character varying
+  accountingcode: character varying
+  adjustmentdate: date
+  adjustmentnumber: character varying
+  amount: numeric
+  cancelledbyid: character varying
+  cancelledon: timestamp without time zone
+  createdbyid: character varying
+  createddate: timestamp without time zone
+  id: character varying
+  impactamount: numeric
+  invoiceid: character varying
+  invoicenumber: character varying
+  reasoncode: character varying
+  referenceid: character varying
+  status: character varying
+  type: character varying
+  updatedbyid: character varying
+  updateddate: timestamp without time zone
+  invoiceadjustment_id_mapping_key: id
+invoiceitem:
+  accountingcode: character varying
+  accountingperiodid: character varying
+  appliedtoinvoiceitemid: character varying
+  chargeamount: numeric
+  chargedate: timestamp without time zone
+  chargename: character varying
+  createdbyid: character varying
+  createddate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: character varying
+  invoiceid: character varying
+  processingtype: character varying
+  productid: character varying
+  quantity: numeric
+  rateplanchargeid: character varying
+  revrecstartdate: date
+  serviceenddate: date
+  servicestartdate: date
+  sku: character varying
+  subscriptionid: character varying
+  taxamount: numeric
+  taxcode: character varying
+  taxexemptamount: numeric
+  taxmode: character varying
+  unitprice: numeric
+  uom: character varying
+  updatedbyid: character varying
+  updateddate: timestamp without time zone
+  invoiceitem_id_mapping_key: id
+invoiceitemadjustment:
+  accountid: text
+  accountingcode: text
+  adjustmentdate: date
+  adjustmentnumber: text
+  amount: numeric
+  cancelledbyid: text
+  cancelleddate: timestamp without time zone
+  comment: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  invoiceid: text
+  invoiceitemname: text
+  invoicenumber: text
+  reasoncode: text
+  referenceid: text
+  serviceenddate: date
+  servicestartdate: date
+  sourceid: text
+  sourcetype: text
+  status: text
+  transferredtoaccounting: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  invoiceitemadjustment_id_mapping_key: id
+invoicepayment:
+  amount: numeric
+  createdbyid: text
+  createddate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  invoiceid: text
+  paymentid: text
+  refundamount: numeric
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  invoicepayment_id_mapping_key: id
+payment:
+  accountid: text
+  accountingcode: text
+  amount: numeric
+  appliedcreditbalanceamount: numeric
+  authtransactionid: text
+  bankidentificationnumber: text
+  cancelledon: timestamp without time zone
+  comment: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  effectivedate: date
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  gatewayorderid: text
+  gatewayresponse: text
+  gatewayresponsecode: text
+  gatewaystate: text
+  id: text
+  markedforsubmissionon: timestamp without time zone
+  paymentmethodid: text
+  paymentmethodsnapshotid: text
+  paymentnumber: text
+  referenceid: text
+  refundamount: numeric
+  secondpaymentreferenceid: text
+  settledon: timestamp without time zone
+  softdescriptor: text
+  softdescriptorphone: text
+  source: text
+  sourcename: text
+  status: text
+  submittedon: timestamp without time zone
+  transferredtoaccounting: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  payment_id_mapping_key: id
+product:
+  allowfeaturechanges: text
+  category: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  description: text
+  effectiveenddate: date
+  effectivestartdate: date
+  id: text
+  name: text
+  sku: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  product_id_mapping_key: id
+productrateplan:
+  createdbyid: text
+  createddate: timestamp without time zone
+  description: text
+  effectiveenddate: date
+  effectivestartdate: date
+  id: text
+  name: text
+  productid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  productrateplan_id_mapping_key: id
+productrateplancharge:
+  accountingcode: text
+  applydiscountto: text
+  billcycleday: integer
+  billcycletype: text
+  billingperiod: text
+  billingperiodalignment: text
+  chargemodel: text
+  chargetype: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  defaultquantity: numeric
+  deferredrevenueaccount: text
+  description: text
+  discountlevel: text
+  id: text
+  includedunits: numeric
+  legacyrevenuereporting: text
+  listpricebase: text
+  maxquantity: numeric
+  minquantity: numeric
+  name: text
+  numberofperiod: integer
+  overagecalculationoption: text
+  overageunusedcreditoption: text
+  overageunusedunitscreditoption: text
+  pricechangeoption: text
+  priceincreasepercentage: text
+  productrateplanid: text
+  recognizedrevenueaccount: text
+  revenuerecognitionrulename: text
+  revreccode: text
+  revrectriggercondition: text
+  smoothingmodel: text
+  specificbillingperiod: text
+  taxable: boolean
+  taxcode: text
+  taxmode: text
+  triggerevent: text
+  uom: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  uptoperiods: integer
+  usediscountspecificaccountingcode: boolean
+  usetenantdefaultforpricechange: boolean
+  productrateplancharge_id_mapping_key: id
+productrateplanchargetier:
+  active: boolean
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  discountamount: numeric
+  discountpercentage: numeric
+  endingunit: numeric
+  id: text
+  includedunits: integer
+  overageprice: boolean
+  price: numeric
+  priceformat: text
+  productrateplanchargeid: text
+  startingunit: integer
+  tier: integer
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  productrateplanchargetier_id_mapping_key: id
+rateplan:
+  amendmentid: text
+  amendmenttype: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  id: character varying
+  name: character varying
+  productid: text
+  productrateplanid: text
+  subscriptionid: character varying
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  rateplan_id_mapping_key: id
+rateplancharge:
+  accountingcode: text
+  applydiscountto: text
+  billcycleday: integer
+  billcycletype: text
+  billingperiod: text
+  billingperiodalignment: text
+  chargedthroughdate: date
+  chargemodel: character varying
+  chargenumber: text
+  chargetype: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  description: text
+  discountlevel: text
+  dmrc: numeric
+  dtcv: numeric
+  effectiveenddate: date
+  effectivestartdate: date
+  enddatecondition: text
+  ext1: text
+  ext10: text
+  ext11: text
+  ext12: text
+  ext13: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  ext8: text
+  ext9: text
+  id: character varying
+  islastsegment: boolean
+  listpricebase: text
+  mrr: numeric
+  name: text
+  numberofperiods: integer
+  originalid: text
+  overagecalculationoption: text
+  overageunusedunitscreditoption: text
+  processedthroughdate: date
+  productrateplanchargeid: text
+  quantity: numeric
+  rateplanid: character varying
+  revenuerecognitionrulename: text
+  revreccode: text
+  revrectriggercondition: text
+  segment: integer
+  specificbillingperiod: integer
+  specificenddate: date
+  tcv: numeric
+  triggerdate: date
+  triggerevent: text
+  uom: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  uptoperiods: integer
+  uptoperiodstype: text
+  version: integer
+  rateplancharge_id_mapping_key: id
+rateplanchargetier:
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  discountamount: numeric
+  discountpercentage: numeric
+  endingunit: numeric
+  id: text
+  includedunits: integer
+  overageprice: numeric
+  price: numeric
+  priceformat: text
+  rateplanchargeid: character varying
+  startingunit: numeric
+  tier: integer
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  rateplanchargetier_id_mapping_key: id
+refund:
+  accountid: text
+  accountingcode: text
+  amount: numeric
+  cancelledon: timestamp without time zone
+  comment: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  gateway: text
+  gatewayresponse: text
+  gatewayresponsecode: text
+  gatewaystate: text
+  id: text
+  markedforsubmissionon: timestamp without time zone
+  methodtype: text
+  paymentmethodid: text
+  reasoncode: text
+  referenceid: text
+  refunddate: date
+  refundnumber: text
+  refundtransactiontime: timestamp without time zone
+  secondrefundreferenceid: text
+  settledon: text
+  softdescriptor: text
+  softdescriptorphone: text
+  sourcetype: text
+  status: text
+  submittedon: timestamp without time zone
+  transferredtoaccounting: text
+  type: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  refund_id_mapping_key: id
+refundinvoicepayment:
+  createdbyid: text
+  createddate: timestamp without time zone
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  invoiceid: text
+  invoicepaymentid: text
+  refundamount: text
+  refundid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  refundinvoicepayment_id_mapping_key: id
+revenuechargesummaryitem:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  id: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  revenuechargesummaryid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenuechargesummaryitem_id_mapping_key: id
+revenueeventitem:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  id: text
+  journalentryid: text
+  journalrunid: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenueeventid: text
+  revenueeventtypeid: text
+  revenuescheduleid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenueeventitem_id_mapping_key: id
+revenueeventiteminvoiceitem:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  id: text
+  invoiceid: text
+  invoiceitemid: text
+  journalentryid: text
+  journalrunid: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenueeventinvoiceitemid: text
+  revenueeventtypeid: text
+  revenuescheduleinvoiceitemid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenueeventiteminvoiceitem_id_mapping_key: id
+revenueeventiteminvoiceitemadjustment:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  id: text
+  invoiceid: text
+  invoiceitemadjustmentid: text
+  invoiceitemid: text
+  journalentryid: text
+  journalrunid: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenueeventinvoiceitemadjustmentid: text
+  revenueeventtypeid: text
+  revenuescheduleinvoiceitemadjustmentid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenueeventiteminvoiceitemadjustment_id_mapping_key: id
+revenuescheduleinvoiceitem:
+  amount: numeric
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  exchangeratedate: timestamp without time zone
+  financetransactiontype: text
+  id: text
+  invoiceid: text
+  invoiceitemid: text
+  number: text
+  recognitionperiodend: timestamp without time zone
+  recognitionperiodstart: timestamp without time zone
+  referenceid: text
+  revenuescheduledate: timestamp without time zone
+  rule: text
+  transactiondate: timestamp without time zone
+  transactionnumber: text
+  undistributedamount: numeric
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenuescheduleinvoiceitem_id_mapping_key: id
+revenuescheduleinvoiceitemadjustment:
+  amount: numeric
+  id: text
+  invoiceitem_id: text
+  number: text
+  transactionnumber: text
+  updateddate: timestamp without time zone
+  revenuescheduleinvoiceitemadjustment_id_mapping_key: id
+revenuescheduleitem:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenuescheduleid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenuescheduleitem_id_mapping_key: id
+revenuescheduleiteminvoiceitem:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  invoiceid: text
+  invoiceitemid: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenuescheduleinvoiceitemid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenuescheduleiteminvoiceitem_id_mapping_key: id
+revenuescheduleiteminvoiceitemadjustment:
+  accountid: text
+  accountingperiodid: text
+  amendmentid: text
+  amount: numeric
+  billtocontactid: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  currency: text
+  defaultpaymentmethodid: text
+  deferredrevenueaccountingcodeid: text
+  ext1: text
+  ext2: text
+  ext3: text
+  ext4: text
+  ext5: text
+  ext6: text
+  ext7: text
+  id: text
+  invoiceid: text
+  invoiceitemid: text
+  invoiceitemadjustmentid: text
+  iteminvoiceitemadjustmentid: text
+  parentaccountid: text
+  productid: text
+  productrateplanchargeid: text
+  productrateplanid: text
+  rateplanchargeid: text
+  rateplanid: text
+  recognizedrevenueaccountingcodeid: text
+  revenuechargesummaryid: text
+  revenuescheduleinvoiceitemadjustmentid: text
+  soldtocontactid: text
+  subscriptionid: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  revenuescheduleiteminvoiceitemadjustment_id_mapping_key: id
+subscription:
+  accountid: text
+  autorenew: boolean
+  cancelleddate: date
+  clickthrougheularequired__c: text
+  contractacceptancedate: date
+  contracteffectivedate: date
+  cpqbundlejsonid__qt: text
+  createdbyid: text
+  createddate: timestamp without time zone
+  creatoraccountid: text
+  creatorinvoiceownerid: text
+  currentterm: integer
+  currenttermperiodtype: text
+  endcustomerdetails__c: text
+  excludefromanalysis__c: boolean
+  exclude_from_renewal_report__c__c: text
+  id: text
+  initialterm: integer
+  initialtermperiodtype: text
+  invoiceownerid: text
+  isinvoiceseparate: boolean
+  name: text
+  notes: text
+  opportunityclosedate__qt: date
+  opportunityid__c: text
+  opportunityname__qt: text
+  originalcreateddate: timestamp without time zone
+  originalid: text
+  previoussubscriptionid: text
+  purchase_order__c: text
+  purchaseorder__c: text
+  quotebusinesstype__qt: text
+  quotenumber__qt: text
+  quotetype__qt: text
+  recurlyid__c: text
+  renewal_subscription__c__c: text
+  renewalsetting: text
+  renewalterm: text
+  renewaltermperiodtype: text
+  serviceactivationdate: date
+  status: text
+  subscriptionenddate: date
+  subscriptionstartdate: date
+  termenddate: date
+  termstartdate: date
+  termtype: text
+  updatedbyid: text
+  updateddate: timestamp without time zone
+  version: integer
+  subscription_id_mapping_key: id

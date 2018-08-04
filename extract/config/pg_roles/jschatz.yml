@@ -1,0 +1,5 @@
+jschatz:
+    can_login: yesk
+    is_superuser: no
+    member_of:
+        - readonly
