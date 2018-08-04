@@ -15,6 +15,9 @@ RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
+# -- Define API location at build time
+ENV API_URL=/
+
 # -- Add backend python code
 ADD app/api /meltano/app
 WORKDIR /meltano/app
