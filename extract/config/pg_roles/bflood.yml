@@ -1,5 +1,0 @@
-bflood:
-    can_login: yes
-    is_superuser: no
-    member_of:
-        - readonly

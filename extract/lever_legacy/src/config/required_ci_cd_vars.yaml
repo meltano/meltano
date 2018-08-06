@@ -1,8 +1,0 @@
-Required:
-  - PG_ADDRESS
-  - PG_PORT
-  - PG_DATABASE
-  - PG_USERNAME
-  - PG_PASSWORD
-
-  - LEVER_API_KEY

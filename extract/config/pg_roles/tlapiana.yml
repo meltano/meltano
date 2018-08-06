@@ -1,8 +1,0 @@
-tlapiana:
-    can_login: yes
-    is_superuser: no
-    member_of:
-        - readonly
-    owns:
-        schemas:
-          - tlapiana_scratch
