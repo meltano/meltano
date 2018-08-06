@@ -4,6 +4,8 @@ import sys
 import logging
 import functools
 import os
+import json
+import pandas as pd
 
 from meltano.common.service import MeltanoService
 from meltano.common.manifest_reader import ManifestReader
@@ -43,9 +45,26 @@ def build_loader(name):
     return loader
 
 
-def register_manifest(manifest):
-    for id in service.register_manifest(manifest):
-        logging.debug("Registered entity {}".format(id))
+def meltano_entity_dataframes_to_json(result):
+    json_export = [{'EntityName': entity['EntityName'],
+               'DataFrame': entity['DataFrame'].to_json(orient='table')} for entity in result]
+
+    return json.dumps(json_export)
+
+def json_to_meltano_entity_dataframes(json_str):
+    result = []
+
+    json_import = json.loads(json_str)
+
+    for entity in json_import:
+        result.append(
+              {
+                'EntityName': entity['EntityName'],
+                'DataFrame': pd.read_json(entity['DataFrame'], orient='table')
+              }
+            )
+
+    return result
 
 
 def db_options(func):
@@ -89,45 +108,66 @@ def root():
 
 
 @root.command()
-@click.argument('manifest')
-def describe(manifest):
-    manifest = build_manifest('describe', manifest)
-    print(manifest)
-
-
-@root.command()
-@click.argument('extractor')
-@click.argument('source_name')
-def discover(extractor, source_name):
-    extractor = build_extractor(extractor)
-    manifest = Manifest(source_name,
-                        entities=extractor.discover_entities())
-
-    with open(source_name + ".yaml", 'w') as out:
-        writer = ManifestWriter(out)
-        writer.write(manifest)
-
-
-@root.command()
 @click.argument('extractor')
 def extract(extractor):
     extractor = build_extractor(extractor)
 
     logging.info("Extracting data...")
-    extractor.extract_all()
+
+    result = extractor.extract()
+
     logging.info("Extraction complete.")
 
+    json_export = meltano_entity_dataframes_to_json(result)
+    print('{}'.format(json_export))
 
 @root.command()
 @click.argument('loader')
-@click.argument('manifest', type=MANIFEST_TYPE)
-def load(loader, manifest):
-    register_manifest(manifest)
-    loader = build_loader(loader)
+@click.option('--manifest',
+              help="The db manifest yaml file")
+def load(loader, manifest): #, manifest):
+    # Get the results from the previous step
+    json_import = ''
 
     logging.info("Waiting for data...")
-    loader.run()
-    logging.info("Integration complete.")
+    for line in sys.stdin:
+        json_import += line
+
+    result = json_to_meltano_entity_dataframes(json_import)
+
+    # Dynamically instantiate the Loader
+    loader = build_loader(loader)
+
+    # Apply the schema defined in the manifest file
+    logging.info("Applying schema defined in manifest {}...".format(manifest))
+
+    loader.schema_apply(
+        manifest=manifest
+    )
+
+    # Load the Data
+    logging.info("Loading data...")
+
+    for entity in result:
+        logging.info('Loading entity: {}'.format(entity['EntityName']))
+
+        loader.load(
+            entity_name=entity['EntityName'],
+            dataframe=entity['DataFrame']
+        )
+
+        # df = entity['DataFrame']
+        # print('')
+        # print('DataFrame Schema:')
+        # print('')
+        # print('{}'.format(df.dtypes))
+
+        # print('')
+        # print('DataFrame Values:')
+        # print('')
+        # print('{}'.format(df))
+
+    logging.info("Load complete.")
 
 
 @root.command()

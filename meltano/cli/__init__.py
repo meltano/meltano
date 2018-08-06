@@ -4,5 +4,5 @@ from .main import root
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
     root()
