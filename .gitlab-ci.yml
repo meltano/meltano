@@ -179,6 +179,8 @@ production:
     name: production
     url: https://melt.gitlab-bizops.com
   script:
+  - kubectl get po
+  - helm list
   - |
     helm upgrade --wait --install meltano app/chart/meltano \
     --set image.repository=$CI_REGISTRY_IMAGE/meltano \
@@ -195,5 +197,3 @@ production:
     --set global.oauth2-proxy.enabled=true \
     --set oauth2-proxy.emailDomain=gitlab.com \
     --set oauth2-proxy.gitlabHost=https://dev.gitlab.org
-  only:
-  - master
