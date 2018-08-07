@@ -180,7 +180,7 @@ production:
     url: https://melt.gitlab-bizops.com
   script:
   - |
-    helm upgrade --wait --install meltano . \
+    helm upgrade --wait --install meltano app/chart/meltano \
     --set image.repository=$CI_REGISTRY_IMAGE/meltano \
     --set image.tag=full-$CI_COMMIT_SHA \
     --set ingress.enabled=true \
