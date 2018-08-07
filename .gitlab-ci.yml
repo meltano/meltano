@@ -179,7 +179,7 @@ production:
     name: production
     url: https://melt.gitlab-bizops.com
   script:
-  - kubectl get po
+  - kubectl --username=admin --password=$CLUSTER_ADMIN_PASSWORD get po
   - helm list
   - |
     helm upgrade --wait --install meltano app/chart/meltano \
