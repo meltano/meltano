@@ -1,0 +1,25 @@
+users:
+  export_schema: 'demo'
+  export_table: 'users'
+  export_table_schema:
+    id: integer
+    name: character varying
+  export_table_primary_key: id
+products:
+  export_schema: 'demo'
+  export_table: 'products'
+  export_table_schema:
+    id: integer
+    name: character varying
+    price: numeric
+  export_table_primary_key: id
+carts:
+  export_schema: 'demo'
+  export_table: 'carts'
+  export_table_schema:
+    id: integer
+    user_id: integer
+    product_id: integer
+    qty: integer
+    created_at: timestamp without time zone
+  export_table_primary_key: id

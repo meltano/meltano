@@ -24,18 +24,18 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          - name: POSTGRES_URL
+          - name: MELTANO_ANALYSIS_POSTGRES_URL
             value: {{ .Release.Name }}-postgresql
-          - name: POSTGRES_USER
+          - name: MELTANO_ANALYSIS_POSTGRES_USER
             value: {{ .Values.database.postgresUser }}
-          - name: POSTGRES_PASSWORD
+          - name: MELTANO_ANALYSIS_POSTGRES_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: {{ .Release.Name }}-postgresql
                 key: postgres-password
-          - name: POSTGRES_DB
+          - name: MELTANO_ANALYSIS_POSTGRES_DB
             value: {{ .Values.database.postgresDatabase }}
-          - name: LOG_PATH
+          - name: MELTANO_ANALYSIS_LOG_PATH
             value: melt.log
           - name: FLASK_ENV
             value: production

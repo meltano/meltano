@@ -1,3 +1,13 @@
+*/__pycache__
+*.log
+*.pyc
+*.DS_Store
+*.idea
+*.csv
+tmp_log.txt
+.vscode/
+build/
+
 .DS_Store
 node_modules/
 dist/
