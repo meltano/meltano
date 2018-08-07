@@ -106,7 +106,7 @@ publish:
   - master
 
 .review:
-  image: s1lv/kubectl:latest
+  image: silvs/kubectl:latest
   stage: review
   script:
   - echo ""
@@ -173,7 +173,7 @@ meltano_full:
   - branches
 
 production:
-  image: s1lvs/kubectl:latest
+  image: silvs/kubectl:latest
   stage: production
   environment:
     name: production
