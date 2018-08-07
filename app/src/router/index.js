@@ -5,6 +5,7 @@ import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
 import Explore from '@/components/explores/Explore';
 import Settings from '@/components/settings/Settings';
+import Orchestrate from '@/components/orchestrations/Orchestrate';
 
 Vue.use(Router);
 
@@ -39,6 +40,11 @@ export default new Router({
       path: '/settings',
       name: '',
       component: Settings,
+    },
+    {
+      path: '/orchestrations',
+      name: 'Orchestrate',
+      component: Orchestrate,
     },
   ],
 });

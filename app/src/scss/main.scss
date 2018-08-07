@@ -55,3 +55,9 @@ $primary-invert: $pink-invert;
   position: absolute;
   right: 0;
 }
+
+a.disabled {
+ pointer-events: none;
+ cursor: default;
+ color: #CCC;
+}
