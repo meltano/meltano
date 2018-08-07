@@ -7,6 +7,8 @@ stages:
     - publish
     - build_base
     - build
+    - review
+    - deploy
 
 cache:
   paths:
@@ -20,14 +22,14 @@ cache:
   - pipenv install --dev
   - pipenv run pip install -e .
 
-lint:
+.lint:
   stage: test
   before_script: *pipenv_install
   script:
   - pipenv run flake8
   allow_failure: true
 
-test:
+.test:
   stage: test
   before_script: *pipenv_install
   script:
@@ -102,48 +104,57 @@ publish:
   only:
   - master
 
-meltano_base:
-  image: docker:latest
-  stage: build_base
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-  - docker:dind
+.review:
+  image: s1lv/kubectl:latest
+  stage: review
   script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME -f app/images/base.Dockerfile .
-  - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME
-  except:
-  - master
-
-meltano_full:
-  image: docker:latest
-  stage: build
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-  - docker:dind
-  script:
-  - sed -i "2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_REF_NAME?" app/images/full.Dockerfile
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME -f app/images/full.Dockerfile .
-  - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_REF_NAME
-  except:
-  - master
-
-meltano_base:
-  image: docker:latest
-  stage: build_base
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-  - docker:dind
-  script:
-  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-  - docker build -t meltano/meltano:base -f app/images/base.Dockerfile .
-  - docker push meltano/meltano:base
+  - echo ""
   only:
+  - branches
+  except:
   - master
+
+meltano_base_hub:
+  image: docker:latest
+  stage: build_base
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+  - docker build -t meltano/meltano:base-v$CI_COMMIT_REF_NAME -f app/images/base.Dockerfile .
+  - docker push meltano/meltano:base-v$CI_COMMIT_REF_NAME
+  only:
+  - tags
+
+meltano_full_hub:
+  image: docker:latest
+  stage: build
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+  - docker build -t meltano/meltano:full-v$CI_COMMIT_REF_NAME -f app/images/full.Dockerfile .
+  - docker push meltano/meltano:full-v$CI_COMMIT_REF_NAME
+  only:
+  - tags
+
+meltano_base:
+  image: docker:latest
+  stage: build_base
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+  - docker:dind
+  script:
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA -f app/images/base.Dockerfile .
+  - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA
+  only:
+  - branches
 
 meltano_full:
   image: docker:latest
@@ -153,8 +164,32 @@ meltano_full:
   services:
   - docker:dind
   script:
-  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-  - docker build -t meltano/meltano:full -f app/images/full.Dockerfile .
-  - docker push meltano/meltano:full
+  - sed -i "2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA?" app/images/full.Dockerfile
+  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA -f app/images/full.Dockerfile .
+  - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA
+  only:
+  - branches
+
+production:
+  image: s1lvs/kubectl:latest
+  stage: production
+  script:
+  - |
+    helm upgrade --wait --install meltano . \
+    --set image.repository=$CI_REGISTRY_IMAGE/meltano \
+    --set image.tag=full-$CI_COMMIT_SHA \
+    --set ingress.enabled=true \
+    --set 'global.ingress.hosts[0]=melt.gitlab-bizops.com' \
+    --set 'global.ingress.tls[0].hosts[0]=melt.gitlab-bizops.com' \
+    --set 'global.ingress.tls[0].secretName=melt-tls'
+    --set postgresql.postgresPassword=$POSTGRES_PASSWORD \
+    --set oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID \
+    --set oauth2-proxy.clientSecret=OAUTH2_PROXY_CLIENT_SECRET \
+    --set oauth2-proxy.cookieSecret=OAUTH2_PROXY_COOKIE_SECRET \
+    --set oauth2-proxy.enabled=true \
+    --set global.oauth2-proxy.enabled=true \
+    --set oauth2-proxy.emailDomain=gitlab.com \
+    --set oauth2-proxy.gitlabHost=https://dev.gitlab.org
   only:
   - master
