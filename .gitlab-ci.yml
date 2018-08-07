@@ -190,8 +190,8 @@ production:
     --set 'global.ingress.tls[0].secretName=melt-tls'
     --set postgresql.postgresPassword=$POSTGRES_PASSWORD \
     --set oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID \
-    --set oauth2-proxy.clientSecret=OAUTH2_PROXY_CLIENT_SECRET \
-    --set oauth2-proxy.cookieSecret=OAUTH2_PROXY_COOKIE_SECRET \
+    --set oauth2-proxy.clientSecret=$OAUTH2_PROXY_CLIENT_SECRET \
+    --set oauth2-proxy.cookieSecret=$OAUTH2_PROXY_COOKIE_SECRET \
     --set oauth2-proxy.enabled=true \
     --set global.oauth2-proxy.enabled=true \
     --set oauth2-proxy.emailDomain=gitlab.com \
