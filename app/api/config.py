@@ -8,11 +8,11 @@ def get_env_variable(name):
     raise Exception(message)
 
 # the values of those depend on your setup
-POSTGRES_URL = get_env_variable("POSTGRES_URL")
-POSTGRES_USER = get_env_variable("POSTGRES_USER")
-POSTGRES_PASSWORD = get_env_variable("POSTGRES_PASSWORD")
-POSTGRES_DB = get_env_variable("POSTGRES_DB")
-LOG_PATH = get_env_variable('LOG_PATH')
+POSTGRES_URL = get_env_variable("MELTANO_ANALYSIS_POSTGRES_URL")
+POSTGRES_USER = get_env_variable("MELTANO_ANALYSIS_POSTGRES_USER")
+POSTGRES_PASSWORD = get_env_variable("MELTANO_ANALYSIS_POSTGRES_PASSWORD")
+POSTGRES_DB = get_env_variable("MELTANO_ANALYSIS_POSTGRES_DB")
+LOG_PATH = get_env_variable('MELTANO_ANALYSIS_LOG_PATH')
 ENV = 'development'
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
