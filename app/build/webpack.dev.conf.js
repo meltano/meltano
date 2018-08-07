@@ -48,7 +48,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': require('../config/dev.env')
     }),
-    new webpack.DefinePlugin({"API_URL": "http://localhost:5000"}),
+    new webpack.DefinePlugin({"API_URL": JSON.stringify("http://localhost:5000")}),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
     new webpack.NoEmitOnErrorsPlugin(),
