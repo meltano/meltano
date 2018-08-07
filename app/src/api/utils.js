@@ -18,6 +18,7 @@ export default {
     ],
   },
   root() {
+    // eslint-disable-next-line no-undef
     return API_URL;
   },
   buildUrl(blueprint, location = '') {
