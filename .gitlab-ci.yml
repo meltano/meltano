@@ -8,7 +8,8 @@ stages:
     - build_base
     - build
     - review
-    - deploy
+    - production
+    - dockerhub
 
 cache:
   paths:
@@ -174,6 +175,9 @@ meltano_full:
 production:
   image: s1lvs/kubectl:latest
   stage: production
+  environment:
+    name: production
+    url: https://melt.gitlab-bizops.com
   script:
   - |
     helm upgrade --wait --install meltano . \
