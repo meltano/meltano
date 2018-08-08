@@ -23,7 +23,8 @@ ADD app/api /meltano/app
 WORKDIR /meltano/app
 
 # -- Install dependencies:
-RUN pipenv install --deploy --system
+RUN pipenv install && \
+    pipenv install --deploy --system
 
 # -- Install the needed nodejs dependencies that the python code shells out to
 RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
