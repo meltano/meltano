@@ -32,19 +32,6 @@ class FastlyExtractor:
         # This is historical data starts after this period
         self.start_date = datetime.date(2017, 8, 1)
 
-    # async def get_entities(self):
-    #     fetch_entities_tasks = []
-    #     async with create_aiohttp_session() as session:
-    #         date = self.start_date
-    #         while date < self.this_month:
-    #             billing_endpoint = f'billing/v2/year/{date.year:04}/month/{date.month:02}'
-    #             billing_url = get_endpoint_url(billing_endpoint)
-    #             task = asyncio.create_task(
-    #                 fetch(url=billing_url, session=session)
-    #             )
-    #             fetch_entities_tasks.append(task)
-    #         return await asyncio.gather(*fetch_entities_tasks)
-
     def get_billing_urls(self):
         date = self.start_date
         while date < self.this_month:
