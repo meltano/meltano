@@ -8,17 +8,12 @@ import json
 import pandas as pd
 
 from meltano.common.service import MeltanoService
-from meltano.common.manifest_reader import ManifestReader
-from meltano.common.manifest_writer import ManifestWriter
-from meltano.common.manifest import Manifest
 from meltano.common.db import DB
-from meltano.common.utils import setup_db, pop_all
+from meltano.common.utils import pop_all
 from meltano.schema import schema_apply
 from meltano.cli.params import MANIFEST_TYPE
 
-
 service = MeltanoService()
-# print(service.auto_discover())
 
 
 def build_extractor(name):
@@ -28,7 +23,6 @@ def build_extractor(name):
     except ImportError as e:
         logging.error("Cannot find the extractor {0}, you might need to install it (meltano-extract-{0})".format(name))
 
-    schema = None
     extractor = service.create_extractor("com.meltano.extract.{}".format(name))
     return extractor
 
@@ -40,16 +34,16 @@ def build_loader(name):
     except ImportError as e:
         logging.error("Cannot find the loader {0}, you might need to install it (meltano-load-{0})".format(name))
 
-    schema = None
     loader = service.create_loader("com.meltano.load.{}".format(name))
     return loader
 
 
 def meltano_entity_dataframes_to_json(result):
     json_export = [{'EntityName': entity['EntityName'],
-               'DataFrame': entity['DataFrame'].to_json(orient='table')} for entity in result]
+                    'DataFrame': entity['DataFrame'].to_json(orient='table')} for entity in result]
 
     return json.dumps(json_export)
+
 
 def json_to_meltano_entity_dataframes(json_str):
     result = []
@@ -58,37 +52,31 @@ def json_to_meltano_entity_dataframes(json_str):
 
     for entity in json_import:
         result.append(
-              {
+            {
                 'EntityName': entity['EntityName'],
                 'DataFrame': pd.read_json(entity['DataFrame'], orient='table')
-              }
-            )
-
+            }
+        )
     return result
 
 
 def db_options(func):
     @click.option('-S', '--schema',
                   required=True)
-
     @click.option('-H', '--host',
                   envvar='PG_ADDRESS',
                   default='localhost',
                   help="Database schema to use.")
-
     @click.option('-p', '--port',
                   type=int,
                   envvar='PG_PORT',
                   default=5432)
-
     @click.option('-d', '-db', 'database',
                   envvar='PG_DATABASE',
                   default=lambda: os.getenv('USER', ''),
                   help="Database to import the data to.")
-
     @click.option('-T', '--table', 'table_name',
                   help="Table to import the data to.")
-
     @click.option('-u', '--user',
                   envvar='PG_USERNAME',
                   default=lambda: os.getenv('USER', ''),
@@ -99,6 +87,7 @@ def db_options(func):
         config = pop_all(("schema", "host", "port", "database", "table_name", "user", "password"), kwargs)
         DB.setup(**config)
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -121,11 +110,12 @@ def extract(extractor):
     json_export = meltano_entity_dataframes_to_json(result)
     print('{}'.format(json_export))
 
+
 @root.command()
 @click.argument('loader')
 @click.option('--manifest',
               help="The db manifest yaml file")
-def load(loader, manifest): #, manifest):
+def load(loader, manifest):  # , manifest):
     # Get the results from the previous step
     json_import = ''
 
@@ -141,9 +131,7 @@ def load(loader, manifest): #, manifest):
     # Apply the schema defined in the manifest file
     logging.info("Applying schema defined in manifest {}...".format(manifest))
 
-    loader.schema_apply(
-        manifest=manifest
-    )
+    loader.schema_apply(manifest=manifest)
 
     # Load the Data
     logging.info("Loading data...")
