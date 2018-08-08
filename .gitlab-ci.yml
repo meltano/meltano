@@ -183,3 +183,5 @@ production:
   - helm init --client-only
   - helm dep update
   - helm upgrade --install --namespace default meltano . --set image.repository=$CI_REGISTRY_IMAGE/meltano,image.tag=full-$CI_COMMIT_SHA,ingress.enabled=true,'global.ingress.hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].secretName=melt-tls',postgresql.postgresPassword=$POSTGRES_PASSWORD,oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID,oauth2-proxy.clientSecret=$OAUTH2_PROXY_CLIENT_SECRET,oauth2-proxy.cookieSecret=$OAUTH2_PROXY_COOKIE_SECRET,oauth2-proxy.enabled=true,global.oauth2-proxy.enabled=true,oauth2-proxy.emailDomain=gitlab.com,oauth2-proxy.gitlabHost=https://dev.gitlab.org
+  only:
+  - master
