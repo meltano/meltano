@@ -9,19 +9,9 @@ setup(
     author_email='meltano@gitlab.com',
     url='https://gitlab.com/meltano/meltano',
     packages=find_packages(),
-    install_requires=[
-        "click",
-        "psycopg2>=2.7.4",
-        "configparser",
-        "SQLAlchemy",
-        "pandas",
-        "pyyaml",
-        "yamlordereddictloader",
-        "requests",
-        "attrs",
-        "aiohttp",
-        "certifi"
-    ],
+    # install_requires=[
+    #
+    # ],
     entry_points={
         'console_scripts': [
             "meltano = meltano.cli:main"

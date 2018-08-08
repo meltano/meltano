@@ -1,13 +1,15 @@
 import psycopg2
-import os
 import contextlib
 import logging
 
+from abc import ABC, abstractmethod
+from pandas import DataFrame
 from psycopg2.extras import LoggingConnection
 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
+
 
 class DB:
     connection_class = LoggingConnection
@@ -72,3 +74,24 @@ class DB:
         except:
             session.rollback()
             raise
+
+
+class MeltanoLoader(ABC):
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def schema_apply(self, manifest: str):
+        """
+        Load the schema manifest from a file (or str) and create/update the schema
+        in the target Data Warehouse
+        """
+        pass
+
+    @abstractmethod
+    def load(self, entity_name: str, dataframe: DataFrame):
+        """
+        Load the data in the provided dataframe to table schema_name.entity_name
+        """
+        pass

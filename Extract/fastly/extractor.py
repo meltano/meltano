@@ -4,6 +4,7 @@ import datetime
 import grequests
 from dateutil.relativedelta import relativedelta
 from pandas.io.json import json_normalize
+from sqlalchemy import Table, Column, Float, String, MetaData
 
 FASTLY_API_SERVER = "https://api.fastly.com/"
 FASTLY_HEADERS = {
@@ -20,6 +21,15 @@ def get_endpoint_url(endpoint) -> str:
     return f'{FASTLY_API_SERVER}{endpoint}'
 
 
+fastly_metadata = MetaData()
+fastly_billing = Table(
+    'fastly_billing',
+    fastly_metadata,
+    Column('amount', Float),
+    Column('id', String, primary_key=True),
+)
+
+
 class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
@@ -31,6 +41,7 @@ class FastlyExtractor:
         self.this_month = datetime.date(year=today.year, month=today.month, day=1)
         # This is historical data starts after this period
         self.start_date = datetime.date(2017, 8, 1)
+        self.table: Table = fastly_billing
 
     def get_billing_urls(self):
         date = self.start_date

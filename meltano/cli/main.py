@@ -1,166 +1,74 @@
 import click
-import importlib
-import sys
-import logging
-import functools
-import os
-import json
-import pandas as pd
 
-from meltano.common.service import MeltanoService
-from meltano.common.db import DB
-from meltano.common.utils import pop_all
-from meltano.schema import schema_apply
-from meltano.cli.params import MANIFEST_TYPE
-
-service = MeltanoService()
-
-
-def build_extractor(name):
-    try:
-        # this should register the module
-        importlib.import_module("extract.{}".format(name))
-    except ImportError as e:
-        logging.error("Cannot find the extractor {0}, you might need to install it (meltano-extract-{0})".format(name))
-
-    extractor = service.create_extractor("com.meltano.extract.{}".format(name))
-    return extractor
-
-
-def build_loader(name):
-    # this should register the module
-    try:
-        importlib.import_module("load.{}".format(name))
-    except ImportError as e:
-        logging.error("Cannot find the loader {0}, you might need to install it (meltano-load-{0})".format(name))
-
-    loader = service.create_loader("com.meltano.load.{}".format(name))
-    return loader
-
-
-def meltano_entity_dataframes_to_json(result):
-    json_export = [{'EntityName': entity['EntityName'],
-                    'DataFrame': entity['DataFrame'].to_json(orient='table')} for entity in result]
-
-    return json.dumps(json_export)
-
-
-def json_to_meltano_entity_dataframes(json_str):
-    result = []
-
-    json_import = json.loads(json_str)
-
-    for entity in json_import:
-        result.append(
-            {
-                'EntityName': entity['EntityName'],
-                'DataFrame': pd.read_json(entity['DataFrame'], orient='table')
-            }
-        )
-    return result
-
-
-def db_options(func):
-    @click.option('-S', '--schema',
-                  required=True)
-    @click.option('-H', '--host',
-                  envvar='PG_ADDRESS',
-                  default='localhost',
-                  help="Database schema to use.")
-    @click.option('-p', '--port',
-                  type=int,
-                  envvar='PG_PORT',
-                  default=5432)
-    @click.option('-d', '-db', 'database',
-                  envvar='PG_DATABASE',
-                  default=lambda: os.getenv('USER', ''),
-                  help="Database to import the data to.")
-    @click.option('-T', '--table', 'table_name',
-                  help="Table to import the data to.")
-    @click.option('-u', '--user',
-                  envvar='PG_USERNAME',
-                  default=lambda: os.getenv('USER', ''),
-                  help="Specifies the user to connect to the database with.")
-    @click.password_option(envvar='PG_PASSWORD')
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        config = pop_all(("schema", "host", "port", "database", "table_name", "user", "password"), kwargs)
-        DB.setup(**config)
-        return func(*args, **kwargs)
-
-    return wrapper
+from Extract.fastly.extractor import FastlyExtractor
+from Load.postgres.loader import PostgresLoader
 
 
 @click.group()
-def root():
+def cli():
     pass
 
 
-@root.command()
-@click.argument('extractor')
-def extract(extractor):
-    extractor = build_extractor(extractor)
+# TODO: to be generated from the file structure of /Extract/
+EXTRACTOR_REGISTRY = {
+    'fastly': FastlyExtractor,
+}
 
-    logging.info("Extracting data...")
-
-    result = extractor.extract()
-
-    logging.info("Extraction complete.")
-
-    json_export = meltano_entity_dataframes_to_json(result)
-    print('{}'.format(json_export))
+LOADER_REGISTRY = {
+    'postgres': PostgresLoader,
+}
 
 
-@root.command()
-@click.argument('loader')
-@click.option('--manifest',
-              help="The db manifest yaml file")
-def load(loader, manifest):  # , manifest):
-    # Get the results from the previous step
-    json_import = ''
-
-    logging.info("Waiting for data...")
-    for line in sys.stdin:
-        json_import += line
-
-    result = json_to_meltano_entity_dataframes(json_import)
-
-    # Dynamically instantiate the Loader
-    loader = build_loader(loader)
-
-    # Apply the schema defined in the manifest file
-    logging.info("Applying schema defined in manifest {}...".format(manifest))
-
-    loader.schema_apply(manifest=manifest)
-
-    # Load the Data
-    logging.info("Loading data...")
-
-    for entity in result:
-        logging.info('Loading entity: {}'.format(entity['EntityName']))
-
-        loader.load(
-            entity_name=entity['EntityName'],
-            dataframe=entity['DataFrame']
+@cli.command()
+@click.argument('extractor_name')
+@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
+# @click.option('-S', '--schema', required=True)
+@click.option('-H', '--host',
+              envvar='PG_ADDRESS',
+              default='localhost',
+              help="Database schema to use.")
+@click.option('-p', '--port',
+              type=int,
+              envvar='PG_PORT',
+              default=5432)
+@click.option('-d', '-db', 'database',
+              envvar='PG_DATABASE',
+              help="Database to import the data to.")
+@click.option('-u', '--username', envvar='PG_USERNAME',
+              help="Specifies the user to connect to the database with.")
+@click.password_option(envvar='PG_PASSWORD')
+def extract(extractor_name, loader_name, host, port, database, username, password):
+    """
+    :param extractor_name: name of the extractor
+    :param loader_name: name of the loader
+    :return:
+    """
+    click.echo(f"Loading and initializing extractor: {extractor_name}")
+    extractor_class = EXTRACTOR_REGISTRY.get(extractor_name)
+    if not extractor_class:
+        raise Exception(
+            f'Extractor {extractor_name} not found please specify one of the following: {EXTRACTOR_REGISTRY.keys()}'
+        )
+    extractor = extractor_class()
+    # TODO: add metadata engine binding
+    click.echo(f"Loading and initializing loader: {loader_name}")
+    loader_class = LOADER_REGISTRY.get(loader_name, None)
+    if not loader_class:
+        raise Exception(
+            f'Loader {loader_name} not found please specify one of the following: {LOADER_REGISTRY.keys()}'
         )
 
-        # df = entity['DataFrame']
-        # print('')
-        # print('DataFrame Schema:')
-        # print('')
-        # print('{}'.format(df.dtypes))
+    connection_string = f'postgresql://{username}:{password}@{host}:{port}/{database}'
+    loader = loader_class(connection_string=connection_string, table=extractor.table)
+    click.echo("Starting extraction ... ")
+    extracted_entities = extractor.extract()
+    click.echo("Applying the schema ... ")
 
-        # print('')
-        # print('DataFrame Values:')
-        # print('')
-        # print('{}'.format(df))
-
-    logging.info("Load complete.")
+    loader.schema_apply()
+    click.echo("Got extractor results, loading them into the loader")
+    loader.load(extracted_entities)
+    click.echo("Load done! Exiting")
 
 
-@root.command()
-@db_options
-@click.argument('manifest', type=MANIFEST_TYPE)
-def apply_schema(manifest):
-    with DB.open() as db:
-        schema_apply(db, manifest.as_schema())
+if __name__ == '__main__':
+    cli()
