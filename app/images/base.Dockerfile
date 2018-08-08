@@ -22,10 +22,6 @@ ENV API_URL=
 ADD app/api /meltano/app
 WORKDIR /meltano/app
 
-# -- Install dependencies:
-RUN pipenv install && \
-    pipenv install --deploy --system
-
 # -- Install the needed nodejs dependencies that the python code shells out to
 RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
     mv node-lookml-parser parser && \
@@ -33,12 +29,18 @@ RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
     yarn
 
 # -- Build the static assets
-ADD app /tmp
+ADD . /tmp
 
+# -- Install dependencies:
 RUN cd /tmp && \
+    pipenv --python /usr/bin/python3 && \
+    pipenv install && \
+    pipenv install --deploy --system
+
+RUN cd /tmp/app && \
     yarn && \
     yarn run build && \
-    mv /tmp/dist /meltano/app/static-assets && \
+    mv /tmp/app/dist /meltano/app/static-assets && \
     rm -rf /tmp
 
 CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/meltano/app/static-assets", "--static-index", "index.html"]
