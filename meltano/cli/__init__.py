@@ -1,8 +1,9 @@
 import logging
 
-from .main import root
+from .main import cli
 
 
 def main():
     logging.basicConfig(level=logging.INFO)
-    root()
+    cli()
+

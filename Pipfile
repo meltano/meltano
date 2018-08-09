@@ -13,11 +13,15 @@ gitpython = "*"
 markdown = "*"
 flask-sqlalchemy = "*"
 pypika = "*"
+pandas = "*"
+pyyaml = "*"
+grequests = "*"
 
 [dev-packages]
 "flake8" = "*"
 "autopep8" = "*"
 pytest = "*"
+bpython = "*"
 
 [requires]
 python_version = "3.6.6"
