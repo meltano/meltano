@@ -17,8 +17,8 @@
         <a class="navbar-item" href="/">
           Home
         </a>
-        <a class="navbar-item" href="/extract">
-          Extract
+        <a class="navbar-item" href="/orchestrations">
+          Orchestrate
         </a>
         <div class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link" href="#">
