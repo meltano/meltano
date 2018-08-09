@@ -1,3 +1,41 @@
+from typing import Generator, Dict
+
+from sqlalchemy import create_engine
+from pandas import DataFrame
+from sqlalchemy.dialects import postgresql
+
+
+class PostgresLoader:
+    def __init__(self, connection_string, table):
+        self.engine = create_engine(connection_string)
+        self.table = table
+
+    def schema_apply(self):
+        if not self.engine.dialect.has_table(self.engine, self.table.name):
+            # create table
+            self.table.metadata.create_all(self.engine)
+        else:
+            pass
+            print('Schema already exists skipping creation')
+
+    def load(self, entities: Generator[Dict[str, DataFrame], None, None]):
+        for entity in entities:
+            for schema_name, df in entity.items():
+                if not df.empty:
+                    # df.to_sql(schema_name, con=self.engine, if_exists='append')
+                    dfs_to_load: list = df.to_dict(orient='records')
+                    insert_stmt = postgresql.insert(self.table).values(
+                        dfs_to_load
+                    )
+                    insert_stmt = insert_stmt.on_conflict_do_update(
+                        index_elements=['id'],
+                        set_=insert_stmt.excluded._data  # overwrite the data with the new one
+                    )
+                    print(f'Loading df: {dfs_to_load}')
+                    self.engine.execute(insert_stmt)
+                else:
+                    print(f'DataFrame {df} is empty -> skipping it')
+
 # import os
 # import yaml
 # import psycopg2
@@ -200,40 +238,3 @@
 #             )
 #
 #         return upsert_clause
-
-import os
-from typing import Generator, Dict
-
-from sqlalchemy import create_engine
-from pandas import DataFrame
-from sqlalchemy.dialects import postgresql
-
-
-class PostgresLoader:
-    def __init__(self, connection_string, table):
-        self.engine = create_engine(connection_string)
-        self.extracting_entities = ['line_items', ]
-        self.table = table
-
-    def schema_apply(self):
-        if not self.engine.dialect.has_table(self.engine, self.table.name):
-            # create table
-            self.table.metadata.create_all()
-        else:
-            pass
-            print('schema exists ... ')
-
-    def load(self, entity_data: Generator[Dict[str, DataFrame], None, None]):
-        for entity_dict in entity_data:
-            for schema_name, df in entity_dict.items():
-                if not df.empty:
-                    insert_stmt = postgresql.insert(self.table).values(
-                        df.to_dict(orient='records')
-                    )
-                    update_stmt = insert_stmt.on_conflict_do_update(
-                        constraint='id',
-                    )
-                    self.engine.execute(update_stmt)
-                    # df.to_sql(name=schema_name, con=self.engine, index=False, if_exists='append')
-                else:
-                    print(f'DataFrame {df} is empty -> skipping it')
