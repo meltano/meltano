@@ -1,54 +1,69 @@
-import io
-import logging
 import pandas as pd
-import numpy as np
-import json
-import asyncio
-import itertools
+from sqlalchemy import MetaData, Table, String, Column, TIMESTAMP, Float, Integer
 
-from pandas.io.json import json_normalize
-from meltano.extract.base import MeltanoExtractor
+demo_metadata = MetaData()
+users_table = Table(
+    'users',  # Name of the table
+    demo_metadata,
+    Column('id', Integer, primary_key=True),
+    Column('name', String),
+    schema='demo'
+)
 
-class DemoExtractor(MeltanoExtractor):
+products_table = Table(
+    'products',  # Name of the table
+    demo_metadata,
+    Column('id', Integer, primary_key=True),
+    Column('name', String),
+    Column('price', Float),
+    schema='demo'
+)
+carts_table = Table(
+    'carts',
+    demo_metadata,
+    Column('id', Integer, primary_key=True),
+    Column('user_id', Integer),
+    Column('product_id', Integer),
+    Column('qty', Integer),
+    Column('created_at', TIMESTAMP),
+    schema='demo'
+)
+
+
+class DemoExtractor:
     """
     Demo Extractor
     """
 
-    def entities(self):
-        """
-        Return a list of Entities supported by this Extractor.
+    def __init__(self):
+        self.tables = {
+            'users': users_table,
+            'products': products_table,
+            'carts': carts_table,
+        }
+        self.primary_keys = {
+            'users': ['id'],
+            'products': ['id'],
+            'carts': ['id'],
+        }
+        self.entities = ['users', 'products', 'carts']
 
-        Whatever type the extractor wants as long as it is properly used in
-         extract_entity()
-        """
-        return ['users', 'products', 'carts']
-
-    def extract_entity(self, entity):
-        """
-        Return a DataFrame for a specified entity.
-        """
-        if entity == 'users':
-            users = [
+        self.TEST_DATA = {
+            'users': [
                 {'id': 1, 'name': 'jacob'},
                 {'id': 2, 'name': 'josh'},
                 {'id': 3, 'name': 'alex'},
                 {'id': 4, 'name': 'micael'},
                 {'id': 5, 'name': 'yannis'},
-            ]
-
-            df = pd.DataFrame(data=users)
-        elif entity == 'products':
-            products = [
+            ],
+            'products': [
                 {'id': 1, 'name': 'apple', 'price': 1.32},
                 {'id': 2, 'name': 'lemon', 'price': 2.12},
                 {'id': 3, 'name': 'orange', 'price': 2.45},
                 {'id': 4, 'name': 'melon', 'price': 1.98},
                 {'id': 5, 'name': 'appricot', 'price': 0.96},
-            ]
-
-            df = pd.DataFrame(data=products)
-        elif entity == 'carts':
-            carts = [
+            ],
+            'carts': [
                 {'id': 1, 'user_id': 1, 'product_id': 1, 'qty': 5, 'created_at': '2018-04-12 10:01:50'},
                 {'id': 2, 'user_id': 1, 'product_id': 5, 'qty': 3, 'created_at': '2018-04-23 15:35:40'},
                 {'id': 3, 'user_id': 2, 'product_id': 2, 'qty': 2, 'created_at': '2018-05-01 12:13:25'},
@@ -59,21 +74,10 @@ class DemoExtractor(MeltanoExtractor):
                 {'id': 8, 'user_id': 5, 'product_id': 1, 'qty': 7, 'created_at': '2018-08-06 20:25:52'},
             ]
 
-            df = pd.DataFrame(data=carts)
-        else:
-            raise ValueError("Not supported entity ({}) was provided".format(entity))
-
-        return df
+        }
 
     def extract(self):
-        result = []
-
-        for entity in self.entities():
-            result.append(
-              {
-                'EntityName': entity,
-                'DataFrame': self.extract_entity(entity)
-              }
-            )
-
-        return result
+        for entity in self.entities:
+            yield {
+                entity: pd.DataFrame(data=self.TEST_DATA.get(entity))
+            }

@@ -56,8 +56,13 @@ class FastlyExtractor:
         today = datetime.date.today()
         self.this_month = datetime.date(year=today.year, month=today.month, day=1)
         self.start_date = datetime.date(2017, 8, 1)  # after this period billing data starts
-        self.table: Table = fastly_billing
-        self.primary_keys: list = ['id']
+        self.entities: list = ['line_items']
+        self.tables = {
+            'line_items': fastly_billing,
+        }
+        self.primary_keys = {
+            'line_items': ['id']
+        }
 
     def get_billing_urls(self):
         date = self.start_date
@@ -66,13 +71,12 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self) -> Generator[Dict[str, DataFrame], None, None]:
+    def extract(self) -> Dict[str, DataFrame]:
         rs = (grequests.get(url, headers=FASTLY_HEADERS) for url in self.get_billing_urls())
         results = grequests.imap(rs)
         for result in results:
-            result_dict = result.json()
-            yield {'line_items': json_normalize(result_dict, record_path='line_items',
-                                                meta=['customer_id', 'end_time', 'start_time', 'invoice_id']),
-                   # 'regions': json_normalize(result_dict.get('regions')) TODO: figure out how to normalize this part
-                   # https://stackoverflow.com/questions/41469430/writing-json-column-to-postgres-using-pandas-to-sql
+            yield {'line_items': json_normalize(result.json(),
+                                                record_path='line_items',
+                                                meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
+                                                )
                    }
