@@ -43,6 +43,7 @@ fastly_billing = Table(
     Column('invoice_id', String),
     Column('start_time', TIMESTAMP),
     Column('end_time', TIMESTAMP),
+    schema='fastly'
 )
 
 

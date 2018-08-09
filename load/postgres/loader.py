@@ -3,6 +3,7 @@ from typing import Generator, Dict
 from sqlalchemy import create_engine
 from pandas import DataFrame
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.schema import CreateSchema
 
 
 class PostgresLoader:
@@ -12,12 +13,12 @@ class PostgresLoader:
         self.primary_keys = extractor.primary_keys
 
     def schema_apply(self):
+        if not self.engine.dialect.has_schema(self.engine, self.table.schema):
+            print(f"Schema {self.table.schema} does not exist -> creating it ")
+            self.engine.execute(CreateSchema(self.table.schema))
         if not self.engine.dialect.has_table(self.engine, self.table.name):
-            # create table
+            print(f"Table {self.table.name} does not exist -> creating it ")
             self.table.metadata.create_all(self.engine)
-        else:
-            pass
-            print('Schema already exists skipping creation')
 
     def load(self, entities: Generator[Dict[str, DataFrame], None, None]):
         for entity in entities:
