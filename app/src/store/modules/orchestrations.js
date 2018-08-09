@@ -3,12 +3,17 @@ import orchestrationsApi from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
-  currentView: 'extractor',
+  currentView: 'intro',
   currentExtractor: '',
   currentLoader: '',
+  log: 'Job log will appear when run.',
 };
 
 const getters = {
+  isIntroView() {
+    return state.currentView === 'intro';
+  },
+
   isExtractorView() {
     return state.currentView === 'extractor';
   },
@@ -19,6 +24,10 @@ const getters = {
 
   isTransformView() {
     return state.currentView === 'transform';
+  },
+
+  isRunView() {
+    return state.currentView === 'run';
   },
 
   canRun() {
@@ -46,6 +55,18 @@ const actions = {
   currentLoaderClicked({ commit }, e) {
     const selectedLoader = e.target.value;
     commit('setCurrentLoader', selectedLoader);
+  },
+
+  runJobs({ commit }) {
+    const payload = {
+      extractor: state.currentExtractor,
+      loader: state.currentLoader,
+    };
+    state.log = 'Running...';
+    orchestrationsApi.run(payload)
+      .then((data) => {
+        state.log = data.data.append;
+      });
   },
 };
 

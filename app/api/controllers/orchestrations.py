@@ -1,3 +1,5 @@
+import subprocess, json
+
 from flask import (
   Blueprint, jsonify, request
 )
@@ -17,3 +19,12 @@ def index():
   load_dir = os.path.join(myDir, '../../../', 'load/')
   result['loaders'] =  [ name for name in os.listdir(load_dir) if os.path.isdir(os.path.join(load_dir, name)) ]
   return jsonify(result)
+
+@bp.route('/run', methods=['POST'])
+def run():
+  incoming = request.get_json()
+  extractor = incoming['extractor']
+  command = ['meltano', 'extract', extractor]
+  p = subprocess.run(command, stdout=subprocess.PIPE)
+  j = json.loads(p.stdout.decode("utf-8"))
+  return jsonify({'append': j})

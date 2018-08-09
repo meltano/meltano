@@ -5,4 +5,8 @@ export default {
   index() {
     return axios.get(utils.buildUrl('orchestrations'));
   },
+
+  run(payload) {
+    return axios.post(utils.buildUrl('orchestrations', 'run'), payload);
+  }
 };
