@@ -1,6 +1,6 @@
 import os
 import datetime
-import typing
+from typing import Dict, Generator
 
 import grequests
 from dateutil.relativedelta import relativedelta
@@ -52,13 +52,11 @@ class FastlyExtractor:
     """
 
     def __init__(self):
-        self.name = 'fastly'  # used for defining schema name
         today = datetime.date.today()
         self.this_month = datetime.date(year=today.year, month=today.month, day=1)
-
-        # This is historical data starts after this period
-        self.start_date = datetime.date(2017, 8, 1)
+        self.start_date = datetime.date(2017, 8, 1)  # after this period billing data starts
         self.table: Table = fastly_billing
+        self.primary_keys: list = ['id']
 
     def get_billing_urls(self):
         date = self.start_date
@@ -67,7 +65,7 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self) -> typing.Dict[str, DataFrame]:
+    def extract(self) -> Generator[Dict[str, DataFrame], None, None]:
         rs = (grequests.get(url, headers=FASTLY_HEADERS) for url in self.get_billing_urls())
         results = grequests.imap(rs)
         for result in results:

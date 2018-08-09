@@ -39,8 +39,13 @@ LOADER_REGISTRY = {
 @click.password_option(envvar='PG_PASSWORD')
 def extract(extractor_name, loader_name, host, port, database, username, password):
     """
-    :param extractor_name: name of the extractor
-    :param loader_name: name of the loader
+    :param host: db hostname
+    :param port:
+    :param database: name of the database to load to
+    :param username: rolename with wright access to the db
+    :param password:
+    :param extractor_name:
+    :param loader_name:
     :return:
     """
     click.echo(f"Loading and initializing extractor: {extractor_name}")
@@ -59,7 +64,7 @@ def extract(extractor_name, loader_name, host, port, database, username, passwor
         )
 
     connection_string = f'postgresql://{username}:{password}@{host}:{port}/{database}'
-    loader = loader_class(connection_string=connection_string, table=extractor.table)
+    loader = loader_class(connection_string=connection_string, extractor=extractor)
     click.echo("Starting extraction ... ")
     extracted_entities = extractor.extract()
     click.echo("Applying the schema ... ")

@@ -6,9 +6,10 @@ from sqlalchemy.dialects import postgresql
 
 
 class PostgresLoader:
-    def __init__(self, connection_string, table):
+    def __init__(self, connection_string, extractor):
         self.engine = create_engine(connection_string)
-        self.table = table
+        self.table = extractor.table
+        self.primary_keys = extractor.primary_keys
 
     def schema_apply(self):
         if not self.engine.dialect.has_table(self.engine, self.table.name):
@@ -28,7 +29,7 @@ class PostgresLoader:
                         dfs_to_load
                     )
                     insert_stmt = insert_stmt.on_conflict_do_update(
-                        index_elements=['id'],
+                        index_elements=self.primary_keys,
                         set_=insert_stmt.excluded._data  # overwrite the data with the new one
                     )
                     print(f'Loading df: {dfs_to_load}')
