@@ -1,6 +1,6 @@
 import click
 
-from ..Extract.fastly.extractor import FastlyExtractor
+from Extract.fastly.extractor import FastlyExtractor
 from Load.postgres.loader import PostgresLoader
 
 
