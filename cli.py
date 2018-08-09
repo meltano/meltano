@@ -1,7 +1,7 @@
 import click
 
-from Extract.fastly.extractor import FastlyExtractor
-from Load.postgres.loader import PostgresLoader
+from extract.fastly.extractor import FastlyExtractor
+from load.postgres.loader import PostgresLoader
 
 
 @click.group()
