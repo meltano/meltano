@@ -24,7 +24,8 @@ def index():
 def run():
   incoming = request.get_json()
   extractor = incoming['extractor']
-  command = ['meltano', 'extract', extractor]
+  command = ['python3', '../../../cli.py', 'extract' , extractor]
   p = subprocess.run(command, stdout=subprocess.PIPE)
+  print(p.stdout.decode("utf-8"))
   j = json.loads(p.stdout.decode("utf-8"))
   return jsonify({'append': j})
