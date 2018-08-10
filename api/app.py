@@ -5,12 +5,17 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request
 from flask import jsonify
 
+import sys, os
+sys.path.append(os.path.abspath(os.path.join('..', 'meltano')))
+
+from meltano.cli import extract
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
 from external_connector import ExternalConnector
 
-app = Flask(__name__)
+app = Flask(__name__) 
 
 app.config.from_object('config')
 if os.environ['FLASK_ENV'] == 'development':
