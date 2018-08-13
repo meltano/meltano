@@ -29,3 +29,27 @@ def run():
   print(extract)
   j = json.loads(p.stdout.decode("utf-8"))
   return jsonify({'append': j})
+
+@bp.route('/extract/<extractor_name>', methods=['POST'])
+def extract(extractor_name):
+  # do the business
+  # save to a file
+  # return json
+
+@bp.route('/load/<loader_name>', methods=['POST'])
+def extract(extractor_name):
+  # do the business
+  incoming = request.get_json()
+  extract = incoming['extractor']
+  # get the file name/extractor name
+  # query the setting model to get 
+  # load the extracted data to data warehouse
+  # return json
+
+@bp.route('/transform/<transform_name>', methods=['POST'])
+def extract(transform_name):
+  # do the business
+  incoming = request.get_json()
+  loader = incoming['loader']
+  # find the transformer and run with DBT
+  # return json
