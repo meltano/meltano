@@ -1,5 +1,5 @@
 import click
-
+import os
 from extract.fastly.extractor import FastlyExtractor
 from extract.demo.extractor import DemoExtractor
 from load.postgres.loader import PostgresLoader
@@ -21,25 +21,15 @@ LOADER_REGISTRY = {
 }
 
 
-@cli.command()
-@click.argument('extractor_name')
-@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
-# @click.option('-S', '--schema', required=True)
-@click.option('-H', '--host',
-              envvar='PG_ADDRESS',
-              default='localhost',
-              help="Database schema to use.")
-@click.option('-p', '--port',
-              type=int,
-              envvar='PG_PORT',
-              default=5432)
-@click.option('-d', '-db', 'database',
-              envvar='PG_DATABASE',
-              help="Database to import the data to.")
-@click.option('-u', '--username', envvar='PG_USERNAME',
-              help="Specifies the user to connect to the database with.")
-@click.password_option(envvar='PG_PASSWORD')
-def extract(extractor_name, loader_name, host, port, database, username, password):
+def run_extract(
+        extractor_name,
+        loader_name,
+        host=os.environ.get('PG_ADDRESS'),
+        port=os.environ.get('PG_PORT'),
+        database=os.environ.get('PG_DATABASE'),
+        username=os.environ.get('PG_USERNAME'),
+        password=os.environ.get('PG_PASSWORD'),
+):
     """
     :param host: db hostname
     :param port:
@@ -79,6 +69,28 @@ def extract(extractor_name, loader_name, host, port, database, username, passwor
             click.echo("Got extractor results, loading them into the loader")
             loader.load(schema_name=entity_name, df=df)
             click.echo("Load done! Exiting")
+
+
+@cli.command()
+@click.argument('extractor_name')
+@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
+# @click.option('-S', '--schema', required=True)
+@click.option('-H', '--host',
+              envvar='PG_ADDRESS',
+              default='localhost',
+              help="Database schema to use.")
+@click.option('-p', '--port',
+              type=int,
+              envvar='PG_PORT',
+              default=5432)
+@click.option('-d', '-db', 'database',
+              envvar='PG_DATABASE',
+              help="Database to import the data to.")
+@click.option('-u', '--username', envvar='PG_USERNAME',
+              help="Specifies the user to connect to the database with.")
+@click.password_option(envvar='PG_PASSWORD')
+def extract(extractor_name, loader_name, host, port, database, username, password):
+    run_extract(extractor_name, loader_name, host, port, database, username, password)
 
 
 if __name__ == '__main__':

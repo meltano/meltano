@@ -1,8 +1,7 @@
 import os
 import datetime
 from typing import Dict, Generator
-
-import grequests
+#import grequests
 from dateutil.relativedelta import relativedelta
 from pandas import DataFrame
 from pandas.io.json import json_normalize
@@ -71,12 +70,12 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self) -> Dict[str, DataFrame]:
-        rs = (grequests.get(url, headers=FASTLY_HEADERS) for url in self.get_billing_urls())
-        results = grequests.imap(rs)
-        for result in results:
-            yield {'line_items': json_normalize(result.json(),
-                                                record_path='line_items',
-                                                meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
-                                                )
-                   }
+    # def extract(self) -> Dict[str, DataFrame]:
+    #     rs = (grequests.get(url, headers=FASTLY_HEADERS) for url in self.get_billing_urls())
+    #     results = grequests.imap(rs)
+    #     for result in results:
+    #         yield {'line_items': json_normalize(result.json(),
+    #                                             record_path='line_items',
+    #                                             meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
+    #                                             )
+    #                }
