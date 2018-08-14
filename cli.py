@@ -3,6 +3,7 @@ import os
 from extract.fastly.extractor import FastlyExtractor
 from extract.demo.extractor import DemoExtractor
 from load.postgres.loader import PostgresLoader
+from load.csv.loader import CsvLoader
 
 
 @click.group()
@@ -18,6 +19,7 @@ EXTRACTOR_REGISTRY = {
 
 LOADER_REGISTRY = {
     'postgres': PostgresLoader,
+    'csv': CsvLoader,
 }
 
 
@@ -48,27 +50,28 @@ def run_extract(
         )
     extractor = extractor_class()
     click.echo(f"Loading and initializing loader: {loader_name}")
-    loader_class = LOADER_REGISTRY.get(loader_name, None)
+    loader_class = LOADER_REGISTRY.get(loader_name)
     if not loader_class:
         raise Exception(
             f'Loader {loader_name} not found please specify one of the following: {LOADER_REGISTRY.keys()}'
         )
-
     connection_string = f'postgresql://{username}:{password}@{host}:{port}/{database}'
-    extracted_entities = extractor.extract()
-    for entity in extracted_entities:
+    click.echo("Starting extraction ... ")
+
+    loader = loader_class(
+        connection_string=connection_string,
+        extractor=extractor,
+    )
+    click.echo("Applying the schema ... ")
+    loader.schema_apply()
+    entities_gen = extractor.extract()
+    results = set()
+    for entity in entities_gen:
         for entity_name, df in entity.items():
-            loader = loader_class(
-                connection_string=connection_string,
-                table=extractor.tables.get(entity_name),  # get table for current entity
-                primary_keys=extractor.primary_keys.get(entity_name),
-            )
-            click.echo("Starting extraction ... ")
-            click.echo("Applying the schema ... ")
-            loader.schema_apply()
             click.echo("Got extractor results, loading them into the loader")
-            loader.load(schema_name=entity_name, df=df)
+            results.add(loader.load(df=df, schema_name=entity_name))
             click.echo("Load done! Exiting")
+    return results
 
 
 @cli.command()

@@ -7,10 +7,11 @@ from sqlalchemy.schema import CreateSchema
 
 
 class PostgresLoader:
-    def __init__(self, connection_string, table, primary_keys):
-        self.engine = create_engine(connection_string)
-        self.table = table
-        self.primary_keys = primary_keys
+    def __init__(self, **kwargs):
+        self.engine = create_engine(kwargs['connection_string'])
+        self.entity_name = kwargs['entity_name']
+        self.extractor = kwargs['extractor']
+        self.table = self.extractor.get
 
     def schema_apply(self):
         if not self.engine.dialect.has_schema(self.engine, self.table.schema):
@@ -24,12 +25,10 @@ class PostgresLoader:
         if not df.empty:
             # df.to_sql(schema_name, con=self.engine, if_exists='append')
             dfs_to_load: list = df.to_dict(orient='records')
-            insert_stmt = postgresql.insert(self.table).values(
-                dfs_to_load
-            )
+            insert_stmt = postgresql.insert(self.table).values(dfs_to_load)
             insert_stmt = insert_stmt.on_conflict_do_update(
                 index_elements=self.primary_keys,
-                set_=insert_stmt.excluded._data  # overwrite the data with the new one
+                set_=insert_stmt.excluded._data,   # overwrite the data with the new one
             )
             print(f'Loading df: {dfs_to_load}')
             self.engine.execute(insert_stmt)

@@ -2,8 +2,8 @@ import os
 import json
 
 from flask import (
-    Blueprint, jsonify, request
-)
+    Blueprint, jsonify, request,
+    url_for)
 from cli import run_extract
 bp = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
 
@@ -30,9 +30,10 @@ def run():
 
 @bp.route('/extract/<extractor_name>', methods=['POST'])
 def extract(extractor_name):
-    run_extract(extractor_name, 'csv')
+    csv_files = run_extract(extractor_name, 'csv')
+    csv_files_url = [url_for('static', filename=file_name) for file_name in csv_files]
     return jsonify({'extractor_name': extractor_name,
-                    'output_file_path': f'{extractor_name}.csv'})
+                    'output_file_paths': csv_files_url})
 
 
 @bp.route('/load/<loader_name>', methods=['POST'])

@@ -132,4 +132,4 @@ venv.bak/
 .mypy_cache/
 
 api/tmp/output.json
-
+static/tmp

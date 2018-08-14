@@ -9,7 +9,6 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))  # needed to import from the parent folder
-from cli import run_extract
 from external_connector import ExternalConnector
 
 app = Flask(__name__)

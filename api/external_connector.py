@@ -5,6 +5,7 @@ import json
 class ExternalConnector:
     def __init__(self):
         self.connections = {}
+
     def add_connections(self, connections):
         print('adding connections...')
         for connection in connections:
