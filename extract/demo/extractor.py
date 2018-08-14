@@ -36,6 +36,7 @@ class DemoExtractor:
     """
 
     def __init__(self):
+        self.name = 'DemoExtractor'
         self.tables = {
             'users': users_table,
             'products': products_table,
@@ -47,7 +48,6 @@ class DemoExtractor:
             'carts': ['id'],
         }
         self.entities = ['users', 'products', 'carts']
-
         self.TEST_DATA = {
             'users': [
                 {'id': 1, 'name': 'jacob'},

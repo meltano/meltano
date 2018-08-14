@@ -1,22 +1,21 @@
 import os
 import datetime
-from typing import Dict, Generator
-
-import grequests
+from typing import Dict
+import requests
 from dateutil.relativedelta import relativedelta
 from pandas import DataFrame
 from pandas.io.json import json_normalize
-from sqlalchemy import Table, Column, Float, String, MetaData, Integer, TIMESTAMP, BigInteger
+from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
 
 FASTLY_API_SERVER = "https://api.fastly.com/"
 FASTLY_HEADERS = {
     'Fastly-Key': os.getenv("FASTLY_API_TOKEN"),
-    'Accept': "application/json"
+    'Accept': "application/json",
 }
 
 fastly_metadata = MetaData()
-fastly_billing = Table(
-    'fastly_billing',  # Name of the table
+line_items = Table(
+    'line_items',  # Name of the table
     fastly_metadata,
     Column('id', String, primary_key=True),
     Column('aria_invoice_id', String),
@@ -47,21 +46,24 @@ fastly_billing = Table(
 )
 
 
+async def fetch(session, url, headers):
+    async with session.get(url, headers=headers) as resp:
+        return await resp.json()
+
+
 class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
     """
 
     def __init__(self):
+        self.name = 'fastly'
         today = datetime.date.today()
         self.this_month = datetime.date(year=today.year, month=today.month, day=1)
         self.start_date = datetime.date(2017, 8, 1)  # after this period billing data starts
         self.entities: list = ['line_items']
-        self.tables = {
-            'line_items': fastly_billing,
-        }
         self.primary_keys = {
-            'line_items': ['id']
+            'line_items': ['id'],
         }
 
     def get_billing_urls(self):
@@ -72,11 +74,12 @@ class FastlyExtractor:
             date += relativedelta(months=1)
 
     def extract(self) -> Dict[str, DataFrame]:
-        rs = (grequests.get(url, headers=FASTLY_HEADERS) for url in self.get_billing_urls())
-        results = grequests.imap(rs)
-        for result in results:
-            yield {'line_items': json_normalize(result.json(),
-                                                record_path='line_items',
-                                                meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
-                                                )
-                   }
+        for url in self.get_billing_urls():
+            resp = requests.get(url, headers=FASTLY_HEADERS)
+            yield {
+                'line_items': json_normalize(
+                    resp.json(),
+                    record_path='line_items',
+                    meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
+                )
+            }
