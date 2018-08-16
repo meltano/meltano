@@ -14,12 +14,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/project',
-    },
-    {
-      path: '/project',
-      name: 'Project',
-      component: Project,
+      redirect: '/model',
     },
     {
       path: '/project/new',
@@ -28,6 +23,11 @@ export default new Router({
     },
     {
       path: '/repo/',
+      name: 'Repo',
+      component: Repo,
+    },
+    {
+      path: '/model/',
       name: 'Repo',
       component: Repo,
     },

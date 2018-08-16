@@ -8,5 +8,5 @@ export default {
 
   run(payload) {
     return axios.post(utils.buildUrl('orchestrations', 'run'), payload);
-  }
+  },
 };
