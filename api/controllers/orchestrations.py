@@ -2,10 +2,22 @@ import os
 import json
 
 from flask import (
-    Blueprint, jsonify, request,
-    url_for)
-from cli import run_extract
+    Blueprint,
+    request,
+    url_for,
+    jsonify,
+    make_response,
+    Response,
+)
+import pandas as pd
+from sqlalchemy import TIMESTAMP, DATE, DATETIME
+
+from api.config import TEMP_FOLDER
+from cli import run_extract, EXTRACTOR_REGISTRY, LOADER_REGISTRY
+
 bp = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
+
+DATETIME_TYPES_TO_PARSE = (TIMESTAMP, DATE, DATETIME)
 
 
 @bp.route('/', methods=['GET'])
@@ -29,27 +41,54 @@ def run():
 
 
 @bp.route('/extract/<extractor_name>', methods=['POST'])
-def extract(extractor_name):
+def extract(extractor_name: str)-> Response:
+    """
+    endpoint that performs extraction of the selected datasource to the .csv file(s)
+    stored on disk in the /static/tmp/ directory)
+    """
     csv_files = run_extract(extractor_name, 'csv')
-    csv_files_url = [url_for('static', filename=file_name) for file_name in csv_files]
+    csv_files_url = [url_for('static', filename=f'tmp/{file_name}') for file_name in csv_files]
     return jsonify({'extractor_name': extractor_name,
                     'output_file_paths': csv_files_url})
 
 
 @bp.route('/load/<loader_name>', methods=['POST'])
-def load(extractor_name):
-    # do the business
+def load(loader_name: str) -> Response:
+    """
+    endpoint that performs load of the .csv file(s)(stored on disk in the /static/tmp/ directory)
+    of the selected extractor  into the selected loader
+    :param loader_name: the name of the loader to use in this request
+    """
     incoming = request.get_json()
-    extract = incoming['extractor']
-    # get the file name/extractor name
-    # query the setting model to get
-    # load the extracted data to data warehouse
-    # return json
-    pass
+    try:
+        extractor_name = incoming['extractor']
+    except TypeError:
+        return make_response(
+            jsonify({'response': 'extractor not found', 'available extractors': list(EXTRACTOR_REGISTRY.keys())}),
+            404
+        )
+    extractor_class = EXTRACTOR_REGISTRY.get(extractor_name)
+    extractor = extractor_class()
+    loader_class = LOADER_REGISTRY.get(loader_name)
+    extractor_temp_files = [filename for filename in os.listdir(TEMP_FOLDER) if filename.startswith(extractor_name)]
+    for file_path in extractor_temp_files:
+        filename = os.path.splitext(file_path)[0]
+        entity_name = filename.split('--')[1]
+        loader = loader_class(entity_name=entity_name, extractor=extractor)
+        loader.schema_apply()
+        datetime_cols = [col.name for col in loader.table.columns if isinstance(col.type, DATETIME_TYPES_TO_PARSE)]
+        df = pd.read_csv(os.path.join(TEMP_FOLDER, file_path), parse_dates=datetime_cols)
+        df.replace({pd.NaT: None}, inplace=True)
+        loader.load(df=df)
+    return jsonify({'response': 'done', 'inserted files': extractor_temp_files})
 
 
-@bp.route('/transform/<transform_name>', methods=['POST'])
-def transform(transform_name):
+@bp.route('/transform/<transformer_name>', methods=['POST'])
+def transform(transformer_name):
+    """
+    :param transformer_name:
+    :return:
+    """
     # do the business
     incoming = request.get_json()
     loader = incoming['loader']

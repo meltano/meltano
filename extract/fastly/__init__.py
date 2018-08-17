@@ -1,8 +1,10 @@
 import os
 import datetime
 from typing import Dict
+
 import requests
 from dateutil.relativedelta import relativedelta
+import pandas as pd
 from pandas import DataFrame
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
@@ -40,15 +42,10 @@ line_items = Table(
     # Column from the meta of the response
     Column('customer_id', String),
     Column('invoice_id', String),
-    Column('start_time', TIMESTAMP),
-    Column('end_time', TIMESTAMP),
+    Column('start_time', TIMESTAMP, nullable=True),
+    Column('end_time', TIMESTAMP, nullable=True),
     schema='fastly'
 )
-
-
-async def fetch(session, url, headers):
-    async with session.get(url, headers=headers) as resp:
-        return await resp.json()
 
 
 class FastlyExtractor:
@@ -62,6 +59,9 @@ class FastlyExtractor:
         self.this_month = datetime.date(year=today.year, month=today.month, day=1)
         self.start_date = datetime.date(2017, 8, 1)  # after this period billing data starts
         self.entities: list = ['line_items']
+        self.tables = {
+            'line_items': line_items
+        }
         self.primary_keys = {
             'line_items': ['id'],
         }
@@ -73,13 +73,16 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self) -> Dict[str, DataFrame]:
-        for url in self.get_billing_urls():
-            resp = requests.get(url, headers=FASTLY_HEADERS)
-            yield {
-                'line_items': json_normalize(
+    def extract(self, entity) -> Dict[str, DataFrame]:
+        if entity == 'line_items':
+            # in this extractor there is only one entity 'line_items'
+            # otherwise here would be branching to generate and request other urls
+            for url in self.get_billing_urls():
+                resp = requests.get(url, headers=FASTLY_HEADERS)
+                df = json_normalize(
                     resp.json(),
                     record_path='line_items',
-                    meta=['customer_id', 'end_time', 'start_time', 'invoice_id']
+                    meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
                 )
-            }
+                df[['created_at', 'deleted_at', 'updated_at', 'end_time', 'start_time']].apply(pd.to_datetime)
+                yield df

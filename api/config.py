@@ -18,6 +18,7 @@ LOG_PATH = get_env_variable('MELTANO_ANALYSIS_LOG_PATH')
 ENV = 'development'
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+TEMP_FOLDER = os.path.join(BASE_DIR, 'static/tmp')
 
 SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,
                                                                                 pw=POSTGRES_PASSWORD, url=POSTGRES_URL,
