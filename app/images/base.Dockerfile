@@ -19,7 +19,7 @@ ENV LANG=C.UTF-8
 ENV MELTANO_ANALYSIS_API_URL=
 
 # -- Add backend python code
-ADD app/api /meltano/app
+ADD api /meltano/app
 WORKDIR /meltano/app
 
 # -- Install the needed nodejs dependencies that the python code shells out to
