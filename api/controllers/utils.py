@@ -3,7 +3,7 @@ from sqlalchemy import String, cast
 from .substitution import Substitution
 from .aggregate import Aggregate
 from .date import Date
-# from .join import Join as JoinQuery
+from .join import Join as JoinQuery
 from models.data import View, Dimension, DimensionGroup, Measure, Join
 from pypika import Query, Table, Field
 
@@ -29,19 +29,29 @@ class SqlHelper():
     incoming_measures = incoming_json['measures']
     incoming_filters = incoming_json['filters']
     incoming_joins = incoming_json['joins']
+    incoming_limit = incoming_json.get('limit', 50)
     # get all timeframes
     timeframes = [t['timeframes'] for t in incoming_dimension_groups]
     # flatten list of timeframes
     timeframes = [y for x in timeframes for y in x]
     dimensions = list(filter(lambda x: x.name in incoming_dimensions, view.dimensions))
     measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
+    dimension_names = dimensions
+    measure_names = [m.name for m in measures]
     table = self.table(base_table, explore.name)
-    # joins = self.joins(incoming_joins, table)
+    joins = self.joins(incoming_joins, view, table)
     dimension_groups = self.dimension_groups(view_name, incoming_dimension_groups, table)
     dimensions = self.dimensions(dimensions, table)
     dimensions = dimensions + dimension_groups
     measures = self.measures(measures, table)
-    return self.get_query(from_=table, dimensions=dimensions, measures=measures)
+    return {\
+      'dimensions': dimension_names,\
+      'measures': measure_names,\
+      'sql': self.get_query(from_=table,\
+        dimensions=dimensions,\
+        measures=measures,\
+        limit=incoming_limit)\
+    }
 
 
   def table(self, name, alias):
@@ -63,14 +73,13 @@ class SqlHelper():
     aggregate = Aggregate(m, table)
     return aggregate.sql
 
-  def joins(self, joins, table):
+  def joins(self, joins, view, table):
     if len(joins):
       for join in joins:
         queried_join = Join.query\
           .filter(Join.name == join['name'])\
           .first()
         join = JoinQuery(queried_join, view, table)
-
 
   def dimension_groups(self, view_name, dimension_groups, table):
     fields = []
@@ -87,7 +96,7 @@ class SqlHelper():
     return fields
 
 
-  def get_query(self, from_, dimensions, measures):
+  def get_query(self, from_, dimensions, measures, limit):
     select = dimensions + measures
-    q = Query.from_(from_).select(*select).groupby(*dimensions)
+    q = Query.from_(from_).select(*select).groupby(*dimensions).limit(limit)
     return '{};'.format(str(q))

@@ -36,15 +36,18 @@
             </template>
           </div>
         </router-link>
-        <a class="navbar-item" href="/">
+        <router-link to="/extract"
+          class="navbar-item">
           Extract
-        </a>
-        <a class="navbar-item" href="/">
+        </router-link>
+        <router-link to="/load"
+          class="navbar-item">
           Load
-        </a>
-        <a class="navbar-item" href="/">
+        </router-link>
+        <router-link to="/transform"
+          class="navbar-item">
           Transform
-        </a>
+        </router-link>
         <a class="navbar-item" href="/">
           Analyze
         </a>

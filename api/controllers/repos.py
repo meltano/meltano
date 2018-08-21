@@ -25,7 +25,7 @@ def index():
   # For all you know, the first argument to Repo is a path to the repository
   # you want to work with
   repo = Repo(repo_url)
-  tree = repo.heads.master.commit.tree
+  tree = repo.heads.dothis.commit.tree
   sortedLkml = {'documents': [],'views': [], 'models': [], 'dashboards': []}
   for blob in tree.traverse():
     if blob.type != 'blob':
@@ -54,7 +54,7 @@ def index():
 def blob(hexsha):
   repo_url = Project.query.first().git_url
   repo = Repo(repo_url)
-  tree = repo.heads.master.commit.tree
+  tree = repo.heads.dothis.commit.tree
   found_blob = None
   
   for blob in tree.traverse():
@@ -73,7 +73,7 @@ def blob(hexsha):
 @bp.route('/lint', methods=['GET'])
 def lint():
   repo_url = Project.query.first().git_url
-  command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
+  command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
   # with open('./tmp/output.json', "w") as outfile:
   #   subprocess.call(command, stdout=outfile)
   p = subprocess.run(command, stdout=subprocess.PIPE)
@@ -86,7 +86,7 @@ def lint():
 @bp.route('/update', methods=['GET'])
 def db_import():
   repo_url = Project.query.first().git_url
-  command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
+  command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
   
