@@ -1,8 +1,6 @@
 import os
 import json
-import tempfile
 
-import yaml
 from flask import (
     Blueprint,
     request,
@@ -23,6 +21,7 @@ bp = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
 
 DATETIME_TYPES_TO_PARSE = (TIMESTAMP, DATE, DATETIME)
 TRANSFORM_DIR = 'transform'
+PROFILES_DIR = 'profile'
 
 
 @bp.route('/', methods=['GET'])
@@ -133,34 +132,27 @@ def transform(model_name):
     :param model_name: nam
     :return:
     """
-
+    settings = Settings.query.first()
+    settings_connections = settings.settings['connections']
     incoming = request.get_json()
     datastore_name = incoming.get('datastore_name')
-    settings = Settings.query.first()
-    available_connections = settings.settings['connections']
-    connection = available_connections.get(datastore_name)
+    connection = settings_connections.get(datastore_name)
+    run_command = ['run', '--profiles-dir', f'{PROFILES_DIR}']
+    if model_name:
+        run_command.extend(['--models', f'models.{model_name}'])
+    if not connection:
+        return jsonify({'response': f'Connection {datastore_name} not found',
+                        'status': 'error'})
+    if connection['type'] == 'postgres':
+        os.environ['PG_ADDRESS'] = connection['host']
+        os.environ['PG_PORT'] = str(connection['port'])
+        os.environ['PG_USERNAME'] = connection['user']
+        os.environ['PG_PASSWORD'] = str(connection['password'])
+        os.environ['PG_DATABASE'] = connection['dbname']
+        os.environ['PG_SCHEMA'] = connection['schema']
 
-    # if not connection:
-    #     return jsonify({'response': f'Connection {datastore_name} not found',
-    #                     'status': 'error'})
-    # DBT_PROFILE_TEMPLATE['meltano']['outputs']['dev'] = {
-    #     'type': connection['type'],
-    #     'threads': connection['threads'],
-    #     'host': connection['host'],
-    #     'port': connection['port'],
-    #     'user': connection['user'],
-    #     'pass': connection['pass'],
-    #     'dbname': connection['dbname'],
-    #     'schema': connection['schema'],
-    # }
-    # with tempfile.TemporaryDirectory() as temp_dir:
-    #     with open(os.path.join(temp_dir, 'profile.yml'), 'w') as file:
-    #         yaml.dump(DBT_PROFILE_TEMPLATE, file, default_flow_style=False)
-    #         run_command = ['run', '--profiles-dir', f'{temp_dir}']
-    #         if model_name:
-    #             run_command.extend(['--models', f'models.{model_name}'])
-    #         os.chdir(os.path.join(PROJECT_ROOT_DIR, TRANSFORM_DIR))
-    #         dbt_main(run_command)
+    os.chdir(os.path.join(PROJECT_ROOT_DIR, TRANSFORM_DIR))
+    dbt_main(run_command)
     return jsonify({
         'response': 'done!',
         'command': str(run_command),

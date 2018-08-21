@@ -8,7 +8,7 @@ POSTGRES_CONNECT_VALUES = {
         "host": "localhost",
         "port": 5432,
         "user": "postgres",
-        "pass": "pass",
+        "password": "pass",
         "dbname": "dw",
         "schema": "dev"}
 }
