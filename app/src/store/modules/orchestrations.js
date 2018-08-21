@@ -57,7 +57,7 @@ const actions = {
     commit('setCurrentLoader', selectedLoader);
   },
 
-  runJobs({ commit }) {
+  runJobs() {
     const payload = {
       extractor: state.currentExtractor,
       loader: state.currentLoader,

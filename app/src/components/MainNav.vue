@@ -14,15 +14,10 @@
     <div id="meltnavbar-transparent"
         class="navbar-menu">
       <div class="navbar-start">
-        <a class="navbar-item" href="/">
-          Home
-        </a>
-        <a class="navbar-item" href="/orchestrations">
-          Orchestrate
-        </a>
-        <div class="navbar-item has-dropdown is-hoverable">
+        <router-link to="/model"
+            class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link" href="#">
-            Explore
+            Model
           </a>
           <div class="navbar-dropdown
                 is-boxed"
@@ -40,8 +35,28 @@
             </router-link>
             </template>
           </div>
-        </div>
-        <router-link to="/repo" class="navbar-item">{{project.name}}</router-link>
+        </router-link>
+        <router-link to="/extract"
+          class="navbar-item">
+          Extract
+        </router-link>
+        <router-link to="/load"
+          class="navbar-item">
+          Load
+        </router-link>
+        <router-link to="/transform"
+          class="navbar-item">
+          Transform
+        </router-link>
+        <a class="navbar-item" href="/">
+          Analyze
+        </a>
+        <a class="navbar-item disabled" disabled="true" href="/">
+          Notebook
+        </a>
+        <a class="navbar-item" href="/orchestrations">
+          Orchestrate
+        </a>
       </div>
       <div class="navbar-end">
         <router-link to="/settings"
@@ -94,6 +109,10 @@ export default {
 <style lang="scss">
 .navbar.is-info {
   background: #464ACB;
+  .navbar-start > a.navbar-item.is-active,
+  .navbar-start > a.navbar-item:hover {
+    background: darken(#464ACB, 20%);
+  }
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;

@@ -67,6 +67,7 @@ class Explore(BaseLook):
                 this_dimension['name'] = dimension.name
                 this_dimension['settings'] = dimension.settings
                 this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
+                this_dimension['view_label'] = dimension.settings.get('view_label', ' '.join(dimension.name.split('_')).title())
                 this_dimension['unique_name'] = 'dimension_{}_{}'.format(dimension.name, uuid.uuid4())
                 this_dimension['selected'] = False
                 this_view['dimensions'].append(this_dimension)
@@ -101,7 +102,9 @@ class Explore(BaseLook):
             this_join['collapsed'] = True
             this_join['dimensions'] = []
             this_join['settings'] = join.settings
+            this_join['settings']['view_label'] = this_join['settings'].get('view_label', ' '.join(this_join['name'].split('_')).title())
             this_explore['joins'].append(this_join)
+        this_explore['joins'] = sorted(this_explore['joins'], key=lambda x: x['settings']['view_label'])
         return this_explore
 
 
