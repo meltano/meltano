@@ -18,15 +18,13 @@ ENV LANG=C.UTF-8
 # -- Define API location at build time
 ENV MELTANO_ANALYSIS_API_URL=
 
-# -- Install the needed nodejs dependencies that the python code shells out to
-RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
-    mv node-lookml-parser parser && \
-    cd parser && \
-    yarn
-
 # -- Add the project
 ADD . /meltano
 WORKDIR /meltano/api
+
+# -- Install the needed nodejs dependencies that the python code shells out to
+RUN cd /meltano/api && \
+    yarn
 
 # -- Install dependencies:
 RUN cd /meltano && \
