@@ -26,7 +26,7 @@ RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
 
 # -- Add the project
 ADD . /meltano
-WORKDIR /meltano
+WORKDIR /meltano/api
 
 # -- Install dependencies:
 RUN cd /meltano && \
@@ -38,4 +38,4 @@ RUN cd /meltano/app && \
     yarn && \
     yarn run build
 
-CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "api/app:app", "--check-static", "/meltano/app/dist", "--static-index", "index.html"]
+CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/meltano/app/dist", "--static-index", "index.html"]
