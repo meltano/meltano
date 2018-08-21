@@ -1,15 +1,8 @@
 import click
-import os
 from extract.fastly import FastlyExtractor
 from extract.demo import DemoExtractor
 from load.postgres.loader import PostgresLoader
 from load.csv.loader import CsvLoader
-
-
-@click.group()
-def cli():
-    pass
-
 
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
@@ -60,6 +53,11 @@ def run_extract(
             results.add(loader.load(df=df, entity_name=entity))
     click.echo("Load done! Returning results ")
     return results
+
+
+@click.group()
+def cli():
+    pass
 
 
 @cli.command()

@@ -1,0 +1,50 @@
+name: 'meltano_dw'
+version: '1.0'
+
+profile: 'meltano'
+
+source-paths: ["models"]
+
+test-paths: ["tests"]
+
+on-run-start:
+    - '{{create_udfs()}}'
+
+on-run-end:
+    - grant usage on schema {{ target.schema }} to looker
+    - grant select on all tables in schema {{ target.schema }} to looker
+
+models:
+  gitlab_dw:
+    date:
+      base:
+        enabled: true
+        materialized: view
+    sfdc:
+      base:
+        enabled: true
+        materialized: view
+      transformed:
+        enabled: true
+        materialized: table
+    pings:
+      base:
+        enabled: true
+        materialized: view
+        pings_usage_data_unpacked:
+          materialized: incremental
+          sql_where: 'TRUE'
+      clean:
+        enabled: true
+        materialized: table
+        pings_usage_data_month:
+          materialized: incremental
+          sql_where: 'TRUE'
+          unique_key: 'unique_key'
+    retention:
+      enabled: true
+      materialized: table
+    zuora:
+      base:
+        enabled: true
+        materialized: table

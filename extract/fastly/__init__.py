@@ -1,6 +1,5 @@
 import os
 import datetime
-from typing import Dict
 
 import requests
 from dateutil.relativedelta import relativedelta
@@ -52,7 +51,6 @@ class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
     """
-
     def __init__(self):
         self.name = 'fastly'
         today = datetime.date.today()
@@ -73,16 +71,20 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self, entity) -> Dict[str, DataFrame]:
+    def extract(self, entity) -> DataFrame:
         if entity == 'line_items':
             # in this extractor there is only one entity 'line_items'
             # otherwise here would be branching to generate and request other urls
             for url in self.get_billing_urls():
+                # TODO: make async with aiohttp
                 resp = requests.get(url, headers=FASTLY_HEADERS)
                 df = json_normalize(
                     resp.json(),
                     record_path='line_items',
+                    # TODO: generate from the Table def
                     meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
                 )
-                df[['created_at', 'deleted_at', 'updated_at', 'end_time', 'start_time']].apply(pd.to_datetime)
+                datetime_cols = ['created_at', 'deleted_at', 'updated_at', 'end_time', 'start_time']
+                # TODO: generate datetime cols from the Table def
+                df[datetime_cols].apply(pd.to_datetime)
                 yield df

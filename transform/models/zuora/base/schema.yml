@@ -1,0 +1,49 @@
+zuora_account:
+    constraints:
+        not_null:
+            - account_id
+            - account_name
+        unique:
+            - account_id
+
+zuora_contact:
+    constraints:
+        not_null:
+            - contact_id
+            - account_id
+        unique:
+            - contact_id
+
+zuora_invoice:
+    constraints:
+        not_null:
+            - invoice_id
+            - account_id
+        unique:
+            - invoice_id
+
+zuora_rate_plan:
+    constraints:
+        not_null:
+            - rate_plan_id
+            - product_id
+        unique:
+            - rate_plan_id
+
+zuora_rate_plan_charge:
+    constraints:
+        not_null:
+            - rate_plan_charge_id
+            - original_id
+            - rate_plan_id
+        unique:
+            - rate_plan_charge_id
+
+zuora_subscription:
+    constraints:
+        not_null:
+            - subscription_id
+            - account_id
+            - subscription_status
+        unique:
+            - subscription_id

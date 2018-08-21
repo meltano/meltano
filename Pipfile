@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 sqlalchemy = "*"
 flask = "*"
-"psycopg2-binary" = "*"
+"psycopg2" = "*"
 flask-cors = "*"
 gitpython = "*"
 markdown = "*"
@@ -16,6 +16,7 @@ pandas = "*"
 pyyaml = "*"
 greenlet = ">=0.4.13"
 grequests = "*"
+dbt = "*"
 
 [dev-packages]
 "flake8" = "*"

@@ -1,3 +1,4 @@
+import sqlalchemy
 import sys
 import os
 import logging
@@ -49,14 +50,3 @@ app.register_blueprint(orchestrations.bp)
 @app.route("/")
 def hello():
     return jsonify({"hello": 1})
-
-
-@app.route("/drop_it_like_its_hot")
-def reset_db():
-    try:
-        db.drop_all()
-    except sqlalchemy.exc.OperationalError as err:
-        logging.error("Failed drop database.")
-
-    db.create_all()
-    return jsonify({"dropped_it": "like_its_hot"})

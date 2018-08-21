@@ -26,9 +26,11 @@ class PostgresLoader:
             self.engine = create_engine(f'postgresql://{username}:{password}@{host}:{port}/{database}')
 
     def schema_apply(self):
+        # TODO: add loaded_at(timestamp) col to the schema
         if not self.engine.dialect.has_schema(self.engine, self.table.schema):
             print(f"Schema {self.table.schema} does not exist -> creating it ")
             self.engine.execute(CreateSchema(self.table.schema))
+        # TODO: update table
         if not self.engine.dialect.has_table(self.engine, self.table.name):
             print(f"Table {self.table.name} does not exist -> creating it ")
             self.table.metadata.create_all(self.engine)
@@ -39,6 +41,7 @@ class PostgresLoader:
             insert_stmt = postgresql.insert(self.table).values(dfs_to_load)
             insert_stmt = insert_stmt.on_conflict_do_update(
                 index_elements=self.index_elements,
+                # only compatible with Postgres >= 9.5
                 set_=insert_stmt.excluded._data,  # link to the conflicting data
             )
             print(f'Loading df: {dfs_to_load}')
