@@ -18,29 +18,24 @@ ENV LANG=C.UTF-8
 # -- Define API location at build time
 ENV MELTANO_ANALYSIS_API_URL=
 
-# -- Add backend python code
-ADD api /meltano/app
-WORKDIR /meltano/app
-
 # -- Install the needed nodejs dependencies that the python code shells out to
 RUN git clone https://github.com/fabio-looker/node-lookml-parser.git && \
     mv node-lookml-parser parser && \
     cd parser && \
     yarn
 
-# -- Build the static assets
-ADD . /tmp
+# -- Add the project
+ADD . /meltano
+WORKDIR /meltano
 
 # -- Install dependencies:
-RUN cd /tmp && \
+RUN cd /meltano && \
     pipenv --python /usr/bin/python3 && \
     pipenv install && \
     pipenv install --deploy --system
 
-RUN cd /tmp/app && \
+RUN cd /meltano/app && \
     yarn && \
-    yarn run build && \
-    mv /tmp/app/dist /meltano/app/static-assets && \
-    rm -rf /tmp
+    yarn run build
 
-CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "app:app", "--check-static", "/meltano/app/static-assets", "--static-index", "index.html"]
+CMD ["/usr/local/bin/uwsgi", "--gevent", "100", "--http", ":5000", "--module", "api/app:app", "--check-static", "/meltano/app/dist", "--static-index", "index.html"]
