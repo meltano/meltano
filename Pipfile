@@ -14,7 +14,7 @@ flask-sqlalchemy = "*"
 pypika = "*"
 pandas = "*"
 pyyaml = "*"
-greenlet = "==0.4.13"
+greenlet = ">=0.4.13"
 grequests = "*"
 
 [dev-packages]
