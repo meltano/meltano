@@ -111,7 +111,7 @@ export default {
       'loaders',
       'currentExtractor',
       'currentLoader',
-      'log'
+      'log',
     ]),
     ...mapGetters('orchestrations', [
       'isIntroView',

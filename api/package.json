@@ -1,0 +1,13 @@
+{
+  "name": "api",
+  "version": "0.0.1",
+  "description": "API for Meltano",
+  "main": "index.js",
+  "repository": "http://gitlab.com/meltano/meltano/",
+  "author": "Meltano Team",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "lookml-parser": "^3.2.6"
+  }
+}

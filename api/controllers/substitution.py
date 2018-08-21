@@ -1,5 +1,6 @@
 import re
 from collections import namedtuple
+from models.data import Explore
 from enum import Enum
 from pypika import Field, Case
 
@@ -50,6 +51,14 @@ class Substitution():
     inner_results = re.findall(inner_pattern, input_);
     Results = namedtuple('Results', 'inner outer')
     return Results(inner=inner_results, outer=outer_results)
+
+  @staticmethod
+  def variable_replace(results):
+    for i, result in enumerate(results.outer):
+      (explore, dimension) = results.inner[i].split('.')
+      explores = Explore.query.filter(Explore.name == explore).all()
+      print(explore)
+      print([e.name for e in explores])
 
   def set_sql(self):
     if self.substitution_type is SubstitutionType.table:

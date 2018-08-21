@@ -4,6 +4,9 @@
 
 const path = require('path')
 
+const envPath = path.join(process.env.PWD, '../.env')
+require('dotenv').config({path: envPath})
+
 module.exports = {
   dev: {
 

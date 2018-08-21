@@ -56,11 +56,12 @@ def get_sql(model_name, explore_name):
   explore = Explore.query.filter(Explore.name == explore_name).first()
   incoming_json = request.get_json()
   to_run = incoming_json['run']
-  outgoing_sql = sqlHelper.get_sql(explore, incoming_json)
-
+  sql_dict = sqlHelper.get_sql(explore, incoming_json)
+  outgoing_sql = sql_dict['sql']
   incoming_order = incoming_json['order']
   incoming_order_desc = incoming_json['desc']
-
+  measures = sql_dict['measures']
+  dimensions = sql_dict['dimensions']
 
   if to_run:
     db_to_connect = model.settings['connection']
@@ -71,17 +72,18 @@ def get_sql(model_name, explore_name):
     try:
       results = engine.execute(outgoing_sql)
     except sqlalchemy.exc.DBAPIError as e:
+      print(e)
       return jsonify({'error': True, 'code': e.code, 'orig': e.orig.diag.message_primary, 'statement': e.statement}), 422
 
     results = [OrderedDict(row) for row in results]
 
-    base_dict = {'sql': base_sql, 'results': results, 'error': False}
+    base_dict = {'sql': outgoing_sql, 'results': results, 'error': False}
     if not len(results):
       base_dict['empty'] = True
     else:
       base_dict['empty'] = False
       base_dict['keys'] = list(results[0].keys())
-      base_dict['measures'] = measures_as_dict
+      base_dict['measures'] = measures
     return json.dumps(base_dict, default=default)
   else:
     return json.dumps({'sql': outgoing_sql}, default=default)
