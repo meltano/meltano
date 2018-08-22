@@ -32,7 +32,7 @@ def index():
       continue
     f = blob.path
     filename, ext = os.path.splitext(f)
-    file_dict = {'path': f, 'abs': blob.abspath} 
+    file_dict = {'path': f, 'abs': blob.abspath}
     file_dict['visual'] = filename
     file_dict['hexsha'] = blob.hexsha
     filename = filename.lower()
@@ -56,7 +56,7 @@ def blob(hexsha):
   repo = Repo(repo_url)
   tree = repo.heads.dothis.commit.tree
   found_blob = None
-  
+
   for blob in tree.traverse():
     if blob.hexsha == hexsha:
       found_blob = blob
@@ -73,23 +73,23 @@ def blob(hexsha):
 @bp.route('/lint', methods=['GET'])
 def lint():
   repo_url = Project.query.first().git_url
-  command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
+  command = ['./node_modules/lookml-parser/cli.js', f'--input={repo_url}/*.{{view,model}}.lkml']
   # with open('./tmp/output.json', "w") as outfile:
   #   subprocess.call(command, stdout=outfile)
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
   if 'errors' in j:
     return jsonify({'result': False, 'errors': j['errors']})
-  else: 
+  else:
     return jsonify({'result': True})
 
 @bp.route('/update', methods=['GET'])
 def db_import():
   repo_url = Project.query.first().git_url
-  command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
+  command = ['./node_modules/lookml-parser/cli.js', f'--input={repo_url}/*.{{view,model}}.lkml']
   p = subprocess.run(command, stdout=subprocess.PIPE)
   j = json.loads(p.stdout.decode("utf-8"))
-  
+
   # db.session.query(Explore).delete()
   # db.session.query(Model).delete()
   # db.session.query(View).delete()
@@ -255,7 +255,7 @@ def models():
       this_explore = {}
       this_explore['settings'] = explore.settings
       this_explore['name'] = explore.name
-      this_explore['link'] = '/explore/{}/{}'.format(model.name, explore.name)
+      this_explore['link'] = f'/explore/{model.name}/{explore.name}'
       this_view = {}
       this_view['name'] = explore.view.name
       this_view['settings'] = explore.view.settings

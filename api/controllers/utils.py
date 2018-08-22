@@ -99,4 +99,4 @@ class SqlHelper():
   def get_query(self, from_, dimensions, measures, limit):
     select = dimensions + measures
     q = Query.from_(from_).select(*select).groupby(*dimensions).limit(limit)
-    return '{};'.format(str(q))
+    return f'{str(q)};'

@@ -64,7 +64,7 @@ class Substitution():
     if self.substitution_type is SubstitutionType.table:
       self.set_sql_table_type()
     else:
-      raise Exception('Substitution Type {} not implemented yet'.format(self.substitution_type.value))
+      raise Exception(f'Substitution Type {self.substitution_type.value} not implemented yet')
 
   def set_sql_table_type(self):
     self.sql = self.input.replace(self.placeholders.outer[0], self.table._table_name)

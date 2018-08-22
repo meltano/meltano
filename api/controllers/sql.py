@@ -28,7 +28,7 @@ def default(obj):
       return str(obj)
   elif isinstance(obj, (datetime, date)):
     return obj.isoformat()
-  raise TypeError("Object of type '%s' is not JSON serialize-able" % type(obj).__name__)
+  raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
 
 def update_connections():
   current_connections = Settings.query.first().settings['connections']
@@ -37,7 +37,9 @@ def update_connections():
     if connection_name not in connections:
       this_connection = {}
       if connection['dialect'] == 'postgresql':
-        connection_url = 'postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}'.format(user=connection['username'],pw=connection['password'],host=connection['host'],port=connection['port'], db=connection['database'])
+        psql_params = ['username', 'password', 'host', 'port', 'database']
+        user, pw, host, port, db = [connection[param] for param in psql_params]
+        connection_url = f'postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}'
         this_connection['connection_url'] = connection_url
         this_connection['engine'] =  sqlalchemy.create_engine(this_connection['connection_url'])
       connections[connection_name] = this_connection
@@ -66,7 +68,7 @@ def get_sql(model_name, explore_name):
   if to_run:
     db_to_connect = model.settings['connection']
     if not db_to_connect in connections:
-      return jsonify({'error': True, 'code': 'Missing connection details to {}. Create a connection to {} in the settings.'.format(db_to_connect, db_to_connect)}), 422
+      return jsonify({'error': True, 'code': f'Missing connection details to {db_to_connect}. Create a connection to {db_to_connect} in the settings.'}), 422
     engine = connections[model.settings['connection']]['engine']
 
     try:
@@ -96,7 +98,7 @@ def get_distinct_field_name(model_name, explore_name):
   model = Model.query.filter(Model.name == model_name).first()
   explore = Explore.query.filter(Explore.name == explore_name).first()
   base_table = explore.view.settings['sql_table_name']
-  base_sql = 'SELECT DISTINCT {} FROM {} AS {} ORDER BY {}'.format(field_name, base_table, explore_name, field_name)
+  base_sql = f'SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}'
   engine = connections[model.settings['connection']]['engine']
   results = engine.execute(base_sql)
   results = [dict(row) for row in results]
