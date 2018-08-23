@@ -29,6 +29,6 @@ def test(name):
   try:
     found_connection = next(connection for connection in connections if connection['name'] == name)
   except Exception as e:
-    found_connection = {} 
+    found_connection = {}
 
   return jsonify(found_connection)

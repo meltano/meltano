@@ -13,9 +13,9 @@ class ExternalConnector:
             if connection_name not in connections:
                 this_connection = {}
                 if connection['dialect'] == 'postgresql':
-                    connection_url = 'postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}'.format(
-                        user=connection['username'], pw=connection['password'], host=connection['host'],
-                        port=connection['port'], db=connection['database'])
+                    psql_params = ['username', 'password', 'host', 'port', 'database']
+                    user, pw, host, port db = [connection[param] for param in psql_params]
+                    connection_url = f'postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}'
                     this_connection['connection_url'] = connection_url
                     this_connection['engine'] = create_engine(this_connection['connection_url'])
                     # inspection = inspect(this_connection['engine'])

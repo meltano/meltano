@@ -5,7 +5,7 @@ def get_env_variable(name):
     try:
         return os.environ[name]
     except KeyError:
-        message = "Expected environment variable '{}' not set.".format(name)
+        message = f"Expected environment variable '{name}' not set."
         raise Exception(message)
 
 
@@ -19,9 +19,8 @@ ENV = 'development'
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
-SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,
-                                                                                pw=POSTGRES_PASSWORD, url=POSTGRES_URL,
-                                                                                db=POSTGRES_DB)
+user, pw, url, db = POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_URL, POSTGRES_DB
+SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{user}:{pw}@{url}/{db}'
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 

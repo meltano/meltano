@@ -25,12 +25,12 @@ logger = logging.getLogger('melt_logger')
 handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=2000, backupCount=10)
 logger.addHandler(handler)
 now = str(datetime.datetime.utcnow().strftime('%b %d %Y %I:%M:%S:%f'))
-logger.warning('Melt started at: {}'.format(now))
+logger.warning(f'Melt started at: {now}')
 
 
 @app.before_request
 def before_request():
-    logger.info('[{}] request: {}'.format(request.remote_addr, now))
+    logger.info(f'[{request.remote_addr}] request: {now}')
 
 
 from controllers import projects
