@@ -9,7 +9,7 @@ const state = {
   models: [],
   navbarClicked: false,
   errors: [],
-  blobs: {
+  files: {
     dashboards:
     [{
       abs: 'loading',
@@ -42,14 +42,14 @@ const actions = {
   getRepo({ commit }) {
     repoApi.index()
       .then((data) => {
-        const blobs = data.data;
-        commit('setRepoBlobs', { blobs });
+        const files = data.data;
+        commit('setRepoFiles', { files });
       });
   },
 
 
   getBlob({ commit }, blob) {
-    repoApi.blob(blob.hexsha)
+    repoApi.blob(blob.unique)
       .then((data) => {
         commit('setCurrentBlobView', data.data);
       });
@@ -97,8 +97,8 @@ const mutations = {
     state.models = models;
   },
 
-  setRepoBlobs(_, { blobs }) {
-    state.blobs = blobs;
+  setRepoFiles(_, { files }) {
+    state.files = files;
   },
 
   setCurrentBlobView(_, blob) {

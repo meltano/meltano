@@ -14,6 +14,11 @@ from external_connector import ExternalConnector
 
 app = Flask(__name__)
 
+meltano_home_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+meltano_model_path = os.path.join(meltano_home_path, 'model')
+meltano_load_path = os.path.join(meltano_home_path, 'load')
+meltano_transform_path = os.path.join(meltano_home_path, 'transform')
+
 app.config.from_object('config')
 if os.environ['FLASK_ENV'] == 'development':
     CORS(app)

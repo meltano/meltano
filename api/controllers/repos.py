@@ -2,9 +2,10 @@ import os
 import markdown
 import subprocess
 import json
+import hashlib
 import psycopg2
 
-from app import db
+from app import db, meltano_model_path
 
 from flask import (
     Blueprint, jsonify, config, current_app
@@ -21,21 +22,16 @@ bp = Blueprint('repos', __name__, url_prefix='/repos')
 
 @bp.route('/', methods=['GET'])
 def index():
-    repo_url = Project.query.first().git_url
     # rorepo is a Repo instance pointing to the git-python repository.
     # For all you know, the first argument to Repo is a path to the repository
     # you want to work with
-    repo = Repo(repo_url)
-    tree = repo.heads.master.commit.tree
+    onlyfiles = [f for f in os.listdir(meltano_model_path) if os.path.isfile(os.path.join(meltano_model_path, f))]
     sortedLkml = {'documents': [], 'views': [], 'models': [], 'dashboards': []}
-    for blob in tree.traverse():
-        if blob.type != 'blob':
-            continue
-        f = blob.path
+    for f in onlyfiles:
         filename, ext = os.path.splitext(f)
-        file_dict = {'path': f, 'abs': blob.abspath}
-        file_dict['visual'] = filename
-        file_dict['hexsha'] = blob.hexsha
+        file_dict = {'path': f, 'abs': os.path.abspath(os.path.join(meltano_model_path, f))}
+        file_dict['visual'] = f
+        file_dict['unique'] = hashlib.md5(file_dict['abs'].encode('utf-8')).hexdigest()
         filename = filename.lower()
         if ext == '.md':
             sortedLkml['documents'].append(file_dict)
@@ -51,15 +47,15 @@ def index():
 
     return jsonify(sortedLkml)
 
-@bp.route('/blobs/<hexsha>', methods=['GET'])
-def blob(hexsha):
+@bp.route('/blobs/<unique>', methods=['GET'])
+def blob(unique):
     repo_url = Project.query.first().git_url
     repo = Repo(repo_url)
     tree = repo.heads.master.commit.tree
     found_blob = None
 
     for blob in tree.traverse():
-        if blob.hexsha == hexsha:
+        if blob.unique == unique:
             found_blob = blob
             break
 
@@ -74,10 +70,7 @@ def blob(hexsha):
 
 @bp.route('/lint', methods=['GET'])
 def lint():
-    repo_url = Project.query.first().git_url
-    command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
-    # with open('./tmp/output.json', "w") as outfile:
-    #   subprocess.call(command, stdout=outfile)
+    command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
     p = subprocess.run(command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
     if 'errors' in j:
@@ -88,8 +81,7 @@ def lint():
 
 @bp.route('/update', methods=['GET'])
 def db_import():
-    repo_url = Project.query.first().git_url
-    command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(repo_url)]
+    command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
     p = subprocess.run(command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
 

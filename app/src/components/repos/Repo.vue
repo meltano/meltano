@@ -39,16 +39,16 @@
               </div>
             </nav>
           </template>
-          <template v-for="(value, key) in blobs">
+          <template v-for="(value, key) in files">
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <p class="menu-label">
               <a href="#">{{key}}</a>
             </p>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <ul class="menu-list">
-              <li v-for="blob in value" :key="blob.abs">
-                <a :class="{'is-active': isActive(blob)}"
-                  @click.prevent='getBlob(blob)'>{{blob.visual}}</a>
+              <li v-for="file in value" :key="file.abs">
+                <a :class="{'is-active': isActive(file)}"
+                  @click.prevent='getBlob(file)'>{{file.visual}}</a>
               </li>
             </ul>
           </template>
@@ -65,11 +65,11 @@
         </div>
       </div>
       <div class="column" v-if="hasMarkdown">
-        <div class="content has-background-white" v-html="activeView.blob"></div>
+        <div class="content has-background-white" v-html="activeView.file"></div>
       </div>
       <div class="column is-paddingless code-container" v-else-if="hasCode">
         <div class="content has-background-white">
-          <pre>{{activeView.blob}}</pre>
+          <pre>{{activeView.file}}</pre>
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@ export default {
       'hasCode',
     ]),
     ...mapState('repos', [
-      'blobs',
+      'files',
       'activeView',
       'validated',
       'loadingValidation',
@@ -104,10 +104,10 @@ export default {
       this.$store.dispatch('repos/getRepo');
     },
     isActive(f) {
-      return f.hexsha === this.activeView.hexsha;
+      return f.unique === this.activeView.unique;
     },
-    getBlob(blob) {
-      this.$store.dispatch('repos/getBlob', blob);
+    getBlob(file) {
+      this.$store.dispatch('repos/getBlob', file);
     },
     lint() {
       this.$store.dispatch('repos/lint');
