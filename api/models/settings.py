@@ -15,7 +15,7 @@ POSTGRES_CONNECT_VALUES = {
 
 
 class Settings(Base):
-    __tablename__ = 'settings'
+    __tablename__ = 'setting'
     settings = db.Column(db.JSON(), nullable=False, default={'connections': POSTGRES_CONNECT_VALUES})
     project_id = db.Column(db.Integer, db.ForeignKey('project.id'), nullable=False)
     project = db.relationship('Project', backref=db.backref('settings', lazy=True, uselist=False))

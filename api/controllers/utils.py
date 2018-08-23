@@ -99,6 +99,8 @@ class SqlHelper:
 @app.route("/drop_it_like_its_hot")
 def reset_db():
     try:
+        Settings.__table__.drop(db.engine)
+        Project.__table__.drop(db.engine)
         db.drop_all()
     except sqlalchemy.exc.OperationalError as err:
         logging.error("Failed drop database.")

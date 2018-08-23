@@ -48,7 +48,7 @@
             <ul class="menu-list">
               <li v-for="file in value" :key="file.abs">
                 <a :class="{'is-active': isActive(file)}"
-                  @click.prevent='getBlob(file)'>{{file.visual}}</a>
+                  @click.prevent='getFile(file)'>{{file.visual}}</a>
               </li>
             </ul>
           </template>
@@ -106,8 +106,8 @@ export default {
     isActive(f) {
       return f.unique === this.activeView.unique;
     },
-    getBlob(file) {
-      this.$store.dispatch('repos/getBlob', file);
+    getFile(file) {
+      this.$store.dispatch('repos/getFile', file);
     },
     lint() {
       this.$store.dispatch('repos/lint');

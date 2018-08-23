@@ -1,7 +1,7 @@
 import repoApi from '../../api/repo';
 
 const state = {
-  activeView: { is_markdown: false, blob: '', populated: false },
+  activeView: { is_markdown: false, file: '', populated: false },
   validated: false,
   loadingValidation: false,
   loadingUpdate: false,
@@ -48,10 +48,10 @@ const actions = {
   },
 
 
-  getBlob({ commit }, blob) {
-    repoApi.blob(blob.unique)
+  getFile({ commit }, file) {
+    repoApi.file(file.unique)
       .then((data) => {
-        commit('setCurrentBlobView', data.data);
+        commit('setCurrentFileView', data.data);
       });
   },
 
@@ -101,8 +101,8 @@ const mutations = {
     state.files = files;
   },
 
-  setCurrentBlobView(_, blob) {
-    state.activeView = blob;
+  setCurrentFileView(_, file) {
+    state.activeView = file;
   },
 
   setValidatedState(_, validated) {

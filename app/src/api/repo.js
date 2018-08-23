@@ -6,8 +6,8 @@ export default {
     return axios.get(utils.buildUrl('repos'));
   },
 
-  blob(sha) {
-    return axios.get(utils.buildUrl('repos', `blobs/${sha}`));
+  file(unique) {
+    return axios.get(utils.buildUrl('repos', `file/${unique}`));
   },
 
   lint() {

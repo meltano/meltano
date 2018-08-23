@@ -2,7 +2,7 @@ import os
 import markdown
 import subprocess
 import json
-import hashlib
+import base64
 import psycopg2
 
 from app import db, meltano_model_path
@@ -29,9 +29,9 @@ def index():
     sortedLkml = {'documents': [], 'views': [], 'models': [], 'dashboards': []}
     for f in onlyfiles:
         filename, ext = os.path.splitext(f)
-        file_dict = {'path': f, 'abs': os.path.abspath(os.path.join(meltano_model_path, f))}
+        file_dict = {'path': f, 'abs': f}
         file_dict['visual'] = f
-        file_dict['unique'] = hashlib.md5(file_dict['abs'].encode('utf-8')).hexdigest()
+        file_dict['unique'] = base64.b32encode(bytes(file_dict['abs'], 'utf-8')).decode('utf-8')
         filename = filename.lower()
         if ext == '.md':
             sortedLkml['documents'].append(file_dict)
@@ -47,25 +47,18 @@ def index():
 
     return jsonify(sortedLkml)
 
-@bp.route('/blobs/<unique>', methods=['GET'])
-def blob(unique):
-    repo_url = Project.query.first().git_url
-    repo = Repo(repo_url)
-    tree = repo.heads.master.commit.tree
-    found_blob = None
-
-    for blob in tree.traverse():
-        if blob.unique == unique:
-            found_blob = blob
-            break
-
-    filename, ext = os.path.splitext(found_blob.path)
-    data = found_blob.data_stream.read().decode("utf-8")
+@bp.route('/file/<unique>', methods=['GET'])
+def file(unique):
+    file_path = base64.b32decode(unique).decode('utf-8')
+    (filename, ext) = os.path.splitext(file_path)
     is_markdown = False
-    if ext == '.md':
-        data = markdown.markdown(data)
-        is_markdown = True
-    return jsonify({'blob': data, 'is_markdown': is_markdown, 'hexsha': found_blob.hexsha, 'populated': True})
+    path_to_file = os.path.abspath(os.path.join(meltano_model_path, file_path))
+    with open(path_to_file, 'r') as read_file:
+        data = read_file.read()
+        if ext == '.md':
+            data = markdown.markdown(data)
+            is_markdown = True
+        return jsonify({'file': data, 'is_markdown': is_markdown, 'unique': unique, 'populated': True})
 
 
 @bp.route('/lint', methods=['GET'])
