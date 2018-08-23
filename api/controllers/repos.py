@@ -19,6 +19,9 @@ from models.data import (
 
 bp = Blueprint('repos', __name__, url_prefix='/repos')
 
+path_to_parser = './node_modules/lookml-parser/cli.js'
+parser_command = [path_to_parser, '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
+
 
 @bp.route('/', methods=['GET'])
 def index():
@@ -63,8 +66,7 @@ def file(unique):
 
 @bp.route('/lint', methods=['GET'])
 def lint():
-    command = ['./node_modules/lookml-parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
-    p = subprocess.run(command, stdout=subprocess.PIPE)
+    p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
     if 'errors' in j:
         return jsonify({'result': False, 'errors': j['errors']})
@@ -74,8 +76,7 @@ def lint():
 
 @bp.route('/update', methods=['GET'])
 def db_import():
-    command = ['./parser/cli.js', '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
-    p = subprocess.run(command, stdout=subprocess.PIPE)
+    p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
 
     # db.session.query(Explore).delete()

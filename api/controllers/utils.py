@@ -105,10 +105,7 @@ def reset_db():
     except sqlalchemy.exc.OperationalError as err:
         logging.error("Failed drop database.")
     db.create_all()
-    init_project = Project('Meltano', 'https://gitlab.com/meltano/meltano')
-    db.session.add(init_project)
-    db.session.commit()
-    init_settings = Settings(project_id=init_project.id)
-    db.session.add(init_settings)
+    settings = Settings()
+    db.session.add(settings)
     db.session.commit()
     return jsonify({"dropped_it": "like_its_hot"})
