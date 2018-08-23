@@ -50,7 +50,7 @@ def run_extract(
         entity_dfs = extractor.extract(entity)
         for df in entity_dfs:
             click.echo("Got extractor results, loading them into the loader")
-            results.add(loader.load(df=df, entity_name=entity))
+            results.add(loader.load(df=df))
     click.echo("Load done! Returning results ")
     return results
 
@@ -79,7 +79,7 @@ def cli():
               help="Specifies the user to connect to the database with.")
 @click.password_option(envvar='PG_PASSWORD')
 def extract(extractor_name, loader_name, host, port, database, username, password):
-    run_extract(extractor_name, loader_name, host, port, database, username, password)
+    run_extract(extractor_name, loader_name)
 
 
 if __name__ == '__main__':

@@ -21,9 +21,9 @@ class CsvLoader:
         print("No need to apply schema for csv ")
         pass
 
-    def load(self, df, entity_name):
-        print(f'Saving file for schema: {entity_name}')
-        file_name = f'{self.extractor.name}--{entity_name}.csv'
+    def load(self, df):
+        print(f'Saving file for schema: {self.entity_name}')
+        file_name = f'{self.extractor.name}--{self.entity_name}.csv'
         file_path = os.path.join(self.output_path, file_name)
         with open(file_path, 'a') as csv_file:
             if not df.empty:
