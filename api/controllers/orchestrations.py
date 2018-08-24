@@ -109,7 +109,7 @@ def load(loader_name: str) -> Response:
     except KeyError:
         return make_response(
             jsonify(
-                {'response': 'extractor not found', 'available extractors': list(EXTRACTOR_REGISTRY.keys())}
+                {'response': 'extractor not found', 'available_extractors': list(EXTRACTOR_REGISTRY.keys())}
             ), 404
         )
     try:
@@ -117,7 +117,7 @@ def load(loader_name: str) -> Response:
     except KeyError:
         return make_response(
             jsonify(
-                {'response': 'Loader not found', 'available loaders': list(LOADER_REGISTRY.keys())}
+                {'response': 'Loader not found', 'available_loaders': list(LOADER_REGISTRY.keys())}
             ), 404
         )
     extractor_temp_files = [filename for filename in os.listdir(TEMP_FOLDER) if filename.startswith(extractor_name)]
@@ -130,7 +130,7 @@ def load(loader_name: str) -> Response:
         df = pd.read_csv(os.path.join(TEMP_FOLDER, file_path), parse_dates=datetime_cols)
         df.replace({pd.NaT: None}, inplace=True)
         loader.load(df=df)
-    return jsonify({'response': 'done', 'inserted files': extractor_temp_files})
+    return jsonify({'response': 'done', 'inserted_files': extractor_temp_files})
 
 
 DBT_PROFILE_TEMPLATE = {

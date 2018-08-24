@@ -57,6 +57,22 @@ const actions = {
     commit('setCurrentLoader', selectedLoader);
   },
 
+  runExtractor() {
+    state.log = 'Running...';
+    orchestrationsApi.extract(state.currentExtractor)
+      .then((data) => {
+        state.log = `Output saved to \n${data.data.output_file_paths.join(',\n')}`;
+      });
+  },
+
+  runLoader() {
+    state.log = 'Running...';
+    orchestrationsApi.load(state.currentExtractor, state.currentLoader)
+      .then((data) => {
+        state.log = `CSV's Loaded \n${data.data.inserted_files.join(',\n')}`;
+      });
+  },
+
   runJobs() {
     const payload = {
       extractor: state.currentExtractor,
