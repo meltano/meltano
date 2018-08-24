@@ -54,11 +54,11 @@ class Explore(BaseLook):
         this_explore_model['name'] = self.model.name
         this_explore['model'] = this_explore_model
         this_explore['joins'] = []
-        this_explore['unique_name'] = 'explore_{}_{}'.format(self.name, uuid.uuid4())
+        this_explore['unique_name'] = f'explore_{self.name}_{uuid.uuid4()}'
         this_view = {}
         this_view['name'] = self.view.name
         this_view['settings'] = self.view.settings
-        this_view['unique_name'] = 'view_{}_{}'.format(self.view.name, uuid.uuid4())
+        this_view['unique_name'] = f'view_{self.view.name}_{uuid.uuid4()}'
         this_view['collapsed'] = True
         if include_dimensions_and_measures:
             this_view['dimensions'] = []
@@ -68,7 +68,7 @@ class Explore(BaseLook):
                 this_dimension['settings'] = dimension.settings
                 this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
                 this_dimension['view_label'] = dimension.settings.get('view_label', ' '.join(dimension.name.split('_')).title())
-                this_dimension['unique_name'] = 'dimension_{}_{}'.format(dimension.name, uuid.uuid4())
+                this_dimension['unique_name'] = f'dimension_{dimension.name}_{uuid.uuid4()}'
                 this_dimension['selected'] = False
                 this_view['dimensions'].append(this_dimension)
 
@@ -79,10 +79,10 @@ class Explore(BaseLook):
                 this_dimension_group['settings'] = dimension_group.settings
                 this_dimension_group['label'] = dimension_group.settings.get('label', ' '.join(
                     dimension_group.name.split('_')).title())
-                this_dimension_group['unique_name'] = 'dimension_group_{}_{}'.format(dimension_group.name, uuid.uuid4())
+                this_dimension_group['unique_name'] = f'dimension_group_{dimension_group.name}_{uuid.uuid4()}'
                 this_dimension_group['selected'] = False
                 this_dimension_group['timeframes'] = [
-                    {'label': tf.title().replace('*', ''), 'name': tf, 'selected': False} for tf in
+                  {'label': tf.title().replace('*', ''), 'name': tf, 'selected': False} for tf in
                     dimension_group.settings['timeframes']]
                 this_view['dimension_groups'].append(this_dimension_group)
 
@@ -92,7 +92,7 @@ class Explore(BaseLook):
                 this_measure['name'] = measure.name
                 this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
                 this_measure['settings'] = measure.settings
-                this_measure['unique_name'] = 'measure_{}_{}'.format(measure.name, uuid.uuid4())
+                this_measure['unique_name'] = f'measure_{measure.name}_{uuid.uuid4()}'
                 this_measure['selected'] = False
                 this_view['measures'].append(this_measure)
             this_explore['view'] = this_view
@@ -138,7 +138,7 @@ class View(BaseLook):
             this_dimension['name'] = dimension.name
             this_dimension['settings'] = dimension.settings
             this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
-            this_dimension['unique_name'] = 'dimension_{}_{}'.format(dimension.name, uuid.uuid4())
+            this_dimension['unique_name'] = f'dimension_{dimension.name}_{uuid.uuid4()}'
             this_dimension['selected'] = False
             this_view['dimensions'].append(this_dimension)
         this_view['measures'] = []
@@ -147,7 +147,7 @@ class View(BaseLook):
             this_measure['name'] = measure.name
             this_measure['label'] = measure.settings.get('label', ' '.join(measure.name.split('_')).title())
             this_measure['settings'] = measure.settings
-            this_measure['unique_name'] = 'measure_{}_{}'.format(measure.name, uuid.uuid4())
+            this_measure['unique_name'] = f'measure_{measure.name}_{uuid.uuid4()}'
             this_measure['selected'] = False
             this_view['measures'].append(this_measure)
         return this_view
@@ -165,7 +165,7 @@ class Dimension(BaseLook):
     def table_column_name(self):
         if 'sql' in self.settings:
             return self.settings['sql'].replace('${TABLE}', self.view.name).rstrip()
-        return '{}.{}'.format(self.view.name, self.name).rstrip()
+        return f'{self.view.name}.{self.name}'.rstrip()
 
     def __init__(self, name, settings):
         super().__init__(name, settings)
@@ -189,7 +189,7 @@ class DimensionGroup(BaseLook):
     def table_column_name(self):
         if 'sql' in self.settings:
             return self.settings['sql'].replace('${TABLE}', self.view.name).rstrip()
-        return '{}.{}'.format(self.view.name, self.name).rstrip()
+        return f'{self.view.name}.{self.name}'.rstrip()
 
     def __repr__(self):
         return '<DimensionGroup %i>' % (self.id)

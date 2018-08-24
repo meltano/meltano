@@ -47,10 +47,10 @@ class Join():
       return queried_dimension.table_column_name
 
     inner_results = list(map(dimension_actual_name, results.inner))
-    
+
     Substitution.variable_replace(results)
 
     for i, result in enumerate(results.outer):
       sql = sql.replace(result, inner_results[i])
-
-    return '{} AS {} ON {}'.format(related_view.settings['sql_table_name'], join.name, sql)
+    table_name = related_view.settings['sql_table_name']
+    return f'{table_name} AS {join.name} ON {sql}'

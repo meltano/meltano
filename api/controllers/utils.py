@@ -36,6 +36,7 @@ class SqlHelper:
         incoming_measures = incoming_json['measures']
         incoming_filters = incoming_json['filters']
         incoming_joins = incoming_json['joins']
+        incoming_limit = incoming_json['limit']
         # get all timeframes
         timeframes = [t['timeframes'] for t in incoming_dimension_groups]
         # flatten list of timeframes
@@ -48,7 +49,7 @@ class SqlHelper:
         dimensions = self.dimensions(dimensions, table)
         dimensions = dimensions + dimension_groups
         measures = self.measures(measures, table)
-        return self.get_query(from_=table, dimensions=dimensions, measures=measures)
+        return self.get_query(from_=table, dimensions=dimensions, measures=measures, limit=incoming_limit)
 
     def table(self, name, alias):
         (schema, name) = name.split('.')
@@ -91,21 +92,22 @@ class SqlHelper:
                 fields.append(d.sql)
         return fields
 
-    def get_query(self, from_, dimensions, measures):
+    def get_query(self, from_, dimensions, measures, limit):
         select = dimensions + measures
-        q = Query.from_(from_).select(*select).groupby(*dimensions)
-        return '{};'.format(str(q))
+        q = Query.from_(from_).select(*select).groupby(*dimensions).limit(limit)
+        return f'{str(q)};'
 
-@app.route("/drop_it_like_its_hot")
-def reset_db():
-    try:
-        Settings.__table__.drop(db.engine)
-        Project.__table__.drop(db.engine)
-        db.drop_all()
-    except sqlalchemy.exc.OperationalError as err:
-        logging.error("Failed drop database.")
-    db.create_all()
-    settings = Settings()
-    db.session.add(settings)
-    db.session.commit()
-    return jsonify({"dropped_it": "like_its_hot"})
+    @app.route("/drop_it_like_its_hot")
+    def reset_db():
+        try:
+            Settings.__table__.drop(db.engine)
+            Project.__table__.drop(db.engine)
+            db.drop_all()
+        except sqlalchemy.exc.OperationalError as err:
+            logging.error("Failed drop database.")
+        db.create_all()
+        settings = Settings()
+        db.session.add(settings)
+        db.session.commit()
+        return jsonify({"dropped_it": "like_its_hot"})
+

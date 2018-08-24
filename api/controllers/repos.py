@@ -245,7 +245,7 @@ def models():
             this_explore = {}
             this_explore['settings'] = explore.settings
             this_explore['name'] = explore.name
-            this_explore['link'] = '/explore/{}/{}'.format(model.name, explore.name)
+            this_explore['link'] = f'/explore/{model.name}/{explore.name}'
             this_view = {}
             this_view['name'] = explore.view.name
             this_view['settings'] = explore.view.settings
@@ -260,7 +260,6 @@ def models():
             this_model['explores'].append(this_explore)
         models_json.append(this_model)
     return jsonify(models_json)
-
 
 @bp.route('/explores', methods=['GET'])
 def explores():

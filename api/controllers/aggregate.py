@@ -33,7 +33,7 @@ class Aggregate:
             self.setAggregateSQLNumber()
         else:
             self.aggregateType = AggregateType.unknown
-            raise Exception('Aggregate Type {} not implemented yet'.format(type_))
+            raise Exception(f'Aggregate Type {type_} not implemented yet')
 
     def setAggregateSQLSum(self):
         self.sql = fn.Coalesce(fn.Sum(self.sql), 0, alias=self.substitution.alias)
