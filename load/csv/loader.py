@@ -16,13 +16,23 @@ class CsvLoader:
                 os.makedirs(TEMP_FOLDER)
             self.output_path = TEMP_FOLDER
 
-    @staticmethod
-    def schema_apply():
-        print("No need to apply schema for csv ")
-        pass
+    def schema_apply(self):
+        """
+        The schema apply is set to run once per entity before the extract phase
+          in order to initialize the target of the load operation.
+
+        In the case of csv files, we want to delete the tmp csv files from
+          older extraction runs, otherwise the new data would be appended to
+          the data from the previous execution.
+        """
+        # print(f'Deleting existing csv files for {self.entity_name}')
+        file_name = f'{self.extractor.name}--{self.entity_name}.csv'
+        file_path = os.path.join(self.output_path, file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     def load(self, df):
-        print(f'Saving file for schema: {self.entity_name}')
+        print(f'Updating csv file for entity: {self.entity_name}')
         file_name = f'{self.extractor.name}--{self.entity_name}.csv'
         file_path = os.path.join(self.output_path, file_name)
         with open(file_path, 'a') as csv_file:

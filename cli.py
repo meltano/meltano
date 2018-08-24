@@ -45,11 +45,14 @@ def run_extract(
             extractor=extractor,
             entity_name=entity,
         )
-        click.echo("Applying the schema ... ")
+
+        click.echo(f'Applying the schema for Entity {entity}')
         loader.schema_apply()
+
+        click.echo(f'Extracting data for {entity}')
         entity_dfs = extractor.extract(entity)
         for df in entity_dfs:
-            click.echo("Got extractor results, loading them into the loader")
+            # click.echo("Got extractor results, loading them into the loader")
             results.add(loader.load(df=df))
     click.echo("Load done! Returning results ")
     return results

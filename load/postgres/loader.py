@@ -31,7 +31,7 @@ class PostgresLoader:
             print(f"Schema {self.table.schema} does not exist -> creating it ")
             self.engine.execute(CreateSchema(self.table.schema))
         # TODO: update table
-        if not self.engine.dialect.has_table(self.engine, self.table.name):
+        if not self.engine.dialect.has_table(self.engine, self.table.name, self.table.schema):
             print(f"Table {self.table.name} does not exist -> creating it ")
             self.table.metadata.create_all(self.engine)
 
@@ -44,7 +44,7 @@ class PostgresLoader:
                 # only compatible with Postgres >= 9.5
                 set_=insert_stmt.excluded._data,  # link to the conflicting data
             )
-            print(f'Loading df: {dfs_to_load}')
+            print(f'Loading data to Postgres for {self.entity_name}')
             self.engine.execute(insert_stmt)
         else:
             print(f'DataFrame {df} is empty -> skipping it')
