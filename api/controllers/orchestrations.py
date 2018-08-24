@@ -160,37 +160,44 @@ def transform(model_name):
     """
     {
         'datastore_name': 'prod_dw',
-        ''
     }
     Looks up the credential by the name of the datastore passed to the api
 
-    Generates temp profiles.yml file from the passed credentials,
-    then is is passed to the dbt.main function
-    :param model_name: nam
-    :return:
+    Sets the environment variables and runs dbt in a subprocess for the given model
+    dbt run --profiles-dir profile --models <model_name>
     """
     settings = Settings.query.first()
     settings_connections = settings.settings['connections']
     incoming = request.get_json()
     datastore_name = incoming.get('datastore_name')
-    connection = settings_connections.get(datastore_name)
-    run_command = ['run', '--profiles-dir', f'{PROFILES_DIR}']
-    if model_name:
-        run_command.extend(['--models', f'models.{model_name}'])
+    connection = next((item for item in settings_connections if item['name'] == datastore_name), None)
+
     if not connection:
         return jsonify({'response': f'Connection {datastore_name} not found',
                         'status': 'error'})
-    if connection['type'] == 'postgres':
+
+    if connection['dialect'] == 'postgresql':
         os.environ['PG_ADDRESS'] = connection['host']
         os.environ['PG_PORT'] = str(connection['port'])
-        os.environ['PG_USERNAME'] = connection['user']
+        os.environ['PG_USERNAME'] = connection['username']
         os.environ['PG_PASSWORD'] = str(connection['password'])
-        os.environ['PG_DATABASE'] = connection['dbname']
+        os.environ['PG_DATABASE'] = connection['database']
         os.environ['PG_SCHEMA'] = connection['schema']
 
+    run_command = ['dbt', 'run', '--profiles-dir', f'{PROFILES_DIR}']
+    if model_name:
+        run_command.extend(['--models', f'{model_name}'])
+
+    work_dir = os.getcwd()
     os.chdir(os.path.join(PROJECT_ROOT_DIR, TRANSFORM_DIR))
-    dbt_main(run_command)
+
+    command = " ".join(run_command)
+    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+    transform_log = proc.stdout.read()
+
+    os.chdir(work_dir)
+
     return jsonify({
-        'response': 'done!',
-        'command': str(run_command),
+        'command': str(command),
+        'output': transform_log.decode("utf-8"),
     })
