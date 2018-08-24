@@ -1,4 +1,5 @@
 import os
+import subprocess
 import json
 
 from flask import (
@@ -176,13 +177,15 @@ def transform(model_name):
         return jsonify({'response': f'Connection {datastore_name} not found',
                         'status': 'error'})
 
+    new_env = os.environ.copy()
+
     if connection['dialect'] == 'postgresql':
-        os.environ['PG_ADDRESS'] = connection['host']
-        os.environ['PG_PORT'] = str(connection['port'])
-        os.environ['PG_USERNAME'] = connection['username']
-        os.environ['PG_PASSWORD'] = str(connection['password'])
-        os.environ['PG_DATABASE'] = connection['database']
-        os.environ['PG_SCHEMA'] = connection['schema']
+        new_env['PG_ADDRESS'] = connection['host']
+        new_env['PG_PORT'] = str(connection['port'])
+        new_env['PG_USERNAME'] = connection['username']
+        new_env['PG_PASSWORD'] = str(connection['password'])
+        new_env['PG_DATABASE'] = connection['database']
+        new_env['PG_SCHEMA'] = connection['schema']
 
     run_command = ['dbt', 'run', '--profiles-dir', f'{PROFILES_DIR}']
     if model_name:
@@ -192,7 +195,7 @@ def transform(model_name):
     os.chdir(os.path.join(PROJECT_ROOT_DIR, TRANSFORM_DIR))
 
     command = " ".join(run_command)
-    proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.Popen(command, env=new_env, shell=True, stdout=subprocess.PIPE)
     transform_log = proc.stdout.read()
 
     os.chdir(work_dir)
