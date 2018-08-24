@@ -24,6 +24,15 @@ $primary-invert: $pink-invert;
 */
 
 @import "../../node_modules/bulma/bulma";
+@import './mixins.scss';
+.log-output {
+  background: black;
+  color: white;
+  margin: 20px 0;
+  padding: 1rem;
+  white-space: pre-wrap;
+  @include courier;
+}
 .fixed-sidebar {
   position: fixed;
   overflow: scroll;

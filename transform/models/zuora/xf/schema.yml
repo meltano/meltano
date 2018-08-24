@@ -1,0 +1,21 @@
+zuora_accounts_receivables:
+    constraints:
+        not_null:
+            - invoice_id
+        unique:
+            - invoice_id
+
+zuora_current_arr:
+    constraints:
+        not_null:
+            - current_arr
+
+zuora_scheduled_renewals:
+    constraints:
+        not_null:
+            - account_name
+            - account_number
+            - subscription_name
+            - subscription_end_date
+            - rate_plan_name
+            - term

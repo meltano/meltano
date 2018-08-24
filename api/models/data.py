@@ -138,7 +138,7 @@ class View(BaseLook):
             this_dimension['name'] = dimension.name
             this_dimension['settings'] = dimension.settings
             this_dimension['label'] = dimension.settings.get('label', ' '.join(dimension.name.split('_')).title())
-            this_dimension['unique_name'] = f'dimension_{dimension.name}_{uuid.uuid4()}')
+            this_dimension['unique_name'] = f'dimension_{dimension.name}_{uuid.uuid4()}'
             this_dimension['selected'] = False
             this_view['dimensions'].append(this_dimension)
         this_view['measures'] = []
