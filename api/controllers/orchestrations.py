@@ -37,11 +37,48 @@ def index():
 
 @bp.route('/run', methods=['POST'])
 def run():
+    run_output = ''
+    out_nl = '\n'
     incoming = request.get_json()
-    extractor = incoming['extractor']
-    print(extract)
-    j = json.loads(p.stdout.decode("utf-8"))
-    return jsonify({'append': j})
+    extractor_name = incoming['extractor']
+    loader_name = incoming['loader']
+
+
+    run_output += f"Loading and initializing extractor: {extractor_name}"
+    extractor_class = EXTRACTOR_REGISTRY.get(extractor_name)
+    if not extractor_class:
+        run_output += out_nl+f'Extractor {extractor_name} not found please specify one of the: {list(EXTRACTOR_REGISTRY.keys())}'
+        return jsonify({'append': run_output})
+    extractor = extractor_class()
+
+    run_output += out_nl+f"Loading and initializing loader: {loader_name}"
+    loader_class = LOADER_REGISTRY.get(loader_name)
+    if not loader_class:
+        run_output += out_nl+f'Loader {loader_name} not found please specify one of the following: {list(LOADER_REGISTRY.keys())}'
+        return jsonify({'append': run_output})
+
+    run_output += out_nl+"Starting extraction"
+    results = set()
+    for entity in extractor.entities:
+        loader = loader_class(
+            extractor=extractor,
+            entity_name=entity,
+        )
+        run_output += out_nl+"Applying the schema"
+        loader.schema_apply()
+
+        run_output += out_nl+"Extracting Data"+out_nl
+        entity_dfs = extractor.extract(entity)
+        for df in entity_dfs:
+            run_output += "."
+            results.add(loader.load(df=df))
+    run_output += out_nl+"Load done!"
+
+    run_output += out_nl+"Starting Transform"
+    run_output += out_nl+"Transform Skipped!"
+
+    # print(run_output)
+    return jsonify({'append': run_output})
 
 
 @bp.route('/extract/<extractor_name>', methods=['POST'])
