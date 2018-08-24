@@ -35,6 +35,13 @@ def index():
     result['loaders'] = [name for name in os.listdir(load_dir) if os.path.isdir(os.path.join(load_dir, name))]
     return jsonify(result)
 
+@bp.route('/connection_names', methods=['GET'])
+def connection_names():
+    settings = Settings.query.first()
+    if not settings:
+        settings = Settings()
+    connections = [c['name'] for c in settings.serializable()['settings']['connections']]
+    return jsonify(connections)
 
 @bp.route('/run', methods=['POST'])
 def run():
@@ -78,7 +85,6 @@ def run():
     run_output += out_nl+"Starting Transform"
     run_output += out_nl+"Transform Skipped!"
 
-    # print(run_output)
     return jsonify({'append': run_output})
 
 
@@ -160,7 +166,7 @@ DBT_PROFILE_TEMPLATE = {
 def transform(model_name):
     """
     {
-        'datastore_name': 'prod_dw',
+        'connection_name': 'prod_dw',
     }
     Looks up the credential by the name of the datastore passed to the api
 
@@ -170,11 +176,11 @@ def transform(model_name):
     settings = Settings.query.first()
     settings_connections = settings.settings['connections']
     incoming = request.get_json()
-    datastore_name = incoming.get('datastore_name')
-    connection = next((item for item in settings_connections if item['name'] == datastore_name), None)
+    connection_name = incoming.get('connection_name')
+    connection = next((item for item in settings_connections if item['name'] == connection_name), None)
 
     if not connection:
-        return jsonify({'response': f'Connection {datastore_name} not found',
+        return jsonify({'response': f'Connection {connection_name} not found',
                         'status': 'error'})
 
     new_env = os.environ.copy()

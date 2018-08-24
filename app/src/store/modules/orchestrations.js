@@ -5,6 +5,8 @@ const state = {
   loaders: [],
   currentView: 'intro',
   currentExtractor: '',
+  currentConnectionName: '',
+  connectionNames: [],
   currentLoader: '',
   log: 'Job log will appear when run.',
 };
@@ -43,6 +45,13 @@ const actions = {
       });
   },
 
+  getConnectionNames({ commit }) {
+    orchestrationsApi.connectionNames()
+      .then((data) => {
+        commit('setConnectionNames', data.data);
+      });
+  },
+
   currentViewClicked({ commit }, selectedCurrentView) {
     commit('setCurrentView', selectedCurrentView);
   },
@@ -55,6 +64,11 @@ const actions = {
   currentLoaderClicked({ commit }, e) {
     const selectedLoader = e.target.value;
     commit('setCurrentLoader', selectedLoader);
+  },
+
+  currentConnectionNameClicked({ commit }, e) {
+    const selectedConnectionName = e.target.value;
+    commit('setCurrentConnectionName', selectedConnectionName);
   },
 
   runExtractor() {
@@ -70,6 +84,14 @@ const actions = {
     orchestrationsApi.load(state.currentExtractor, state.currentLoader)
       .then((data) => {
         state.log = `CSV's Loaded \n${data.data.inserted_files.join(',\n')}`;
+      });
+  },
+
+  runTransform() {
+    state.log = 'Running...';
+    orchestrationsApi.transform(state.currentExtractor, state.currentConnectionName)
+      .then((data) => {
+        state.log = `${data.data.command}\n${data.data.output}`;
       });
   },
 
@@ -92,6 +114,10 @@ const mutations = {
     state.loaders = orchestrationData.loaders;
   },
 
+  setConnectionNames(_, connectionNames) {
+    state.connectionNames = connectionNames;
+  },
+
   setCurrentView(_, selectedCurrentView) {
     state.currentView = selectedCurrentView;
   },
@@ -103,6 +129,10 @@ const mutations = {
   setCurrentLoader(_, selectedLoader) {
     state.currentLoader = selectedLoader;
   },
+
+  setCurrentConnectionName(_, selectedConnectionName) {
+    state.currentConnectionName = selectedConnectionName;
+  }
 };
 
 export default {
