@@ -14,7 +14,7 @@ class ExternalConnector:
                 this_connection = {}
                 if connection['dialect'] == 'postgresql':
                     psql_params = ['username', 'password', 'host', 'port', 'database']
-                    user, pw, host, port db = [connection[param] for param in psql_params]
+                    user, pw, host, port, db = [connection[param] for param in psql_params]
                     connection_url = f'postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}'
                     this_connection['connection_url'] = connection_url
                     this_connection['engine'] = create_engine(this_connection['connection_url'])

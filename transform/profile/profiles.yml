@@ -1,0 +1,16 @@
+config:
+    send_anonymous_usage_stats: False
+    use_colors: True
+
+meltano:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      threads: 2
+      host: "{{ env_var('PG_ADDRESS') }}"
+      port: "{{ env_var('PG_PORT') }}"
+      user: "{{ env_var('PG_USERNAME') }}"
+      pass: "{{ env_var('PG_PASSWORD') }}"
+      dbname: "{{ env_var('PG_DATABASE') }}"
+      schema: "{{ env_var('PG_SCHEMA') }}"

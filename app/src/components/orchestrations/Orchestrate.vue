@@ -90,9 +90,7 @@
               <li>Loader: {{currentLoader}}</li>
               <li>Transformation: {{currentExtractor}}</li>
             </ol>
-            <div class="log-output">
-              {{log}}
-            </div>
+            <div class="log-output">{{log}}</div>
             <a @click="runJobs" class="button is-primary is-large">Run</a>
           </div>
         </div>
@@ -141,14 +139,3 @@ export default {
   },
 };
 </script>
-<style lang="scss">
-@import '../../scss/mixins.scss';
-.log-output {
-  background: black;
-  color: white;
-  margin: 20px 0;
-  padding: 1rem;
-  @include courier;
-
-}
-</style>

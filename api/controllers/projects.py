@@ -3,7 +3,7 @@ from flask import (
 )
 
 from models.projects import Project
-from models.projects import Settings
+from models.settings import Settings
 from app import db
 
 bp = Blueprint('projects', __name__, url_prefix='/projects')

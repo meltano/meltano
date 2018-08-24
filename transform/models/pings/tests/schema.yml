@@ -1,0 +1,43 @@
+
+pings_usage_data:
+  constraints:
+    not_null:
+      - uuid
+
+pings_usage_data_boolean:
+  constraints:
+    unique:
+      - unique_key
+
+    not_null:
+      - unique_key
+      - uuid
+      - created_at
+
+pings_usage_data_month:
+  constraints:
+    unique:
+      - unique_key
+
+    not_null:
+      - unique_key
+      - uuid
+      - created_at
+
+pings_usage_data_unpacked:
+  constraints:
+    not_null:
+      - uuid
+
+    accepted_values:
+      - {field: main_edition, values: ['EE','CE']}
+
+libre_sfdc_accounts:
+  constraints:
+    not_null:
+      - account__c
+      - name
+      - original_hostname__c
+
+    accepted_values:
+      - {field: host_data_source__c, values: ['DiscoverOrg' ,'Clearbit', 'WHOIS']}

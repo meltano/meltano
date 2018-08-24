@@ -1,0 +1,13 @@
+historical_metrics:
+    constraints:
+        not_null:
+            - primary_key
+        unique:
+            - primary_key
+
+historical_headcount:
+    constraints:
+        not_null:
+            - primary_key
+        unique:
+            - primary_key

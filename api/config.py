@@ -17,7 +17,9 @@ POSTGRES_DB = get_env_variable("MELTANO_ANALYSIS_POSTGRES_DB")
 LOG_PATH = get_env_variable('MELTANO_ANALYSIS_LOG_PATH')
 ENV = 'development'
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+TEMP_FOLDER = os.path.join(API_ROOT_DIR, 'static/tmp')
+PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 
 user, pw, url, db = POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_URL, POSTGRES_DB
 SQLALCHEMY_DATABASE_URI = f'postgresql+psycopg2://{user}:{pw}@{url}/{db}'
