@@ -77,6 +77,7 @@ pipenv install
 ## Run API For Real
 
 ```
+pipenv shell
 cd api
 flask run
 ```
