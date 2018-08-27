@@ -28,7 +28,7 @@ service:
 
 image:
   repository: meltano/meltano
-  tag: full
+  tag: base
   pullPolicy: Always
 
 database:
