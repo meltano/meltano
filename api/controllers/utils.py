@@ -26,6 +26,9 @@ class SqlHelper:
         inner_results = re.findall(inner_pattern, input);
         return (outer_results, inner_results)
 
+    def get_names(self, things):
+        return [thing.name for thing in things]
+
     def get_sql(self, explore, incoming_json):
         view_name = incoming_json['view']
         view = View.query.filter(View.name == view_name).first()
@@ -36,20 +39,36 @@ class SqlHelper:
         incoming_measures = incoming_json['measures']
         incoming_filters = incoming_json['filters']
         incoming_joins = incoming_json['joins']
-        incoming_limit = incoming_json['limit']
+        incoming_limit = incoming_json.get('limit', 50)
         # get all timeframes
         timeframes = [t['timeframes'] for t in incoming_dimension_groups]
         # flatten list of timeframes
         timeframes = [y for x in timeframes for y in x]
         dimensions = list(filter(lambda x: x.name in incoming_dimensions, view.dimensions))
         measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
+        dimensions_raw = dimensions
+        measures_raw = measures
         table = self.table(base_table, explore.name)
         # joins = self.joins(incoming_joins, table)
         dimension_groups = self.dimension_groups(view_name, incoming_dimension_groups, table)
         dimensions = self.dimensions(dimensions, table)
         dimensions = dimensions + dimension_groups
         measures = self.measures(measures, table)
+        column_headers = self.column_headers(dimensions_raw, measures_raw)
+        return {\
+            'dimensions': dimensions_raw,\
+            'measures': measures_raw,\
+            'column_headers': column_headers,\
+            'sql': self.get_query(from_=table,\
+                dimensions=dimensions,\
+                measures=measures,\
+                limit=incoming_limit)\
+        }
+
         return self.get_query(from_=table, dimensions=dimensions, measures=measures, limit=incoming_limit)
+
+    def column_headers(self, dimensions, measures):
+      return [d.label for d in dimensions+measures]
 
     def table(self, name, alias):
         (schema, name) = name.split('.')
@@ -57,6 +76,7 @@ class SqlHelper:
 
     def dimensions(self, dimensions, table):
         return [self.field_from_dimension(d, table) for d in dimensions]
+
 
     def field_from_dimension(self, d, table):
         sql = d.settings['sql']
