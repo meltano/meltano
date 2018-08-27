@@ -167,6 +167,11 @@ class Dimension(BaseLook):
             return self.settings['sql'].replace('${TABLE}', self.view.name).rstrip()
         return f'{self.view.name}.{self.name}'.rstrip()
 
+    @property
+    def label(self):
+      return self.settings.get('label', self.name.replace('_', ' ').title())
+    
+
     def __init__(self, name, settings):
         super().__init__(name, settings)
 
@@ -202,6 +207,9 @@ class Measure(BaseLook):
                         db.ForeignKey('view.id'), nullable=False)
     view = db.relationship('View',
                            backref=db.backref('measures', lazy=True))
+    @property
+    def label(self):
+      return self.settings.get('label', self.name.replace('_', ' ').title())
 
     def __init__(self, name, settings):
         super().__init__(name, settings)

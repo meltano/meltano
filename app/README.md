@@ -27,11 +27,29 @@ npm run e2e
 npm test
 ```
 
+Or you can use yarn
+``` bash
+# install dependencies
+yarn
+
+# serve with hot reload at localhost:8080
+yarn run dev
+
+... etc ...
+```
+
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
 
 # Running the API
 
 ## First Time
+
+Install dependencies
+``` bash
+# install dependencies
+cd api
+yarn
+```
 
 Open the python shell. `python`
 ```
@@ -40,9 +58,18 @@ python
 ```
 From the shell:
 ```
->>> from app import db
->>> db.create_all()
+from app import db
+from models.settings import Settings
+
+db.create_all()
+settings = Settings()
+db.session.add(settings)
+db.session.commit()
+
+exit()
 ```
+
+From the project root:
 ```
 pipenv install
 ```
@@ -50,6 +77,7 @@ pipenv install
 ## Run API For Real
 
 ```
+pipenv shell
 cd api
 flask run
 ```
