@@ -68,6 +68,7 @@ def get_sql(model_name, explore_name):
   incoming_order_desc = incoming_json['desc']
   measures = sql_dict['measures']
   dimensions = sql_dict['dimensions']
+  column_headers = sql_dict['column_headers']
 
   if to_run:
       db_to_connect = model.settings['connection']
@@ -82,10 +83,16 @@ def get_sql(model_name, explore_name):
           return jsonify({'error': True, 'code': e.code, 'orig': e.orig.diag.message_primary, 'statement': e.statement}), 422
 
       results = [OrderedDict(row) for row in results]
-
       base_dict = {'sql': outgoing_sql, 'results': results, 'error': False}
       if not len(results):
           base_dict['empty'] = True
+      else:
+        base_dict['empty'] = False
+        base_dict['column_headers'] = column_headers
+        base_dict['keys'] = list(results[0].keys())
+        base_dict['measures'] = sqlHelper.get_names(measures)
+
+      return json.dumps(base_dict, default=default)
   else:
       return json.dumps({'sql': outgoing_sql}, default=default)
 

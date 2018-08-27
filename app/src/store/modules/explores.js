@@ -17,6 +17,7 @@ const state = {
   currentExplore: '',
   results: [],
   keys: [],
+  columnHeaders: [],
   resultMeasures: {},
   loadingQuery: false,
   currentDataTab: 'sql',
@@ -370,6 +371,7 @@ const mutations = {
   setQueryResults(_, results) {
     state.results = results.results;
     state.keys = results.keys;
+    state.columnHeaders = results.column_headers;
     state.resultMeasures = results.measures;
   },
 
