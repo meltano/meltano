@@ -38,6 +38,11 @@ logger.warning(f'Melt started at: {now}')
 def before_request():
     logger.info(f'[{request.remote_addr}] request: {now}')
 
+@app.errorhandler(500)
+def internal_error(exception):
+    logger.info(f'[{request.remote_addr}] request: {now}, error: {exception}')
+    return render_template('500.html'), 500
+
 
 from controllers import projects
 from controllers import repos
