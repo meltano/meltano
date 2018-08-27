@@ -132,7 +132,7 @@ const mutations = {
 
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
-  }
+  },
 };
 
 export default {
