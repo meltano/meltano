@@ -99,6 +99,7 @@ const actions = {
     const payload = {
       extractor: state.currentExtractor,
       loader: state.currentLoader,
+      connection_name: state.currentConnectionName,
     };
     state.log = 'Running...';
     orchestrationsApi.run(payload)
