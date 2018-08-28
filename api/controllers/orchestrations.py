@@ -50,7 +50,7 @@ def run():
     incoming = request.get_json()
     extractor_name = incoming['extractor']
     loader_name = incoming['loader']
-
+    connection_name = incoming.get('connection_name')
 
     run_output += f"Loading and initializing extractor: {extractor_name}"
     extractor_class = EXTRACTOR_REGISTRY.get(extractor_name)
@@ -83,7 +83,17 @@ def run():
     run_output += out_nl+"Load done!"
 
     run_output += out_nl+"Starting Transform"
-    run_output += out_nl+"Transform Skipped!"
+
+    # use the extractor's name as the model name for the transform operation
+    transform_log = run_transform(extractor_name, connection_name)
+
+    if transform_log['status'] != 'ok':
+        run_output += out_nl+'ERROR'
+    else:
+        run_output += out_nl+f"Status: {transform_log['status']}"
+        run_output += out_nl+f"Command: {transform_log['command']}"
+
+    run_output += out_nl+out_nl+f"Status:{transform_log['output']}"+out_nl
 
     return jsonify({'append': run_output})
 
@@ -139,29 +149,6 @@ def load(loader_name: str) -> Response:
     return jsonify({'response': 'done', 'inserted_files': extractor_temp_files})
 
 
-DBT_PROFILE_TEMPLATE = {
-    'config': {
-        'send_anonymous_usage_stats': False,
-        'use_colors': True
-    },
-    'meltano': {
-        'target': 'dev',
-        'outputs': {
-            'dev': {
-                'type': 'postgres',
-                'threads': 2,
-                'host': '',
-                'port': '',
-                'user': '',
-                'pass': '',
-                'dbname': '',
-                'schema': '',
-            }
-        }
-    }
-}
-
-
 @bp.route('/transform/<model_name>', methods=['POST'])
 def transform(model_name):
     """
@@ -171,17 +158,25 @@ def transform(model_name):
     Looks up the credential by the name of the datastore passed to the api
 
     Sets the environment variables and runs dbt in a subprocess for the given model
-    dbt run --profiles-dir profile --models <model_name>
+    dbt run --profiles-dir profile --target meltano_analysis --models <model_name>
     """
-    settings = Settings.query.first()
-    settings_connections = settings.settings['connections']
     incoming = request.get_json()
     connection_name = incoming.get('connection_name')
+
+    return jsonify(run_transform(model_name, connection_name))
+
+
+def run_transform(model_name, connection_name):
+    settings = Settings.query.first()
+    settings_connections = settings.settings['connections']
     connection = next((item for item in settings_connections if item['name'] == connection_name), None)
 
     if not connection:
-        return jsonify({'response': f'Connection {connection_name} not found',
-                        'status': 'error'})
+        return {
+            'status': 'error',
+            'output': f'Connection {connection_name} not found',
+            'command': '',
+        }
 
     new_env = os.environ.copy()
 
@@ -210,7 +205,8 @@ def transform(model_name):
 
     os.chdir(work_dir)
 
-    return jsonify({
+    return {
         'command': str(command),
         'output': transform_log.decode("utf-8"),
-    })
+        'status': 'ok',
+    }
