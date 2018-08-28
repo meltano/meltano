@@ -15,7 +15,7 @@ on-run-end:
     - grant select on all tables in schema {{ target.schema }} to looker
 
 models:
-  gitlab_dw:
+  meltano_dw:
     date:
       base:
         enabled: true

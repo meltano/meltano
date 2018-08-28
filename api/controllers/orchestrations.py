@@ -193,7 +193,11 @@ def transform(model_name):
         new_env['PG_DATABASE'] = connection['database']
         new_env['PG_SCHEMA'] = connection['schema']
 
-    run_command = ['dbt', 'run', '--profiles-dir', f'{PROFILES_DIR}']
+    run_command = [
+        'dbt', 'run',
+        '--profiles-dir', f'{PROFILES_DIR}',
+        '--target', 'meltano_analysis'
+    ]
     if model_name:
         run_command.extend(['--models', f'{model_name}'])
 
