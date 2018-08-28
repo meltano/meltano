@@ -20,6 +20,7 @@ models:
       base:
         enabled: true
         materialized: view
+
     sfdc:
       base:
         enabled: true
@@ -27,6 +28,7 @@ models:
       transformed:
         enabled: true
         materialized: table
+
     pings:
       base:
         enabled: true
@@ -41,10 +43,21 @@ models:
           materialized: incremental
           sql_where: 'TRUE'
           unique_key: 'unique_key'
+
     retention:
       enabled: true
       materialized: table
+
     zuora:
       base:
         enabled: true
         materialized: table
+
+    fastly:
+      base:
+        enabled: true
+        materialized: table
+
+    demo:
+      enabled: true
+      materialized: table
