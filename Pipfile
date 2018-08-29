@@ -17,6 +17,7 @@ pyyaml = "*"
 greenlet = ">=0.4.13"
 grequests = "*"
 dbt = "*"
+aiohttp = "*"
 
 [dev-packages]
 "flake8" = "*"

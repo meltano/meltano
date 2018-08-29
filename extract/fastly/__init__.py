@@ -1,6 +1,8 @@
+import asyncio
 import os
 import datetime
 
+import aiohttp
 import requests
 from dateutil.relativedelta import relativedelta
 import pandas as pd
@@ -8,6 +10,7 @@ from pandas import DataFrame
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
 
+CONNECTIONS_LIMIT = 100
 FASTLY_API_SERVER = "https://api.fastly.com/"
 FASTLY_HEADERS = {
     'Fastly-Key': os.getenv("FASTLY_API_TOKEN"),
@@ -47,10 +50,19 @@ line_items = Table(
 )
 
 
+async def fetch(url, session):
+    # TODO: add timeout
+    async with session.get(url) as response:
+        if response.status != 200:
+            response.raise_for_status()
+        return await response.read()
+
+
 class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
     """
+
     def __init__(self):
         self.name = 'fastly'
         today = datetime.date.today()
@@ -71,13 +83,23 @@ class FastlyExtractor:
             yield f'{FASTLY_API_SERVER}{billing_endpoint}'
             date += relativedelta(months=1)
 
-    def extract(self, entity) -> DataFrame:
-        if entity == 'line_items':
-            # in this extractor there is only one entity 'line_items'
-            # otherwise here would be branching to generate and request other urls
+    async def run(self):
+        tasks = []
+        # Fetch all responses within one Client session,
+        # keep connection alive for all requests.
+        async with aiohttp.ClientSession() as session:
             for url in self.get_billing_urls():
-                # TODO: make async with aiohttp
-                resp = requests.get(url, headers=FASTLY_HEADERS)
+                task = asyncio.ensure_future(fetch(url, session))
+                tasks.append(task)
+            responses = await asyncio.gather(*tasks)
+        return responses
+
+    def extract(self, entity_name):
+        if entity_name == 'line_items':
+            loop = asyncio.get_event_loop()
+            future = asyncio.ensure_future(self.run())
+            responses = loop.run_until_complete(future)
+            for resp in responses:
                 df = json_normalize(
                     resp.json(),
                     record_path='line_items',
