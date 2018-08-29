@@ -1,0 +1,20 @@
+demo_carts:
+    constraints: 
+        not_null: 
+        - id
+        unique:
+        - id
+
+demo_products:
+    constraints: 
+        not_null: 
+        - id
+        unique:
+        - id
+
+demo_users:
+    constraints: 
+        not_null: 
+        - id
+        unique:
+        - id

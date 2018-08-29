@@ -11,16 +11,16 @@
           is-fullwidth"
           v-if="hasResults">
         <thead>
-          <th v-for="key in keys"
+          <th v-for="(columnHeader, i) in columnHeaders"
               class="sortable-header"
-              :key="key"
+              :key="columnHeader"
               :class="{
-                'has-background-warning': isColumnSelectedMeasure(key),
-                'has-background-white-ter sorted': isColumnSorted(key),
+                'has-background-warning': isColumnSelectedMeasure(keys[i]),
+                'has-background-white-ter sorted': isColumnSorted(keys[i]),
                 'is-desc': sortDesc,
               }"
-              @click="sortBy(key)">
-            {{key}}
+              @click="sortBy(keys[i])">
+            {{columnHeader}}
           </th>
         </thead>
         <tbody>
@@ -47,6 +47,7 @@ export default {
   computed: {
     ...mapState('explores', [
       'resultMeasures',
+      'columnHeaders',
       'results',
       'keys',
       'sortDesc',

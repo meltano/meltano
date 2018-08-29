@@ -24,7 +24,7 @@
             <li>
               <a @click="currentViewClicked('transform')"
                 :class="{'is-active': isTransformView}">
-                Transform ({{currentExtractor || "unselected"}})
+                Transform ({{currentConnectionName || "unselected"}})
               </a>
             </li>
             <li>
@@ -81,6 +81,13 @@
           <div v-else-if="isTransformView" key="transformView">
             <h3 class="is-size-3">Transformers</h3>
             <p>We'll use the transformer with the same name as the extractor.</p>
+            <div class="select">
+              <select @click="currentConnectionNameClicked">
+                <option selected="true" disabled="disabled">Choose a connection</option>
+                <option v-for="connection in connectionNames"
+                  :key="connection">{{connection}}</option>
+              </select>
+            </div>
           </div>
           <div v-else-if="isRunView" key="runView">
             <h3 class="is-size-3">Run Orchestration</h3>
@@ -88,7 +95,8 @@
             <ol>
               <li>Extractor: {{currentExtractor}}</li>
               <li>Loader: {{currentLoader}}</li>
-              <li>Transformation: {{currentExtractor}}</li>
+              <li>Transformation: {{currentExtractor}}
+                with {{currentConnectionName}} connection</li>
             </ol>
             <div class="log-output">{{log}}</div>
             <a @click="runJobs" class="button is-primary is-large">Run</a>
@@ -107,6 +115,8 @@ export default {
     ...mapState('orchestrations', [
       'extractors',
       'loaders',
+      'connectionNames',
+      'currentConnectionName',
       'currentExtractor',
       'currentLoader',
       'log',
@@ -122,11 +132,13 @@ export default {
   },
   created() {
     this.$store.dispatch('orchestrations/getAll');
+    this.$store.dispatch('orchestrations/getConnectionNames');
   },
 
   methods: {
     ...mapActions('orchestrations', [
       'currentViewClicked',
+      'currentConnectionNameClicked',
       'currentExtractorClicked',
       'currentLoaderClicked',
       'runJobs',

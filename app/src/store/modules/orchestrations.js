@@ -99,6 +99,7 @@ const actions = {
     const payload = {
       extractor: state.currentExtractor,
       loader: state.currentLoader,
+      connection_name: state.currentConnectionName,
     };
     state.log = 'Running...';
     orchestrationsApi.run(payload)
@@ -132,7 +133,7 @@ const mutations = {
 
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
-  }
+  },
 };
 
 export default {
