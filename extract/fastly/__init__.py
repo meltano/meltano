@@ -3,13 +3,13 @@ import os
 import datetime
 
 import aiohttp
-import requests
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from pandas import DataFrame
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
 
+REQUEST_TIMEOUT_SEC = 30
 CONNECTIONS_LIMIT = 100
 FASTLY_API_SERVER = "https://api.fastly.com/"
 FASTLY_HEADERS = {
@@ -51,11 +51,10 @@ line_items = Table(
 
 
 async def fetch(url, session):
-    # TODO: add timeout
     async with session.get(url) as response:
         if response.status != 200:
             response.raise_for_status()
-        return await response.read()
+        return await response.json()
 
 
 class FastlyExtractor:
@@ -77,17 +76,18 @@ class FastlyExtractor:
         }
 
     def get_billing_urls(self):
+        urls = []
         date = self.start_date
         while date < self.this_month:
             billing_endpoint = f'billing/v2/year/{date.year:04}/month/{date.month:02}'
-            yield f'{FASTLY_API_SERVER}{billing_endpoint}'
+            urls.append(f'{FASTLY_API_SERVER}{billing_endpoint}')
             date += relativedelta(months=1)
+        return urls
 
     async def run(self):
         tasks = []
-        # Fetch all responses within one Client session,
-        # keep connection alive for all requests.
-        async with aiohttp.ClientSession() as session:
+        timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SEC)
+        async with aiohttp.ClientSession(headers=FASTLY_HEADERS, timeout=timeout) as session:
             for url in self.get_billing_urls():
                 task = asyncio.ensure_future(fetch(url, session))
                 tasks.append(task)
@@ -101,7 +101,7 @@ class FastlyExtractor:
             responses = loop.run_until_complete(future)
             for resp in responses:
                 df = json_normalize(
-                    resp.json(),
+                    resp,
                     record_path='line_items',
                     # TODO: generate from the Table def
                     meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
