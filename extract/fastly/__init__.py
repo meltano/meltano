@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 import datetime
 
@@ -8,6 +9,8 @@ import pandas as pd
 from pandas import DataFrame
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
+
+from extract.utils import fetch_urls
 
 REQUEST_TIMEOUT_SEC = 30
 CONNECTIONS_LIMIT = 100
@@ -50,13 +53,6 @@ line_items = Table(
 )
 
 
-async def fetch(url, session):
-    async with session.get(url) as response:
-        if response.status != 200:
-            response.raise_for_status()
-        return await response.json()
-
-
 class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
@@ -84,24 +80,18 @@ class FastlyExtractor:
             date += relativedelta(months=1)
         return urls
 
-    async def run(self):
-        tasks = []
-        timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SEC)
-        async with aiohttp.ClientSession(headers=FASTLY_HEADERS, timeout=timeout) as session:
-            for url in self.get_billing_urls():
-                task = asyncio.ensure_future(fetch(url, session))
-                tasks.append(task)
-            responses = await asyncio.gather(*tasks)
-        return responses
-
     def extract(self, entity_name):
         if entity_name == 'line_items':
-            loop = asyncio.get_event_loop()
-            future = asyncio.ensure_future(self.run())
-            responses = loop.run_until_complete(future)
+            timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SEC)
+            responses = fetch_urls(
+                urls=self.get_billing_urls(),
+                headers=FASTLY_HEADERS,
+                timeout=timeout,
+            )
             for resp in responses:
+                resp_json = json.loads(resp)
                 df = json_normalize(
-                    resp,
+                    resp_json,
                     record_path='line_items',
                     # TODO: generate from the Table def
                     meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
