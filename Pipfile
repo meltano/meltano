@@ -17,6 +17,7 @@ pyyaml = "*"
 greenlet = ">=0.4.13"
 grequests = "*"
 dbt = "*"
+salesforce-bulk = "*"
 
 [dev-packages]
 "flake8" = "*"
