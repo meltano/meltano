@@ -1,4 +1,8 @@
+import os
+from importlib import import_module
+from typing import Dict
 import yaml
+
 from sqlalchemy import (
     MetaData,
     Table,
@@ -70,3 +74,47 @@ def tables_from_manifest(
             )
             tables[table_name] = table
     return tables
+
+
+def import_class(registry_path, dir_name, prefix) -> object:
+    """
+
+    :param registry_path: name of the registry to load from (e.g. extract, load)
+    :param dir_name: Name of the individual extractor or loader
+    :param prefix: Prefix used for its class name (e.g. Loader, Extractor)
+    :return:
+    """
+    module = import_module('.'.join([registry_path, dir_name]))
+    return getattr(module, f'{dir_name}{prefix}')
+
+
+def get_registry(registry_path: str, prefix: str) -> Dict[str, object]:
+    """
+    Helper method that searches registry_path and returns registry dict
+    :param prefix:
+    :param registry_path: path to the registry folder (should be folders with loaders or extractors)
+    :return:  a dictionary like:
+        {
+            'Demo': <class 'extract.Demo.DemoExtractor'>,
+            'Fastly': <class 'extract.Fastly.FastlyExtractor'>,
+            'Sfdc': <class 'extract.Sfdc.extractor.SfdcExtractor'>
+        }
+    """
+    with os.scandir(registry_path) as DirEntries:
+        registry_folders = [
+            entry for entry in DirEntries
+            if entry.is_dir() and not entry.name.startswith(('__', '.'))
+        ]
+        return {
+            dir_entry.name: import_class(registry_path, dir_entry.name, prefix)
+            for dir_entry in registry_folders
+        }
+
+
+EXTRACTORS_DIR = 'extract'
+LOADERS_DIR = 'load'
+EXTRACT_CLASS_PREFIX = 'Extractor'
+LOAD_CLASS_PREFIX = 'Loader'
+
+EXTRACTOR_REGISTRY = get_registry(EXTRACTORS_DIR, EXTRACT_CLASS_PREFIX)
+LOADER_REGISTRY = get_registry(LOADERS_DIR, LOAD_CLASS_PREFIX)

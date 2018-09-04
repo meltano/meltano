@@ -1,19 +1,5 @@
 import click
-from extract.fastly import FastlyExtractor
-from extract.demo import DemoExtractor
-from load.postgres.loader import PostgresLoader
-from load.csv.loader import CsvLoader
-
-# TODO: to be generated from the file structure of /Extract/
-EXTRACTOR_REGISTRY = {
-    'fastly': FastlyExtractor,
-    'demo': DemoExtractor
-}
-
-LOADER_REGISTRY = {
-    'postgres': PostgresLoader,
-    'csv': CsvLoader,
-}
+from extract.utils import EXTRACTOR_REGISTRY, LOADER_REGISTRY
 
 
 def run_extract(
