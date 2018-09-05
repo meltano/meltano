@@ -1,13 +1,19 @@
+import asyncio
+import json
 import os
 import datetime
 
-import requests
+import aiohttp
 from dateutil.relativedelta import relativedelta
 import pandas as pd
 from pandas import DataFrame
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
 
+from extract.utils import fetch_urls
+
+REQUEST_TIMEOUT_SEC = 30
+CONNECTIONS_LIMIT = 100
 FASTLY_API_SERVER = "https://api.fastly.com/"
 FASTLY_HEADERS = {
     'Fastly-Key': os.getenv("FASTLY_API_TOKEN"),
@@ -51,6 +57,7 @@ class FastlyExtractor:
     """
     Extractor for the Fastly Billing API
     """
+
     def __init__(self):
         self.name = 'fastly'
         today = datetime.date.today()
@@ -65,21 +72,26 @@ class FastlyExtractor:
         }
 
     def get_billing_urls(self):
+        urls = []
         date = self.start_date
         while date < self.this_month:
             billing_endpoint = f'billing/v2/year/{date.year:04}/month/{date.month:02}'
-            yield f'{FASTLY_API_SERVER}{billing_endpoint}'
+            urls.append(f'{FASTLY_API_SERVER}{billing_endpoint}')
             date += relativedelta(months=1)
+        return urls
 
-    def extract(self, entity) -> DataFrame:
-        if entity == 'line_items':
-            # in this extractor there is only one entity 'line_items'
-            # otherwise here would be branching to generate and request other urls
-            for url in self.get_billing_urls():
-                # TODO: make async with aiohttp
-                resp = requests.get(url, headers=FASTLY_HEADERS)
+    def extract(self, entity_name):
+        if entity_name == 'line_items':
+            timeout = aiohttp.ClientTimeout(total=REQUEST_TIMEOUT_SEC)
+            responses = fetch_urls(
+                urls=self.get_billing_urls(),
+                headers=FASTLY_HEADERS,
+                timeout=timeout,
+            )
+            for resp in responses:
+                resp_json = json.loads(resp)
                 df = json_normalize(
-                    resp.json(),
+                    resp_json,
                     record_path='line_items',
                     # TODO: generate from the Table def
                     meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
