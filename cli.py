@@ -1,25 +1,8 @@
 import click
-from extract.fastly import FastlyExtractor
-from extract.demo import DemoExtractor
-from load.postgres.loader import PostgresLoader
-from load.csv.loader import CsvLoader
-
-# TODO: to be generated from the file structure of /Extract/
-EXTRACTOR_REGISTRY = {
-    'fastly': FastlyExtractor,
-    'demo': DemoExtractor
-}
-
-LOADER_REGISTRY = {
-    'postgres': PostgresLoader,
-    'csv': CsvLoader,
-}
+from extract.utils import EXTRACTOR_REGISTRY, LOADER_REGISTRY
 
 
-def run_extract(
-        extractor_name,
-        loader_name,
-):
+def run_extract(extractor_name, loader_name):
     """
     :param extractor_name:
     :param loader_name:
@@ -40,7 +23,8 @@ def run_extract(
         )
     click.echo("Starting extraction ... ")
     results = set()
-    for entity_name in extractor.entities:
+    # TODO: move this loop into the Extractor ??
+    for entity in extractor.tables.keys():
         loader = loader_class(
             extractor=extractor,
             entity_name=entity_name,
@@ -52,7 +36,7 @@ def run_extract(
         click.echo(f'Extracting data for {entity_name}')
         entity_dfs = extractor.extract(entity_name)
         for df in entity_dfs:
-            # click.echo("Got extractor results, loading them into the loader")
+            click.echo("Got extractor results, loading them into the loader")
             results.add(loader.load(df=df))
     click.echo("Load done! Returning results ")
     return results
@@ -65,7 +49,7 @@ def cli():
 
 @cli.command()
 @click.argument('extractor_name')
-@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
+@click.option('--loader_name', default='Postgres', help="Which loader should be used in this extraction")
 # @click.option('-S', '--schema', required=True)
 @click.option('-H', '--host',
               envvar='PG_ADDRESS',
