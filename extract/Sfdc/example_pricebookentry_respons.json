@@ -1,0 +1,1222 @@
+[
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jRB3AAM"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458014050000,
+    "Id": "01u61000001jRB3AAM",
+    "IsActive": false,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000001jx7OAAQ",
+    "LastModifiedDate": 1473704024000,
+    "Name": "Discount",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001dsZ9AAI",
+    "ProductCode": "010",
+    "SystemModstamp": 1473704024000,
+    "UnitPrice": -100.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000LeSzAAK"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441391403000,
+    "Id": "01u61000000LeSzAAK",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1447107408000,
+    "Name": "GitLab Training",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000002ajKAAQ",
+    "ProductCode": "007",
+    "SystemModstamp": 1447107408000,
+    "UnitPrice": 2500.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C29uAAC"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855358000,
+    "Id": "01u61000001C29uAAC",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855358000,
+    "Name": "GitHost Startup",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000nGF2AAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855507000,
+    "UnitPrice": 960.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkMAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318833000,
+    "Id": "01u61000000gYkMAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318833000,
+    "Name": "True-up: Basic Subscription Pack (10 users) 6 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RTi1AAG",
+    "ProductCode": "006",
+    "SystemModstamp": 1441318833000,
+    "UnitPrice": 195.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkCAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318745000,
+    "Id": "01u61000000gYkCAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318745000,
+    "Name": "True-up: Standard Subscription Pack (100 users) 6 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RThwAAG",
+    "ProductCode": "005",
+    "SystemModstamp": 1441318745000,
+    "UnitPrice": 2450.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjOAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441317872000,
+    "Id": "01u61000000gYjOAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441317872000,
+    "Name": "Standard Subscription (100 users)",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RThXAAW",
+    "ProductCode": "002",
+    "SystemModstamp": 1447190028000,
+    "UnitPrice": 4900.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjYAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441317964000,
+    "Id": "01u61000000gYjYAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441317964000,
+    "Name": "Basic Subscription Pack (10 users) 12 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RThcAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1441317964000,
+    "UnitPrice": 390.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjiAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318042000,
+    "Id": "01u61000000gYjiAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318042000,
+    "Name": "Plus Subscription Pack (100 users) 12 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RThhAAG",
+    "ProductCode": "003",
+    "SystemModstamp": 1441318042000,
+    "UnitPrice": 14900.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjsAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318161000,
+    "Id": "01u61000000gYjsAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318161000,
+    "Name": "Old Basic Subscription Pack (20 users) 12 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RThmAAG",
+    "ProductCode": "004",
+    "SystemModstamp": 1441318210000,
+    "UnitPrice": 398.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINUAA4"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026682000,
+    "Id": "01u61000000MINUAA4",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013578000,
+    "Name": "Standard Subscription Pack (100 users) 24 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003ljNAAQ",
+    "ProductCode": "002",
+    "SystemModstamp": 1458013578000,
+    "UnitPrice": 9800.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINjAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026862000,
+    "Id": "01u61000000MINjAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013693000,
+    "Name": "Plus Subscription Pack (100 users) 36 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003ljcAAA",
+    "ProductCode": "003",
+    "SystemModstamp": 1458013693000,
+    "UnitPrice": 44700.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MIOaAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443027049000,
+    "Id": "01u61000000MIOaAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1443027082000,
+    "Name": "GitLab.com & CE Support Subscription (100 users) 12 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003llzAAA",
+    "ProductCode": "008",
+    "SystemModstamp": 1443027139000,
+    "UnitPrice": 2500.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkWAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318900000,
+    "Id": "01u61000000gYkWAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318900000,
+    "Name": "True-up: Old Basic Subscription Pack (20 users) 6 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000RTi6AAG",
+    "ProductCode": "007",
+    "SystemModstamp": 1441318900000,
+    "UnitPrice": 199.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C29zAAC"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855374000,
+    "Id": "01u61000001C29zAAC",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855374000,
+    "Name": "GitHost Business",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000nGF7AAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855598000,
+    "UnitPrice": 2400.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2A9AAK"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855428000,
+    "Id": "01u61000001C2A9AAK",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855428000,
+    "Name": "GitHost Corporate",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000nGFHAA2",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855546000,
+    "UnitPrice": 9600.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hHRWAA2"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452614449000,
+    "Id": "01u61000001hHRWAA2",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013757000,
+    "Name": "Basic Subscription Pack (10 users) 24 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000PX9bAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1458013757000,
+    "UnitPrice": 780.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hHRgAAM"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452614522000,
+    "Id": "01u61000001hHRgAAM",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013790000,
+    "Name": "Basic Subscription Pack (10 users) 48 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000PX9lAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1458013790000,
+    "UnitPrice": 1560.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hHRRAA2"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452614324000,
+    "Id": "01u61000001hHRRAA2",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013744000,
+    "Name": "Plus Subscription Pack (100 users) 48 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000PX9WAAW",
+    "ProductCode": "003",
+    "SystemModstamp": 1458013744000,
+    "UnitPrice": 59600.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINeAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026829000,
+    "Id": "01u61000000MINeAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013650000,
+    "Name": "Plus Subscription Pack (100 users) 24 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003ljXAAQ",
+    "ProductCode": "003",
+    "SystemModstamp": 1458013650000,
+    "UnitPrice": 29800.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000LeTXAA0"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441391588000,
+    "Id": "01u61000000LeTXAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441391588000,
+    "Name": "GitLab Consulting",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000002ajtAAA",
+    "ProductCode": "008",
+    "SystemModstamp": 1441391588000,
+    "UnitPrice": 280.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hHRMAA2"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452614296000,
+    "Id": "01u61000001hHRMAA2",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013717000,
+    "Name": "Standard Subscription Pack (100 users) 48 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000PX9RAAW",
+    "ProductCode": "002",
+    "SystemModstamp": 1458013717000,
+    "UnitPrice": 19600.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000M66AAAS"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1442507906000,
+    "Id": "01u61000000M66AAAS",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1442507906000,
+    "Name": "GitLab.com Bronze Support Subscription",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003QVgAAM",
+    "ProductCode": "008",
+    "SystemModstamp": 1442507906000,
+    "UnitPrice": 199.8,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hHRbAAM"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452614493000,
+    "Id": "01u61000001hHRbAAM",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013773000,
+    "Name": "Basic Subscription Pack (10 users) 36 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000PX9gAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1458013773000,
+    "UnitPrice": 1170.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINZAA4"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026726000,
+    "Id": "01u61000000MINZAA4",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013621000,
+    "Name": "Standard Subscription Pack (100 users) 36 months",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t610000003ljSAAQ",
+    "ProductCode": "002",
+    "SystemModstamp": 1458013621000,
+    "UnitPrice": 14700.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C29pAAC"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855329000,
+    "Id": "01u61000001C29pAAC",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855329000,
+    "Name": "GitHost Developer",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000nGExAAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855485000,
+    "UnitPrice": 300.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2A4AAK"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855393000,
+    "Id": "01u61000001C2A4AAK",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855393000,
+    "Name": "GitHost Busines Pro",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000000nGFCAA2",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855527000,
+    "UnitPrice": 4800.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jYxPAAU"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458164933000,
+    "Id": "01u61000001jYxPAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458164933000,
+    "Name": "Premium Support",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001dspRAAQ",
+    "ProductCode": "012",
+    "SystemModstamp": 1458239156000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jYwKAAU"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458151142000,
+    "Id": "01u61000001jYwKAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458151142000,
+    "Name": "GitSwarm EE",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001dsoiAAA",
+    "ProductCode": "011",
+    "SystemModstamp": 1458151142000,
+    "UnitPrice": 24.5,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jf8OAAQ"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458239290000,
+    "Id": "01u61000001jf8OAAQ",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458239290000,
+    "Name": "GitLab Geo",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001duveAAA",
+    "ProductCode": "014",
+    "SystemModstamp": 1458239290000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u610000021zCNAAY"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1459881010000,
+    "Id": "01u610000021zCNAAY",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1459881010000,
+    "Name": "Pivotal Tile for GitLab EE",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001eCGgAAM",
+    "ProductCode": "015",
+    "SystemModstamp": 1459881044000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jf8EAAQ"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458239205000,
+    "Id": "01u61000001jf8EAAQ",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458239205000,
+    "Name": "Enterprise Edition License",
+    "Pricebook2Id": "01s61000000fcNNAAY",
+    "Product2Id": "01t61000001duvZAAQ",
+    "ProductCode": "013",
+    "SystemModstamp": 1458239213000,
+    "UnitPrice": 39.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jRB8AAM"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458014062000,
+    "Id": "01u61000001jRB8AAM",
+    "IsActive": false,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000001jx7OAAQ",
+    "LastModifiedDate": 1473704024000,
+    "Name": "Discount",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001dsZ9AAI",
+    "ProductCode": "010",
+    "SystemModstamp": 1473704024000,
+    "UnitPrice": -100.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2AJAA0"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855493000,
+    "Id": "01u61000001C2AJAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855493000,
+    "Name": "GitHost Developer",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000nGExAAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855493000,
+    "UnitPrice": 300.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjTAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441317892000,
+    "Id": "01u61000000gYjTAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441317892000,
+    "Name": "Standard Subscription (100 users)",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RThXAAW",
+    "ProductCode": "002",
+    "SystemModstamp": 1447190028000,
+    "UnitPrice": 4900.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkHAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318762000,
+    "Id": "01u61000000gYkHAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318762000,
+    "Name": "True-up: Standard Subscription Pack (100 users) 6 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RThwAAG",
+    "ProductCode": "005",
+    "SystemModstamp": 1441318762000,
+    "UnitPrice": 2450.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjxAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318169000,
+    "Id": "01u61000000gYjxAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318169000,
+    "Name": "Old Basic Subscription Pack (20 users) 12 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RThmAAG",
+    "ProductCode": "004",
+    "SystemModstamp": 1441318210000,
+    "UnitPrice": 398.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkbAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318909000,
+    "Id": "01u61000000gYkbAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318909000,
+    "Name": "True-up: Old Basic Subscription Pack (20 users) 6 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RTi6AAG",
+    "ProductCode": "007",
+    "SystemModstamp": 1441318909000,
+    "UnitPrice": 199.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINVAA4"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026682000,
+    "Id": "01u61000000MINVAA4",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013578000,
+    "Name": "Standard Subscription Pack (100 users) 24 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003ljNAAQ",
+    "ProductCode": "002",
+    "SystemModstamp": 1458013578000,
+    "UnitPrice": 9800.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINkAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026862000,
+    "Id": "01u61000000MINkAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013693000,
+    "Name": "Plus Subscription Pack (100 users) 36 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003ljcAAA",
+    "ProductCode": "003",
+    "SystemModstamp": 1458013693000,
+    "UnitPrice": 44700.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MIObAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443027049000,
+    "Id": "01u61000000MIObAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1443027049000,
+    "Name": "GitLab.com & CE Support Subscription (100 users) 12 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003llzAAA",
+    "ProductCode": "008",
+    "SystemModstamp": 1443027139000,
+    "UnitPrice": 199.8,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjdAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441317977000,
+    "Id": "01u61000000gYjdAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441317977000,
+    "Name": "Basic Subscription Pack (10 users) 12 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RThcAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1441317977000,
+    "UnitPrice": 390.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYjnAAE"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318074000,
+    "Id": "01u61000000gYjnAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318074000,
+    "Name": "Plus Subscription Pack (100 users) 12 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RThhAAG",
+    "ProductCode": "003",
+    "SystemModstamp": 1441318074000,
+    "UnitPrice": 14900.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000gYkRAAU"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441318843000,
+    "Id": "01u61000000gYkRAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441318843000,
+    "Name": "True-up: Basic Subscription Pack (10 users) 6 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000RTi1AAG",
+    "ProductCode": "006",
+    "SystemModstamp": 1441318843000,
+    "UnitPrice": 195.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2AEAA0"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855446000,
+    "Id": "01u61000001C2AEAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855446000,
+    "Name": "GitHost Corporate",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000nGFHAA2",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855546000,
+    "UnitPrice": 9600.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000LeThAAK"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441391601000,
+    "Id": "01u61000000LeThAAK",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1441391601000,
+    "Name": "GitLab Consulting",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000002ajtAAA",
+    "ProductCode": "008",
+    "SystemModstamp": 1441391601000,
+    "UnitPrice": 280.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINfAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026829000,
+    "Id": "01u61000000MINfAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013650000,
+    "Name": "Plus Subscription Pack (100 users) 24 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003ljXAAQ",
+    "ProductCode": "003",
+    "SystemModstamp": 1458013650000,
+    "UnitPrice": 29800.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hIg1AAE"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452707324000,
+    "Id": "01u61000001hIg1AAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1452707324000,
+    "Name": "Plus Subscription Pack (100 users) 48 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000PX9WAAW",
+    "ProductCode": "003",
+    "SystemModstamp": 1452707324000,
+    "UnitPrice": 47680.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000LeTIAA0"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1441391500000,
+    "Id": "01u61000000LeTIAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1447107460000,
+    "Name": "GitLab Training",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000002ajKAAQ",
+    "ProductCode": "007",
+    "SystemModstamp": 1447107460000,
+    "UnitPrice": 2500.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000M6BjAAK"
+    },
+    "CreatedById": "00561000000hjpWAAQ",
+    "CreatedDate": 1442507952000,
+    "Id": "01u61000000M6BjAAK",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000hjpWAAQ",
+    "LastModifiedDate": 1442509619000,
+    "Name": "GitLab.com Bronze Support Subscription",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003QVgAAM",
+    "ProductCode": "008",
+    "SystemModstamp": 1442509619000,
+    "UnitPrice": 199.8,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hIfmAAE"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452707196000,
+    "Id": "01u61000001hIfmAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1452707196000,
+    "Name": "Basic Subscription Pack (10 users) 48 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000PX9lAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1452707196000,
+    "UnitPrice": 1250.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hIfrAAE"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452707230000,
+    "Id": "01u61000001hIfrAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1452707230000,
+    "Name": "Basic Subscription Pack (10 users) 36 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000PX9gAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1452707230000,
+    "UnitPrice": 1000.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2AOAA0"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855516000,
+    "Id": "01u61000001C2AOAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855516000,
+    "Name": "GitHost Startup",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000nGF2AAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855516000,
+    "UnitPrice": 960.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000000MINaAAO"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1443026726000,
+    "Id": "01u61000000MINaAAO",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458013621000,
+    "Name": "Standard Subscription Pack (100 users) 36 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t610000003ljSAAQ",
+    "ProductCode": "002",
+    "SystemModstamp": 1458013621000,
+    "UnitPrice": 14700.0,
+    "UseStandardPrice": true
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001hIfwAAE"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1452707293000,
+    "Id": "01u61000001hIfwAAE",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1452707293000,
+    "Name": "Basic Subscription Pack (10 users) 24 months",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000PX9bAAG",
+    "ProductCode": "001",
+    "SystemModstamp": 1452707293000,
+    "UnitPrice": 700.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2ATAA0"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855536000,
+    "Id": "01u61000001C2ATAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855536000,
+    "Name": "GitHost Busines Pro",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000nGFCAA2",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855536000,
+    "UnitPrice": 4800.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001C2AYAA0"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1456855606000,
+    "Id": "01u61000001C2AYAA0",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1456855606000,
+    "Name": "GitHost Business",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000000nGF7AAM",
+    "ProductCode": "009",
+    "SystemModstamp": 1456855606000,
+    "UnitPrice": 2400.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jYxUAAU"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458164956000,
+    "Id": "01u61000001jYxUAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458164956000,
+    "Name": "Premium Support",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001dspRAAQ",
+    "ProductCode": "012",
+    "SystemModstamp": 1458239156000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jYwPAAU"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458151159000,
+    "Id": "01u61000001jYwPAAU",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458151159000,
+    "Name": "GitSwarm EE",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001dsoiAAA",
+    "ProductCode": "011",
+    "SystemModstamp": 1458151159000,
+    "UnitPrice": 24.5,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jf8JAAQ"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458239223000,
+    "Id": "01u61000001jf8JAAQ",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458239223000,
+    "Name": "Enterprise Edition License",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001duvZAAQ",
+    "ProductCode": "013",
+    "SystemModstamp": 1458239223000,
+    "UnitPrice": 39.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000001jf8TAAQ"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1458239299000,
+    "Id": "01u61000001jf8TAAQ",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1458239299000,
+    "Name": "GitLab Geo",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001duveAAA",
+    "ProductCode": "014",
+    "SystemModstamp": 1458239299000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  },
+  {
+    "attributes": {
+      "type": "PricebookEntry",
+      "url": "/services/data/v40.0/sobjects/PricebookEntry/01u61000002GI4sAAG"
+    },
+    "CreatedById": "00561000000RzbDAAS",
+    "CreatedDate": 1464196111000,
+    "Id": "01u61000002GI4sAAG",
+    "IsActive": true,
+    "IsDeleted": false,
+    "LastModifiedById": "00561000000RzbDAAS",
+    "LastModifiedDate": 1464196111000,
+    "Name": "Pivotal Tile for GitLab EE",
+    "Pricebook2Id": "01s6100000159jQAAQ",
+    "Product2Id": "01t61000001eCGgAAM",
+    "ProductCode": "015",
+    "SystemModstamp": 1464196111000,
+    "UnitPrice": 99.0,
+    "UseStandardPrice": false
+  }
+]
