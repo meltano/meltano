@@ -35,7 +35,7 @@ class DemoExtractor:
     Demo Extractor
     """
     def __init__(self):
-        self.name = 'demo'
+        self.name = 'Demo'
         self.tables = {
             'users': users_table,
             'products': products_table,

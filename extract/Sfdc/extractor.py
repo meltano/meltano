@@ -47,8 +47,7 @@ class SfdcExtractor:
         for result in client.get_all_results_for_query_batch(batch_id):
             return result
 
-    def extract(self) -> Iterator[pd.DataFrame]:
-        for entity_name in self.tables:
-            result = self._extract_entity(entity_name)
-            df = pd.read_json(result, orient='records')
-            yield df
+    def extract(self, entity_name) -> Iterator[pd.DataFrame]:
+        result = self._extract_entity(entity_name)
+        df = pd.read_json(result, orient='records')
+        yield df

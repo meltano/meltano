@@ -2,10 +2,7 @@ import click
 from extract.utils import EXTRACTOR_REGISTRY, LOADER_REGISTRY
 
 
-def run_extract(
-        extractor_name,
-        loader_name,
-):
+def run_extract(extractor_name, loader_name):
     """
     :param extractor_name:
     :param loader_name:
@@ -26,7 +23,8 @@ def run_extract(
         )
     click.echo("Starting extraction ... ")
     results = set()
-    for entity in extractor.entities:
+    # TODO: move this loop into the Extractor ??
+    for entity in extractor.tables.keys():
         loader = loader_class(
             extractor=extractor,
             entity_name=entity,
@@ -38,7 +36,7 @@ def run_extract(
         click.echo(f'Extracting data for {entity}')
         entity_dfs = extractor.extract(entity)
         for df in entity_dfs:
-            # click.echo("Got extractor results, loading them into the loader")
+            click.echo("Got extractor results, loading them into the loader")
             results.add(loader.load(df=df))
     click.echo("Load done! Returning results ")
     return results
@@ -51,7 +49,7 @@ def cli():
 
 @cli.command()
 @click.argument('extractor_name')
-@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
+@click.option('--loader_name', default='Postgres', help="Which loader should be used in this extraction")
 # @click.option('-S', '--schema', required=True)
 @click.option('-H', '--host',
               envvar='PG_ADDRESS',

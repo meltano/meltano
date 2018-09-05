@@ -57,6 +57,13 @@ def tables_from_manifest(
         metadata: MetaData,
         schema_name: str,
 ) -> {str: Table}:
+    """
+    Example return:
+    {
+        'contacts': <sqlalchemy.Table name=contacts>,
+        'entity_name': <sqlalchemy.Table name=entity_name>,
+    }
+    """
     with open(manifest_file_path) as file:
         schema_manifest: dict = yaml.load(file)
         tables = {}
