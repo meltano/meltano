@@ -104,7 +104,7 @@ def extract(extractor_name: str) -> Response:
     endpoint that performs extraction of the selected datasource to the .csv file(s)
     stored on disk in the /static/tmp/ directory)
     """
-    csv_files = run_extract(extractor_name, 'csv')
+    csv_files = run_extract(extractor_name, 'Csv')
     csv_files_url = [url_for('static', filename=f'tmp/{file_name}') for file_name in csv_files]
     return jsonify({'extractor_name': extractor_name,
                     'output_file_paths': csv_files_url})
