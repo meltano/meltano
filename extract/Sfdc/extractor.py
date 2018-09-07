@@ -1,5 +1,5 @@
 import os
-from typing import Iterator, Dict
+from typing import Iterator
 from time import sleep
 
 import pandas as pd
@@ -55,7 +55,7 @@ class SfdcExtractor:
         df.rename(columns=lambda x: x.lower(), inplace=True)
         # Include only the columns specified in the the manifest file
         df = df[entity_column_names]
-        # Convert the datetime columns to pandas datatime
+        # Convert the datetime columns to pandas datetime
         datetime_col_names = [
             col.name
             for col in entity_columns
