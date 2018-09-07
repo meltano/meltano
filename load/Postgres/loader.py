@@ -49,7 +49,7 @@ class PostgresLoader:
             # TODO: potentially discover datetime rows from the dataframe itself
             # datetime_col_names = [col for col in df.columns if df[col].dtype == np.dtype('datetime64[ns]')]
 
-            # Converting datetimes to strings, then replace the pandas NaT values to python None
+            # Converting datetime cols to strings, then replace the pandas NaT values to python None
             # which is what postgresql.insert() expects (it does not handle NaT by itself)
             df[datetime_col_names] = df[datetime_col_names].astype(object).where(pd.notnull(df), None)
             dict_to_load: list = df.to_dict(orient='records')
