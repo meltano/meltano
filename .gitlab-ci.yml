@@ -19,7 +19,6 @@ cache:
 .pipenv_install: &pipenv_install
   - pip install pipenv
   - pipenv run python --version
-  - pipenv run pip install cython
   - pipenv install --dev
   - pipenv run pip install -e .
 
