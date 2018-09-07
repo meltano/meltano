@@ -63,35 +63,38 @@ def fetch_urls(urls: list, headers: dict = None, timeout: aiohttp.ClientTimeout 
         yield resp
 
 
-def get_sqlalchemy_col(field_name: str, field_type_name: str) -> Column:
-    if field_type_name == 'timestamp without time zone':
-        return Column(field_name, TIMESTAMP(timezone=False))
-    elif field_type_name == 'timestamp with time zone':
-        return Column(field_name, TIMESTAMP(timezone=True))
-    elif field_type_name == 'character varying':
-        return Column(field_name, String)
-    elif field_type_name == 'date':
-        return Column(field_name, Date)
-    elif field_type_name == 'real':
-        return Column(field_name, REAL)
-    elif field_type_name == 'integer':
-        return Column(field_name, Integer)
-    elif field_type_name == 'smallint':
-        return Column(field_name, SMALLINT)
-    elif field_type_name == 'text':
-        return Column(field_name, TEXT)
-    elif field_type_name == 'bigint':
-        return Column(field_name, BIGINT)
-    elif field_type_name == 'float':
-        return Column(field_name, Float)
-    elif field_type_name == 'boolean':
-        return Column(field_name, Boolean)
-    elif field_type_name == 'json':
-        return Column(field_name, JSON)
-    # elif field_type_name == '':
-    #     return Column(field_name, )
-    print((f'{field_type_name} is unknown column type'))
-    raise NotImplemented
+def get_sqlalchemy_col(column_name: str, column_type_name: str, primary_key_col_name: str) -> Column:
+    """
+    Helper method that returns the sqlalchemy Column object to be used for Table def.
+    """
+    if column_type_name == 'timestamp without time zone':
+        col = Column(column_name, TIMESTAMP(timezone=False))
+    elif column_type_name == 'timestamp with time zone':
+        col = Column(column_name, TIMESTAMP(timezone=True))
+    elif column_type_name == 'date':
+        col = Column(column_name, Date)
+    elif column_type_name == 'real':
+        col = Column(column_name, REAL)
+    elif column_type_name == 'integer':
+        col = Column(column_name, Integer)
+    elif column_type_name == 'smallint':
+        col = Column(column_name, SMALLINT)
+    elif column_type_name == 'text':
+        col = Column(column_name, TEXT)
+    elif column_type_name == 'bigint':
+        col = Column(column_name, BIGINT)
+    elif column_type_name == 'float':
+        col = Column(column_name, Float)
+    elif column_type_name == 'boolean':
+        col = Column(column_name, Boolean)
+    elif column_type_name == 'json':
+        col = Column(column_name, JSON)
+    else:
+        col = Column(column_name, String)
+
+    if column_name == primary_key_col_name:
+        col.primary_key = True
+    return col
 
 
 def tables_from_manifest(
@@ -103,11 +106,13 @@ def tables_from_manifest(
         schema_manifest: dict = yaml.load(file)
         tables = {}
         for table_name in schema_manifest:
+            primary_key_col_name = schema_manifest[table_name]['primary_key']
             columns: {str: str} = schema_manifest[table_name]['columns']
             columns_list = [
-                get_sqlalchemy_col(field_name, field_type_name)
-                for field_name, field_type_name in columns.items()
+                get_sqlalchemy_col(column_name, column_type_name, primary_key_col_name)
+                for column_name, column_type_name in columns.items()
             ]
+
             table = Table(
                 table_name,
                 metadata,

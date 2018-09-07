@@ -1,18 +1,20 @@
 import click
-from extract.fastly import FastlyExtractor
-from extract.demo import DemoExtractor
-from load.postgres.loader import PostgresLoader
-from load.csv.loader import CsvLoader
+from extract.Fastly import FastlyExtractor
+from extract.Demo import DemoExtractor
+from extract.Sfdc.extractor import SfdcExtractor
+from load.Postgres.loader import PostgresLoader
+from load.Csv.loader import CsvLoader
 
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
-    'fastly': FastlyExtractor,
-    'demo': DemoExtractor
+    'Fastly': FastlyExtractor,
+    'Demo': DemoExtractor,
+    'Sfdc': SfdcExtractor,
 }
 
 LOADER_REGISTRY = {
-    'postgres': PostgresLoader,
-    'csv': CsvLoader,
+    'Postgres': PostgresLoader,
+    'Csv': CsvLoader,
 }
 
 
@@ -65,7 +67,7 @@ def cli():
 
 @cli.command()
 @click.argument('extractor_name')
-@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
+@click.option('--loader_name', default='Postgres', help="Which loader should be used in this extraction")
 # @click.option('-S', '--schema', required=True)
 @click.option('-H', '--host',
               envvar='PG_ADDRESS',

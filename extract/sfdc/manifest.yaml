@@ -43,1811 +43,1837 @@ zqu__productrateplan__c:
     zqu__syncstatus__c: character varying
     zqu__zproduct__c: character varying
     zqu__zuoraid__c: character varying
-#zqu__productrateplancharge__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  ownerid: character varying
-#  systemmodstamp: timestamp without time zone
-#  zqu__accountingcode2__c: character varying
-#  zqu__accountingcode__c: character varying
-#  zqu__apply_discount_to_one_time_charges__c: boolean
-#  zqu__apply_discount_to_recurring_charges__c: boolean
-#  zqu__apply_discount_to_usage_charges__c: boolean
-#  zqu__billcycleday__c: character varying
-#  zqu__billcycletype__c: character varying
-#  zqu__billingperiodalignment__c: character varying
-#  zqu__catalog_sync_history__c: character varying
-#  zqu__defaultquantity__c: real
-#  zqu__deferredrevenueaccount__c: character varying
-#  zqu__deleted__c: boolean
-#  zqu__description__c: character varying
-#  zqu__discount_apply_type__c: real
-#  zqu__discount_level__c: character varying
-#  zqu__enddatecondition__c: character varying
-#  zqu__entityid__c: character varying
-#  zqu__includedunits__c: real
-#  zqu__listpricebase__c: character varying
-#  zqu__listprice__c: real
-#  zqu__maxquantity__c: real
-#  zqu__minquantity__c: real
-#  zqu__model__c: character varying
-#  zqu__numberofperiod__c: real
-#  zqu__overagecalculationoption__c: character varying
-#  zqu__overageunusedunitscreditoption__c: character varying
-#  zqu__prepaymentperiods__c: real
-#  zqu__pricechangeoption__c: character varying
-#  zqu__priceincreasepercentage__c: real
-#  zqu__pricetable__c: character varying
-#  zqu__productrateplanchargefullname__c: character varying
-#  zqu__productrateplanchargename__c: character varying
-#  zqu__productrateplancharge__c_id_mapping_key: id
-#  zqu__productrateplan__c: character varying
-#  zqu__recognizedrevenueaccount__c: character varying
-#  zqu__recurringperiod__c: character varying
-#  zqu__revreccode2__c: character varying
-#  zqu__revreccode__c: character varying
-#  zqu__revrectriggercondition__c: character varying
-#  zqu__revenuerecognitionrulename__c: character varying
-#  zqu__smoothingmodel__c: character varying
-#  zqu__specificbillingperiod__c: real
-#  zqu__syncmessage__c: character varying
-#  zqu__syncstatus__c: character varying
-#  zqu__taxcode2__c: character varying
-#  zqu__taxcode__c: character varying
-#  zqu__taxmode__c: character varying
-#  zqu__taxable__c: boolean
-#  zqu__triggerevent__c: character varying
-#  zqu__type__c: character varying
-#  zqu__uom__c: character varying
-#  zqu__uptoperiodstype__c: character varying
-#  zqu__upto_how_many_periods__c: real
-#  zqu__usagerecordratingoption__c: character varying
-#  zqu__usediscountspecificaccountingcode__c: boolean
-#  zqu__usetenantdefaultforpricechange__c: boolean
-#  zqu__zunitofmeasure__c: character varying
-#  zqu__zuom_id__c: character varying
-#  zqu__zuoraid__c: character varying
-#opportunitylineitem:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  description: character varying
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  listprice: real
-#  name: character varying
-#  opportunityid: character varying
-#  opportunitylineitem_id_mapping_key: id
-#  opportunity_product_id__c: character varying
-#  pricebookentryid: character varying
-#  product2id: character varying
-#  productcode: character varying
-#  product_code_from_products__c: character varying
-#  product_name_from_products__c: character varying
-#  quantity: real
-#  servicedate: date
-#  sortorder: bigint
-#  systemmodstamp: timestamp without time zone
-#  ticket_group_numeric__c: real
-#  totalprice: real
-#  unitprice: real
-#opportunityhistory:
-#  amount: character varying
-#  closedate: date
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  expectedrevenue: character varying
-#  forecastcategory: character varying
-#  id: character varying
-#  isdeleted: boolean
-#  opportunityid: character varying
-#  opportunityhistory_id_mapping_key: id
-#  probability: character varying
-#  stagename: character varying
-#  systemmodstamp: timestamp without time zone
-#zqu__quote__c:
-#  click_through_eula_contract_language__c: character varying
-#  click_through_eula_test__c: character varying
-#  clickthrougheularequired__c: character varying
-#  createdbyemailaddress__c: character varying
-#  createdbyfirstname__c: character varying
-#  createdbyid: character varying
-#  createdbylastname__c: character varying
-#  createddate: timestamp without time zone
-#  gitlab_privacy_url__c: character varying
-#  gitlab_terms_url__c: character varying
-#  has_githost__c: real
-#  has_githost_cb__c: boolean
-#  has_invoice_owner__c: character varying
-#  id: character varying
-#  invoiceownerpaymentterms__c: real
-#  invoice_amount__c: real
-#  invoice_number__c: character varying
-#  invoice_owner_account_id__c: character varying
-#  invoice_owner_account_type__c: character varying
-#  invoice_owner_vat_id__c: character varying
-#  invoice_paid_date__c: timestamp without time zone
-#  invoice_paid__c: boolean
-#  isdeleted: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  max_premium_discount_2__c: real
-#  max_premium_discount__c: real
-#  mrr_rollup__c: real
-#  max_ticket_group_numeric__c: real
-#  nrv_roll_up__c: real
-#  name: character varying
-#  opportunity_amount__c: real
-#  opportunity_id__c: character varying
-#  opportunity_stage__c: character varying
-#  original_contract_signature_date__c: date
-#  ownerid: character varying
-#  previous_renewal_term__c: real
-#  purchase_order__c: character varying
-#  quote_entity_bank_information__c: character varying
-#  quote_entity_beneficiary_information__c: character varying
-#  quote_entity_contact_information__c: character varying
-#  quote_entity_legal_name__c: character varying
-#  quote_entity_override__c: boolean
-#  quote_entity__c: character varying
-#  quote_opportunity_amount_match__c: character varying
-#  quote_tcv__c: real
-#  recordtypeid: character varying
-#  related_subscription__c: character varying
-#  renewal_mrr__c: real
-#  reseller_entity_bank_information__c: character varying
-#  reseller_entity_beneficiary_information__c: character varying
-#  reseller_entity_contact_information__c: character varying
-#  reseller_entity_legal_name__c: character varying
-#  reseller_type__c: character varying
-#  send_githost_email_to_support__c: boolean
-#  sold_to_country_code__c: character varying
-#  subscription_agreement_amendments__c: character varying
-#  subscription_agreement_effective_date__c: date
-#  subscription_agreement_effective_date_ca__c: character varying
-#  subscription_agreement_id__c: character varying
-#  systemmodstamp: timestamp without time zone
-#  tcv_including_discount__c: real
-#  trigger_workflow__c: boolean
-#  vat_tax_id__c: character varying
-#  zqu__account__c: character varying
-#  zqu__amendmentname__c: character varying
-#  zqu__amendment_name__c: character varying
-#  zqu__applycreditbalance__c: boolean
-#  zqu__approvalstatus__c: character varying
-#  zqu__autorenew__c: boolean
-#  zqu__billcycleday__c: character varying
-#  zqu__billtocontact__c: character varying
-#  zqu__billingbatch__c: character varying
-#  zqu__billingcycleday__c: character varying
-#  zqu__billingentity__c: character varying
-#  zqu__billingmethod__c: character varying
-#  zqu__calculate_quote_metrics_through__c: character varying
-#  zqu__cancellationdate__c: date
-#  zqu__cancellationeffectivedate__c: character varying
-#  zqu__certificate_id__c: character varying
-#  zqu__certificate_type__c: character varying
-#  zqu__communicationprofile__c: character varying
-#  zqu__company_code__c: character varying
-#  zqu__currency__c: character varying
-#  zqu__customer_acceptance_date__c: date
-#  zqu__deltamrr__c: real
-#  zqu__deltatcv__c: real
-#  zqu__description__c: character varying
-#  zqu__electronicpaymentmethodid__c: character varying
-#  zqu__existsubscriptionid__c: character varying
-#  zqu__generateinvoice__c: boolean
-#  zqu__hidden_subscription_name__c: character varying
-#  zqu__initialtermperiodtype__c: character varying
-#  zqu__initialterm__c: real
-#  zqu__invoicedate__c: date
-#  zqu__invoiceid__c: character varying
-#  zqu__invoiceownerid__c: character varying
-#  zqu__invoiceownername__c: character varying
-#  zqu__invoiceprocessingoption__c: character varying
-#  zqu__invoiceseparately__c: boolean
-#  zqu__invoicetargetdate__c: date
-#  zqu__invoicetemplate__c: character varying
-#  zqu__is_charge_expired__c: boolean
-#  zqu__is_parent_quote__c: boolean
-#  zqu__issuing_jurisdiction__c: character varying
-#  zqu__mrr__c: real
-#  zqu__number__c: character varying
-#  zqu__opportunity__c: character varying
-#  zqu__parentquote__c: character varying
-#  zqu__paymentgateway__c: character varying
-#  zqu__paymentmethod__c: character varying
-#  zqu__paymentterm__c: character varying
-#  zqu__previewed_delta_mrr__c: real
-#  zqu__previewed_delta_tcv__c: real
-#  zqu__previewed_discount__c: real
-#  zqu__previewed_mrr__c: real
-#  zqu__previewed_subtotal__c: real
-#  zqu__previewed_tcv__c: real
-#  zqu__previewed_tax__c: real
-#  zqu__previewed_total__c: real
-#  zqu__primary__c: boolean
-#  zqu__processpayment__c: boolean
-#  zqu__productselectorversion__c: character varying
-#  zqu__quotebusinesstype__c: character varying
-#  zqu__quotetemplate__c: character varying
-#  zqu__quote__c_id_mapping_key: id
-#  zqu__recordreadonly__c: boolean
-#  zqu__renewalsetting__c: character varying
-#  zqu__renewaltermperiodtype__c: character varying
-#  zqu__renewalterm__c: real
-#  zqu__service_activation_date__c: date
-#  zqu__soldtocontact__c: character varying
-#  zqu__startdate__c: date
-#  zqu__status__c: character varying
-#  zqu__subscriptionname__c: character varying
-#  zqu__subscriptiontermenddate__c: date
-#  zqu__subscriptiontermstartdate__c: date
-#  zqu__subscriptiontype__c: character varying
-#  zqu__subscriptionversion__c: real
-#  zqu__subscription_name__c: character varying
-#  zqu__subscription_term_type__c: character varying
-#  zqu__tcv__c: real
-#  zqu__tax_exempt_description__c: character varying
-#  zqu__tax_exempt__c: character varying
-#  zqu__tax__c: real
-#  zqu__termstartdate__c: date
-#  zqu__terms__c: character varying
-#  zqu__total__c: real
-#  zqu__vat_id__c: character varying
-#  zqu__validuntil__c: date
-#  zqu__zuoraaccountid__c: character varying
-#  zqu__zuoraconfig__c: character varying
-#  zqu__zuoraentityid__c: character varying
-#  zqu__zuoraparentbillingaccountid__c: character varying
-#  zqu__zuoraparentbillingaccountname__c: character varying
-#  zqu__zuorapaymentid__c: character varying
-#  zqu__zuorasubscriptionid__c: character varying
-#  zqu__zuora_account_number__c: character varying
-#zqu__productrateplanchargetier__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  systemmodstamp: timestamp without time zone
-#  zqu__active__c: boolean
-#  zqu__catalog_sync_history__c: character varying
-#  zqu__currency2__c: character varying
-#  zqu__currency__c: character varying
-#  zqu__deleted__c: boolean
-#  zqu__discountamount__c: real
-#  zqu__discountpercentage__c: real
-#  zqu__endingunit__c: real
-#  zqu__entityid__c: character varying
-#  zqu__isoverageprice__c: boolean
-#  zqu__priceformat2__c: character varying
-#  zqu__priceformat__c: character varying
-#  zqu__price__c: real
-#  zqu__productrateplanchargeid__c: character varying
-#  zqu__productrateplanchargetier__c_id_mapping_key: id
-#  zqu__productrateplancharge__c: character varying
-#  zqu__startingunit__c: real
-#  zqu__syncmessage__c: character varying
-#  zqu__syncstatus__c: character varying
-#  zqu__tier__c: real
-#  zqu__zuoraid__c: character varying
-#product2:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  description: character varying
-#  family: character varying
-#  id: character varying
-#  isactive: boolean
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  name: character varying
-#  product2_id_mapping_key: id
-#  productcode: character varying
-#  systemmodstamp: timestamp without time zone
-#  zqu__allow_feature_changes__c: boolean
-#  zqu__billingentity__c: character varying
-#  zqu__catalog_sync_history__c: character varying
-#  zqu__category__c: character varying
-#  zqu__deleted__c: boolean
-#  zqu__effectiveenddate__c: date
-#  zqu__effectivestartdate__c: date
-#  zqu__entityid__c: character varying
-#  zqu__sku2__c: character varying
-#  zqu__sku__c: character varying
-#  zqu__syncmessage__c: character varying
-#  zqu__syncstatus__c: character varying
-#  zqu__type__c: character varying
-#  zqu__zuoraid__c: character varying
-#opportunitystage:
-#  apiname: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  defaultprobability: real
-#  description: character varying
-#  forecastcategory: character varying
-#  forecastcategoryname: character varying
-#  id: character varying
-#  isactive: boolean
-#  isclosed: boolean
-#  iswon: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  masterlabel: character varying
-#  opportunitystage_id_mapping_key: id
-#  sortorder: bigint
-#  systemmodstamp: timestamp without time zone
-#recordtype:
-#  businessprocessid: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  description: character varying
-#  developername: character varying
-#  id: character varying
-#  isactive: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  namespaceprefix: character varying
-#  recordtype_id_mapping_key: id
-#  sobjecttype: character varying
-#  systemmodstamp: timestamp without time zone
-#campaign:
-#  actualcost: real
-#  amountallopportunities: real
-#  amountwonopportunities: real
-#  budgetedcost: real
-#  campaignmemberrecordtypeid: character varying
-#  campaign_id_mapping_key: id
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  data_quality_description__c: character varying
-#  data_quality_score__c: real
-#  description: character varying
-#  enddate: date
-#  expectedresponse: real
-#  expectedrevenue: real
-#  id: character varying
-#  isactive: boolean
-#  isdeleted: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  leandata__back_dated__c: boolean
-#  leandata__rep_lt_attribution__c: real
-#  leandata__rep_lt_bookings_attribution__c: real
-#  leandata__rep_lt_generated_attribution__c: real
-#  leandata__rep_lt_generated_bookings_attribution__c: real
-#  leandata__rep_mt_accelerated_attribution__c: real
-#  leandata__rep_mt_accelerated_bookings_attr__c: real
-#  leandata__rep_mt_generated_attribution__c: real
-#  leandata__rep_mt_generated_bookings_attribution__c: real
-#  leandata__reporting_average_days_to_close__c: real
-#  leandata__reporting_bookings_attribution__c: real
-#  leandata__reporting_campaign_member_totals__c: character varying
-#  leandata__reporting_cost__c: real
-#  leandata__reporting_ft_attribution_amount__c: real
-#  leandata__reporting_ft_bookings_attribution__c: real
-#  leandata__reporting_lift__c: real
-#  leandata__reporting_mt_attribution_amount__c: real
-#  leandata__reporting_num_target_campaign_members__c: real
-#  leandata__reporting_number_of_campaign_members__c: real
-#  leandata__reporting_number_of_opportunities__c: real
-#  leandata__reporting_number_of_touches__c: real
-#  leandata__reporting_on_target__c: real
-#  leandata__reporting_opportunity_close_rate__c: real
-#  name: character varying
-#  numberofcontacts: bigint
-#  numberofconvertedleads: bigint
-#  numberofleads: bigint
-#  numberofopportunities: bigint
-#  numberofresponses: bigint
-#  numberofwonopportunities: bigint
-#  numbersent: real
-#  ownerid: character varying
-#  parentid: character varying
-#  startdate: date
-#  status: character varying
-#  systemmodstamp: timestamp without time zone
-#  type: character varying
-#contact:
-#  ae_comments__c: character varying
-#  accountid: character varying
-#  account_owner__c: character varying
-#  account_type__c: character varying
-#  business_development_rep__c: character varying
-#  contact_id_mapping_key: id
-#  contact_status__c: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  data_quality_description__c: character varying
-#  data_quality_score__c: real
-#  department: character varying
-#  digital_ocean_promo_code__c: character varying
-#  donotcall: boolean
-#  domain__c: character varying
-#  ee_trial_end_date__c: date
-#  ee_trial_start_date__c: date
-#  emailbounceddate: timestamp without time zone
-#  emailbouncedreason: character varying
-#  githost_other_response__c: character varying
-#  githost_response_status__c: character varying
-#  gitlabcom_user_id__c: character varying
-#  hasoptedoutofemail: boolean
-#  id: character varying
-#  inactive_contact__c: boolean
-#  industry__c: character varying
-#  invalid_email_address__c: boolean
-#  isdeleted: boolean
-#  isemailbounced: boolean
-#  jigsawcontactid: character varying
-#  lastactivitydate: date
-#  lastcurequestdate: timestamp without time zone
-#  lastcuupdatedate: timestamp without time zone
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  leadsource: character varying
-#  lead_source_type__c: character varying
-#  leandata__ld_segment__c: character varying
-#  leandata__matched_buyer_persona__c: character varying
-#  leandata__modified_score__c: real
-#  leandata__routing_action__c: character varying
-#  leandata__tag__c: character varying
-#  mailingcity: character varying
-#  mailingcountry: character varying
-#  mailingcountrycode: character varying
-#  mailinggeocodeaccuracy: character varying
-#  mailinglatitude: real
-#  mailinglongitude: real
-#  mailingpostalcode: character varying
-#  mailingstate: character varying
-#  mailingstatecode: character varying
-#  mailingstreet: character varying
-#  masterrecordid: character varying
-#  mobilephone: character varying
-#  name: character varying
-#  outbound_bdr__c: character varying
-#  outreach_stage__c: character varying
-#  ownerid: character varying
-#  person_score__c: real
-#  photourl: character varying
-#  recordtypeid: character varying
-#  reportstoid: character varying
-#  requested_contact__c: boolean
-#  responded_to_githost_price_change__c: boolean
-#  role__c: character varying
-#  salutation: character varying
-#  sertifi2_0__level__c: character varying
-#  suffix: character varying
-#  systemmodstamp: timestamp without time zone
-#  title: character varying
-#  using_ce__c: boolean
-#  web_form__c: character varying
-#  x30_day_opt_out__c: boolean
-#  zendesk__create_in_zendesk__c: boolean
-#  infer__infer_band__c: character varying
-#  infer__infer_hash__c: character varying
-#  infer__infer_last_modified__c: timestamp without time zone
-#  infer__infer_rating__c: character varying
-#  infer__infer_score__c: real
-#  mkto71_acquisition_date__c: timestamp without time zone
-#  mkto71_acquisition_program_id__c: real
-#  mkto71_acquisition_program__c: character varying
-#  mkto71_inferred_city__c: character varying
-#  mkto71_inferred_company__c: character varying
-#  mkto71_inferred_country__c: character varying
-#  mkto71_inferred_metropolitan_area__c: character varying
-#  mkto71_inferred_postal_code__c: character varying
-#  mkto71_inferred_state_region__c: character varying
-#  mkto71_lead_score__c: real
-#  mkto71_original_referrer__c: character varying
-#  mkto71_original_search_engine__c: character varying
-#  mkto71_original_search_phrase__c: character varying
-#  mkto71_original_source_info__c: character varying
-#  mkto71_original_source_type__c: character varying
-#  mkto_si__add_to_marketo_campaign__c: character varying
-#  mkto_si__hidedate__c: date
-#  mkto_si__last_interesting_moment_date__c: timestamp without time zone
-#  mkto_si__last_interesting_moment_desc__c: character varying
-#  mkto_si__last_interesting_moment_source__c: character varying
-#  mkto_si__last_interesting_moment_type__c: character varying
-#  mkto_si__last_interesting_moment__c: character varying
-#  mkto_si__mkto_lead_score__c: real
-#  mkto_si__priority__c: real
-#  mkto_si__relative_score_value__c: real
-#  mkto_si__relative_score__c: character varying
-#  mkto_si__sales_insight__c: character varying
-#  mkto_si__urgency_value__c: real
-#  mkto_si__urgency__c: character varying
-#  mkto_si__view_in_marketo__c: character varying
-#  rh2__currency_test__c: character varying
-#  rh2__describe__c: character varying
-#  rh2__formula_test__c: character varying
-#  rh2__integer_test__c: real
-#  zqu__county__c: character varying
-#campaignmember:
-#  campaignid: character varying
-#  campaignmember_id_mapping_key: id
-#  city: character varying
-#  companyoraccount: character varying
-#  contactid: character varying
-#  country: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  description: character varying
-#  donotcall: boolean
-#  firstrespondeddate: date
-#  hasoptedoutofemail: boolean
-#  hasoptedoutoffax: boolean
-#  hasresponded: boolean
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  leadid: character varying
-#  leadorcontactid: character varying
-#  leadorcontactownerid: character varying
-#  leadsource: character varying
-#  salutation: character varying
-#  state: character varying
-#  status: character varying
-#  systemmodstamp: timestamp without time zone
-#  title: character varying
-#  type: character varying
-#account:
-#  absd_campaign__c: character varying
-#  ae_comments__c: character varying
-#  account_id_18__c: character varying
-#  account_id_mapping_key: id
-#  account_initial_start_date__c: date
-#  account_manager__c: character varying
-#  account_owner_calc__c: character varying
-#  account_owner_team__c: character varying
-#  account_tier__c: character varying
-#  active_ce_users__c: real
-#  billingcity: character varying
-#  billingcountry: character varying
-#  billingcountrycode: character varying
-#  billinggeocodeaccuracy: character varying
-#  billinglatitude: real
-#  billinglongitude: real
-#  billingpostalcode: character varying
-#  billingstate: character varying
-#  billingstatecode: character varying
-#  billingstreet: character varying
-#  business_development_rep_account_team__c: character varying
-#  business_development_rep__c: character varying
-#  carr_all_child_accounts__c: real
-#  carr_this_account__c: real
-#  carr_total__c: real
-#  ce_instances__c: real
-#  cmrr_all_child_accounts__c: real
-#  cmrr_this_account__c: real
-#  cmrr_total__c: real
-#  company_technologies__c: character varying
-#  concurrent_ee_subscriptions__c: real
-#  count_of_active_subscription_charges__c: real
-#  count_of_active_subscriptions__c: real
-#  count_of_billing_accounts__c: real
-#  count_of_new_business_won_opps__c: real
-#  count_of_open_renewal_opportunities__c: real
-#  count_of_opportunities__c: real
-#  count_of_products_purchased__c: real
-#  count_of_won_opportunities__c: real
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  customer_since__c: date
-#  dscorgpkg__fortune_rank__c: character varying
-#  dscorgpkg__it_employees__c: real
-#  data_quality_description__c: character varying
-#  data_quality_score__c: real
-#  days_outstanding__c: real
-#  dedicated_service_engineer__c: character varying
-#  description: character varying
-#  domains__c: character varying
-#  entity_bank_information__c: character varying
-#  entity_beneficiary_information__c: character varying
-#  entity_contact_information__c: character varying
-#  entity_override__c: boolean
-#  entity__c: character varying
-#  federal_account__c: boolean
-#  gitlab_team__c: character varying
-#  gitlab_com_user__c: boolean
-#  health__c: character varying
-#  health_score_reasons__c: character varying
-#  historical_max_users__c: real
-#  it_tedd__c: real
-#  id: character varying
-#  industry: character varying
-#  initial_start_date__c: date
-#  invoice_owner__c: character varying
-#  isdeleted: boolean
-#  iseebasiccustomer__c: real
-#  iseepluscustomer__c: real
-#  iseestandardcustomer__c: real
-#  isfilelockingcustomer__c: real
-#  isgithostbusinesscustomer__c: real
-#  isgithostdevelopercustomer__c: real
-#  isgithoststartupcustomer__c: real
-#  isgithoststoragecustomer__c: real
-#  isgitlabeecustomer__c: real
-#  isgitlabgeocustomer__c: real
-#  isimplementationsupportcustomer__c: real
-#  ispartner: boolean
-#  ispremiumsupportcustomer__c: real
-#  jigsawcompanyid: character varying
-#  large_account__c: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  leandata__ld_emaildomain__c: character varying
-#  leandata__ld_emaildomains__c: character varying
-#  leandata__reporting_customer__c: boolean
-#  leandata__reporting_has_opportunity__c: boolean
-#  leandata__reporting_last_marketing_touch_date__c: timestamp without time zone
-#  leandata__reporting_last_sales_touch_date__c: timestamp without time zone
-#  leandata__reporting_recent_marketing_touches__c: real
-#  leandata__reporting_target_account_number__c: real
-#  leandata__reporting_target_account__c: boolean
-#  leandata__reporting_total_leads_and_contacts__c: real
-#  leandata__reporting_total_marketing_touches__c: real
-#  leandata__reporting_total_sales_touches__c: real
-#  leandata__routing_action__c: character varying
-#  leandata__sla__c: character varying
-#  leandata__scenario_1_owner__c: character varying
-#  leandata__scenario_2_owner__c: character varying
-#  leandata__scenario_3_owner__c: character varying
-#  leandata__scenario_4_owner__c: character varying
-#  leandata__search__c: character varying
-#  leandata__tag__c: character varying
-#  license_user_count__c: real
-#  license_utilization__c: real
-#  manual_support_upgrade__c: boolean
-#  masterrecordid: character varying
-#  max_for_potential_ee_users__c: real
-#  most_recent_expired_subscription_date__c: date
-#  name: character varying
-#  next_renewal_date__c: date
-#  numberofemployees: bigint
-#  number_of_licenses_all_child_accounts__c: real
-#  number_of_licenses_this_account__c: real
-#  number_of_licenses_total__c: real
-#  number_of_open_opportunities__c: real
-#  opt_out_file_locking__c: boolean
-#  opt_out_geo__c: boolean
-#  ownerid: character varying
-#  parentid: character varying
-#  parent_account_type__c: character varying
-#  partner_account_iban_number__c: character varying
-#  partner_bank_name__c: character varying
-#  partner_beneficiary_name__c: character varying
-#  partner_name_and_type__c: character varying
-#  partner_routing__c: character varying
-#  partner_vat_tax_id__c: character varying
-#  paymenttermnumeric__c: real
-#  photourl: character varying
-#  potential_carr_this_account__c: real
-#  potential_ee_subscription_amount__c: real
-#  potential_ee_users_total__c: real
-#  potential_users_all_child_accounts__c: real
-#  potential_users__c: real
-#  previous_account_owner__c: character varying
-#  primary_contact_id__c: character varying
-#  primary_contact__c: character varying
-#  products_purchased__c: character varying
-#  product_category__c:  character varying
-#  recordtypeid: character varying
-#  reference_type__c: character varying
-#  referenceable_customer_notes__c: character varying
-#  referenceable_customer__c: character varying
-#  region__c: character varying
-#  reseller_discount__c: character varying
-#  reseller_type__c: character varying
-#  reseller__c: character varying
-#  revenue__c: real
-#  sdr_account_team__c: character varying
-#  sdr__c: character varying
-#  sales_segmentation_updated__c: character varying
-#  sales_segmentation__c: character varying
-#  sales_segmentation_new__c: character varying
-#  shippingcity: character varying
-#  shippingcountry: character varying
-#  shippingcountrycode: character varying
-#  shippingcountrycode__c: character varying
-#  shippinggeocodeaccuracy: character varying
-#  shippinglatitude: real
-#  shippinglongitude: real
-#  shippingpostalcode: character varying
-#  shippingstate: character varying
-#  shippingstatecode: character varying
-#  shippingstreet: character varying
-#  solutions_architect__c: character varying
-#  special_terms__c: character varying
-#  sub_industry__c: character varying
-#  sub_region__c: character varying
-#  subscription_amount__c: real
-#  sum_of_open_renewal_opportunities__c: real
-#  support_level_new__c: character varying
-#  support_level_numeric__c: real
-#  support_level__c: character varying
-#  systemmodstamp: timestamp without time zone
-#  tedd_employees__c: real
-#  technical_account_manager_lu__c: character varying
-#  technology_stack__c: character varying
-#  temp_duplicated_account__c: boolean
-#  terminus_clicks__c: real
-#  terminus_impressions__c: real
-#  terminus_spend__c: real
-#  terminus_velocity_level__c: character varying
-#  territories_covered__c: character varying
-#  territory__c: character varying
-#  top_list__c: character varying
-#  trigger_workflow__c: boolean
-#  type: character varying
-#  type_amount_close_date__c: character varying
-#  ultimateparentpotentialeeusers__c: real
-#  ultimateparentsalessegmentation__c: character varying
-#  ultimate_parent_account_id__c: character varying
-#  ultimate_parent_account__c: character varying
-#  ultimate_parent_account_id__c: character varying
-#  ultimate_parent_is_current_account__c: boolean
-#  ultimate_parent_old__c: character varying
-#  using_ce__c: boolean
-#  website: character varying
-#  zendesk__create_in_zendesk__c: boolean
-#  zendesk__domain_mapping__c: character varying
-#  zendesk__last_sync_date__c: timestamp without time zone
-#  zendesk__last_sync_status__c: character varying
-#  zendesk__notes__c: character varying
-#  zendesk__result__c: character varying
-#  zendesk__tags__c: character varying
-#  zendesk__zendesk_organization_id__c: character varying
-#  zendesk__zendesk_organization__c: character varying
-#  zendesk__zendesk_outofsync__c: boolean
-#  zendesk__zendesk_oldtags__c: character varying
-#  zendesk__createdupdatedflag__c: boolean
-#  zuora_issue__c: character varying
-#  zuora__active__c: character varying
-#  zuora__customerpriority__c: character varying
-#  zuora__numberoflocations__c: real
-#  zuora__slaexpirationdate__c: date
-#  zuora__slaserialnumber__c: character varying
-#  zuora__sla__c: character varying
-#  zuora__upsellopportunity__c: character varying
-#  billingd__c: character varying
-#  infer__infer_band__c: character varying
-#  infer__infer_hash__c: character varying
-#  infer__infer_last_modified__c: timestamp without time zone
-#  infer__infer_rating__c: character varying
-#  infer__infer_score__c: real
-#  of_carr__c: real
-#  of_licenses__c: real
-#opportunitycontactrole:
-#  contactid: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  isprimary: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  opportunitycontactrole_id_mapping_key: id
-#  opportunityid: character varying
-#  role: character varying
-#  systemmodstamp: timestamp without time zone
-#executive_business_review__c:
-#  id: character varying
-#  executive_business_review__c_id_mapping_key: id
-#  createdbyid: character varying
-#  lastmodifiedbyid: character varying
-#  ownerid: character varying
-#  name: character varying
-#  ebr_account__c: character varying
-#  ebr_action_items_takeaways__c: character varying
-#  ebr_date__c: timestamp without time zone
-#  ebr_notes__c: character varying
-#  ebr_number__c: real
-#  ebr_outcome__c: character varying
-#  ebr_quarter__c: character varying
-#  ebr_status__c: character varying
-#  ebr_success__c: character varying
-#  ebr_summary__c: character varying
-#  first_date_success_updated__c: timestamp without time zone
-#  quarter_end_date__c: timestamp without time zone
-#  quarter_start_date__c: timestamp without time zone
-#lead:
-#  bdr_lu__c: character varying
-#  bdr_text__c: character varying
-#  business_development_rep_contact__c: character varying
-#  business_development_representative__c: character varying
-#  buying_process_for_procuring_gitlab__c: character varying
-#  city: character varying
-#  company: character varying
-#  company_search_query__c: character varying
-#  competition__c: character varying
-#  convertedaccountid: character varying
-#  convertedcontactid: character varying
-#  converteddate: date
-#  convertedopportunityid: character varying
-#  country: character varying
-#  countrycode: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  data_quality_description__c: character varying
-#  data_quality_score__c: real
-#  donotcall: boolean
-#  ee_trial_end_date__c: date
-#  ee_trial_start_date__c: date
-#  emailbounceddate: timestamp without time zone
-#  emailbouncedreason: character varying
-#  geocodeaccuracy: character varying
-#  githost_other_response__c: character varying
-#  githost_response_status__c: character varying
-#  gitlab_com_user_id__c: character varying
-#  gitlab_com_user__c: boolean
-#  hasoptedoutofemail: boolean
-#  how_are_you_using_gitlab__c: character varying
-#  how_large_is_your_group__c: real
-#  how_many_seats_are_they_interested_in_pu__c: real
-#  id: character varying
-#  industry: character varying
-#  infer_web_direct_fit_score__c: real
-#  infer_web_direct_hash__c: character varying
-#  infer_web_direct_last_modified__c: timestamp without time zone
-#  instance_uuid__c: character varying
-#  interested_in_gitlab_ee__c: character varying
-#  interested_in_hosted_solution__c: boolean
-#  introduce_to_reseller__c: boolean
-#  invalid_email_address__c: boolean
-#  isconverted: boolean
-#  isdeleted: boolean
-#  isunreadbyowner: boolean
-#  is_there_a_meeting_set_with_an_ae_to_dis__c: character varying
-#  jigsawcontactid: character varying
-#  largeaccount__c: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  latitude: real
-#  leadsource: character varying
-#  lead_conversion_approval_status__c: character varying
-#  lead_id_mapping_key: id
-#  lead_number__c: real
-#  lead_owner_calc__c: character varying
-#  lead_source_type__c: character varying
-#  lead_from__c: character varying
-#  leandata__a2b_account__c: character varying
-#  leandata__a2b_group__c: character varying
-#  leandata__has_matched__c: boolean
-#  leandata__ld_segment__c: character varying
-#  leandata__marketing_sys_created_date__c: timestamp without time zone
-#  leandata__matched_account_annual_revenue__c: real
-#  leandata__matched_account_billing_country__c: character varying
-#  leandata__matched_account_billing_postal_code__c: character varying
-#  leandata__matched_account_billing_state__c: character varying
-#  leandata__matched_account_custom_field_1__c: character varying
-#  leandata__matched_account_employees__c: real
-#  leandata__matched_account_industry__c: character varying
-#  leandata__matched_account_type__c: character varying
-#  leandata__matched_account_website__c: character varying
-#  leandata__matched_account__c: character varying
-#  leandata__matched_lead__c: character varying
-#  leandata__modified_score__c: real
-#  leandata__reporting_matched_account__c: character varying
-#  leandata__reporting_timestamp__c: timestamp without time zone
-#  leandata__router_status__c: character varying
-#  leandata__routing_action__c: character varying
-#  leandata__routing_status__c: character varying
-#  leandata__salesforce_id__c: character varying
-#  leandata__search_index__c: character varying
-#  leandata__search__c: character varying
-#  leandata__status_info__c: character varying
-#  leandata__tag__c: character varying
-#  longitude: real
-#  mql_date__c: timestamp without time zone
-#  masterrecordid: character varying
-#  matched_account_top_list__c: character varying
-#  name: character varying
-#  numberofdevelopersbucket__c: character varying
-#  numberofemployees: bigint
-#  outreach_stage__c: character varying
-#  ownerid: character varying
-#  partner_account__c: character varying
-#  partner_missing_info_for_conversion__c: character varying
-#  photourl: character varying
-#  postalcode: character varying
-#  potential_ee_users__c: real
-#  qualification_notes__c: character varying
-#  recordtypeid: character varying
-#  region__c: character varying
-#  requested_contact__c: boolean
-#  responded_to_githost_price_change__c: boolean
-#  role_prospect_plays_in_evaluation__c: character varying
-#  round_robin_id__c: real
-#  sdr_lu__c: character varying
-#  sdr_text__c: character varying
-#  sales_segmentation__c: character varying
-#  salutation: character varying
-#  source__c: character varying
-#  state: character varying
-#  statecode: character varying
-#  status: character varying
-#  street: character varying
-#  sub_industry__c: character varying
-#  sub_region__c: character varying
-#  submitterip__c: character varying
-#  subscribe_securityalerts__c: boolean
-#  suffix: character varying
-#  systemmodstamp: timestamp without time zone
-#  technology_stack__c: character varying
-#  terminus_clicks__c: real
-#  terminus_impressions__c: real
-#  terminus_spend__c: real
-#  terminus_velocity_level__c: character varying
-#  title: character varying
-#  trigger_workflow__c: boolean
-#  unbouncepageid__c: character varying
-#  unbouncepagevariant__c: character varying
-#  unbouncesubmissiondate__c: date
-#  unbouncesubmissiontime__c: character varying
-#  using_ce__c: boolean
-#  web_form__c: character varying
-#  what_vcs_are_you_using_now__c: character varying
-#  what_is_the_prospect_currently_doing_to__c: character varying
-#  what_is_the_timing_to_purchase__c: character varying
-#  what_other_groups_are_using_git__c: character varying
-#  what_performance_issues_do_you_have__c: character varying
-#  what_problems_are_you_looking_to_solve__c: character varying
-#  what_would_constitute_a_successful_trial__c: character varying
-#  where_are_you_in_your__c: character varying
-#  where_is_the_budget_for_this_coming_from__c: character varying
-#  who_is_the_decision_maker_for_gitlab__c: character varying
-#  x30_day_opt_out__c: boolean
-#  zendesk__create_in_zendesk__c: boolean
-#  if_svn_why_looking_to_move_to_git__c: character varying
-#  infer__infer_band__c: character varying
-#  infer__infer_converted_to_opp__c: boolean
-#  infer__infer_created_month__c: character varying
-#  infer__infer_good_lead__c: boolean
-#  infer__infer_hash__c: character varying
-#  infer__infer_is_open__c: boolean
-#  infer__infer_last_modified__c: timestamp without time zone
-#  infer__infer_lead_age__c: real
-#  infer__infer_rating__c: character varying
-#  infer__infer_score__c: real
-#  mkto2__inferred_city__c: character varying
-#  mkto2__inferred_company__c: character varying
-#  mkto2__inferred_country__c: character varying
-#  mkto2__inferred_state_region__c: character varying
-#  mkto2__lead_score__c: real
-#  mkto71_acquisition_date__c: timestamp without time zone
-#  mkto71_acquisition_program_id__c: real
-#  mkto71_acquisition_program__c: character varying
-#  mkto71_inferred_city__c: character varying
-#  mkto71_inferred_company__c: character varying
-#  mkto71_inferred_country__c: character varying
-#  mkto71_inferred_metropolitan_area__c: character varying
-#  mkto71_inferred_postal_code__c: character varying
-#  mkto71_inferred_state_region__c: character varying
-#  mkto71_lead_score__c: real
-#  mkto71_original_referrer__c: character varying
-#  mkto71_original_search_engine__c: character varying
-#  mkto71_original_search_phrase__c: character varying
-#  mkto71_original_source_info__c: character varying
-#  mkto71_original_source_type__c: character varying
-#  mkto_si__add_to_marketo_campaign__c: character varying
-#  mkto_si__hidedate__c: date
-#  mkto_si__last_interesting_moment_date__c: timestamp without time zone
-#  mkto_si__last_interesting_moment_desc__c: character varying
-#  mkto_si__last_interesting_moment_source__c: character varying
-#  mkto_si__last_interesting_moment_type__c: character varying
-#  mkto_si__last_interesting_moment__c: character varying
-#  mkto_si__msicontactid__c: character varying
-#  mkto_si__priority__c: real
-#  mkto_si__relative_score_value__c: real
-#  mkto_si__relative_score__c: character varying
-#  mkto_si__urgency_value__c: real
-#  mkto_si__urgency__c: character varying
-#  mkto_si__view_in_marketo__c: character varying
-#  newslettersegment__c: boolean
-#  subscribeliveevents__c: boolean
-#  subscribenewsletter__c: boolean
-#  subscribewebcast__c: boolean
-#opportunity:
-#  account_id_18__c: character varying
-#  account_id__c: character varying
-#  account_owner__c: character varying
-#  accountid: character varying
-#  activity_source__c: character varying
-#  acv_2__c: real
-#  acv__c: real
-#  acv_override__c: real
-#  acv_test__c: real
-#  ae_qualification_status__c: character varying
-#  amount: real
-#  approval_status__c: character varying
-#  arr__c: real
-#  arr_override__c: real
-#  authorized_reseller_opportunity__c: boolean
-#  auto_renew__c: boolean
-#  auto_renewal__c: boolean
-#  awaiting_approval_stage__c: real
-#  bdr_lu__c: character varying
-#  bdr_qualified_stage__c: real
-#  booking_category__c: character varying
-#  business_development_rep__c: character varying
-#  business_problems_to_solve__c: character varying
-#  business_value_assessment__c: character varying
-#  buying_process_for_procuring_gitlab__c: character varying
-#  campaignid: character varying
-#  champion_selling_on_your_behalf__c: character varying
-#  channel_manager__c: character varying
-#  channel_partner_close_date_override__c: date
-#  channel_partner_iacv_override__c: real
-#  channel_partner_stage_override__c: character varying
-#  churn_acv__c: real
-#  churn_month__c: date
-#  churn_notes__c: character varying
-#  churn_type__c: character varying
-#  closedate: date
-#  competitive_awareness__c: character varying
-#  competitors__c: character varying
-#  converted_from_ce__c: boolean
-#  count_of_active_ee_subscriptions__c: real
-#  count_of_primary_contacts__c: real
-#  count_of_products__c: real
-#  count_of_quotes__c: real
-#  count_of_quotes_to_z_billing__c: real
-#  count_of_quotes_with_invoice_owner__c: real
-#  count_of_signed_agreements__c: real
-#  create_renewal_opportunity__c: boolean
-#  created_month__c: date
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  currently_using_ce__c: boolean
-#  data_quality_description__c: character varying
-#  data_quality_score__c: real
-#  days_in_0_pending_acceptance__c: real
-#  days_in_1_discovery__c: real
-#  days_in_2_scoping__c: real
-#  days_in_3_technical_evaluation__c: real
-#  days_in_4_proposal__c: real
-#  days_in_5_negotiating__c: real
-#  days_since_customer__c: real
-#  days_until_close__c: real
-#  dec_criteria_tech_vendor_financial__c: character varying
-#  dec_process_define_validation_approval__c: character varying
-#  decision_criteria__c: character varying
-#  decision_making_process__c: character varying
-#  delta_amount__c: real
-#  description: character varying
-#  developing_stage__c: real
-#  discovery_stage__c: real
-#  does_not_require_approval__c: boolean
-#  don_t_send_slack_notification__c: boolean
-#  economic_buyer_who_has_profit_loss__c: character varying
-#  ee_trial_start_date__c: date
-#  end_date__c: date
-#  engagement_type__c: character varying
-#  exclude_number_of_opps_is__c: boolean
-#  exclude_sales_cycle_analysis__c: boolean
-#  exclude_sales_cycle_analysis_is__c: boolean
-#  exclude_won_loss_analysis_is__c: boolean
-#  expected_amount__c: real
-#  expected_close_date__c: date
-#  first_12_months__c: boolean
-#  fiscal: character varying
-#  fiscalquarter: bigint
-#  fiscalyear: bigint
-#  forecastcategory: character varying
-#  forecastcategoryname: character varying
-#  full_circle_count__c: boolean
-#  full_circle_velocity__c: real
-#  funding__c: character varying
-#  hasopenactivity: boolean
-#  hasopportunitylineitem: boolean
-#  hasoverduetask: boolean
-#  how_are_you_solving_these_problems_today__c: character varying
-#  how_are_you_using_gitlab__c: character varying
-#  how_large_is_your_group__c: real
-#  how_many_seats_are_they_interested_in__c: real
-#  id: character varying
-#  identify_pain__c: character varying
-#  if_svn_why_looking_to_move_to_git__c: character varying
-#  impact_due_to_business_problems__c: character varying
-#  incremental_acv_2__c: real
-#  incremental_acv__c: real
-#  incremental_acv_licenses__c: real
-#  incremental_acv_override__c: real
-#  incremental_amount_2__c: real
-#  incremental_amount__c: real
-#  incremental_arr__c: real
-#  infer__infer_band__c: character varying
-#  infer__infer_hash__c: character varying
-#  infer__infer_last_modified__c: timestamp without time zone
-#  infer__infer_rating__c: character varying
-#  infer__infer_score__c: real
-#  infer__infer_won_amount__c: real
-#  initial_iacv__c: real
-#  initial_term__c: real
-#  interested_in_gitlab_ee__c: character varying
-#  interested_in_hosted_solution__c: boolean
-#  internal_champion__c: character varying
-#  invoice_amount__c: real
-#  invoice_number__c: character varying
-#  invoice_paid__c: boolean
-#  invoice_paid_date__c: date
-#  is_0_pending_acceptance__c: boolean
-#  is_1_discovery__c: boolean
-#  is_2_scoping__c: boolean
-#  is_3_technical_evaluation__c: boolean
-#  is_4_proposal__c: boolean
-#  is_5_negotiating__c: boolean
-#  is_6_closed_won__c: boolean
-#  is_7_closed_lost__c: boolean
-#  is_8_unqualified__c: boolean
-#  is_9_duplicate__c: boolean
-#  is_there_a_meeting_set_with_an_ae_to_dis__c: character varying
-#  isclosed: boolean
-#  isdeleted: boolean
-#  islost__c: boolean
-#  isopen__c: boolean
-#  isunqualified__c: boolean
-#  iswon: boolean
-#  lastactivitydate: timestamp without time zone
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  lead_activity_type__c: character varying
-#  leadsource: character varying
-#  leandata__days_in_stage__c: real
-#  leandata__days_to_close__c: real
-#  leandata__ordernumber__c: character varying
-#  leandata__reporting_last_run_date__c: timestamp without time zone
-#  leandata__reporting_opportunity_source__c: character varying
-#  leandata__reporting_total_marketing_touches__c: real
-#  leandata__reporting_won_number__c: character varying
-#  legacy_sql_new_biz__c: boolean
-#  lost_amount__c: real
-#  max_ticket_group_from_products_numeric__c: real
-#  merged_opportunity__c: character varying
-#  metrics__c: character varying
-#  missing_features__c: character varying
-#  mkto_si__marketoanalyzer__c: character varying
-#  mrr1__c: real
-#  mrr2__c: real
-#  mrr__c: real
-#  mrr_override__c: real
-#  multiyear_renewal__c: boolean
-#  name: character varying
-#  need_to_buy__c: character varying
-#  negotiating_stage__c: real
-#  nextstep: character varying
-#  nrv__c: real
-#  null_date__c: date
-#  number_of_pushes__c: real
-#  of_users_on_ce__c: real
-#  online_purchase__c: boolean
-#  open_amount__c: real
-#  opportunity__c: real
-#  opportunity_age__c: real
-#  opportunity_closed__c: boolean
-#  opportunity_id_mapping_key: id
-#  opportunity_owner__c: character varying
-#  opportunity_term__c: real
-#  opportunity_term_new__c: real
-#  opportunity_term_override__c: real
-#  owner_account_type__c: character varying
-#  ownerid: character varying
-#  partners__c: character varying
-#  paymentupdateddate__c: timestamp without time zone
-#  poc_end_date__c: date
-#  poc_notes__c: character varying
-#  poc_start_date__c: date
-#  poc_success_criteria__c: character varying
-#  present_solution_stage__c: real
-#  pricebook2id: character varying
-#  probability: real
-#  product_details__c: character varying
-#  products_purchased__c: character varying
-#  projections_growth__c: real
-#  projections_new__c: real
-#  projections_total__c: real
-#  proof_of_concept_poc_status__c: character varying
-#  purchasing_procurement_process__c: character varying
-#  push_counter__c: real
-#  qualification_notes__c: character varying
-#  quote_amount__c: real
-#  reason_for_lost__c: character varying
-#  reason_for_lost_details__c: character varying
-#  reason_for_refund_credit__c: character varying
-#  reason_we_won__c: character varying
-#  recordtypeid: character varying
-#  refund_opp_source__c: character varying
-#  region_o__c: character varying
-#  related_quote__c: character varying
-#  related_subscription__c: character varying
-#  renewal_acv__c: real
-#  renewal_amount__c: real
-#  renewal_arr__c: real
-#  renewal_mrr__c: real
-#  renewal_notification__c: boolean
-#  renewal_term__c: real
-#  role_prospect_plays_in_evaluation__c: character varying
-#  sales_accepted_date__c: date
-#  sales_cycle_key__c: character varying
-#  sales_qualified__c: boolean
-#  sales_qualified_date__c: date
-#  sales_qualified_fiscal_period__c: character varying
-#  sales_segmentation_o__c: character varying
-#  sdr__c: character varying
-#  sdr_lu__c: character varying
-#  second_owner_insight_squared__c: character varying
-#  sertifi2_0__email__c: character varying
-#  software_development_methodology_state__c: character varying
-#  solution_fit__c: character varying
-#  solutions_to_be_replaced__c: character varying
-#  solutions_to_be_replaced_notes__c: character varying
-#  sql_amount__c: real
-#  sql_source__c: character varying
-#  stage_report__c: character varying
-#  stagename: character varying
-#  start_date__c: date
-#  sub_region_o__c: character varying
-#  subscription_start_date__c: date
-#  swing_deal__c: boolean
-#  syncedquoteid: character varying
-#  systemmodstamp: timestamp without time zone
-#  term_end_date__c: date
-#  term_start_date__c: date
-#  trigger_workflow__c: boolean
-#  type: character varying
-#  type_amount_close_date__c: character varying
-#  ultimate_parent_sales_segment_o__c: character varying
-#  unqualified_amount__c: real
-#  upside_iacv__c: real
-#  upside_swing_deal_iacv__c: real
-#  verbal_commitment_stage__c: real
-#  vertical_market_qualification__c: character varying
-#  web_portal_purchase__c: boolean
-#  weighted_iacv__c: real
-#  what_is_prospect_doing_to_address_need__c: character varying
-#  what_is_the_timing_to_purchase__c: character varying
-#  what_other_groups_are_using_git__c: character varying
-#  what_performance_issues_do_you_have__c: character varying
-#  what_problems_are_you_looking_to_solve__c: character varying
-#  what_vcs_are_you_using_now__c: character varying
-#  what_would_constitute_a_successful_trial__c: character varying
-#  where_is_the_budget_for_this_coming_from__c: character varying
-#  who_is_the_decision_maker_for_gitlab__c: character varying
-#  why_did_you_choose_gitlab__c: character varying
-#  win_probability_score__c: real
-#  won_amount__c: real
-#  x0_pending_acceptance_date__c: date
-#  x1_discovery_date__c: date
-#  x2_scoping_date__c: date
-#  x3_technical_evaluation_date__c: date
-#  x4_proposal_date__c: date
-#  x5_negotiating_date__c: date
-#  x6_closed_won_date__c: date
-#  x7_closed_lost_date__c: date
-#  x8_unqualified_date__c: date
-#  x9_duplicate_date__c: date
-#  xactly_incremental_amount__c: real
-#  xactly_invoice_paid_date__c: date
-#  xactly_renewal_amount__c: real
-#  zqu__currentgenerators__c: character varying
-#  zqu__deliveryinstallationstatus__c: character varying
-#  zqu__maincompetitors__c: character varying
-#  zqu__ordernumber__c: character varying
-#  zqu__trackingnumber__c: character varying
-#  zqu__zuoraconfig__c: character varying
-#  zuora_initial_term__c: real
-#  zuora_mrr__c: real
-#zuora__subscriptionproductcharge__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  file_locking_customer__c: boolean
-#  gitlab_ee_customer__c: boolean
-#  id: character varying
-#  isbronzesupportcustomer__c: boolean
-#  iscirunnermacrocustomer__c: boolean
-#  iscloudfoundrycustomer__c: boolean
-#  isdeleted: boolean
-#  iseebasiccustomer__c: boolean
-#  iseepluscustomer__c: boolean
-#  iseestandardcustomer__c: boolean
-#  isgithostbusinesscustomer__c: boolean
-#  isgithostdevelopercustomer__c: boolean
-#  isgithoststartupcustomer__c: boolean
-#  isgithoststoragecustomer__c: boolean
-#  isgitlabgeocustomer__c: boolean
-#  ispremiumsupportcustomer__c: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  licenses_divided_by__c: real
-#  licenses__c: real
-#  name: character varying
-#  ownerid: character varying
-#  quantity_override__c: real
-#  subscription_product_charge_arr__c: real
-#  subscription_status__c: character varying
-#  systemmodstamp: timestamp without time zone
-#  zuora__account__c: character varying
-#  zuora__accountingcode__c: character varying
-#  zuora__billingperiodstartday__c: character varying
-#  zuora__billingperiod__c: character varying
-#  zuora__chargenumber__c: character varying
-#  zuora__description__c: character varying
-#  zuora__effectiveenddate__c: date
-#  zuora__effectivestartdate__c: date
-#  zuora__enddatecondition__c: character varying
-#  zuora__extendedamount__c: real
-#  zuora__external_id__c: character varying
-#  zuora__model__c: character varying
-#  zuora__monthlyrecurringrevenue__c: real
-#  zuora__pricetable__c: character varying
-#  zuora__price__c: real
-#  zuora__productdescription__c: character varying
-#  zuora__producteffectiveenddate_product__c: date
-#  zuora__producteffectiveenddate__c: date
-#  zuora__productname_product__c: character varying
-#  zuora__productname__c: character varying
-#  zuora__productsku_product__c: character varying
-#  zuora__productsku__c: character varying
-#  zuora__product__c: character varying
-#  zuora__quantity__c: real
-#  zuora__rateplandescription__c: character varying
-#  zuora__rateplaneffectiveenddate__c: date
-#  zuora__rateplanid__c: character varying
-#  zuora__rateplanname__c: character varying
-#  zuora__specificenddate__c: date
-#  zuora__subscriptionchargenumber__c: character varying
-#  zuora__subscriptionproductcharge__c_id_mapping_key: id
-#  zuora__subscription__c: character varying
-#  zuora__totalcontractvalue__c: real
-#  zuora__type__c: character varying
-#  zuora__uom__c: character varying
-#  zuora__uom_formula__c: character varying
-#  zuora__unitofmeasure__c: character varying
-#  zuora__uptoperiodstype__c: character varying
-#  zuora__upto_how_many_periods__c: real
-#  zuora__zuora_id__c: character varying
-#  arateplan__c: character varying
-#user:
-#  aboutme: character varying
-#  accountid: character varying
-#  alias: character varying
-#  badgetext: character varying
-#  bannerphotourl: character varying
-#  callcenterid: character varying
-#  can_change_bdr_on_lead__c: boolean
-#  can_change_lead_or_contact_owner__c: boolean
-#  can_change_sdr_on_account__c: boolean
-#  city: character varying
-#  communitynickname: character varying
-#  companyname: character varying
-#  contactid: character varying
-#  country: character varying
-#  countrycode: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  defaultgroupnotificationfrequency: character varying
-#  delegatedapproverid: character varying
-#  department: character varying
-#  digestfrequency: character varying
-#  division: character varying
-#  email: character varying
-#  emailencodingkey: character varying
-#  emailpreferencesautobcc: boolean
-#  emailpreferencesautobccstayintouch: boolean
-#  emailpreferencesstayintouchreminder: boolean
-#  employeenumber: character varying
-#  extension: character varying
-#  federationidentifier: character varying
-#  forecastenabled: boolean
-#  fullphotourl: character varying
-#  geocodeaccuracy: character varying
-#  id: character varying
-#  isactive: boolean
-#  isportalenabled: boolean
-#  isprmsuperuser: boolean
-#  isprofilephotoactive: boolean
-#  languagelocalekey: character varying
-#  lastlogindate: timestamp without time zone
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastpasswordchangedate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  latitude: real
-#  localesidkey: character varying
-#  longitude: real
-#  managerid: character varying
-#  mediumphotourl: character varying
-#  middlename: character varying
-#  name: character varying
-#  offlinepdatrialexpirationdate: timestamp without time zone
-#  offlinetrialexpirationdate: timestamp without time zone
-#  portalrole: character varying
-#  postalcode: character varying
-#  profileid: character varying
-#  receivesadmininfoemails: boolean
-#  receivesinfoemails: boolean
-#  senderemail: character varying
-#  sendername: character varying
-#  signature: character varying
-#  smallphotourl: character varying
-#  start_date__c: date
-#  state: character varying
-#  statecode: character varying
-#  stayintouchnote: character varying
-#  stayintouchsignature: character varying
-#  stayintouchsubject: character varying
-#  street: character varying
-#  suffix: character varying
-#  systemmodstamp: timestamp without time zone
-#  team__c: character varying
-#  timezonesidkey: character varying
-#  title: character varying
-#  userpermissionsavantgouser: boolean
-#  userpermissionscallcenterautologin: boolean
-#  userpermissionschatteranswersuser: boolean
-#  userpermissionsinteractionuser: boolean
-#  userpermissionsmarketinguser: boolean
-#  userpermissionsmobileuser: boolean
-#  userpermissionsofflineuser: boolean
-#  userpermissionssfcontentuser: boolean
-#  userpermissionssupportuser: boolean
-#  userpreferencesactivityreminderspopup: boolean
-#  userpreferencesapexpagesdevelopermode: boolean
-#  userpreferencescachediagnostics: boolean
-#  userpreferencesdiscommentafterlikeemail: boolean
-#  userpreferencesdismentionscommentemail: boolean
-#  userpreferencesdisprofpostcommentemail: boolean
-#  userpreferencesdisableallfeedsemail: boolean
-#  userpreferencesdisablebookmarkemail: boolean
-#  userpreferencesdisablechangecommentemail: boolean
-#  userpreferencesdisableendorsementemail: boolean
-#  userpreferencesdisablefilesharenotificationsforapi: boolean
-#  userpreferencesdisablefollowersemail: boolean
-#  userpreferencesdisablelatercommentemail: boolean
-#  userpreferencesdisablelikeemail: boolean
-#  userpreferencesdisablementionspostemail: boolean
-#  userpreferencesdisablemessageemail: boolean
-#  userpreferencesdisableprofilepostemail: boolean
-#  userpreferencesdisablesharepostemail: boolean
-#  userpreferencesenableautosubforfeeds: boolean
-#  userpreferenceseventreminderscheckboxdefault: boolean
-#  userpreferenceshidebiggerphotocallout: boolean
-#  userpreferenceshidecsndesktoptask: boolean
-#  userpreferenceshidecsngetchattermobiletask: boolean
-#  userpreferenceshidechatteronboardingsplash: boolean
-#  userpreferenceshideenduseronboardingassistantmodal: boolean
-#  userpreferenceshidelightningmigrationmodal: boolean
-#  userpreferenceshides1browserui: boolean
-#  userpreferenceshidesecondchatteronboardingsplash: boolean
-#  userpreferenceshidesfxwelcomemat: boolean
-#  userpreferenceslightningexperiencepreferred: boolean
-#  userpreferencespathassistantcollapsed: boolean
-#  userpreferencespreviewlightning: boolean
-#  userpreferencesremindersoundoff: boolean
-#  userpreferencesshowcitytoexternalusers: boolean
-#  userpreferencesshowcitytoguestusers: boolean
-#  userpreferencesshowcountrytoexternalusers: boolean
-#  userpreferencesshowcountrytoguestusers: boolean
-#  userpreferencesshowemailtoexternalusers: boolean
-#  userpreferencesshowemailtoguestusers: boolean
-#  userpreferencesshowfaxtoexternalusers: boolean
-#  userpreferencesshowfaxtoguestusers: boolean
-#  userpreferencesshowmanagertoexternalusers: boolean
-#  userpreferencesshowmanagertoguestusers: boolean
-#  userpreferencesshowmobilephonetoexternalusers: boolean
-#  userpreferencesshowmobilephonetoguestusers: boolean
-#  userpreferencesshowpostalcodetoexternalusers: boolean
-#  userpreferencesshowpostalcodetoguestusers: boolean
-#  userpreferencesshowprofilepictoguestusers: boolean
-#  userpreferencesshowstatetoexternalusers: boolean
-#  userpreferencesshowstatetoguestusers: boolean
-#  userpreferencesshowstreetaddresstoexternalusers: boolean
-#  userpreferencesshowstreetaddresstoguestusers: boolean
-#  userpreferencesshowtitletoexternalusers: boolean
-#  userpreferencesshowtitletoguestusers: boolean
-#  userpreferencesshowworkphonetoexternalusers: boolean
-#  userpreferencesshowworkphonetoguestusers: boolean
-#  userpreferencessortfeedbycomment: boolean
-#  userpreferencestaskreminderscheckboxdefault: boolean
-#  userroleid: character varying
-#  usertype: character varying
-#  user_id_mapping_key: id
-#  username: character varying
-#  finance__c: character varying
-#  mkto_si__iscachinganonwebactivitylist__c: boolean
-#  mkto_si__iscachingbestbets__c: boolean
-#  mkto_si__iscachingemailactivitylist__c: boolean
-#  mkto_si__iscachinggroupedwebactivitylist__c: boolean
-#  mkto_si__iscachinginterestingmomentslist__c: boolean
-#  mkto_si__iscachingscoringlist__c: boolean
-#  mkto_si__iscachingstreamlist__c: boolean
-#  mkto_si__iscachingwatchlist__c: boolean
-#  mkto_si__iscachingwebactivitylist__c: boolean
-#  mkto_si__sales_insight_counter__c: real
-#zuora__customeraccount__c:
-#  account_id__c: character varying
-#  account_type__c: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  employees__c: real
-#  id: character varying
-#  isdeleted: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  potential_ee_users__c: real
-#  sales_segmentation__c: character varying
-#  systemmodstamp: timestamp without time zone
-#  zuora__account__c: character varying
-#  zuora__accountnumber__c: character varying
-#  zuora__autopay__c: boolean
-#  zuora__balance__c: real
-#  zuora__batch__c: character varying
-#  zuora__billcycleday__c: character varying
-#  zuora__billtoaddress1__c: character varying
-#  zuora__billtoaddress2__c: character varying
-#  zuora__billtocity__c: character varying
-#  zuora__billtocountry__c: character varying
-#  zuora__billtofax__c: character varying
-#  zuora__billtoid__c: character varying
-#  zuora__billtoname__c: character varying
-#  zuora__billtopostalcode__c: character varying
-#  zuora__billtostate__c: character varying
-#  zuora__billtoworkemail__c: character varying
-#  zuora__billtoworkphone__c: character varying
-#  zuora__credit_balance__c: real
-#  zuora__creditbalance__c: real
-#  zuora__creditcard_expiration__c: character varying
-#  zuora__creditcard_number__c: character varying
-#  zuora__creditcardexpiration__c: character varying
-#  zuora__creditcardnumber__c: character varying
-#  zuora__creditcardtype__c: character varying
-#  zuora__currency__c: character varying
-#  zuora__customeraccount__c_id_mapping_key: id
-#  zuora__customerservicerepname__c: character varying
-#  zuora__default_payment_method__c: character varying
-#  zuora__defaultpaymentmethod__c: character varying
-#  zuora__external_id__c: character varying
-#  zuora__is_crm_id_change_processed__c: boolean
-#  zuora__lastinvoicedate__c: date
-#  zuora__mrr__c: real
-#  zuora__parent__c: character varying
-#  zuora__payment_term__c: character varying
-#  zuora__payment_term_formula__c: character varying
-#  zuora__paymentmethod_type__c: character varying
-#  zuora__paymentmethodtype__c: character varying
-#  zuora__paymentterm__c: character varying
-#  zuora__purchaseordernumber__c: character varying
-#  zuora__salesrepname__c: character varying
-#  zuora__soldtoid__c: character varying
-#  zuora__soldtoname__c: character varying
-#  zuora__status__c: character varying
-#  zuora__zuora_id__c: character varying
-#userrole:
-#  caseaccessforaccountowner: character varying
-#  contactaccessforaccountowner: character varying
-#  developername: character varying
-#  forecastuserid: character varying
-#  id: character varying
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  mayforecastmanagershare: boolean
-#  name: character varying
-#  opportunityaccessforaccountowner: character varying
-#  parentroleid: character varying
-#  portalaccountid: character varying
-#  portalaccountownerid: character varying
-#  portalrole: character varying
-#  portaltype: character varying
-#  rollupdescription: character varying
-#  systemmodstamp: timestamp without time zone
-#  userrole_id_mapping_key: id
-#zuora__product__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  ownerid: character varying
-#  systemmodstamp: timestamp without time zone
-#  zuora__description__c: character varying
-#  zuora__effectiveenddate__c: date
-#  zuora__external_id__c: character varying
-#  zuora__product__c_id_mapping_key: id
-#  zuora__sku__c: character varying
-#zqu__quoterateplan__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  systemmodstamp: timestamp without time zone
-#  ticket_group_numeric__c: real
-#  zqu__amendmenttype__c: character varying
-#  zqu__entityid__c: character varying
-#  zqu__originalprpoid__c: character varying
-#  zqu__parent__c: character varying
-#  zqu__productrateplanzuoraid__c: character varying
-#  zqu__productrateplan__c: character varying
-#  zqu__product__c: character varying
-#  zqu__quoteamendment__c: character varying
-#  zqu__quoteproductname__c: character varying
-#  zqu__quoterateplanfullname__c: character varying
-#  zqu__quoterateplanzuoraid__c: character varying
-#  zqu__quoterateplan__c_id_mapping_key: id
-#  zqu__quote__c: character varying
-#  zqu__rootqrpid__c: character varying
-#  zqu__subscriptionrateplanzuoraid__c: character varying
-#  zqu__time_product_added__c: character varying
-#zqu__quoterateplancharge__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  discount_text__c: real
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  systemmodstamp: timestamp without time zone
-#  zqu__apply_discount_to_one_time_charges__c: boolean
-#  zqu__apply_discount_to_recurring_charges__c: boolean
-#  zqu__apply_discount_to_usage_charges__c: boolean
-#  zqu__billcycleday__c: real
-#  zqu__billcycletype__c: character varying
-#  zqu__billingdiscount__c: real
-#  zqu__billingperiodalignment__c: character varying
-#  zqu__billingsubtotal__c: real
-#  zqu__billingtax__c: real
-#  zqu__billingtotal__c: real
-#  zqu__chargetype__c: character varying
-#  zqu__currency__c: character varying
-#  zqu__description__c: character varying
-#  zqu__discount_level__c: character varying
-#  zqu__discount__c: real
-#  zqu__effectiveprice__c: real
-#  zqu__enddatecondition__c: character varying
-#  zqu__entityid__c: character varying
-#  zqu__feetype__c: character varying
-#  zqu__includedunits__c: real
-#  zqu__listpricebase__c: character varying
-#  zqu__listprice__c: real
-#  zqu__listtotal__c: real
-#  zqu__mrr__c: real
-#  zqu__model__c: character varying
-#  zqu__period__c: character varying
-#  zqu__previewedmrr__c: real
-#  zqu__previewedtcv__c: real
-#  zqu__pricechangeoption__c: character varying
-#  zqu__priceincreasepercentage__c: real
-#  zqu__productname__c: character varying
-#  zqu__productrateplanchargezuoraid__c: character varying
-#  zqu__productrateplancharge__c: character varying
-#  zqu__quantity__c: real
-#  zqu__quoterateplanchargefullname__c: character varying
-#  zqu__quoterateplanchargezuoraid__c: character varying
-#  zqu__quoterateplancharge__c_id_mapping_key: id
-#  zqu__quoterateplan__c: character varying
-#  zqu__rateplanname__c: character varying
-#  zqu__specificbillingperiod__c: real
-#  zqu__specificenddate__c: date
-#  zqu__subscriptionrateplanchargezuoraid__c: character varying
-#  zqu__tcv__c: real
-#  zqu__total__c: real
-#  zqu__triggerdate__c: date
-#  zqu__triggerevent__c: character varying
-#  zqu__uom__c: character varying
-#  zqu__upto_how_many_periods_type__c: character varying
-#  zqu__upto_how_many_periods__c: real
-#zuora__subscription__c:
-#  acv__c: real
-#  billing_account_id__c: character varying
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  initial_start_date__c: date
-#  initial_subscription_start_date__c: date
-#  initial_term_calc__c: real
-#  initial_term_numeric__c: real
-#  isdeleted: boolean
-#  lastactivitydate: date
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  name: character varying
-#  ownerid: character varying
-#  parent_account__c: character varying
-#  previous_mrr__c: real
-#  products_purchased__c: character varying
-#  salesforce_account__c: character varying
-#  support_level__c: character varying
-#  systemmodstamp: timestamp without time zone
-#  term_start_month__c: date
-#  zuora__account__c: character varying
-#  zuora__autorenew__c: boolean
-#  zuora__contractacceptancedate__c: date
-#  zuora__contracteffectivedate__c: date
-#  zuora__customeraccount__c: character varying
-#  zuora__external_id__c: character varying
-#  zuora__initialterm__c: character varying
-#  zuora__invoiceowner__c: character varying
-#  zuora__mrr__c: real
-#  zuora__nextchargedate__c: date
-#  zuora__nextrenewaldate__c: date
-#  zuora__notes__c: character varying
-#  zuora__originalcreateddate__c: date
-#  zuora__originalcreated_date__c: timestamp without time zone
-#  zuora__renewalterm__c: character varying
-#  zuora__serviceactivationdate__c: date
-#  zuora__status__c: character varying
-#  zuora__subscriptionenddate__c: date
-#  zuora__subscriptionnumber__c: character varying
-#  zuora__subscriptionstartdate__c: date
-#  zuora__subscription__c_id_mapping_key: id
-#  zuora__tcv__c: real
-#  zuora__termenddate__c: date
-#  zuora__termsettingtype__c: character varying
-#  zuora__termstartdate__c: date
-#  zuora__version__c: real
-#  zuora__zuora_id__c: character varying
-#zqu__zproduct__c:
-#  createdbyid: character varying
-#  createddate: timestamp without time zone
-#  id: character varying
-#  isdeleted: boolean
-#  lastmodifiedbyid: character varying
-#  lastmodifieddate: timestamp without time zone
-#  lastreferenceddate: timestamp without time zone
-#  lastvieweddate: timestamp without time zone
-#  name: character varying
-#  ownerid: character varying
-#  systemmodstamp: timestamp without time zone
-#  zqu__active__c: boolean
-#  zqu__allow_feature_changes__c: boolean
-#  zqu__category__c: character varying
-#  zqu__currency__c: character varying
-#  zqu__deleted__c: boolean
-#  zqu__description__c: character varying
-#  zqu__effectiveenddatetext__c: character varying
-#  zqu__effectiveenddate__c: date
-#  zqu__effectivestartdatetext__c: character varying
-#  zqu__effectivestartdate__c: date
-#  zqu__product__c: character varying
-#  zqu__sku__c: character varying
-#  zqu__zproduct__c_id_mapping_key: id
-#  zqu__zuoraid__c: character varying
+zqu__productrateplancharge__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    ownerid: character varying
+    systemmodstamp: timestamp without time zone
+    zqu__accountingcode2__c: character varying
+    zqu__accountingcode__c: character varying
+    zqu__apply_discount_to_one_time_charges__c: boolean
+    zqu__apply_discount_to_recurring_charges__c: boolean
+    zqu__apply_discount_to_usage_charges__c: boolean
+    zqu__billcycleday__c: character varying
+    zqu__billcycletype__c: character varying
+    zqu__billingperiodalignment__c: character varying
+    zqu__catalog_sync_history__c: character varying
+    zqu__defaultquantity__c: real
+    zqu__deferredrevenueaccount__c: character varying
+    zqu__deleted__c: boolean
+    zqu__description__c: character varying
+    zqu__discount_apply_type__c: real
+    zqu__discount_level__c: character varying
+    zqu__enddatecondition__c: character varying
+    zqu__entityid__c: character varying
+    zqu__includedunits__c: real
+    zqu__listpricebase__c: character varying
+    zqu__listprice__c: real
+    zqu__maxquantity__c: real
+    zqu__minquantity__c: real
+    zqu__model__c: character varying
+    zqu__numberofperiod__c: real
+    zqu__overagecalculationoption__c: character varying
+    zqu__overageunusedunitscreditoption__c: character varying
+    zqu__prepaymentperiods__c: real
+    zqu__pricechangeoption__c: character varying
+    zqu__priceincreasepercentage__c: real
+    zqu__pricetable__c: character varying
+    zqu__productrateplanchargefullname__c: character varying
+    zqu__productrateplanchargename__c: character varying
+    zqu__productrateplan__c: character varying
+    zqu__recognizedrevenueaccount__c: character varying
+    zqu__recurringperiod__c: character varying
+    zqu__revreccode2__c: character varying
+    zqu__revreccode__c: character varying
+    zqu__revrectriggercondition__c: character varying
+    zqu__revenuerecognitionrulename__c: character varying
+    zqu__smoothingmodel__c: character varying
+    zqu__specificbillingperiod__c: real
+    zqu__syncmessage__c: character varying
+    zqu__syncstatus__c: character varying
+    zqu__taxcode2__c: character varying
+    zqu__taxcode__c: character varying
+    zqu__taxmode__c: character varying
+    zqu__taxable__c: boolean
+    zqu__triggerevent__c: character varying
+    zqu__type__c: character varying
+    zqu__uom__c: character varying
+    zqu__uptoperiodstype__c: character varying
+    zqu__upto_how_many_periods__c: real
+    zqu__usagerecordratingoption__c: character varying
+    zqu__usediscountspecificaccountingcode__c: boolean
+    zqu__usetenantdefaultforpricechange__c: boolean
+    zqu__zunitofmeasure__c: character varying
+    zqu__zuom_id__c: character varying
+    zqu__zuoraid__c: character varying
+opportunitylineitem:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    description: character varying
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    listprice: real
+    name: character varying
+    opportunityid: character varying
+    opportunity_product_id__c: character varying
+    pricebookentryid: character varying
+    product2id: character varying
+    productcode: character varying
+    product_code_from_products__c: character varying
+    product_name_from_products__c: character varying
+    quantity: real
+    servicedate: date
+    sortorder: bigint
+    systemmodstamp: timestamp without time zone
+    ticket_group_numeric__c: real
+    totalprice: real
+    unitprice: real
+opportunityhistory:
+  primary_key: id
+  columns:
+    amount: character varying
+    closedate: date
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    expectedrevenue: character varying
+    forecastcategory: character varying
+    id: character varying
+    isdeleted: boolean
+    opportunityid: character varying
+    probability: character varying
+    stagename: character varying
+    systemmodstamp: timestamp without time zone
+zqu__quote__c:
+  primary_key: id
+  columns:
+    click_through_eula_contract_language__c: character varying
+    click_through_eula_test__c: character varying
+    clickthrougheularequired__c: character varying
+    createdbyemailaddress__c: character varying
+    createdbyfirstname__c: character varying
+    createdbyid: character varying
+    createdbylastname__c: character varying
+    createddate: timestamp without time zone
+    gitlab_privacy_url__c: character varying
+    gitlab_terms_url__c: character varying
+    has_githost__c: real
+    has_githost_cb__c: boolean
+    has_invoice_owner__c: character varying
+    id: character varying
+    invoiceownerpaymentterms__c: real
+    invoice_amount__c: real
+    invoice_number__c: character varying
+    invoice_owner_account_id__c: character varying
+    invoice_owner_account_type__c: character varying
+    invoice_owner_vat_id__c: character varying
+    invoice_paid_date__c: timestamp without time zone
+    invoice_paid__c: boolean
+    isdeleted: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    max_premium_discount_2__c: real
+    max_premium_discount__c: real
+    mrr_rollup__c: real
+    max_ticket_group_numeric__c: real
+    nrv_roll_up__c: real
+    name: character varying
+    opportunity_amount__c: real
+    opportunity_id__c: character varying
+    opportunity_stage__c: character varying
+    original_contract_signature_date__c: date
+    ownerid: character varying
+    previous_renewal_term__c: real
+    purchase_order__c: character varying
+    quote_entity_bank_information__c: character varying
+    quote_entity_beneficiary_information__c: character varying
+    quote_entity_contact_information__c: character varying
+    quote_entity_legal_name__c: character varying
+    quote_entity_override__c: boolean
+    quote_entity__c: character varying
+    quote_opportunity_amount_match__c: character varying
+    quote_tcv__c: real
+    recordtypeid: character varying
+    related_subscription__c: character varying
+    renewal_mrr__c: real
+    reseller_entity_bank_information__c: character varying
+    reseller_entity_beneficiary_information__c: character varying
+    reseller_entity_contact_information__c: character varying
+    reseller_entity_legal_name__c: character varying
+    reseller_type__c: character varying
+    send_githost_email_to_support__c: boolean
+    sold_to_country_code__c: character varying
+    subscription_agreement_amendments__c: character varying
+    subscription_agreement_effective_date__c: date
+    subscription_agreement_effective_date_ca__c: character varying
+    subscription_agreement_id__c: character varying
+    systemmodstamp: timestamp without time zone
+    tcv_including_discount__c: real
+    trigger_workflow__c: boolean
+    vat_tax_id__c: character varying
+    zqu__account__c: character varying
+    zqu__amendmentname__c: character varying
+    zqu__amendment_name__c: character varying
+    zqu__applycreditbalance__c: boolean
+    zqu__approvalstatus__c: character varying
+    zqu__autorenew__c: boolean
+    zqu__billcycleday__c: character varying
+    zqu__billtocontact__c: character varying
+    zqu__billingbatch__c: character varying
+    zqu__billingcycleday__c: character varying
+    zqu__billingentity__c: character varying
+    zqu__billingmethod__c: character varying
+    zqu__calculate_quote_metrics_through__c: character varying
+    zqu__cancellationdate__c: date
+    zqu__cancellationeffectivedate__c: character varying
+    zqu__certificate_id__c: character varying
+    zqu__certificate_type__c: character varying
+    zqu__communicationprofile__c: character varying
+    zqu__company_code__c: character varying
+    zqu__currency__c: character varying
+    zqu__customer_acceptance_date__c: date
+    zqu__deltamrr__c: real
+    zqu__deltatcv__c: real
+    zqu__description__c: character varying
+    zqu__electronicpaymentmethodid__c: character varying
+    zqu__existsubscriptionid__c: character varying
+    zqu__generateinvoice__c: boolean
+    zqu__hidden_subscription_name__c: character varying
+    zqu__initialtermperiodtype__c: character varying
+    zqu__initialterm__c: real
+    zqu__invoicedate__c: date
+    zqu__invoiceid__c: character varying
+    zqu__invoiceownerid__c: character varying
+    zqu__invoiceownername__c: character varying
+    zqu__invoiceprocessingoption__c: character varying
+    zqu__invoiceseparately__c: boolean
+    zqu__invoicetargetdate__c: date
+    zqu__invoicetemplate__c: character varying
+    zqu__is_charge_expired__c: boolean
+    zqu__is_parent_quote__c: boolean
+    zqu__issuing_jurisdiction__c: character varying
+    zqu__mrr__c: real
+    zqu__number__c: character varying
+    zqu__opportunity__c: character varying
+    zqu__parentquote__c: character varying
+    zqu__paymentgateway__c: character varying
+    zqu__paymentmethod__c: character varying
+    zqu__paymentterm__c: character varying
+    zqu__previewed_delta_mrr__c: real
+    zqu__previewed_delta_tcv__c: real
+    zqu__previewed_discount__c: real
+    zqu__previewed_mrr__c: real
+    zqu__previewed_subtotal__c: real
+    zqu__previewed_tcv__c: real
+    zqu__previewed_tax__c: real
+    zqu__previewed_total__c: real
+    zqu__primary__c: boolean
+    zqu__processpayment__c: boolean
+    zqu__productselectorversion__c: character varying
+    zqu__quotebusinesstype__c: character varying
+    zqu__quotetemplate__c: character varying
+    zqu__recordreadonly__c: boolean
+    zqu__renewalsetting__c: character varying
+    zqu__renewaltermperiodtype__c: character varying
+    zqu__renewalterm__c: real
+    zqu__service_activation_date__c: date
+    zqu__soldtocontact__c: character varying
+    zqu__startdate__c: date
+    zqu__status__c: character varying
+    zqu__subscriptionname__c: character varying
+    zqu__subscriptiontermenddate__c: date
+    zqu__subscriptiontermstartdate__c: date
+    zqu__subscriptiontype__c: character varying
+    zqu__subscriptionversion__c: real
+    zqu__subscription_name__c: character varying
+    zqu__subscription_term_type__c: character varying
+    zqu__tcv__c: real
+    zqu__tax_exempt_description__c: character varying
+    zqu__tax_exempt__c: character varying
+    zqu__tax__c: real
+    zqu__termstartdate__c: date
+    zqu__terms__c: character varying
+    zqu__total__c: real
+    zqu__vat_id__c: character varying
+    zqu__validuntil__c: date
+    zqu__zuoraaccountid__c: character varying
+    zqu__zuoraconfig__c: character varying
+    zqu__zuoraentityid__c: character varying
+    zqu__zuoraparentbillingaccountid__c: character varying
+    zqu__zuoraparentbillingaccountname__c: character varying
+    zqu__zuorapaymentid__c: character varying
+    zqu__zuorasubscriptionid__c: character varying
+    zqu__zuora_account_number__c: character varying
+zqu__productrateplanchargetier__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    systemmodstamp: timestamp without time zone
+    zqu__active__c: boolean
+    zqu__catalog_sync_history__c: character varying
+    zqu__currency2__c: character varying
+    zqu__currency__c: character varying
+    zqu__deleted__c: boolean
+    zqu__discountamount__c: real
+    zqu__discountpercentage__c: real
+    zqu__endingunit__c: real
+    zqu__entityid__c: character varying
+    zqu__isoverageprice__c: boolean
+    zqu__priceformat2__c: character varying
+    zqu__priceformat__c: character varying
+    zqu__price__c: real
+    zqu__productrateplanchargeid__c: character varying
+    zqu__productrateplancharge__c: character varying
+    zqu__startingunit__c: real
+    zqu__syncmessage__c: character varying
+    zqu__syncstatus__c: character varying
+    zqu__tier__c: real
+    zqu__zuoraid__c: character varying
+product2:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    description: character varying
+    family: character varying
+    id: character varying
+    isactive: boolean
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    name: character varying
+    productcode: character varying
+    systemmodstamp: timestamp without time zone
+    zqu__allow_feature_changes__c: boolean
+    zqu__billingentity__c: character varying
+    zqu__catalog_sync_history__c: character varying
+    zqu__category__c: character varying
+    zqu__deleted__c: boolean
+    zqu__effectiveenddate__c: date
+    zqu__effectivestartdate__c: date
+    zqu__entityid__c: character varying
+    zqu__sku2__c: character varying
+    zqu__sku__c: character varying
+    zqu__syncmessage__c: character varying
+    zqu__syncstatus__c: character varying
+    zqu__type__c: character varying
+    zqu__zuoraid__c: character varying
+opportunitystage:
+  primary_key: id
+  columns:
+    apiname: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    defaultprobability: real
+    description: character varying
+    forecastcategory: character varying
+    forecastcategoryname: character varying
+    id: character varying
+    isactive: boolean
+    isclosed: boolean
+    iswon: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    masterlabel: character varying
+    sortorder: bigint
+    systemmodstamp: timestamp without time zone
+recordtype:
+  primary_key: id
+  columns:
+    businessprocessid: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    description: character varying
+    developername: character varying
+    id: character varying
+    isactive: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    namespaceprefix: character varying
+    sobjecttype: character varying
+    systemmodstamp: timestamp without time zone
+campaign:
+  primary_key: id
+  columns:
+    actualcost: real
+    amountallopportunities: real
+    amountwonopportunities: real
+    budgetedcost: real
+    campaignmemberrecordtypeid: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    data_quality_description__c: character varying
+    data_quality_score__c: real
+    description: character varying
+    enddate: date
+    expectedresponse: real
+    expectedrevenue: real
+    id: character varying
+    isactive: boolean
+    isdeleted: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    leandata__back_dated__c: boolean
+    leandata__rep_lt_attribution__c: real
+    leandata__rep_lt_bookings_attribution__c: real
+    leandata__rep_lt_generated_attribution__c: real
+    leandata__rep_lt_generated_bookings_attribution__c: real
+    leandata__rep_mt_accelerated_attribution__c: real
+    leandata__rep_mt_accelerated_bookings_attr__c: real
+    leandata__rep_mt_generated_attribution__c: real
+    leandata__rep_mt_generated_bookings_attribution__c: real
+    leandata__reporting_average_days_to_close__c: real
+    leandata__reporting_bookings_attribution__c: real
+    leandata__reporting_campaign_member_totals__c: character varying
+    leandata__reporting_cost__c: real
+    leandata__reporting_ft_attribution_amount__c: real
+    leandata__reporting_ft_bookings_attribution__c: real
+    leandata__reporting_lift__c: real
+    leandata__reporting_mt_attribution_amount__c: real
+    leandata__reporting_num_target_campaign_members__c: real
+    leandata__reporting_number_of_campaign_members__c: real
+    leandata__reporting_number_of_opportunities__c: real
+    leandata__reporting_number_of_touches__c: real
+    leandata__reporting_on_target__c: real
+    leandata__reporting_opportunity_close_rate__c: real
+    name: character varying
+    numberofcontacts: bigint
+    numberofconvertedleads: bigint
+    numberofleads: bigint
+    numberofopportunities: bigint
+    numberofresponses: bigint
+    numberofwonopportunities: bigint
+    numbersent: real
+    ownerid: character varying
+    parentid: character varying
+    startdate: date
+    status: character varying
+    systemmodstamp: timestamp without time zone
+    type: character varying
+contact:
+  primary_key: id
+  columns:
+    ae_comments__c: character varying
+    accountid: character varying
+    account_owner__c: character varying
+    account_type__c: character varying
+    business_development_rep__c: character varying
+    contact_status__c: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    data_quality_description__c: character varying
+    data_quality_score__c: real
+    department: character varying
+    digital_ocean_promo_code__c: character varying
+    donotcall: boolean
+    domain__c: character varying
+    ee_trial_end_date__c: date
+    ee_trial_start_date__c: date
+    emailbounceddate: timestamp without time zone
+    emailbouncedreason: character varying
+    githost_other_response__c: character varying
+    githost_response_status__c: character varying
+    gitlabcom_user_id__c: character varying
+    hasoptedoutofemail: boolean
+    id: character varying
+    inactive_contact__c: boolean
+    industry__c: character varying
+    invalid_email_address__c: boolean
+    isdeleted: boolean
+    isemailbounced: boolean
+    jigsawcontactid: character varying
+    lastactivitydate: date
+    lastcurequestdate: timestamp without time zone
+    lastcuupdatedate: timestamp without time zone
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    leadsource: character varying
+    lead_source_type__c: character varying
+    leandata__ld_segment__c: character varying
+    leandata__matched_buyer_persona__c: character varying
+    leandata__modified_score__c: real
+    leandata__routing_action__c: character varying
+    leandata__tag__c: character varying
+    mailingcity: character varying
+    mailingcountry: character varying
+    mailingcountrycode: character varying
+    mailinggeocodeaccuracy: character varying
+    mailinglatitude: real
+    mailinglongitude: real
+    mailingpostalcode: character varying
+    mailingstate: character varying
+    mailingstatecode: character varying
+    mailingstreet: character varying
+    masterrecordid: character varying
+    mobilephone: character varying
+    name: character varying
+    outbound_bdr__c: character varying
+    outreach_stage__c: character varying
+    ownerid: character varying
+    person_score__c: real
+    photourl: character varying
+    recordtypeid: character varying
+    reportstoid: character varying
+    requested_contact__c: boolean
+    responded_to_githost_price_change__c: boolean
+    role__c: character varying
+    salutation: character varying
+    sertifi2_0__level__c: character varying
+    suffix: character varying
+    systemmodstamp: timestamp without time zone
+    title: character varying
+    using_ce__c: boolean
+    web_form__c: character varying
+    x30_day_opt_out__c: boolean
+    zendesk__create_in_zendesk__c: boolean
+    infer__infer_band__c: character varying
+    infer__infer_hash__c: character varying
+    infer__infer_last_modified__c: timestamp without time zone
+    infer__infer_rating__c: character varying
+    infer__infer_score__c: real
+    mkto71_acquisition_date__c: timestamp without time zone
+    mkto71_acquisition_program_id__c: real
+    mkto71_acquisition_program__c: character varying
+    mkto71_inferred_city__c: character varying
+    mkto71_inferred_company__c: character varying
+    mkto71_inferred_country__c: character varying
+    mkto71_inferred_metropolitan_area__c: character varying
+    mkto71_inferred_postal_code__c: character varying
+    mkto71_inferred_state_region__c: character varying
+    mkto71_lead_score__c: real
+    mkto71_original_referrer__c: character varying
+    mkto71_original_search_engine__c: character varying
+    mkto71_original_search_phrase__c: character varying
+    mkto71_original_source_info__c: character varying
+    mkto71_original_source_type__c: character varying
+    mkto_si__add_to_marketo_campaign__c: character varying
+    mkto_si__hidedate__c: date
+    mkto_si__last_interesting_moment_date__c: timestamp without time zone
+    mkto_si__last_interesting_moment_desc__c: character varying
+    mkto_si__last_interesting_moment_source__c: character varying
+    mkto_si__last_interesting_moment_type__c: character varying
+    mkto_si__last_interesting_moment__c: character varying
+    mkto_si__mkto_lead_score__c: real
+    mkto_si__priority__c: real
+    mkto_si__relative_score_value__c: real
+    mkto_si__relative_score__c: character varying
+    mkto_si__sales_insight__c: character varying
+    mkto_si__urgency_value__c: real
+    mkto_si__urgency__c: character varying
+    mkto_si__view_in_marketo__c: character varying
+    rh2__currency_test__c: character varying
+    rh2__describe__c: character varying
+    rh2__formula_test__c: character varying
+    rh2__integer_test__c: real
+    zqu__county__c: character varying
+campaignmember:
+  primary_key: id
+  columns:
+    campaignid: character varying
+    city: character varying
+    companyoraccount: character varying
+    contactid: character varying
+    country: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    description: character varying
+    donotcall: boolean
+    firstrespondeddate: date
+    hasoptedoutofemail: boolean
+    hasoptedoutoffax: boolean
+    hasresponded: boolean
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    leadid: character varying
+    leadorcontactid: character varying
+    leadorcontactownerid: character varying
+    leadsource: character varying
+    salutation: character varying
+    state: character varying
+    status: character varying
+    systemmodstamp: timestamp without time zone
+    title: character varying
+    type: character varying
+account:
+  primary_key: id
+  columns:
+    absd_campaign__c: character varying
+    ae_comments__c: character varying
+    account_id_18__c: character varying
+    account_initial_start_date__c: date
+    account_manager__c: character varying
+    account_owner_calc__c: character varying
+    account_owner_team__c: character varying
+    account_tier__c: character varying
+    active_ce_users__c: real
+    billingcity: character varying
+    billingcountry: character varying
+    billingcountrycode: character varying
+    billinggeocodeaccuracy: character varying
+    billinglatitude: real
+    billinglongitude: real
+    billingpostalcode: character varying
+    billingstate: character varying
+    billingstatecode: character varying
+    billingstreet: character varying
+    business_development_rep_account_team__c: character varying
+    business_development_rep__c: character varying
+    carr_all_child_accounts__c: real
+    carr_this_account__c: real
+    carr_total__c: real
+    ce_instances__c: real
+    cmrr_all_child_accounts__c: real
+    cmrr_this_account__c: real
+    cmrr_total__c: real
+    company_technologies__c: character varying
+    concurrent_ee_subscriptions__c: real
+    count_of_active_subscription_charges__c: real
+    count_of_active_subscriptions__c: real
+    count_of_billing_accounts__c: real
+    count_of_new_business_won_opps__c: real
+    count_of_open_renewal_opportunities__c: real
+    count_of_opportunities__c: real
+    count_of_products_purchased__c: real
+    count_of_won_opportunities__c: real
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    customer_since__c: date
+    dscorgpkg__fortune_rank__c: character varying
+    dscorgpkg__it_employees__c: real
+    data_quality_description__c: character varying
+    data_quality_score__c: real
+    days_outstanding__c: real
+    dedicated_service_engineer__c: character varying
+    description: character varying
+    domains__c: character varying
+    entity_bank_information__c: character varying
+    entity_beneficiary_information__c: character varying
+    entity_contact_information__c: character varying
+    entity_override__c: boolean
+    entity__c: character varying
+    federal_account__c: boolean
+    gitlab_team__c: character varying
+    gitlab_com_user__c: boolean
+    health__c: character varying
+    health_score_reasons__c: character varying
+    historical_max_users__c: real
+    it_tedd__c: real
+    id: character varying
+    industry: character varying
+    initial_start_date__c: date
+    invoice_owner__c: character varying
+    isdeleted: boolean
+    iseebasiccustomer__c: real
+    iseepluscustomer__c: real
+    iseestandardcustomer__c: real
+    isfilelockingcustomer__c: real
+    isgithostbusinesscustomer__c: real
+    isgithostdevelopercustomer__c: real
+    isgithoststartupcustomer__c: real
+    isgithoststoragecustomer__c: real
+    isgitlabeecustomer__c: real
+    isgitlabgeocustomer__c: real
+    isimplementationsupportcustomer__c: real
+    ispartner: boolean
+    ispremiumsupportcustomer__c: real
+    jigsawcompanyid: character varying
+    large_account__c: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    leandata__ld_emaildomain__c: character varying
+    leandata__ld_emaildomains__c: character varying
+    leandata__reporting_customer__c: boolean
+    leandata__reporting_has_opportunity__c: boolean
+    leandata__reporting_last_marketing_touch_date__c: timestamp without time zone
+    leandata__reporting_last_sales_touch_date__c: timestamp without time zone
+    leandata__reporting_recent_marketing_touches__c: real
+    leandata__reporting_target_account_number__c: real
+    leandata__reporting_target_account__c: boolean
+    leandata__reporting_total_leads_and_contacts__c: real
+    leandata__reporting_total_marketing_touches__c: real
+    leandata__reporting_total_sales_touches__c: real
+    leandata__routing_action__c: character varying
+    leandata__sla__c: character varying
+    leandata__scenario_1_owner__c: character varying
+    leandata__scenario_2_owner__c: character varying
+    leandata__scenario_3_owner__c: character varying
+    leandata__scenario_4_owner__c: character varying
+    leandata__search__c: character varying
+    leandata__tag__c: character varying
+    license_user_count__c: real
+    license_utilization__c: real
+    manual_support_upgrade__c: boolean
+    masterrecordid: character varying
+    max_for_potential_ee_users__c: real
+    most_recent_expired_subscription_date__c: date
+    name: character varying
+    next_renewal_date__c: date
+    numberofemployees: bigint
+    number_of_licenses_all_child_accounts__c: real
+    number_of_licenses_this_account__c: real
+    number_of_licenses_total__c: real
+    number_of_open_opportunities__c: real
+    opt_out_file_locking__c: boolean
+    opt_out_geo__c: boolean
+    ownerid: character varying
+    parentid: character varying
+    parent_account_type__c: character varying
+    partner_account_iban_number__c: character varying
+    partner_bank_name__c: character varying
+    partner_beneficiary_name__c: character varying
+    partner_name_and_type__c: character varying
+    partner_routing__c: character varying
+    partner_vat_tax_id__c: character varying
+    paymenttermnumeric__c: real
+    photourl: character varying
+    potential_carr_this_account__c: real
+    potential_ee_subscription_amount__c: real
+    potential_ee_users_total__c: real
+    potential_users_all_child_accounts__c: real
+    potential_users__c: real
+    previous_account_owner__c: character varying
+    primary_contact_id__c: character varying
+    primary_contact__c: character varying
+    products_purchased__c: character varying
+    product_category__c:  character varying
+    recordtypeid: character varying
+    reference_type__c: character varying
+    referenceable_customer_notes__c: character varying
+    referenceable_customer__c: character varying
+    region__c: character varying
+    reseller_discount__c: character varying
+    reseller_type__c: character varying
+    reseller__c: character varying
+    revenue__c: real
+    sdr_account_team__c: character varying
+    sdr__c: character varying
+    sales_segmentation_updated__c: character varying
+    sales_segmentation__c: character varying
+    sales_segmentation_new__c: character varying
+    shippingcity: character varying
+    shippingcountry: character varying
+    shippingcountrycode: character varying
+    shippingcountrycode__c: character varying
+    shippinggeocodeaccuracy: character varying
+    shippinglatitude: real
+    shippinglongitude: real
+    shippingpostalcode: character varying
+    shippingstate: character varying
+    shippingstatecode: character varying
+    shippingstreet: character varying
+    solutions_architect__c: character varying
+    special_terms__c: character varying
+    sub_industry__c: character varying
+    sub_region__c: character varying
+    subscription_amount__c: real
+    sum_of_open_renewal_opportunities__c: real
+    support_level_new__c: character varying
+    support_level_numeric__c: real
+    support_level__c: character varying
+    systemmodstamp: timestamp without time zone
+    tedd_employees__c: real
+    technical_account_manager_lu__c: character varying
+    technology_stack__c: character varying
+    temp_duplicated_account__c: boolean
+    terminus_clicks__c: real
+    terminus_impressions__c: real
+    terminus_spend__c: real
+    terminus_velocity_level__c: character varying
+    territories_covered__c: character varying
+    territory__c: character varying
+    top_list__c: character varying
+    trigger_workflow__c: boolean
+    type: character varying
+    type_amount_close_date__c: character varying
+    ultimateparentpotentialeeusers__c: real
+    ultimateparentsalessegmentation__c: character varying
+    ultimate_parent_account_id__c: character varying
+    ultimate_parent_account__c: character varying
+    ultimate_parent_account_id__c: character varying
+    ultimate_parent_is_current_account__c: boolean
+    ultimate_parent_old__c: character varying
+    using_ce__c: boolean
+    website: character varying
+    zendesk__create_in_zendesk__c: boolean
+    zendesk__domain_mapping__c: character varying
+    zendesk__last_sync_date__c: timestamp without time zone
+    zendesk__last_sync_status__c: character varying
+    zendesk__notes__c: character varying
+    zendesk__result__c: character varying
+    zendesk__tags__c: character varying
+    zendesk__zendesk_organization_id__c: character varying
+    zendesk__zendesk_organization__c: character varying
+    zendesk__zendesk_outofsync__c: boolean
+    zendesk__zendesk_oldtags__c: character varying
+    zendesk__createdupdatedflag__c: boolean
+    zuora_issue__c: character varying
+    zuora__active__c: character varying
+    zuora__customerpriority__c: character varying
+    zuora__numberoflocations__c: real
+    zuora__slaexpirationdate__c: date
+    zuora__slaserialnumber__c: character varying
+    zuora__sla__c: character varying
+    zuora__upsellopportunity__c: character varying
+    billingd__c: character varying
+    infer__infer_band__c: character varying
+    infer__infer_hash__c: character varying
+    infer__infer_last_modified__c: timestamp without time zone
+    infer__infer_rating__c: character varying
+    infer__infer_score__c: real
+    of_carr__c: real
+    of_licenses__c: real
+opportunitycontactrole:
+  primary_key: id
+  columns:
+    contactid: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    isprimary: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    opportunityid: character varying
+    role: character varying
+    systemmodstamp: timestamp without time zone
+executive_business_review__c:
+  primary_key: id
+  columns:
+    id: character varying
+    createdbyid: character varying
+    lastmodifiedbyid: character varying
+    ownerid: character varying
+    name: character varying
+    ebr_account__c: character varying
+    ebr_action_items_takeaways__c: character varying
+    ebr_date__c: timestamp without time zone
+    ebr_notes__c: character varying
+    ebr_number__c: real
+    ebr_outcome__c: character varying
+    ebr_quarter__c: character varying
+    ebr_status__c: character varying
+    ebr_success__c: character varying
+    ebr_summary__c: character varying
+    first_date_success_updated__c: timestamp without time zone
+    quarter_end_date__c: timestamp without time zone
+    quarter_start_date__c: timestamp without time zone
+lead:
+  primary_key: id
+  columns:
+    bdr_lu__c: character varying
+    bdr_text__c: character varying
+    business_development_rep_contact__c: character varying
+    business_development_representative__c: character varying
+    buying_process_for_procuring_gitlab__c: character varying
+    city: character varying
+    company: character varying
+    company_search_query__c: character varying
+    competition__c: character varying
+    convertedaccountid: character varying
+    convertedcontactid: character varying
+    converteddate: date
+    convertedopportunityid: character varying
+    country: character varying
+    countrycode: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    data_quality_description__c: character varying
+    data_quality_score__c: real
+    donotcall: boolean
+    ee_trial_end_date__c: date
+    ee_trial_start_date__c: date
+    emailbounceddate: timestamp without time zone
+    emailbouncedreason: character varying
+    geocodeaccuracy: character varying
+    githost_other_response__c: character varying
+    githost_response_status__c: character varying
+    gitlab_com_user_id__c: character varying
+    gitlab_com_user__c: boolean
+    hasoptedoutofemail: boolean
+    how_are_you_using_gitlab__c: character varying
+    how_large_is_your_group__c: real
+    how_many_seats_are_they_interested_in_pu__c: real
+    id: character varying
+    industry: character varying
+    infer_web_direct_fit_score__c: real
+    infer_web_direct_hash__c: character varying
+    infer_web_direct_last_modified__c: timestamp without time zone
+    instance_uuid__c: character varying
+    interested_in_gitlab_ee__c: character varying
+    interested_in_hosted_solution__c: boolean
+    introduce_to_reseller__c: boolean
+    invalid_email_address__c: boolean
+    isconverted: boolean
+    isdeleted: boolean
+    isunreadbyowner: boolean
+    is_there_a_meeting_set_with_an_ae_to_dis__c: character varying
+    jigsawcontactid: character varying
+    largeaccount__c: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    latitude: real
+    leadsource: character varying
+    lead_conversion_approval_status__c: character varying
+    lead_number__c: real
+    lead_owner_calc__c: character varying
+    lead_source_type__c: character varying
+    lead_from__c: character varying
+    leandata__a2b_account__c: character varying
+    leandata__a2b_group__c: character varying
+    leandata__has_matched__c: boolean
+    leandata__ld_segment__c: character varying
+    leandata__marketing_sys_created_date__c: timestamp without time zone
+    leandata__matched_account_annual_revenue__c: real
+    leandata__matched_account_billing_country__c: character varying
+    leandata__matched_account_billing_postal_code__c: character varying
+    leandata__matched_account_billing_state__c: character varying
+    leandata__matched_account_custom_field_1__c: character varying
+    leandata__matched_account_employees__c: real
+    leandata__matched_account_industry__c: character varying
+    leandata__matched_account_type__c: character varying
+    leandata__matched_account_website__c: character varying
+    leandata__matched_account__c: character varying
+    leandata__matched_lead__c: character varying
+    leandata__modified_score__c: real
+    leandata__reporting_matched_account__c: character varying
+    leandata__reporting_timestamp__c: timestamp without time zone
+    leandata__router_status__c: character varying
+    leandata__routing_action__c: character varying
+    leandata__routing_status__c: character varying
+    leandata__salesforce_id__c: character varying
+    leandata__search_index__c: character varying
+    leandata__search__c: character varying
+    leandata__status_info__c: character varying
+    leandata__tag__c: character varying
+    longitude: real
+    mql_date__c: timestamp without time zone
+    masterrecordid: character varying
+    matched_account_top_list__c: character varying
+    name: character varying
+    numberofdevelopersbucket__c: character varying
+    numberofemployees: bigint
+    outreach_stage__c: character varying
+    ownerid: character varying
+    partner_account__c: character varying
+    partner_missing_info_for_conversion__c: character varying
+    photourl: character varying
+    postalcode: character varying
+    potential_ee_users__c: real
+    qualification_notes__c: character varying
+    recordtypeid: character varying
+    region__c: character varying
+    requested_contact__c: boolean
+    responded_to_githost_price_change__c: boolean
+    role_prospect_plays_in_evaluation__c: character varying
+    round_robin_id__c: real
+    sdr_lu__c: character varying
+    sdr_text__c: character varying
+    sales_segmentation__c: character varying
+    salutation: character varying
+    source__c: character varying
+    state: character varying
+    statecode: character varying
+    status: character varying
+    street: character varying
+    sub_industry__c: character varying
+    sub_region__c: character varying
+    submitterip__c: character varying
+    subscribe_securityalerts__c: boolean
+    suffix: character varying
+    systemmodstamp: timestamp without time zone
+    technology_stack__c: character varying
+    terminus_clicks__c: real
+    terminus_impressions__c: real
+    terminus_spend__c: real
+    terminus_velocity_level__c: character varying
+    title: character varying
+    trigger_workflow__c: boolean
+    unbouncepageid__c: character varying
+    unbouncepagevariant__c: character varying
+    unbouncesubmissiondate__c: date
+    unbouncesubmissiontime__c: character varying
+    using_ce__c: boolean
+    web_form__c: character varying
+    what_vcs_are_you_using_now__c: character varying
+    what_is_the_prospect_currently_doing_to__c: character varying
+    what_is_the_timing_to_purchase__c: character varying
+    what_other_groups_are_using_git__c: character varying
+    what_performance_issues_do_you_have__c: character varying
+    what_problems_are_you_looking_to_solve__c: character varying
+    what_would_constitute_a_successful_trial__c: character varying
+    where_are_you_in_your__c: character varying
+    where_is_the_budget_for_this_coming_from__c: character varying
+    who_is_the_decision_maker_for_gitlab__c: character varying
+    x30_day_opt_out__c: boolean
+    zendesk__create_in_zendesk__c: boolean
+    if_svn_why_looking_to_move_to_git__c: character varying
+    infer__infer_band__c: character varying
+    infer__infer_converted_to_opp__c: boolean
+    infer__infer_created_month__c: character varying
+    infer__infer_good_lead__c: boolean
+    infer__infer_hash__c: character varying
+    infer__infer_is_open__c: boolean
+    infer__infer_last_modified__c: timestamp without time zone
+    infer__infer_lead_age__c: real
+    infer__infer_rating__c: character varying
+    infer__infer_score__c: real
+    mkto2__inferred_city__c: character varying
+    mkto2__inferred_company__c: character varying
+    mkto2__inferred_country__c: character varying
+    mkto2__inferred_state_region__c: character varying
+    mkto2__lead_score__c: real
+    mkto71_acquisition_date__c: timestamp without time zone
+    mkto71_acquisition_program_id__c: real
+    mkto71_acquisition_program__c: character varying
+    mkto71_inferred_city__c: character varying
+    mkto71_inferred_company__c: character varying
+    mkto71_inferred_country__c: character varying
+    mkto71_inferred_metropolitan_area__c: character varying
+    mkto71_inferred_postal_code__c: character varying
+    mkto71_inferred_state_region__c: character varying
+    mkto71_lead_score__c: real
+    mkto71_original_referrer__c: character varying
+    mkto71_original_search_engine__c: character varying
+    mkto71_original_search_phrase__c: character varying
+    mkto71_original_source_info__c: character varying
+    mkto71_original_source_type__c: character varying
+    mkto_si__add_to_marketo_campaign__c: character varying
+    mkto_si__hidedate__c: date
+    mkto_si__last_interesting_moment_date__c: timestamp without time zone
+    mkto_si__last_interesting_moment_desc__c: character varying
+    mkto_si__last_interesting_moment_source__c: character varying
+    mkto_si__last_interesting_moment_type__c: character varying
+    mkto_si__last_interesting_moment__c: character varying
+    mkto_si__msicontactid__c: character varying
+    mkto_si__priority__c: real
+    mkto_si__relative_score_value__c: real
+    mkto_si__relative_score__c: character varying
+    mkto_si__urgency_value__c: real
+    mkto_si__urgency__c: character varying
+    mkto_si__view_in_marketo__c: character varying
+    newslettersegment__c: boolean
+    subscribeliveevents__c: boolean
+    subscribenewsletter__c: boolean
+    subscribewebcast__c: boolean
+opportunity:
+  primary_key: id
+  columns:
+    account_id_18__c: character varying
+    account_id__c: character varying
+    account_owner__c: character varying
+    accountid: character varying
+    activity_source__c: character varying
+    acv_2__c: real
+    acv__c: real
+    acv_override__c: real
+    acv_test__c: real
+    ae_qualification_status__c: character varying
+    amount: real
+    approval_status__c: character varying
+    arr__c: real
+    arr_override__c: real
+    authorized_reseller_opportunity__c: boolean
+    auto_renew__c: boolean
+    auto_renewal__c: boolean
+    awaiting_approval_stage__c: real
+    bdr_lu__c: character varying
+    bdr_qualified_stage__c: real
+    booking_category__c: character varying
+    business_development_rep__c: character varying
+    business_problems_to_solve__c: character varying
+    business_value_assessment__c: character varying
+    buying_process_for_procuring_gitlab__c: character varying
+    campaignid: character varying
+    champion_selling_on_your_behalf__c: character varying
+    channel_manager__c: character varying
+    channel_partner_close_date_override__c: date
+    channel_partner_iacv_override__c: real
+    channel_partner_stage_override__c: character varying
+    churn_acv__c: real
+    churn_month__c: date
+    churn_notes__c: character varying
+    churn_type__c: character varying
+    closedate: date
+    competitive_awareness__c: character varying
+    competitors__c: character varying
+    converted_from_ce__c: boolean
+    count_of_active_ee_subscriptions__c: real
+    count_of_primary_contacts__c: real
+    count_of_products__c: real
+    count_of_quotes__c: real
+    count_of_quotes_to_z_billing__c: real
+    count_of_quotes_with_invoice_owner__c: real
+    count_of_signed_agreements__c: real
+    create_renewal_opportunity__c: boolean
+    created_month__c: date
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    currently_using_ce__c: boolean
+    data_quality_description__c: character varying
+    data_quality_score__c: real
+    days_in_0_pending_acceptance__c: real
+    days_in_1_discovery__c: real
+    days_in_2_scoping__c: real
+    days_in_3_technical_evaluation__c: real
+    days_in_4_proposal__c: real
+    days_in_5_negotiating__c: real
+    days_since_customer__c: real
+    days_until_close__c: real
+    dec_criteria_tech_vendor_financial__c: character varying
+    dec_process_define_validation_approval__c: character varying
+    decision_criteria__c: character varying
+    decision_making_process__c: character varying
+    delta_amount__c: real
+    description: character varying
+    developing_stage__c: real
+    discovery_stage__c: real
+    does_not_require_approval__c: boolean
+    don_t_send_slack_notification__c: boolean
+    economic_buyer_who_has_profit_loss__c: character varying
+    ee_trial_start_date__c: date
+    end_date__c: date
+    engagement_type__c: character varying
+    exclude_number_of_opps_is__c: boolean
+    exclude_sales_cycle_analysis__c: boolean
+    exclude_sales_cycle_analysis_is__c: boolean
+    exclude_won_loss_analysis_is__c: boolean
+    expected_amount__c: real
+    expected_close_date__c: date
+    first_12_months__c: boolean
+    fiscal: character varying
+    fiscalquarter: bigint
+    fiscalyear: bigint
+    forecastcategory: character varying
+    forecastcategoryname: character varying
+    full_circle_count__c: boolean
+    full_circle_velocity__c: real
+    funding__c: character varying
+    hasopenactivity: boolean
+    hasopportunitylineitem: boolean
+    hasoverduetask: boolean
+    how_are_you_solving_these_problems_today__c: character varying
+    how_are_you_using_gitlab__c: character varying
+    how_large_is_your_group__c: real
+    how_many_seats_are_they_interested_in__c: real
+    id: character varying
+    identify_pain__c: character varying
+    if_svn_why_looking_to_move_to_git__c: character varying
+    impact_due_to_business_problems__c: character varying
+    incremental_acv_2__c: real
+    incremental_acv__c: real
+    incremental_acv_licenses__c: real
+    incremental_acv_override__c: real
+    incremental_amount_2__c: real
+    incremental_amount__c: real
+    incremental_arr__c: real
+    infer__infer_band__c: character varying
+    infer__infer_hash__c: character varying
+    infer__infer_last_modified__c: timestamp without time zone
+    infer__infer_rating__c: character varying
+    infer__infer_score__c: real
+    infer__infer_won_amount__c: real
+    initial_iacv__c: real
+    initial_term__c: real
+    interested_in_gitlab_ee__c: character varying
+    interested_in_hosted_solution__c: boolean
+    internal_champion__c: character varying
+    invoice_amount__c: real
+    invoice_number__c: character varying
+    invoice_paid__c: boolean
+    invoice_paid_date__c: date
+    is_0_pending_acceptance__c: boolean
+    is_1_discovery__c: boolean
+    is_2_scoping__c: boolean
+    is_3_technical_evaluation__c: boolean
+    is_4_proposal__c: boolean
+    is_5_negotiating__c: boolean
+    is_6_closed_won__c: boolean
+    is_7_closed_lost__c: boolean
+    is_8_unqualified__c: boolean
+    is_9_duplicate__c: boolean
+    is_there_a_meeting_set_with_an_ae_to_dis__c: character varying
+    isclosed: boolean
+    isdeleted: boolean
+    islost__c: boolean
+    isopen__c: boolean
+    isunqualified__c: boolean
+    iswon: boolean
+    lastactivitydate: timestamp without time zone
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    lead_activity_type__c: character varying
+    leadsource: character varying
+    leandata__days_in_stage__c: real
+    leandata__days_to_close__c: real
+    leandata__ordernumber__c: character varying
+    leandata__reporting_last_run_date__c: timestamp without time zone
+    leandata__reporting_opportunity_source__c: character varying
+    leandata__reporting_total_marketing_touches__c: real
+    leandata__reporting_won_number__c: character varying
+    legacy_sql_new_biz__c: boolean
+    lost_amount__c: real
+    max_ticket_group_from_products_numeric__c: real
+    merged_opportunity__c: character varying
+    metrics__c: character varying
+    missing_features__c: character varying
+    mkto_si__marketoanalyzer__c: character varying
+    mrr1__c: real
+    mrr2__c: real
+    mrr__c: real
+    mrr_override__c: real
+    multiyear_renewal__c: boolean
+    name: character varying
+    need_to_buy__c: character varying
+    negotiating_stage__c: real
+    nextstep: character varying
+    nrv__c: real
+    null_date__c: date
+    number_of_pushes__c: real
+    of_users_on_ce__c: real
+    online_purchase__c: boolean
+    open_amount__c: real
+    opportunity__c: real
+    opportunity_age__c: real
+    opportunity_closed__c: boolean
+    opportunity_owner__c: character varying
+    opportunity_term__c: real
+    opportunity_term_new__c: real
+    opportunity_term_override__c: real
+    owner_account_type__c: character varying
+    ownerid: character varying
+    partners__c: character varying
+    paymentupdateddate__c: timestamp without time zone
+    poc_end_date__c: date
+    poc_notes__c: character varying
+    poc_start_date__c: date
+    poc_success_criteria__c: character varying
+    present_solution_stage__c: real
+    pricebook2id: character varying
+    probability: real
+    product_details__c: character varying
+    products_purchased__c: character varying
+    projections_growth__c: real
+    projections_new__c: real
+    projections_total__c: real
+    proof_of_concept_poc_status__c: character varying
+    purchasing_procurement_process__c: character varying
+    push_counter__c: real
+    qualification_notes__c: character varying
+    quote_amount__c: real
+    reason_for_lost__c: character varying
+    reason_for_lost_details__c: character varying
+    reason_for_refund_credit__c: character varying
+    reason_we_won__c: character varying
+    recordtypeid: character varying
+    refund_opp_source__c: character varying
+    region_o__c: character varying
+    related_quote__c: character varying
+    related_subscription__c: character varying
+    renewal_acv__c: real
+    renewal_amount__c: real
+    renewal_arr__c: real
+    renewal_mrr__c: real
+    renewal_notification__c: boolean
+    renewal_term__c: real
+    role_prospect_plays_in_evaluation__c: character varying
+    sales_accepted_date__c: date
+    sales_cycle_key__c: character varying
+    sales_qualified__c: boolean
+    sales_qualified_date__c: date
+    sales_qualified_fiscal_period__c: character varying
+    sales_segmentation_o__c: character varying
+    sdr__c: character varying
+    sdr_lu__c: character varying
+    second_owner_insight_squared__c: character varying
+    sertifi2_0__email__c: character varying
+    software_development_methodology_state__c: character varying
+    solution_fit__c: character varying
+    solutions_to_be_replaced__c: character varying
+    solutions_to_be_replaced_notes__c: character varying
+    sql_amount__c: real
+    sql_source__c: character varying
+    stage_report__c: character varying
+    stagename: character varying
+    start_date__c: date
+    sub_region_o__c: character varying
+    subscription_start_date__c: date
+    swing_deal__c: boolean
+    syncedquoteid: character varying
+    systemmodstamp: timestamp without time zone
+    term_end_date__c: date
+    term_start_date__c: date
+    trigger_workflow__c: boolean
+    type: character varying
+    type_amount_close_date__c: character varying
+    ultimate_parent_sales_segment_o__c: character varying
+    unqualified_amount__c: real
+    upside_iacv__c: real
+    upside_swing_deal_iacv__c: real
+    verbal_commitment_stage__c: real
+    vertical_market_qualification__c: character varying
+    web_portal_purchase__c: boolean
+    weighted_iacv__c: real
+    what_is_prospect_doing_to_address_need__c: character varying
+    what_is_the_timing_to_purchase__c: character varying
+    what_other_groups_are_using_git__c: character varying
+    what_performance_issues_do_you_have__c: character varying
+    what_problems_are_you_looking_to_solve__c: character varying
+    what_vcs_are_you_using_now__c: character varying
+    what_would_constitute_a_successful_trial__c: character varying
+    where_is_the_budget_for_this_coming_from__c: character varying
+    who_is_the_decision_maker_for_gitlab__c: character varying
+    why_did_you_choose_gitlab__c: character varying
+    win_probability_score__c: real
+    won_amount__c: real
+    x0_pending_acceptance_date__c: date
+    x1_discovery_date__c: date
+    x2_scoping_date__c: date
+    x3_technical_evaluation_date__c: date
+    x4_proposal_date__c: date
+    x5_negotiating_date__c: date
+    x6_closed_won_date__c: date
+    x7_closed_lost_date__c: date
+    x8_unqualified_date__c: date
+    x9_duplicate_date__c: date
+    xactly_incremental_amount__c: real
+    xactly_invoice_paid_date__c: date
+    xactly_renewal_amount__c: real
+    zqu__currentgenerators__c: character varying
+    zqu__deliveryinstallationstatus__c: character varying
+    zqu__maincompetitors__c: character varying
+    zqu__ordernumber__c: character varying
+    zqu__trackingnumber__c: character varying
+    zqu__zuoraconfig__c: character varying
+    zuora_initial_term__c: real
+    zuora_mrr__c: real
+zuora__subscriptionproductcharge__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    file_locking_customer__c: boolean
+    gitlab_ee_customer__c: boolean
+    id: character varying
+    isbronzesupportcustomer__c: boolean
+    iscirunnermacrocustomer__c: boolean
+    iscloudfoundrycustomer__c: boolean
+    isdeleted: boolean
+    iseebasiccustomer__c: boolean
+    iseepluscustomer__c: boolean
+    iseestandardcustomer__c: boolean
+    isgithostbusinesscustomer__c: boolean
+    isgithostdevelopercustomer__c: boolean
+    isgithoststartupcustomer__c: boolean
+    isgithoststoragecustomer__c: boolean
+    isgitlabgeocustomer__c: boolean
+    ispremiumsupportcustomer__c: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    licenses_divided_by__c: real
+    licenses__c: real
+    name: character varying
+    ownerid: character varying
+    quantity_override__c: real
+    subscription_product_charge_arr__c: real
+    subscription_status__c: character varying
+    systemmodstamp: timestamp without time zone
+    zuora__account__c: character varying
+    zuora__accountingcode__c: character varying
+    zuora__billingperiodstartday__c: character varying
+    zuora__billingperiod__c: character varying
+    zuora__chargenumber__c: character varying
+    zuora__description__c: character varying
+    zuora__effectiveenddate__c: date
+    zuora__effectivestartdate__c: date
+    zuora__enddatecondition__c: character varying
+    zuora__extendedamount__c: real
+    zuora__external_id__c: character varying
+    zuora__model__c: character varying
+    zuora__monthlyrecurringrevenue__c: real
+    zuora__pricetable__c: character varying
+    zuora__price__c: real
+    zuora__productdescription__c: character varying
+    zuora__producteffectiveenddate_product__c: date
+    zuora__producteffectiveenddate__c: date
+    zuora__productname_product__c: character varying
+    zuora__productname__c: character varying
+    zuora__productsku_product__c: character varying
+    zuora__productsku__c: character varying
+    zuora__product__c: character varying
+    zuora__quantity__c: real
+    zuora__rateplandescription__c: character varying
+    zuora__rateplaneffectiveenddate__c: date
+    zuora__rateplanid__c: character varying
+    zuora__rateplanname__c: character varying
+    zuora__specificenddate__c: date
+    zuora__subscriptionchargenumber__c: character varying
+    zuora__subscription__c: character varying
+    zuora__totalcontractvalue__c: real
+    zuora__type__c: character varying
+    zuora__uom__c: character varying
+    zuora__uom_formula__c: character varying
+    zuora__unitofmeasure__c: character varying
+    zuora__uptoperiodstype__c: character varying
+    zuora__upto_how_many_periods__c: real
+    zuora__zuora_id__c: character varying
+    arateplan__c: character varying
+user:
+  primary_key: id
+  columns:
+    aboutme: character varying
+    accountid: character varying
+    alias: character varying
+    badgetext: character varying
+    bannerphotourl: character varying
+    callcenterid: character varying
+    can_change_bdr_on_lead__c: boolean
+    can_change_lead_or_contact_owner__c: boolean
+    can_change_sdr_on_account__c: boolean
+    city: character varying
+    communitynickname: character varying
+    companyname: character varying
+    contactid: character varying
+    country: character varying
+    countrycode: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    defaultgroupnotificationfrequency: character varying
+    delegatedapproverid: character varying
+    department: character varying
+    digestfrequency: character varying
+    division: character varying
+    email: character varying
+    emailencodingkey: character varying
+    emailpreferencesautobcc: boolean
+    emailpreferencesautobccstayintouch: boolean
+    emailpreferencesstayintouchreminder: boolean
+    employeenumber: character varying
+    extension: character varying
+    federationidentifier: character varying
+    forecastenabled: boolean
+    fullphotourl: character varying
+    geocodeaccuracy: character varying
+    id: character varying
+    isactive: boolean
+    isportalenabled: boolean
+    isprmsuperuser: boolean
+    isprofilephotoactive: boolean
+    languagelocalekey: character varying
+    lastlogindate: timestamp without time zone
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastpasswordchangedate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    latitude: real
+    localesidkey: character varying
+    longitude: real
+    managerid: character varying
+    mediumphotourl: character varying
+    middlename: character varying
+    name: character varying
+    offlinepdatrialexpirationdate: timestamp without time zone
+    offlinetrialexpirationdate: timestamp without time zone
+    portalrole: character varying
+    postalcode: character varying
+    profileid: character varying
+    receivesadmininfoemails: boolean
+    receivesinfoemails: boolean
+    senderemail: character varying
+    sendername: character varying
+    signature: character varying
+    smallphotourl: character varying
+    start_date__c: date
+    state: character varying
+    statecode: character varying
+    stayintouchnote: character varying
+    stayintouchsignature: character varying
+    stayintouchsubject: character varying
+    street: character varying
+    suffix: character varying
+    systemmodstamp: timestamp without time zone
+    team__c: character varying
+    timezonesidkey: character varying
+    title: character varying
+    userpermissionsavantgouser: boolean
+    userpermissionscallcenterautologin: boolean
+    userpermissionschatteranswersuser: boolean
+    userpermissionsinteractionuser: boolean
+    userpermissionsmarketinguser: boolean
+    userpermissionsmobileuser: boolean
+    userpermissionsofflineuser: boolean
+    userpermissionssfcontentuser: boolean
+    userpermissionssupportuser: boolean
+    userpreferencesactivityreminderspopup: boolean
+    userpreferencesapexpagesdevelopermode: boolean
+    userpreferencescachediagnostics: boolean
+    userpreferencesdiscommentafterlikeemail: boolean
+    userpreferencesdismentionscommentemail: boolean
+    userpreferencesdisprofpostcommentemail: boolean
+    userpreferencesdisableallfeedsemail: boolean
+    userpreferencesdisablebookmarkemail: boolean
+    userpreferencesdisablechangecommentemail: boolean
+    userpreferencesdisableendorsementemail: boolean
+    userpreferencesdisablefilesharenotificationsforapi: boolean
+    userpreferencesdisablefollowersemail: boolean
+    userpreferencesdisablelatercommentemail: boolean
+    userpreferencesdisablelikeemail: boolean
+    userpreferencesdisablementionspostemail: boolean
+    userpreferencesdisablemessageemail: boolean
+    userpreferencesdisableprofilepostemail: boolean
+    userpreferencesdisablesharepostemail: boolean
+    userpreferencesenableautosubforfeeds: boolean
+    userpreferenceseventreminderscheckboxdefault: boolean
+    userpreferenceshidebiggerphotocallout: boolean
+    userpreferenceshidecsndesktoptask: boolean
+    userpreferenceshidecsngetchattermobiletask: boolean
+    userpreferenceshidechatteronboardingsplash: boolean
+    userpreferenceshideenduseronboardingassistantmodal: boolean
+    userpreferenceshidelightningmigrationmodal: boolean
+    userpreferenceshides1browserui: boolean
+    userpreferenceshidesecondchatteronboardingsplash: boolean
+    userpreferenceshidesfxwelcomemat: boolean
+    userpreferenceslightningexperiencepreferred: boolean
+    userpreferencespathassistantcollapsed: boolean
+    userpreferencespreviewlightning: boolean
+    userpreferencesremindersoundoff: boolean
+    userpreferencesshowcitytoexternalusers: boolean
+    userpreferencesshowcitytoguestusers: boolean
+    userpreferencesshowcountrytoexternalusers: boolean
+    userpreferencesshowcountrytoguestusers: boolean
+    userpreferencesshowemailtoexternalusers: boolean
+    userpreferencesshowemailtoguestusers: boolean
+    userpreferencesshowfaxtoexternalusers: boolean
+    userpreferencesshowfaxtoguestusers: boolean
+    userpreferencesshowmanagertoexternalusers: boolean
+    userpreferencesshowmanagertoguestusers: boolean
+    userpreferencesshowmobilephonetoexternalusers: boolean
+    userpreferencesshowmobilephonetoguestusers: boolean
+    userpreferencesshowpostalcodetoexternalusers: boolean
+    userpreferencesshowpostalcodetoguestusers: boolean
+    userpreferencesshowprofilepictoguestusers: boolean
+    userpreferencesshowstatetoexternalusers: boolean
+    userpreferencesshowstatetoguestusers: boolean
+    userpreferencesshowstreetaddresstoexternalusers: boolean
+    userpreferencesshowstreetaddresstoguestusers: boolean
+    userpreferencesshowtitletoexternalusers: boolean
+    userpreferencesshowtitletoguestusers: boolean
+    userpreferencesshowworkphonetoexternalusers: boolean
+    userpreferencesshowworkphonetoguestusers: boolean
+    userpreferencessortfeedbycomment: boolean
+    userpreferencestaskreminderscheckboxdefault: boolean
+    userroleid: character varying
+    usertype: character varying
+    username: character varying
+    finance__c: character varying
+    mkto_si__iscachinganonwebactivitylist__c: boolean
+    mkto_si__iscachingbestbets__c: boolean
+    mkto_si__iscachingemailactivitylist__c: boolean
+    mkto_si__iscachinggroupedwebactivitylist__c: boolean
+    mkto_si__iscachinginterestingmomentslist__c: boolean
+    mkto_si__iscachingscoringlist__c: boolean
+    mkto_si__iscachingstreamlist__c: boolean
+    mkto_si__iscachingwatchlist__c: boolean
+    mkto_si__iscachingwebactivitylist__c: boolean
+    mkto_si__sales_insight_counter__c: real
+zuora__customeraccount__c:
+  primary_key: id
+  columns:
+    account_id__c: character varying
+    account_type__c: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    employees__c: real
+    id: character varying
+    isdeleted: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    potential_ee_users__c: real
+    sales_segmentation__c: character varying
+    systemmodstamp: timestamp without time zone
+    zuora__account__c: character varying
+    zuora__accountnumber__c: character varying
+    zuora__autopay__c: boolean
+    zuora__balance__c: real
+    zuora__batch__c: character varying
+    zuora__billcycleday__c: character varying
+    zuora__billtoaddress1__c: character varying
+    zuora__billtoaddress2__c: character varying
+    zuora__billtocity__c: character varying
+    zuora__billtocountry__c: character varying
+    zuora__billtofax__c: character varying
+    zuora__billtoid__c: character varying
+    zuora__billtoname__c: character varying
+    zuora__billtopostalcode__c: character varying
+    zuora__billtostate__c: character varying
+    zuora__billtoworkemail__c: character varying
+    zuora__billtoworkphone__c: character varying
+    zuora__credit_balance__c: real
+    zuora__creditbalance__c: real
+    zuora__creditcard_expiration__c: character varying
+    zuora__creditcard_number__c: character varying
+    zuora__creditcardexpiration__c: character varying
+    zuora__creditcardnumber__c: character varying
+    zuora__creditcardtype__c: character varying
+    zuora__currency__c: character varying
+    zuora__customerservicerepname__c: character varying
+    zuora__default_payment_method__c: character varying
+    zuora__defaultpaymentmethod__c: character varying
+    zuora__external_id__c: character varying
+    zuora__is_crm_id_change_processed__c: boolean
+    zuora__lastinvoicedate__c: date
+    zuora__mrr__c: real
+    zuora__parent__c: character varying
+    zuora__payment_term__c: character varying
+    zuora__payment_term_formula__c: character varying
+    zuora__paymentmethod_type__c: character varying
+    zuora__paymentmethodtype__c: character varying
+    zuora__paymentterm__c: character varying
+    zuora__purchaseordernumber__c: character varying
+    zuora__salesrepname__c: character varying
+    zuora__soldtoid__c: character varying
+    zuora__soldtoname__c: character varying
+    zuora__status__c: character varying
+    zuora__zuora_id__c: character varying
+userrole:
+  primary_key: id
+  columns:
+    caseaccessforaccountowner: character varying
+    contactaccessforaccountowner: character varying
+    developername: character varying
+    forecastuserid: character varying
+    id: character varying
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    mayforecastmanagershare: boolean
+    name: character varying
+    opportunityaccessforaccountowner: character varying
+    parentroleid: character varying
+    portalaccountid: character varying
+    portalaccountownerid: character varying
+    portalrole: character varying
+    portaltype: character varying
+    rollupdescription: character varying
+    systemmodstamp: timestamp without time zone
+zuora__product__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    ownerid: character varying
+    systemmodstamp: timestamp without time zone
+    zuora__description__c: character varying
+    zuora__effectiveenddate__c: date
+    zuora__external_id__c: character varying
+    zuora__sku__c: character varying
+zqu__quoterateplan__c:
+  primary_key: id
+  columns:
+
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    systemmodstamp: timestamp without time zone
+    ticket_group_numeric__c: real
+    zqu__amendmenttype__c: character varying
+    zqu__entityid__c: character varying
+    zqu__originalprpoid__c: character varying
+    zqu__parent__c: character varying
+    zqu__productrateplanzuoraid__c: character varying
+    zqu__productrateplan__c: character varying
+    zqu__product__c: character varying
+    zqu__quoteamendment__c: character varying
+    zqu__quoteproductname__c: character varying
+    zqu__quoterateplanfullname__c: character varying
+    zqu__quoterateplanzuoraid__c: character varying
+    zqu__quote__c: character varying
+    zqu__rootqrpid__c: character varying
+    zqu__subscriptionrateplanzuoraid__c: character varying
+    zqu__time_product_added__c: character varying
+zqu__quoterateplancharge__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    discount_text__c: real
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    systemmodstamp: timestamp without time zone
+    zqu__apply_discount_to_one_time_charges__c: boolean
+    zqu__apply_discount_to_recurring_charges__c: boolean
+    zqu__apply_discount_to_usage_charges__c: boolean
+    zqu__billcycleday__c: real
+    zqu__billcycletype__c: character varying
+    zqu__billingdiscount__c: real
+    zqu__billingperiodalignment__c: character varying
+    zqu__billingsubtotal__c: real
+    zqu__billingtax__c: real
+    zqu__billingtotal__c: real
+    zqu__chargetype__c: character varying
+    zqu__currency__c: character varying
+    zqu__description__c: character varying
+    zqu__discount_level__c: character varying
+    zqu__discount__c: real
+    zqu__effectiveprice__c: real
+    zqu__enddatecondition__c: character varying
+    zqu__entityid__c: character varying
+    zqu__feetype__c: character varying
+    zqu__includedunits__c: real
+    zqu__listpricebase__c: character varying
+    zqu__listprice__c: real
+    zqu__listtotal__c: real
+    zqu__mrr__c: real
+    zqu__model__c: character varying
+    zqu__period__c: character varying
+    zqu__previewedmrr__c: real
+    zqu__previewedtcv__c: real
+    zqu__pricechangeoption__c: character varying
+    zqu__priceincreasepercentage__c: real
+    zqu__productname__c: character varying
+    zqu__productrateplanchargezuoraid__c: character varying
+    zqu__productrateplancharge__c: character varying
+    zqu__quantity__c: real
+    zqu__quoterateplanchargefullname__c: character varying
+    zqu__quoterateplanchargezuoraid__c: character varying
+    zqu__quoterateplan__c: character varying
+    zqu__rateplanname__c: character varying
+    zqu__specificbillingperiod__c: real
+    zqu__specificenddate__c: date
+    zqu__subscriptionrateplanchargezuoraid__c: character varying
+    zqu__tcv__c: real
+    zqu__total__c: real
+    zqu__triggerdate__c: date
+    zqu__triggerevent__c: character varying
+    zqu__uom__c: character varying
+    zqu__upto_how_many_periods_type__c: character varying
+    zqu__upto_how_many_periods__c: real
+zuora__subscription__c:
+  primary_key: id
+  columns:
+    acv__c: real
+    billing_account_id__c: character varying
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    initial_start_date__c: date
+    initial_subscription_start_date__c: date
+    initial_term_calc__c: real
+    initial_term_numeric__c: real
+    isdeleted: boolean
+    lastactivitydate: date
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    name: character varying
+    ownerid: character varying
+    parent_account__c: character varying
+    previous_mrr__c: real
+    products_purchased__c: character varying
+    salesforce_account__c: character varying
+    support_level__c: character varying
+    systemmodstamp: timestamp without time zone
+    term_start_month__c: date
+    zuora__account__c: character varying
+    zuora__autorenew__c: boolean
+    zuora__contractacceptancedate__c: date
+    zuora__contracteffectivedate__c: date
+    zuora__customeraccount__c: character varying
+    zuora__external_id__c: character varying
+    zuora__initialterm__c: character varying
+    zuora__invoiceowner__c: character varying
+    zuora__mrr__c: real
+    zuora__nextchargedate__c: date
+    zuora__nextrenewaldate__c: date
+    zuora__notes__c: character varying
+    zuora__originalcreateddate__c: date
+    zuora__originalcreated_date__c: timestamp without time zone
+    zuora__renewalterm__c: character varying
+    zuora__serviceactivationdate__c: date
+    zuora__status__c: character varying
+    zuora__subscriptionenddate__c: date
+    zuora__subscriptionnumber__c: character varying
+    zuora__subscriptionstartdate__c: date
+    zuora__tcv__c: real
+    zuora__termenddate__c: date
+    zuora__termsettingtype__c: character varying
+    zuora__termstartdate__c: date
+    zuora__version__c: real
+    zuora__zuora_id__c: character varying
+zqu__zproduct__c:
+  primary_key: id
+  columns:
+    createdbyid: character varying
+    createddate: timestamp without time zone
+    id: character varying
+    isdeleted: boolean
+    lastmodifiedbyid: character varying
+    lastmodifieddate: timestamp without time zone
+    lastreferenceddate: timestamp without time zone
+    lastvieweddate: timestamp without time zone
+    name: character varying
+    ownerid: character varying
+    systemmodstamp: timestamp without time zone
+    zqu__active__c: boolean
+    zqu__allow_feature_changes__c: boolean
+    zqu__category__c: character varying
+    zqu__currency__c: character varying
+    zqu__deleted__c: boolean
+    zqu__description__c: character varying
+    zqu__effectiveenddatetext__c: character varying
+    zqu__effectiveenddate__c: date
+    zqu__effectivestartdatetext__c: character varying
+    zqu__effectivestartdate__c: date
+    zqu__product__c: character varying
+    zqu__sku__c: character varying
+    zqu__zuoraid__c: character varying
