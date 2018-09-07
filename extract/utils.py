@@ -8,17 +8,19 @@ from sqlalchemy import (
     Table,
     String,
     Column,
+    Boolean,
+    Date,
     TIMESTAMP,
     Float,
     Integer,
-    Boolean,
-    Date,
     REAL,
     SMALLINT,
     TEXT,
     BIGINT,
     JSON,
 )
+
+DATETIME_COLUMNS = (TIMESTAMP, Date,)
 
 
 def get_sqlalchemy_col(field_name: str, field_type_name: str) -> Column:
@@ -46,10 +48,11 @@ def get_sqlalchemy_col(field_name: str, field_type_name: str) -> Column:
         return Column(field_name, Boolean)
     elif field_type_name == 'json':
         return Column(field_name, JSON)
+    else:
+        # 'character varying' or empty
+        return Column(field_name, String, nullable=True)
     # elif field_type_name == '':
     #     return Column(field_name, )
-    print((f'{field_type_name} is unknown column type'))
-    raise NotImplemented
 
 
 def tables_from_manifest(

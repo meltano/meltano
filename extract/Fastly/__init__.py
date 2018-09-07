@@ -84,7 +84,8 @@ class FastlyExtractor:
                     # TODO: generate from the Table def
                     meta=['customer_id', 'invoice_id', 'end_time', 'start_time'],
                 )
-                datetime_cols = ['created_at', 'deleted_at', 'updated_at', 'end_time', 'start_time']
                 # TODO: generate datetime cols from the Table def
-                df[datetime_cols].apply(pd.to_datetime)
+                datetime_cols = ['created_at', 'deleted_at', 'updated_at', 'end_time', 'start_time']
+                # TODO: probably wrong:
+                df[datetime_cols] = df[datetime_cols].apply(pd.to_datetime)
                 yield df

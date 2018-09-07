@@ -1,8 +1,11 @@
 import os
 
+import pandas as pd
 from sqlalchemy import create_engine
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.schema import CreateSchema
+
+from extract.utils import DATETIME_COLUMNS
 
 
 class PostgresLoader:
@@ -37,8 +40,21 @@ class PostgresLoader:
 
     def load(self, df):
         if not df.empty:
-            dfs_to_load: list = df.to_dict(orient='records')
-            insert_stmt = postgresql.insert(self.table).values(dfs_to_load)
+            entity_columns = self.table.columns
+            datetime_col_names = [
+                col.name
+                for col in entity_columns
+                if isinstance(col.type, DATETIME_COLUMNS)
+            ]
+            # TODO: potentially discover datetime rows from the dataframe itself
+            # datetime_col_names = [col for col in df.columns if df[col].dtype == np.dtype('datetime64[ns]')]
+
+            # Converting datetimes to strings, then replace the pandas NaT values to python None
+            # which is what postgresql.insert() expects (it does not handle NaT by itself)
+            df[datetime_col_names] = df[datetime_col_names].astype(object).where(pd.notnull(df), None)
+            dict_to_load: list = df.to_dict(orient='records')
+            dict_to_load = dict_to_load[0:50]
+            insert_stmt = postgresql.insert(self.table).values(dict_to_load)
             insert_stmt = insert_stmt.on_conflict_do_update(
                 index_elements=self.index_elements,
                 # only compatible with Postgres >= 9.5
@@ -46,5 +62,6 @@ class PostgresLoader:
             )
             print(f'Loading data to Postgres for {self.entity_name}')
             self.engine.execute(insert_stmt)
+            print(f'Loading Done ')
         else:
             print(f'DataFrame {df} is empty -> skipping it')
