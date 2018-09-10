@@ -7,7 +7,7 @@ from extract.utils import tables_from_manifest
 
 sfdc_metadata = MetaData()
 SFDC_SCHEMA_NAME = 'sfdc'
-manifest_file_path = 'extract/Sfdc/manifest.yaml'
+manifest_file_path = 'extract/sfdc/manifest.yaml'
 
 
 class SfdcExtractor:

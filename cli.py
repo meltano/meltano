@@ -1,20 +1,20 @@
 import click
-from extract.Fastly import FastlyExtractor
-from extract.Demo import DemoExtractor
-from extract.Sfdc.extractor import SfdcExtractor
-from load.Postgres.loader import PostgresLoader
-from load.Csv.loader import CsvLoader
+from extract.fastly import FastlyExtractor
+from extract.demo import DemoExtractor
+from extract.sfdc.extractor import SfdcExtractor
+from load.postgres.loader import PostgresLoader
+from load.csv.loader import CsvLoader
 
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
-    'Fastly': FastlyExtractor,
-    'Demo': DemoExtractor,
-    'Sfdc': SfdcExtractor,
+    'fastly': FastlyExtractor,
+    'demo': DemoExtractor,
+    'sfdc': SfdcExtractor,
 }
 
 LOADER_REGISTRY = {
-    'Postgres': PostgresLoader,
-    'Csv': CsvLoader,
+    'postgres': PostgresLoader,
+    'csv': CsvLoader,
 }
 
 
