@@ -169,7 +169,9 @@ It is expected that the Meltano project will have many applications managed in t
 
 ### Meltano Model
 
-[dbt wrote a good article](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304), 
+[Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
+
+Meltano Models are [LookML files](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) that model data so that you can esility visualize it in Meltano Analysis.
 
 ### Meltano Extract
 
