@@ -11,7 +11,7 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
-| Model | [dbt](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304), Meltano Model | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
+| Model | Meltano Model | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
 | Extract   | [Meltano Extract](#meltano-extract) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Load      | [Meltano Load](#meltano-load) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Target](https://www.singer.io/#targets) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
@@ -166,6 +166,10 @@ The Meltano product consists of three key components:
 As development progresses, additional documentation on getting started along with example configuration and CI scripts will become available.
 
 It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion. 
+
+### Meltano Model
+
+[dbt wrote a good article](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304), 
 
 ### Meltano Extract
 
