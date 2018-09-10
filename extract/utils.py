@@ -51,7 +51,14 @@ def fetch_urls(urls: list, headers: dict = None, timeout: aiohttp.ClientTimeout 
     :param urls: Iterator of url strings
     :return: Generator of response texts
     """
-    loop = asyncio.get_event_loop()
+    try:
+        loop = asyncio.get_event_loop()
+    except RuntimeError as e:
+        # Fix for when asyncio runs inside a sub-thread so there is no
+        #  event_loop available
+        asyncio.set_event_loop(asyncio.new_event_loop())
+        loop = asyncio.get_event_loop()
+
     futures = get_futures(
         urls=urls,
         headers=headers,
