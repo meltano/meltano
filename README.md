@@ -152,6 +152,154 @@ We want the tools to be open source so we can ship this as a product.
 1. Orchestration/Monitoring: [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) for scheduling, running, and monitoring the ELT jobs. In the future, [DAG](https://gitlab.com/gitlab-org/gitlab-ce/issues/41947) support will be added. Non-GitLab alternatives are [Airflow](https://airflow.incubator.apache.org) or [Luigi](https://github.com/spotify/luigi). GitLab CI can handle 1000's of distributed runners to run for example Python scripts.
 1. Visualization/Dashboard: Meltano is compatible with nearly all visualization engines, due to the SQL based data store. For example commercial products like [Looker](https://looker.com/) or [Tableau](https://www.tableau.com/), as well as open-source products like [Superset](https://github.com/airbnb/superset) or [Metabase](https://metabase.com) can be used.
 
+## How to Install and Run Meltano
+
+### One time setup required
+
+The first step is to install all the required libraries and tools:
+* python 3.6.6
+* pipenv
+* postgres (9.5+)
+* yarn
+* linux libraries required --> someone has to check with a clean laptop and add those
+
+Create Postgres DB, schema and Users required:
+```
+# Create the user and database where extracted data will be loaded
+sudo -u postgres createuser meltano -d -P
+sudo -u postgres createdb meltano
+
+# Create looker user in case Looker is used
+sudo -u postgres createuser looker -d -P
+
+# Create Analytics Schema --> This is where the results of the final Transform are stored
+sudo -u postgres psql -d meltano
+postgres=# CREATE SCHEMA IF NOT EXISTS analytics AUTHORIZATION meltano;
+postgres=# GRANT ALL PRIVILEGES ON DATABASE meltano TO meltano;
+postgres=# \q
+```
+
+Clone Meltano and install everything required
+```
+git clone git@gitlab.com:meltano/meltano.git
+
+# Create pipenv environment and Install python dependencies from Pipfile.lock
+cd meltano
+pipenv install
+
+# Install packages required by Flask App (API server)
+cd api/
+yarn
+
+# Install packages required by Meltano Analysis Web App (Web front end)
+cd ../app/
+yarn
+
+# Create .env file and set the required variables
+cd ../
+cp .env.example .env
+```
+
+At least the following Environment Variables must be present (or properly defined in the .env file)
+```
+# Connection to the DB used by Meltano Loaders and other Meltano processes
+PG_DATABASE=meltano (or name of the DB used)
+PG_PASSWORD=<PASSWORD>
+PG_USERNAME=meltano (or name of the user used)
+
+# Connection to the DB used by Meltano Analysis - Can be the same as the previous one or a different DB
+MELTANO_ANALYSIS_POSTGRES_DB=meltano (or name of the DB if a different on is used)
+MELTANO_ANALYSIS_POSTGRES_USER=meltano (or name of the user if a different on is used)
+MELTANO_ANALYSIS_POSTGRES_PASSWORD=<PASSWORD>
+```
+
+Initial Setup Required For Meltano Analysis Web App
+```
+# From Meltano's project directory (the one with the Pipfile and the .env)
+pipenv shell
+cd api/
+python
+
+# From inside the python shell
+from app import db
+from models.settings import Settings
+
+db.create_all()
+settings = Settings()
+db.session.add(settings)
+db.session.commit()
+
+exit()
+```
+
+
+### Setting the Variables required by the Extractors
+
+The personal API keys for any extractor used must be set prior to running Meltano through the .env file or by setting the relevant ENV Variables. 
+
+For example, {ZUORA_URL, ZUORA_USERNAME and ZUORA_PASSWORD} are required for running the Zuora extractor, {MKTO_CLIENT_ID, MKTO_CLIENT_SECRET, MKTO_ENDPOINT} are required for connecting with Marketo, etc.
+
+A little bit of caution is required when running Meltano using pipenv: If you want to update the .env file, you have to 
+first exit the `pipenv shell`, update the .env file and reload the shell. The reason is that the .env file is loaded 
+only when `pipenv shell` starts, not whenever it is updated.
+
+### Running Meltano using the CLI
+
+```
+# From Meltano's project directory (the one with the Pipfile and the .env 
+
+# Run pipenv
+pipenv shell
+
+# Run The Demo extractor
+# Extract the data and export to csv (located in api/static/tmp/)
+python cli.py extract demo --loader_name csv
+# Extract the data and export them in Postgres
+python cli.py extract demo --loader_name postgres
+
+# Run Fastly extractor and request Meltano to load the results to Postgres (as it is the default loader)
+python cli.py extract fastly
+
+# Run DBT transformations
+cd transform/
+dbt run --profiles-dir profile --models demo
+dbt run --profiles-dir profile --models fastly
+```
+
+### Running Meltano using the Meltano Analysis Web App
+
+The API server and the Web server must run in order to use the Meltano Analysis web interface.
+
+First Terminal
+```
+# From Meltano's project directory (the one with the Pipfile and the .env)
+pipenv shell
+cd api/
+flask run
+```
+
+Second Terminal
+```
+# From Meltano's project directory (the one with the Pipfile and the .env)
+pipenv shell
+cd app/
+yarn run dev
+```
+
+Web Browser
+```
+# Check That API server works
+http://127.0.0.1:5000/
+http://127.0.0.1:5000/orchestrations/
+
+# Use Meltano Analysis Web App
+http://localhost:8080
+
+# Don't forget to at least set a Connection From the Settings Tab (up right)
+http://localhost:8080/settings
+```
+
+
 ## How to use
 > Notes:
 > * Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields.
