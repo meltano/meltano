@@ -67,7 +67,7 @@ def cli():
 
 @cli.command()
 @click.argument('extractor_name')
-@click.option('--loader_name', default='Postgres', help="Which loader should be used in this extraction")
+@click.option('--loader_name', default='postgres', help="Which loader should be used in this extraction")
 # @click.option('-S', '--schema', required=True)
 @click.option('-H', '--host',
               envvar='PG_ADDRESS',
