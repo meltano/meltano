@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, Integer
+from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, Integer, Float
 from sqlalchemy.schema import CreateSchema
 
 from snowflake.sqlalchemy import URL
@@ -10,7 +10,6 @@ from sqlalchemy.sql import select
 if __name__ == '__main__':
     engine = create_engine(
         URL(
-#                'snowflake://{user}:{password}@{account}/{database}'.format(
             user=os.environ.get('SNOWFLAKE_USERNAME'),
             password=os.environ.get('SNOWFLAKE_PASSWORD'),
             account=os.environ.get('SNOWFLAKE_ACCOUNT_NAME'),
@@ -36,10 +35,12 @@ if __name__ == '__main__':
 
         demo_metadata = MetaData()
         test_table = Table(
-            'test_table',  # Name of the table
+            'test_table',
             demo_metadata,
             Column('id', Integer, primary_key=True),
+            Column('id2', String, primary_key=True),
             Column('name', String),
+            Column('value', Float),
             schema='meltano_loader_tests'
         )
 
@@ -52,10 +53,6 @@ if __name__ == '__main__':
         if not (test_table.schema in all_schema_names):
             print(f"Schema {test_table.schema} does not exist -> creating it ")
             engine.execute(CreateSchema(test_table.schema))
-
-            # For testing
-            # grant_stmt = f'GRANT USAGE ON SCHEMA {db_name}.{test_table.schema} TO ROLE LOADER;'
-            # connection.execute(grant_stmt)
         else:
             print(f"Schema {test_table.schema} found!")
 
@@ -63,40 +60,100 @@ if __name__ == '__main__':
         if not (test_table.name in all_table_names):
             print(f"Table {test_table.name} does not exist -> creating it ")
             test_table.metadata.create_all(engine)
-
-            # For testing
-            # grant_stmt = f'GRANT SELECT ON TABLE {db_name}.{test_table.schema}.{test_table.name} TO ROLE LOADER;'
-            # connection.execute(grant_stmt)
         else:
             print(f"Table {test_table.name} found!")
 
         print()
-        print(f'Loading data to table {test_table.name}')
+        print(f'Creating temporary table tmp_{test_table.name}')
+        columns = [c.copy() for c in test_table.columns]
+        tmp_table = Table(
+                        f'tmp_{test_table.name}',
+                        test_table.metadata,
+                        *columns,
+                        schema=test_table.schema
+                    )
+
+        tmp_table.drop(engine, checkfirst=True)
+        tmp_table.create(engine)
+
+        print()
+        print(f'Loading data to table {tmp_table.name}')
 
         test_data = [
-            {'id': 1, 'name': 'test1'},
-            {'id': 2, 'name': 'test2'},
-            {'id': 3, 'name': 'test3'},
-            {'id': 4, 'name': 'test4'},
-            {'id': 5, 'name': 'test5'},
+            {'id': 1, 'id2': 'a', 'name': 'test1a', 'value': 1.21},
+            {'id': 1, 'id2': 'b', 'name': 'test1b', 'value': 1.26},
+            {'id': 2, 'id2': 'a', 'name': 'test2a', 'value': 2.96},
+            {'id': 3, 'id2': 'a', 'name': 'test3a', 'value': 3.04},
+            {'id': 3, 'id2': 'b', 'name': 'test3b', 'value': 3.09},
+            {'id': 4, 'id2': 'a', 'name': 'test4a', 'value': 4.57},
         ]
 
         df = pd.DataFrame(data=test_data)
         dfs_to_load: list = df.to_dict(orient='records')
 
-        connection.execute(test_table.insert(), dfs_to_load)
+        connection.execute(tmp_table.insert(), dfs_to_load)
 
         print()
-        print(f'Fetching back the data from table {test_table.name}')
-        results = connection.execute( select([test_table]) )
+        print(f'Merging {tmp_table.name} into {test_table.name}')
+
+        merge_target = f'{test_table.schema}.{test_table.name}'
+        merge_source = f'{test_table.schema}.{tmp_table.name}'
+
+        joins = []
+        for primary_key in test_table.primary_key:
+            pk = primary_key.name
+            joins.append(f'{merge_target}.{pk} = {merge_source}.{pk}')
+        join_expr = ' AND '.join(joins)
+
+        attributes_target = []
+        attributes_source = []
+        update_sub_clauses = []
+
+        for column in test_table.columns:
+            attr = column.name
+            attributes_target.append(attr)
+            attributes_source.append(f'{merge_source}.{attr}')
+
+            if attr not in test_table.primary_key:
+                update_sub_clauses.append(f'{attr} = {merge_source}.{attr}')
+
+        update_clause = ', '.join(update_sub_clauses)
+        matched_clause = f'WHEN MATCHED THEN UPDATE SET {update_clause}'
+
+        source_attributes = ', '.join(attributes_target)
+        target_attributes = ', '.join(attributes_source)
+
+        insert_clause = f"({source_attributes}) VALUES ({target_attributes})"
+        not_matched_clause = f'WHEN NOT MATCHED THEN INSERT {insert_clause}'
+
+        merge_stmt = f'MERGE INTO {merge_target} USING {merge_source} ON {join_expr} {matched_clause} {not_matched_clause}'
+        connection.execute(merge_stmt)
+
+        print()
+        print(f'Fetching back the data from table {tmp_table.name}')
+        results = connection.execute( select([tmp_table]).order_by('id', 'id2') )
         for row in results:
-            print(f"{row['id']} - {row['name']}")
+            print(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
         results.close()
 
         print()
-        print('Droping Schema and Table')
+        print(f'Fetching back the data from table {test_table.name}')
+        results = connection.execute( select([test_table]).order_by('id', 'id2') )
+        for row in results:
+            print(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
+        results.close()
+
+        print()
+        print('Droping Schema and Tables')
+        tmp_table.drop(engine)
         test_table.drop(engine)
         connection.execute(f'DROP SCHEMA {db_name}.{test_table.schema} CASCADE')
+
+        # Facilitate Testing when the tables are not dropped
+        # grant_stmt = f'GRANT USAGE ON SCHEMA {db_name}.{test_table.schema} TO ROLE LOADER;'
+        # connection.execute(grant_stmt)
+        # grant_stmt = f'GRANT SELECT ON ALL TABLES IN SCHEMA {db_name}.{test_table.schema} TO ROLE LOADER;'
+        # connection.execute(grant_stmt)
 
         print('Success!')
     finally:
