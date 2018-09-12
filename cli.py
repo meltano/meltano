@@ -4,7 +4,7 @@ from extract.demo import DemoExtractor
 from extract.sfdc.extractor import SfdcExtractor
 from load.postgres.loader import PostgresLoader
 from load.csv.loader import CsvLoader
-from load.Snowflake.loader import SnowflakeLoader
+from load.snowflake.loader import SnowflakeLoader
 
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
@@ -16,7 +16,7 @@ EXTRACTOR_REGISTRY = {
 LOADER_REGISTRY = {
     'postgres': PostgresLoader,
     'csv': CsvLoader,
-    'Snowflake': SnowflakeLoader,
+    'snowflake': SnowflakeLoader,
 }
 
 
