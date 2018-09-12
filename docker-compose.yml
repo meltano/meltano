@@ -1,24 +1,50 @@
 version: '3.1'
 services:
-  postgres:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_PASSWORD: changeme
-    expose:
-      - "5432"
-
-  meltano-full:
-    build: 
-      dockerfile: app/images/full.Dockerfile
-      context: .
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: changeme
-      POSTGRES_URL: postgres
-      LOG_PATH: meltano-analyze.log
-      FLASK_ENV: production
+  ui:
+    image: node:10
+    env_file:
+    - .env.dev
+    working_dir: /meltano/meltano_ui
+    volumes:
+    - ./src/meltano_ui:/meltano/meltano_ui
     ports:
-      - "5000:5000"
-    image: meltano:full
+    - 8080:8080
+    command: ['bash', '-c', 'yarn && yarn run dev']
+    depends_on:
+    - api
+
+  api:
+    image: meltano/meltano
+    env_file:
+      - .env.dev
+    working_dir: /meltano
+    command: ['python', '-m', 'meltano.api']
+    volumes:
+    - ./:/meltano
+    ports:
+    - 5000:5000
+    depends_on:
+    - api_db
+
+  api_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: meltano
+      POSTGRES_PASSWORD: meltano
+      POSTGRES_USER: meltano
+    ports:
+    - '5501:5432'
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+
+  warehouse_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: warehouse
+      POSTGRES_PASSWORD: warehouse
+      POSTGRES_USER: warehouse
+    ports:
+    - '5502:5432'
+
+volumes:
+  pgdata:
