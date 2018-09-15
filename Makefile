@@ -59,10 +59,11 @@ BASE_DF_DEPS += docker/vendor/python/Dockerfile
 docker/base/Dockerfile: ${BASE_DF_DEPS}
 	${PYTHON_RUN} python -m bin.build_dockerfile docker/base/Dockerfile.template -o $@
 
-docker/vendor/python/Dockerfile:
+docker/vendor/python/Dockerfile: docker/vendor/python/keyservers.patch
 	echo '# DO NOT EDIT ME' > $@
 	echo '# I am from ${BASE_PYTHON_DOCKERFILE_URL}' >> $@
 	curl ${BASE_PYTHON_DOCKERFILE_URL} >> $@
+	git apply docker/vendor/python/keyservers.patch
 
 docker/vendor/node/Dockerfile:
 	echo '# DO NOT EDIT ME' > $@
