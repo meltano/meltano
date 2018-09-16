@@ -2,7 +2,6 @@ import base64
 import json
 import os
 import subprocess
-from os.path import abspath, join, dirname
 
 import markdown
 from flask import (
@@ -16,7 +15,7 @@ from ..models.data import (
     Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 )
 
-path_to_parser = abspath(join(dirname(__file__), '../node_modules/lookml-parser/cli.js'))
+path_to_parser = './node_modules/lookml-parser/cli.js'
 parser_command = [path_to_parser, '--input={}/*.{{view,model}}.lkml'.format(meltano_model_path)]
 
 
