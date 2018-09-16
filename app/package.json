@@ -5,14 +5,13 @@
   "author": "Jacob Schatz",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --host 0.0.0.0 --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit test/e2e/specs",
-    "build": "node build/build.js",
-    "clean": "rm -rf node_modules dist"
+    "build": "node build/build.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.0",
