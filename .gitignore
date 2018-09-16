@@ -6,11 +6,11 @@
 *.csv
 tmp_log.txt
 .vscode/
-/build/
+build/
 
 .DS_Store
 node_modules/
-/dist/
+dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -38,6 +38,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 develop-eggs/
+dist/
 downloads/
 eggs/
 .eggs/

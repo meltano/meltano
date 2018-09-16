@@ -152,29 +152,6 @@ We want the tools to be open source so we can ship this as a product.
 1. Orchestration/Monitoring: [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) for scheduling, running, and monitoring the ELT jobs. In the future, [DAG](https://gitlab.com/gitlab-org/gitlab-ce/issues/41947) support will be added. Non-GitLab alternatives are [Airflow](https://airflow.incubator.apache.org) or [Luigi](https://github.com/spotify/luigi). GitLab CI can handle 1000's of distributed runners to run for example Python scripts.
 1. Visualization/Dashboard: Meltano is compatible with nearly all visualization engines, due to the SQL based data store. For example commercial products like [Looker](https://looker.com/) or [Tableau](https://www.tableau.com/), as well as open-source products like [Superset](https://github.com/airbnb/superset) or [Metabase](https://metabase.com) can be used.
 
-## How to Install and Run Meltano    
-
-You can run local copy of Meltano using [docker-compose][].
-
-```bash
-# build the project
-make
-
-# initialize the db schema
-make init_db
-
-# bring up docker-compose
-docker-compose up
-```
-
-This will start:
-
-- The front-end UI at [http://localhost:8080]()
-- The api server [http://localhost:5000]() and an accompanying Postgres DB
-- A mock warehouse Postgres DB
-
-For more info see the [docker-compose.yml]()
-
 ## How to use
 > Notes:
 > * Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields.
@@ -646,5 +623,3 @@ We welcome contributions and improvements, please see the [contribution guidelin
 # License
 
 This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.
-
-[docker-compose]: https://docs.docker.com/compose/
