@@ -75,5 +75,5 @@ class DemoExtractor:
 
         }
 
-    def extract(self, entity):
-        yield pd.DataFrame(data=self.TEST_DATA.get(entity))
+    def extract(self, entity_name):
+        yield pd.DataFrame(data=self.TEST_DATA.get(entity_name))
