@@ -16,6 +16,8 @@ pandas = "*"
 pyyaml = "*"
 aiohttp = "*"
 dbt = "*"
+snowflake-connector-python = "*"
+snowflake-sqlalchemy = "*"
 
 [dev-packages]
 "flake8" = "*"
