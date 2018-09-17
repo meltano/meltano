@@ -1,4 +1,5 @@
 import os
+import logging
 import pandas as pd
 
 from sqlalchemy import create_engine, inspect, MetaData, Table, Column, String, Integer, Float
@@ -8,6 +9,12 @@ from snowflake.sqlalchemy import URL
 from sqlalchemy.sql import select
 
 if __name__ == '__main__':
+    # Set proper Logging Level
+    Log = logging.getLogger()
+    level = logging.getLevelName('INFO')
+    Log.setLevel(level)
+
+    # Create engine for Snowflake
     engine = create_engine(
         URL(
             user=os.environ.get('SNOWFLAKE_USERNAME'),
@@ -21,17 +28,14 @@ if __name__ == '__main__':
     db_name = os.environ.get('SNOWFLAKE_DB_NAME')
 
     try:
-        print()
-        print('Testing that the connection to Snowflake has been properly set up.')
+        logging.info('Testing that the connection to Snowflake has been properly set up.')
 
-        print()
-        print('Connecting to Snowflake')
+        logging.info('Connecting to Snowflake')
         connection = engine.connect()
 
-        print()
-        print('Executing simple query')
+        logging.info('Executing simple query')
         results = connection.execute('select current_version()').fetchone()
-        print(f'Current Snowflake version: {results[0]}')
+        logging.info(f'Current Snowflake version: {results[0]}')
 
         demo_metadata = MetaData()
         test_table = Table(
@@ -44,27 +48,25 @@ if __name__ == '__main__':
             schema='meltano_loader_tests'
         )
 
-        print()
-        print('Checking if test schema and test table exist')
+        logging.info('Checking if test schema and test table exist')
 
         inspector = inspect(engine)
 
         all_schema_names = inspector.get_schema_names()
         if not (test_table.schema in all_schema_names):
-            print(f"Schema {test_table.schema} does not exist -> creating it ")
+            logging.info(f"Schema {test_table.schema} does not exist -> creating it ")
             engine.execute(CreateSchema(test_table.schema))
         else:
-            print(f"Schema {test_table.schema} found!")
+            logging.info(f"Schema {test_table.schema} found!")
 
         all_table_names = inspector.get_table_names(test_table.schema)
         if not (test_table.name in all_table_names):
-            print(f"Table {test_table.name} does not exist -> creating it ")
+            logging.info(f"Table {test_table.name} does not exist -> creating it ")
             test_table.metadata.create_all(engine)
         else:
-            print(f"Table {test_table.name} found!")
+            logging.info(f"Table {test_table.name} found!")
 
-        print()
-        print(f'Creating temporary table tmp_{test_table.name}')
+        logging.info(f'Creating temporary table tmp_{test_table.name}')
         columns = [c.copy() for c in test_table.columns]
         tmp_table = Table(
                         f'tmp_{test_table.name}',
@@ -76,8 +78,7 @@ if __name__ == '__main__':
         tmp_table.drop(engine, checkfirst=True)
         tmp_table.create(engine)
 
-        print()
-        print(f'Loading data to table {tmp_table.name}')
+        logging.info(f'Loading data to table {tmp_table.name}')
 
         test_data = [
             {'id': 1, 'id2': 'a', 'name': 'test1a', 'value': 1.21},
@@ -93,8 +94,7 @@ if __name__ == '__main__':
 
         connection.execute(tmp_table.insert(), dfs_to_load)
 
-        print()
-        print(f'Merging {tmp_table.name} into {test_table.name}')
+        logging.info(f'Merging {tmp_table.name} into {test_table.name}')
 
         merge_target = f'{test_table.schema}.{test_table.name}'
         merge_source = f'{test_table.schema}.{tmp_table.name}'
@@ -129,22 +129,19 @@ if __name__ == '__main__':
         merge_stmt = f'MERGE INTO {merge_target} USING {merge_source} ON {join_expr} {matched_clause} {not_matched_clause}'
         connection.execute(merge_stmt)
 
-        print()
-        print(f'Fetching back the data from table {tmp_table.name}')
+        logging.info(f'Fetching back the data from table {tmp_table.name}')
         results = connection.execute( select([tmp_table]).order_by('id', 'id2') )
         for row in results:
-            print(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
+            logging.info(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
         results.close()
 
-        print()
-        print(f'Fetching back the data from table {test_table.name}')
+        logging.info(f'Fetching back the data from table {test_table.name}')
         results = connection.execute( select([test_table]).order_by('id', 'id2') )
         for row in results:
-            print(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
+            logging.info(f"{row['id']} - {row['id2']} - {row['name']} - {row['value']}")
         results.close()
 
-        print()
-        print('Droping Schema and Tables')
+        logging.info('Droping Schema and Tables')
         tmp_table.drop(engine)
         test_table.drop(engine)
         connection.execute(f'DROP SCHEMA {db_name}.{test_table.schema} CASCADE')
@@ -155,7 +152,7 @@ if __name__ == '__main__':
         # grant_stmt = f'GRANT SELECT ON ALL TABLES IN SCHEMA {db_name}.{test_table.schema} TO ROLE LOADER;'
         # connection.execute(grant_stmt)
 
-        print('Success!')
+        logging.info('Success!')
     finally:
         connection.close()
         engine.dispose()

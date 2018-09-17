@@ -1,4 +1,5 @@
 import os
+import logging
 import pandas as pd
 
 from sqlalchemy import create_engine, inspect, Table
@@ -31,57 +32,68 @@ class SnowflakeLoader:
             )
 
 
-    def schema_apply(self):
+    def schema_apply(self) -> None:
         inspector = inspect(self.engine)
 
         all_schema_names = inspector.get_schema_names()
         if not (self.table.schema in all_schema_names):
-            print(f"Schema {self.table.schema} does not exist -> creating it ")
+            logging.info(f"Schema {self.table.schema} does not exist -> creating it ")
             self.engine.execute(CreateSchema(self.table.schema))
 
         all_table_names = inspector.get_table_names(self.table.schema)
         if not (self.table.name in all_table_names):
-            print(f"Table {self.table.name} does not exist -> creating it ")
+            logging.info(f"Table {self.table.name} does not exist -> creating it ")
             self.table.metadata.create_all(self.engine)
 
 
-    def load(self, df):
+    def load(self, df: pd.DataFrame) -> None:
         if not df.empty:
             # Convert tricky NaN and NaT values to None
             #  so that they are properly stored as NULL values
-            df2 = df.astype(object).where(pd.notnull(df), None)
+            df_to_load = df.astype(object).where(pd.notnull(df), None)
 
-            dfs_to_load: list = df2.to_dict(orient='records')
+            logging.info(f'Loading data to Snowflake for {self.entity_name}')
 
-            print(f'Loading data to Snowflake for {self.entity_name}')
-            try:
-                connection = self.engine.connect()
+            if len(self.table.primary_key) > 0:
+                # We have to use Snowflake's Merge in order to Upsert
 
-                if len(self.table.primary_key) > 0:
-                    # We have to use Snowflake's Merge in order to Upsert
+                # Create Temporary table to load the data to
+                tmp_table = self.create_tmp_table()
 
-                    # Create Temporary table to load the data to
-                    tmp_table = self.create_tmp_table()
+                # Insert data to temporary table
+                df_to_load.to_sql(
+                    name=tmp_table.name,
+                    con=self.engine,
+                    schema=tmp_table.schema,
+                    if_exists='append',
+                    index=False,
+                )
 
-                    # Insert data to temporary table
-                    connection.execute(tmp_table.insert(), dfs_to_load)
+                # Merge Temporary Table into the Table we want to load data into
+                merge_stmt = self.generate_merge_stmt(tmp_table.name)
 
-                    # Merge Temporary Table into the Table we want to load data into
-                    merge_stmt = self.generate_merge_stmt(tmp_table.name)
+                try:
+                    connection = self.engine.connect()
                     connection.execute(merge_stmt)
+                finally:
+                    connection.close()
 
-                    # Drop the Temporary Table
-                    tmp_table.drop(self.engine)
-                else:
-                    # Just Insert (append) as no conflicts can arise
-                    connection.execute(self.table.insert(), dfs_to_load)
-            finally:
-                connection.close()
+                # Drop the Temporary Table
+                tmp_table.drop(self.engine)
+            else:
+                # Just Insert (append) as no conflicts can arise
+                df_to_load.to_sql(
+                    name=self.table.name,
+                    con=self.engine,
+                    schema=self.table.schema,
+                    if_exists='append',
+                    index=False,
+                )
         else:
-            print(f'DataFrame {df} is empty -> skipping it')
+            logging.info(f'DataFrame {df} is empty -> skipping it')
 
 
-    def create_tmp_table(self):
+    def create_tmp_table(self) -> Table:
         columns = [c.copy() for c in self.table.columns]
         tmp_table = Table(
                         f'tmp_{self.table.name}',
@@ -97,7 +109,7 @@ class SnowflakeLoader:
         return tmp_table
 
 
-    def generate_merge_stmt(self, tmp_table_name):
+    def generate_merge_stmt(self, tmp_table_name: str) -> str:
         """
         Generate a merge statement for Merging a temporary table into the
           main table.
@@ -148,7 +160,7 @@ class SnowflakeLoader:
         return merge_stmt
 
 
-    def grant_privileges(self, role):
+    def grant_privileges(self, role: str) -> None:
         # GRANT access to the created schema and tables to the provided role
         try:
             db_name = os.environ.get('SNOWFLAKE_DB_NAME')
