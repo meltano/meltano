@@ -13,7 +13,7 @@
 
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/base
-app_image_tag = ${DOCKER_REGSITRY}/meltano/meltano
+app_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
 else
 base_image_tag = meltano/base
 app_image_tag = meltano/meltano
