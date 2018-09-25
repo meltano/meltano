@@ -1,3 +1,9 @@
-.git
-*Dockerfile*
-node_modules
+*
+
+!/requirements.txt
+!/setup.py
+!/README.md
+!/LICENSE
+!/src
+!/model
+!/transform

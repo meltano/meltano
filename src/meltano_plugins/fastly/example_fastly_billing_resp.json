@@ -1,0 +1,507 @@
+{
+  "customer_id": "7kxRjlY3AgbPqzcnNufmL7",
+  "end_time": "2018-02-28T00:00:00Z",
+  "start_time": "2018-02-01T00:00:00Z",
+  "invoice_id": 2433860,
+  "regions": {
+    "latam": {
+      "cost": 48.18,
+      "bandwidth": {
+        "total": 40.22,
+        "tiers": [
+          {
+            "name": "Latin America Bandwidth (143.656927205 gigabytes @ $.28)",
+            "units": 143.656927205,
+            "price": 0.28,
+            "discounted_price": 0.28,
+            "total": 40.22
+          }
+        ]
+      },
+      "requests": {
+        "total": 7.96,
+        "tiers": [
+          {
+            "name": "Latin America Requests (497.2731 units @ $.016)",
+            "units": 497.2731,
+            "price": 0.016,
+            "discounted_price": 0.016,
+            "total": 7.96
+          }
+        ]
+      }
+    },
+    "australia": {
+      "cost": 8.59,
+      "requests": {
+        "total": 1.16,
+        "tiers": [
+          {
+            "name": "Australia Requests (128.5872 units @ $.009)",
+            "units": 128.5872,
+            "price": 0.009,
+            "discounted_price": 0.009,
+            "total": 1.16
+          }
+        ]
+      },
+      "bandwidth": {
+        "total": 7.43,
+        "tiers": [
+          {
+            "name": "Australia Bandwidth (39.128170527 gigabytes @ $.19)",
+            "units": 39.128170527,
+            "price": 0.19,
+            "discounted_price": 0.19,
+            "total": 7.43
+          }
+        ]
+      }
+    },
+    "europe": {
+      "cost": 231.05,
+      "requests": {
+        "total": 45.02,
+        "tiers": [
+          {
+            "name": "Europe Requests (5,002.2096 units @ $.009)",
+            "units": 5002.2096,
+            "price": 0.009,
+            "discounted_price": 0.009,
+            "total": 45.02
+          }
+        ]
+      },
+      "bandwidth": {
+        "total": 186.03,
+        "tiers": [
+          {
+            "name": "Europe Bandwidth (1,550.216163606 gigabytes @ $.12)",
+            "units": 1550.216163606,
+            "price": 0.12,
+            "discounted_price": 0.12,
+            "total": 186.03
+          }
+        ]
+      }
+    },
+    "south_africa": {
+      "cost": 5.140000000000001,
+      "bandwidth": {
+        "total": 4.28,
+        "tiers": [
+          {
+            "name": "South Africa Bandwidth (15.278642313 gigabytes @ $.28)",
+            "units": 15.278642313,
+            "price": 0.28,
+            "discounted_price": 0.28,
+            "total": 4.28
+          }
+        ]
+      },
+      "requests": {
+        "total": 0.86,
+        "tiers": [
+          {
+            "name": "South Africa Requests (53.7219 units @ $.016)",
+            "units": 53.7219,
+            "price": 0.016,
+            "discounted_price": 0.016,
+            "total": 0.86
+          }
+        ]
+      }
+    },
+    "asia": {
+      "cost": 91.26,
+      "requests": {
+        "total": 10.2,
+        "tiers": [
+          {
+            "name": "Asia Requests (1,133.8762 units @ $.009)",
+            "units": 1133.8762,
+            "price": 0.009,
+            "discounted_price": 0.009,
+            "total": 10.2
+          }
+        ]
+      },
+      "bandwidth": {
+        "total": 81.06,
+        "tiers": [
+          {
+            "name": "Asia Bandwidth (426.620507326 gigabytes @ $.19)",
+            "units": 426.620507326,
+            "price": 0.19,
+            "discounted_price": 0.19,
+            "total": 81.06
+          }
+        ]
+      }
+    },
+    "usa": {
+      "cost": 91.03999999999999,
+      "requests": {
+        "total": 14.69,
+        "tiers": [
+          {
+            "name": "North America Requests (1,959.2106 units @ $.0075)",
+            "units": 1959.2106,
+            "price": 0.0075,
+            "discounted_price": 0.0075,
+            "total": 14.69
+          }
+        ]
+      },
+      "bandwidth": {
+        "total": 76.35,
+        "tiers": [
+          {
+            "name": "North America Bandwidth (636.276045391 gigabytes @ $.12)",
+            "units": 636.276045391,
+            "price": 0.12,
+            "discounted_price": 0.12,
+            "total": 76.35
+          }
+        ]
+      }
+    }
+  },
+  "status": {
+    "status": "Paid"
+  },
+  "total": {
+    "cost": 575.26,
+    "requests": 8774.8786,
+    "requests_cost": 79.89,
+    "bandwidth": 2811.176456368,
+    "bandwidth_cost": 395.37,
+    "percentile": 0,
+    "percentile_cost": 0,
+    "commit_shortfall": 0,
+    "discount": 0,
+    "discount_amount": 0,
+    "incurred_cost": 475.26,
+    "overage": 0,
+    "cost_before_discount": 575.26,
+    "extras": [
+      {
+        "name": "Shared TLS Certificate",
+        "recurring": 100,
+        "setup": 0
+      }
+    ],
+    "extras_cost": 100,
+    "bandwidth_units": "GB"
+  },
+  "line_items": [
+    {
+      "id": "0byn0p0krGg0em6w7bYpaw",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 6,
+      "description": "Latin America Bandwidth (143.656927205 gigabytes @ $.28)",
+      "service_no": 11000339,
+      "service_name": "Latin America Bandwidth",
+      "units": "143.656927205",
+      "rate_per_unit": "0.28",
+      "amount": "40.22",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019404,
+      "usage_type_cd": "Latin_America_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Latin_America_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "3Dw4BkS4TOl9FxQIvIZrhQ",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 14,
+      "description": "Shared TLS Certificate",
+      "service_no": 11000364,
+      "service_name": "Shared TLS Certificate",
+      "units": "1.0",
+      "rate_per_unit": "100.0",
+      "amount": "100.0",
+      "rate_schedule_no": 533,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": null,
+      "usage_type_cd": null,
+      "plan_no": 300,
+      "plan_name": "Shared TLS Certificate",
+      "client_service_id": "Shared_TLS_Certificate",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "6nm7JegCCGtUIPpaaR5MZg",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 11,
+      "description": "Latin America Requests (497.2731 units @ $.016)",
+      "service_no": 11000352,
+      "service_name": "Latin America Requests",
+      "units": "497.2731",
+      "rate_per_unit": "0.016",
+      "amount": "7.96",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019417,
+      "usage_type_cd": "Latin_America_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Latin_America_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "8gyuebD3MTPeAc6Lj3W43g",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 9,
+      "description": "Australia Requests (128.5872 units @ $.009)",
+      "service_no": 11000349,
+      "service_name": "Australia Requests",
+      "units": "128.5872",
+      "rate_per_unit": "0.009",
+      "amount": "1.16",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019415,
+      "usage_type_cd": "Australia_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Australia_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "9feZu0nSq6rAh7VCapwMSA",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 4,
+      "description": "Australia Bandwidth (39.128170527 gigabytes @ $.19)",
+      "service_no": 11000337,
+      "service_name": "Australia Bandwidth",
+      "units": "39.128170527",
+      "rate_per_unit": "0.19",
+      "amount": "7.43",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019402,
+      "usage_type_cd": "Australia_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Australia_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "C1F3YWVe0tarundCsymTeg",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 8,
+      "description": "Europe Requests (5,002.2096 units @ $.009)",
+      "service_no": 11000348,
+      "service_name": "Europe Requests",
+      "units": "5002.2096",
+      "rate_per_unit": "0.009",
+      "amount": "45.02",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019413,
+      "usage_type_cd": "Europe_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Europe_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "co3BZgSWDOuUVzn7jcWbPA",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 1,
+      "description": "Master Plan",
+      "service_no": 11000380,
+      "service_name": "Master Plan",
+      "units": "1.0",
+      "rate_per_unit": "0.0",
+      "amount": "0.0",
+      "rate_schedule_no": 488,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": null,
+      "usage_type_cd": null,
+      "plan_no": 284,
+      "plan_name": "Master Plan - Fastly US - M2M",
+      "client_service_id": "Master_Plan",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "Dj4bE0wzo1ZljZJsjoOMZw",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 3,
+      "description": "Europe Bandwidth (1,550.216163606 gigabytes @ $.12)",
+      "service_no": 11000336,
+      "service_name": "Europe Bandwidth",
+      "units": "1550.216163606",
+      "rate_per_unit": "0.12",
+      "amount": "186.03",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019401,
+      "usage_type_cd": "Europe_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Europe_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "igsQahYQHNs1MOLK2f0n7A",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 12,
+      "description": "South Africa Bandwidth (15.278642313 gigabytes @ $.28)",
+      "service_no": 11000438,
+      "service_name": "South Africa Bandwidth",
+      "units": "15.278642313",
+      "rate_per_unit": "0.28",
+      "amount": "4.28",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019444,
+      "usage_type_cd": "South_Africa_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "South_Africa_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "iTfaPKvVZKVbfV8cyhMeVA",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 10,
+      "description": "Asia Requests (1,133.8762 units @ $.009)",
+      "service_no": 11000350,
+      "service_name": "Asia Requests",
+      "units": "1133.8762",
+      "rate_per_unit": "0.009",
+      "amount": "10.2",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019411,
+      "usage_type_cd": "Asia_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Asia_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "PyOZEvGbid3y1bd6RA9yYw",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 7,
+      "description": "North America Requests (1,959.2106 units @ $.0075)",
+      "service_no": 11000347,
+      "service_name": "North America Requests",
+      "units": "1959.2106",
+      "rate_per_unit": "0.0075",
+      "amount": "14.69",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019406,
+      "usage_type_cd": "North_America_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "North_America_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "rVohnhq2Auej2YF4TK89xg",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 2,
+      "description": "North America Bandwidth (636.276045391 gigabytes @ $.12)",
+      "service_no": 11000335,
+      "service_name": "North America Bandwidth",
+      "units": "636.276045391",
+      "rate_per_unit": "0.12",
+      "amount": "76.35",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019400,
+      "usage_type_cd": "North_America_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "North_America_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "tZHFZI9n9TAS8uo9MPll3g",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 5,
+      "description": "Asia Bandwidth (426.620507326 gigabytes @ $.19)",
+      "service_no": 11000338,
+      "service_name": "Asia Bandwidth",
+      "units": "426.620507326",
+      "rate_per_unit": "0.19",
+      "amount": "81.06",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019403,
+      "usage_type_cd": "Asia_Bandwidth",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "Asia_Bandwidth",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    },
+    {
+      "id": "yyoN1UOQVE4Fenu7dPoZpA",
+      "aria_invoice_id": "ZbGzgfGVCmz3q7vwa21wAw",
+      "line_number": 13,
+      "description": "South Africa Requests (53.7219 units @ $.016)",
+      "service_no": 11000440,
+      "service_name": "South Africa Requests",
+      "units": "53.7219",
+      "rate_per_unit": "0.016",
+      "amount": "0.86",
+      "rate_schedule_no": 490,
+      "rate_schedule_tier_no": 1,
+      "usage_type_no": 10019446,
+      "usage_type_cd": "South_Africa_Requests",
+      "plan_no": 286,
+      "plan_name": "CDN",
+      "client_service_id": "South_Africa_Requests",
+      "credit_coupon_code": null,
+      "created_at": "2018-03-01T15:58:08Z",
+      "updated_at": "2018-03-01T15:58:08Z",
+      "deleted_at": null
+    }
+  ]
+}
