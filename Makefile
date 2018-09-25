@@ -42,6 +42,8 @@ TO_CLEAN += ./src/meltano_ui/node_modules
 TO_CLEAN += ./src/meltano_ui/dist
 
 clean:
+	# rm is run inside a container to support cross-platform volume mount permissions.
+	# see: https://github.com/moby/moby/issues/2259
 	${PYTHON_RUN} bash -c 'rm -rf ${TO_CLEAN}'
 	docker rmi -f ${base_image_tag}
 	docker rmi -f ${app_image_tag}
