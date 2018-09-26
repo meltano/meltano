@@ -12,8 +12,8 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
 | Model     | [Meltano Model](#meltano-model) | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
-| Extract   | [Meltano Extract](#meltano-extract) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
-| Load      | [Meltano Load](#meltano-load) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Target](https://www.singer.io/#targets) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Extract   | [Meltano Extract](#meltano-extract),  [Singer Core](https://github.com/singer-io/singer-python) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Load      | [Meltano Load](#meltano-load), [Singer Core](https://github.com/singer-io/singer-python) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Target](https://www.singer.io/#targets) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
 | Analyze | [Meltano Analysis](https://gitlab.com/meltano/meltano/tree/master/src/melt) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
 | Notebook | [JupyterHub](https://github.com/jupyterhub/jupyterhub) | [GNU Octave](https://www.gnu.org/software/octave/) | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/) |
@@ -21,17 +21,17 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 
 ## Principles
 
-We believe that information is the foundation of good decisions, and that companies of all sizes deserve insights into their operations. So Meltano provides broad, democratized access to detailed operational metrics, thereby driving better decisions and shortening decision cycle time across the entire enterprise.
+We believe that information is the foundation of good decisions, and that companies of all sizes deserve insights into their operations. So Meltano provides broad, democratized access to detailed operational metrics, driving better decisions and shortening decision cycle time across the entire enterprise.
 
-In addition, believe that the information a business uses to make decisions must come from all parts of that business. Meltano joins data from multiple systems used by Sales, Marketing, Product and others, thereby providing a comprehensive view of the relationship between business activities, associated costs, and customer long-term value.
+In addition, we believe that the information a business uses to make decisions must come from all parts of that business. Meltano joins data from multiple systems used by Sales, Marketing, Product and others, thereby providing a comprehensive view of the relationship between business activities, associated costs, and customer long-term value.
 
-A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within MAnalyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
+A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
 
 ## Media
 
 - [Google Docs Meeting Agenda](https://docs.google.com/document/d/1nayKquFLL8DN3h8mnLo3pVZsEKyPcBgQm2mqc5GggPA)
-- [Youtube Channel](https://www.youtube.com/channel/UCmp7zJAZEC7I_n9BEydH8XQ/videos)
-- [Issue board](https://gitlab.com/meltano/meltano/boards/528368?=)
+- [Youtube Channel](https://www.youtube.com/meltano/videos)
+- [Issue board](https://gitlab.com/meltano/meltano/boards)
 - [Functional Group Update (PDF format)](https://drive.google.com/open?id=1oNiCtHkorYKq19kx8CwGr8Z7QCjVQiOj)  
 - [Functional Group Update (Keynote format)](https://drive.google.com/open?id=1WmleHjP41nsxszGV50ionZKx-b2X3PvF)
 - [Blog post](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/)
@@ -56,7 +56,7 @@ Meltano also makes use of [review apps](https://docs.gitlab.com/ee/ci/review_app
 
 ### Evolution from an internal project, to a community, to open core
 
-1. We are building Meltano to solve a problem that GitLab share with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
+1. We are building Meltano to solve a problem that GitLab shares with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
 2. Next we'll focus on building a community around Meltano with more users and regular contributors to the code base.
 3. Right now Meltano is completely open source. After we have a community we'll introduce propietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
 
@@ -152,7 +152,9 @@ We want the tools to be open source so we can ship this as a product.
 1. Orchestration/Monitoring: [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) for scheduling, running, and monitoring the ELT jobs. In the future, [DAG](https://gitlab.com/gitlab-org/gitlab-ce/issues/41947) support will be added. Non-GitLab alternatives are [Airflow](https://airflow.incubator.apache.org) or [Luigi](https://github.com/spotify/luigi). GitLab CI can handle 1000's of distributed runners to run for example Python scripts.
 1. Visualization/Dashboard: Meltano is compatible with nearly all visualization engines, due to the SQL based data store. For example commercial products like [Looker](https://looker.com/) or [Tableau](https://www.tableau.com/), as well as open-source products like [Superset](https://github.com/airbnb/superset) or [Metabase](https://metabase.com) can be used.
 
-## How to Install and Run Meltano    
+## How to Install and Run Meltano  
+
+### With Docker  
 
 You can run local copy of Meltano using [docker-compose][].
 
@@ -165,6 +167,14 @@ make init_db
 
 # bring up docker-compose
 docker-compose up
+```
+
+### Without Docker
+```bash
+python -m virtualenv ~/path/to/melt_venv 
+source ~/path/to/melt_venv/bin/activate
+pip install -e '.[api]' 
+python -m meltano.api
 ```
 
 This will start:
