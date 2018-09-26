@@ -170,7 +170,12 @@ docker-compose up
 ```
 
 ### Without Docker
-
+```bash
+python -m virtualenv ~/path/to/melt_venv 
+source ~/path/to/melt_venv/bin/activate
+pip install -e '.[api]' 
+python -m meltano.api
+```
 
 This will start:
 
