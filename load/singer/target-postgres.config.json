@@ -1,0 +1,8 @@
+{
+  "host": "$PG_ADDRESS",
+  "user": "$PG_USERNAME",
+  "port": "$PG_PORT",
+  "password": "$PG_PASSWORD",
+  "dbname": "$PG_DATABASE",
+  "schema": "$PG_SCHEMA"
+}
