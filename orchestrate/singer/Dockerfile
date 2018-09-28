@@ -1,7 +1,7 @@
 # TODO: move to a more basic image
 FROM registry.gitlab.com/meltano/meltano-elt/extract:latest
 
-RUN pip3 install virtualenv
+RUN pip3 install virtualenv click
 
 RUN virtualenv /venvs/tap-zendesk
 RUN virtualenv /venvs/target-postgres
@@ -13,13 +13,11 @@ RUN /venvs/target-postgres/bin/pip install git+https://github.com/micaelbergeron
 ENV SINGER_RUN_DIR /run/singer
 RUN mkdir $SINGER_RUN_DIR
 
-COPY ./orchestrate/singer/meltano-singer.sh /usr/bin
-RUN chmod +x /usr/bin/meltano-singer.sh
+COPY ./orchestrate/singer/meltano-singer.py /usr/bin
+RUN chmod +x /usr/bin/meltano-singer.py
 
 # defaut config files
 COPY ./extract/singer/ /etc/singer/tap
 COPY ./load/singer /etc/singer/target
 
-ENTRYPOINT ["meltano-singer.sh"]
-
-CMD ["--help"]
+ENTRYPOINT ["meltano-singer.py"]
