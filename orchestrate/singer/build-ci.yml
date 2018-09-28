@@ -2,7 +2,7 @@
 
 # Builds the singer_runner container for use in testing on branches
 build_singer_runner:
-  stage: build
+  stage: build_base
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -18,8 +18,8 @@ build_singer_runner:
   when: manual
 
 # Builds the orchestrate container as latest on master
-publish_orchestrate:
-  stage: build
+publish_singer_runner:
+  stage: build_base
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
