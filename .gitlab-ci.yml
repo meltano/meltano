@@ -3,7 +3,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
 include:
-  - "$CI_PROJECT_DIR/orchestrate/singer/build-ci.yml"
+  - "/orchestrate/singer/build-ci.yml"
 
 stages:
     - test
