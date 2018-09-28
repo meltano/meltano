@@ -1,0 +1,36 @@
+# Build
+
+# Builds the singer_runner container for use in testing on branches
+build_singer_runner:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - housekeeping
+  script:
+    - mkdir -p /root/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:$CI_COMMIT_SHA
+  except:
+    refs:
+      - master
+  when: manual
+
+# Builds the orchestrate container as latest on master
+publish_orchestrate:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  tags:
+    - housekeeping
+  script:
+    - mkdir -p /root/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:latest
+  only:
+    refs:
+      - master
+    variables:
+      - $CI_PIPELINE_SOURCE == 'push'
