@@ -9,7 +9,7 @@ build_singer_runner:
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:$CI_COMMIT_SHA
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:$CI_COMMIT_SHA
   except:
     refs:
       - master
@@ -24,7 +24,7 @@ publish_singer_runner:
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:latest
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:latest
   only:
     refs:
       - master
