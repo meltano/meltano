@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
-import click
-import subprocess
 import os
-
+import subprocess
 from pathlib import Path
 
+import click
 
 VENVS_DIR = Path("/venvs")
 RUN_DIR = Path(os.getenv("SINGER_RUN_DIR"))
