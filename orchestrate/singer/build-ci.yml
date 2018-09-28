@@ -6,8 +6,6 @@ build_singer_runner:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  tags:
-    - housekeeping
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
@@ -23,8 +21,6 @@ publish_singer_runner:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  tags:
-    - housekeeping
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
