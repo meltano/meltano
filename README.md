@@ -11,8 +11,8 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 ## Solution
 1. _M:_ Provide Modeling via [Meltano Model and Analyze (MMA)](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui), a modeling layer, which works via [lkml files](https://docs.looker.com/data-modeling/getting-started/model-development).
 1. _E, L:_ Provide a solid and extract, load structure via the singer spec.
-  * [Getting Started](https://github.com/singer-io/getting-started)
-  * [Specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
+ * [Getting Started](https://github.com/singer-io/getting-started)
+ * [Specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
 1. _T:_ Provide transforms via [DBT](https://www.getdbt.com/)
 1. _A:_ Provide Analysis via [Meltano Model and Analyze (MMA)](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui), an analysis layer, which works via [lkml files](https://docs.looker.com/data-modeling/getting-started/model-development).
 1. _N:_ Provide Notebooking via [Jupyter Notebooks](https://jupyter.org/)
