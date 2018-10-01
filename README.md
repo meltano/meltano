@@ -11,13 +11,13 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 ## Solution
 1. _M:_ Provide Modeling via [Meltano Model and Analyze (MMA)](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui), a modeling layer, which works via [lkml files](https://docs.looker.com/data-modeling/getting-started/model-development).
 1. _E, L:_ Provide a solid and extract, load structure via the singer spec.
- * [Getting Started](https://github.com/singer-io/getting-started)
- * [Specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
+  1. [Getting Started](https://github.com/singer-io/getting-started)
+  1. [Specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
 1. _T:_ Provide transforms via [DBT](https://www.getdbt.com/)
 1. _A:_ Provide Analysis via [Meltano Model and Analyze (MMA)](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui), an analysis layer, which works via [lkml files](https://docs.looker.com/data-modeling/getting-started/model-development).
 1. _N:_ Provide Notebooking via [Jupyter Notebooks](https://jupyter.org/)
 1. _O:_ Provide Orchestration via [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/)
-  * Provide a way to easily generate orchestration files ([gitlab-ci.yml](https://docs.gitlab.com/ee/ci/yaml/) files)
+  1. Provide a way to easily generate orchestration files ([gitlab-ci.yml](https://docs.gitlab.com/ee/ci/yaml/) files)
 1. We provide tools and specs to create, extractors, loaders and transformers. 
 1. We provide tools to run extractors in your orchestrator seamlessly via [containerization](https://www.digitalocean.com/community/tutorials/the-docker-ecosystem-an-overview-of-containerization).
 
