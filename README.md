@@ -12,7 +12,7 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
 | Model     | [Meltano Model](#meltano-model) | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
-| Extract   | [Meltano Extract](#meltano-extract),  [Singer Core](https://github.com/singer-io/singer-python) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Extract   | [Tap](https://www.singer.io/#taps) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Load      | [Meltano Load](#meltano-load), [Singer Core](https://github.com/singer-io/singer-python) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Target](https://www.singer.io/#targets) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
 | Analyze | [Meltano Analysis](https://gitlab.com/meltano/meltano/tree/master/src/melt) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
@@ -205,45 +205,6 @@ It is expected that the Meltano project will have many applications managed in t
 [Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
 
 Meltano Models are [LookML files](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) that model data so that you can esility visualize it in Meltano Analysis.
-
-### Meltano Extract
-
-_Meltano Extract is under development, consider it a moving target: API breakage are frequent and spontaneous._
-
-To satisfy our data integration needs, we started working on custom EL scripts, creating the Meltano fuse `meltano-extract-common` python module. 
-
-Features include:
-
-  - Automatic schema creation
-  - Automatic schema mutation
-  - Fields whitelisting
-  - Fields pseudonymization
-  - Job logging (recovery)
-  - CLI configuration
-  - REST data source
-  - SOAP data source
-  - SQL data source
-  
-Currently we are using these tools to extract data from the following data sources:
-  
-  - Zendesk
-  - Zuora
-  - NetSuite
-  - Marketo
-  - Lever
-  - Google Sheets/CSV
-  
-#### Architecture
-
-The `meltano-extract-common` is currently only a set of tools to help build EL scripts. It enforces very little structure on how the process should be handled.
-
-EL scripts should describe the `Schema` or the data source they try to integrate data from. This schema can then be applied to the data warehouse, if possible.
-
-EL scripts are responsible for extracting data that complies for the specified configuration options (incremental, full) and save them to an intermediary format (currently CSV).
-
-Then, using PostgreSQL `COPY FROM ...`, EL scripts should insert/upsert into the backend (warehouse).
-
-Job logging can also be provided to make the run persistent and recoverable.
 
 ### Meltano Load
 
