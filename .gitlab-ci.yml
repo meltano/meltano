@@ -177,6 +177,7 @@ meltano_full:
 
 dev_meltano_runner:
   <<: *docker_build
+  stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
     DOCKER_DRIVER: overlay2
@@ -186,6 +187,7 @@ dev_meltano_runner:
 
 meltano_runner:
   <<: *docker_build
+  stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
     DOCKER_DRIVER: overlay2

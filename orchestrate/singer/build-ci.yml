@@ -2,7 +2,7 @@
 
 # Builds the singer_runner container for use in testing on branches
 build_singer_runner:
-  stage: build_base
+  stage: build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -11,13 +11,11 @@ build_singer_runner:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
     - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:$CI_COMMIT_SHA
   except:
-    refs:
-      - master
-  when: manual
+    - master
 
 # Builds the orchestrate container as latest on master
 publish_singer_runner:
-  stage: build_base
+  stage: build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
