@@ -129,7 +129,7 @@ meltano_base_hub:
   only:
     - tags
 
-meltano_base:
+dev_meltano_base:
   <<: *docker_build
   stage: build_base
   variables:
@@ -139,6 +139,17 @@ meltano_base:
     IMAGE_TAG: base-$CI_COMMIT_SHA
   only:
     - branches
+
+meltano_base:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: meltano
+    IMAGE_TAG: latest
+  only:
+    - master
 
 dev_meltano_runner:
   <<: *docker_build
