@@ -14,9 +14,11 @@
 ifdef DOCKER_REGISTRY
 base_image_tag = ${DOCKER_REGISTRY}/meltano/base
 app_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
+runner_image_tag = ${DOCKER_REGISTRY}/meltano/runner
 else
 base_image_tag = meltano/base
 app_image_tag = meltano/meltano
+runner_image_tag = meltano/runner
 endif
 
 DOCKER_RUN=docker run -it --rm -v $(shell pwd):/app -w /app
@@ -47,8 +49,9 @@ clean:
 	${PYTHON_RUN} bash -c 'rm -rf ${TO_CLEAN}'
 	docker rmi -f ${base_image_tag}
 	docker rmi -f ${app_image_tag}
+	docker rmi -f ${runner_image_tag}
 
-docker_images: base_image prod_image
+docker_images: base_image prod_image runner_image
 
 # Docker Image Related
 # ====================
@@ -57,7 +60,7 @@ docker_images: base_image prod_image
 # - `make prod_image` builds meltano/meltano which is an all-in-one production
 #   image that includes the static ui artifacts in the image.
 
-.PHONY: base_image prod_image
+.PHONY: base_image prod_image runner_image
 
 base_image:
 	docker build \
@@ -72,6 +75,11 @@ prod_image: base_image ui
 		-t $(app_image_tag) \
 		.
 
+runner_image:
+	docker build \
+		--file docker/runner/Dockerfile \
+		-t $(runner_image_tag) \
+	  .
 
 # API Related
 # ===========

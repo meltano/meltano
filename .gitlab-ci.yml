@@ -6,13 +6,13 @@ include:
   - "/orchestrate/singer/build-ci.yml"
 
 stages:
-    - test
-    - publish
-    - build_base
-    - build
-    - review
-    - production
-    - dockerhub
+  - test
+  - publish
+  - build_base
+  - build
+  - review
+  - production
+  - dockerhub
 
 cache:
   paths:
@@ -30,47 +30,47 @@ cache:
   stage: test
   before_script: *pipenv_install
   script:
-  - pipenv run flake8
+    - pipenv run flake8
   allow_failure: true
 
 .test:
   stage: test
   before_script: *pipenv_install
   script:
-  - pipenv run pytest 
+    - pipenv run pytest
   allow_failure: true
- 
+
 .run:
   script:
-  - python setup.py bdist_wheel
-  # an alternative approach is to install and run:
-  - pip install dist/*
-  # run the command here
+    - python setup.py bdist_wheel
+    # an alternative approach is to install and run:
+    - pip install dist/*
+    # run the command here
   artifacts:
     paths:
     - dist/*.whl
 
 .pages:
   script:
-  - pip install sphinx sphinx-rtd-theme
-  - cd doc ; make html
-  - mv build/html/ ../public/
+    - pip install sphinx sphinx-rtd-theme
+    - cd doc ; make html
+    - mv build/html/ ../public/
   artifacts:
     paths:
     - public
   only:
-  - master
+    - master
 
 publish:
   stage: publish
   before_script:
-  - pip install twine 
+    - pip install twine
   script:
-  - python setup.py sdist
-  - twine upload dist/*
+    - python setup.py sdist
+    - twine upload dist/*
   only:
-  - master
-  - dev
+    - master
+    - dev
   when: manual
 
 .docker_build: &docker_build
@@ -80,13 +80,13 @@ publish:
     DOCKERFILE: .
     DOCKER_DRIVER: overlay2
   services:
-  - docker:dind
+    - docker:dind
   script:
-  - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_PROJECT_SLUG}
-  - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_REF_NAME}
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
-  - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_PROJECT_SLUG}
+    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_REF_NAME}
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
+    - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 .dev_build_meltano:
   <<: *docker_build
@@ -96,7 +96,7 @@ publish:
     IMAGE_NAME: meltano
     DOCKERFILE: ./docker/Dockerfile
   except:
-  - master
+    - master
 
 .build_meltano:
   <<: *docker_build
@@ -106,17 +106,17 @@ publish:
     IMAGE_TAG: latest
     DOCKERFILE: ./docker/Dockerfile
   only:
-  - master
+    - master
 
 .review:
   image: silvs/kubectl:latest
   stage: review
   script:
-  - echo ""
+    - echo ""
   only:
-  - branches
+    - branches
   except:
-  - master
+    - master
 
 meltano_base_hub:
   image: docker:latest
@@ -124,13 +124,13 @@ meltano_base_hub:
   variables:
     DOCKER_DRIVER: overlay2
   services:
-  - docker:dind
+    - docker:dind
   script:
-  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-  - docker build -t meltano/meltano:base-v$CI_COMMIT_REF_NAME -f app/images/base.Dockerfile .
-  - docker push meltano/meltano:base-v$CI_COMMIT_REF_NAME
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+    - docker build -t meltano/meltano:base-v$CI_COMMIT_REF_NAME -f app/images/base.Dockerfile .
+    - docker push meltano/meltano:base-v$CI_COMMIT_REF_NAME
   only:
-  - tags
+    - tags
 
 meltano_full_hub:
   image: docker:latest
@@ -138,13 +138,13 @@ meltano_full_hub:
   variables:
     DOCKER_DRIVER: overlay2
   services:
-  - docker:dind
+    - docker:dind
   script:
-  - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-  - docker build -t meltano/meltano:full-v$CI_COMMIT_REF_NAME -f app/images/full.Dockerfile .
-  - docker push meltano/meltano:full-v$CI_COMMIT_REF_NAME
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+    - docker build -t meltano/meltano:full-v$CI_COMMIT_REF_NAME -f app/images/full.Dockerfile .
+    - docker push meltano/meltano:full-v$CI_COMMIT_REF_NAME
   only:
-  - tags
+    - tags
 
 meltano_base:
   image: docker:latest
@@ -152,13 +152,13 @@ meltano_base:
   variables:
     DOCKER_DRIVER: overlay2
   services:
-  - docker:dind
+    - docker:dind
   script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA -f app/images/base.Dockerfile .
-  - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA -f app/images/base.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA
   only:
-  - branches
+    - branches
 
 meltano_full:
   image: docker:latest
@@ -166,14 +166,33 @@ meltano_full:
   variables:
     DOCKER_DRIVER: overlay2
   services:
-  - docker:dind
+    - docker:dind
   script:
-  - sed -i "2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA?" app/images/full.Dockerfile
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA -f app/images/full.Dockerfile .
-  - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA
+    - sed -i "2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA?" app/images/full.Dockerfile
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA -f app/images/full.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA
   only:
-  - branches
+    - branches
+
+dev_meltano_runner:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/runner/Dockerfile
+    DOCKER_DRIVER: overlay2
+    IMAGE_NAME: runner
+  except:
+    - master
+
+meltano_runner:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/runner/Dockerfile
+    DOCKER_DRIVER: overlay2
+    IMAGE_NAME: runner
+    IMAGE_TAG: latest
+  only:
+    - master
 
 production:
   image: silvs/kubectl:latest
@@ -182,9 +201,9 @@ production:
     name: production
     url: https://melt.gitlab-bizops.com
   script:
-  - cd app/chart/meltano
-  - helm init --client-only
-  - helm dep update
-  - helm upgrade --install --namespace default meltano . --set image.repository=$CI_REGISTRY_IMAGE/meltano,image.tag=base-$CI_COMMIT_SHA,ingress.enabled=true,'global.ingress.hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].secretName=melt-tls',postgresql.postgresPassword=$POSTGRES_PASSWORD,oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID,oauth2-proxy.clientSecret=$OAUTH2_PROXY_CLIENT_SECRET,oauth2-proxy.cookieSecret=$OAUTH2_PROXY_COOKIE_SECRET,oauth2-proxy.enabled=true,global.oauth2-proxy.enabled=true,oauth2-proxy.emailDomain=gitlab.com,oauth2-proxy.gitlabHost=https://dev.gitlab.org
+    - cd app/chart/meltano
+    - helm init --client-only
+    - helm dep update
+    - helm upgrade --install --namespace default meltano . --set image.repository=$CI_REGISTRY_IMAGE/meltano,image.tag=base-$CI_COMMIT_SHA,ingress.enabled=true,'global.ingress.hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].secretName=melt-tls',postgresql.postgresPassword=$POSTGRES_PASSWORD,oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID,oauth2-proxy.clientSecret=$OAUTH2_PROXY_CLIENT_SECRET,oauth2-proxy.cookieSecret=$OAUTH2_PROXY_COOKIE_SECRET,oauth2-proxy.enabled=true,global.oauth2-proxy.enabled=true,oauth2-proxy.emailDomain=gitlab.com,oauth2-proxy.gitlabHost=https://dev.gitlab.org
   only:
-  - master
+    - master

@@ -1,4 +1,4 @@
-FROM meltano/base
+FROM registry.gitlab.com/meltano/base
 
 RUN pip install uwsgi gevent
 
