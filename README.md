@@ -27,6 +27,10 @@ In addition, we believe that the information a business uses to make decisions m
 
 A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
 
+### Loosely Coupled Tools
+
+All extractors and loaders should be self contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in it's final form. An extractor should not rely on a loader to clean up it's data.  
+
 ## Media
 
 - [Google Docs Meeting Agenda](https://docs.google.com/document/d/1nayKquFLL8DN3h8mnLo3pVZsEKyPcBgQm2mqc5GggPA)
