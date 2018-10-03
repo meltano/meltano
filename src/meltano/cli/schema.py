@@ -1,4 +1,3 @@
-import os
 import logging
 import click
 import psycopg2

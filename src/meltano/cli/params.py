@@ -1,3 +1,4 @@
+import os
 import functools
 import click
 
@@ -10,21 +11,17 @@ def db_options(func):
                   envvar='PG_ADDRESS',
                   default='localhost',
                   help="Database address.")
-
     @click.option('-p', '--port',
                   type=int,
                   envvar='PG_PORT',
                   default=5432)
-
     @click.option('-d', '-db', 'database',
                   envvar='PG_DATABASE',
                   help="Database to import the data to.")
-
     @click.option('-u', '--username',
                   envvar='PG_USERNAME',
                   default=lambda: os.getenv('USER', ''),
                   help="Specifies the user to connect to the database with.")
-
     @click.password_option(envvar='PG_PASSWORD')
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
