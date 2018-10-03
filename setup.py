@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -8,8 +7,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="meltano",
     version="0.0.1",
-    author="Meltano Team",
-    author_email="info@gitlab.com",
+    author='Meltano Team & Contributors',
+    author_email="meltano@gitlab.com",
     description="Meltano",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -58,6 +57,11 @@ setuptools.setup(
             'flask-cors',
             'flask-sqlalchemy',
             'flask',
+        ]
+    },
+    entry_points={
+        'console_scripts': [
+            "meltano = meltano.cli:main"
         ]
     }
 )
