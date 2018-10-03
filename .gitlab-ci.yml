@@ -119,59 +119,24 @@ publish:
     - master
 
 meltano_base_hub:
-  image: docker:latest
+  <<: *docker_build
   stage: build_base
   variables:
     DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  script:
-    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker build -t meltano/meltano:base-v$CI_COMMIT_REF_NAME -f app/images/base.Dockerfile .
-    - docker push meltano/meltano:base-v$CI_COMMIT_REF_NAME
-  only:
-    - tags
-
-meltano_full_hub:
-  image: docker:latest
-  stage: build
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  script:
-    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker build -t meltano/meltano:full-v$CI_COMMIT_REF_NAME -f app/images/full.Dockerfile .
-    - docker push meltano/meltano:full-v$CI_COMMIT_REF_NAME
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: meltano
+    IMAGE_TAG: base-v$CI_COMMIT_REF_NAME
   only:
     - tags
 
 meltano_base:
-  image: docker:latest
+  <<: *docker_build
   stage: build_base
   variables:
     DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA -f app/images/base.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA
-  only:
-    - branches
-
-meltano_full:
-  image: docker:latest
-  stage: build
-  variables:
-    DOCKER_DRIVER: overlay2
-  services:
-    - docker:dind
-  script:
-    - sed -i "2s?.*?FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA?" app/images/full.Dockerfile
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA -f app/images/full.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE/meltano:full-$CI_COMMIT_SHA
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: meltano
+    IMAGE_TAG: base-$CI_COMMIT_SHA
   only:
     - branches
 
