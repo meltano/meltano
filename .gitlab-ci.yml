@@ -82,7 +82,7 @@ publish:
   services:
     - docker:dind
   script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_PROJECT_SLUG}
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-meltano}
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
