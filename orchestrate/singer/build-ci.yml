@@ -6,11 +6,11 @@
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_PROJECT_SLUG}
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 # Builds the singer_runner container for use in testing on branches
 dev_singer_runner:
@@ -20,7 +20,7 @@ dev_singer_runner:
     IMAGE_NAME: singer_runner
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "2s#.*#FROM $CI_REGISTRY_IMAGE/runner:$CI_COMMIT_SHA#" $DOCKERFILE
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/runner:$CI_COMMIT_SHA#" $DOCKERFILE
   except:
     - master
 
@@ -28,7 +28,7 @@ singer_runner:
   <<: *kaniko_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
-    IMAGE_NAME: singer_runner
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/singer_runner
     IMAGE_TAG: latest
   only:
     refs:

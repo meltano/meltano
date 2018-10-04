@@ -1,5 +1,4 @@
-# TODO: move to a more basic image
-FROM registry.gitlab.com/meltano/runner
+FROM meltano/meltano/runner
 
 RUN pip install virtualenv
 

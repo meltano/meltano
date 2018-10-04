@@ -12,13 +12,13 @@
 #   image
 
 ifdef DOCKER_REGISTRY
-base_image_tag = ${DOCKER_REGISTRY}/meltano/base
+base_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/base
 app_image_tag = ${DOCKER_REGISTRY}/meltano/meltano
-runner_image_tag = ${DOCKER_REGISTRY}/meltano/runner
+runner_image_tag = ${DOCKER_REGISTRY}/meltano/meltano/runner
 else
-base_image_tag = meltano/base
+base_image_tag = meltano/meltano/base
 app_image_tag = meltano/meltano
-runner_image_tag = meltano/runner
+runner_image_tag = meltano/meltano/runner
 endif
 
 DOCKER_RUN=docker run -it --rm -v $(shell pwd):/app -w /app

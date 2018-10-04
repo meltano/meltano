@@ -82,11 +82,11 @@ publish:
   services:
     - docker:dind
   script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-meltano}
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
-    - docker push $CI_REGISTRY_IMAGE/$DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
+    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 .dev_build_meltano:
   <<: *docker_build
@@ -121,7 +121,12 @@ meltano_base_hub:
   stage: build_base
   variables:
     DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: meltano/base
     IMAGE_TAG: base-v$CI_COMMIT_TAG
+  script:
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+    - docker build -t $IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE .
+    - docker push $IMAGE_NAME:$IMAGE_TAG
   only:
     - tags
 
@@ -130,6 +135,7 @@ dev_meltano_base:
   stage: build_base
   variables:
     DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
     IMAGE_TAG: base-$CI_COMMIT_SHA
   only:
     - branches
@@ -139,7 +145,7 @@ meltano_base:
   stage: build_base
   variables:
     DOCKERFILE: docker/base/Dockerfile
-    IMAGE_TAG: base
+    IMAGE_TAG: $CI_REGISTRY_IMAGE/base
   only:
     - master
 
@@ -149,14 +155,14 @@ dev_meltano:
     DOCKERFILE: docker/prod/Dockerfile
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA#" $DOCKERFILE
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/meltano/base:$CI_COMMIT_SHA#" $DOCKERFILE
   except:
     - master
 
 meltano:
   <<: *docker_build
   variables:
-    DOCKERFILE: docker/full/Dockerfile
+    DOCKERFILE: docker/prod/Dockerfile
     IMAGE_TAG: latest
   only:
     - master
@@ -166,7 +172,7 @@ dev_meltano_runner:
   stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
-    IMAGE_NAME: runner
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
   except:
     - master
 
@@ -175,7 +181,7 @@ meltano_runner:
   stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
-    IMAGE_NAME: runner
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     IMAGE_TAG: latest
   only:
     - master
