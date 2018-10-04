@@ -1,6 +1,6 @@
 FROM meltano/meltano/runner
 
-RUN pip install virtualenv
+RUN pip install virtualenv click
 
 COPY . /meltano
 
