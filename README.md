@@ -29,7 +29,22 @@ A data analyst or scientist should be able to easily use Meltano to add whatever
 
 ### Loosely Coupled Tools
 
-All extractors and loaders should be self contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in it's final form. An extractor should not rely on a loader to clean up it's data.  
+All extractors and loaders should be self contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in it's final form. An extractor should not rely on a loader to clean up it's data.
+
+### Product
+
+The product is the glue to adhere the complete data science life cycle together and is built for 2 different team personas.
+
+1. Team 1 wants a CLI, they have engineers in place to write the code, e.g. to make needed extractors.
+2. Team 2 wants a GUI, they do not have engineers in place to write a lot of code.
+
+For both teams we provide a complete single source of truth solution. Single source of truth solution means:
+* CLI: One CLI, with one command, with one config to extract, load, transform, remove PII, mock data and orchestrate.
+* GUI: One single application to extract, load, transform, remove PII, mock data and orchestrate. 
+
+One GUI is also available for both personas for modeling and analysis. All data comes from files which are version controlled.
+
+The orchestration will use the GitLab CI, but running it and configuring it will happen from the CLI or GUI.
 
 ## Media
 
