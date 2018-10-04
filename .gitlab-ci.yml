@@ -136,7 +136,6 @@ dev_meltano_base:
   variables:
     DOCKERFILE: docker/base/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
-    IMAGE_TAG: base-$CI_COMMIT_SHA
   only:
     - branches
 
@@ -145,7 +144,8 @@ meltano_base:
   stage: build_base
   variables:
     DOCKERFILE: docker/base/Dockerfile
-    IMAGE_TAG: $CI_REGISTRY_IMAGE/base
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
+    IMAGE_TAG: latest
   only:
     - master
 
@@ -155,7 +155,7 @@ dev_meltano:
     DOCKERFILE: docker/prod/Dockerfile
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/meltano/base:$CI_COMMIT_SHA#" $DOCKERFILE
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base:$CI_COMMIT_SHA#" $DOCKERFILE
   except:
     - master
 
