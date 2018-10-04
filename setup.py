@@ -39,7 +39,7 @@ setuptools.setup(
     tests_require=['pytest'],
     # run `make requirements.txt` after editing
     install_requires=[
-        'click'
+        'click',
         'aiohttp',
         'backoff',
         'dbt',
