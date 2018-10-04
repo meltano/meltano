@@ -92,7 +92,6 @@ publish:
   <<: *docker_build
   image: docker:latest
   variables:
-    DOCKER_DRIVER: overlay2
     IMAGE_NAME: meltano
     DOCKERFILE: ./docker/Dockerfile
   except:
@@ -101,7 +100,6 @@ publish:
 .build_meltano:
   <<: *docker_build
   variables:
-    DOCKER_DRIVER: overlay2
     IMAGE_NAME: meltano
     IMAGE_TAG: latest
     DOCKERFILE: ./docker/Dockerfile
@@ -122,9 +120,7 @@ meltano_base_hub:
   <<: *docker_build
   stage: build_base
   variables:
-    DOCKER_DRIVER: overlay2
     DOCKERFILE: docker/base/Dockerfile
-    IMAGE_NAME: meltano
     IMAGE_TAG: base-v$CI_COMMIT_TAG
   only:
     - tags
@@ -133,9 +129,7 @@ dev_meltano_base:
   <<: *docker_build
   stage: build_base
   variables:
-    DOCKER_DRIVER: overlay2
     DOCKERFILE: docker/base/Dockerfile
-    IMAGE_NAME: meltano
     IMAGE_TAG: base-$CI_COMMIT_SHA
   only:
     - branches
@@ -144,9 +138,25 @@ meltano_base:
   <<: *docker_build
   stage: build_base
   variables:
-    DOCKER_DRIVER: overlay2
     DOCKERFILE: docker/base/Dockerfile
-    IMAGE_NAME: meltano
+    IMAGE_TAG: base
+  only:
+    - master
+
+dev_meltano:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/prod/Dockerfile
+  before_script:
+    # replace the FROM ... in the Dockerfile to use this branch's image
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/meltano:base-$CI_COMMIT_SHA#" $DOCKERFILE
+  except:
+    - master
+
+meltano:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/full/Dockerfile
     IMAGE_TAG: latest
   only:
     - master
@@ -156,7 +166,6 @@ dev_meltano_runner:
   stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
-    DOCKER_DRIVER: overlay2
     IMAGE_NAME: runner
   except:
     - master
@@ -166,7 +175,6 @@ meltano_runner:
   stage: build_base
   variables:
     DOCKERFILE: docker/runner/Dockerfile
-    DOCKER_DRIVER: overlay2
     IMAGE_NAME: runner
     IMAGE_TAG: latest
   only:
