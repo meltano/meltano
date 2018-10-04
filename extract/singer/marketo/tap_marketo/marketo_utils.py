@@ -60,7 +60,7 @@ class MarketoUtils(object):
         if output_file:
             with open(output_file, 'w') as keyfile:
                 json.dump(keyfile_dict, keyfile, sort_keys=True, indent=2)
-            logging.info('Keyfile written successfully.')
+            logging.info('Keyfile written to {} successfully.'.format(output_file))
         else:
             return keyfile_dict
 
