@@ -1,4 +1,4 @@
-import json
+
 import logging
 from typing import Dict
 import sys
@@ -25,7 +25,14 @@ class MarketoClient(object):
         Boilerplate for GETting a request and returning the json.
         """
 
-        response = requests.get(url, params=payload)
+        # Try to get the access token, it may not exist yet
+        try:
+            auth = {'access_token': self.access_token}
+        except:
+            auth = {'access_token': 'None'}
+
+        params = {**auth, **payload}
+        response = requests.get(url, params=params)
         if response.status_code != 200:
             logging.critical(response.status_code)
             logging.critical(response.text)
@@ -50,9 +57,16 @@ class MarketoClient(object):
         Get a date-based paging token from Marketo for use in other calls.
         """
 
-        token_url = '{}/rest/v1/activities/pagingtoken.json'.format(self.endpoint)
-        #response = requests.get()
-        return
+        token_url = '{}/v1/activities/pagingtoken.json'.format(self.endpoint)
+        payload = {'sinceDatetime': self.start_time}
+        response = self.get_response(token_url, payload)
+
+        if not response['success']:
+            logging.critical('Failed to get initial nextPageToken.')
+            logging.critical(response['errors'])
+            sys.exit(1)
+        else:
+            return response['nextPageToken']
 
     def get_activity_types(self):
         """
