@@ -23,14 +23,14 @@ def file_has_data(file: Path):
 
 class SingerRunner():
     tap_files = {
-        'config': os.path.join(RUN_DIR, "tap.config.json"),
-        'catalog': os.path.join(RUN_DIR, "tap.properties.json"),
-        'state': os.path.join(RUN_DIR, "state.json"),
+        'config': RUN_DIR.joinpath("tap.config.json"),
+        'catalog': RUN_DIR.joinpath("tap.properties.json"),
+        'state': RUN_DIR.joinpath("state.json"),
     }
 
     target_files = {
-        'config': os.path.join(RUN_DIR, "target.config.json"),
-        'state': os.path.join(RUN_DIR, "new_state.json"),
+        'config': RUN_DIR.joinpath("target.config.json"),
+        'state': RUN_DIR.joinpath("new_state.json"),
     }
 
     def __init__(self, **config):
@@ -38,14 +38,14 @@ class SingerRunner():
 
 
     def exec_path(self, name) -> Path:
-        return os.path.join(VENVS_DIR, name, "bin", name)
+        return VENVS_DIR.joinpath(name, "bin", name)
 
 
     def prepare(self, tap: str, target: str):
         config_files = {
-            self.tap_files['config']: os.path.join(TAP_CONFIG_DIR, f"{tap}.config.json"),
-            self.tap_files['catalog']: os.path.join(TAP_CONFIG_DIR, f"{tap}.properties.json"),
-            self.target_files['config']: os.path.join(TARGET_CONFIG_DIR, f"{target}.config.json"),
+            self.tap_files['config']: TAP_CONFIG_DIR.joinpath(f"{tap}.config.json"),
+            self.tap_files['catalog']: TAP_CONFIG_DIR.joinpath(f"{tap}.properties.json"),
+            self.target_files['config']: TARGET_CONFIG_DIR.joinpath(f"{target}.config.json"),
         }
 
         for dst, src in config_files.items():
