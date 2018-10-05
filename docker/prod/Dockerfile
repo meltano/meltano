@@ -1,4 +1,4 @@
-FROM meltano/base
+FROM meltano/meltano/base
 
 RUN pip install uwsgi gevent
 

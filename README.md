@@ -218,7 +218,19 @@ The Meltano product consists of three key components:
 
 As development progresses, additional documentation on getting started along with example configuration and CI scripts will become available.
 
-It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion. 
+It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion.
+
+### Meltano CLI
+
+Meltano will provide a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
+
+This CLI tool should hold the single source of truth for all the pipeline and make it easy to develop, run, and debug all the components.
+
+#### meltano schema
+Helper functions to manage the dataware house. For now this is PGSQL specific.
+
+##### create <SCHEMA> <ROLES>
+Create and grant usage for a database schema.
 
 ### Meltano Model
 

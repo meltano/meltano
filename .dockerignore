@@ -5,5 +5,8 @@
 !/README.md
 !/LICENSE
 !/src
+!/orchestrate
 !/model
 !/transform
+!/extract
+!/load
