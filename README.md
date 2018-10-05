@@ -202,9 +202,9 @@ It is expected that the Meltano project will have many applications managed in t
 
 ### Meltano CLI
 
-Meltano will provide a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
+Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
 
-This CLI tool should hold the single source of truth for all the pipeline and make it easy to develop, run, and debug all the components.
+This CLI tool is based upon the single source of truth for all the pipeline and make it easy to develop, run, and debug all the components.
 
 #### meltano schema
 Helper functions to manage the dataware house. For now this is PGSQL specific.
