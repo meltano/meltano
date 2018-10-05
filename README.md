@@ -12,8 +12,8 @@ Meltano stands for the [steps of the data science life-cycle](#data-engineering-
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
 | Model     | [Meltano Model](#meltano-model) | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
-| Extract   | [Tap](https://www.singer.io/#taps) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Tap](https://www.singer.io/#taps) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
-| Load      | [Meltano Load](#meltano-load), [Singer Core](https://github.com/singer-io/singer-python) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/), [Singer Target](https://www.singer.io/#targets) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Extract   | [Tap](https://www.singer.io/#taps) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Load      | [Target](https://singer.io/#targets) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
 | Analyze | [Meltano Analysis](https://gitlab.com/meltano/meltano/tree/master/src/melt) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
 | Notebook | [JupyterHub](https://github.com/jupyterhub/jupyterhub) | [GNU Octave](https://www.gnu.org/software/octave/) | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/) |
@@ -26,6 +26,25 @@ We believe that information is the foundation of good decisions, and that compan
 In addition, we believe that the information a business uses to make decisions must come from all parts of that business. Meltano joins data from multiple systems used by Sales, Marketing, Product and others, thereby providing a comprehensive view of the relationship between business activities, associated costs, and customer long-term value.
 
 A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
+
+### Loosely Coupled Tools
+
+All extractors and loaders should be self contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in it's final form. An extractor should not rely on a loader to clean up it's data.
+
+### Product
+
+The product is the glue to adhere the complete data science life cycle together and is built for 2 different team personas.
+
+1. Team 1 wants a CLI, they have engineers in place to write the code, e.g. to make needed extractors.
+2. Team 2 wants a GUI, they do not have engineers in place to write a lot of code.
+
+For both teams we provide a complete single source of truth solution. Single source of truth solution means:
+* CLI: One CLI, with one command, with one config to extract, load, transform, remove PII, mock data and orchestrate.
+* GUI: One single application to extract, load, transform, remove PII, mock data and orchestrate. 
+
+One GUI is also available for both personas for modeling and analysis. All data comes from files which are version controlled.
+
+The orchestration will use the GitLab CI, but running it and configuring it will happen from the CLI or GUI.
 
 ## Media
 
