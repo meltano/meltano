@@ -1,5 +1,7 @@
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def get_env_variable(name):
     try:
@@ -7,7 +9,6 @@ def get_env_variable(name):
     except KeyError:
         message = f"Expected environment variable '{name}' not set."
         raise Exception(message)
-
 
 # the values of those depend on your setup
 POSTGRES_URL = get_env_variable("POSTGRES_URL")
