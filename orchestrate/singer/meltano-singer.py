@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import subprocess
 from pathlib import Path
@@ -24,14 +23,14 @@ def file_has_data(file: Path):
 
 class SingerRunner():
     tap_files = {
-        'config': RUN_DIR / "tap.config.json",
-        'catalog': RUN_DIR / "tap.properties.json",
-        'state': RUN_DIR / "state.json"
+        'config': os.path.join(RUN_DIR, "tap.config.json"),
+        'catalog': os.path.join(RUN_DIR, "tap.properties.json"),
+        'state': os.path.join(RUN_DIR, "state.json"),
     }
 
     target_files = {
-        'config': RUN_DIR / "target.config.json",
-        'state': RUN_DIR / "new_state.json"
+        'config': os.path.join(RUN_DIR, "target.config.json"),
+        'state': os.path.join(RUN_DIR, "new_state.json"),
     }
 
     def __init__(self, **config):
@@ -39,14 +38,14 @@ class SingerRunner():
 
 
     def exec_path(self, name) -> Path:
-        return VENVS_DIR / name / "bin" / name
+        return os.path.join(VENVS_DIR, name, "bin", name)
 
 
     def prepare(self, tap: str, target: str):
         config_files = {
-            self.tap_files['config']: TAP_CONFIG_DIR / "{}.config.json".format(tap),
-            self.tap_files['catalog']: TAP_CONFIG_DIR / "{}.properties.json".format(tap),
-            self.target_files['config']: TARGET_CONFIG_DIR / "{}.config.json".format(target),
+            self.tap_files['config']: os.path.join(TAP_CONFIG_DIR, f"{tap}.config.json"),
+            self.tap_files['catalog']: os.path.join(TAP_CONFIG_DIR, f"{tap}.properties.json"),
+            self.target_files['config']: os.path.join(TARGET_CONFIG_DIR, f"{target}.config.json"),
         }
 
         for dst, src in config_files.items():
@@ -91,10 +90,10 @@ class SingerRunner():
         target_code = p_target.wait()
 
         if tap_code != 0:
-            raise "Tap exited with {}".format(tap_code)
+            raise f"Tap exited with {tap_code}"
 
         if target_code != 0:
-            raise "Target exited with {}".format(target_code)
+            raise f"Target exited with {target_code}"
 
     def run(self, tap: str, target: str):
         self.prepare(tap, target)
