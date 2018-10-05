@@ -65,6 +65,7 @@ class MarketoClient(object):
         Hit the Marketo Identity endpoint to get a valid access token.
         """
 
+        logging.info('Getting access token...')
         identity_url = '{}/oauth/token'.format(self.identity)
         payload = {'grant_type': 'client_credentials',
                    'client_id': self.client_id,
@@ -77,6 +78,7 @@ class MarketoClient(object):
         Get a date-based paging token from Marketo for use in other calls.
         """
 
+        logging.info('Getting initial nextPageToken...')
         token_url = '{}/v1/activities/pagingtoken.json'.format(self.endpoint)
         payload = {'sinceDatetime': self.start_time}
         response = self.get_response(token_url, payload)
@@ -87,32 +89,51 @@ class MarketoClient(object):
         Get a list of activities based on a datetime nextPageToken.
         """
 
+        logging.info('Getting activities...')
         chunk_size = 10 # This is the limit for the API
+        date_token = self.initial_date_token
+        activities_url = '{}/v1/activities.json'.format(self.endpoint)
 
+        # Append the results
+        results = []
+        # GET response filtered by activity type ids
         for type_chunk in self.chunker(activity_type_ids, chunk_size):
-            activities_url = '{}/v1/activities.json'.format(self.endpoint)
-            payload = {'nextPageToken': self.initial_date_token,
-                       'activityTypeIds': type_chunk}
 
-            initial_response = (self.check_response_success(
-                                    self.get_response(activities_url, payload)))
-            print(initial_response.keys())
+            # Loop until there are no more results
+            while True:
+                payload = {'nextPageToken': date_token,
+                           'activityTypeIds': type_chunk}
 
-            return initial_response['result']
+                response = (self.check_response_success(
+                                self.get_response(activities_url, payload)))
+                try:
+                    results += response['result']
+                    logging.info('Retrieved {} records...'.format(len(response['result'])))
+                except:
+                    print(response)
+                    pass
+                if response['moreResult']:
+                    date_token = response['nextPageToken']
+                else:
+                    break
+        return results
 
     def get_activity_types(self) -> List[Dict]:
         """
         Get the full list of activity types.
         """
 
+        logging.info('Getting activity types...')
         ## TODO: Deal with the case that there are over 300 activity types
         activity_type_url = '{}/v1/activities/types.json'.format(self.endpoint)
         payload =  {}
 
-        initial_response = (self.check_response_success(
-                                self.get_response(activity_type_url, payload)))
+        response = (self.check_response_success(
+                        self.get_response(activity_type_url, payload)))
+        result = response['result']
 
-        return initial_response['result']
+        logging.info('Retrieved {} records'.format(len(result)))
+        return result
 
     def get_leads(self):
         """
@@ -132,10 +153,13 @@ class MarketoClient(object):
         Get leads, activities and activity_types.
         """
 
+        logging.info('Starting API Calls...')
+
         activity_types = self.get_activity_types()
         activity_type_ids = [record['id'] for record in activity_types]
+        logging.info('Retrieved {} total activity_type_ids...'.format(len(activity_type_ids)))
 
         activities = self.get_activities(activity_type_ids)
-        print(activities[0])
+        logging.info('Retrieved {} total activities...'.format(len(activities)))
 
 
