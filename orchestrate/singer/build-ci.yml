@@ -1,30 +1,35 @@
 # Build
 
-# Builds the singer_runner container for use in testing on branches
-build_singer_runner:
-  stage: build_base
+.kaniko_build: &kaniko_build
+  stage: build
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
+    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:$CI_COMMIT_SHA
-  except:
-    refs:
-      - master
-  when: manual
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
-# Builds the orchestrate container as latest on master
-publish_singer_runner:
-  stage: build_base
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  script:
-    - mkdir -p /root/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/orchestrate/singer/Dockerfile --destination $CI_REGISTRY_IMAGE/singer_runner:latest
+# Builds the singer_runner container for use in testing on branches
+dev_singer_runner:
+  <<: *kaniko_build
+  variables:
+    DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/singer_runner
+  before_script:
+    # replace the FROM ... in the Dockerfile to use this branch's image
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/runner:$CI_COMMIT_SHA#" $DOCKERFILE
+  except:
+    - master
+
+singer_runner:
+  <<: *kaniko_build
+  variables:
+    DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/singer_runner
+    IMAGE_TAG: latest
   only:
     refs:
       - master

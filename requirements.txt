@@ -1,7 +1,4 @@
-aenum==2.0.8
-agate==1.6.1
 aiohttp==3.4.4
-asn1crypto==0.24.0
 async-timeout==3.0.0
 attrs==18.2.0
 azure-common==1.1.16
@@ -13,7 +10,6 @@ boto3==1.7.84
 botocore==1.10.84
 cachetools==2.1.0
 certifi==2018.8.24
-cffi==1.11.5
 chardet==3.0.4
 Click==7.0
 colorama==0.3.9
@@ -48,8 +44,6 @@ multidict==4.4.2
 networkx==1.11
 numpy==1.15.2
 pandas==0.23.4
-parsedatetime==2.4
-protobuf==3.6.1
 psycopg2==2.7.5
 pyasn1==0.4.4
 pyasn1-modules==0.2.2
@@ -67,15 +61,11 @@ pytimeparse==1.1.8
 pytz==2018.5
 PyYAML==3.13
 requests==2.19.1
-rsa==4.0
-s3transfer==0.1.13
 six==1.11.0
 smmap2==2.0.4
 snowflake-connector-python==1.6.10
 snowflake-sqlalchemy==1.1.2
 SQLAlchemy==1.2.12
-sqlparse==0.2.3
-Unidecode==1.0.22
 urllib3==1.23
-Werkzeug==0.14.1
+yamlordereddictloader==0.4.0
 yarl==1.2.6
