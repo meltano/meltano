@@ -47,6 +47,7 @@ setuptools.setup(
         'markdown',
         'pandas',
         'psycopg2',
+        'python-dotenv',
         'pypika',
         'pyyaml',
         'sqlalchemy',

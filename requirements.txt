@@ -4,7 +4,7 @@ aiohttp==3.4.4
 asn1crypto==0.24.0
 async-timeout==3.0.0
 attrs==18.2.0
-azure-common==1.1.15
+azure-common==1.1.16
 azure-nspkg==2.0.0
 azure-storage==0.36.0
 Babel==2.6.0
@@ -15,7 +15,7 @@ cachetools==2.1.0
 certifi==2018.8.24
 cffi==1.11.5
 chardet==3.0.4
-click==6.7
+Click==7.0
 colorama==0.3.9
 cryptography==2.3.1
 dbt==0.11.1
@@ -27,9 +27,9 @@ Flask-SQLAlchemy==2.3.2
 future==0.16.0
 gitdb2==2.0.4
 GitPython==2.1.11
-google-api-core==1.4.0
+google-api-core==1.4.1
 google-auth==1.5.1
-google-cloud-bigquery==1.5.0
+google-cloud-bigquery==1.6.0
 google-cloud-core==0.28.1
 google-resumable-media==0.3.1
 googleapis-common-protos==1.5.3
@@ -41,12 +41,12 @@ Jinja2==2.10
 jmespath==0.9.3
 jsonschema==2.6.0
 leather==0.3.3
-Markdown==2.6.11
+Markdown==3.0.1
 MarkupSafe==1.0
 minimal-snowplow-tracker==0.0.1
 multidict==4.4.2
 networkx==1.11
-numpy==1.15.1
+numpy==1.15.2
 pandas==0.23.4
 parsedatetime==2.4
 protobuf==3.6.1
@@ -58,9 +58,10 @@ pycparser==2.19
 pycryptodomex==3.6.6
 PyJWT==1.6.4
 pyOpenSSL==18.0.0
-pyparsing==2.2.1
-PyPika==0.15.5
+pyparsing==2.2.2
+PyPika==0.15.7
 python-dateutil==2.7.3
+python-dotenv==0.9.1
 python-slugify==1.2.6
 pytimeparse==1.1.8
 pytz==2018.5
@@ -70,7 +71,7 @@ rsa==4.0
 s3transfer==0.1.13
 six==1.11.0
 smmap2==2.0.4
-snowflake-connector-python==1.6.9
+snowflake-connector-python==1.6.10
 snowflake-sqlalchemy==1.1.2
 SQLAlchemy==1.2.12
 sqlparse==0.2.3
