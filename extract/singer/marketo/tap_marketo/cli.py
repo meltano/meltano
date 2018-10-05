@@ -16,6 +16,7 @@ def main(config_path: str='marketo_keyfile.json'):
         config_dict = json.load(config_file)
 
     marketo_client = MarketoClient(config_dict)
+    marketo_client.get_data()
 
 if __name__ == '__main__':
     Fire(main)
