@@ -18,7 +18,6 @@ class MarketoClient(object):
         self.client_secret = config.get('client_secret')
         self.start_time = config.get('start_time')
         self.access_token = self.get_access_token()
-        self.initial_date_token = self.get_date_token()
 
     def chunker(self, full_list: List, chunk_size: int) -> List:
         """
@@ -78,7 +77,6 @@ class MarketoClient(object):
         Get a date-based paging token from Marketo for use in other calls.
         """
 
-        logging.info('Getting initial nextPageToken...')
         token_url = '{}/v1/activities/pagingtoken.json'.format(self.endpoint)
         payload = {'sinceDatetime': self.start_time}
         response = self.get_response(token_url, payload)
@@ -91,10 +89,9 @@ class MarketoClient(object):
 
         logging.info('Getting activities...')
         chunk_size = 10 # This is the limit for the API
-        date_token = self.initial_date_token
+        date_token = self.get_date_token()
         activities_url = '{}/v1/activities.json'.format(self.endpoint)
 
-        # Append the results
         results = []
         # GET response filtered by activity type ids
         for type_chunk in self.chunker(activity_type_ids, chunk_size):
@@ -108,9 +105,8 @@ class MarketoClient(object):
                                 self.get_response(activities_url, payload)))
                 try:
                     results += response['result']
-                    logging.info('Retrieved {} records...'.format(len(response['result'])))
+                    logging.info('Retrieved {} records total...'.format(len(results)))
                 except:
-                    print(response)
                     pass
                 if response['moreResult']:
                     date_token = response['nextPageToken']
@@ -135,18 +131,28 @@ class MarketoClient(object):
         logging.info('Retrieved {} records'.format(len(result)))
         return result
 
-    def get_leads(self):
+    def get_leads(self, activity_lead_ids: List[str]) -> List[Dict]:
         """
         Get lead data based on leads pulled in by the activities endpoint.
         """
 
+        logging.info('Getting leads...')
+        chunk_size = 300 # This is the limit for the API
         leads_url = '{}/v1/leads.json'.format(self.endpoint)
-        payload = {'nextPageToken': self.initial_date_token}
 
-        initial_response = self.get_response(leads_url, payload)
+        results = []
+        # GET response filtered by activity type ids
+        for id_chunk in self.chunker(activity_lead_ids, chunk_size):
 
+            payload = {'filterType': 'id',
+                       'filterValues': id_chunk}
 
-        return
+            response = (self.check_response_success(
+                            self.get_response(leads_url, payload)))
+            results += response['result']
+            logging.info('Retrieved {} records total...'.format(len(results)))
+
+        return results
 
     def get_data(self):
         """
@@ -156,10 +162,14 @@ class MarketoClient(object):
         logging.info('Starting API Calls...')
 
         activity_types = self.get_activity_types()
-        activity_type_ids = [record['id'] for record in activity_types]
+        activity_type_ids = list({record['id'] for record in activity_types})
         logging.info('Retrieved {} total activity_type_ids...'.format(len(activity_type_ids)))
 
         activities = self.get_activities(activity_type_ids)
+        activity_lead_ids = list({record['leadId'] for record in activities})
         logging.info('Retrieved {} total activities...'.format(len(activities)))
+
+        leads = self.get_leads(activity_lead_ids)
+        logging.info('Retrieved {} total leads...'.format(len(leads)))
 
 
