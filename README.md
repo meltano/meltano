@@ -192,6 +192,7 @@ docker-compose up
 ```bash
 python -m virtualenv ~/path/to/melt_venv 
 source ~/path/to/melt_venv/bin/activate
+pip install -r requirements.txt
 pip install -e '.[api]' 
 python -m meltano.api
 ```

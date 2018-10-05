@@ -40,25 +40,25 @@ setuptools.setup(
     tests_require=['pytest'],
     # run `make requirements.txt` after editing
     install_requires=[
-        'aiohttp==3.4.4',
-        'backoff==1.6.0',
-        'dbt==0.11.1',
-        'gitpython==2.1.11',
-        'markdown==3.0.1',
-        'pandas==0.23.4',
-        'psycopg2==2.7.5',
-        'python-dotenv==0.9.1',
-        'pypika==0.15.7',
-        'pyyaml==3.13',
-        'sqlalchemy==1.2.12',
-        'snowflake-connector-python==1.6.10',
-        'snowflake-sqlalchemy==1.1.2'
+        'aiohttp',
+        'backoff',
+        'dbt',
+        'gitpython',
+        'markdown',
+        'pandas',
+        'psycopg2',
+        'python-dotenv',
+        'pypika',
+        'pyyaml',
+        'sqlalchemy',
+        'snowflake-connector-python',
+        'snowflake-sqlalchemy'
     ],
     extras_require={
         'api': [
-            'flask-cors==3.0.6',
-            'flask-sqlalchemy==2.3.2',
-            'flask==1.0.2',
+            'flask-cors',
+            'flask-sqlalchemy',
+            'flask',
         ]
     }
 )
