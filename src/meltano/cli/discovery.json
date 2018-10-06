@@ -1,0 +1,10 @@
+{
+  "extractors": {
+    "zendesk": "git@github.com:singer-io/tap-zendesk.git",
+    "marketo": "git@github.com:singer-io/tap-marketo.git"
+  },
+  "loaders": {
+    "csv": "git@github.com:singer-io/target-csv",
+    "gsheet": "git@github.com:singer-io/target-gsheet.git"
+  }
+}
