@@ -11,7 +11,7 @@ from flask import (
     Response,
 )
 
-from meltano.cli import run_extract, EXTRACTOR_REGISTRY, LOADER_REGISTRY
+from meltano.cli.extract import run_extract, EXTRACTOR_REGISTRY, LOADER_REGISTRY
 
 orchestrationsBP = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
 
