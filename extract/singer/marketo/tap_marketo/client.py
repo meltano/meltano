@@ -154,22 +154,30 @@ class MarketoClient(object):
 
         return results
 
-    def get_data(self):
+    def get_data(self) -> Dict[List[Dict]]:
         """
         Get leads, activities and activity_types.
         """
 
         logging.info('Starting API Calls...')
 
+        # Retrieve all activity types
         activity_types = self.get_activity_types()
         activity_type_ids = list({record['id'] for record in activity_types})
         logging.info('Retrieved {} total activity_type_ids...'.format(len(activity_type_ids)))
 
+        # Retrieve all related activities
         activities = self.get_activities(activity_type_ids)
         activity_lead_ids = list({record['leadId'] for record in activities})
         logging.info('Retrieved {} total activities...'.format(len(activities)))
 
+        # Retrieve leads that are related to retrieved activities
         leads = self.get_leads(activity_lead_ids)
         logging.info('Retrieved {} total leads...'.format(len(leads)))
 
+        data_dict = {'activity_types': activity_types,
+                     'activities': activities,
+                     'leads': leads}
+
+        return data_dict
 
