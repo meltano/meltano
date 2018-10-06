@@ -2,10 +2,10 @@ import json
 
 from fire import Fire
 
-from client import MarketoClient
+from .client import MarketoClient
 
 
-def main(config_path: str='marketo_keyfile.json'):
+def extract(config_path: str='marketo_keyfile.json'):
     """
     Handle creation of a MarketoClient instance and invoking its methods.
 
@@ -18,5 +18,8 @@ def main(config_path: str='marketo_keyfile.json'):
     marketo_client = MarketoClient(config_dict)
     marketo_client.get_data()
 
+def main():
+    Fire(extract)
+
 if __name__ == '__main__':
-    Fire(main)
+    Fire(extract)

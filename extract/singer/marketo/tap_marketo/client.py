@@ -2,7 +2,6 @@ import logging
 from typing import Dict, List
 import sys
 
-import aiohttp
 from fire import Fire
 import pandas as pd
 import requests
@@ -154,7 +153,7 @@ class MarketoClient(object):
 
         return results
 
-    def get_data(self) -> Dict[List[Dict]]:
+    def get_data(self) -> Dict[str,List[Dict]]:
         """
         Get leads, activities and activity_types.
         """
