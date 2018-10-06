@@ -102,7 +102,7 @@ ${MELTANO_API}/node_modules:
 #   as a lockfile essentially.
 
 requirements.txt: setup.py
-	${PYTHON_RUN} bash -c 'pip install -e .[api] && pip freeze --exclude-editable > $@'
+	${PYTHON_RUN} bash -c 'pip install -e .[all] && pip freeze --exclude-editable > $@'
 
 # UI Related Tasks
 # =================

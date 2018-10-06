@@ -175,7 +175,7 @@ We want the tools to be open source so we can ship this as a product.
 
 ### With Docker  
 
-You can run local copy of Meltano using [docker-compose][].
+You can run local copy of Meltano using [docker-compose][]. Run the following in your project directory:
 
 ```bash
 # build the project
@@ -189,11 +189,14 @@ docker-compose up
 ```
 
 ### Without Docker
+
+Run the following in your project directory:
+
 ```bash
 python -m virtualenv ~/path/to/melt_venv 
 source ~/path/to/melt_venv/bin/activate
 pip install -r requirements.txt
-pip install -e '.[api]' 
+pip install -e '.[all]'
 python -m meltano.api
 ```
 
