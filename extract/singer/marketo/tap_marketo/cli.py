@@ -1,9 +1,16 @@
 import json
+import logging
+import sys
 
 from fire import Fire
+from os import environ as env
 
 from .client import MarketoClient
+from .marketo_utils import MarketoUtils
 
+
+# Set logging config
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 def extract(config_path: str='marketo_keyfile.json'):
     """
@@ -18,8 +25,16 @@ def extract(config_path: str='marketo_keyfile.json'):
     marketo_client = MarketoClient(config_dict)
     marketo_client.get_data()
 
-def main():
-    Fire(extract)
+def create_keyfile(keyfile_path: str='marketo_keyfile.json'):
+    """
+    Create the keyfile from env vars.
+    """
 
-if __name__ == '__main__':
-    Fire(extract)
+    marketo_utils = MarketoUtils(env.copy())
+    marketo_utils.generate_keyfile()
+
+
+def main():
+    Fire({'extract': extract,
+          'create_keyfile': create_keyfile})
+

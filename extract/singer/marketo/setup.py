@@ -9,6 +9,9 @@ setup(
         ]
     },
     install_requires=[
+        'fire>=0.1.3',
+        'pandas>=0.23.4',
+        'requests>=2.18.4'
     ],
 )
 

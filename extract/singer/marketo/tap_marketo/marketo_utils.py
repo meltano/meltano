@@ -8,11 +8,9 @@ from typing import Dict
 
 from fire import Fire
 
-# Set logging config
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 class MarketoUtils(object):
-    def __init__(self, config_dict: Dict[str, str]):
+    def __init__(self, config_dict: Dict[str, str]) -> None:
         self.config_dict = config_dict
 
     def generate_start_time(self, run_time: str, offset: int) -> str:
@@ -26,7 +24,7 @@ class MarketoUtils(object):
         output_format = '%Y-%m-%dT%H:%M:%SZ'
         parsed_datetime = datetime.strptime(run_time, input_format)
         raw_start_time = parsed_datetime - timedelta(minutes=offset)
-        formatted_start_time = datetime.strftime(parsed_datetime, output_format)
+        formatted_start_time = datetime.strftime(raw_start_time, output_format)
 
         return formatted_start_time
 
@@ -45,6 +43,7 @@ class MarketoUtils(object):
         Should be UTC
         """
 
+        logging.info('Generating keyfile...')
         # Get the secret credentials from env vars
         keyfile_mapping = {'endpoint': 'MARKETO_ENDPOINT',
                            'identity': 'MARKETO_IDENTITY',
@@ -55,6 +54,7 @@ class MarketoUtils(object):
 
         # add the start_time
         start_time = self.generate_start_time(run_time, minute_offset)
+        logging.info('Requesting data from {} onward...'.format(start_time))
         keyfile_dict['start_time'] = start_time
 
         if output_file:
@@ -64,7 +64,3 @@ class MarketoUtils(object):
         else:
             return keyfile_dict
 
-
-if __name__ == '__main__':
-    marketo_utils = MarketoUtils(env.copy())
-    Fire(marketo_utils)

@@ -1,31 +1,29 @@
 import logging
-from typing import Dict, List
+from typing import Dict, List, Optional, Sequence, Any, Iterator
 import sys
 
 from fire import Fire
 import pandas as pd
 import requests
 
-# Set the logging config
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 class MarketoClient(object):
-    def __init__(self, config: Dict[str,str]):
-        self.endpoint = config.get('endpoint')
-        self.identity = config.get('identity')
-        self.client_id = config.get('client_id')
-        self.client_secret = config.get('client_secret')
-        self.start_time = config.get('start_time')
-        self.access_token = self.get_access_token()
+    def __init__(self, config: Dict[str,str]) -> None:
+        self.endpoint: str = config['endpoint']
+        self.identity: str = config['identity']
+        self.client_id: str = config['client_id']
+        self.client_secret: str = config['client_secret']
+        self.start_time: str = config['start_time']
+        self.access_token: str = self.get_access_token()
 
-    def chunker(self, full_list: List, chunk_size: int) -> List:
+    def chunker(self, full_list: List, chunk_size: int) -> Iterator[List]:
         """
         Generator that yields a chunk of the original list.
         """
         for i in range(0, len(full_list), chunk_size):
             yield full_list[i:i + chunk_size]
 
-    def get_response(self, url: str, payload: Dict[str,str]):
+    def get_response(self, url: str, payload: Dict[str, Any]):
         """
         Boilerplate for GETting a request and returning the json.
         """
@@ -45,7 +43,7 @@ class MarketoClient(object):
         else:
             return response.json()
 
-    def check_response_success(self, response: requests.Response) -> Dict:
+    def check_response_success(self, response: Dict) -> Dict:
         """
         Marketo returns a 200 even if the request might have failed.
         Check the status in the object and return if truly successful.
@@ -91,7 +89,7 @@ class MarketoClient(object):
         date_token = self.get_date_token()
         activities_url = '{}/v1/activities.json'.format(self.endpoint)
 
-        results = []
+        results: List = []
         # GET response filtered by activity type ids
         for type_chunk in self.chunker(activity_type_ids, chunk_size):
 
@@ -121,7 +119,7 @@ class MarketoClient(object):
         logging.info('Getting activity types...')
         ## TODO: Deal with the case that there are over 300 activity types
         activity_type_url = '{}/v1/activities/types.json'.format(self.endpoint)
-        payload =  {}
+        payload: Dict =  {}
 
         response = (self.check_response_success(
                         self.get_response(activity_type_url, payload)))
@@ -139,7 +137,7 @@ class MarketoClient(object):
         chunk_size = 300 # This is the limit for the API
         leads_url = '{}/v1/leads.json'.format(self.endpoint)
 
-        results = []
+        results: List = []
         # GET response filtered by activity type ids
         for id_chunk in self.chunker(activity_lead_ids, chunk_size):
 
