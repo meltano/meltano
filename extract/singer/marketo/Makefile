@@ -3,7 +3,8 @@
 APP_NAME=tap-marketo
 
 test:
-	@echo "Not implemented yet..."
+	@echo "Running full test suite..."
+	@time docker run ${APP_NAME} pytest -vv
 
 test-quick:
 	@echo "Not implemented yet..."
