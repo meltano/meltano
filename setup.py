@@ -4,6 +4,32 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+requires = [
+    'aiohttp',
+    'backoff',
+    'dbt',
+    'gitpython',
+    'markdown',
+    'pandas',
+    'psycopg2',
+    'pypika',
+    'python-dotenv',
+    'pyyaml',
+    'snowflake-connector-python',
+    'snowflake-sqlalchemy',
+    'sqlalchemy',
+]
+
+api_requires = [
+    'flask',
+    'flask-cors',
+    'flask-sqlalchemy',
+]
+
+cli_requires = [
+    'click',
+]
+
 setuptools.setup(
     name="meltano",
     version="0.0.1",
@@ -38,28 +64,15 @@ setuptools.setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest'],
     # run `make requirements.txt` after editing
-    install_requires=[
-        'click',
-        'aiohttp',
-        'backoff',
-        'dbt',
-        'gitpython',
-        'markdown',
-        'pandas',
-        'psycopg2',
-        'python-dotenv',
-        'pypika',
-        'pyyaml',
-        'sqlalchemy',
-        'snowflake-connector-python',
-        'snowflake-sqlalchemy'
-    ],
+    install_requires=requires,
     extras_require={
-        'api': [
-            'flask-cors',
-            'flask-sqlalchemy',
-            'flask',
-        ]
+        'api': api_requires,
+        'cli': cli_requires,
+
+        'all': [
+            *api_requires,
+            *cli_requires
+        ],
     },
     entry_points={
         'console_scripts': [
