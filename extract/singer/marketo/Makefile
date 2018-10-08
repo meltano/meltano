@@ -23,3 +23,7 @@ build:
 mypy:
 	@echo "Running mypy for type-checking..."
 	@time docker run ${APP_NAME} mypy tap_marketo --ignore-missing-imports
+
+lint:
+	@echo "Running linter..."
+	@time black tap_marketo
