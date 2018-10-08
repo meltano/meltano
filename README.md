@@ -210,6 +210,68 @@ This will start:
 
 For more info see the [docker-compose.yml]()
 
+## Workflow for tap/target development
+
+### For existing taps/targets
+
+We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
+
+  1. Fork (using Meltano organization)
+  1. Modify and submits PRs
+  1. If there is resistance, fork as our tap (2)
+
+### For taps/targets we create
+
+  1. Use a separate repo (meltano/target|tap-x) in GitLab
+e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+  1. Publish PyPI packages of these package (not for now)
+  1. We could mirror these repoon GitHub if we want (not for now)
+
+## Discoverability
+
+We should maintain a curated list (see Bootstrap) of taps/targets that are expected to work out-of-the box with Meltano (see meltano bootstrap).
+
+Meltano should help the end-user find components via a `discover` command:
+
+```
+$ meltano discover extract
+tap-demo==...
+tap-zendesk==1.3.0
+tap-marketo==...
+...
+
+$ meltano discover load
+target-demo==...
+target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
+target-postgres==...
+```
+
+## How to install taps/targets
+
+### Locally
+
+Use `pip` like you would for any python package. Make sure to install it into a python virtualenv. These are all options on the table.
+
+  - `pip install git+https://…@master
+  - `meltano install tap-zendesk` (uses `venv` python module)
+
+### On a CI
+
+A docker image should be build containing all the latests curated version of the taps/targets, each isolated into its own virtualenv.
+
+This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
+
+Meltano should provide a wrapper script to manage the execution of the selected components:
+
+`meltano extract tap-zendesk --to target-postgres`
+
+#### Bootstrap
+
+To build the image, Meltano should provide a `meltano bootstrap <venvs_dir>` command to download and install each taps/target in isolation. Also, to ease the development of taps, we should be able to tell Meltano where it can find a local python package that contains a tap/target (or at least where to put it).
+
+These commands should be mainly for internal use.
+
+
 ## How to use
 > Notes:
 > * Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields.
