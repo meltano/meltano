@@ -229,7 +229,7 @@ e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 
 ## Discoverability
 
-We should maintain a curated list of taps/targets that are expected to work out-of-the box with Meltano.
+We should maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
 
 Meltano should help the end-user find components via a `discover` command:
 
