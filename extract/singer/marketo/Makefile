@@ -10,7 +10,8 @@ test:
 					${APP_NAME}  pytest -vv -x
 
 test-quick:
-	@echo "Not implemented yet..."
+	@echo "Running tests that don't require a real API..."
+	@time docker run ${APP_NAME} pytest -vv -k TestMarketoUtils
 
 run:
 	@echo "Running tap-marketo..."
