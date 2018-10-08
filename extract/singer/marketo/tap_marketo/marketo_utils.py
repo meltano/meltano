@@ -20,17 +20,20 @@ class MarketoUtils(object):
         Expected start_time format: 2018-01-01T01:00:00.000000
         """
 
-        input_format = '%Y-%m-%dT%H:%M:%S.%f'
-        output_format = '%Y-%m-%dT%H:%M:%SZ'
+        input_format = "%Y-%m-%dT%H:%M:%S.%f"
+        output_format = "%Y-%m-%dT%H:%M:%SZ"
         parsed_datetime = datetime.strptime(run_time, input_format)
         raw_start_time = parsed_datetime - timedelta(minutes=offset)
         formatted_start_time = datetime.strftime(raw_start_time, output_format)
 
         return formatted_start_time
 
-    def generate_keyfile(self, minute_offset: int=240,
-                         run_time: str=datetime.utcnow().isoformat(),
-                         output_file: str='marketo_keyfile.json'):
+    def generate_keyfile(
+        self,
+        minute_offset: int = 240,
+        run_time: str = datetime.utcnow().isoformat(),
+        output_file: str = "marketo_keyfile.json",
+    ):
         """
         Generate a Marketo keyfile for tap-marketo.
 
@@ -43,24 +46,24 @@ class MarketoUtils(object):
         Should be UTC
         """
 
-        logging.info('Generating keyfile...')
+        logging.info("Generating keyfile...")
         # Get the secret credentials from env vars
-        keyfile_mapping = {'endpoint': 'MARKETO_ENDPOINT',
-                           'identity': 'MARKETO_IDENTITY',
-                           'client_id': 'MARKETO_CLIENT_ID',
-                           'client_secret': 'MARKETO_CLIENT_SECRET'}
-        keyfile_dict = {k: self.config_dict.get(v)
-                        for k, v in keyfile_mapping.items()}
+        keyfile_mapping = {
+            "endpoint": "MARKETO_ENDPOINT",
+            "identity": "MARKETO_IDENTITY",
+            "client_id": "MARKETO_CLIENT_ID",
+            "client_secret": "MARKETO_CLIENT_SECRET",
+        }
+        keyfile_dict = {k: self.config_dict.get(v) for k, v in keyfile_mapping.items()}
 
         # add the start_time
         start_time = self.generate_start_time(run_time, minute_offset)
-        logging.info('Requesting data from {} onward...'.format(start_time))
-        keyfile_dict['start_time'] = start_time
+        logging.info("Requesting data from {} onward...".format(start_time))
+        keyfile_dict["start_time"] = start_time
 
         if output_file:
-            with open(output_file, 'w') as keyfile:
+            with open(output_file, "w") as keyfile:
                 json.dump(keyfile_dict, keyfile, sort_keys=True, indent=2)
-            logging.info('Keyfile written to {} successfully.'.format(output_file))
+            logging.info("Keyfile written to {} successfully.".format(output_file))
         else:
             return keyfile_dict
-

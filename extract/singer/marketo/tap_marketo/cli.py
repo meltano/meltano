@@ -12,20 +12,22 @@ from .marketo_utils import MarketoUtils
 # Set logging config
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
-def extract(config_path: str='marketo_keyfile.json'):
+
+def extract(config_path: str = "marketo_keyfile.json"):
     """
     Handle creation of a MarketoClient instance and invoking its methods.
 
     config_file should be a path to a valid configuration file
     """
 
-    with open(config_path, 'r') as config_file:
+    with open(config_path, "r") as config_file:
         config_dict = json.load(config_file)
 
     marketo_client = MarketoClient(config_dict)
     marketo_client.get_data()
 
-def create_keyfile(keyfile_path: str='marketo_keyfile.json'):
+
+def create_keyfile(keyfile_path: str = "marketo_keyfile.json"):
     """
     Create the keyfile from env vars.
     """
@@ -35,6 +37,4 @@ def create_keyfile(keyfile_path: str='marketo_keyfile.json'):
 
 
 def main():
-    Fire({'extract': extract,
-          'create_keyfile': create_keyfile})
-
+    Fire({"extract": extract, "create_keyfile": create_keyfile})
