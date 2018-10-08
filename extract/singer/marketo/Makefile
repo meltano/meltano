@@ -4,7 +4,10 @@ APP_NAME=tap-marketo
 
 test:
 	@echo "Running full test suite..."
-	@time docker run ${APP_NAME} pytest -vv
+	@time docker run \
+					-e MARKETO_ENDPOINT -e MARKETO_IDENTITY \
+					-e MARKETO_CLIENT_SECRET -e MARKETO_CLIENT_ID \
+					${APP_NAME}  pytest -vv -x
 
 test-quick:
 	@echo "Not implemented yet..."

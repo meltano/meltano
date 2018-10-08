@@ -18,6 +18,7 @@ class MarketoUtils(object):
         Generate a start_date for the keyfile.
 
         Expected start_time format: 2018-01-01T01:00:00.000000
+        Output format: 2018-01-01T01:00:00Z
         """
 
         input_format = "%Y-%m-%dT%H:%M:%S.%f"

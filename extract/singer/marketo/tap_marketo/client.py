@@ -15,6 +15,7 @@ class MarketoClient(object):
         self.client_secret: str = config["client_secret"]
         self.start_time: str = config["start_time"]
         self.access_token: str = self.get_access_token()
+        self.start_time_token: str = self.get_date_token()
 
     def chunker(self, full_list: List, chunk_size: int) -> Iterator[List]:
         """
@@ -88,7 +89,7 @@ class MarketoClient(object):
 
         logging.info("Getting activities...")
         chunk_size = 10  # This is the limit for the API
-        date_token = self.get_date_token()
+        date_token = self.start_time_token
         activities_url = "{}/v1/activities.json".format(self.endpoint)
 
         results: List = []
