@@ -29,4 +29,4 @@ mypy:
 
 lint:
 	@echo "Running linter..."
-	@time black tap_marketo
+	@time black tap_marketo tests
