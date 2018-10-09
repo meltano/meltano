@@ -229,7 +229,7 @@ e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 
 ## Discoverability
 
-We should maintain a curated list (see Bootstrap) of taps/targets that are expected to work out-of-the box with Meltano (see meltano bootstrap).
+We will maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
 
 Meltano should help the end-user find components via a `discover` command:
 
@@ -265,14 +265,8 @@ Meltano should provide a wrapper script to manage the execution of the selected 
 
 `meltano extract tap-zendesk --to target-postgres`
 
-#### Bootstrap
-
-To build the image, Meltano should provide a `meltano bootstrap <venvs_dir>` command to download and install each taps/target in isolation. Also, to ease the development of taps, we should be able to tell Meltano where it can find a local python package that contains a tap/target (or at least where to put it).
-
-These commands should be mainly for internal use.
-
-
 ## How to use
+
 > Notes:
 > * Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields.
 > * The sample Zuora python scripts have been written to support GitLab's Zuora implementation. This includes a workaround to handle some subscriptions that should have been created as a single subscription.
@@ -286,37 +280,6 @@ The Meltano product consists of three key components:
 As development progresses, additional documentation on getting started along with example configuration and CI scripts will become available.
 
 It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion.
-
-### Meltano CLI
-
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
-
-This CLI tool is based upon the single source of truth for all the pipeline and make it easy to develop, run, and debug all the components.
-
-#### meltano schema
-Helper functions to manage the dataware house. For now this is PGSQL specific.
-
-##### create <SCHEMA> <ROLES>
-Create and grant usage for a database schema.
-
-### Meltano Model
-
-[Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
-
-Meltano Models are [LookML files](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) that model data so that you can esility visualize it in Meltano Analysis.
-
-### Meltano Load
-
-Right now Meltano Load is part of the code of [Meltano Extract](#meltano-extract).
-We're planning on splitting it into a separate piece of code.
-
-### Python scripts
-
-Some transformations can't be done with DBT like API calls.
-
-### Stored procedures
-
-We don't use stored procedures because they are hard to keep under version control.
 
 ### Local environment
 
@@ -360,13 +323,94 @@ source /root/.local/share/virtualenvs/bizops-YMzVKlMq/bin/activate
 
 You should be ready to go!
 
-### Managing API requests and limits
+## Meltano components
 
-Many of the SaaS sources have various types of API limits, typically a given quota per day. If you are nearing the limit of a given source, or are iterating frequently on your repo, you may need to implement some additional measures to manage usage.
+### Meltano CLI
+
+Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
+
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data science lifecycle.
+
+#### meltano schema
+Helper functions to manage the data warehouse. At the moment, these are PGSQL specific.
+
+##### create <SCHEMA> <ROLES>
+Create and grant usage for a database schema.
+
+### Meltano Model
+
+Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analysis.
+
+
+### Meltano Transform
+
+#### DBT
+
+Meltano uses [dbt](https://docs.getdbt.com/) to transform the source data into the `analytics` schema, ready to be consumed by models.  
+
+[Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
+
+#### Python scripts
+
+In certain circumstances transformations cannot be done in dbt (like API calls), so we use python scripts for these cases.
+
+### Spreadsheet Loader Utility
+
+Spreadsheets can be loaded into the DW (Data Warehouse) using `elt/util/spreadsheet_loader.py`. Local CSV files can be loaded as well as spreadsheets in Google Sheets.
+
+#### Loading a CSV:
+
+> Notes:
+> - The naming format for the `FILES` must be `<schema>.<table>.csv`. This pattern is required and will be used to create/update the table in the DW.
+> - Multiple `FILES` can be used, use spaces to separate.
+
+  - Start the cloud sql proxy
+  - Run the command:
+  ```
+  python3 elt/util/spreadsheet_loader.py csv FILES...
+  ``` 
+  - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
+
+#### Loading a Google Sheet:
+
+> Notes:
+> - Each `FILES` will be located and loaded based on its name. The names of the sheets shared with the runner must be unique and in the `<schema>.<table>` format
+> - Multiple `FILES` can be used, use spaces to separate.
+
+  - Share the sheet with the required service account (if being used in automated CI, use the runner service account)
+  - Run the command:
+  ```
+  python3 elt/util/spreadsheet_loader.py sheet FILES...
+  ```
+  - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
+
+#### Further Usage Help:
+
+  - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
+
+### Docker images
+
+Meltano provides the following docker images:
+
+> Notes: All images are available in the GitLab's registry: `registry.gitlab.com`
+  
+  - `meltano/meltano`: Contains the API, CLI, and Meltano Analyze. This image should be deployed as Meltano Analyze.
+  - `meltano/meltano/singer_runner`: Contains the CLI, and all curated taps/targets pre-installed. This image should be used on the CI runner.
+
+> Notes: These images are base images used as the basis of other images.
+
+  - `meltano/meltano/base`: Contains the requirements for `meltano/meltano`
+  - `meltano/meltano/runner`: Contains the requirements for `meltano/meltano/singer_runner`
+
+## Best practices
 
 ### How to Use Sub pipelines to Effectively Create a DAG like Architecture
 
 An example of this can be seen in the [gitlab-ci.yml](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml#L251) which is being used to trigger the gitlab-qa project. This will trigger a [`SCRIPT_NAME`:`trigger-build`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/trigger-build) which has the API calls written in Ruby, for which we can use Python. From there the sky is the limit.
+
+### Managing API requests and limits
+
+Many of the SaaS sources have various types of API limits, typically a given quota per day. If you are nearing the limit of a given source, or are iterating frequently on your repo, you may need to implement some additional measures to manage usage.
 
 #### Reducing API usage by review apps
 
@@ -419,40 +463,21 @@ zuora_review:
   when: manual
 ```
 
-## Pipeline configuration
+### Pipeline configuration
 
 Data integration stages are configurable using `Project variables` for the CI/CD pipeline. The following variables may help you control what needs to run:
 
   - `EXTRACT_SKIP`: either `all` (to skip the `extract` stage) or job names, like `marketo,zendesk,zuora` to be skipped from the pipeline.
   - `UPDATE_SKIP`: either `all` (to skip the `update` stage) or job names, like `sfdc_update`.
 
-## Spreadsheet Loader Utility
+### Stored procedures
 
-Spreadsheets can be loaded into the DW (Data Warehouse) using `elt/util/spreadsheet_loader.py`. Local CSV files can be loaded as well as spreadsheets in Google Sheets.
-A file will only be loaded if there has been a change between the current and existing data in the DW.
-
-Loading a CSV:
-
-  - Start the cloud sql proxy
-  - The naming format for the file must be `<schema>.<table>.csv`. This pattern is required and will be used to create/update the table in the DW.
-  - Run the command `python3 elt/util/spreadsheet_loader.py csv <path>/<to>/<csv>/<file_name>.csv` Multiple paths can be used, use spaces to separate.
-  - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
-
-
-Loading a Google Sheet:
-
-  - Share the sheet with the required service account (if being used in automated CI, use the runner service account)
-  - The file will be located and loaded based on its name. The names of the sheets shared with the runner must be unique and in the `<schema>.<table>` format
-  - Run the command `python3 elt/util/spreadsheet_loader.py sheet <file_name>` Multiple names can be used, use spaces to separate.
-  - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
-
-Further Usage Help:
-
-  - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
+We don't use stored procedures because they are hard to keep under version control.
 
 ## GitLab Data and Analytics - Internal
 
 ### Charter/Goals
+
 * Build a centralized data warehouse that can support data analysis requirements from all functional groups within the company.
 * Create a common data framework and governance practice.
 * Establish the single source of truth for company metrics.
