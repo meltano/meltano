@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
 import os
 import subprocess
+import json
+import logging
+from datetime import datetime
 from pathlib import Path
 
 import click
+from . import Runner
+from meltano.support.job import Job, JobFinder
 
 VENVS_DIR = Path(os.getenv("SINGER_VENVS_DIR", "/venvs"))
 RUN_DIR = Path(os.getenv("SINGER_RUN_DIR"))
@@ -21,7 +25,7 @@ def file_has_data(file: Path):
     return file.exists() and file.stat().st_size > 0
 
 
-class SingerRunner():
+class SingerRunner(Runner):
     tap_files = {
         'config': RUN_DIR.joinpath("tap.config.json"),
         'catalog': RUN_DIR.joinpath("tap.properties.json"),
@@ -33,15 +37,25 @@ class SingerRunner():
         'state': RUN_DIR.joinpath("new_state.json"),
     }
 
-    def __init__(self, **config):
+    def __init__(self, job_id, **config):
+        self.job_id = job_id
         self.tap_output_path = config.get("tap_output_path")
-
 
     def exec_path(self, name) -> Path:
         return VENVS_DIR.joinpath(name, "bin", name)
 
-
     def prepare(self, tap: str, target: str):
+        # the `state.json` is stored in the database
+        finder = JobFinder(self.job_id)
+        state_job = finder.latest_success()
+
+        if state_job:
+            logging.info(f"Found state from {state_job.started_at}.")
+            with self.tap_files['state'].open("w+") as state:
+                json.dump(state_job.payload['singer_state'], state)
+        else:
+            logging.warn("No state was found, complete import.")
+
         config_files = {
             self.tap_files['config']: TAP_CONFIG_DIR.joinpath(f"{tap}.config.json"),
             self.tap_files['catalog']: TAP_CONFIG_DIR.joinpath(f"{tap}.properties.json"),
@@ -50,7 +64,6 @@ class SingerRunner():
 
         for dst, src in config_files.items():
             envsubst(src, dst)
-
 
     def invoke(self, tap: str, target: str):
         tap_args = [
@@ -74,46 +87,47 @@ class SingerRunner():
             "-c", self.target_files['config'],
         ]
 
-        p_target = subprocess.Popen(map(str, target_args),
+        try:
+            p_target, p_tee, p_tap = None, None, None
+            p_target = subprocess.Popen(map(str, target_args),
+                                        stdin=subprocess.PIPE,
+                                        stdout=self.target_files['state'].open("w+"))
+
+            p_tee = subprocess.Popen(map(str, tee_args),
                                     stdin=subprocess.PIPE,
-                                    stdout=self.target_files['state'].open("w+"))
+                                    stdout=p_target.stdin)
 
-        p_tee = subprocess.Popen(tee_args,
-                                 stdin=subprocess.PIPE,
-                                 stdout=p_target.stdin)
+            p_tap = subprocess.Popen(map(str, tap_args),
+                                    stdout=p_tee.stdin)
+        except Exception as err:
+            for p in (p_target, p_tee, p_tap):
+                if p: p.kill()
+            raise Exception(f"Cannot start tap or target: {err}")
 
-        p_tap = subprocess.Popen(map(str, tap_args),
-                                 stdout=p_tee.stdin)
-
-        # Polling would probably be better
         tap_code = p_tap.wait()
-        target_code = p_target.wait()
 
         if tap_code != 0:
-            raise f"Tap exited with {tap_code}"
+            p_tee.kill()
+            p_target.kill()
+            raise Exception(f"Tap exited with {tap_code}")
+
+        target_code = p_target.wait()
 
         if target_code != 0:
-            raise f"Target exited with {target_code}"
-
-    def run(self, tap: str, target: str):
-        self.prepare(tap, target)
-        self.invoke(tap, target)
-        self.bookmark()
+            raise Exception(f"Target exited with {target_code}")
 
     def bookmark(self):
-        if not file_has_data(self.target_files['state']):
-            return
+        state_file = self.target_files['state']
+        if not file_has_data(state_file):
+            raise Exception(f"Invalid state file: {state_file} is empty.")
 
-        self.target_files['state'].replace(self.tap_files['state'])
+        with state_file.open() as state:
+            self.job.payload['singer_state'] = json.load(state)
 
+    def run(self, extractor_name: str, loader_name: str):
+        self.job = Job(elt_uri=self.job_id)
 
-@click.command()
-@click.argument("tap")
-@click.argument("target")
-def main(tap, target):
-    runner = SingerRunner(tap_output_path=os.getenv("TAP_OUTPUT"))
-    runner.run(tap, target)
-
-
-if __name__ == '__main__':
-    main()
+        with self.job.run():
+            self.prepare(extractor_name, loader_name)
+            self.invoke(extractor_name, loader_name)
+            self.bookmark()

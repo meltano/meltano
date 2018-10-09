@@ -1,11 +1,13 @@
 import logging
 import sqlalchemy.types as types
 
+from datetime import datetime
+from contextlib import contextmanager
 from enum import Enum
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
-from .db import SystemModel, session_open
-from .error import Error
+from meltano.support.db import SystemModel, session_open
+from meltano.support.error import Error
 
 
 class InconsistentStateError(Error):
@@ -46,20 +48,54 @@ class Job(SystemModel):
 
     def __init__(self, **kwargs):
         kwargs['state'] = kwargs.get('state', State.IDLE)
+        kwargs['payload'] = kwargs.get('payload', {})
         super().__init__(**kwargs)
+
+    def can_transit(self, state: State) -> bool:
+        if self.state is state:
+            return True
+
+        return state.name in self.state.transitions()
 
     def transit(self, state: State) -> (State, State):
         transition = (self.state, state)
 
+        if not self.can_transit(state):
+            raise ImpossibleTransitionError(transition)
+
         if self.state is state:
             return transition
 
-        if state.name not in self.state.transitions():
-            raise ImpossibleTransitionError(transition)
-
         self.state = state
-        logging.debug("Job {} → {}.".format(self, state))
+        Job.save(self)
+
         return transition
+
+    @contextmanager
+    def run(self):
+        try:
+            self.start()
+            yield
+            self.success()
+        except Exception as err:
+            logging.error(err)
+            self.fail(error=err)
+
+    def start(self):
+        self.started_at = datetime.utcnow()
+        self.transit(State.RUNNING)
+        Job.save(self)
+
+    def fail(self, error=None):
+        self.ended_at = datetime.utcnow()
+        self.transit(State.FAIL)
+        self.payload = {'error': str(error)}
+        Job.save(self)
+
+    def success(self):
+        self.ended_at = datetime.utcnow()
+        self.transit(State.SUCCESS)
+        Job.save(self)
 
     def __repr__(self):
         return "<Job(id='%s', elt_uri='%s', state='%s')>" % (
