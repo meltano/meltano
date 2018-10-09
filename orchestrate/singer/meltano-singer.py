@@ -9,11 +9,6 @@ import click
 from . import Runner
 from meltano.support.job import Job, JobFinder
 
-VENVS_DIR = Path(os.getenv("SINGER_VENVS_DIR", "/venvs"))
-RUN_DIR = Path(os.getenv("SINGER_RUN_DIR"))
-TAP_CONFIG_DIR = Path(os.getenv("SINGER_TAP_CONFIG_DIR", "/etc/singer/tap"))
-TARGET_CONFIG_DIR = Path(os.getenv("SINGER_TARGET_CONFIG_DIR", "/etc/singer/target"))
-
 
 def envsubst(src: Path, dst: Path):
     with src.open() as i, \
@@ -26,23 +21,30 @@ def file_has_data(file: Path):
 
 
 class SingerRunner(Runner):
-    tap_files = {
-        'config': RUN_DIR.joinpath("tap.config.json"),
-        'catalog': RUN_DIR.joinpath("tap.properties.json"),
-        'state': RUN_DIR.joinpath("state.json"),
-    }
-
-    target_files = {
-        'config': RUN_DIR.joinpath("target.config.json"),
-        'state': RUN_DIR.joinpath("new_state.json"),
-    }
-
     def __init__(self, job_id, **config):
         self.job_id = job_id
+        self.run_dir = Path(config.get('run_dir',
+                                       os.getenv("SINGER_RUN_DIR")))
+        self.venvs_dir = Path(config.get('venvs_dir',
+                                         os.getenv("SINGER_VENVS_DIR", "/venvs")))
+        self.tap_config_dir = Path(config.get('tap_config_dir',
+                                              os.getenv("SINGER_TAP_CONFIG_DIR", "/etc/singer/tap")))
+        self.target_config_dir = Path(config.get('target_config_dir',
+                                                 os.getenv("SINGER_TARGET_CONFIG_DIR", "/etc/singer/target")))
         self.tap_output_path = config.get("tap_output_path")
 
+        self.tap_files = {
+            'config': self.run_dir.joinpath("tap.config.json"),
+            'catalog': self.run_dir.joinpath("tap.properties.json"),
+            'state': self.run_dir.joinpath("state.json"),
+        }
+        self.target_files = {
+            'config': self.run_dir.joinpath("target.config.json"),
+            'state': self.run_dir.joinpath("new_state.json"),
+        }
+
     def exec_path(self, name) -> Path:
-        return VENVS_DIR.joinpath(name, "bin", name)
+        return self.venvs_dir.joinpath(name, "bin", name)
 
     def prepare(self, tap: str, target: str):
         # the `state.json` is stored in the database
@@ -57,9 +59,9 @@ class SingerRunner(Runner):
             logging.warn("No state was found, complete import.")
 
         config_files = {
-            self.tap_files['config']: TAP_CONFIG_DIR.joinpath(f"{tap}.config.json"),
-            self.tap_files['catalog']: TAP_CONFIG_DIR.joinpath(f"{tap}.properties.json"),
-            self.target_files['config']: TARGET_CONFIG_DIR.joinpath(f"{target}.config.json"),
+            self.tap_files['config']: self.tap_config_dir.joinpath(f"{tap}.config.json"),
+            self.tap_files['catalog']: self.tap_config_dir.joinpath(f"{tap}.properties.json"),
+            self.target_files['config']: self.target_config_dir.joinpath(f"{target}.config.json"),
         }
 
         for dst, src in config_files.items():

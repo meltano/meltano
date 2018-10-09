@@ -16,4 +16,4 @@ class JobFinder():
                       .filter((Job.elt_uri == self.elt_uri) &
                               (Job.state == State.SUCCESS)) \
                       .order_by(Job.ended_at.desc()) \
-                      .one()
+                      .first()

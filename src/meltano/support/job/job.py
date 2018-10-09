@@ -67,7 +67,7 @@ class Job(SystemModel):
             return transition
 
         self.state = state
-        Job.save(self)
+        self.save()
 
         return transition
 
@@ -84,23 +84,24 @@ class Job(SystemModel):
     def start(self):
         self.started_at = datetime.utcnow()
         self.transit(State.RUNNING)
-        Job.save(self)
+        self.save()
 
     def fail(self, error=None):
         self.ended_at = datetime.utcnow()
         self.transit(State.FAIL)
         self.payload = {'error': str(error)}
-        Job.save(self)
+        self.save()
 
     def success(self):
         self.ended_at = datetime.utcnow()
         self.transit(State.SUCCESS)
-        Job.save(self)
+        self.save()
 
     def __repr__(self):
         return "<Job(id='%s', elt_uri='%s', state='%s')>" % (
             self.id, self.elt_uri, self.state)
 
-    def save(job):
+    def save(self):
         with session_open() as session:
-            session.add(job)
+            session.add(self)
+            return self
