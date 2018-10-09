@@ -225,7 +225,7 @@ We should be good citizen about these, and use the default workflow to contribut
   1. Use a separate repo (meltano/target|tap-x) in GitLab
 e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
   1. Publish PyPI packages of these package (not for now)
-  1. We could mirror these repo on GitHub if we want (not for now)
+  1. We could mirror this repo on GitHub if we want (not for now)
 
 ## Discoverability
 
