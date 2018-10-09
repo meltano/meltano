@@ -229,7 +229,7 @@ e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 
 ## Discoverability
 
-We should maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
+We will maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
 
 Meltano should help the end-user find components via a `discover` command:
 
@@ -329,46 +329,59 @@ You should be ready to go!
 
 Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
 
-This CLI tool is based upon the single source of truth for all the pipeline and make it easy to develop, run, and debug all the components.
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data science lifecycle.
 
 #### meltano schema
-Helper functions to manage the dataware house. For now this is PGSQL specific.
+Helper functions to manage the data warehouse. At the moment, these are PGSQL specific.
 
 ##### create <SCHEMA> <ROLES>
 Create and grant usage for a database schema.
 
 ### Meltano Model
 
+Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analysis.
+
+
+### Meltano Transform
+
+#### DBT
+
+Meltano uses [dbt](https://docs.getdbt.com/) to transform the source data into the `analytics` schema, ready to be consumed by models.  
+
 [Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
 
-Meltano Models are [LookML files](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) that model data so that you can esility visualize it in Meltano Analysis.
+#### Python scripts
 
-### Meltano Load
-
-Right now Meltano Load is part of the code of [Meltano Extract](#meltano-extract).
-We're planning on splitting it into a separate piece of code.
-
-### Python scripts
-
-Some transformations can't be done with DBT like API calls.
+In certain circumstances transformations cannot be done in dbt (like API calls), so we use python scripts for these cases.
 
 ### Spreadsheet Loader Utility
 
 Spreadsheets can be loaded into the DW (Data Warehouse) using `elt/util/spreadsheet_loader.py`. Local CSV files can be loaded as well as spreadsheets in Google Sheets.
-A file will only be loaded if there has been a change between the current and existing data in the DW.
 
 #### Loading a CSV:
 
+> Notes:
+> - The naming format for the `FILES` must be `<schema>.<table>.csv`. This pattern is required and will be used to create/update the table in the DW.
+> - Multiple `FILES` can be used, use spaces to separate.
+
   - Start the cloud sql proxy
-  - The naming format for the file must be `<schema>.<table>.csv`. This pattern is required and will be used to create/update the table in the DW.
-  - Run the command `python3 elt/util/spreadsheet_loader.py csv <path>/<to>/<csv>/<file_name>.csv` Multiple paths can be used, use spaces to separate.
+  - Run the command:
+  ```
+  python3 elt/util/spreadsheet_loader.py csv FILES...
+  ``` 
   - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
 
 #### Loading a Google Sheet:
 
+> Notes:
+> - Each `FILES` will be located and loaded based on its name. The names of the sheets shared with the runner must be unique and in the `<schema>.<table>` format
+> - Multiple `FILES` can be used, use spaces to separate.
+
   - Share the sheet with the required service account (if being used in automated CI, use the runner service account)
-  - The file will be located and loaded based on its name. The names of the sheets shared with the runner must be unique and in the `<schema>.<table>` format
-  - Run the command `python3 elt/util/spreadsheet_loader.py sheet <file_name>` Multiple names can be used, use spaces to separate.
+  - Run the command:
+  ```
+  python3 elt/util/spreadsheet_loader.py sheet FILES...
+  ```
   - Logging from the script will tell you table successes/failures and the number of rows uploaded to each table.
 
 #### Further Usage Help:
