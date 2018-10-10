@@ -35,9 +35,10 @@ cache:
 
 test:
   stage: test
-  image: registry.gitlab.com/meltano/meltano-elt/extract:latest
+  before_script:
+    - pip install pytest
   script:
-    - ci_helpers.py use_proxy "pytest -vv"
+    - pytest -vv
   allow_failure: true
 
 .run:
