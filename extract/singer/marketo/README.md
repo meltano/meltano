@@ -32,9 +32,25 @@ These values are obtained by creating an app to integrate with Marketo.
 
 http://developers.marketo.com/rest-api/authentication/
 
-#### Manually creating the keyfile (optional)
+#### Automatically creating the config
 
-Create a JSON file called config.json containing the Endpoint, Identity, Client ID, Client Secret and Start time.
+Create a JSON file containing the Endpoing, Identity, Client ID, Client Secret and Start time
+
+`tap-marketo create_keyfile [--config_path] [--minute_offset]`
+
+This will generate a keyfile based on the shell's env vars, which are expected to be:
+```
+MARKETO_ENDPOINT
+MARKETO_IDENTITY
+MARKETO_CLIENT_ID
+MARKETO_CLIENT_SECRET
+```
+The start_time will be automatically generated using the current time and the minute_offset (default is 70 minutes)
+
+
+#### Manually creating the config (optional)
+
+Create a JSON file containing the Endpoint, Identity, Client ID, Client Secret and Start time.
 
 ```
 {"endpoint": "your-endpoint",  
@@ -44,7 +60,6 @@ Create a JSON file called config.json containing the Endpoint, Identity, Client 
  "start_time": "your_start_time"}  
  ```
 
-
 tap-marketo can be run with:
 
-`tap-marketo extract --config_path <path/to/config/file>`
+`tap-marketo extract --config <path/to/config/file>`
