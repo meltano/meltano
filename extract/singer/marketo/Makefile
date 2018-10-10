@@ -18,7 +18,14 @@ run:
 	@time docker run \
 					-e MARKETO_ENDPOINT -e MARKETO_IDENTITY \
 					-e MARKETO_CLIENT_SECRET -e MARKETO_CLIENT_ID \
-					${APP_NAME}  /bin/bash -c "tap-marketo create_keyfile; tap-marketo extract"
+					${APP_NAME}  /bin/bash -c "tap-marketo create_keyfile --minute_offset 30; tap-marketo extract"
+
+dry-run:
+	@echo "Running tap-marketo..."
+	@time docker run \
+					-e MARKETO_ENDPOINT -e MARKETO_IDENTITY \
+					-e MARKETO_CLIENT_SECRET -e MARKETO_CLIENT_ID \
+					${APP_NAME}  /bin/bash -c "tap-marketo create_keyfile --minute_offset 30; tap-marketo extract --log_only True"
 
 build:
 	@echo "Building app..."

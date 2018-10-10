@@ -179,9 +179,9 @@ class MarketoClient(object):
         logging.info("Retrieved {} total leads...".format(len(leads)))
 
         data_dict = {
-            "activity_types": activity_types,
-            "activities": activities,
-            "leads": leads,
+            "activity_types": pd.io.json.json_normalize(activity_types),
+            "activities": pd.io.json.json_normalize(activities),
+            "leads": pd.io.json.json_normalize(leads),
         }
 
         return data_dict
