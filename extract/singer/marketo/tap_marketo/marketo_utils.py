@@ -31,7 +31,7 @@ class MarketoUtils(object):
 
     def generate_keyfile(
         self,
-        minute_offset: int = 240,
+        minute_offset: int = 70,
         run_time: str = datetime.utcnow().isoformat(),
         output_file: str = "marketo_keyfile.json",
     ):

@@ -47,7 +47,7 @@ def extract(config: str = "marketo_keyfile.json", log_only: bool = False):
 
 
 def create_keyfile(
-    config_path: str = "marketo_keyfile.json", minute_offset: str = "60"
+    config_path: str = "marketo_keyfile.json", minute_offset: str = "70"
 ):
     """
     Create the keyfile from env vars.
