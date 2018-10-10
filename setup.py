@@ -68,7 +68,6 @@ setuptools.setup(
     extras_require={
         'api': api_requires,
         'cli': cli_requires,
-
         'all': [
             *api_requires,
             *cli_requires
