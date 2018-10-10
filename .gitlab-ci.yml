@@ -1,4 +1,4 @@
-image: python:3.6
+image: registry.gitlab.com/meltano/meltano
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 

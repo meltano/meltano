@@ -3,11 +3,6 @@ FROM python:latest
 LABEL maintainer="Micaël Bergeron <mbergeron@gitlab.com>"
 LABEL maintainer="Meltano Team <meltano@gitlab.com>"
 
-# Install deps
-RUN apt-get update \
-    && apt-get install -y gettext-base \
-    && rm -rf /var/lib/apt/lists/*
-
 # Install Google SQL Proxy
 RUN wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O /usr/bin/cloud_sql_proxy \
     && chmod +x /usr/bin/cloud_sql_proxy
