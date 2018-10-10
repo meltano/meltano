@@ -5,7 +5,7 @@
 Meltano is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it.
 It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, CI, CD, and review apps.
 
-Meltano stands for the [steps of the data science life-cycle](#data-engineering-lifecycle): Model, Extract, Load, Transform, Analyze, Notebook, and Orchestrate.
+Meltano stands for the [steps of the data science life-cycle](#data-science-lifecycle): Model, Extract, Load, Transform, Analyze, Notebook, and Orchestrate.
 
 ## Data Science Lifecycle
 
@@ -27,11 +27,11 @@ In addition, we believe that the information a business uses to make decisions m
 
 A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
 
-Meltano runs in parallel with the data team with it's 2 week milestones. Meltano team runs with 1 week milestones.
+Meltano runs in parallel with the data team with its 2-week milestones. Meltano team runs with 1-week milestones.
 
 ### Loosely Coupled Tools
 
-All extractors and loaders should be self contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in it's final form. An extractor should not rely on a loader to clean up it's data.
+All extractors and loaders should be self-contained units and [loosely coupled](https://en.wikipedia.org/wiki/Loose_coupling), i.e. an extractor should output data in its final form. An extractor should not rely on a loader to clean up its data.
 
 ### Product
 
@@ -40,7 +40,7 @@ The product is the glue to adhere the complete data science life cycle together 
 1. Team 1 wants a CLI, they have engineers in place to write the code, e.g. to make needed extractors.
 2. Team 2 wants a GUI, they do not have engineers in place to write a lot of code.
 
-For both teams we provide a complete single source of truth solution. Single source of truth solution means:
+For both teams, we provide a complete single source of truth solution. Single source of truth solution means:
 * CLI: One CLI, with one command, with one config to extract, load, transform, remove PII, mock data and orchestrate.
 * GUI: One single application to extract, load, transform, remove PII, mock data and orchestrate. 
 
@@ -66,20 +66,20 @@ The orchestration will use the GitLab CI, but running it and configuring it will
 
 For many companies GitLab serves as the single data store for their engineering organization, shepherding their ideas all the way through to delivering them to customers. There are key gaps however in understanding the effectiveness of sales and marketing. By expanding the common data store to include go to market information, additional insights can be drawn across the customer lifecycle. This evolution is as follows:
 
-1. Business intelligence, this is the current state of the project.
-2. Data science, add more machine learning (ML) and Artificial Intelligence (AI)
-3. Market lifecycle, the complete go-to-market lifecycle with the user/customer jouney.
+1. Business intelligence; this is the current state of the project.
+2. Data science; add more machine learning (ML) and Artificial Intelligence (AI)
+3. Market lifecycle; the complete go-to-market lifecycle with the user/customer journey.
 
 ### Meltano is business intelligence (BI) as code.
-Meltano uses GitLab CI/CD to setup and maintain its stack, so software and scripts required are checked into SCM with the attendant benefits: full version control, history, easy collaboration and reviews. Automated management of the BI environment means it is easy to make alterations, re-deploy in the event of an issue or outage, as well as provision new environments for different uses like a staging server.
+Meltano uses [GitLab CI/CD](https://about.gitlab.com/features/gitlab-ci-cd/) to set up and maintain its stack, so software and scripts required are checked into SCM with the attendant benefits: full version control, history, easy collaboration and reviews. Automated management of the BI environment means it is easy to make alterations, re-deploy in the event of an issue or outage, as well as provision new environments for different uses like a staging server.
 
 Meltano also makes use of [review apps](https://docs.gitlab.com/ee/ci/review_apps/), making a fresh clone of the data warehouse for each development branch. This means engineers can test changes to the data pipeline on real data, as well as major schema changes. Once everything is working, the changes can be reviewed, then merged and reflected safely in production.
 
 ### Evolution from an internal project, to a community, to open core
 
 1. We are building Meltano to solve a problem that GitLab shares with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
-2. Next we'll focus on building a community around Meltano with more users and regular contributors to the code base.
-3. Right now Meltano is completely open source. After we have a community we'll introduce propietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
+2. Next, we'll focus on building a community around Meltano with more users and regular contributors to the code base.
+3. Right now Meltano is completely open source. After we have a community we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
 
 ## Roadmap
 
@@ -101,10 +101,10 @@ When using Meltano, like any data science tool, it is important to consider the 
 
 * Meltano expects the required credentials for each extractor to be stored as a project variable. Project members with the role [`Maintainer` or `Owner`](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions) will be able to see these in plaintext, as well as any instance wide administrators. If you are using GitLab.com, this includes select GitLab employees responsible for the service.
   * Support for KMS systems is being considered for a future release.
-* Because these variables are passed to GitLab CI jobs, it is possible to accidentally or maliciously compromise them. 
-  * For example a developer who normally cannot see the variables in project settings, could accidentally print the environment variables when debugging a CI job, causing them to be readable by a wider audience than intended.
+* Because these variables are passed to GitLab CI jobs, it is possible to accidentally or maliciously compromise them: 
+  * For example, a developer who normally cannot see the variables in project settings, could accidentally print the environment variables when debugging a CI job, causing them to be readable by a wider audience than intended.
   * Similarly it is possible for a malicious developer to utilize the variables to extract data from a source, then send it to an unauthorized destination.
-  * These risks can be mitigated by [restricting the production variables](https://docs.gitlab.com/ee/ci/variables/#protected-variables) to only protected branches, so code is reviewed before it is able run with access to the credentials. It is also possible to set job logs to be available to only those with `Developer` roles or above, in CI/CD settings.
+  * These risks can be mitigated by [restricting the production variables](https://docs.gitlab.com/ee/ci/variables/#protected-variables) to only protected branches, so code is reviewed before it is able to run with access to the credentials. It is also possible to set job logs to be available to only those with `Developer` roles or above, in CI/CD settings.
 * When designing your data warehouse, consider any relevant laws and regulations, like GDPR. For example, historical data being retained as part of a snapshot could present challenges in the event a user requests to be forgotten.
 
 ### Competition & Value
@@ -121,25 +121,25 @@ We use dbt for testing too, instead of [Great Expectations](https://github.com/g
 
 At GitLab we're using Looker instead of Superset, for sure for the rest of 2018.
 If we switch we'll want to make sure that most of the functionality can be replicated in Superset, and the switch will be gradual.
-For now try to keep as much functionality as possible in DBT instead of Looker.
+For now, try to keep as much functionality as possible in DBT instead of Looker.
 
 ### Meltano data security and privacy at GitLab
 
 We take user security and privacy seriously at GitLab. We internally use Meltano to learn about how users interact with GitLab.com, build a better product, and efficiently run our organization. We adhere to the following guidelines:
 
 1. GitLab employees have access to the data warehouse and can see pseudonymized data. In some cases due to public projects, it is possible to tie a pseudonymized account to a public account. It is not possible to learn the private projects a user is working on or contents of their communications.
-1. We will never release the pseudonymized data set publicly, in the event it is possible to reverse engineer unintended content.
-1. Select GitLab employees have administrative access to GitLab.com, and the credentials used for our extractors. As [noted above](#data-security-and-privacy), developers on the Meltano project could maliciously emit credentials into a job log, however the logs are not publicly available.
+1. We will never release the pseudonymized dataset publicly, in the event it is possible to reverse engineer unintended content.
+1. Select GitLab employees have administrative access to GitLab.com, and the credentials used for our extractors. As [noted above](#data-security-and-privacy), developers on the Meltano project could maliciously emit credentials into a job log, however, the logs are not publicly available.
 
 ## Metrics
 
-We are targeting analytics for sales and marketing performance first. We plan to track the following metrics, in order of priority. These results will be able to reviewed over various time periods. Initially we will support single touch attribution, with support for multitouch in a [later sprint](doc/development_plan.md#backlog).
+We are targeting analytics for sales and marketing performance first. We plan to track the following metrics, in order of priority. These results will be reviewed over various time periods. Initially, we will support single touch attribution, with support for multitouch in a [later sprint](doc/development_plan.md#backlog).
 
 1. SAOs by source
   1. Aggregated (SDR / BDR / AE generated / Other)
   1. Campaign level (AWS Reinvent / etc.)
 1. SAOs by source by week and/or month
-2. Aquisition cost per SAO
+2. Acquisition cost per SAO
   * Cost per lead = dollar spend / number of attributed leads
 3. Estimated IACV and LTV per SAO based on history (can do IACV if LTV is hard to calculate)
   * Estimated IACV = 2 *  IACV at median conversion time
@@ -159,9 +159,9 @@ To achieve this, we bring data from all [data sources](data_sources.md) to a [co
 It is important to be cognizant of the personally identifiable information which is extracted into the data warehouse. Warehouses are at their best when they are leveraged across many parts of the organization, and therefore it is hard to predict which users will ultimately have access and how each user will treat the data.
 
 We recommend the following best practices:
-1. Avoid extracting any personally identifable information in the first place. For example, consider extracting only company names from your CRM and avoid extracting individual contact details.
-1. If it is important to collect data about individual users, for example to learn more about user behavior, pseudonymize the data prior to writing it into the data warehouse.
-1. Consider how you are persisting any PII data, and it's impact on compliance requirements like GDPR.
+1. Avoid extracting any personally identifiable information in the first place. For example, consider extracting only company names from your CRM and avoid extracting individual contact details.
+1. If it is important to collect data about individual users, for example, to learn more about user behavior, pseudonymize the data prior to writing it into the data warehouse.
+1. Consider how you are persisting any PII data, and its impact on compliance requirements like GDPR.
 
 ## Tools
 
@@ -177,7 +177,7 @@ We want the tools to be open source so we can ship this as a product.
 
 ### With Docker  
 
-You can run local copy of Meltano using [docker-compose][]. Run the following in your project directory:
+You can run a local copy of Meltano using [docker-compose][]. Run the following in your project directory:
 
 ```bash
 # build the project
@@ -205,7 +205,7 @@ python -m meltano.api
 This will start:
 
 - The front-end UI at [http://localhost:8080]()
-- The api server [http://localhost:5000]() and an accompanying Postgres DB
+- The API server [http://localhost:5000]() and an accompanying Postgres DB
 - A mock warehouse Postgres DB
 
 For more info see the [docker-compose.yml]()
@@ -225,7 +225,7 @@ We should be good citizen about these, and use the default workflow to contribut
   1. Use a separate repo (meltano/target|tap-x) in GitLab
 e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
   1. Publish PyPI packages of these package (not for now)
-  1. We could mirror these repoon GitHub if we want (not for now)
+  1. We could mirror this repo on GitHub if we want (not for now)
 
 ## Discoverability
 
@@ -257,7 +257,7 @@ Use `pip` like you would for any python package. Make sure to install it into a 
 
 ### On a CI
 
-A docker image should be build containing all the latests curated version of the taps/targets, each isolated into its own virtualenv.
+A docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
 
 This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
 
@@ -515,7 +515,7 @@ From our on-premises installations, we recieve [version and ping information](ht
 
 The domains from all of the pings are first cleaned by standardizing the URL using a package called [tldextract](https://github.com/john-kurkowski/tldextract). Each cleaned ping type is combined into a single host record. We make a best effort attempt to align the pings from the same install of the software. 
 
-This single host record is then enriched with data from three sources: DiscoverOrg, Clearbit, and WHOIS. If DiscoverOrg has no record of the domain we then fallback to Clearbit, with WHOIS being a last resort. Each request to DiscoverOrg and Clearbit is cached in the database and is updated no more than every 30 days. The cleaning and enrichment steps are all accomplished using Python.
+This single host record is then enriched with data from three sources: DiscoverOrg, Clearbit, and WHOIS. If DiscoverOrg has no record of the domain we then fall back to Clearbit, with WHOIS being a last resort. Each request to DiscoverOrg and Clearbit is cached in the database and is updated no more than every 30 days. The cleaning and enrichment steps are all accomplished using Python.
 
 We then take all of the cleaned records and use dbt to make multiple transformations. The last 60 days of pings are aligned with Salesforce accounts using the account name or the account website. Based on this, tables are generated of host records to upload to SFDC. If no accounts are found, we then generate a table of accounts to create within SFDC. 
 
@@ -585,16 +585,16 @@ CREATE ROLE newrole WITH PASSWORD 'tmppassword' IN ROLE metarole;
 ALTER ROLE newrole WITH LOGIN;
 ```
 
-New readonly and analytics users are then given instructions via Google Drive on how to connect their computer to the CloudSQL Proxy and on how to change their password once they login.
+New readonly and analytics users are then given instructions via Google Drive on how to connect their computer to the CloudSQL Proxy and on how to change their password once they log in.
 
-By default, roles can login to the main production instance of the data warehouse. Any password updates will propagate to `dev-bizops` and review instances when they are next refreshed.
+By default, roles can log in to the main production instance of the data warehouse. Any password updates will propagate to `dev-bizops` and review instances when they are next refreshed.
 
 Both readonly and analytics roles are not able to alter data in load only schemas. Currently, analytics, public, and sandbox are the only schemas which the `analytics` role can fully manipulate. Both roles have the ability to select from all schemas and tables. 
 
 ### Accessing peered VPCs
 
 Some of the GitLab specific ELTs connect to databases which are in peered GCP projects, such as the usage ping. To allow connections, a few actions have been taken:
-1. The Kubernetes cluster where the runner executes has been setup to use [IP aliasing](https://cloud.google.com/kubernetes-engine/docs/how-to/ip-aliases), so each pod gets a real routable IP within GCP.
+1. The Kubernetes cluster where the runner executes has been set up to use [IP aliasing](https://cloud.google.com/kubernetes-engine/docs/how-to/ip-aliases), so each pod gets a real routable IP within GCP.
 1. A [VPC peering relationship](https://cloud.google.com/vpc/docs/vpc-peering) has been established between the two projects and their networks.
 1. A firewall rule has been created in the upstream project to allow access from the runner Kubernetes cluster's pod subnet.
 
@@ -642,7 +642,7 @@ At Gitlab we use dbt for data transformation, as referenced in "Tools" above. Wh
 - All `{{ ref('...') }}` statements should be placed in CTEs at the top of the file.
 - Where performance permits, CTEs should perform a single, logical unit of work.
 - CTE names should be as verbose as needed to convey what they do.
-- CTEs with confusing or noteable logic should be commented.
+- CTEs with confusing or notable logic should be commented.
 - CTEs that are duplicated across models should be pulled out into their own models.
 - CTEs should be formatted like this:
 
@@ -668,7 +668,7 @@ FROM filtered_events
 
 - Indents should be four spaces (except for predicates, which should line up with the `where` keyword).
 - Lines of SQL should be no longer than 80 characters.
-- Field names should all be lowercased.
+- Field names should all be lowercase.
 - Function names should all be capitalized.
 - The `as` keyword should be used when projecting a field or table name.
 - Fields should be stated before aggregates / window functions.
