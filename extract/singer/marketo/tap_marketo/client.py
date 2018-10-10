@@ -1,6 +1,5 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Any, Iterator
-import sys
 
 from fire import Fire
 import pandas as pd
@@ -40,7 +39,7 @@ class MarketoClient(object):
         if response.status_code != 200:
             logging.critical(response.status_code)
             logging.critical(response.text)
-            sys.exit(1)
+            raise requests.exceptions.RequestException
         else:
             return response.json()
 
@@ -53,7 +52,7 @@ class MarketoClient(object):
         if not response["success"]:
             logging.critical("Request failed.")
             logging.critical(response["errors"])
-            sys.exit(1)
+            raise requests.exceptions.RequestException
         else:
             return response
 
