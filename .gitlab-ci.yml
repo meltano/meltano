@@ -166,7 +166,7 @@ meltano:
     IMAGE_TAG: latest
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base" $DOCKERFILE
+    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base#" $DOCKERFILE
   only:
     - master
 
