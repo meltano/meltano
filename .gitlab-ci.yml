@@ -33,11 +33,11 @@ cache:
     - pipenv run flake8
   allow_failure: true
 
-.test:
+test:
   stage: test
-  before_script: *pipenv_install
+  image: registry.gitlab.com/meltano/meltano-elt/extract:latest
   script:
-    - pipenv run pytest
+    - ci_helpers.py use_proxy "pytest -vv"
   allow_failure: true
 
 .run:
