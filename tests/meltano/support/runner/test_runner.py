@@ -1,5 +1,6 @@
 import pytest
 import os
+import json
 
 from unittest import mock
 from meltano.support.job import Job, State
@@ -49,7 +50,6 @@ def test_prepare_job(subject):
 
     for f in subject.tap_files.values():
         assert(f.exists())
-
     for f in subject.target_files.values():
         assert(f.exists())
 
@@ -71,6 +71,14 @@ def test_invoke(Popen, subject):
 
     tap_bin = str(subject.exec_path(TAP_NAME))
     target_bin = str(subject.exec_path(TARGET_NAME))
-
     assert(called_bins == [target_bin, "tee", tap_bin])
     assert(process_mock.wait.call_count == 2)
+
+
+def test_bookmark(subject):
+    with subject.target_files['state'].open("w") as state:
+        state.write('{"line": 1}\n')
+        state.write('{"line": 2}\n')
+
+    subject.bookmark()
+    assert(subject.job.payload['singer_state']['line'] == 2)

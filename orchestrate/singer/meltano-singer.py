@@ -23,6 +23,8 @@ def file_has_data(file: Path):
 class SingerRunner(Runner):
     def __init__(self, job_id, **config):
         self.job_id = job_id
+        self.job = Job(elt_uri=self.job_id)
+
         self.run_dir = Path(config.get('run_dir',
                                        os.getenv("SINGER_RUN_DIR")))
         self.venvs_dir = Path(config.get('venvs_dir',
@@ -124,11 +126,12 @@ class SingerRunner(Runner):
             raise Exception(f"Invalid state file: {state_file} is empty.")
 
         with state_file.open() as state:
-            self.job.payload['singer_state'] = json.load(state)
+            # as per the Singer specification, only the _last_ state
+            # should be persisted
+            *_, last_state = state.readlines()
+            self.job.payload['singer_state'] = json.loads(last_state)
 
     def run(self, extractor_name: str, loader_name: str):
-        self.job = Job(elt_uri=self.job_id)
-
         with self.job.run():
             self.prepare(extractor_name, loader_name)
             self.invoke(extractor_name, loader_name)

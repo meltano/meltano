@@ -12,8 +12,8 @@ class JobFinder():
 
     def latest_success(self):
         with DB.default.session() as session:
-            return session.query(Job) \
-                      .filter((Job.elt_uri == self.elt_uri) &
-                              (Job.state == State.SUCCESS)) \
-                      .order_by(Job.ended_at.desc()) \
-                      .first()
+            return (session.query(Job)
+                    .filter((Job.elt_uri == self.elt_uri) &
+                            (Job.state == State.SUCCESS))
+                    .order_by(Job.ended_at.desc())
+                    .first())
