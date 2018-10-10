@@ -1,3 +1,5 @@
+/docs/build
+
 */__pycache__
 *.log
 *.pyc
