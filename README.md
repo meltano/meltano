@@ -175,6 +175,8 @@ We want the tools to be open source so we can ship this as a product.
 
 ## How to Install and Run Meltano  
 
+**Note:** Meltano requires Python version >= 3.6.6
+
 ### With Docker  
 
 You can run a local copy of Meltano using [docker-compose][]. Run the following in your project directory:
