@@ -13,7 +13,7 @@ from .marketo_utils import MarketoUtils
 
 
 # Set logging config
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = singer.get_logger()
 
 
 def extract(config: str = "marketo_keyfile.json", log_only: bool = False):
@@ -26,7 +26,7 @@ def extract(config: str = "marketo_keyfile.json", log_only: bool = False):
         config_dict = json.load(config_file)
 
     marketo_client = MarketoClient(config_dict)
-    marketo_data: Dict = marketo_client.get_data()
+    marketo_data: Dict = marketo_client.get_all()
 
     if log_only:
         for endpoint, dataframe in marketo_data.items():
