@@ -1,4 +1,4 @@
-image: python:3.6
+image: registry.gitlab.com/meltano/meltano
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
@@ -33,11 +33,12 @@ cache:
     - pipenv run flake8
   allow_failure: true
 
-.test:
+test:
   stage: test
-  before_script: *pipenv_install
+  before_script:
+    - pip install pytest
   script:
-    - pipenv run pytest
+    - pytest -vv
   allow_failure: true
 
 .run:
