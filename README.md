@@ -222,6 +222,8 @@ We should be good citizen about these, and use the default workflow to contribut
 
 ### For taps/targets we create
 
+  1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
+  1. For target developement please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
   1. Use a separate repo (meltano/target|tap-x) in GitLab
 e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
   1. Publish PyPI packages of these package (not for now)
