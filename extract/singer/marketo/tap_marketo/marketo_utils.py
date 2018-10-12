@@ -2,11 +2,7 @@
 from datetime import datetime, timedelta
 import json
 import logging
-from os import environ as env
-import sys
 from typing import Dict
-
-from fire import Fire
 
 
 class MarketoUtils(object):
@@ -43,7 +39,7 @@ class MarketoUtils(object):
         """
 
         logging.info("Generating keyfile...")
-        # Get the secret credentials from env vars
+        # Get the secret credentials from the config_dict
         keyfile_mapping = {
             "endpoint": "MARKETO_ENDPOINT",
             "identity": "MARKETO_IDENTITY",

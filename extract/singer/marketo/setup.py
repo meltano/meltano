@@ -5,11 +5,11 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'tap-marketo = tap_marketo.cli:main'
+            'tap-marketo = tap_marketo.cli:cli'
         ]
     },
     install_requires=[
-        'fire>=0.1',
+        'click>=6',
         'pandas>=0.23',
         'requests>=2.18'
     ],

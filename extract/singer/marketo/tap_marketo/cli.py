@@ -1,11 +1,11 @@
 from datetime import datetime
 import json
 import logging
+from os import environ as env
 import sys
 from typing import Dict
 
-from fire import Fire
-from os import environ as env
+import click
 from pandas.io.json import build_table_schema
 import singer
 
@@ -19,6 +19,14 @@ logger = singer.get_logger()
 CONFIG_PATH = "marketo_keyfile.json"
 
 
+@click.group()
+def cli():
+    pass
+
+
+@cli.command("extract")
+@click.option("--config", "-c", default=CONFIG_PATH)
+@click.option("--log_only", default=False)
 def extract(config: str = CONFIG_PATH, log_only: bool = False):
     """
     Handle creation of a MarketoClient instance and invoking its methods.
@@ -49,11 +57,11 @@ def extract(config: str = CONFIG_PATH, log_only: bool = False):
             )
 
 
-def create_keyfile(
-    config_path: str = CONFIG_PATH,
-    minute_offset: str = "70",
-    run_time: str = datetime.utcnow().isoformat(),
-):
+@cli.command("create_keyfile")
+@click.option("--config_path", default=CONFIG_PATH)
+@click.option("--minute_offset", default="70")
+@click.option("--run_time", default=datetime.utcnow().isoformat())
+def create_keyfile(config_path: str, minute_offset: str, run_time: str):
     """
     Create the keyfile from env vars.
     """
@@ -61,7 +69,3 @@ def create_keyfile(
     marketo_utils.generate_keyfile(
         output_file=config_path, run_time=run_time, minute_offset=int(minute_offset)
     )
-
-
-def main():
-    Fire({"extract": extract, "create_keyfile": create_keyfile})

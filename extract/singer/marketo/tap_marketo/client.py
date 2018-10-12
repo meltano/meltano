@@ -1,7 +1,6 @@
 import logging
 from typing import Dict, List, Optional, Sequence, Any, Iterator
 
-from fire import Fire
 import pandas as pd
 import requests
 
