@@ -69,6 +69,19 @@ class SingerRunner(Runner):
         for dst, src in config_files.items():
             envsubst(src, dst)
 
+    def stop(self, process, timeout=10):
+        if process.stdin:
+            process.stdin.close()
+
+        while(True):
+            try:
+                code = process.wait(timeout)
+                logging.debug(f"{process} exited with {code}")
+                return code
+            except subprocess.TimeoutExpired:
+                process.kill()
+                logging.error(f"{process} was killed.")
+
     def invoke(self, tap: str, target: str):
         tap_args = [
             self.exec_path(tap),
@@ -98,27 +111,22 @@ class SingerRunner(Runner):
                                         stdout=self.target_files['state'].open("w+"))
 
             p_tee = subprocess.Popen(map(str, tee_args),
-                                    stdin=subprocess.PIPE,
-                                    stdout=p_target.stdin)
+                                     stdin=subprocess.PIPE,
+                                     stdout=p_target.stdin)
 
             p_tap = subprocess.Popen(map(str, tap_args),
-                                    stdout=p_tee.stdin)
+                                     stdout=p_tee.stdin)
         except Exception as err:
             for p in (p_target, p_tee, p_tap):
-                if p: p.kill()
+                self.stop(p, timeout=0)
             raise Exception(f"Cannot start tap or target: {err}")
 
-        tap_code = p_tap.wait()
-
-        if tap_code != 0:
-            p_tee.kill()
-            p_target.kill()
-            raise Exception(f"Tap exited with {tap_code}")
-
-        target_code = p_target.wait()
-
-        if target_code != 0:
-            raise Exception(f"Target exited with {target_code}")
+        tap_code = self.stop(p_tap)
+        tee_code = self.stop(p_tee)
+        target_code = self.stop(p_target)
+        
+        if any((tap_code, tee_code, target_code)):
+            raise Exception(f"Extraction failed.")
 
     def bookmark(self):
         state_file = self.target_files['state']
