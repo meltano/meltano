@@ -12,8 +12,8 @@ Meltano stands for the [steps of the data science life-cycle](#data-science-life
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
 | Model     | [Meltano Model](#meltano-model) | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
-| Extract   | [Tap](https://www.singer.io/#taps) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
-| Load      | [Target](https://singer.io/#targets) based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Extract   | [Singer Tap](#tap) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
+| Load      | [Signer Target](#target) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
 | Analyze | [Meltano Analysis](https://gitlab.com/meltano/meltano/tree/master/src/melt) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
 | Notebook | [JupyterHub](https://github.com/jupyterhub/jupyterhub) | [GNU Octave](https://www.gnu.org/software/octave/) | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/) |
@@ -211,6 +211,22 @@ This will start:
 - A mock warehouse Postgres DB
 
 For more info see the [docker-compose.yml]()
+
+## Tap
+
+Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
+
+[List of taps](https://www.singer.io/#taps)
+
+Also see [workflow for tap/target development](#workflow-for-tap-target-development)
+
+## Target
+
+Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
+
+[List of targets](https://singer.io/#targets)
+
+Also see [workflow for tap/target development](#workflow-for-tap-target-development)
 
 ## Workflow for tap/target development
 
