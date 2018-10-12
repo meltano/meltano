@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from . import config
 from .external_connector import ExternalConnector
+from meltano.support.db import DB
 
 app = Flask(__name__)
 
@@ -22,6 +23,14 @@ app.config.from_object(config)
 if os.environ['FLASK_ENV'] == 'development':
     CORS(app)
 
+# TODO: we need to setup proper dependency injection for
+# this kind of hard-coupling. We are building multiple UI on
+# the same backend. Almost all component need a ready DB
+# connection.
+DB.setup(host=app.config['POSTGRES_URL'],
+         user=app.config['POSTGRES_USER'],
+         password=app.config['POSTGRES_PASSWORD'],
+         database=app.config['POSTGRES_DB'])
 db = SQLAlchemy(app)
 
 connector = ExternalConnector()
