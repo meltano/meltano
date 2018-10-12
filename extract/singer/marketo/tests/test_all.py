@@ -1,4 +1,6 @@
+from datetime import datetime
 from os import environ as env
+
 import pytest
 
 from tap_marketo.client import *
@@ -13,7 +15,9 @@ def pytest_namespace():
 class TestMarketoUtils:
     def test_create_keyfile(self):
         marketo_utils = MarketoUtils(env.copy())
-        config_dict = marketo_utils.generate_keyfile(minute_offset=60, output_file=None)
+        config_dict = marketo_utils.generate_keyfile(
+            minute_offset=60, output_file=None, run_time=datetime.utcnow().isoformat()
+        )
         assert list(config_dict.keys()) == [
             "endpoint",
             "identity",

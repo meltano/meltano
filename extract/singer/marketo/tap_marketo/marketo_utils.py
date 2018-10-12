@@ -29,12 +29,7 @@ class MarketoUtils(object):
 
         return formatted_start_time
 
-    def generate_keyfile(
-        self,
-        minute_offset: int = 70,
-        run_time: str = datetime.utcnow().isoformat(),
-        output_file: str = "marketo_keyfile.json",
-    ):
+    def generate_keyfile(self, minute_offset: int, run_time: str, output_file: str):
         """
         Generate a Marketo keyfile for tap-marketo.
 

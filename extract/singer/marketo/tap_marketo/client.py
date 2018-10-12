@@ -13,7 +13,7 @@ class MarketoClient(object):
         self.client_id: str = config["client_id"]
         self.client_secret: str = config["client_secret"]
         self.start_time: str = config["start_time"]
-        self.access_token: Optional[str] = self.get_access_token()
+        self.access_token: str = self.get_access_token()
         self.start_time_token: str = self.get_date_token()
 
     def chunker(self, full_list: List, chunk_size: int) -> Iterator[List]:
@@ -51,7 +51,7 @@ class MarketoClient(object):
         Hit the Marketo Identity endpoint to get a valid access token.
         """
 
-        self.access_token = None
+        self.access_token = ""
         logging.info("Getting access token...")
         identity_url = f"{self.identity}/oauth/token"
         payload = {

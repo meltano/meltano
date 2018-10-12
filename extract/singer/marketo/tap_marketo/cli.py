@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 import logging
 import sys
@@ -15,8 +16,10 @@ from .marketo_utils import MarketoUtils
 # Set logging config
 logger = singer.get_logger()
 
+CONFIG_PATH = "marketo_keyfile.json"
 
-def extract(config: str = "marketo_keyfile.json", log_only: bool = False):
+
+def extract(config: str = CONFIG_PATH, log_only: bool = False):
     """
     Handle creation of a MarketoClient instance and invoking its methods.
 
@@ -47,13 +50,17 @@ def extract(config: str = "marketo_keyfile.json", log_only: bool = False):
 
 
 def create_keyfile(
-    config_path: str = "marketo_keyfile.json", minute_offset: str = "70"
+    config_path: str = CONFIG_PATH,
+    minute_offset: str = "70",
+    run_time: str = datetime.utcnow().isoformat(),
 ):
     """
     Create the keyfile from env vars.
     """
     marketo_utils = MarketoUtils(env.copy())
-    marketo_utils.generate_keyfile(minute_offset=int(minute_offset))
+    marketo_utils.generate_keyfile(
+        output_file=config_path, run_time=run_time, minute_offset=int(minute_offset)
+    )
 
 
 def main():
