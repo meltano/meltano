@@ -1,12 +1,15 @@
 *
 
-!/requirements.txt
-!/setup.py
-!/README.md
 !/LICENSE
-!/src
-!/orchestrate
-!/model
-!/transform
+!/README.md
+!/docs
 !/extract
 !/load
+!/model
+!/orchestrate
+!/requirements.txt
+!/setup.py
+!/src
+!/transform
+
+docs/build

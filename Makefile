@@ -138,8 +138,20 @@ ${MELTANO_UI}/dist: ${APP_DEPS}
 #
 # - `make explain_makefile` will bring up a web server with this makefile annotated.
 
-.PHONY: makefile_docs
+.PHONY: makefile_docs docs_image docs_shell
 
 explain_makefile:
 	docker stop explain_makefile || echo 'booting server'
 	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh
+
+docs_image: base_image
+	docker build \
+		--file docker/docs/Dockerfile \
+		-t meltano/docs_build \
+		.
+
+docs_shell:
+	${DOCKER_RUN} -w /app/docs meltano/docs_build bash
+
+docs/build: docs_image docs/source
+	${DOCKER_RUN} -w /app/docs meltano/docs_build make html
