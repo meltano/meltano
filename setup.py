@@ -30,6 +30,11 @@ cli_requires = [
     'click',
 ]
 
+dev_requires = [
+    'pytest',
+    'black',
+]
+
 setup(
     name="meltano",
     version="0.0.1",
@@ -53,15 +58,17 @@ setup(
         "Operating System :: OS Independent",
     ],
     setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    tests_require=dev_requires,
     # run `make requirements.txt` after editing
     install_requires=requires,
     extras_require={
         'api': api_requires,
         'cli': cli_requires,
+        'dev': dev_requires,
         'all': [
             *api_requires,
-            *cli_requires
+            *cli_requires,
+            *dev_requires,
         ],
     },
     entry_points={
