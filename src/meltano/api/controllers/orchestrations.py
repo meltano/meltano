@@ -1,7 +1,9 @@
 import os
 import subprocess
-
+import logging
+from io import StringIO
 import pandas as pd
+from sqlalchemy import TIMESTAMP, DATE, DATETIME
 from flask import (
     Blueprint,
     request,
@@ -10,16 +12,17 @@ from flask import (
     make_response,
     Response,
 )
-
-from meltano.cli.extract import run_extract, EXTRACTOR_REGISTRY, LOADER_REGISTRY
-
-orchestrationsBP = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
-
-from sqlalchemy import TIMESTAMP, DATE, DATETIME
-
+from meltano.support.runner.meltano import (
+    MeltanoRunner,
+    ComponentNotFoundError,
+    EXTRACTOR_REGISTRY,
+    LOADER_REGISTRY
+)
 from ..config import TEMP_FOLDER, PROJECT_ROOT_DIR
 from ..models.settings import Settings
 
+
+orchestrationsBP = Blueprint('orchestrations', __name__, url_prefix='/orchestrations')
 DATETIME_TYPES_TO_PARSE = (TIMESTAMP, DATE, DATETIME)
 TRANSFORM_DIR = 'transform'
 PROFILES_DIR = 'profile'
@@ -43,57 +46,37 @@ def connection_names():
 
 @orchestrationsBP.route('/run', methods=['POST'])
 def run():
-    run_output = ''
     out_nl = '\n'
+    run_output = StringIO(newline=out_nl)
     incoming = request.get_json()
     extractor_name = incoming['extractor']
     loader_name = incoming['loader']
     connection_name = incoming.get('connection_name')
+    runner = MeltanoRunner()
 
-    run_output += f"Loading and initializing extractor: {extractor_name}"
-    extractor_class = EXTRACTOR_REGISTRY.get(extractor_name)
-    if not extractor_class:
-        run_output += out_nl + f'Extractor {extractor_name} not found please specify one of the: {list(EXTRACTOR_REGISTRY.keys())}'
-        return jsonify({'append': run_output})
-    extractor = extractor_class()
+    # Use a logging handler to capture the output of the extraction run
+    runner.logger.addHandler(logging.StreamHandler(run_output))
 
-    run_output += out_nl + f"Loading and initializing loader: {loader_name}"
-    loader_class = LOADER_REGISTRY.get(loader_name)
-    if not loader_class:
-        run_output += out_nl + f'Loader {loader_name} not found please specify one of the following: {list(LOADER_REGISTRY.keys())}'
-        return jsonify({'append': run_output})
+    try:
+        runner.perform(extractor_name, loader_name)
+    except ComponentNotFoundError as err:
+        run_output.write(f"\n{err}")
+        return jsonify({'append': run_output.getvalue()})
 
-    run_output += out_nl + "Starting extraction"
-    results = set()
-    for entity in extractor.entities:
-        loader = loader_class(
-            extractor=extractor,
-            entity_name=entity,
-        )
-        run_output += out_nl + "Applying the schema"
-        loader.schema_apply()
-
-        run_output += out_nl + "Extracting Data" + out_nl
-        entity_dfs = extractor.extract(entity)
-        for df in entity_dfs:
-            run_output += "."
-            results.add(loader.load(df=df))
-    run_output += out_nl + "Load done!"
-
-    run_output += out_nl + "Starting Transform"
+    run_output.write("\nLoad done!")
+    run_output.write("\nStarting Transform")
 
     # use the extractor's name as the model name for the transform operation
     transform_log = run_transform(extractor_name, connection_name)
 
     if transform_log['status'] != 'ok':
-        run_output += out_nl + 'ERROR'
+        run_output.write('\nERROR')
     else:
-        run_output += out_nl + f"Status: {transform_log['status']}"
-        run_output += out_nl + f"Command: {transform_log['command']}"
+        run_output.write(f"\nStatus: {transform_log['status']}")
+        run_output.write(f"\nCommand: {transform_log['command']}")
 
-    run_output += out_nl + out_nl + f"Status:{transform_log['output']}" + out_nl
-
-    return jsonify({'append': run_output})
+    run_output.write(f"\n\nStatus:{transform_log['output']}\n")
+    return jsonify({'append': run_output.getvalue()})
 
 
 @orchestrationsBP.route('/extract/<extractor_name>', methods=['POST'])
@@ -102,7 +85,8 @@ def extract(extractor_name: str) -> Response:
     endpoint that performs extraction of the selected datasource to the .csv file(s)
     stored on disk in the /static/tmp/ directory)
     """
-    csv_files = run_extract(extractor_name, 'csv')
+    runner = MeltanoRunner()
+    csv_files = runner.perform(extractor_name, 'csv')
     csv_files_url = [url_for('static', filename=f'tmp/{file_name}') for file_name in csv_files]
     return jsonify({'extractor_name': extractor_name,
                     'output_file_paths': csv_files_url})
@@ -118,7 +102,7 @@ def load(loader_name: str) -> Response:
     incoming = request.get_json()
     try:
         extractor_name = incoming['extractor']
-        extractor_class = EXTRACTOR_REGISTRY[extractor_name]
+        extractor_class = MeltanoRunner.import_cls(EXTRACTOR_REGISTRY[extractor_name])
         extractor = extractor_class()
     except KeyError:
         return make_response(
@@ -127,13 +111,14 @@ def load(loader_name: str) -> Response:
             ), 404
         )
     try:
-        loader_class = LOADER_REGISTRY.get(loader_name)
+        loader_class = MeltanoRunner.import_cls(LOADER_REGISTRY[loader_name])
     except KeyError:
         return make_response(
             jsonify(
                 {'response': 'Loader not found', 'available_loaders': list(LOADER_REGISTRY.keys())}
             ), 404
         )
+    
     extractor_temp_files = [filename for filename in os.listdir(TEMP_FOLDER) if filename.startswith(extractor_name)]
     for file_path in extractor_temp_files:
         filename = os.path.splitext(file_path)[0]
