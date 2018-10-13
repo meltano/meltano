@@ -71,8 +71,13 @@ def test_invoke(Popen, subject):
 
     tap_bin = str(subject.exec_path(TAP_NAME))
     target_bin = str(subject.exec_path(TARGET_NAME))
+
+    # correct bins are called
     assert(called_bins == [target_bin, "tee", tap_bin])
-    assert(process_mock.wait.call_count == 2)
+
+    # pipeline is closed
+    assert(process_mock.stdin.close.call_count == 3)
+    assert(process_mock.wait.call_count == 3)
 
 
 def test_bookmark(subject):
