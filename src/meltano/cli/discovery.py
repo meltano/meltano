@@ -1,26 +1,26 @@
 import os
 import json
 import click
-from urllib.parse import urljoin
+from urllib.parse import urlparse
 from . import cli
 
 EXTRACTORS = 'extractors';
 LOADERS = 'loaders'
 ALL = 'all'
 
-discovery_file = urljoin(os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__))),'cli/discovery.json')
+discovery_file = os.path.join(os.path.dirname(__file__), "cli/discovery.json")
 
 @cli.command()
-@click.argument('what', type=click.Choice([EXTRACTORS, LOADERS, ALL]))
-def discover(what):
+@click.argument('plugin_type', type=click.Choice([EXTRACTORS, LOADERS, ALL]))
+def discover(plugin_type):
     with open(discovery_file) as f:
         data = json.load(f)
 
-        if what == ALL:
+        if plugin_type == ALL:
             list_discovery(EXTRACTORS, data)
             list_discovery(LOADERS, data)
         else:
-            list_discovery(what, data)
+            list_discovery(plugin_type, data)
 
 def list_discovery(discovery, data):
     click.echo(click.style(discovery.title(), fg='green'))

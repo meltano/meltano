@@ -28,6 +28,7 @@ api_requires = [
 
 cli_requires = [
     'click',
+    'packaging',
 ]
 
 dev_requires = [
