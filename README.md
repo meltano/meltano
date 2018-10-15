@@ -214,6 +214,8 @@ For more info see the [docker-compose.yml]()
 
 ## Tap
 
+See our [sample first tap](https://gitlab.com/meltano/tap-first/) as a good tap starting point. 
+
 Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
 
 [List of taps](https://www.singer.io/#taps)
@@ -221,6 +223,8 @@ Based on [Singer specification](https://github.com/singer-io/getting-started/blo
 Also see [workflow for tap/target development](#workflow-for-tap-target-development)
 
 ## Target
+
+See our [csv target](https://gitlab.com/meltano/target-csv) as a good starting point for targets.
 
 Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
 
