@@ -52,9 +52,7 @@ meltano orchestrate
 
 After installing `meltano` CLI, you can choose to run meltano against the sample project.
 
-The sample project contains a sample `meltano.yml` file.
-
-The configuration file will initially look like like this:
+The sample project contains a sample `meltano.yml` file:
 
 `meltano.yml`
 
