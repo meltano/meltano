@@ -80,6 +80,7 @@ class Job(SystemModel):
         except Exception as err:
             logging.error(err)
             self.fail(error=err)
+            raise
 
     def start(self):
         self.started_at = datetime.utcnow()
