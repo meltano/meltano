@@ -8,7 +8,7 @@ EXTRACTORS = 'extractors';
 LOADERS = 'loaders'
 ALL = 'all'
 
-discovery_file = os.path.join(os.path.dirname(__file__), "cli/discovery.json")
+discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
 
 @cli.command()
 @click.argument('plugin_type', type=click.Choice([EXTRACTORS, LOADERS, ALL]))
