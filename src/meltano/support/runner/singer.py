@@ -126,7 +126,7 @@ class SingerRunner(Runner):
         target_code = self.stop(p_target, timeout=10)
         
         if any((tap_code, tee_code, target_code)):
-            raise Exception(f"Extraction failed.")
+            raise Exception(f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code}), tee({tee_code})")
 
     def bookmark(self):
         state_file = self.target_files['state']

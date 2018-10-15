@@ -51,8 +51,14 @@ def test_run(session):
 def test_run_failed(session):
     # A failed run will mark the subject as FAILED an set the payload['error']
     subject = sample_job().save()
-    with subject.run():
-        raise Exception("This is a test.")
+    exception = Exception("This is a test.")
+
+    with pytest.raises(Exception) as e:
+        with subject.run():
+            raise exception
+
+        # raise the same exception
+        assert(e is exception)
 
     assert(subject.state == State.FAIL)
     assert(subject.ended_at is not None)
