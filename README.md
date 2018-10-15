@@ -35,11 +35,11 @@ Meltano runs many different types of files and projects including but not limite
 1. Extractors
 1. Loaders
 1. DBT Transforms
-1. Meltano Models or Lookml Models
+1. Meltano Models or .lookml Models
 1. Jupyter Notebook files
 1. Airflow DAGs as part of an orchestration step
 
-All of these files are version controled in their own respective repos.
+All of these files are version controlled in their own respective repos.
 
 You will first install Meltano through `pip`, via
 
@@ -47,51 +47,38 @@ You will first install Meltano through `pip`, via
 pip install meltano
 ```
 
-After the installation you will find the default Meltano configuration file, `meltanofile.json`, which contains the location of the default sources. You will be able to add sources via the command line, or manually edit this file. 
-
-Many of these sources will be forked from Singer repos, and some may forked without changes. The reason for forking is as follows: we test and run all singer taps and targets before bringing them under the Meltano namespace and therefore guarantee the functionality and tests of all extractors, loaders, transformers, models, notebooks, and orchestrations under the Meltano namespace.
+After the installation you will find the default Meltano configuration file, `meltanoconfig.yml`, which contains the location of the default sources. You will be able to add sources via the command line, or manually edit this file. 
 
 The reason for having all sources in separate repos, is that many sources have different licenses and we do not want that license to consume our development repository license. 
 
 The configuration file will initially look like like this (note the ellipsis, as this file may be different as advertised):
 
-`meltanofile.json`
+`meltanoconfig.yml`
 
-```json
-{
-  extractors: {
-    "first": "https://gitlab.com/meltano/tap-first"
-    "mysql": "https://gitlab.com/meltano/tap-mysql",
-    "zendesk": "http://gitlab.com/meltano/tap-zendesk",
-    ...
-  },
-  loaders: {
-    "csv": "http://gitlab.com/meltano/target-csv",
-    "snowflake": "http://gitlab.com/meltano/target-snowflake",
-    ...
-  },
-  models: {
-    "first": "https://gitlab.com/meltano/model-first"
-    "mysql": "https://gitlab.com/meltano/model-mysql",
-    "zendesk": "http://gitlab.com/meltano/model-zendesk",
-    ...
-  },
-  transforms: {
-    "first": "https://gitlab.com/meltano/transform-first"
-    "mysql": "https://gitlab.com/meltano/transform-mysql",
-    "zendesk": "http://gitlab.com/meltano/transform-zendesk",
-    ...
-  },
-  orchestrations: {
-    "first": "https://gitlab.com/meltano/orchestrate-first"
-    "mysql": "https://gitlab.com/meltano/orchestrate-mysql",
-    "zendesk": "http://gitlab.com/meltano/orchestrate-zendesk",
-    ...
-  }
-}
+```yml
+extractors:
+  first: https://gitlab.com/meltano/tap-first
+  mysql: https://gitlab.com/meltano/tap-mysql
+  zendesk: http://gitlab.com/meltano/tap-zendesk
+loaders:
+  csv: http://gitlab.com/meltano/target-csv
+  snowflake: http://gitlab.com/meltano/target-snowflake
+project: https://gitlab.com/meltano/analytics
 ```
 
-Notice that the `meltanofile.json` comes with defaults. These defaults may be changed, to point to external repos within or outside of GitLab. Meltano will do a clone of these repos from within the tool to read the files, and you will be able to run a `git pull origin <branch>` to update the repo internally through the CLI and/or the user interface. These source will always be maintained externally as separate repos. As a first step for our MVP we will provide only read access to these repos, therefore you will be able to update the internal source but not write to them. All development to those repos will be done outside of Meltano. This will change in the future. 
+Three separate sections define the `meltanoconfig.yml`. `extractors` and `loaders` are the extractors and loaders you want to be available to for your life cycle. The `project` section defines the location of your project repo where you model, transform, analyze, notebook and orchestrate files will live. 
+
+When you initialize Meltano for the first time you'll give it the repo url of your project files.
+
+`project` is a repo that contains the following directories:
+
+* model - For your `.lookml` files.
+* transform - For your dbt `.py` files.
+* analyze - For your `.yml` dashboard files.
+* notebook - for your jupyter notebook files.
+* orchestrate - For your airflow `.py` files.
+
+The `meltanoconfig.yml` comes with defaults. These defaults can be changed to point to external repos. Meltano clone these repos internally. As a first step for our MVP we will provide read access to these repos only. Therefore, you will be able to update the internal source but not write to them. All development to those repos will be done outside of Meltano. This will change in the future.
 
 ### Milestones
 
