@@ -27,6 +27,74 @@ In addition, we believe that the information a business uses to make decisions m
 
 A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
 
+### How Meltano Does Version Control
+
+**Note: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.**
+
+Meltano runs many different types of files and projects including but not limited to: 
+1. Extractors
+1. Loaders
+1. DBT Transforms
+1. Meltano Models or Lookml Models
+1. Jupyter Notebook files
+1. Airflow DAGs as part of an orchestration step
+
+All of these files are version controled in their own respective repos.
+
+You will first install Meltano through `pip`, via
+
+```bash
+pip install meltano
+```
+
+After the installation you will find the default Meltano configuration file, `meltanofile.json`, which contains the location of the default sources. You will be able to add sources via the command line, or manually edit this file. 
+
+Many of these sources will be forked from Singer repos, and some may forked without changes. The reason for forking is as follows: we test and run all singer taps and targets before bringing them under the Meltano namespace and therefore guarantee the functionality and tests of all extractors, loaders, transformers, models, notebooks, and orchestrations under the Meltano namespace.
+
+The reason for having all sources in separate repos, is that many sources have different licenses and we do not want that license to consume our development repository license. 
+
+The configuration file will initially look like like this (note the ellipsis, as this file may be different as advertised):
+
+`meltanofile.json`
+
+```json
+{
+  extractors: {
+    "first": "https://gitlab.com/meltano/tap-first"
+    "mysql": "https://gitlab.com/meltano/tap-mysql",
+    "zendesk": "http://gitlab.com/meltano/tap-zendesk",
+    ...
+  },
+  loaders: {
+    "csv": "http://gitlab.com/meltano/target-csv",
+    "snowflake": "http://gitlab.com/meltano/target-snowflake",
+    ...
+  },
+  models: {
+    "first": "https://gitlab.com/meltano/model-first"
+    "mysql": "https://gitlab.com/meltano/model-mysql",
+    "zendesk": "http://gitlab.com/meltano/model-zendesk",
+    ...
+  },
+  transforms: {
+    "first": "https://gitlab.com/meltano/transform-first"
+    "mysql": "https://gitlab.com/meltano/transform-mysql",
+    "zendesk": "http://gitlab.com/meltano/transform-zendesk",
+    ...
+  },
+  orchestrations: {
+    "first": "https://gitlab.com/meltano/orchestrate-first"
+    "mysql": "https://gitlab.com/meltano/orchestrate-mysql",
+    "zendesk": "http://gitlab.com/meltano/orchestrate-zendesk",
+    ...
+  }
+}
+```
+
+Notice that the `meltanofile.json` comes with defaults. These defaults may be changed, to point to external repos within or outside of GitLab. Meltano will do a clone of these repos from within the tool to read the files, and you will be able to run a `git pull origin <branch>` to update the repo internally through the CLI and/or the user interface. These source will always be maintained externally as separate repos. As a first step for our MVP we will provide only read access to these repos, therefore you will be able to update the internal source but not write to them. All development to those repos will be done outside of Meltano. This will change in the future. 
+
+### Milestones
+
 Meltano runs in parallel with the data team with its 2-week milestones. Meltano team runs with 1-week milestones.
 
 ### Loosely Coupled Tools
