@@ -31,7 +31,8 @@ A data analyst or scientist should be able to easily use Meltano to add whatever
 
 **Note: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.**
 
-Meltano runs many different types of files and projects including but not limited to: 
+Meltano runs many different types of files and projects including but not limited to:
+
 1. Extractors
 1. Loaders
 1. DBT Transforms
@@ -39,24 +40,23 @@ Meltano runs many different types of files and projects including but not limite
 1. Jupyter Notebook files
 1. Airflow DAGs as part of an orchestration step
 
-All of these files are version controlled in their own respective repos.
-
-You will first install Meltano through `pip`, via
+First install Meltano through `pip`, via
 
 ```bash
 pip install meltano
+# Run the sample project
 git clone https://gitlab.com/meltano/gitlab-runners
 cd gitlab-runners
 meltano orchestrate
 ```
 
-After the installation you will find the default Meltano configuration file, `meltanoconfig.yml`, which contains the location of the default sources. You will be able to add sources via the command line, or manually edit this file. 
+After installing `meltano` CLI, you can choose to run meltano against the sample project.
 
-The reason for having all sources in separate repos, is that many sources have different licenses and we do not want that license to consume our development repository license. 
+The sample project contains a sample `meltano.yml` file.
 
-The configuration file will initially look like like this (note the ellipsis, as this file may be different as advertised):
+The configuration file will initially look like like this:
 
-`meltanoconfig.yml`
+`meltano.yml`
 
 ```yml
 extractors:
@@ -66,24 +66,31 @@ extractors:
 loaders:
   csv: http://gitlab.com/meltano/target-csv
   snowflake: http://gitlab.com/meltano/target-snowflake
-project: https://gitlab.com/meltano/analytics
 ```
 
-Three separate sections define the `meltanoconfig.yml`. `extractors` and `loaders` are the extractors and loaders you want to be available to for your life cycle. The `project` section defines the location of your project repo where you model, transform, analyze, notebook and orchestrate files will live. 
+Three separate sections define the `meltano.yml`. `extractors` and `loaders` are the extractors and loaders you want to be available to for your life cycle. 
 
-When you initialize Meltano for the first time you'll give it the repo url of your project files.
-
-`project` is a repo that contains the following directories:
+Your project should contains the following directory structure:
 
 * model - For your `.lookml` files.
 * transform - For your dbt `.py` files.
 * analyze - For your `.yml` dashboard files.
 * notebook - for your jupyter notebook files.
 * orchestrate - For your airflow `.py` files.
-* load - caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
-* extract - caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
+* load - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
+* extract - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
+* .gitignore - Ignores your load and extract directories.
+* README.md - Explains how this project works.
+* meltano.yml - Config file which shows which extractors and loaders you would like to use and where to find them.
 
-The `meltanoconfig.yml` comes with defaults. These defaults can be changed to point to external repos. Meltano clone these repos internally. As a first step for our MVP we will provide read access to these repos only. Therefore, you will be able to update the internal source but not write to them. All development to those repos will be done outside of Meltano. This will change in the future.
+Once you have your project, you can run `meltano` against it.
+
+* `meltano discover all`: list available extractors and loaders:
+  * `meltano discover extractors`: list only available extractors
+  * `meltano discover loaders`: list only available loaders
+* `meltano add extractor [name of extractor | git url]`: Install an extractor
+* `meltano add loader [name of extractor | git url]`: Install a loader
+* `meltano extract [name of extractor] --to [name of loader] --transform`: Extract data to a loader and optionally transform the data
 
 ### Milestones
 
