@@ -1,0 +1,9 @@
+{
+  "account": "$SF_ACCOUNT",
+  "username": "$SF_USER",
+  "password": "$SF_PASSWORD",
+  "role": "$SF_ROLE",
+  "database": "$SF_DATABASE",
+  "schema": "$SF_TEST_SCHEMA",
+  "warehouse": "$SF_WAREHOUSE"
+}
