@@ -69,13 +69,13 @@ class SingerRunner(Runner):
         for dst, src in config_files.items():
             envsubst(src, dst)
 
-    def stop(self, process, timeout=10):
+    def stop(self, process, **wait_args):
         if process.stdin:
             process.stdin.close()
 
         while(True):
             try:
-                code = process.wait(timeout)
+                code = process.wait(**wait_args)
                 logging.debug(f"{process} exited with {code}")
                 return code
             except subprocess.TimeoutExpired:
@@ -122,11 +122,11 @@ class SingerRunner(Runner):
             raise Exception(f"Cannot start tap or target: {err}")
 
         tap_code = self.stop(p_tap)
-        tee_code = self.stop(p_tee)
-        target_code = self.stop(p_target)
+        tee_code = self.stop(p_tee, timeout=10)
+        target_code = self.stop(p_target, timeout=10)
         
         if any((tap_code, tee_code, target_code)):
-            raise Exception(f"Extraction failed.")
+            raise Exception(f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code}), tee({tee_code})")
 
     def bookmark(self):
         state_file = self.target_files['state']
