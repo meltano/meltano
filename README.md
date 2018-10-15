@@ -45,6 +45,9 @@ You will first install Meltano through `pip`, via
 
 ```bash
 pip install meltano
+git clone https://gitlab.com/meltano/gitlab-runners
+cd gitlab-runners
+meltano orchestrate
 ```
 
 After the installation you will find the default Meltano configuration file, `meltanoconfig.yml`, which contains the location of the default sources. You will be able to add sources via the command line, or manually edit this file. 
@@ -77,6 +80,8 @@ When you initialize Meltano for the first time you'll give it the repo url of yo
 * analyze - For your `.yml` dashboard files.
 * notebook - for your jupyter notebook files.
 * orchestrate - For your airflow `.py` files.
+* load - caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
+* extract - caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
 
 The `meltanoconfig.yml` comes with defaults. These defaults can be changed to point to external repos. Meltano clone these repos internally. As a first step for our MVP we will provide read access to these repos only. Therefore, you will be able to update the internal source but not write to them. All development to those repos will be done outside of Meltano. This will change in the future.
 
