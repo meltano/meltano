@@ -44,15 +44,15 @@ First install Meltano through `pip`, via
 
 ```bash
 pip install meltano
-# Run the sample project
+# clone the gitlab-runner project
 git clone https://gitlab.com/meltano/gitlab-runners
 cd gitlab-runners
 meltano orchestrate
 ```
 
-After installing `meltano` CLI, you can choose to run meltano against the sample project.
+After installing `meltano` CLI, you can choose to run meltano against the your project.
 
-The sample project contains a sample `meltano.yml` file:
+The gitlab-runner project contains a `meltano.yml` file:
 
 `meltano.yml`
 
@@ -65,8 +65,6 @@ loaders:
   csv: http://gitlab.com/meltano/target-csv
   snowflake: http://gitlab.com/meltano/target-snowflake
 ```
-
-Three separate sections define the `meltano.yml`. `extractors` and `loaders` are the extractors and loaders you want to be available to for your life cycle. 
 
 Your project should contains the following directory structure:
 
@@ -83,11 +81,10 @@ Your project should contains the following directory structure:
 
 Once you have your project, you can run `meltano` against it.
 
+* `meltano`: Installs all the dependencies of your project based on the `meltano.yml` file.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
   * `meltano discover loaders`: list only available loaders
-* `meltano add extractor [name of extractor | git url]`: Install an extractor
-* `meltano add loader [name of extractor | git url]`: Install a loader
 * `meltano extract [name of extractor] --to [name of loader] --transform`: Extract data to a loader and optionally transform the data
 
 ### Milestones
