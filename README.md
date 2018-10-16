@@ -57,6 +57,7 @@ The gitlab-runner project contains a `meltano.yml` file:
 `meltano.yml`
 
 ```yml
+version: 0.0.0
 extractors:
 - name: first
   url: https://gitlab.com/meltano/tap-first
@@ -97,11 +98,60 @@ Your project should contains the following directory structure:
 * analyze - For your `.yml` dashboard files.
 * notebook - For your `.ipynb` notebook files.
 * orchestrate - For your airflow `.py` files.
-* load - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
-* extract - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
-* .gitignore - Ignores your load and extract directories.
-* README.md - Explains how this project works.
-* meltano.yml - Config file which shows which extractors and loaders you would like to use and where to find them.
+* .meltano - A .gitignored directory for internal caching (venvs, pypi packages, etc.). 
+* load - A directory where your configs for your loaders are placed. Each config should be in a directory with the name of the loader. e.g. For csv loader, the config would be in `load/target-csv/config.json`.
+* extract - A directory where your configs for your extractors are placed. Each config should be in a directory with the name of the extractor. e.g. For zendesk extractor, the config would be in `extract/tap-zendesk/config.json`.
+* .gitignore
+* README.md
+* meltano.yml - Config file which shows which extractors and loaders, etc. you would like to use and where to find them.
+
+Here is a sample of what your project might look like:
+
+```
+├── extract
+│   ├── tap-marketo
+│   └── tap-zendesk
+│       ├── config.json
+│       └── properties.json
+├── load
+│   └── target-postgres
+│       └── config.json
+├── .meltano
+│   ├── dbt
+│   │   └── meltano.yml
+│   ├── model
+│   │   ├── base_ticket.model.lookml
+│   │   └── ticket.model.lookml
+│   ├── run
+│   │   ├── dbt
+│   │   │   ├── dbt_profile.yml
+│   │   │   └── dbt_project.yml
+│   │   └── singer
+│   │       ├── tap.config.json
+│   │       ├── tap.properties.json
+│   │       └── target.config.json
+│   └── transform
+│       └── tap-zendesk
+│           ├── base_ticket.sql
+│           └── base_user.sql
+├── meltano.yml
+├── model
+│   └── zendesk
+│       ├── zendesk.model.lookml
+│       └── zendesk.view.lookml
+├── analyze
+│   └── zendesk
+│       └── zendesk.dashboard.yml
+├── orchestrate
+│   ├── dag_1.py
+│   ├── dag_2.py
+│   ├── dag_3.py
+│   ├── dag_4.py
+│   └── dag_5.py
+└── transform
+    └── tap-zendesk
+        └── base.sql
+```
 
 Once you have your project, you can run `meltano` against it.
 
