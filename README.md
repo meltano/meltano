@@ -50,7 +50,7 @@ cd gitlab-runners
 meltano orchestrate
 ```
 
-After installing `meltano` CLI, you can choose to run meltano against the your project.
+After installing `meltano` CLI, you can choose to run meltano against your project.
 
 The gitlab-runner project contains a `meltano.yml` file:
 
