@@ -58,20 +58,44 @@ The gitlab-runner project contains a `meltano.yml` file:
 
 ```yml
 extractors:
-  first: https://gitlab.com/meltano/tap-first
-  mysql: https://gitlab.com/meltano/tap-mysql
-  zendesk: http://gitlab.com/meltano/tap-zendesk
+- name: first
+  url: https://gitlab.com/meltano/tap-first
+- name: mysql
+  url: https://gitlab.com/meltano/tap-mysql
+- name: zendesk
+  url: https://gitlab.com/meltano/tap-zendesk
+  ...
 loaders:
-  csv: http://gitlab.com/meltano/target-csv
-  snowflake: http://gitlab.com/meltano/target-snowflake
+- name: snowflake
+  url: https://gitlab.com/meltano/target-snowflake
+  warehouse: main
+- name: postgresql
+  url: https://gitlab.com/meltano/target-postgresql
+  warehouse: test
+  ...
+warehouses:
+- name: main
+  username: "$MAIN_WAREHOUSE"
+  password: "$MAIN_WAREHOUSE_PW"
+  host: "$MAIN_WAREHOUSE_HOST"
+  db: "$MAIN_WAREHOUSE_DB"
+  type: snowflake
+  ...
+orchestrate:
+- name: first-to-csv
+  extractor: first
+  loader: csv
+  transformer:
+  - first
+  ...
 ```
 
 Your project should contains the following directory structure:
 
 * model - For your `.lookml` files.
-* transform - For your dbt `.py` files.
+* transform - For your dbt `.sql` files.
 * analyze - For your `.yml` dashboard files.
-* notebook - for your jupyter notebook files.
+* notebook - For your `.ipynb` notebook files.
 * orchestrate - For your airflow `.py` files.
 * load - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
 * extract - Caching directory for the loaders (which are downloads from separate repo's based on your meltano.yml)
@@ -85,7 +109,8 @@ Once you have your project, you can run `meltano` against it.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
   * `meltano discover loaders`: list only available loaders
-* `meltano extract [name of extractor] --to [name of loader] --transform`: Extract data to a loader and optionally transform the data
+* `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
+* `meltano transform [name of transformation] --warehouse [name of warehouse]`: 
 
 ### Milestones
 
