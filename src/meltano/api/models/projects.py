@@ -3,7 +3,7 @@ from ..models.base import Base
 
 
 class Project(Base):
-    __tablename__ = 'project'
+    __tablename__ = "project"
     name = db.Column(db.String(128), nullable=False)
     git_url = db.Column(db.String(), nullable=False)
     validated = db.Column(db.Boolean(), default=False)
@@ -13,4 +13,4 @@ class Project(Base):
         self.git_url = git_url
 
     def __repr__(self):
-        return f'<Project {self.name}>'
+        return f"<Project {self.name}>"

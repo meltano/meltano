@@ -1,7 +1,7 @@
 from meltano.support.db import DB, SystemModel
 
 
-class Runner():
+class Runner:
     def before_run(self, *args):
         SystemModel.metadata.create_all(DB.default.engine)
 

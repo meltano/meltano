@@ -8,9 +8,7 @@ from .models import settings
 
 
 # to get the desired UX we should wait for the db to be available
-@backoff.on_exception(backoff.expo,
-                      OperationalError,
-                      max_time=60)
+@backoff.on_exception(backoff.expo, OperationalError, max_time=60)
 def create_db():
     db.create_all()
     db_settings = settings.Settings()
@@ -18,5 +16,5 @@ def create_db():
     db.session.commit()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     create_db()

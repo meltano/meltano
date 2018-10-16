@@ -23,10 +23,10 @@ class ImpossibleTransitionError(Error):
 
 
 class State(Enum):
-    IDLE = (0, ('RUNNING', 'FAIL'))
-    RUNNING = (1, ('SUCCESS', 'FAIL'))
+    IDLE = (0, ("RUNNING", "FAIL"))
+    RUNNING = (1, ("SUCCESS", "FAIL"))
     SUCCESS = (2, ())
-    FAIL = (3, ('RUNNING',))
+    FAIL = (3, ("RUNNING",))
     DEAD = (4, ())
 
     def transitions(self):
@@ -37,7 +37,7 @@ class State(Enum):
 
 
 class Job(SystemModel):
-    __tablename__ = 'job'
+    __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
     elt_uri = Column(types.String)
@@ -47,8 +47,8 @@ class Job(SystemModel):
     payload = Column(MutableDict.as_mutable(types.JSON))
 
     def __init__(self, **kwargs):
-        kwargs['state'] = kwargs.get('state', State.IDLE)
-        kwargs['payload'] = kwargs.get('payload', {})
+        kwargs["state"] = kwargs.get("state", State.IDLE)
+        kwargs["payload"] = kwargs.get("payload", {})
         super().__init__(**kwargs)
 
     def can_transit(self, state: State) -> bool:
@@ -90,7 +90,7 @@ class Job(SystemModel):
     def fail(self, error=None):
         self.ended_at = datetime.utcnow()
         self.transit(State.FAIL)
-        self.payload = {'error': str(error)}
+        self.payload = {"error": str(error)}
         self.save()
 
     def success(self):
@@ -100,7 +100,10 @@ class Job(SystemModel):
 
     def __repr__(self):
         return "<Job(id='%s', elt_uri='%s', state='%s')>" % (
-            self.id, self.elt_uri, self.state)
+            self.id,
+            self.elt_uri,
+            self.state,
+        )
 
     def save(self):
         with session_open() as session:
