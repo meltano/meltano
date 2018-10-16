@@ -35,20 +35,20 @@ def slugify(s):
 
     # "[some] _ article's_title--"
     # "[some]___article's_title__"
-    for c in [' ', '-', '.', '/']:
-        s = s.replace(c, '_')
+    for c in [" ", "-", ".", "/"]:
+        s = s.replace(c, "_")
 
     # "[some]___article's_title__"
     # "some___articles_title__"
-    s = re.sub('\W', '', s)
+    s = re.sub("\W", "", s)
 
     # "some___articles_title__"
     # "some   articles title  "
-    s = s.replace('_', ' ')
+    s = s.replace("_", " ")
 
     # "some   articles title  "
     # "some articles title "
-    s = re.sub('\s+', ' ', s)
+    s = re.sub("\s+", " ", s)
 
     # "some articles title "
     # "some articles title"
@@ -56,7 +56,7 @@ def slugify(s):
 
     # "some articles title"
     # "some-articles-title"
-    s = s.replace(' ', '-')
+    s = s.replace(" ", "-")
 
     return s
 
@@ -73,9 +73,11 @@ def setup_logging(args=None):
     if args:
         log_level = int(args.log_level)
 
-    logging.basicConfig(stream=sys.stdout,
-                        format="[%(threadName)10s][%(levelname)s][%(asctime)s] %(message)s",
-                        level=log_level)
+    logging.basicConfig(
+        stream=sys.stdout,
+        format="[%(threadName)10s][%(levelname)s][%(asctime)s] %(message)s",
+        level=log_level,
+    )
 
 
 def get_basic_auth(user, token):

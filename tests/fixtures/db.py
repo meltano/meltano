@@ -7,14 +7,14 @@ from meltano.support.db import DB, SystemModel
 from sqlalchemy import MetaData
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope="session")
 def db_setup(request):
     args = {
-        'database': "pytest",
-        'host': os.getenv("PG_ADDRESS"),
-        'port': os.getenv("PG_PORT", 5432),
-        'user': os.getenv("PG_USERNAME"),
-        'password': os.getenv("PG_PASSWORD"),
+        "database": "pytest",
+        "host": os.getenv("PG_ADDRESS"),
+        "port": os.getenv("PG_PORT", 5432),
+        "user": os.getenv("PG_USERNAME"),
+        "password": os.getenv("PG_PASSWORD"),
     }
     DB.setup(**args)
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
@@ -24,20 +24,19 @@ def db_setup(request):
     # Create the base models
     SystemModel.metadata.create_all(DB.default.engine)
 
-    truncate_tables(DB.default.engine, schema='meltano')
+    truncate_tables(DB.default.engine, schema="meltano")
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def db(request, db_setup):
-
     def teardown():
-        truncate_tables(DB.default, schema='meltano')
+        truncate_tables(DB.default, schema="meltano")
 
     request.addfinalizer(teardown)
     return DB.default
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def session(request, db):
     """Creates a new database session for a test."""
     session = db.create_session()

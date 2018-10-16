@@ -3,11 +3,11 @@ import os
 
 class CsvLoader:
     def __init__(self, **kwargs):
-        TEMP_FOLDER = '/tmp'
-        self.extractor = kwargs['extractor']
-        self.entity_name = kwargs['entity_name']
-        if 'output_path' in kwargs:
-            output_path = kwargs['output_path']
+        TEMP_FOLDER = "/tmp"
+        self.extractor = kwargs["extractor"]
+        self.entity_name = kwargs["entity_name"]
+        if "output_path" in kwargs:
+            output_path = kwargs["output_path"]
             if not os.path.exists(output_path):
                 os.makedirs(output_path)
             self.output_path = output_path
@@ -26,22 +26,22 @@ class CsvLoader:
           the data from the previous execution.
         """
         # print(f'Deleting existing csv files for {self.entity_name}')
-        file_name = f'{self.extractor.name}--{self.entity_name}.csv'
+        file_name = f"{self.extractor.name}--{self.entity_name}.csv"
         file_path = os.path.join(self.output_path, file_name)
         if os.path.exists(file_path):
             os.remove(file_path)
 
     def load(self, df):
-        print(f'Updating csv file for entity: {self.entity_name}')
-        file_name = f'{self.extractor.name}--{self.entity_name}.csv'
+        print(f"Updating csv file for entity: {self.entity_name}")
+        file_name = f"{self.extractor.name}--{self.entity_name}.csv"
         file_path = os.path.join(self.output_path, file_name)
-        with open(file_path, 'a') as csv_file:
+        with open(file_path, "a") as csv_file:
             if not df.empty:
                 write_header: bool = file_is_empty(file_path)
                 df.to_csv(path_or_buf=csv_file, index=False, header=write_header)
                 return file_name
             else:
-                print(f'DataFrame {df} is empty -> skipping it')
+                print(f"DataFrame {df} is empty -> skipping it")
 
 
 def file_is_empty(path):
