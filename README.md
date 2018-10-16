@@ -437,7 +437,6 @@ Create and grant usage for a database schema.
 
 Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analysis.
 
-
 ### Meltano Transform
 
 #### DBT
@@ -569,6 +568,14 @@ Data integration stages are configurable using `Project variables` for the CI/CD
 ### Stored procedures
 
 We don't use stored procedures because they are hard to keep under version control.
+
+## Contributing
+
+### Code style
+
+Meltano uses [Black](https://github.com/ambv/black) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+
+You can also have black run automatically using a `git` hook. See https://github.com/ambv/black#version-control-integration for more details.
 
 ## GitLab Data and Analytics - Internal
 
