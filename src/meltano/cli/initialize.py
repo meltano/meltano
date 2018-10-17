@@ -10,6 +10,7 @@ ALL = "all"
 
 initialize_file = os.path.join(os.path.dirname(__file__), "initialize.yml")
 
+
 @cli.command()
 @click.argument("project_name")
 def init(project_name):
@@ -36,15 +37,18 @@ def init(project_name):
     click.secho("\thttps://gitlab.com/meltano/meltano/blob/master/README.md", fg="red")
     click.echo("3.\tEdit the meltano.yml file.")
 
+
 def create_file(project, name, content):
     with open(join_with_project_base(project, name), "w") as f:
         f.write(content)
         project_echo(project, name, False, True)
 
+
 def create_dir(project, name):
     current_dir = name[1:]
     os.mkdir(os.path.join(".", project, current_dir))
     project_echo(project, current_dir, False, True)
+
 
 def project_echo(project, filename="", star=False, check=False):
     star = "⭐" if star else ""
