@@ -155,6 +155,7 @@ Here is a sample of what your project might look like:
 
 Once you have your project, you can run `meltano` against it.
 
+* `meltano initialize [project name]`: Create an empty meltano project.
 * `meltano`: Installs all the dependencies of your project based on the `meltano.yml` file.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
