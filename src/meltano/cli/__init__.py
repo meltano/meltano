@@ -1,5 +1,5 @@
 from .main import cli
-from . import extract, schema, discovery
+from . import extract, schema, discovery, initialize
 
 
 def main():
