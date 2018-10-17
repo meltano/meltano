@@ -3,11 +3,11 @@ from ..app import db
 
 
 class Settings(Base):
-    __tablename__ = 'setting'
-    settings = db.Column(db.JSON(), nullable=False, default={'connections': []})
+    __tablename__ = "setting"
+    settings = db.Column(db.JSON(), nullable=False, default={"connections": []})
 
     def serializable(self):
-        return {'settings': self.settings}
+        return {"settings": self.settings}
 
     def __repr__(self):
-        return f'<Settings for {self.project} id: {self.id}>'
+        return f"<Settings for {self.project} id: {self.id}>"

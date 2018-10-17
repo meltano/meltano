@@ -5,8 +5,8 @@ from meltano.support.extract_utils import tables_from_manifest
 from sqlalchemy import MetaData
 
 sfdc_metadata = MetaData()
-SFDC_SCHEMA_NAME = 'sfdc'
-manifest_file_path = 'extract/sfdc/manifest.yaml'
+SFDC_SCHEMA_NAME = "sfdc"
+manifest_file_path = "extract/sfdc/manifest.yaml"
 
 
 class SfdcExtractor:
@@ -15,7 +15,7 @@ class SfdcExtractor:
     """
 
     def __init__(self):
-        self.name = 'sfdc-extractor'
+        self.name = "sfdc-extractor"
         self.tables = tables_from_manifest(
             manifest_file_path=manifest_file_path,
             metadata=sfdc_metadata,

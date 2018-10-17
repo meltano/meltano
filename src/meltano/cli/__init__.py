@@ -1,9 +1,6 @@
 from .main import cli
+from . import extract, schema, discovery
 
-# import subcommands
-from . import \
-    extract, \
-    schema
 
 def main():
     cli()

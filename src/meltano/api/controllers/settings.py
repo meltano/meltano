@@ -1,17 +1,13 @@
-from flask import (
-    Blueprint,
-    jsonify,
-    request,
-)
+from flask import Blueprint, jsonify, request
 
-settingsBP = Blueprint('settings', __name__, url_prefix='/settings')
+settingsBP = Blueprint("settings", __name__, url_prefix="/settings")
 
 from ..app import db
 
 from ..models.settings import Settings
 
 
-@settingsBP.route('/', methods=['GET'])
+@settingsBP.route("/", methods=["GET"])
 def index():
     settings = Settings.query.first()
     if not settings:
@@ -19,7 +15,7 @@ def index():
     return jsonify(settings.serializable())
 
 
-@settingsBP.route('/new', methods=['POST'])
+@settingsBP.route("/new", methods=["POST"])
 def new():
     settings = request.get_json()
     current_settings = Settings.query.first()
@@ -31,12 +27,14 @@ def new():
     return jsonify(settings)
 
 
-@settingsBP.route('/connections/<name>/test')
+@settingsBP.route("/connections/<name>/test")
 def test(name):
     current_settings = Settings.query.first().settings
-    connections = current_settings['connections']
+    connections = current_settings["connections"]
     try:
-        found_connection = next(connection for connection in connections if connection['name'] == name)
+        found_connection = next(
+            connection for connection in connections if connection["name"] == name
+        )
     # this is a really broad exception catch, this will swallow sneaky errors
     except Exception as e:
         found_connection = {}

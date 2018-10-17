@@ -136,13 +136,8 @@ ${MELTANO_UI}/dist: ${APP_DEPS}
 # Docs Related Tasks
 # ==================
 #
-# - `make explain_makefile` will bring up a web server with this makefile annotated.
 
 .PHONY: makefile_docs docs_image docs_shell
-
-explain_makefile:
-	docker stop explain_makefile || echo 'booting server'
-	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh
 
 docs_image: base_image
 	docker build \
@@ -155,3 +150,23 @@ docs_shell:
 
 docs/build: docs_image docs/source
 	${DOCKER_RUN} -w /app/docs meltano/docs_build make html
+
+# Lint Related Tasks
+# ==================
+#
+
+.PHONY: lint show_lint
+
+lint:
+	black src/ tests/
+
+show_lint:
+	black --check --diff src/ tests/
+
+# Makefile Related Tasks
+# ======================
+# 
+# - `make explain_makefile` will bring up a web server with this makefile annotated.
+explain_makefile:
+	docker stop explain_makefile || echo 'booting server'
+	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh

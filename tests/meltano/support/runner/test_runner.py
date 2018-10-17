@@ -34,29 +34,30 @@ def subject(db_setup, mkdtemp):
     create_tap_files(tap_config_dir)
     create_target_files(target_config_dir)
 
-    Job(elt_uri=TEST_JOB_ID,
+    Job(
+        elt_uri=TEST_JOB_ID,
         state=State.SUCCESS,
-        payload={
-            'singer_state': {"bookmarks": []}
-        }).save()
+        payload={"singer_state": {"bookmarks": []}},
+    ).save()
 
-    return SingerRunner(TEST_JOB_ID,
-                        tap_config_dir=tap_config_dir,
-                        target_config_dir=target_config_dir)
+    return SingerRunner(
+        TEST_JOB_ID, tap_config_dir=tap_config_dir, target_config_dir=target_config_dir
+    )
 
 
 def test_prepare_job(subject):
     subject.prepare(TAP_NAME, TARGET_NAME)
 
     for f in subject.tap_files.values():
-        assert(f.exists())
+        assert f.exists()
     for f in subject.target_files.values():
-        assert(f.exists())
+        assert f.exists()
 
 
-@mock.patch('subprocess.Popen')
+@mock.patch("subprocess.Popen")
 def test_invoke(Popen, subject):
     called_bins = []
+
     def Popen_record_bin(cmd, *args, **kwargs):
         called_bins.append(list(cmd)[0])
         return mock.DEFAULT
@@ -73,17 +74,17 @@ def test_invoke(Popen, subject):
     target_bin = str(subject.exec_path(TARGET_NAME))
 
     # correct bins are called
-    assert(called_bins == [target_bin, "tee", tap_bin])
+    assert called_bins == [target_bin, "tee", tap_bin]
 
     # pipeline is closed
-    assert(process_mock.stdin.close.call_count == 3)
-    assert(process_mock.wait.call_count == 3)
+    assert process_mock.stdin.close.call_count == 3
+    assert process_mock.wait.call_count == 3
 
 
 def test_bookmark(subject):
-    with subject.target_files['state'].open("w") as state:
+    with subject.target_files["state"].open("w") as state:
         state.write('{"line": 1}\n')
         state.write('{"line": 2}\n')
 
     subject.bookmark()
-    assert(subject.job.payload['singer_state']['line'] == 2)
+    assert subject.job.payload["singer_state"]["line"] == 2
