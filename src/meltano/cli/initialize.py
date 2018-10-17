@@ -10,6 +10,7 @@ ALL = "all"
 
 initialize_file = os.path.join(os.path.dirname(__file__), "initialize.yml")
 
+
 @cli.command()
 @click.argument("project_name")
 def initialize(project_name):
@@ -22,14 +23,14 @@ def initialize(project_name):
             raise e
         created_output(project, "", True)
         for key in data.keys():
-            if key.startswith('/'):
-              current_dir = key[1:]
-              os.mkdir(os.path.join('.', project, current_dir))
-              created_output(project, current_dir, False, True)
+            if key.startswith("/"):
+                current_dir = key[1:]
+                os.mkdir(os.path.join(".", project, current_dir))
+                created_output(project, current_dir, False, True)
             else:
-              with open(join_with_project_base(project, key),'w') as f:
-                  f.write(data.get(key))
-                  created_output(project, key, False, True)
+                with open(join_with_project_base(project, key), "w") as f:
+                    f.write(data.get(key))
+                    created_output(project, key, False, True)
     click.secho(f"🚀\t{project}", fg="green", nl=False)
     click.echo(" has been created. Next steps:")
     click.secho("1.\tRun", nl=False)
@@ -38,11 +39,13 @@ def initialize(project_name):
     click.secho("\thttps://gitlab.com/meltano/meltano/blob/master/README.md", fg="red")
     click.echo("3.\tEdit the meltano.yml file.")
 
+
 def created_output(project, filename="", star=False, check=False):
-  star = "⭐" if star else ""
-  check = "✅" if check else ""
-  click.secho(f"{star}{check}\tCreated", fg="blue", nl=False)
-  click.echo(f" ./{project}/{filename}")
+    star = "⭐" if star else ""
+    check = "✅" if check else ""
+    click.secho(f"{star}{check}\tCreated", fg="blue", nl=False)
+    click.echo(f" ./{project}/{filename}")
+
 
 def join_with_project_base(project, filename):
-  return os.path.join('.', project, filename)
+    return os.path.join(".", project, filename)
