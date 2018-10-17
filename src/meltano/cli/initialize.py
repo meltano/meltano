@@ -36,6 +36,7 @@ def initialize(project_name):
     click.secho(" pip install", fg="green")
     click.echo("2.\tRead the Meltano README.")
     click.secho("\thttps://gitlab.com/meltano/meltano/blob/master/README.md", fg="red")
+    click.echo("3.\tEdit the meltano.yml file.")
 
 def created_output(project, filename="", star=False, check=False):
   star = "⭐" if star else ""
