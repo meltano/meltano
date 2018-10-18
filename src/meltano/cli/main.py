@@ -11,15 +11,17 @@ LOADERS = "loaders"
 
 discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
 discovery_json = json.load(open(discovery_file))
-meltano_yml_file = os.path.join("./", "meltano.yml")
-meltano_yml = yaml.load(open(meltano_yml_file))
 
 @click.group(invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
     setup_logging()
-    if ctx.invoked_subcommand is not None:
-        return
+    if ctx.invoked_subcommand is None:
+      install()
+
+def install():
+    meltano_yml_file = os.path.join("./", "meltano.yml")
+    meltano_yml = yaml.load(open(meltano_yml_file))
     click.secho('Updating from meltano.yml', fg="green")
     extractors = meltano_yml.get(EXTRACTORS)
     loaders = meltano_yml.get(LOADERS)
