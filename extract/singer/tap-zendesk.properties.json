@@ -824,8 +824,8 @@
       "metadata": [
         {
           "breadcrumb": [],
-            "metadata": {
-                "selected": true,
+          "metadata": {
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -1287,8 +1287,8 @@
       "metadata": [
         {
           "breadcrumb": [],
-            "metadata": {
-                "selected": true,
+          "metadata": {
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -1824,7 +1824,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -2767,7 +2767,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-              "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -3324,7 +3324,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": false,
+            "selected": false,
             "table-key-properties": [
               "id"
             ],
@@ -3647,7 +3647,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -4003,7 +4003,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -4209,7 +4209,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -4407,7 +4407,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -4599,7 +4599,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "id"
             ],
@@ -4746,7 +4746,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": true,
+            "selected": true,
             "table-key-properties": [
               "name"
             ],
@@ -5057,7 +5057,7 @@
         {
           "breadcrumb": [],
           "metadata": {
-                "selected": false,
+            "selected": false,
             "table-key-properties": [
               "id"
             ],
@@ -5302,6 +5302,250 @@
           "breadcrumb": [
             "properties",
             "assignee_updated_at"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        }
+      ]
+    },
+    {
+      "stream": "sla_policies",
+      "tap_stream_id": "sla_policies",
+      "schema": {
+        "properties": {
+          "id": {
+            "type": [
+              "integer"
+            ]
+          },
+          "url": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "type": [
+              "null",
+              "integer"
+            ]
+          },
+          "filter": {
+            "properties": {
+              "all": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "properties": {
+                    "field": {
+                      "type": [
+                        "string"
+                      ]
+                    },
+                    "operator": {
+                      "type": [
+                        "string"
+                      ]
+                    },
+                    "value": {
+                      "type": [
+                        "string"
+                      ]
+                    }
+                  },
+                  "type": [
+                    "object"
+                  ]
+                }
+              },
+              "any": {
+                "type": [
+                  "null",
+                  "array"
+                ],
+                "items": {
+                  "properties": {
+                    "field": {
+                      "type": [
+                        "string"
+                      ]
+                    },
+                    "operator": {
+                      "type": [
+                        "string"
+                      ]
+                    },
+                    "value": {
+                      "type": [
+                        "string"
+                      ]
+                    }
+                  },
+                  "type": [
+                    "object"
+                  ]
+                }
+              }
+            },
+            "type": [
+              "null",
+              "object"
+            ]
+          },
+          "policy_metrics": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "properties": {
+                "priority": {
+                  "type": [
+                    "null",
+                    "string"
+                  ]
+                },
+                "target": {
+                  "type": [
+                    "null",
+                    "integer"
+                  ]
+                },
+                "business_hours": {
+                  "type": [
+                    "null",
+                    "boolean"
+                  ]
+                },
+                "metric": {}
+              },
+              "type": [
+                "null",
+                "object"
+              ]
+            }
+          },
+          "created_at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        },
+        "type": [
+          "object"
+        ]
+      },
+      "metadata": [
+        {
+          "breadcrumb": [],
+          "metadata": {
+            "selected": true,
+            "table-key-properties": [
+              "id"
+            ],
+            "forced-replication-method": "FULL_TABLE"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "id"
+          ],
+          "metadata": {
+            "inclusion": "automatic"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "url"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "title"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "description"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "position"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "filter"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "policy_metrics"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "created_at"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "updated_at"
           ],
           "metadata": {
             "inclusion": "available"

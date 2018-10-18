@@ -6,15 +6,15 @@ from .substitution import Substitution
 
 
 class AggregateType(Enum):
-    unknown = 'UNKNOWN'
-    count = 'count'
-    sum = 'sum'
-    number = 'number'
+    unknown = "UNKNOWN"
+    count = "count"
+    sum = "sum"
+    number = "number"
 
 
 class Aggregate:
     def __init__(self, measure, table):
-        sql = measure.settings['sql']
+        sql = measure.settings["sql"]
         self.substitution = Substitution(sql, table)
         self.measure = measure
         self.table = table
@@ -23,7 +23,7 @@ class Aggregate:
         self.getAggregateType()
 
     def getAggregateType(self):
-        type_ = self.measure.settings['type']
+        type_ = self.measure.settings["type"]
         if type_ == AggregateType.sum.value:
             self.aggregateType = AggregateType.sum
             self.setAggregateSQLSum()
@@ -35,7 +35,7 @@ class Aggregate:
             self.setAggregateSQLNumber()
         else:
             self.aggregateType = AggregateType.unknown
-            raise Exception(f'Aggregate Type {type_} not implemented yet')
+            raise Exception(f"Aggregate Type {type_} not implemented yet")
 
     def setAggregateSQLSum(self):
         self.sql = fn.Coalesce(fn.Sum(self.sql), 0, alias=self.substitution.alias)

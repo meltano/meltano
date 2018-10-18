@@ -15,7 +15,8 @@ def engine_uri(**db_config):
     return "postgresql://{user}:{password}@{host}:{port}/{database}".format(**db_config)
 
 
-SystemModel = declarative_base(metadata=MetaData(schema='meltano'))
+SystemModel = declarative_base(metadata=MetaData(schema="meltano"))
+
 
 class MetaDB(type):
     def __init__(cls, *_):
@@ -35,11 +36,11 @@ class MetaDB(type):
 
 class DB(metaclass=MetaDB):
     db_config = {
-        'host': os.getenv('PG_ADDRESS', 'localhost'),
-        'port': os.getenv('PG_PORT', 5432),
-        'user': os.getenv('PG_USERNAME', os.getenv('USER')),
-        'password': os.getenv('PG_PASSWORD'),
-        'database': os.getenv('PG_DATABASE'),
+        "host": os.getenv("PG_ADDRESS", "localhost"),
+        "port": os.getenv("PG_PORT", 5432),
+        "user": os.getenv("PG_USERNAME", os.getenv("USER")),
+        "password": os.getenv("PG_PASSWORD"),
+        "database": os.getenv("PG_DATABASE"),
     }
 
     @classmethod
@@ -47,9 +48,9 @@ class DB(metaclass=MetaDB):
         """
         Store the DB connection parameters and create a default engine.
         """
-        cls.db_config.update({k: kwargs[k]
-                              for k in cls.db_config.keys()
-                              if k in kwargs})
+        cls.db_config.update(
+            {k: kwargs[k] for k in cls.db_config.keys() if k in kwargs}
+        )
 
         # use connection pooling for all connections
         pool.manage(psycopg2)
@@ -61,10 +62,9 @@ class DB(metaclass=MetaDB):
         Create a new database
         """
         config = cls.db_config.copy()
-        config.update({'database': "postgres"})
+        config.update({"database": "postgres"})
         with create_engine(
-            engine_uri(**config),
-            isolation_level='AUTOCOMMIT'
+            engine_uri(**config), isolation_level="AUTOCOMMIT"
         ).connect() as con:
             con.execute(text(f"CREATE DATABASE {db_name}"))
 
@@ -111,21 +111,25 @@ class DB(metaclass=MetaDB):
         conn = self.create_connection()
         cursor = conn.cursor()
         schema_identifier = Identifier(schema_name)
-        group_identifiers = SQL(",").join(
-            map(Identifier, grant_roles)
-        )
+        group_identifiers = SQL(",").join(map(Identifier, grant_roles))
 
-        create_schema = SQL("""
+        create_schema = SQL(
+            """
         CREATE SCHEMA IF NOT EXISTS {}
-        """).format(schema_identifier)
+        """
+        ).format(schema_identifier)
 
-        grant_select_schema = SQL("""
+        grant_select_schema = SQL(
+            """
         ALTER DEFAULT PRIVILEGES IN SCHEMA {} GRANT SELECT ON TABLES TO {}
-        """).format(schema_identifier, group_identifiers)
+        """
+        ).format(schema_identifier, group_identifiers)
 
-        grant_usage_schema = SQL("""
+        grant_usage_schema = SQL(
+            """
         GRANT USAGE ON SCHEMA {} TO {}
-        """).format(schema_identifier, group_identifiers)
+        """
+        ).format(schema_identifier, group_identifiers)
 
         cursor.execute(create_schema)
         if grant_roles:
@@ -137,7 +141,6 @@ class DB(metaclass=MetaDB):
         logging.info("Schema {} has been created successfully.".format(schema_name))
         for role in grant_roles:
             logging.info("Usage has been granted for role: {}.".format(role))
-
 
 
 @contextlib.contextmanager

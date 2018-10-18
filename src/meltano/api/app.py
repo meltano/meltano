@@ -20,36 +20,38 @@ meltano_transform_path = config.meltano_transform_path
 
 app.config.from_object(config)
 
-if os.environ['FLASK_ENV'] == 'development':
+if os.environ["FLASK_ENV"] == "development":
     CORS(app)
 
 # TODO: we need to setup proper dependency injection for
 # this kind of hard-coupling. We are building multiple UI on
 # the same backend. Almost all component need a ready DB
 # connection.
-DB.setup(host=app.config['POSTGRES_URL'],
-         user=app.config['POSTGRES_USER'],
-         password=app.config['POSTGRES_PASSWORD'],
-         database=app.config['POSTGRES_DB'])
+DB.setup(
+    host=app.config["POSTGRES_URL"],
+    user=app.config["POSTGRES_USER"],
+    password=app.config["POSTGRES_PASSWORD"],
+    database=app.config["POSTGRES_DB"],
+)
 db = SQLAlchemy(app)
 
 connector = ExternalConnector()
 
-logger = logging.getLogger('melt_logger')
-handler = RotatingFileHandler(app.config['LOG_PATH'], maxBytes=2000, backupCount=10)
+logger = logging.getLogger("melt_logger")
+handler = RotatingFileHandler(app.config["LOG_PATH"], maxBytes=2000, backupCount=10)
 logger.addHandler(handler)
-now = str(datetime.datetime.utcnow().strftime('%b %d %Y %I:%M:%S:%f'))
-logger.warning(f'Melt started at: {now}')
+now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
+logger.warning(f"Melt started at: {now}")
 
 
 @app.before_request
 def before_request():
-    logger.info(f'[{request.remote_addr}] request: {now}')
+    logger.info(f"[{request.remote_addr}] request: {now}")
 
 
 @app.errorhandler(500)
 def internal_error(exception):
-    logger.info(f'[{request.remote_addr}] request: {now}, error: {exception}')
+    logger.info(f"[{request.remote_addr}] request: {now}, error: {exception}")
     return jsonify({"error": 1}), 500
 
 

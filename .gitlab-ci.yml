@@ -1,4 +1,4 @@
-image: registry.gitlab.com/meltano/meltano
+image: python:3.6
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
@@ -6,10 +6,11 @@ include:
   - "/orchestrate/singer/build-ci.yml"
 
 stages:
-  - test
-  - publish
+  - lint
   - build_base
   - build
+  - test
+  - publish
   - review
   - production
   - dockerhub
@@ -19,37 +20,20 @@ cache:
     - .cache/pip
     - venv/
 
-.pipenv_install: &pipenv_install
-  - pip install pipenv
-  - pipenv run python --version
-  - pipenv run pip install cython
-  - pipenv install --dev
-  - pipenv run pip install -e .
-
-.lint:
-  stage: test
-  before_script: *pipenv_install
+lint:
+  stage: lint
+  before_script:
+    - pip install black
   script:
-    - pipenv run flake8
-  allow_failure: true
+    - make show_lint
 
-test:
+.test:
   stage: test
   before_script:
-    - pip install pytest
+    - pip install '.[dev]'
   script:
-    - pytest -vv
+    - pytest -v
   allow_failure: true
-
-.run:
-  script:
-    - python setup.py bdist_wheel
-    # an alternative approach is to install and run:
-    - pip install dist/*
-    # run the command here
-  artifacts:
-    paths:
-    - dist/*.whl
 
 .pages:
   script:
