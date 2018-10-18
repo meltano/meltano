@@ -9,9 +9,9 @@ EXTRACTOR = "extractor"
 LOADER = "loader"
 
 discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
+discovery_json = json.load(open(discovery_file))
 meltano_yml_file = os.path.join("./", "meltano.yml")
 meltano_yml = yaml.load(open(meltano_yml_file))
-discovery_json = json.load(open(discovery_file))
 
 
 @cli.command()
