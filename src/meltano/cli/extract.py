@@ -3,7 +3,6 @@ from . import cli
 from .params import db_options
 from meltano.support.runner.singer import SingerRunner
 
-
 @cli.command()
 @db_options
 @click.argument("job_id", envvar="MELTANO_JOB_ID")
