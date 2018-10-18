@@ -15,7 +15,7 @@ RUN /venvs/meltano/bin/pip install -r /meltano/requirements.txt && \
 
 RUN /venvs/tap-zendesk/bin/pip install tap-zendesk==1.4.0
 RUN /venvs/target-postgres/bin/pip install git+https://github.com/meltano/target-postgres.git@master
-RUN /venvs/target-snowflake/bin/pip install git+https://gitlab.com/meltano/target-snowflake.git@1-create-snowflake-target
+RUN /venvs/target-snowflake/bin/pip install git+https://gitlab.com/meltano/target-snowflake.git@master
 
 ENV SINGER_RUN_DIR /run/singer
 ENV SINGER_VENVS_DIR /venvs
