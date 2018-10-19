@@ -21,4 +21,4 @@ def extract(job_id, extractor_name, loader_name, tap_output):
         runner.perform(extractor_name, loader_name)
     except Exception as err:
         click.secho(f"Extraction failed: {err}.", fg="red")
-        click.Abort()
+        raise click.Abort()
