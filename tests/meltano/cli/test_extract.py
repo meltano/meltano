@@ -1,5 +1,4 @@
-import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import patch
 from click.testing import CliRunner
 from meltano.cli import cli
 from meltano.support.runner.singer import SingerRunner
@@ -15,11 +14,11 @@ def test_perform():
     assert result.exit_code == 2
 
     # exit cleanly when everything is fine
-    with patch.object(SingerRunner, 'perform', return_value=None) as perform:
+    with patch.object(SingerRunner, "perform", return_value=None):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 0
 
-    # aborts when there is an exception 
-    with patch.object(SingerRunner, 'perform', side_effect=Exception) as perform:
+    # aborts when there is an exception
+    with patch.object(SingerRunner, "perform", side_effect=Exception):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 1
