@@ -4,7 +4,10 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from ..support.project_add_service import ProjectAddService, ProjectMissingYMLFileException
+from ..support.project_add_service import (
+    ProjectAddService,
+    ProjectMissingYMLFileException,
+)
 
 
 @cli.command()
@@ -19,4 +22,3 @@ def add(plugin_type, plugin_name):
         add_service.add()
     except ProjectMissingYMLFileException as e:
         click.Abort()
-    

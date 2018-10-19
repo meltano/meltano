@@ -3,8 +3,10 @@ import click
 import json
 import yaml
 
+
 class ProjectMissingYMLFileException(Exception):
     pass
+
 
 class ProjectAddService:
     EXTRACTOR = "extractor"
@@ -23,11 +25,13 @@ class ProjectAddService:
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         except Exception as e:
             self.aborted = True
-            click.secho("Are you in the right directory? I don't see a meltano.yml file here.", fg="red")
+            click.secho(
+                "Are you in the right directory? I don't see a meltano.yml file here.",
+                fg="red",
+            )
             raise ProjectMissingYMLFileException()
 
         self.url = self.discovery_json.get(self.plugin_type_key).get(self.plugin_name)
-
 
     def add(self):
         extract_dict = self.meltano_yml.get(self.plugin_type)
