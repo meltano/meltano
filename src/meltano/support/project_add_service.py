@@ -1,5 +1,7 @@
-import os, click, json, yaml
-
+import os
+import click
+import json
+import yaml
 
 class ProjectAddService:
     EXTRACTOR = "extractor"
@@ -24,6 +26,7 @@ class ProjectAddService:
         if not extract_dict:
             self.meltano_yml[self.plugin_type] = []
             extract_dict = self.meltano_yml.get(self.plugin_type)
+
         try:
             found_extractor = next(
                 (
@@ -34,8 +37,7 @@ class ProjectAddService:
             )
             click.secho(f"{self.plugin_name} is already installed", fg="green")
             click.Abort()
-        except Exception as e:
-
+        except Exception:
             if self.url is not None:
                 self.add_to_file()
             else:

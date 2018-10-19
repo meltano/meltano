@@ -1,7 +1,7 @@
 import os
 import yaml
 import click
-from ..support.project_init_service import ProjectInitService, ProjectInitServiceError
+from meltano.support.project_init_service import ProjectInitService, ProjectInitServiceError
 from urllib.parse import urlparse
 from . import cli
 
@@ -21,5 +21,3 @@ def init(project_name):
         print(e)
         click.secho(f"Directory {init_service.project} already exists!", fg="red")
         raise click.Abort()
-    except Exception as e:
-        raise e
