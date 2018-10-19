@@ -1,0 +1,12 @@
+"requirements.txt": requirements go here... publish meltano on pypi first.
+"meltano.yml": ''
+"README.md": ''
+".gitignore": "/venv\n/.meltano"
+"/.meltano": []
+"/model": []
+"/extract": []
+"/load": []
+"/transform": []
+"/analyze": []
+"/notebook": []
+"/orchestrate": []
