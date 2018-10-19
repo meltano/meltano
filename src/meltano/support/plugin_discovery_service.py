@@ -1,6 +1,7 @@
 import os, json
 import click
 
+
 class PluginDiscoveryService:
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
@@ -19,7 +20,6 @@ class PluginDiscoveryService:
             self.list_discovery(PluginDiscoveryService.LOADERS)
         else:
             self.list_discovery(plugin_type)
-
 
     def list_discovery(self, discovery):
         click.echo(click.style(discovery.title(), fg="green"))

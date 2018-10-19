@@ -9,6 +9,7 @@ EXTRACTORS = "extractors"
 LOADERS = "loaders"
 ALL = "all"
 
+
 @cli.command()
 @click.argument("project_name")
 def init(project_name):
@@ -22,4 +23,3 @@ def init(project_name):
         raise click.Abort()
     except Exception as e:
         raise e
-
