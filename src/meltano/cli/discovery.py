@@ -8,7 +8,14 @@ from ..support.plugin_discovery_service import PluginDiscoveryService
 
 @cli.command()
 @click.argument(
-    "plugin_type", type=click.Choice([PluginDiscoveryService.EXTRACTORS, PluginDiscoveryService.LOADERS, PluginDiscoveryService.ALL])
+    "plugin_type",
+    type=click.Choice(
+        [
+            PluginDiscoveryService.EXTRACTORS,
+            PluginDiscoveryService.LOADERS,
+            PluginDiscoveryService.ALL,
+        ]
+    ),
 )
 def discover(plugin_type):
     discover_service = PluginDiscoveryService()

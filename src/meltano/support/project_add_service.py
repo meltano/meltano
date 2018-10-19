@@ -3,6 +3,7 @@ import click
 import json
 import yaml
 
+
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"

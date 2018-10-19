@@ -1,7 +1,10 @@
 import os
 import yaml
 import click
-from meltano.support.project_init_service import ProjectInitService, ProjectInitServiceError
+from meltano.support.project_init_service import (
+    ProjectInitService,
+    ProjectInitServiceError,
+)
 from urllib.parse import urlparse
 from . import cli
 
