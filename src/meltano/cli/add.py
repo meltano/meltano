@@ -15,7 +15,13 @@ from meltano.support.plugin_discovery_service import PluginDiscoveryService
 @cli.command()
 @click.argument(
     "plugin_type",
-    type=click.Choice([ProjectAddService.EXTRACTOR, ProjectAddService.LOADER, ProjectAddService.WAREHOUSE]),
+    type=click.Choice(
+        [
+            ProjectAddService.EXTRACTOR,
+            ProjectAddService.LOADER,
+            ProjectAddService.WAREHOUSE,
+        ]
+    ),
 )
 @click.argument("plugin_name")
 def add(plugin_type, plugin_name):
