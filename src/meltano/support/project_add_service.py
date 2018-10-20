@@ -11,6 +11,7 @@ class ProjectMissingYMLFileException(Exception):
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
+    WAREHOUSE = "warehouse"
 
     def __init__(self, plugin_type, plugin_name):
         self.plugin_type = plugin_type
