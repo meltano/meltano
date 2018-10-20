@@ -40,14 +40,14 @@ class PluginInstallService:
             "./", "meltano", "venvs", plugin_type, plugin_name
         )
         path_to_pip_install = os.path.join(
-            ".meltano","venvs", plugin_type, plugin_name, "bin", "pip"
+            ".meltano", "venvs", plugin_type, plugin_name, "bin", "pip"
         )
 
         run_pip_install = subprocess.run(
-          [path_to_pip_install, "install", plugin_url],
-          stdout=subprocess.PIPE,
-          stderr=subprocess.PIPE,
-          universal_newlines=True,
+            [path_to_pip_install, "install", plugin_url],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
         )
 
         click.echo(run_pip_install.stdout)
