@@ -46,13 +46,19 @@ class ProjectAddService:
                     if plugin["name"] == self.plugin_name
                 )
             )
-            click.secho(f"The {self.plugin_type} {self.plugin_name} is already listed in your meltano.yml file", fg="green")
+            click.secho(
+                f"The {self.plugin_type} {self.plugin_name} is already listed in your meltano.yml file",
+                fg="green",
+            )
             click.Abort()
         except Exception:
             if self.url is not None:
                 self.add_to_file()
             else:
-                click.secho(f"The {self.plugin_type} {self.plugin_name} is not supported", fg="red")
+                click.secho(
+                    f"The {self.plugin_type} {self.plugin_name} is not supported",
+                    fg="red",
+                )
                 click.Abort()
 
     def add_to_file(self):
