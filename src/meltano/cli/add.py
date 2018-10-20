@@ -8,6 +8,8 @@ from meltano.support.project_add_service import (
     ProjectAddService,
     ProjectMissingYMLFileException,
 )
+from meltano.support.plugin_install_service import PluginInstallService
+from meltano.support.plugin_discovery_service import PluginDiscoveryService
 
 
 @cli.command()
@@ -21,4 +23,18 @@ def add(plugin_type, plugin_name):
         add_service = ProjectAddService(plugin_type, plugin_name)
         add_service.add()
     except ProjectMissingYMLFileException as e:
-        click.Abort()
+        raise click.Abort()
+
+    install_service = PluginInstallService()
+    plugin_type = (
+        PluginDiscoveryService.EXTRACTORS
+        if plugin_type == ProjectAddService.EXTRACTOR
+        else PluginDiscoveryService.LOADERS
+    )
+
+    try:
+        install_service.install(plugin_type, plugin_name)
+    except Exception as e:
+        raise click.Abort()
+
+    click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")

@@ -25,4 +25,4 @@ def discover(plugin_type):
     try:
         discover_service.discover(plugin_type)
     except PluginDiscoveryInvalidJSONError:
-        click.Abort()
+        raise click.Abort()
