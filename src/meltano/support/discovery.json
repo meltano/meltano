@@ -1,10 +1,10 @@
 {
   "extractors": {
-    "zendesk": "git@github.com:singer-io/tap-zendesk.git",
-    "marketo": "git@github.com:singer-io/tap-marketo.git"
+    "marketo": "git+https://gitlab.com/meltano/tap-marketo.git",
+    "first": "git+https://gitlab.com/meltano/tap-first.git"
   },
   "loaders": {
-    "csv": "git@github.com:singer-io/target-csv",
-    "gsheet": "git@github.com:singer-io/target-gsheet.git"
+    "csv": "git+https://gitlab.com/meltano/target-csv.git",
+    "snowflake": "git+https://gitlab.com/meltano/target-snowflake.git"
   }
 }

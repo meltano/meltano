@@ -3,7 +3,10 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from ..support.plugin_discovery_service import PluginDiscoveryService
+from meltano.support.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginDiscoveryInvalidJSONError,
+)
 
 
 @cli.command()
@@ -19,4 +22,7 @@ from ..support.plugin_discovery_service import PluginDiscoveryService
 )
 def discover(plugin_type):
     discover_service = PluginDiscoveryService()
-    discover_service.discover(plugin_type)
+    try:
+        discover_service.discover(plugin_type)
+    except PluginDiscoveryInvalidJSONError:
+        click.Abort()

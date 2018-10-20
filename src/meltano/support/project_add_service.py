@@ -24,7 +24,6 @@ class ProjectAddService:
         try:
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         except Exception as e:
-            self.aborted = True
             click.secho(
                 "Are you in the right directory? I don't see a meltano.yml file here.",
                 fg="red",

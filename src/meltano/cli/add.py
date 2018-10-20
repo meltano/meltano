@@ -4,7 +4,7 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from ..support.project_add_service import (
+from meltano.support.project_add_service import (
     ProjectAddService,
     ProjectMissingYMLFileException,
 )
