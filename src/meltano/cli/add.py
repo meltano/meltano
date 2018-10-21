@@ -19,7 +19,6 @@ from meltano.support.plugin_discovery_service import PluginDiscoveryService
         [
             ProjectAddService.EXTRACTOR,
             ProjectAddService.LOADER,
-            ProjectAddService.WAREHOUSE,
         ]
     ),
 )

@@ -3,15 +3,12 @@ import click
 import json
 import yaml
 
-
 class ProjectMissingYMLFileException(Exception):
     pass
-
 
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
-    WAREHOUSE = "warehouse"
 
     def __init__(self, plugin_type, plugin_name):
         self.plugin_type = plugin_type
@@ -30,7 +27,6 @@ class ProjectAddService:
                 fg="red",
             )
             raise ProjectMissingYMLFileException()
-
         self.url = self.discovery_json.get(self.plugin_type_key).get(self.plugin_name)
 
     def add(self):
