@@ -3,8 +3,10 @@ import click
 import json
 import yaml
 
+
 class ProjectMissingYMLFileException(Exception):
     pass
+
 
 class ProjectAddService:
     EXTRACTOR = "extractor"
