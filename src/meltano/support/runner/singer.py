@@ -87,7 +87,6 @@ class SingerRunner(Runner):
 
         while True:
             try:
-                logging.info("Waiting for {process.name} to exit...")
                 code = process.wait(**wait_args)
                 logging.debug(f"{process} exited with {code}")
                 return code
