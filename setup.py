@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 try:
   from setuptools import setup, find_namespace_packages
-except Exception, e:
+except Exception as e:
   print('You need to upgrade setuptools.')
   print('pip install setuptools --upgrade')
   raise e
