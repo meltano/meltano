@@ -47,7 +47,6 @@ class ProjectAddService:
         except Exception as e:
             if self.url is not None:
                 self.add_to_file()
-                return True
             else:
                 raise PluginNotSupportedException()
 
