@@ -315,6 +315,9 @@ We want the tools to be open source so we can ship this as a product.
 
 We use Airflow to orchestrate Meltano jobs. Jobs can be Extract, Load, Transform etc. To see the difference between the GitLab CI and Airflow which would cover the difference between DAGs and a CI, see this [comprehensive issue](https://gitlab.com/meltano/analytics/issues/458).
 
+## Releases
+TBD
+
 ## How to Install and Run Meltano  
 
 **Note:** Meltano requires Python version >= 3.6.6
