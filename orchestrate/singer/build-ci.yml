@@ -36,5 +36,3 @@ singer_runner:
   only:
     refs:
       - master
-    variables:
-      - $CI_PIPELINE_SOURCE == 'push'
