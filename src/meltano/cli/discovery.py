@@ -23,6 +23,10 @@ from meltano.support.plugin_discovery_service import (
 def discover(plugin_type):
     discover_service = PluginDiscoveryService()
     try:
-        discover_service.discover(plugin_type)
+        discovery_dict = discover_service.discover(plugin_type)
+        for key, value in discovery_dict.items():
+            click.secho(key, fg="green")
+            click.echo(value)
     except PluginDiscoveryInvalidJSONError:
+        click.secho(PluginDiscoveryInvalidJSONError.invalid_message, fg="red")
         raise click.Abort()

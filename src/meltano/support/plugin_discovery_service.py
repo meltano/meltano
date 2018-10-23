@@ -1,5 +1,4 @@
 import os, json
-import click
 
 
 class PluginDiscoveryInvalidJSONError(Exception):
@@ -22,7 +21,6 @@ class PluginDiscoveryService:
                 discovery_json = json.load(f)
                 return discovery_json
             except Exception as e:
-                click.secho(PluginDiscoveryInvalidJSONError.invalid_message, fg="red")
                 raise PluginDiscoveryInvalidJSONError()
 
     def discover(self, plugin_type):
@@ -30,15 +28,13 @@ class PluginDiscoveryService:
             try:
                 self.discovery_data = json.load(f)
             except Exception as e:
-                click.secho(PluginDiscoveryInvalidJSONError.invalid_message, fg="red")
                 raise PluginDiscoveryInvalidJSONError()
 
         if plugin_type == PluginDiscoveryService.ALL:
-            self.list_discovery(PluginDiscoveryService.EXTRACTORS)
-            self.list_discovery(PluginDiscoveryService.LOADERS)
+            return {PluginDiscoveryService.EXTRACTORS: self.list_discovery(PluginDiscoveryService.EXTRACTORS),
+            PluginDiscoveryService.LOADERS: self.list_discovery(PluginDiscoveryService.LOADERS)}
         else:
-            self.list_discovery(plugin_type)
+            return {plugin_type: self.list_discovery(plugin_type)}
 
     def list_discovery(self, discovery):
-        click.echo(click.style(discovery.title(), fg="green"))
-        click.echo("\n".join(self.discovery_data.get(discovery).keys()))
+        return "\n".join(self.discovery_data.get(discovery).keys())
