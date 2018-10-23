@@ -132,8 +132,8 @@ class SingerRunner(Runner):
             raise Exception(f"Cannot start tap or target: {err}")
 
         tap_code = self.stop(p_tap)
-        tee_code = self.stop(p_tee, timeout=10)
-        target_code = self.stop(p_target, timeout=10)
+        tee_code = self.stop(p_tee)
+        target_code = self.stop(p_target)
 
         if any((tap_code, tee_code, target_code)):
             raise Exception(
