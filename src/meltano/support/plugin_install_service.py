@@ -1,6 +1,5 @@
 import os
 import subprocess
-import click
 from meltano.support.project_add_service import ProjectAddService
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
 
@@ -10,45 +9,53 @@ class PluginInstallServicePluginNotFoundError(Exception):
 
 
 class PluginInstallService:
-    def __init__(self):
-        pass
-        self.discovery_service = PluginDiscoveryService()
+    def __init__(self, plugin_type, plugin_name, discovery_service=None):
+        self.discovery_service = discovery_service or PluginDiscoveryService()
+        self.plugin_type = plugin_type
+        self.plugin_name = plugin_name
+        self.plugin_url = None
+        self.path_to_plugin = None
+        self.path_to_pip_install = None
 
-    def install(self, plugin_type, plugin_name):
+    def get_plugin_url(self):
         discover_json = self.discovery_service.discover_json()
-        plugin_url = discover_json[plugin_type].get(plugin_name)
-        if plugin_url is None:
-            click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
+        return discover_json[self.plugin_type].get(self.plugin_name)
+
+    def get_path_to_plugin(self):
+        if self.path_to_plugin is None:
+            self.path_to_plugin = os.path.join(
+                "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
+            )
+        return self.path_to_plugin
+
+    def create_venv(self):
+        if self.plugin_url is None:
+            self.plugin_url = self.get_plugin_url()
+
+        if self.plugin_url is None:  # still
             raise PluginInstallServicePluginNotFoundError()
 
-        path_to_plugin = os.path.join(
-            "./", "meltano", "venvs", plugin_type, plugin_name
-        )
-        os.makedirs(path_to_plugin, exist_ok=True)
+        self.get_path_to_plugin()
+
+        os.makedirs(self.path_to_plugin, exist_ok=True)
         run_venv = subprocess.run(
-            ["python", "-m", "venv", f"./.meltano/venvs/{plugin_type}/{plugin_name}"],
+            ["python", "-m", "venv", self.path_to_plugin],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
 
-        click.echo(run_venv.stdout)
-        click.secho(run_venv.stderr, fg="red")
+        return {"stdout": run_venv.stdout, "stderr": run_venv.stderr}
 
-        click.echo(f"getting from {plugin_url}")
-        path_to_plugin = os.path.join(
-            "./", "meltano", "venvs", plugin_type, plugin_name
-        )
-        path_to_pip_install = os.path.join(
-            ".meltano", "venvs", plugin_type, plugin_name, "bin", "pip"
-        )
+    def install(self):
+        self.get_path_to_plugin()
+        self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
 
         run_pip_install = subprocess.run(
-            [path_to_pip_install, "install", plugin_url],
+            [self.path_to_pip_install, "install", self.plugin_url],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
 
-        click.echo(run_pip_install.stdout)
-        click.secho(run_pip_install.stderr, fg="red")
+        return {"stdout": run_pip_install.stdout, "stderr": run_pip_install.stderr}

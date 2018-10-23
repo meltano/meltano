@@ -1,7 +1,10 @@
 import os
-import click
 import json
 import yaml
+
+
+class PluginNotSupportedException(Exception):
+    pass
 
 
 class ProjectMissingYMLFileException(Exception):
@@ -15,7 +18,6 @@ class ProjectAddService:
     def __init__(self, plugin_type, plugin_name):
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
-        self.plugin_type_key = f"{self.plugin_type}s"
 
         self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
         self.discovery_json = json.load(open(self.discovery_file))
@@ -24,12 +26,8 @@ class ProjectAddService:
         try:
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         except Exception as e:
-            click.secho(
-                "Are you in the right directory? I don't see a meltano.yml file here.",
-                fg="red",
-            )
             raise ProjectMissingYMLFileException()
-        self.url = self.discovery_json.get(self.plugin_type_key).get(self.plugin_name)
+        self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
 
     def add(self):
         extract_dict = self.meltano_yml.get(self.plugin_type)
@@ -45,20 +43,13 @@ class ProjectAddService:
                     if plugin["name"] == self.plugin_name
                 )
             )
-            click.secho(
-                f"The {self.plugin_type} {self.plugin_name} is already listed in your meltano.yml file",
-                fg="green",
-            )
-            click.Abort()
-        except Exception:
+
+        except Exception as e:
             if self.url is not None:
                 self.add_to_file()
+                return True
             else:
-                click.secho(
-                    f"The {self.plugin_type} {self.plugin_name} is not supported",
-                    fg="red",
-                )
-                click.Abort()
+                raise PluginNotSupportedException()
 
     def add_to_file(self):
         self.meltano_yml[self.plugin_type].append(
@@ -66,4 +57,3 @@ class ProjectAddService:
         )
         with open(self.meltano_yml_file, "w") as f:
             f.write(yaml.dump(self.meltano_yml))
-        click.secho(f"{self.plugin_name} added to your meltano.yml config", fg="green")

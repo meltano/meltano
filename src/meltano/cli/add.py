@@ -7,8 +7,12 @@ from . import cli
 from meltano.support.project_add_service import (
     ProjectAddService,
     ProjectMissingYMLFileException,
+    PluginNotSupportedException,
 )
-from meltano.support.plugin_install_service import PluginInstallService
+from meltano.support.plugin_install_service import (
+    PluginInstallService,
+    PluginInstallServicePluginNotFoundError,
+)
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
 
 
@@ -19,22 +23,43 @@ from meltano.support.plugin_discovery_service import PluginDiscoveryService
 )
 @click.argument("plugin_name")
 def add(plugin_type, plugin_name):
-    try:
-        add_service = ProjectAddService(plugin_type, plugin_name)
-        add_service.add()
-    except ProjectMissingYMLFileException as e:
-        raise click.Abort()
-
-    install_service = PluginInstallService()
     plugin_type = (
         PluginDiscoveryService.EXTRACTORS
         if plugin_type == ProjectAddService.EXTRACTOR
         else PluginDiscoveryService.LOADERS
     )
+    try:
+        add_service = ProjectAddService(plugin_type, plugin_name)
+        add_service.add()
+        click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
+    except ProjectMissingYMLFileException as e:
+        click.secho(
+            "Are you in the right directory? I don't see a meltano.yml file here.",
+            fg="red",
+        )
+        raise click.Abort()
+    except PluginNotSupportedException:
+        click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
+        raise click.Abort()
+
+    discovery_service = PluginDiscoveryService()
+    install_service = PluginInstallService(plugin_type, plugin_name, discovery_service)
 
     try:
-        install_service.install(plugin_type, plugin_name)
-    except Exception as e:
+        run_venv = install_service.create_venv()
+
+        if run_venv["stdout"]:
+            click.echo(run_venv["stdout"])
+        if run_venv["stderr"]:
+            click.secho(run_venv["stderr"], fg="red")
+    except PluginInstallServicePluginNotFoundError as e:
+        click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
+
+    run_install = install_service.install()
+    if run_install["stdout"]:
+        click.echo(run_install["stdout"])
+    if run_install["stderr"]:
+        click.secho(run_install["stderr"], fg="red")
 
     click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")
