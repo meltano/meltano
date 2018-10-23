@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-from setuptools import setup, find_namespace_packages
+try:
+  from setuptools import setup, find_namespace_packages
+except Exception as e:
+  print('You need to upgrade setuptools.')
+  print('pip install setuptools --upgrade')
+  raise e
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
