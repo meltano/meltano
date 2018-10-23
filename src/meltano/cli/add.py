@@ -62,7 +62,7 @@ def add(plugin_type, plugin_name):
     if run_install_dbt["stdout"]:
         click.echo(run_install_dbt["stdout"])
     if run_install_dbt["stderr"]:
-        click.secho(run_install_dbt["stderr"], fg="red")    
+        click.secho(run_install_dbt["stderr"], fg="red")
 
     click.secho(f"Installing {plugin_name} via pip...", fg="green")
     run_install_plugin = install_service.install_plugin()

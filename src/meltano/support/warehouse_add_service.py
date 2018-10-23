@@ -1,6 +1,7 @@
 import re
 import os
 
+
 class WarehouseAddService:
     def __init__(self):
         self.env_file = os.path.join("./", ".env")

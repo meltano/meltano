@@ -55,13 +55,15 @@ class PluginInstallService:
         self.get_path_to_pip_install()
         run_pip_install_dbt = subprocess.run(
             [self.path_to_pip_install, "install", "dbt"],
-                stdout=subprocess.PIPE,
+            stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
         )
-        
 
-        return {"stdout": run_pip_install_dbt.stdout, "stderr": run_pip_install_dbt.stderr}
+        return {
+            "stdout": run_pip_install_dbt.stdout,
+            "stderr": run_pip_install_dbt.stderr,
+        }
 
     def install_plugin(self):
         self.get_path_to_pip_install()
