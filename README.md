@@ -381,6 +381,7 @@ Also see [workflow for tap/target development](#workflow-for-tap-target-developm
 We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
 
   1. Fork (using Meltano organization)
+  1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
   1. Modify and submits PRs
   1. If there is resistance, fork as our tap (2)
 
@@ -390,6 +391,7 @@ We should be good citizen about these, and use the default workflow to contribut
   1. For target developement please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
   1. Use a separate repo (meltano/target|tap-x) in GitLab
 e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+  1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
   1. Publish PyPI packages of these package (not for now)
   1. We could mirror this repo on GitHub if we want (not for now)
 
