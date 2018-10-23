@@ -31,8 +31,14 @@ class PluginDiscoveryService:
                 raise PluginDiscoveryInvalidJSONError()
 
         if plugin_type == PluginDiscoveryService.ALL:
-            return {PluginDiscoveryService.EXTRACTORS: self.list_discovery(PluginDiscoveryService.EXTRACTORS),
-            PluginDiscoveryService.LOADERS: self.list_discovery(PluginDiscoveryService.LOADERS)}
+            return {
+                PluginDiscoveryService.EXTRACTORS: self.list_discovery(
+                    PluginDiscoveryService.EXTRACTORS
+                ),
+                PluginDiscoveryService.LOADERS: self.list_discovery(
+                    PluginDiscoveryService.LOADERS
+                ),
+            }
         else:
             return {plugin_type: self.list_discovery(plugin_type)}
 
