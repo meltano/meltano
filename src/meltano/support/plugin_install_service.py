@@ -28,6 +28,10 @@ class PluginInstallService:
             )
         return self.path_to_plugin
 
+    def get_path_to_pip_install(self):
+        self.get_path_to_plugin()
+        self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
+
     def create_venv(self):
         if self.plugin_url is None:
             self.plugin_url = self.get_plugin_url()
@@ -39,7 +43,7 @@ class PluginInstallService:
 
         os.makedirs(self.path_to_plugin, exist_ok=True)
         run_venv = subprocess.run(
-            ["python", "-m", "venv", self.path_to_plugin],
+            ["python", "-m", "venv", "--upgrade", self.path_to_plugin],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -47,10 +51,20 @@ class PluginInstallService:
 
         return {"stdout": run_venv.stdout, "stderr": run_venv.stderr}
 
-    def install(self):
-        self.get_path_to_plugin()
-        self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
+    def install_dbt(self):
+        self.get_path_to_pip_install()
+        run_pip_install_dbt = subprocess.run(
+            [self.path_to_pip_install, "install", "dbt"],
+                stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+        )
+        
 
+        return {"stdout": run_pip_install_dbt.stdout, "stderr": run_pip_install_dbt.stderr}
+
+    def install_plugin(self):
+        self.get_path_to_pip_install()
         run_pip_install = subprocess.run(
             [self.path_to_pip_install, "install", self.plugin_url],
             stdout=subprocess.PIPE,

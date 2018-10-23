@@ -46,6 +46,7 @@ def add(plugin_type, plugin_name):
     install_service = PluginInstallService(plugin_type, plugin_name, discovery_service)
 
     try:
+        click.secho("Activating your virtual environment", fg="green")
         run_venv = install_service.create_venv()
 
         if run_venv["stdout"]:
@@ -56,10 +57,18 @@ def add(plugin_type, plugin_name):
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
 
-    run_install = install_service.install()
-    if run_install["stdout"]:
-        click.echo(run_install["stdout"])
-    if run_install["stderr"]:
-        click.secho(run_install["stderr"], fg="red")
+    click.secho("Installing DBT...", fg="green")
+    run_install_dbt = install_service.install_dbt()
+    if run_install_dbt["stdout"]:
+        click.echo(run_install_dbt["stdout"])
+    if run_install_dbt["stderr"]:
+        click.secho(run_install_dbt["stderr"], fg="red")    
+
+    click.secho(f"Installing {plugin_name} via pip...", fg="green")
+    run_install_plugin = install_service.install_plugin()
+    if run_install_plugin["stdout"]:
+        click.echo(run_install_plugin["stdout"])
+    if run_install_plugin["stderr"]:
+        click.secho(run_install_plugin["stderr"], fg="red")
 
     click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")
