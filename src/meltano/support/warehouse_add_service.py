@@ -1,7 +1,5 @@
 import re
 import os
-import click
-
 
 class WarehouseAddService:
     def __init__(self):
@@ -59,4 +57,3 @@ class WarehouseAddService:
         contents = self.content_replace(**kwargs)
         with open(self.env_file, "w") as f:
             f.write(contents)
-        click.secho("ENV file updated", fg="green")

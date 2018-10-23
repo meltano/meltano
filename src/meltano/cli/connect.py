@@ -28,6 +28,7 @@ def add(name, host, database, schema, username, password):
         username=username,
         password=password,
     )
+    click.secho("ENV file updated", fg="green")
 
 
 @connect.command()
