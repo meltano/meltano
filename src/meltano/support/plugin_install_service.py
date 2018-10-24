@@ -1,4 +1,5 @@
 import os
+import yaml
 import subprocess
 from meltano.support.project_add_service import ProjectAddService
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
@@ -9,8 +10,15 @@ class PluginInstallServicePluginNotFoundError(Exception):
 
 
 class PluginInstallService:
-    def __init__(self, plugin_type, plugin_name, discovery_service=None):
+    def __init__(
+        self,
+        plugin_type=None,
+        plugin_name=None,
+        discovery_service=None,
+        add_service=None,
+    ):
         self.discovery_service = discovery_service or PluginDiscoveryService()
+        self.add_service = add_service or ProjectAddService()
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
         self.plugin_url = None
@@ -22,10 +30,9 @@ class PluginInstallService:
         return discover_json[self.plugin_type].get(self.plugin_name)
 
     def get_path_to_plugin(self):
-        if self.path_to_plugin is None:
-            self.path_to_plugin = os.path.join(
-                "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
-            )
+        self.path_to_plugin = os.path.join(
+            "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
+        )
         return self.path_to_plugin
 
     def get_path_to_pip_install(self):
@@ -33,10 +40,9 @@ class PluginInstallService:
         self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
 
     def create_venv(self):
-        if self.plugin_url is None:
-            self.plugin_url = self.get_plugin_url()
+        self.plugin_url = self.get_plugin_url()
 
-        if self.plugin_url is None:  # still
+        if not self.plugin_url:
             raise PluginInstallServicePluginNotFoundError()
 
         self.get_path_to_plugin()
@@ -64,6 +70,46 @@ class PluginInstallService:
             "stdout": run_pip_install_dbt.stdout,
             "stderr": run_pip_install_dbt.stderr,
         }
+
+    def install_all_plugins(self, status_cb=None):
+        if status_cb is None:
+            status_cb = lambda *a, **k: None
+        config_yml = self.add_service.meltano_yml
+        approved_keys = [
+            PluginDiscoveryService.EXTRACTORS,
+            PluginDiscoveryService.LOADERS,
+        ]
+        errors = []
+        installed = []
+        for kind, plugins in config_yml.items():
+            if kind in approved_keys:
+                for plugin in plugins:
+                    status_cb(
+                        {"plugin_type": kind, "plugin": plugin, "status": "running"}
+                    )
+                    self.plugin_name = plugin.get("name")
+                    self.plugin_url = plugin.get("url")
+                    self.plugin_type = kind
+                    if self.plugin_url is None:
+                        errors.append(
+                            {
+                                "plugin_type": kind,
+                                "plugin": plugin,
+                                "reason": "Missing URL",
+                            }
+                        )
+                        continue
+                    self.create_venv()
+                    self.install_dbt()
+                    self.install_plugin()
+                    installed.append(
+                        {"plugin_type": kind, "plugin": plugin, "status": "success"}
+                    )
+                    status_cb(
+                        {"plugin_type": kind, "plugin": plugin, "status": "success"}
+                    )
+
+        return {"errors": errors, "installed": installed}
 
     def install_plugin(self):
         self.get_path_to_pip_install()

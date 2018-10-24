@@ -7,15 +7,11 @@ class PluginNotSupportedException(Exception):
     pass
 
 
-class ProjectMissingYMLFileException(Exception):
-    pass
-
-
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
 
-    def __init__(self, plugin_type, plugin_name):
+    def __init__(self, plugin_type=None, plugin_name=None):
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
 
@@ -26,8 +22,10 @@ class ProjectAddService:
         try:
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         except Exception as e:
-            raise ProjectMissingYMLFileException()
-        self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
+            open(os.path.join("./", "meltano.yml"), "a").close()
+            self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
+        if self.plugin_type:
+            self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
 
     def add(self):
         extract_dict = self.meltano_yml.get(self.plugin_type)
