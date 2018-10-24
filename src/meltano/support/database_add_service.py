@@ -13,7 +13,9 @@ class DatabaseAddService:
         return s.upper() if upper else s.lower()
 
     def get_env_file_path(self, **kwargs):
-        return os.path.join(self.env_file, f".database_{kwargs['root_name'].lower()}.yml")
+        return os.path.join(
+            self.env_file, f".database_{kwargs['root_name'].lower()}.yml"
+        )
 
     def add_additional_kwargs(self, **kwargs):
         root_name = self.env_param(kwargs["name"])
