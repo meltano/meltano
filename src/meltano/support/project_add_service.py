@@ -6,6 +6,7 @@ import yaml
 class PluginNotSupportedException(Exception):
     pass
 
+
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
@@ -21,7 +22,7 @@ class ProjectAddService:
         try:
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         except Exception as e:
-            open(os.path.join("./", "meltano.yml"), 'a').close()
+            open(os.path.join("./", "meltano.yml"), "a").close()
             self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
         if self.plugin_type:
             self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
