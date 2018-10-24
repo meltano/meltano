@@ -3,7 +3,7 @@ import click
 import psycopg2
 import psycopg2.sql
 
-from meltano.support.db import db_open
+from meltano.core.db import db_open
 from . import cli
 from .params import db_options
 

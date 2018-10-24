@@ -1,7 +1,7 @@
 import sqlalchemy
 
 from . import Job, State
-from meltano.support.db import DB
+from meltano.core.db import DB
 
 
 class JobFinder:

@@ -2,8 +2,8 @@ import os
 import functools
 import click
 
-from meltano.support.utils import pop_all
-from meltano.support.db import DB
+from meltano.core.utils import pop_all
+from meltano.core.db import DB
 
 
 def db_options(func):

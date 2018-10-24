@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from . import config
 from .external_connector import ExternalConnector
-from meltano.support.db import DB
+from meltano.core.db import DB
 
 app = Flask(__name__)
 

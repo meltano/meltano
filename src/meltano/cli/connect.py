@@ -1,5 +1,5 @@
 import click
-from meltano.support.warehouse_add_service import WarehouseAddService
+from meltano.core.warehouse_add_service import WarehouseAddService
 from urllib.parse import urlparse
 from . import cli
 

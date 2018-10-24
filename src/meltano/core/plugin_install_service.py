@@ -1,7 +1,7 @@
 import os
 import subprocess
-from meltano.support.project_add_service import ProjectAddService
-from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
 class PluginInstallServicePluginNotFoundError(Exception):
