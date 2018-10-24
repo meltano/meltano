@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 from . import cli
 from meltano.support.project_add_service import (
     ProjectAddService,
-    ProjectMissingYMLFileException,
     PluginNotSupportedException,
 )
 from meltano.support.plugin_install_service import (
