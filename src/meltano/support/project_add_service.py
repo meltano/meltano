@@ -2,6 +2,7 @@ import os
 import json
 import yaml
 
+from .project import Project
 
 class PluginNotSupportedException(Exception):
     pass
@@ -15,21 +16,24 @@ class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
 
-    def __init__(self, plugin_type=None, plugin_name=None):
+    def __init__(self, project: Project,
+                 plugin_type=None,
+                 plugin_name=None):
+        self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
 
         self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
         self.discovery_json = json.load(open(self.discovery_file))
-        self.meltano_yml_file = os.path.join("./", "meltano.yml")
 
         try:
-            self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
+            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
         except Exception as e:
-            open(os.path.join("./", "meltano.yml"), "a").close()
-            self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
+            self.project.meltanofile.open("a").close()
+            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
+            
         if self.plugin_type:
-            self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
+            self.url = self.discovery_json.get(self.plugin_type, {}).get(self.plugin_name)
 
     def add(self):
         if not self.plugin_name or not self.plugin_type:
@@ -59,5 +63,5 @@ class ProjectAddService:
         self.meltano_yml[self.plugin_type].append(
             {"name": self.plugin_name, "url": self.url}
         )
-        with open(self.meltano_yml_file, "w") as f:
+        with open(self.project.meltanofile, "w") as f:
             f.write(yaml.dump(self.meltano_yml))

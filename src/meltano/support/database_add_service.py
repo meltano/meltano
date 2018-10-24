@@ -2,10 +2,12 @@ import re
 import os
 import yaml
 
+from .project import Project
+
 
 class DatabaseAddService:
-    def __init__(self):
-        self.meltano_secret_dir = os.path.join("./", ".meltano")
+    def __init__(self, project: Project):
+        self.project = project
 
     def environmentalize(self, name, upper=True):
         s = re.sub(r"[^\w\s]", "", name)
@@ -13,8 +15,8 @@ class DatabaseAddService:
         return s.upper() if upper else s.lower()
 
     def get_db_vars_file_path(self, **kwargs):
-        return os.path.join(
-            self.meltano_secret_dir, f".database_{kwargs['root_name'].lower()}.yml"
+        return self.project.meltano_dir(
+            f".database_{kwargs['root_name'].lower()}.yml"
         )
 
     def add_additional_kwargs(self, **kwargs):
