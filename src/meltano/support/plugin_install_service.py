@@ -10,7 +10,13 @@ class PluginInstallServicePluginNotFoundError(Exception):
 
 
 class PluginInstallService:
-    def __init__(self, plugin_type=None, plugin_name=None, discovery_service=None, add_service=None):
+    def __init__(
+        self,
+        plugin_type=None,
+        plugin_name=None,
+        discovery_service=None,
+        add_service=None,
+    ):
         self.discovery_service = discovery_service or PluginDiscoveryService()
         self.add_service = add_service or ProjectAddService()
         self.plugin_type = plugin_type
@@ -67,26 +73,41 @@ class PluginInstallService:
 
     def install_all_plugins(self, status_cb):
         config_yml = self.add_service.meltano_yml
-        approved_keys = [PluginDiscoveryService.EXTRACTORS, PluginDiscoveryService.LOADERS]
+        approved_keys = [
+            PluginDiscoveryService.EXTRACTORS,
+            PluginDiscoveryService.LOADERS,
+        ]
         errors = []
         installed = []
         for key, value in config_yml.items():
             if key in approved_keys:
                 for plugin in value:
-                    status_cb({'plugin_type': key, 'plugin': plugin, 'status': 'running'})
-                    self.plugin_name = plugin.get('name')
-                    self.plugin_url = plugin.get('url')
+                    status_cb(
+                        {"plugin_type": key, "plugin": plugin, "status": "running"}
+                    )
+                    self.plugin_name = plugin.get("name")
+                    self.plugin_url = plugin.get("url")
                     self.plugin_type = key
                     if self.plugin_url is None:
-                        errors.append({'plugin_type': key, 'plugin': plugin, 'reason': 'Missing URL'})
+                        errors.append(
+                            {
+                                "plugin_type": key,
+                                "plugin": plugin,
+                                "reason": "Missing URL",
+                            }
+                        )
                         continue
                     self.create_venv()
                     self.install_dbt()
                     self.install_plugin()
-                    installed.append({'plugin_type': key, 'plugin': plugin, 'status': 'success'})
-                    status_cb({'plugin_type': key, 'plugin': plugin, 'status': 'success'})
-        
-        return {'errors': errors, 'installed': installed}
+                    installed.append(
+                        {"plugin_type": key, "plugin": plugin, "status": "success"}
+                    )
+                    status_cb(
+                        {"plugin_type": key, "plugin": plugin, "status": "success"}
+                    )
+
+        return {"errors": errors, "installed": installed}
 
     def install_plugin(self):
         self.get_path_to_pip_install()
