@@ -24,10 +24,9 @@ class PluginInstallService:
         return discover_json[self.plugin_type].get(self.plugin_name)
 
     def get_path_to_plugin(self):
-        if self.path_to_plugin is None:
-            self.path_to_plugin = os.path.join(
-                "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
-            )
+        self.path_to_plugin = os.path.join(
+            "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
+        )
         return self.path_to_plugin
 
     def get_path_to_pip_install(self):
@@ -35,8 +34,7 @@ class PluginInstallService:
         self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
 
     def create_venv(self):
-        if self.plugin_url is None:
-            self.plugin_url = self.get_plugin_url()
+        self.plugin_url = self.get_plugin_url()
 
         if self.plugin_url is None:  # still
             raise PluginInstallServicePluginNotFoundError()
@@ -67,7 +65,7 @@ class PluginInstallService:
             "stderr": run_pip_install_dbt.stderr,
         }
 
-    def install_all_plugins(self):
+    def install_all_plugins(self, status_cb):
         config_yml = self.add_service.meltano_yml
         approved_keys = [PluginDiscoveryService.EXTRACTORS, PluginDiscoveryService.LOADERS]
         errors = []
@@ -75,17 +73,18 @@ class PluginInstallService:
         for key, value in config_yml.items():
             if key in approved_keys:
                 for plugin in value:
+                    status_cb({'plugin_type': key, 'plugin': plugin, 'status': 'running'})
                     self.plugin_name = plugin.get('name')
                     self.plugin_url = plugin.get('url')
                     self.plugin_type = key
-                    print(self.plugin_url, self.plugin_type)
                     if self.plugin_url is None:
                         errors.append({'plugin_type': key, 'plugin': plugin, 'reason': 'Missing URL'})
                         continue
                     self.create_venv()
-                    # self.install_dbt()
+                    self.install_dbt()
                     self.install_plugin()
                     installed.append({'plugin_type': key, 'plugin': plugin, 'status': 'success'})
+                    status_cb({'plugin_type': key, 'plugin': plugin, 'status': 'success'})
         
         return {'errors': errors, 'installed': installed}
 
