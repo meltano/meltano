@@ -4,7 +4,51 @@
 ".gitignore": |
   /venv
   /.meltano
+  .env
+"dbt_project.yml": |
+  # Name your package! Package names should contain only lowercase characters
+  # and underscores. A good package name should reflect your organization's
+  # name or the intended use of these models
+  name: 'my_meltano_project'
+  version: '1.0'
+  # This setting configures which "profile" dbt uses for this project. Profiles contain
+  # database connection information, and should be configured in the  ~/.dbt/profiles.yml file
+  profile: 'meltano'
+  # These configurations specify where dbt should look for different types of files.
+  # The `source-paths` config, for example, states that source models can be found
+  # in the "models/" directory. You probably won't need to change these!
+  source-paths: ["transform/models"]
+  analysis-paths: ["transform/analysis"]
+  test-paths: ["transform/tests"]
+  data-paths: ["transform/data"]
+  macro-paths: ["transform/macros"]
+  target-path: ".meltano/dbt/target"  # directory which will store compiled SQL files
+  clean-targets:         # directories to be removed by `dbt clean`
+      - ".meltano/dbt/target"
+      - "dbt_modules"
+  models:
+    meltano:
+      enabled: true
+"packages.yml": |
+  packages:
+    - git: https://gitlab.com/meltano/meltano.git
 "/.meltano": []
+"dbt_profiles.yml": |
+  config:
+    send_anonymous_usage_stats: False
+    use_colors: True
+  meltano:
+    target: analysis
+    outputs:
+      postgres:
+      type: postgres
+      threads: 2
+      host: "{{ env_var('PG_ADDRESS') }}"
+      port: "{{ env_var('PG_PORT') }}"
+      user: "{{ env_var('PG_USERNAME') }}"
+      pass: "{{ env_var('PG_PASSWORD') }}"
+      dbname: "{{ env_var('PG_DATABASE') }}"
+      schema: "{{ env_var('PG_SCHEMA') }}"
 "/model": []
 "/extract": []
 "/load": []

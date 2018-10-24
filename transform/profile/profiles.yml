@@ -4,9 +4,8 @@ config:
 
 meltano:
   target: meltano_analysis
-  
   outputs:
-    meltano_analysis:
+    postgres:
       type: postgres
       threads: 2
       host: "{{ env_var('PG_ADDRESS') }}"
@@ -15,33 +14,3 @@ meltano:
       pass: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DATABASE') }}"
       schema: "{{ env_var('PG_SCHEMA') }}"
-
-    prod:
-      type: postgres
-      threads: 2
-      host: "{{ env_var('PG_ADDRESS') }}"
-      port: "{{ env_var('PG_PORT') }}"
-      user: "{{ env_var('PG_USERNAME') }}"
-      pass: "{{ env_var('PG_PASSWORD') }}"
-      dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: "{{ env_var('PG_PROD_SCHEMA') }}"
-
-    dev:
-      type: postgres
-      threads: 2
-      host: "{{ env_var('PG_ADDRESS') }}"
-      port: "{{ env_var('PG_PORT') }}"
-      user: "{{ env_var('PG_USERNAME') }}"
-      pass: "{{ env_var('PG_PASSWORD') }}"
-      dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: "{{ env_var('PG_DEV_SCHEMA') }}"
-
-    version:
-      type: postgres
-      threads: 2
-      host: "{{ env_var('PG_ADDRESS') }}"
-      port: "{{ env_var('PG_PORT') }}"
-      user: "{{ env_var('PG_USERNAME') }}"
-      pass: "{{ env_var('PG_PASSWORD') }}"
-      dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: version
