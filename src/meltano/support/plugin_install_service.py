@@ -42,7 +42,7 @@ class PluginInstallService:
     def create_venv(self):
         self.plugin_url = self.get_plugin_url()
 
-        if self.plugin_url is None:  # still
+        if not self.plugin_url:
             raise PluginInstallServicePluginNotFoundError()
 
         self.get_path_to_plugin()
@@ -81,19 +81,19 @@ class PluginInstallService:
         ]
         errors = []
         installed = []
-        for key, value in config_yml.items():
-            if key in approved_keys:
-                for plugin in value:
+        for kind, plugins in config_yml.items():
+            if kind in approved_keys:
+                for plugin in plugins:
                     status_cb(
-                        {"plugin_type": key, "plugin": plugin, "status": "running"}
+                        {"plugin_type": kind, "plugin": plugin, "status": "running"}
                     )
                     self.plugin_name = plugin.get("name")
                     self.plugin_url = plugin.get("url")
-                    self.plugin_type = key
+                    self.plugin_type = kind
                     if self.plugin_url is None:
                         errors.append(
                             {
-                                "plugin_type": key,
+                                "plugin_type": kind,
                                 "plugin": plugin,
                                 "reason": "Missing URL",
                             }
@@ -103,10 +103,10 @@ class PluginInstallService:
                     self.install_dbt()
                     self.install_plugin()
                     installed.append(
-                        {"plugin_type": key, "plugin": plugin, "status": "success"}
+                        {"plugin_type": kind, "plugin": plugin, "status": "success"}
                     )
                     status_cb(
-                        {"plugin_type": key, "plugin": plugin, "status": "success"}
+                        {"plugin_type": kind, "plugin": plugin, "status": "success"}
                     )
 
         return {"errors": errors, "installed": installed}
