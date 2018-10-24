@@ -4,16 +4,16 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from meltano.support.project_add_service import (
+from meltano.core.project_add_service import (
     ProjectAddService,
     ProjectMissingYMLFileException,
     PluginNotSupportedException,
 )
-from meltano.support.plugin_install_service import (
+from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallServicePluginNotFoundError,
 )
-from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
 @cli.command()

@@ -3,7 +3,7 @@ import os
 import contextlib
 import sqlalchemy
 
-from meltano.support.db import DB, SystemModel
+from meltano.core.db import DB, SystemModel
 from sqlalchemy import MetaData
 
 

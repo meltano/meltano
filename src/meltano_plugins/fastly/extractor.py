@@ -5,7 +5,7 @@ import os
 import aiohttp
 import pandas as pd
 from dateutil.relativedelta import relativedelta
-from meltano.support.extract_utils import fetch_urls
+from meltano.core.extract_utils import fetch_urls
 from pandas.io.json import json_normalize
 from sqlalchemy import Table, Column, String, MetaData, TIMESTAMP
 

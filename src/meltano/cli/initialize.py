@@ -1,7 +1,7 @@
 import os
 import yaml
 import click
-from meltano.support.project_init_service import (
+from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )

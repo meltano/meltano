@@ -3,7 +3,7 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from meltano.support.plugin_discovery_service import (
+from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginDiscoveryInvalidJSONError,
 )
