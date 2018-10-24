@@ -25,10 +25,15 @@ class TestDatabaseAddService:
         )
 
         root_name = database_service.environmentalize(name)
-        assert (
+        assert yaml.load(
             open(f"./.meltano/.database_{root_name.lower()}.yml").read()
-            == """{database: sample_database, host: 127.0.0.1, name: sample_name_123, password: freedomforjeffery,
-  root_name: SAMPLE_NAME_123, schema: analytics, username: jeffery}
-"""
-        )
+        ) == {
+            "database": "sample_database",
+            "host": "127.0.0.1",
+            "name": "sample_name_123",
+            "password": "freedomforjeffery",
+            "root_name": "SAMPLE_NAME_123",
+            "schema": "analytics",
+            "username": "jeffery",
+        }
         shutil.rmtree("./.meltano")
