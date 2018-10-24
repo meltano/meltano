@@ -4,6 +4,7 @@ import yaml
 
 from .project import Project
 
+
 class PluginNotSupportedException(Exception):
     pass
 

@@ -41,8 +41,9 @@ class PluginInstallService:
         if not self.plugin_url:
             raise PluginInstallServicePluginNotFoundError()
 
-        return self.venv_service.create(namespace=self.plugin_type,
-                                        name=self.plugin_name)
+        return self.venv_service.create(
+            namespace=self.plugin_type, name=self.plugin_name
+        )
 
     def install_all_plugins(self, status_cb=None):
         if status_cb is None:
@@ -84,6 +85,6 @@ class PluginInstallService:
         return {"errors": errors, "installed": installed}
 
     def install_plugin(self):
-        return self.venv_service.install(namespace=self.plugin_type,
-                                         name=self.plugin_name,
-                                         pip_url=self.plugin_url)
+        return self.venv_service.install(
+            namespace=self.plugin_type, name=self.plugin_name, pip_url=self.plugin_url
+        )
