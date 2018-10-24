@@ -1,5 +1,5 @@
 import click
-from meltano.support.warehouse_add_service import WarehouseAddService
+from meltano.support.database_add_service import DatabaseAddService
 from urllib.parse import urlparse
 from . import cli
 
@@ -19,8 +19,8 @@ def connect():
     "--password", prompt="Warehouse password", hide_input=True, confirmation_prompt=True
 )
 def add(name, host, database, schema, username, password):
-    warehouse_service = WarehouseAddService()
-    warehouse_service.add(
+    database_add_service = DatabaseAddService()
+    database_add_service.add(
         name=name,
         host=host,
         database=database,
@@ -33,5 +33,5 @@ def add(name, host, database, schema, username, password):
 
 @connect.command()
 def list():
-    warehouse_service = WarehouseAddService()
-    warehouse_service.list()
+    database_add_service = DatabaseAddService()
+    database_add_service.list()
