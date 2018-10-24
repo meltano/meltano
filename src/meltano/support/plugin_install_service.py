@@ -71,7 +71,9 @@ class PluginInstallService:
             "stderr": run_pip_install_dbt.stderr,
         }
 
-    def install_all_plugins(self, status_cb):
+    def install_all_plugins(self, status_cb=None):
+        if status_cb is None:
+            status_cb = lambda *a, **k: None
         config_yml = self.add_service.meltano_yml
         approved_keys = [
             PluginDiscoveryService.EXTRACTORS,
