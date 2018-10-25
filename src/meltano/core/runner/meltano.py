@@ -2,7 +2,7 @@ import importlib
 import click
 import logging
 
-from meltano.support.error import Error
+from meltano.core.error import Error
 from . import Runner
 
 

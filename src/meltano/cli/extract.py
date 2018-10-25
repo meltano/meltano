@@ -1,7 +1,7 @@
 import click
 from . import cli
 from .params import db_options
-from meltano.support.runner.singer import SingerRunner
+from meltano.core.runner.singer import SingerRunner
 
 
 @cli.command()

@@ -1,11 +1,11 @@
 import click
 from . import cli
-from meltano.support.plugin_install_service import (
+from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallServicePluginNotFoundError,
 )
 
-from meltano.support.project_add_service import ProjectAddService
+from meltano.core.project_add_service import ProjectAddService
 
 
 def install_status_update(data):

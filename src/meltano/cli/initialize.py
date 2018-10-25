@@ -3,11 +3,11 @@ import yaml
 import click
 from urllib.parse import urlparse
 
-from meltano.support.project_init_service import (
+from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
 )
-from meltano.support.plugin_install_service import PluginInstallService
+from meltano.core.plugin_install_service import PluginInstallService
 from . import cli
 
 EXTRACTORS = "extractors"

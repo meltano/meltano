@@ -1,7 +1,7 @@
 from typing import Iterator
 
 import pandas as pd
-from meltano.support.extract_utils import tables_from_manifest
+from meltano.core.extract_utils import tables_from_manifest
 from sqlalchemy import MetaData
 
 sfdc_metadata = MetaData()

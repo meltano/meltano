@@ -3,8 +3,8 @@ import os
 import json
 
 from unittest import mock
-from meltano.support.job import Job, State
-from meltano.support.runner.singer import SingerRunner
+from meltano.core.job import Job, State
+from meltano.core.runner.singer import SingerRunner
 from pathlib import Path
 
 

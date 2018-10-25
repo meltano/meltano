@@ -1,6 +1,6 @@
 import pytest
 
-from meltano.support.job import Job, State
+from meltano.core.job import Job, State
 from datetime import datetime
 
 
