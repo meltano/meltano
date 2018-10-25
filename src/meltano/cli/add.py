@@ -13,20 +13,49 @@ from meltano.support.plugin_install_service import (
     PluginInstallServicePluginNotFoundError,
 )
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.support.database_add_service import DatabaseAddService
 
 
-@cli.command()
-@click.argument(
-    "plugin_type",
-    type=click.Choice([ProjectAddService.EXTRACTOR, ProjectAddService.LOADER]),
+@cli.group()
+def add():
+    pass
+
+
+@add.command()
+@click.option("--name", prompt="Database connection name")
+@click.option("--host", prompt="Database host")
+@click.option("--database", prompt="Database database")
+@click.option("--schema", prompt="Database schema")
+@click.option("--username", prompt="Database username")
+@click.option(
+    "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
 )
-@click.argument("plugin_name")
-def add(plugin_type, plugin_name):
-    plugin_type = (
-        PluginDiscoveryService.EXTRACTORS
-        if plugin_type == ProjectAddService.EXTRACTOR
-        else PluginDiscoveryService.LOADERS
+def database(name, host, database, schema, username, password):
+    database_add_service = DatabaseAddService()
+    database_add_service.add(
+        name=name,
+        host=host,
+        database=database,
+        schema=schema,
+        username=username,
+        password=password,
     )
+    click.secho("database yml file updated", fg="green")
+
+
+@add.command()
+@click.argument("plugin_name")
+def extractor(plugin_name):
+    add_plugin(PluginDiscoveryService.EXTRACTORS, plugin_name)
+
+
+@add.command()
+@click.argument("plugin_name")
+def loader(plugin_name):
+    add_plugin(PluginDiscoveryService.LOADERS, plugin_name)
+
+
+def add_plugin(plugin_type, plugin_name):
     try:
         add_service = ProjectAddService(plugin_type, plugin_name)
         add_service.add()
