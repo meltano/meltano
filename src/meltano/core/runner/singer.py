@@ -7,12 +7,28 @@ from pathlib import Path
 
 import click
 from . import Runner
-from meltano.core.job import Job, JobFinder
+fsupportrom meltano.core.job import Job, JobFinder
+from meltano.core.venv_service import VenvService
+from meltano.core.project import Project
+from meltano.core.plugin import PluginType
+
+# from meltano.support.config_service import ConfigService
 
 
-def envsubst(src: Path, dst: Path):
+class ConfigService:
+    def __init__(self, project: Project):
+        self.project = project
+
+    def database(self, database: str):
+        return os.environ.copy()
+
+
+def envsubst(src: Path, dst: Path, env={}):
+    env_override = os.environ.copy()
+    env_override.update(env)
+
     with src.open() as i, dst.open("w+") as o:
-        subprocess.Popen(["envsubst"], stdin=i, stdout=o)
+        subprocess.Popen(["envsubst"], stdin=i, stdout=o, env=env_override)
 
 
 def file_has_data(file: Path):
@@ -20,14 +36,22 @@ def file_has_data(file: Path):
 
 
 class SingerRunner(Runner):
-    def __init__(self, job_id, **config):
+    def __init__(
+        self,
+        project: Project,
+        job_id,
+        venv_service: VenvService = None,
+        config_service: ConfigService = None,
+        **config,
+    ):
+        self.project = project
         self.job_id = job_id
-        self.job = Job(elt_uri=self.job_id)
+        self.venv_service = venv_service or VenvService(project)
+        self.config_service = config_service or ConfigService(project)
+        self.config = config
 
+        self.job = Job(elt_uri=self.job_id)
         self.run_dir = Path(config.get("run_dir", os.getenv("SINGER_RUN_DIR")))
-        self.venvs_dir = Path(
-            config.get("venvs_dir", os.getenv("SINGER_VENVS_DIR", "/venvs"))
-        )
         self.tap_config_dir = Path(
             config.get(
                 "tap_config_dir", os.getenv("SINGER_TAP_CONFIG_DIR", "/etc/singer/tap")
@@ -40,7 +64,6 @@ class SingerRunner(Runner):
             )
         )
         self.tap_output_path = config.get("tap_output_path")
-
         self.tap_files = {
             "config": self.run_dir.joinpath("tap.config.json"),
             "catalog": self.run_dir.joinpath("tap.properties.json"),
@@ -51,10 +74,16 @@ class SingerRunner(Runner):
             "state": self.run_dir.joinpath("new_state.json"),
         }
 
-    def exec_path(self, name) -> Path:
-        return self.venvs_dir.joinpath(name, "bin", name)
+    @property
+    def database(self):
+        return self.config.get("database", "default")
+
+    def exec_path(self, plugin_type, plugin_name) -> Path:
+        return self.project.venvs_dir(plugin_type, plugin_name, "bin", plugin_name)
 
     def prepare(self, tap: str, target: str):
+        os.makedirs(self.project.run_dir(), exist_ok=True)
+
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
         state_job = finder.latest_success()
@@ -79,7 +108,7 @@ class SingerRunner(Runner):
         }
 
         for dst, src in config_files.items():
-            envsubst(src, dst)
+            envsubst(src, dst, env=self.config_service.database(self.database))
 
     def stop(self, process, **wait_args):
         if process.stdin:
@@ -96,7 +125,7 @@ class SingerRunner(Runner):
 
     def invoke(self, tap: str, target: str):
         tap_args = [
-            self.exec_path(tap),
+            self.exec_path(PluginType.EXTRACTORS, tap),
             "-c",
             self.tap_files["config"],
             "--catalog",
@@ -111,7 +140,11 @@ class SingerRunner(Runner):
         if self.tap_output_path:
             tee_args += [self.tap_output_path]
 
-        target_args = [self.exec_path(target), "-c", self.target_files["config"]]
+        target_args = [
+            self.exec_path(PluginType.LOADERS, target),
+            "-c",
+            self.target_files["config"],
+        ]
 
         try:
             p_target, p_tee, p_tap = None, None, None
@@ -151,7 +184,19 @@ class SingerRunner(Runner):
             *_, last_state = state.readlines()
             self.job.payload["singer_state"] = json.loads(last_state)
 
-    def run(self, extractor_name: str, loader_name: str):
+    def dry_run(self, extractor_name: str, loader_name: str):
+        self.prepare(extractor_name, loader_name)
+        tap_exec = self.exec_path(PluginType.EXTRACTORS, extractor_name)
+        target_exec = self.exec_path(PluginType.LOADERS, loader_name)
+
+        logging.info("Dry run:")
+        logging.info(f"\textractor: {extractor_name} at '{tap_exec}'")
+        logging.info(f"\tloader: {extractor_name} at '{target_exec}'")
+
+    def run(self, extractor_name: str, loader_name: str, dry_run=False):
+        if dry_run:
+            return self.dry_run(extractor_name, loader_name)
+
         with self.job.run():
             self.prepare(extractor_name, loader_name)
             self.invoke(extractor_name, loader_name)
