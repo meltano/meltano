@@ -14,19 +14,21 @@ from meltano.support.plugin_install_service import (
 )
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
 
+@cli.group()
+def add():
+    pass
 
-@cli.command()
-@click.argument(
-    "plugin_type",
-    type=click.Choice([ProjectAddService.EXTRACTOR, ProjectAddService.LOADER]),
-)
+@add.command()
 @click.argument("plugin_name")
+def extractor(plugin_name):
+    add(PluginDiscoveryService.EXTRACTORS, plugin_name)
+
+@add.command()
+@click.argument("plugin_name")
+def loader(plugin_name):
+    add(PluginDiscoveryService.LOADERS, plugin_name)
+
 def add(plugin_type, plugin_name):
-    plugin_type = (
-        PluginDiscoveryService.EXTRACTORS
-        if plugin_type == ProjectAddService.EXTRACTOR
-        else PluginDiscoveryService.LOADERS
-    )
     try:
         add_service = ProjectAddService(plugin_type, plugin_name)
         add_service.add()
