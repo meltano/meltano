@@ -163,6 +163,7 @@ Once you have your project, you can run `meltano` against it.
   * `meltano discover loaders`: list only available loaders
 * `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 * `meltano transform [name of transformation] --warehouse [name of warehouse]`: 
+* `meltano elt <job_id> --extractor <extractor> --loader <loader> [--dry]`: Extract, Load, and Transform the data.
 
 ### Milestones
 
