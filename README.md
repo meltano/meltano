@@ -157,8 +157,8 @@ Here is a sample of what your project might look like:
 
 Once you have your project, you can run `meltano` against it.
 
-* `meltano init [project name]`: Create an empty meltano project.
-* {: #meltano-add}`meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your melatano.yml file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
+* {: #meltano-add}`meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your meltano.yml file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
+* `meltano list [extractors | loaders]`: Shows a list of extractors or loaders currently installed.
 * `meltano install`: Installs all the dependencies of your project based on the `meltano.yml` file.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
