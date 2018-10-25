@@ -5,6 +5,7 @@ import subprocess
 from meltano.support.project_add_service import ProjectAddService
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
 from meltano.support.venv_service import VenvService
+from .plugin import PluginType
 from .project import Project
 
 
@@ -27,7 +28,7 @@ class PluginInstallService:
         self.plugin_name = plugin_name
         self.discovery_service = discovery_service or PluginDiscoveryService()
         self.venv_service = venv_service or VenvService(project)
-        self.add_service = add_service or AddService(project)
+        self.add_service = add_service or ProjectAddService(project)
         self.plugin_url = None
 
     def get_plugin_url(self):

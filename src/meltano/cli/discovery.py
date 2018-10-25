@@ -3,6 +3,7 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
+from meltano.support.plugin import PluginType
 from meltano.support.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginDiscoveryInvalidJSONError,
@@ -14,9 +15,9 @@ from meltano.support.plugin_discovery_service import (
     "plugin_type",
     type=click.Choice(
         [
-            PluginDiscoveryService.EXTRACTORS,
-            PluginDiscoveryService.LOADERS,
-            PluginDiscoveryService.ALL,
+            PluginType.EXTRACTORS,
+            PluginType.LOADERS,
+            PluginType.ALL,
         ]
     ),
 )
