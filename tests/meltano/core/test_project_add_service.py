@@ -3,10 +3,7 @@ import yaml
 import os
 import shutil
 
-from meltano.support.project_add_service import (
-    ProjectAddService,
-    MissingPluginException,
-)
+from meltano.core.project_add_service import ProjectAddService, MissingPluginException
 
 
 class TestProjectAddService:

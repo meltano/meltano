@@ -1,7 +1,7 @@
 from unittest.mock import patch
 from click.testing import CliRunner
 from meltano.cli import cli
-from meltano.support.runner.singer import SingerRunner
+from meltano.core.runner.singer import SingerRunner
 
 
 PERFORM_TEST_ARGS = ["extract", "test", "tap-test", "--loader_name", "target-test"]

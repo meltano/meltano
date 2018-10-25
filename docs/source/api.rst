@@ -4,6 +4,6 @@ API Reference
 Meltano Support
 ---------------
 
-.. automodule:: meltano.support.utils
+.. automodule:: meltano.core.utils
     :members:
     :undoc-members:

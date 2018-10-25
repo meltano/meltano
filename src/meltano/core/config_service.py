@@ -1,6 +1,6 @@
 import os
 import yaml
-from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
 
 class ConfigService:

@@ -1,4 +1,4 @@
-from meltano.support.db import DB, SystemModel
+from meltano.core.db import DB, SystemModel
 
 
 class Runner:

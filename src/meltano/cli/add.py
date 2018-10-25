@@ -4,17 +4,17 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
-from meltano.support.project_add_service import (
+from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
 )
-from meltano.support.plugin_install_service import (
+from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallServicePluginNotFoundError,
 )
-from meltano.support.plugin import PluginType
-from meltano.support.database_add_service import DatabaseAddService
-from meltano.support.project import Project
+from meltano.core.plugin import PluginType
+from meltano.core.database_add_service import DatabaseAddService
+from meltano.core.project import Project
 
 
 @cli.group()

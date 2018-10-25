@@ -3,7 +3,7 @@ import yaml
 import os
 import shutil
 
-from meltano.support.database_add_service import DatabaseAddService
+from meltano.core.database_add_service import DatabaseAddService
 
 
 class TestDatabaseAddService:
