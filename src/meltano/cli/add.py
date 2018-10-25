@@ -13,26 +13,47 @@ from meltano.support.plugin_install_service import (
     PluginInstallServicePluginNotFoundError,
 )
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.support.database_add_service import DatabaseAddService
 
 
 @cli.group()
 def add():
     pass
 
+@add.command()
+@click.option("--name", prompt="Warehouse connection name")
+@click.option("--host", prompt="Warehouse host")
+@click.option("--database", prompt="Warehouse database")
+@click.option("--schema", prompt="Warehouse schema")
+@click.option("--username", prompt="Warehouse username")
+@click.option(
+    "--password", prompt="Warehouse password", hide_input=True, confirmation_prompt=True
+)
+def database(name, host, database, schema, username, password):
+    database_add_service = DatabaseAddService()
+    database_add_service.add(
+        name=name,
+        host=host,
+        database=database,
+        schema=schema,
+        username=username,
+        password=password,
+    )
+    click.secho("database yml file updated", fg="green")
 
 @add.command()
 @click.argument("plugin_name")
 def extractor(plugin_name):
-    add(PluginDiscoveryService.EXTRACTORS, plugin_name)
+    add_plugin(PluginDiscoveryService.EXTRACTORS, plugin_name)
 
 
 @add.command()
 @click.argument("plugin_name")
 def loader(plugin_name):
-    add(PluginDiscoveryService.LOADERS, plugin_name)
+    add_plugin(PluginDiscoveryService.LOADERS, plugin_name)
 
 
-def add(plugin_type, plugin_name):
+def add_plugin(plugin_type, plugin_name):
     try:
         add_service = ProjectAddService(plugin_type, plugin_name)
         add_service.add()
