@@ -20,6 +20,7 @@ from meltano.support.database_add_service import DatabaseAddService
 def add():
     pass
 
+
 @add.command()
 @click.option("--name", prompt="Database connection name")
 @click.option("--host", prompt="Database host")
@@ -40,6 +41,7 @@ def database(name, host, database, schema, username, password):
         password=password,
     )
     click.secho("database yml file updated", fg="green")
+
 
 @add.command()
 @click.argument("plugin_name")
