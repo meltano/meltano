@@ -1,6 +1,0 @@
-fastly_line_items:
-    constraints: 
-        not_null: 
-        - id
-        unique:
-        - id

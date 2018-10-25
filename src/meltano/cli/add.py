@@ -12,8 +12,9 @@ from meltano.support.plugin_install_service import (
     PluginInstallService,
     PluginInstallServicePluginNotFoundError,
 )
-from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.support.plugin import PluginType
 from meltano.support.database_add_service import DatabaseAddService
+from meltano.support.project import Project
 
 
 @cli.group()
@@ -31,7 +32,8 @@ def add():
     "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
 )
 def database(name, host, database, schema, username, password):
-    database_add_service = DatabaseAddService()
+    project = Project.find()
+    database_add_service = DatabaseAddService(project)
     database_add_service.add(
         name=name,
         host=host,
@@ -46,34 +48,28 @@ def database(name, host, database, schema, username, password):
 @add.command()
 @click.argument("plugin_name")
 def extractor(plugin_name):
-    add_plugin(PluginDiscoveryService.EXTRACTORS, plugin_name)
+    project = Project.find()
+    add_plugin(project, PluginType.EXTRACTORS, plugin_name)
 
 
 @add.command()
 @click.argument("plugin_name")
 def loader(plugin_name):
-    add_plugin(PluginDiscoveryService.LOADERS, plugin_name)
+    project = Project.find()
+    add_plugin(project, PluginType.LOADERS, plugin_name)
 
 
-def add_plugin(plugin_type, plugin_name):
+def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
-        add_service = ProjectAddService(plugin_type, plugin_name)
+        add_service = ProjectAddService(project, plugin_type, plugin_name)
         add_service.add()
         click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
-    except ProjectMissingYMLFileException as e:
-        click.secho(
-            "Are you in the right directory? I don't see a meltano.yml file here.",
-            fg="red",
-        )
-        raise click.Abort()
     except PluginNotSupportedException:
         click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
         raise click.Abort()
 
-    discovery_service = PluginDiscoveryService()
-    install_service = PluginInstallService(plugin_type, plugin_name, discovery_service)
-
     try:
+        install_service = PluginInstallService(project, plugin_type, plugin_name)
         click.secho("Activating your virtual environment", fg="green")
         run_venv = install_service.create_venv()
 
@@ -84,13 +80,6 @@ def add_plugin(plugin_type, plugin_name):
     except PluginInstallServicePluginNotFoundError as e:
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
-
-    click.secho("Installing DBT...", fg="green")
-    run_install_dbt = install_service.install_dbt()
-    if run_install_dbt["stdout"]:
-        click.echo(run_install_dbt["stdout"])
-    if run_install_dbt["stderr"]:
-        click.secho(run_install_dbt["stderr"], fg="red")
 
     click.secho(f"Installing {plugin_name} via pip...", fg="green")
     run_install_plugin = install_service.install_plugin()

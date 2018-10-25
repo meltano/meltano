@@ -1,4 +1,5 @@
 import os, json
+from .plugin import PluginType
 
 
 class PluginDiscoveryInvalidJSONError(Exception):
@@ -7,10 +8,6 @@ class PluginDiscoveryInvalidJSONError(Exception):
 
 
 class PluginDiscoveryService:
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    ALL = "all"
-
     def __init__(self):
         self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
         self.discovery_data = None
@@ -23,21 +20,17 @@ class PluginDiscoveryService:
             except Exception as e:
                 raise PluginDiscoveryInvalidJSONError()
 
-    def discover(self, plugin_type):
+    def discover(self, plugin_type: PluginType):
         with open(self.discovery_file) as f:
             try:
                 self.discovery_data = json.load(f)
             except Exception as e:
                 raise PluginDiscoveryInvalidJSONError()
 
-        if plugin_type == PluginDiscoveryService.ALL:
+        if plugin_type == PluginType.ALL:
             return {
-                PluginDiscoveryService.EXTRACTORS: self.list_discovery(
-                    PluginDiscoveryService.EXTRACTORS
-                ),
-                PluginDiscoveryService.LOADERS: self.list_discovery(
-                    PluginDiscoveryService.LOADERS
-                ),
+                PluginType.EXTRACTORS: self.list_discovery(PluginType.EXTRACTORS),
+                PluginType.LOADERS: self.list_discovery(PluginType.LOADERS),
             }
         else:
             return {plugin_type: self.list_discovery(plugin_type)}

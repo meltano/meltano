@@ -1,8 +1,12 @@
 import os
 import yaml
 import subprocess
+
 from meltano.support.project_add_service import ProjectAddService
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
+from meltano.support.venv_service import VenvService
+from .plugin import PluginType
+from .project import Project
 
 
 class PluginInstallServicePluginNotFoundError(Exception):
@@ -12,32 +16,30 @@ class PluginInstallServicePluginNotFoundError(Exception):
 class PluginInstallService:
     def __init__(
         self,
-        plugin_type=None,
-        plugin_name=None,
+        project: Project,
+        plugin_type,
+        plugin_name,
         discovery_service=None,
+        venv_service=None,
         add_service=None,
     ):
-        self.discovery_service = discovery_service or PluginDiscoveryService()
-        self.add_service = add_service or ProjectAddService()
+        self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
+        self.discovery_service = discovery_service or PluginDiscoveryService()
+        self.venv_service = venv_service or VenvService(project)
+        self.add_service = add_service or ProjectAddService(project)
         self.plugin_url = None
-        self.path_to_plugin = None
-        self.path_to_pip_install = None
 
     def get_plugin_url(self):
         discover_json = self.discovery_service.discover_json()
         return discover_json[self.plugin_type].get(self.plugin_name)
 
     def get_path_to_plugin(self):
-        self.path_to_plugin = os.path.join(
-            "./", ".meltano", "venvs", self.plugin_type, self.plugin_name
-        )
-        return self.path_to_plugin
+        return self.project.venvs_dir(self.plugin_type, self.plugin_name)
 
     def get_path_to_pip_install(self):
-        self.get_path_to_plugin()
-        self.path_to_pip_install = os.path.join(self.path_to_plugin, "bin", "pip")
+        return self.get_path_to_plugin().joinpath("bin", "pip")
 
     def create_venv(self):
         self.plugin_url = self.get_plugin_url()
@@ -45,40 +47,15 @@ class PluginInstallService:
         if not self.plugin_url:
             raise PluginInstallServicePluginNotFoundError()
 
-        self.get_path_to_plugin()
-
-        os.makedirs(self.path_to_plugin, exist_ok=True)
-        run_venv = subprocess.run(
-            ["python", "-m", "venv", "--upgrade", self.path_to_plugin],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
+        return self.venv_service.create(
+            namespace=self.plugin_type, name=self.plugin_name
         )
-
-        return {"stdout": run_venv.stdout, "stderr": run_venv.stderr}
-
-    def install_dbt(self):
-        self.get_path_to_pip_install()
-        run_pip_install_dbt = subprocess.run(
-            [self.path_to_pip_install, "install", "dbt"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
-        )
-
-        return {
-            "stdout": run_pip_install_dbt.stdout,
-            "stderr": run_pip_install_dbt.stderr,
-        }
 
     def install_all_plugins(self, status_cb=None):
         if status_cb is None:
             status_cb = lambda *a, **k: None
         config_yml = self.add_service.meltano_yml
-        approved_keys = [
-            PluginDiscoveryService.EXTRACTORS,
-            PluginDiscoveryService.LOADERS,
-        ]
+        approved_keys = [PluginType.EXTRACTORS, PluginType.LOADERS]
         errors = []
         installed = []
         for kind, plugins in config_yml.items():
@@ -100,7 +77,6 @@ class PluginInstallService:
                         )
                         continue
                     self.create_venv()
-                    self.install_dbt()
                     self.install_plugin()
                     installed.append(
                         {"plugin_type": kind, "plugin": plugin, "status": "success"}
@@ -112,12 +88,6 @@ class PluginInstallService:
         return {"errors": errors, "installed": installed}
 
     def install_plugin(self):
-        self.get_path_to_pip_install()
-        run_pip_install = subprocess.run(
-            [self.path_to_pip_install, "install", self.plugin_url],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
+        return self.venv_service.install(
+            namespace=self.plugin_type, name=self.plugin_name, pip_url=self.plugin_url
         )
-
-        return {"stdout": run_pip_install.stdout, "stderr": run_pip_install.stderr}
