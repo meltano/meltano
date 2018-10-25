@@ -45,13 +45,15 @@ class ProjectInitService:
     def echo_instructions(self):
         click.secho(f"🚀\t{self.project}", fg="green", nl=False)
         click.echo(" has been created. Next steps:")
-        click.secho("1.\tRun", nl=False)
+        click.echo(f"🚪\tcd ", nl=False)
+        click.secho(self.project, fg="green")
+        click.secho("🏃\tRun", nl=False)
         click.secho(" pip install", fg="green")
-        click.echo("2.\tRead the Meltano README.")
+        click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
-            "\thttps://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"
+            " https://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"
         )
-        click.echo("3.\tEdit the meltano.yml file.")
+        click.echo("✏️\tEdit the meltano.yml file.")
 
     def join_with_project_base(self, filename):
         return os.path.join(".", self.project, filename)
