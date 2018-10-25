@@ -21,13 +21,13 @@ def add():
     pass
 
 @add.command()
-@click.option("--name", prompt="Warehouse connection name")
-@click.option("--host", prompt="Warehouse host")
-@click.option("--database", prompt="Warehouse database")
-@click.option("--schema", prompt="Warehouse schema")
-@click.option("--username", prompt="Warehouse username")
+@click.option("--name", prompt="Database connection name")
+@click.option("--host", prompt="Database host")
+@click.option("--database", prompt="Database database")
+@click.option("--schema", prompt="Database schema")
+@click.option("--username", prompt="Database username")
 @click.option(
-    "--password", prompt="Warehouse password", hide_input=True, confirmation_prompt=True
+    "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
 )
 def database(name, host, database, schema, username, password):
     database_add_service = DatabaseAddService()
