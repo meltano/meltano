@@ -7,6 +7,10 @@ class PluginNotSupportedException(Exception):
     pass
 
 
+class MissingPluginException(Exception):
+    pass
+
+
 class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
@@ -28,6 +32,9 @@ class ProjectAddService:
             self.url = self.discovery_json.get(self.plugin_type).get(self.plugin_name)
 
     def add(self):
+        if not self.plugin_name or not self.plugin_type:
+            raise MissingPluginException("Plugin type or plugin name is not set")
+
         extract_dict = self.meltano_yml.get(self.plugin_type)
         if not extract_dict:
             self.meltano_yml[self.plugin_type] = []
