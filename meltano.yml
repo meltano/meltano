@@ -1,0 +1,4 @@
+extractors:
+- {name: first, url: 'git+https://gitlab.com/meltano/tap-first.git'}
+loaders:
+- {name: csv, url: 'git+https://gitlab.com/meltano/target-csv.git'}
