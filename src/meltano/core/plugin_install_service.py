@@ -32,8 +32,11 @@ class PluginInstallService:
         self.plugin_url = None
 
     def get_plugin_url(self):
-        discover_json = self.discovery_service.discover_json()
-        return discover_json[self.plugin_type].get(self.plugin_name)
+        plugin = self.discovery_service.find_plugin(
+            self.plugin_type,
+            self.plugin_name
+        )
+        return plugin.pip_url
 
     def get_path_to_plugin(self):
         return self.project.venvs_dir(self.plugin_type, self.plugin_name)
@@ -54,6 +57,7 @@ class PluginInstallService:
     def install_all_plugins(self, status_cb=None):
         if status_cb is None:
             status_cb = lambda *a, **k: None
+
         config_yml = self.add_service.meltano_yml
         approved_keys = [PluginType.EXTRACTORS, PluginType.LOADERS]
         errors = []

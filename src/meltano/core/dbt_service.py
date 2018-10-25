@@ -1,14 +1,18 @@
 import subprocess
 import logging
 
+from .venv_service import VenvService
+
 
 class DbtService:
-    def __init__(self, project):
+    def __init__(self, project,
+                 venv_service: VenvService = None):
         self.project = project
+        self.venv_service = venv_service or VenvService(project)
 
     @property
     def exec_path(self):
-        return self.project.venvs_dir("dbt", "bin", "dbt")
+        return self.venv_service.exec_path("dbt")
 
     def call(self, *args):
         logging.debug(f"Invoking: dbt {args}")

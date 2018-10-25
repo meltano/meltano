@@ -1,6 +1,0 @@
-{
-    "email": "$ZENDESK_EMAIL",
-    "api_token": "$ZENDESK_API_TOKEN",
-    "subdomain": "$ZENDESK_SUBDOMAIN",
-    "start_date": "$ZENDESK_START_DATE"
-}

@@ -4,6 +4,7 @@ import click
 
 from .project import Project
 from .venv_service import VenvService
+from .dbt_service import DbtService
 
 
 class ProjectInitServiceError(Exception):
@@ -69,3 +70,6 @@ class ProjectInitService:
         venv_service = VenvService(project)
         venv_service.create(name="dbt")
         venv_service.install(name="dbt", pip_url="dbt")
+
+        # run `dbt deps`
+        DbtService(project).deps()

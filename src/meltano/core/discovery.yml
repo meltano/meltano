@@ -1,0 +1,37 @@
+extractors:
+  - name: tap-first
+    pip_url: "git+https://gitlab.com/meltano/tap-first.git"
+    config:
+      api_key: "$GITLAB_API_TOKEN"
+  - name: tap-zendesk
+    pip_url: "tap-zendesk"
+    config:
+      email: "$ZENDESK_EMAIL"
+      api_token: "$ZENDESK_API_TOKEN"
+      subdomain: "$ZENDESK_SUBDOMAIN"
+      start_date: "$ZENDESK_START_DATE"
+loaders:
+  - name: target-csv
+    pip_url: "git+https://gitlab.com/meltano/target-csv.git"
+    config:
+      delimiter": "\t"
+      quotechar": "'"
+  - name: target-snowflake
+    pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
+    config:
+      account: "$SF_ACCOUNT"
+      username: "$SF_USER"
+      password: "$SF_PASSWORD"
+      role: "$SF_ROLE"
+      database: "$SF_DATABASE"
+      schema: "$SF_SCHEMA"
+      warehouse: "$SF_WAREHOUSE"
+  - name: target-postgres
+    pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
+    config:
+      host: "$PG_ADDRESS"
+      user: "$PG_USERNAME"
+      port: "$PG_PORT"
+      password: "$PG_PASSWORD"
+      dbname: "$PG_DATABASE"
+      schema: "$PG_SCHEMA"

@@ -1,8 +1,10 @@
 import os
 import json
 import yaml
+import logging
 
 from .project import Project
+from .plugin_discovery_service import PluginDiscoveryService
 
 
 class PluginNotSupportedException(Exception):
@@ -17,13 +19,14 @@ class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
 
-    def __init__(self, project: Project, plugin_type=None, plugin_name=None):
+    def __init__(self, project: Project,
+                 plugin_type=None,
+                 plugin_name=None,
+                 discovery_service: PluginDiscoveryService = None):
         self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
-
-        self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.json")
-        self.discovery_json = json.load(open(self.discovery_file))
+        self.discovery_service = discovery_service or PluginDiscoveryService()
 
         try:
             self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
@@ -32,12 +35,10 @@ class ProjectAddService:
             self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
 
         if self.plugin_type:
-            self.url = self.discovery_json.get(self.plugin_type, {}).get(
-                self.plugin_name
-            )
+            self.plugin = self.discovery_service.find_plugin(self.plugin_type, self.plugin_name)
 
     def add(self):
-        if not self.plugin_name or not self.plugin_type:
+        if not self.plugin:
             raise MissingPluginException("Plugin type or plugin name is not set")
 
         extract_dict = self.meltano_yml.get(self.plugin_type)
@@ -45,24 +46,30 @@ class ProjectAddService:
             self.meltano_yml[self.plugin_type] = []
             extract_dict = self.meltano_yml.get(self.plugin_type)
 
-        try:
-            found_extractor = next(
-                (
-                    plugin
-                    for plugin in extract_dict
-                    if plugin["name"] == self.plugin_name
-                )
-            )
+        if self.plugin.pip_url is not None:
+            self.add_to_file()
+            self.add_config_stub()
+        else:
+            raise PluginNotSupportedException()
 
-        except Exception as e:
-            if self.url is not None:
-                self.add_to_file()
-            else:
-                raise PluginNotSupportedException()
-
+    def add_config_stub(self):
+        plugin_dir = self.project.meltano_dir(self.plugin_type, self.plugin_name)
+        os.makedirs(plugin_dir, exist_ok=True)
+        
+        with open(plugin_dir.joinpath(f"{self.plugin_name}.config.json"), "w") as config:
+            json.dump(self.plugin.config, config)
+        
     def add_to_file(self):
-        self.meltano_yml[self.plugin_type].append(
-            {"name": self.plugin_name, "url": self.url}
-        )
+        exists = any(p['name'] == self.plugin_name
+                     for p in self.meltano_yml.get(self.plugin_type, []))
+
+        if exists:
+            logging.warn(f"{self.plugin_name} is already present, use `meltano install` to install it.")
+            return
+        
+        self.meltano_yml[self.plugin_type].append({
+            "name": self.plugin.name,
+            "url": self.plugin.pip_url,
+        })
         with open(self.project.meltanofile, "w") as f:
             f.write(yaml.dump(self.meltano_yml))

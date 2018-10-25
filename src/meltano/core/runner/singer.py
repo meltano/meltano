@@ -51,17 +51,17 @@ class SingerRunner(Runner):
         self.config = config
 
         self.job = Job(elt_uri=self.job_id)
-        self.run_dir = Path(config.get("run_dir", os.getenv("SINGER_RUN_DIR")))
+        self.run_dir = Path(
+            config.get("run_dir", "/run/singer")
+        )
         self.tap_config_dir = Path(
-            config.get(
-                "tap_config_dir", os.getenv("SINGER_TAP_CONFIG_DIR", "/etc/singer/tap")
-            )
+            config.get("tap_config_dir", "/etc/singer/tap")
+        )
+        self.tap_catalog_dir = Path(
+            config.get("tap_catalog_dir", self.tap_config_dir)
         )
         self.target_config_dir = Path(
-            config.get(
-                "target_config_dir",
-                os.getenv("SINGER_TARGET_CONFIG_DIR", "/etc/singer/target"),
-            )
+            config.get("target_config_dir", "/etc/singer/target")
         )
         self.tap_output_path = config.get("tap_output_path")
         self.tap_files = {
@@ -79,7 +79,7 @@ class SingerRunner(Runner):
         return self.config.get("database", "default")
 
     def exec_path(self, plugin_type, plugin_name) -> Path:
-        return self.project.venvs_dir(plugin_type, plugin_name, "bin", plugin_name)
+        return self.venv_service.exec_path(plugin_name, namespace=plugin_type)
 
     def prepare(self, tap: str, target: str):
         os.makedirs(self.project.run_dir(), exist_ok=True)
@@ -88,7 +88,7 @@ class SingerRunner(Runner):
             self.tap_files["config"]: self.tap_config_dir.joinpath(
                 f"{tap}.config.json"
             ),
-            self.tap_files["catalog"]: self.tap_config_dir.joinpath(
+            self.tap_files["catalog"]: self.tap_catalog_dir.joinpath(
                 f"{tap}.properties.json"
             ),
             self.target_files["config"]: self.target_config_dir.joinpath(
@@ -97,7 +97,10 @@ class SingerRunner(Runner):
         }
 
         for dst, src in config_files.items():
-            envsubst(src, dst, env=self.config_service.database(self.database))
+            try:
+                envsubst(src, dst, env=self.config_service.database(self.database))
+            except FileNotFoundError:
+                logging.warn(f"Could not find {src.name}, skipping.") 
 
     def stop(self, process, **wait_args):
         if process.stdin:
