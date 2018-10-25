@@ -14,19 +14,23 @@ from meltano.support.plugin_install_service import (
 )
 from meltano.support.plugin_discovery_service import PluginDiscoveryService
 
+
 @cli.group()
 def add():
     pass
+
 
 @add.command()
 @click.argument("plugin_name")
 def extractor(plugin_name):
     add(PluginDiscoveryService.EXTRACTORS, plugin_name)
 
+
 @add.command()
 @click.argument("plugin_name")
 def loader(plugin_name):
     add(PluginDiscoveryService.LOADERS, plugin_name)
+
 
 def add(plugin_type, plugin_name):
     try:
