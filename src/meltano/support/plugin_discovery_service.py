@@ -29,12 +29,8 @@ class PluginDiscoveryService:
 
         if plugin_type == PluginType.ALL:
             return {
-                PluginType.EXTRACTORS: self.list_discovery(
-                    PluginType.EXTRACTORS
-                ),
-                PluginType.LOADERS: self.list_discovery(
-                    PluginType.LOADERS
-                ),
+                PluginType.EXTRACTORS: self.list_discovery(PluginType.EXTRACTORS),
+                PluginType.LOADERS: self.list_discovery(PluginType.LOADERS),
             }
         else:
             return {plugin_type: self.list_discovery(plugin_type)}
