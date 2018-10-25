@@ -22,24 +22,30 @@ class PluginDiscoveryService:
                 raise PluginDiscoveryInvalidError()
 
     def plugins(self, plugin_type: PluginType):
-        return (Plugin(**plugin_def)
-                for plugin_def in self.discovery_data.get(plugin_type))
+        return (
+            Plugin(**plugin_def) for plugin_def in self.discovery_data.get(plugin_type)
+        )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
         try:
-            return next(plugin
-                        for plugin in self.plugins(plugin_type)
-                        if plugin.name == plugin_name)
+            return next(
+                plugin
+                for plugin in self.plugins(plugin_type)
+                if plugin.name == plugin_name
+            )
         except StopIteration:
             return None
 
     def discover(self, plugin_type: PluginType):
-        enabled_plugin_types = (PluginType.EXTRACTORS, PluginType.LOADERS) if PluginType.ALL else (plugin_type,)
+        enabled_plugin_types = (
+            (PluginType.EXTRACTORS, PluginType.LOADERS)
+            if PluginType.ALL
+            else (plugin_type,)
+        )
         return {
             plugin_type: self.list_discovery(plugin_type)
             for plugin_type in enabled_plugin_types
         }
 
     def list_discovery(self, discovery):
-        return "\n".join(plugin.name
-                         for plugin in self.plugins(discovery))
+        return "\n".join(plugin.name for plugin in self.plugins(discovery))

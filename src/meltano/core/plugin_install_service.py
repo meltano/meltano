@@ -32,10 +32,7 @@ class PluginInstallService:
         self.plugin_url = None
 
     def get_plugin_url(self):
-        plugin = self.discovery_service.find_plugin(
-            self.plugin_type,
-            self.plugin_name
-        )
+        plugin = self.discovery_service.find_plugin(self.plugin_type, self.plugin_name)
         return plugin.pip_url
 
     def get_path_to_plugin(self):

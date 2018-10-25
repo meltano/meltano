@@ -5,8 +5,7 @@ from .venv_service import VenvService
 
 
 class DbtService:
-    def __init__(self, project,
-                 venv_service: VenvService = None):
+    def __init__(self, project, venv_service: VenvService = None):
         self.project = project
         self.venv_service = venv_service or VenvService(project)
 
