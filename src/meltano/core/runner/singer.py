@@ -7,7 +7,7 @@ from pathlib import Path
 
 import click
 from . import Runner
-fsupportrom meltano.core.job import Job, JobFinder
+from meltano.core.job import Job, JobFinder
 from meltano.core.venv_service import VenvService
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
@@ -51,15 +51,9 @@ class SingerRunner(Runner):
         self.config = config
 
         self.job = Job(elt_uri=self.job_id)
-        self.run_dir = Path(
-            config.get("run_dir", "/run/singer")
-        )
-        self.tap_config_dir = Path(
-            config.get("tap_config_dir", "/etc/singer/tap")
-        )
-        self.tap_catalog_dir = Path(
-            config.get("tap_catalog_dir", self.tap_config_dir)
-        )
+        self.run_dir = Path(config.get("run_dir", "/run/singer"))
+        self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
+        self.tap_catalog_dir = Path(config.get("tap_catalog_dir", self.tap_config_dir))
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")
         )
@@ -100,7 +94,7 @@ class SingerRunner(Runner):
             try:
                 envsubst(src, dst, env=self.config_service.database(self.database))
             except FileNotFoundError:
-                logging.warn(f"Could not find {src.name}, skipping.") 
+                logging.warn(f"Could not find {src.name}, skipping.")
 
     def stop(self, process, **wait_args):
         if process.stdin:
@@ -118,7 +112,8 @@ class SingerRunner(Runner):
     def invoke(self, tap: str, target: str):
         tap_args = [
             self.exec_path(PluginType.EXTRACTORS, tap),
-            "--config", self.tap_files["config"]
+            "--config",
+            self.tap_files["config"],
         ]
 
         if file_has_data(self.tap_files["catalog"]):
@@ -180,7 +175,9 @@ class SingerRunner(Runner):
     def bookmark(self):
         state_file = self.target_files["state"]
         if not file_has_data(state_file):
-            logging.warn("State file is empty, this run will not update the incremental state.")
+            logging.warn(
+                "State file is empty, this run will not update the incremental state."
+            )
             return
 
         with state_file.open() as state:

@@ -3,8 +3,8 @@ import subprocess
 from io import StringIO
 
 from . import Runner
-from meltano.support.project import Project
-from meltano.support.dbt_service import DbtService
+from meltano.core.project import Project
+from meltano.core.dbt_service import DbtService
 
 
 class DbtRunner(Runner):

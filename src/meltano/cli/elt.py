@@ -4,10 +4,10 @@ import click
 
 from . import cli
 from .params import db_options
-from meltano.support.runner.singer import SingerRunner
-from meltano.support.runner.dbt import DbtRunner
-from meltano.support.project import Project
-from meltano.support.plugin import PluginType
+from meltano.core.runner.singer import SingerRunner
+from meltano.core.runner.dbt import DbtRunner
+from meltano.core.project import Project
+from meltano.core.plugin import PluginType
 
 
 @cli.command()
@@ -23,28 +23,30 @@ from meltano.support.plugin import PluginType
 )
 @click.option("--tap-output", help="Output tap stream to this file.")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
-@click.option("--transform", type=click.Choice(["skip", "only", "auto"]), default="auto")
+@click.option(
+    "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
+)
 def elt(job_id, extractor, loader, tap_output, dry, transform):
     project = Project.find()
-    singer_runner = SingerRunner(project,
-                                 job_id=job_id,
-                                 tap_output=tap_output,
-                                 run_dir=os.getenv(
-                                     "SINGER_RUN_DIR",
-                                     project.meltano_dir("run")
-                                 ),
-                                 target_config_dir=os.getenv(
-                                     "SINGER_TARGET_CONFIG_DIR",
-                                     project.meltano_dir(PluginType.LOADERS, loader)
-                                 ),
-                                 tap_config_dir=os.getenv(
-                                     "SINGER_TAP_CONFIG_DIR",
-                                     project.meltano_dir(PluginType.EXTRACTORS, extractor)
-                                 ),
-                                 tap_catalog_dir=os.getenv(
-                                     "SINGER_TAP_CATALOG_DIR",
-                                     project.root.joinpath("dbt_modules/meltano/extract/singer") # this is a hack
-                                 ))
+    singer_runner = SingerRunner(
+        project,
+        job_id=job_id,
+        tap_output=tap_output,
+        run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
+        target_config_dir=os.getenv(
+            "SINGER_TARGET_CONFIG_DIR", project.meltano_dir(PluginType.LOADERS, loader)
+        ),
+        tap_config_dir=os.getenv(
+            "SINGER_TAP_CONFIG_DIR",
+            project.meltano_dir(PluginType.EXTRACTORS, extractor),
+        ),
+        tap_catalog_dir=os.getenv(
+            "SINGER_TAP_CATALOG_DIR",
+            project.root.joinpath(
+                "dbt_modules/meltano/extract/singer"
+            ),  # this is a hack
+        ),
+    )
     dbt_runner = DbtRunner(project)
 
     try:
