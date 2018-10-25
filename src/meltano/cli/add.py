@@ -59,9 +59,7 @@ def loader(plugin_name):
     add_plugin(project, PluginType.LOADERS, plugin_name)
 
 
-def add_plugin(project: Project,
-               plugin_type: PluginType,
-               plugin_name: str):
+def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project, plugin_type, plugin_name)
         add_service.add()

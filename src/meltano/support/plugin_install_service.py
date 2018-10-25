@@ -13,10 +13,15 @@ class PluginInstallServicePluginNotFoundError(Exception):
 
 
 class PluginInstallService:
-    def __init__(self, project: Project, plugin_type, plugin_name,
-                 discovery_service=None,
-                 venv_service=None,
-                 add_service=None):
+    def __init__(
+        self,
+        project: Project,
+        plugin_type,
+        plugin_name,
+        discovery_service=None,
+        venv_service=None,
+        add_service=None,
+    ):
         self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
@@ -49,10 +54,7 @@ class PluginInstallService:
         if status_cb is None:
             status_cb = lambda *a, **k: None
         config_yml = self.add_service.meltano_yml
-        approved_keys = [
-            PluginType.EXTRACTORS,
-            PluginType.LOADERS,
-        ]
+        approved_keys = [PluginType.EXTRACTORS, PluginType.LOADERS]
         errors = []
         installed = []
         for kind, plugins in config_yml.items():

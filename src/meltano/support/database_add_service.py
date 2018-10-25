@@ -15,9 +15,7 @@ class DatabaseAddService:
         return s.upper() if upper else s.lower()
 
     def get_db_vars_file_path(self, **kwargs):
-        return self.project.meltano_dir(
-            f".database_{kwargs['root_name'].lower()}.yml"
-        )
+        return self.project.meltano_dir(f".database_{kwargs['root_name'].lower()}.yml")
 
     def add_additional_kwargs(self, **kwargs):
         root_name = self.environmentalize(kwargs["name"])

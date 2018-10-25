@@ -17,9 +17,7 @@ class ProjectAddService:
     EXTRACTOR = "extractor"
     LOADER = "loader"
 
-    def __init__(self, project: Project,
-                 plugin_type=None,
-                 plugin_name=None):
+    def __init__(self, project: Project, plugin_type=None, plugin_name=None):
         self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
@@ -32,9 +30,11 @@ class ProjectAddService:
         except Exception as e:
             self.project.meltanofile.open("a").close()
             self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
-            
+
         if self.plugin_type:
-            self.url = self.discovery_json.get(self.plugin_type, {}).get(self.plugin_name)
+            self.url = self.discovery_json.get(self.plugin_type, {}).get(
+                self.plugin_name
+            )
 
     def add(self):
         if not self.plugin_name or not self.plugin_type:
