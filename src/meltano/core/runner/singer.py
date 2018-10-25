@@ -7,7 +7,7 @@ from pathlib import Path
 
 import click
 from . import Runner
-from meltano.support.job import Job, JobFinder
+from meltano.core.job import Job, JobFinder
 
 
 def envsubst(src: Path, dst: Path):

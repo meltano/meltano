@@ -3,7 +3,7 @@ import yaml
 import os
 import shutil
 
-from meltano.support.config_service import ConfigService
+from meltano.core.config_service import ConfigService
 
 
 def make_meltano_yml():

@@ -5,7 +5,7 @@ from io import StringIO
 import pandas as pd
 from sqlalchemy import TIMESTAMP, DATE, DATETIME
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
-from meltano.support.runner.meltano import (
+from meltano.core.runner.meltano import (
     MeltanoRunner,
     ComponentNotFoundError,
     EXTRACTOR_REGISTRY,

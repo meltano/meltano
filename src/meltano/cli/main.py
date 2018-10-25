@@ -1,6 +1,6 @@
 import click
 
-from meltano.support.utils import setup_logging
+from meltano.core.utils import setup_logging
 from .params import db_options
 
 

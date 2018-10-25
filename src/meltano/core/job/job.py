@@ -6,8 +6,8 @@ from contextlib import contextmanager
 from enum import Enum
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
-from meltano.support.db import SystemModel, session_open
-from meltano.support.error import Error
+from meltano.core.db import SystemModel, session_open
+from meltano.core.error import Error
 
 
 class InconsistentStateError(Error):

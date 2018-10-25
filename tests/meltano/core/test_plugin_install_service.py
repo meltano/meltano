@@ -3,7 +3,7 @@ import yaml
 import os
 import shutil
 
-from meltano.support.plugin_install_service import (
+from meltano.core.plugin_install_service import (
     PluginInstallService,
     PluginInstallServicePluginNotFoundError,
 )
