@@ -2,6 +2,7 @@ import os
 import json
 from .plugin import PluginType
 
+
 class PluginDiscoveryInvalidJSONError(Exception):
     invalid_message = "Invalid JSON data in discovery.json"
     pass
