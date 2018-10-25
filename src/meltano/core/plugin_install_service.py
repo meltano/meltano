@@ -17,8 +17,8 @@ class PluginInstallService:
     def __init__(
         self,
         project: Project,
-        plugin_type,
-        plugin_name,
+        plugin_type=None,
+        plugin_name=None,
         discovery_service=None,
         venv_service=None,
         add_service=None,
