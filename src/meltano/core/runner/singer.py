@@ -84,17 +84,6 @@ class SingerRunner(Runner):
     def prepare(self, tap: str, target: str):
         os.makedirs(self.project.run_dir(), exist_ok=True)
 
-        # the `state.json` is stored in the database
-        finder = JobFinder(self.job_id)
-        state_job = finder.latest_success()
-
-        if state_job:
-            logging.info(f"Found state from {state_job.started_at}.")
-            with self.tap_files["state"].open("w+") as state:
-                json.dump(state_job.payload["singer_state"], state)
-        else:
-            logging.warn("No state was found, complete import.")
-
         config_files = {
             self.tap_files["config"]: self.tap_config_dir.joinpath(
                 f"{tap}.config.json"
@@ -126,11 +115,11 @@ class SingerRunner(Runner):
     def invoke(self, tap: str, target: str):
         tap_args = [
             self.exec_path(PluginType.EXTRACTORS, tap),
-            "-c",
-            self.tap_files["config"],
-            "--catalog",
-            self.tap_files["catalog"],
+            "--config", self.tap_files["config"]
         ]
+
+        if file_has_data(self.tap_files["catalog"]):
+            tap_args += ["--catalog", self.tap_files["catalog"]]
 
         if file_has_data(self.tap_files["state"]):
             tap_args += ["--state", self.tap_files["state"]]
@@ -173,10 +162,23 @@ class SingerRunner(Runner):
                 f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code}), tee({tee_code})"
             )
 
+    def restore_bookmark(self):
+        # the `state.json` is stored in the database
+        finder = JobFinder(self.job_id)
+        state_job = finder.latest_success()
+
+        if state_job and "singer_state" in state_job.payload:
+            logging.info(f"Found state from {state_job.started_at}.")
+            with self.tap_files["state"].open("w+") as state:
+                json.dump(state_job.payload["singer_state"], state)
+        else:
+            logging.warn("No state was found, complete import.")
+
     def bookmark(self):
         state_file = self.target_files["state"]
         if not file_has_data(state_file):
-            raise Exception(f"Invalid state file: {state_file} is empty.")
+            logging.warn("State file is empty, this run will not update the incremental state.")
+            return
 
         with state_file.open() as state:
             # as per the Singer specification, only the _last_ state
@@ -198,6 +200,7 @@ class SingerRunner(Runner):
             return self.dry_run(extractor_name, loader_name)
 
         with self.job.run():
+            self.restore_bookmark()
             self.prepare(extractor_name, loader_name)
             self.invoke(extractor_name, loader_name)
             self.bookmark()

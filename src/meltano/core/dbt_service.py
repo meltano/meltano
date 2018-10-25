@@ -13,9 +13,7 @@ class DbtService:
     def call(self, *args):
         logging.debug(f"Invoking: dbt {args}")
         exec_args = list(map(str, [self.exec_path, *args]))
-        run = subprocess.run(exec_args, stdout=subprocess.PIPE)
-
-        logging.debug(run.stdout)
+        run = subprocess.run(exec_args)
 
         run.check_returncode()
         return run
@@ -30,5 +28,5 @@ class DbtService:
 
     def run(self):
         return self.call(
-            "run" "--profiles-dir", self.project.root, "--profile", "meltano"
+            "run", "--profiles-dir", self.project.root, "--profile", "meltano"
         )
