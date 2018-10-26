@@ -8,7 +8,14 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 
 
-PERFORM_TEST_ARGS = ["elt", "test", "--extractor", "tap-test", "--loader", "target-test"]
+PERFORM_TEST_ARGS = [
+    "elt",
+    "test",
+    "--extractor",
+    "tap-test",
+    "--loader",
+    "target-test",
+]
 
 
 def test_elt(request, project):
@@ -25,8 +32,9 @@ def test_elt(request, project):
     assert result.exit_code == 2
 
     # exit cleanly when everything is fine
-    with patch.object(SingerRunner, "perform", return_value=None), \
-         patch.object(DbtRunner, "perform", return_value=None):
+    with patch.object(SingerRunner, "perform", return_value=None), patch.object(
+        DbtRunner, "perform", return_value=None
+    ):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 0
 
