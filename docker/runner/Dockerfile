@@ -1,4 +1,5 @@
-FROM python:latest
+ARG BASE_IMAGE=meltano/meltano/cli
+FROM $BASE_IMAGE
 
 LABEL maintainer="Meltano Team <meltano@gitlab.com>"
 

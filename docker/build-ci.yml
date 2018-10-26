@@ -10,29 +10,25 @@
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
 
 # Builds the singer_runner container for use in testing on branches
-dev_singer_runner:
+dev_runner:
   <<: *kaniko_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
-    IMAGE_NAME: $CI_REGISTRY_IMAGE/singer_runner
-  before_script:
-    # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/runner:$CI_COMMIT_SHA#" $DOCKERFILE
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:$CI_COMMIT_SHA"
   except:
     - master
 
-singer_runner:
+runner:
   <<: *kaniko_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
-    IMAGE_NAME: $CI_REGISTRY_IMAGE/singer_runner
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     IMAGE_TAG: latest
-  before_script:
-    # replace the FROM ... in the Dockerfile to use this branch's image
-    - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/runner#" $DOCKERFILE
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli"
   only:
     refs:
       - master
