@@ -22,7 +22,7 @@ class Project:
 
         while not Project(".").meltanofile.exists():
             if os.getcwd() == "/":
-                raise Exception("Cannot go any further.")
+                raise Exception("Cannot find a meltano.yml file in your project")
 
             os.chdir("..")
 
