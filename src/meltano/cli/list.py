@@ -3,11 +3,17 @@ from . import cli
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 
+def all_command():
+    discovery_service = PluginDiscoveryService()
+    click.secho('Extractors', fg="green")
+    click.echo("\n".join(discovery_service.list(PluginType.EXTRACTORS)))
+    click.secho('Loaders', fg="green")
+    click.echo("\n".join(discovery_service.list(PluginType.LOADERS)))
 
-@cli.group()
+@click.group(invoke_without_command=True)
 def list():
-    pass
-
+    if ctx.invoked_subcommand is None:
+        all_command()
 
 @list.command()
 def extractors():
@@ -22,8 +28,4 @@ def loaders():
 
 @list.command()
 def all():
-    discovery_service = PluginDiscoveryService()
-    click.secho('Extractors', fg="green")
-    click.echo("\n".join(discovery_service.list(PluginType.EXTRACTORS)))
-    click.secho('Loaders', fg="green")
-    click.echo("\n".join(discovery_service.list(PluginType.LOADERS)))
+    all_command()
