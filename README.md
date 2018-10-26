@@ -42,6 +42,8 @@ Meltano runs many different types of files and projects including but not limite
 
 First install Meltano through `pip`, via
 
+**If you want to install Meltano in a venv: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment. See [this issue](https://gitlab.com/meltano/meltano/issues/141).**
+
 ```bash
 pip install meltano
 # clone the gitlab-runner project
@@ -156,7 +158,7 @@ Here is a sample of what your project might look like:
 Once you have your project, you can run `meltano` against it.
 
 * `meltano init [project name]`: Create an empty meltano project.
-* `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your meltano.yml file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
+* {: #meltano-add}`meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your melatano.yml file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
 * `meltano install`: Installs all the dependencies of your project based on the `meltano.yml` file.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
@@ -340,7 +342,7 @@ docker-compose up
 Run the following in your project directory:
 
 ```bash
-python -m virtualenv ~/path/to/melt_venv 
+python -m venv ~/path/to/melt_venv
 source ~/path/to/melt_venv/bin/activate
 pip install -r requirements.txt
 pip install -e '.[all]'
@@ -419,10 +421,7 @@ target-postgres==...
 
 ### Locally
 
-Use `pip` like you would for any python package. Make sure to install it into a python virtualenv. These are all options on the table.
-
-  - `pip install git+https://…@master
-  - `meltano install tap-zendesk` (uses `venv` python module)
+See [meltano-add](#meltano-add)
 
 ### On a CI
 
@@ -449,48 +448,6 @@ The Meltano product consists of three key components:
 As development progresses, additional documentation on getting started along with example configuration and CI scripts will become available.
 
 It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion.
-
-### Local environment
-
-#### On the host machine
-
-The local environment might differ for different ELT processes.
-The most standard setup uses Python 3.5.
-
-Customize the `.env.example` file according to your needs.
-
-```
-$ cp .env.example .env
-```
-
-Then, create the virtualenv using `pipenv`:
-```
-$ pipenv install --skip-lock
-$ pipenv shell
-```
-
-This installs the python dependencies that the ELT process needs.
-
-#### Using the docker stack
-
-A docker-compose configuration is also provided to start:
-
-  - a PostgreSQL instance (bizops-dw) for the data warehousing needs
-  - a Python3 container with the 
-  
-These containers will use environment variables defined in the Meltano project.
-To run:
-
-```
-$ docker-compose up -d
-$ docker-compose exec elt pipenv shell
-Loading .env environment variables…
-Spawning environment shell (/bin/bash). Use 'exit' to leave.
-source /root/.local/share/virtualenvs/bizops-YMzVKlMq/bin/activate
-(bizops-YMzVKlMq) root@b9951069d9cf:/bizops#
-```
-
-You should be ready to go!
 
 ## Meltano components
 
