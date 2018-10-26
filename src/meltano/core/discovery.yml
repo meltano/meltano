@@ -27,7 +27,7 @@ loaders:
       schema: "$SF_SCHEMA"
       warehouse: "$SF_WAREHOUSE"
   - name: target-postgres
-    pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
+    pip_url: "git+https://github.com/meltano/target-postgres.git"
     config:
       host: "$PG_ADDRESS"
       user: "$PG_USERNAME"
