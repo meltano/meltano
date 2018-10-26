@@ -1,2 +1,2 @@
 select *
-from '{{ source_table("runners") }}'
+from {{ source_table("runners") }}
