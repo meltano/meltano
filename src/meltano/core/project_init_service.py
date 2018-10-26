@@ -53,9 +53,22 @@ class ProjectInitService:
         click.secho(f"🚀\t{self.project_name}", fg="green", nl=False)
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
-        click.secho(self.project, fg="green")
+        click.secho(self.project_name, fg="green")
+        click.echo(f"✏️\tEdit", nl=False)
+        click.secho(" .env", fg="green")
+        click.echo(f"🏃\tRun", nl=False)
+        click.secho(" source .env", fg="green")
+        click.echo("Try it out:")
         click.secho("🏃\tRun", nl=False)
-        click.secho(" pip install", fg="green")
+        click.secho(" meltano add extractor tap-first", fg="green")
+        click.secho("🏃\tRun", nl=False)
+        click.secho(" meltano add loader target-postgres", fg="green")
+        click.secho("🏃\tRun", nl=False)
+        click.secho(
+            " meltano elt job_id1 --extractor tap-first --loader target-postgres",
+            fg="green",
+        )
+        click.echo("WOW! NEATO!")
         click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
             " https://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"
@@ -69,6 +82,3 @@ class ProjectInitService:
         venv_service = VenvService(project)
         venv_service.create(name="dbt")
         venv_service.install(name="dbt", pip_url="dbt")
-
-        # run `dbt deps`
-        DbtService(project).deps()

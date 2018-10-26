@@ -6,6 +6,7 @@ from . import cli
 from .params import db_options
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
+from meltano.core.dbt_service import DbtService
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
 
@@ -28,18 +29,15 @@ from meltano.core.plugin import PluginType
 )
 def elt(job_id, extractor, loader, tap_output, dry, transform):
     project = Project.find()
+    # run `dbt deps`
+    DbtService(project).deps()
     singer_runner = SingerRunner(
         project,
         job_id=job_id,
         tap_output=tap_output,
         run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
-        target_config_dir=os.getenv(
-            "SINGER_TARGET_CONFIG_DIR", project.meltano_dir(PluginType.LOADERS, loader)
-        ),
-        tap_config_dir=os.getenv(
-            "SINGER_TAP_CONFIG_DIR",
-            project.meltano_dir(PluginType.EXTRACTORS, extractor),
-        ),
+        target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
+        tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
         tap_catalog_dir=os.getenv(
             "SINGER_TAP_CATALOG_DIR",
             project.root.joinpath(

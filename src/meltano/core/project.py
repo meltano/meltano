@@ -12,6 +12,10 @@ class Project:
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root)
 
+    def chdir(self):
+        os.chdir(self.root)
+        self.root = Path(".")
+
     @classmethod
     def find(self, from_dir: Union[Path, str] = ".", chdir=True):
         """

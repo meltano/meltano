@@ -27,7 +27,7 @@ class DbtService:
         )
 
     def deps(self):
-        return self.call("deps")
+        return self.call("deps", "--profiles-dir", self.project.root)
 
     def run(self):
         return self.call(
