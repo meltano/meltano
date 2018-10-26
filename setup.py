@@ -54,9 +54,9 @@ setup(
     package_data={
         'meltano.api': [
             'node_modules',
-        ]
+        ],
+        'meltano.core': ['*.yml']
     },
-    include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
