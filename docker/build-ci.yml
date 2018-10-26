@@ -16,7 +16,7 @@
 dev_runner:
   <<: *kaniko_build
   variables:
-    DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
+    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:$CI_COMMIT_SHA"
   except:
@@ -25,7 +25,7 @@ dev_runner:
 runner:
   <<: *kaniko_build
   variables:
-    DOCKERFILE: $CI_PROJECT_DIR/orchestrate/singer/Dockerfile
+    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     IMAGE_TAG: latest
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli"
