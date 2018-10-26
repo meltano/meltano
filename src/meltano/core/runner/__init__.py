@@ -3,6 +3,7 @@ from meltano.core.db import DB, SystemModel
 
 class Runner:
     def before_run(self, *args, **kwargs):
+        DB.default.ensure_schema_exists("meltano")
         SystemModel.metadata.create_all(DB.default.engine)
 
     def run(self, *args, **kwargs):
