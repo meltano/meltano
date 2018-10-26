@@ -10,8 +10,9 @@ def all_command():
     click.secho('Loaders', fg="green")
     click.echo("\n".join(discovery_service.list(PluginType.LOADERS)))
 
-@click.group(invoke_without_command=True)
-def list():
+@cli.group(invoke_without_command=True)
+@click.pass_context
+def list(ctx):
     if ctx.invoked_subcommand is None:
         all_command()
 

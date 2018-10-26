@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 from meltano.core.utils import setup_logging
 
 
-@click.group(invoke_without_command=True)
+@click.group()
 @click.pass_context
 def cli(ctx):
     setup_logging()
