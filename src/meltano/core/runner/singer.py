@@ -94,7 +94,7 @@ class SingerRunner(Runner):
             try:
                 envsubst(src, dst, env=self.config_service.database(self.database))
             except FileNotFoundError:
-                logging.warn(f"Could not find {src.name}, skipping.")
+                logging.warn(f"Could not find {src.name} in {src.resolve()}, skipping.")
 
     def stop(self, process, **wait_args):
         if process.stdin:
