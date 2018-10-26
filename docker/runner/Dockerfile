@@ -1,4 +1,5 @@
-FROM python:latest
+ARG BASE_IMAGE=meltano/meltano/cli
+FROM $BASE_IMAGE
 
 LABEL maintainer="Meltano Team <meltano@gitlab.com>"
 
@@ -12,9 +13,4 @@ RUN echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
     && apt-get update \
     && apt-get install -y google-cloud-sdk \
-    && rm -rf /var/lib/apt/lists/*
-
-# system deps
-RUN apt-get update \
-    && apt-get install -y gettext-base \
     && rm -rf /var/lib/apt/lists/*

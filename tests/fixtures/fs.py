@@ -1,3 +1,4 @@
+import os
 import pytest
 import tempfile
 import shutil
@@ -15,3 +16,14 @@ def mkdtemp(request):
         return path
 
     return _mkdtemp
+
+
+@pytest.fixture(scope="session")
+def test_dir(tmp_path_factory):
+    test_dir = tmp_path_factory.mktemp("meltano_root")
+
+    try:
+        os.chdir(test_dir)
+        yield test_dir
+    finally:
+        shutil.rmtree(test_dir)

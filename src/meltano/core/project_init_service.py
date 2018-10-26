@@ -4,6 +4,7 @@ import click
 
 from .project import Project
 from .venv_service import VenvService
+from .dbt_service import DbtService
 
 
 class ProjectInitServiceError(Exception):
@@ -30,7 +31,6 @@ class ProjectInitService:
             else:
                 self.create_file(name, default_project_yaml[name])
 
-        self.install_dbt(new_project)
         return new_project
 
     def create_file(self, name, content):
@@ -69,3 +69,6 @@ class ProjectInitService:
         venv_service = VenvService(project)
         venv_service.create(name="dbt")
         venv_service.install(name="dbt", pip_url="dbt")
+
+        # run `dbt deps`
+        DbtService(project).deps()
