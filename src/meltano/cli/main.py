@@ -1,7 +1,11 @@
 import click
+import warnings
+
+# disable the psycopg2 warning
+# this needs to run before `psycopg2` is imported
+warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
 from meltano.core.utils import setup_logging
-from .params import db_options
 
 
 @click.group(invoke_without_command=True)
