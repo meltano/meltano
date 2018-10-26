@@ -19,3 +19,11 @@ def extractors():
 def loaders():
     discovery_service = PluginDiscoveryService()
     click.echo("\n".join(discovery_service.list(PluginType.LOADERS)))
+
+@list.command()
+def all():
+    discovery_service = PluginDiscoveryService()
+    click.secho('Extractors', fg="green")
+    click.echo("\n".join(discovery_service.list(PluginType.EXTRACTORS)))
+    click.secho('Loaders', fg="green")
+    click.echo("\n".join(discovery_service.list(PluginType.LOADERS)))
