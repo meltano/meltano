@@ -5,6 +5,7 @@ from meltano.core.plugin_install_service import (
     PluginInstallServicePluginNotFoundError,
 )
 
+from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 
 
@@ -22,8 +23,8 @@ def install_status_update(data):
 
 @cli.command()
 def install():
-    add_service = ProjectAddService()
-    install_service = PluginInstallService(None, None, None, add_service)
+    project = Project.find()
+    install_service = PluginInstallService(project)
     install_status = install_service.install_all_plugins(install_status_update)
     num_installed = len(install_status["installed"])
     click.secho(f"{num_installed} plugins installed successfully", fg="green")

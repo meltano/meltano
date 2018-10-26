@@ -3,7 +3,7 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache"
 
 include:
-  - "/orchestrate/singer/build-ci.yml"
+  - "/docker/build-ci.yml"
 
 stages:
   - lint
@@ -155,21 +155,21 @@ meltano:
   only:
     - master
 
-dev_meltano_runner:
+dev_meltano_cli:
   <<: *docker_build
   stage: build_base
   variables:
-    DOCKERFILE: docker/runner/Dockerfile
-    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    DOCKERFILE: docker/cli/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
   except:
     - master
 
-meltano_runner:
+meltano_cli:
   <<: *docker_build
   stage: build_base
   variables:
-    DOCKERFILE: docker/runner/Dockerfile
-    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    DOCKERFILE: docker/cli/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
     IMAGE_TAG: latest
   only:
     - master

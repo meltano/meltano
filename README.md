@@ -165,6 +165,7 @@ Once you have your project, you can run `meltano` against it.
   * `meltano discover loaders`: list only available loaders
 * `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 * `meltano transform [name of transformation] --warehouse [name of warehouse]`: 
+* `meltano elt <job_id> --extractor <extractor> --loader <loader> [--dry]`: Extract, Load, and Transform the data.
 
 ### Milestones
 
@@ -520,12 +521,13 @@ Meltano provides the following docker images:
 > Notes: All images are available in the GitLab's registry: `registry.gitlab.com`
   
   - `meltano/meltano`: Contains the API, CLI, and Meltano Analyze. This image should be deployed as Meltano Analyze.
-  - `meltano/meltano/singer_runner`: Contains the CLI, and all curated taps/targets pre-installed. This image should be used on the CI runner.
+  - `meltano/meltano/runner`: Contains the CLI and extra runner specific binaries. This image should be used on the CI runner. 
+  - `meltano/meltano/singer_runner`: **DEPRECATED: Use `meltano/meltano/runner` instead** Contains the CLI, and all curated taps/targets pre-installed.
 
 > Notes: These images are base images used as the basis of other images.
 
+  - `meltano/meltano/cli`: Contains the meltano cli
   - `meltano/meltano/base`: Contains the requirements for `meltano/meltano`
-  - `meltano/meltano/runner`: Contains the requirements for `meltano/meltano/singer_runner`
 
 ## Best practices
 

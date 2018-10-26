@@ -1,0 +1,34 @@
+# Build
+
+.kaniko_build: &kaniko_build
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
+    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
+    - mkdir -p /root/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
+
+# Builds the singer_runner container for use in testing on branches
+dev_runner:
+  <<: *kaniko_build
+  variables:
+    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:$CI_COMMIT_SHA"
+  except:
+    - master
+
+runner:
+  <<: *kaniko_build
+  variables:
+    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    IMAGE_TAG: latest
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli"
+  only:
+    refs:
+      - master

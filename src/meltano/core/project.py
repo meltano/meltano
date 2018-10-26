@@ -38,8 +38,8 @@ class Project:
     def meltano_dir(self, *joinpaths):
         return self.root.joinpath(".meltano", *joinpaths)
 
-    def venvs_dir(self, *joinpaths):
-        return self.meltano_dir("venvs", *joinpaths)
+    def venvs_dir(self, *prefixes):
+        return self.meltano_dir(*prefixes, "venv")
 
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
