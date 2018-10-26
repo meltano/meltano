@@ -21,7 +21,7 @@ def init(project_name):
     init_service = ProjectInitService(project_name)
     try:
         project = init_service.init()
-        click.echo('Installing dbt...')
+        click.echo("Installing dbt...")
         init_service.install_dbt(project)
         init_service.echo_instructions()
     except ProjectInitServiceError as e:
