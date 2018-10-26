@@ -31,7 +31,6 @@ class ProjectInitService:
             else:
                 self.create_file(name, default_project_yaml[name])
 
-        self.install_dbt(new_project)
         return new_project
 
     def create_file(self, name, content):
