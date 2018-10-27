@@ -2,6 +2,7 @@ import os
 import subprocess
 import json
 import logging
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -24,11 +25,32 @@ class ConfigService:
 
 
 def envsubst(src: Path, dst: Path, env={}):
+    # find viable substitutions
+    var_matcher = re.compile(
+        """
+      \$                # starts with a '$'
+      (?:              # either $VAR or ${VAR}
+        {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
+      )
+    """,
+        re.VERBOSE,
+    )
+
     env_override = os.environ.copy()
     env_override.update(env)
 
+    def subst(match) -> str:
+        try:
+            # the variable can be in either group
+            var = next(var for var in match.groups() if var)
+            return str(env_override[var])
+        except KeyError as e:
+            logging.warning(f"Variable {var} is missing from the environment.")
+            return None
+
     with src.open() as i, dst.open("w+") as o:
-        subprocess.Popen(["envsubst"], stdin=i, stdout=o, env=env_override)
+        output = re.sub(var_matcher, subst, i.read())
+        o.write(output)
 
 
 def file_has_data(file: Path):

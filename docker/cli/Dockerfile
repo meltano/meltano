@@ -1,10 +1,5 @@
 FROM python:latest
 
-# system deps
-RUN apt-get update \
-    && apt-get install -y gettext-base \
-    && rm -rf /var/lib/apt/lists/*
-
 COPY . /meltano
 
 # defaut config files
