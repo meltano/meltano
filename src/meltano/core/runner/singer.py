@@ -26,12 +26,15 @@ class ConfigService:
 
 def envsubst(src: Path, dst: Path, env={}):
     # find viable substitutions
-    var_matcher = re.compile('''
+    var_matcher = re.compile(
+        """
       \$                # starts with a '$'
       (?:              # either $VAR or ${VAR}
         {(\w+)}|(\w+)  # capture the variable name as group[0] or group[1]
       )
-    ''', re.VERBOSE)
+    """,
+        re.VERBOSE,
+    )
 
     env_override = os.environ.copy()
     env_override.update(env)
@@ -39,18 +42,14 @@ def envsubst(src: Path, dst: Path, env={}):
     def subst(match) -> str:
         try:
             # the variable can be in either group
-            var = next(var
-                       for var in match.groups()
-                       if var)
+            var = next(var for var in match.groups() if var)
             return str(env_override[var])
         except KeyError as e:
             logging.warning(f"Variable {var} is missing from the environment.")
             return None
 
     with src.open() as i, dst.open("w+") as o:
-        output = re.sub(var_matcher,
-                        subst,
-                        i.read())
+        output = re.sub(var_matcher, subst, i.read())
         o.write(output)
 
 
