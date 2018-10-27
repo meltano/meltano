@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from setuptools import setup, find_namespace_packages
+from setuptools import setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -45,7 +45,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://gitlab.com/meltano/meltano",
     package_dir={'': 'src'},
-    packages=find_namespace_packages(where='src'),
+    packages=['meltano', 'meltano_plugins'],
     package_data={
         'meltano.api': [
             'node_modules',
