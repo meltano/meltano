@@ -3,7 +3,7 @@ ENV NODE_VERSION 10
 
 RUN echo "Installing system deps" \
     && apt-get update \
-    && apt-get install -y gettext-base build-essential \
+    && apt-get install -y build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN echo "Installing node and yarn" \
