@@ -25,4 +25,3 @@ class Plugin:
         self.name = name
         self.pip_url = pip_url
         self.config = config
-

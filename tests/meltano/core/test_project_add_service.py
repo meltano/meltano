@@ -27,6 +27,9 @@ class TestProjectAddService:
 
         assert meltano_yml == {
             "extractors": [
-                {"name": "tap-first", "url": "git+https://gitlab.com/meltano/tap-first.git"}
+                {
+                    "name": "tap-first",
+                    "url": "git+https://gitlab.com/meltano/tap-first.git",
+                }
             ]
         }
