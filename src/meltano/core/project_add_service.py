@@ -29,6 +29,7 @@ class ProjectAddService:
         self.project = project
         self.plugin_type = plugin_type
         self.plugin_name = plugin_name
+        self.plugin = None
         self.discovery_service = discovery_service or PluginDiscoveryService()
 
         try:
@@ -82,4 +83,4 @@ class ProjectAddService:
             {"name": self.plugin.name, "url": self.plugin.pip_url}
         )
         with open(self.project.meltanofile, "w") as f:
-            f.write(yaml.dump(self.meltano_yml))
+            f.write(yaml.dump(self.meltano_yml, default_flow_style=False))
