@@ -58,15 +58,6 @@ class ProjectAddService:
         else:
             raise PluginNotSupportedException()
 
-    def add_config_stub(self):
-        plugin_dir = self.project.meltano_dir(self.plugin_type, self.plugin_name)
-        os.makedirs(plugin_dir, exist_ok=True)
-
-        with open(
-            plugin_dir.joinpath(f"{self.plugin_name}.config.json"), "w"
-        ) as config:
-            json.dump(self.plugin.config, config)
-
     def add_to_file(self):
         exists = any(
             p["name"] == self.plugin_name

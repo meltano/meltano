@@ -29,6 +29,7 @@ from meltano.core.plugin import PluginType
 )
 def elt(job_id, extractor, loader, tap_output, dry, transform):
     project = Project.find()
+
     # run `dbt deps`
     DbtService(project).deps()
     singer_runner = SingerRunner(
@@ -38,13 +39,8 @@ def elt(job_id, extractor, loader, tap_output, dry, transform):
         run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
         target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
         tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
-        tap_catalog_dir=os.getenv(
-            "SINGER_TAP_CATALOG_DIR",
-            project.root.joinpath(
-                "dbt_modules/meltano/extract/singer"
-            ),  # this is a hack
-        ),
     )
+
     dbt_runner = DbtRunner(project)
 
     try:

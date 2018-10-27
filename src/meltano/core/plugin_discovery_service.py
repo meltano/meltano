@@ -2,6 +2,7 @@ import os, yaml, json
 from typing import Dict, List
 
 from .plugin import Plugin, PluginType
+from .plugin.singer import SingerTap, SingerTarget
 
 
 class PluginDiscoveryInvalidError(Exception):
@@ -22,8 +23,15 @@ class PluginDiscoveryService:
                 raise PluginDiscoveryInvalidError()
 
     def plugins(self, plugin_type: PluginType):
+        plugin_class = {
+            PluginType.EXTRACTORS: SingerTap,
+            PluginType.LOADERS: SingerTarget
+        }
+
         return (
-            Plugin(**plugin_def) for plugin_def in self.discovery_data.get(plugin_type)
+            plugin_class[plugin_type](plugin_def.pop("name"),
+                                      **plugin_def)
+            for plugin_def in self.discovery_data.get(plugin_type)
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):

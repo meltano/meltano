@@ -2,10 +2,12 @@ import os
 from pathlib import Path
 from typing import Union
 
+from .plugin import Plugin
+
 
 class Project:
     """
-    Represent the current Meltano project from a file-system 
+    Represent the current Meltano project from a file-system
     perspective.
     """
 
@@ -47,3 +49,6 @@ class Project:
 
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
+
+    def plugin_dir(self, plugin: Plugin):
+        return self.meltano_dir(plugin.type, plugin.name)
