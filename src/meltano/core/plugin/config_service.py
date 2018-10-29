@@ -8,7 +8,10 @@ from meltano.core.project import Project
 from meltano.core.plugin import Plugin
 
 
-class ConfigService():
+class PluginConfigService():
+    """
+
+    """
     def __init__(self,
                  project: Project,
                  plugin: Plugin,

@@ -2,13 +2,13 @@ import subprocess
 
 from .project import Project
 from .plugin import Plugin
+from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
-from .runner.config_service import ConfigService
 
 
 class PluginInvoker():
     """
-    Expects the `run_dir` to be correctly configured
+    This class handles the invocation of a `Plugin` instance.
     """
     _prepared = False
 
@@ -18,13 +18,13 @@ class PluginInvoker():
                  run_dir=None,
                  config_dir=None,
                  venv_service: VenvService = None,
-                 config_service: ConfigService = None):
+                 config_service: PluginConfigService = None):
         self.project = project
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(project)
-        self.config_service = config_service or ConfigService(project, plugin,
-                                                              run_dir=run_dir,
-                                                              config_dir=config_dir)
+        self.config_service = config_service or PluginConfigService(project, plugin,
+                                                                    run_dir=run_dir,
+                                                                    config_dir=config_dir)
 
     @property
     def files(self):
@@ -49,11 +49,11 @@ class PluginInvoker():
             self.config_service.perform()
             self._prepared = True
 
-    def invoke(self, **Popen):
+    def invoke(self, *args, **Popen):
         try:
             self.prepare()
             return subprocess.Popen(
-                self.exec_args(),
+                [*self.exec_args(), *args],
                 **Popen)
 
             return handle
