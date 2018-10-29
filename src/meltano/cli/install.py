@@ -2,9 +2,10 @@ import click
 from . import cli
 from meltano.core.plugin_install_service import (
     PluginInstallService,
-    PluginInstallServicePluginNotFoundError,
 )
-
+from meltano.core.plugin_discovery_service import (
+    PluginNotFoundError
+)
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 

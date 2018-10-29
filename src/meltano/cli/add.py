@@ -10,8 +10,8 @@ from meltano.core.project_add_service import (
 )
 from meltano.core.plugin_install_service import (
     PluginInstallService,
-    PluginInstallServicePluginNotFoundError,
 )
+from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.project import Project
@@ -77,7 +77,7 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
             click.echo(run_venv["stdout"])
         if run_venv["stderr"]:
             click.secho(run_venv["stderr"], fg="red")
-    except PluginInstallServicePluginNotFoundError as e:
+    except PluginNotFoundError as e:
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
 

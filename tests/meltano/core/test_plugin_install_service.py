@@ -24,7 +24,3 @@ loaders:
         assert len(all_plugins["installed"]) == 2
         assert all_plugins["installed"][0]["status"] == "success"
         assert all_plugins["installed"][1]["status"] == "success"
-
-        # Clean up
-        shutil.rmtree("./.meltano")
-        os.remove("./meltano.yml")
