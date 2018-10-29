@@ -4,14 +4,13 @@ import json
 import subprocess
 
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.venv_service import VenvService
 from .plugin import PluginType
 from .project import Project
-
-
-class PluginInstallServicePluginNotFoundError(Exception):
-    pass
 
 
 class PluginInstallService:
@@ -34,8 +33,9 @@ class PluginInstallService:
     @property
     def plugin(self):
         if not self._plugin:
-            self._plugin = self.discovery_service.find_plugin(self.plugin_type,
-                                                              self.plugin_name)
+            self._plugin = self.discovery_service.find_plugin(
+                self.plugin_type, self.plugin_name
+            )
         return self._plugin
 
     @property
@@ -63,9 +63,6 @@ class PluginInstallService:
         return self.get_path_to_plugin().joinpath("bin", "pip")
 
     def create_venv(self):
-        if not self.plugin:
-            raise PluginInstallServicePluginNotFoundError()
-
         return self.venv_service.create(
             namespace=self.plugin.type, name=self.plugin.name
         )
@@ -96,8 +93,18 @@ class PluginInstallService:
                             }
                         )
                         continue
-                    self.create_venv()
-                    self.install_plugin(pip_url=plugin_url)
+                    try:
+                        self.create_venv()
+                        self.install_plugin(pip_url=plugin_url)
+                    except PluginNotFoundError as pnf:
+                        errors.append(
+                            {
+                                "plugin_type": kind,
+                                "plugin": plugin,
+                                "reason": "Cannot find the plugin.",
+                            }
+                        )
+
                     installed.append(
                         {"plugin_type": kind, "plugin": plugin, "status": "success"}
                     )
@@ -111,7 +118,7 @@ class PluginInstallService:
         install_result = self.venv_service.install(
             namespace=self.plugin.type,
             name=self.plugin.name,
-            pip_url=pip_url or self.plugin.pip_url
+            pip_url=pip_url or self.plugin.pip_url,
         )
 
         self.install_config_stub()
@@ -126,10 +133,3 @@ class PluginInstallService:
             plugin_dir.joinpath(self.plugin.config_files["config"]), "w"
         ) as config:
             json.dump(self.plugin.config, config)
-
-    def installed_plugins(self):
-        config_yml = self.add_service.meltano_yml
-
-        installed = (plugin_dir
-                     for plugin_dir in self.project.meltano_dir(PluginType.EXTRACTORS).iterdir()
-                     if plugin_dir.is_dir())

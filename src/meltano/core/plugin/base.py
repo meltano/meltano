@@ -1,17 +1,6 @@
 from enum import Enum
 
 
-class PluginMissingError(Exception):
-    """
-    Base exception when a plugin seems to be missing.
-    """
-    def __init__(self, plugin_or_name):
-        if isinstance(Plugin, plugin_or_name):
-            self.plugin_name = plugin_or_name.name
-        else:
-            self.plugin_name = plugin_or_name
-
-
 class PluginType(str, Enum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
@@ -21,13 +10,8 @@ class PluginType(str, Enum):
         return self.value
 
 
-
 class Plugin:
-    def __init__(self,
-                 plugin_type: PluginType,
-                 name: str,
-                 pip_url=None,
-                 config=None):
+    def __init__(self, plugin_type: PluginType, name: str, pip_url=None, config=None):
         self.name = name
         self.type = plugin_type
         self.pip_url = pip_url

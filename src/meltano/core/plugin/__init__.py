@@ -1,1 +1,1 @@
-from .base import Plugin, PluginType, PluginMissingError
+from .base import Plugin, PluginType

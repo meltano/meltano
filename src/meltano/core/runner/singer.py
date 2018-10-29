@@ -1,37 +1,22 @@
-import os
 import subprocess
 import json
 import logging
-import re
-from datetime import datetime
 from pathlib import Path
-from typing import Dict
 
-import click
 from . import Runner
 from meltano.core.job import Job, JobFinder
-from meltano.core.venv_service import VenvService
 from meltano.core.project import Project
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin import (
-    Plugin,
-    PluginType,
-    PluginMissingError,
-)
-from meltano.core.plugin.singer import (
-    SingerTap,
-    SingerTarget
-)
+from meltano.core.plugin.singer import SingerTap, SingerTarget
 from meltano.core.utils import file_has_data
 
 
+class EmptyStateError(Exception):
+    pass
+
+
 class SingerRunner(Runner):
-    def __init__(
-        self,
-        project: Project,
-        job_id,
-        **config,
-    ):
+    def __init__(self, project: Project, job_id, **config):
         self.project = project
         self.job_id = job_id
         self.config = config
@@ -40,7 +25,9 @@ class SingerRunner(Runner):
 
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
-        self.target_config_dir = Path(config.get("target_config_dir", "/etc/singer/target"))
+        self.target_config_dir = Path(
+            config.get("target_config_dir", "/etc/singer/target")
+        )
         self.tap_output = config.get("tap_output", False)
 
     @property
@@ -73,14 +60,11 @@ class SingerRunner(Runner):
         try:
             p_target, p_tee, p_tap = None, None, None
             p_target = target.invoke(
-                stdin=subprocess.PIPE,
-                stdout=target.files["state"].open("w+"),
+                stdin=subprocess.PIPE, stdout=target.files["state"].open("w+")
             )
 
             p_tee = subprocess.Popen(
-                map(str, tee_args),
-                stdin=subprocess.PIPE,
-                stdout=p_target.stdin
+                map(str, tee_args), stdin=subprocess.PIPE, stdout=p_target.stdin
             )
 
             p_tap = tap.invoke(stdout=p_tee.stdin)
@@ -98,7 +82,7 @@ class SingerRunner(Runner):
                 f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code}), tee({tee_code})"
             )
 
-    def restore_bookmark(self, tap: SingerTap):
+    def restore_bookmark(self, tap: PluginInvoker):
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
         state_job = finder.latest_success()
@@ -110,13 +94,13 @@ class SingerRunner(Runner):
         else:
             logging.warn("No state was found, complete import.")
 
-    def bookmark(self, target: SingerTarget):
+    def bookmark(self, target: PluginInvoker):
         state_file = target.files["state"]
         if not file_has_data(state_file):
             logging.warn(
                 "State file is empty, this run will not update the incremental state."
             )
-            return
+            raise EmptyStateError()
 
         with state_file.open() as state:
             # as per the Singer specification, only the _last_ state
@@ -124,9 +108,7 @@ class SingerRunner(Runner):
             *_, last_state = state.readlines()
             self.job.payload["singer_state"] = json.loads(last_state)
 
-    def dry_run(self,
-                extractor: SingerTap,
-                loader: SingerTarget):
+    def dry_run(self, extractor: SingerTap, loader: SingerTarget):
         self.prepare(extractor, loader)
         tap_exec = extractor.exec_path()
         target_exec = loader.exec_path()
@@ -135,15 +117,10 @@ class SingerRunner(Runner):
         logging.info(f"\textractor: {extractor.name} at '{tap_exec}'")
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
-    def run(self,
-            extractor: str,
-            loader: str,
-            dry_run=False):
+    def run(self, extractor: str, loader: str, dry_run=False):
         tap, target = SingerTap(extractor), SingerTarget(loader)
-        extractor = PluginInvoker(self.project,
-                                  tap)
-        loader = PluginInvoker(self.project,
-                               target)
+        extractor = PluginInvoker(self.project, tap)
+        loader = PluginInvoker(self.project, target)
 
         if dry_run:
             return self.dry_run(tap, target)

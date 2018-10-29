@@ -4,35 +4,32 @@ import json
 
 from unittest import mock
 from meltano.core.job import Job, State
+from meltano.core.plugin import Plugin
+from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin.singer import SingerTap, SingerTarget
 from meltano.core.runner.singer import SingerRunner
 from pathlib import Path
 
 
 TEST_JOB_ID = "test_job"
-TAP_NAME = "tap-test"
-TARGET_NAME = "target-test"
+TAP = SingerTap("tap-test")
+TARGET = SingerTarget("target-test")
 
 
-def create_tap_files(config_dir: Path, tap=TAP_NAME):
-    for file in (f"{tap}.config.json", f"{tap}.properties.json"):
+def create_plugin_files(config_dir: Path, plugin: Plugin):
+    for file in plugin.config_files.values():
         Path(os.path.join(config_dir, file)).touch()
 
     return config_dir
 
 
-def create_target_files(config_dir: Path, target=TARGET_NAME):
-    Path(os.path.join(config_dir, f"{target}.config.json")).touch()
-
-    return config_dir
-
-
 @pytest.fixture()
-def subject(db_setup, mkdtemp):
+def subject(db_setup, mkdtemp, project):
     tap_config_dir = mkdtemp()
     target_config_dir = mkdtemp()
 
-    create_tap_files(tap_config_dir)
-    create_target_files(target_config_dir)
+    create_plugin_files(tap_config_dir, TAP)
+    create_plugin_files(target_config_dir, TARGET)
 
     Job(
         elt_uri=TEST_JOB_ID,
@@ -41,22 +38,38 @@ def subject(db_setup, mkdtemp):
     ).save()
 
     return SingerRunner(
-        TEST_JOB_ID, tap_config_dir=tap_config_dir, target_config_dir=target_config_dir
+        project,
+        TEST_JOB_ID,
+        tap_config_dir=tap_config_dir,
+        target_config_dir=target_config_dir,
     )
 
 
 def test_prepare_job(subject):
-    subject.prepare(TAP_NAME, TARGET_NAME)
+    tap_invoker = PluginInvoker(subject.project, TAP, config_dir=subject.tap_config_dir)
+    target_invoker = PluginInvoker(
+        subject.project, TARGET, config_dir=subject.target_config_dir
+    )
 
-    for f in subject.tap_files.values():
-        assert f.exists()
-    for f in subject.target_files.values():
-        assert f.exists()
+    subject.prepare(tap_invoker, target_invoker)
+
+    for f in TAP.config_files.values():
+        assert subject.tap_config_dir.joinpath(f).exists()
+
+    for f in TARGET.config_files.values():
+        assert subject.target_config_dir.joinpath(f).exists()
 
 
 @mock.patch("subprocess.Popen")
 def test_invoke(Popen, subject):
     called_bins = []
+    tap_invoker = PluginInvoker(subject.project, TAP, config_dir=subject.tap_config_dir)
+    target_invoker = PluginInvoker(
+        subject.project, TARGET, config_dir=subject.target_config_dir
+    )
+
+    # call prepare beforehand
+    subject.prepare(tap_invoker, target_invoker)
 
     def Popen_record_bin(cmd, *args, **kwargs):
         called_bins.append(list(cmd)[0])
@@ -68,10 +81,10 @@ def test_invoke(Popen, subject):
     Popen.return_value = process_mock
     Popen.side_effect = Popen_record_bin
 
-    subject.invoke(TAP_NAME, TARGET_NAME)
+    subject.invoke(tap_invoker, target_invoker)
 
-    tap_bin = str(subject.exec_path(TAP_NAME))
-    target_bin = str(subject.exec_path(TARGET_NAME))
+    tap_bin = str(tap_invoker.exec_path())
+    target_bin = str(target_invoker.exec_path())
 
     # correct bins are called
     assert called_bins == [target_bin, "tee", tap_bin]
@@ -82,9 +95,20 @@ def test_invoke(Popen, subject):
 
 
 def test_bookmark(subject):
-    with subject.target_files["state"].open("w") as state:
+    target_invoker = PluginInvoker(subject.project, TARGET)
+    # bookmark
+    with target_invoker.files["state"].open("w") as state:
         state.write('{"line": 1}\n')
         state.write('{"line": 2}\n')
 
-    subject.bookmark()
+    with subject.job.run():
+        subject.bookmark(target_invoker)
+
     assert subject.job.payload["singer_state"]["line"] == 2
+
+    # restore
+    tap_invoker = PluginInvoker(subject.project, TAP)
+    subject.restore_bookmark(tap_invoker)
+    state_json = json.dumps(subject.job.payload["singer_state"])
+    assert tap_invoker.files["state"].exists()
+    assert tap_invoker.files["state"].open().read() == state_json

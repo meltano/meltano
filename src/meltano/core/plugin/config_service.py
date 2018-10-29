@@ -8,15 +8,12 @@ from meltano.core.project import Project
 from meltano.core.plugin import Plugin
 
 
-class PluginConfigService():
+class PluginConfigService:
     """
 
     """
-    def __init__(self,
-                 project: Project,
-                 plugin: Plugin,
-                 config_dir=None,
-                 run_dir=None):
+
+    def __init__(self, project: Project, plugin: Plugin, config_dir=None, run_dir=None):
         self.project = project
         self.plugin = plugin
 
@@ -60,12 +57,18 @@ class PluginConfigService():
         run_file = self.run_dir.joinpath
 
         # grab the list of files the plugin needs
-        stubs = ((run_file(file_name), config_file(file_name))
-                 for file_name in self.plugin.config_files.values())
+        stubs = (
+            (run_file(file_name), config_file(file_name))
+            for file_name in self.plugin.config_files.values()
+        )
 
+        stubbed = []
         # stub the files from the env
         for dst, src in stubs:
             try:
                 self.envsubst(src, dst)
+                stubbed.append(dst)
             except FileNotFoundError:
                 logging.warn(f"Could not find {src.name} in {src.resolve()}, skipping.")
+
+        return stubbed

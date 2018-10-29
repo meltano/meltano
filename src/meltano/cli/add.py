@@ -61,8 +61,8 @@ def loader(plugin_name):
 
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
-        add_service = ProjectAddService(project, plugin_type, plugin_name)
-        add_service.add()
+        add_service = ProjectAddService(project)
+        add_service.add(plugin_type, plugin_name)
         click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
     except PluginNotSupportedException:
         click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")

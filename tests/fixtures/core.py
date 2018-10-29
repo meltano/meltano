@@ -14,4 +14,8 @@ def project_init_service():
 @pytest.fixture(scope="session")
 def project(test_dir):
     service = ProjectInitService(PROJECT_NAME)
-    return service.init()
+    project = service.init()
+
+    # cd into the new project root
+    project.chdir()
+    return project

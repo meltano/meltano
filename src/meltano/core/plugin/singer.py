@@ -27,14 +27,12 @@ class SingerTap(Plugin):
         return {
             "config": "tap.config.json",
             "catalog": "tap.properties.json",
-            "state": "state.json"
+            "state": "state.json",
         }
 
     @property
     def output_files(self):
-        return {
-            "output": "tap.out"
-        }
+        return {"output": "tap.out"}
 
 
 class SingerTarget(Plugin):
@@ -48,12 +46,8 @@ class SingerTarget(Plugin):
 
     @property
     def config_files(self):
-        return {
-            "config": "target.config.json",
-        }
+        return {"config": "target.config.json"}
 
     @property
     def output_files(self):
-        return {
-            "state": "new_state.json"
-        }
+        return {"state": "new_state.json"}

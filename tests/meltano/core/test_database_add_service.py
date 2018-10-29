@@ -7,15 +7,16 @@ from meltano.core.database_add_service import DatabaseAddService
 
 
 class TestDatabaseAddService:
-    def test_default_init_should_not_fail(self):
-        database_service = DatabaseAddService()
+    @pytest.fixture
+    def subject(self, project):
+        database_service = DatabaseAddService(project)
         assert database_service
 
-    def test_add_database_should_update_file(self):
-        os.mkdir("./.meltano")
-        database_service = DatabaseAddService()
+        return database_service
+
+    def test_add_database_should_update_file(self, subject):
         name = "sample %% name ^^ 123"
-        database_service.add(
+        subject.add(
             name=name,
             host="127.0.0.1",
             database="sample_database",
@@ -24,9 +25,9 @@ class TestDatabaseAddService:
             password="freedomforjeffery",
         )
 
-        root_name = database_service.environmentalize(name)
+        root_name = subject.environmentalize(name)
         assert yaml.load(
-            open(f"./.meltano/.database_{root_name.lower()}.yml").read()
+            open(f".meltano/.database_{root_name.lower()}.yml").read()
         ) == {
             "database": "sample_database",
             "host": "127.0.0.1",
@@ -36,4 +37,3 @@ class TestDatabaseAddService:
             "schema": "analytics",
             "username": "jeffery",
         }
-        shutil.rmtree("./.meltano")

@@ -88,5 +88,6 @@ def pop_all(keys, d: dict):
 def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
+
 def file_has_data(file: Path):
     return file.exists() and file.stat().st_size > 0
