@@ -28,9 +28,7 @@ class PluginDiscoveryService:
                 raise PluginDiscoveryInvalidError()
 
     def plugins(self) -> List[Plugin]:
-        """
-        Parse the discovery file and returns it as `Plugin` instances.
-        """
+        """Parse the discovery file and returns it as `Plugin` instances."""
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
@@ -50,9 +48,7 @@ class PluginDiscoveryService:
             raise PluginNotFoundError()
 
     def discover(self, plugin_type: PluginType):
-        """
-        Return a pretty printed list of available plugins.
-        """
+        """Return a pretty printed list of available plugins."""
         enabled_plugin_types = (
             (PluginType.EXTRACTORS, PluginType.LOADERS)
             if PluginType.ALL
