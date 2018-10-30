@@ -8,10 +8,8 @@ from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
 )
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-    PluginInstallServicePluginNotFoundError,
-)
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.project import Project
@@ -61,8 +59,8 @@ def loader(plugin_name):
 
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
-        add_service = ProjectAddService(project, plugin_type, plugin_name)
-        add_service.add()
+        add_service = ProjectAddService(project)
+        add_service.add(plugin_type, plugin_name)
         click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
     except PluginNotSupportedException:
         click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
@@ -77,7 +75,7 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
             click.echo(run_venv["stdout"])
         if run_venv["stderr"]:
             click.secho(run_venv["stderr"], fg="red")
-    except PluginInstallServicePluginNotFoundError as e:
+    except PluginNotFoundError as e:
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
 

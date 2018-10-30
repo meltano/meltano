@@ -1,6 +1,7 @@
 import os
 import yaml
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+
+from .plugin import PluginType
 
 
 class ConfigService:
@@ -16,10 +17,10 @@ class ConfigService:
             os.mkdir(os.path.join("./", ".meltano"))
 
     def get_extractors(self):
-        return self.meltano_yml.get(PluginDiscoveryService.EXTRACTORS)
+        return self.meltano_yml.get(PluginType.EXTRACTORS)
 
     def get_loaders(self):
-        return self.meltano_yml.get(PluginDiscoveryService.LOADERS)
+        return self.meltano_yml.get(PluginType.LOADERS)
 
     def get_database(self, database_name):
         return yaml.load(

@@ -1,5 +1,3 @@
-import sqlalchemy
-
 from . import Job, State
 from meltano.core.db import DB
 
@@ -16,7 +14,11 @@ class JobFinder:
         with DB.default.session() as session:
             return (
                 session.query(Job)
-                .filter((Job.elt_uri == self.elt_uri) & (Job.state == State.SUCCESS))
+                .filter(
+                    (Job.elt_uri == self.elt_uri)
+                    & (Job.state == State.SUCCESS)
+                    & Job.ended_at.isnot(None)
+                )
                 .order_by(Job.ended_at.desc())
                 .first()
             )

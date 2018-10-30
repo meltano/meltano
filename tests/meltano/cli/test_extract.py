@@ -6,11 +6,12 @@ from click.testing import CliRunner
 from meltano.cli import cli
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
+from meltano.core.dbt_service import DbtService
 
 
 PERFORM_TEST_ARGS = [
     "elt",
-    "test",
+    "test_job_id",
     "--extractor",
     "tap-test",
     "--loader",
@@ -19,13 +20,6 @@ PERFORM_TEST_ARGS = [
 
 
 def test_elt(request, project):
-    # popd
-    popd = partial(os.chdir, os.getcwd())
-    request.addfinalizer(popd)
-
-    # move into the project
-    os.chdir(project.root)
-
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(cli, ["elt"])
@@ -34,7 +28,7 @@ def test_elt(request, project):
     # exit cleanly when everything is fine
     with patch.object(SingerRunner, "perform", return_value=None), patch.object(
         DbtRunner, "perform", return_value=None
-    ):
+    ), patch.object(DbtService, "deps", return_value=None):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 0
 

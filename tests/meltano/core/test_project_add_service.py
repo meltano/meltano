@@ -3,7 +3,9 @@ import yaml
 import os
 import shutil
 
-from meltano.core.project_add_service import ProjectAddService, MissingPluginException
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_discovery_service import PluginNotFoundError
+from meltano.core.plugin import PluginType
 
 
 class TestProjectAddService:
@@ -14,13 +16,13 @@ class TestProjectAddService:
     def test_missing_plugin_exception(self, project):
         add_service = ProjectAddService(project)
         try:
-            add_service.add()
+            add_service.add(PluginType.EXTRACTORS, "tap-missing")
         except Exception as e:
-            assert type(e) is MissingPluginException
+            assert type(e) is PluginNotFoundError
 
     def test_add_extractor(self, project):
-        add_service = ProjectAddService(project, "extractors", "tap-first")
-        add_service.add()
+        add_service = ProjectAddService(project)
+        add_service.add(PluginType.EXTRACTORS, "tap-first")
 
         meltano_yml = yaml.load(project.meltanofile.open())
         os.remove(project.meltanofile.resolve())

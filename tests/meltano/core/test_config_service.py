@@ -66,7 +66,6 @@ class TestConfigService:
 
     def test_database_config(self):
         config_service = ConfigService()
-        config_service.make_meltano_secret_dir()
         make_database_yml()
         assert config_service.get_database("test") == {
             "database": "test",
@@ -77,4 +76,3 @@ class TestConfigService:
             "schema": "test",
             "username": "test",
         }
-        shutil.rmtree(config_service.meltano_secret_dir)

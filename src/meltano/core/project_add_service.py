@@ -4,6 +4,7 @@ import yaml
 import logging
 
 from .project import Project
+from .plugin import PluginType, Plugin
 from .plugin_discovery_service import PluginDiscoveryService
 
 
@@ -20,16 +21,9 @@ class ProjectAddService:
     LOADER = "loader"
 
     def __init__(
-        self,
-        project: Project,
-        plugin_type=None,
-        plugin_name=None,
-        discovery_service: PluginDiscoveryService = None,
+        self, project: Project, discovery_service: PluginDiscoveryService = None
     ):
         self.project = project
-        self.plugin_type = plugin_type
-        self.plugin_name = plugin_name
-        self.plugin = None
         self.discovery_service = discovery_service or PluginDiscoveryService()
 
         try:
@@ -38,39 +32,22 @@ class ProjectAddService:
             self.project.meltanofile.open("a").close()
             self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
 
-        if self.plugin_type:
-            self.plugin = self.discovery_service.find_plugin(
-                self.plugin_type, self.plugin_name
-            )
+    def add(self, plugin_type: PluginType, plugin_name: str):
+        plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
-    def add(self):
-        if not self.plugin:
-            raise MissingPluginException("Plugin type or plugin name is not set")
-
-        extract_dict = self.meltano_yml.get(self.plugin_type)
+        extract_dict = self.meltano_yml.get(plugin_type)
         if not extract_dict:
-            self.meltano_yml[self.plugin_type] = []
-            extract_dict = self.meltano_yml.get(self.plugin_type)
+            self.meltano_yml[plugin.type] = []
+            extract_dict = self.meltano_yml.get(plugin.type)
 
-        if self.plugin.pip_url is not None:
-            self.add_to_file()
-            self.add_config_stub()
+        if plugin.pip_url:
+            self.add_to_file(plugin)
         else:
             raise PluginNotSupportedException()
 
-    def add_config_stub(self):
-        plugin_dir = self.project.meltano_dir(self.plugin_type, self.plugin_name)
-        os.makedirs(plugin_dir, exist_ok=True)
-
-        with open(
-            plugin_dir.joinpath(f"{self.plugin_name}.config.json"), "w"
-        ) as config:
-            json.dump(self.plugin.config, config)
-
-    def add_to_file(self):
+    def add_to_file(self, plugin: Plugin):
         exists = any(
-            p["name"] == self.plugin_name
-            for p in self.meltano_yml.get(self.plugin_type, [])
+            p["name"] == plugin.name for p in self.meltano_yml.get(plugin.type, [])
         )
 
         if exists:
@@ -79,8 +56,8 @@ class ProjectAddService:
             )
             return
 
-        self.meltano_yml[self.plugin_type].append(
-            {"name": self.plugin.name, "url": self.plugin.pip_url}
+        self.meltano_yml[plugin.type].append(
+            {"name": plugin.name, "url": plugin.pip_url}
         )
         with open(self.project.meltanofile, "w") as f:
             f.write(yaml.dump(self.meltano_yml, default_flow_style=False))

@@ -6,16 +6,8 @@ from meltano.core.plugin import PluginType
 
 
 def test_add_extractor(project):
-    # TODO: mock
-    discovery_service = PluginDiscoveryService()
-
-    service = ProjectAddService(
-        project,
-        plugin_type=PluginType.EXTRACTORS,
-        plugin_name="tap-first",  # TODO: create tap-test
-        discovery_service=discovery_service,
-    )
-    service.add()
+    service = ProjectAddService(project)
+    service.add(PluginType.EXTRACTORS, "tap-first")
     meltano_config = yaml.load(project.meltanofile.open())
 
     assert PluginType.EXTRACTORS in meltano_config
@@ -26,16 +18,8 @@ def test_add_extractor(project):
 
 
 def test_add_loader(project):
-    # TODO: mock
-    discovery_service = PluginDiscoveryService()
-
-    service = ProjectAddService(
-        project,
-        plugin_type=PluginType.LOADERS,
-        plugin_name="target-csv",  # TODO: create target-test
-        discovery_service=discovery_service,
-    )
-    service.add()
+    service = ProjectAddService(project)
+    service.add(PluginType.LOADERS, "target-csv")
 
     meltano_config = yaml.load(project.meltanofile.open())
 
