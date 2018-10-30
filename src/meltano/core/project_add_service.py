@@ -31,19 +31,11 @@ class ProjectAddService:
         self.discovery_service = discovery_service or PluginDiscoveryService()
         self.config_service = config_service or ConfigService(project)
 
-        try:
-            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
-        except Exception as e:
-            self.project.meltanofile.open("a").close()
-            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
-
     def add(self, plugin_type: PluginType, plugin_name: str):
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
-        extract_dict = self.meltano_yml.get(plugin_type)
-        if not extract_dict:
-            self.meltano_yml[plugin.type] = []
-            extract_dict = self.meltano_yml.get(plugin.type)
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml[plugin_type] = meltano_yml.get(plugin_type, [])
 
         if plugin.pip_url:
             self.add_to_file(plugin)
@@ -59,6 +51,5 @@ class ProjectAddService:
             )
             return
 
-        self.meltano_yml[plugin.type].append(plugin.canonical())
-        with open(self.project.meltanofile, "w") as f:
-            f.write(yaml.dump(self.meltano_yml, default_flow_style=False))
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml[plugin.type].append(plugin.canonical())

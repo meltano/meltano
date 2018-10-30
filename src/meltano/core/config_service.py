@@ -10,7 +10,6 @@ from .plugin.singer import plugin_factory
 class ConfigService:
     def __init__(self, project: Project):
         self.project = project
-        self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
@@ -27,13 +26,11 @@ class ConfigService:
         )
 
     def plugins(self) -> List[Plugin]:
-        """
-        Parse the discovery file and returns it as `Plugin` instances.
-        """
+        """Parse the discovery file and returns it as `Plugin` instances."""
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
             plugin_factory(plugin_type, plugin_def)
-            for plugin_type, plugin_defs in self.meltano_yml.items()
+            for plugin_type, plugin_defs in self.project.meltano.items()
             for plugin_def in plugin_defs
         )

@@ -1,6 +1,9 @@
 import os
+import yaml
+import logging
 from pathlib import Path
-from typing import Union
+from typing import Union, Dict
+from contextlib import contextmanager
 
 from .plugin import Plugin
 
@@ -10,6 +13,8 @@ class Project:
     Represent the current Meltano project from a file-system
     perspective.
     """
+
+    _meltano = {}
 
     def __init__(self, root: Union[Path, str]):
         self.root = Path(root)
@@ -36,6 +41,33 @@ class Project:
             os.chdir(cwd)
 
         return Project(os.getcwd())
+
+    @property
+    def meltano(self) -> Dict:
+        """Return a copy of the current meltano config"""
+        if not self._meltano:
+            self._meltano = yaml.load(self.meltanofile.open()) or {}
+        return self._meltano.copy()
+
+    @contextmanager
+    def meltano_update(self):
+        """
+        Yield the current meltano configuration and update the meltanofile
+        if the context ends gracefully.
+        """
+        try:
+            meltano_update = self.meltano
+            yield meltano_update
+
+            # save it
+            with self.meltanofile.open("w") as meltanofile:
+                meltanofile.write(yaml.dump(meltano_update, default_flow_style=False))
+
+            # update the cache
+            self._meltano = meltano_update
+        except Exception as err:
+            logging.error(f"Could not update meltano.yml: {err}")
+            raise
 
     @property
     def meltanofile(self):

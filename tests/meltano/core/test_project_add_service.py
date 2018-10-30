@@ -5,7 +5,7 @@ import shutil
 
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginType
 
 
 class TestProjectAddService:
@@ -24,6 +24,4 @@ class TestProjectAddService:
         add_service = ProjectAddService(project)
         added = add_service.add(PluginType.EXTRACTORS, "tap-first")
 
-        meltano_yml = yaml.load(project.meltanofile.open())
-
-        assert added.canonical() in meltano_yml[PluginType.EXTRACTORS]
+        assert added.canonical() in project.meltano[PluginType.EXTRACTORS]
