@@ -17,6 +17,13 @@ class Plugin:
         self.pip_url = pip_url
         self.config = config
 
+    def canonical(self):
+        return {
+            "name": self.name,
+            "pip_url": self.pip_url,
+            "config": self.config
+        }
+
     @property
     def config_files(self):
         """
@@ -27,3 +34,7 @@ class Plugin:
     @property
     def output_files(self):
         return []
+
+    def __eq__(self, other):
+        return (self.name == other.name and
+                self.type == other.type)

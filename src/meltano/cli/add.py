@@ -60,30 +60,29 @@ def loader(plugin_name):
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project)
-        add_service.add(plugin_type, plugin_name)
+        plugin = add_service.add(plugin_type, plugin_name)
         click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
-    except PluginNotSupportedException:
-        click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
-        raise click.Abort()
 
-    try:
-        install_service = PluginInstallService(project, plugin_type, plugin_name)
+        install_service = PluginInstallService(project)
         click.secho("Activating your virtual environment", fg="green")
-        run_venv = install_service.create_venv()
+        run_venv = install_service.create_venv(plugin)
 
         if run_venv["stdout"]:
             click.echo(run_venv["stdout"])
         if run_venv["stderr"]:
             click.secho(run_venv["stderr"], fg="red")
+
+        click.secho(f"Installing {plugin_name} via pip...", fg="green")
+        run_install_plugin = install_service.install_plugin(plugin)
+        if run_install_plugin["stdout"]:
+            click.echo(run_install_plugin["stdout"])
+        if run_install_plugin["stderr"]:
+            click.secho(run_install_plugin["stderr"], fg="red")
+
+        click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")
+    except PluginNotSupportedException:
+        click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
+        raise click.Abort()
     except PluginNotFoundError as e:
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
         raise click.Abort()
-
-    click.secho(f"Installing {plugin_name} via pip...", fg="green")
-    run_install_plugin = install_service.install_plugin()
-    if run_install_plugin["stdout"]:
-        click.echo(run_install_plugin["stdout"])
-    if run_install_plugin["stderr"]:
-        click.secho(run_install_plugin["stderr"], fg="red")
-
-    click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")

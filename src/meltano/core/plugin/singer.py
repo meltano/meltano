@@ -4,6 +4,17 @@ from . import Plugin, PluginType
 from meltano.core.utils import file_has_data
 
 
+def plugin_factory(plugin_type: PluginType, canonical: Dict):
+    plugin_class = {
+        PluginType.EXTRACTORS: SingerTap,
+        PluginType.LOADERS: SingerTarget,
+    }
+
+    # this will parse the discovery file and create an instance of the
+    # corresponding `plugin_class` for all the plugins.
+    return plugin_class[plugin_type](**canonical)
+
+
 class SingerTap(Plugin):
     def __init__(self, *args, **kwargs):
         super().__init__(PluginType.EXTRACTORS, *args, **kwargs)
