@@ -35,9 +35,7 @@ class Plugin:
 
     @property
     def config_files(self):
-        """
-        Return a list of stubbed files created for this plugin.
-        """
+        """Return a list of stubbed files created for this plugin."""
         return []
 
     @property
