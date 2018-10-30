@@ -61,7 +61,7 @@ class PluginInvoker:
 
     def prepare(self):
         if not self._prepared:
-            self.config_service.perform()
+            self.config_service.configure()
             self._prepared = True
 
     def invoke(self, *args, **Popen):
