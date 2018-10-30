@@ -1,7 +1,20 @@
+import yaml
 from enum import Enum
 
 
-class PluginType(str, Enum):
+class YAMLEnum(str, Enum):
+    def __str__(self):
+        return self.value
+
+    @staticmethod
+    def yaml_representer(dumper, obj):
+        return dumper.represent_scalar("tag:yaml.org,2002:str", str(obj))
+
+
+yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
+
+
+class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     ALL = "all"
@@ -18,11 +31,7 @@ class Plugin:
         self.config = config
 
     def canonical(self):
-        return {
-            "name": self.name,
-            "pip_url": self.pip_url,
-            "config": self.config
-        }
+        return {"name": self.name, "pip_url": self.pip_url, "config": self.config}
 
     @property
     def config_files(self):
@@ -36,5 +45,4 @@ class Plugin:
         return []
 
     def __eq__(self, other):
-        return (self.name == other.name and
-                self.type == other.type)
+        return self.name == other.name and self.type == other.type

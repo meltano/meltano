@@ -22,9 +22,10 @@ class ProjectAddService:
     LOADER = "loader"
 
     def __init__(
-        self, project: Project,
+        self,
+        project: Project,
         discovery_service: PluginDiscoveryService = None,
-        config_service: ConfigService = None
+        config_service: ConfigService = None,
     ):
         self.project = project
         self.discovery_service = discovery_service or PluginDiscoveryService()

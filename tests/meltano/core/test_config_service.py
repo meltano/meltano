@@ -4,23 +4,24 @@ import os
 import shutil
 
 from meltano.core.config_service import ConfigService
+from meltano.core.plugin import Plugin, PluginType
 
 
-def make_meltano_yml():
-    with open(os.path.join("./", "meltano.yml"), "w") as f:
+def make_meltano_yml(project):
+    with open(project.meltanofile, "w") as f:
         f.write(
             yaml.dump(
                 {
                     "extractors": [
                         {
                             "name": "first",
-                            "url": "git+https://gitlab.com/meltano/tap-first.git",
+                            "pip_url": "git+https://gitlab.com/meltano/tap-first.git",
                         }
                     ],
                     "loaders": [
                         {
                             "name": "csv",
-                            "url": "git+https://gitlab.com/meltano/target-csv.git",
+                            "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                         }
                     ],
                 }
@@ -28,8 +29,8 @@ def make_meltano_yml():
         )
 
 
-def make_database_yml():
-    with open(os.path.join("./.meltano/.database_test.yml"), "w") as f:
+def make_database_yml(project):
+    with open(project.meltano_dir(".database_test.yml"), "w") as f:
         f.write(
             yaml.dump(
                 {
@@ -46,28 +47,27 @@ def make_database_yml():
 
 
 class TestConfigService:
-    def test_default_init_should_not_fail(self):
-        config_service = ConfigService()
-        assert config_service
+    @pytest.fixture
+    def subject(self, project):
+        make_meltano_yml(project)
+        make_database_yml(project)
+        return ConfigService(project)
 
-    def test_get_extractors(self):
-        make_meltano_yml()
-        config_service = ConfigService()
-        assert config_service.get_extractors() == [
-            {"name": "first", "url": "git+https://gitlab.com/meltano/tap-first.git"}
-        ]
+    def test_default_init_should_not_fail(self, subject):
+        assert subject
 
-    def test_get_extractors(self):
-        make_meltano_yml()
-        config_service = ConfigService()
-        assert config_service.get_loaders() == [
-            {"name": "csv", "url": "git+https://gitlab.com/meltano/target-csv.git"}
-        ]
+    def test_get_extractors(self, subject):
+        extractors = list(subject.get_extractors())
+        assert len(extractors) == 1
+        assert all(map(lambda p: p.type == PluginType.EXTRACTORS, extractors))
 
-    def test_database_config(self):
-        config_service = ConfigService()
-        make_database_yml()
-        assert config_service.get_database("test") == {
+    def test_get_loaders(self, subject):
+        loaders = list(subject.get_loaders())
+        assert len(loaders) == 1
+        assert all(map(lambda p: p.type == PluginType.LOADERS, loaders))
+
+    def test_database_config(self, subject):
+        assert subject.get_database("test") == {
             "database": "test",
             "host": "127.0.0.1",
             "name": "test",

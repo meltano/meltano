@@ -16,12 +16,10 @@ class ConfigService:
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
     def get_extractors(self):
-        return filter(lambda p: p.type == PluginType.EXTRACTORS,
-                      self.plugins())
+        return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
 
     def get_loaders(self):
-        return filter(lambda p: p.type == PluginType.LOADERS,
-                      self.plugins())
+        return filter(lambda p: p.type == PluginType.LOADERS, self.plugins())
 
     def get_database(self, database_name):
         return yaml.load(

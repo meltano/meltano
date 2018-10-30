@@ -14,6 +14,7 @@ class PluginInstallError(Exception):
     """
     Happens when a plugin fails to install.
     """
+
     pass
 
 
@@ -29,10 +30,7 @@ class PluginInstallService:
         self.config_service = config_service or ConfigService(project)
 
     def create_venv(self, plugin: Plugin):
-        return self.venv_service.create(
-            namespace=plugin.type,
-            name=plugin.name
-        )
+        return self.venv_service.create(namespace=plugin.type, name=plugin.name)
 
     def install_all_plugins(self, status_cb=noop):
         errors = []
@@ -43,7 +41,7 @@ class PluginInstallService:
             status_cb(status)
 
             try:
-                self.create_venv()
+                self.create_venv(plugin)
                 self.install_plugin(plugin)
 
                 status["status"] = "success"
@@ -60,9 +58,7 @@ class PluginInstallService:
     def install_plugin(self, plugin: Plugin):
         try:
             install_result = self.venv_service.install(
-                namespace=plugin.type,
-                name=plugin.name,
-                pip_url=plugin.pip_url,
+                namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
             )
 
             self.install_config_stub(plugin)
@@ -75,7 +71,5 @@ class PluginInstallService:
         os.makedirs(plugin_dir, exist_ok=True)
 
         # TODO: refactor as explicit stubs
-        with open(
-            plugin_dir.joinpath(plugin.config_files["config"]), "w"
-        ) as config:
+        with open(plugin_dir.joinpath(plugin.config_files["config"]), "w") as config:
             json.dump(plugin.config, config)

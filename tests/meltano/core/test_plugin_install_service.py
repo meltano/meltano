@@ -4,22 +4,30 @@ import os
 import shutil
 
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.config_service import ConfigService
 
 
 class TestPluginInstallService:
-    def test_default_init_should_not_fail(self, project):
-        install_service = PluginInstallService(project)
-        assert install_service
+    @pytest.fixture
+    def subject(self, project):
+        with project.meltanofile.open("w") as f:
+            f.write(
+                """
+                    extractors:
+                    - {name: tap-first, pip_url: 'git+https://gitlab.com/meltano/tap-first.git'}
+                    loaders:
+                    - {name: target-csv, pip_url: 'git+https://gitlab.com/meltano/target-csv.git'}
+            """
+            )
 
-    def test_get_plugin_url(self, project):
-        install_service = PluginInstallService(project)
-        install_service.add_service.meltano_yml = yaml.load(
-            """extractors:
-- {name: tap-first, url: 'git+https://gitlab.com/meltano/tap-first.git'}
-loaders:
-- {name: target-csv, url: 'git+https://gitlab.com/meltano/target-csv.git'}"""
-        )
-        all_plugins = install_service.install_all_plugins()
+        return PluginInstallService(project)
+
+    def test_default_init_should_not_fail(self, subject):
+        assert subject
+
+    @pytest.mark.slow
+    def test_install_all(self, subject):
+        all_plugins = subject.install_all_plugins()
         assert len(all_plugins["errors"]) == 0
         assert len(all_plugins["installed"]) == 2
         assert all_plugins["installed"][0]["status"] == "success"

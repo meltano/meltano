@@ -5,7 +5,7 @@ import shutil
 
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import Plugin, PluginType
 
 
 class TestProjectAddService:
@@ -22,16 +22,8 @@ class TestProjectAddService:
 
     def test_add_extractor(self, project):
         add_service = ProjectAddService(project)
-        add_service.add(PluginType.EXTRACTORS, "tap-first")
+        added = add_service.add(PluginType.EXTRACTORS, "tap-first")
 
         meltano_yml = yaml.load(project.meltanofile.open())
-        os.remove(project.meltanofile.resolve())
 
-        assert meltano_yml == {
-            "extractors": [
-                {
-                    "name": "tap-first",
-                    "url": "git+https://gitlab.com/meltano/tap-first.git",
-                }
-            ]
-        }
+        assert added.canonical() in meltano_yml[PluginType.EXTRACTORS]

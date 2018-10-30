@@ -5,10 +5,7 @@ from meltano.core.utils import file_has_data
 
 
 def plugin_factory(plugin_type: PluginType, canonical: Dict):
-    plugin_class = {
-        PluginType.EXTRACTORS: SingerTap,
-        PluginType.LOADERS: SingerTarget,
-    }
+    plugin_class = {PluginType.EXTRACTORS: SingerTap, PluginType.LOADERS: SingerTarget}
 
     # this will parse the discovery file and create an instance of the
     # corresponding `plugin_class` for all the plugins.
