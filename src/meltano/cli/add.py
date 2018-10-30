@@ -8,9 +8,7 @@ from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
 )
-from meltano.core.plugin_install_service import (
-    PluginInstallService,
-)
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
