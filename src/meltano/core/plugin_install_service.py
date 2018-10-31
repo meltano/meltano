@@ -28,24 +28,24 @@ class PluginInstallService:
             status = {"plugin": plugin, "status": "running"}
             status_cb(status)
 
-            with plugin.trigger_hooks("install", self.project):
-                try:
+            try:
+                with plugin.trigger_hooks("install", self.project):
                     self.create_venv(plugin)
                     self.install_plugin(plugin)
 
                     status["status"] = "success"
                     installed.append(status)
                     status_cb(status)
-                except PluginInstallError as err:
-                    status["status"] = "error"
-                    status["message"] = str(err)
-                    errors.append(status)
-                    status_cb(status)
-                except PluginInstallWarning as warn:
-                    status["status"] = "warning"
-                    status["message"] = str(err)
-                    errors.append(status)
-                    status_cb(status)
+            except PluginInstallError as err:
+                status["status"] = "error"
+                status["message"] = str(err)
+                errors.append(status)
+                status_cb(status)
+            except PluginInstallWarning as warn:
+                status["status"] = "warning"
+                status["message"] = str(warn)
+                errors.append(status)
+                status_cb(status)
 
         return {"errors": errors, "installed": installed}
 
