@@ -1,8 +1,9 @@
-import os, yaml, json
+import os
+import yaml
 from typing import Dict, List
 
 from .plugin import Plugin, PluginType
-from .plugin.singer import SingerTap, SingerTarget
+from .plugin.singer import plugin_factory
 
 
 class PluginNotFoundError(Exception):
@@ -27,20 +28,11 @@ class PluginDiscoveryService:
                 raise PluginDiscoveryInvalidError()
 
     def plugins(self) -> List[Plugin]:
-        """
-        Parse the discovery file and returns it as `Plugin` instances.
-        """
-        plugin_class = {
-            PluginType.EXTRACTORS: SingerTap,
-            PluginType.LOADERS: SingerTarget,
-        }
-
+        """Parse the discovery file and returns it as `Plugin` instances."""
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
-
-        # the shape of the returned Dict is the same as the discovery file
         return (
-            plugin_class[plugin_type](**plugin_def)
+            plugin_factory(plugin_type, plugin_def)
             for plugin_type, plugin_defs in self.discovery_data.items()
             for plugin_def in plugin_defs
         )
@@ -56,9 +48,7 @@ class PluginDiscoveryService:
             raise PluginNotFoundError()
 
     def discover(self, plugin_type: PluginType):
-        """
-        Return a pretty printed list of available plugins.
-        """
+        """Return a pretty printed list of available plugins."""
         enabled_plugin_types = (
             (PluginType.EXTRACTORS, PluginType.LOADERS)
             if PluginType.ALL

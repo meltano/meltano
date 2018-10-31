@@ -11,7 +11,7 @@ def project_init_service():
     return ProjectInitService()
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="class")
 def project(test_dir):
     service = ProjectInitService(PROJECT_NAME)
     project = service.init()

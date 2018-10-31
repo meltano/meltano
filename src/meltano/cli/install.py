@@ -7,14 +7,15 @@ from meltano.core.project_add_service import ProjectAddService
 
 
 def install_status_update(data):
+    plugin = data["plugin"]
+
     if data["status"] == "running":
-        click.secho(
-            f"Installing {data['plugin_type']}: {data['plugin']['name']}", fg="yellow"
-        )
+        click.secho(f"Installing {plugin.type}: {plugin.name}", fg="yellow")
+    if data["status"] == "error":
+        click.secho(f"An error occured: {data['message']}.", fg="red")
     if data["status"] == "success":
         click.secho(
-            f"{data['plugin_type'].title()}: {data['plugin']['name']} installed successfully",
-            fg="green",
+            f"{plugin.type.title()}: {plugin.name} installed successfully", fg="green"
         )
 
 

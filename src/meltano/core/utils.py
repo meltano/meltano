@@ -91,3 +91,7 @@ def get_all(keys, d: dict, default=None):
 
 def file_has_data(file: Path):
     return file.exists() and file.stat().st_size > 0
+
+
+def noop(*_args, **_kwargs):
+    pass

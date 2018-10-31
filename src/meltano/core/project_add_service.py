@@ -6,6 +6,7 @@ import logging
 from .project import Project
 from .plugin import PluginType, Plugin
 from .plugin_discovery_service import PluginDiscoveryService
+from .config_service import ConfigService
 
 
 class PluginNotSupportedException(Exception):
@@ -21,43 +22,34 @@ class ProjectAddService:
     LOADER = "loader"
 
     def __init__(
-        self, project: Project, discovery_service: PluginDiscoveryService = None
+        self,
+        project: Project,
+        discovery_service: PluginDiscoveryService = None,
+        config_service: ConfigService = None,
     ):
         self.project = project
         self.discovery_service = discovery_service or PluginDiscoveryService()
-
-        try:
-            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
-        except Exception as e:
-            self.project.meltanofile.open("a").close()
-            self.meltano_yml = yaml.load(open(self.project.meltanofile)) or {}
+        self.config_service = config_service or ConfigService(project)
 
     def add(self, plugin_type: PluginType, plugin_name: str):
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
-        extract_dict = self.meltano_yml.get(plugin_type)
-        if not extract_dict:
-            self.meltano_yml[plugin.type] = []
-            extract_dict = self.meltano_yml.get(plugin.type)
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml[plugin_type] = meltano_yml.get(plugin_type, [])
 
         if plugin.pip_url:
             self.add_to_file(plugin)
         else:
             raise PluginNotSupportedException()
 
-    def add_to_file(self, plugin: Plugin):
-        exists = any(
-            p["name"] == plugin.name for p in self.meltano_yml.get(plugin.type, [])
-        )
+        return plugin
 
-        if exists:
+    def add_to_file(self, plugin: Plugin):
+        if plugin in self.config_service.plugins():
             logging.warn(
-                f"{self.plugin_name} is already present, use `meltano install` to install it."
+                f"{plugin.name} is already present, use `meltano install` to install it."
             )
             return
 
-        self.meltano_yml[plugin.type].append(
-            {"name": plugin.name, "url": plugin.pip_url}
-        )
-        with open(self.project.meltanofile, "w") as f:
-            f.write(yaml.dump(self.meltano_yml, default_flow_style=False))
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml[plugin.type].append(plugin.canonical())

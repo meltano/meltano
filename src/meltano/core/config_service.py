@@ -1,28 +1,36 @@
 import os
 import yaml
+from typing import List
 
-from .plugin import PluginType
+from .project import Project
+from .plugin import Plugin, PluginType
+from .plugin.singer import plugin_factory
 
 
 class ConfigService:
-    def __init__(self):
-        self.meltano_yml_file = self.meltano_yml_file = os.path.join(
-            "./", "meltano.yml"
-        )
-        self.meltano_yml = yaml.load(open(self.meltano_yml_file)) or {}
-        self.meltano_secret_dir = os.path.join("./", ".meltano")
+    def __init__(self, project: Project):
+        self.project = project
 
     def make_meltano_secret_dir(self):
-        if not os.path.isdir(self.meltano_secret_dir):
-            os.mkdir(os.path.join("./", ".meltano"))
+        os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
     def get_extractors(self):
-        return self.meltano_yml.get(PluginType.EXTRACTORS)
+        return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
 
     def get_loaders(self):
-        return self.meltano_yml.get(PluginType.LOADERS)
+        return filter(lambda p: p.type == PluginType.LOADERS, self.plugins())
 
     def get_database(self, database_name):
         return yaml.load(
-            open(os.path.join("./", ".meltano", f".database_{database_name}.yml"))
+            open(self.project.meltano_dir(f".database_{database_name}.yml"))
+        )
+
+    def plugins(self) -> List[Plugin]:
+        """Parse the discovery file and returns it as `Plugin` instances."""
+        # this will parse the discovery file and create an instance of the
+        # corresponding `plugin_class` for all the plugins.
+        return (
+            plugin_factory(plugin_type, plugin_def)
+            for plugin_type, plugin_defs in self.project.meltano.items()
+            for plugin_def in plugin_defs
         )
