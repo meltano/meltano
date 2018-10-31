@@ -20,7 +20,7 @@ class VenvService:
     def install(self, pip_url, namespace="", name=""):
         pip_install_path = self.exec_path("pip", namespace=namespace, name=name)
         run_pip_install = subprocess.run(
-            [pip_install_path, "install", pip_url],
+            [pip_install_path, "install", *pip_url.split(" ")],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,

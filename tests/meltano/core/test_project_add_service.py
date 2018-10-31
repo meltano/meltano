@@ -22,16 +22,6 @@ class TestProjectAddService:
 
     def test_add_extractor(self, project):
         add_service = ProjectAddService(project)
-        add_service.add(PluginType.EXTRACTORS, "tap-first")
+        added = add_service.add(PluginType.EXTRACTORS, "tap-first")
 
-        meltano_yml = yaml.load(project.meltanofile.open())
-        os.remove(project.meltanofile.resolve())
-
-        assert meltano_yml == {
-            "extractors": [
-                {
-                    "name": "tap-first",
-                    "url": "git+https://gitlab.com/meltano/tap-first.git",
-                }
-            ]
-        }
+        assert added.canonical() in project.meltano[PluginType.EXTRACTORS]

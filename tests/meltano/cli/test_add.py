@@ -8,12 +8,11 @@ from meltano.core.plugin import PluginType
 def test_add_extractor(project):
     service = ProjectAddService(project)
     service.add(PluginType.EXTRACTORS, "tap-first")
-    meltano_config = yaml.load(project.meltanofile.open())
 
-    assert PluginType.EXTRACTORS in meltano_config
+    assert PluginType.EXTRACTORS in project.meltano
     assert any(
         plugin["name"] == "tap-first"
-        for plugin in meltano_config[PluginType.EXTRACTORS]
+        for plugin in project.meltano[PluginType.EXTRACTORS]
     )
 
 
@@ -21,9 +20,7 @@ def test_add_loader(project):
     service = ProjectAddService(project)
     service.add(PluginType.LOADERS, "target-csv")
 
-    meltano_config = yaml.load(project.meltanofile.open())
-
-    assert PluginType.LOADERS in meltano_config
+    assert PluginType.LOADERS in project.meltano
     assert any(
-        plugin["name"] == "target-csv" for plugin in meltano_config[PluginType.LOADERS]
+        plugin["name"] == "target-csv" for plugin in project.meltano[PluginType.LOADERS]
     )

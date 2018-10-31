@@ -10,7 +10,8 @@ from meltano.core.plugin import Plugin
 
 class PluginConfigService:
     """
-
+    Manage the plugin configuration files. Each plugin can expose a
+    set of files that should be stubbed using environment variables.
     """
 
     def __init__(self, project: Project, plugin: Plugin, config_dir=None, run_dir=None):
@@ -50,7 +51,7 @@ class PluginConfigService:
             output = re.sub(var_matcher, subst, i.read())
             o.write(output)
 
-    def perform(self):
+    def configure(self):
         os.makedirs(self.run_dir, exist_ok=True)
 
         config_file = self.config_dir.joinpath
