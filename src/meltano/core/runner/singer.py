@@ -11,10 +11,6 @@ from meltano.core.plugin.singer import SingerTap, SingerTarget
 from meltano.core.utils import file_has_data
 
 
-class EmptyStateError(Exception):
-    pass
-
-
 class SingerRunner(Runner):
     def __init__(self, project: Project, job_id, **config):
         self.project = project
@@ -103,7 +99,6 @@ class SingerRunner(Runner):
             logging.warn(
                 "State file is empty, this run will not update the incremental state."
             )
-            raise EmptyStateError()
 
         with state_file.open() as state:
             # as per the Singer specification, only the _last_ state
