@@ -24,8 +24,6 @@ class PluginInvoker:
     This class handles the invocation of a `Plugin` instance.
     """
 
-    _prepared = False
-
     def __init__(
         self,
         project: Project,
@@ -41,6 +39,8 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
+
+        self._prepared = False
 
     @property
     def files(self):
