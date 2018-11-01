@@ -37,6 +37,8 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
+        
+        self._prepared = False
 
     @property
     def files(self):
@@ -46,6 +48,11 @@ class PluginInvoker:
             _key: self.config_service.run_dir.joinpath(filename)
             for _key, filename in plugin_files.items()
         }
+
+    def prepare(self):
+        if not self._prepared:
+            self.config_service.configure()
+            self._prepared = True
 
     def exec_path(self):
         return self.venv_service.exec_path(self.plugin.name, namespace=self.plugin.type)
@@ -57,6 +64,7 @@ class PluginInvoker:
 
     def invoke(self, *args, **Popen):
         try:
+            self.prepare()
             exec_args = [*self.exec_args(), *args]
             with self.plugin.trigger_hooks("invoke", self, exec_args):
                 return subprocess.Popen(exec_args, **Popen)

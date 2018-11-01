@@ -31,10 +31,6 @@ class SingerPlugin(Plugin, HookObject):
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config:
             json.dump(self.config, config)
 
-    @hook("before_invoke")
-    def invoke_stub_config(self, plugin_invoker, exec_args):
-        plugin_invoker.config_service.configure()
-
 
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
@@ -78,23 +74,28 @@ class SingerTap(SingerPlugin):
 
         if exit_code != 0:
             logging.error(
-                f"Command {invoker.exec_path()} {invoker.exec_args()} returned {exit_code}"
+                f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
             )
-            raise TapDiscoveryError()
+            return
 
-        with properties_file.open() as catalog:
-            schema = json.load(catalog)
+        try:
+            with properties_file.open() as catalog:
+                schema = json.load(catalog)
 
-        for stream in schema["streams"]:
-            stream_metadata = next(
-                metadata
-                for metadata in stream["metadata"]
-                if len(metadata["breadcrumb"]) == 0
+            for stream in schema["streams"]:
+                stream_metadata = next(
+                    metadata
+                    for metadata in stream["metadata"]
+                    if len(metadata["breadcrumb"]) == 0
+                )
+                stream_metadata["metadata"].update({"selected": True})
+
+            with properties_file.open("w") as catalog:
+                json.dump(schema, catalog)
+        except Exception as err:
+            logging.error(
+                f"Could not select stream, catalog file is invalid: {properties_file}"
             )
-            stream_metadata["metadata"].update({"selected": True})
-
-        with properties_file.open("w") as catalog:
-            json.dump(schema, catalog)
 
 
 class SingerTarget(SingerPlugin):
