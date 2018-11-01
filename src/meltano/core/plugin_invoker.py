@@ -65,9 +65,8 @@ class PluginInvoker:
     def invoke(self, *args, **Popen):
         try:
             self.prepare()
-            exec_args = [*self.exec_args(), *args]
-            with self.plugin.trigger_hooks("invoke", self, exec_args):
-                return subprocess.Popen(exec_args, **Popen)
+            with self.plugin.trigger_hooks("invoke", self, args):
+                return subprocess.Popen([*self.exec_args(), *args], **Popen)
 
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
