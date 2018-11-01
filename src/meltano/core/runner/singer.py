@@ -117,12 +117,12 @@ class SingerRunner(Runner):
         tap, target = SingerTap(extractor), SingerTarget(loader)
         extractor = PluginInvoker(self.project, tap)
         loader = PluginInvoker(self.project, target)
+        self.prepare(extractor, loader)
 
         if dry_run:
             return self.dry_run(tap, target)
 
         with self.job.run():
             self.restore_bookmark(extractor)
-            self.prepare(extractor, loader)
             self.invoke(extractor, loader)
             self.bookmark(loader)
