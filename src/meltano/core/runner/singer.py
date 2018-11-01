@@ -99,6 +99,7 @@ class SingerRunner(Runner):
             logging.warn(
                 "State file is empty, this run will not update the incremental state."
             )
+            return
 
         with state_file.open() as state:
             # as per the Singer specification, only the _last_ state
