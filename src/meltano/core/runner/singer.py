@@ -34,10 +34,6 @@ class SingerRunner(Runner):
     def database(self):
         return self.config.get("database", "default")
 
-    def prepare(self, tap: PluginInvoker, target: PluginInvoker):
-        tap.prepare()
-        target.prepare()
-
     def stop(self, process, **wait_args):
         if process.stdin:
             process.stdin.close()
@@ -109,7 +105,6 @@ class SingerRunner(Runner):
             self.job.payload["singer_state"] = json.loads(last_state)
 
     def dry_run(self, extractor: SingerTap, loader: SingerTarget):
-        self.prepare(extractor, loader)
         tap_exec = extractor.exec_path()
         target_exec = loader.exec_path()
 
@@ -127,6 +122,5 @@ class SingerRunner(Runner):
 
         with self.job.run():
             self.restore_bookmark(extractor)
-            self.prepare(extractor, loader)
             self.invoke(extractor, loader)
             self.bookmark(loader)

@@ -7,25 +7,22 @@ from . import Plugin, PluginType
 from .error import TapDiscoveryError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import file_has_data
-from meltano.core.behavior.hookable import Hookable
+from meltano.core.behavior.hookable import HookObject, hook
 
 
 def plugin_factory(plugin_type: PluginType, canonical: Dict):
-    plugin_class = {
-        PluginType.EXTRACTORS: SingerTap,
-        PluginType.LOADERS: SingerTarget
-    }
+    plugin_class = {PluginType.EXTRACTORS: SingerTap, PluginType.LOADERS: SingerTarget}
 
     # this will parse the discovery file and create an instance of the
     # corresponding `plugin_class` for all the plugins.
     return plugin_class[plugin_type](**canonical)
 
 
-class SingerPlugin(Plugin, Hookable):
+class SingerPlugin(Plugin, HookObject):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-    @Hookable.hook("before_install")
+    @hook("before_install")
     def install_config_stub(self, project):
         plugin_dir = project.plugin_dir(self)
         os.makedirs(plugin_dir, exist_ok=True)
@@ -33,6 +30,10 @@ class SingerPlugin(Plugin, Hookable):
         # TODO: refactor as explicit stubs
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config:
             json.dump(self.config, config)
+
+    @hook("before_invoke")
+    def invoke_stub_config(self, plugin_invoker, exec_args):
+        plugin_invoker.config_service.configure()
 
 
 class SingerTap(SingerPlugin):
@@ -64,14 +65,15 @@ class SingerTap(SingerPlugin):
     def output_files(self):
         return {"output": "tap.out"}
 
-    @Hookable.hook("after_install")
-    def run_discovery(self, project):
-        invoker = PluginInvoker(project, self)
+    @hook("before_invoke")
+    def run_discovery(self, plugin_invoker, exec_args):
+        if "--discover" in exec_args:
+            return
 
-        with project.plugin_dir(self, self.config_files["catalog"]).open(
-            "w"
-        ) as catalog:
-            result = invoker.invoke("--discover", stdout=catalog)
+        properties_file = plugin_invoker.files["catalog"]
+
+        with properties_file.open("w") as catalog:
+            result = plugin_invoker.invoke("--discover", stdout=catalog)
             exit_code = result.wait()
 
         if exit_code != 0:
@@ -79,6 +81,20 @@ class SingerTap(SingerPlugin):
                 f"Command {invoker.exec_path()} {invoker.exec_args()} returned {exit_code}"
             )
             raise TapDiscoveryError()
+
+        with properties_file.open() as catalog:
+            schema = json.load(catalog)
+
+        for stream in schema["streams"]:
+            stream_metadata = next(
+                metadata
+                for metadata in stream["metadata"]
+                if len(metadata["breadcrumb"]) == 0
+            )
+            stream_metadata["metadata"].update({"selected": True})
+
+        with properties_file.open("w") as catalog:
+            json.dump(schema, catalog)
 
 
 class SingerTarget(SingerPlugin):

@@ -29,13 +29,12 @@ class PluginInstallService:
             status_cb(status)
 
             try:
-                with plugin.trigger_hooks("install", self.project):
-                    self.create_venv(plugin)
-                    self.install_plugin(plugin)
+                self.create_venv(plugin)
+                self.install_plugin(plugin)
 
-                    status["status"] = "success"
-                    installed.append(status)
-                    status_cb(status)
+                status["status"] = "success"
+                installed.append(status)
+                status_cb(status)
             except PluginInstallError as err:
                 status["status"] = "error"
                 status["message"] = str(err)
@@ -51,9 +50,10 @@ class PluginInstallService:
 
     def install_plugin(self, plugin: Plugin):
         try:
-            install_result = self.venv_service.install(
-                namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
-            )
-            return install_result
+            with plugin.trigger_hooks("install", self.project):
+                install_result = self.venv_service.install(
+                    namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
+                )
+                return install_result
         except Exception as err:
             raise PluginInstallError()

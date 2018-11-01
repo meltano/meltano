@@ -13,18 +13,14 @@ class PluginMissingError(Exception):
     """
 
     def __init__(self, plugin_or_name):
-        if isinstance(Plugin, plugin_or_name):
+        if isinstance(plugin_or_name, Plugin):
             self.plugin_name = plugin_or_name.name
         else:
             self.plugin_name = plugin_or_name
 
 
 class PluginInvoker:
-    """
-    This class handles the invocation of a `Plugin` instance.
-    """
-
-    _prepared = False
+    """This class handles the invocation of a `Plugin` instance."""
 
     def __init__(
         self,
@@ -59,15 +55,11 @@ class PluginInvoker:
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args)]
 
-    def prepare(self):
-        if not self._prepared:
-            self.config_service.configure()
-            self._prepared = True
-
     def invoke(self, *args, **Popen):
         try:
-            self.prepare()
-            return subprocess.Popen([*self.exec_args(), *args], **Popen)
+            exec_args = [*self.exec_args(), *args]
+            with self.plugin.trigger_hooks("invoke", self, exec_args):
+                return subprocess.Popen(exec_args, **Popen)
 
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
