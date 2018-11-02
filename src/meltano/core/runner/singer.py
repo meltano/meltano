@@ -13,10 +13,9 @@ from meltano.core.utils import file_has_data
 
 
 class SingerRunner(Runner):
-    def __init__(self, project: Project,
-                 job_id,
-                 config_service: ConfigService = None,
-                 **config):
+    def __init__(
+        self, project: Project, job_id, config_service: ConfigService = None, **config
+    ):
         self.project = project
         self.job_id = job_id
         self.config_service = config_service or ConfigService(project)
@@ -60,14 +59,11 @@ class SingerRunner(Runner):
         try:
             p_target, p_tee, p_tap = None, None, None
             p_target = target.invoke(
-                stdin=subprocess.PIPE,
-                stdout=target.files["state"].open("w")
+                stdin=subprocess.PIPE, stdout=target.files["state"].open("w")
             )
 
             p_tee = subprocess.Popen(
-                map(str, tee_args),
-                stdin=subprocess.PIPE,
-                stdout=p_target.stdin
+                map(str, tee_args), stdin=subprocess.PIPE, stdout=p_target.stdin
             )
 
             p_tap = tap.invoke(stdout=p_tee.stdin)

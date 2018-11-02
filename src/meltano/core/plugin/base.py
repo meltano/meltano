@@ -24,11 +24,9 @@ class PluginType(YAMLEnum):
 
 
 class Plugin:
-    def __init__(self, plugin_type: PluginType,
-                 name: str,
-                 pip_url=None,
-                 config=None,
-                 **extras):
+    def __init__(
+        self, plugin_type: PluginType, name: str, pip_url=None, config=None, **extras
+    ):
         self.name = name
         self.type = plugin_type
         self.pip_url = pip_url
@@ -36,10 +34,12 @@ class Plugin:
         self._extras = extras or {}
 
     def canonical(self):
-        return {"name": self.name,
-                "pip_url": self.pip_url,
-                "config": self.config,
-                **self._extras}
+        return {
+            "name": self.name,
+            "pip_url": self.pip_url,
+            "config": self.config,
+            **self._extras,
+        }
 
     @property
     def config_files(self):

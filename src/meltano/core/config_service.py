@@ -17,10 +17,11 @@ class ConfigService:
 
     def get_plugin(self, plugin_type: PluginType, plugin_name: str):
         try:
-            return next(plugin
-                        for plugin in self.plugins()
-                        if plugin.type == plugin_type
-                        and plugin.name == plugin_name)
+            return next(
+                plugin
+                for plugin in self.plugins()
+                if plugin.type == plugin_type and plugin.name == plugin_name
+            )
         except StopIteration:
             raise PluginMissingError(plugin_name)
 

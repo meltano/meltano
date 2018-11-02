@@ -26,7 +26,7 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
-        
+
         self._prepared = False
 
     @property
