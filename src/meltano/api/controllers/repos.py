@@ -2,16 +2,17 @@ import base64
 import json
 import os
 import subprocess
+import sys
 from os.path import join
+from ..app import db
 
 import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
+from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
-
-from ..app import db, meltano_model_path
-from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
+meltano_model_path = join(os.getcwd(), 'model')
 
 path_to_parser = join(
     pkg_resources.resource_filename("meltano.api", "node_modules"),
@@ -25,7 +26,6 @@ parser_command = [
 
 @reposBP.route("/", methods=["GET"])
 def index():
-    # rorepo is a Repo instance pointing to the git-python repository.
     # For all you know, the first argument to Repo is a path to the repository
     # you want to work with
     onlyfiles = [
@@ -99,7 +99,6 @@ def db_import():
     # db.session.query(DimensionGroup).delete()
     # db.session.query(Measure).delete()
     # db.session.query(Join).delete()
-
     models = j["models"]
     files = j["files"]
     # process views
@@ -201,11 +200,11 @@ def db_import():
         model_settings["connection"] = model["connection"]
         model_settings["_type"] = model["_type"]
 
-        new_model = Model(model["_model"], model_settings)
-
         # Set the explores for the model
-        if len(model["explores"]):
-            for explore in model["explores"]:
+        has_explores = len(model.get("explores") or model.get("explore"))
+        explores = model.get("explores", [model.get("explore")])
+        if has_explores:
+            for explore in explores:
                 explore_settings = {}
                 if "label" in explore:
                     explore_settings["label"] = explore["label"]
@@ -217,11 +216,12 @@ def db_import():
                     explore_settings["always_filter"] = explore["always_filter"]
                 explore_settings["_type"] = explore["_type"]
 
-                new_explore = Explore(explore["_explore"], explore_settings)
+                explore_name = explore.get('_explore', explore.get('label'))
+                new_explore = Explore(explore_name, explore_settings)
 
                 # Set the view for the explore
                 # Name the explore from `from` or from name of explore itself
-                view_name = explore.get("from", explore["_explore"])
+                view_name = explore.get("from", explore_name)
                 connected_view = View.query.filter_by(name=view_name).first()
                 new_explore.view = connected_view
                 if "joins" in explore:

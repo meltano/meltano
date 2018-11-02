@@ -11,7 +11,7 @@ from meltano.api import app
 @click.option("--port", default=5001, help="Port to run webserver on")
 @click.option(
     "--reload/--no-reload",
-    default=False,
+    default=True,
     help="To reload the server or not on file changes",
 )
 @click.option("--hostname", default="localhost", help="The hostname of the webserver")

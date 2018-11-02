@@ -14,10 +14,6 @@ from meltano.core.db import DB
 
 app = Flask(__name__)
 
-# unused afaik
-meltano_model_path = config.meltano_model_path
-meltano_transform_path = config.meltano_transform_path
-
 app.config.from_object(config)
 
 if os.environ["FLASK_ENV"] == "development":
@@ -55,14 +51,16 @@ def internal_error(exception):
     return jsonify({"error": 1}), 500
 
 
+@app.route("/model")
 @app.route("/")
-def hello():
-    return jsonify({"hello": 1})
-
-
-@app.route("/analytics")
-def analytics():
+def analyze():
     return render_template("analyze.html")
+
+@app.route("/drop_it_like_its_hot")
+def drop_it():
+    from .controllers.utils import SqlHelper
+    SqlHelper().reset_db()
+    return jsonify({"dropped_it": "like it's hot"})
 
 
 from .controllers.projects import projectsBP

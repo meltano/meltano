@@ -33,6 +33,3 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 THREADS_PER_PAGE = 2
 
 SECRET_KEY = "damnitjanice"
-
-meltano_model_path = get_env_variable("MELTANO_MODEL_DIR")
-meltano_transform_path = get_env_variable("MELTANO_TRANSFORM_DIR")
