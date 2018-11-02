@@ -119,7 +119,6 @@ class SqlHelper:
         q = Query.from_(from_).select(*select).groupby(*dimensions).limit(limit)
         return f"{str(q)};"
 
-    @app.route("/drop_it_like_its_hot")
     def reset_db(self):
         try:
             Settings.__table__.drop(db.engine)

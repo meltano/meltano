@@ -332,6 +332,8 @@ make init_db
 docker-compose up
 ```
 
+Update the cli with the current prod files.
+
 ### Without Docker
 
 You will need to have postgres installed and available >= 10.5. 
