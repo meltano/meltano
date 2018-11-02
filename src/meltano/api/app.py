@@ -59,9 +59,10 @@ def internal_error(exception):
 def hello():
     return jsonify({"hello": 1})
 
+
 @app.route("/analytics")
 def analytics():
-    return render_template('analyze.html')
+    return render_template("analyze.html")
 
 
 from .controllers.projects import projectsBP
