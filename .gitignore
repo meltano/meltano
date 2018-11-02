@@ -110,6 +110,12 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
+src/meltano/api/templates/analyze.html
+src/meltano/api/static/css/app.*
+src/meltano/api/static/js/app.*
+src/meltano/api/static/js/manifest.*
+src/meltano/api/static/js/vendor.*
+
 # Environments
 .env
 .venv
