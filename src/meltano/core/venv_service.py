@@ -9,7 +9,7 @@ class VenvService:
     def create(self, namespace="", name=""):
         venv_path = self.project.venvs_dir(namespace, name)
         run_venv = subprocess.run(
-            ["virtualenv", venv_path],
+            ["python", "-m", "venv", venv_path],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
