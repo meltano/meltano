@@ -63,6 +63,9 @@ class SingerTap(SingerPlugin):
 
     @hook("before_invoke")
     def run_discovery(self, plugin_invoker, exec_args):
+        if not self._extras.get("autodiscover", True):
+            return
+
         if "--discover" in exec_args:
             return
 

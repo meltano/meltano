@@ -5,6 +5,7 @@ from typing import List
 from .project import Project
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
+from .plugin.error import PluginMissingError
 
 
 class ConfigService:
@@ -13,6 +14,15 @@ class ConfigService:
 
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
+
+    def get_plugin(self, plugin_type: PluginType, plugin_name: str):
+        try:
+            return next(plugin
+                        for plugin in self.plugins()
+                        if plugin.type == plugin_type
+                        and plugin.name == plugin_name)
+        except StopIteration:
+            raise PluginMissingError(plugin_name)
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())

@@ -3,20 +3,9 @@ import subprocess
 
 from .project import Project
 from .plugin import Plugin
+from .plugin.error import PluginMissingError
 from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
-
-
-class PluginMissingError(Exception):
-    """
-    Base exception when a plugin seems to be missing.
-    """
-
-    def __init__(self, plugin_or_name):
-        if isinstance(plugin_or_name, Plugin):
-            self.plugin_name = plugin_or_name.name
-        else:
-            self.plugin_name = plugin_or_name
 
 
 class PluginInvoker:

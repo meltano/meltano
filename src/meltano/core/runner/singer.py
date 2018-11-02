@@ -7,18 +7,22 @@ from . import Runner
 from meltano.core.job import Job, JobFinder
 from meltano.core.project import Project
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer import SingerTap, SingerTarget
+from meltano.core.config_service import ConfigService
+from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
 
 
 class SingerRunner(Runner):
-    def __init__(self, project: Project, job_id, **config):
+    def __init__(self, project: Project,
+                 job_id,
+                 config_service: ConfigService = None,
+                 **config):
         self.project = project
         self.job_id = job_id
+        self.config_service = config_service or ConfigService(project)
         self.config = config
 
         self.job = Job(elt_uri=self.job_id)
-
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
@@ -116,7 +120,9 @@ class SingerRunner(Runner):
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
     def run(self, extractor: str, loader: str, dry_run=False):
-        tap, target = SingerTap(extractor), SingerTarget(loader)
+        tap = self.config_service.get_plugin(PluginType.EXTRACTORS, extractor)
+        target = self.config_service.get_plugin(PluginType.LOADERS, loader)
+
         extractor = PluginInvoker(self.project, tap)
         loader = PluginInvoker(self.project, target)
         self.prepare(extractor, loader)
