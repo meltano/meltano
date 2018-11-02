@@ -3,7 +3,7 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -58,6 +58,10 @@ def internal_error(exception):
 @app.route("/")
 def hello():
     return jsonify({"hello": 1})
+
+@app.route("/analytics")
+def analytics():
+    return render_template('analyze.html')
 
 
 from .controllers.projects import projectsBP
