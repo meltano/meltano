@@ -1,11 +1,11 @@
 import re
 import sys
 import logging
+from typing import Union
 
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
-
 from .db import DB
 
 
@@ -89,7 +89,8 @@ def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
-def file_has_data(file: Path):
+def file_has_data(file: Union[Path, str]):
+    file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
 
 

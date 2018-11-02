@@ -6,10 +6,6 @@ from meltano.core.error import Error
 from . import Runner
 
 
-class ComponentNotFoundError(Error):
-    pass
-
-
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
     "fastly": ("meltano_plugins.fastly.extractor", "FastlyExtractor"),

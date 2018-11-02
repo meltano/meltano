@@ -24,20 +24,26 @@ class PluginType(YAMLEnum):
 
 
 class Plugin:
-    def __init__(self, plugin_type: PluginType, name: str, pip_url=None, config=None):
+    def __init__(
+        self, plugin_type: PluginType, name: str, pip_url=None, config=None, **extras
+    ):
         self.name = name
         self.type = plugin_type
         self.pip_url = pip_url
         self.config = config
+        self._extras = extras or {}
 
     def canonical(self):
-        return {"name": self.name, "pip_url": self.pip_url, "config": self.config}
+        return {
+            "name": self.name,
+            "pip_url": self.pip_url,
+            "config": self.config,
+            **self._extras,
+        }
 
     @property
     def config_files(self):
-        """
-        Return a list of stubbed files created for this plugin.
-        """
+        """Return a list of stubbed files created for this plugin."""
         return []
 
     @property

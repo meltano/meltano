@@ -7,18 +7,21 @@ from . import Runner
 from meltano.core.job import Job, JobFinder
 from meltano.core.project import Project
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer import SingerTap, SingerTarget
+from meltano.core.config_service import ConfigService
+from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
 
 
 class SingerRunner(Runner):
-    def __init__(self, project: Project, job_id, **config):
+    def __init__(
+        self, project: Project, job_id, config_service: ConfigService = None, **config
+    ):
         self.project = project
         self.job_id = job_id
+        self.config_service = config_service or ConfigService(project)
         self.config = config
 
         self.job = Job(elt_uri=self.job_id)
-
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
@@ -29,10 +32,6 @@ class SingerRunner(Runner):
     @property
     def database(self):
         return self.config.get("database", "default")
-
-    def prepare(self, tap: PluginInvoker, target: PluginInvoker):
-        tap.prepare()
-        target.prepare()
 
     def stop(self, process, **wait_args):
         if process.stdin:
@@ -47,6 +46,10 @@ class SingerRunner(Runner):
                 process.kill()
                 logging.error(f"{process} was killed.")
 
+    def prepare(self, tap: PluginInvoker, target: PluginInvoker):
+        tap.prepare()
+        target.prepare()
+
     def invoke(self, tap: PluginInvoker, target: PluginInvoker):
         tee_args = ["tee"]
 
@@ -56,7 +59,7 @@ class SingerRunner(Runner):
         try:
             p_target, p_tee, p_tap = None, None, None
             p_target = target.invoke(
-                stdin=subprocess.PIPE, stdout=target.files["state"].open("w+")
+                stdin=subprocess.PIPE, stdout=target.files["state"].open("w")
             )
 
             p_tee = subprocess.Popen(
@@ -105,7 +108,6 @@ class SingerRunner(Runner):
             self.job.payload["singer_state"] = json.loads(last_state)
 
     def dry_run(self, extractor: SingerTap, loader: SingerTarget):
-        self.prepare(extractor, loader)
         tap_exec = extractor.exec_path()
         target_exec = loader.exec_path()
 
@@ -114,7 +116,9 @@ class SingerRunner(Runner):
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
     def run(self, extractor: str, loader: str, dry_run=False):
-        tap, target = SingerTap(extractor), SingerTarget(loader)
+        tap = self.config_service.get_plugin(PluginType.EXTRACTORS, extractor)
+        target = self.config_service.get_plugin(PluginType.LOADERS, loader)
+
         extractor = PluginInvoker(self.project, tap)
         loader = PluginInvoker(self.project, target)
         self.prepare(extractor, loader)
