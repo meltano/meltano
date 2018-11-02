@@ -30,8 +30,6 @@ from meltano.core.plugin import PluginType
 def elt(job_id, extractor, loader, tap_output, dry, transform):
     project = Project.find()
 
-    # run `dbt deps`
-    DbtService(project).deps()
     singer_runner = SingerRunner(
         project,
         job_id=job_id,

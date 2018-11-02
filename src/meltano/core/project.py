@@ -82,5 +82,5 @@ class Project:
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
 
-    def plugin_dir(self, plugin: Plugin):
-        return self.meltano_dir(plugin.type, plugin.name)
+    def plugin_dir(self, plugin: Plugin, *joinpaths):
+        return self.meltano_dir(plugin.type, plugin.name, *joinpaths)

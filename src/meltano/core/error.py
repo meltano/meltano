@@ -18,12 +18,22 @@ class Error(Exception):
 
 
 class ExtractError(Error):
-    """
-    Error in the extraction process, like API errors.
-    """
+    """Error in the extraction process, like API errors."""
 
     def exit_code(self):
         return ExitCode.NO_RETRY
+
+
+class PluginInstallError(Exception):
+    """Happens when a plugin fails to install."""
+
+    pass
+
+
+class PluginInstallWarning(Exception):
+    """Happens when a plugin optional optional step fails to install."""
+
+    pass
 
 
 def aggregate(error_cls):

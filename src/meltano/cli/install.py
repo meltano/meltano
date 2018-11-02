@@ -13,6 +13,8 @@ def install_status_update(data):
         click.secho(f"Installing {plugin.type}: {plugin.name}", fg="yellow")
     if data["status"] == "error":
         click.secho(f"An error occured: {data['message']}.", fg="red")
+    if data["status"] == "warning":
+        click.secho(f"Warning! {data['message']}.", fg="yellow")
     if data["status"] == "success":
         click.secho(
             f"{plugin.type.title()}: {plugin.name} installed successfully", fg="green"

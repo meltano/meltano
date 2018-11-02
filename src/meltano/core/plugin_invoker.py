@@ -3,26 +3,13 @@ import subprocess
 
 from .project import Project
 from .plugin import Plugin
+from .plugin.error import PluginMissingError
 from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
 
 
-class PluginMissingError(Exception):
-    """
-    Base exception when a plugin seems to be missing.
-    """
-
-    def __init__(self, plugin_or_name):
-        if isinstance(Plugin, plugin_or_name):
-            self.plugin_name = plugin_or_name.name
-        else:
-            self.plugin_name = plugin_or_name
-
-
 class PluginInvoker:
-    """
-    This class handles the invocation of a `Plugin` instance.
-    """
+    """This class handles the invocation of a `Plugin` instance."""
 
     def __init__(
         self,
@@ -51,6 +38,11 @@ class PluginInvoker:
             for _key, filename in plugin_files.items()
         }
 
+    def prepare(self):
+        if not self._prepared:
+            self.config_service.configure()
+            self._prepared = True
+
     def exec_path(self):
         return self.venv_service.exec_path(self.plugin.name, namespace=self.plugin.type)
 
@@ -59,15 +51,11 @@ class PluginInvoker:
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args)]
 
-    def prepare(self):
-        if not self._prepared:
-            self.config_service.configure()
-            self._prepared = True
-
     def invoke(self, *args, **Popen):
         try:
             self.prepare()
-            return subprocess.Popen([*self.exec_args(), *args], **Popen)
+            with self.plugin.trigger_hooks("invoke", self, args):
+                return subprocess.Popen([*self.exec_args(), *args], **Popen)
 
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
