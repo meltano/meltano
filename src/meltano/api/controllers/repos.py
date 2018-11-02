@@ -12,7 +12,7 @@ from flask import Blueprint, jsonify
 from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
-meltano_model_path = join(os.getcwd(), 'model')
+meltano_model_path = join(os.getcwd(), "model")
 
 path_to_parser = join(
     pkg_resources.resource_filename("meltano.api", "node_modules"),
@@ -200,6 +200,8 @@ def db_import():
         model_settings["connection"] = model["connection"]
         model_settings["_type"] = model["_type"]
 
+        new_model = Model(model["_model"], model_settings)
+
         # Set the explores for the model
         has_explores = len(model.get("explores") or model.get("explore"))
         explores = model.get("explores", [model.get("explore")])
@@ -216,7 +218,7 @@ def db_import():
                     explore_settings["always_filter"] = explore["always_filter"]
                 explore_settings["_type"] = explore["_type"]
 
-                explore_name = explore.get('_explore', explore.get('label'))
+                explore_name = explore.get("_explore", explore.get("label"))
                 new_explore = Explore(explore_name, explore_settings)
 
                 # Set the view for the explore
