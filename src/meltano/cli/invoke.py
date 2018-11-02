@@ -1,4 +1,5 @@
 import click
+import sys
 from . import cli
 
 from meltano.core.project import Project
@@ -20,4 +21,11 @@ def invoke(plugin_name, plugin_args):
                   if plugin.name == plugin_name)
 
     service = PluginInvoker(project, plugin)
-    service.invoke(*plugin_args)
+    handle = service.invoke(*plugin_args)
+
+    try:
+        exit_code = handle.wait()
+        sys.exit(exit_code)
+    except Exception as err:
+        click.secho(f"An error occured: {err}.", fg="red")
+        raise click.Abort() from err
