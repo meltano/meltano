@@ -79,6 +79,7 @@ class SingerTap(SingerPlugin):
             logging.error(
                 f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
             )
+            properties_file.unlink()
             return
 
         try:
@@ -99,6 +100,7 @@ class SingerTap(SingerPlugin):
             logging.error(
                 f"Could not select stream, catalog file is invalid: {properties_file}"
             )
+            properties_file.unlink()
 
 
 class SingerTarget(SingerPlugin):

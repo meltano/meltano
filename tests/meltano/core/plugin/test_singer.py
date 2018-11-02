@@ -34,7 +34,7 @@ class TestSingerTap:
 
     def test_run_discovery(self, project, subject):
         process_mock = mock.Mock()
-        process_mock.wait.return_value = 00
+        process_mock.wait.return_value = 0
 
         invoker = PluginInvoker(project, subject)
         invoker.prepare()
@@ -43,6 +43,39 @@ class TestSingerTap:
             subject.run_discovery(invoker, [])
             
             assert invoke.called_with(["--discover"])
+
+    def test_run_discovery_fails(self, project, subject):
+        process_mock = mock.Mock()
+        process_mock.wait.return_value = 1  # something wrong happened
+
+        invoker = PluginInvoker(project, subject)
+        invoker.prepare()
+        
+        with mock.patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
+            subject.run_discovery(invoker, [])
+
+            assert not invoker.files["catalog"].exists(), "Catalog should not be present."
+
+    def test_run_discovery_invalid(self, project, subject):
+        process_mock = mock.Mock()
+        process_mock.wait.return_value = 0
+
+        invoker = PluginInvoker(project, subject)
+        invoker.prepare()
+
+        def corrupt_catalog(*_, **__):
+            invoker.files["catalog"] \
+                   .open("w") \
+                   .write("this is invalid json")
+
+            return process_mock
+
+        with mock.patch.object(PluginInvoker,
+                               "invoke",
+                               side_effect=corrupt_catalog) as invoke:
+            subject.run_discovery(invoker, [])
+
+            assert not invoker.files["catalog"].exists(), "Catalog should not be present."
 
 
 class TestSingerTarget:
