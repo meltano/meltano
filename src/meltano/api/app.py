@@ -56,9 +56,11 @@ def internal_error(exception):
 def analyze():
     return render_template("analyze.html")
 
+
 @app.route("/drop_it_like_its_hot")
 def drop_it():
     from .controllers.utils import SqlHelper
+
     SqlHelper().reset_db()
     return jsonify({"dropped_it": "like it's hot"})
 
