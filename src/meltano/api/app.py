@@ -28,10 +28,10 @@ if os.environ["FLASK_ENV"] == "development":
 # the same backend. Almost all component need a ready DB
 # connection.
 DB.setup(
-    host=app.config["POSTGRES_URL"],
-    user=app.config["POSTGRES_USER"],
-    password=app.config["POSTGRES_PASSWORD"],
-    database=app.config["POSTGRES_DB"],
+    host=app.config["MELTANO_POSTGRES_URL"],
+    username=app.config["MELTANO_POSTGRES_USER"],
+    password=app.config["MELTANO_POSTGRES_PASSWORD"],
+    database=app.config["MELTANO_POSTGRES_DB"],
 )
 db = SQLAlchemy(app)
 
