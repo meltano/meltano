@@ -9,6 +9,9 @@ Meltano stands for the [steps of the data science life-cycle](#data-science-life
 
 ## Data Science Lifecycle
 
+[Demo video of the data science lifecycle](https://youtu.be/CVZx2q00XnA)
+
+
 | Stage     | Meltano selected | OSS considered but not selected | Proprietary alternatives |
 | --------- | ------------ | -------------- | --------------------- |
 | Model     | [Meltano Model](#meltano-model) | [Open ModelSphere](http://www.modelsphere.com/org/) | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
