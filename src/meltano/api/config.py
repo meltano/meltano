@@ -13,10 +13,10 @@ def get_env_variable(name):
 
 
 # the values of those depend on your setup
-POSTGRES_URL = get_env_variable("POSTGRES_URL")
-POSTGRES_USER = get_env_variable("POSTGRES_USER")
-POSTGRES_PASSWORD = get_env_variable("POSTGRES_PASSWORD")
-POSTGRES_DB = get_env_variable("POSTGRES_DB")
+MELTANO_POSTGRES_URL = get_env_variable("MELTANO_POSTGRES_URL")
+MELTANO_POSTGRES_USER = get_env_variable("MELTANO_POSTGRES_USER")
+MELTANO_POSTGRES_PASSWORD = get_env_variable("MELTANO_POSTGRES_PASSWORD")
+MELTANO_POSTGRES_DB = get_env_variable("MELTANO_POSTGRES_DB")
 LOG_PATH = get_env_variable("MELTANO_ANALYSIS_LOG_PATH")
 ENV = "development"
 
@@ -24,8 +24,7 @@ API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
 PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 
-user, pw, url, db = POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_URL, POSTGRES_DB
-SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{user}:{pw}@{url}/{db}"
+SQLALCHEMY_DATABASE_URI = f"postgresql+psycopg2://{MELTANO_POSTGRES_USER}:{MELTANO_POSTGRES_PASSWORD}@{MELTANO_POSTGRES_URL}/{MELTANO_POSTGRES_DB}"
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
