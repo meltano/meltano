@@ -43,17 +43,7 @@ Meltano runs many different types of files and projects including but not limite
 1. Jupyter Notebook files
 1. Airflow DAGs as part of an orchestration step
 
-First install Meltano through `pip`, via
-
 **If you want to install Meltano in a venv: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment. See [this issue](https://gitlab.com/meltano/meltano/issues/141).**
-
-```bash
-pip install meltano
-# clone the gitlab-runner project
-git clone https://gitlab.com/meltano/gitlab-runners
-cd gitlab-runners
-meltano orchestrate
-```
 
 After installing `meltano` CLI, you can choose to run meltano against your project.
 
@@ -343,6 +333,8 @@ docker-compose up
 ```
 
 ### Without Docker
+
+You will need to have postgres installed and available >= 10.5. 
 
 Run the following in your project directory:
 
