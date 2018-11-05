@@ -1,0 +1,260 @@
+# Databases
+
+raw:
+    type: database
+
+analytics:
+    type: database
+
+
+# Roles
+
+## Admin Roles
+accountadmin:
+    type: role
+    warehouse:
+        - admin
+    member_of:
+        - sysadmin
+
+securityadmin:
+    type: role
+    warehouse:
+        - admin
+    member_of:
+        - sysadmin
+
+
+sysadmin:
+    type: role
+    warehouse:
+        - admin
+    privileges:
+        databases:
+            read:
+                - raw
+                - analytics
+            write:
+                - raw
+                - analytics
+        schemas:
+            read:
+                - raw.*
+                - analytics.*
+            write:
+                - raw.*
+                - analytics.*
+        tables:
+            read:
+                - raw.*.*
+                - analytics.*.*
+            write:
+                - raw.*.*
+                - analytics.*.*
+## User Roles
+engineer:
+    type: role
+    member_of:
+        - sysadmin
+    warehouse:
+        - admin
+    privileges:
+        databases:
+            read:
+                - raw
+                - analytics
+            write:
+                - raw
+                - analytics
+        schemas:
+            read:
+                - raw.*
+                - analytics.*
+            write:
+                - raw.*
+                - analytics.*
+        tables:
+            read:
+                - raw.*.*
+                - analytics.*.*
+            write:
+                - raw.*.*
+                - analytics.*.*
+
+loader:
+    type: role
+    warehouse:
+        - loading
+    owns:
+        schemas:
+            - raw.*
+        tables:
+            - raw.*.*
+    privileges:
+        database:
+            read:
+                - raw
+            write:
+                - raw
+        schemas:
+            read:
+                - raw.*
+            write:
+                - raw.*
+        tables:
+            read:
+                - raw.*.*
+            write:
+                - raw.*.*
+
+
+reporter:
+    type: role
+    warehouse:
+        - reporting
+    privileges:
+        databases:
+            read:
+                - analytics
+        schemas:
+            read:
+                - analytics.*
+        tables:
+            read:
+                - analytics.*.*
+
+transformer:
+    type: role
+    warehouse:
+        - transforming
+    owns:
+        schemas:
+            - analytics.*
+        tables:
+            - analytics.*.*
+    privileges:
+        databases:
+            read:
+                - raw
+                - analytics
+            write:
+                - analytics
+        schemas:
+            read:
+                - raw.*
+            write:
+                - analytics.*
+        tables:
+            read:
+                - raw.*.*
+            write:
+                - analytics.*.*
+
+
+# Users
+
+eburke:
+    type: user
+    can_login: yes
+    member_of:
+        - sysadmin
+        - transformer
+    owns:
+        schemas:
+            - eburke_scratch
+
+eeastwood:
+    type: user
+    can_login: yes
+    member_of:
+        - transformer
+    owns:
+        schemas:
+            - eeastwood_scratch
+
+gitlab-ci:
+    type: user
+    can_login: yes
+    member_of:
+        - loader
+        - reporter
+        - sysadmin
+        - transformer
+
+looker:
+    type: user
+    can_login: yes
+    member_of:
+        - reporter
+    owns:
+        schemas:
+            - looker_scratch
+
+iroussos:
+    type: user
+    can_login: yes
+    member_of:
+        - engineer
+        - loader
+    owns:
+        schemas:
+            - iroussos_scratch
+
+
+tlapiana:
+    type: user
+    can_login: yes
+    member_of:
+        - engineer
+        - loader
+        - transformer
+        - sysadmin
+    owns:
+        schemas:
+            - tlapiana_scratch
+
+
+tmurphy:
+    type: user
+    can_login: yes
+    member_of:
+        - accountadmin
+        - engineer
+        - sysadmin
+        - transformer
+    owns:
+        schemas:
+            - tmurphy_scratch
+
+
+tszuromi:
+    type: user
+    can_login: yes
+    member_of:
+        - reporter
+    owns:
+        schemas:
+            - tszuromi_scratch
+
+
+# Warehouse
+
+admin:
+    type: warehouse
+    size:
+        - x-small
+
+loading:
+    type: warehouse
+    size:
+        - x-small
+
+reporting:
+    type: warehouse
+    size:
+        - x-small
+
+transforming:
+    type: warehouse
+    size:
+        - x-small
