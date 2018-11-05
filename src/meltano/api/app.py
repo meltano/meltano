@@ -54,10 +54,14 @@ def internal_error(exception):
 @app.route("/model")
 @app.route("/")
 def analyze():
-    return render_template("analyze.html")
+    from jinja2.exceptions import TemplateNotFound
+    try:
+      return render_template("analyze.html")
+    except TemplateNotFound:
+      return "Please run yarn build-templates from src/meltano_ui"
 
 
-@app.route("/drop_it_like_its_hot")
+@app.route("/drop")
 def drop_it():
     from .controllers.utils import SqlHelper
 
