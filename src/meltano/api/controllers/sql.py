@@ -79,13 +79,12 @@ def get_sql(model_name, explore_name):
         try:
             results = engine.execute(outgoing_sql)
         except sqlalchemy.exc.DBAPIError as e:
-            print(e)
             return (
                 jsonify(
                     {
                         "error": True,
                         "code": e.code,
-                        "orig": e.orig.diag.message_primary,
+                        "orig": str(e),
                         "statement": e.statement,
                     }
                 ),
