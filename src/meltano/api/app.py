@@ -55,10 +55,11 @@ def internal_error(exception):
 @app.route("/")
 def analyze():
     from jinja2.exceptions import TemplateNotFound
+
     try:
-      return render_template("analyze.html")
+        return render_template("analyze.html")
     except TemplateNotFound:
-      return "Please run yarn build-templates from src/meltano_ui"
+        return "Please run yarn build-templates from src/meltano_ui"
 
 
 @app.route("/drop")
