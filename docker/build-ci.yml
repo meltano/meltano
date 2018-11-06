@@ -13,7 +13,7 @@
     - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
 
 # Builds the singer_runner container for use in testing on branches
-dev_runner:
+runner_dev:
   <<: *kaniko_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
