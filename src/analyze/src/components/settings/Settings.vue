@@ -29,6 +29,10 @@
                     <span class="is-pulled-right">{{connection.dialect}}</span>
                   </p>
                   <p>
+                    <strong>Port</strong>
+                    <span class="is-pulled-right">{{connection.port}}</span>
+                  </p>
+                  <p>
                     <strong>Username</strong>
                     <span class="is-pulled-right">{{connection.username}}</span>
                   </p>
