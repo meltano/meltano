@@ -38,6 +38,7 @@ cli_requires = [
 dev_requires = [
     'pytest',
     'black',
+    'bumpversion',
 ]
 
 setup(
