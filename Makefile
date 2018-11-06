@@ -74,7 +74,7 @@ prod_image: base_image ui
 	docker build \
 		--file docker/prod/Dockerfile \
 		-t $(app_image_tag) \
-		--build-arg BASE_IMAGE=$(base_image_tag)
+		--build-arg BASE_IMAGE=$(base_image_tag) \
 		.
 
 cli_image:
