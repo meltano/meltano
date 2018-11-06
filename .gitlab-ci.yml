@@ -92,8 +92,8 @@ meltano_base_dev:
   variables:
     DOCKERFILE: docker/base/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
-  only:
-    - branches
+  except:
+    - master
 
 # Manages:
 #  - meltano/meltano/base:edge
@@ -160,7 +160,7 @@ meltano_cli:
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
-    - master
+    - tags
 
 #############
 # Build     #
