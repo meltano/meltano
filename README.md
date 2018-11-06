@@ -623,10 +623,13 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
 ```bash
-$ git checkout master  # versions should be on master
+$ git fetch origin
+$ git checkout -b release-next origin/master
 $ bumpversion (minor|major|--new-version <new_version>) --tag
 $ git push --tags origin
 ```
+
+Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.
 
 ## GitLab Data and Analytics - Internal
 
