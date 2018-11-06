@@ -230,9 +230,12 @@ hub_meltano: &docker_hub_publish
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
     - docker pull $SOURCE_IMAGE:$IMAGE_TAG
+    - docker pull $SOURCE_IMAGE:latest
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker tag $SOURCE_IMAGE $IMAGE_NAME:$IMAGE_TAG
+    - docker tag $SOURCE_IMAGE:$IMAGE_TAG $IMAGE_NAME:$IMAGE_TAG
+    - docker tag $SOURCE_IMAGE:latest $IMAGE_NAME:latest
     - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker push $IMAGE_NAME:latest
   only:
     variables:
       - $CI_COMMIT_TAG
