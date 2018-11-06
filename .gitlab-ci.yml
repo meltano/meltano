@@ -119,7 +119,7 @@ meltano_base:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
     IMAGE_TAG: $CI_COMMIT_TAG
   after_script:
-    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
@@ -159,7 +159,7 @@ meltano_cli:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
     IMAGE_TAG: $CI_COMMIT_TAG
   after_script:
-    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
@@ -209,7 +209,7 @@ meltano:
     # replace the FROM ... in the Dockerfile to use this branch's image
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base#" $DOCKERFILE
   after_script:
-    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -t $DOCKER_IMAGE_NAME:latest
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
@@ -230,9 +230,12 @@ hub_meltano: &docker_hub_publish
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
     - docker pull $SOURCE_IMAGE:$IMAGE_TAG
+    - docker pull $SOURCE_IMAGE:latest
     - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
-    - docker tag $SOURCE_IMAGE -t $IMAGE_NAME:$IMAGE_TAG
+    - docker tag $SOURCE_IMAGE:$IMAGE_TAG $IMAGE_NAME:$IMAGE_TAG
+    - docker tag $SOURCE_IMAGE:latest $IMAGE_NAME:latest
     - docker push $IMAGE_NAME:$IMAGE_TAG
+    - docker push $IMAGE_NAME:latest
   only:
     variables:
       - $CI_COMMIT_TAG
