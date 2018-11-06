@@ -56,6 +56,13 @@ publish:
     variables:
       - $CI_COMMIT_TAG
 
+.docker_build_script: &docker_build_script |
+  export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
+  export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
+  docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
+  docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+
 .docker_build: &docker_build
   image: docker:latest
   stage: build
@@ -65,11 +72,7 @@ publish:
   services:
     - docker:dind
   script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
-    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
-    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+    - *docker_build_script
 
 .review:
   image: silvs/kubectl:latest
@@ -118,7 +121,8 @@ meltano_base:
     DOCKERFILE: docker/base/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
     IMAGE_TAG: $CI_COMMIT_TAG
-  after_script:
+  script:
+    - *docker_build_script
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
@@ -158,7 +162,8 @@ meltano_cli:
     DOCKERFILE: docker/cli/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
     IMAGE_TAG: $CI_COMMIT_TAG
-  after_script:
+  script:
+    - *docker_build_script
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
@@ -208,7 +213,8 @@ meltano:
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base#" $DOCKERFILE
-  after_script:
+  script:
+    - *docker_build_script
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
