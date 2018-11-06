@@ -613,6 +613,20 @@ Meltano uses an approval workflow for all merge requests.
   1. Assign the merge request to any Meltano maintainer for a review cycle
   1. Once the review is done the reviewer should approve the merge request
   1. Once approved, the merge request can be merged by any Meltano maintainer
+  
+## Release
+
+Meltano uses [semver](https://semver.org/) as its version number scheme.
+
+### Release process
+
+Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
+
+```bash
+$ git checkout master  # versions should be on master
+$ bumpversion (minor|major|--new-version <new_version>) --tag
+$ git push --tags origin
+```
 
 ## GitLab Data and Analytics - Internal
 
