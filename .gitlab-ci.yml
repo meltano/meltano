@@ -235,7 +235,7 @@ hub_meltano: &docker_hub_publish
   variables:
     DOCKERFILE: .
     DOCKER_DRIVER: overlay2
-    IMAGE_NAME: meltano
+    IMAGE_NAME: meltano/meltano
     IMAGE_TAG: $CI_COMMIT_TAG
     SOURCE_IMAGE: $CI_REGISTRY_IMAGE
   script:
