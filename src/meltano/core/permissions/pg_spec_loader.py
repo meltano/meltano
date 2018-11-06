@@ -47,6 +47,15 @@ class PGSpecLoader:
 
 
     def load_spec(self, spec_path: str) -> Dict:
+        """
+        Load a permissions specification from a file.
+
+        If the file is not found or at least an error is found during validation,
+        raise a SpecLoadingError with the appropriate error messages.
+
+        Otherwise, return the valid specification as a Dictionary to be used
+        in other operations.
+        """
         try:
             with open(spec_path, 'r') as stream:
                 spec = yaml.load(stream)
@@ -61,7 +70,11 @@ class PGSpecLoader:
 
 
     def ensure_valid_schema(self, spec: Dict) -> List[str]:
-        """ Ensure spec has no schema errors """
+        """
+        Ensure that the provided spec has no schema errors.
+
+        Return a list with all the errors found.
+        """
         error_messages = []
 
         schema = yaml.load(PG_SPEC_SCHEMA_YAML)
@@ -169,12 +182,12 @@ class PGSpecLoader:
         GRANT_WRITE_ON_SCHEMA_TEMPLATE = 'GRANT CREATE ON SCHEMA {schema} TO {role}'
         GRANT_READ_ON_TABLE_TEMPLATE = 'GRANT SELECT ON TABLE {table} TO {role}'
         GRANT_WRITE_ON_TABLE_TEMPLATE = (
-            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER"
+            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER "
             "ON TABLE {table} TO {role}"
         )
         GRANT_READ_ON_ALL_TABLES_TEMPLATE = 'GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {role}'
         GRANT_WRITE_ON_ALL_TABLE_TEMPLATE = (
-            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER"
+            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER "
             "ON ALL TABLES IN SCHEMA {schema} TO {role}"
         )
 

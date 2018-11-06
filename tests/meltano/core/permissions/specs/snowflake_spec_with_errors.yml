@@ -91,7 +91,7 @@ loader:
         tables:
             - raw.*.*
     privileges:
-        databases:
+        database:
             read:
                 - raw
             write:
@@ -241,16 +241,20 @@ tszuromi:
 
 admin:
     type: warehouse
-    size: x-small
+    size:
+        - x-small
 
 loading:
     type: warehouse
-    size: x-small
+    size:
+        - x-small
 
 reporting:
     type: warehouse
-    size: x-small
+    size:
+        - x-small
 
 transforming:
     type: warehouse
-    size: x-small
+    size:
+        - x-small

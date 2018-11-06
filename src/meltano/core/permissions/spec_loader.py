@@ -1,11 +1,14 @@
 from typing import List
 
 from .pg_spec_loader import PGSpecLoader
+from .snowflake_spec_loader import SnowflakeSpecLoader
 from .error import SpecLoadingError
 
 def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
     if db == "postgres":
         spec_loader = PGSpecLoader(spec_path)
+    elif db == "snowflake":
+        spec_loader = SnowflakeSpecLoader(spec_path)
     else:
         raise SpecLoadingError(f"Permissions Spec File for {db} is not supported.")
 
