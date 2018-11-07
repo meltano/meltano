@@ -339,11 +339,11 @@ You will need to have postgres installed and available >= 10.5.
 Run the following in your project directory:
 
 ```bash
-python -m venv ~/path/to/melt_venv
+python3 -m venv ~/path/to/melt_venv
 source ~/path/to/melt_venv/bin/activate
 pip install -r requirements.txt
 pip install -e '.[all]'
-python -m meltano.api
+python3 -m meltano.api
 ```
 
 This will start:
