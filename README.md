@@ -32,7 +32,7 @@ A data analyst or scientist should be able to easily use Meltano to add whatever
 
 ### How Meltano Does Version Control
 
-> **Note**: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.
+> **Note**: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.  
 > Items marked with `**` are not yet implemented.
 
 Meltano runs many different types of files and projects including but not limited to:
