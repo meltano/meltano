@@ -90,13 +90,13 @@ orchestrate: **
 Your project should contains the following directory structure:
 
 * model - For your `.lookml` files.
-* transform - For your dbt `.sql` files.
+* transform - For your local dbt project files.
 * analyze - For your `.yml` dashboard files.
 * notebook - For your `.ipynb` notebook files.
 * orchestrate - For your airflow `.py` files.
-* .meltano - A .gitignored directory for internal caching (venvs, pypi packages, etc.). 
-* load - A directory where your configs for your loaders are placed. Each config should be in a directory with the name of the loader. e.g. For csv loader, the config would be in `load/target-csv/config.json`. **
-* extract - A directory where your configs for your extractors are plac ed. Each config should be in a directory with the name of the extractor. e.g. For zendesk extractor, the config would be in `extract/tap-zendesk/config.json`. **
+* .meltano - A .gitignored directory for internal caching (virtualenvs, pypi packages, generated configuration files, etc.). 
+* load - A directory where your configs for your loaders are placed. Each config should be in a directory with the name of the loader. e.g. For csv loader, the config would be in `load/target-csv/tap.config.json`. **
+* extract - A directory where your configs for your extractors are placed. Each config should be in a directory with the name of the extractor. e.g. For zendesk extractor, the config would be in `extract/tap-zendesk/target.config.json`. **
 * .gitignore
 * README.md
 * meltano.yml - Config file which shows which extractors and loaders, etc. you would like to use and where to find them.
@@ -104,16 +104,16 @@ Your project should contains the following directory structure:
 Here is a sample of what your project might look like:
 
 ```
-MELTANO_ROOT
 .
 ├── analyze
 │   └── zendesk
 │       └── zendesk.dashboard.yml
-├── extract **
+├── dbt_project.yml
+├── extract
 │   └── tap-...
 │       ├── tap.config.json
 │       └── tap.properties.json
-├── load **
+├── load
 │   └── target-...
 │       └── target.config.json
 ├── .meltano
@@ -141,6 +141,8 @@ MELTANO_ROOT
 │   ├── dag_3.py
 │   ├── dag_4.py
 │   └── dag_5.py
+├── packages.yml
+├── profiles.yml
 └── transform
     └── tap-zendesk
         └── base.sql
