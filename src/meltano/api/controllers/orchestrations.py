@@ -7,7 +7,6 @@ from sqlalchemy import TIMESTAMP, DATE, DATETIME
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 from meltano.core.runner.meltano import (
     MeltanoRunner,
-    ComponentNotFoundError,
     EXTRACTOR_REGISTRY,
     LOADER_REGISTRY,
 )
@@ -51,12 +50,7 @@ def run():
 
     # Use a logging handler to capture the output of the extraction run
     runner.logger.addHandler(logging.StreamHandler(run_output))
-
-    try:
-        runner.perform(extractor_name, loader_name)
-    except ComponentNotFoundError as err:
-        run_output.write(f"\n{err}")
-        return jsonify({"append": run_output.getvalue()})
+    runner.perform(extractor_name, loader_name)
 
     run_output.write("\nLoad done!")
     run_output.write("\nStarting Transform")
