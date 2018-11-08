@@ -20,6 +20,14 @@ extractors:
       security_token: $SFDC_SECURITY_TOKEN
       select_fields_by_default: true
       start_date: $SFDC_START_DATE
+  - name: tap-mongodb
+    pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
+    config:
+      host: $MONGODB_HOST
+      port: $MONGODB_PORT
+      user: $MONGODB_USERNAME
+      password: $MONGODB_PASSWORD
+      dbname: $MONGODB_DBNAME
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
