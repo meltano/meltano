@@ -161,7 +161,7 @@ eburke:
         - transformer
     owns:
         schemas:
-            - eburke_scratch
+            - analytics.eburke_scratch
 
 eeastwood:
     type: user
@@ -170,7 +170,7 @@ eeastwood:
         - transformer
     owns:
         schemas:
-            - eeastwood_scratch
+            - analytics.eeastwood_scratch
 
 gitlab-ci:
     type: user
@@ -188,7 +188,7 @@ looker:
         - reporter
     owns:
         schemas:
-            - looker_scratch
+            - analytics.looker_scratch
 
 iroussos:
     type: user
@@ -198,7 +198,7 @@ iroussos:
         - loader
     owns:
         schemas:
-            - iroussos_scratch
+            - analytics.iroussos_scratch
 
 
 tlapiana:
@@ -211,7 +211,7 @@ tlapiana:
         - sysadmin
     owns:
         schemas:
-            - tlapiana_scratch
+            - analytics.tlapiana_scratch
 
 
 tmurphy:
@@ -224,7 +224,7 @@ tmurphy:
         - transformer
     owns:
         schemas:
-            - tmurphy_scratch
+            - analytics.tmurphy_scratch
 
 
 tszuromi:
@@ -234,7 +234,7 @@ tszuromi:
         - reporter
     owns:
         schemas:
-            - tszuromi_scratch
+            - analytics.tszuromi_scratch
 
 
 # Warehouse

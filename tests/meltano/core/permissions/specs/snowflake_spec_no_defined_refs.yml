@@ -1,0 +1,43 @@
+# Databases
+test_db:
+    type: database
+
+# Roles
+loader:
+    type: role
+    warehouse:
+        - dev_warehouse
+        - loading
+    privileges:
+        databases:
+            read:
+                - raw
+            write:
+                - raw
+        schemas:
+            read:
+                - analytics.*
+            write:
+                - analytics.*
+        tables:
+            read:
+                - test_db.test.*
+            write:
+                - test_db.test.*
+
+# Users
+test_user:
+    type: user
+    can_login: yes
+    member_of:
+        - sysadmin
+        - transformer
+        - loader
+    owns:
+        schemas:
+            - dev_db.test_user_scratch
+
+# Warehouses
+loading:
+    type: warehouse
+    size: x-small

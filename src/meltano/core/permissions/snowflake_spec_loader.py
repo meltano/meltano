@@ -1,5 +1,6 @@
 import cerberus
 import yaml
+import re
 
 from typing import Dict, List
 from .error import SpecLoadingError
@@ -180,6 +181,25 @@ class SnowflakeSpecLoader:
 
         entities = self.generate_entities()
 
+        # Check that all the referenced entities are also defined
+        for database in entities['database_refs']:
+            if database not in entities['databases']:
+                error_messages.append(
+                    f'Database {database} is referenced in the spec but not defined'
+                )
+
+        for role in entities['role_refs']:
+            if role not in entities['roles']:
+                error_messages.append(
+                    f'Role {role} is referenced in the spec but not defined'
+                )
+
+        for warehouse in entities['warehouse_refs']:
+            if warehouse not in entities['warehouses']:
+                error_messages.append(
+                    f'Warehouse {warehouse} is referenced in the spec but not defined'
+                )
+
         if error_messages:
             raise SpecLoadingError('\n'.join(error_messages))
 
@@ -187,6 +207,17 @@ class SnowflakeSpecLoader:
 
 
     def generate_entities(self) -> Dict:
+        """
+        Generate and return a dictionary with all the entities defined or
+        referenced in the permissions specification file.
+
+        The xxx_refs entities are referenced by various permissions.
+        For example:
+        'roles' --> All the roles defined in the spec
+        'role_refs' --> All the roles referenced in a member_of permission
+        'table_refs' --> All the tables referenced in read/write privileges
+                         or in owns entries
+        """
         entities = {
             'databases': set(),
             'database_refs': set(),
@@ -282,6 +313,60 @@ class SnowflakeSpecLoader:
 
             elif permission_type == 'warehouse':
                 entities['warehouses'].add(entity_name)
+
+        # Check that all names are valid and also add implicit references to
+        #  DBs and Schemas. e.g. RAW.TEST_SCHEMA.TABLE references also
+        #  DB RAW and Schema TEST_SCHEMA
+        error_messages = []
+
+        for db in entities['databases'] | entities['database_refs']:
+            name_parts = db.split('.')
+            if not len(name_parts) == 1:
+                error_messages.append(
+                    f'Not a valid database name: {db}' + \
+                    ' (Proper definition: DB)'
+                )
+
+        for schema in entities['schema_refs']:
+            name_parts = schema.split('.')
+            if (not len(name_parts) == 2) \
+               or (name_parts[0] == '*'):
+                error_messages.append(
+                    f'Not a valid schema name: {schema}' + \
+                    ' (Proper definition: DB.[SCHEMA | *])'
+                )
+
+            # Add the Database in the database refs
+            if name_parts[0] != '*':
+                entities['database_refs'].add(name_parts[0])
+
+        for table in entities['table_refs']:
+            name_parts = table.split('.')
+            if (not len(name_parts) == 3) \
+               or (name_parts[0] == '*'):
+                error_messages.append(
+                    f'Not a valid table name: {table}' + \
+                    ' (Proper definition: DB.[SCHEMA | *].[TABLE | *])'
+                )
+            elif (name_parts[1] == '*' and name_parts[2] != '*'):
+                error_messages.append(
+                    f'Not a valid table name: {table}' + \
+                    " (Can't have a Table name after selecting all schemas" + \
+                    " with *: DB.[SCHEMA | *].[TABLE | *])"
+                )
+
+            # Add the Database in the database refs
+            if name_parts[0] != '*':
+                entities['database_refs'].add(name_parts[0])
+
+            # Add the Schema in the schema refs
+            if name_parts[1] != '*':
+                entities['schema_refs'].add(
+                    f'{name_parts[0]}.{name_parts[1]}'
+                )
+
+        if error_messages:
+            raise SpecLoadingError('\n'.join(error_messages))
 
         return entities
 
