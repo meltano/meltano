@@ -37,6 +37,8 @@ cli_requires = [
 
 dev_requires = [
     'pytest',
+    'pytest-asyncio',
+    'asynctest',
     'black',
     'bumpversion',
 ]

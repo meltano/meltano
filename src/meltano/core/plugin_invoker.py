@@ -1,5 +1,6 @@
 import logging
 import subprocess
+import asyncio
 
 from .project import Project
 from .plugin import Plugin
@@ -60,3 +61,14 @@ class PluginInvoker:
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
             raise PluginMissingError(self.plugin)
+
+    async def invoke_async(self, *args, **Popen):
+        try:
+            self.prepare()
+            with self.plugin.trigger_hooks("invoke", self, args):
+                return await asyncio.create_subprocess_exec(*self.exec_args(), *args, **Popen)
+
+        except Exception as err:
+            logging.error(f"Failed to start plugin {self.plugin}.")
+            raise PluginMissingError(self.plugin)
+
