@@ -16,7 +16,6 @@ class JobFinder:
                 session.query(Job)
                 .filter(
                     (Job.elt_uri == self.elt_uri)
-                    & (Job.state == State.SUCCESS)
                     & Job.ended_at.isnot(None)
                 )
                 .order_by(Job.ended_at.desc())

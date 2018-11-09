@@ -113,19 +113,22 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     async def test_bookmark(self, subject, tap_process, target_process):
-        in, out = os.pipe()
+        lines = (b'{"line": 1}\n',
+                 b'{"line": 2}\n',
+                 b'{"line": 3}\n')
 
-        # bookmark
-        target_process.stdout = ('{"line": 1}\n'
-                                 '{"line": 2}\n'
-                                 '{"line": 3}\n')
+        # testing with a real subprocess proved to be pretty
+        # complicated.
+        target_process.stdout = mock.MagicMock()
+        target_process.stdout.at_eof.side_effect = (False, False, False, True)
+        target_process.stdout.readline = CoroutineMock(side_effect=lines)
 
         with subject.job.run():
             await subject.bookmark(target_process.stdout)
 
-        assert subject.job.payload["singer_state"]["line"] == 2
+        assert subject.job.payload["singer_state"]["line"] == 3
 
-        # restore
+        # test the restore
         tap_invoker = PluginInvoker(subject.project, TAP)
         subject.restore_bookmark(tap_invoker)
         state_json = json.dumps(subject.job.payload["singer_state"])
