@@ -14,14 +14,14 @@ testing_db:
 ## Admin Roles
 accountadmin:
     type: role
-    warehouse:
+    warehouses:
         - loading
     member_of:
         - sysadmin
 
 securityadmin:
     type: role
-    warehouse:
+    warehouses:
         - loading
     member_of:
         - sysadmin
@@ -29,7 +29,7 @@ securityadmin:
 
 sysadmin:
     type: role
-    warehouse:
+    warehouses:
         - loading
     privileges:
         databases:
@@ -58,7 +58,7 @@ engineer:
     type: role
     member_of:
         - sysadmin
-    warehouse:
+    warehouses:
         - loading
     privileges:
         databases:
@@ -85,7 +85,7 @@ engineer:
 
 loader:
     type: role
-    warehouse:
+    warehouses:
         - loading
     owns:
         schemas:
@@ -120,7 +120,7 @@ loader:
 
 reporter:
     type: role
-    warehouse:
+    warehouses:
         - reporting
     privileges:
         databases:
@@ -135,7 +135,7 @@ reporter:
 
 transformer:
     type: role
-    warehouse:
+    warehouses:
         - transforming
     owns:
         schemas:
@@ -259,7 +259,7 @@ tszuromi:
             - analytics.tszuromi_scratch
 
 
-# Warehouse
+# Warehouses
 
 loading:
     type: warehouse

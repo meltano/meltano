@@ -168,8 +168,8 @@ class SnowflakeSpecLoader:
                     for member_role in config["member_of"]:
                         entities["role_refs"].add(member_role)
 
-                if "warehouse" in config:
-                    for warehouse in config["warehouse"]:
+                if "warehouses" in config:
+                    for warehouse in config["warehouses"]:
                         entities["warehouse_refs"].add(warehouse)
 
                 if "privileges" in config:
@@ -219,10 +219,6 @@ class SnowflakeSpecLoader:
                 if "member_of" in config:
                     for member_role in config["member_of"]:
                         entities["role_refs"].add(member_role)
-
-                if "warehouse" in config:
-                    for warehouse in config["warehouse"]:
-                        entities["warehouse_refs"].add(warehouse)
 
                 if "owns" in config:
                     if "databases" in config["owns"]:
@@ -365,33 +361,27 @@ class SnowflakeSpecLoader:
                 continue
             elif permission_type == "role":
                 sql_commands.extend(
-                    self.generate_grant_roles_to_role(entity_name, config)
+                    self.generate_grant_roles("ROLE", entity_name, config)
                 )
 
-                sql_commands.extend(
-                    self.generate_grant_ownership_to_role(entity_name, config)
-                )
+                sql_commands.extend(self.generate_grant_ownership(entity_name, config))
 
                 sql_commands.extend(
                     self.generate_grant_privileges_to_role(entity_name, config)
                 )
             elif permission_type == "user":
-                sql_commands.extend(self.generate_alter_role(entity_name, config))
+                sql_commands.extend(self.generate_alter_user(entity_name, config))
 
                 sql_commands.extend(
-                    self.generate_grant_roles_to_role(entity_name, config)
-                )
-
-                sql_commands.extend(
-                    self.generate_grant_ownership_to_role(entity_name, config)
+                    self.generate_grant_roles("USER", entity_name, config)
                 )
             elif permission_type == "warehouse":
                 continue
 
         return sql_commands
 
-    def generate_alter_role(self, role: str, config: str) -> List[str]:
-        ALTER_ROLE_TEMPLATE = "ALTER ROLE {role} {privileges}"
+    def generate_alter_user(self, user: str, config: str) -> List[str]:
+        ALTER_USER_TEMPLATE = "ALTER USER {user_name} SET {privileges}"
 
         sql_commands = []
 
@@ -399,125 +389,297 @@ class SnowflakeSpecLoader:
 
         if "can_login" in config:
             if config["can_login"]:
-                alter_privileges.append("LOGIN")
+                alter_privileges.append("DISABLED = FALSE")
             else:
-                alter_privileges.append("NOLOGIN")
-
-        if "is_superuser" in config:
-            if config["is_superuser"]:
-                alter_privileges.append("SUPERUSER")
-            else:
-                alter_privileges.append("NOSUPERUSER")
+                alter_privileges.append("DISABLED = TRUE")
 
         if alter_privileges:
             sql_commands.append(
-                ALTER_ROLE_TEMPLATE.format(
-                    role=role, privileges=" ".join(alter_privileges)
+                ALTER_USER_TEMPLATE.format(
+                    user_name=user, privileges=", ".join(alter_privileges)
                 )
             )
 
         return sql_commands
 
-    def generate_grant_roles_to_role(self, role: str, config: str) -> List[str]:
-        GRANT_ROLE_TEMPLATE = "GRANT {role_names} TO {role}"
-
+    def generate_grant_roles(
+        self, entity_type: str, entity: str, config: str
+    ) -> List[str]:
+        GRANT_ROLE_TEMPLATE = "GRANT {role_name} TO {type} {entity_name}"
         sql_commands = []
-
-        role_names = []
 
         if "member_of" in config:
             for member_role in config["member_of"]:
-                role_names.append(member_role)
-
-        if role_names:
-            sql_commands.append(
-                GRANT_ROLE_TEMPLATE.format(role=role, role_names=", ".join(role_names))
-            )
+                sql_commands.append(
+                    GRANT_ROLE_TEMPLATE.format(
+                        role_name=member_role, type=entity_type, entity_name=entity
+                    )
+                )
 
         return sql_commands
 
-    def generate_grant_ownership_to_role(self, role: str, config: str) -> List[str]:
-        ALTER_SCHEMA_OWNER_TEMPLATE = "ALTER SCHEMA {schema} OWNER TO {role}"
+    def generate_grant_ownership(self, role: str, config: str) -> List[str]:
+        Grant_Ownership_TEMPLATE = (
+            "GRANT OWNERSHIP"
+            + " ON {resource_type} {resource_name}"
+            + " TO ROLE {role_name} COPY CURRENT GRANTS"
+        )
 
         sql_commands = []
 
         if "owns" in config:
+            if "databases" in config["owns"]:
+                for database in config["owns"]["databases"]:
+                    sql_commands.append(
+                        Grant_Ownership_TEMPLATE.format(
+                            resource_type="DATABASE",
+                            resource_name=database,
+                            role_name=role,
+                        )
+                    )
 
             if "schemas" in config["owns"]:
                 for schema in config["owns"]["schemas"]:
-                    sql_commands.append(
-                        ALTER_SCHEMA_OWNER_TEMPLATE.format(role=role, schema=schema)
-                    )
+                    name_parts = schema.split(".")
+                    info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+                    if name_parts[1] == "*":
+                        schemas = []
+                        conn = SnowflakeConnector()
+                        db_schemas = conn.show_schemas(name_parts[0])
+
+                        for db_schema in db_schemas:
+                            if db_schema != info_schema:
+                                schemas.append(db_schema)
+
+                        for db_schema in schemas:
+                            sql_commands.append(
+                                Grant_Ownership_TEMPLATE.format(
+                                    resource_type="SCHEMA",
+                                    resource_name=db_schema,
+                                    role_name=role,
+                                )
+                            )
+                    else:
+                        sql_commands.append(
+                            Grant_Ownership_TEMPLATE.format(
+                                resource_type="SCHEMA",
+                                resource_name=name_parts[1],
+                                role_name=role,
+                            )
+                        )
+
+            if "tables" in config["owns"]:
+                for table in config["owns"]["tables"]:
+                    name_parts = table.split(".")
+                    info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+                    if name_parts[2] == "*":
+                        schemas = []
+
+                        if name_parts[1] == "*":
+                            conn = SnowflakeConnector()
+                            db_schemas = conn.show_schemas(name_parts[0])
+
+                            for schema in db_schemas:
+                                if schema != info_schema:
+                                    schemas.append(schema)
+                        else:
+                            schemas = [name_parts[1]]
+
+                        for schema in schemas:
+                            sql_commands.append(
+                                Grant_Ownership_TEMPLATE.format(
+                                    resource_type="ALL TABLES IN SCHEMA",
+                                    resource_name=schema,
+                                    role_name=role,
+                                )
+                            )
+                    else:
+                        sql_commands.append(
+                            Grant_Ownership_TEMPLATE.format(
+                                resource_type="TABLE",
+                                resource_name=name_parts[2],
+                                role_name=role,
+                            )
+                        )
 
         return sql_commands
 
     def generate_grant_privileges_to_role(self, role: str, config: str) -> List[str]:
-        GRANT_READ_ON_SCHEMA_TEMPLATE = "GRANT USAGE ON SCHEMA {schema} TO {role}"
-        GRANT_WRITE_ON_SCHEMA_TEMPLATE = "GRANT CREATE ON SCHEMA {schema} TO {role}"
-        GRANT_READ_ON_TABLE_TEMPLATE = "GRANT SELECT ON TABLE {table} TO {role}"
-        GRANT_WRITE_ON_TABLE_TEMPLATE = (
-            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER "
-            "ON TABLE {table} TO {role}"
-        )
-        GRANT_READ_ON_ALL_TABLES_TEMPLATE = (
-            "GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {role}"
-        )
-        GRANT_WRITE_ON_ALL_TABLE_TEMPLATE = (
-            "GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER "
-            "ON ALL TABLES IN SCHEMA {schema} TO {role}"
+        sql_commands = []
+
+        Privileges_TEMPLATE = (
+            "GRANT {privileges}"
+            + " ON {resource_type} {resource_name}"
+            + " TO ROLE {role}"
         )
 
-        sql_commands = []
+        if "warehouses" in config:
+            for warehouse in config["warehouses"]:
+                sql_commands.append(
+                    Privileges_TEMPLATE.format(
+                        privileges="USAGE",
+                        resource_type="WAREHOUSE",
+                        resource_name=warehouse,
+                        role=role,
+                    )
+                )
 
         if "privileges" in config:
 
-            if "schemas" in config["privileges"]:
-                if "read" in config["privileges"]["schemas"]:
-                    for schema in config["privileges"]["schemas"]["read"]:
+            if "databases" in config["privileges"]:
+                if "read" in config["privileges"]["databases"]:
+                    for database in config["privileges"]["databases"]["read"]:
                         sql_commands.append(
-                            GRANT_READ_ON_SCHEMA_TEMPLATE.format(
-                                role=role, schema=schema
+                            Privileges_TEMPLATE.format(
+                                privileges="USAGE",
+                                resource_type="DATABASE",
+                                resource_name=database,
+                                role=role,
                             )
                         )
 
-                if "write" in config["privileges"]["schemas"]:
-                    for schema in config["privileges"]["schemas"]["write"]:
+                if "write" in config["privileges"]["databases"]:
+                    for database in config["privileges"]["databases"]["write"]:
                         sql_commands.append(
-                            GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(
-                                role=role, schema=schema
+                            Privileges_TEMPLATE.format(
+                                privileges="USAGE, MONITOR, CREATE SCHEMA",
+                                resource_type="DATABASE",
+                                resource_name=database,
+                                role=role,
                             )
                         )
+
+            if "schemas" in config["privileges"]:
+                if "read" in config["privileges"]["schemas"]:
+                    Schema_Read_Privileges = "USAGE, MONITOR"
+
+                    for schema in config["privileges"]["schemas"]["read"]:
+                        name_parts = schema.split(".")
+                        if name_parts[1] == "*":
+                            sql_commands.append(
+                                Privileges_TEMPLATE.format(
+                                    privileges=Schema_Read_Privileges,
+                                    resource_type="ALL SCHEMAS IN DATABASE",
+                                    resource_name=name_parts[0],
+                                    role=role,
+                                )
+                            )
+                        else:
+                            sql_commands.append(
+                                Privileges_TEMPLATE.format(
+                                    privileges=Schema_Read_Privileges,
+                                    resource_type="SCHEMA",
+                                    resource_name=name_parts[1],
+                                    role=role,
+                                )
+                            )
+
+                if "write" in config["privileges"]["schemas"]:
+                    Schema_Write_Privileges = (
+                        "USAGE, MONITOR, CREATE TABLE,"
+                        + " CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT,"
+                        + " CREATE SEQUENCE, CREATE FUNCTION, CREATE PIPE"
+                    )
+
+                    for schema in config["privileges"]["schemas"]["write"]:
+                        name_parts = schema.split(".")
+                        if name_parts[1] == "*":
+                            sql_commands.append(
+                                Privileges_TEMPLATE.format(
+                                    privileges=Schema_Write_Privileges,
+                                    resource_type="ALL SCHEMAS IN DATABASE",
+                                    resource_name=name_parts[0],
+                                    role=role,
+                                )
+                            )
+                        else:
+                            sql_commands.append(
+                                Privileges_TEMPLATE.format(
+                                    privileges=Schema_Write_Privileges,
+                                    resource_type="SCHEMA",
+                                    resource_name=name_parts[1],
+                                    role=role,
+                                )
+                            )
 
             if "tables" in config["privileges"]:
                 if "read" in config["privileges"]["tables"]:
                     for table in config["privileges"]["tables"]["read"]:
-                        if table.endswith(".*"):
-                            schema = table[:-2]
-                            sql_commands.append(
-                                GRANT_READ_ON_ALL_TABLES_TEMPLATE.format(
-                                    role=role, schema=schema
+                        name_parts = table.split(".")
+                        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+                        if name_parts[2] == "*":
+                            schemas = []
+
+                            if name_parts[1] == "*":
+
+                                conn = SnowflakeConnector()
+                                db_schemas = conn.show_schemas(name_parts[0])
+                                for schema in db_schemas:
+                                    if schema != info_schema:
+                                        schemas.append(schema)
+                            else:
+                                schemas = [name_parts[1]]
+
+                            for schema in schemas:
+                                sql_commands.append(
+                                    Privileges_TEMPLATE.format(
+                                        privileges="SELECT",
+                                        resource_type="ALL TABLES IN SCHEMA",
+                                        resource_name=schema,
+                                        role=role,
+                                    )
                                 )
-                            )
                         else:
                             sql_commands.append(
-                                GRANT_READ_ON_TABLE_TEMPLATE.format(
-                                    role=role, table=table
+                                Privileges_TEMPLATE.format(
+                                    privileges="SELECT",
+                                    resource_type="TABLE",
+                                    resource_name=name_parts[2],
+                                    role=role,
                                 )
                             )
 
                 if "write" in config["privileges"]["tables"]:
+                    Table_Write_Privileges = (
+                        "SELECT, INSERT, UPDATE, " + "DELETE, TRUNCATE, REFERENCES"
+                    )
+
                     for table in config["privileges"]["tables"]["write"]:
-                        if table.endswith(".*"):
-                            schema = table[:-2]
-                            sql_commands.append(
-                                GRANT_WRITE_ON_ALL_TABLE_TEMPLATE.format(
-                                    role=role, schema=schema
+                        name_parts = table.split(".")
+                        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+                        if name_parts[2] == "*":
+                            schemas = []
+
+                            if name_parts[1] == "*":
+
+                                conn = SnowflakeConnector()
+                                db_schemas = conn.show_schemas(name_parts[0])
+                                for schema in db_schemas:
+                                    if schema != info_schema:
+                                        schemas.append(schema)
+                            else:
+                                schemas = [name_parts[1]]
+
+                            for schema in schemas:
+                                sql_commands.append(
+                                    Privileges_TEMPLATE.format(
+                                        privileges=Table_Write_Privileges,
+                                        resource_type="ALL TABLES IN SCHEMA",
+                                        resource_name=schema,
+                                        role=role,
+                                    )
                                 )
-                            )
                         else:
                             sql_commands.append(
-                                GRANT_WRITE_ON_TABLE_TEMPLATE.format(
-                                    role=role, table=table
+                                Privileges_TEMPLATE.format(
+                                    privileges=Table_Write_Privileges,
+                                    resource_type="TABLE",
+                                    resource_name=name_parts[2],
+                                    role=role,
                                 )
                             )
 

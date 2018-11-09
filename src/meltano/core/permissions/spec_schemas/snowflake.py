@@ -8,7 +8,7 @@ SNOWFLAKE_SPEC_ROLE_SCHEMA = """
     type:
         type: string
         required: True
-    warehouse:
+    warehouses:
         type: list
         schema:
             type: string
@@ -50,10 +50,6 @@ SNOWFLAKE_SPEC_USER_SCHEMA = """
     can_login:
         type: boolean
         required: True
-    warehouse:
-        type: list
-        schema:
-            type: string
     member_of:
         type: list
         schema:

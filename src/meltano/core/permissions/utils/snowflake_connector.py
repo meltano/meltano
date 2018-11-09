@@ -59,16 +59,20 @@ class SnowflakeConnector:
     def show_users(self) -> List[str]:
         return self.show_query("USERS")
 
-    def show_schemas(self) -> List[str]:
+    def show_schemas(self, database: str = None) -> List[str]:
         names = []
 
-        query = f"SHOW TERSE SCHEMAS IN ACCOUNT"
+        if database:
+            query = f"SHOW TERSE SCHEMAS IN DATABASE {database}"
+        else:
+            query = f"SHOW TERSE SCHEMAS IN ACCOUNT"
+
         with self.engine.connect() as connection:
             results = connection.execute(query).fetchall()
 
             for result in results:
                 names.append(
-                    f"{result['database_name'].upper()}" + f".{result['name'].upper()}"
+                    f"{result['database_name'].upper()}.{result['name'].upper()}"
                 )
 
         return names
