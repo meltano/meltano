@@ -1,11 +1,13 @@
 # Databases
 
-raw:
-    type: database
-
 analytics:
     type: database
 
+raw:
+    type: database
+
+testing_db:
+    type: database
 
 # Roles
 
@@ -13,14 +15,14 @@ analytics:
 accountadmin:
     type: role
     warehouse:
-        - admin
+        - loading
     member_of:
         - sysadmin
 
 securityadmin:
     type: role
     warehouse:
-        - admin
+        - loading
     member_of:
         - sysadmin
 
@@ -28,7 +30,7 @@ securityadmin:
 sysadmin:
     type: role
     warehouse:
-        - admin
+        - loading
     privileges:
         databases:
             read:
@@ -57,7 +59,7 @@ engineer:
     member_of:
         - sysadmin
     warehouse:
-        - admin
+        - loading
     privileges:
         databases:
             read:
@@ -88,24 +90,32 @@ loader:
     owns:
         schemas:
             - raw.*
+            - testing_db.*
         tables:
             - raw.*.*
+            - testing_db.*.*
     privileges:
         databases:
             read:
                 - raw
+                - testing_db
             write:
                 - raw
+                - testing_db
         schemas:
             read:
                 - raw.*
+                - testing_db.*
             write:
                 - raw.*
+                - testing_db.*
         tables:
             read:
                 - raw.*.*
+                - testing_db.*.*
             write:
                 - raw.*.*
+                - testing_db.*.*
 
 
 reporter:
@@ -196,9 +206,21 @@ iroussos:
     member_of:
         - engineer
         - loader
+        - transformer
+        - sysadmin
     owns:
         schemas:
             - analytics.iroussos_scratch
+
+
+target_snowflake:
+    type: user
+    can_login: yes
+    member_of:
+        - loader
+    owns:
+        schemas:
+            - testing_db.target_snowflake
 
 
 tlapiana:
@@ -238,10 +260,6 @@ tszuromi:
 
 
 # Warehouse
-
-admin:
-    type: warehouse
-    size: x-small
 
 loading:
     type: warehouse

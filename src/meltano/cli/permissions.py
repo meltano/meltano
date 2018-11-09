@@ -11,12 +11,13 @@ def permissions():
     """Database permission related commands."""
     pass
 
+
 @permissions.command()
 @click.option(
     "--db",
     help="The type of the target DB the specifications file is for.",
     type=click.Choice(["postgres", "snowflake"]),
-    required=True
+    required=True,
 )
 @click.option("--spec", help="The specifications file path.", required=True)
 @click.option("--dry", help="Do not actually run, just check.", is_flag=True)
@@ -32,9 +33,9 @@ def grant(db, spec, dry):
             click.secho("!! SQL Commands that were excecuted: !!")
 
         for command in sql_commands:
-            click.secho(command, fg='green')
+            click.secho(command, fg="green")
             click.secho()
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():
-            click.secho(line, fg='red')
+            click.secho(line, fg="red")
         sys.exit(1)

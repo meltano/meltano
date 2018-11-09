@@ -1,8 +1,9 @@
 from typing import List
 
-from .pg_spec_loader import PGSpecLoader
-from .snowflake_spec_loader import SnowflakeSpecLoader
-from .error import SpecLoadingError
+from meltano.core.permissions.pg_spec_loader import PGSpecLoader
+from meltano.core.permissions.snowflake_spec_loader import SnowflakeSpecLoader
+from meltano.core.permissions.utils.error import SpecLoadingError
+
 
 def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
     if db == "postgres":
@@ -12,11 +13,11 @@ def grant_permissions(db: str, spec_path: str, dry_run: bool) -> List[str]:
     else:
         raise SpecLoadingError(f"Permissions Spec File for {db} is not supported.")
 
-    sql_commands = spec_loader.generate_sql_commands()
+    sql_permission_queries = spec_loader.generate_permission_queries()
 
     # just check at the moment
     # if not dry_run:
     #     # Do something
 
     # Always return the SQL commands that [would] run
-    return sql_commands
+    return sql_permission_queries
