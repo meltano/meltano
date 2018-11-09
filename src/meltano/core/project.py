@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
+from functools import wraps
 
 from .plugin import Plugin
 
@@ -69,18 +70,31 @@ class Project:
             logging.error(f"Could not update meltano.yml: {err}")
             raise
 
+    def makedirs(func):
+        @wraps(func)
+        def decorate(*args, **kwargs):
+            dir = func(*args, **kwargs)
+            os.makedirs(dir, exist_ok=True)
+            return dir
+
+        return decorate
+
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
 
+    @makedirs
     def meltano_dir(self, *joinpaths):
         return self.root.joinpath(".meltano", *joinpaths)
 
+    @makedirs
     def venvs_dir(self, *prefixes):
         return self.meltano_dir(*prefixes, "venv")
 
+    @makedirs
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
 
+    @makedirs
     def plugin_dir(self, plugin: Plugin, *joinpaths):
         return self.meltano_dir(plugin.type, plugin.name, *joinpaths)

@@ -22,18 +22,16 @@ from meltano.core.plugin import PluginType
 @click.option(
     "--loader", help="Which loader should be used in this extraction", required=True
 )
-@click.option("--tap-output", help="Output tap stream to this file.")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
 )
-def elt(job_id, extractor, loader, tap_output, dry, transform):
+def elt(job_id, extractor, loader, dry, transform):
     project = Project.find()
 
     singer_runner = SingerRunner(
         project,
         job_id=job_id,
-        tap_output=tap_output,
         run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
         target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
         tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
