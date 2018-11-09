@@ -10,6 +10,14 @@ extractors:
       api_token: "$ZENDESK_API_TOKEN"
       subdomain: "$ZENDESK_SUBDOMAIN"
       start_date: "$ZENDESK_START_DATE"
+  - name: tap-marketo
+    pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
+    config:
+      endpoint: $MARKETO_ENDPOINT
+      identity: $MARKETO_IDENTITY
+      client_id: $MARKETO_CLIENT_ID
+      client_secret: $MARKETO_CLIENT_SECRET
+      start_time: $MARKETO_START_TIME
   - name: tap-salesforce
     pip_url: "git+https://github.com/meltano/tap-salesforce.git@add-password-auth"
     config:
