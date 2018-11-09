@@ -14,7 +14,24 @@ class JobFinder:
         with DB.default.session() as session:
             return (
                 session.query(Job)
-                .filter((Job.elt_uri == self.elt_uri) & Job.ended_at.isnot(None))
+                .filter(
+                    (Job.elt_uri == self.elt_uri)
+                    & (Job.state == State.SUCCESS)
+                    & Job.ended_at.isnot(None)
+                )
+                .order_by(Job.ended_at.desc())
+                .first()
+            )
+
+    def latest_state(self):
+        with DB.default.session() as session:
+            return (
+                session.query(Job)
+                .filter(
+                    (Job.elt_uri == self.elt_uri)
+                    & Job.payload["singer_state"].isnot(None)
+                    & Job.ended_at.isnot(None)
+                )
                 .order_by(Job.ended_at.desc())
                 .first()
             )

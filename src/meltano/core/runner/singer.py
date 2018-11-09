@@ -30,7 +30,6 @@ class SingerRunner(Runner):
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")
         )
-        self.tap_output = config.get("tap_output", False)
 
     @property
     def database(self):
@@ -92,7 +91,7 @@ class SingerRunner(Runner):
     def restore_bookmark(self, tap: PluginInvoker):
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
-        state_job = finder.latest_success()
+        state_job = finder.latest_state()
 
         if state_job and "singer_state" in state_job.payload:
             logging.info(f"Found state from {state_job.started_at}.")
