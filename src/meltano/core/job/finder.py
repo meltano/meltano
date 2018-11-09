@@ -14,10 +14,7 @@ class JobFinder:
         with DB.default.session() as session:
             return (
                 session.query(Job)
-                .filter(
-                    (Job.elt_uri == self.elt_uri)
-                    & Job.ended_at.isnot(None)
-                )
+                .filter((Job.elt_uri == self.elt_uri) & Job.ended_at.isnot(None))
                 .order_by(Job.ended_at.desc())
                 .first()
             )

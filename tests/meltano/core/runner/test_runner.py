@@ -97,10 +97,11 @@ class TestSingerRunner:
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
 
-        with mock.patch.object(SingerRunner, 'bookmark', new=CoroutineMock()), \
-             mock.patch.object(PluginInvoker,
-                               'invoke_async',
-                               new=invoke_async) as invoke_async:
+        with mock.patch.object(
+            SingerRunner, "bookmark", new=CoroutineMock()
+        ), mock.patch.object(
+            PluginInvoker, "invoke_async", new=invoke_async
+        ) as invoke_async:
             # async method
             await subject.invoke(tap_invoker, target_invoker)
 
@@ -113,9 +114,7 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     async def test_bookmark(self, subject, tap_process, target_process):
-        lines = (b'{"line": 1}\n',
-                 b'{"line": 2}\n',
-                 b'{"line": 3}\n')
+        lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
 
         # testing with a real subprocess proved to be pretty
         # complicated.

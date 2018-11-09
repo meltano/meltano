@@ -59,24 +59,25 @@ class SingerRunner(Runner):
 
             p_target, p_tap = None, None
             p_target = await target.invoke_async(
-                stdin=target_in,
-                stdout=asyncio.subprocess.PIPE  # state log
+                stdin=target_in, stdout=asyncio.subprocess.PIPE  # state log
             )
             os.close(target_in)
 
             p_tap = await tap.invoke_async(stdout=tap_out)
             os.close(tap_out)
         except Exception as err:
-            if p_tap: p_tap.kill()
-            if p_target: p_target.kill()
+            if p_tap:
+                p_tap.kill()
+            if p_target:
+                p_target.kill()
             raise Exception(f"Cannot start tap or target: {err}")
 
         # receive the target stdout and update the current job
         # for each lines
-        await asyncio.wait([self.bookmark(p_target.stdout),
-                            p_target.wait(),
-                            p_tap.wait()],
-                           return_when=asyncio.FIRST_COMPLETED)
+        await asyncio.wait(
+            [self.bookmark(p_target.stdout), p_target.wait(), p_tap.wait()],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
 
         # at this point, something already stopped, the other component
         # should die soon because of a SIGPIPE
@@ -108,7 +109,9 @@ class SingerRunner(Runner):
             logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
-            logging.warn("Received state is invalid, incremental state has not been updated")
+            logging.warn(
+                "Received state is invalid, incremental state has not been updated"
+            )
 
     async def bookmark(self, target_stream):
         while not target_stream.at_eof():
