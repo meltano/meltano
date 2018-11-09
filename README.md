@@ -18,7 +18,7 @@ Meltano stands for the [steps of the data science life-cycle](#data-science-life
 | Extract   | [Singer Tap](#tap) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Load      | [Signer Target](#target) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
-| Analyze | [Meltano Analyze](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
+| Analyze | [Meltano Analyze](https://gitlab.com/meltano/meltano/tree/master/src/analyze) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
 | Notebook | [JupyterHub](https://github.com/jupyterhub/jupyterhub) | [GNU Octave](https://www.gnu.org/software/octave/) | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/) |
 | Orchestrate | [Airflow](https://airflow.apache.org/) | [Luigi](https://github.com/spotify/luigi), [Nifi](https://nifi.apache.org/) | [Fivetran](https://fivetran.com/) |
 
