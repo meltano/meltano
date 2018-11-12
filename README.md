@@ -215,7 +215,7 @@ Meltano also makes use of [review apps](https://docs.gitlab.com/ee/ci/review_app
 
 1. We are building Meltano to solve a problem that GitLab shares with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
 2. Next, we'll focus on building a community around Meltano with more users and regular contributors to the code base.
-3. Right now Meltano is completely open source. After we have a community we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
+3. Right now Meltano is open source. In the future we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. An example of a proprietary/source available feature is fine grained access controls. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
 
 ## Roadmap
 
