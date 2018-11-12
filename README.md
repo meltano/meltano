@@ -891,6 +891,10 @@ HAVING count(*) > 1
 1. In your browser, navigate to `localhost:5000/drop_it_like_its_hot` to reset the schema of the database
 1. Then navigate to `localhost:5000`. Click on add project, and specify `/meltano/model`
 
+# Resources
+
+- [Meltano Slides](https://docs.google.com/presentation/d/1elX6ChyOxWnwtYQUuZOe1rMLPxP7sUle49iaaFKOcTo/edit#slide=id.g29b9a49e13_0_213)
+
 # Contributing to Meltano
 
 We welcome contributions and improvements, please see the [contribution guidelines](CONTRIBUTING.md)
