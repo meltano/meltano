@@ -151,7 +151,7 @@ def transform(model_name):
     Looks up the credential by the name of the datastore passed to the api
 
     Sets the environment variables and runs dbt in a subprocess for the given model
-    dbt run --profiles-dir profile --target meltano_analysis --models <model_name>
+    dbt run --profiles-dir profile --target meltano_analyze --models <model_name>
     """
     incoming = request.get_json()
     connection_name = incoming.get("connection_name")
@@ -189,7 +189,7 @@ def run_transform(model_name, connection_name):
         "--profiles-dir",
         f"{PROFILES_DIR}",
         "--target",
-        "meltano_analysis",
+        "meltano_analyze",
     ]
     if model_name:
         run_command.extend(["--models", f"{model_name}"])

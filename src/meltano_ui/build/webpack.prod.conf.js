@@ -34,7 +34,7 @@ const webpackConfig = merge(baseWebpackConfig, {
     new webpack.DefinePlugin({
       'process.env': env
     }),
-    new webpack.DefinePlugin({"API_URL": JSON.stringify(process.env.MELTANO_ANALYSIS_API_URL)}),
+    new webpack.DefinePlugin({"API_URL": JSON.stringify(process.env.MELTANO_ANALYZE_API_URL)}),
     new UglifyJsPlugin({
       uglifyOptions: {
         compress: {
