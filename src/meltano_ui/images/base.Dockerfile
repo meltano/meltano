@@ -16,7 +16,7 @@ ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 
 # -- Define API location at build time
-ENV MELTANO_ANALYSIS_API_URL=
+ENV MELTANO_ANALYZE_API_URL=
 
 # -- Add the project
 ADD . /meltano
