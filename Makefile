@@ -154,11 +154,17 @@ docs_image: base_image
 		-t meltano/docs_build \
 		.
 
-docs_shell:
+docs_shell: docs_image
 	${DOCKER_RUN} -w /app/docs meltano/docs_build bash
 
 docs/build: docs_image docs/source
 	${DOCKER_RUN} -w /app/docs meltano/docs_build make html
+
+docs/serve: docs/build
+	${DOCKER_RUN} \
+		-w /app/docs \
+		-p 8080:8081 \
+		meltano/docs_build sphinx-serve -b build
 
 # Lint Related Tasks
 # ==================

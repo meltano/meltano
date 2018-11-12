@@ -14,3 +14,7 @@ You can also just run `make docs/build` and it will do everything for you.
 If you want to replicate the build environment outside docker you can probably
 get away with following
 [this guide](https://docs.readthedocs.io/en/latest/intro/getting-started-with-sphinx.html).
+
+## Previewing the docs
+
+You may use the `make docs/serve` command to have a local preview of the docs at http://localhost:8080
