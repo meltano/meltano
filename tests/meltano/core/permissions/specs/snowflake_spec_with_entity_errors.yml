@@ -7,7 +7,7 @@ analytics.*:
 
 loader:
     type: role
-    warehouse:
+    warehouses:
         - loading
     owns:
         schemas:
@@ -25,6 +25,7 @@ loader:
         schemas:
             read:
                 - analytics.*
+                - scratch_schema
             write:
                 - analytics.*
         tables:
@@ -42,6 +43,3 @@ test_user:
         - sysadmin
         - transformer
         - loader
-    owns:
-        schemas:
-            - scratch_schema

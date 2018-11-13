@@ -110,21 +110,31 @@ class SnowflakeSpecLoader:
             if database not in entities["databases"]:
                 error_messages.append(
                     f"Reference error: Database {database} is referenced "
-                    + "in the spec but not defined"
+                    "in the spec but not defined"
                 )
 
         for role in entities["role_refs"]:
             if role not in entities["roles"]:
                 error_messages.append(
                     f"Reference error: Role {role} is referenced in the "
-                    + "spec but not defined"
+                    "spec but not defined"
                 )
 
         for warehouse in entities["warehouse_refs"]:
             if warehouse not in entities["warehouses"]:
                 error_messages.append(
                     f"Reference error: Warehouse {warehouse} is referenced "
-                    + "in the spec but not defined"
+                    "in the spec but not defined"
+                )
+
+        # Check that all users have a same name role defined
+        for user in entities["users"]:
+            if f"{user}_role" not in entities["roles"]:
+                error_messages.append(
+                    f"Missing role {user}_role for user {user}. All users must "
+                    "have a role defined in order to assign user specific "
+                    "permissions. The name of the role for a user XXX should "
+                    "be XXX_role."
                 )
 
         if error_messages:
@@ -144,6 +154,8 @@ class SnowflakeSpecLoader:
         'table_refs' --> All the tables referenced in read/write privileges
                          or in owns entries
         """
+        error_messages = []
+
         entities = {
             "databases": set(),
             "database_refs": set(),
@@ -214,11 +226,23 @@ class SnowflakeSpecLoader:
                             entities["table_refs"].add(table)
 
             elif permission_type == "user":
+                # Check if this user is member of the user role ($USER_role)
+                is_member_of_user_role = False
+
                 entities["users"].add(entity_name)
 
                 if "member_of" in config:
                     for member_role in config["member_of"]:
                         entities["role_refs"].add(member_role)
+
+                        if member_role == f"{entity_name}_role":
+                            is_member_of_user_role = True
+
+                if is_member_of_user_role == False:
+                    error_messages.append(
+                        f"Role error: User {entity_name} in not a member of her "
+                        f"user role ({entity_name}_role)"
+                    )
 
                 if "owns" in config:
                     if "databases" in config["owns"]:
@@ -239,14 +263,12 @@ class SnowflakeSpecLoader:
         # Check that all names are valid and also add implicit references to
         #  DBs and Schemas. e.g. RAW.TEST_SCHEMA.TABLE references also
         #  DB RAW and Schema TEST_SCHEMA
-        error_messages = []
-
         for db in entities["databases"] | entities["database_refs"]:
             name_parts = db.split(".")
             if not len(name_parts) == 1:
                 error_messages.append(
                     f"Name error: Not a valid database name: {db}"
-                    + " (Proper definition: DB)"
+                    " (Proper definition: DB)"
                 )
 
         for schema in entities["schema_refs"]:
@@ -254,7 +276,7 @@ class SnowflakeSpecLoader:
             if (not len(name_parts) == 2) or (name_parts[0] == "*"):
                 error_messages.append(
                     f"Name error: Not a valid schema name: {schema}"
-                    + " (Proper definition: DB.[SCHEMA | *])"
+                    " (Proper definition: DB.[SCHEMA | *])"
                 )
 
             # Add the Database in the database refs
@@ -266,13 +288,13 @@ class SnowflakeSpecLoader:
             if (not len(name_parts) == 3) or (name_parts[0] == "*"):
                 error_messages.append(
                     f"Name error: Not a valid table name: {table}"
-                    + " (Proper definition: DB.[SCHEMA | *].[TABLE | *])"
+                    " (Proper definition: DB.[SCHEMA | *].[TABLE | *])"
                 )
             elif name_parts[1] == "*" and name_parts[2] != "*":
                 error_messages.append(
                     f"Name error: Not a valid table name: {table}"
-                    + " (Can't have a Table name after selecting all schemas"
-                    + " with *: DB.[SCHEMA | *].[TABLE | *])"
+                    " (Can't have a Table name after selecting all schemas"
+                    " with *: DB.[SCHEMA | *].[TABLE | *])"
                 )
 
             # Add the Database in the database refs
@@ -298,7 +320,7 @@ class SnowflakeSpecLoader:
             if warehouse.upper() not in warehouses:
                 error_messages.append(
                     f"Missing Entity Error: Warehouse {warehouse} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         databases = conn.show_databases()
@@ -306,7 +328,7 @@ class SnowflakeSpecLoader:
             if db.upper() not in databases:
                 error_messages.append(
                     f"Missing Entity Error: Database {db} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         schemas = conn.show_schemas()
@@ -314,7 +336,7 @@ class SnowflakeSpecLoader:
             if "*" not in schema and schema.upper() not in schemas:
                 error_messages.append(
                     f"Missing Entity Error: Schema {schema} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         tables = conn.show_tables()
@@ -322,7 +344,7 @@ class SnowflakeSpecLoader:
             if "*" not in table and table.upper() not in tables:
                 error_messages.append(
                     f"Missing Entity Error: Table {table} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         roles = conn.show_roles()
@@ -330,7 +352,7 @@ class SnowflakeSpecLoader:
             if role.upper() not in roles:
                 error_messages.append(
                     f"Missing Entity Error: Role {role} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         users = conn.show_users()
@@ -338,7 +360,7 @@ class SnowflakeSpecLoader:
             if user.upper() not in users:
                 error_messages.append(
                     f"Missing Entity Error: User {user} was not found on"
-                    + " Snowflake Server. Please create it before continuing."
+                    " Snowflake Server. Please create it before continuing."
                 )
 
         if error_messages:
@@ -421,8 +443,8 @@ class SnowflakeSpecLoader:
     def generate_grant_ownership(self, role: str, config: str) -> List[str]:
         Grant_Ownership_TEMPLATE = (
             "GRANT OWNERSHIP"
-            + " ON {resource_type} {resource_name}"
-            + " TO ROLE {role_name} COPY CURRENT GRANTS"
+            " ON {resource_type} {resource_name}"
+            " TO ROLE {role_name} COPY CURRENT GRANTS"
         )
 
         sql_commands = []
@@ -510,9 +532,7 @@ class SnowflakeSpecLoader:
         sql_commands = []
 
         Privileges_TEMPLATE = (
-            "GRANT {privileges}"
-            + " ON {resource_type} {resource_name}"
-            + " TO ROLE {role}"
+            "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
         )
 
         if "warehouses" in config:
@@ -579,8 +599,8 @@ class SnowflakeSpecLoader:
                 if "write" in config["privileges"]["schemas"]:
                     Schema_Write_Privileges = (
                         "USAGE, MONITOR, CREATE TABLE,"
-                        + " CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT,"
-                        + " CREATE SEQUENCE, CREATE FUNCTION, CREATE PIPE"
+                        " CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT,"
+                        " CREATE SEQUENCE, CREATE FUNCTION, CREATE PIPE"
                     )
 
                     for schema in config["privileges"]["schemas"]["write"]:
@@ -644,7 +664,7 @@ class SnowflakeSpecLoader:
 
                 if "write" in config["privileges"]["tables"]:
                     Table_Write_Privileges = (
-                        "SELECT, INSERT, UPDATE, " + "DELETE, TRUNCATE, REFERENCES"
+                        "SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES"
                     )
 
                     for table in config["privileges"]["tables"]["write"]:

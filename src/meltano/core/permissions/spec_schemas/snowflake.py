@@ -54,16 +54,6 @@ SNOWFLAKE_SPEC_USER_SCHEMA = """
         type: list
         schema:
             type: string
-    owns:
-        type: dict
-        allowed:
-            - databases
-            - schemas
-            - tables
-        valueschema:
-            type: list
-            schema:
-                type: string
     """
 
 SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA = """

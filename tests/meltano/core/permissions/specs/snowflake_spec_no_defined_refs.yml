@@ -5,7 +5,7 @@ test_db:
 # Roles
 loader:
     type: role
-    warehouse:
+    warehouses:
         - dev_warehouse
         - loading
     privileges:
@@ -24,6 +24,9 @@ loader:
                 - test_db.test.*
             write:
                 - test_db.test.*
+    owns:
+        schemas:
+            - dev_db.loader_scratch
 
 # Users
 test_user:
@@ -33,9 +36,7 @@ test_user:
         - sysadmin
         - transformer
         - loader
-    owns:
-        schemas:
-            - dev_db.test_user_scratch
+        - test_user_role
 
 # Warehouses
 loading:

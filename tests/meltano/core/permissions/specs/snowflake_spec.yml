@@ -53,7 +53,8 @@ sysadmin:
             write:
                 - raw.*.*
                 - analytics.*.*
-## User Roles
+
+## Regular Roles
 engineer:
     type: role
     member_of:
@@ -117,7 +118,6 @@ loader:
                 - raw.*.*
                 - testing_db.*.*
 
-
 reporter:
     type: role
     warehouses:
@@ -160,6 +160,75 @@ transformer:
             write:
                 - analytics.*.*
 
+# User Roles
+eburke_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.eburke_scratch
+
+eeastwood_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.eeastwood_scratch
+
+gitlab-ci_role:
+    type: role
+    warehouses:
+        - reporting
+
+looker_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.looker_scratch
+
+iroussos_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.iroussos_scratch
+
+target_snowflake_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - testing_db.target_snowflake
+
+tlapiana_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.tlapiana_scratch
+
+tmurphy_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.tmurphy_scratch
+
+tszuromi_role:
+    type: role
+    warehouses:
+        - reporting
+    owns:
+        schemas:
+            - analytics.tszuromi_scratch
 
 # Users
 
@@ -169,18 +238,14 @@ eburke:
     member_of:
         - sysadmin
         - transformer
-    owns:
-        schemas:
-            - analytics.eburke_scratch
-
+        - eburke_role
+       
 eeastwood:
     type: user
     can_login: yes
     member_of:
         - transformer
-    owns:
-        schemas:
-            - analytics.eeastwood_scratch
+        - eeastwood_role
 
 gitlab-ci:
     type: user
@@ -190,15 +255,14 @@ gitlab-ci:
         - reporter
         - sysadmin
         - transformer
+        - gitlab-ci_role
 
 looker:
     type: user
     can_login: yes
     member_of:
         - reporter
-    owns:
-        schemas:
-            - analytics.looker_scratch
+        - looker_role
 
 iroussos:
     type: user
@@ -208,20 +272,14 @@ iroussos:
         - loader
         - transformer
         - sysadmin
-    owns:
-        schemas:
-            - analytics.iroussos_scratch
-
+        - iroussos_role
 
 target_snowflake:
     type: user
     can_login: yes
     member_of:
         - loader
-    owns:
-        schemas:
-            - testing_db.target_snowflake
-
+        - target_snowflake_role
 
 tlapiana:
     type: user
@@ -231,10 +289,7 @@ tlapiana:
         - loader
         - transformer
         - sysadmin
-    owns:
-        schemas:
-            - analytics.tlapiana_scratch
-
+        - tlapiana_role
 
 tmurphy:
     type: user
@@ -244,19 +299,14 @@ tmurphy:
         - engineer
         - sysadmin
         - transformer
-    owns:
-        schemas:
-            - analytics.tmurphy_scratch
-
+        - tmurphy_role
 
 tszuromi:
     type: user
     can_login: yes
     member_of:
         - reporter
-    owns:
-        schemas:
-            - analytics.tszuromi_scratch
+        - tszuromi_role
 
 
 # Warehouses
