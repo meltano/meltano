@@ -5,7 +5,13 @@
 - [Docker](https://www.docker.com/)
 - [Docker Hub Account](https://hub.docker.com/)
 
-## Building the Docs
+## Quick Local Setup
+
+1. Navigate to project root directory in terminal
+1. Run `make docs/serve`
+    - This will build a local preview of the docs at http://localhost:8080
+
+## Manually Building the Docs
 
 1. Navigate to project root directory in terminal
 1. Run `make docs_image`
@@ -20,6 +26,4 @@ If you want to replicate the build environment outside docker you can probably
 get away with following
 [this guide](https://docs.readthedocs.io/en/latest/intro/getting-started-with-sphinx.html).
 
-## Previewing the docs
 
-You may use the `make docs/serve` command to have a local preview of the docs at http://localhost:8080
