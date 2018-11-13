@@ -1,45 +1,42 @@
 # Databases
-
-analytics.*:
-    type: database
+databases:
+    - analytics.*
 
 # Roles
-
-loader:
-    type: role
-    warehouses:
-        - loading
-    owns:
-        schemas:
-            - raw.*
-        tables:
-            - raw.*.*
-    privileges:
-        databases:
-            read:
-                - raw
+roles:
+    - loader:
+        warehouses:
+            - loading
+        owns:
+            schemas:
                 - raw.*
-            write:
-                - raw
-                - raw.*
-        schemas:
-            read:
-                - analytics.*
-                - scratch_schema
-            write:
-                - analytics.*
-        tables:
-            read:
-                - loader.*.test_table
-            write:
-                - loader.*.*.*
+            tables:
+                - raw.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - raw.*
+                write:
+                    - raw
+                    - raw.*
+            schemas:
+                read:
+                    - analytics.*
+                    - scratch_schema
+                write:
+                    - analytics.*
+            tables:
+                read:
+                    - loader.*.test_table
+                write:
+                    - loader.*.*.*
 
 # Users
-
-test_user:
-    type: user
-    can_login: yes
-    member_of:
-        - sysadmin
-        - transformer
-        - loader
+users:
+    - test_user:
+        can_login: yes
+        member_of:
+            - sysadmin
+            - transformer
+            - loader

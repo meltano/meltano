@@ -1,13 +1,36 @@
-SNOWFLAKE_SPEC_DATABASE_SCHEMA = """
-    type:
-        type: string
-        required: True
+SNOWFLAKE_SPEC_SCHEMA = """
+    databases:
+        type: list
+        schema:
+            type: string
+    roles:
+        type: list
+        schema:
+            type: dict
+            keyschema:
+                type: string
+            valueschema:
+                type: dict
+    users:
+        type: list
+        schema:
+            type: dict
+            keyschema:
+                type: string
+            valueschema:
+                type: dict
+    warehouses:
+        type: list
+        schema:
+            type: dict
+            keyschema:
+                type: string
+            valueschema:
+                type: dict
     """
 
+
 SNOWFLAKE_SPEC_ROLE_SCHEMA = """
-    type:
-        type: string
-        required: True
     warehouses:
         type: list
         schema:
@@ -44,9 +67,6 @@ SNOWFLAKE_SPEC_ROLE_SCHEMA = """
     """
 
 SNOWFLAKE_SPEC_USER_SCHEMA = """
-    type:
-        type: string
-        required: True
     can_login:
         type: boolean
         required: True
@@ -57,9 +77,6 @@ SNOWFLAKE_SPEC_USER_SCHEMA = """
     """
 
 SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA = """
-    type:
-        type: string
-        required: True
     size:
         type: string
         required: True

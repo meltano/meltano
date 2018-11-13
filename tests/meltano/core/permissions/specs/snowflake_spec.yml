@@ -1,324 +1,290 @@
 # Databases
-
-analytics:
-    type: database
-
-raw:
-    type: database
-
-testing_db:
-    type: database
+databases:
+    - analytics
+    - raw
+    - testing_db
 
 # Roles
+roles:
+    ## Admin Roles
+    - accountadmin:
+        warehouses:
+            - loading
+        member_of:
+            - sysadmin
 
-## Admin Roles
-accountadmin:
-    type: role
-    warehouses:
-        - loading
-    member_of:
-        - sysadmin
+    - securityadmin:
+        warehouses:
+            - loading
+        member_of:
+            - sysadmin
 
-securityadmin:
-    type: role
-    warehouses:
-        - loading
-    member_of:
-        - sysadmin
+    - sysadmin:
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - raw
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                    - analytics.*
+                write:
+                    - raw.*
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                    - analytics.*.*
+                write:
+                    - raw.*.*
+                    - analytics.*.*
 
+    ## Regular Roles
+    - engineer:
+        member_of:
+            - sysadmin
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - raw
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                    - analytics.*
+                write:
+                    - raw.*
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                    - analytics.*.*
+                write:
+                    - raw.*.*
+                    - analytics.*.*
 
-sysadmin:
-    type: role
-    warehouses:
-        - loading
-    privileges:
-        databases:
-            read:
-                - raw
-                - analytics
-            write:
-                - raw
-                - analytics
-        schemas:
-            read:
-                - raw.*
-                - analytics.*
-            write:
-                - raw.*
-                - analytics.*
-        tables:
-            read:
-                - raw.*.*
-                - analytics.*.*
-            write:
-                - raw.*.*
-                - analytics.*.*
-
-## Regular Roles
-engineer:
-    type: role
-    member_of:
-        - sysadmin
-    warehouses:
-        - loading
-    privileges:
-        databases:
-            read:
-                - raw
-                - analytics
-            write:
-                - raw
-                - analytics
-        schemas:
-            read:
-                - raw.*
-                - analytics.*
-            write:
-                - raw.*
-                - analytics.*
-        tables:
-            read:
-                - raw.*.*
-                - analytics.*.*
-            write:
-                - raw.*.*
-                - analytics.*.*
-
-loader:
-    type: role
-    warehouses:
-        - loading
-    owns:
-        schemas:
-            - raw.*
-            - testing_db.*
-        tables:
-            - raw.*.*
-            - testing_db.*.*
-    privileges:
-        databases:
-            read:
-                - raw
-                - testing_db
-            write:
-                - raw
-                - testing_db
-        schemas:
-            read:
+    - loader:
+        warehouses:
+            - loading
+        owns:
+            schemas:
                 - raw.*
                 - testing_db.*
-            write:
-                - raw.*
-                - testing_db.*
-        tables:
-            read:
+            tables:
                 - raw.*.*
                 - testing_db.*.*
-            write:
-                - raw.*.*
-                - testing_db.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - testing_db
+                write:
+                    - raw
+                    - testing_db
+            schemas:
+                read:
+                    - raw.*
+                    - testing_db.*
+                write:
+                    - raw.*
+                    - testing_db.*
+            tables:
+                read:
+                    - raw.*.*
+                    - testing_db.*.*
+                write:
+                    - raw.*.*
+                    - testing_db.*.*
 
-reporter:
-    type: role
-    warehouses:
-        - reporting
-    privileges:
-        databases:
-            read:
-                - analytics
-        schemas:
-            read:
+    - reporter:
+        warehouses:
+            - reporting
+        privileges:
+            databases:
+                read:
+                    - analytics
+            schemas:
+                read:
+                    - analytics.*
+            tables:
+                read:
+                    - analytics.*.*
+
+    - transformer:
+        warehouses:
+            - transforming
+        owns:
+            schemas:
                 - analytics.*
-        tables:
-            read:
+            tables:
                 - analytics.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                write:
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                write:
+                    - analytics.*.*
 
-transformer:
-    type: role
-    warehouses:
-        - transforming
-    owns:
-        schemas:
-            - analytics.*
-        tables:
-            - analytics.*.*
-    privileges:
-        databases:
-            read:
-                - raw
-                - analytics
-            write:
-                - analytics
-        schemas:
-            read:
-                - raw.*
-            write:
-                - analytics.*
-        tables:
-            read:
-                - raw.*.*
-            write:
-                - analytics.*.*
+    # User Roles
+    - eburke:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.eburke_scratch
 
-# User Roles
-eburke_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.eburke_scratch
+    - eeastwood:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.eeastwood_scratch
 
-eeastwood_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.eeastwood_scratch
+    - gitlab-ci:
+        warehouses:
+            - reporting
 
-gitlab-ci_role:
-    type: role
-    warehouses:
-        - reporting
+    - looker:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.looker_scratch
 
-looker_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.looker_scratch
+    - iroussos:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.iroussos_scratch
 
-iroussos_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.iroussos_scratch
+    - target_snowflake:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - testing_db.target_snowflake
 
-target_snowflake_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - testing_db.target_snowflake
+    - tlapiana:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tlapiana_scratch
 
-tlapiana_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.tlapiana_scratch
+    - tmurphy:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tmurphy_scratch
 
-tmurphy_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.tmurphy_scratch
-
-tszuromi_role:
-    type: role
-    warehouses:
-        - reporting
-    owns:
-        schemas:
-            - analytics.tszuromi_scratch
+    - tszuromi:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tszuromi_scratch
 
 # Users
+users:
+    - eburke:
+        can_login: yes
+        member_of:
+            - sysadmin
+            - transformer
+            - eburke
+           
+    - eeastwood:
+        can_login: yes
+        member_of:
+            - transformer
+            - eeastwood
 
-eburke:
-    type: user
-    can_login: yes
-    member_of:
-        - sysadmin
-        - transformer
-        - eburke_role
-       
-eeastwood:
-    type: user
-    can_login: yes
-    member_of:
-        - transformer
-        - eeastwood_role
+    - gitlab-ci:
+        can_login: yes
+        member_of:
+            - loader
+            - reporter
+            - sysadmin
+            - transformer
+            - gitlab-ci
 
-gitlab-ci:
-    type: user
-    can_login: yes
-    member_of:
-        - loader
-        - reporter
-        - sysadmin
-        - transformer
-        - gitlab-ci_role
+    - looker:
+        can_login: yes
+        member_of:
+            - reporter
+            - looker
 
-looker:
-    type: user
-    can_login: yes
-    member_of:
-        - reporter
-        - looker_role
+    - iroussos:
+        can_login: yes
+        member_of:
+            - engineer
+            - loader
+            - transformer
+            - sysadmin
+            - iroussos
 
-iroussos:
-    type: user
-    can_login: yes
-    member_of:
-        - engineer
-        - loader
-        - transformer
-        - sysadmin
-        - iroussos_role
+    - target_snowflake:
+        can_login: yes
+        member_of:
+            - loader
+            - target_snowflake
 
-target_snowflake:
-    type: user
-    can_login: yes
-    member_of:
-        - loader
-        - target_snowflake_role
+    - tlapiana:
+        can_login: yes
+        member_of:
+            - engineer
+            - loader
+            - transformer
+            - sysadmin
+            - tlapiana
 
-tlapiana:
-    type: user
-    can_login: yes
-    member_of:
-        - engineer
-        - loader
-        - transformer
-        - sysadmin
-        - tlapiana_role
+    - tmurphy:
+        can_login: yes
+        member_of:
+            - accountadmin
+            - engineer
+            - sysadmin
+            - transformer
+            - tmurphy
 
-tmurphy:
-    type: user
-    can_login: yes
-    member_of:
-        - accountadmin
-        - engineer
-        - sysadmin
-        - transformer
-        - tmurphy_role
-
-tszuromi:
-    type: user
-    can_login: yes
-    member_of:
-        - reporter
-        - tszuromi_role
+    - tszuromi:
+        can_login: yes
+        member_of:
+            - reporter
+            - tszuromi
 
 
 # Warehouses
+warehouses:
+    - loading:
+        size: x-small
 
-loading:
-    type: warehouse
-    size: x-small
+    - reporting:
+        size: x-small
 
-reporting:
-    type: warehouse
-    size: x-small
-
-transforming:
-    type: warehouse
-    size: x-small
+    - transforming:
+        size: x-small

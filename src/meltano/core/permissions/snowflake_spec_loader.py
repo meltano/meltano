@@ -56,35 +56,48 @@ class SnowflakeSpecLoader:
         """
         error_messages = []
 
+        validator =  cerberus.Validator(yaml.load(SNOWFLAKE_SPEC_SCHEMA))
+        validator.validate(spec)
+        for entity_type, err_msg in validator.errors.items():
+            if isinstance(err_msg[0], str):
+                error_messages.append(
+                    f"Spec error: {entity_type}: {err_msg[0]}"
+                )
+                continue
+
+            for error in err_msg[0].values():
+                error_messages.append(
+                    f"Spec error: {entity_type}: {error[0]}"
+                )
+
+        if error_messages:
+            return error_messages
+
         schema = {
-            "database": yaml.load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
-            "role": yaml.load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
-            "user": yaml.load(SNOWFLAKE_SPEC_USER_SCHEMA),
-            "warehouse": yaml.load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
+            "roles": yaml.load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
+            "users": yaml.load(SNOWFLAKE_SPEC_USER_SCHEMA),
+            "warehouses": yaml.load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
         }
 
         validators = {
-            "database": cerberus.Validator(schema["database"]),
-            "role": cerberus.Validator(schema["role"]),
-            "user": cerberus.Validator(schema["user"]),
-            "warehouse": cerberus.Validator(schema["warehouse"]),
+            "roles": cerberus.Validator(schema["roles"]),
+            "users": cerberus.Validator(schema["users"]),
+            "warehouses": cerberus.Validator(schema["warehouses"]),
         }
 
-        for entity_name, config in spec.items():
-            if not config:
+        for entity_type, entities in spec.items():
+            if not entities or entity_type == "databases":
                 continue
 
-            if "type" not in config:
-                error_messages.append(f"Spec error: {entity_name} has no type field")
-                continue
-
-            validators[config["type"]].validate(config)
-            for field, err_msg in validators[config["type"]].errors.items():
-                error_messages.append(
-                    VALIDATION_ERR_MSG.format(
-                        config["type"], entity_name, field, err_msg[0]
-                    )
-                )
+            for entity_dict in entities:
+                for entity_name, config in entity_dict.items():
+                    validators[entity_type].validate(config)
+                    for field, err_msg in validators[entity_type].errors.items():
+                        error_messages.append(
+                            VALIDATION_ERR_MSG.format(
+                                entity_type, entity_name, field, err_msg[0]
+                            )
+                        )
 
         return error_messages
 
@@ -129,12 +142,11 @@ class SnowflakeSpecLoader:
 
         # Check that all users have a same name role defined
         for user in entities["users"]:
-            if f"{user}_role" not in entities["roles"]:
+            if user not in entities["roles"]:
                 error_messages.append(
-                    f"Missing role {user}_role for user {user}. All users must "
-                    "have a role defined in order to assign user specific "
-                    "permissions. The name of the role for a user XXX should "
-                    "be XXX_role."
+                    f"Missing user role for user {user}. All users must "
+                    "have a role of the same name defined in order to assign "
+                    "user specific permissions."
                 )
 
         if error_messages:
@@ -168,97 +180,100 @@ class SnowflakeSpecLoader:
             "warehouse_refs": set(),
         }
 
-        for entity_name, config in self.spec.items():
-            permission_type = config["type"]
+        for entity_type, entry in self.spec.items():
+            if entity_type == "databases":
+                for entity_name in entry:
+                    entities["databases"].add(entity_name)
+                continue
 
-            if permission_type == "database":
-                entities["databases"].add(entity_name)
-            elif permission_type == "role":
-                entities["roles"].add(entity_name)
+            for entity_dict in entry:
+                for entity_name, config in entity_dict.items():
+                    if entity_type == "roles":
+                        entities["roles"].add(entity_name)
 
-                if "member_of" in config:
-                    for member_role in config["member_of"]:
-                        entities["role_refs"].add(member_role)
+                        if "member_of" in config:
+                            for member_role in config["member_of"]:
+                                entities["role_refs"].add(member_role)
 
-                if "warehouses" in config:
-                    for warehouse in config["warehouses"]:
-                        entities["warehouse_refs"].add(warehouse)
+                        if "warehouses" in config:
+                            for warehouse in config["warehouses"]:
+                                entities["warehouse_refs"].add(warehouse)
 
-                if "privileges" in config:
-                    if "databases" in config["privileges"]:
-                        if "read" in config["privileges"]["databases"]:
-                            for schema in config["privileges"]["databases"]["read"]:
-                                entities["database_refs"].add(schema)
+                        if "privileges" in config:
+                            if "databases" in config["privileges"]:
+                                if "read" in config["privileges"]["databases"]:
+                                    for schema in config["privileges"]["databases"]["read"]:
+                                        entities["database_refs"].add(schema)
 
-                        if "write" in config["privileges"]["databases"]:
-                            for schema in config["privileges"]["databases"]["write"]:
-                                entities["database_refs"].add(schema)
+                                if "write" in config["privileges"]["databases"]:
+                                    for schema in config["privileges"]["databases"]["write"]:
+                                        entities["database_refs"].add(schema)
 
-                    if "schemas" in config["privileges"]:
-                        if "read" in config["privileges"]["schemas"]:
-                            for schema in config["privileges"]["schemas"]["read"]:
-                                entities["schema_refs"].add(schema)
+                            if "schemas" in config["privileges"]:
+                                if "read" in config["privileges"]["schemas"]:
+                                    for schema in config["privileges"]["schemas"]["read"]:
+                                        entities["schema_refs"].add(schema)
 
-                        if "write" in config["privileges"]["schemas"]:
-                            for schema in config["privileges"]["schemas"]["write"]:
-                                entities["schema_refs"].add(schema)
+                                if "write" in config["privileges"]["schemas"]:
+                                    for schema in config["privileges"]["schemas"]["write"]:
+                                        entities["schema_refs"].add(schema)
 
-                    if "tables" in config["privileges"]:
-                        if "read" in config["privileges"]["tables"]:
-                            for table in config["privileges"]["tables"]["read"]:
-                                entities["table_refs"].add(table)
+                            if "tables" in config["privileges"]:
+                                if "read" in config["privileges"]["tables"]:
+                                    for table in config["privileges"]["tables"]["read"]:
+                                        entities["table_refs"].add(table)
 
-                        if "write" in config["privileges"]["tables"]:
-                            for table in config["privileges"]["tables"]["write"]:
-                                entities["table_refs"].add(table)
+                                if "write" in config["privileges"]["tables"]:
+                                    for table in config["privileges"]["tables"]["write"]:
+                                        entities["table_refs"].add(table)
 
-                if "owns" in config:
-                    if "databases" in config["owns"]:
-                        for schema in config["owns"]["databases"]:
-                            entities["database_refs"].add(schema)
+                        if "owns" in config:
+                            if "databases" in config["owns"]:
+                                for schema in config["owns"]["databases"]:
+                                    entities["database_refs"].add(schema)
 
-                    if "schemas" in config["owns"]:
-                        for schema in config["owns"]["schemas"]:
-                            entities["schema_refs"].add(schema)
+                            if "schemas" in config["owns"]:
+                                for schema in config["owns"]["schemas"]:
+                                    entities["schema_refs"].add(schema)
 
-                    if "tables" in config["owns"]:
-                        for table in config["owns"]["tables"]:
-                            entities["table_refs"].add(table)
+                            if "tables" in config["owns"]:
+                                for table in config["owns"]["tables"]:
+                                    entities["table_refs"].add(table)
 
-            elif permission_type == "user":
-                # Check if this user is member of the user role ($USER_role)
-                is_member_of_user_role = False
+                    elif entity_type == "users":
+                        # Check if this user is member of the user role
+                        is_member_of_user_role = False
 
-                entities["users"].add(entity_name)
+                        entities["users"].add(entity_name)
 
-                if "member_of" in config:
-                    for member_role in config["member_of"]:
-                        entities["role_refs"].add(member_role)
+                        if "member_of" in config:
+                            for member_role in config["member_of"]:
+                                entities["role_refs"].add(member_role)
 
-                        if member_role == f"{entity_name}_role":
-                            is_member_of_user_role = True
+                                if member_role == entity_name:
+                                    is_member_of_user_role = True
 
-                if is_member_of_user_role == False:
-                    error_messages.append(
-                        f"Role error: User {entity_name} in not a member of her "
-                        f"user role ({entity_name}_role)"
-                    )
+                        if is_member_of_user_role == False:
+                            error_messages.append(
+                                f"Role error: User {entity_name} in not a member of her "
+                                f"user role (role with the same name as the user)"
+                            )
 
-                if "owns" in config:
-                    if "databases" in config["owns"]:
-                        for schema in config["owns"]["databases"]:
-                            entities["database_refs"].add(schema)
+                        if "owns" in config:
+                            if "databases" in config["owns"]:
+                                for schema in config["owns"]["databases"]:
+                                    entities["database_refs"].add(schema)
 
-                    if "schemas" in config["owns"]:
-                        for schema in config["owns"]["schemas"]:
-                            entities["schema_refs"].add(schema)
+                            if "schemas" in config["owns"]:
+                                for schema in config["owns"]["schemas"]:
+                                    entities["schema_refs"].add(schema)
 
-                    if "tables" in config["owns"]:
-                        for table in config["owns"]["tables"]:
-                            entities["table_refs"].add(table)
+                            if "tables" in config["owns"]:
+                                for table in config["owns"]["tables"]:
+                                    entities["table_refs"].add(table)
 
-            elif permission_type == "warehouse":
-                entities["warehouses"].add(entity_name)
+                    elif entity_type == "warehouses":
+                        entities["warehouses"].add(entity_name)
 
         # Check that all names are valid and also add implicit references to
         #  DBs and Schemas. e.g. RAW.TEST_SCHEMA.TABLE references also
@@ -371,34 +386,33 @@ class SnowflakeSpecLoader:
 
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
-        for entity_name, config in self.spec.items():
-            alter_privileges = []
-
-            if not config:
+        for entity_type, entry in self.spec.items():
+            if entity_type == "databases" or entity_type == "warehouses":
                 continue
 
-            permission_type = config["type"]
+            for entity_dict in entry:
+                for entity_name, config in entity_dict.items():
+                    alter_privileges = []
 
-            if permission_type == "database":
-                continue
-            elif permission_type == "role":
-                sql_commands.extend(
-                    self.generate_grant_roles("ROLE", entity_name, config)
-                )
+                    if not config:
+                        continue
 
-                sql_commands.extend(self.generate_grant_ownership(entity_name, config))
+                    if entity_type == "roles":
+                        sql_commands.extend(
+                            self.generate_grant_roles("ROLE", entity_name, config)
+                        )
 
-                sql_commands.extend(
-                    self.generate_grant_privileges_to_role(entity_name, config)
-                )
-            elif permission_type == "user":
-                sql_commands.extend(self.generate_alter_user(entity_name, config))
+                        sql_commands.extend(self.generate_grant_ownership(entity_name, config))
 
-                sql_commands.extend(
-                    self.generate_grant_roles("USER", entity_name, config)
-                )
-            elif permission_type == "warehouse":
-                continue
+                        sql_commands.extend(
+                            self.generate_grant_privileges_to_role(entity_name, config)
+                        )
+                    elif entity_type == "users":
+                        sql_commands.extend(self.generate_alter_user(entity_name, config))
+
+                        sql_commands.extend(
+                            self.generate_grant_roles("USER", entity_name, config)
+                        )
 
         return sql_commands
 
