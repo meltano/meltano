@@ -28,6 +28,9 @@ PYTHON_RUN=${DOCKER_RUN} --name python-$(shell uuidgen) python
 DCR=docker-compose run --rm
 DCRN=${DCR} --no-deps
 
+MELTANO_ANALYZE = src/analyze
+MELTANO_API = src/meltano/api
+
 .PHONY: build test init_db clean docker_images
 
 build: ui api
@@ -41,9 +44,9 @@ init_db:
 # pip related
 TO_CLEAN  = ./build ./dist ./*.pyc ./*.tgz ./*.egg-info
 # node_modules
-TO_CLEAN += ./src/meltano_api/node_modules
-TO_CLEAN += ./src/meltano_ui/node_modules
-TO_CLEAN += ./src/meltano_ui/dist
+TO_CLEAN += ./${MELTANO_API}/node_modules
+TO_CLEAN += ./${MELTANO_ANALYZE}/node_modules
+TO_CLEAN += ./${MELTANO_ANALYZE}/dist
 
 clean:
 	# rm is run inside a container to support cross-platform volume mount permissions.
@@ -97,8 +100,6 @@ runner_image: cli_image
 
 .PHONY: api
 
-MELTANO_API = src/meltano/api
-
 api: prod_image ${MELTANO_API}/node_modules
 
 ${MELTANO_API}/node_modules:
@@ -123,23 +124,21 @@ requirements.txt: setup.py
 
 .PHONY: ui ui_%
 
-MELTANO_UI = src/meltano_ui
-
-ui: ${MELTANO_UI}/dist
+ui: ${MELTANO_ANALYZE}/dist
 
 ui_%:
 	${DCRN} ui yarn run $(@:ui_%=%)
 
-${MELTANO_UI}/node_modules: ${MELTANO_UI}/yarn.lock
+${MELTANO_ANALYZE}/node_modules: ${MELTANO_ANALYZE}/yarn.lock
 	${DCRN} ui yarn
 
-APP_DEPS = ${MELTANO_UI}/node_modules
-APP_DEPS += ${MELTANO_UI}/build ${MELTANO_UI}/config ${MELTANO_UI}/.babelrc
-APP_DEPS += $(wildcard ${MELTANO_UI}/*.js)
-APP_DEPS += $(wildcard ${MELTANO_UI}/*.json)
-APP_DEPS += $(wildcard ${MELTANO_UI}/*.html)
+APP_DEPS = ${MELTANO_ANALYZE}/node_modules
+APP_DEPS += ${MELTANO_ANALYZE}/build ${MELTANO_ANALYZE}/config ${MELTANO_ANALYZE}/.babelrc
+APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.js)
+APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.json)
+APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.html)
 
-${MELTANO_UI}/dist: ${APP_DEPS}
+${MELTANO_ANALYZE}/dist: ${APP_DEPS}
 	${MAKE} ui_build
 
 # Docs Related Tasks

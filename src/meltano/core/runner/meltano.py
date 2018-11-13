@@ -8,14 +8,14 @@ from . import Runner
 
 # TODO: to be generated from the file structure of /Extract/
 EXTRACTOR_REGISTRY = {
-    "fastly": ("meltano_plugins.fastly.extractor", "FastlyExtractor"),
-    "sfdc": ("meltano_plugins.sfdc", "SfdcExtractor"),
+    "fastly": ("meltano.plugins.fastly.extractor", "FastlyExtractor"),
+    "sfdc": ("meltano.plugins.sfdc", "SfdcExtractor"),
 }
 
 LOADER_REGISTRY = {
-    "postgres": ("meltano_plugins.postgres_loader", "PostgresLoader"),
-    "csv": ("meltano_plugins.csv_loader", "CsvLoader"),
-    "snowflake": ("meltano_plugins.snowflake.loader", "SnowflakeLoader"),
+    "postgres": ("meltano.plugins.postgres_loader", "PostgresLoader"),
+    "csv": ("meltano.plugins.csv_loader", "CsvLoader"),
+    "snowflake": ("meltano.plugins.snowflake.loader", "SnowflakeLoader"),
 }
 
 
