@@ -56,19 +56,15 @@ class SnowflakeSpecLoader:
         """
         error_messages = []
 
-        validator =  cerberus.Validator(yaml.load(SNOWFLAKE_SPEC_SCHEMA))
+        validator = cerberus.Validator(yaml.load(SNOWFLAKE_SPEC_SCHEMA))
         validator.validate(spec)
         for entity_type, err_msg in validator.errors.items():
             if isinstance(err_msg[0], str):
-                error_messages.append(
-                    f"Spec error: {entity_type}: {err_msg[0]}"
-                )
+                error_messages.append(f"Spec error: {entity_type}: {err_msg[0]}")
                 continue
 
             for error in err_msg[0].values():
-                error_messages.append(
-                    f"Spec error: {entity_type}: {error[0]}"
-                )
+                error_messages.append(f"Spec error: {entity_type}: {error[0]}")
 
         if error_messages:
             return error_messages
@@ -202,20 +198,28 @@ class SnowflakeSpecLoader:
                         if "privileges" in config:
                             if "databases" in config["privileges"]:
                                 if "read" in config["privileges"]["databases"]:
-                                    for schema in config["privileges"]["databases"]["read"]:
+                                    for schema in config["privileges"]["databases"][
+                                        "read"
+                                    ]:
                                         entities["database_refs"].add(schema)
 
                                 if "write" in config["privileges"]["databases"]:
-                                    for schema in config["privileges"]["databases"]["write"]:
+                                    for schema in config["privileges"]["databases"][
+                                        "write"
+                                    ]:
                                         entities["database_refs"].add(schema)
 
                             if "schemas" in config["privileges"]:
                                 if "read" in config["privileges"]["schemas"]:
-                                    for schema in config["privileges"]["schemas"]["read"]:
+                                    for schema in config["privileges"]["schemas"][
+                                        "read"
+                                    ]:
                                         entities["schema_refs"].add(schema)
 
                                 if "write" in config["privileges"]["schemas"]:
-                                    for schema in config["privileges"]["schemas"]["write"]:
+                                    for schema in config["privileges"]["schemas"][
+                                        "write"
+                                    ]:
                                         entities["schema_refs"].add(schema)
 
                             if "tables" in config["privileges"]:
@@ -224,7 +228,9 @@ class SnowflakeSpecLoader:
                                         entities["table_refs"].add(table)
 
                                 if "write" in config["privileges"]["tables"]:
-                                    for table in config["privileges"]["tables"]["write"]:
+                                    for table in config["privileges"]["tables"][
+                                        "write"
+                                    ]:
                                         entities["table_refs"].add(table)
 
                         if "owns" in config:
@@ -402,13 +408,17 @@ class SnowflakeSpecLoader:
                             self.generate_grant_roles("ROLE", entity_name, config)
                         )
 
-                        sql_commands.extend(self.generate_grant_ownership(entity_name, config))
+                        sql_commands.extend(
+                            self.generate_grant_ownership(entity_name, config)
+                        )
 
                         sql_commands.extend(
                             self.generate_grant_privileges_to_role(entity_name, config)
                         )
                     elif entity_type == "users":
-                        sql_commands.extend(self.generate_alter_user(entity_name, config))
+                        sql_commands.extend(
+                            self.generate_alter_user(entity_name, config)
+                        )
 
                         sql_commands.extend(
                             self.generate_grant_roles("USER", entity_name, config)
