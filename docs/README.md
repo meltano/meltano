@@ -1,5 +1,10 @@
 # Meltano Guide and API Reference
 
+## Prerequisites
+
+- [Docker](https://www.docker.com/)
+- [Docker Hub Account](https://hub.docker.com/)
+
 ## Building the Docs
 
 1. Navigate to project root directory in terminal
