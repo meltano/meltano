@@ -2,12 +2,12 @@
 
 ## Building the Docs
 
-Run `make docs_image`
-
-Run `make docs_shell`. you will be launched into a
-bash shell with everything you need to build the docs.
-
-Then run `make html`
+1. Navigate to project root directory in terminal
+1. Run `make docs_image`
+1. Run `make docs_shell`
+    - You will be launched into a bash shell with everything you need to build the docs.
+1. Run `make html`
+    - This will generate all the documentation from the Python Documentation Generator: [Sphinx](http://www.sphinx-doc.org/en/master/).
 
 You can also just run `make docs/build` and it will do everything for you.
 
