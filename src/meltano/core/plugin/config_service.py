@@ -70,6 +70,8 @@ class PluginConfigService:
                 self.envsubst(src, dst)
                 stubbed.append(dst)
             except FileNotFoundError:
-                logging.warn(f"Could not find {src.name} in {src.resolve()}, skipping.")
+                logging.warning(
+                    f"Could not find {src.name} in {src.resolve()}, skipping."
+                )
 
         return stubbed
