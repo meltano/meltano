@@ -73,9 +73,17 @@ class Project:
     def makedirs(func):
         @wraps(func)
         def decorate(*args, **kwargs):
-            dir = func(*args, **kwargs)
+            path = func(*args, **kwargs)
+
+            # if there is an extension, only create the base dir
+            _, ext = os.path.splitext(path)
+            if ext:
+                dir = os.path.dirname(path)
+            else:
+                dir = path
+
             os.makedirs(dir, exist_ok=True)
-            return dir
+            return path
 
         return decorate
 

@@ -35,9 +35,6 @@ class Hooked(HookObject):
 class DerivedHooked(Hooked):
     @hook("before_test")
     def derived_before_test(self):
-        import pdb
-
-        pdb.set_trace()
         super().call("derived_before_test")
 
 

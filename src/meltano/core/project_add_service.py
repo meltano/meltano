@@ -46,7 +46,7 @@ class ProjectAddService:
 
     def add_to_file(self, plugin: Plugin):
         if plugin in self.config_service.plugins():
-            logging.warn(
+            logging.warning(
                 f"{plugin.name} is already present, use `meltano install` to install it."
             )
             return

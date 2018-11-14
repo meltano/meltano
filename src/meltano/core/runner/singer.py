@@ -98,7 +98,7 @@ class SingerRunner(Runner):
             with tap.files["state"].open("w+") as state:
                 json.dump(state_job.payload["singer_state"], state)
         else:
-            logging.warn("No state was found, complete import.")
+            logging.warning("No state was found, complete import.")
 
     def bookmark_state(self, new_state: str):
         try:
@@ -108,7 +108,7 @@ class SingerRunner(Runner):
             logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
-            logging.warn(
+            logging.warning(
                 "Received state is invalid, incremental state has not been updated"
             )
 
