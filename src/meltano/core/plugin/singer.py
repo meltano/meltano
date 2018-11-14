@@ -87,17 +87,24 @@ class SingerTap(SingerPlugin):
                 schema = json.load(catalog)
 
             for stream in schema["streams"]:
-                stream_metadata = next(
-                    metadata
-                    for metadata in stream["metadata"]
-                    if len(metadata["breadcrumb"]) == 0
-                )
-                stream_metadata["metadata"].update({"selected": True})
+                for stream_metadata in (metadata
+                                        for metadata in stream["metadata"]
+                                        if len(metadata["breadcrumb"]) == 0):
+                    stream_metadata["metadata"].update({"selected": True})
+                else:
+                    stream.update({"selected": True})
+                    stream["metadata"].append({
+                        "breadcrumb": [],
+                        "metadata": {
+                            "inclusion": "available",
+                            "selected": True
+                        }
+                    })
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
         except Exception as err:
-            logging.error(
+            logging.exception(
                 f"Could not select stream, catalog file is invalid: {properties_file}"
             )
             properties_file.unlink()
