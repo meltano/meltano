@@ -10,6 +10,15 @@ extractors:
       api_token: "$ZENDESK_API_TOKEN"
       subdomain: "$ZENDESK_SUBDOMAIN"
       start_date: "$ZENDESK_START_DATE"
+  - name: tap-zuora
+    pip_url: "tap-zuora"
+    config:
+      username: $ZUORA_USERNAME
+      password: $ZUORA_PASSWORD
+      api_type: $ZUORA_API_TYPE
+      partner_id: $ZUORA_PARTNER_ID
+      api_token: $ZUORA_API_TOKEN
+      start_date: $ZUORA_START_DATE
   - name: tap-marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
     config:
