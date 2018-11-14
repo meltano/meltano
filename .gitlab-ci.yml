@@ -41,7 +41,6 @@ test:
     - pip install '.[dev]'
   script:
     - pytest -v
-  allow_failure: true
 
 .pages:
   script:
