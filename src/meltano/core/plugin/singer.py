@@ -1,13 +1,53 @@
 import logging
 import os
 import json
+import re
 from typing import Dict
+from functools import singledispatch
 
 from . import Plugin, PluginType
 from .error import TapDiscoveryError
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.utils import file_has_data
 from meltano.core.behavior.hookable import HookObject, hook
+
+
+class CatalogSelectAllVisitor:
+    @singledispatch
+    def visit(node, path: str):
+        pass
+
+    @visit.register
+    def _(node: dict, path: str):
+        if re.search(r"streams.\[\d+\]$", path):
+            node.update({"selected": True})
+
+        if path.endswith("metadata") and node.get("inclusion") == "available":
+            node.update({"selected": True})
+            logging.debug("{path} has been selected.")
+
+        for child_path, child_node in node.items():
+            CatalogSelectAllVisitor.visit(child_node, f"{path}.{child_path}")
+
+    @visit.register
+    def _(node: list, path: str):
+        # ensure the stream metadata is in there
+        if path.endswith("metadata"):
+            for stream_metadata in (
+                metadata for metadata in node if len(metadata["breadcrumb"]) == 0
+            ):
+                node["metadata"].update({"selected": True})
+            else:
+                node.append(
+                    {
+                        "breadcrumb": [],
+                        "metadata": {"inclusion": "available", "selected": True},
+                    }
+                )
+            logging.debug("{path} has been selected.")
+
+        for index, child_node in enumerate(node):
+            CatalogSelectAllVisitor.visit(child_node, f"{path}.[{index}]")
 
 
 def plugin_factory(plugin_type: PluginType, canonical: Dict):
@@ -86,20 +126,7 @@ class SingerTap(SingerPlugin):
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
-            for stream in schema["streams"]:
-                for stream_metadata in (metadata
-                                        for metadata in stream["metadata"]
-                                        if len(metadata["breadcrumb"]) == 0):
-                    stream_metadata["metadata"].update({"selected": True})
-                else:
-                    stream.update({"selected": True})
-                    stream["metadata"].append({
-                        "breadcrumb": [],
-                        "metadata": {
-                            "inclusion": "available",
-                            "selected": True
-                        }
-                    })
+            CatalogSelectAllVisitor.visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
