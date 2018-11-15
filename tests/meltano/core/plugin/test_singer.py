@@ -1192,15 +1192,27 @@ class TestCatalogSelectVisitor:
         if inclusion == "available":
             return metadata.get("selected", False)
 
-    def test_visitor(self, catalog):
+    def test_visit(self, catalog):
         CatalogSelectAllVisitor.visit(catalog)
 
-        streams = (stream for stream in catalog["streams"])
-        metadata = (metadata for stream in streams for metadata in stream["metadata"])
+        streams = {stream["stream"]: stream for stream in catalog["streams"]}
 
-        # everything is selected
-        assert all(map(self.stream_is_selected, streams))
-        assert all(map(self.metadata_is_selected, metadata))
+        metadatas = {
+            stream["stream"]: metadata
+            for _, stream in streams.items()
+            for metadata in stream["metadata"]
+        }
+
+        # all streams are selected
+        for name, stream in streams.items():
+            assert self.stream_is_selected(stream), f"{name} is not selected."
+
+        # all fields are selecte
+        for stream, metadata in metadatas.items():
+            field_metadata = metadata["metadata"]
+            assert self.metadata_is_selected(
+                field_metadata
+            ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
 
 class TestSingerTarget:
