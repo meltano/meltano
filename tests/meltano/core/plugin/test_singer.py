@@ -1193,10 +1193,9 @@ class TestCatalogSelectVisitor:
             return metadata.get("selected", False)
 
     def test_visitor(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog, "")
+        CatalogSelectAllVisitor.visit(catalog)
 
         streams = (stream for stream in catalog["streams"])
-
         metadata = (metadata for stream in streams for metadata in stream["metadata"])
 
         # everything is selected

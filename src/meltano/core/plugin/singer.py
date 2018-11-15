@@ -14,11 +14,11 @@ from meltano.core.behavior.hookable import HookObject, hook
 
 class CatalogSelectAllVisitor:
     @singledispatch
-    def visit(node, path: str):
+    def visit(node, path: str = ""):
         pass
 
     @visit.register
-    def _(node: dict, path: str):
+    def _(node: dict, path=""):
         if re.search(r"streams.\[\d+\]$", path):
             node.update({"selected": True})
 
@@ -27,10 +27,10 @@ class CatalogSelectAllVisitor:
             logging.debug("{path} has been selected.")
 
         for child_path, child_node in node.items():
-            CatalogSelectAllVisitor.visit(child_node, f"{path}.{child_path}")
+            CatalogSelectAllVisitor.visit(child_node, path=f"{path}.{child_path}")
 
     @visit.register
-    def _(node: list, path: str):
+    def _(node: list, path=""):
         # ensure the stream metadata is in there
         if path.endswith("metadata"):
             for stream_metadata in (
@@ -47,7 +47,7 @@ class CatalogSelectAllVisitor:
             logging.debug("{path} has been selected.")
 
         for index, child_node in enumerate(node):
-            CatalogSelectAllVisitor.visit(child_node, f"{path}.[{index}]")
+            CatalogSelectAllVisitor.visit(child_node, path=f"{path}.[{index}]")
 
 
 def plugin_factory(plugin_type: PluginType, canonical: Dict):
