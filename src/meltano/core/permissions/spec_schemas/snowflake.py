@@ -2,7 +2,11 @@ SNOWFLAKE_SPEC_SCHEMA = """
     databases:
         type: list
         schema:
-            type: string
+            type: dict
+            keyschema:
+                type: string
+            valueschema:
+                type: dict
     roles:
         type: list
         schema:
@@ -27,6 +31,12 @@ SNOWFLAKE_SPEC_SCHEMA = """
                 type: string
             valueschema:
                 type: dict
+    """
+
+SNOWFLAKE_SPEC_DATABASE_SCHEMA = """
+    shared:
+        type: boolean
+        required: True
     """
 
 

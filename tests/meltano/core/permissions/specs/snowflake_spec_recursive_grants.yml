@@ -1,0 +1,35 @@
+# Databases
+databases:
+    - analytics:
+        shared: no
+
+    - raw:
+        shared: no
+
+    - testing_db:
+        shared: no
+
+    - snowflake:
+        shared: yes
+
+# Roles
+roles:
+    ## Admin Roles
+    - loader:
+        warehouses:
+            - loading
+        privileges:
+            tables:
+                read:
+                    - raw.demo.carts
+                    - analytics.analytics.*
+                    - testing_db.*.*
+                write:
+                    - analytics.analytics.country_codes
+                    - raw.target_snowflake.*
+                    - snowflake.*.*
+
+# Warehouses
+warehouses:
+    - loading:
+        size: x-small

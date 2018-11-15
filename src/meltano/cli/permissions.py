@@ -33,7 +33,7 @@ def grant(db, spec, dry):
             click.secho("!! SQL Commands that were excecuted: !!")
 
         for command in sql_commands:
-            click.secho(command, fg="green")
+            click.secho(f"{command};", fg="green")
             click.secho()
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():

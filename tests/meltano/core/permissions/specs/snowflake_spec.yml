@@ -1,8 +1,17 @@
 # Databases
 databases:
-    - analytics
-    - raw
-    - testing_db
+    - analytics:
+        shared: no
+
+    - raw:
+        shared: no
+
+    - testing_db:
+        shared: no
+
+    - snowflake:
+        shared: yes
+
 
 # Roles
 roles:
@@ -114,12 +123,16 @@ roles:
             databases:
                 read:
                     - analytics
+                    - snowflake
             schemas:
                 read:
                     - analytics.*
+                    - snowflake.account_usage
+
             tables:
                 read:
                     - analytics.*.*
+                    - snowflake.account_usage.*
 
     - transformer:
         warehouses:

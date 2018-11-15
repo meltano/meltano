@@ -7,6 +7,7 @@ from typing import Dict, List
 from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
 from meltano.core.permissions.spec_schemas.snowflake import *
+from meltano.core.permissions.utils.snowflake_grants import *
 
 
 VALIDATION_ERR_MSG = 'Spec error: {} "{}", field "{}": {}'
@@ -70,19 +71,21 @@ class SnowflakeSpecLoader:
             return error_messages
 
         schema = {
+            "databases": yaml.load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
             "roles": yaml.load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
             "users": yaml.load(SNOWFLAKE_SPEC_USER_SCHEMA),
             "warehouses": yaml.load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
         }
 
         validators = {
+            "databases": cerberus.Validator(schema["databases"]),
             "roles": cerberus.Validator(schema["roles"]),
             "users": cerberus.Validator(schema["users"]),
             "warehouses": cerberus.Validator(schema["warehouses"]),
         }
 
         for entity_type, entities in spec.items():
-            if not entities or entity_type == "databases":
+            if not entities:
                 continue
 
             for entity_dict in entities:
@@ -167,6 +170,7 @@ class SnowflakeSpecLoader:
         entities = {
             "databases": set(),
             "database_refs": set(),
+            "shared_databases": set(),
             "schema_refs": set(),
             "table_refs": set(),
             "roles": set(),
@@ -177,14 +181,16 @@ class SnowflakeSpecLoader:
         }
 
         for entity_type, entry in self.spec.items():
-            if entity_type == "databases":
-                for entity_name in entry:
-                    entities["databases"].add(entity_name)
-                continue
-
             for entity_dict in entry:
                 for entity_name, config in entity_dict.items():
-                    if entity_type == "roles":
+                    if entity_type == "databases":
+                        entities["databases"].add(entity_name)
+
+                        if "shared" in config:
+                            if config["shared"]:
+                                entities["shared_databases"].add(entity_name)
+
+                    elif entity_type == "roles":
                         entities["roles"].add(entity_name)
 
                         if "member_of" in config:
@@ -398,8 +404,6 @@ class SnowflakeSpecLoader:
 
             for entity_dict in entry:
                 for entity_name, config in entity_dict.items():
-                    alter_privileges = []
-
                     if not config:
                         continue
 
@@ -510,7 +514,7 @@ class SnowflakeSpecLoader:
                         sql_commands.append(
                             Grant_Ownership_TEMPLATE.format(
                                 resource_type="SCHEMA",
-                                resource_name=name_parts[1],
+                                resource_name=schema,
                                 role_name=role,
                             )
                         )
@@ -531,7 +535,7 @@ class SnowflakeSpecLoader:
                                 if schema != info_schema:
                                     schemas.append(schema)
                         else:
-                            schemas = [name_parts[1]]
+                            schemas = [f"{name_parts[0]}.{name_parts[1]}"]
 
                         for schema in schemas:
                             sql_commands.append(
@@ -545,7 +549,7 @@ class SnowflakeSpecLoader:
                         sql_commands.append(
                             Grant_Ownership_TEMPLATE.format(
                                 resource_type="TABLE",
-                                resource_name=name_parts[2],
+                                resource_name=table,
                                 role_name=role,
                             )
                         )
@@ -555,176 +559,80 @@ class SnowflakeSpecLoader:
     def generate_grant_privileges_to_role(self, role: str, config: str) -> List[str]:
         sql_commands = []
 
-        Privileges_TEMPLATE = (
-            "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
-        )
+        usage_granted = {"databases": set(), "schemas": set()}
 
         if "warehouses" in config:
             for warehouse in config["warehouses"]:
-                sql_commands.append(
-                    Privileges_TEMPLATE.format(
-                        privileges="USAGE",
-                        resource_type="WAREHOUSE",
-                        resource_name=warehouse,
-                        role=role,
-                    )
-                )
+                sql_commands.append(generate_warehouse_grants(role, warehouse))
 
         if "privileges" in config:
-
             if "databases" in config["privileges"]:
                 if "read" in config["privileges"]["databases"]:
                     for database in config["privileges"]["databases"]["read"]:
-                        sql_commands.append(
-                            Privileges_TEMPLATE.format(
-                                privileges="USAGE",
-                                resource_type="DATABASE",
-                                resource_name=database,
-                                role=role,
-                            )
+                        new_commands, usage_granted = generate_database_grants(
+                            role=role,
+                            database=database,
+                            grant_type="read",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
                         )
+                        sql_commands.extend(new_commands)
 
                 if "write" in config["privileges"]["databases"]:
                     for database in config["privileges"]["databases"]["write"]:
-                        sql_commands.append(
-                            Privileges_TEMPLATE.format(
-                                privileges="USAGE, MONITOR, CREATE SCHEMA",
-                                resource_type="DATABASE",
-                                resource_name=database,
-                                role=role,
-                            )
+                        new_commands, usage_granted = generate_database_grants(
+                            role=role,
+                            database=database,
+                            grant_type="write",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
                         )
+                        sql_commands.extend(new_commands)
 
             if "schemas" in config["privileges"]:
                 if "read" in config["privileges"]["schemas"]:
-                    Schema_Read_Privileges = "USAGE, MONITOR"
-
                     for schema in config["privileges"]["schemas"]["read"]:
-                        name_parts = schema.split(".")
-                        if name_parts[1] == "*":
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges=Schema_Read_Privileges,
-                                    resource_type="ALL SCHEMAS IN DATABASE",
-                                    resource_name=name_parts[0],
-                                    role=role,
-                                )
-                            )
-                        else:
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges=Schema_Read_Privileges,
-                                    resource_type="SCHEMA",
-                                    resource_name=name_parts[1],
-                                    role=role,
-                                )
-                            )
+                        new_commands, usage_granted = generate_schema_grants(
+                            role=role,
+                            schema=schema,
+                            grant_type="read",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
+                        )
+                        sql_commands.extend(new_commands)
 
                 if "write" in config["privileges"]["schemas"]:
-                    Schema_Write_Privileges = (
-                        "USAGE, MONITOR, CREATE TABLE,"
-                        " CREATE VIEW, CREATE STAGE, CREATE FILE FORMAT,"
-                        " CREATE SEQUENCE, CREATE FUNCTION, CREATE PIPE"
-                    )
-
                     for schema in config["privileges"]["schemas"]["write"]:
-                        name_parts = schema.split(".")
-                        if name_parts[1] == "*":
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges=Schema_Write_Privileges,
-                                    resource_type="ALL SCHEMAS IN DATABASE",
-                                    resource_name=name_parts[0],
-                                    role=role,
-                                )
-                            )
-                        else:
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges=Schema_Write_Privileges,
-                                    resource_type="SCHEMA",
-                                    resource_name=name_parts[1],
-                                    role=role,
-                                )
-                            )
+                        new_commands, usage_granted = generate_schema_grants(
+                            role=role,
+                            schema=schema,
+                            grant_type="write",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
+                        )
+                        sql_commands.extend(new_commands)
 
             if "tables" in config["privileges"]:
                 if "read" in config["privileges"]["tables"]:
                     for table in config["privileges"]["tables"]["read"]:
-                        name_parts = table.split(".")
-                        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
-
-                        if name_parts[2] == "*":
-                            schemas = []
-
-                            if name_parts[1] == "*":
-
-                                conn = SnowflakeConnector()
-                                db_schemas = conn.show_schemas(name_parts[0])
-                                for schema in db_schemas:
-                                    if schema != info_schema:
-                                        schemas.append(schema)
-                            else:
-                                schemas = [name_parts[1]]
-
-                            for schema in schemas:
-                                sql_commands.append(
-                                    Privileges_TEMPLATE.format(
-                                        privileges="SELECT",
-                                        resource_type="ALL TABLES IN SCHEMA",
-                                        resource_name=schema,
-                                        role=role,
-                                    )
-                                )
-                        else:
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges="SELECT",
-                                    resource_type="TABLE",
-                                    resource_name=name_parts[2],
-                                    role=role,
-                                )
-                            )
+                        new_commands, usage_granted = generate_table_grants(
+                            role=role,
+                            table=table,
+                            grant_type="read",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
+                        )
+                        sql_commands.extend(new_commands)
 
                 if "write" in config["privileges"]["tables"]:
-                    Table_Write_Privileges = (
-                        "SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES"
-                    )
-
                     for table in config["privileges"]["tables"]["write"]:
-                        name_parts = table.split(".")
-                        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
-
-                        if name_parts[2] == "*":
-                            schemas = []
-
-                            if name_parts[1] == "*":
-
-                                conn = SnowflakeConnector()
-                                db_schemas = conn.show_schemas(name_parts[0])
-                                for schema in db_schemas:
-                                    if schema != info_schema:
-                                        schemas.append(schema)
-                            else:
-                                schemas = [name_parts[1]]
-
-                            for schema in schemas:
-                                sql_commands.append(
-                                    Privileges_TEMPLATE.format(
-                                        privileges=Table_Write_Privileges,
-                                        resource_type="ALL TABLES IN SCHEMA",
-                                        resource_name=schema,
-                                        role=role,
-                                    )
-                                )
-                        else:
-                            sql_commands.append(
-                                Privileges_TEMPLATE.format(
-                                    privileges=Table_Write_Privileges,
-                                    resource_type="TABLE",
-                                    resource_name=name_parts[2],
-                                    role=role,
-                                )
-                            )
+                        new_commands, usage_granted = generate_table_grants(
+                            role=role,
+                            table=table,
+                            grant_type="write",
+                            usage_granted=usage_granted,
+                            shared_dbs=self.entities["shared_databases"],
+                        )
+                        sql_commands.extend(new_commands)
 
         return sql_commands
