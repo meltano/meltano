@@ -29,7 +29,7 @@ runner_edge:
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
-    IMAGE_TAG: latest
+    IMAGE_TAG: edge
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:edge"
   only:
     refs:
