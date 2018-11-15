@@ -106,6 +106,7 @@ meltano_base_dev:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
   except:
     - master
+    - tags
 
 # Manages:
 #  - meltano/meltano/base:edge
@@ -147,6 +148,7 @@ meltano_cli_dev:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
   except:
     - master
+    - tags
 
 # Manages:
 #  - meltano/meltano/cli:edge
@@ -193,6 +195,7 @@ meltano_dev:
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base:$CI_COMMIT_SHA#" $DOCKERFILE
   except:
     - master
+    - tags
 
 # Manages:
 #  - meltano/meltano:edge
