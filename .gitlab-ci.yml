@@ -7,9 +7,9 @@ include:
 
 stages:
   - lint
+  - test
   - build_base
   - build
-  # - test
   - publish
   - review
   # - production
@@ -26,13 +26,21 @@ lint:
   script:
     - make show_lint
 
-.test:
+test:
   stage: test
+  variables:
+    POSTGRES_USER: runner
+    POSTGRES_DB: pytest
+    POSTGRES_PASSWORD: ""
+    PG_ADDRESS: postgres
+    PG_USERNAME: $POSTGRES_USER
+    PG_PASSWORD: $POSTGRES_PASSWORD
+  services:
+    - postgres:latest
   before_script:
     - pip install '.[dev]'
   script:
     - pytest -v
-  allow_failure: true
 
 .pages:
   script:
