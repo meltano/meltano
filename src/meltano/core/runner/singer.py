@@ -103,7 +103,7 @@ class SingerRunner(Runner):
     def bookmark_state(self, new_state: str):
         try:
             new_state = json.loads(new_state)
-            
+
             self.job.payload["singer_state"] = new_state.get("value", {})
             self.job.ended_at = datetime.utcnow()
             self.job.save()

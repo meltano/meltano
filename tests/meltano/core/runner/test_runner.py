@@ -114,9 +114,11 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     async def test_bookmark(self, subject, tap_process, target_process):
-        lines = (b'{"type": "STATE", "value": {"line": 1}}\n',
-                 b'{"type": "STATE", "value": {"line": 2}}\n',
-                 b'{"type": "STATE", "value": {"line": 3}}\n')
+        lines = (
+            b'{"type": "STATE", "value": {"line": 1}}\n',
+            b'{"type": "STATE", "value": {"line": 2}}\n',
+            b'{"type": "STATE", "value": {"line": 3}}\n',
+        )
 
         # testing with a real subprocess proved to be pretty
         # complicated.
