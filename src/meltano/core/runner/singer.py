@@ -102,7 +102,9 @@ class SingerRunner(Runner):
 
     def bookmark_state(self, new_state: str):
         try:
-            self.job.payload["singer_state"] = json.loads(new_state)
+            new_state = json.loads(new_state)
+
+            self.job.payload["singer_state"] = new_state.get("value", {})
             self.job.ended_at = datetime.utcnow()
             self.job.save()
             logging.info(f"Incremental state has been updated at {self.job.ended_at}.")

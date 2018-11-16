@@ -114,7 +114,11 @@ class TestSingerRunner:
 
     @pytest.mark.asyncio
     async def test_bookmark(self, subject, tap_process, target_process):
-        lines = (b'{"line": 1}\n', b'{"line": 2}\n', b'{"line": 3}\n')
+        lines = (
+            b'{"type": "STATE", "value": {"line": 1}}\n',
+            b'{"type": "STATE", "value": {"line": 2}}\n',
+            b'{"type": "STATE", "value": {"line": 3}}\n',
+        )
 
         # testing with a real subprocess proved to be pretty
         # complicated.
@@ -125,7 +129,8 @@ class TestSingerRunner:
         with subject.job.run():
             await subject.bookmark(target_process.stdout)
 
-        assert subject.job.payload["singer_state"]["line"] == 3
+        # assert the STATE's `value` was saved
+        assert subject.job.payload["singer_state"] == {"line": 3}
 
         # test the restore
         tap_invoker = PluginInvoker(subject.project, TAP)
