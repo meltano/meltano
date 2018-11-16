@@ -1,6 +1,7 @@
 # Databases
 databases:
-    - analytics.*
+    - analytics.*:
+        shared: no
 
 # Roles
 roles:

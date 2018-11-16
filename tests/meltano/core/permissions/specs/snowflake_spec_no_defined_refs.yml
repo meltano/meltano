@@ -1,6 +1,7 @@
 # Databases
 databases:
-    - test_db
+    - test_db:
+        shared: no
 
 # Roles
 roles:

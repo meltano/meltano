@@ -1,6 +1,7 @@
 # Databases
 databases:
-    - raw
+    - raw:
+        shared: no
 
 # Roles
 roles:

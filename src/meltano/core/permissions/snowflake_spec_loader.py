@@ -2,7 +2,7 @@ import cerberus
 import yaml
 import re
 
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
@@ -36,6 +36,11 @@ class SnowflakeSpecLoader:
 
         Otherwise, return the valid specification as a Dictionary to be used
         in other operations.
+
+        Raises a SpecLoadingError with all the errors found in the spec if at
+        least one error is found.
+
+        Returns the spec as a dictionary if everything is OK
         """
         try:
             with open(spec_path, "r") as stream:
@@ -53,7 +58,7 @@ class SnowflakeSpecLoader:
         """
         Ensure that the provided spec has no schema errors.
 
-        Return a list with all the errors found.
+        Returns a list with all the errors found.
         """
         error_messages = []
 
@@ -112,48 +117,24 @@ class SnowflakeSpecLoader:
 
         Otherwise, return the entities found as a Dictionary to be used
         in other operations.
+
+        Raises a SpecLoadingError with all the errors found in the spec if at
+        least an error is found.
+
+        Returns a dictionary with all the entities defined in the spec
         """
-        error_messages = []
+        entities, error_messages = self.generate_entities()
 
-        entities = self.generate_entities()
+        error_messages.extend(self.ensure_valid_entity_names(entities))
 
-        # Check that all the referenced entities are also defined
-        for database in entities["database_refs"]:
-            if database not in entities["databases"]:
-                error_messages.append(
-                    f"Reference error: Database {database} is referenced "
-                    "in the spec but not defined"
-                )
-
-        for role in entities["role_refs"]:
-            if role not in entities["roles"]:
-                error_messages.append(
-                    f"Reference error: Role {role} is referenced in the "
-                    "spec but not defined"
-                )
-
-        for warehouse in entities["warehouse_refs"]:
-            if warehouse not in entities["warehouses"]:
-                error_messages.append(
-                    f"Reference error: Warehouse {warehouse} is referenced "
-                    "in the spec but not defined"
-                )
-
-        # Check that all users have a same name role defined
-        for user in entities["users"]:
-            if user not in entities["roles"]:
-                error_messages.append(
-                    f"Missing user role for user {user}. All users must "
-                    "have a role of the same name defined in order to assign "
-                    "user specific permissions."
-                )
+        error_messages.extend(self.ensure_valid_references(entities))
 
         if error_messages:
             raise SpecLoadingError("\n".join(error_messages))
 
         return entities
 
-    def generate_entities(self) -> Dict:
+    def generate_entities(self) -> Tuple[Dict, List[str]]:
         """
         Generate and return a dictionary with all the entities defined or
         referenced in the permissions specification file.
@@ -164,6 +145,9 @@ class SnowflakeSpecLoader:
         'role_refs' --> All the roles referenced in a member_of permission
         'table_refs' --> All the tables referenced in read/write privileges
                          or in owns entries
+
+        Returns a tuple (entities, error_messages) with all the entities defined
+        in the spec and any errors found (e.g. a user not assigned her user role)
         """
         error_messages = []
 
@@ -287,9 +271,34 @@ class SnowflakeSpecLoader:
                     elif entity_type == "warehouses":
                         entities["warehouses"].add(entity_name)
 
-        # Check that all names are valid and also add implicit references to
-        #  DBs and Schemas. e.g. RAW.TEST_SCHEMA.TABLE references also
-        #  DB RAW and Schema TEST_SCHEMA
+        # Add implicit references to DBs and Schemas.
+        #  e.g. RAW.MYSCHEMA.TABLE references also DB RAW and Schema MYSCHEMA
+        for schema in entities["schema_refs"]:
+            name_parts = schema.split(".")
+            # Add the Database in the database refs
+            if name_parts[0] != "*":
+                entities["database_refs"].add(name_parts[0])
+
+        for table in entities["table_refs"]:
+            name_parts = table.split(".")
+            # Add the Database in the database refs
+            if name_parts[0] != "*":
+                entities["database_refs"].add(name_parts[0])
+
+            # Add the Schema in the schema refs
+            if name_parts[1] != "*":
+                entities["schema_refs"].add(f"{name_parts[0]}.{name_parts[1]}")
+
+        return (entities, error_messages)
+
+    def ensure_valid_entity_names(self, entities: Dict) -> List[str]:
+        """
+        Check that all entity names are valid.
+
+        Returns a list with all the errors found.
+        """
+        error_messages = []
+
         for db in entities["databases"] | entities["database_refs"]:
             name_parts = db.split(".")
             if not len(name_parts) == 1:
@@ -306,10 +315,6 @@ class SnowflakeSpecLoader:
                     " (Proper definition: DB.[SCHEMA | *])"
                 )
 
-            # Add the Database in the database refs
-            if name_parts[0] != "*":
-                entities["database_refs"].add(name_parts[0])
-
         for table in entities["table_refs"]:
             name_parts = table.split(".")
             if (not len(name_parts) == 3) or (name_parts[0] == "*"):
@@ -321,23 +326,60 @@ class SnowflakeSpecLoader:
                 error_messages.append(
                     f"Name error: Not a valid table name: {table}"
                     " (Can't have a Table name after selecting all schemas"
-                    " with *: DB.[SCHEMA | *].[TABLE | *])"
+                    " with *: DB.SCHEMA.[TABLE | *])"
                 )
 
-            # Add the Database in the database refs
-            if name_parts[0] != "*":
-                entities["database_refs"].add(name_parts[0])
+        return error_messages
 
-            # Add the Schema in the schema refs
-            if name_parts[1] != "*":
-                entities["schema_refs"].add(f"{name_parts[0]}.{name_parts[1]}")
+    def ensure_valid_references(self, entities: Dict) -> List[str]:
+        """
+        Make sure that all references are well defined.
 
-        if error_messages:
-            raise SpecLoadingError("\n".join(error_messages))
+        Returns a list with all the errors found.
+        """
+        error_messages = []
 
-        return entities
+        # Check that all the referenced entities are also defined
+        for database in entities["database_refs"]:
+            if database not in entities["databases"]:
+                error_messages.append(
+                    f"Reference error: Database {database} is referenced "
+                    "in the spec but not defined"
+                )
+
+        for role in entities["role_refs"]:
+            if role not in entities["roles"]:
+                error_messages.append(
+                    f"Reference error: Role {role} is referenced in the "
+                    "spec but not defined"
+                )
+
+        for warehouse in entities["warehouse_refs"]:
+            if warehouse not in entities["warehouses"]:
+                error_messages.append(
+                    f"Reference error: Warehouse {warehouse} is referenced "
+                    "in the spec but not defined"
+                )
+
+        # Check that all users have a same name role defined
+        for user in entities["users"]:
+            if user not in entities["roles"]:
+                error_messages.append(
+                    f"Missing user role for user {user}. All users must "
+                    "have a role of the same name defined in order to assign "
+                    "user specific permissions."
+                )
+
+        return error_messages
 
     def check_entities_on_snowflake_server(self) -> None:
+        """
+        Make sure that all [warehouses, dbs, schemas, tables, users, roles]
+        referenced in the spec are defined in SNowflake.
+
+        Raises a SpecLoadingError with all the errors found while checking
+        Snowflake for missinf entities.
+        """
         error_messages = []
 
         conn = SnowflakeConnector()
@@ -394,6 +436,14 @@ class SnowflakeSpecLoader:
             raise SpecLoadingError("\n".join(error_messages))
 
     def generate_permission_queries(self) -> List[str]:
+        """
+        Starting point to generate all the permission queries.
+
+        For each entity type (e.g. user or role) that is affected by the spec,
+        the proper sql permission queries are generated.
+
+        Returns all the SQL commands as a list.
+        """
         sql_commands = []
 
         # For each permission in the spec, check if we have to generate an
@@ -409,230 +459,23 @@ class SnowflakeSpecLoader:
 
                     if entity_type == "roles":
                         sql_commands.extend(
-                            self.generate_grant_roles("ROLE", entity_name, config)
+                            generate_grant_roles("ROLE", entity_name, config)
                         )
 
                         sql_commands.extend(
-                            self.generate_grant_ownership(entity_name, config)
+                            generate_grant_ownership(entity_name, config)
                         )
 
                         sql_commands.extend(
-                            self.generate_grant_privileges_to_role(entity_name, config)
+                            generate_grant_privileges_to_role(
+                                entity_name, config, self.entities["shared_databases"]
+                            )
                         )
                     elif entity_type == "users":
-                        sql_commands.extend(
-                            self.generate_alter_user(entity_name, config)
-                        )
+                        sql_commands.extend(generate_alter_user(entity_name, config))
 
                         sql_commands.extend(
-                            self.generate_grant_roles("USER", entity_name, config)
+                            generate_grant_roles("USER", entity_name, config)
                         )
-
-        return sql_commands
-
-    def generate_alter_user(self, user: str, config: str) -> List[str]:
-        ALTER_USER_TEMPLATE = "ALTER USER {user_name} SET {privileges}"
-
-        sql_commands = []
-
-        alter_privileges = []
-
-        if "can_login" in config:
-            if config["can_login"]:
-                alter_privileges.append("DISABLED = FALSE")
-            else:
-                alter_privileges.append("DISABLED = TRUE")
-
-        if alter_privileges:
-            sql_commands.append(
-                ALTER_USER_TEMPLATE.format(
-                    user_name=user, privileges=", ".join(alter_privileges)
-                )
-            )
-
-        return sql_commands
-
-    def generate_grant_roles(
-        self, entity_type: str, entity: str, config: str
-    ) -> List[str]:
-        GRANT_ROLE_TEMPLATE = "GRANT {role_name} TO {type} {entity_name}"
-        sql_commands = []
-
-        if "member_of" in config:
-            for member_role in config["member_of"]:
-                sql_commands.append(
-                    GRANT_ROLE_TEMPLATE.format(
-                        role_name=member_role, type=entity_type, entity_name=entity
-                    )
-                )
-
-        return sql_commands
-
-    def generate_grant_ownership(self, role: str, config: str) -> List[str]:
-        Grant_Ownership_TEMPLATE = (
-            "GRANT OWNERSHIP"
-            " ON {resource_type} {resource_name}"
-            " TO ROLE {role_name} COPY CURRENT GRANTS"
-        )
-
-        sql_commands = []
-
-        if "owns" in config:
-            if "databases" in config["owns"]:
-                for database in config["owns"]["databases"]:
-                    sql_commands.append(
-                        Grant_Ownership_TEMPLATE.format(
-                            resource_type="DATABASE",
-                            resource_name=database,
-                            role_name=role,
-                        )
-                    )
-
-            if "schemas" in config["owns"]:
-                for schema in config["owns"]["schemas"]:
-                    name_parts = schema.split(".")
-                    info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
-
-                    if name_parts[1] == "*":
-                        schemas = []
-                        conn = SnowflakeConnector()
-                        db_schemas = conn.show_schemas(name_parts[0])
-
-                        for db_schema in db_schemas:
-                            if db_schema != info_schema:
-                                schemas.append(db_schema)
-
-                        for db_schema in schemas:
-                            sql_commands.append(
-                                Grant_Ownership_TEMPLATE.format(
-                                    resource_type="SCHEMA",
-                                    resource_name=db_schema,
-                                    role_name=role,
-                                )
-                            )
-                    else:
-                        sql_commands.append(
-                            Grant_Ownership_TEMPLATE.format(
-                                resource_type="SCHEMA",
-                                resource_name=schema,
-                                role_name=role,
-                            )
-                        )
-
-            if "tables" in config["owns"]:
-                for table in config["owns"]["tables"]:
-                    name_parts = table.split(".")
-                    info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
-
-                    if name_parts[2] == "*":
-                        schemas = []
-
-                        if name_parts[1] == "*":
-                            conn = SnowflakeConnector()
-                            db_schemas = conn.show_schemas(name_parts[0])
-
-                            for schema in db_schemas:
-                                if schema != info_schema:
-                                    schemas.append(schema)
-                        else:
-                            schemas = [f"{name_parts[0]}.{name_parts[1]}"]
-
-                        for schema in schemas:
-                            sql_commands.append(
-                                Grant_Ownership_TEMPLATE.format(
-                                    resource_type="ALL TABLES IN SCHEMA",
-                                    resource_name=schema,
-                                    role_name=role,
-                                )
-                            )
-                    else:
-                        sql_commands.append(
-                            Grant_Ownership_TEMPLATE.format(
-                                resource_type="TABLE",
-                                resource_name=table,
-                                role_name=role,
-                            )
-                        )
-
-        return sql_commands
-
-    def generate_grant_privileges_to_role(self, role: str, config: str) -> List[str]:
-        sql_commands = []
-
-        usage_granted = {"databases": set(), "schemas": set()}
-
-        if "warehouses" in config:
-            for warehouse in config["warehouses"]:
-                sql_commands.append(generate_warehouse_grants(role, warehouse))
-
-        if "privileges" in config:
-            if "databases" in config["privileges"]:
-                if "read" in config["privileges"]["databases"]:
-                    for database in config["privileges"]["databases"]["read"]:
-                        new_commands, usage_granted = generate_database_grants(
-                            role=role,
-                            database=database,
-                            grant_type="read",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
-
-                if "write" in config["privileges"]["databases"]:
-                    for database in config["privileges"]["databases"]["write"]:
-                        new_commands, usage_granted = generate_database_grants(
-                            role=role,
-                            database=database,
-                            grant_type="write",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
-
-            if "schemas" in config["privileges"]:
-                if "read" in config["privileges"]["schemas"]:
-                    for schema in config["privileges"]["schemas"]["read"]:
-                        new_commands, usage_granted = generate_schema_grants(
-                            role=role,
-                            schema=schema,
-                            grant_type="read",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
-
-                if "write" in config["privileges"]["schemas"]:
-                    for schema in config["privileges"]["schemas"]["write"]:
-                        new_commands, usage_granted = generate_schema_grants(
-                            role=role,
-                            schema=schema,
-                            grant_type="write",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
-
-            if "tables" in config["privileges"]:
-                if "read" in config["privileges"]["tables"]:
-                    for table in config["privileges"]["tables"]["read"]:
-                        new_commands, usage_granted = generate_table_grants(
-                            role=role,
-                            table=table,
-                            grant_type="read",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
-
-                if "write" in config["privileges"]["tables"]:
-                    for table in config["privileges"]["tables"]["write"]:
-                        new_commands, usage_granted = generate_table_grants(
-                            role=role,
-                            table=table,
-                            grant_type="write",
-                            usage_granted=usage_granted,
-                            shared_dbs=self.entities["shared_databases"],
-                        )
-                        sql_commands.extend(new_commands)
 
         return sql_commands

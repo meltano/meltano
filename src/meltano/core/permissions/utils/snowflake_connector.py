@@ -32,6 +32,8 @@ class SnowflakeConnector:
                 database=config["database"],
                 role=config["role"],
                 warehouse=config["warehouse"],
+                # Enable the insecure_mode if you get OCSP errors while testing
+                # insecure_mode=True,
             )
         )
 
