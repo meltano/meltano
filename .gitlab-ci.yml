@@ -198,15 +198,19 @@ meltano_dev:
     - tags
 
 # Manages:
+#  - meltano/meltano:<sha>
 #  - meltano/meltano:edge
 meltano_edge:
   <<: *docker_build
   variables:
     DOCKERFILE: docker/prod/Dockerfile
-    IMAGE_TAG: edge
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base:edge#" $DOCKERFILE
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:edge
+    - docker push $DOCKER_IMAGE_NAME:edge
   only:
     - master
   except:
@@ -214,8 +218,8 @@ meltano_edge:
       - $CI_COMMIT_TAG
 
 # Manages:
-#  - meltano/meltano/edge:<tag>
-#  - meltano/meltano/edge:latest
+#  - meltano/meltano:<tag>
+#  - meltano/meltano:latest
 meltano:
   <<: *docker_build
   variables:

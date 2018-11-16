@@ -13,7 +13,8 @@
   script:
     - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
 
-# Builds the singer_runner container for use in testing on branches
+# Manages:
+#   - meltano/meltano/runner:<sha>
 runner_dev:
   <<: *kaniko_build
   variables:
@@ -24,17 +25,24 @@ runner_dev:
     - master
     - tags
 
+# Manages:
+#   - meltano/meltano/runner:<sha>
+#   - meltano/meltano/runner:edge
 runner_edge:
   <<: *kaniko_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
-    IMAGE_TAG: edge
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:edge"
+  script:
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG --destination $DOCKER_IMAGE_NAME:edge $EXTRA_ARGS
   only:
     refs:
       - master
 
+# Manages:
+#   - meltano/meltano/runner:<tag>
+#   - meltano/meltano/runner:latest
 runner:
   <<: *kaniko_build
   variables:
