@@ -87,10 +87,10 @@ class SqlHelper:
         return substitution.sql
 
     def measures(self, measures, table):
-        return [self.field_from_measure(m, table) for m in measures]
+        return [self.field_from_measure(measure, table) for measure in measures]
 
-    def field_from_measure(self, m, table):
-        aggregate = Aggregate(m, table)
+    def field_from_measure(self, measure, table):
+        aggregate = Aggregate(measure, table)
         return aggregate.sql
 
     def joins(self, joins, table):

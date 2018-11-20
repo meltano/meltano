@@ -14,9 +14,9 @@ class SubstitutionType(Enum):
 
 
 class Substitution:
-    def __init__(self, _input, table, dimension=None):
+    def __init__(self, _input, table, dimension=None, alias=None):
         self.input = _input
-        self.alias = None
+        self.alias = alias
         self.sql = None
         self.table = table
 
@@ -66,7 +66,8 @@ class Substitution:
             self.placeholders.outer[0], self.table._table_name
         )
         (table, field) = self.sql.split(".")
-        self.alias = self.sql
+        if not self.alias:
+          self.alias = self.sql
         if self.type == "yesno":
             field = Field(field, table=self.table)
             self.sql = Case(alias=self.sql).when(field, "yes").else_("no")
