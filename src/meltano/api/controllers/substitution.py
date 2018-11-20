@@ -67,7 +67,7 @@ class Substitution:
         )
         (table, field) = self.sql.split(".")
         if not self.alias:
-          self.alias = self.sql
+            self.alias = self.sql
         if self.type == "yesno":
             field = Field(field, table=self.table)
             self.sql = Case(alias=self.sql).when(field, "yes").else_("no")

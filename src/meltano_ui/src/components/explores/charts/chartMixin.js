@@ -20,6 +20,11 @@ const chartMixin = {
         },
         options: {
           scales: {
+            xAxes: [{
+              ticks: {
+                beginAtZero: true,
+              }
+            }],
             yAxes: [{
               ticks: {
                 beginAtZero: true,
