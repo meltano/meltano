@@ -15,7 +15,7 @@ class AggregateType(Enum):
 class Aggregate:
     def __init__(self, measure, table):
         sql = measure.settings["sql"]
-        self.substitution = Substitution(sql, table)
+        self.substitution = Substitution(sql, table, None, measure.name)
         self.measure = measure
         self.table = table
         self.sql = self.substitution.sql
