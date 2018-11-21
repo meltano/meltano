@@ -23,7 +23,7 @@ const chartMixin = {
             xAxes: [{
               ticks: {
                 beginAtZero: true,
-              }
+              },
             }],
             yAxes: [{
               ticks: {
