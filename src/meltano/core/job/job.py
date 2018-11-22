@@ -90,7 +90,8 @@ class Job(SystemModel):
     def fail(self, error=None):
         self.ended_at = datetime.utcnow()
         self.transit(State.FAIL)
-        self.payload = {"error": str(error)}
+        if error:
+            self.payload.update({"error": str(error)})
         self.save()
 
     def success(self):
