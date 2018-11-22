@@ -9,12 +9,12 @@ class TestJob:
         return Job(elt_uri="elt://bizops/sample-elt", state=State.IDLE, payload=payload)
 
     def test_save(self, session):
-        subject = sample_job().save()
+        subject = self.sample_job().save()
 
         assert subject.id > 0
 
     def test_load(self, session):
-        [session.add(sample_job({"key": i})) for i in range(0, 10)]
+        [session.add(self.sample_job({"key": i})) for i in range(0, 10)]
 
         subjects = session.query(Job).filter_by(elt_uri="elt://bizops/sample-elt")
 
@@ -22,7 +22,7 @@ class TestJob:
         session.rollback()
 
     def test_transit(self, session):
-        subject = sample_job().save()
+        subject = self.sample_job().save()
 
         transition = subject.transit(State.RUNNING)
         assert transition == (State.IDLE, State.RUNNING)
@@ -33,7 +33,7 @@ class TestJob:
         subject.ended_at = datetime.utcnow()
 
     def test_run(self, session):
-        subject = sample_job().save()
+        subject = self.sample_job().save()
 
         # A successful run will mark the subject as SUCCESS and set the `ended_at`
         with subject.run():
