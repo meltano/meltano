@@ -45,6 +45,11 @@ extractors:
       user: $MONGODB_USERNAME
       password: $MONGODB_PASSWORD
       dbname: $MONGODB_DBNAME
+  - name: tap-fastly
+    pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
+    config:
+      api_token: $FASTLY_API_TOKEN
+      start_date: $FASTLY_START_DATE
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
