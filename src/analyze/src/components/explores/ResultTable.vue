@@ -16,10 +16,10 @@
               :key="columnHeader"
               :class="{
                 'has-background-warning': isColumnSelectedMeasure(keys[i]),
-                'has-background-white-ter sorted': isColumnSorted(keys[i]),
+                'has-background-white-ter sorted': isColumnSorted(names[i]),
                 'is-desc': sortDesc,
               }"
-              @click="sortBy(keys[i])">
+              @click="sortBy(names[i])">
             {{columnHeader}}
           </th>
         </thead>
@@ -48,6 +48,7 @@ export default {
     ...mapState('explores', [
       'resultMeasures',
       'columnHeaders',
+      'names',
       'results',
       'keys',
       'sortDesc',

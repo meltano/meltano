@@ -3,7 +3,7 @@ import re
 
 import sqlalchemy
 from flask import jsonify
-from pypika import Query, Table
+from pypika import Query, Table, Order
 
 from .aggregate import Aggregate
 from .date import Date
@@ -40,6 +40,15 @@ class SqlHelper:
         incoming_filters = incoming_json["filters"]
         incoming_joins = incoming_json["joins"]
         incoming_limit = incoming_json.get("limit", 50)
+        incoming_order = incoming_json["order"]
+        order = None
+        if incoming_order:
+            if incoming_order['direction'] == 'asc':
+                order = Order.asc
+            else:
+                order = Order.desc
+        orderby = incoming_order['column'] if incoming_order else None
+        
         # get all timeframes
         timeframes = [t["timeframes"] for t in incoming_dimension_groups]
         # flatten list of timeframes
@@ -59,15 +68,19 @@ class SqlHelper:
         dimensions = dimensions + dimension_groups
         measures = self.measures(measures, table)
         column_headers = self.column_headers(dimensions_raw, measures_raw)
+        names = self.get_names(dimensions_raw + measures_raw)
         return {
             "dimensions": dimensions_raw,
             "measures": measures_raw,
             "column_headers": column_headers,
+            "names": names,
             "sql": self.get_query(
                 from_=table,
                 dimensions=dimensions,
                 measures=measures,
                 limit=incoming_limit,
+                order=order,
+                orderby=orderby,
             ),
         }
 
@@ -114,9 +127,12 @@ class SqlHelper:
                 fields.append(d.sql)
         return fields
 
-    def get_query(self, from_, dimensions, measures, limit):
+    def get_query(self, from_, dimensions, measures, limit, order=None, orderby=None):
         select = dimensions + measures
-        q = Query.from_(from_).select(*select).groupby(*dimensions).limit(limit)
+        q = Query.from_(from_).select(*select).groupby(*dimensions)
+        if order:
+            q = q.orderby(orderby, order=order)
+        q = q.limit(limit)
         return f"{str(q)};"
 
     def reset_db(self):
