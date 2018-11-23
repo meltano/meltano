@@ -15,41 +15,47 @@ from meltano.core.behavior.hookable import HookObject, hook
 class CatalogSelectAllVisitor:
     @singledispatch
     def visit(node, path: str = ""):
-        logging.debug("Skipping node at '{path}'")
+        logging.debug(f"Skipping node at '{path}'")
 
     @visit.register(dict)
     def _(node: dict, path=""):
-        logging.debug("Visiting node at '{path}'.")
-        if re.search(r"streams.\[\d+\]$", path):
+        logging.debug(f"Visiting node at '{path}'.")
+        if re.search(r"streams\[\d+\]$", path):
             node.update({"selected": True})
 
         if path.endswith("metadata") and node.get("inclusion") == "available":
             node.update({"selected": True})
-            logging.debug("{path} has been selected.")
+            logging.debug(f"{path} has been selected.")
 
         for child_path, child_node in node.items():
             CatalogSelectAllVisitor.visit(child_node, path=f"{path}.{child_path}")
 
     @visit.register(list)
     def _(node: list, path=""):
-        logging.debug("Visiting node at '{path}'.")
+        logging.debug(f"Visiting node at '{path}'.")
         # ensure the stream metadata is in there
         if path.endswith("metadata"):
+            found = False
             for stream_metadata in (
-                metadata for metadata in node if len(metadata["breadcrumb"]) == 0
+                metadata
+                for metadata in node
+                if len(metadata["breadcrumb"]) == 0
             ):
-                node["metadata"].update({"selected": True})
-            else:
-                node.append(
-                    {
+                found = True
+                stream_metadata["metadata"].update({"selected": True})
+
+            # This is to support legacy catalogs
+            if not found:
+                node.insert(0, {
                         "breadcrumb": [],
                         "metadata": {"inclusion": "available", "selected": True},
                     }
                 )
-            logging.debug("{path} has been selected.")
+
+            logging.debug(f"{path} has been selected.")
 
         for index, child_node in enumerate(node):
-            CatalogSelectAllVisitor.visit(child_node, path=f"{path}.[{index}]")
+            CatalogSelectAllVisitor.visit(child_node, path=f"{path}[{index}]")
 
 
 def plugin_factory(plugin_type: PluginType, canonical: Dict):
