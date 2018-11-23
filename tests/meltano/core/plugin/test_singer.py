@@ -384,10 +384,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
 
-        stream_metadata = len([metadata
-                               for stream in streams.values()
-                               for metadata in stream["metadata"]
-                               if len(metadata["breadcrumb"]) == 0])
+        stream_metadata = len(
+            [
+                metadata
+                for stream in streams.values()
+                for metadata in stream["metadata"]
+                if len(metadata["breadcrumb"]) == 0
+            ]
+        )
 
         assert stream_metadata == 1, "Extraneous stream metadata"
 

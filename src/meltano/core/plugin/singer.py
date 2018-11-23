@@ -37,19 +37,19 @@ class CatalogSelectAllVisitor:
         if path.endswith("metadata"):
             found = False
             for stream_metadata in (
-                metadata
-                for metadata in node
-                if len(metadata["breadcrumb"]) == 0
+                metadata for metadata in node if len(metadata["breadcrumb"]) == 0
             ):
                 found = True
                 stream_metadata["metadata"].update({"selected": True})
 
             # This is to support legacy catalogs
             if not found:
-                node.insert(0, {
+                node.insert(
+                    0,
+                    {
                         "breadcrumb": [],
                         "metadata": {"inclusion": "available", "selected": True},
-                    }
+                    },
                 )
 
             logging.debug(f"{path} has been selected.")
