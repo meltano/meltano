@@ -45,6 +45,12 @@ extractors:
       user: $MONGODB_USERNAME
       password: $MONGODB_PASSWORD
       dbname: $MONGODB_DBNAME
+  - name: tap-stripe
+    pip_url: "git+https://github.com/meltano/tap-stripe.git"
+    config:
+      client_secret: $STRIPE_API_KEY
+      start_date: $STRIPE_START_DATE
+      account_id:
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
