@@ -46,7 +46,7 @@ extractors:
       password: $MONGODB_PASSWORD
       dbname: $MONGODB_DBNAME
   - name: tap-stripe
-    pip_url: "git+https://github.com/meltano/tap-stripe.git"
+    pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
     config:
       client_secret: $STRIPE_API_KEY
       start_date: $STRIPE_START_DATE
