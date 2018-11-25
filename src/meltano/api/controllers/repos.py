@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import sys
+from pathlib import Path
 from os.path import join
 from ..app import db
 
@@ -34,24 +35,30 @@ def index():
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
     sortedLkml = {"documents": [], "views": [], "models": [], "dashboards": []}
+    onlydocs = Path(meltano_model_path).parent.glob('*.md')
+    for d in onlydocs:
+        file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
+        file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
+            "utf-8"
+        )
+        sortedLkml["documents"].append(file_dict)
+
     for f in onlyfiles:
-        filename, ext = os.path.splitext(f)
+        filename, _ = os.path.splitext(f)
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
         )
         filename = filename.lower()
-        if ext == ".md":
-            sortedLkml["documents"].append(file_dict)
-        else:
-            filename, ext = os.path.splitext(filename)
-            file_dict["visual"] = filename
-            if ext == ".view":
-                sortedLkml["views"].append(file_dict)
-            if ext == ".model":
-                sortedLkml["models"].append(file_dict)
-            if ext == ".dashboard":
-                sortedLkml["dashboards"].append(file_dict)
+
+        filename, ext = os.path.splitext(filename)
+        file_dict["visual"] = filename
+        if ext == ".view":
+            sortedLkml["views"].append(file_dict)
+        if ext == ".model":
+            sortedLkml["models"].append(file_dict)
+        if ext == ".dashboard":
+            sortedLkml["dashboards"].append(file_dict)
 
     return jsonify(sortedLkml)
 
