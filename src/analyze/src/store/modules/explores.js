@@ -187,11 +187,11 @@ const actions = {
       .map(d => d.name);
     let sortColumn = baseView
       .dimensions
-      .find(d => d.name === state.sortColumn);
+      .find(d => d.name === state.sortColumn).name;
     if (!sortColumn) {
       sortColumn = baseView
         .measures
-        .find(d => d.name === state.sortColumn);
+        .find(d => d.name === state.sortColumn).name;
     }
     const measures = baseView
       .measures
@@ -239,7 +239,7 @@ const actions = {
 
     if (sortColumn) {
       order = {
-        column: sortColumn.name,
+        column: sortColumn,
         direction: state.sortDesc ? 'desc' : 'asc',
       };
     }
