@@ -3,21 +3,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-def get_env_variable(name):
-    try:
-        return os.environ[name]
-    except KeyError:
-        message = f"Expected environment variable '{name}' not set."
-        raise Exception(message)
-
-
 # the values of those depend on your setup
-MELTANO_POSTGRES_URL = get_env_variable("MELTANO_POSTGRES_URL")
-MELTANO_POSTGRES_USER = get_env_variable("MELTANO_POSTGRES_USER")
-MELTANO_POSTGRES_PASSWORD = get_env_variable("MELTANO_POSTGRES_PASSWORD")
-MELTANO_POSTGRES_DB = get_env_variable("MELTANO_POSTGRES_DB")
-LOG_PATH = get_env_variable("MELTANO_ANALYZE_LOG_PATH")
+MELTANO_POSTGRES_URL = os.getenv("MELTANO_POSTGRES_URL", "localhost")
+MELTANO_POSTGRES_USER = os.getenv("MELTANO_POSTGRES_USER", "meltano")
+MELTANO_POSTGRES_PASSWORD = os.getenv("MELTANO_POSTGRES_PASSWORD", "meltano")
+MELTANO_POSTGRES_DB = os.getenv("MELTANO_POSTGRES_DB", "meltano")
+LOG_PATH = os.getenv("MELTANO_LOG_PATH", "meltano.log")
 ENV = "development"
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
