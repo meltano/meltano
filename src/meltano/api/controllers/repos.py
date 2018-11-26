@@ -35,7 +35,7 @@ def index():
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
     sortedLkml = {"documents": [], "views": [], "models": [], "dashboards": []}
-    onlydocs = Path(meltano_model_path).parent.glob('*.md')
+    onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
         file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(

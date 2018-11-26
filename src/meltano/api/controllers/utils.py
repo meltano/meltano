@@ -43,12 +43,12 @@ class SqlHelper:
         incoming_order = incoming_json["order"]
         order = None
         if incoming_order:
-            if incoming_order['direction'] == 'asc':
+            if incoming_order["direction"] == "asc":
                 order = Order.asc
             else:
                 order = Order.desc
-        orderby = incoming_order['column'] if incoming_order else None
-        
+        orderby = incoming_order["column"] if incoming_order else None
+
         # get all timeframes
         timeframes = [t["timeframes"] for t in incoming_dimension_groups]
         # flatten list of timeframes
