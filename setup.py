@@ -33,6 +33,7 @@ dev_requires = [
     'asynctest',
     'black',
     'bumpversion',
+    'changelog-cli'
 ]
 
 setup(

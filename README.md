@@ -605,6 +605,19 @@ Meltano uses [Black](https://github.com/ambv/black) to enforce a consistent code
 
 You can also have black run automatically using a `git` hook. See https://github.com/ambv/black#version-control-integration for more details.
 
+### Changelog
+
+Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
+
+Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
+
+```bash
+$ changelog new "add an amazing feature"
+$ git add CHANGELOG.md
+```
+
+Make sure to add CHANGELOG entries to your merge requests.
+
 ### Merge Requests
 
 Meltano uses an approval workflow for all merge requests.
@@ -617,6 +630,7 @@ Meltano uses an approval workflow for all merge requests.
 ## Release
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
+Meltano adheres to [Keep a Changelog](http://keepachangelog.com/) for changes tracking.
 
 ### Release process
 
@@ -625,8 +639,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 ```bash
 $ git fetch origin
 $ git checkout -b release-next origin/master
-$ bumpversion (minor|major|--new-version <new_version>) --tag
-$ git push --tags origin
+$ changelog view ;; make sure to validate the CHANGELOG changes
+$ changelog release && git add CHANGELOG.md ;; update the CHANGELOG
+$ bumpversion --new-version $(changelog current) --tag
+$ git push --follow-tags origin
 ```
 
 Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.
