@@ -20,6 +20,11 @@ const chartMixin = {
         },
         options: {
           scales: {
+            xAxes: [{
+              ticks: {
+                beginAtZero: true,
+              },
+            }],
             yAxes: [{
               ticks: {
                 beginAtZero: true,
@@ -62,12 +67,13 @@ const chartMixin = {
       this.chart.data.labels = [];
       this.chart.data.datasets = [];
       const resultsKeys = Object.keys(this.results[0]);
-      const measures = Object.keys(this.resultMeasures);
+      const measures = this.resultMeasures;
       const diff = utils.difference(resultsKeys, measures);
       const dataSets = {};
       this.results.forEach((r) => {
         let label = [];
         resultsKeys.forEach((k, i) => {
+          // isn't this just measures?
           if (!diff.includes(k)) {
             const color = utils.getColor(i);
             if (!dataSets[k]) {
