@@ -55,8 +55,8 @@ The gitlab-runner project contains a `meltano.yml` file:
 ```yml
 version: 0.0.0 **
 extractors:
-- name: tap-first
-  url: https://gitlab.com/meltano/tap-first
+- name: tap-gitlab
+  url: https://gitlab.com/meltano/tap-gitlab
 - name: tap-mysql
   url: https://gitlab.com/meltano/tap-mysql
 - name: tap-zendesk
@@ -356,7 +356,7 @@ For more info see the [docker-compose.yml]()
 
 ## Tap
 
-See our [sample first tap](https://gitlab.com/meltano/tap-first/) as a good tap starting point. 
+See our [tap gitlab](https://gitlab.com/meltano/tap-gitlab/) as a good tap starting point. 
 
 Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
 

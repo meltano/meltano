@@ -1093,7 +1093,7 @@ CATALOG = """
 class TestSingerTap:
     @pytest.fixture
     def subject(self, project_add_service):
-        return project_add_service.add(PluginType.EXTRACTORS, "tap-first")
+        return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
 
     def config_files(self, subject, dir: Path):
         return {key: dir.join(file) for key, file in subject.config_files.items()}

@@ -60,12 +60,12 @@ class ProjectInitService:
         click.secho(" source .env", fg="green")
         click.echo("Try it out:")
         click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano add extractor tap-first", fg="green")
+        click.secho(" meltano add extractor tap-gitlab", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(" meltano add loader target-postgres", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(
-            " meltano elt job_id1 --extractor tap-first --loader target-postgres",
+            " meltano elt job_id1 --extractor tap-gitlab --loader target-postgres",
             fg="green",
         )
         click.echo("WOW! NEATO!")

@@ -14,8 +14,8 @@ def make_meltano_yml(project):
                 {
                     "extractors": [
                         {
-                            "name": "first",
-                            "pip_url": "git+https://gitlab.com/meltano/tap-first.git",
+                            "name": "gitlab",
+                            "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
                         }
                     ],
                     "loaders": [

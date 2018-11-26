@@ -7,11 +7,11 @@ from meltano.core.plugin import PluginType
 
 def test_add_extractor(project):
     service = ProjectAddService(project)
-    service.add(PluginType.EXTRACTORS, "tap-first")
+    service.add(PluginType.EXTRACTORS, "tap-gitlab")
 
     assert PluginType.EXTRACTORS in project.meltano
     assert any(
-        plugin["name"] == "tap-first"
+        plugin["name"] == "tap-gitlab"
         for plugin in project.meltano[PluginType.EXTRACTORS]
     )
 
