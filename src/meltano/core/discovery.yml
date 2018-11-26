@@ -1,6 +1,6 @@
 extractors:
-  - name: tap-first
-    pip_url: "git+https://gitlab.com/meltano/tap-first.git"
+  - name: tap-gitlab
+    pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
       api_key: "$GITLAB_API_TOKEN"
   - name: tap-zendesk
