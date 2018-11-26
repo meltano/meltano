@@ -5,14 +5,16 @@
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  script:
+  before_script:
     - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+  script:
     - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
 
-# Builds the singer_runner container for use in testing on branches
+# Manages:
+#   - meltano/meltano/runner:<sha>
 runner_dev:
   <<: *kaniko_build
   variables:
@@ -21,7 +23,26 @@ runner_dev:
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:$CI_COMMIT_SHA"
   except:
     - master
+    - tags
 
+# Manages:
+#   - meltano/meltano/runner:<sha>
+#   - meltano/meltano/runner:edge
+runner_edge:
+  <<: *kaniko_build
+  variables:
+    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:edge"
+  script:
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG --destination $DOCKER_IMAGE_NAME:edge $EXTRA_ARGS
+  only:
+    refs:
+      - master
+
+# Manages:
+#   - meltano/meltano/runner:<tag>
+#   - meltano/meltano/runner:latest
 runner:
   <<: *kaniko_build
   variables:
@@ -29,6 +50,8 @@ runner:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     IMAGE_TAG: latest
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli"
+  script:
+    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG --destination $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG $EXTRA_ARGS
   only:
-    refs:
-      - master
+    variables:
+      - $CI_COMMIT_TAG

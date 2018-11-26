@@ -18,7 +18,7 @@ Meltano stands for the [steps of the data science life-cycle](#data-science-life
 | Extract   | [Singer Tap](#tap) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Load      | [Signer Target](#target) | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/) | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/) |
 | Transform | [dbt](https://www.getdbt.com/), [Python scripts](#python-scripts) | [Stored procedures](#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/) |  
-| Analyze | [Meltano Analysis](https://gitlab.com/meltano/meltano/tree/master/src/meltano_ui) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
+| Analyze | [Meltano Analyze](https://gitlab.com/meltano/meltano/tree/master/src/analyze) | [Metabase](https://www.metabase.com/) | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/) |
 | Notebook | [JupyterHub](https://github.com/jupyterhub/jupyterhub) | [GNU Octave](https://www.gnu.org/software/octave/) | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/) |
 | Orchestrate | [Airflow](https://airflow.apache.org/) | [Luigi](https://github.com/spotify/luigi), [Nifi](https://nifi.apache.org/) | [Fivetran](https://fivetran.com/) |
 
@@ -32,7 +32,8 @@ A data analyst or scientist should be able to easily use Meltano to add whatever
 
 ### How Meltano Does Version Control
 
-**Note: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.**
+> **Note**: This section is a WIP, and not currently functioning as written. This note will be removed once it does work as advertised.  
+> Items marked with `**` are not yet implemented.
 
 Meltano runs many different types of files and projects including but not limited to:
 
@@ -40,8 +41,8 @@ Meltano runs many different types of files and projects including but not limite
 1. Loaders
 1. DBT Transforms
 1. Meltano Models or .lookml Models
-1. Jupyter Notebook files
-1. Airflow DAGs as part of an orchestration step
+1. Jupyter Notebook files **
+1. Airflow DAGs as part of an orchestration step **
 
 **If you want to install Meltano in a venv: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment. See [this issue](https://gitlab.com/meltano/meltano/issues/141).**
 
@@ -52,24 +53,24 @@ The gitlab-runner project contains a `meltano.yml` file:
 `meltano.yml`
 
 ```yml
-version: 0.0.0
+version: 0.0.0 **
 extractors:
-- name: first
-  url: https://gitlab.com/meltano/tap-first
-- name: mysql
+- name: tap-gitlab
+  url: https://gitlab.com/meltano/tap-gitlab
+- name: tap-mysql
   url: https://gitlab.com/meltano/tap-mysql
-- name: zendesk
+- name: tap-zendesk
   url: https://gitlab.com/meltano/tap-zendesk
   ...
 loaders:
-- name: snowflake
+- name: target-snowflake
   url: https://gitlab.com/meltano/target-snowflake
-  warehouse: main
-- name: postgresql
+  database: main **
+- name: target-postgresql
   url: https://gitlab.com/meltano/target-postgresql
-  warehouse: test
+  database: test **
   ...
-warehouses:
+databases: 
 - name: main
   username: "$MAIN_WAREHOUSE"
   password: "$MAIN_WAREHOUSE_PW"
@@ -77,7 +78,7 @@ warehouses:
   db: "$MAIN_WAREHOUSE_DB"
   type: snowflake
   ...
-orchestrate:
+orchestrate: **
 - name: first-to-csv
   extractor: first
   loader: csv
@@ -89,13 +90,13 @@ orchestrate:
 Your project should contains the following directory structure:
 
 * model - For your `.lookml` files.
-* transform - For your dbt `.sql` files.
+* transform - For your local dbt project files.
 * analyze - For your `.yml` dashboard files.
 * notebook - For your `.ipynb` notebook files.
 * orchestrate - For your airflow `.py` files.
-* .meltano - A .gitignored directory for internal caching (venvs, pypi packages, etc.). 
-* load - A directory where your configs for your loaders are placed. Each config should be in a directory with the name of the loader. e.g. For csv loader, the config would be in `load/target-csv/config.json`.
-* extract - A directory where your configs for your extractors are placed. Each config should be in a directory with the name of the extractor. e.g. For zendesk extractor, the config would be in `extract/tap-zendesk/config.json`.
+* .meltano - A .gitignored directory for internal caching (virtualenvs, pypi packages, generated configuration files, etc.). 
+* load - A directory where your configs for your loaders are placed. Each config should be in a directory with the name of the loader. e.g. For csv loader, the config would be in `load/target-csv/tap.config.json`. **
+* extract - A directory where your configs for your extractors are placed. Each config should be in a directory with the name of the extractor. e.g. For zendesk extractor, the config would be in `extract/tap-zendesk/target.config.json`. **
 * .gitignore
 * README.md
 * meltano.yml - Config file which shows which extractors and loaders, etc. you would like to use and where to find them.
@@ -103,46 +104,45 @@ Your project should contains the following directory structure:
 Here is a sample of what your project might look like:
 
 ```
+.
+├── analyze
+│   └── zendesk
+│       └── zendesk.dashboard.yml
+├── dbt_project.yml
 ├── extract
-│   ├── tap-marketo
-│   └── tap-zendesk
-│       ├── config.json
-│       └── properties.json
+│   └── tap-...
+│       ├── tap.config.json
+│       └── tap.properties.json
 ├── load
-│   └── target-postgres
-│       └── config.json
+│   └── target-...
+│       └── target.config.json
 ├── .meltano
-│   ├── dbt
-│   │   └── meltano.yml
-│   ├── model
-│   │   ├── base_ticket.model.lookml
-│   │   └── ticket.model.lookml
-│   ├── run
-│   │   ├── dbt
-│   │   │   ├── dbt_profile.yml
-│   │   │   └── dbt_project.yml
-│   │   └── singer
-│   │       ├── tap.config.json
-│   │       ├── tap.properties.json
-│   │       └── target.config.json
-│   └── transform
-│       └── tap-zendesk
-│           ├── base_ticket.sql
-│           └── base_user.sql
+│   ├── dbt
+│   │   └── venv
+│   ├── extractors
+│   │   └── tap-...
+│   ├── loaders
+│   │   └── target-...
+│   ├── model
+│   │   ├── base_ticket.lookml
+│   │   └── ticket.lookml
+│   └── run
+│       ├── dbt
+│       ├── tap-...
+│       └── target-...
 ├── meltano.yml
 ├── model
-│   └── zendesk
-│       ├── zendesk.model.lookml
-│       └── zendesk.view.lookml
-├── analyze
-│   └── zendesk
-│       └── zendesk.dashboard.yml
+│   └── zendesk
+│       ├── zendesk.model.lookml
+│       └── zendesk.view.lookml
 ├── orchestrate
-│   ├── dag_1.py
-│   ├── dag_2.py
-│   ├── dag_3.py
-│   ├── dag_4.py
-│   └── dag_5.py
+│   ├── dag_1.py
+│   ├── dag_2.py
+│   ├── dag_3.py
+│   ├── dag_4.py
+│   └── dag_5.py
+├── packages.yml
+├── profiles.yml
 └── transform
     └── tap-zendesk
         └── base.sql
@@ -151,13 +151,13 @@ Here is a sample of what your project might look like:
 Once you have your project, you can run `meltano` against it.
 
 * `meltano init [project name]`: Create an empty meltano project.
-* {: #meltano-add}`meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your melatano.yml file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
-* `meltano install`: Installs all the dependencies of your project based on the `meltano.yml` file.
+* {: #meltano-add}`meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs`, `dbt` and `pip`. 
+* `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 * `meltano discover all`: list available extractors and loaders:
   * `meltano discover extractors`: list only available extractors
   * `meltano discover loaders`: list only available loaders
 * `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
-* `meltano transform [name of transformation] --warehouse [name of warehouse]`: 
+* `meltano transform [name of transformation] --warehouse [name of warehouse]`: **
 * `meltano elt <job_id> --extractor <extractor> --loader <loader> [--dry]`: Extract, Load, and Transform the data.
 * `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually. 
 
@@ -215,7 +215,7 @@ Meltano also makes use of [review apps](https://docs.gitlab.com/ee/ci/review_app
 
 1. We are building Meltano to solve a problem that GitLab shares with all other software companies - how to acquire the highest-value customers at the lowest cost of acquisition?  We are solving this problem for ourselves first, incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers.
 2. Next, we'll focus on building a community around Meltano with more users and regular contributors to the code base.
-3. Right now Meltano is completely open source. After we have a community we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
+3. Right now Meltano is open source. In the future we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. An example of a proprietary/source available feature is fine grained access controls. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
 
 ## Roadmap
 
@@ -358,7 +358,7 @@ For more info see the [docker-compose.yml]()
 
 ## Tap
 
-See our [sample first tap](https://gitlab.com/meltano/tap-first/) as a good tap starting point. 
+See our [tap gitlab](https://gitlab.com/meltano/tap-gitlab/) as a good tap starting point. 
 
 Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
 
@@ -464,7 +464,7 @@ Create and grant usage for a database schema.
 
 ### Meltano Model
 
-Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analysis.
+Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analyze.
 
 ### Meltano Transform
 
@@ -619,6 +619,14 @@ Meltano uses an approval workflow for all merge requests.
 ## Release
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
+
+### Requirements
+
+Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
+
+```bash
+pip install '.[dev]'
+```
 
 ### Release process
 
@@ -892,6 +900,10 @@ HAVING count(*) > 1
 1. From the main project directory, run `docker-compose up`
 1. In your browser, navigate to `localhost:5000/drop_it_like_its_hot` to reset the schema of the database
 1. Then navigate to `localhost:5000`. Click on add project, and specify `/meltano/model`
+
+# Resources
+
+- [Meltano Slides](https://docs.google.com/presentation/d/1elX6ChyOxWnwtYQUuZOe1rMLPxP7sUle49iaaFKOcTo/edit#slide=id.g29b9a49e13_0_213)
 
 # Contributing to Meltano
 

@@ -1,7 +1,10 @@
 import subprocess
 import json
 import logging
+import asyncio
+import os
 from pathlib import Path
+from datetime import datetime
 
 from . import Runner
 from meltano.core.job import Job, JobFinder
@@ -27,16 +30,12 @@ class SingerRunner(Runner):
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")
         )
-        self.tap_output = config.get("tap_output", False)
 
     @property
     def database(self):
         return self.config.get("database", "default")
 
     def stop(self, process, **wait_args):
-        if process.stdin:
-            process.stdin.close()
-
         while True:
             try:
                 code = process.wait(**wait_args)
@@ -50,62 +49,78 @@ class SingerRunner(Runner):
         tap.prepare()
         target.prepare()
 
-    def invoke(self, tap: PluginInvoker, target: PluginInvoker):
-        tee_args = ["tee"]
-
-        if self.tap_output:
-            tee_args += [tap.files["output"]]
-
+    async def invoke(self, tap: PluginInvoker, target: PluginInvoker):
         try:
-            p_target, p_tee, p_tap = None, None, None
-            p_target = target.invoke(
-                stdin=subprocess.PIPE, stdout=target.files["state"].open("w")
-            )
+            # use standard pipes here because we
+            # don't need async processing between the
+            # tap and target.
+            target_in, tap_out = os.pipe()
 
-            p_tee = subprocess.Popen(
-                map(str, tee_args), stdin=subprocess.PIPE, stdout=p_target.stdin
+            p_target, p_tap = None, None
+            p_target = await target.invoke_async(
+                stdin=target_in, stdout=asyncio.subprocess.PIPE  # state log
             )
+            os.close(target_in)
 
-            p_tap = tap.invoke(stdout=p_tee.stdin)
+            p_tap = await tap.invoke_async(stdout=tap_out)
+            os.close(tap_out)
         except Exception as err:
-            for p in (p_target, p_tee, p_tap):
-                self.stop(p, timeout=0)
+            if p_tap:
+                p_tap.kill()
+            if p_target:
+                p_target.kill()
             raise Exception(f"Cannot start tap or target: {err}")
 
-        tap_code = self.stop(p_tap)
-        tee_code = self.stop(p_tee)
-        target_code = self.stop(p_target)
+        # receive the target stdout and update the current job
+        # for each lines
+        await asyncio.wait(
+            [self.bookmark(p_target.stdout), p_target.wait(), p_tap.wait()],
+            return_when=asyncio.FIRST_COMPLETED,
+        )
 
-        if any((tap_code, tee_code, target_code)):
+        # at this point, something already stopped, the other component
+        # should die soon because of a SIGPIPE
+        target_code = await p_target.wait()
+        tap_code = await p_tap.wait()
+
+        if any((tap_code, target_code)):
             raise Exception(
-                f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code}), tee({tee_code})"
+                f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code})"
             )
 
     def restore_bookmark(self, tap: PluginInvoker):
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
-        state_job = finder.latest_success()
+        state_job = finder.latest_state()
 
         if state_job and "singer_state" in state_job.payload:
             logging.info(f"Found state from {state_job.started_at}.")
             with tap.files["state"].open("w+") as state:
                 json.dump(state_job.payload["singer_state"], state)
         else:
-            logging.warn("No state was found, complete import.")
+            logging.warning("No state was found, complete import.")
 
-    def bookmark(self, target: PluginInvoker):
-        state_file = target.files["state"]
-        if not file_has_data(state_file):
-            logging.warn(
-                "State file is empty, this run will not update the incremental state."
+    def bookmark_state(self, new_state: str):
+        try:
+            new_state = json.loads(new_state)
+
+            self.job.payload["singer_state"] = new_state.get("value", {})
+            self.job.ended_at = datetime.utcnow()
+            self.job.save()
+            logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
+            logging.debug(f"Incremental state: {new_state}")
+        except Exception as err:
+            logging.warning(
+                "Received state is invalid, incremental state has not been updated"
             )
-            return
 
-        with state_file.open() as state:
-            # as per the Singer specification, only the _last_ state
-            # should be persisted
-            *_, last_state = state.readlines()
-            self.job.payload["singer_state"] = json.loads(last_state)
+    async def bookmark(self, target_stream):
+        while not target_stream.at_eof():
+            last_state = await target_stream.readline()
+            if not last_state:
+                continue
+
+            self.bookmark_state(last_state)
 
     def dry_run(self, extractor: SingerTap, loader: SingerTarget):
         tap_exec = extractor.exec_path()
@@ -128,5 +143,5 @@ class SingerRunner(Runner):
 
         with self.job.run():
             self.restore_bookmark(extractor)
-            self.invoke(extractor, loader)
-            self.bookmark(loader)
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.invoke(extractor, loader))

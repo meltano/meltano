@@ -17,7 +17,7 @@ MELTANO_POSTGRES_URL = get_env_variable("MELTANO_POSTGRES_URL")
 MELTANO_POSTGRES_USER = get_env_variable("MELTANO_POSTGRES_USER")
 MELTANO_POSTGRES_PASSWORD = get_env_variable("MELTANO_POSTGRES_PASSWORD")
 MELTANO_POSTGRES_DB = get_env_variable("MELTANO_POSTGRES_DB")
-LOG_PATH = get_env_variable("MELTANO_ANALYSIS_LOG_PATH")
+LOG_PATH = get_env_variable("MELTANO_ANALYZE_LOG_PATH")
 ENV = "development"
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))

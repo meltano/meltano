@@ -22,6 +22,6 @@ class TestProjectAddService:
 
     def test_add_extractor(self, project):
         add_service = ProjectAddService(project)
-        added = add_service.add(PluginType.EXTRACTORS, "tap-first")
+        added = add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
 
         assert added.canonical() in project.meltano[PluginType.EXTRACTORS]

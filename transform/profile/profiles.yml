@@ -3,7 +3,7 @@ config:
     use_colors: True
 
 meltano:
-  target: meltano_analysis
+  target: meltano_analyze
   outputs:
     postgres:
       type: postgres

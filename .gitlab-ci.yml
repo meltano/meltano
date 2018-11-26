@@ -7,9 +7,9 @@ include:
 
 stages:
   - lint
+  - test
   - build_base
   - build
-  # - test
   - publish
   - review
   # - production
@@ -26,13 +26,21 @@ lint:
   script:
     - make show_lint
 
-.test:
+test:
   stage: test
+  variables:
+    POSTGRES_USER: runner
+    POSTGRES_DB: pytest
+    POSTGRES_PASSWORD: ""
+    PG_ADDRESS: postgres
+    PG_USERNAME: $POSTGRES_USER
+    PG_PASSWORD: $POSTGRES_PASSWORD
+  services:
+    - postgres:latest
   before_script:
     - pip install '.[dev]'
   script:
     - pytest -v
-  allow_failure: true
 
 .pages:
   script:
@@ -98,6 +106,7 @@ meltano_base_dev:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/base
   except:
     - master
+    - tags
 
 # Manages:
 #  - meltano/meltano/base:edge
@@ -139,6 +148,7 @@ meltano_cli_dev:
     IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
   except:
     - master
+    - tags
 
 # Manages:
 #  - meltano/meltano/cli:edge
@@ -185,17 +195,22 @@ meltano_dev:
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base:$CI_COMMIT_SHA#" $DOCKERFILE
   except:
     - master
+    - tags
 
 # Manages:
+#  - meltano/meltano:<sha>
 #  - meltano/meltano:edge
 meltano_edge:
   <<: *docker_build
   variables:
     DOCKERFILE: docker/prod/Dockerfile
-    IMAGE_TAG: edge
   before_script:
     # replace the FROM ... in the Dockerfile to use this branch's image
     - sed -i "1s#.*#FROM $CI_REGISTRY_IMAGE/base:edge#" $DOCKERFILE
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:edge
+    - docker push $DOCKER_IMAGE_NAME:edge
   only:
     - master
   except:
@@ -203,8 +218,8 @@ meltano_edge:
       - $CI_COMMIT_TAG
 
 # Manages:
-#  - meltano/meltano/edge:<tag>
-#  - meltano/meltano/edge:latest
+#  - meltano/meltano:<tag>
+#  - meltano/meltano:latest
 meltano:
   <<: *docker_build
   variables:

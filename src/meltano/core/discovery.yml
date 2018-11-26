@@ -1,6 +1,6 @@
 extractors:
-  - name: tap-first
-    pip_url: "git+https://gitlab.com/meltano/tap-first.git"
+  - name: tap-gitlab
+    pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
       api_key: "$GITLAB_API_TOKEN"
   - name: tap-zendesk
@@ -10,6 +10,23 @@ extractors:
       api_token: "$ZENDESK_API_TOKEN"
       subdomain: "$ZENDESK_SUBDOMAIN"
       start_date: "$ZENDESK_START_DATE"
+  - name: tap-zuora
+    pip_url: "tap-zuora"
+    config:
+      username: $ZUORA_USERNAME
+      password: $ZUORA_PASSWORD
+      api_type: $ZUORA_API_TYPE
+      partner_id: $ZUORA_PARTNER_ID
+      api_token: $ZUORA_API_TOKEN
+      start_date: $ZUORA_START_DATE
+  - name: tap-marketo
+    pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
+    config:
+      endpoint: $MARKETO_ENDPOINT
+      identity: $MARKETO_IDENTITY
+      client_id: $MARKETO_CLIENT_ID
+      client_secret: $MARKETO_CLIENT_SECRET
+      start_time: $MARKETO_START_TIME
   - name: tap-salesforce
     pip_url: "git+https://github.com/meltano/tap-salesforce.git@add-password-auth"
     config:
@@ -20,6 +37,19 @@ extractors:
       security_token: $SFDC_SECURITY_TOKEN
       select_fields_by_default: true
       start_date: $SFDC_START_DATE
+  - name: tap-mongodb
+    pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
+    config:
+      host: $MONGODB_HOST
+      port: $MONGODB_PORT
+      user: $MONGODB_USERNAME
+      password: $MONGODB_PASSWORD
+      dbname: $MONGODB_DBNAME
+  - name: tap-fastly
+    pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
+    config:
+      api_token: $FASTLY_API_TOKEN
+      start_date: $FASTLY_START_DATE
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"

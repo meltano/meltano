@@ -4,9 +4,9 @@ services:
     image: node:10
     env_file:
     - .env.dev
-    working_dir: /meltano/meltano_ui
+    working_dir: /meltano/analyze
     volumes:
-    - ./src/meltano_ui:/meltano/meltano_ui
+    - ./src/analyze:/meltano/analyze
     ports:
     - 8080:8080
     command: ['bash', '-c', 'yarn && yarn run dev']
