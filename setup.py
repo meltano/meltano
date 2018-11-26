@@ -19,9 +19,6 @@ requires = [
     'snowflake-connector-python',
     'snowflake-sqlalchemy',
     'sqlalchemy',
-]
-
-api_requires = [
     'flask',
     'flask-cors',
     'flask-sqlalchemy',
@@ -57,12 +54,7 @@ setup(
     # run `make requirements.txt` after editing
     install_requires=requires,
     extras_require={
-        'api': api_requires,
-        'dev': dev_requires,
-        'all': [
-            *api_requires,
-            *dev_requires,
-        ],
+        'dev': dev_requires
     },
     entry_points={
         'console_scripts': [

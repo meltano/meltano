@@ -20,7 +20,9 @@ meltano_transform_path = config.meltano_transform_path
 
 app.config.from_object(config)
 
-if os.environ["FLASK_ENV"] == "development":
+flask_env = os.getenv("FLASK_ENV", "development")
+
+if flask_env == "development":
     CORS(app)
 
 # TODO: we need to setup proper dependency injection for
