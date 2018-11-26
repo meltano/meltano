@@ -618,6 +618,14 @@ Meltano uses an approval workflow for all merge requests.
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
+### Requirements
+
+Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
+
+```bash
+pip install '.[dev]'
+```
+
 ### Release process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
