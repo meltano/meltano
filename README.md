@@ -650,9 +650,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 $ git fetch origin
 $ git checkout -b release-next origin/master
 $ changelog view ;; make sure to validate the CHANGELOG changes
-$ changelog release && git add CHANGELOG.md ;; update the CHANGELOG
-$ bumpversion --new-version $(changelog current) --tag
-$ git push --follow-tags origin
+$ make release
+$ git push --tags
+$ git push origin release-next
 ```
 
 Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.
