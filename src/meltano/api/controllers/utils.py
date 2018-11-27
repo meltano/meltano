@@ -78,7 +78,9 @@ class SqlHelper:
                 if ordered_by_column:
                     orderby = self.measures(ordered_by_column, table)[0]
                 else:
-                    raise Exception("Something is wrong, no dimension or measure column matching the column to sort by.")
+                    raise Exception(
+                        "Something is wrong, no dimension or measure column matching the column to sort by."
+                    )
 
         column_headers = self.column_headers(dimensions_raw, measures_raw)
         names = self.get_names(dimensions_raw + measures_raw)
