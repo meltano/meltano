@@ -311,9 +311,9 @@ We want the tools to be open source so we can ship this as a product.
 
 ## Meltano Data Flow
 
-Meltano uses Singer Taps and Targets in order to Extract the data from various data sources and Load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. The raw data are afterwards transformed properly, depending on the Data Warehouse used, in order to generate the final data set that is used for Analysis and report generation.
+Meltano uses Singer Taps and Targets in order to Extract the data from various data sources and Load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. The raw data is subsequently transformed in order to generate the data set that is used for analysis and dashboard generation.
 
-With respect to the Extract and Load steps, Meltano can adapt to any ELT approach based on the Taps and Targets used, ranging from dumping the source data to a data lake and keeping all historical versions for each record to only storing well formatted, clean data to the target Data Store. 
+Meltano can adapt to any ELT approach based on the Taps and Targets used. The strategies supported can range from dumping the source data in a data lake, keeping all historical versions for each record, to only storing well formatted, clean data in the target Data Store. 
 
 As far as the Meltano maintained Taps and Targets are considered, a number of implicit assumptions are followed with respect to how the source data are stored to the Target Data Store:
 *  All extracted data are stored in the same Target Database (or collection of schemas if there is no notion of a Database in the Target Data Store). For example, we use a Database named `RAW` for storing all extracted data to Snowflake.
