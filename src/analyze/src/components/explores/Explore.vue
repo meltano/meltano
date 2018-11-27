@@ -374,6 +374,7 @@ export default {
     },
 
     dimensionSelected(dimension) {
+      this.$store.dispatch('explores/removeSort', dimension);
       this.$store.dispatch('explores/toggleDimension', dimension);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
