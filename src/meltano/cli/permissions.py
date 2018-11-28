@@ -24,6 +24,10 @@ def permissions():
 def grant(db, spec, dry):
     """Grant the permissions provided in --spec specification file."""
     try:
+        if not dry:
+            click.secho("Error: Only dry runs are supported at the moment", fg="red")
+            sys.exit(1)
+
         sql_commands = grant_permissions(db, spec, dry_run=dry)
 
         click.secho()
