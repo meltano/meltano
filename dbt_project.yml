@@ -33,7 +33,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 # SHOULD DISABLE ALL PER DEFAULT
 models:
   meltano:
-    tap-first:
+    tap-gitlab:
       vars:
         # these vars should either be injected at runtime
         schema: "gitlab"

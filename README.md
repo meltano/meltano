@@ -55,8 +55,8 @@ The gitlab-runner project contains a `meltano.yml` file:
 ```yml
 version: 0.0.0 **
 extractors:
-- name: tap-first
-  url: https://gitlab.com/meltano/tap-first
+- name: tap-gitlab
+  url: https://gitlab.com/meltano/tap-gitlab
 - name: tap-mysql
   url: https://gitlab.com/meltano/tap-mysql
 - name: tap-zendesk
@@ -332,6 +332,8 @@ make init_db
 docker-compose up
 ```
 
+Update the cli with the current prod files.
+
 ### Without Docker
 
 You will need to have postgres installed and available >= 10.5. 
@@ -356,7 +358,7 @@ For more info see the [docker-compose.yml]()
 
 ## Tap
 
-See our [sample first tap](https://gitlab.com/meltano/tap-first/) as a good tap starting point. 
+See our [tap gitlab](https://gitlab.com/meltano/tap-gitlab/) as a good tap starting point. 
 
 Based on [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md)
 
@@ -605,6 +607,19 @@ Meltano uses [Black](https://github.com/ambv/black) to enforce a consistent code
 
 You can also have black run automatically using a `git` hook. See https://github.com/ambv/black#version-control-integration for more details.
 
+### Changelog
+
+Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
+
+Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
+
+```bash
+$ changelog new "add an amazing feature"
+$ git add CHANGELOG.md
+```
+
+Make sure to add CHANGELOG entries to your merge requests.
+
 ### Merge Requests
 
 Meltano uses an approval workflow for all merge requests.
@@ -617,6 +632,15 @@ Meltano uses an approval workflow for all merge requests.
 ## Release
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
+Meltano adheres to [Keep a Changelog](http://keepachangelog.com/) for changes tracking.
+
+### Requirements
+
+Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
+
+```bash
+pip install '.[dev]'
+```
 
 ### Release process
 
@@ -625,8 +649,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 ```bash
 $ git fetch origin
 $ git checkout -b release-next origin/master
-$ bumpversion (minor|major|--new-version <new_version>) --tag
-$ git push --tags origin
+$ changelog view ;; make sure to validate the CHANGELOG changes
+$ make release
+$ git push --tags
+$ git push origin release-next
 ```
 
 Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.

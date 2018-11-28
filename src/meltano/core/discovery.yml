@@ -1,6 +1,6 @@
 extractors:
-  - name: tap-first
-    pip_url: "git+https://gitlab.com/meltano/tap-first.git"
+  - name: tap-gitlab
+    pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
       api_key: "$GITLAB_API_TOKEN"
   - name: tap-zendesk
@@ -51,6 +51,11 @@ extractors:
       client_secret: $STRIPE_API_KEY
       start_date: $STRIPE_START_DATE
       account_id:
+  - name: tap-fastly
+    pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
+    config:
+      api_token: $FASTLY_API_TOKEN
+      start_date: $FASTLY_START_DATE
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
