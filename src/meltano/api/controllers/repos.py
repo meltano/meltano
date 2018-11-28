@@ -90,7 +90,6 @@ def file(unique):
 def lint():
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
-    print(p.stdout.decode("utf-8"), flush=True)
 
     if "errors" in j:
         return jsonify({"result": False, "errors": j["errors"]})
