@@ -214,8 +214,11 @@ def generate_database_grants(
     """
     sql_commands = []
 
-    # If this is a shared database, we have to first grant the
-    #  "IMPORTED PRIVILEGES" privilege to the user.
+    usage_granted["databases"].add(database.upper())
+
+    # If this is a shared database, we have to grant the "IMPORTED PRIVILEGES"
+    #  privilege to the user and skip granting the specific permissions as
+    #  "Granting individual privileges on imported databases is not allowed."
     if database in shared_dbs:
         sql_commands.append(
             GRANT_PRIVILEGES_TEMPLATE.format(
@@ -225,6 +228,8 @@ def generate_database_grants(
                 role=snowflaky(role),
             )
         )
+
+        return (sql_commands, usage_granted)
 
     # And then grant privileges to the database
     if grant_type == "read":
@@ -244,8 +249,6 @@ def generate_database_grants(
             role=snowflaky(role),
         )
     )
-
-    usage_granted["databases"].add(database.upper())
 
     return (sql_commands, usage_granted)
 
@@ -267,6 +270,15 @@ def generate_schema_grants(
     """
     sql_commands = []
 
+    # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
+    #  so that we can check and use each one
+    name_parts = schema.split(".")
+
+    # Do nothing if this is a schema inside a shared database:
+    #  "Granting individual privileges on imported databases is not allowed."
+    if name_parts[0] in shared_dbs:
+        return (sql_commands, usage_granted)
+
     if grant_type == "read":
         privileges = "USAGE"
     elif grant_type == "write":
@@ -279,10 +291,6 @@ def generate_schema_grants(
         raise SpecLoadingError(
             f"Wrong grant_type {spec_path} provided to generate_schema_grants()"
         )
-
-    # Split the schema identifier into parts {DB_NAME}.{SCHEMA_NAME}
-    #  so that we can check and use each one
-    name_parts = schema.split(".")
 
     # Before assigning privileges to a schema, check if
     #  usage to the database has been granted and
@@ -338,6 +346,15 @@ def generate_table_grants(
     """
     sql_commands = []
 
+    # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
+    #  so that we can check and use each one
+    name_parts = table.split(".")
+
+    # Do nothing if this is a table inside a shared database:
+    #  "Granting individual privileges on imported databases is not allowed."
+    if name_parts[0] in shared_dbs:
+        return (sql_commands, usage_granted)
+
     if grant_type == "read":
         privileges = "SELECT"
     elif grant_type == "write":
@@ -346,10 +363,6 @@ def generate_table_grants(
         raise SpecLoadingError(
             f"Wrong grant_type {spec_path} provided to generate_table_grants()"
         )
-
-    # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
-    #  so that we can check and use each one
-    name_parts = table.split(".")
 
     # Generate the INFORMATION_SCHEMA identifier for that database
     #  in order to be able to filter it out

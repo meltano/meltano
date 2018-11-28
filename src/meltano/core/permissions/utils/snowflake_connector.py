@@ -16,12 +16,12 @@ class SnowflakeConnector:
     def __init__(self, config: Dict = None) -> None:
         if not config:
             config = {
-                "user": os.getenv("SNOWFLAKE_PERMISSIONS_USER"),
-                "password": os.getenv("SNOWFLAKE_PERMISSIONS_PASSWORD"),
-                "account": os.getenv("SNOWFLAKE_PERMISSIONS_ACCOUNT"),
-                "database": os.getenv("SNOWFLAKE_PERMISSIONS_DATABASE"),
-                "role": os.getenv("SNOWFLAKE_PERMISSIONS_ROLE"),
-                "warehouse": os.getenv("SNOWFLAKE_PERMISSIONS_WAREHOUSE"),
+                "user": os.getenv("PERMISSION_BOT_USER"),
+                "password": os.getenv("PERMISSION_BOT_PASSWORD"),
+                "account": os.getenv("PERMISSION_BOT_ACCOUNT"),
+                "database": os.getenv("PERMISSION_BOT_DATABASE"),
+                "role": os.getenv("PERMISSION_BOT_ROLE"),
+                "warehouse": os.getenv("PERMISSION_BOT_WAREHOUSE"),
             }
 
         self.engine = create_engine(
