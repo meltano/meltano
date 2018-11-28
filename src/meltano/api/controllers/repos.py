@@ -21,7 +21,7 @@ path_to_parser = join(
 )
 parser_command = [
     path_to_parser,
-    "--input={}/*.{{view,model}}.lkml".format(meltano_model_path),
+    "--input={}/*.{{view,model}}.ma".format(meltano_model_path),
 ]
 
 
@@ -44,7 +44,9 @@ def index():
         sortedLkml["documents"].append(file_dict)
 
     for f in onlyfiles:
-        filename, _ = os.path.splitext(f)
+        filename, ext = os.path.splitext(f)
+        if ext != '.ma':
+            continue
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
@@ -88,6 +90,8 @@ def file(unique):
 def lint():
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
+    print(p.stdout.decode("utf-8"), flush=True)
+
     if "errors" in j:
         return jsonify({"result": False, "errors": j["errors"]})
     else:
