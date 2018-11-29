@@ -50,6 +50,8 @@ extractors:
     config:
       api_token: $FASTLY_API_TOKEN
       start_date: $FASTLY_START_DATE
+  - name: tap-carbon-intensity
+    pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
