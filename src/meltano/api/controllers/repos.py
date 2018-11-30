@@ -241,6 +241,8 @@ def db_import():
                             explore_join_settings["type"] = join["type"]
                         if "relationship" in join:
                             explore_join_settings["relationship"] = join["relationship"]
+                        if "fields" in join:
+                            explore_join_settings["fields"] = join["fields"]
                         if "sql_on" in join:
                             explore_join_settings["sql_on"] = join["sql_on"]
                         if "type" in join:
