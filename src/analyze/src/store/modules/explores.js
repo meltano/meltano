@@ -155,7 +155,7 @@ const actions = {
   },
 
   removeSort({ commit }, dimension) {
-    if(!state.sortColumn || state.sortColumn !== dimension.name) return;
+    if (!state.sortColumn || state.sortColumn !== dimension.name) return;
     commit('setRemoveSort', dimension);
   },
 
