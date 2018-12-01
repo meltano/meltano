@@ -89,10 +89,13 @@ class SnowflakeSpecLoader:
             "warehouses": cerberus.Validator(schema["warehouses"]),
         }
 
-        for entity_type, entities in spec.items():
-            if not entities:
-                continue
+        entities_by_type = [
+            (entity_type, entities)
+            for entity_type, entities in spec.items()
+            if entities
+        ]
 
+        for entity_type, entities in entities_by_type:
             for entity_dict in entities:
                 for entity_name, config in entity_dict.items():
                     validators[entity_type].validate(config)
@@ -170,69 +173,68 @@ class SnowflakeSpecLoader:
                     if entity_type == "databases":
                         entities["databases"].add(entity_name)
 
-                        if "shared" in config:
-                            if config["shared"]:
-                                entities["shared_databases"].add(entity_name)
+                        if "shared" in config and config["shared"]:
+                            entities["shared_databases"].add(entity_name)
 
                     elif entity_type == "roles":
                         entities["roles"].add(entity_name)
 
-                        if "member_of" in config:
+                        if config.get("member_of"):
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
 
-                        if "warehouses" in config:
+                        if config.get("warehouses"):
                             for warehouse in config["warehouses"]:
                                 entities["warehouse_refs"].add(warehouse)
 
-                        if "privileges" in config:
-                            if "databases" in config["privileges"]:
-                                if "read" in config["privileges"]["databases"]:
+                        if config.get("privileges"):
+                            if config["privileges"].get("databases"):
+                                if config["privileges"]["databases"].get("read"):
                                     for schema in config["privileges"]["databases"][
                                         "read"
                                     ]:
                                         entities["database_refs"].add(schema)
 
-                                if "write" in config["privileges"]["databases"]:
+                                if config["privileges"]["databases"].get("write"):
                                     for schema in config["privileges"]["databases"][
                                         "write"
                                     ]:
                                         entities["database_refs"].add(schema)
 
-                            if "schemas" in config["privileges"]:
-                                if "read" in config["privileges"]["schemas"]:
+                            if config["privileges"].get("schemas"):
+                                if config["privileges"]["schemas"].get("read"):
                                     for schema in config["privileges"]["schemas"][
                                         "read"
                                     ]:
                                         entities["schema_refs"].add(schema)
 
-                                if "write" in config["privileges"]["schemas"]:
+                                if config["privileges"]["schemas"].get("write"):
                                     for schema in config["privileges"]["schemas"][
                                         "write"
                                     ]:
                                         entities["schema_refs"].add(schema)
 
-                            if "tables" in config["privileges"]:
-                                if "read" in config["privileges"]["tables"]:
+                            if config["privileges"].get("tables"):
+                                if config["privileges"]["tables"].get("read"):
                                     for table in config["privileges"]["tables"]["read"]:
                                         entities["table_refs"].add(table)
 
-                                if "write" in config["privileges"]["tables"]:
+                                if config["privileges"]["tables"].get("write"):
                                     for table in config["privileges"]["tables"][
                                         "write"
                                     ]:
                                         entities["table_refs"].add(table)
 
-                        if "owns" in config:
-                            if "databases" in config["owns"]:
+                        if config.get("owns"):
+                            if config["owns"].get("databases"):
                                 for schema in config["owns"]["databases"]:
                                     entities["database_refs"].add(schema)
 
-                            if "schemas" in config["owns"]:
+                            if config["owns"].get("schemas"):
                                 for schema in config["owns"]["schemas"]:
                                     entities["schema_refs"].add(schema)
 
-                            if "tables" in config["owns"]:
+                            if config["owns"].get("tables"):
                                 for table in config["owns"]["tables"]:
                                     entities["table_refs"].add(table)
 
@@ -242,7 +244,7 @@ class SnowflakeSpecLoader:
 
                         entities["users"].add(entity_name)
 
-                        if "member_of" in config:
+                        if config.get("member_of"):
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
 
@@ -255,16 +257,16 @@ class SnowflakeSpecLoader:
                                 f"user role (role with the same name as the user)"
                             )
 
-                        if "owns" in config:
-                            if "databases" in config["owns"]:
+                        if config.get("owns"):
+                            if config["owns"].get("databases"):
                                 for schema in config["owns"]["databases"]:
                                     entities["database_refs"].add(schema)
 
-                            if "schemas" in config["owns"]:
+                            if config["owns"].get("schemas"):
                                 for schema in config["owns"]["schemas"]:
                                     entities["schema_refs"].add(schema)
 
-                            if "tables" in config["owns"]:
+                            if config["owns"].get("tables"):
                                 for table in config["owns"]["tables"]:
                                     entities["table_refs"].add(table)
 
@@ -453,10 +455,13 @@ class SnowflakeSpecLoader:
                 continue
 
             for entity_dict in entry:
-                for entity_name, config in entity_dict.items():
-                    if not config:
-                        continue
+                entity_configs = [
+                    (entity_name, config)
+                    for entity_name, config in entity_dict.items()
+                    if config
+                ]
 
+                for entity_name, config in entity_configs:
                     if entity_type == "roles":
                         sql_commands.extend(
                             generate_grant_roles("ROLE", entity_name, config)

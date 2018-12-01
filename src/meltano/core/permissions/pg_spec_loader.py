@@ -45,13 +45,14 @@ class PGSpecLoader:
 
         schema = yaml.load(PG_SPEC_SCHEMA_YAML)
         v = cerberus.Validator(schema)
-        for rolename, config in spec.items():
-            if not config:
-                continue
+
+        role_configs = [(role, config) for role, config in spec.items() if config]
+
+        for role, config in role_configs:
             v.validate(config)
             for field, err_msg in v.errors.items():
                 error_messages.append(
-                    VALIDATION_ERR_MSG.format(rolename, field, err_msg[0])
+                    VALIDATION_ERR_MSG.format(role, field, err_msg[0])
                 )
 
         return error_messages
@@ -59,27 +60,19 @@ class PGSpecLoader:
     def generate_permission_queries(self) -> List[str]:
         sql_commands = []
 
-        for role, config in self.spec.items():
-            alter_privileges = []
+        role_configs = [(role, config) for role, config in self.spec.items() if config]
 
-            if not config:
-                continue
-
+        for role, config in role_configs:
             sql_commands.extend(self.generate_alter_role(role, config))
-
             sql_commands.extend(self.generate_grant_roles_to_role(role, config))
-
             sql_commands.extend(self.generate_grant_ownership_to_role(role, config))
-
             sql_commands.extend(self.generate_grant_privileges_to_role(role, config))
 
         return sql_commands
 
-    def generate_alter_role(self, role: str, config: str) -> List[str]:
+    def generate_alter_role(self, role: str, config: Dict) -> List[str]:
         ALTER_ROLE_TEMPLATE = "ALTER ROLE {role} {privileges}"
-
         sql_commands = []
-
         alter_privileges = []
 
         if "can_login" in config:
@@ -103,16 +96,11 @@ class PGSpecLoader:
 
         return sql_commands
 
-    def generate_grant_roles_to_role(self, role: str, config: str) -> List[str]:
+    def generate_grant_roles_to_role(self, role: str, config: Dict) -> List[str]:
         GRANT_ROLE_TEMPLATE = "GRANT {role_names} TO {role}"
-
         sql_commands = []
 
-        role_names = []
-
-        if "member_of" in config:
-            for member_role in config["member_of"]:
-                role_names.append(member_role)
+        role_names = config.get("member_of", [])
 
         if role_names:
             sql_commands.append(
@@ -121,22 +109,19 @@ class PGSpecLoader:
 
         return sql_commands
 
-    def generate_grant_ownership_to_role(self, role: str, config: str) -> List[str]:
+    def generate_grant_ownership_to_role(self, role: str, config: Dict) -> List[str]:
         ALTER_SCHEMA_OWNER_TEMPLATE = "ALTER SCHEMA {schema} OWNER TO {role}"
-
         sql_commands = []
 
-        if "owns" in config:
-
-            if "schemas" in config["owns"]:
-                for schema in config["owns"]["schemas"]:
-                    sql_commands.append(
-                        ALTER_SCHEMA_OWNER_TEMPLATE.format(role=role, schema=schema)
-                    )
+        if config.get("owns") and config["owns"].get("schemas"):
+            for schema in config["owns"]["schemas"]:
+                sql_commands.append(
+                    ALTER_SCHEMA_OWNER_TEMPLATE.format(role=role, schema=schema)
+                )
 
         return sql_commands
 
-    def generate_grant_privileges_to_role(self, role: str, config: str) -> List[str]:
+    def generate_grant_privileges_to_role(self, role: str, config: Dict) -> List[str]:
         GRANT_READ_ON_SCHEMA_TEMPLATE = "GRANT USAGE ON SCHEMA {schema} TO {role}"
         GRANT_WRITE_ON_SCHEMA_TEMPLATE = "GRANT CREATE ON SCHEMA {schema} TO {role}"
         GRANT_READ_ON_TABLE_TEMPLATE = "GRANT SELECT ON TABLE {table} TO {role}"
@@ -154,10 +139,9 @@ class PGSpecLoader:
 
         sql_commands = []
 
-        if "privileges" in config:
-
-            if "schemas" in config["privileges"]:
-                if "read" in config["privileges"]["schemas"]:
+        if config.get("privileges"):
+            if config["privileges"].get("schemas"):
+                if config["privileges"]["schemas"].get("read"):
                     for schema in config["privileges"]["schemas"]["read"]:
                         sql_commands.append(
                             GRANT_READ_ON_SCHEMA_TEMPLATE.format(
@@ -165,7 +149,7 @@ class PGSpecLoader:
                             )
                         )
 
-                if "write" in config["privileges"]["schemas"]:
+                if config["privileges"]["schemas"].get("write"):
                     for schema in config["privileges"]["schemas"]["write"]:
                         sql_commands.append(
                             GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(
@@ -173,8 +157,8 @@ class PGSpecLoader:
                             )
                         )
 
-            if "tables" in config["privileges"]:
-                if "read" in config["privileges"]["tables"]:
+            if config["privileges"].get("tables"):
+                if config["privileges"]["tables"].get("read"):
                     for table in config["privileges"]["tables"]["read"]:
                         if table.endswith(".*"):
                             schema = table[:-2]
@@ -190,7 +174,7 @@ class PGSpecLoader:
                                 )
                             )
 
-                if "write" in config["privileges"]["tables"]:
+                if config["privileges"]["tables"].get("write"):
                     for table in config["privileges"]["tables"]["write"]:
                         if table.endswith(".*"):
                             schema = table[:-2]

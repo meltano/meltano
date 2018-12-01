@@ -56,7 +56,7 @@ def generate_grant_roles(entity_type: str, entity: str, config: str) -> List[str
     """
     sql_commands = []
 
-    if "member_of" in config:
+    if config.get("member_of"):
         for member_role in config["member_of"]:
             sql_commands.append(
                 GRANT_ROLE_TEMPLATE.format(
@@ -101,13 +101,13 @@ def generate_grant_privileges_to_role(
     # 4. Finaly the requested permissions are GRANTED to role for MY_TABLE
     usage_granted = {"databases": set(), "schemas": set()}
 
-    if "warehouses" in config:
+    if config.get("warehouses"):
         for warehouse in config["warehouses"]:
             sql_commands.append(generate_warehouse_grants(role, warehouse))
 
-    if "privileges" in config:
-        if "databases" in config["privileges"]:
-            if "read" in config["privileges"]["databases"]:
+    if config.get("privileges"):
+        if config["privileges"].get("databases"):
+            if config["privileges"]["databases"].get("read"):
                 for database in config["privileges"]["databases"]["read"]:
                     new_commands, usage_granted = generate_database_grants(
                         role=role,
@@ -118,7 +118,7 @@ def generate_grant_privileges_to_role(
                     )
                     sql_commands.extend(new_commands)
 
-            if "write" in config["privileges"]["databases"]:
+            if config["privileges"]["databases"].get("write"):
                 for database in config["privileges"]["databases"]["write"]:
                     new_commands, usage_granted = generate_database_grants(
                         role=role,
@@ -129,8 +129,8 @@ def generate_grant_privileges_to_role(
                     )
                     sql_commands.extend(new_commands)
 
-        if "schemas" in config["privileges"]:
-            if "read" in config["privileges"]["schemas"]:
+        if config["privileges"].get("schemas"):
+            if config["privileges"]["schemas"].get("read"):
                 for schema in config["privileges"]["schemas"]["read"]:
                     new_commands, usage_granted = generate_schema_grants(
                         role=role,
@@ -141,7 +141,7 @@ def generate_grant_privileges_to_role(
                     )
                     sql_commands.extend(new_commands)
 
-            if "write" in config["privileges"]["schemas"]:
+            if config["privileges"]["schemas"].get("write"):
                 for schema in config["privileges"]["schemas"]["write"]:
                     new_commands, usage_granted = generate_schema_grants(
                         role=role,
@@ -152,8 +152,8 @@ def generate_grant_privileges_to_role(
                     )
                     sql_commands.extend(new_commands)
 
-        if "tables" in config["privileges"]:
-            if "read" in config["privileges"]["tables"]:
+        if config["privileges"].get("tables"):
+            if config["privileges"]["tables"].get("read"):
                 for table in config["privileges"]["tables"]["read"]:
                     new_commands, usage_granted = generate_table_grants(
                         role=role,
@@ -164,7 +164,7 @@ def generate_grant_privileges_to_role(
                     )
                     sql_commands.extend(new_commands)
 
-            if "write" in config["privileges"]["tables"]:
+            if config["privileges"]["tables"].get("write"):
                 for table in config["privileges"]["tables"]["write"]:
                     new_commands, usage_granted = generate_table_grants(
                         role=role,
@@ -462,7 +462,6 @@ def generate_alter_user(user: str, config: str) -> List[str]:
     Returns the SQL commands generated as a List
     """
     sql_commands = []
-
     alter_privileges = []
 
     if "can_login" in config:
@@ -492,8 +491,8 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
     """
     sql_commands = []
 
-    if "owns" in config:
-        if "databases" in config["owns"]:
+    if config.get("owns"):
+        if config["owns"].get("databases"):
             for database in config["owns"]["databases"]:
                 sql_commands.append(
                     GRANT_OWNERSHIP_TEMPLATE.format(
@@ -503,7 +502,7 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
                     )
                 )
 
-        if "schemas" in config["owns"]:
+        if config["owns"].get("schemas"):
             for schema in config["owns"]["schemas"]:
                 name_parts = schema.split(".")
                 info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
@@ -534,7 +533,7 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
                         )
                     )
 
-        if "tables" in config["owns"]:
+        if config["owns"].get("tables"):
             for table in config["owns"]["tables"]:
                 name_parts = table.split(".")
                 info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"

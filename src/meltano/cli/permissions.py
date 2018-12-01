@@ -13,16 +13,16 @@ def permissions():
 
 
 @permissions.command()
+@click.argument("spec")
 @click.option(
     "--db",
     help="The type of the target DB the specifications file is for.",
     type=click.Choice(["postgres", "snowflake"]),
     required=True,
 )
-@click.option("--spec", help="The specifications file path.", required=True)
 @click.option("--dry", help="Do not actually run, just check.", is_flag=True)
 def grant(db, spec, dry):
-    """Grant the permissions provided in --spec specification file."""
+    """Grant the permissions provided in the provided specification file."""
     try:
         if not dry:
             click.secho("Error: Only dry runs are supported at the moment", fg="red")
@@ -31,10 +31,7 @@ def grant(db, spec, dry):
         sql_commands = grant_permissions(db, spec, dry_run=dry)
 
         click.secho()
-        if dry:
-            click.secho("SQL Commands generated for given spec file:")
-        else:
-            click.secho("!! SQL Commands that were excecuted: !!")
+        click.secho("SQL Commands generated for given spec file:")
 
         for command in sql_commands:
             click.secho(f"{command};", fg="green")
