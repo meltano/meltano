@@ -1,4 +1,8 @@
 SNOWFLAKE_SPEC_SCHEMA = """
+    version:
+        type: string
+        required: False
+
     databases:
         type: list
         schema:

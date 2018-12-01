@@ -92,7 +92,7 @@ class SnowflakeSpecLoader:
         entities_by_type = [
             (entity_type, entities)
             for entity_type, entities in spec.items()
-            if entities
+            if entities and entity_type != "version"
         ]
 
         for entity_type, entities in entities_by_type:
@@ -167,7 +167,13 @@ class SnowflakeSpecLoader:
             "warehouse_refs": set(),
         }
 
-        for entity_type, entry in self.spec.items():
+        entities_by_type = [
+            (entity_type, entry)
+            for entity_type, entry in self.spec.items()
+            if entry and entity_type != "version"
+        ]
+
+        for entity_type, entry in entities_by_type:
             for entity_dict in entry:
                 for entity_name, config in entity_dict.items():
                     if entity_type == "databases":
@@ -451,7 +457,7 @@ class SnowflakeSpecLoader:
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
         for entity_type, entry in self.spec.items():
-            if entity_type == "databases" or entity_type == "warehouses":
+            if entity_type in ["databases", "warehouses", "version"]:
                 continue
 
             for entity_dict in entry:
