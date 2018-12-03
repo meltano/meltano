@@ -8,6 +8,7 @@ requires = [
     'aiohttp',
     'backoff',
     'click',
+    'Cerberus',
     'dbt',
     'gitpython',
     'markdown',

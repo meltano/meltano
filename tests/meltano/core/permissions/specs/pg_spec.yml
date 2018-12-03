@@ -1,0 +1,210 @@
+# Primary Roles
+
+analytics:
+    can_login: no
+    is_superuser: no
+    privileges:
+        schemas:
+            read:
+                - analytics
+                - customers
+                - gitlab
+                - historical
+                - lever
+                - license
+                - mkto
+                - public
+                - sandbox
+                - sfdc
+                - version
+                - zendesk
+                - zuora
+            write:
+                - analytics
+                - public
+                - sandbox
+        tables:
+            read:
+                - analytics.*
+                - customers.*
+                - gitlab.*
+                - historical.*
+                - lever.*
+                - license.*
+                - mkto.*
+                - public.*
+                - sandbox.*
+                - sfdc.*
+                - version.*
+                - zendesk.*
+                - zuora.*
+            write:
+                - analytics.*
+                - public.*
+                - sandbox.*
+
+readonly:
+    can_login: no
+    is_superuser: no
+    privileges:
+        schemas:
+            read:
+                - analytics
+                - customers
+                - gitlab
+                - historical
+                - lever
+                - license
+                - mkto
+                - public
+                - sandbox
+                - sfdc
+                - version
+                - zendesk
+                - zuora
+            write:
+                - sandbox
+        tables:
+            read:
+                - analytics.*
+                - customers.*
+                - gitlab.*
+                - historical.*
+                - lever.*
+                - license.*
+                - mkto.*
+                - public.*
+                - sandbox.*
+                - sfdc.*
+                - version.*
+                - zendesk.*
+                - zuora.*
+            write:
+                - sandbox.*
+
+
+# User Roles
+
+akaemmerle:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+dgruesso:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+eburke:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+          - eburke_scratch
+
+fabio:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+iroussos:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+          - iroussos_scratch
+
+jobv:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+joshua:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+jramsay:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+jschatz:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+jwatson:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+mbergeron:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+mpundsack:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+tlapiana:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+          - tlapiana_scratch
+
+tmurphy:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+          - tmurphy_scratch
+
+tszuromi:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    owns:
+        schemas:
+            - tszuromi_scratch
+
+victorwu:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+
+wwright:
+    can_login: yes
+    is_superuser: no
+    member_of:
+        - readonly
+    privileges:
+        schemas:
+            write:
+                - historical
+    owns:
+        schemas:
+          - wwright_scratch
