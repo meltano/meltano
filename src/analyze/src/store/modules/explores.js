@@ -154,6 +154,11 @@ const actions = {
       });
   },
 
+  removeSort({ commit }, dimension) {
+    if (!state.sortColumn || state.sortColumn !== dimension.name) return;
+    commit('setRemoveSort', dimension);
+  },
+
   toggleDimension({ commit }, dimension) {
     commit('toggleDimensionSelected', dimension);
   },
@@ -319,6 +324,10 @@ const actions = {
 };
 
 const mutations = {
+
+  setRemoveSort() {
+    state.sortColumn = null;
+  },
 
   setChartType(context, chartType) {
     state.chartType = chartType;

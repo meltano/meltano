@@ -1,6 +1,6 @@
 connection: "runners_db"
 
-include: "*.view.lkml"
+include: "runners.view.lkml"
 label: "runners"
 
 explore: {

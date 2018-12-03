@@ -44,7 +44,9 @@ def index():
         sortedLkml["documents"].append(file_dict)
 
     for f in onlyfiles:
-        filename, _ = os.path.splitext(f)
+        filename, ext = os.path.splitext(f)
+        if ext != ".lkml":
+            continue
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
@@ -88,6 +90,7 @@ def file(unique):
 def lint():
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
+    print(p.stdout.decode("utf-8"), flush=True)
     if "errors" in j:
         return jsonify({"result": False, "errors": j["errors"]})
     else:
@@ -238,6 +241,8 @@ def db_import():
                             explore_join_settings["type"] = join["type"]
                         if "relationship" in join:
                             explore_join_settings["relationship"] = join["relationship"]
+                        if "fields" in join:
+                            explore_join_settings["fields"] = join["fields"]
                         if "sql_on" in join:
                             explore_join_settings["sql_on"] = join["sql_on"]
                         if "type" in join:

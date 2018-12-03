@@ -59,6 +59,7 @@ class SqlHelper:
         measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
         dimensions_raw = dimensions
         measures_raw = measures
+
         table = self.table(base_table, explore.name)
         # joins = self.joins(incoming_joins, table)
         dimension_groups = self.dimension_groups(
@@ -67,6 +68,20 @@ class SqlHelper:
         dimensions = self.dimensions(dimensions, table)
         dimensions = dimensions + dimension_groups
         measures = self.measures(measures, table)
+
+        if orderby:
+            ordered_by_column = [d for d in dimensions_raw if d.name == orderby]
+            if ordered_by_column:
+                orderby = self.dimensions(ordered_by_column, table)[0]
+            else:
+                ordered_by_column = [m for m in measures_raw if m.name == orderby]
+                if ordered_by_column:
+                    orderby = self.measures(ordered_by_column, table)[0]
+                else:
+                    raise Exception(
+                        "Something is wrong, no dimension or measure column matching the column to sort by."
+                    )
+
         column_headers = self.column_headers(dimensions_raw, measures_raw)
         names = self.get_names(dimensions_raw + measures_raw)
         return {
