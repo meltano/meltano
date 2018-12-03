@@ -1,4 +1,5 @@
 import cerberus
+import logging
 import yaml
 
 from typing import Dict, List
@@ -75,17 +76,27 @@ class PGSpecLoader:
         sql_commands = []
         alter_privileges = []
 
-        if "can_login" in config:
+        try:
             if config["can_login"]:
                 alter_privileges.append("LOGIN")
             else:
                 alter_privileges.append("NOLOGIN")
+        except KeyError:
+            logging.debug(
+                "`can_login` not found for {}, skipping login rules.".format(role)
+            )
 
-        if "is_superuser" in config:
+        try:
             if config["is_superuser"]:
                 alter_privileges.append("SUPERUSER")
             else:
                 alter_privileges.append("NOSUPERUSER")
+        except KeyError:
+            logging.debug(
+                "`is_superuser` not found for {}, skipping superuser rules.".format(
+                    role
+                )
+            )
 
         if alter_privileges:
             sql_commands.append(
@@ -113,11 +124,17 @@ class PGSpecLoader:
         ALTER_SCHEMA_OWNER_TEMPLATE = "ALTER SCHEMA {schema} OWNER TO {role}"
         sql_commands = []
 
-        if config.get("owns") and config["owns"].get("schemas"):
+        try:
             for schema in config["owns"]["schemas"]:
                 sql_commands.append(
                     ALTER_SCHEMA_OWNER_TEMPLATE.format(role=role, schema=schema)
                 )
+        except KeyError:
+            logging.debug(
+                "`owns.schemas` not found for {}, skipping OWNership rules.".format(
+                    role
+                )
+            )
 
         return sql_commands
 
@@ -139,55 +156,68 @@ class PGSpecLoader:
 
         sql_commands = []
 
-        if config.get("privileges"):
-            if config["privileges"].get("schemas"):
-                if config["privileges"]["schemas"].get("read"):
-                    for schema in config["privileges"]["schemas"]["read"]:
-                        sql_commands.append(
-                            GRANT_READ_ON_SCHEMA_TEMPLATE.format(
-                                role=role, schema=schema
-                            )
+        try:
+            for schema in config["privileges"]["schemas"]["read"]:
+                sql_commands.append(
+                    GRANT_READ_ON_SCHEMA_TEMPLATE.format(role=role, schema=schema)
+                )
+        except KeyError:
+            logging.debug(
+                "`privileges.schemas.read` not found for {}, skipping Schema Read GRANTS.".format(
+                    role
+                )
+            )
+
+        try:
+            for schema in config["privileges"]["schemas"]["write"]:
+                sql_commands.append(
+                    GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(role=role, schema=schema)
+                )
+        except KeyError:
+            logging.debug(
+                "`privileges.schemas.write` not found for {}, skipping Schema Write GRANTS.".format(
+                    role
+                )
+            )
+
+        try:
+            for table in config["privileges"]["tables"]["read"]:
+                if table.endswith(".*"):
+                    schema = table[:-2]
+                    sql_commands.append(
+                        GRANT_READ_ON_ALL_TABLES_TEMPLATE.format(
+                            role=role, schema=schema
                         )
+                    )
+                else:
+                    sql_commands.append(
+                        GRANT_READ_ON_TABLE_TEMPLATE.format(role=role, table=table)
+                    )
+        except KeyError:
+            logging.debug(
+                "`privileges.tables.read` not found for {}, skipping Table Read GRANTS.".format(
+                    role
+                )
+            )
 
-                if config["privileges"]["schemas"].get("write"):
-                    for schema in config["privileges"]["schemas"]["write"]:
-                        sql_commands.append(
-                            GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(
-                                role=role, schema=schema
-                            )
+        try:
+            for table in config["privileges"]["tables"]["write"]:
+                if table.endswith(".*"):
+                    schema = table[:-2]
+                    sql_commands.append(
+                        GRANT_WRITE_ON_ALL_TABLE_TEMPLATE.format(
+                            role=role, schema=schema
                         )
-
-            if config["privileges"].get("tables"):
-                if config["privileges"]["tables"].get("read"):
-                    for table in config["privileges"]["tables"]["read"]:
-                        if table.endswith(".*"):
-                            schema = table[:-2]
-                            sql_commands.append(
-                                GRANT_READ_ON_ALL_TABLES_TEMPLATE.format(
-                                    role=role, schema=schema
-                                )
-                            )
-                        else:
-                            sql_commands.append(
-                                GRANT_READ_ON_TABLE_TEMPLATE.format(
-                                    role=role, table=table
-                                )
-                            )
-
-                if config["privileges"]["tables"].get("write"):
-                    for table in config["privileges"]["tables"]["write"]:
-                        if table.endswith(".*"):
-                            schema = table[:-2]
-                            sql_commands.append(
-                                GRANT_WRITE_ON_ALL_TABLE_TEMPLATE.format(
-                                    role=role, schema=schema
-                                )
-                            )
-                        else:
-                            sql_commands.append(
-                                GRANT_WRITE_ON_TABLE_TEMPLATE.format(
-                                    role=role, table=table
-                                )
-                            )
+                    )
+                else:
+                    sql_commands.append(
+                        GRANT_WRITE_ON_TABLE_TEMPLATE.format(role=role, table=table)
+                    )
+        except KeyError:
+            logging.debug(
+                "`privileges.tables.write` not found for {}, skipping Table Write GRANTS.".format(
+                    role
+                )
+            )
 
         return sql_commands

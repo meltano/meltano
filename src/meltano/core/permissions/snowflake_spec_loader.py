@@ -1,4 +1,5 @@
 import cerberus
+import logging
 import yaml
 import re
 
@@ -185,64 +186,115 @@ class SnowflakeSpecLoader:
                     elif entity_type == "roles":
                         entities["roles"].add(entity_name)
 
-                        if config.get("member_of"):
+                        try:
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
+                        except KeyError:
+                            logging.debug(
+                                "`member_of` not found for role {}, skipping Role Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                        if config.get("warehouses"):
+                        try:
                             for warehouse in config["warehouses"]:
                                 entities["warehouse_refs"].add(warehouse)
+                        except KeyError:
+                            logging.debug(
+                                "`warehouses` not found for role {}, skipping Warehouse Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                        if config.get("privileges"):
-                            if config["privileges"].get("databases"):
-                                if config["privileges"]["databases"].get("read"):
-                                    for schema in config["privileges"]["databases"][
-                                        "read"
-                                    ]:
-                                        entities["database_refs"].add(schema)
+                        try:
+                            for schema in config["privileges"]["databases"]["read"]:
+                                entities["database_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.databases.read` not found for role {}, skipping Database Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                                if config["privileges"]["databases"].get("write"):
-                                    for schema in config["privileges"]["databases"][
-                                        "write"
-                                    ]:
-                                        entities["database_refs"].add(schema)
+                        try:
+                            for schema in config["privileges"]["databases"]["write"]:
+                                entities["database_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.databases.write` not found for role {}, skipping Database Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["privileges"].get("schemas"):
-                                if config["privileges"]["schemas"].get("read"):
-                                    for schema in config["privileges"]["schemas"][
-                                        "read"
-                                    ]:
-                                        entities["schema_refs"].add(schema)
+                        try:
+                            for schema in config["privileges"]["schemas"]["read"]:
+                                entities["schema_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.schemas.read` not found for role {}, skipping Schema Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                                if config["privileges"]["schemas"].get("write"):
-                                    for schema in config["privileges"]["schemas"][
-                                        "write"
-                                    ]:
-                                        entities["schema_refs"].add(schema)
+                        try:
+                            for schema in config["privileges"]["schemas"]["write"]:
+                                entities["schema_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.schemas.write` not found for role {}, skipping Schema Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["privileges"].get("tables"):
-                                if config["privileges"]["tables"].get("read"):
-                                    for table in config["privileges"]["tables"]["read"]:
-                                        entities["table_refs"].add(table)
+                        try:
+                            for table in config["privileges"]["tables"]["read"]:
+                                entities["table_refs"].add(table)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.tables.read` not found for role {}, skipping Table Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                                if config["privileges"]["tables"].get("write"):
-                                    for table in config["privileges"]["tables"][
-                                        "write"
-                                    ]:
-                                        entities["table_refs"].add(table)
+                        try:
+                            for table in config["privileges"]["tables"]["write"]:
+                                entities["table_refs"].add(table)
+                        except KeyError:
+                            logging.debug(
+                                "`privileges.tables.write` not found for role {}, skipping Table Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                        if config.get("owns"):
-                            if config["owns"].get("databases"):
-                                for schema in config["owns"]["databases"]:
-                                    entities["database_refs"].add(schema)
+                        try:
+                            for schema in config["owns"]["databases"]:
+                                entities["database_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.databases` not found for role {}, skipping Database Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["owns"].get("schemas"):
-                                for schema in config["owns"]["schemas"]:
-                                    entities["schema_refs"].add(schema)
+                        try:
+                            for schema in config["owns"]["schemas"]:
+                                entities["schema_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.schemas` not found for role {}, skipping Schema Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["owns"].get("tables"):
-                                for table in config["owns"]["tables"]:
-                                    entities["table_refs"].add(table)
+                        try:
+                            for table in config["owns"]["tables"]:
+                                entities["table_refs"].add(table)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.tables` not found for role {}, skipping Table Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
                     elif entity_type == "users":
                         # Check if this user is member of the user role
@@ -250,12 +302,18 @@ class SnowflakeSpecLoader:
 
                         entities["users"].add(entity_name)
 
-                        if config.get("member_of"):
+                        try:
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
 
                                 if member_role == entity_name:
                                     is_member_of_user_role = True
+                        except KeyError:
+                            logging.debug(
+                                "`member_of` not found for user {}, skipping Role Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
                         if is_member_of_user_role == False:
                             error_messages.append(
@@ -263,18 +321,35 @@ class SnowflakeSpecLoader:
                                 f"user role (role with the same name as the user)"
                             )
 
-                        if config.get("owns"):
-                            if config["owns"].get("databases"):
-                                for schema in config["owns"]["databases"]:
-                                    entities["database_refs"].add(schema)
+                        try:
+                            for schema in config["owns"]["databases"]:
+                                entities["database_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.databases` not found for user {}, skipping Database Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["owns"].get("schemas"):
-                                for schema in config["owns"]["schemas"]:
-                                    entities["schema_refs"].add(schema)
+                        try:
+                            for schema in config["owns"]["schemas"]:
+                                entities["schema_refs"].add(schema)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.schemas` not found for user {}, skipping Schema Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
-                            if config["owns"].get("tables"):
-                                for table in config["owns"]["tables"]:
-                                    entities["table_refs"].add(table)
+                        try:
+                            for table in config["owns"]["tables"]:
+                                entities["table_refs"].add(table)
+                        except KeyError:
+                            logging.debug(
+                                "`owns.tables` not found for user {}, skipping Table Reference generation.".format(
+                                    entity_name
+                                )
+                            )
 
                     elif entity_type == "warehouses":
                         entities["warehouses"].add(entity_name)

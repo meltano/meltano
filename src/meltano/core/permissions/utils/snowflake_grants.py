@@ -1,3 +1,4 @@
+import logging
 import re
 
 from typing import Dict, List, Tuple, Set
@@ -56,7 +57,7 @@ def generate_grant_roles(entity_type: str, entity: str, config: str) -> List[str
     """
     sql_commands = []
 
-    if config.get("member_of"):
+    try:
         for member_role in config["member_of"]:
             sql_commands.append(
                 GRANT_ROLE_TEMPLATE.format(
@@ -65,6 +66,12 @@ def generate_grant_roles(entity_type: str, entity: str, config: str) -> List[str
                     entity_name=snowflaky(entity),
                 )
             )
+    except KeyError:
+        logging.debug(
+            "`member_of` not found for {}, skipping generation of GRANT ROLE statements.".format(
+                entity
+            )
+        )
 
     return sql_commands
 
@@ -101,79 +108,117 @@ def generate_grant_privileges_to_role(
     # 4. Finaly the requested permissions are GRANTED to role for MY_TABLE
     usage_granted = {"databases": set(), "schemas": set()}
 
-    if config.get("warehouses"):
+    try:
         for warehouse in config["warehouses"]:
             sql_commands.append(generate_warehouse_grants(role, warehouse))
+    except KeyError:
+        logging.debug(
+            "`warehouses` not found for role {}, skipping generation of Warehouse GRANT statements.".format(
+                role
+            )
+        )
 
-    if config.get("privileges"):
-        if config["privileges"].get("databases"):
-            if config["privileges"]["databases"].get("read"):
-                for database in config["privileges"]["databases"]["read"]:
-                    new_commands, usage_granted = generate_database_grants(
-                        role=role,
-                        database=database,
-                        grant_type="read",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for database in config["privileges"]["databases"]["read"]:
+            new_commands, usage_granted = generate_database_grants(
+                role=role,
+                database=database,
+                grant_type="read",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.databases.read` not found for role {}, skipping generation of DATABASE read level GRANT statements.".format(
+                role
+            )
+        )
 
-            if config["privileges"]["databases"].get("write"):
-                for database in config["privileges"]["databases"]["write"]:
-                    new_commands, usage_granted = generate_database_grants(
-                        role=role,
-                        database=database,
-                        grant_type="write",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for database in config["privileges"]["databases"]["write"]:
+            new_commands, usage_granted = generate_database_grants(
+                role=role,
+                database=database,
+                grant_type="write",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.databases.write` not found for role {}, skipping generation of DATABASE write level GRANT statements.".format(
+                role
+            )
+        )
 
-        if config["privileges"].get("schemas"):
-            if config["privileges"]["schemas"].get("read"):
-                for schema in config["privileges"]["schemas"]["read"]:
-                    new_commands, usage_granted = generate_schema_grants(
-                        role=role,
-                        schema=schema,
-                        grant_type="read",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for schema in config["privileges"]["schemas"]["read"]:
+            new_commands, usage_granted = generate_schema_grants(
+                role=role,
+                schema=schema,
+                grant_type="read",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.schemas.read` not found for role {}, skipping generation of SCHEMA read level GRANT statements.".format(
+                role
+            )
+        )
 
-            if config["privileges"]["schemas"].get("write"):
-                for schema in config["privileges"]["schemas"]["write"]:
-                    new_commands, usage_granted = generate_schema_grants(
-                        role=role,
-                        schema=schema,
-                        grant_type="write",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for schema in config["privileges"]["schemas"]["write"]:
+            new_commands, usage_granted = generate_schema_grants(
+                role=role,
+                schema=schema,
+                grant_type="write",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.schemas.write` not found for role {}, skipping generation of SCHEMA write level GRANT statements.".format(
+                role
+            )
+        )
 
-        if config["privileges"].get("tables"):
-            if config["privileges"]["tables"].get("read"):
-                for table in config["privileges"]["tables"]["read"]:
-                    new_commands, usage_granted = generate_table_grants(
-                        role=role,
-                        table=table,
-                        grant_type="read",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for table in config["privileges"]["tables"]["read"]:
+            new_commands, usage_granted = generate_table_grants(
+                role=role,
+                table=table,
+                grant_type="read",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.tables.read` not found for role {}, skipping generation of TABLE read level GRANT statements.".format(
+                role
+            )
+        )
 
-            if config["privileges"]["tables"].get("write"):
-                for table in config["privileges"]["tables"]["write"]:
-                    new_commands, usage_granted = generate_table_grants(
-                        role=role,
-                        table=table,
-                        grant_type="write",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+    try:
+        for table in config["privileges"]["tables"]["write"]:
+            new_commands, usage_granted = generate_table_grants(
+                role=role,
+                table=table,
+                grant_type="write",
+                usage_granted=usage_granted,
+                shared_dbs=shared_dbs,
+            )
+            sql_commands.extend(new_commands)
+    except KeyError:
+        logging.debug(
+            "`privileges.tables.write` not found for role {}, skipping generation of TABLE write level GRANT statements.".format(
+                role
+            )
+        )
 
     return sql_commands
 
@@ -491,81 +536,98 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
     """
     sql_commands = []
 
-    if config.get("owns"):
-        if config["owns"].get("databases"):
-            for database in config["owns"]["databases"]:
-                sql_commands.append(
-                    GRANT_OWNERSHIP_TEMPLATE.format(
-                        resource_type="DATABASE",
-                        resource_name=snowflaky(database),
-                        role_name=snowflaky(role),
-                    )
+    try:
+        for database in config["owns"]["databases"]:
+            sql_commands.append(
+                GRANT_OWNERSHIP_TEMPLATE.format(
+                    resource_type="DATABASE",
+                    resource_name=snowflaky(database),
+                    role_name=snowflaky(role),
                 )
+            )
+    except KeyError:
+        logging.debug(
+            "`owns.databases` not found for role {}, skipping generation of DATABASE OWNERSHIP statements.".format(
+                role
+            )
+        )
 
-        if config["owns"].get("schemas"):
-            for schema in config["owns"]["schemas"]:
-                name_parts = schema.split(".")
-                info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+    try:
+        for schema in config["owns"]["schemas"]:
+            name_parts = schema.split(".")
+            info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
 
-                if name_parts[1] == "*":
-                    schemas = []
-                    conn = SnowflakeConnector()
-                    db_schemas = conn.show_schemas(name_parts[0])
+            if name_parts[1] == "*":
+                schemas = []
+                conn = SnowflakeConnector()
+                db_schemas = conn.show_schemas(name_parts[0])
 
-                    for db_schema in db_schemas:
-                        if db_schema != info_schema:
-                            schemas.append(db_schema)
+                for db_schema in db_schemas:
+                    if db_schema != info_schema:
+                        schemas.append(db_schema)
 
-                    for db_schema in schemas:
-                        sql_commands.append(
-                            GRANT_OWNERSHIP_TEMPLATE.format(
-                                resource_type="SCHEMA",
-                                resource_name=snowflaky(db_schema),
-                                role_name=snowflaky(role),
-                            )
-                        )
-                else:
+                for db_schema in schemas:
                     sql_commands.append(
                         GRANT_OWNERSHIP_TEMPLATE.format(
                             resource_type="SCHEMA",
+                            resource_name=snowflaky(db_schema),
+                            role_name=snowflaky(role),
+                        )
+                    )
+            else:
+                sql_commands.append(
+                    GRANT_OWNERSHIP_TEMPLATE.format(
+                        resource_type="SCHEMA",
+                        resource_name=snowflaky(schema),
+                        role_name=snowflaky(role),
+                    )
+                )
+    except KeyError:
+        logging.debug(
+            "`owns.schemas` not found for role {}, skipping generation of SCHEMA OWNERSHIP statements.".format(
+                role
+            )
+        )
+
+    try:
+        for table in config["owns"]["tables"]:
+            name_parts = table.split(".")
+            info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+            if name_parts[2] == "*":
+                schemas = []
+
+                if name_parts[1] == "*":
+                    conn = SnowflakeConnector()
+                    db_schemas = conn.show_schemas(name_parts[0])
+
+                    for schema in db_schemas:
+                        if schema != info_schema:
+                            schemas.append(schema)
+                else:
+                    schemas = [f"{name_parts[0]}.{name_parts[1]}"]
+
+                for schema in schemas:
+                    sql_commands.append(
+                        GRANT_OWNERSHIP_TEMPLATE.format(
+                            resource_type="ALL TABLES IN SCHEMA",
                             resource_name=snowflaky(schema),
                             role_name=snowflaky(role),
                         )
                     )
-
-        if config["owns"].get("tables"):
-            for table in config["owns"]["tables"]:
-                name_parts = table.split(".")
-                info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
-
-                if name_parts[2] == "*":
-                    schemas = []
-
-                    if name_parts[1] == "*":
-                        conn = SnowflakeConnector()
-                        db_schemas = conn.show_schemas(name_parts[0])
-
-                        for schema in db_schemas:
-                            if schema != info_schema:
-                                schemas.append(schema)
-                    else:
-                        schemas = [f"{name_parts[0]}.{name_parts[1]}"]
-
-                    for schema in schemas:
-                        sql_commands.append(
-                            GRANT_OWNERSHIP_TEMPLATE.format(
-                                resource_type="ALL TABLES IN SCHEMA",
-                                resource_name=snowflaky(schema),
-                                role_name=snowflaky(role),
-                            )
-                        )
-                else:
-                    sql_commands.append(
-                        GRANT_OWNERSHIP_TEMPLATE.format(
-                            resource_type="TABLE",
-                            resource_name=snowflaky(table),
-                            role_name=snowflaky(role),
-                        )
+            else:
+                sql_commands.append(
+                    GRANT_OWNERSHIP_TEMPLATE.format(
+                        resource_type="TABLE",
+                        resource_name=snowflaky(table),
+                        role_name=snowflaky(role),
                     )
+                )
+    except KeyError:
+        logging.debug(
+            "`owns.tables` not found for role {}, skipping generation of TABLE OWNERSHIP statements.".format(
+                role
+            )
+        )
 
     return sql_commands
