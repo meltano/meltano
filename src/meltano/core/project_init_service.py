@@ -54,18 +54,16 @@ class ProjectInitService:
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.echo(f"✏️\tEdit", nl=False)
-        click.secho(" .env", fg="green")
         click.echo(f"🏃\tRun", nl=False)
         click.secho(" source .env", fg="green")
         click.echo("Try it out:")
         click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano add extractor tap-gitlab", fg="green")
+        click.secho(" meltano add extractor tap-carbon-intensity", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(" meltano add loader target-postgres", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(
-            " meltano elt job_id1 --extractor tap-gitlab --loader target-postgres",
+            " meltano elt job_id1 --extractor tap-carbon-intensity --loader target-postgres",
             fg="green",
         )
         click.echo("WOW! NEATO!")
