@@ -1,8 +1,11 @@
 import contextlib
+from collections import OrderedDict
 
 
-import contextlib
-import collections
+class TriggerError(Exception):
+    def __init__(self, before_hooks={}, after_hooks={}):
+        self.before_hooks = before_hooks
+        self.after_hooks = after_hooks
 
 
 class hook:
@@ -39,7 +42,7 @@ class Hookable(type):
         return cls
 
     def __prepare__(name, bases, **kwds):
-        return collections.OrderedDict()
+        return OrderedDict()
 
 
 class HookObject(metaclass=Hookable):
@@ -51,12 +54,17 @@ class HookObject(metaclass=Hookable):
 
     @contextlib.contextmanager
     def trigger_hooks(self, hook_name, *args, **kwargs):
-        self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
+        before_errors = self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
         yield
-        self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+        after_errors = self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+
+        if before_errors or after_errors:
+            raise TriggerError(before_hooks=before_errors,
+                               after_hooks=after_errors)
 
     @classmethod
     def trigger(cls, target, hook_name, *args, **kwargs):
+        errors = {}
         hooks = [
             hook
             for hook_cls in reversed(cls.__mro__)
@@ -65,4 +73,9 @@ class HookObject(metaclass=Hookable):
         ]
 
         for hook in hooks:
-            hook(target, *args, **kwargs)
+            try:
+                hook(target, *args, **kwargs)
+            except Exception as err:
+                errors[hook_name] = err
+
+        return errors

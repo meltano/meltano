@@ -1,11 +1,12 @@
 import pytest
 import json
+import logging
 from unittest import mock
 from pathlib import Path
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer import CatalogSelectAllVisitor
+from meltano.core.plugin.singer.catalog import visit, SelectAllExecutor, ListExecutor
 
 
 LEGACY_CATALOG = """
@@ -360,7 +361,8 @@ class TestLegacyCatalogSelectVisitor:
             ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
     def test_visit(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog)
+        select_executor = SelectAllExecutor()
+        visit(catalog, select_executor)
 
         self.assert_catalog_is_selected(catalog)
 
@@ -377,13 +379,17 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         except (KeyError, IndexError):
             return False
 
-    def test_visit(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog)
+    def test_visit(self, catalog, caplog):
+        caplog.set_level(logging.DEBUG)
+
+        select_executor = SelectAllExecutor()
+        visit(catalog, select_executor)
+
+        import pdb; pdb.set_trace()
 
         self.assert_catalog_is_selected(catalog)
 
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
-
         stream_metadata = len(
             [
                 metadata
@@ -396,6 +402,19 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert stream_metadata == 1, "Extraneous stream metadata"
 
 
+class TestListExecutor:
+    @pytest.fixture
+    def catalog(self):
+        return json.loads(CATALOG)
+
+    def test_visit(self, catalog):
+        executor = ListExecutor()
+        visit(catalog, executor)
+
+        assert len(executor.streams) > 0
+        assert len(executor.properties) > 0
+        
+
 class TestSingerTarget:
     @pytest.fixture
     def subject(self, project_add_service):
@@ -404,3 +423,4 @@ class TestSingerTarget:
     def test_exec_args(self, subject):
         base_files = subject.config_files
         assert subject.exec_args(base_files) == ["--config", base_files["config"]]
+
