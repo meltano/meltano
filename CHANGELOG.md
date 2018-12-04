@@ -16,6 +16,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 0.2.0 - (2018-12-04)
+
+### New
+* Add `meltano permissions grant` command for generating permission queries for Postgres and Snowflake - [!90](https://gitlab.com/meltano/meltano/merge_requests/90)
+
 ## 0.1.4 - (2018-11-27)
 
 ### Fixes
