@@ -9,25 +9,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-### Changes
-
-### Fixes
-
-### Breaks
-
-
-## 0.2.0 - (2018-12-04)
-
-### New
 * add `meltano permissions grant` command for generating permission queries for Postgres and Snowflake - [!90](https://gitlab.com/meltano/meltano/merge_requests/90)
 * add 'tap-stripe' to the discovery
 
-### Fixes
-* fix order in Meltano Analyze
-
 ### Changes
+
 * demo with [carbon intensity](https://gitlab.com/meltano/tap-carbon-intensity), no API keys needed
 * .ma file extension WIP as alternative to lkml
+
+### Fixes
+
+* fix order in Meltano Analyze
+
+### Breaks
+
 
 ## 0.1.4 - (2018-11-27)
 
