@@ -19,11 +19,6 @@ const state = {
   keys: [],
   columnHeaders: [],
   names: [],
-  exploreJoins: {
-    dimensions: [],
-    dimension_groups: [],
-    measures: [],
-  },
   resultMeasures: {},
   loadingQuery: false,
   currentDataTab: 'sql',
@@ -150,12 +145,15 @@ const actions = {
       .then((data) => {
         commit('setJoinDimensions', {
           dimensions: data.data.dimensions,
+          join,
         });
         commit('setJoinDimensionGroups', {
           dimensionGroups: data.data.dimension_groups,
+          join,
         });
         commit('setJoinMeasures', {
           measures: data.data.measures,
+          join,
         });
       });
   },
@@ -350,16 +348,16 @@ const mutations = {
     Vue.set(state.distincts, field, data);
   },
 
-  setJoinDimensions(_, { dimensions }) {
-    state.exploreJoins.dimensions = dimensions;
+  setJoinDimensions(_, { dimensions, join }) {
+    join.dimensions = dimensions;
   },
 
-  setJoinDimensionGroups(_, { dimensionGroups }) {
-    state.exploreJoins.dimension_groups = dimensionGroups;
+  setJoinDimensionGroups(_, { dimensionGroups, join }) {
+    join.dimension_groups = dimensionGroups;
   },
 
-  setJoinMeasures(_, { measures }) {
-    state.exploreJoins.measures = measures;
+  setJoinMeasures(_, { measures, join }) {
+    join.measures = measures;
   },
 
   toggleJoinOpen(_, join) {

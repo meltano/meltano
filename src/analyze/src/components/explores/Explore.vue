@@ -31,10 +31,10 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(exploreJoins.dimensions)">
+                  v-if="showJoinDimensionMeasureHeader(join.dimensions)">
                   Dimensions
                 </a>
-                <template v-for="dimensionGroup in exploreJoins.dimension_groups">
+                <template v-for="dimensionGroup in join.dimension_groups">
                   <a class="panel-block dimension-group"
                       :key="dimensionGroup.unique_name"
                       v-if="!dimensionGroup.settings.hidden"
@@ -53,7 +53,7 @@
                     </template>
                   </template>
                 </template>
-                <template v-for="dimension in exploreJoins.dimensions">
+                <template v-for="dimension in join.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.settings.hidden"
                     :key="dimension.unique_name"
@@ -335,7 +335,6 @@ export default {
   computed: {
     ...mapState('explores', [
       'explore',
-      'exploreJoins',
       'selectedDimensions',
       'currentModel',
       'currentExplore',
