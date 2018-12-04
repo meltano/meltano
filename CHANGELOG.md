@@ -27,10 +27,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * add default values for the 'www' command - [!185](https://gitlab.com/meltano/meltano/merge_requests/185)
 * add CHANGELOG.md
 * fix a problem with autodiscovery on taps - [!180](https://gitlab.com/meltano/meltano/merge_requests/180)
+* order in analyze working.
 
 ### Changes
 * move the 'api' extra package into the default package
 * add 'tap-fastly' to the discovery
+* demo with [carbon intensity](https://gitlab.com/meltano/tap-carbon-intensity), no API keys needed
+* .ma file extension WIP as alternative to lkml
 
 ---
 
