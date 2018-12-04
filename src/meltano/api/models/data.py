@@ -179,11 +179,7 @@ class View(BaseLook):
             ] = f"dimension_group_{dimension_group.name}_{uuid.uuid4()}"
             this_dimension_group["selected"] = False
             this_dimension_group["timeframes"] = [
-                {
-                    "label": tf.title().replace("*", ""),
-                    "name": tf,
-                    "selected": False,
-                }
+                {"label": tf.title().replace("*", ""), "name": tf, "selected": False}
                 for tf in dimension_group.settings["timeframes"]
             ]
             this_view["dimension_groups"].append(this_dimension_group)
