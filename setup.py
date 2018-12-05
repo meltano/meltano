@@ -23,6 +23,8 @@ requires = [
     'flask',
     'flask-cors',
     'flask-sqlalchemy',
+    # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
+    'idna==2.7',
 ]
 
 dev_requires = [
