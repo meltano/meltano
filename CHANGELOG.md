@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * resolve version conflict for `idna==2.7`
 * fix the `discover` command in the docker images
 * fix the `add` command in the docker images
+* fix module not found for meltano.core.permissions.utils
 
 ### Breaks
 
