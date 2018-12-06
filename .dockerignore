@@ -2,6 +2,7 @@
 
 !/LICENSE
 !/README.md
+!/VERSION
 !/docs
 !/extract
 !/load
@@ -9,7 +10,10 @@
 !/orchestrate
 !/requirements.txt
 !/setup.py
+!/setup.cfg
+!/MANIFEST.in
 !/src
 !/transform
+!/.pyre_configuration
 
 docs/build
