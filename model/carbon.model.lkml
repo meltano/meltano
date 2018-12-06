@@ -13,10 +13,4 @@ explore: region {
     sql_on: ${region.id} = ${entry.region_id};;
     relationship: one_to_many
   }
-
-  join: intensity {
-    fields: [intensity.forecast, intensity.index]
-    sql_on: ${entry.id} = ${intensity.entry_id};;
-    relationship: one_to_one
-  }
 }
