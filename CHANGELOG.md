@@ -14,14 +14,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * resolve version conflict for `idna==2.7`
+* fix module not found for meltano.core.permissions.utils
 
 ### Breaks
 
-
-## 0.2.1 - (2018-12-06)
-
-### Fixes
-* fix module not found for meltano.core.permissions.utils
 
 ## 0.2.0 - (2018-12-04)
 ---
