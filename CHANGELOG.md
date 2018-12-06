@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * resolve version conflict for `idna==2.7`
+* fix the `discover` command in the docker images
+* fix the `add` command in the docker images
 
 ### Breaks
 
