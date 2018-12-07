@@ -613,6 +613,12 @@ You can also have black run automatically using a `git` hook. See https://github
 
 Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
 
+#### Manual
+
+
+
+#### Script
+
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
 ```bash
