@@ -22,7 +22,6 @@ module.exports = {
 				'/docs/source-to-dashboard',
 				'/docs/version-control',
 				'/docs/taps-targets',
-				'/docs/contributing',
 				'/docs/security-privacy',
 				'/docs/license'
 			]

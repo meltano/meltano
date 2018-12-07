@@ -343,6 +343,14 @@ We don't use stored procedures because they are hard to keep under version contr
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
+### Requirements
+
+Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
+
+```bash
+pip install '.[dev]'
+```
+
 ### Release process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
@@ -374,3 +382,18 @@ Meltano uses an approval workflow for all merge requests.
 1. Assign the merge request to any Meltano maintainer for a review cycle
 1. Once the review is done the reviewer should approve the merge request
 1. Once approved, the merge request can be merged by any Meltano maintainer
+
+### Changelog
+
+Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
+
+#### Script
+
+Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
+
+```bash
+$ changelog new "add an amazing feature"
+$ git add CHANGELOG.md
+```
+
+Make sure to add CHANGELOG entries to your merge requests.
