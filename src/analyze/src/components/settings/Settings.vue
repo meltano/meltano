@@ -43,6 +43,11 @@
                       {{connection.host}}
                     </span>
                   </p>
+                  <hr>
+                  <button class="button is-danger"
+                            @click.prevent="deleteConnection(connection)">
+                    Delete Connection
+                  </button>
                 </div>
               </div>
             </div>
@@ -157,6 +162,9 @@ export default {
   },
 
   methods: {
+    deleteConnection(connection) {
+      this.$store.dispatch('settings/deleteConnection', connection);
+    },
     submitConnectionForm() {
       this.$store.dispatch('settings/saveNewConnection', {
         name: this.connectionName,
