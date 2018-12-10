@@ -2,9 +2,7 @@
 title: "Data Source to Dashboard"
 ---
 
-## Data Science Lifecycle
-
-![Meltano](./images/meltano.png)
+## Data Lifecycle
 
 ### How we currently structure Meltano
 
