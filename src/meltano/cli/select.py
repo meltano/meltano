@@ -10,7 +10,11 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
+from meltano.core.plugin.singer.catalog import (
+    visit,
+    parse_select_pattern,
+    ListSelectedExecutor,
+)
 
 
 @cli.command()
@@ -20,27 +24,20 @@ from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
-def select(extractor,
-           entities_filter,
-           attributes_filter,
-           **flags):
+def select(extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:
-            show(extractor,
-                 entities_filter,
-                 attributes_filter,
-                 show_all=flags["all"])
+            show(extractor, entities_filter, attributes_filter, show_all=flags["all"])
         else:
-            add(extractor,
-                entities_filter,
-                attributes_filter,
-                exclude=flags["exclude"])
+            add(extractor, entities_filter, attributes_filter, exclude=flags["exclude"])
     except PluginExecutionError as e:
-        raise click.ClickException(f"Cannot list the selected properties: "
-                                   "there was a problem running the tap with `--discover`. "
-                                   "Make sure the tap supports `--discover` and run "
-                                   "`meltano invoke {extractor} --discover` to make "
-                                   "sure it runs correctly.") from e
+        raise click.ClickException(
+            f"Cannot list the selected properties: "
+            "there was a problem running the tap with `--discover`. "
+            "Make sure the tap supports `--discover` and run "
+            "`meltano invoke {extractor} --discover` to make "
+            "sure it runs correctly."
+        ) from e
     except Exception as e:
         raise click.ClickException(str(e)) from e
 
@@ -55,10 +52,8 @@ def add(extractor, entities_filter, attributes_filter, exclude=False):
         extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
         extractor.add_select_filter(pattern)
 
-        idx = next(i
-                   for i, it in enumerate(config.get_extractors())
-                   if it == extractor)
-        meltano['extractors'][idx] = extractor.canonical()
+        idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
+        meltano["extractors"][idx] = extractor.canonical()
 
 
 def show(extractor, entities_filter, attributes_filter, show_all=False):
@@ -78,21 +73,27 @@ def show(extractor, entities_filter, attributes_filter, show_all=False):
             schema = json.load(catalog)
             visit(schema, list_all)
     except FileNotFoundError as e:
-        logging.error("Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`")
+        logging.error(
+            "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
+        )
         raise e
 
     # report
     click.secho("Enabled patterns:")
-    for select in extractor.select:
-        click.secho(f"\t{select.property_pattern}", fg='red' if select.negated else 'white')
+    for select in map(parse_select_pattern, extractor.select):
+        click.secho(
+            f"\t{select.property_pattern}", fg="red" if select.negated else "white"
+        )
     else:
         click.echo()
 
     click.secho("Selected properties:")
-    color = lambda selected: 'white' if selected else 'red'
-    for stream, prop in ((stream, prop)
-                         for stream, props in list_all.properties.items()
-                         for prop in props):
+    color = lambda selected: "white" if selected else "red"
+    for stream, prop in (
+        (stream, prop)
+        for stream, props in list_all.properties.items()
+        for prop in props
+    ):
         if show_all:
             click.secho(f"\t{stream.key}", fg=color(stream.selected), nl=False)
             click.echo(".", nl=False)

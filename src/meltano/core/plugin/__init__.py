@@ -1,1 +1,1 @@
-from .base import Plugin, PluginType, SelectPattern
+from .base import Plugin, PluginType

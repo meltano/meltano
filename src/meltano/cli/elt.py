@@ -57,4 +57,6 @@ def elt(job_id, extractor, loader, dry, transform):
         else:
             click.secho("Transformation skipped.", fg="yellow")
     except Exception as err:
-        raise click.ClickException(f"ELT could not complete, an error happened during the process: {err}.")
+        raise click.ClickException(
+            f"ELT could not complete, an error happened during the process: {err}."
+        )

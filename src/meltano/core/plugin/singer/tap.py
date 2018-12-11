@@ -55,7 +55,9 @@ class SingerTap(SingerPlugin):
 
         if exit_code != 0:
             properties_file.unlink()
-            raise PluginExecutionError(f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}")
+            raise PluginExecutionError(
+                f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
+            )
 
         try:
             with properties_file.open() as catalog:
@@ -68,4 +70,6 @@ class SingerTap(SingerPlugin):
                 json.dump(schema, catalog)
         except Exception as err:
             properties_file.unlink()
-            raise PluginExecutionError(f"Could not select stream, catalog file is invalid: {properties_file}") from err
+            raise PluginExecutionError(
+                f"Could not select stream, catalog file is invalid: {properties_file}"
+            ) from err

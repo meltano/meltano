@@ -54,13 +54,16 @@ class HookObject(metaclass=Hookable):
 
     @contextlib.contextmanager
     def trigger_hooks(self, hook_name, *args, **kwargs):
-        before_errors = self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
+        before_errors = self.__class__.trigger(
+            self, f"before_{hook_name}", *args, **kwargs
+        )
         yield
-        after_errors = self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
+        after_errors = self.__class__.trigger(
+            self, f"after_{hook_name}", *args, **kwargs
+        )
 
         if before_errors or after_errors:
-            raise TriggerError(before_hooks=before_errors,
-                               after_hooks=after_errors)
+            raise TriggerError(before_hooks=before_errors, after_hooks=after_errors)
 
     @classmethod
     def trigger(cls, target, hook_name, *args, **kwargs):

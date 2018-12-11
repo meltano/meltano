@@ -25,26 +25,15 @@ class PluginType(YAMLEnum):
         return self.value
 
 
-SelectPattern = namedtuple('SelectPattern', ("stream_pattern", "property_pattern", "negated"))
-
-
-def parse_select_pattern(pattern: str):
-    negated = False
-
-    if pattern.startswith("!"):
-        negated = True
-        pattern = pattern[1:]
-
-    stream, *_ = pattern.split(".")
-
-    return SelectPattern(stream_pattern=stream,
-                         property_pattern=pattern,
-                         negated=negated)
-
-
 class Plugin:
     def __init__(
-        self, plugin_type: PluginType, name: str, pip_url=None, config=None, select=None, **extras
+        self,
+        plugin_type: PluginType,
+        name: str,
+        pip_url=None,
+        config=None,
+        select=None,
+        **extras
     ):
         self.name = name
         self.type = plugin_type
@@ -80,7 +69,7 @@ class Plugin:
 
     @property
     def select(self):
-        return set(map(parse_select_pattern, self._select or ["*.*"]))
+        return self._select or {"*.*"}
 
     @select.setter
     def select(self, patterns):
