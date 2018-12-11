@@ -12,12 +12,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-* documentation site will utilize a new static site generation tool called VuePress
-* first iteration of joins (working on a small scale)
-
 ### Fixes
 
 ### Breaks
+
+
+## 0.2.2 - (2018-12-11)
+---
+
+### Changes
+
+* documentation site will utilize a new static site generation tool called VuePress
+* first iteration of joins (working on a small scale)
 
 
 ## 0.2.1 - (2018-12-06)
