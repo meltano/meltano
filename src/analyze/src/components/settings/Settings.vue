@@ -43,13 +43,14 @@
                       {{connection.host}}
                     </span>
                   </p>
-                  <hr>
-                  <button class="button is-danger"
-                            @click.prevent="deleteConnection(connection)">
-                    Delete Connection
-                  </button>
                 </div>
               </div>
+              <footer class="card-footer">
+                <a href="#" class="card-footer-item button is-danger"
+                    @click.prevent="deleteConnection(connection)">
+                  Delete Connection
+                </a>
+              </footer>
             </div>
           </div>
         </div>
