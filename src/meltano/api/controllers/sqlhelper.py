@@ -116,7 +116,9 @@ class SqlHelper:
                 fields.append(d.sql)
         return fields
 
-    def get_query(self, from_, dimensions, measures, limit, joins=None, order=None, orderby=None):
+    def get_query(
+        self, from_, dimensions, measures, limit, joins=None, order=None, orderby=None
+    ):
         select = dimensions + measures
         q = Query.from_(from_)
         if joins:
@@ -126,8 +128,9 @@ class SqlHelper:
             join_measures = joins[0]["measures"]
             select = select + join_dimensions + join_measures
             dimensions = dimensions + join_dimensions
-            q = q.join(joins[0]["table"])\
-              .on(region.id == entry.region_id and region.id == entry.region_id)
+            q = q.join(joins[0]["table"]).on(
+                region.id == entry.region_id and region.id == entry.region_id
+            )
         q = q.select(*select).groupby(*dimensions)
         if order:
             q = q.orderby(orderby, order=order)

@@ -3,6 +3,7 @@ from enum import Enum
 from .analysishelper import AnalysisHelper
 from ..models.data import View, Join
 
+
 class JoinType(Enum):
     left_join = "left"
     inner_join = "inner"
@@ -20,12 +21,12 @@ class JoinHelper:
         measures = []
         join = Join.query.filter(Join.name == join["name"]).first()
         return {
-          "view": view,
-          "dimensions": dimensions,
-          "measures": measures,
-          "table": table,
-          "on": join.settings["sql_on"],
-          "join": join,
+            "view": view,
+            "dimensions": dimensions,
+            "measures": measures,
+            "table": table,
+            "on": join.settings["sql_on"],
+            "join": join,
         }
 
     def get_dimensions(join, view, table):
@@ -34,4 +35,3 @@ class JoinHelper:
 
     def get_view(join):
         return View.query.filter(View.name == join["name"]).first()
-
