@@ -334,8 +334,8 @@ When considering which taps and targets Meltano will maintain, some assumptions 
     2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
     3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
 
-*  Data is UPSERTed when an entity has at least one primary key (key_properties not empty). If there is already a row with the same
-composite key (combination of key_properties) then the new record UPDATEs the existing one.
+*  Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same
+composite key (combination of key_properties) then the new record updates the existing one.
 
     No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
 
