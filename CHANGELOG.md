@@ -9,7 +9,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-Joins are working on a small scale. Not complete but working.
 
 ### Changes
 
