@@ -1,5 +1,0 @@
-../[all]
-recommonmark
-sphinx
-sphinx_rtd_theme
-sphinx-serve
