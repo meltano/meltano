@@ -26,7 +26,6 @@ def new():
     db.session.commit()
     return jsonify(settings)
 
-
 @settingsBP.route("/connections/<name>/test")
 def test(name):
     current_settings = Settings.query.first().settings

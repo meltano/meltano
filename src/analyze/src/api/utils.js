@@ -19,7 +19,7 @@ export default {
   },
   root() {
     // eslint-disable-next-line no-undef
-    return API_URL;
+    return 'http://localhost:5000';
   },
   buildUrl(blueprint, location = '') {
     return [this.root(), blueprint, location].join('/');
