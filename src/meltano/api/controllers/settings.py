@@ -32,7 +32,11 @@ def delete():
     connectionToRemove = request.get_json()
     current_settings = Settings.query.first()
     connections = current_settings.settings["connections"]
-    current_settings.settings["connections"] = [connection for connection in connections if connection["name"] != connectionToRemove["name"]]
+    current_settings.settings["connections"] = [
+        connection
+        for connection in connections
+        if connection["name"] != connectionToRemove["name"]
+    ]
 
     db.session.add(current_settings)
     db.session.commit()
