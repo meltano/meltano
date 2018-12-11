@@ -24,7 +24,7 @@
                 :class="{'is-collapsed': join.collapsed}"
                 :key="join.name"
                 @click="joinRowClicked(join)">
-                  {{getLabelForJoin(join)}}
+                  {{getLabelForJoin(join) | capitalize}}
               </a>
               <template v-if="!join.collapsed">
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -34,6 +34,25 @@
                   v-if="showJoinDimensionMeasureHeader(join.dimensions)">
                   Dimensions
                 </a>
+                <template v-for="dimensionGroup in join.dimension_groups">
+                  <a class="panel-block dimension-group"
+                      :key="dimensionGroup.unique_name"
+                      v-if="!dimensionGroup.settings.hidden"
+                      @click="dimensionGroupSelected(dimensionGroup)"
+                      :class="{'is-active': dimensionGroup.selected}">
+                    {{dimensionGroup.label}}
+                  </a>
+                  <template v-if="dimensionGroup.selected">
+                    <template v-for="timeframe in dimensionGroup.timeframes">
+                      <a class="panel-block indented"
+                          :key="timeframe.name"
+                          @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
+                          :class="{'is-active': timeframe.selected}">
+                        {{timeframe.label}}
+                      </a>
+                    </template>
+                  </template>
+                </template>
                 <template v-for="dimension in join.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.settings.hidden"
@@ -71,11 +90,8 @@
               is-expandable"
               :class="{'is-collapsed': explore.view.collapsed}"
               @click="viewRowClicked">
-                <template v-if="hasJoins">
-                  {{explore.settings.view_label}}
-                </template>
-                <template v-else>
-                  {{explore.settings.label}}
+                <template>
+                  {{explore.settings.label | capitalize}}
                 </template>
               </a>
           </template>
@@ -286,6 +302,7 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import capitalize from '@/filters/capitalize';
 import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
@@ -298,6 +315,9 @@ export default {
       model: this.$route.params.model,
       explore: this.$route.params.explore,
     });
+  },
+  filters: {
+    capitalize,
   },
   components: {
     ResultTable,

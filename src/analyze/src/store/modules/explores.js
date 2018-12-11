@@ -144,12 +144,16 @@ const actions = {
     exploreApi.getView(join.name)
       .then((data) => {
         commit('setJoinDimensions', {
-          join,
           dimensions: data.data.dimensions,
+          join,
+        });
+        commit('setJoinDimensionGroups', {
+          dimensionGroups: data.data.dimension_groups,
+          join,
         });
         commit('setJoinMeasures', {
-          join,
           measures: data.data.measures,
+          join,
         });
       });
   },
@@ -344,14 +348,16 @@ const mutations = {
     Vue.set(state.distincts, field, data);
   },
 
-  setJoinDimensions(_, { join, dimensions }) {
-    const thisJoin = join;
-    thisJoin.dimensions = dimensions;
+  setJoinDimensions(_, { dimensions, join }) {
+    join.dimensions = dimensions;
   },
 
-  setJoinMeasures(_, { join, measures }) {
-    const thisJoin = join;
-    thisJoin.measures = measures;
+  setJoinDimensionGroups(_, { dimensionGroups, join }) {
+    join.dimension_groups = dimensionGroups;
+  },
+
+  setJoinMeasures(_, { measures, join }) {
+    join.measures = measures;
   },
 
   toggleJoinOpen(_, join) {

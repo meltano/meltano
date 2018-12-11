@@ -66,7 +66,7 @@ def analyze():
 
 @app.route("/drop")
 def drop_it():
-    from .controllers.utils import SqlHelper
+    from .controllers.sqlhelper import SqlHelper
 
     SqlHelper().reset_db()
     return jsonify({"dropped_it": "like it's hot"})

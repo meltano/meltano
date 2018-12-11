@@ -3,12 +3,12 @@ import re
 
 import sqlalchemy
 from flask import jsonify
-from pypika import Query, Table, Order
+from pypika import Query, Order
 
+from .analysishelper import AnalysisHelper
 from .aggregate import Aggregate
 from .date import Date
-from .join import Join as JoinQuery
-from .substitution import Substitution
+from .joinhelper import JoinHelper
 from ..app import app, db
 from ..models.data import View, DimensionGroup, Join
 from ..models.projects import Project
@@ -53,21 +53,19 @@ class SqlHelper:
         timeframes = [t["timeframes"] for t in incoming_dimension_groups]
         # flatten list of timeframes
         timeframes = [y for x in timeframes for y in x]
-        dimensions = list(
-            filter(lambda x: x.name in incoming_dimensions, view.dimensions)
-        )
-        measures = list(filter(lambda x: x.name in incoming_measures, view.measures))
+        dimensions = AnalysisHelper.dimensions_from_names(incoming_dimensions, view)
+        measures = AnalysisHelper.measures_from_names(incoming_measures, view)
         dimensions_raw = dimensions
         measures_raw = measures
 
-        table = self.table(base_table, explore.name)
-        # joins = self.joins(incoming_joins, table)
+        table = AnalysisHelper.table(base_table, explore.name)
+        joins = [JoinHelper.get_join(j) for j in incoming_joins]
         dimension_groups = self.dimension_groups(
             view_name, incoming_dimension_groups, table
         )
-        dimensions = self.dimensions(dimensions, table)
+        dimensions = AnalysisHelper.dimensions(dimensions, table)
         dimensions = dimensions + dimension_groups
-        measures = self.measures(measures, table)
+        measures = AnalysisHelper.measures(measures, table)
 
         if orderby:
             ordered_by_column = [d for d in dimensions_raw if d.name == orderby]
@@ -94,6 +92,7 @@ class SqlHelper:
                 dimensions=dimensions,
                 measures=measures,
                 limit=incoming_limit,
+                joins=joins,
                 order=order,
                 orderby=orderby,
             ),
@@ -101,31 +100,6 @@ class SqlHelper:
 
     def column_headers(self, dimensions, measures):
         return [d.label for d in dimensions + measures]
-
-    def table(self, name, alias):
-        (schema, name) = name.split(".")
-        return Table(name, schema=schema, alias=alias)
-
-    def dimensions(self, dimensions, table):
-        return [self.field_from_dimension(d, table) for d in dimensions]
-
-    def field_from_dimension(self, d, table):
-        sql = d.settings["sql"]
-        substitution = Substitution(sql, table, dimension=d)
-        return substitution.sql
-
-    def measures(self, measures, table):
-        return [self.field_from_measure(measure, table) for measure in measures]
-
-    def field_from_measure(self, measure, table):
-        aggregate = Aggregate(measure, table)
-        return aggregate.sql
-
-    def joins(self, joins, table):
-        if len(joins):
-            for join in joins:
-                queried_join = Join.query.filter(Join.name == join["name"]).first()
-                join = JoinQuery(queried_join, view, table)
 
     def dimension_groups(self, view_name, dimension_groups, table):
         fields = []
@@ -142,9 +116,22 @@ class SqlHelper:
                 fields.append(d.sql)
         return fields
 
-    def get_query(self, from_, dimensions, measures, limit, order=None, orderby=None):
+    def get_query(
+        self, from_, dimensions, measures, limit, joins=None, order=None, orderby=None
+    ):
         select = dimensions + measures
-        q = Query.from_(from_).select(*select).groupby(*dimensions)
+        q = Query.from_(from_)
+        if joins:
+            region = from_
+            entry = joins[0]["table"]
+            join_dimensions = joins[0]["dimensions"]
+            join_measures = joins[0]["measures"]
+            select = select + join_dimensions + join_measures
+            dimensions = dimensions + join_dimensions
+            q = q.join(joins[0]["table"]).on(
+                region.id == entry.region_id and region.id == entry.region_id
+            )
+        q = q.select(*select).groupby(*dimensions)
         if order:
             q = q.orderby(orderby, order=order)
         q = q.limit(limit)
