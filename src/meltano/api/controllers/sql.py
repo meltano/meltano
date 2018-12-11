@@ -9,7 +9,7 @@ sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 
 import sqlalchemy
 
-from .utils import SqlHelper
+from .sqlhelper import SqlHelper
 from ..models.data import Model, Explore
 from ..models.settings import Settings
 

@@ -145,6 +145,8 @@ class View(BaseLook):
         this_view["name"] = self.name
         this_view["settings"] = self.settings
         this_view["dimensions"] = []
+        this_view["measures"] = []
+        this_view["dimension_groups"] = []
         for dimension in self.dimensions:
             this_dimension = {}
             this_dimension["name"] = dimension.name
@@ -155,7 +157,6 @@ class View(BaseLook):
             this_dimension["unique_name"] = f"dimension_{dimension.name}_{uuid.uuid4()}"
             this_dimension["selected"] = False
             this_view["dimensions"].append(this_dimension)
-        this_view["measures"] = []
         for measure in self.measures:
             this_measure = {}
             this_measure["name"] = measure.name
@@ -166,6 +167,22 @@ class View(BaseLook):
             this_measure["unique_name"] = f"measure_{measure.name}_{uuid.uuid4()}"
             this_measure["selected"] = False
             this_view["measures"].append(this_measure)
+        for dimension_group in self.dimension_groups:
+            this_dimension_group = {}
+            this_dimension_group["name"] = dimension_group.name
+            this_dimension_group["settings"] = dimension_group.settings
+            this_dimension_group["label"] = dimension_group.settings.get(
+                "label", " ".join(dimension_group.name.split("_")).title()
+            )
+            this_dimension_group[
+                "unique_name"
+            ] = f"dimension_group_{dimension_group.name}_{uuid.uuid4()}"
+            this_dimension_group["selected"] = False
+            this_dimension_group["timeframes"] = [
+                {"label": tf.title().replace("*", ""), "name": tf, "selected": False}
+                for tf in dimension_group.settings["timeframes"]
+            ]
+            this_view["dimension_groups"].append(this_dimension_group)
         return this_view
 
 

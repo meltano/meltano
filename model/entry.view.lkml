@@ -16,6 +16,18 @@ view: entry {
     sql: ${TABLE}.id;;
   }
 
+  dimension: forecast {
+    description: "Carbon entry intensity forecast"
+    type: number
+    sql: ${TABLE}.forecast;;
+  }
+
+  dimension: index {
+    description: "Carbon entry intensity forecast"
+    type: number
+    sql: ${TABLE}.index;;
+  }
+
   dimension_group: from {
     description: "Selected from range in carbon data"
     type: time
