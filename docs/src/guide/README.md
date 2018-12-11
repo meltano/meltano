@@ -358,11 +358,14 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 ```bash
 $ git fetch origin
 $ git checkout -b release-next origin/master
-$ bumpversion (minor|major|--new-version <new_version>) --tag
-$ git push --tags origin
+$ changelog view ;; make sure to validate the CHANGELOG changes
+$ make release
+$ git push --tags
+$ git push origin release-next
 ```
 
 Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.
+Make sure to link to the pipeline that does the actual deployment: go to the commit's pipelines tab and select the one that has the **publish** stage.
 
 ## Contributing to Meltano
 
