@@ -1,4 +1,5 @@
 /docs/build
+/docs/public
 
 */__pycache__
 *.log

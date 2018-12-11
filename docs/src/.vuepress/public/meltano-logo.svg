@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="160px" height="160px" viewBox="0 0 160 160" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Meltano Logo</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="meltano-logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <path d="M130,135 L30,135 C24.4771525,135 20,130.522681 20,124.999629 L20,39.0003713 C20,33.4773187 24.4771525,29 30,29 C32.6544898,29 35.2000622,30.0554504 37.0758102,31.9337867 L88.2487391,83.1773284 L122.68119,46.1943604 C124.572865,44.1625631 127.223973,43.0085663 130,43.0085663 C135.522847,43.0085663 140,47.485885 140,53.0089376 L140,124.999629 C140,130.522681 135.522847,135 130,135 Z M36,119.999443 L53.9660488,119.999443 L76.1898014,96.1295087 L36,55.9970666 L36,119.999443 Z M77.1401869,119.999443 L122,119.999443 L122,71.9976607 L77.1401869,119.999443 Z" id="Combined-Shape" fill="#464ACB"></path>
+    </g>
+</svg>
