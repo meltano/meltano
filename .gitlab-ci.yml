@@ -8,6 +8,7 @@ include:
 stages:
   - lint
   - test
+  - pages
   - build_base
   - build
   - publish
@@ -42,14 +43,18 @@ test:
   script:
     - pytest -v
 
-.pages:
+pages:
+  stage: pages
+  image: node:9.11.1
+  cache:
+    paths:
+      - node_modules/
   script:
-    - pip install sphinx sphinx-rtd-theme
-    - cd doc ; make html
-    - mv build/html/ ../public/
+    - yarn
+    - yarn build:docs
   artifacts:
     paths:
-    - public
+      - docs/public
   only:
     - master
 

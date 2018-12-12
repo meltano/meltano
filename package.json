@@ -4,13 +4,13 @@
   "description": "The source code for the Meltano.com site",
   "main": "index.js",
   "scripts": {
-    "dev": "vuepress dev src",
-    "build": "vuepress build src",
+    "dev:docs": "vuepress dev docs/src",
+    "build:docs": "vuepress build docs/src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/meltano/meltano.com.git"
+    "url": "git+ssh://git@gitlab.com/meltano/meltano.git"
   },
   "keywords": [
     "meltano"
@@ -18,9 +18,9 @@
   "author": "Ben Hong <bhong@gitlab.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://gitlab.com/meltano/meltano.com/issues"
+    "url": "https://gitlab.com/meltano/meltano/issues"
   },
-  "homepage": "https://gitlab.com/meltano/meltano.com#readme",
+  "homepage": "https://gitlab.com/meltano/meltano#readme",
   "devDependencies": {
     "vuepress": "^0.14.5"
   }
