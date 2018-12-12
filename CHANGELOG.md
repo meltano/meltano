@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * model dropdown now updates when updating database (no longer requires page refresh)
+* prevent model duplication that previously occurred after subsequent "Update Database" clicks
 
 ### Breaks
 
