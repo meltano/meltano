@@ -5,7 +5,6 @@ const state = {
   validated: false,
   loadingValidation: false,
   loadingUpdate: false,
-  importResults: {},
   models: [],
   navbarClicked: false,
   errors: [],
@@ -47,7 +46,6 @@ const actions = {
       });
   },
 
-
   getFile({ commit }, file) {
     repoApi.file(file.unique)
       .then((data) => {
@@ -57,18 +55,25 @@ const actions = {
 
   lint({ commit }) {
     state.loadingValidation = true;
-    repoApi.lint()
-      .then((data) => {
-        commit('setValidatedState', data.data);
+    repoApi
+      .lint()
+      .then(data => {
+        commit("setValidatedState", data.data);
+        state.loadingValidation = false;
+      })
+      .catch(() => {
         state.loadingValidation = false;
       });
   },
 
-  update({ commit }) {
+  update({ dispatch }) {
     state.loadingUpdate = true;
     repoApi.update()
       .then((data) => {
-        commit('setUpdateResults', data.data);
+        dispatch('getModels');
+        state.loadingUpdate = false;
+      })
+      .catch(() => {
         state.loadingUpdate = false;
       });
   },
@@ -112,10 +117,6 @@ const mutations = {
     if (!validated.result) {
       state.errors = validated.errors;
     }
-  },
-
-  setUpdateResults(_, results) {
-    state.setImportResults = results;
   },
 };
 

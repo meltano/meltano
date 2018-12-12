@@ -27,6 +27,23 @@ def new():
     return jsonify(settings)
 
 
+@settingsBP.route("/delete", methods=["POST"])
+def delete():
+    connectionToRemove = request.get_json()
+    current_settings = Settings.query.first()
+    connections = current_settings.settings["connections"]
+    current_settings.settings["connections"] = [
+        connection
+        for connection in connections
+        if connection["name"] != connectionToRemove["name"]
+    ]
+
+    db.session.add(current_settings)
+    db.session.commit()
+
+    return jsonify(current_settings.settings)
+
+
 @settingsBP.route("/connections/<name>/test")
 def test(name):
     current_settings = Settings.query.first().settings

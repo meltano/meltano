@@ -45,6 +45,12 @@
                   </p>
                 </div>
               </div>
+              <footer class="card-footer">
+                <a href="#" class="card-footer-item button is-danger"
+                    @click.prevent="deleteConnection(connection)">
+                  Delete Connection
+                </a>
+              </footer>
             </div>
           </div>
         </div>
@@ -157,6 +163,9 @@ export default {
   },
 
   methods: {
+    deleteConnection(connection) {
+      this.$store.dispatch('settings/deleteConnection', connection);
+    },
     submitConnectionForm() {
       this.$store.dispatch('settings/saveNewConnection', {
         name: this.connectionName,

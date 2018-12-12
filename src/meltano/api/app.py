@@ -61,7 +61,7 @@ def analyze():
     try:
         return render_template("analyze.html")
     except TemplateNotFound:
-        return "Please run yarn build-templates from src/meltano_ui"
+        return "Please run yarn build-templates from src/analyze"
 
 
 @app.route("/drop")
