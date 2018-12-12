@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+* meltano.com will be deployed from the meltano repo
+
 ### Fixes
 
 ### Breaks
