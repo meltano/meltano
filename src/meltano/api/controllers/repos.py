@@ -207,7 +207,14 @@ def db_import():
 
         # Prevent model duplication
         targetLabel = model["label"]
-        preexistingModel = next((modelObj for modelObj in existingModels if modelObj.settings["label"] == targetLabel), None)
+        preexistingModel = next(
+            (
+                modelObj
+                for modelObj in existingModels
+                if modelObj.settings["label"] == targetLabel
+            ),
+            None,
+        )
         if preexistingModel != None:
             continue
 
