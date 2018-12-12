@@ -49,7 +49,7 @@ pages:
       - node_modules/
   script:
     - yarn
-    - yarn build
+    - yarn build:docs
   artifacts:
     paths:
       - docs/public
