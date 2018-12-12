@@ -9,10 +9,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* updated Settings view so each database connection can be independently disconnected
 
 ### Changes
+* documentation site will utilize a new static site generation tool called VuePress
 
 ### Fixes
+* model dropdown now updates when updating database (no longer requires page refresh)
 
 ### Breaks
 
