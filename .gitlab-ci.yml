@@ -8,6 +8,7 @@ include:
 stages:
   - lint
   - test
+  - pages
   - build_base
   - build
   - publish
@@ -43,6 +44,7 @@ test:
     - pytest -v
 
 pages:
+  stage: pages
   image: node:9.11.1
   cache:
     paths:
