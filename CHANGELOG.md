@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* model dropdown now updates when updating database (no longer requires page refresh)
 
 ### Breaks
 
@@ -21,7 +22,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### Changes
-
 * documentation site will utilize a new static site generation tool called VuePress
 * first iteration of joins (working on a small scale)
 
