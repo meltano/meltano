@@ -99,7 +99,7 @@ We use dbt for testing too, instead of [Great Expectations](https://github.com/g
 
 At GitLab we're using Looker instead of Superset, for sure for the rest of 2018.
 If we switch we'll want to make sure that most of the functionality can be replicated in Superset, and the switch will be gradual.
-For now, try to keep as much functionality as possible in DBT instead of Looker.
+For now, try to keep as much functionality as possible in dbt instead of Looker.
 
 ## Metrics
 

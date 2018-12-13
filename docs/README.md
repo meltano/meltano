@@ -1,15 +1,15 @@
-# Meltano Docs
+---
+home: true
+heroImage: /meltano-logo.svg
+actionText: Get Started →
+actionLink: /guide/
+features:
+  - title: Simplicity
+    details: Make it easy for everyone  to make informed decisions about their business.
+  - title: Savings
+    details: Reduce time and cost for businesses that need to invest in data analytics.
+  - title: Structure
+    details: Allow  data scientists and analysts to build a robust, well-tested, and well-documented infrastructure that follows DevOps and data engineering best practices.
 
-## Prerequisites
-
-- [NodeJS 8+](https://nodejs.org/en/)
-
-## Getting Started
-
-1. Navigate to project root directory in terminal
-1. Run `npm install` or `yarn`
-1. Run `npm run dev` or `yarn dev`
-
-## Resources
-
-- [VuePress](https://vuepress.vuejs.org)
+footer: Meltano is a GitLab startup | MIT Licensed | Copyright © 2018-Present
+---
