@@ -189,9 +189,9 @@ It is expected that the Meltano project will have many applications managed in t
 
 ### Meltano CLI
 
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Science Lifecycle].
+Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
 
-Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data science lifecycle.
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
 
 #### Meltano Schema
 
