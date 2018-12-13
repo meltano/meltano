@@ -46,7 +46,7 @@
                 </div>
               </div>
               <footer class="card-footer">
-                <a href="#" class="card-footer-item button is-danger"
+                <a href="#" class="card-footer-item is-danger"
                     @click.prevent="deleteConnection(connection)">
                   Delete Connection
                 </a>
