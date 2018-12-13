@@ -36,7 +36,7 @@ module.exports = {
 		repoLabel: 'Repo',
 		lastUpdated: 'Last Updated',
 		docsDir: 'src',
-		docsRepo: 'https://gitlab.com/meltano/meltano.com',
+		docsRepo: 'https://gitlab.com/meltano/meltano',
 		editLinks: true,
 		editLinkText: 'Help us improve this page!'
 	}
