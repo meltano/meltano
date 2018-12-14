@@ -1,5 +1,3 @@
-public
-
 */__pycache__
 *.log
 *.pyc
@@ -92,8 +90,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
-docs/_build/
+# VuePress Docs Build
+docs/public
 
 # PyBuilder
 target/
