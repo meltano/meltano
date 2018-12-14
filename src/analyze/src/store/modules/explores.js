@@ -18,6 +18,7 @@ const state = {
   results: [],
   keys: [],
   columnHeaders: [],
+  names: [],
   resultMeasures: {},
   loadingQuery: false,
   currentDataTab: 'sql',
@@ -143,14 +144,23 @@ const actions = {
     exploreApi.getView(join.name)
       .then((data) => {
         commit('setJoinDimensions', {
-          join,
           dimensions: data.data.dimensions,
+          join,
+        });
+        commit('setJoinDimensionGroups', {
+          dimensionGroups: data.data.dimension_groups,
+          join,
         });
         commit('setJoinMeasures', {
-          join,
           measures: data.data.measures,
+          join,
         });
       });
+  },
+
+  removeSort({ commit }, dimension) {
+    if (!state.sortColumn || state.sortColumn !== dimension.name) return;
+    commit('setRemoveSort', dimension);
   },
 
   toggleDimension({ commit }, dimension) {
@@ -184,6 +194,14 @@ const actions = {
       .dimensions
       .filter(d => d.selected)
       .map(d => d.name);
+    let sortColumn = baseView
+      .dimensions
+      .find(d => d.name === state.sortColumn);
+    if (!sortColumn) {
+      sortColumn = baseView
+        .measures
+        .find(d => d.name === state.sortColumn);
+    }
     const measures = baseView
       .measures
       .filter(m => m.selected)
@@ -228,8 +246,11 @@ const actions = {
       }))
       .filter(dg => dg.timeframes.length);
 
-    if (state.sortColumn) {
-      order = state.keys.indexOf(state.sortColumn) + 1;
+    if (sortColumn) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
     }
 
     const postData = {
@@ -239,7 +260,6 @@ const actions = {
       measures,
       joins,
       order,
-      desc: state.sortDesc,
       limit: state.limit,
       filters,
       run,
@@ -299,39 +319,45 @@ const actions = {
     commit('setChartToggle');
   },
 
-  sortBy({ commit }, key) {
-    commit('setSortColumn', key);
+  sortBy({ commit }, name) {
+    commit('setSortColumn', name);
+    this.dispatch('explores/getSQL', {
+      run: true,
+    });
   },
 };
 
 const mutations = {
 
+  setRemoveSort() {
+    state.sortColumn = null;
+  },
+
   setChartType(context, chartType) {
     state.chartType = chartType;
   },
 
-  setSortColumn(context, key) {
-    if (state.sortColumn === key) {
+  setSortColumn(context, name) {
+    if (state.sortColumn === name) {
       state.sortDesc = !state.sortDesc;
     }
-    state.sortColumn = key;
-    this.dispatch('explores/getSQL', {
-      run: true,
-    });
+    state.sortColumn = name;
   },
 
   setDistincts(_, { data, field }) {
     Vue.set(state.distincts, field, data);
   },
 
-  setJoinDimensions(_, { join, dimensions }) {
-    const thisJoin = join;
-    thisJoin.dimensions = dimensions;
+  setJoinDimensions(_, { dimensions, join }) {
+    join.dimensions = dimensions;
   },
 
-  setJoinMeasures(_, { join, measures }) {
-    const thisJoin = join;
-    thisJoin.measures = measures;
+  setJoinDimensionGroups(_, { dimensionGroups, join }) {
+    join.dimension_groups = dimensionGroups;
+  },
+
+  setJoinMeasures(_, { measures, join }) {
+    join.measures = measures;
   },
 
   toggleJoinOpen(_, join) {
@@ -372,6 +398,7 @@ const mutations = {
     state.results = results.results;
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
+    state.names = results.names;
     state.resultMeasures = results.measures;
   },
 

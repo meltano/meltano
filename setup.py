@@ -8,6 +8,7 @@ requires = [
     'aiohttp',
     'backoff',
     'click',
+    'Cerberus',
     'dbt',
     'gitpython',
     'markdown',
@@ -19,12 +20,11 @@ requires = [
     'snowflake-connector-python',
     'snowflake-sqlalchemy',
     'sqlalchemy',
-]
-
-api_requires = [
     'flask',
     'flask-cors',
     'flask-sqlalchemy',
+    # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
+    'idna==2.7',
 ]
 
 dev_requires = [
@@ -33,11 +33,12 @@ dev_requires = [
     'asynctest',
     'black',
     'bumpversion',
+    'changelog-cli'
 ]
 
 setup(
     name="meltano",
-    version="0.1.3",
+    version="0.2.2",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",
@@ -57,12 +58,7 @@ setup(
     # run `make requirements.txt` after editing
     install_requires=requires,
     extras_require={
-        'api': api_requires,
-        'dev': dev_requires,
-        'all': [
-            *api_requires,
-            *dev_requires,
-        ],
+        'dev': dev_requires
     },
     entry_points={
         'console_scripts': [

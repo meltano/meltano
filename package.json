@@ -1,0 +1,27 @@
+{
+  "name": "meltano.com",
+  "version": "0.0.1-alpha",
+  "description": "The source code for the Meltano.com site",
+  "main": "index.js",
+  "scripts": {
+    "dev:docs": "vuepress dev docs",
+    "build:docs": "vuepress build docs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/meltano/meltano.git"
+  },
+  "keywords": [
+    "meltano"
+  ],
+  "author": "Ben Hong <bhong@gitlab.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/meltano/meltano/issues"
+  },
+  "homepage": "https://gitlab.com/meltano/meltano#readme",
+  "devDependencies": {
+    "vuepress": "^0.14.5"
+  }
+}

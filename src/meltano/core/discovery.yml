@@ -1,6 +1,6 @@
 extractors:
-  - name: tap-first
-    pip_url: "git+https://gitlab.com/meltano/tap-first.git"
+  - name: tap-gitlab
+    pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
       api_key: "$GITLAB_API_TOKEN"
   - name: tap-zendesk
@@ -45,6 +45,19 @@ extractors:
       user: $MONGODB_USERNAME
       password: $MONGODB_PASSWORD
       dbname: $MONGODB_DBNAME
+  - name: tap-stripe
+    pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
+    config:
+      client_secret: $STRIPE_API_KEY
+      start_date: $STRIPE_START_DATE
+      account_id:
+  - name: tap-fastly
+    pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
+    config:
+      api_token: $FASTLY_API_TOKEN
+      start_date: $FASTLY_START_DATE
+  - name: tap-carbon-intensity
+    pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"

@@ -29,6 +29,10 @@
                     <span class="is-pulled-right">{{connection.dialect}}</span>
                   </p>
                   <p>
+                    <strong>Port</strong>
+                    <span class="is-pulled-right">{{connection.port}}</span>
+                  </p>
+                  <p>
                     <strong>Username</strong>
                     <span class="is-pulled-right">{{connection.username}}</span>
                   </p>
@@ -41,6 +45,12 @@
                   </p>
                 </div>
               </div>
+              <footer class="card-footer">
+                <a href="#" class="card-footer-item is-danger"
+                    @click.prevent="deleteConnection(connection)">
+                  Delete Connection
+                </a>
+              </footer>
             </div>
           </div>
         </div>
@@ -153,6 +163,9 @@ export default {
   },
 
   methods: {
+    deleteConnection(connection) {
+      this.$store.dispatch('settings/deleteConnection', connection);
+    },
     submitConnectionForm() {
       this.$store.dispatch('settings/saveNewConnection', {
         name: this.connectionName,

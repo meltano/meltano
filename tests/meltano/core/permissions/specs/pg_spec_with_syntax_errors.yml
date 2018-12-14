@@ -1,0 +1,30 @@
+role1:
+    wrong_attribute: no
+    is_superuser: 'wrong type'
+    privileges:
+        wrong_privilege_object: 111
+        schemas:
+            wrong_privilege_type: 222
+            write:
+            read:
+                - some_schema
+                - some_other_schema
+    owns:
+        wrong_owns_object: 8723
+        schemas:
+          - a_schema
+role2:
+    is_superuser: no
+    privileges:
+        schemas:
+            write:
+            read:
+                - some_schema
+
+role3:
+    is_superuser: no
+    privileges:
+        schemas:
+            wrong_privilege_type: 333
+            read:
+                - some_schema

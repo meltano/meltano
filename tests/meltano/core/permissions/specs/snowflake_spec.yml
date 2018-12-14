@@ -1,0 +1,319 @@
+version: "1.0"
+
+# Databases
+databases:
+    - analytics:
+        shared: no
+
+    - raw:
+        shared: no
+
+    - testing_db:
+        shared: no
+
+    - snowflake:
+        shared: yes
+
+
+# Roles
+roles:
+    ## Admin Roles
+    - accountadmin:
+        warehouses:
+            - loading
+        member_of:
+            - sysadmin
+
+    - securityadmin:
+        warehouses:
+            - loading
+        member_of:
+            - sysadmin
+
+    - sysadmin:
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - raw
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                    - analytics.*
+                write:
+                    - raw.*
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                    - analytics.*.*
+                write:
+                    - raw.*.*
+                    - analytics.*.*
+
+    ## Regular Roles
+    - engineer:
+        member_of:
+            - sysadmin
+        warehouses:
+            - loading
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - raw
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                    - analytics.*
+                write:
+                    - raw.*
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                    - analytics.*.*
+                write:
+                    - raw.*.*
+                    - analytics.*.*
+
+    - loader:
+        warehouses:
+            - loading
+        owns:
+            schemas:
+                - raw.*
+                - testing_db.*
+            tables:
+                - raw.*.*
+                - testing_db.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - testing_db
+                write:
+                    - raw
+                    - testing_db
+            schemas:
+                read:
+                    - raw.*
+                    - testing_db.*
+                write:
+                    - raw.*
+                    - testing_db.*
+            tables:
+                read:
+                    - raw.*.*
+                    - testing_db.*.*
+                write:
+                    - raw.*.*
+                    - testing_db.*.*
+
+    - reporter:
+        warehouses:
+            - reporting
+        privileges:
+            databases:
+                read:
+                    - analytics
+                    - snowflake
+            schemas:
+                read:
+                    - analytics.*
+                    - snowflake.account_usage
+
+            tables:
+                read:
+                    - analytics.*.*
+                    - snowflake.account_usage.*
+
+    - transformer:
+        warehouses:
+            - transforming
+        owns:
+            schemas:
+                - analytics.*
+            tables:
+                - analytics.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                write:
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                write:
+                    - analytics.*.*
+
+    # User Roles
+    - eburke:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.eburke_scratch
+
+    - eeastwood:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.eeastwood_scratch
+
+    - gitlab-ci:
+        warehouses:
+            - reporting
+
+    - looker:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.looker_scratch
+
+    - iroussos:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.iroussos_scratch
+
+    - jurbanc:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.jurbanc_scratch
+        
+    - target_snowflake:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - testing_db.target_snowflake
+
+    - tlapiana:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tlapiana_scratch
+
+    - tmurphy:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tmurphy_scratch
+
+    - tszuromi:
+        warehouses:
+            - reporting
+        owns:
+            schemas:
+                - analytics.tszuromi_scratch
+
+# Users
+users:
+    - eburke:
+        can_login: yes
+        member_of:
+            - sysadmin
+            - transformer
+            - eburke
+           
+    - eeastwood:
+        can_login: yes
+        member_of:
+            - transformer
+            - eeastwood
+
+    - gitlab-ci:
+        can_login: yes
+        member_of:
+            - loader
+            - reporter
+            - sysadmin
+            - transformer
+            - gitlab-ci
+
+    - looker:
+        can_login: yes
+        member_of:
+            - reporter
+            - looker
+
+    - iroussos:
+        can_login: yes
+        member_of:
+            - engineer
+            - loader
+            - transformer
+            - sysadmin
+            - iroussos
+    
+    - jurbanc:
+        can_login: yes
+        member_of:
+            - securityadmin
+            - sysadmin
+            - jurbanc
+
+    - target_snowflake:
+        can_login: yes
+        member_of:
+            - loader
+            - target_snowflake
+
+    - tlapiana:
+        can_login: yes
+        member_of:
+            - engineer
+            - loader
+            - transformer
+            - sysadmin
+            - tlapiana
+
+    - tmurphy:
+        can_login: yes
+        member_of:
+            - accountadmin
+            - engineer
+            - sysadmin
+            - transformer
+            - tmurphy
+
+    - tszuromi:
+        can_login: yes
+        member_of:
+            - reporter
+            - tszuromi
+
+
+# Warehouses
+warehouses:
+    - loading:
+        size: x-small
+
+    - reporting:
+        size: x-small
+
+    - transforming:
+        size: x-small

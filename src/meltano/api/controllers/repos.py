@@ -2,16 +2,18 @@ import base64
 import json
 import os
 import subprocess
+import sys
+from pathlib import Path
 from os.path import join
+from ..app import db
 
 import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
+from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
-
-from ..app import db, meltano_model_path
-from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
+meltano_model_path = join(os.getcwd(), "model")
 
 path_to_parser = join(
     pkg_resources.resource_filename("meltano.api", "node_modules"),
@@ -25,7 +27,6 @@ parser_command = [
 
 @reposBP.route("/", methods=["GET"])
 def index():
-    # rorepo is a Repo instance pointing to the git-python repository.
     # For all you know, the first argument to Repo is a path to the repository
     # you want to work with
     onlyfiles = [
@@ -34,24 +35,32 @@ def index():
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
     sortedLkml = {"documents": [], "views": [], "models": [], "dashboards": []}
+    onlydocs = Path(meltano_model_path).parent.glob("*.md")
+    for d in onlydocs:
+        file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
+        file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
+            "utf-8"
+        )
+        sortedLkml["documents"].append(file_dict)
+
     for f in onlyfiles:
         filename, ext = os.path.splitext(f)
+        if ext != ".lkml":
+            continue
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
         )
         filename = filename.lower()
-        if ext == ".md":
-            sortedLkml["documents"].append(file_dict)
-        else:
-            filename, ext = os.path.splitext(filename)
-            file_dict["visual"] = filename
-            if ext == ".view":
-                sortedLkml["views"].append(file_dict)
-            if ext == ".model":
-                sortedLkml["models"].append(file_dict)
-            if ext == ".dashboard":
-                sortedLkml["dashboards"].append(file_dict)
+
+        filename, ext = os.path.splitext(filename)
+        file_dict["visual"] = filename
+        if ext == ".view":
+            sortedLkml["views"].append(file_dict)
+        if ext == ".model":
+            sortedLkml["models"].append(file_dict)
+        if ext == ".dashboard":
+            sortedLkml["dashboards"].append(file_dict)
 
     return jsonify(sortedLkml)
 
@@ -81,6 +90,7 @@ def file(unique):
 def lint():
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
+    print(p.stdout.decode("utf-8"), flush=True)
     if "errors" in j:
         return jsonify({"result": False, "errors": j["errors"]})
     else:
@@ -91,14 +101,6 @@ def lint():
 def db_import():
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
-
-    # db.session.query(Explore).delete()
-    # db.session.query(Model).delete()
-    # db.session.query(View).delete()
-    # db.session.query(Dimension).delete()
-    # db.session.query(DimensionGroup).delete()
-    # db.session.query(Measure).delete()
-    # db.session.query(Join).delete()
 
     models = j["models"]
     files = j["files"]
@@ -204,8 +206,10 @@ def db_import():
         new_model = Model(model["_model"], model_settings)
 
         # Set the explores for the model
-        if len(model["explores"]):
-            for explore in model["explores"]:
+        has_explores = len(model.get("explores") or model.get("explore"))
+        explores = model.get("explores", [model.get("explore")])
+        if has_explores:
+            for explore in explores:
                 explore_settings = {}
                 if "label" in explore:
                     explore_settings["label"] = explore["label"]
@@ -217,11 +221,12 @@ def db_import():
                     explore_settings["always_filter"] = explore["always_filter"]
                 explore_settings["_type"] = explore["_type"]
 
-                new_explore = Explore(explore["_explore"], explore_settings)
+                explore_name = explore.get("_explore", explore.get("label"))
+                new_explore = Explore(explore_name, explore_settings)
 
                 # Set the view for the explore
                 # Name the explore from `from` or from name of explore itself
-                view_name = explore.get("from", explore["_explore"])
+                view_name = explore.get("from", explore_name)
                 connected_view = View.query.filter_by(name=view_name).first()
                 new_explore.view = connected_view
                 if "joins" in explore:
@@ -236,6 +241,8 @@ def db_import():
                             explore_join_settings["type"] = join["type"]
                         if "relationship" in join:
                             explore_join_settings["relationship"] = join["relationship"]
+                        if "fields" in join:
+                            explore_join_settings["fields"] = join["fields"]
                         if "sql_on" in join:
                             explore_join_settings["sql_on"] = join["sql_on"]
                         if "type" in join:

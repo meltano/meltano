@@ -14,7 +14,7 @@ class TestPluginInstallService:
             f.write(
                 """
                     extractors:
-                    - {name: tap-first, pip_url: 'git+https://gitlab.com/meltano/tap-first.git'}
+                    - {name: tap-gitlab, pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'}
                     loaders:
                     - {name: target-csv, pip_url: 'git+https://gitlab.com/meltano/target-csv.git'}
             """

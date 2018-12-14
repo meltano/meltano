@@ -3,7 +3,7 @@ import logging
 import os
 from logging.handlers import RotatingFileHandler
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -14,13 +14,11 @@ from meltano.core.db import DB
 
 app = Flask(__name__)
 
-# unused afaik
-meltano_model_path = config.meltano_model_path
-meltano_transform_path = config.meltano_transform_path
-
 app.config.from_object(config)
 
-if os.environ["FLASK_ENV"] == "development":
+flask_env = os.getenv("FLASK_ENV", "development")
+
+if flask_env == "development":
     CORS(app)
 
 # TODO: we need to setup proper dependency injection for
@@ -55,9 +53,23 @@ def internal_error(exception):
     return jsonify({"error": 1}), 500
 
 
+@app.route("/model")
 @app.route("/")
-def hello():
-    return jsonify({"hello": 1})
+def analyze():
+    from jinja2.exceptions import TemplateNotFound
+
+    try:
+        return render_template("analyze.html")
+    except TemplateNotFound:
+        return "Please run yarn build-templates from src/analyze"
+
+
+@app.route("/drop")
+def drop_it():
+    from .controllers.sqlhelper import SqlHelper
+
+    SqlHelper().reset_db()
+    return jsonify({"dropped_it": "like it's hot"})
 
 
 from .controllers.projects import projectsBP

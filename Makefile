@@ -31,7 +31,7 @@ DCRN=${DCR} --no-deps
 MELTANO_ANALYZE = src/analyze
 MELTANO_API = src/meltano/api
 
-.PHONY: build test init_db clean docker_images
+.PHONY: build test init_db clean docker_images release
 
 build: ui api
 
@@ -184,3 +184,11 @@ show_lint:
 explain_makefile:
 	docker stop explain_makefile || echo 'booting server'
 	${DOCKER_RUN} --name explain_makefile -p 8081:8081 node ./Makefile_explain.sh
+
+# Release
+# =====================
+release:
+	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; } && \
+	changelog release --yes && \
+	git add CHANGELOG.md && \
+	bumpversion --tag --allow-dirty --new-version `changelog current` minor

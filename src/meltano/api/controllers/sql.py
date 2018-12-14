@@ -9,7 +9,7 @@ sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 
 import sqlalchemy
 
-from .utils import SqlHelper
+from .sqlhelper import SqlHelper
 from ..models.data import Model, Explore
 from ..models.settings import Settings
 
@@ -54,13 +54,13 @@ def get_sql(model_name, explore_name):
     explore = Explore.query.filter(Explore.name == explore_name).first()
     incoming_json = request.get_json()
     to_run = incoming_json["run"]
+    incoming_order = incoming_json["order"]
     sql_dict = sqlHelper.get_sql(explore, incoming_json)
     outgoing_sql = sql_dict["sql"]
-    incoming_order = incoming_json["order"]
-    incoming_order_desc = incoming_json["desc"]
     measures = sql_dict["measures"]
     dimensions = sql_dict["dimensions"]
     column_headers = sql_dict["column_headers"]
+    names = sql_dict["names"]
 
     if to_run:
         db_to_connect = model.settings["connection"]
@@ -79,13 +79,12 @@ def get_sql(model_name, explore_name):
         try:
             results = engine.execute(outgoing_sql)
         except sqlalchemy.exc.DBAPIError as e:
-            print(e)
             return (
                 jsonify(
                     {
                         "error": True,
                         "code": e.code,
-                        "orig": e.orig.diag.message_primary,
+                        "orig": str(e),
                         "statement": e.statement,
                     }
                 ),
@@ -99,6 +98,7 @@ def get_sql(model_name, explore_name):
         else:
             base_dict["empty"] = False
             base_dict["column_headers"] = column_headers
+            base_dict["names"] = names
             base_dict["keys"] = list(results[0].keys())
             base_dict["measures"] = sqlHelper.get_names(measures)
 

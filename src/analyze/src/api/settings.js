@@ -5,7 +5,9 @@ export default {
   index() {
     return axios.get(utils.buildUrl('settings'));
   },
-
+  deleteConnection(connection) {
+    return axios.post(utils.buildUrl('settings', 'delete'), connection);
+  },
   save(data) {
     return axios.post(utils.buildUrl('settings', 'new'), data);
   },

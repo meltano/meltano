@@ -1,0 +1,101 @@
+# Databases
+databases:
+    - raw:
+        shared: no
+
+# Roles
+roles:
+    - loader:
+        warehouse:
+            - loading
+        owns:
+            schemas:
+                - raw.*
+            tables:
+                - raw.*.*
+        privileges:
+            database:
+                read:
+                    - raw
+                write:
+                    - raw
+            schemas:
+                read:
+                    - raw.*
+                write:
+                    - raw.*
+            tables:
+                read:
+                    - raw.*.*
+                write:
+                    - raw.*.*
+
+    - reporter:
+        warehouse:
+            - reporting
+        privileges:
+            databases:
+                read:
+                    - analytics
+            schemas:
+                read:
+                    - analytics.*
+            tables:
+                read:
+                    - analytics.*.*
+
+    - transformer:
+        warehouse:
+            - transforming
+        owns:
+            schemas:
+                - analytics.*
+            tables:
+                - analytics.*.*
+        privileges:
+            databases:
+                read:
+                    - raw
+                    - analytics
+                write:
+                    - analytics
+            schemas:
+                read:
+                    - raw.*
+                write:
+                    - analytics.*
+            tables:
+                read:
+                    - raw.*.*
+                write:
+                    - analytics.*.*
+
+# Users
+users:
+    - eburke:
+        can_login: yes
+        member_of:
+            - sysadmin
+            - transformer
+        owns:
+            schemas:
+                - eburke_scratch
+
+    - eeastwood:
+        can_login: yes
+        member_of:
+            - transformer
+        owns:
+            schemas:
+                - eeastwood_scratch
+
+
+# Warehouses
+warehouses:
+    - admin:
+        size:
+            - x-small
+
+    - loading:
+        size:
+            - x-small

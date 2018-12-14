@@ -1,5 +1,5 @@
 {
-  "name": "melt",
+  "name": "meltano-analysis",
   "version": "1.0.0",
   "description": "meltano visualization with lookml files",
   "author": "Jacob Schatz",
@@ -12,6 +12,7 @@
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit test/e2e/specs",
     "build": "node build/build.js",
+    "build-templates": "npm run build && cp ./dist/index.html ../meltano/api/templates/analyze.html && cp -R ./dist/static/* ../meltano/api/static/",
     "clean": "rm -rf node_modules dist"
   },
   "dependencies": {

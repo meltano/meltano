@@ -1,4 +1,4 @@
-/docs/build
+public
 
 */__pycache__
 *.log
@@ -110,6 +110,12 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
+src/meltano/api/templates/analyze.html
+src/meltano/api/static/css/app.*
+src/meltano/api/static/js/app.*
+src/meltano/api/static/js/manifest.*
+src/meltano/api/static/js/vendor.*
+
 # Environments
 .env
 .venv
@@ -118,6 +124,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.env.dev
 
 # Spyder project settings
 .spyderproject
@@ -136,3 +143,4 @@ api/tmp/output.json
 static/tmp
 src/meltano/api/static
 src/meltano/api/templates
+src/meltano_ui/dist/

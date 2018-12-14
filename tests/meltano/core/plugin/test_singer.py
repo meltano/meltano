@@ -8,356 +8,52 @@ from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer import CatalogSelectAllVisitor
 
 
-CATALOG = """
+LEGACY_CATALOG = """
 {
   "streams": [
     {
-      "tap_stream_id": "Account",
-      "stream": "Account",
+      "tap_stream_id": "Entity",
+      "stream": "entities",
       "key_properties": [
-        "Id"
+        "id"
       ],
       "schema": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "AccountCode__c": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
             "type": [
               "string",
               "null"
             ]
           },
-          "AccountNumber": {
+          "name": {
             "type": [
               "string",
               "null"
             ]
           },
-          "AdditionalEmailAddresses": {
+          "created_at": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "format": "date-time"
           },
-          "AllowInvoiceEdit": {
+          "active": {
             "type": [
               "boolean",
               "null"
             ]
           },
-          "AutoPay": {
-            "type": [
-              "boolean",
-              "null"
-            ]
-          },
-          "Balance": {
+          "balance": {
             "type": [
               "number",
               "null"
             ]
-          },
-          "Batch": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "BcdSettingOption": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "BillCycleDay": {
-            "type": [
-              "integer",
-              "null"
-            ]
-          },
-          "CommunicationProfileId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "ConversionRate__c": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "CreatedById": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "CreatedDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "CreditBalance": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "CrmId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Currency": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "CustomerServiceRepName": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Entity__c": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Id": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "InvoiceDeliveryPrefsEmail": {
-            "type": [
-              "boolean",
-              "null"
-            ]
-          },
-          "InvoiceDeliveryPrefsPrint": {
-            "type": [
-              "boolean",
-              "null"
-            ]
-          },
-          "InvoiceTemplateId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "LastInvoiceDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "Mrr": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "Name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Notes": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Parent__c": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "ParentId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "PaymentGateway": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "PaymentTerm": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "PurchaseOrderNumber": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "SalesRepName": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "SFDC_Sync__c": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Status": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Support_Hold__c__c": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxCompanyCode": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptCertificateID": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptCertificateType": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptDescription": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptEffectiveDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "TaxExemptEntityUseCode": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptExpirationDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "TaxExemptIssuingJurisdiction": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TaxExemptStatus": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "TotalDebitMemoBalance": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "TotalInvoiceBalance": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "UnappliedBalance": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "UnappliedCreditMemoAmount": {
-            "type": [
-              "number",
-              "null"
-            ]
-          },
-          "UpdatedById": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "UpdatedDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "VATId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "BillToContactId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "DefaultPaymentMethodId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "ParentAccountId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "SoldToContactId": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Deleted": {
-            "type": "boolean"
           }
         }
       },
@@ -365,7 +61,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "AccountCode__c"
+            "id"
           ],
           "metadata": {
               "inclusion": "available"
@@ -374,7 +70,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "AccountNumber"
+            "code"
           ],
           "metadata": {
             "inclusion": "available"
@@ -383,7 +79,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "AdditionalEmailAddresses"
+            "name"
           ],
           "metadata": {
             "inclusion": "available"
@@ -392,7 +88,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "AllowInvoiceEdit"
+            "created_at"
           ],
           "metadata": {
             "inclusion": "available"
@@ -401,7 +97,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "AutoPay"
+            "active"
           ],
           "metadata": {
             "inclusion": "available"
@@ -410,564 +106,79 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "Balance"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Batch"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "BcdSettingOption"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "BillCycleDay"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CommunicationProfileId"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "ConversionRate__c"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CreatedById"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CreatedDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CreditBalance"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CrmId"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Currency"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "CustomerServiceRepName"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Entity__c"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Id"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "InvoiceDeliveryPrefsEmail"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "InvoiceDeliveryPrefsPrint"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "InvoiceTemplateId"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "LastInvoiceDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Mrr"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Name"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Notes"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Parent__c"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "ParentId"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "PaymentGateway"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "PaymentTerm"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "PurchaseOrderNumber"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "SalesRepName"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "SFDC_Sync__c"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Status"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Support_Hold__c__c"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxCompanyCode"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptCertificateID"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptCertificateType"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptDescription"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptEffectiveDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptEntityUseCode"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptExpirationDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptIssuingJurisdiction"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TaxExemptStatus"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TotalDebitMemoBalance"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "TotalInvoiceBalance"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UnappliedBalance"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UnappliedCreditMemoAmount"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UpdatedById"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UpdatedDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "VATId"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "BillToContactId"
-          ],
-          "metadata": {
-            "tap-zuora.joined_object": "BillToContact",
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "DefaultPaymentMethodId"
-          ],
-          "metadata": {
-            "tap-zuora.joined_object": "DefaultPaymentMethod",
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "ParentAccountId"
-          ],
-          "metadata": {
-            "tap-zuora.joined_object": "ParentAccount",
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "SoldToContactId"
-          ],
-          "metadata": {
-            "tap-zuora.joined_object": "SoldToContact",
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Deleted"
+            "balance"
           ],
           "metadata": {
             "inclusion": "available"
           }
         }
       ],
-      "replication_key": "UpdatedDate",
+      "replication_key": "created_at",
       "replication_method": "INCREMENTAL"
-    },
+    }
+  ]
+}
+"""
+
+CATALOG = """
+{
+  "streams": [
     {
-      "tap_stream_id": "AccountingCode",
-      "stream": "AccountingCode",
-      "key_properties": [
-        "Id"
-      ],
+      "tap_stream_id": "Entity",
+      "stream": "entities",
       "schema": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
-          "Category": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
             "type": [
               "string",
               "null"
             ]
           },
-          "CreatedById": {
+          "name": {
             "type": [
               "string",
               "null"
             ]
           },
-          "CreatedDate": {
+          "created_at": {
             "type": [
               "string",
               "null"
             ],
             "format": "date-time"
           },
-          "GLAccountName": {
+          "active": {
             "type": [
-              "string",
+              "boolean",
               "null"
             ]
           },
-          "GLAccountNumber": {
+          "balance": {
             "type": [
-              "string",
+              "number",
               "null"
             ]
-          },
-          "Id": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Notes": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Status": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "Type": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "UpdatedById": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "UpdatedDate": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "Deleted": {
-            "type": "boolean"
           }
         }
       },
       "metadata": [
         {
+          "breadcrumb": [],
+          "metadata": {
+            "table-key-properties": ["id"],
+            "valid-replication-keys": ["created_at"],
+            "forced-replication-method": "INCREMENTAL"
+          }
+        },
+        {
           "breadcrumb": [
             "properties",
-            "Category"
+            "id"
           ],
           "metadata": {
             "inclusion": "available"
@@ -976,7 +187,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "CreatedById"
+            "code"
           ],
           "metadata": {
             "inclusion": "available"
@@ -985,7 +196,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "CreatedDate"
+            "name"
           ],
           "metadata": {
             "inclusion": "available"
@@ -994,7 +205,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "GLAccountName"
+            "created_at"
           ],
           "metadata": {
             "inclusion": "available"
@@ -1003,7 +214,7 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "GLAccountNumber"
+            "active"
           ],
           "metadata": {
             "inclusion": "available"
@@ -1012,78 +223,13 @@ CATALOG = """
         {
           "breadcrumb": [
             "properties",
-            "Id"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Name"
-          ],
-          "metadata": {
-            "inclusion": "automatic"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Notes"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Status"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Type"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UpdatedById"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "UpdatedDate"
-          ],
-          "metadata": {
-            "inclusion": "available"
-          }
-        },
-        {
-          "breadcrumb": [
-            "properties",
-            "Deleted"
+            "balance"
           ],
           "metadata": {
             "inclusion": "available"
           }
         }
-      ],
-      "replication_key": "UpdatedDate",
-      "replication_method": "INCREMENTAL"
+      ]
     }
   ]
 }
@@ -1093,7 +239,7 @@ CATALOG = """
 class TestSingerTap:
     @pytest.fixture
     def subject(self, project_add_service):
-        return project_add_service.add(PluginType.EXTRACTORS, "tap-first")
+        return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
 
     def config_files(self, subject, dir: Path):
         return {key: dir.join(file) for key, file in subject.config_files.items()}
@@ -1174,10 +320,10 @@ class TestSingerTap:
             ].exists(), "Catalog should not be present."
 
 
-class TestCatalogSelectVisitor:
+class TestLegacyCatalogSelectVisitor:
     @pytest.fixture
     def catalog(self):
-        return json.loads(CATALOG)
+        return json.loads(LEGACY_CATALOG)
 
     @classmethod
     def stream_is_selected(cls, stream):
@@ -1192,9 +338,8 @@ class TestCatalogSelectVisitor:
         if inclusion == "available":
             return metadata.get("selected", False)
 
-    def test_visit(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog)
-
+    @classmethod
+    def assert_catalog_is_selected(cls, catalog):
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
 
         metadatas = {
@@ -1205,14 +350,50 @@ class TestCatalogSelectVisitor:
 
         # all streams are selected
         for name, stream in streams.items():
-            assert self.stream_is_selected(stream), f"{name} is not selected."
+            assert cls.stream_is_selected(stream), f"{name} is not selected."
 
-        # all fields are selecte
+        # all fields are selected
         for stream, metadata in metadatas.items():
             field_metadata = metadata["metadata"]
-            assert self.metadata_is_selected(
+            assert cls.metadata_is_selected(
                 field_metadata
             ), f"{stream}.{metadata['breadcrumb']} is not selected"
+
+    def test_visit(self, catalog):
+        CatalogSelectAllVisitor.visit(catalog)
+
+        self.assert_catalog_is_selected(catalog)
+
+
+class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
+    @pytest.fixture
+    def catalog(self):
+        return json.loads(CATALOG)
+
+    @classmethod
+    def stream_is_selected(cls, stream):
+        try:
+            return stream["metadata"][0]["metadata"]["selected"]
+        except (KeyError, IndexError):
+            return False
+
+    def test_visit(self, catalog):
+        CatalogSelectAllVisitor.visit(catalog)
+
+        self.assert_catalog_is_selected(catalog)
+
+        streams = {stream["stream"]: stream for stream in catalog["streams"]}
+
+        stream_metadata = len(
+            [
+                metadata
+                for stream in streams.values()
+                for metadata in stream["metadata"]
+                if len(metadata["breadcrumb"]) == 0
+            ]
+        )
+
+        assert stream_metadata == 1, "Extraneous stream metadata"
 
 
 class TestSingerTarget:

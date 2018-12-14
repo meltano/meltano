@@ -16,7 +16,7 @@
       <div class="navbar-start">
         <router-link to="/model"
             class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" href="#">
+          <a class="navbar-link" href="/model">
             Model
           </a>
           <div class="navbar-dropdown
