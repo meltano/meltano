@@ -25,15 +25,12 @@
                 <ul>
                   <li class="level">
                     <div class="tags has-addons">
-                      <span class="tag is-info">{{err._file_type}}</span>
-                      <span class="tag">{{err._file_name}}</span>
+                      <span class="tag is-info">?</span>
+                      <span class="tag">{{err.file_name}}</span>
                     </div>
                   </li>
                   <li class="error-desc-cont">
-                    <div class="tag">{{err.error.name}}</div>
-                    <code class="error-desc">{{err.error.message}}</code>
-                    <code class="error-desc">Start: {{err.error.location.start}}</code>
-                    <code class="error-desc">End: {{err.error.location.end}}</code>
+                    <code class="error-desc">{{err.message}}</code>
                   </li>
                 </ul>
               </div>
