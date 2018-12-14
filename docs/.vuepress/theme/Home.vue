@@ -19,12 +19,22 @@
       >
         <NavLink
           class="action-button"
-          :item="actionLink"
+          :item="actionLinkItem"
         />
       </p>
     </div>
 
     <Content custom/>
+ 
+    <p
+        class="action"
+        v-if="data.learnMoreText && data.learnMoreLink"
+      >
+        <NavLink
+          class="action-button"
+          :item="learnMoreLinkItem"
+        />
+    </p>
 
     <div
       class="features"
@@ -60,10 +70,17 @@ export default {
       return this.$page.frontmatter
     },
 
-    actionLink () {
+    actionLinkItem () {
       return {
         link: this.data.actionLink,
         text: this.data.actionText
+      }
+    },
+
+    learnMoreLinkItem () {
+      return {
+        link: this.data.learnMoreLink,
+        text: this.data.learnMoreText
       }
     }
   }
@@ -92,18 +109,6 @@ export default {
       font-size 1.6rem
       line-height 1.3
       color lighten($textColor, 40%)
-    .action-button
-      display inline-block
-      font-size 1.2rem
-      color #fff
-      background-color $accentColor
-      padding 0.8rem 1.6rem
-      border-radius 4px
-      transition background-color .1s ease
-      box-sizing border-box
-      border-bottom 1px solid darken($accentColor, 10%)
-      &:hover
-        background-color lighten($accentColor, 10%)
   .features
     border-top 1px solid $borderColor
     padding 1.2rem 0
@@ -130,6 +135,19 @@ export default {
     border-top 1px solid $borderColor
     text-align center
     color lighten($textColor, 25%)
+
+.action-button
+  display inline-block
+  font-size 1.2rem
+  color #fff
+  background-color $accentColor
+  padding 0.8rem 1.6rem
+  border-radius 4px
+  transition background-color .1s ease
+  box-sizing border-box
+  border-bottom 1px solid darken($accentColor, 10%)
+  &:hover
+    background-color lighten($accentColor, 10%)
 
 @media (max-width: $MQMobile)
   .home
