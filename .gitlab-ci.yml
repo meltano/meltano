@@ -52,9 +52,10 @@ pages:
   script:
     - yarn
     - yarn build:docs
+    - mv docs/public public
   artifacts:
     paths:
-      - docs/public
+      - public
   only:
     - master
 
