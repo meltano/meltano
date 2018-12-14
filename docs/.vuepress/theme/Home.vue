@@ -24,6 +24,8 @@
       </p>
     </div>
 
+    <Content custom/>
+
     <div
       class="features"
       v-if="data.features && data.features.length"
@@ -37,8 +39,6 @@
         <p>{{ feature.details }}</p>
       </div>
     </div>
-
-    <Content custom/>
 
     <div
       class="footer"
