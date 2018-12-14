@@ -54,7 +54,7 @@ pages:
     - yarn build:docs
   artifacts:
     paths:
-      - public
+      - docs/public
   only:
     - master
 
