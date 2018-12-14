@@ -90,7 +90,12 @@ def file(unique):
 def lint():
     from .ma_file_parser import MeltanoAnalysisFileParser
     ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
-    ma_parse.parse()
+    try:
+      ma_parse.parse()
+    except Exception as e:
+      return jsonify({"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]})
+
+
     p = subprocess.run(parser_command, stdout=subprocess.PIPE)
     j = json.loads(p.stdout.decode("utf-8"))
     if "errors" in j:
