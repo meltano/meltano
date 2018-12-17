@@ -15,7 +15,7 @@ Python >= 3.6.6
 
 #### With Docker
 
-You can run a local copy of Meltano using [docker-compose][https://docs.docker.com/compose/]. Run the following in your project directory:
+You can run a local copy of Meltano using [docker-compose](https://docs.docker.com/compose/). Run the following in your project directory:
 
 ```bash
 # build the project
