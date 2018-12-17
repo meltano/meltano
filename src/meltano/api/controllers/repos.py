@@ -206,7 +206,9 @@ def db_import():
         model_settings["_type"] = model["_type"]
 
         # Prevent model duplication
-        exists = model["label"] in map(lambda m: m.settings.get("label"), existing_models)
+        exists = model["label"] in map(
+            lambda m: m.settings.get("label"), existing_models
+        )
         if exists:
             continue
 
