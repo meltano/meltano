@@ -7,8 +7,9 @@ sidebar: auto
 ## Getting Started
 
 ### Requirements
-
-- Python Version >= 3.6.6
+::: warning Requirement
+Python >= 3.6.6
+:::
 
 ### Installation & Setup
 
@@ -29,7 +30,9 @@ docker-compose up
 
 #### Without Docker
 
-You will need to have postgres installed and available >= 10.5.
+::: warning Requirement
+PostgreSQL >= 10.5.
+:::
 
 Run the following in your project directory:
 
