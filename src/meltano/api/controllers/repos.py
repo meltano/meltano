@@ -206,16 +206,8 @@ def db_import():
         model_settings["_type"] = model["_type"]
 
         # Prevent model duplication
-        target_label = model["label"]
-        preexisting_model = next(
-            (
-                model_obj
-                for model_obj in existing_models
-                if model_obj.settings["label"] == target_label
-            ),
-            None,
-        )
-        if preexisting_model:
+        exists = model["label"] in map(lambda m: m.settings.get("label"), existing_models)
+        if exists:
             continue
 
         new_model = Model(model["_model"], model_settings)
