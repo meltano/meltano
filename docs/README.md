@@ -1,6 +1,6 @@
 # Meltano Documentation
 
-The live site can be found at: [https://meltano.gitlab.io/meltano](https://meltano.gitlab.io/meltano).
+The live site can be found at: [https://www.meltano.com](https://www.meltano.com).
 
 ## Requirements
 

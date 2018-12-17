@@ -14,7 +14,7 @@ Check out our [guide](https://meltano.com/guide/#getting-started) to getting sta
 
 ## Documentation
 
-You can find our documentation at [https://meltano.gitlab.io/meltano](https://meltano.gitlab.io/meltano). 
+You can find our documentation at [https://www.meltano.com](https://www.meltano.com). 
 
 For more information on the source code and running it locally, you can find them in the [docs directory on this project](https://gitlab.com/meltano/meltano/tree/master/docs).
 
