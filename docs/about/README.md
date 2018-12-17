@@ -99,7 +99,7 @@ We use dbt for testing too, instead of [Great Expectations](https://github.com/g
 
 At GitLab we're using Looker instead of Superset, for sure for the rest of 2018.
 If we switch we'll want to make sure that most of the functionality can be replicated in Superset, and the switch will be gradual.
-For now, try to keep as much functionality as possible in DBT instead of Looker.
+For now, try to keep as much functionality as possible in dbt instead of Looker.
 
 ## Metrics
 
@@ -148,6 +148,44 @@ We want the tools to be open source so we can ship this as a product.
 1. Warehouse: Any SQL based data warehouse. We recommend [PostgeSQL](https://www.postgresql.org/) and include it in the Meltano pipeline. Postgres cloud services like [Google Cloud SQL](https://cloud.google.com/sql/) are also supported, for increased scalability and durability.
 1. Orchestration/Monitoring: [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) for scheduling, running, and monitoring the ELT jobs. In the future, [DAG](https://gitlab.com/gitlab-org/gitlab-ce/issues/41947) support will be added. Non-GitLab alternatives are [Airflow](https://airflow.incubator.apache.org) or [Luigi](https://github.com/spotify/luigi). GitLab CI can handle 1000's of distributed runners to run for example Python scripts.
 1. Visualization/Dashboard: Meltano is compatible with nearly all visualization engines, due to the SQL based data store. For example commercial products like [Looker](https://looker.com/) or [Tableau](https://www.tableau.com/), as well as open-source products like [Superset](https://github.com/airbnb/superset) or [Metabase](https://metabase.com) can be used.
+
+## Meltano Data Flow
+
+Meltano uses Singer Taps and Targets to Extract the data from various data sources and load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. Subsequentially, the raw data is transformed to generate the dataset used for analysis and dashboard generation.
+
+Meltano can be used in any ELT architecture by using the right taps and targets for the job. The strategies supported can range from dumping the source data in a data lake to keeping all historical versions for each record to storing well formatted, clean data in the target data store.
+
+When considering which taps and targets Meltano will maintain, some assumptions are followed concerning how source data is stored in the target data store:
+*  All extracted data is stored in the same Target Database, e.g., we use a Database named `RAW` for storing all extracted data to Snowflake.
+
+*  For each tap's data source, a schema is created for storing all the data that is extracted through a tap. E.g., The `RAW.SALESFORCE` schema is used for data extracted from Salesforce, and the `RAW.ZENDESK` schema is used for data extracted from Zendesk.
+
+*  Every stream generated from a tap will result in a table with the same name. That table will be created in the schema from that tap based on the information sent in the `SCHEMA` message.
+
+*  Meltano supports schema updates for when a schema of an entity changes during an extraction. This is enacted when Meltano receives more than one `SCHEMA` message for a specific stream in the same extract load run.
+
+    When a SCHEMA message for a stream is received, our Targets check whether there is already a table for the entity defined by the stream.
+    * If the schema for the tap does not exist, it is created.
+    * If the table for the stream does not exist, it is created.
+    * If a table does exist, our Targets create a diff to check if new attributes must be added to the table or already defined attributes should have their data type updated. Based on that diff, the Targets make the appropriate schema changes.
+
+    Rules followed:
+    1. Only support type upgrades (e.g., STRING -> VARCHAR) for existing columns.
+    2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
+    3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
+
+*  Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same
+composite key (combination of key_properties) then the new record updates the existing one.
+
+    No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
+
+*  If a timestamp_column attribute is not defined in the SCHEMA sent to the target for a specific stream, it is added explicitly. Each RECORD has the timestamp of when the target receives it as a value. As an example, `target-snowflake` sets the name of that attribute to `__loaded_at` when an explicit name is not provided in the target's configuration file.
+
+    When a target is set to work on append-only mode (i.e. no primary keys defined for the streams), the timestamp_column's value can be used to get the most recent information for each record.
+
+*  For targets loading data to Relational Data Stores (e.g., Postgres, Snowflake, etc.), we unnest nested JSON data structures and follow a `[object_name]__[property_name]` approach similar to [what Stitch platform also does](https://www.stitchdata.com/docs/data-structure/nested-data-structures-row-count-impact).
+
+*  At the moment we do not deconstruct nested arrays. Arrays are stored as JSON or STRING data types (depending on the support provided by the target Data Store) with the relevant JSON representation stored as is. e.g. "['banana','apple']". It can then be extracted and used in the Transform Step.
 
 ## Differences between DAG and CI
 

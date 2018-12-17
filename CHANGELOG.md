@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 * documentation site will utilize a new static site generation tool called VuePress
 
+* meltano.com will be deployed from the meltano repo
+
 ### Fixes
 * model dropdown now updates when updating database (no longer requires page refresh)
 * prevent model duplication that previously occurred after subsequent "Update Database" clicks
