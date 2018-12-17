@@ -9,8 +9,7 @@ module.exports = {
 		['meta', { name: "msapplication-TileColor", content: "#da532c" }],
 		['meta', { name: "theme-color", content: "#ffffff" }]
 	],
-	base: '/meltano/',
-	dest: './public',
+	dest: './docs/public',
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
