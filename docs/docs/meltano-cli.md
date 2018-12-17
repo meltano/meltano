@@ -23,7 +23,7 @@ Use this command to add select patterns to a specific extractor in your Meltano 
 
 ### Select Pattern
 
-Meltano select patterns are inspired by the glob syntax you might find in your operation system.
+Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) syntax you might find in your operating system.
 
   - `*`: matches any sequence of characters
   - `?`: matches one character
@@ -32,26 +32,26 @@ Meltano select patterns are inspired by the glob syntax you might find in your o
 
 #### Examples
 
-> Note: depending on your shell, you might have to escape the special characters in the select pattern.
+> Note: Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.
 
 ```bash
 $ meltano select tap-carbon-intensity '*' 'name*'
 ```
 
-This will cause all streams to select any attributes starting with `name`.
+This will select all attributes starting with `name`.
 
 ```bash
 $ meltano select tap-carbon-intensity 'region'
 ```
 
-This will cause the `region` stream, along with all its attributes to be selected.
+This will select all attributes of the `region` entity.
 
 ### --exclude
 
-Using the exclude switch will cause Meltano to exclude any attributes that match the filter.
+Use `--exclude` to exclude all attributes that match the filter.
 
-> Note: the exclusion has precedence over the inclusion. If an attribute is excluded, there
-> is no way to include it back without removing the exclusion select pattern first.
+> Note: exclusion has precedence over inclusion. If an attribute is excluded, there
+> is no way to include it back without removing the exclusion pattern first.
 
 #### Examples
 
@@ -60,10 +60,10 @@ $ meltano select --exclude tap-carbon-intensity '*' 'longitude'
 $ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 ```
 
-This will cause meltano to exlude any `longitude` and `latitude` attribute from all stream.
+This will exclude all `longitude` and `latitude` attributes.
 
 ### --list
 
-Using the `--list` switch will cause meltano to list the current selected tap attributes.
+Use `--list` to list the current selected tap attributes.
 
-> Note: the `--all` can be used to show all the tap attributes, along with their selection status.
+> Note: `--all` can be used to show all the tap attributes with their selected status.
