@@ -195,7 +195,7 @@ def db_import():
                     new_view.measures.append(new_measure)
             db.session.add(new_view)
 
-    existingModels = Model.query.all()
+    existing_models = Model.query.all()
     # process models
     for model in models:
         model_settings = {}
@@ -206,16 +206,16 @@ def db_import():
         model_settings["_type"] = model["_type"]
 
         # Prevent model duplication
-        targetLabel = model["label"]
-        preexistingModel = next(
+        target_label = model["label"]
+        preexisting_model = next(
             (
-                modelObj
-                for modelObj in existingModels
-                if modelObj.settings["label"] == targetLabel
+                model_obj
+                for model_obj in existing_models
+                if model_obj.settings["label"] == target_label
             ),
             None,
         )
-        if preexistingModel != None:
+        if preexisting_model:
             continue
 
         new_model = Model(model["_model"], model_settings)
