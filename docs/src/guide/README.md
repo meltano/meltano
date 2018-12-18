@@ -64,6 +64,11 @@ For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/bl
 First, customize the `.env.example` with your database connection settings:
 
 ```bash
+cp .env.example .env
+```
+
+**.env**:
+```bash
 export PG_DATABASE=warehouse
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
