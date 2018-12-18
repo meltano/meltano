@@ -8,6 +8,12 @@ sidebar: auto
 
 ### Installation from source
 
+First, clone Meltano: 
+```bash
+git clone https://gitlab.com/meltano/meltano
+cd meltano
+```
+
 #### Using Docker
 
 ##### Requirements
