@@ -37,10 +37,15 @@ PostgreSQL >= 10.5.
 Run the following in your project directory:
 
 ```bash
+# create a virtual environment (`python3` vs `python` may be necessary)
 python -m venv ~/path/to/melt_venv
+# initialize the virtual environment
 source ~/path/to/melt_venv/bin/activate
+# install dependencies defined in requirements.txt
 pip install -r requirements.txt
+# install project in editable/develop mode
 pip install -e '.[all]'
+# initialize meltano
 python -m meltano.api
 ```
 
