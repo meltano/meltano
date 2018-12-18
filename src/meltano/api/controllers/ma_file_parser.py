@@ -87,9 +87,4 @@ class MeltanoAnalysisFileParser:
 
     def join(self):
         pass
-
-
-
-            
-
         

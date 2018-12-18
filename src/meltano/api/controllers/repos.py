@@ -94,9 +94,7 @@ def lint():
       ma_parse.parse()
       return jsonify({"result": True})
     except MeltanoAnalysisFileParserError as e:
-      print(e.file_name)
       return jsonify({"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]})
-
 
 @reposBP.route("/update", methods=["GET"])
 def db_import():
