@@ -57,8 +57,8 @@ const actions = {
     state.loadingValidation = true;
     repoApi
       .lint()
-      .then(data => {
-        commit("setValidatedState", data.data);
+      .then((data) => {
+        commit('setValidatedState', data.data);
         state.loadingValidation = false;
       })
       .catch(() => {
@@ -69,7 +69,7 @@ const actions = {
   update({ dispatch }) {
     state.loadingUpdate = true;
     repoApi.update()
-      .then((data) => {
+      .then(() => {
         dispatch('getModels');
         state.loadingUpdate = false;
       })
