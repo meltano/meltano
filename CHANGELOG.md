@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.3.0 - (2018-12-18)
+---
+
+### New
 * updated Settings view so each database connection can be independently disconnected
 
 ### Changes
@@ -18,8 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * model dropdown now updates when updating database (no longer requires page refresh)
-
-### Breaks
 
 
 ## 0.2.2 - (2018-12-11)
