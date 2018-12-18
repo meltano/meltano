@@ -88,22 +88,22 @@ Run the following in your project directory:
 source .env
 
 # then create a virtualenv to isolate Meltano from your system's python
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 
 # then install the package from source
-pip install -r requirements.txt
-pip install -e '.[all]'
+pip3 install -r requirements.txt
+pip3 install -e '.[all]'
 
 # or from PyPI
-pip install -r requirements.txt
-pip install 'meltano[all]'
+pip3 install -r requirements.txt
+pip3 install 'meltano[all]'
 
 # then seed the database
-python -m meltano.api.init_db
+python3 -m meltano.api.init_db
 
 # then start Meltano
-python -m meltano.api
+python3 -m meltano.api
 ```
 
 This will start:
