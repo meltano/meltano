@@ -6,18 +6,24 @@ sidebar: auto
 
 ## Getting Started
 
-### Requirements
+### Installation from source
 
-- Python Version >= 3.6.6
+#### Using Docker
 
-### Installation & Setup
+##### Requirements
 
-#### With Docker
+  - [Docker](https://www.docker.com/get-started)
+  - [Make](https://www.gnu.org/software/make/)
+  - [Python](https://www.python.org/) (version >= 3.6.6)
+  - [docker-compose](https://docs.docker.com/compose/) (now included in Docker)
 
-You can run a local copy of Meltano using [docker-compose][https://docs.docker.com/compose/]. Run the following in your project directory:
+You can then build the Meltano docker images.
+
+> Alternatively, Meltano provide built images on Docker Hub, you may find them at: https://hub.docker.com/r/meltano/meltano
+> To use the prebuilt images, run the following command: `export DOCKER_REGISTRY=docker.io`
 
 ```bash
-# build the project
+# build (or pull) the Meltano images
 make
 
 # initialize the db schema
@@ -27,33 +33,79 @@ make init_db
 docker-compose up
 ```
 
+This will start:
+
+- The front-end UI at http://localhost:8080
+- The API server http://localhost:5000
+- Meltano API database at `localhost:5501`
+- A mock warehouse database at `localhost:5502`
+
+For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/blob/master/docker-compose.yml)
+
 #### Without Docker
 
-You will need to have postgres installed and available >= 10.5.
+##### Requirements
+
+  - [Make](https://www.gnu.org/software/make/)
+  - [Python](https://www.python.org/) (version >= 3.6.6)
+  - [Docker](https://www.docker.com/get-started) (optional)
+  - [docker-compose](https://docs.docker.com/compose/) (optional)
+  - An available PostgreSQL instance
+
+> Alternatively, you may use the provided database containers if you don't have an available PostgresSQL instance.
+> Use `docker-compose up warehouse_db, api_db` to start them.
+
+First, customize the `.env.example` with your database connection settings:
+
+```bash
+export PG_DATABASE=warehouse
+export PG_PASSWORD=warehouse
+export PG_USERNAME=warehouse
+export PG_ADDRESS=localhost
+export PG_PORT=5502
+
+export MELTANO_ANALYZE_POSTGRES_URL=localhost
+export MELTANO_ANALYZE_POSTGRES_DB=meltano
+export MELTANO_ANALYZE_POSTGRES_USER=meltano
+export MELTANO_ANALYZE_POSTGRES_PASSWORD=meltano
+export MELTANO_ANALYZE_POSTGRES_PORT=5501
+```
 
 Run the following in your project directory:
 
+::: warning Note
+**If you want to install Meltano in a venv: virtualenv and pipenv are not supported. Please use `python -m venv` to create your virtual environment. See [this issue](https://gitlab.com/meltano/meltano/issues/141).**
+:::
+
 ```bash
-python -m venv ~/path/to/melt_venv
-source ~/path/to/melt_venv/bin/activate
+# first, load your customized environment
+source .env
+
+# then create a virtualenv to isolate Meltano from your system's python
+python -m venv .venv
+source .venv/bin/activate
+
+# then install the package from source
 pip install -r requirements.txt
 pip install -e '.[all]'
+
+# or from PyPI
+pip install -r requirements.txt
+pip install 'meltano[all]'
+
+# then seed the database
+python -m meltano.api.init_db
+
+# then start Meltano
 python -m meltano.api
 ```
 
 This will start:
 
-- The front-end UI at [http://localhost:8080]()
-- The API server [http://localhost:5000]() and an accompanying Postgres DB
-- A mock warehouse Postgres DB
-
-For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/blob/master/docker-compose.yml)
+- The front-end UI at http://localhost:8080
+- The API server [http://localhost:5000
 
 ### Your First Meltano Project
-
-::: warning Note
-**If you want to install Meltano in a venv: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment. See [this issue](https://gitlab.com/meltano/meltano/issues/141).**
-:::
 
 After installing `meltano` CLI, you can choose to run meltano against your project.
 
