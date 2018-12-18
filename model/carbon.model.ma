@@ -1,10 +1,11 @@
 {
+  name: carbon
   # Postgres DB
-  connection = runners_db
-  label = carbon
+  #connection = runners_db
+  label = carbon intensity
   explores {
     region {
-      from = region
+      #from = region
       label = region
       description = Region Carbon Intensity Data
 

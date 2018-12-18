@@ -4,7 +4,7 @@ include: "region.view.lkml"
 label: "carbon"
 
 explore: region {
-  from: region
+  #from: region
   label: region
   description: "Region Carbon Region Data"
 

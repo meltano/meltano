@@ -142,3 +142,5 @@ static/tmp
 src/meltano/api/static
 src/meltano/api/templates
 src/meltano_ui/dist/
+
+meltano.log.*
