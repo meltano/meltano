@@ -26,6 +26,7 @@ def new():
     db.session.commit()
     return jsonify(settings)
 
+
 @settingsBP.route("/delete", methods=["POST"])
 def delete():
     connectionToRemove = request.get_json()
@@ -41,6 +42,7 @@ def delete():
     db.session.commit()
 
     return jsonify(current_settings.settings)
+
 
 @settingsBP.route("/connections/<name>/test")
 def test(name):
