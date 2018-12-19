@@ -125,8 +125,14 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 > This is where you'd *connect* your datasets using Meltano
 - Navigate to Settings (upper-right)
 - Enter connection settings
-  - `runners_db`, `postgres`, `warehouse_db`, ...'
-- Add connection
+  - Name: `runners_db`
+  - Host: `warehouse_db`
+  - Port: `5502`
+  - Database: `warehouse`
+  - Schema: `gitlab`
+  - Username: `warehouse`
+  - Password: `warehouse`
+- Click "Save Connection"
 
 Then, we'll populate our data warehouse:
 > This is where you'd *populate* your data warehouse using Meltano
@@ -136,9 +142,11 @@ Then, we'll populate our data warehouse:
 
 Lastly, we'll query and explore the data:
 > This is where you'd *explore* your data using Meltano
-- Navigate to Model > Runners
-- Select toggles in UI to automatically generate SQL queries
-- Click "Run" and interact with graphs to explore the data
+- Navigate to Model > Region (Model dropdown)
+- Open Region accordion
+  - Toggle Dimensions and Measures to generate SQL query
+  - Click "Run" to query
+- Open Charts accordion and explore the data!
 
 ### Your First Meltano Project
 
