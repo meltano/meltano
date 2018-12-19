@@ -85,6 +85,7 @@ def file(unique):
             }
         )
 
+
 def lint_all(compile):
     from .ma_file_parser import (
         MeltanoAnalysisFileParser,
@@ -104,6 +105,7 @@ def lint_all(compile):
                 "errors": [{"message": e.message, "file_name": e.file_name}],
             }
         )
+
 
 @reposBP.route("/lint", methods=["GET"])
 def lint():

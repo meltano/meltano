@@ -88,7 +88,7 @@ class MeltanoAnalysisFileParser:
         for model in models:
             compiled_file_name = f"{model['name']}.model.mac"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
-            compiled_model = open(compiled_file_path,'w')
+            compiled_model = open(compiled_file_path, "w")
             compiled_model.write(json.dumps(model))
             compiled_model.close()
 
