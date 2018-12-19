@@ -30,6 +30,7 @@ DB.setup(
     username=app.config["MELTANO_POSTGRES_USER"],
     password=app.config["MELTANO_POSTGRES_PASSWORD"],
     database=app.config["MELTANO_POSTGRES_DB"],
+    port=app.config["MELTANO_POSTGRES_PORT"],
 )
 db = SQLAlchemy(app)
 
