@@ -13,8 +13,16 @@ module.exports = {
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
-			{ text: 'Guide', link: '/guide/' },
-			{ text: 'Documentation', link: '/docs/' }
+			{ 
+				text: 'Learn',
+				items: [
+					{ text: 'Tutorial', link: '/guide/' },
+					{ text: 'Fundamentals', link: '/guide/fundamentals' },
+					{ text: 'Best Practices', link :'/guide/best-practices' }
+				]
+			},
+			{ text: 'Documentation', link: '/docs/' },
+			{ text: 'About', link: '/about/' }
 		],
 		sidebar: {
 			'/docs': [
@@ -23,15 +31,11 @@ module.exports = {
 				'/docs/version-control',
 				'/docs/taps-targets',
 				'/docs/security-privacy',
-				'/docs/license'
+				'/docs/license',
+				'/docs/release',
+				'/docs/contributing'
 			]
 		},
-		nav: [
-			{ text: 'Home', link: '/' },
-			{ text: 'Guide', link: '/guide/' },
-			{ text: 'Documentation', link: '/docs/' },
-			{ text: 'About', link: '/about/' }
-		],
 		repo: 'https://gitlab.com/meltano/meltano',
 		repoLabel: 'Repo',
 		lastUpdated: 'Last Updated',
