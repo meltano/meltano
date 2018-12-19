@@ -8,7 +8,7 @@ sidebar: auto
 
 ### Installation from source
 
-First, clone Meltano: 
+First, clone Meltano:
 ```bash
 git clone https://gitlab.com/meltano/meltano
 cd meltano
@@ -46,7 +46,7 @@ This will start:
 - Meltano API database at `localhost:5501`
 - A mock warehouse database at `localhost:5502`
 
-For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/blob/master/docker-compose.yml)
+For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/blob/master/docker-compose.yml) or skip to [*Using the Meltano Sample Project*](#using-the-meltano-sample-project)
 
 #### Without Docker
 
@@ -114,7 +114,31 @@ python3 -m meltano.api
 This will start:
 
 - The front-end UI at http://localhost:8080
-- The API server [http://localhost:5000
+- The API server http://localhost:5000
+
+### Using the Meltano Sample Project
+
+First, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
+> Follow the [installation](#installation-from-source) steps if Meltano UI is not running
+
+Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
+> This is where you'd *connect* your datasets using Meltano
+- Navigate to Settings (upper-right)
+- Enter connection settings
+  - `runners_db`, `postgres`, `warehouse_db`, ...'
+- Add connection
+
+Then, we'll populate our data warehouse:
+> This is where you'd *populate* your data warehouse using Meltano
+- Navigate to Model section (upper-left)
+- Click "Validate"
+- Click "Update Database"
+
+Lastly, we'll query and explore the data:
+> This is where you'd *explore* your data using Meltano
+- Navigate to Model > Runners
+- Select toggles in UI to automatically generate SQL queries
+- Click "Run" and interact with graphs to explore the data
 
 ### Your First Meltano Project
 
