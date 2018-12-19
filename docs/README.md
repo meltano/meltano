@@ -1,32 +1,33 @@
----
-home: true
-heroImage: /meltano-logo.svg
-actionText: Quick Start →
-actionLink: /guide/
-learnMoreText: Learn More →
-learnMoreLink: /about/ 
-features:
-  - title: Simplicity
-    details: Make it easy for everyone  to make informed decisions about their business.
-  - title: Savings
-    details: Reduce time and cost for businesses that need to invest in data analytics.
-  - title: Structure
-    details: Allow data scientists and analysts to build a robust, well-tested, and well-documented infrastructure that follows DevOps and data engineering best practices.
-footer: Meltano is a GitLab startup | MIT Licensed | Copyright © 2018-Present
----
+# Meltano Documentation
 
-## What is Meltano?
+The live site can be found at: [https://www.meltano.com](https://www.meltano.com).
 
-Meltano is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it.
+## Requirements
 
-Meltano stands for the steps of the data lifecycle:
+- [NodeJS 8+](https://nodejs.org/)
 
-- Model
-- Extract
-- Load
-- Transform
-- Analyze
-- Notebook
-- Orchestrate
+## Instructions
 
-It leverages open source software and software development best practices including version control, CI, CD, and review apps for [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence and data science.
+1. Clone this repo `git@gitlab.com:meltano/meltano.git`
+1. Navigate to root directory in terminal
+1. Install all dependencies
+```bash
+npm install
+```
+4. Run a local instance of VuePress that dynamically uploads as you make changes to the files in the `/docs` directory
+```bash
+npm run dev:docs
+```
+
+## Build Artifacts
+
+To build the artifacts for the docs site, run the following commands:
+
+1. Install all dependencies
+```bash
+npm install
+```
+2. Run a local instance of VuePress that dynamically uploads as you make changes to the files in the `/docs` directory
+```bash
+npm run build:docs
+```
