@@ -225,6 +225,3 @@ class MeltanoAnalysisFileParser:
             for prop in measures[measure]:
                 this_measure[measure][prop] = measures[measure][prop]
         return this_measure
-
-    def join(self):
-        pass
