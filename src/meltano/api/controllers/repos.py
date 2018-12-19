@@ -194,6 +194,8 @@ def db_import():
                     db.session.add(new_measure)
                     new_view.measures.append(new_measure)
             db.session.add(new_view)
+
+    existing_models = Model.query.all()
     # process models
     for model in models:
         model_settings = {}
@@ -202,6 +204,13 @@ def db_import():
         model_settings["include"] = model["include"]
         model_settings["connection"] = model["connection"]
         model_settings["_type"] = model["_type"]
+
+        # Prevent model duplication
+        exists = model["label"] in map(
+            lambda m: m.settings.get("label"), existing_models
+        )
+        if exists:
+            continue
 
         new_model = Model(model["_model"], model_settings)
 
