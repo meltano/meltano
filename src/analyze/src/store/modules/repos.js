@@ -2,10 +2,10 @@ import repoApi from '../../api/repo';
 
 const state = {
   activeView: { is_markdown: false, file: '', populated: false },
-  validated: false,
   loadingValidation: false,
   loadingUpdate: false,
   models: [],
+  validated: false,
   navbarClicked: false,
   errors: [],
   files: {
@@ -29,12 +29,13 @@ const getters = {
   },
 
   hasError() {
-    return state.validated && state.errors.length;
+    return state.errors.length;
   },
 
   passedValidation() {
     return state.validated && !state.errors.length;
   },
+
 };
 
 const actions = {
@@ -66,11 +67,13 @@ const actions = {
       });
   },
 
-  update({ dispatch }) {
+  sync({ commit, dispatch }) {
     state.loadingUpdate = true;
-    repoApi.update()
-      .then(() => {
+    repoApi
+      .sync()
+      .then((data) => {
         dispatch('getModels');
+        commit('setValidatedState', data.data);
         state.loadingUpdate = false;
       })
       .catch(() => {
@@ -111,13 +114,14 @@ const mutations = {
   },
 
   setValidatedState(_, validated) {
-    state.validated = true;
     state.errors = [];
+    state.validated = true;
     // validation failed, so there will be errors
     if (!validated.result) {
       state.errors = validated.errors;
     }
   },
+
 };
 
 export default {

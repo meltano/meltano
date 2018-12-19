@@ -1,6 +1,7 @@
 from pyhocon import ConfigFactory
 from pathlib import Path
 from jinja2 import Template
+import json
 
 
 class MeltanoAnalysisFileParserMissingViewError(Exception):
@@ -82,6 +83,14 @@ class MeltanoAnalysisFileParser:
 
     def parse_ma_file(self, file_path):
         return ConfigFactory.parse_string(open(file_path, "r").read())
+
+    def compile(self, models):
+        for model in models:
+            compiled_file_name = f"{model['name']}.model.mac"
+            compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
+            compiled_model = open(compiled_file_path,'w')
+            compiled_model.write(json.dumps(model))
+            compiled_model.close()
 
     def parse(self):
         self.ma_views = Path(self.directory).glob("*.view.ma")

@@ -3,20 +3,29 @@
     <div class="columns">
         <aside class="fixed-sidebar column is-one-quarter menu has-background-white-bis">
           <div class="level">
-            <a
-              href="#"
-              class="button is-small"
-              :class="{'is-loading': loadingValidation}"
-              @click="lint">Validate</a>
-            <a
-              href="#"
-              class="button is-small"
-              :class="{'is-loading': loadingUpdate}"
-              :disabled="!validated"
-              @click="update">Update Database</a>
-            <span class="tag is-success" v-if="passedValidation">Passed!</span>
-            <span class="tag is-warning" v-if="!validated">Unvalidated</span>
-            <span class="tag is-danger" v-if="hasError">Errors</span>
+            <div class="level-left">
+              <div class="field has-addons">
+                <div class="control">
+                  <a
+                    href="#"
+                    class="button is-small"
+                    :class="{'is-loading': loadingValidation}"
+                    @click="lint">Lint</a>
+                </div>
+                <div class="control">
+                  <a
+                    href="#"
+                    class="button is-small"
+                    :class="{'is-loading': loadingUpdate}"
+                    @click="sync">Sync</a>
+                </div>
+              </div>
+            </div>
+            <div class="level-right">
+              <span class="tag is-success pull-right" v-if="passedValidation">Passed!</span>
+              <span class="tag is-warning" v-if="!validated">Unvalidated</span>
+              <span class="tag is-danger" v-if="hasError">Errors</span>
+            </div>
           </div>
           <template v-if="hasError">
             <nav class="panel">
@@ -109,8 +118,8 @@ export default {
     lint() {
       this.$store.dispatch('repos/lint');
     },
-    update() {
-      this.$store.dispatch('repos/update');
+    sync() {
+      this.$store.dispatch('repos/sync');
     },
   },
 };
