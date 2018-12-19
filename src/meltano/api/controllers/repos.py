@@ -111,6 +111,7 @@ def lint_all(compile):
 def lint():
     return lint_all(False)
 
+
 @reposBP.route("/sync", methods=["GET"])
 def sync():
     return lint_all(True)
