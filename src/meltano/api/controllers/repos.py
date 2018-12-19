@@ -88,13 +88,23 @@ def file(unique):
 
 @reposBP.route("/lint", methods=["GET"])
 def lint():
-    from .ma_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
+    from .ma_file_parser import (
+        MeltanoAnalysisFileParser,
+        MeltanoAnalysisFileParserError,
+    )
+
     ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
     try:
-      ma_parse.parse()
-      return jsonify({"result": True})
+        ma_parse.parse()
+        return jsonify({"result": True})
     except MeltanoAnalysisFileParserError as e:
-      return jsonify({"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]})
+        return jsonify(
+            {
+                "result": False,
+                "errors": [{"message": e.message, "file_name": e.file_name}],
+            }
+        )
+
 
 @reposBP.route("/update", methods=["GET"])
 def db_import():
