@@ -16,7 +16,8 @@ module.exports = {
 			{ 
 				text: 'Learn',
 				items: [
-					{ text: 'Tutorial', link: '/guide/' },
+					{ text: 'Getting Started', link: '/guide/' },
+					{ text: 'Tutorial', link: '/guide/tutorial' },
 					{ text: 'Fundamentals', link: '/guide/fundamentals' },
 					{ text: 'Best Practices', link :'/guide/best-practices' }
 				]
