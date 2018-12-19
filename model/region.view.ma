@@ -5,25 +5,26 @@
       primary_key = true
       hidden = true
       type = string
-      sql = {{table}}.id
+      sql = "{{table}}.id"
     }
 
     name {
       description = Carbon region long name
       type = string
-      sql = {{table}}.dnoregion
+      sql = "{{table}}.dnoregion"
     }
 
     short_name {
       description: Carbon region short name
       type: string
-      sql: {{table}}.shortname
+      sql: "{{table}}.shortname"
     }
-
-    measure: count {
+  }
+  measures {
+    count {
       description: Runner Count
       type: count
-      sql: {{table}}.id
+      sql: "{{table}}.id"
     }
   }
 }
