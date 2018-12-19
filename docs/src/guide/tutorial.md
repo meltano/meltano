@@ -116,9 +116,28 @@ This will start:
 - The front-end UI at http://localhost:8080
 - The API server http://localhost:5000
 
-### Using the Meltano Sample Project
+### Creating Your First Meltano Project
 
-First, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
+In your terminal, navigate to the directory where you want your demo project to live.
+
+```bash
+# create the meltano project
+meltano init meltano_project
+cd meltano_project
+
+# add the `tap-carbon-intensity` to your meltano project
+meltano add extractor tap-carbon-intensity
+
+# add the `target-postgres` to your meltano project
+meltano add loader target-postgres
+
+# run the extraction
+meltano elt carbon --extractor tap-carbon-intensity --loader target-postgres
+```
+
+Once this is done, the data should now be loaded in the warehouse.
+
+Next, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
 > Follow the [installation](#installation-from-source) steps if Meltano UI is not running
 
 Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
@@ -128,10 +147,10 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
   - Name = `runners_db`
   - Dialect = `PostgresSQL`
   - Host = `warehouse_db`
-  - Port = `5502`
+  - Port = `5432` or `5502` for non-Docker setups
   - Database = `warehouse`
   - Schema = `gitlab`
-  - Username = `warehouse`
+  - Username = `warehouse` or `localhost` for non-Docker setups
   - Password = `warehouse`
 - Click "Save Connection"
 
