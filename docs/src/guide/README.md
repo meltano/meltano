@@ -446,27 +446,41 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 
 ### Requirements
 
-Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
-
+::: warning Requirement
+Ensure you have the latest `master` branch locally before continuing.
 ```bash
-pip install '.[dev]'
+  # get latest master branch
+  $ git fetch origin
 ```
+:::
 
 ### Release process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
+1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install dev dependencies:
+    ```bash
+    pip install '.[dev]'
+    ```
+1. Execute the commands below:
+    ```bash
+    # create and checkout release-next branch that's based off master branch
+    $ git checkout -b release-next origin/master
 
-```bash
-$ git fetch origin
-$ git checkout -b release-next origin/master
-$ changelog view ;; make sure to validate the CHANGELOG changes
-$ make release
-$ git push --tags
-$ git push origin release-next
-```
+    # view changelog (verify changes made match changes logged)
+    $ changelog view
 
-Create a merge request from `release-next` targeting `master` and make sure to `delete the source branch when the changes are merged`.
-Make sure to link to the pipeline that does the actual deployment: go to the commit's pipelines tab and select the one that has the **publish** stage.
+    # after changelog validation, build the release
+    $ make release
+
+    # validate that the tag auto increments based on semver
+    $ git push --tags
+
+    # update meltano repo with release-next branch
+    $ git push origin release-next
+    ```
+1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
+1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
+1. When the **publish** pipeline succeeds, the release is publicly available.
 
 ## Contributing to Meltano
 
