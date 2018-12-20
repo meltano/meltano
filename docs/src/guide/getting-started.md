@@ -4,7 +4,7 @@ sidebar: auto
 
 # Getting Started
 
-Welcome to Meltano! Meltano is your solution for taking you from data source to dashboard. What does that mean? It means we have you covered from:
+Welcome to Meltano! Meltano is your solution for taking you from data source to dashboard. What does that mean? It means we have you covered through the entire data lifecycle:
 
 - Model
 - Extract
@@ -16,7 +16,7 @@ Welcome to Meltano! Meltano is your solution for taking you from data source to 
 
 ## Prerequisites
 
-Before you get started, there are a couple of things your environment has the following:
+Before you get started, there are a couple of things your environment needs:
 
 - [Git](https://git-scm.com/)
 - [Docker](https://www.docker.com/get-started)
@@ -24,7 +24,7 @@ Before you get started, there are a couple of things your environment has the fo
 
 ## Step 1: Install Meltano CLI
 
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the data lifecycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
+Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the data lifecycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data lifecycle.
 
 To start, open your terminal in the directory where you want Meltano to live. Run the following commands:
 
@@ -39,7 +39,7 @@ cd meltano
 pip install .
 ```
 
-That's it! Meltano should now be available on your local environment.
+That's it! Meltano should now be available in your local environment.
 
 ## Step 2: Initialize a New Sample Project
 
