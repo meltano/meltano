@@ -111,14 +111,12 @@ python3 -m meltano.api.init_db
 python3 -m meltano.api
 ```
 
-This will start:
+This starts the API server at [http://localhost:5000](http://localhost:5000)
 
-- The API server at http://localhost:5000
-
-Lastly, let's start the UI:
+Lastly, let's start the web server:
 
 ```bash
-# install UI dependencies
+# install web server dependencies
 cd src/analyze/
 yarn install
 
@@ -126,7 +124,7 @@ yarn install
 yarn run dev
 ```
 
-- The front-end UI at http://localhost:8080
+This starts the front-end UI at [http://localhost:8080](http://localhost:8080)
 
 ### Using the Meltano Sample Project
 
