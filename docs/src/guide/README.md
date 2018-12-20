@@ -54,6 +54,7 @@ For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/bl
 
   - [Make](https://www.gnu.org/software/make/)
   - [Python](https://www.python.org/) (version >= 3.6.6)
+  - [Yarn](https://yarnpkg.com/en/) or [npm](https://www.npmjs.com/)
   - [Docker](https://www.docker.com/get-started) (optional)
   - [docker-compose](https://docs.docker.com/compose/) (optional)
   - An available PostgreSQL instance
