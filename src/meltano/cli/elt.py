@@ -7,7 +7,7 @@ from .params import db_options
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.dbt_service import DbtService
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
 
 
@@ -27,7 +27,10 @@ from meltano.core.plugin import PluginType
     "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
 )
 def elt(job_id, extractor, loader, dry, transform):
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        raise click.ClickException(e)
 
     singer_runner = SingerRunner(
         project,
