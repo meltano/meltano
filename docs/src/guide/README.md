@@ -18,9 +18,9 @@ cd meltano
 
 ##### Requirements
 
-  - [Docker](https://www.docker.com/get-started)
   - [Make](https://www.gnu.org/software/make/)
   - [Python](https://www.python.org/) (version >= 3.6.6)
+  - [Docker](https://www.docker.com/get-started)
   - [docker-compose](https://docs.docker.com/compose/) (now included in Docker)
 
 You can then build the Meltano docker images.
@@ -54,9 +54,9 @@ For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/bl
 
   - [Make](https://www.gnu.org/software/make/)
   - [Python](https://www.python.org/) (version >= 3.6.6)
-  - [Yarn](https://yarnpkg.com/en/) or [npm](https://www.npmjs.com/)
   - [Docker](https://www.docker.com/get-started) (optional)
-  - [docker-compose](https://docs.docker.com/compose/) (optional)
+  - [docker-compose](https://docs.docker.com/compose/) (now included in Docker)
+  - [Yarn](https://yarnpkg.com/en/) or [npm](https://www.npmjs.com/)
   - An available PostgreSQL instance
 
 > Alternatively, you may use the provided database containers if you don't have an available PostgresSQL instance.
