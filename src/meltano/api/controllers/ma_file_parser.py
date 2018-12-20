@@ -3,6 +3,7 @@ from pathlib import Path
 from jinja2 import Template
 import json
 
+
 class MeltanoAnalysisFileParserError(Exception):
     def __init__(self, message, file_name, *args):
         self.message = message
@@ -10,6 +11,7 @@ class MeltanoAnalysisFileParserError(Exception):
         super(MeltanoAnalysisFileParserError, self).__init__(
             self.message, self.file_name, *args
         )
+
 
 class MeltanoAnalysisFileParserMissingViewError(MeltanoAnalysisFileParserError):
     def __init__(self, field, your_choice, cls, file_name, *args):

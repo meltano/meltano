@@ -8,7 +8,9 @@ class SettingsHelper:
     def __init__(self):
         self.meltano_model_path = join(os.getcwd(), "model")
 
-        self.settings_file_path = Path(self.meltano_model_path).joinpath("database.settings.ma")
+        self.settings_file_path = Path(self.meltano_model_path).joinpath(
+            "database.settings.ma"
+        )
         if not self.settings_file_path.is_file():
             setting_file = open(self.settings_file_path, "w")
             setting_file.write(json.dumps({"settings": {"connections": []}}))
