@@ -45,7 +45,7 @@ That's it! Meltano should now be available in your local environment.
 
 Now it's time for you to set up a sample project!
 
-::: tip 
+::: warning Prerequisite
 Before getting started on a Meltano project, make sure that Docker is up and running!
 :::
 
