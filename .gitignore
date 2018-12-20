@@ -90,8 +90,8 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Documentation
-./public
+# VuePress Docs Build
+docs/public
 
 # PyBuilder
 target/
