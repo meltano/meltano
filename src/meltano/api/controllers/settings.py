@@ -1,29 +1,19 @@
 from flask import Blueprint, jsonify, request
-
+from .settingshelper import SettingsHelper
 settingsBP = Blueprint("settings", __name__, url_prefix="/settings")
-
-from ..app import db
-
-from ..models.settings import Settings
 
 
 @settingsBP.route("/", methods=["GET"])
 def index():
-    settings = Settings.query.first()
-    if not settings:
-        settings = Settings()
-    return jsonify(settings.serializable())
+    settingsHelper = SettingsHelper()
+    return jsonify(settingsHelper.get_connections())
 
 
 @settingsBP.route("/new", methods=["POST"])
 def new():
+    settingsHelper = SettingsHelper()
     settings = request.get_json()
-    current_settings = Settings.query.first()
-    if not current_settings:
-        current_settings = Settings()
-    current_settings.settings = settings
-    db.session.add(current_settings)
-    db.session.commit()
+    settingsHelper.set_connections(settings)
     return jsonify(settings)
 
 

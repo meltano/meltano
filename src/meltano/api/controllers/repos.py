@@ -23,18 +23,18 @@ def index():
         for f in os.listdir(meltano_model_path)
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
-    sortedLkml = {"documents": [], "views": [], "models": [], "dashboards": []}
+    sortedMaFiles = {"documents": [], "views": [], "models": [], "dashboards": []}
     onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
         file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
         )
-        sortedLkml["documents"].append(file_dict)
+        sortedMaFiles["documents"].append(file_dict)
 
     for f in onlyfiles:
         filename, ext = os.path.splitext(f)
-        if ext != ".lkml":
+        if ext != ".ma":
             continue
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
@@ -45,13 +45,13 @@ def index():
         filename, ext = os.path.splitext(filename)
         file_dict["visual"] = filename
         if ext == ".view":
-            sortedLkml["views"].append(file_dict)
+            sortedMaFiles["views"].append(file_dict)
         if ext == ".model":
-            sortedLkml["models"].append(file_dict)
+            sortedMaFiles["models"].append(file_dict)
         if ext == ".dashboard":
-            sortedLkml["dashboards"].append(file_dict)
+            sortedMaFiles["dashboards"].append(file_dict)
 
-    return jsonify(sortedLkml)
+    return jsonify(sortedMaFiles)
 
 
 @reposBP.route("/file/<unique>", methods=["GET"])

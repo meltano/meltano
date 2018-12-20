@@ -23,7 +23,7 @@
                 is-boxed"
                 :class="{'has-been-clicked': navbarClicked}">
             <template v-for="(v,model) in models">
-            <div class="navbar-item navbar-title has-text-grey-light">
+            <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
             <router-link :to="urlForModelExplore(model, explore)"
