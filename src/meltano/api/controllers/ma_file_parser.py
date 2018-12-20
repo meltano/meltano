@@ -82,15 +82,26 @@ class MeltanoAnalysisFileParser:
         return properties_copy
 
     def parse_ma_file(self, file_path):
-        return ConfigFactory.parse_string(open(file_path, "r").read())
+        try:
+          return ConfigFactory.parse_string(open(file_path, "r").read())
+        except Exception as e:
+          raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
     def compile(self, models):
+        indices = {}
         for model in models:
             compiled_file_name = f"{model['name']}.model.mac"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
+            indices[model["name"]] = {"explores": [e["name"] for e in model["explores"]]}
             compiled_model.write(json.dumps(model))
             compiled_model.close()
+
+        # index file
+        index_file_path = Path(self.directory).joinpath("models.index.mac")
+        index_file = open(index_file_path, "w")
+        index_file.write(json.dumps(indices))
+        index_file.close()
 
     def parse(self):
         self.ma_views = Path(self.directory).glob("*.view.ma")
@@ -156,7 +167,7 @@ class MeltanoAnalysisFileParser:
                         this_explore[prop], "explore", prop, file_name
                     )
                     this_explore["related_view"] = self.view(
-                        self.parse_ma_file(matching_view), file_name
+                        self.parse_ma_file(matching_view), matching_view.parts[-1]
                     )
                 if prop == "joins":
                     this_explore[prop] = self.joins(explores[explore][prop], file_name)
@@ -168,6 +179,12 @@ class MeltanoAnalysisFileParser:
         for join in joins:
             this_join = {}
             this_join["name"] = join
+            matching_view = self.view_conf_by_name(
+                this_join["name"], "join", "name", file_name
+            )
+            this_join["related_view"] = self.view(
+                self.parse_ma_file(matching_view), matching_view.parts[-1]
+            )
             missing_properties = self.missing_properties(
                 self.required_join_properties, joins[join]
             )

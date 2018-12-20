@@ -88,6 +88,7 @@ export default {
   name: 'Repo',
   created() {
     this.getRepo();
+    this.sync();
   },
   computed: {
     ...mapGetters('repos', [

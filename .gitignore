@@ -144,3 +144,5 @@ src/meltano/api/templates
 src/meltano_ui/dist/
 
 meltano.log.*
+
+/model/*.mac

@@ -24,6 +24,8 @@ const getters = {
     return state.activeView.populated && state.activeView.is_markdown;
   },
 
+  urlForModelExplore: () => (model, explore) => `repos/explores/${model}/${explore}`,
+
   hasCode() {
     return state.activeView.populated && !state.activeView.is_markdown;
   },

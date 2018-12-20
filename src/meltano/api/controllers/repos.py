@@ -5,25 +5,13 @@ import subprocess
 import sys
 from pathlib import Path
 from os.path import join
-from ..app import db
 
 import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
-from ..models.data import Model, Explore, View, Dimension, DimensionGroup, Measure, Join
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
-
-path_to_parser = join(
-    pkg_resources.resource_filename("meltano.api", "node_modules"),
-    "lookml-parser/cli.js",
-)
-parser_command = [
-    path_to_parser,
-    "--input={}/*.{{view,model}}.lkml".format(meltano_model_path),
-]
-
 
 @reposBP.route("/", methods=["GET"])
 def index():
@@ -125,32 +113,8 @@ def db_test():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    models = Model.query.all()
-    models_json = []
-    for model in models:
-        this_model = {}
-        this_model["settings"] = model.settings
-        this_model["name"] = model.name
-        this_model["explores"] = []
-        for explore in model.explores:
-            this_explore = {}
-            this_explore["settings"] = explore.settings
-            this_explore["name"] = explore.name
-            this_explore["link"] = f"/explore/{model.name}/{explore.name}"
-            this_view = {}
-            this_view["name"] = explore.view.name
-            this_view["settings"] = explore.view.settings
-            this_explore["views"] = this_view
-            this_explore["joins"] = []
-            for join in explore.joins:
-                this_join = {}
-                this_join["name"] = join.name
-                this_join["settings"] = join.settings
-                this_explore["joins"].append(this_join)
-
-            this_model["explores"].append(this_explore)
-        models_json.append(this_model)
-    return jsonify(models_json)
+    models = Path(meltano_model_path).joinpath("models.index.mac")
+    return jsonify(json.loads(open(models, 'r').read()))
 
 
 @reposBP.route("/explores", methods=["GET"])
