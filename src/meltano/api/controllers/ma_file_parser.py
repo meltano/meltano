@@ -3,8 +3,15 @@ from pathlib import Path
 from jinja2 import Template
 import json
 
+class MeltanoAnalysisFileParserError(Exception):
+    def __init__(self, message, file_name, *args):
+        self.message = message
+        self.file_name = file_name
+        super(MeltanoAnalysisFileParserError, self).__init__(
+            self.message, self.file_name, *args
+        )
 
-class MeltanoAnalysisFileParserMissingViewError(Exception):
+class MeltanoAnalysisFileParserMissingViewError(MeltanoAnalysisFileParserError):
     def __init__(self, field, your_choice, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
@@ -14,7 +21,7 @@ class MeltanoAnalysisFileParserMissingViewError(Exception):
         )
 
 
-class MeltanoAnalysisFileParserUnacceptableChoiceError(Exception):
+class MeltanoAnalysisFileParserUnacceptableChoiceError(MeltanoAnalysisFileParserError):
     def __init__(self, field, your_choice, acceptable_choices, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
@@ -25,7 +32,7 @@ class MeltanoAnalysisFileParserUnacceptableChoiceError(Exception):
         )
 
 
-class MeltanoAnalysisFileParserMissingFieldsError(Exception):
+class MeltanoAnalysisFileParserMissingFieldsError(MeltanoAnalysisFileParserError):
     def __init__(self, fields, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
@@ -42,15 +49,6 @@ class MeltanoAnalysisFileParserMissingFieldsError(Exception):
 
     def __repr__(self):
         return f"{self.message} in {self.file_name}"
-
-
-class MeltanoAnalysisFileParserError(Exception):
-    def __init__(self, message, file_name, *args):
-        self.message = message
-        self.file_name = file_name
-        super(MeltanoAnalysisFileParserError, self).__init__(
-            self.message, self.file_name, *args
-        )
 
 
 class MeltanoAnalysisFileParser:
@@ -111,20 +109,13 @@ class MeltanoAnalysisFileParser:
         self.ma_dashboards = Path(self.directory).glob("*.dashboards.ma")
         for model in self.ma_models:
             file_name = model.parts[-1]
-            try:
-                conf = self.parse_ma_file(model)
-                parsed_model = self.model(conf, file_name)
-            except MeltanoAnalysisFileParserMissingFieldsError as e:
-                raise MeltanoAnalysisFileParserError(e.message, file_name)
-            except MeltanoAnalysisFileParserUnacceptableChoiceError as e:
-                raise MeltanoAnalysisFileParserError(e.message, file_name)
-            except MeltanoAnalysisFileParserMissingViewError as e:
-                raise MeltanoAnalysisFileParserError(e.message, file_name)
+            conf = self.parse_ma_file(model)
+            parsed_model = self.model(conf, file_name)
             self.models.append(parsed_model)
         return self.models
 
     def model(self, ma_file_model_dict, file_name):
-        this_model = {}
+        temp_model = {}
         missing_properties = self.missing_properties(
             self.required_model_properties, ma_file_model_dict
         )
@@ -132,11 +123,11 @@ class MeltanoAnalysisFileParser:
             raise MeltanoAnalysisFileParserMissingFieldsError(
                 missing_properties, "model", file_name
             )
-        for prop, prop_def in ma_file_model_dict.items():
-            this_model[prop] = prop_def
-            if prop == "explores":
-                this_model[prop] = self.explores(prop_def, file_name)
-        return this_model
+        for prop_name, prop_def in ma_file_model_dict.items():
+            temp_model[prop_name] = prop_def
+            if prop_name == "explores":
+                temp_model[prop_name] = self.explores(prop_def, file_name)
+        return temp_model
 
     def view_conf_by_name(self, view_name, cls, prop, file_name):
         try:
@@ -153,8 +144,8 @@ class MeltanoAnalysisFileParser:
     def explores(self, ma_file_explores_dict, file_name):
         model_explores = []
         for explore_name, explore_def in ma_file_explores_dict.items():
-            this_explore = {}
-            this_explore["name"] = explore_name
+            temp_explore = {}
+            temp_explore["name"] = explore_name
             missing_properties = self.missing_properties(
                 self.required_explore_properties, explore_def
             )
@@ -163,28 +154,28 @@ class MeltanoAnalysisFileParser:
                     missing_properties, "explore", file_name
                 )
             for prop_name, prop_def in explore_def.items():
-                this_explore[prop_name] = prop_def
+                temp_explore[prop_name] = prop_def
                 if prop_name == "from":
                     matching_view = self.view_conf_by_name(
-                        this_explore[prop_name], "explore", prop_name, file_name
+                        temp_explore[prop_name], "explore", prop_name, file_name
                     )
-                    this_explore["related_view"] = self.view(
+                    temp_explore["related_view"] = self.view(
                         self.parse_ma_file(matching_view), matching_view.parts[-1]
                     )
                 if prop_name == "joins":
-                    this_explore[prop_name] = self.joins(prop_def, file_name)
-            model_explores.append(this_explore)
+                    temp_explore[prop_name] = self.joins(prop_def, file_name)
+            model_explores.append(temp_explore)
         return model_explores
 
     def joins(self, ma_file_joins_dict, file_name):
         explore_joins = []
         for join_name, join_def in ma_file_joins_dict.items():
-            this_join = {}
-            this_join["name"] = join_name
+            temp_join = {}
+            temp_join["name"] = join_name
             matching_view = self.view_conf_by_name(
-                this_join["name"], "join", "name", file_name
+                temp_join["name"], "join", "name", file_name
             )
-            this_join["related_view"] = self.view(
+            temp_join["related_view"] = self.view(
                 self.parse_ma_file(matching_view), matching_view.parts[-1]
             )
             missing_properties = self.missing_properties(
@@ -195,7 +186,7 @@ class MeltanoAnalysisFileParser:
                     missing_properties, "join", file_name
                 )
             for prop_name, prop_def in join_def.items():
-                this_join[prop_name] = prop_def
+                temp_join[prop_name] = prop_def
                 if prop_name == "relationship":
                     uses_accepted_choices = self.uses_accepted_choice(
                         self.join_relationship_types, prop_def
@@ -209,11 +200,11 @@ class MeltanoAnalysisFileParser:
                             file_name,
                         )
 
-            explore_joins.append(this_join)
+            explore_joins.append(temp_join)
         return explore_joins
 
     def view(self, view_file, file_name):
-        this_view = {}
+        temp_view = {}
         missing_properties = self.missing_properties(
             self.required_view_properties, view_file
         )
@@ -222,25 +213,25 @@ class MeltanoAnalysisFileParser:
                 missing_properties, "view", file_name
             )
         for prop_name, prop_def in view_file.items():
-            this_view[prop_name] = prop_def
+            temp_view[prop_name] = prop_def
             if prop_name == "dimensions":
-                this_view[prop_name] = self.dimensions(prop_def)
+                temp_view[prop_name] = self.dimensions(prop_def)
             elif prop_name == "measures":
-                this_view[prop_name] = self.measures(prop_def)
-        return this_view
+                temp_view[prop_name] = self.measures(prop_def)
+        return temp_view
 
     def dimensions(self, ma_file_dimensions_dict):
-        this_dimensions = {}
+        temp_dimensions = {}
         for dimension_name, dimension_def in ma_file_dimensions_dict.items():
-            this_dimensions[dimension_name] = {}
+            temp_dimensions[dimension_name] = {}
             for prop_name, prop_def in dimension_def.items():
-                this_dimensions[dimension_name][prop_name] = prop_def
-        return this_dimensions
+                temp_dimensions[dimension_name][prop_name] = prop_def
+        return temp_dimensions
 
     def measures(self, ma_file_measures_dict):
-        this_measure = {}
+        temp_measure = {}
         for measure_name, measure_def in ma_file_measures_dict.items():
-            this_measure[measure_name] = {}
+            temp_measure[measure_name] = {}
             for prop_name, prop_def in measure_def.items():
-                this_measure[measure_name][prop_name] = prop_def
-        return this_measure
+                temp_measure[measure_name][prop_name] = prop_def
+        return temp_measure

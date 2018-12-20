@@ -43,16 +43,16 @@ const getters = {
 const actions = {
   getRepo({ commit }) {
     repoApi.index()
-      .then((data) => {
-        const files = data.data;
+      .then((response) => {
+        const files = response.data;
         commit('setRepoFiles', { files });
       });
   },
 
   getFile({ commit }, file) {
     repoApi.file(file.unique)
-      .then((data) => {
-        commit('setCurrentFileView', data.data);
+      .then((response) => {
+        commit('setCurrentFileView', response.data);
       });
   },
 
@@ -60,8 +60,8 @@ const actions = {
     state.loadingValidation = true;
     repoApi
       .lint()
-      .then((data) => {
-        commit('setValidatedState', data.data);
+      .then((response) => {
+        commit('setValidatedState', response.data);
         state.loadingValidation = false;
       })
       .catch(() => {
@@ -73,9 +73,9 @@ const actions = {
     state.loadingUpdate = true;
     repoApi
       .sync()
-      .then((data) => {
+      .then((response) => {
         dispatch('getModels');
-        commit('setValidatedState', data.data);
+        commit('setValidatedState', response.data);
         state.loadingUpdate = false;
       })
       .catch(() => {
@@ -85,8 +85,8 @@ const actions = {
 
   getModels({ commit }) {
     repoApi.models()
-      .then((data) => {
-        commit('setModels', data.data);
+      .then((response) => {
+        commit('setModels', response.data);
       });
   },
 

@@ -1,5 +1,6 @@
 {
-  name: carbon
+  version = 1
+  name = carbon
   # Postgres DB
   connection = runners_db
   label = carbon intensity
