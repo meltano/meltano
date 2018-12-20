@@ -10,6 +10,11 @@ import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
 
+from .ma_file_parser import (
+    MeltanoAnalysisFileParser,
+    MeltanoAnalysisFileParserError,
+)
+
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
 
@@ -76,25 +81,21 @@ def file(unique):
 
 
 def lint_all(compile):
-    from .ma_file_parser import (
-        MeltanoAnalysisFileParser,
-        MeltanoAnalysisFileParserError,
-    )
-
     ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
-    try:
-        models = ma_parse.parse()
-        if compile:
-            ma_parse.compile(models)
-        return jsonify({"result": True})
-    except MeltanoAnalysisFileParserError as e:
-        return jsonify(
-            {
-                "result": False,
-                "errors": [{"message": e.message, "file_name": e.file_name}],
-            }
-        )
+    models = ma_parse.parse()
+    if compile:
+        ma_parse.compile(models)
+    return jsonify({"result": True})
+        
 
+@reposBP.errorhandler(MeltanoAnalysisFileParserError)
+def handle_meltano_analysis_file_parser_error(e):
+    return jsonify(
+        {
+            "result": False,
+            "errors": [{"message": e.message, "file_name": e.file_name}],
+        }
+    )
 
 @reposBP.route("/lint", methods=["GET"])
 def lint():
