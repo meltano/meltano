@@ -64,6 +64,8 @@ publish:
   before_script:
     - pip install twine
   script:
+    - cd src/analyze && yarn && yarn build-templates
+    - cd src/meltano/api && yarn
     - python setup.py sdist
     - twine upload dist/*
   only:
