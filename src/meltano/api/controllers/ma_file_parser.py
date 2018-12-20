@@ -83,9 +83,9 @@ class MeltanoAnalysisFileParser:
 
     def parse_ma_file(self, file_path):
         try:
-          return ConfigFactory.parse_string(open(file_path, "r").read())
+            return ConfigFactory.parse_string(open(file_path, "r").read())
         except Exception as e:
-          raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
+            raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
     def compile(self, models):
         indices = {}
@@ -93,7 +93,9 @@ class MeltanoAnalysisFileParser:
             compiled_file_name = f"{model['name']}.model.mac"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
-            indices[model["name"]] = {"explores": [e["name"] for e in model["explores"]]}
+            indices[model["name"]] = {
+                "explores": [e["name"] for e in model["explores"]]
+            }
             compiled_model.write(json.dumps(model))
             compiled_model.close()
 

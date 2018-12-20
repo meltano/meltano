@@ -13,6 +13,7 @@ from flask import Blueprint, jsonify
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
 
+
 @reposBP.route("/", methods=["GET"])
 def index():
     # For all you know, the first argument to Repo is a path to the repository
@@ -114,7 +115,7 @@ def db_test():
 @reposBP.route("/models", methods=["GET"])
 def models():
     models = Path(meltano_model_path).joinpath("models.index.mac")
-    return jsonify(json.loads(open(models, 'r').read()))
+    return jsonify(json.loads(open(models, "r").read()))
 
 
 @reposBP.route("/explores", methods=["GET"])
