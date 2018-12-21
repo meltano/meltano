@@ -21,25 +21,29 @@ It is expected that the Meltano project will have many applications managed in t
 - _Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields._
 - _The sample Zuora python scripts have been written to support GitLab's Zuora implementation. This includes a workaround to handle some subscriptions that should have been created as a single subscription._
 
-### Meltano CLI
+## Meltano CLI
 
 Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
 
 Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
 
-#### Meltano Schema
+## Meltano Schema
 
 Helper functions to manage the data warehouse. At the moment, these are PGSQL specific.
 
-#### Create Schema and Roles
+### Create Schema and Roles
 
 Create and grant usage for a database schema.
 
-### Meltano Model
+## Meltano Model
 
-Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analyze.
+Meltano Models allow you to define your data model and generate SQL so that you can easily analyze and visualize it in Meltano Analyze.
 
-### Meltano Transform
+## Meltano Analyze
+
+Meltano Analyze is a dashboard that allows you to run SQL queries and produce data visualizations, charts, and graphs based on your data.
+
+## Meltano Transform
 
 ### dbt
 

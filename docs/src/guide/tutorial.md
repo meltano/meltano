@@ -205,7 +205,7 @@ orchestrate: **
 
 Your project should contains the following directory structure:
 
-- model - For your `.lookml` files.
+- model - For your `.ma` files.
 - transform - For your local dbt project files.
 - analyze - For your `.yml` dashboard files.
 - notebook - For your `.ipynb` notebook files.
@@ -240,8 +240,8 @@ Here is a sample of what your project might look like:
 │   ├── loaders
 │   │   └── target-...
 │   ├── model
-│   │   ├── base_ticket.lookml
-│   │   └── ticket.lookml
+│   │   ├── base_ticket.ma
+│   │   └── ticket.ma
 │   └── run
 │       ├── dbt
 │       ├── tap-...
@@ -249,8 +249,8 @@ Here is a sample of what your project might look like:
 ├── meltano.yml
 ├── model
 │   └── zendesk
-│       ├── zendesk.model.lookml
-│       └── zendesk.view.lookml
+│       ├── zendesk.model.ma
+│       └── zendesk.view.ma
 ├── orchestrate
 │   ├── dag_1.py
 │   ├── dag_2.py

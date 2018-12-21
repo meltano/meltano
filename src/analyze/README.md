@@ -1,6 +1,6 @@
-# melt
+# Meltano Analyze
 
-> meltano visualization with lookml files
+> Meltano visualization
 
 ## Build Setup
 
