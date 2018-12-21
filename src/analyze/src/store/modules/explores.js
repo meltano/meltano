@@ -64,7 +64,7 @@ const getters = {
   showJoinDimensionMeasureHeader: () => arr => !!(arr && arr.length),
 
   joinIsExpanded: () => join => join.expanded,
-  getLabelForJoin: () => join => ('view_label' in join.settings ? join.settings.view_label : join.name),
+  getLabelForJoin: () => join => ('view_label' in join ? join.view_label : join.name),
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -124,7 +124,6 @@ const getters = {
 
 const actions = {
   getExplore({ commit }, { model, explore }) {
-    console.log('get explore lady')
     state.currentModel = model;
     state.currentExplore = explore;
     exploreApi.index(model, explore)
