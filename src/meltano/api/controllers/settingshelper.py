@@ -34,9 +34,7 @@ class SettingsHelper:
             settings = json.load(f)
         connections = settings["settings"]["connections"]
         updated_connections = [
-            conn
-            for conn in connections
-            if conn["name"] != connection["name"]
+            conn for conn in connections if conn["name"] != connection["name"]
         ]
         settings["settings"]["connections"] = updated_connections
         with open(self.settings_file_path, "w") as f:
