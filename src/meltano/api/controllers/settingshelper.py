@@ -17,7 +17,8 @@ class SettingsHelper:
             setting_file.close()
 
     def get_connections(self):
-        settings_file = json.loads(open(self.settings_file_path, "r").read())
+        with open(self.settings_file_path) as f:
+            settings_file = json.load(f)
         return settings_file
 
     def set_connections(self, contents):
