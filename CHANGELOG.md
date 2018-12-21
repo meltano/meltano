@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 * removes database dependency from meltano and uses .ma files
+* update the error message when using Meltano from outside a project - [238](https://gitlab.com/meltano/meltano/merge_requests/238)
 
 ### Fixes
 
