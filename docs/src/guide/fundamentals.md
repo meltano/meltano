@@ -37,7 +37,7 @@ Create and grant usage for a database schema.
 
 ### Meltano Model
 
-Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analyze.
+Meltano Models allow you to model your data so you can easily analyze and visualize it in Meltano Analyze.
 
 ### Meltano Transform
 

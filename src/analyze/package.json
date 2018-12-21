@@ -1,7 +1,7 @@
 {
   "name": "meltano-analysis",
   "version": "1.0.0",
-  "description": "meltano visualization with lookml files",
+  "description": "meltano visualization",
   "author": "Jacob Schatz",
   "private": true,
   "scripts": {
