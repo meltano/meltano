@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 actionText: Quick Start →
-actionLink: /guide/
+actionLink: /guide/getting-started
 learnMoreText: Learn More →
 learnMoreLink: /about/
 features:
