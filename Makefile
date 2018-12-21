@@ -52,7 +52,7 @@ TO_CLEAN += ./${MELTANO_ANALYZE}/dist
 clean:
 	# rm is run inside a container to support cross-platform volume mount permissions.
 	# see: https://github.com/moby/moby/issues/2259
-	${PYTHON_RUN} bash -c 'rm -rf ${TO_CLEAN}'
+	rm -rf ${TO_CLEAN}
 
 clean_all: clean
 	docker rmi -f ${base_image_tag}
@@ -120,10 +120,12 @@ requirements.txt: setup.py
 build_templates:
 	cd src/analyze && yarn && yarn build
 
-sdist: build_templates
-	mkdir -p src/meltano/api/{templates,static} && \
+bundle: build_templates
+	mkdir -p src/meltano/api/templates && \
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
+
+sdist: bundle
 	python setup.py sdist
 
 docker_sdist: base_image
