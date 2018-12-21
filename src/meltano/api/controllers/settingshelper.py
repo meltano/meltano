@@ -12,15 +12,31 @@ class SettingsHelper:
             "database.settings.ma"
         )
         if not self.settings_file_path.is_file():
-            setting_file = open(self.settings_file_path, "w")
-            setting_file.write(json.dumps({"settings": {"connections": []}}))
-            setting_file.close()
+            with open(self.settings_file_path, "w") as f:
+                settings = {"settings": {"connections": []}}
+                json.dump(settings, f)
 
     def get_connections(self):
-        settings_file = json.loads(open(self.settings_file_path, "r").read())
-        return settings_file
+        with open(self.settings_file_path, "r") as f:
+            settings = json.load(f)
+        return settings
 
-    def set_connections(self, contents):
-        settings_file = open(self.settings_file_path, "w")
-        settings_file.write(json.dumps({"settings": contents}))
-        settings_file.close()
+    def save_connection(self, connection):
+        with open(self.settings_file_path, "r") as f:
+            settings = json.load(f)
+        settings["settings"]["connections"].append(connection)
+        with open(self.settings_file_path, "w") as f:
+            json.dump(settings, f)
+        return settings
+
+    def delete_connection(self, connection):
+        with open(self.settings_file_path, "r") as f:
+            settings = json.load(f)
+        connections = settings["settings"]["connections"]
+        updated_connections = [
+            conn for conn in connections if conn["name"] != connection["name"]
+        ]
+        settings["settings"]["connections"] = updated_connections
+        with open(self.settings_file_path, "w") as f:
+            json.dump(settings, f)
+        return settings
