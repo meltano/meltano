@@ -12,6 +12,7 @@
 !/setup.py
 !/setup.cfg
 !/MANIFEST.in
+!/Makefile
 !/src
 !/transform
 !/.pyre_configuration

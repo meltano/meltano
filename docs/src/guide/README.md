@@ -108,13 +108,12 @@ pip3 install 'meltano[all]'
 python3 -m meltano.api.init_db
 
 # then start Meltano
-python3 -m meltano.api
+meltano www
 ```
 
 This will start:
 
-- The front-end UI at http://localhost:8080
-- The API server http://localhost:5000
+- Meltano Analyze at http://localhost:5001
 
 ### Using the Meltano Sample Project
 

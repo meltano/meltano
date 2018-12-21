@@ -4,6 +4,9 @@ RUN pip install uwsgi gevent
 
 COPY ./ ./
 
-RUN pip install -e '.[all]'
+RUN make build_templates
+RUN pip install -e .
 
-CMD ["python", "-m", "meltano.api"]
+EXPOSE 5000
+
+CMD ["meltano", "www"]

@@ -14,8 +14,7 @@ RUN echo "Installing node and yarn" \
     && apt-get install -y nodejs yarn \
     && rm -rf /var/lib/apt/lists/*
 
-ENV melt_workdir /meltano
-WORKDIR ${melt_workdir}
+WORKDIR /meltano
 
 # application deps
 COPY requirements.txt ./
