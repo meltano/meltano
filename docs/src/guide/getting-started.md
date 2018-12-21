@@ -4,6 +4,8 @@ sidebar: auto
 
 # Getting Started
 
+## Introduction
+
 Welcome to Meltano! Meltano is your solution for taking you from data source to dashboard. What does that mean? It means we have you covered through the entire data lifecycle:
 
 - Model
@@ -13,6 +15,10 @@ Welcome to Meltano! Meltano is your solution for taking you from data source to 
 - Analyze
 - Notebook
 - Orchestrate
+
+::: warning Note
+For developers who want to contribute to Meltano, check out our [contributing guide](/docs/contributing.html).
+:::
 
 ## Prerequisites
 
@@ -29,15 +35,13 @@ Meltano provides a CLI to kickstart and help you manage the configuration and or
 To start, open your terminal in the directory where you want Meltano to live. Run the following commands:
 
 ```bash
-# Clone the repo
-git clone https://gitlab.com/meltano/meltano
-
-# Change directory to the fresh clone of Meltano
-cd meltano
-
-# Install Meltano locally
-pip install .
+# Install Meltano from PyPi
+pip install meltano
 ```
+
+::: warning Note
+If you're having issues with the `pip` command, try `pip3 install meltano` instead!
+:::
 
 That's it! Meltano should now be available in your local environment.
 
