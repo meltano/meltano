@@ -146,4 +146,4 @@ src/analyze/dist/
 meltano.log.*
 
 /model/*.mac
-/model/settings.ma
+/model/database.settings.ma
