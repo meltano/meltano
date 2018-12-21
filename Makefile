@@ -120,7 +120,7 @@ requirements.txt: setup.py
 build_templates:
 	cd src/analyze && yarn && yarn build
 
-sdist: clean build_templates
+sdist: build_templates
 	mkdir -p src/meltano/api/{templates,static} && \
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
