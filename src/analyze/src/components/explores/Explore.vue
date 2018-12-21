@@ -11,139 +11,9 @@
             <input class="input is-small" type="text" placeholder="search">
           </p>
         </div>
-        <div class="inner-scroll">
-          <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
-          <template v-if="hasJoins">
-            <template v-for="join in explore.joins">
-              <a
-                class="panel-block
-                panel-block-heading
-                has-background-white-ter
-                has-text-grey
-                is-expandable"
-                :class="{'is-collapsed': join.collapsed}"
-                :key="join.name"
-                @click="joinRowClicked(join)">
-                  {{getLabelForJoin(join) | capitalize}}
-              </a>
-              <template v-if="!join.collapsed">
-                <!-- eslint-disable-next-line vue/require-v-for-key -->
-                <a class="panel-block
-                  panel-block-heading
-                  has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.dimensions)">
-                  Dimensions
-                </a>
-                <template v-for="dimensionGroup in join.dimension_groups">
-                  <a class="panel-block dimension-group"
-                      :key="dimensionGroup.unique_name"
-                      v-if="!dimensionGroup.settings.hidden"
-                      @click="dimensionGroupSelected(dimensionGroup)"
-                      :class="{'is-active': dimensionGroup.selected}">
-                    {{dimensionGroup.label}}
-                  </a>
-                  <template v-if="dimensionGroup.selected">
-                    <template v-for="timeframe in dimensionGroup.timeframes">
-                      <a class="panel-block indented"
-                          :key="timeframe.name"
-                          @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
-                          :class="{'is-active': timeframe.selected}">
-                        {{timeframe.label}}
-                      </a>
-                    </template>
-                  </template>
-                </template>
-                <template v-for="dimension in join.dimensions">
-                  <a class="panel-block"
-                    v-if="!dimension.settings.hidden"
-                    :key="dimension.unique_name"
-                    :class="{'is-active': dimension.selected}"
-                    @click="joinDimensionSelected(join, dimension)">
-                  {{dimension.label}}
-                  </a>
-                </template>
-                <!-- eslint-disable-next-line vue/require-v-for-key -->
-                <a class="panel-block
-                  panel-block-heading
-                  has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.measures)">
-                  Measures
-                </a>
-                <template v-for="measure in join.measures">
-                  <a class="panel-block"
-                    v-if="!measure.settings.hidden"
-                    :key="measure.unique_name"
-                    :class="{'is-active': measure.selected}"
-                    @click="joinMeasureSelected(join, measure)">
-                  {{measure.label}}
-                  </a>
-                </template>
-              </template>
-            </template>
-          </template>
-          <template>
-          <a
-              class="panel-block
-              panel-block-heading
-              has-background-white-ter
-              has-text-grey
-              is-expandable"
-              :class="{'is-collapsed': explore.related_view.collapsed}"
-              @click="viewRowClicked">
-                <template>
-                  {{explore.label | capitalize}}
-                </template>
-              </a>
-          </template>
-          <template v-if="!explore.related_view.collapsed">
-            <a class="panel-block
-                panel-block-heading
-                has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
-              Dimensions
-            </a>
-            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
-              <a class="panel-block dimension-group"
-                  :key="dimensionGroup.unique_name"
-                  v-if="!dimensionGroup.settings.hidden"
-                  @click="dimensionGroupSelected(dimensionGroup)"
-                  :class="{'is-active': dimensionGroup.selected}">
-                {{dimensionGroup.label}}
-              </a>
-              <template v-for="timeframe in dimensionGroup.timeframes">
-                <a class="panel-block indented"
-                    :key="timeframe.name"
-                    @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
-                    v-if="dimensionGroup.selected"
-                    :class="{'is-active': timeframe.selected}">
-                  {{timeframe.label}}
-                </a>
-              </template>
-            </template>
-            <a class="panel-block"
-                v-for="dimension in explore.related_view.dimensions"
-                :key="dimension.unique_name"
-                v-if="!dimension.settings.hidden"
-                @click="dimensionSelected(dimension)"
-                :class="{'is-active': dimension.selected}">
-              {{dimension.label}}
-            </a>
-            <!-- eslint-disable-next-line vue/require-v-for-key -->
-            <a class="panel-block
-                    panel-block-heading
-                    has-background-white"
-                    v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
-              Measures
-            </a>
-            <a class="panel-block"
-                    v-for="measure in explore.related_view.measures"
-                    :key="measure.unique_name"
-                    @click="measureSelected(measure)"
-                    :class="{'is-active': measure.selected}">
-              {{measure.label}}
-            </a>
-          </template>
-        </div>
+
+        <pre>TODO joins partial</pre>
+
         <div class="panel-block">
           <button class="button is-link is-outlined is-fullwidth">
             reset all filters
@@ -158,48 +28,48 @@
               @click="runQuery">Run</a>
           </div>
         </div>
-        <template v-if="explore.settings.has_filters">
-        <div class="has-background-grey-darker
-        section-header
-        has-text-white-bis
-        is-expandable"
-        @click="toggleFilterOpen"
-        :class="{'is-collapsed': !filtersOpen}">Filters</div>
-        <div class="has-background-white-ter filter-item"
-              v-for="filter in explore.settings.always_filter.filters"
-              :key="filter.field"
-              v-if="filtersOpen">
-          <div class="columns">
-            <div class="column is-3">
-              <strong>{{filter.explore_label}}</strong>
-              <span>{{filter.label}}</span>
-              <span>({{filter.type}})</span>
-            </div>
-            <div class="column is-9">
-              <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
-              <div class="field" v-if="filter.type == 'string'">
-                <select-dropdown
-                  :placeholder="filter.field"
-                  :field="filter.sql"
-                  :dropdownList="getResultsFromDistinct(filter.sql)"
-                  :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
-                  @focused="inputFocused(filter.sql)"
-                  @selected="dropdownSelected"
-                  @modifierChanged="modifierChanged">
-                </select-dropdown>
+        <!-- <template v-if="explore.settings.has_filters">
+          <div class="has-background-grey-darker
+          section-header
+          has-text-white-bis
+          is-expandable"
+          @click="toggleFilterOpen"
+          :class="{'is-collapsed': !filtersOpen}">Filters</div>
+          <div class="has-background-white-ter filter-item"
+                v-for="filter in explore.settings.always_filter.filters"
+                :key="filter.field"
+                v-if="filtersOpen">
+            <div class="columns">
+              <div class="column is-3">
+                <strong>{{filter.explore_label}}</strong>
+                <span>{{filter.label}}</span>
+                <span>({{filter.type}})</span>
               </div>
-              <div class="tags selected-filters">
-                <template v-for="selected in getSelectionsFromDistinct(filter.sql)">
-                  <span class="tag is-link" :key="selected">
-                    {{selected}}
-                    <button class="delete is-small"></button>
-                  </span>
-                </template>
+              <div class="column is-9">
+                <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
+                <div class="field" v-if="filter.type == 'string'">
+                  <select-dropdown
+                    :placeholder="filter.field"
+                    :field="filter.sql"
+                    :dropdownList="getResultsFromDistinct(filter.sql)"
+                    :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
+                    @focused="inputFocused(filter.sql)"
+                    @selected="dropdownSelected"
+                    @modifierChanged="modifierChanged">
+                  </select-dropdown>
+                </div>
+                <div class="tags selected-filters">
+                  <template v-for="selected in getSelectionsFromDistinct(filter.sql)">
+                    <span class="tag is-link" :key="selected">
+                      {{selected}}
+                      <button class="delete is-small"></button>
+                    </span>
+                  </template>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        </template>
+        </template> -->
 
         <!-- charts tab -->
         <div class="has-background-grey-darker
