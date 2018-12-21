@@ -124,6 +124,7 @@ const getters = {
 
 const actions = {
   getExplore({ commit }, { model, explore }) {
+    console.log('get explore lady')
     state.currentModel = model;
     state.currentExplore = explore;
     exploreApi.index(model, explore)
