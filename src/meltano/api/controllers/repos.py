@@ -91,6 +91,11 @@ def handle_meltano_analysis_file_parser_error(e):
         {"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]}
     )
 
+@reposBP.errorhandler(FileNotFoundError)
+def handle_file_not_found(e):
+    return jsonify(
+        {"result": False, "error": str(e)}
+    )
 
 @reposBP.route("/lint", methods=["GET"])
 def lint():
@@ -131,28 +136,10 @@ def view_read(view_name):
 
 @reposBP.route("/explores/<model_name>/<explore_name>", methods=["GET"])
 def explore_read(model_name, explore_name):
-    explore = (
-        Explore.query.join(Model, Explore.model_id == Model.id)
-        .filter(Model.name == model_name)
-        .filter(Explore.name == explore_name)
-        .first()
-    )
-    explore_json = explore.serializable(True)
-    explore_json["settings"]["has_filters"] = False
-    if "always_filter" in explore_json["settings"]:
-        explore_json["settings"]["has_filters"] = True
-        for a_filter in explore_json["settings"]["always_filter"]["filters"]:
-            dimensions = explore_json["view"]["dimensions"]
-            for dimension in dimensions:
-                if dimension["name"] == a_filter["field"]:
-                    a_filter["explore_label"] = a_filter["_explore"].title()
-                    a_filter["type"] = dimension["settings"]["type"]
-                    if "label" in dimension["settings"]:
-                        a_filter["label"] = dimension["settings"]["label"]
-                    else:
-                        a_filter["label"] = " ".join(
-                            dimension["name"].split("_")
-                        ).title()
-                    a_filter["sql"] = dimension["settings"]["sql"]
-                    break
-    return jsonify(explore_json)
+    model = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
+    with model.open() as f:
+        model = json.load(f)
+    explores = model["explores"]
+    explore = next(e for e in explores if e["from"] == explore_name)
+    return jsonify(explore)
+

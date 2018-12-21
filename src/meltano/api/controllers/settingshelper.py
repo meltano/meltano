@@ -17,9 +17,9 @@ class SettingsHelper:
                 json.dump(settings, f)
 
     def get_connections(self):
-        with open(self.settings_file_path, "r") as f:
-            settings = json.load(f)
-        return settings
+        with open(self.settings_file_path) as f:
+            settings_file = json.load(f)
+        return settings_file
 
     def save_connection(self, connection):
         with open(self.settings_file_path, "r") as f:
