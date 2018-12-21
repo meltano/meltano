@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* add default models for 'tap-carbon-intensity'.
 * Meltano Analyze is now part of the package.
 * removes database dependency from Meltano Analyze and uses .ma files
 * update the error message when using Meltano from outside a project - [238](https://gitlab.com/meltano/meltano/merge_requests/238)
