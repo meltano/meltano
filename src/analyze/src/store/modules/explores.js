@@ -129,7 +129,7 @@ const actions = {
     exploreApi.index(model, explore)
       .then((data) => {
         commit('setExplore', data.data);
-        commit('selectedDimensions', data.data.view.dimensions);
+        commit('selectedDimensions', data.data.related_view.dimensions);
       });
   },
 
@@ -438,9 +438,10 @@ const mutations = {
   },
 
   selectedDimensions(_, dimensions) {
-    dimensions.forEach((dimension) => {
-      state.selectedDimensions[dimension.unique_name] = false;
-    });
+    console.log('TODO: resolve forEach issue - meant to iterate props, dimensions is not an array')
+    // dimensions.forEach((dimension) => {
+    //   state.selectedDimensions[dimension.unique_name] = false;
+    // });
   },
 
   setExplore(_, exploreData) {
