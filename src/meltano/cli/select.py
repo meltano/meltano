@@ -77,6 +77,8 @@ def show(extractor, entities_filter, attributes_filter, show_all=False):
             "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
         )
         raise e
+    else:
+        invoker.files["catalog"].unlink()
 
     # report
     click.secho("Enabled patterns:")
