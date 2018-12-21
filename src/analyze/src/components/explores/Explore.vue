@@ -326,6 +326,7 @@ export default {
     Chart,
   },
   beforeRouteUpdate(to, from, next) {
+    console.log('beforeRouteUpdate')
     this.$store.dispatch('explores/getExplore', {
       model: to.params.model,
       explore: to.params.explore,
