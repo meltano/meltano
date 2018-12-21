@@ -2,10 +2,10 @@ import repoApi from '../../api/repo';
 
 const state = {
   activeView: { is_markdown: false, file: '', populated: false },
-  validated: false,
   loadingValidation: false,
   loadingUpdate: false,
   models: [],
+  validated: false,
   navbarClicked: false,
   errors: [],
   files: {
@@ -24,32 +24,35 @@ const getters = {
     return state.activeView.populated && state.activeView.is_markdown;
   },
 
+  urlForModelExplore: () => (model, explore) => `repos/explores/${model}/${explore}`,
+
   hasCode() {
     return state.activeView.populated && !state.activeView.is_markdown;
   },
 
   hasError() {
-    return state.validated && state.errors.length;
+    return state.errors.length;
   },
 
   passedValidation() {
     return state.validated && !state.errors.length;
   },
+
 };
 
 const actions = {
   getRepo({ commit }) {
     repoApi.index()
-      .then((data) => {
-        const files = data.data;
+      .then((response) => {
+        const files = response.data;
         commit('setRepoFiles', { files });
       });
   },
 
   getFile({ commit }, file) {
     repoApi.file(file.unique)
-      .then((data) => {
-        commit('setCurrentFileView', data.data);
+      .then((response) => {
+        commit('setCurrentFileView', response.data);
       });
   },
 
@@ -57,8 +60,8 @@ const actions = {
     state.loadingValidation = true;
     repoApi
       .lint()
-      .then(data => {
-        commit("setValidatedState", data.data);
+      .then((response) => {
+        commit('setValidatedState', response.data);
         state.loadingValidation = false;
       })
       .catch(() => {
@@ -66,11 +69,13 @@ const actions = {
       });
   },
 
-  update({ dispatch }) {
+  sync({ commit, dispatch }) {
     state.loadingUpdate = true;
-    repoApi.update()
-      .then((data) => {
+    repoApi
+      .sync()
+      .then((response) => {
         dispatch('getModels');
+        commit('setValidatedState', response.data);
         state.loadingUpdate = false;
       })
       .catch(() => {
@@ -80,8 +85,8 @@ const actions = {
 
   getModels({ commit }) {
     repoApi.models()
-      .then((data) => {
-        commit('setModels', data.data);
+      .then((response) => {
+        commit('setModels', response.data);
       });
   },
 
@@ -111,13 +116,14 @@ const mutations = {
   },
 
   setValidatedState(_, validated) {
-    state.validated = true;
     state.errors = [];
+    state.validated = true;
     // validation failed, so there will be errors
     if (!validated.result) {
       state.errors = validated.errors;
     }
   },
+
 };
 
 export default {

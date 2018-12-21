@@ -141,4 +141,9 @@ api/tmp/output.json
 static/tmp
 src/meltano/api/static
 src/meltano/api/templates
-src/meltano_ui/dist/
+src/analyze/dist/
+
+meltano.log.*
+
+/model/*.mac
+/model/settings.ma

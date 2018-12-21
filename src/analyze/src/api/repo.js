@@ -14,8 +14,8 @@ export default {
     return axios.get(utils.buildUrl('repos', 'lint'));
   },
 
-  update() {
-    return axios.get(utils.buildUrl('repos', 'update'));
+  sync() {
+    return axios.get(utils.buildUrl('repos', 'sync'));
   },
 
   models() {

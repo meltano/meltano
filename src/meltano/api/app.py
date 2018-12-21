@@ -6,7 +6,6 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
 
 from . import config
 from .external_connector import ExternalConnector
@@ -20,19 +19,6 @@ flask_env = os.getenv("FLASK_ENV", "development")
 
 if flask_env == "development":
     CORS(app)
-
-# TODO: we need to setup proper dependency injection for
-# this kind of hard-coupling. We are building multiple UI on
-# the same backend. Almost all component need a ready DB
-# connection.
-DB.setup(
-    host=app.config["MELTANO_POSTGRES_URL"],
-    username=app.config["MELTANO_POSTGRES_USER"],
-    password=app.config["MELTANO_POSTGRES_PASSWORD"],
-    database=app.config["MELTANO_POSTGRES_DB"],
-    port=app.config["MELTANO_POSTGRES_PORT"],
-)
-db = SQLAlchemy(app)
 
 connector = ExternalConnector()
 
@@ -73,15 +59,13 @@ def drop_it():
     return jsonify({"dropped_it": "like it's hot"})
 
 
-from .controllers.projects import projectsBP
 from .controllers.repos import reposBP
 from .controllers.settings import settingsBP
-from .controllers.sql import sqlBP
 
-from .controllers.orchestrations import orchestrationsBP
+# from .controllers.sql import sqlBP
+# from .controllers.orchestrations import orchestrationsBP
 
-app.register_blueprint(projectsBP)
 app.register_blueprint(reposBP)
 app.register_blueprint(settingsBP)
-app.register_blueprint(sqlBP)
-app.register_blueprint(orchestrationsBP)
+# app.register_blueprint(sqlBP)
+# app.register_blueprint(orchestrationsBP)
