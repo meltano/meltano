@@ -2,10 +2,10 @@ import datetime
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-
 from flask import Flask, request, render_template
 from flask import jsonify
 from flask_cors import CORS
+from jinja2.exceptions import TemplateNotFound
 
 from . import config
 from .external_connector import ExternalConnector
@@ -43,12 +43,10 @@ def internal_error(exception):
 @app.route("/model")
 @app.route("/")
 def analyze():
-    from jinja2.exceptions import TemplateNotFound
-
     try:
         return render_template("analyze.html")
     except TemplateNotFound:
-        return "Please run yarn build-templates from src/analyze"
+        return "Please run `yarn build` from src/analyze."
 
 
 @app.route("/drop")
