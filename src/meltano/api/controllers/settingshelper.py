@@ -24,3 +24,16 @@ class SettingsHelper:
         settings_file = open(self.settings_file_path, "w")
         settings_file.write(json.dumps({"settings": contents}))
         settings_file.close()
+
+    def delete_connection(self, contents):
+        settings_file = self.get_connections()
+        settings = settings_file["settings"]
+        connections = settings["connections"]
+        updated_connections = [
+            connection
+            for connection in connections
+            if connection["name"] != contents["name"]
+        ]
+        settings["connections"] = updated_connections
+        self.set_connections({"connections": updated_connections})
+        return settings
