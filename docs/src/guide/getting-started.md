@@ -45,10 +45,6 @@ That's it! Meltano should now be available in your local environment.
 
 Now it's time for you to set up a sample project!
 
-::: warning Prerequisite
-Before getting started on a Meltano project, make sure that Docker is up and running!
-:::
-
 Go ahead and navigate to a directory separate from your Meltano directory in your terminal. Run the following commands:
 
 ```bash
@@ -57,6 +53,9 @@ meltano init my-cool-data-project
 
 # Change directory into your new cool project
 cd my-cool-data-project
+
+# Start Docker container
+docker-compose up
 
 # Source the environment variables
 source .env
