@@ -50,6 +50,9 @@ package:
     entrypoint: [""]
   script:
     - make sdist
+  artifacts:
+    paths:
+      - dist
 
 pages:
   stage: pages
