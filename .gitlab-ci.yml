@@ -60,13 +60,12 @@ pages:
     - master
 
 publish:
+  image: registry.gitlab.com/meltano/meltano/base
   stage: publish
   before_script:
     - pip install twine
   script:
-    - cd src/analyze && yarn && yarn build-templates
-    - cd src/meltano/api && yarn
-    - python setup.py sdist
+    - make sdist
     - twine upload dist/*
   only:
     variables:
