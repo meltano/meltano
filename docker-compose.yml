@@ -18,7 +18,7 @@ services:
     env_file:
       - .env.dev
     working_dir: /meltano
-    command: ['python', '-m', 'meltano.api']
+    command: ['meltano', 'www']
     volumes:
     - ./:/meltano
     ports:
