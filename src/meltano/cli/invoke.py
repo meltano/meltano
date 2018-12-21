@@ -2,7 +2,7 @@ import click
 import sys
 from . import cli
 
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.config_service import ConfigService
 
@@ -11,7 +11,11 @@ from meltano.core.config_service import ConfigService
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 def invoke(plugin_name, plugin_args):
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        click.ClickException(e)
+
     config_service = ConfigService(project)
 
     plugin = next(

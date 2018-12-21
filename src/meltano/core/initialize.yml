@@ -56,7 +56,102 @@
         pass: "{{ env_var('PG_PASSWORD') }}"
         dbname: "{{ env_var('PG_DATABASE') }}"
         schema: "{{ env_var('PG_SCHEMA') }}"
+"docker-compose.yml": |
+  version: '3.1'
+  services: 
+    warehouse_db:
+      image: postgres
+      environment:
+        POSTGRES_DB: warehouse
+        POSTGRES_PASSWORD: warehouse
+        POSTGRES_USER: warehouse
+      ports:
+      - '5502:5432'
 "/model": []
+"model/carbon.model.ma": |
+  {
+    version = 1
+    name = carbon
+    # Postgres DB
+    connection = runners_db
+    label = carbon intensity
+    explores {
+      region {
+        from = region
+        label = region
+        description = Region Carbon Intensity Data
+        joins {
+          entry {
+            fields = [entry.from, entry.to]
+            sql_on = "{{ region.id }} = {{ entry.region_id }}"
+            relationship = one_to_one
+          }
+        }
+      }
+    }
+  }
+"model/entry.view.ma": |
+  {
+    sql_table_name = gitlab.entry
+    dimensions {
+      id {
+        primary_key = yes
+        hidden = yes
+        type = string
+        sql = "{{table}}.id"
+      }
+      region_id {
+        hidden = yes
+        type = string
+        sql = "{{table}}.id"
+      }
+    }
+    dimension_groups {
+      from {
+        description = Selected from range in carbon data
+        type = time
+        timeframes = [date, week, month, year]
+        convert_tz = no
+        sql = "{{TABLE}}.from"
+      }
+      to {
+        description = Selected to range in carbon data
+        type = time
+        timeframes = [date, week, month, year]
+        convert_tz = no
+        sql = "{{TABLE}}.to"
+      }
+    }
+  }
+"model/region.view.ma": |
+  {
+    sql_table_name = gitlab.region
+    dimensions {
+      id {
+        primary_key = true
+        hidden = true
+        type = string
+        sql = "{{table}}.id"
+      }
+      name {
+        description = Carbon region long name
+        type = string
+        sql = "{{table}}.dnoregion"
+      }
+      short_name {
+        description: Carbon region short name
+        type: string
+        sql: "{{table}}.shortname"
+      }
+    }
+    measures {
+      count {
+        description: Runner Count
+        type: count
+        sql: "{{table}}.id"
+      }
+    }
+  }
 "/extract": []
 "/load": []
 "/transform": []
