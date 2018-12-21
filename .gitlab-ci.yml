@@ -43,6 +43,14 @@ test:
   script:
     - pytest -v
 
+package:
+  stage: test
+  image:
+    name: registry.gitlab.com/meltano/meltano/base
+    entrypoint: [""]
+  script:
+    - make sdist
+
 pages:
   stage: pages
   image: node:9.11.1
@@ -60,7 +68,9 @@ pages:
     - master
 
 publish:
-  image: registry.gitlab.com/meltano/meltano/base
+  image:
+    name: registry.gitlab.com/meltano/meltano/base
+    entrypoint: [""]
   stage: publish
   before_script:
     - pip install twine
