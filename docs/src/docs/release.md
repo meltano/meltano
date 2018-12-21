@@ -16,9 +16,12 @@ Ensure you have the latest `master` branch locally before continuing.
 ### Release process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
-1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install dev dependencies:
+1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install dev dependencies:
     ```bash
-    pip install '.[dev]'
+    # activate your virtualenv
+    $ source ./venv/bin/activate
+    # pip install all the development dependencies
+    $ pip install '.[dev]'
     ```
 1. Execute the commands below:
     ```bash

@@ -120,7 +120,7 @@
         <div class="field">
           <div class="control">
             <button class="button is-link"
-                      @click.prevent="submitConnectionForm">
+                      @click.prevent="saveConnection">
               Save Connection
             </button>
           </div>
@@ -163,11 +163,8 @@ export default {
   },
 
   methods: {
-    deleteConnection(connection) {
-      this.$store.dispatch('settings/deleteConnection', connection);
-    },
-    submitConnectionForm() {
-      this.$store.dispatch('settings/saveNewConnection', {
+    saveConnection() {
+      this.$store.dispatch('settings/saveConnection', {
         name: this.connectionName,
         database: this.connectionDatabase,
         schema: this.connectionSchema,
@@ -186,6 +183,9 @@ export default {
       this.connectionUsername = '';
       this.connectionPassword = '';
     },
-  },
+    deleteConnection(connection) {
+      this.$store.dispatch('settings/deleteConnection', connection);
+    }
+  }
 };
 </script>
