@@ -4,7 +4,7 @@
     <div class="columns">
       <nav class="panel column is-one-quarter">
         <p class="panel-heading">
-          {{explore.settings.label}}
+          {{explore.label}}
         </p>
         <div class="panel-block">
           <p class="control">
@@ -88,21 +88,21 @@
               has-background-white-ter
               has-text-grey
               is-expandable"
-              :class="{'is-collapsed': explore.view.collapsed}"
+              :class="{'is-collapsed': explore.related_view.collapsed}"
               @click="viewRowClicked">
                 <template>
-                  {{explore.settings.label | capitalize}}
+                  {{explore.label | capitalize}}
                 </template>
               </a>
           </template>
-          <template v-if="!explore.view.collapsed">
+          <template v-if="!explore.related_view.collapsed">
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.view.dimensions)">
+                v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
               Dimensions
             </a>
-            <template v-for="dimensionGroup in explore.view.dimension_groups">
+            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
               <a class="panel-block dimension-group"
                   :key="dimensionGroup.unique_name"
                   v-if="!dimensionGroup.settings.hidden"
@@ -121,7 +121,7 @@
               </template>
             </template>
             <a class="panel-block"
-                v-for="dimension in explore.view.dimensions"
+                v-for="dimension in explore.related_view.dimensions"
                 :key="dimension.unique_name"
                 v-if="!dimension.settings.hidden"
                 @click="dimensionSelected(dimension)"
@@ -132,11 +132,11 @@
             <a class="panel-block
                     panel-block-heading
                     has-background-white"
-                    v-if="showJoinDimensionMeasureHeader(explore.view.measures)">
+                    v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
               Measures
             </a>
             <a class="panel-block"
-                    v-for="measure in explore.view.measures"
+                    v-for="measure in explore.related_view.measures"
                     :key="measure.unique_name"
                     @click="measureSelected(measure)"
                     :class="{'is-active': measure.selected}">
@@ -326,7 +326,6 @@ export default {
     Chart,
   },
   beforeRouteUpdate(to, from, next) {
-    console.log('beforeRouteUpdate')
     this.$store.dispatch('explores/getExplore', {
       model: to.params.model,
       explore: to.params.explore,

@@ -77,7 +77,6 @@ export default {
     Logo,
   },
   created() {
-    this.$store.dispatch('projects/getProjects');
     this.$store.dispatch('repos/getModels');
   },
   filters: {
@@ -90,9 +89,6 @@ export default {
     },
   },
   computed: {
-    ...mapState('projects', [
-      'project',
-    ]),
     ...mapState('repos', [
       'models',
       'navbarClicked',

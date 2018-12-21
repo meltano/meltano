@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import Project from '@/components/projects/Project';
 import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
 import Explore from '@/components/explores/Explore';
@@ -18,11 +17,6 @@ export default new Router({
     {
       path: '/',
       redirect: '/model',
-    },
-    {
-      path: '/project',
-      name: 'Project',
-      component: Project,
     },
     {
       path: '/extract',
