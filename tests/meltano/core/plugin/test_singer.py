@@ -1,11 +1,18 @@
 import pytest
 import json
+import logging
 from unittest import mock
 from pathlib import Path
 
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer import CatalogSelectAllVisitor
+from meltano.core.plugin.singer.catalog import (
+    visit,
+    SelectExecutor,
+    ListExecutor,
+    ListSelectedExecutor,
+)
 
 
 LEGACY_CATALOG = """
@@ -64,7 +71,7 @@ LEGACY_CATALOG = """
             "id"
           ],
           "metadata": {
-              "inclusion": "available"
+              "inclusion": "automatic"
           }
         },
         {
@@ -91,7 +98,7 @@ LEGACY_CATALOG = """
             "created_at"
           ],
           "metadata": {
-            "inclusion": "available"
+            "inclusion": "automatic"
           }
         },
         {
@@ -181,7 +188,7 @@ CATALOG = """
             "id"
           ],
           "metadata": {
-            "inclusion": "available"
+            "inclusion": "automatic"
           }
         },
         {
@@ -208,7 +215,7 @@ CATALOG = """
             "created_at"
           ],
           "metadata": {
-            "inclusion": "available"
+            "inclusion": "automatic"
           }
         },
         {
@@ -234,6 +241,11 @@ CATALOG = """
   ]
 }
 """
+
+
+@pytest.fixture
+def select_all_executor():
+    return SelectExecutor(["*.*"])
 
 
 class TestSingerTap:
@@ -269,11 +281,15 @@ class TestSingerTap:
         ]
 
     def test_run_discovery(self, project, subject):
-        process_mock = mock.Mock()
-        process_mock.wait.return_value = 0
-
         invoker = PluginInvoker(project, subject)
         invoker.prepare()
+
+        def mock_discovery():
+            invoker.files["catalog"].open("w").write(CATALOG)
+            return 0
+
+        process_mock = mock.Mock()
+        process_mock.wait = mock_discovery
 
         with mock.patch.object(
             PluginInvoker, "invoke", return_value=process_mock
@@ -284,14 +300,14 @@ class TestSingerTap:
 
     def test_run_discovery_fails(self, project, subject):
         process_mock = mock.Mock()
-        process_mock.wait.return_value = 1  # something wrong happened
+        process_mock.wait.return_value = 1  # something went wrong
 
         invoker = PluginInvoker(project, subject)
         invoker.prepare()
 
         with mock.patch.object(
             PluginInvoker, "invoke", return_value=process_mock
-        ) as invoke:
+        ) as invoke, pytest.raises(PluginExecutionError):
             subject.run_discovery(invoker, [])
 
             assert not invoker.files[
@@ -312,7 +328,7 @@ class TestSingerTap:
 
         with mock.patch.object(
             PluginInvoker, "invoke", side_effect=corrupt_catalog
-        ) as invoke:
+        ) as invoke, pytest.raises(PluginExecutionError):
             subject.run_discovery(invoker, [])
 
             assert not invoker.files[
@@ -333,7 +349,7 @@ class TestLegacyCatalogSelectVisitor:
     def metadata_is_selected(cls, metadata):
         inclusion = metadata.get("inclusion")
         if inclusion == "automatic":
-            return true
+            return True
 
         if inclusion == "available":
             return metadata.get("selected", False)
@@ -359,8 +375,8 @@ class TestLegacyCatalogSelectVisitor:
                 field_metadata
             ), f"{stream}.{metadata['breadcrumb']} is not selected"
 
-    def test_visit(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog)
+    def test_visit(self, catalog, select_all_executor):
+        visit(catalog, select_all_executor)
 
         self.assert_catalog_is_selected(catalog)
 
@@ -377,13 +393,12 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         except (KeyError, IndexError):
             return False
 
-    def test_visit(self, catalog):
-        CatalogSelectAllVisitor.visit(catalog)
+    def test_select_all(self, catalog, select_all_executor):
+        visit(catalog, select_all_executor)
 
         self.assert_catalog_is_selected(catalog)
 
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
-
         stream_metadata = len(
             [
                 metadata
@@ -394,6 +409,47 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         )
 
         assert stream_metadata == 1, "Extraneous stream metadata"
+
+    def test_select(self, catalog):
+        selector = SelectExecutor(["entities.name", "entities.code"])
+        visit(catalog, selector)
+
+        lister = ListSelectedExecutor()
+        visit(catalog, lister)
+
+        assert lister.selected_properties == {
+            "entities": {
+                "id",  # automatic
+                "created_at",  # automatic
+                "name",  # selected
+                "code",  # selected
+            }
+        }
+
+    def test_select_negated(self, catalog):
+        selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
+        visit(catalog, selector)
+
+        lister = ListSelectedExecutor()
+        visit(catalog, lister)
+
+        assert lister.selected_properties == {
+            "entities": {"balance", "created_at", "id", "active"}
+        }
+
+
+class TestListExecutor:
+    @pytest.fixture
+    def catalog(self):
+        return json.loads(CATALOG)
+
+    def test_visit(self, catalog):
+        executor = ListExecutor()
+        visit(catalog, executor)
+
+        assert dict(executor.properties) == {
+            "entities": {"code", "name", "balance", "created_at", "id", "active"}
+        }
 
 
 class TestSingerTarget:
