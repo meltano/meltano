@@ -12,7 +12,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 
 
 @cli.group()
@@ -30,7 +30,11 @@ def add():
     "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
 )
 def database(name, host, database, schema, username, password):
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        click.ClickException(e)
+
     database_add_service = DatabaseAddService(project)
     database_add_service.add(
         name=name,
@@ -46,15 +50,21 @@ def database(name, host, database, schema, username, password):
 @add.command()
 @click.argument("plugin_name")
 def extractor(plugin_name):
-    project = Project.find()
-    add_plugin(project, PluginType.EXTRACTORS, plugin_name)
+    try:
+        project = Project.find()
+        add_plugin(project, PluginType.EXTRACTORS, plugin_name)
+    except ProjectNotFound as e:
+        click.ClickException(e)
 
 
 @add.command()
 @click.argument("plugin_name")
 def loader(plugin_name):
-    project = Project.find()
-    add_plugin(project, PluginType.LOADERS, plugin_name)
+    try:
+        project = Project.find()
+        add_plugin(project, PluginType.LOADERS, plugin_name)
+    except ProjectNotFound as e:
+        click.ClickException(e)
 
 
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):

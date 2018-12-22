@@ -18,17 +18,17 @@ const actions = {
       commit("setSettings", data.data.settings);
     });
   },
-  deleteConnection({ commit }, connection) {
-    const connectionToRemove = state.settings.connections.find(item => item === connection);
-    settingsApi.deleteConnection(connectionToRemove).then(data => {
-      commit("setSettings", data.data);
+  saveConnection({ commit }, connection) {
+    settingsApi.saveConnection(connection).then(data => {
+      commit("setSettings", data.data.settings);
     });
   },
-  saveNewConnection({ commit }, formData) {
-    const settingsCopy = Object.assign({}, state.settings);
-    settingsCopy.connections.push(formData);
-    settingsApi.save(settingsCopy).then(data => {
-      commit("setSettings", data.data);
+  deleteConnection({ commit }, connection) {
+    const connectionToRemove = state.settings.connections.find(
+      item => item === connection
+    );
+    settingsApi.deleteConnection(connectionToRemove).then(data => {
+      commit("setSettings", data.data.settings);
     });
   }
 };

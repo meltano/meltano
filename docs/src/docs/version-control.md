@@ -12,6 +12,6 @@ Meltano runs many different types of files and projects including but not limite
 1. Extractors
 1. Loaders
 1. dbt Transforms
-1. Meltano Models or .lookml Models
+1. Meltano Models
 1. Jupyter Notebook files \*\*
 1. Airflow DAGs as part of an orchestration step \*\*

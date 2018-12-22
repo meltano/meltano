@@ -25,6 +25,7 @@ requires = [
     'flask-sqlalchemy',
     # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
     'idna==2.7',
+    'pyhocon',
 ]
 
 dev_requires = [
@@ -38,7 +39,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.3.0",
+    version="0.3.2",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

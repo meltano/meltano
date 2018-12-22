@@ -7,6 +7,12 @@ from contextlib import contextmanager
 from functools import wraps
 
 from .plugin import Plugin
+from .error import Error
+
+
+class ProjectNotFound(Error):
+    def __init__(self):
+        super().__init__("Cannot find `meltano.yml`. Are you in a meltano project?")
 
 
 class Project:
@@ -34,7 +40,7 @@ class Project:
 
         while not Project(".").meltanofile.exists():
             if os.getcwd() == "/":
-                raise Exception("Cannot go any further.")
+                raise ProjectNotFound()
 
             os.chdir("..")
 

@@ -22,16 +22,16 @@
           <div class="navbar-dropdown
                 is-boxed"
                 :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="model in models">
-            <div class="navbar-item navbar-title has-text-grey-light" :key="model.label">
-              {{model | printable | capitalize | underscoreToSpace}}
+            <template v-for="(v,model) in models">
+            <div class="navbar-item navbar-title has-text-grey-light" :key="model">
+              {{model | capitalize | underscoreToSpace}}
             </div>
-            <router-link :to="explore.link"
+            <router-link :to="urlForModelExplore(model, explore)"
             class="navbar-item navbar-child"
-            v-for="explore in model.explores"
+            v-for="explore in v['explores']"
             @click.native="menuSelected"
-            :key="explore.view_label">
-              {{explore.settings.label}}
+            :key="explore">
+              {{explore | capitalize | underscoreToSpace}}
             </router-link>
             </template>
           </div>
@@ -68,7 +68,7 @@
   </nav>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import Logo from './Logo';
 
 export default {
@@ -96,6 +96,9 @@ export default {
     ...mapState('repos', [
       'models',
       'navbarClicked',
+    ]),
+    ...mapGetters('repos', [
+      'urlForModelExplore',
     ]),
   },
 

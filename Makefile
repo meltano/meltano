@@ -44,14 +44,17 @@ init_db:
 # pip related
 TO_CLEAN  = ./build ./dist ./*.pyc ./*.tgz ./*.egg-info
 # node_modules
-TO_CLEAN += ./${MELTANO_API}/node_modules
+TO_CLEAN += ./${MELTANO_API}/static/*
+TO_CLEAN += ./${MELTANO_API}/templates/*
 TO_CLEAN += ./${MELTANO_ANALYZE}/node_modules
 TO_CLEAN += ./${MELTANO_ANALYZE}/dist
 
 clean:
 	# rm is run inside a container to support cross-platform volume mount permissions.
 	# see: https://github.com/moby/moby/issues/2259
-	${PYTHON_RUN} bash -c 'rm -rf ${TO_CLEAN}'
+	rm -rf ${TO_CLEAN}
+
+clean_all: clean
 	docker rmi -f ${base_image_tag}
 	docker rmi -f ${app_image_tag}
 	docker rmi -f ${runner_image_tag}
@@ -114,6 +117,22 @@ ${MELTANO_API}/node_modules:
 requirements.txt: setup.py
 	${PYTHON_RUN} bash -c 'pip install -e .[all] && pip freeze --exclude-editable > $@'
 
+build_templates:
+	cd src/analyze && yarn && yarn build
+
+bundle: build_templates
+	mkdir -p src/meltano/api/templates && \
+	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
+	cp -r src/analyze/dist/static src/meltano/api
+
+sdist: bundle
+	python setup.py sdist
+
+docker_sdist: base_image
+	docker run --rm -v `pwd`:/meltano ${base_image_tag} \
+	bash -c "make sdist" && \
+	bash -c "chmod 777 dist/*"
+
 # UI Related Tasks
 # =================
 #
@@ -171,11 +190,13 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
+BLACK_RUN = black src/ tests/ --exclude src/analyze
+
 lint:
-	black src/ tests/
+	${BLACK_RUN}
 
 show_lint:
-	black --check --diff src/ tests/
+	${BLACK_RUN} --check --diff
 
 # Makefile Related Tasks
 # ======================

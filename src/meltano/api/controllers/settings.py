@@ -1,47 +1,29 @@
 from flask import Blueprint, jsonify, request
+from .settingshelper import SettingsHelper
 
 settingsBP = Blueprint("settings", __name__, url_prefix="/settings")
-
-from ..app import db
-
-from ..models.settings import Settings
 
 
 @settingsBP.route("/", methods=["GET"])
 def index():
-    settings = Settings.query.first()
-    if not settings:
-        settings = Settings()
-    return jsonify(settings.serializable())
+    settings_helper = SettingsHelper()
+    return jsonify(settings_helper.get_connections())
 
 
-@settingsBP.route("/new", methods=["POST"])
-def new():
-    settings = request.get_json()
-    current_settings = Settings.query.first()
-    if not current_settings:
-        current_settings = Settings()
-    current_settings.settings = settings
-    db.session.add(current_settings)
-    db.session.commit()
+@settingsBP.route("/save", methods=["POST"])
+def save():
+    settings_helper = SettingsHelper()
+    connection = request.get_json()
+    settings = settings_helper.save_connection(connection)
     return jsonify(settings)
 
 
 @settingsBP.route("/delete", methods=["POST"])
 def delete():
-    connectionToRemove = request.get_json()
-    current_settings = Settings.query.first()
-    connections = current_settings.settings["connections"]
-    current_settings.settings["connections"] = [
-        connection
-        for connection in connections
-        if connection["name"] != connectionToRemove["name"]
-    ]
-
-    db.session.add(current_settings)
-    db.session.commit()
-
-    return jsonify(current_settings.settings)
+    settings_helper = SettingsHelper()
+    connection = request.get_json()
+    settings = settings_helper.delete_connection(connection)
+    return jsonify(settings)
 
 
 @settingsBP.route("/connections/<name>/test")
