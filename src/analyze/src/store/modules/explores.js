@@ -189,7 +189,7 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('explores/resetErrorMessage');
-    const baseView = state.explore.view;
+    const baseView = state.explore.related_view;
     const dimensions = baseView
       .dimensions
       .filter(d => d.selected)
@@ -449,7 +449,7 @@ const mutations = {
   },
 
   toggleCollapsed() {
-    state.explore.view.collapsed = !state.explore.view.collapsed;
+    state.explore.related_view.collapsed = !state.explore.related_view.collapsed;
   },
 
   setCurrentTab(_, tab) {
