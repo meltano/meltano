@@ -91,4 +91,31 @@ Assuming you don't have something else running on that port, you should be able 
 
 Now we are ready to analyze the data. We have provided some sample .ma (Meltano Analyze) files that will help you analyze the carbon intensity API. 
 
-[Follow the instructions on our guide](https://meltano.com/guide/#using-the-meltano-sample-project).
+## Step 3: Use Meltano Analyze
+
+Using Meltano Analyze at [http://localhost:5000](http://localhost:5000) we'll wire up Meltano Analyze to use the data in our data warehouse:
+> This is where you'd *connect* your own datasets using Meltano
+- Navigate to Settings (upper-right)
+- Enter connection settings
+  - Name = `runners_db`
+  - Dialect = `PostgresSQL`
+  - Host = `warehouse_db`
+  - Port = `5502`
+  - Database = `warehouse`
+  - Schema = `gitlab`
+  - Username = `warehouse`
+  - Password = `warehouse`
+- Click "Save Connection"
+
+Then, we can check that our data warehouse is working as expected:
+- Click Model button (upper-left)
+- Click Lint button (optional)
+- Click Sync button (optional)
+
+Lastly, we'll query and explore the data:
+> This is where you'd *explore* your data using Meltano
+- Navigate to Model > Region (Model dropdown)
+- Open Region accordion
+  - Toggle Dimensions and Measures buttons to generate SQL query
+  - Click Run button to query
+- Open Charts accordion and explore the data!
