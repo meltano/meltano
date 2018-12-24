@@ -140,8 +140,8 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched dimensions
     commit('toggleJoinOpen', join);
-    if (join.dimensions.length) return;
-    exploreApi.getView(join.name)
+    if (join.related_view.dimensions.length) return;
+    exploreApi.getView(join.related_view.name)
       .then((data) => {
         commit('setJoinDimensions', {
           dimensions: data.data.dimensions,
@@ -438,10 +438,9 @@ const mutations = {
   },
 
   selectedDimensions(_, dimensions) {
-    console.log('TODO: resolve forEach issue - meant to iterate props, dimensions is not an array')
-    // dimensions.forEach((dimension) => {
-    //   state.selectedDimensions[dimension.unique_name] = false;
-    // });
+    dimensions.keys().forEach((dimension) => {
+       state.selectedDimensions[dimension.unique_name] = false;
+    });
   },
 
   setExplore(_, exploreData) {

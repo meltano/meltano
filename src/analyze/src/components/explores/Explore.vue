@@ -32,13 +32,13 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.dimensions)">
+                  v-if="showJoinDimensionMeasureHeader(join.related_view.dimensions)">
                   Dimensions
                 </a>
-                <template v-for="dimensionGroup in join.dimension_groups">
+                <template v-for="dimensionGroup in join.related_view.dimension_groups">
                   <a class="panel-block dimension-group"
                       :key="dimensionGroup.unique_name"
-                      v-if="!dimensionGroup.settings.hidden"
+                      v-if="!dimensionGroup.hidden"
                       @click="dimensionGroupSelected(dimensionGroup)"
                       :class="{'is-active': dimensionGroup.selected}">
                     {{dimensionGroup.label}}
@@ -54,9 +54,9 @@
                     </template>
                   </template>
                 </template>
-                <template v-for="dimension in join.dimensions">
+                <template v-for="(dimension, k) in join.related_view.dimensions">
                   <a class="panel-block"
-                    v-if="!dimension.settings.hidden"
+                    v-if="!dimension.hidden"
                     :key="dimension.unique_name"
                     :class="{'is-active': dimension.selected}"
                     @click="joinDimensionSelected(join, dimension)">
@@ -72,7 +72,7 @@
                 </a>
                 <template v-for="measure in join.measures">
                   <a class="panel-block"
-                    v-if="!measure.settings.hidden"
+                    v-if="!measure.related_view.hidden"
                     :key="measure.unique_name"
                     :class="{'is-active': measure.selected}"
                     @click="joinMeasureSelected(join, measure)">
@@ -106,7 +106,7 @@
             <template v-for="dimensionGroup in explore.related_view.dimension_groups">
               <a class="panel-block dimension-group"
                   :key="dimensionGroup.unique_name"
-                  v-if="!dimensionGroup.settings.hidden"
+                  v-if="!dimensionGroup.related_view.hidden"
                   @click="dimensionGroupSelected(dimensionGroup)"
                   :class="{'is-active': dimensionGroup.selected}">
                 {{dimensionGroup.label}}
