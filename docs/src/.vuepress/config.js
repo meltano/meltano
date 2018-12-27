@@ -2,12 +2,35 @@ module.exports = {
 	title: 'Meltano',
 	description: 'From data source to dashboard',
 	head: [
-		['link', { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" }],
-		['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" }],
-		['link', { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" }],
-		['link', { rel: "manifest", href: "/site.webmanifest" }],
-		['meta', { name: "msapplication-TileColor", content: "#da532c" }],
-		['meta', { name: "theme-color", content: "#ffffff" }]
+		[
+			'link',
+			{
+				rel: 'apple-touch-icon',
+				sizes: '180x180',
+				href: '/apple-touch-icon.png'
+			}
+		],
+		[
+			'link',
+			{
+				rel: 'icon',
+				type: 'image/png',
+				sizes: '32x32',
+				href: '/favicon-32x32.png'
+			}
+		],
+		[
+			'link',
+			{
+				rel: 'icon',
+				type: 'image/png',
+				sizes: '16x16',
+				href: '/favicon-16x16.png'
+			}
+		],
+		['link', { rel: 'manifest', href: '/site.webmanifest' }],
+		['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
+		['meta', { name: 'theme-color', content: '#ffffff' }]
 	],
 	dest: './docs/public',
 	themeConfig: {
@@ -17,14 +40,18 @@ module.exports = {
 		],
 		sidebar: {
 			'/docs': [
-				'/docs/guide/',
 				'/docs/',
+				'/docs/best-practices',
+				'/docs/fundamentals',
+				'/docs/getting-started',
 				'/docs/source-to-dashboard',
 				'/docs/version-control',
 				'/docs/taps-targets',
 				'/docs/security-privacy',
 				'/docs/license',
 				'/docs/release',
+				'/docs/roadmap',
+				'/docs/tutorial',
 				'/docs/contributing',
 				'/docs/about'
 			]

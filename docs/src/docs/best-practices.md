@@ -1,7 +1,3 @@
---- 
-sidebar: auto
----
-
 ## Best practices
 
 ### How to use sub pipelines to effectively create a DAG like architecture
