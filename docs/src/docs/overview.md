@@ -1,10 +1,4 @@
----
-sidebar: auto
----
-
-# Fundamentals
-
-## Overview
+# Overview
 
 The Meltano product consists of three key components:
 

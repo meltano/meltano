@@ -42,8 +42,8 @@ module.exports = {
 			'/docs': [
 				'/docs/',
 				'/docs/tutorial',
+				'/docs/overview',
 				'/docs/best-practices',
-				'/docs/fundamentals',
 				'/docs/source-to-dashboard',
 				'/docs/version-control',
 				'/docs/taps-targets',
