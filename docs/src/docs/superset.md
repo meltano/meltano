@@ -1,6 +1,10 @@
 # Using Superset with Meltano
 
-Follow the directions below to use [Apache Superset](https://superset.incubator.apache.org/index.html) with Meltano's ELT runtime and data warehouse capabilities.
+Follow the directions below to use [Apache Superset](https://superset.incubator.apache.org/index.html) with Meltano's ELT runtime and data warehouse capabilities. The directions are grouped into three areas:
+
+1. Meltano Setup
+1. Superset Setup
+1. Superset with Meltano
 
 ## Meltano Setup
 
@@ -39,6 +43,6 @@ Follow the [Superset Installation & Configuration](https://superset.incubator.ap
     - Schema: `gitlab`
     - Table Name: `region`
         - You can navigate to the SQL Lab page to explore table names
-1. Click on the table name link of your recently created table to see the default `count(*)` metric in action
+1. Click on the table link (gitlab.region) of your recently created table to see the default `count(*)` metric in action
 
 From here you can further customize database connections, queries, filters, and other settings.
