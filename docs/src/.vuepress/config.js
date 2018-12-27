@@ -43,7 +43,6 @@ module.exports = {
 				'/docs/',
 				'/docs/best-practices',
 				'/docs/fundamentals',
-				'/docs/getting-started',
 				'/docs/source-to-dashboard',
 				'/docs/version-control',
 				'/docs/taps-targets',
