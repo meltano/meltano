@@ -13,19 +13,11 @@ module.exports = {
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
-			{ 
-				text: 'Learn',
-				items: [
-					{ text: 'Getting Started', link: '/guide/getting-started' },
-					{ text: 'Fundamentals', link: '/guide/fundamentals' },
-					{ text: 'Best Practices', link :'/guide/best-practices' }
-				]
-			},
-			{ text: 'Documentation', link: '/docs/' },
-			{ text: 'About', link: '/about/' }
+			{ text: 'Documentation', link: '/docs/' }
 		],
 		sidebar: {
 			'/docs': [
+				'/docs/guide/',
 				'/docs/',
 				'/docs/source-to-dashboard',
 				'/docs/version-control',
@@ -33,7 +25,8 @@ module.exports = {
 				'/docs/security-privacy',
 				'/docs/license',
 				'/docs/release',
-				'/docs/contributing'
+				'/docs/contributing',
+				'/docs/about'
 			]
 		},
 		repo: 'https://gitlab.com/meltano/meltano',
