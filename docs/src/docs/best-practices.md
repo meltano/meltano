@@ -1,14 +1,14 @@
-## Best practices
+# Best Practices
 
-### How to use sub pipelines to effectively create a DAG like architecture
+## How to use sub pipelines to effectively create a DAG like architecture
 
 An example of this can be seen in the [gitlab-ci.yml](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml#L251) which is being used to trigger the gitlab-qa project. This will trigger a [`SCRIPT_NAME`:`trigger-build`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/trigger-build) which has the API calls written in Ruby, for which we can use Python. From there the sky is the limit.
 
-### Managing API requests and limits
+## Managing API requests and limits
 
 Many of the SaaS sources have various types of API limits, typically a given quota per day. If you are nearing the limit of a given source, or are iterating frequently on your repo, you may need to implement some additional measures to manage usage.
 
-#### Reducing API usage by review apps
+### Reducing API usage by review apps
 
 One of the easiest ways to reduce consumption of API calls for problematic ELT sources is to make that job manual for branches other than `master`. This way when iterating on a particular branch, this job can be manually run only if it specifically needs to be tested.
 
@@ -59,13 +59,13 @@ zuora_review:
   when: manual
 ```
 
-### Pipeline configuration
+## Pipeline configuration
 
 Data integration stages are configurable using `Project variables` for the CI/CD pipeline. The following variables may help you control what needs to run:
 
 - `EXTRACT_SKIP`: either `all` (to skip the `extract` stage) or job names, like `marketo,zendesk,zuora` to be skipped from the pipeline.
 - `UPDATE_SKIP`: either `all` (to skip the `update` stage) or job names, like `sfdc_update`.
 
-### Stored procedures
+## Stored procedures
 
 We don't use stored procedures because they are hard to keep under version control.

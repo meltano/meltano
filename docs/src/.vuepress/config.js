@@ -44,7 +44,6 @@ module.exports = {
 				'/docs/tutorial',
 				'/docs/overview',
 				'/docs/best-practices',
-				'/docs/source-to-dashboard',
 				'/docs/version-control',
 				'/docs/taps-targets',
 				'/docs/security-privacy',

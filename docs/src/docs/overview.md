@@ -1,14 +1,34 @@
 # Overview
 
-The Meltano product consists of three key components:
+## Introduction
 
-1. A SQL based data store, for example [PostgreSQL](https://www.postgresql.org/) or [Cloud SQL](https://cloud.google.com/sql/). We recommend using Postgres for [review apps](https://about.gitlab.com/features/review-apps/) and a more durable and scalable service for production.
-1. This project, [`meltano`](https://gitlab.com/meltano/meltano), which contains the ELT scripts and CI jobs to refresh the data warehouse from the [configured sources](https://gitlab.com/meltano/meltano/master/data_sources.md). Typically configured to run on a [scheduled CI job](https://docs.gitlab.com/ce/user/project/pipelines/schedules.html) to refresh the data warehouse from the configured sources.
-1. The [`meltano-elt`](https://gitlab.com/meltano/meltano-elt) container, which includes the necessary dependencies for the ELT scripts. Used as the base image for the CI jobs.
+Meltano is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it.
 
-As development progresses, additional documentation on getting started along with example configuration and CI scripts will become available.
+Meltano stands for the steps of the data lifecycle:
 
-It is expected that the Meltano project will have many applications managed in the top level of the project. Some or parts of these applications could be useful to many organizations, and some may only be useful within GitLab. We have no plans on weighing the popularity of an individual application at the top level of the Meltano project for inclusion/exclusion.
+- Model
+- Extract
+- Load
+- Transform
+- Analyze
+- Notebook
+- Orchestrate
+
+To empower you and your team in this lifecycle, Meltano manifests as two tools:
+1. command line interface (CLI)
+1. web app (GUI)
+
+These two tools enable you and your team to use Meltano in a few different ways:
+1. Meltano as **Project** (CLI + GUI)
+    - From data extraction to analysis and visualization with orchestration for automating the process
+1. Meltano as **Framework** (CLI)
+    - Helps you create and test extractors, loaders, and transforms
+1. Meltano as **ELT** only (CLI)
+    - Runtime for extracting, loading, and transforming of data
+1. Meltano as **Analyze** only (GUI)
+    - Interactively query, explore, visualize, and model the data (warehouse)
+
+It leverages open source software and software development best practices including version control, CI, CD, and review apps for [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence and data science.
 
 **Notes**
 
@@ -103,3 +123,15 @@ Meltano provides the following docker images:
 
 - `meltano/meltano/cli`: Contains the meltano cli
 - `meltano/meltano/base`: Contains the requirements for `meltano/meltano`
+
+## Meltano Ecosystem
+
+| Stage       | Meltano selected                                                                     | OSS considered but not selected                                                                                                          | Proprietary alternatives                                                                                                                                       |
+| ----------- | ------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Model       | [Meltano Model](https://gitlab.com/meltano/meltano#meltano-model)                    | [Open ModelSphere](http://www.modelsphere.com/org/)                                                                                      | [LookML](https://looker.com/platform/data-modeling), [Matillion](http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/) |
+| Extract     | [Singer Tap](https://gitlab.com/meltano/meltano#tap)                                 | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/)                                         | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/)                                                                                           |
+| Load        | [Singer Target](https://gitlab.com/meltano/meltano#target)                           | [Pentaho DI](http://www.pentaho.com/product/data-integration), [Talend](https://www.talend.com/)                                         | [Alooma](https://www.alooma.com/), [Fivetran](https://fivetran.com/)                                                                                           |
+| Transform   | [dbt](https://www.getdbt.com/)                                                       | [Stored procedures](https://gitlab.com/meltano/meltano#stored-procedures), [Pentaho DI](http://www.pentaho.com/product/data-integration) | [Alooma](https://www.alooma.com/)                                                                                                                              |
+| Analyze     | [Meltano Analyze](https://gitlab.com/meltano/meltano/tree/master/src/analyze)        | [Metabase](https://www.metabase.com/)                                                                                                    | [Looker](https://looker.com/), [Periscope](https://www.periscopedata.com/)                                                                                     |
+| Notebook    | [JupyterHub](https://github.com/jupyterhub/jupyterhub)                               | [GNU Octave](https://www.gnu.org/software/octave/)                                                                                       | [Nurtch](https://www.nurtch.com/), [Datadog notebooks](https://www.datadoghq.com/blog/data-driven-notebooks/)                                                  |
+| Orchestrate | [GitLab CI](https://docs.gitlab.com/ee/ci/) / [Airflow](https://airflow.apache.org/) | [Luigi](https://github.com/spotify/luigi), [Nifi](https://nifi.apache.org/)                                                              | [Fivetran](https://fivetran.com/)                                                                                                                              |
