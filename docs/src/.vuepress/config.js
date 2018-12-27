@@ -41,6 +41,7 @@ module.exports = {
 		sidebar: {
 			'/docs': [
 				'/docs/',
+				'/docs/tutorial',
 				'/docs/best-practices',
 				'/docs/fundamentals',
 				'/docs/source-to-dashboard',
@@ -50,7 +51,6 @@ module.exports = {
 				'/docs/license',
 				'/docs/release',
 				'/docs/roadmap',
-				'/docs/tutorial',
 				'/docs/contributing',
 				'/docs/about'
 			]

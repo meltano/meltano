@@ -1,4 +1,59 @@
-# Guide
+# Tutorial
+
+In this section, we will create and walk through a sample project using Meltano! If you haven't installed it, check out our [installation guide](/docs/#installation).
+
+## Initialize a New Project
+
+Now it's time for you to set up a sample project!
+
+Navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+
+```bash
+# Initialize a new project with a desired folder name
+meltano init my-cool-data-project
+
+# Change directory into your new cool project
+cd my-cool-data-project
+
+# Start Docker container, which will start a postgres database to act as our data warehouse.
+docker-compose up
+```
+
+Since Docker is running in this tab, let's open a new tab (and navigate to your project) for the rest of tutorial.
+
+```bash
+
+cd /path/to/my-cool-data-project
+
+# Source the environment variables. You won't see any output if it's working.
+source .env
+
+# let's see what extractors and loaders are available
+meltano discover all
+
+# It looks like a tap for carbon intensity data is available, let's add that as a dependency. See https://api.carbonintensity.org.uk/
+meltano add extractor tap-carbon-intensity
+
+# Since we have a postgres running, we can add a loader for a Postgres database
+meltano add loader target-postgres
+
+# Run elt (extract, load, transform) with an id of your choice and the extractor and loader we just added without the need to transform the data
+meltano elt cool_job_id1 --extractor tap-carbon-intensity --loader target-postgres --transform skip
+
+# Start up the Meltano Analyze web application!
+meltano www
+```
+
+Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
+
+Now we are ready to analyze the data. We have provided some sample .ma (Meltano Analyze) files that will help you analyze the carbon intensity API. 
+
+[Follow the instructions on our guide](https://meltano.com/guide/#using-the-meltano-sample-project).
+
+
+
+
+
 
 ## Getting Started
 
