@@ -9,11 +9,11 @@ Now it's time for you to set up a sample project!
 Navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
 
 ```bash
-# Initialize a new project with a desired folder name
-meltano init my-cool-data-project
+# Initialize a new project with a folder called carbon
+meltano init carbon
 
-# Change directory into your new cool project
-cd my-cool-data-project
+# Change directory into your new carbon project
+cd carbon
 
 # Start Docker container, which will start a postgres database 
 # to act as our data warehouse.
@@ -23,8 +23,8 @@ docker-compose up
 Since Docker is running in this tab, let's open a new tab (and navigate to your project) for the rest of tutorial.
 
 ```bash
-
-cd /path/to/my-cool-data-project
+# Change directory to you new carbon project
+cd carbon 
 
 # Source the environment variables. You won't see any output if it's working.
 source .env
