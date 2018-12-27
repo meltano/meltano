@@ -12,7 +12,7 @@ Welcome to Meltano! Meltano is your solution for taking you from data source to 
 - Notebook
 - Orchestrate
 
-::: warning Note
+::: tip Tip
 For developers who want to contribute to Meltano, check out our [contributing guide](/docs/contributing.html).
 :::
 
