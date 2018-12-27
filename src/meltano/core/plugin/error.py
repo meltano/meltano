@@ -1,5 +1,4 @@
 from . import Plugin
-from meltano.core.error import PluginInstallWarning
 
 
 class PluginMissingError(Exception):
@@ -14,11 +13,10 @@ class PluginMissingError(Exception):
             self.plugin_name = plugin_or_name
 
 
-class TapDiscoveryError(PluginInstallWarning):
-    def __str__(self):
-        return (
-            "Running --discover on the tap failed, "
-            "no catalog will be provided."
-            "Some taps requires a valid catalog file "
-            "with some selected streams."
-        )
+class PluginExecutionError(Exception):
+    """
+    Base exception for problems that stems from the
+    execution of a plugin (sub-process).
+    """
+
+    pass

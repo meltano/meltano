@@ -17,6 +17,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 0.3.3 - (2018-12-21)
+---
+
 ## 0.3.2 - (2018-12-21)
 ---
 
@@ -35,6 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * updated Settings view so each database connection can be independently disconnected
+* add `meltano select` to manage what is extracted by a tap.
 
 ### Changes
 * documentation site will utilize a new static site generation tool called VuePress
