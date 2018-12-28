@@ -14,19 +14,20 @@ from meltano.core.plugin import PluginType
 @cli.command()
 @db_options
 @click.argument("job_id", envvar="MELTANO_JOB_ID")
-@click.option(
-    "--extractor",
-    help="Which extractor should be used in this extraction",
-    required=True,
-)
-@click.option(
-    "--loader", help="Which loader should be used in this extraction", required=True
-)
+@click.argument("extractor")
+@click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
     "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
 )
 def elt(job_id, extractor, loader, dry, transform):
+    """
+    meltano elt ${job_id} ${extractor_name} ${loader_name}
+
+    job_id: A custom string to define identify the job
+    extractor_name: Which extractor should be used in this extraction
+    loader_name: Which loader should be used in this extraction
+    """
     try:
         project = Project.find()
     except ProjectNotFound as e:
