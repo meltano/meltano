@@ -9,22 +9,25 @@
     }
 
     name {
+      label = Name
       description = Carbon region long name
       type = string
       sql = "{{table}}.dnoregion"
     }
 
     short_name {
-      description: Carbon region short name
-      type: string
-      sql: "{{table}}.shortname"
+      label = Short Name
+      description = Carbon region short name
+      type = string
+      sql = "{{table}}.shortname"
     }
   }
   measures {
     count {
-      description: Runner Count
-      type: count
-      sql: "{{table}}.id"
+      label = Count
+      description = Runner Count
+      type = count
+      sql = "{{table}}.id"
     }
   }
 }

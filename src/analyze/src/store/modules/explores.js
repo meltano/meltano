@@ -61,10 +61,9 @@ const getters = {
 
   isColumnSorted: () => key => state.sortColumn === key,
 
-  showJoinDimensionMeasureHeader: () => arr => !!(arr && arr.length),
+  showJoinDimensionMeasureHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
-  getLabelForJoin: () => join => ('view_label' in join ? join.view_label : join.name),
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -438,8 +437,8 @@ const mutations = {
   },
 
   selectedDimensions(_, dimensions) {
-    dimensions.keys().forEach((dimension) => {
-       state.selectedDimensions[dimension.unique_name] = false;
+    Object.keys(dimensions).forEach(dimension => {
+      state.selectedDimensions[dimension.unique_name] = false;
     });
   },
 

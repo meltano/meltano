@@ -15,7 +15,7 @@
         <div class="inner-scroll">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
-            <template v-for="join in explore.joins">
+            <template v-for="(join, key) in explore.joins">
               <a
                 class="panel-block
                   panel-block-heading
@@ -23,9 +23,9 @@
                   has-text-grey
                   is-expandable"
                   :class="{'is-collapsed': join.collapsed}"
-                  :key="join.name"
+                  :key="key"
                   @click="joinRowClicked(join)">
-                  {{getLabelForJoin(join) | capitalize}}
+                  {{join.label}}
               </a>
               <template v-if="!join.collapsed">
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -35,18 +35,18 @@
                   v-if="showJoinDimensionMeasureHeader(join.related_view.dimensions)">
                   Dimensions
                 </a>
-                <template v-for="dimensionGroup in join.related_view.dimension_groups">
+                <template v-for="(dimensionGroup, key) in join.related_view.dimension_groups">
                   <a class="panel-block dimension-group"
-                      :key="dimensionGroup.unique_name"
+                      :key="key"
                       v-if="!dimensionGroup.hidden"
                       @click="dimensionGroupSelected(dimensionGroup)"
                       :class="{'is-active': dimensionGroup.selected}">
                     {{dimensionGroup.label}}
                   </a>
                   <template v-if="dimensionGroup.selected">
-                    <template v-for="timeframe in dimensionGroup.timeframes">
+                    <template v-for="(timeframe, key) in dimensionGroup.timeframes">
                       <a class="panel-block indented"
-                          :key="timeframe.name"
+                          :key="key"
                           @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
                           :class="{'is-active': timeframe.selected}">
                         {{timeframe.label}}
@@ -54,10 +54,10 @@
                     </template>
                   </template>
                 </template>
-                <template v-for="(dimension, k) in join.related_view.dimensions">
+                <template v-for="(dimension, key) in join.related_view.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.hidden"
-                    :key="dimension.unique_name"
+                    :key="key"
                     :class="{'is-active': dimension.selected}"
                     @click="joinDimensionSelected(join, dimension)">
                   {{dimension.label}}
@@ -70,10 +70,10 @@
                   v-if="showJoinDimensionMeasureHeader(join.measures)">
                   Measures
                 </a>
-                <template v-for="measure in join.measures">
+                <template v-for="(measure, key) in join.measures">
                   <a class="panel-block"
-                    v-if="!measure.related_view.hidden"
-                    :key="measure.unique_name"
+                    v-if="measure.related_view.hidden"
+                    :key="key"
                     :class="{'is-active': measure.selected}"
                     @click="joinMeasureSelected(join, measure)">
                   {{measure.label}}
@@ -92,7 +92,7 @@
               :class="{'is-collapsed': explore.related_view && explore.related_view.collapsed}"
               @click="viewRowClicked">
                 <template>
-                  {{explore.label | capitalize}}
+                  {{explore.label}}
                 </template>
               </a>
           </template>
@@ -103,17 +103,17 @@
                 v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
               Dimensions
             </a>
-            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
+            <template v-for="(dimensionGroup, key) in explore.related_view.dimension_groups">
               <a class="panel-block dimension-group"
-                  :key="dimensionGroup.unique_name"
+                  :key="key"
                   v-if="!dimensionGroup.related_view.hidden"
                   @click="dimensionGroupSelected(dimensionGroup)"
                   :class="{'is-active': dimensionGroup.selected}">
                 {{dimensionGroup.label}}
               </a>
-              <template v-for="timeframe in dimensionGroup.timeframes">
+              <template v-for="(timeframe, key) in dimensionGroup.timeframes">
                 <a class="panel-block indented"
-                    :key="timeframe.name"
+                    :key="key"
                     @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
                     v-if="dimensionGroup.selected"
                     :class="{'is-active': timeframe.selected}">
@@ -122,8 +122,8 @@
               </template>
             </template>
             <a class="panel-block"
-                v-for="dimension in explore.related_view.dimensions"
-                :key="dimension.unique_name"
+                v-for="(dimension, key) in explore.related_view.dimensions"
+                :key="key"
                 v-if="!dimension.hidden"
                 @click="dimensionSelected(dimension)"
                 :class="{'is-active': dimension.selected}">
@@ -131,16 +131,16 @@
             </a>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <a class="panel-block
-                    panel-block-heading
-                    has-background-white"
-                    v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
+                panel-block-heading
+                has-background-white"
+                v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
               Measures
             </a>
             <a class="panel-block"
-                    v-for="measure in explore.related_view.measures"
-                    :key="measure.unique_name"
-                    @click="measureSelected(measure)"
-                    :class="{'is-active': measure.selected}">
+                v-for="(measure, key) in explore.related_view.measures"
+                :key="key"
+                @click="measureSelected(measure)"
+                :class="{'is-active': measure.selected}">
               {{measure.label}}
             </a>
           </template>
@@ -148,7 +148,7 @@
 
         <div class="panel-block">
           <button class="button is-link is-outlined is-fullwidth">
-            reset all filters
+            Reset All Filters
           </button>
         </div>
       </nav>
@@ -168,8 +168,8 @@
             @click="toggleFilterOpen"
             :class="{'is-collapsed': !filtersOpen}">Filters</div>
           <div class="has-background-white-ter filter-item"
-                v-for="filter in explore.always_filter.filters"
-                :key="filter.field"
+                v-for="(filter, key) in explore.always_filter.filters"
+                :key="key"
                 v-if="filtersOpen">
             <div class="columns">
               <div class="column is-3">
@@ -191,8 +191,8 @@
                   </select-dropdown>
                 </div>
                 <div class="tags selected-filters">
-                  <template v-for="selected in getSelectionsFromDistinct(filter.sql)">
-                    <span class="tag is-link" :key="selected">
+                  <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
+                    <span class="tag is-link" :key="key">
                       {{selected}}
                       <button class="delete is-small"></button>
                     </span>
@@ -205,11 +205,11 @@
 
         <!-- charts tab -->
         <div class="has-background-grey-darker
-        section-header
-        has-text-white-bis
-        is-expandable"
-        @click="toggleChartsOpen"
-        :class="{'is-collapsed': !chartsOpen}">Charts</div>
+          section-header
+          has-text-white-bis
+          is-expandable"
+          @click="toggleChartsOpen"
+          :class="{'is-collapsed': !chartsOpen}">Charts</div>
 
         <template v-if="chartsOpen">
           <div class="field has-addons chart-buttons">
@@ -272,7 +272,7 @@
         <div class="notification is-danger" v-if="hasSQLError">
           <button class="delete" @click="resetErrorMessage"></button>
           <ul>
-            <li v-for="error in sqlErrorMessage" :key="error">{{error}}</li>
+            <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
           </ul>
         </div>
         <div class="has-background-white-ter data-toggles">
@@ -361,7 +361,6 @@ export default {
       'getSelectionsFromDistinct',
       'getChartYAxis',
       'hasJoins',
-      'getLabelForJoin',
       'showJoinDimensionMeasureHeader',
       'formattedSql',
     ]),
