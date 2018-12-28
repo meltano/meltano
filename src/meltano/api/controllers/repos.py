@@ -130,8 +130,10 @@ def explores():
 
 @reposBP.route("/views/<view_name>", methods=["GET"])
 def view_read(view_name):
-    view = View.query.filter(View.name == view_name).first()
-    return jsonify(view.serializable(True))
+    file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.ma")
+    ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
+    view = ma_parse.parse_ma_file(file_path)
+    return jsonify(view)
 
 
 @reposBP.route("/explores/<model_name>/<explore_name>", methods=["GET"])
