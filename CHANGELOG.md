@@ -12,6 +12,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+* extractors and loaders are arguments in the elt command instead of options
+* `meltano www` is now `meltano ui`
+
 ### Fixes
 
 ### Breaks
