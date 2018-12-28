@@ -91,11 +91,11 @@ def handle_meltano_analysis_file_parser_error(e):
         {"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]}
     )
 
+
 @reposBP.errorhandler(FileNotFoundError)
 def handle_file_not_found(e):
-    return jsonify(
-        {"result": False, "error": str(e)}
-    )
+    return jsonify({"result": False, "error": str(e)})
+
 
 @reposBP.route("/lint", methods=["GET"])
 def lint():
