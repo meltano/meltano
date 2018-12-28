@@ -142,4 +142,3 @@ def explore_read(model_name, explore_name):
     explores = model["explores"]
     explore = next(e for e in explores if e["from"] == explore_name)
     return jsonify(explore)
-
