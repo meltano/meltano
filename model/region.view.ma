@@ -1,5 +1,6 @@
 {
   sql_table_name = gitlab.region
+  name = region
   dimensions {
     id {
       primary_key = true

@@ -1,6 +1,6 @@
 {
   sql_table_name = gitlab.entry
-
+  name = entry
   dimensions {
     id {
       label = ID
