@@ -10,11 +10,11 @@ class VenvService:
     def create(self, namespace="", name=""):
         venv_path = self.project.venvs_dir(namespace, name)
         if platform.system() == "Windows":
-            pyhton_executable = "python"
+            python_executable = "python"
         else:
-            pyhton_executable = "python3"
+            python_executable = "python3"
         run_venv = subprocess.run(
-            [pyhton_executable, "-m", "venv", str(venv_path)],
+            [python_executable, "-m", "venv", str(venv_path)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
