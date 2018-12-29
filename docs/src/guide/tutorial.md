@@ -124,7 +124,7 @@ meltano add extractor tap-carbon-intensity
 meltano add loader target-postgres
 
 # run the extraction
-meltano elt carbon --extractor tap-carbon-intensity --loader target-postgres
+meltano elt carbon tap-carbon-intensity target-postgres
 ```
 
 Once this is done, the data should now be loaded in the warehouse.
@@ -274,5 +274,5 @@ Once you have your project, you can run `meltano` against it.
   - `meltano discover loaders`: list only available loaders
 - `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 - `meltano transform [name of transformation] --warehouse [name of warehouse]`: \*\*
-- `meltano elt <job_id> --extractor <extractor> --loader <loader> [--dry]`: Extract, Load, and Transform the data.
+- `meltano elt <job_id> <extractor> <loader> [--dry]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
