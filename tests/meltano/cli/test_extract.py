@@ -9,12 +9,7 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.dbt_service import DbtService
 
 
-PERFORM_TEST_ARGS = [
-    "elt",
-    "test_job_id",
-    "tap-test",
-    "target-test",
-]
+PERFORM_TEST_ARGS = ["elt", "test_job_id", "tap-test", "target-test"]
 
 
 def test_elt(request, project):
