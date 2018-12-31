@@ -75,8 +75,3 @@ class ProjectInitService:
 
     def join_with_project_base(self, filename):
         return os.path.join(".", self.project_name, filename)
-
-    def install_dbt(self, project: Project):
-        venv_service = VenvService(project)
-        venv_service.create(name="dbt")
-        venv_service.install(name="dbt", pip_url="dbt")
