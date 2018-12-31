@@ -32,10 +32,16 @@ class PluginDiscoveryService:
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
-            plugin_factory(plugin_type, plugin_def)
+            self.plugin_generator(plugin_type, plugin_def)
             for plugin_type, plugin_defs in self.discovery_data.items()
             for plugin_def in plugin_defs
         )
+
+    def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
+        if plugin_type == PluginType.TRANSFORMERS:
+            return Plugin(plugin_type, **plugin_def)
+        else:
+            return plugin_factory(plugin_type, plugin_def)
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
         try:
@@ -50,8 +56,8 @@ class PluginDiscoveryService:
     def discover(self, plugin_type: PluginType):
         """Return a pretty printed list of available plugins."""
         enabled_plugin_types = (
-            (PluginType.EXTRACTORS, PluginType.LOADERS)
-            if PluginType.ALL
+            (PluginType.EXTRACTORS, PluginType.LOADERS, PluginType.TRANSFORMERS)
+            if plugin_type == PluginType.ALL
             else (plugin_type,)
         )
         return {

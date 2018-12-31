@@ -1,6 +1,6 @@
 import os
 import yaml
-from typing import List
+from typing import Dict, List
 
 from .project import Project
 from .plugin import Plugin, PluginType
@@ -41,7 +41,13 @@ class ConfigService:
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
-            plugin_factory(plugin_type, plugin_def)
+            self.plugin_generator(plugin_type, plugin_def)
             for plugin_type, plugin_defs in self.project.meltano.items()
             for plugin_def in plugin_defs
         )
+
+    def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
+        if plugin_type == PluginType.TRANSFORMERS:
+            return Plugin(plugin_type, **plugin_def)
+        else:
+            return plugin_factory(plugin_type, plugin_def)
