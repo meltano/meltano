@@ -4,6 +4,7 @@ from typing import Dict, List
 
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
+from .plugin.dbt import DbtPlugin
 
 
 class PluginNotFoundError(Exception):
@@ -39,7 +40,7 @@ class PluginDiscoveryService:
 
     def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
         if plugin_type == PluginType.TRANSFORMERS:
-            return Plugin(plugin_type, **plugin_def)
+            return DbtPlugin(**plugin_def)
         else:
             return plugin_factory(plugin_type, plugin_def)
 

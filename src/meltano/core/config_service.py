@@ -5,6 +5,7 @@ from typing import Dict, List
 from .project import Project
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
+from .plugin.dbt import DbtPlugin
 from .plugin.error import PluginMissingError
 
 
@@ -31,6 +32,9 @@ class ConfigService:
     def get_loaders(self):
         return filter(lambda p: p.type == PluginType.LOADERS, self.plugins())
 
+    def get_transformers(self):
+        return filter(lambda p: p.type == PluginType.TRANSFORMERS, self.plugins())
+
     def get_database(self, database_name):
         return yaml.load(
             open(self.project.meltano_dir(f".database_{database_name}.yml"))
@@ -48,6 +52,6 @@ class ConfigService:
 
     def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
         if plugin_type == PluginType.TRANSFORMERS:
-            return Plugin(plugin_type, **plugin_def)
+            return DbtPlugin(**plugin_def)
         else:
             return plugin_factory(plugin_type, plugin_def)

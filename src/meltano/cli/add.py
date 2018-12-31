@@ -67,6 +67,16 @@ def loader(plugin_name):
         click.ClickException(e)
 
 
+@add.command()
+@click.argument("plugin_name")
+def transformer(plugin_name):
+    try:
+        project = Project.find()
+        add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
+    except ProjectNotFound as e:
+        click.ClickException(e)
+
+
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project)
