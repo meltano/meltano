@@ -13,7 +13,7 @@ module.exports = {
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
-			{ 
+			{
 				text: 'Learn',
 				items: [
 					{ text: 'Getting Started', link: '/guide/getting-started' },
@@ -28,6 +28,7 @@ module.exports = {
 			'/docs': [
 				'/docs/',
 				'/docs/source-to-dashboard',
+				'/docs/superset',
 				'/docs/version-control',
 				'/docs/taps-targets',
 				'/docs/security-privacy',
