@@ -9,7 +9,6 @@ from jinja2.exceptions import TemplateNotFound
 
 from . import config
 from .external_connector import ExternalConnector
-from meltano.core.db import DB
 
 app = Flask(__name__)
 
@@ -59,11 +58,10 @@ def drop_it():
 
 from .controllers.repos import reposBP
 from .controllers.settings import settingsBP
-
-# from .controllers.sql import sqlBP
+from .controllers.sql import sqlBP
 # from .controllers.orchestrations import orchestrationsBP
 
 app.register_blueprint(reposBP)
 app.register_blueprint(settingsBP)
-# app.register_blueprint(sqlBP)
+app.register_blueprint(sqlBP)
 # app.register_blueprint(orchestrationsBP)

@@ -1,17 +1,18 @@
 import json
+import os
 from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
+from os.path import join
 
 from flask import Blueprint, jsonify, request
-
-sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
-
 import sqlalchemy
 
 from .sqlhelper import SqlHelper
-from ..models.data import Model, Explore
-from ..models.settings import Settings
+
+sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
+meltano_model_path = join(os.getcwd(), "model")
 
 
 class ConnectionNotFound(Exception):
@@ -52,25 +53,26 @@ def default(obj):
 
 
 def get_db_engine(connection_name):
-    connections = Settings.query.first().settings["connections"]
+    print('get_db_engine connection_name', connection_name)
+    # connections = Settings.query.first().settings["connections"]
 
-    try:
-        connection = next(
-            connection
-            for connection in connections
-            if connection["name"] == connection_name
-        )
+    # try:
+    #     connection = next(
+    #         connection
+    #         for connection in connections
+    #         if connection["name"] == connection_name
+    #     )
 
-        if connection["dialect"] == "postgresql":
-            psql_params = ["username", "password", "host", "port", "database"]
-            user, pw, host, port, db = [connection[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+    #     if connection["dialect"] == "postgresql":
+    #         psql_params = ["username", "password", "host", "port", "database"]
+    #         user, pw, host, port, db = [connection[param] for param in psql_params]
+    #         connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
 
-            return sqlalchemy.create_engine(connection_url)
+    #         return sqlalchemy.create_engine(connection_url)
 
-        raise ConnectionNotFound(connection_name)
-    except StopIteration:
-        raise ConnectionNotFound(connection_name)
+    #     raise ConnectionNotFound(connection_name)
+    # except StopIteration:
+    #     raise ConnectionNotFound(connection_name)
 
 
 @sqlBP.route("/", methods=["GET"])
@@ -80,8 +82,11 @@ def index():
 
 @sqlBP.route("/get/<model_name>/<explore_name>", methods=["POST"])
 def get_sql(model_name, explore_name):
-    model = Model.query.filter(Model.name == model_name).first()
-    explore = Explore.query.filter(Explore.name == explore_name).first()
+    model = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
+    with model.open() as f:
+        model = json.load(f)
+    explore = next(e for e in model["explores"] if e["name"] == explore_name)
+
     incoming_json = request.get_json()
 
     to_run = incoming_json["run"]
@@ -118,18 +123,19 @@ def get_sql(model_name, explore_name):
 
 @sqlBP.route("/distinct/<model_name>/<explore_name>", methods=["POST"])
 def get_distinct_field_name(model_name, explore_name):
-    incoming_json = request.get_json()
-    field_name = incoming_json["field"].replace("${TABLE}", explore_name)
-    model = Model.query.filter(Model.name == model_name).first()
-    explore = Explore.query.filter(Explore.name == explore_name).first()
+    # incoming_json = request.get_json()
+    # field_name = incoming_json["field"].replace("${TABLE}", explore_name)
+    # model = Model.query.filter(Model.name == model_name).first()
+    # explore = Explore.query.filter(Explore.name == explore_name).first()
 
-    base_table = explore.view.settings["sql_table_name"]
-    base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}"
+    # base_table = explore.view.settings["sql_table_name"]
+    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}"
 
-    engine = get_db_engine(model.settings["connection"])
-    results = engine.execute(base_sql)
-    results = [dict(row) for row in results]
-    return json.dumps(
-        {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
-        default=default,
-    )
+    # engine = get_db_engine(model.settings["connection"])
+    # results = engine.execute(base_sql)
+    # results = [dict(row) for row in results]
+    # return json.dumps(
+    #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
+    #     default=default,
+    # )
+    return json.dumps({"tester": "tester"})

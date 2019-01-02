@@ -1,5 +1,8 @@
 import logging
 import re
+import os
+from pathlib import Path
+from os.path import join
 
 import sqlalchemy
 from flask import jsonify
@@ -8,11 +11,15 @@ from pypika import Query, Order
 from .analysishelper import AnalysisHelper
 from .aggregate import Aggregate
 from .date import Date
-from .joinhelper import JoinHelper
-from ..app import app, db
-from ..models.data import View, DimensionGroup, Join
-from ..models.projects import Project
-from ..models.settings import Settings
+# from .joinhelper import JoinHelper
+# from ..app import app, db
+# from ..models.data import View, DimensionGroup, Join
+# from ..models.projects import Project
+# from ..models.settings import Settings
+
+from .ma_file_parser import MeltanoAnalysisFileParser
+
+meltano_model_path = join(os.getcwd(), "model")
 
 
 class SqlHelper:
@@ -31,7 +38,12 @@ class SqlHelper:
 
     def get_sql(self, explore, incoming_json):
         view_name = incoming_json["view"]
-        view = View.query.filter(View.name == view_name).first()
+        file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.ma")
+        ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
+        view = ma_parse.parse_ma_file(file_path)
+
+        # TODO consume view properly (likely as dict)
+
         base_table = view.settings["sql_table_name"]
         (schema, table) = base_table.split(".")
         incoming_dimensions = incoming_json["dimensions"]
