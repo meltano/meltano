@@ -6,7 +6,6 @@ from flask import jsonify
 from pypika import Query, Order
 
 from .analysishelper import AnalysisHelper
-from .aggregate import Aggregate
 from .date import Date
 from .joinhelper import JoinHelper
 
