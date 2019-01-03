@@ -1,6 +1,4 @@
----
-title: "Taps & Targets"
----
+# Taps & Targets
 
 ## Tap
 

@@ -181,13 +181,6 @@ roles:
         warehouses:
             - reporting
 
-    - looker:
-        warehouses:
-            - reporting
-        owns:
-            schemas:
-                - analytics.looker_scratch
-
     - iroussos:
         warehouses:
             - reporting
@@ -253,12 +246,6 @@ users:
             - sysadmin
             - transformer
             - gitlab-ci
-
-    - looker:
-        can_login: yes
-        member_of:
-            - reporter
-            - looker
 
     - iroussos:
         can_login: yes
