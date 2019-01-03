@@ -1,6 +1,7 @@
 from .substitution import Substitution
 from pypika import Table
 
+from .aggregate import Aggregate
 
 class AnalysisHelper:
     @staticmethod
