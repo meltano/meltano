@@ -9,13 +9,19 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- add Using Superset with Meltano documentation
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
+
+
+## 0.4.0 - (2019-01-03)
+---
+
+### New
+- add Using Superset with Meltano documentation
 
 
 ## 0.3.3 - (2018-12-21)
