@@ -10,6 +10,7 @@ from flask import Blueprint, jsonify, request
 import sqlalchemy
 
 from .sqlhelper import SqlHelper
+from .settingshelper import SettingsHelper
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 meltano_model_path = join(os.getcwd(), "model")
@@ -53,26 +54,26 @@ def default(obj):
 
 
 def get_db_engine(connection_name):
-    print('get_db_engine connection_name', connection_name)
-    # connections = Settings.query.first().settings["connections"]
+    settings_helper = SettingsHelper()
+    connections = settings_helper.get_connections()["settings"]["connections"]
 
-    # try:
-    #     connection = next(
-    #         connection
-    #         for connection in connections
-    #         if connection["name"] == connection_name
-    #     )
+    try:
+        connection = next(
+            connection
+            for connection in connections
+            if connection["name"] == connection_name
+        )
 
-    #     if connection["dialect"] == "postgresql":
-    #         psql_params = ["username", "password", "host", "port", "database"]
-    #         user, pw, host, port, db = [connection[param] for param in psql_params]
-    #         connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        if connection["dialect"] == "postgresql":
+            psql_params = ["username", "password", "host", "port", "database"]
+            user, pw, host, port, db = [connection[param] for param in psql_params]
+            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
 
-    #         return sqlalchemy.create_engine(connection_url)
+            return sqlalchemy.create_engine(connection_url)
 
-    #     raise ConnectionNotFound(connection_name)
-    # except StopIteration:
-    #     raise ConnectionNotFound(connection_name)
+        raise ConnectionNotFound(connection_name)
+    except StopIteration:
+        raise ConnectionNotFound(connection_name)
 
 
 @sqlBP.route("/", methods=["GET"])
@@ -103,7 +104,7 @@ def get_sql(model_name, explore_name):
     if not to_run:
         return json.dumps({"sql": outgoing_sql}, default=default)
 
-    connection_name = model.settings["connection"]
+    connection_name = model["connection"]
     engine = get_db_engine(connection_name)
     results = engine.execute(outgoing_sql)
 
