@@ -1,8 +1,5 @@
 import logging
 import re
-import os
-from pathlib import Path
-from os.path import join
 
 import sqlalchemy
 from flask import jsonify
@@ -16,10 +13,6 @@ from .date import Date
 # from ..models.data import View, DimensionGroup, Join
 # from ..models.projects import Project
 # from ..models.settings import Settings
-
-from .ma_file_parser import MeltanoAnalysisFileParser
-
-meltano_model_path = join(os.getcwd(), "model")
 
 
 class SqlHelper:
@@ -38,13 +31,9 @@ class SqlHelper:
 
     def get_sql(self, explore, incoming_json):
         view_name = incoming_json["view"]
-        file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.ma")
-        ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
-        view = ma_parse.parse_ma_file(file_path)
+        view = explore["related_view"]
 
-        # TODO consume view properly (likely as dict)
-
-        base_table = view.settings["sql_table_name"]
+        base_table = view["sql_table_name"]
         (schema, table) = base_table.split(".")
         incoming_dimensions = incoming_json["dimensions"]
         incoming_dimension_groups = incoming_json["dimension_groups"]
@@ -70,7 +59,7 @@ class SqlHelper:
         dimensions_raw = dimensions
         measures_raw = measures
 
-        table = AnalysisHelper.table(base_table, explore.name)
+        table = AnalysisHelper.table(base_table, explore["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
         dimension_groups = self.dimension_groups(
             view_name, incoming_dimension_groups, table

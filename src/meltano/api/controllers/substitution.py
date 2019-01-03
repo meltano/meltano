@@ -23,7 +23,7 @@ class Substitution:
         if not dimension:
             self.type = "string"
         else:
-            self.type = dimension.settings["type"]
+            self.type = dimension["type"]
 
         self.substitution_type = SubstitutionType.unknown
         self.get_substitution_type()

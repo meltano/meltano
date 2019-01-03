@@ -188,25 +188,26 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('explores/resetErrorMessage');
-
     const baseView = state.explore.related_view;
-    const dimensionsKeys = Object.keys(baseView.dimensions || []);
-    const measuresKeys = Object.keys(baseView.measures || []);
-    const dimensions = dimensionsKeys
+    const dimensions = baseView
+      .dimensions
       .filter(d => d.selected)
       .map(d => d.name);
-    let sortColumn = dimensionsKeys
+    let sortColumn = baseView
+      .dimensions
       .find(d => d.name === state.sortColumn);
     if (!sortColumn) {
-      sortColumn = measuresKeys
+      sortColumn = baseView
+        .measures
         .find(d => d.name === state.sortColumn);
     }
-    const measures = measuresKeys
+    const measures = baseView
+      .measures
       .filter(m => m.selected)
       .map(m => m.name);
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters || []);
+    const filtersKeys = Object.keys(filters);
     filtersKeys.forEach((prop) => {
       delete filters[prop].results;
       delete filters[prop].sql;
@@ -234,13 +235,13 @@ const actions = {
       .filter(j => !!(j.dimensions || j.measures));
 
     let order = null;
-    const dimensionGroupsKeys = Object.keys(baseView.dimension_groups || []);
-    const dimensionGroups = dimensionGroupsKeys
+    const dimensionGroups = baseView
+      .dimension_groups || [] // TODO update default empty array likely in the ma_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
         timeframes: dg.timeframes
           .filter(tf => tf.selected)
-          .map(tf => tf.name)
+          .map(tf => tf.name),
       }))
       .filter(dg => dg.timeframes.length);
 
