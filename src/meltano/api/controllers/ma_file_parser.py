@@ -223,17 +223,19 @@ class MeltanoAnalysisFileParser:
         return temp_view
 
     def dimensions(self, ma_file_dimensions_dict):
-        temp_dimensions = {}
+        temp_dimensions = []
         for dimension_name, dimension_def in ma_file_dimensions_dict.items():
-            temp_dimensions[dimension_name] = {}
+            temp_dimension = {"name": dimension_name}
             for prop_name, prop_def in dimension_def.items():
-                temp_dimensions[dimension_name][prop_name] = prop_def
+                temp_dimension[prop_name] = prop_def
+            temp_dimensions.append(temp_dimension)
         return temp_dimensions
 
     def measures(self, ma_file_measures_dict):
-        temp_measure = {}
+        temp_measures = []
         for measure_name, measure_def in ma_file_measures_dict.items():
-            temp_measure[measure_name] = {}
+            temp_measure = {"name": measure_name}
             for prop_name, prop_def in measure_def.items():
-                temp_measure[measure_name][prop_name] = prop_def
-        return temp_measure
+                temp_measure[prop_name] = prop_def
+            temp_measures.append(temp_measure)
+        return temp_measures
