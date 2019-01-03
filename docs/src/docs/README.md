@@ -1,18 +1,42 @@
-# Roadmap
+# Guide
 
-1. [MVC](https://gitlab.com/meltano/meltano/issues/10)
+## Introduction
 
-    - [Horizontal slice of ELT sources](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=✓&state=opened&label_name[]=elt): Salesforce, Marketo, NetSuite, Zuora, etc.
-    - [Data Pipeline](https://gitlab.com/meltano/meltano/issues?label_name[]=pipeline): container, CI pipeline, review apps
+Welcome to Meltano! Meltano is your solution for taking you from data source to dashboard. What does that mean? It means we have you covered through the entire data lifecycle:
 
-2. Data Model and Visualization
+- Model
+- Extract
+- Load
+- Transform
+- Analyze
+- Notebook
+- Orchestrate
 
-    - [Common Data Model](https://gitlab.com/meltano/meltano/issues?label_name[]=data-model): Conventions for common table and field names (but it allows you to make it organization specific)
-    - [Field Mapping](https://gitlab.com/meltano/meltano/issues/121): Mapping of user fields to common data model, if required
-    - [Visualization Sample](https://gitlab.com/meltano/meltano/issues/122): Documentation and samples for connecting a visualization engine
-    - [JupyterHub deployment](https://gitlab.com/meltano/jupyter-hub): Easily deploy JupyterHub for data exploration
+::: tip Tip
+For developers who want to contribute to Meltano, check out our [contributing guide](/docs/contributing.html).
+:::
 
-3. [Ease of use & Automation](https://gitlab.com/meltano/meltano/issues?label_name%5B%5D=ease-of-use)
+## Requirements
 
-    - Seamless handle some schema changes, like a field rename
-    - Match user fields to common data model, without intervention
+Before you get started, there are a couple of things your environment needs:
+
+- [Git](https://git-scm.com/)
+- [Docker](https://www.docker.com/get-started)
+- [Python 3](https://realpython.com/installing-python/)
+
+## Installation
+
+Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the data lifecycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data lifecycle.
+
+To start, open your terminal in the directory where you want Meltano to live. Run the following commands:
+
+```bash
+# Install Meltano from PyPi
+pip install meltano
+```
+
+::: warning Note
+If you're having issues with the `pip` command, try `pip3 install meltano` instead!
+:::
+
+That's it! Meltano should now be available in your local environment.
