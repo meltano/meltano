@@ -53,7 +53,7 @@ def elt(job_id, extractor, loader, dry, transform):
 
         if transform != "skip":
             click.echo("Running transformation...")
-            dbt_runner.perform(dry_run=dry)
+            dbt_runner.perform(dry_run=dry, models=extractor)
             click.secho("Transformation complete!", fg="green")
         else:
             click.secho("Transformation skipped.", fg="yellow")
