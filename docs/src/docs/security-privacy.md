@@ -1,8 +1,4 @@
----
-title: "Security & Privacy"
----
-
-## Data security and privacy
+# Security & Privacy
 
 When using Meltano, like any data science tool, it is important to consider the security and privacy implications.
 
@@ -14,7 +10,7 @@ When using Meltano, like any data science tool, it is important to consider the 
   - These risks can be mitigated by [restricting the production variables](https://docs.gitlab.com/ee/ci/variables/#protected-variables) to only protected branches, so code is reviewed before it is able to run with access to the credentials. It is also possible to set job logs to be available to only those with `Developer` roles or above, in CI/CD settings.
 - When designing your data warehouse, consider any relevant laws and regulations, like GDPR. For example, historical data being retained as part of a snapshot could present challenges in the event a user requests to be forgotten.
 
-### Meltano data security and privacy at GitLab
+## Meltano data security and privacy at GitLab
 
 We take user security and privacy seriously at GitLab. We internally use Meltano to learn about how users interact with GitLab.com, build a better product, and efficiently run our organization. We adhere to the following guidelines:
 
