@@ -8,11 +8,7 @@ from pypika import Query, Order
 from .analysishelper import AnalysisHelper
 from .aggregate import Aggregate
 from .date import Date
-# from .joinhelper import JoinHelper
-# from ..app import app, db
-# from ..models.data import View, DimensionGroup, Join
-# from ..models.projects import Project
-# from ..models.settings import Settings
+from .joinhelper import JoinHelper
 
 
 class SqlHelper:
@@ -27,7 +23,7 @@ class SqlHelper:
         return (outer_results, inner_results)
 
     def get_names(self, things):
-        return [thing.name for thing in things]
+        return [thing["name"] for thing in things]
 
     def get_sql(self, explore, incoming_json):
         view_name = incoming_json["view"]
@@ -100,7 +96,7 @@ class SqlHelper:
         }
 
     def column_headers(self, dimensions, measures):
-        return [d.label for d in dimensions + measures]
+        return [d["label"] for d in dimensions + measures]
 
     def dimension_groups(self, view_name, dimension_groups, table):
         fields = []
