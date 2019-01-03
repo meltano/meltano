@@ -15,7 +15,7 @@
         <div class="inner-scroll">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
-            <template v-for="(join, key) in explore.joins">
+            <template v-for="join in explore.joins">
               <a
                 class="panel-block
                   panel-block-heading
@@ -23,7 +23,7 @@
                   has-text-grey
                   is-expandable"
                   :class="{'is-collapsed': join.collapsed}"
-                  :key="key"
+                  :key="join.label"
                   @click="joinRowClicked(join)">
                   {{join.label}}
               </a>
@@ -35,18 +35,18 @@
                   v-if="showJoinDimensionMeasureHeader(join.related_view.dimensions)">
                   Dimensions
                 </a>
-                <template v-for="(dimensionGroup, key) in join.related_view.dimension_groups">
+                <template v-for="dimensionGroup in join.related_view.dimension_groups">
                   <a class="panel-block dimension-group"
-                      :key="key"
+                      :key="dimensionGroup.label"
                       v-if="!dimensionGroup.hidden"
                       @click="dimensionGroupSelected(dimensionGroup)"
                       :class="{'is-active': dimensionGroup.selected}">
                     {{dimensionGroup.label}}
                   </a>
                   <template v-if="dimensionGroup.selected">
-                    <template v-for="(timeframe, key) in dimensionGroup.timeframes">
+                    <template v-for="timeframe in dimensionGroup.timeframes">
                       <a class="panel-block indented"
-                          :key="key"
+                          :key="timeframe.label"
                           @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
                           :class="{'is-active': timeframe.selected}">
                         {{timeframe.label}}
@@ -54,10 +54,10 @@
                     </template>
                   </template>
                 </template>
-                <template v-for="(dimension, key) in join.related_view.dimensions">
+                <template v-for="dimension in join.related_view.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.hidden"
-                    :key="key"
+                    :key="dimension.label"
                     :class="{'is-active': dimension.selected}"
                     @click="joinDimensionSelected(join, dimension)">
                   {{dimension.label}}
@@ -70,10 +70,10 @@
                   v-if="showJoinDimensionMeasureHeader(join.measures)">
                   Measures
                 </a>
-                <template v-for="(measure, key) in join.measures">
+                <template v-for="measure in join.measures">
                   <a class="panel-block"
                     v-if="measure.related_view.hidden"
-                    :key="key"
+                    :key="measure.label"
                     :class="{'is-active': measure.selected}"
                     @click="joinMeasureSelected(join, measure)">
                   {{measure.label}}
@@ -103,17 +103,17 @@
                 v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
               Dimensions
             </a>
-            <template v-for="(dimensionGroup, key) in explore.related_view.dimension_groups">
+            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
               <a class="panel-block dimension-group"
-                  :key="key"
+                  :key="dimensionGroup.label"
                   v-if="!dimensionGroup.related_view.hidden"
                   @click="dimensionGroupSelected(dimensionGroup)"
                   :class="{'is-active': dimensionGroup.selected}">
                 {{dimensionGroup.label}}
               </a>
-              <template v-for="(timeframe, key) in dimensionGroup.timeframes">
+              <template v-for="timeframe in dimensionGroup.timeframes">
                 <a class="panel-block indented"
-                    :key="key"
+                    :key="timeframe.label"
                     @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
                     v-if="dimensionGroup.selected"
                     :class="{'is-active': timeframe.selected}">
@@ -122,8 +122,8 @@
               </template>
             </template>
             <a class="panel-block"
-                v-for="(dimension, key) in explore.related_view.dimensions"
-                :key="key"
+                v-for="dimension in explore.related_view.dimensions"
+                :key="dimension.label"
                 v-if="!dimension.hidden"
                 @click="dimensionSelected(dimension)"
                 :class="{'is-active': dimension.selected}">
@@ -137,8 +137,8 @@
               Measures
             </a>
             <a class="panel-block"
-                v-for="(measure, key) in explore.related_view.measures"
-                :key="key"
+                v-for="measure in explore.related_view.measures"
+                :key="measure.label"
                 @click="measureSelected(measure)"
                 :class="{'is-active': measure.selected}">
               {{measure.label}}
@@ -168,8 +168,8 @@
             @click="toggleFilterOpen"
             :class="{'is-collapsed': !filtersOpen}">Filters</div>
           <div class="has-background-white-ter filter-item"
-                v-for="(filter, key) in explore.always_filter.filters"
-                :key="key"
+                v-for="filter in explore.always_filter.filters"
+                :key="filter.label"
                 v-if="filtersOpen">
             <div class="columns">
               <div class="column is-3">
