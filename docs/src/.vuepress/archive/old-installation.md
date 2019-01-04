@@ -1,18 +1,8 @@
----
-sidebar: auto
----
+# Old Installation Instructions
 
-# Tutorial
-
-## Getting Started
-
-#### Using Docker
-
-##### Requirements
-
-  - [Docker](https://www.docker.com/get-started)
   - [Make](https://www.gnu.org/software/make/)
   - [Python](https://www.python.org/) (version >= 3.6.6)
+  - [Docker](https://www.docker.com/get-started)
   - [docker-compose](https://docs.docker.com/compose/) (now included in Docker)
 
 You can then build the Meltano docker images.
@@ -47,7 +37,8 @@ For more info see the [docker-compose.yml](https://gitlab.com/meltano/meltano/bl
   - [Make](https://www.gnu.org/software/make/)
   - [Python](https://www.python.org/) (version >= 3.6.6)
   - [Docker](https://www.docker.com/get-started) (optional)
-  - [docker-compose](https://docs.docker.com/compose/) (optional)
+  - [docker-compose](https://docs.docker.com/compose/) (now included in Docker)
+  - [Yarn](https://yarnpkg.com/en/) or [npm](https://www.npmjs.com/)
   - An available PostgreSQL instance
 
 > Alternatively, you may use the provided database containers if you don't have an available PostgresSQL instance.
@@ -103,62 +94,20 @@ python3 -m meltano.api.init_db
 python3 -m meltano.api
 ```
 
-This will start:
+This starts the API server at [http://localhost:5000](http://localhost:5000)
 
-- The front-end UI at http://localhost:8080
-- The API server http://localhost:5000
-
-### Creating Your First Meltano Project
-
-In your terminal, navigate to the directory where you want your demo project to live.
+Lastly, let's start the web server:
 
 ```bash
-# create the meltano project
-meltano init meltano_project
-cd meltano_project
+# install web server dependencies
+cd src/analyze/
+yarn install
 
-# add the `tap-carbon-intensity` to your meltano project
-meltano add extractor tap-carbon-intensity
-
-# add the `target-postgres` to your meltano project
-meltano add loader target-postgres
-
-# run the extraction
-meltano elt carbon --extractor tap-carbon-intensity --loader target-postgres
+# run the UI
+yarn run dev
 ```
 
-Once this is done, the data should now be loaded in the warehouse.
-
-Next, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
-> Follow the [installation](#installation-from-source) steps if Meltano UI is not running
-
-Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
-> This is where you'd *connect* your datasets using Meltano
-- Navigate to Settings (upper-right)
-- Enter connection settings
-  - Name = `runners_db`
-  - Dialect = `PostgresSQL`
-  - Host = `warehouse_db`
-  - Port = `5432` or `5502` for non-Docker setups
-  - Database = `warehouse`
-  - Schema = `gitlab`
-  - Username = `warehouse` or `localhost` for non-Docker setups
-  - Password = `warehouse`
-- Click "Save Connection"
-
-Then, we'll populate our data warehouse:
-> This is where you'd *populate* your data warehouse using Meltano
-- Click Model button (upper-left)
-- Click Validate button
-- Click Update Database button
-
-Lastly, we'll query and explore the data:
-> This is where you'd *explore* your data using Meltano
-- Navigate to Model > Region (Model dropdown)
-- Open Region accordion
-  - Toggle Dimensions and Measures buttons to generate SQL query
-  - Click Run button to query
-- Open Charts accordion and explore the data!
+This starts the front-end UI at [http://localhost:8080](http://localhost:8080)
 
 ### Your First Meltano Project
 
@@ -205,7 +154,7 @@ orchestrate: **
 
 Your project should contains the following directory structure:
 
-- model - For your `.ma` files.
+- model - For your `.lookml` files.
 - transform - For your local dbt project files.
 - analyze - For your `.yml` dashboard files.
 - notebook - For your `.ipynb` notebook files.
@@ -240,8 +189,8 @@ Here is a sample of what your project might look like:
 │   ├── loaders
 │   │   └── target-...
 │   ├── model
-│   │   ├── base_ticket.ma
-│   │   └── ticket.ma
+│   │   ├── base_ticket.lookml
+│   │   └── ticket.lookml
 │   └── run
 │       ├── dbt
 │       ├── tap-...
@@ -249,8 +198,8 @@ Here is a sample of what your project might look like:
 ├── meltano.yml
 ├── model
 │   └── zendesk
-│       ├── zendesk.model.ma
-│       └── zendesk.view.ma
+│       ├── zendesk.model.lookml
+│       └── zendesk.view.lookml
 ├── orchestrate
 │   ├── dag_1.py
 │   ├── dag_2.py
@@ -274,5 +223,5 @@ Once you have your project, you can run `meltano` against it.
   - `meltano discover loaders`: list only available loaders
 - `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 - `meltano transform [name of transformation] --warehouse [name of warehouse]`: \*\*
-- `meltano elt <job_id> --extractor <extractor> --loader <loader> [--dry]`: Extract, Load, and Transform the data.
+- `meltano elt <job_id> <extractor> <loader> [--dry]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.

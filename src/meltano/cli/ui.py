@@ -15,7 +15,7 @@ from meltano.api import app
     help="To reload the server or not on file changes",
 )
 @click.option("--hostname", default="0.0.0.0", help="The hostname of the webserver")
-def www(debug, port, reload, hostname):
+def ui(debug, port, reload, hostname):
     # todo: run gunicorn if not in debug mode
     if debug:
         app.run(debug=debug, use_reloader=reload, port=port, host=hostname)
