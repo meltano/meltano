@@ -66,6 +66,11 @@ class ProjectInitService:
             " meltano elt job_id1 tap-carbon-intensity target-sqlite --transform skip",
             fg="green",
         )
+        click.echo("🏃\tRun SQLite to check the results:")
+        click.secho("\tsqlite3 meltano.db", fg="green")
+        click.secho("\t sqlite> .tables", fg="green")
+        click.secho("\t sqlite> SELECT * FROM region;", fg="green")
+        click.secho("\t sqlite> SELECT * FROM entry LIMIT 20;", fg="green")
         click.echo("WOW! NEATO!")
         click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
