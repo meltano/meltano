@@ -89,14 +89,14 @@
               has-background-white-ter
               has-text-grey
               is-expandable"
-              :class="{'is-collapsed': explore.related_view.collapsed}"
+              :class="{'is-collapsed': explore.related_view && explore.related_view.collapsed}"
               @click="viewRowClicked">
                 <template>
                   {{explore.label}}
                 </template>
               </a>
           </template>
-          <template v-if="!explore.related_view.collapsed">
+          <template v-if="explore.related_view && !explore.related_view.collapsed">
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
