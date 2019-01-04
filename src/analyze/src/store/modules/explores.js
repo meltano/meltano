@@ -6,10 +6,7 @@ import utils from '../../api/utils';
 
 const state = {
   explore: {
-    settings: {
-      label: 'loading...',
-    },
-    view: {},
+    related_view: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
