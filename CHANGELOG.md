@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+* add `target-sqlite` to available loaders for meltano projects
+
 ### Changes
 
 * extractors and loaders are arguments in the elt command instead of options
