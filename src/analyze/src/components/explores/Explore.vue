@@ -46,7 +46,7 @@
                   <template v-if="dimensionGroup.selected">
                     <template v-for="timeframe in dimensionGroup.timeframes">
                       <a class="panel-block indented"
-                          :key="timeframe.label"
+                          :key="dimensionGroup.label.concat('-', timeframe.label)"
                           @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
                           :class="{'is-active': timeframe.selected}">
                         {{timeframe.label}}
