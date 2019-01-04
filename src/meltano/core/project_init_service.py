@@ -63,7 +63,7 @@ class ProjectInitService:
         click.secho(" meltano add loader target-postgres", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(
-            " meltano elt job_id1 --extractor tap-carbon-intensity --loader target-postgres --transform skip",
+            " meltano elt job_id1 tap-carbon-intensity target-postgres --transform skip",
             fg="green",
         )
         click.echo("WOW! NEATO!")
