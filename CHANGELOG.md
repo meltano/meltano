@@ -9,12 +9,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* ensure `meltano init <project-name>` runs on windows
 
 * add new command `meltano add transformer [name_of_plugin]`
 * add transformers (dbt) to the available plugins
 
 ### Changes
-
 * extractors and loaders are arguments in the elt command instead of options
 * `meltano www` is now `meltano ui`
 * remove dbt installation from `meltano init`
@@ -30,7 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- add Using Superset with Meltano documentation
+* add Using Superset with Meltano documentation
 
 
 ## 0.3.3 - (2018-12-21)
