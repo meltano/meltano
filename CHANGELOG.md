@@ -10,7 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-* add new command `meltano add transformer`
+* add new command `meltano add transformer [name_of_plugin]`
+* add transformers (dbt) to the available plugins
 
 ### Changes
 
@@ -18,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * `meltano www` is now `meltano ui`
 * remove dbt installation from `meltano init`
 * move everything dbt related under `transform/`
+* update `meltano elt` to not run transforms by default
 
 ### Fixes
 

@@ -4,7 +4,6 @@ import click
 
 from .project import Project
 from .venv_service import VenvService
-from .dbt_service import DbtService
 
 
 class ProjectInitServiceError(Exception):

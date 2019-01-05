@@ -10,7 +10,7 @@ sidebar: Meltano CLI
   - `meltano discover loaders`: list only available loaders
 - `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 - `meltano transform [name of transformation] --warehouse [name of warehouse]`: \*\*
-- `meltano elt <job_id> <extractor> <loader> [--dry]`: Extract, Load, and Transform the data.
+- `meltano elt <job_id> <extractor> <loader> [--dry] [--transform run]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
 

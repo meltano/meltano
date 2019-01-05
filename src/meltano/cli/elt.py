@@ -6,7 +6,6 @@ from . import cli
 from .params import db_options
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
-from meltano.core.dbt_service import DbtService
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
 
@@ -18,7 +17,7 @@ from meltano.core.plugin import PluginType
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option(
-    "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
+    "--transform", type=click.Choice(["skip", "only", "run"]), default="skip"
 )
 def elt(job_id, extractor, loader, dry, transform):
     """
