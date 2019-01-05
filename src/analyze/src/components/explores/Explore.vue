@@ -307,6 +307,7 @@ import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
+import { ensureObjPropIsReactive } from '../utils/utils'
 
 export default {
   name: 'Explore',
@@ -385,16 +386,12 @@ export default {
     },
 
     viewRowClicked(relatedView) {
-      if(!relatedView.hasOwnProperty('collapsed')) {
-        this.$set(relatedView, 'collapsed', false)
-      }
+      ensureObjPropIsReactive(this.$set, relatedView, 'collapsed')
       this.$store.dispatch('explores/expandRow');
     },
 
     joinRowClicked(join) {
-      if(!join.hasOwnProperty('collapsed')) {
-        this.$set(join, 'collapsed', false)
-      }
+      ensureObjPropIsReactive(this.$set, join, 'collapsed')
       this.$store.dispatch('explores/expandJoinRow', join);
     },
 
@@ -405,16 +402,12 @@ export default {
     },
 
     dimensionGroupSelected(dimensionGroup) {
-      if(!dimensionGroup.hasOwnProperty('selected')) {
-        this.$set(dimensionGroup, 'selected', false)
-      }
+      ensureObjPropIsReactive(this.$set, dimensionGroup, 'selected')
       this.$store.dispatch('explores/toggleDimensionGroup', dimensionGroup);
     },
 
     dimensionGroupTimeframeSelected(dimensionGroup, timeframe) {
-      if(!timeframe.hasOwnProperty('selected')) {
-        this.$set(timeframe, 'selected', false)
-      }
+      ensureObjPropIsReactive(this.$set, timeframe, 'selected')
       this.$store.dispatch('explores/toggleDimensionGroupTimeframe', {
         dimensionGroup,
         timeframe,
