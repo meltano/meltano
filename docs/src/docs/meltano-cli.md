@@ -1,6 +1,4 @@
----
-sidebar: Meltano CLI
----
+# Meltano CLI
 
 - `meltano init [project name]`: Create an empty meltano project.
 - {: #meltano-add}`meltano add [extractor | loader | transformer] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
