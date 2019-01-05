@@ -16,9 +16,7 @@ from meltano.core.plugin import PluginType
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
-@click.option(
-    "--transform", type=click.Choice(["skip", "only", "run"]), default="skip"
-)
+@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
 def elt(job_id, extractor, loader, dry, transform):
     """
     meltano elt ${job_id} ${extractor_name} ${loader_name}
