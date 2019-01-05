@@ -10,7 +10,7 @@ Follow the directions below to use [Apache Superset](https://superset.incubator.
 
 ### With Docker
 
-- Follow the [Meltano installation instructions](https://meltano.com/guide/getting-started.html#introduction)
+- Follow the [Meltano installation instructions](/docs/#introduction)
     - exclude the last `meltano www` command
 
 ### Without Docker

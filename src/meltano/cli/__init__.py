@@ -7,7 +7,7 @@ from . import (
     add,
     install,
     invoke,
-    www,
+    ui,
     permissions,
     select,
 )
