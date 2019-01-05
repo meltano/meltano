@@ -23,6 +23,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * update `meltano elt` to not run transforms by default
 
 ### Fixes
+* fixed broken sql toggles in analyze view
+* fixed sql output based on sql toggles in analyze view
 
 ### Breaks
 
