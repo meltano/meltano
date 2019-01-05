@@ -405,10 +405,16 @@ export default {
     },
 
     dimensionGroupSelected(dimensionGroup) {
+      if(!dimensionGroup.hasOwnProperty('selected')) {
+        this.$set(dimensionGroup, 'selected', false)
+      }
       this.$store.dispatch('explores/toggleDimensionGroup', dimensionGroup);
     },
 
     dimensionGroupTimeframeSelected(dimensionGroup, timeframe) {
+      if(!timeframe.hasOwnProperty('selected')) {
+        this.$set(timeframe, 'selected', false)
+      }
       this.$store.dispatch('explores/toggleDimensionGroupTimeframe', {
         dimensionGroup,
         timeframe,
