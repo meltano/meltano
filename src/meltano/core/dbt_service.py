@@ -2,34 +2,41 @@ import subprocess
 import logging
 
 from .venv_service import VenvService
+from .plugin import PluginType
 
 
 class DbtService:
     def __init__(self, project, venv_service: VenvService = None):
         self.project = project
         self.venv_service = venv_service or VenvService(project)
+        self.transform_dir = f"{self.project.root}/transform/"
+        self.profile_dir = f"{self.project.root}/transform/profile/"
 
     @property
     def exec_path(self):
-        return self.venv_service.exec_path("dbt")
+        return self.venv_service.exec_path("dbt", namespace=PluginType.TRANSFORMERS)
 
     def call(self, *args):
         logging.debug(f"Invoking: dbt {args}")
         exec_args = list(map(str, [self.exec_path, *args]))
-        run = subprocess.run(exec_args)
+        run = subprocess.run(exec_args, cwd=self.transform_dir)
 
         run.check_returncode()
         return run
 
-    def compile(self):
-        return self.call(
-            "compile", "--profiles-dir", self.project.root, "--profile", "meltano"
-        )
+    def compile(self, models=None):
+        params = ["compile", "--profiles-dir", self.profile_dir, "--profile", "meltano"]
+        if models:
+            params.extend(["--models", models])
+
+        return self.call(*params)
 
     def deps(self):
-        return self.call("deps", "--profiles-dir", self.project.root)
+        return self.call("deps", "--profiles-dir", self.profile_dir)
 
-    def run(self):
-        return self.call(
-            "run", "--profiles-dir", self.project.root, "--profile", "meltano"
-        )
+    def run(self, models=None):
+        params = ["run", "--profiles-dir", self.profile_dir, "--profile", "meltano"]
+        if models:
+            params.extend(["--models", models])
+
+        return self.call(*params)

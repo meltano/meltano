@@ -19,6 +19,7 @@ yaml.add_multi_representer(YAMLEnum, YAMLEnum.yaml_representer)
 class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
+    TRANSFORMERS = "transformers"
     ALL = "all"
 
     def __str__(self):

@@ -43,6 +43,7 @@ module.exports = {
 				'/docs/',
 				'/docs/tutorial',
 				'/docs/overview',
+				'/docs/meltano-cli',
 				'/docs/best-practices',
 				'/docs/superset',
 				'/docs/taps-targets',

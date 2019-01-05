@@ -12,10 +12,10 @@ class DbtRunner(Runner):
         self.project = project
         self.dbt_service = dbt_service or DbtService(project)
 
-    def run(self, dry_run=False):
+    def run(self, dry_run=False, models=None):
         self.dbt_service.deps()
 
         if dry_run:
-            self.dbt_service.compile()
+            self.dbt_service.compile(models)
         else:
-            self.dbt_service.run()
+            self.dbt_service.run(models)

@@ -6,7 +6,6 @@ from . import cli
 from .params import db_options
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
-from meltano.core.dbt_service import DbtService
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
 
@@ -17,9 +16,7 @@ from meltano.core.plugin import PluginType
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
-@click.option(
-    "--transform", type=click.Choice(["skip", "only", "auto"]), default="auto"
-)
+@click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
 def elt(job_id, extractor, loader, dry, transform):
     """
     meltano elt ${job_id} ${extractor_name} ${loader_name}
@@ -53,7 +50,7 @@ def elt(job_id, extractor, loader, dry, transform):
 
         if transform != "skip":
             click.echo("Running transformation...")
-            dbt_runner.perform(dry_run=dry)
+            dbt_runner.perform(dry_run=dry, models=extractor)
             click.secho("Transformation complete!", fg="green")
         else:
             click.secho("Transformation skipped.", fg="yellow")
