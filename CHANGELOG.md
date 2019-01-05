@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * `meltano www` is now `meltano ui`
 
 ### Fixes
+* fixed broken sql toggles in analyze view
+* fixed sql output based on sql toggles in analyze view
 
 ### Breaks
 
@@ -24,7 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- add Using Superset with Meltano documentation
+* add Using Superset with Meltano documentation
 
 
 ## 0.3.3 - (2018-12-21)
