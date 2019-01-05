@@ -41,7 +41,7 @@ meltano add loader target-postgres
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt carbon tap-carbon-intensity target-postgres
+meltano elt carbon tap-carbon-intensity target-postgres --transform skip
 
 # Start up the Meltano Analyze web application!
 meltano www
