@@ -90,10 +90,8 @@
               has-text-grey
               is-expandable"
               :class="{'is-collapsed': explore.related_view.collapsed}"
-              @click="viewRowClicked">
-                <template>
-                  {{explore.label}}
-                </template>
+              @click="viewRowClicked(explore.related_view)">
+                {{explore.label}}
               </a>
           </template>
           <template v-if="!explore.related_view.collapsed">
@@ -386,11 +384,17 @@ export default {
       this.$store.dispatch('explores/setChartType', chartType);
     },
 
-    viewRowClicked() {
+    viewRowClicked(relatedView) {
+      if(!relatedView.hasOwnProperty('collapsed')) {
+        this.$set(relatedView, 'collapsed', false)
+      }
       this.$store.dispatch('explores/expandRow');
     },
 
     joinRowClicked(join) {
+      if(!join.hasOwnProperty('collapsed')) {
+        this.$set(join, 'collapsed', false)
+      }
       this.$store.dispatch('explores/expandJoinRow', join);
     },
 
