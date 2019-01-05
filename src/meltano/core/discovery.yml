@@ -83,3 +83,6 @@ loaders:
       password: "$PG_PASSWORD"
       dbname: "$PG_DATABASE"
       schema: "$PG_SCHEMA"
+transformers:
+  - name: dbt
+    pip_url: dbt

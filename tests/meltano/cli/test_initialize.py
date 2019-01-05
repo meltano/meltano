@@ -5,9 +5,8 @@ def test_init(project):
             "meltano.yml",
             "README.md",
             ".gitignore",
-            "dbt_project.yml",
-            "packages.yml",
-            "profiles.yml",
+            "transform/dbt_project.yml",
+            "transform/profile/profiles.yml",
         )
     )
 
@@ -19,6 +18,7 @@ def test_init(project):
             "extract",
             "load",
             "transform",
+            "transform/profile",
             "analyze",
             "notebook",
             "orchestrate",

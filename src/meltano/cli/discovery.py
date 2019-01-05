@@ -14,7 +14,14 @@ from meltano.core.plugin_discovery_service import (
 @cli.command()
 @click.argument(
     "plugin_type",
-    type=click.Choice([PluginType.EXTRACTORS, PluginType.LOADERS, PluginType.ALL]),
+    type=click.Choice(
+        [
+            PluginType.EXTRACTORS,
+            PluginType.LOADERS,
+            PluginType.TRANSFORMERS,
+            PluginType.ALL,
+        ]
+    ),
 )
 def discover(plugin_type):
     discover_service = PluginDiscoveryService()
