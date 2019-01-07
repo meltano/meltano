@@ -17,7 +17,9 @@ from meltano.core.plugin import PluginType
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
-@click.option("--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job.")
+@click.option(
+    "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
+)
 def elt(extractor, loader, dry, transform, job_id):
     """
     meltano elt ${extractor_name} ${loader_name}
