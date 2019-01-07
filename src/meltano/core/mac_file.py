@@ -26,9 +26,7 @@ class MACFile:
 
     def explore(self, explore_name: str) -> Dict:
         try:
-            return next(e
-                        for e in self.explores
-                        if e["name"] == explore_name)
+            return next(e for e in self.explores if e["name"] == explore_name)
         except StopIteration:
             raise ExploreMissingError(f"{explore_name} not found.")
 
