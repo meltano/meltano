@@ -11,6 +11,7 @@ import sqlalchemy
 
 from .sqlhelper import SqlHelper
 from .settingshelper import SettingsHelper
+from meltano.core.mac_file import MACFile
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 meltano_model_path = join(os.getcwd(), "model")
@@ -83,11 +84,11 @@ def index():
 
 @sqlBP.route("/get/<model_name>/<explore_name>", methods=["POST"])
 def get_sql(model_name, explore_name):
-    model = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
-    with model.open() as f:
-        model = json.load(f)
-    explore = next(e for e in model["explores"] if e["name"] == explore_name)
+    mac_file = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
+    with mac_file.open() as f:
+        mac = MACFile.load(f)
 
+    explore = mac.explore(explore_name)
     incoming_json = request.get_json()
 
     to_run = incoming_json["run"]
@@ -104,7 +105,7 @@ def get_sql(model_name, explore_name):
     if not to_run:
         return json.dumps({"sql": outgoing_sql}, default=default)
 
-    connection_name = model["connection"]
+    connection_name = mac.connection("connection")
     engine = get_db_engine(connection_name)
     results = engine.execute(outgoing_sql)
 
