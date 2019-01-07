@@ -28,21 +28,32 @@
                     <strong>Dialect</strong>
                     <span class="is-pulled-right">{{connection.dialect}}</span>
                   </p>
-                  <p>
-                    <strong>Port</strong>
-                    <span class="is-pulled-right">{{connection.port}}</span>
-                  </p>
-                  <p>
-                    <strong>Username</strong>
-                    <span class="is-pulled-right">{{connection.username}}</span>
-                  </p>
-                  <p>
-                    <strong>Host</strong>
-                    <span class="ellipsis is-pulled-right"
-                            :title="connection.host">
-                      {{connection.host}}
-                    </span>
-                  </p>
+                  <div v-if="connection.dialect !== 'sqlite'">
+                    <p>
+                      <strong>Port</strong>
+                      <span class="is-pulled-right">{{connection.port}}</span>
+                    </p>
+                    <p>
+                      <strong>Username</strong>
+                      <span class="is-pulled-right">{{connection.username}}</span>
+                    </p>
+                    <p>
+                      <strong>Host</strong>
+                      <span class="ellipsis is-pulled-right"
+                              :title="connection.host">
+                        {{connection.host}}
+                      </span>
+                    </p>
+                  </div>
+                  <div v-if="connection.dialect === 'sqlite'">
+                    <p>
+                      <strong>Path</strong>
+                      <span class="ellipsis is-pulled-right"
+                              :title="connection.sqlitePath">
+                        {{connection.sqlitePath}}
+                      </span>
+                    </p>
+                  </div>
                 </div>
               </div>
               <footer class="card-footer">
@@ -67,54 +78,68 @@
                 <option value="" disabled selected>Dialect</option>
                 <option value="postgresql">PostgreSQL</option>
                 <option value="mysql">MySQL</option>
+                <option value="sqlite">SQLite</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div class="field is-grouped">
-          <p class="control is-expanded">
-            <input class="input"
-                    type="text"
-                    placeholder="Host"
-                    v-model="connectionHost">
-          </p>
-          <p class="control">
-            <input class="input"
-                    type="text"
-                    placeholder="Port"
-                    v-model="connectionPort">
-          </p>
+        <div class="field" v-if="connectionDialect !== 'sqlite'">
+          <div class="field is-grouped">
+            <p class="control is-expanded">
+              <input class="input"
+                      type="text"
+                      placeholder="Host"
+                      v-model="connectionHost">
+            </p>
+            <p class="control">
+              <input class="input"
+                      type="text"
+                      placeholder="Port"
+                      v-model="connectionPort">
+            </p>
+          </div>
+
+          <div class="field is-grouped">
+            <p class="control is-expanded">
+              <input class="input"
+                      type="text"
+                      placeholder="Database"
+                      v-model="connectionDatabase">
+            </p>
+            <p class="control">
+              <input class="input"
+                      type="text"
+                      placeholder="Schema"
+                      v-model="connectionSchema">
+            </p>
+          </div>
+
+          <div class="field is-grouped">
+            <p class="control is-expanded">
+              <input class="input"
+                      type="text"
+                      placeholder="Username"
+                      v-model="connectionUsername">
+            </p>
+            <p class="control is-expanded">
+              <input class="input"
+                      type="password"
+                      placeholder="Password"
+                      v-model="connectionPassword">
+            </p>
+          </div>
         </div>
 
-        <div class="field is-grouped">
-          <p class="control is-expanded">
-            <input class="input"
-                    type="text"
-                    placeholder="Database"
-                    v-model="connectionDatabase">
-          </p>
-          <p class="control">
-            <input class="input"
-                    type="text"
-                    placeholder="Schema"
-                    v-model="connectionSchema">
-          </p>
-        </div>
-
-        <div class="field is-grouped">
-          <p class="control is-expanded">
-            <input class="input"
-                    type="text"
-                    placeholder="Username"
-                    v-model="connectionUsername">
-          </p>
-          <p class="control is-expanded">
-            <input class="input"
-                    type="password"
-                    placeholder="Password"
-                    v-model="connectionPassword">
-          </p>
+        <div class="field" v-if="connectionDialect === 'sqlite'">
+          <div class="field is-grouped">
+            <p class="control is-expanded">
+              <input class="input"
+                      type="text"
+                      placeholder="Path to SQLite file"
+                      v-model="connectionSqlitePath">
+            </p>
+          </div>
         </div>
 
         <div class="field">
@@ -146,6 +171,7 @@ export default {
       connectionPort: '',
       connectionUsername: '',
       connectionPassword: '',
+      connectionSqlitePath: '',
     };
   },
 
@@ -173,6 +199,7 @@ export default {
         port: this.connectionPort,
         username: this.connectionUsername,
         password: this.connectionPassword,
+        sqlitePath: this.connectionSqlitePath,
       });
       this.connectionName = '';
       this.connectionDatabase = '';
@@ -182,6 +209,7 @@ export default {
       this.connectionPort = '';
       this.connectionUsername = '';
       this.connectionPassword = '';
+      this.connectionSqlitePath = '';
     },
     deleteConnection(connection) {
       this.$store.dispatch('settings/deleteConnection', connection);
