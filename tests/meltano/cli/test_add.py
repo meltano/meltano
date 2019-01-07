@@ -24,3 +24,13 @@ def test_add_loader(project):
     assert any(
         plugin["name"] == "target-csv" for plugin in project.meltano[PluginType.LOADERS]
     )
+
+
+def test_add_transformer(project):
+    service = ProjectAddService(project)
+    service.add(PluginType.TRANSFORMERS, "dbt")
+
+    assert PluginType.TRANSFORMERS in project.meltano
+    assert any(
+        plugin["name"] == "dbt" for plugin in project.meltano[PluginType.TRANSFORMERS]
+    )

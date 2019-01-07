@@ -4,7 +4,6 @@ import click
 
 from .project import Project
 from .venv_service import VenvService
-from .dbt_service import DbtService
 
 
 class ProjectInitServiceError(Exception):
@@ -60,12 +59,17 @@ class ProjectInitService:
         click.secho("🏃\tRun", nl=False)
         click.secho(" meltano add extractor tap-carbon-intensity", fg="green")
         click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano add loader target-postgres", fg="green")
+        click.secho(" meltano add loader target-sqlite", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(
-            " meltano elt job_id1 --extractor tap-carbon-intensity --loader target-postgres --transform skip",
+            " meltano elt job_id1 tap-carbon-intensity target-sqlite --transform skip",
             fg="green",
         )
+        click.echo("🏃\tRun SQLite to check the results:")
+        click.secho("\tsqlite3 meltano.db", fg="green")
+        click.secho("\t sqlite> .tables", fg="green")
+        click.secho("\t sqlite> SELECT * FROM region;", fg="green")
+        click.secho("\t sqlite> SELECT * FROM entry LIMIT 20;", fg="green")
         click.echo("WOW! NEATO!")
         click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
@@ -75,8 +79,3 @@ class ProjectInitService:
 
     def join_with_project_base(self, filename):
         return os.path.join(".", self.project_name, filename)
-
-    def install_dbt(self, project: Project):
-        venv_service = VenvService(project)
-        venv_service.create(name="dbt")
-        venv_service.install(name="dbt", pip_url="dbt")
