@@ -1,6 +1,7 @@
 import os
 import logging
 import click
+import datetime
 
 from . import cli
 from .params import db_options
@@ -12,16 +13,15 @@ from meltano.core.plugin import PluginType
 
 @cli.command()
 @db_options
-@click.argument("job_id", envvar="MELTANO_JOB_ID")
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
-def elt(job_id, extractor, loader, dry, transform):
+@click.option("--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job.")
+def elt(extractor, loader, dry, transform, job_id):
     """
-    meltano elt ${job_id} ${extractor_name} ${loader_name}
+    meltano elt ${extractor_name} ${loader_name}
 
-    job_id: A custom string to define identify the job
     extractor_name: Which extractor should be used in this extraction
     loader_name: Which loader should be used in this extraction
     """
@@ -29,6 +29,10 @@ def elt(job_id, extractor, loader, dry, transform):
         project = Project.find()
     except ProjectNotFound as e:
         raise click.ClickException(e)
+
+    if job_id is None:
+        # Autogenerate a job_id if it is not provided by the user
+        job_id = f'job{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}'
 
     singer_runner = SingerRunner(
         project,

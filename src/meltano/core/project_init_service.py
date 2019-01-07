@@ -62,7 +62,7 @@ class ProjectInitService:
         click.secho(" meltano add loader target-sqlite", fg="green")
         click.secho("🏃\tRun", nl=False)
         click.secho(
-            " meltano elt job_id1 tap-carbon-intensity target-sqlite --transform skip",
+            " meltano elt tap-carbon-intensity target-sqlite",
             fg="green",
         )
         click.echo("🏃\tRun SQLite to check the results:")
