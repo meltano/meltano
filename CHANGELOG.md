@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * ensure `meltano init <project-name>` runs on windows
-
+* settings ui now provides sqlite-specific controls for sqlite dialect
 * add `target-sqlite` to available loaders for meltano projects
 * add new command `meltano add transformer [name_of_plugin]`
 * add transformers (dbt) to the available plugins
