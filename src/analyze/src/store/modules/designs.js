@@ -185,23 +185,22 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
+    const names_of_selected = arr => arr.filter(x => x.selected).map(x => x.name);
+
     const baseTable = state.design.related_table;
-    const columns = baseTable
-      .columns
-      .filter(d => d.selected)
-      .map(d => d.name);
+    const columns = names_of_selected(baseTable.columns);
+    
     let sortColumn = baseTable
       .columns
       .find(d => d.name === state.sortColumn);
+    
     if (!sortColumn) {
       sortColumn = baseTable
         .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    const aggregates = baseTable
-      .aggregates
-      .filter(m => m.selected)
-      .map(m => m.name);
+    
+    const aggregates = names_of_selected(baseTable.aggregates);
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -213,20 +212,17 @@ const actions = {
     const joins = state.design
       .joins
       .map((j) => {
+        const table = j.related_table;
         const newJoin = {};
+        let selected = null;
+
         newJoin.name = j.name;
-        if (j.columns) {
-          newJoin.columns = j.columns
-            .filter(d => d.selected)
-            .map(d => d.name);
-          if (!newJoin.columns.length) delete newJoin.columns;
-        }
-        if (j.aggregates) {
-          newJoin.aggregates = j.aggregates
-            .filter(m => m.selected)
-            .map(m => m.name);
-          if (!newJoin.aggregates.length) delete newJoin.aggregates;
-        }
+        if (table.columns && (selected = names_of_selected(table.columns)))
+          newJoin.columns = selected;
+        
+        if (table.aggregates && (selected = names_of_selected(table.aggregates)))
+          newJoin.aggregates = selected;
+        
         return newJoin;
       })
       .filter(j => !!(j.columns || j.aggregates));
@@ -236,9 +232,7 @@ const actions = {
       .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
-        timeframes: dg.timeframes
-          .filter(tf => tf.selected)
-          .map(tf => tf.name),
+        timeframes: names_of_selected(dg.timeframes),
       }))
       .filter(dg => dg.timeframes.length);
 
@@ -260,7 +254,8 @@ const actions = {
       filters,
       run,
     };
-    if (run) state.loadingQuery = true;
+
+    state.loadingQuery = !!run;
     designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((data) => {
         if (run) {

@@ -30,9 +30,6 @@ class MeltanoRunner(Runner):
             mod = importlib.import_module(mod_name)
             return getattr(mod, cls_name)
         except (ImportError, NameError) as err:
-            import pdb
-
-            pdb.set_trace()
             logging.debug(err)
 
     def run(self, extractor_name, loader_name):

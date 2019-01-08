@@ -6,12 +6,12 @@ from .aggregate import Aggregate
 
 class AnalysisHelper:
     @staticmethod
-    def table(name, alias):
+    def table(name, **kwargs):
         try:
-            (schema, name) = name.split(".")
-            return Table(name, schema=schema, alias=alias)
+            schema, name = name.split(".")
+            return Table(name, schema=schema, **kwargs)
         except ValueError:
-            return Table(name, alias=alias)
+            return Table(name, **kwargs)
 
     @staticmethod
     def columns_from_names(columns, table):
