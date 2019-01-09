@@ -7,8 +7,11 @@ from .aggregate import Aggregate
 class AnalysisHelper:
     @staticmethod
     def table(name, alias):
-        (schema, name) = name.split(".")
-        return Table(name, schema=schema, alias=alias)
+        try:
+            (schema, name) = name.split(".")
+            return Table(name, schema=schema, alias=alias)
+        except ValueError:
+            return Table(name, alias=alias)
 
     @staticmethod
     def dimensions_from_names(dimensions, view):
