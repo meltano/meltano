@@ -34,7 +34,7 @@ def elt(extractor, loader, dry, transform, job_id):
 
     if job_id is None:
         # Autogenerate a job_id if it is not provided by the user
-        job_id = f'job{datetime.datetime.now().strftime("%Y%m%d%H%M%S%f")}'
+        job_id = f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
 
     singer_runner = SingerRunner(
         project,

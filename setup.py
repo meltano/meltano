@@ -29,7 +29,7 @@ requires = [
 ]
 
 dev_requires = [
-    'pytest==4.0.2',
+    'pytest',
     'pytest-asyncio',
     'asynctest',
     'black',
