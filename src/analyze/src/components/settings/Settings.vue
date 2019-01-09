@@ -49,8 +49,8 @@
                     <p>
                       <strong>Path</strong>
                       <span class="ellipsis is-pulled-right"
-                              :title="connection.sqlitePath">
-                        {{connection.sqlitePath}}
+                              :title="connection.path">
+                        {{connection.path}}
                       </span>
                     </p>
                   </div>
@@ -200,7 +200,7 @@ export default {
         port: this.connectionPort,
         username: this.connectionUsername,
         password: this.connectionPassword,
-        sqlitePath: this.connectionSqlitePath,
+        path: this.connectionSqlitePath,
       });
       this.connectionName = '';
       this.connectionDatabase = '';

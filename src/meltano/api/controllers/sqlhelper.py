@@ -29,7 +29,6 @@ class SqlHelper:
         view = explore["related_view"]
 
         base_table = view["sql_table_name"]
-        (schema, table) = base_table.split(".")
         incoming_dimensions = incoming_json["dimensions"]
         incoming_dimension_groups = incoming_json["dimension_groups"]
         incoming_measures = incoming_json["measures"]
