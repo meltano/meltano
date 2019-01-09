@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.5.0 - (2019-01-09)
+---
+
+### New
 * ensure `meltano init <project-name>` runs on windows
 * settings ui now provides sqlite-specific controls for sqlite dialect
 * add `target-sqlite` to available loaders for meltano projects
@@ -26,8 +38,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * fixed broken sql toggles in analyze view
 * fixed sql output based on sql toggles in analyze view
-
-### Breaks
 
 
 ## 0.4.0 - (2019-01-03)
