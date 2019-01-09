@@ -15,7 +15,7 @@
 "/.meltano": []
 "docker-compose.yml": |
   version: '3.1'
-  services: 
+  services:
     warehouse_db:
       image: postgres
       environment:
@@ -25,7 +25,7 @@
       ports:
       - '5502:5432'
 "/model": []
-"model/carbon.model.ma": |
+"model/carbon.model.m5o": |
   {
     version = 1
     name = carbon
@@ -34,8 +34,8 @@
     label = carbon intensity
     explores {
       region {
+        label = Region
         from = region
-        label = region
         description = Region Carbon Intensity Data
         joins {
           entry {
@@ -47,7 +47,7 @@
       }
     }
   }
-"model/entry.view.ma": |
+"model/entry.view.m5o": |
   {
     sql_table_name = gitlab.entry
     dimensions {
@@ -65,6 +65,7 @@
     }
     dimension_groups {
       from {
+        label = From
         description = Selected from range in carbon data
         type = time
         timeframes = [date, week, month, year]
@@ -72,6 +73,7 @@
         sql = "{{TABLE}}.from"
       }
       to {
+        label = To
         description = Selected to range in carbon data
         type = time
         timeframes = [date, week, month, year]
@@ -80,7 +82,7 @@
       }
     }
   }
-"model/region.view.ma": |
+"model/region.view.m5o": |
   {
     sql_table_name = gitlab.region
     dimensions {
@@ -91,21 +93,24 @@
         sql = "{{table}}.id"
       }
       name {
+        label = Name
         description = Carbon region long name
         type = string
         sql = "{{table}}.dnoregion"
       }
       short_name {
-        description: Carbon region short name
-        type: string
-        sql: "{{table}}.shortname"
+        label = Short Name
+        description = Carbon region short name
+        type = string
+        sql = "{{table}}.shortname"
       }
     }
     measures {
       count {
-        description: Runner Count
-        type: count
-        sql: "{{table}}.id"
+        label = Count
+        description = Runner Count
+        type = count
+        sql = "{{table}}.id"
       }
     }
   }

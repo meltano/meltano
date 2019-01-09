@@ -12,13 +12,13 @@ class ConnectionNotFoundError(Exception):
     pass
 
 
-class MACFile:
+class M5ocFile:
     def __init__(self, content: Dict):
         self.content = content
 
     @classmethod
     def load(cls, file):
-        return MACFile(json.load(file))
+        return M5ocFile(json.load(file))
 
     @property
     def explores(self):

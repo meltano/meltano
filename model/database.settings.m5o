@@ -1,0 +1,1 @@
+{"settings": {"connections": [{"name": "runners_db", "database": "warehouse", "schema": "gitlab", "dialect": "postgresql", "host": "localhost", "port": "5502", "username": "warehouse", "password": "warehouse"}]}}

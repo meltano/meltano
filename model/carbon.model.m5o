@@ -9,13 +9,12 @@
       label = Region
       from = region
       description = Region Carbon Intensity Data
-
       joins {
         entry {
-            label = Entry
-            fields = [entry.from, entry.to]
-            sql_on = "{{ region.id }} = {{ entry.region_id }}"
-            relationship = one_to_one
+          label = Entry
+          fields = [entry.from, entry.to]
+          sql_on = "{{ region.id }} = {{ entry.region_id }}"
+          relationship = one_to_one
         }
       }
     }

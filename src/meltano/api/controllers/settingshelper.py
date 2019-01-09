@@ -9,7 +9,7 @@ class SettingsHelper:
         self.meltano_model_path = join(os.getcwd(), "model")
 
         self.settings_file_path = Path(self.meltano_model_path).joinpath(
-            "database.settings.ma"
+            "database.settings.m5o"
         )
         if not self.settings_file_path.is_file():
             with open(self.settings_file_path, "w") as f:

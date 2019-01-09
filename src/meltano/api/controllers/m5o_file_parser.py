@@ -81,7 +81,7 @@ class MeltanoAnalysisFileParser:
                 continue
         return properties_copy
 
-    def parse_ma_file(self, file_path):
+    def parse_m5o_file(self, file_path):
         try:
             return ConfigFactory.parse_string(open(file_path, "r").read())
         except Exception as e:
@@ -90,7 +90,7 @@ class MeltanoAnalysisFileParser:
     def compile(self, models):
         indices = {}
         for model in models:
-            compiled_file_name = f"{model['name']}.model.mac"
+            compiled_file_name = f"{model['name']}.model.m5oc"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
             indices[model["name"]] = {
@@ -100,18 +100,18 @@ class MeltanoAnalysisFileParser:
             compiled_model.close()
 
         # index file
-        index_file_path = Path(self.directory).joinpath("models.index.mac")
+        index_file_path = Path(self.directory).joinpath("models.index.m5oc")
         index_file = open(index_file_path, "w")
         index_file.write(json.dumps(indices))
         index_file.close()
 
     def parse(self):
-        self.ma_views = Path(self.directory).glob("*.view.ma")
-        self.ma_models = Path(self.directory).glob("*.model.ma")
-        self.ma_dashboards = Path(self.directory).glob("*.dashboards.ma")
-        for model in self.ma_models:
+        self.m5o_views = Path(self.directory).glob("*.view.m5o")
+        self.m5o_models = Path(self.directory).glob("*.model.m5o")
+        self.m5o_dashboards = Path(self.directory).glob("*.dashboards.m5o")
+        for model in self.m5o_models:
             file_name = model.parts[-1]
-            conf = self.parse_ma_file(model)
+            conf = self.parse_m5o_file(model)
             parsed_model = self.model(conf, file_name)
             self.models.append(parsed_model)
         return self.models
@@ -135,8 +135,8 @@ class MeltanoAnalysisFileParser:
         try:
             return next(
                 view
-                for view in self.ma_views
-                if view.parts[-1] == f"{view_name}.view.ma"
+                for view in self.m5o_views
+                if view.parts[-1] == f"{view_name}.view.m5o"
             )
         except StopIteration as e:
             raise MeltanoAnalysisFileParserMissingViewError(
@@ -162,7 +162,7 @@ class MeltanoAnalysisFileParser:
                         temp_explore[prop_name], "explore", prop_name, file_name
                     )
                     temp_explore["related_view"] = self.view(
-                        self.parse_ma_file(matching_view), matching_view.parts[-1]
+                        self.parse_m5o_file(matching_view), matching_view.parts[-1]
                     )
                 if prop_name == "joins":
                     temp_explore[prop_name] = self.joins(prop_def, file_name)
@@ -178,7 +178,7 @@ class MeltanoAnalysisFileParser:
                 temp_join["name"], "join", "name", file_name
             )
             temp_join["related_view"] = self.view(
-                self.parse_ma_file(matching_view), matching_view.parts[-1]
+                self.parse_m5o_file(matching_view), matching_view.parts[-1]
             )
             missing_properties = self.missing_properties(
                 self.required_join_properties, join_def

@@ -233,7 +233,7 @@ const actions = {
 
     let order = null;
     const dimensionGroups = baseView
-      .dimension_groups || [] // TODO update default empty array likely in the ma_file_parser to set proper defaults if user's exclude certain properties in their models
+      .dimension_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
         timeframes: dg.timeframes

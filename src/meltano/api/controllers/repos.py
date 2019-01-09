@@ -10,7 +10,7 @@ import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
 
-from .ma_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
+from .m5o_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
@@ -25,18 +25,18 @@ def index():
         for f in os.listdir(meltano_model_path)
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
-    sortedMaFiles = {"documents": [], "views": [], "models": [], "dashboards": []}
+    sortedM5oFiles = {"documents": [], "views": [], "models": [], "dashboards": []}
     onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
         file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
             "utf-8"
         )
-        sortedMaFiles["documents"].append(file_dict)
+        sortedM5oFiles["documents"].append(file_dict)
 
     for f in onlyfiles:
         filename, ext = os.path.splitext(f)
-        if ext != ".ma":
+        if ext != ".m5o":
             continue
         file_dict = {"path": f, "abs": f, "visual": f}
         file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
@@ -47,13 +47,13 @@ def index():
         filename, ext = os.path.splitext(filename)
         file_dict["visual"] = filename
         if ext == ".view":
-            sortedMaFiles["views"].append(file_dict)
+            sortedM5oFiles["views"].append(file_dict)
         if ext == ".model":
-            sortedMaFiles["models"].append(file_dict)
+            sortedM5oFiles["models"].append(file_dict)
         if ext == ".dashboard":
-            sortedMaFiles["dashboards"].append(file_dict)
+            sortedM5oFiles["dashboards"].append(file_dict)
 
-    return jsonify(sortedMaFiles)
+    return jsonify(sortedM5oFiles)
 
 
 @reposBP.route("/file/<unique>", methods=["GET"])
@@ -78,10 +78,10 @@ def file(unique):
 
 
 def lint_all(compile):
-    ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
-    models = ma_parse.parse()
+    m5o_parse = MeltanoAnalysisFileParser(meltano_model_path)
+    models = m5o_parse.parse()
     if compile:
-        ma_parse.compile(models)
+        m5o_parse.compile(models)
     return jsonify({"result": True})
 
 
@@ -115,7 +115,7 @@ def db_test():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    models = Path(meltano_model_path).joinpath("models.index.mac")
+    models = Path(meltano_model_path).joinpath("models.index.m5oc")
     return jsonify(json.loads(open(models, "r").read()))
 
 
@@ -130,15 +130,15 @@ def explores():
 
 @reposBP.route("/views/<view_name>", methods=["GET"])
 def view_read(view_name):
-    file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.ma")
-    ma_parse = MeltanoAnalysisFileParser(meltano_model_path)
-    view = ma_parse.parse_ma_file(file_path)
+    file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.m5o")
+    m5o_parse = MeltanoAnalysisFileParser(meltano_model_path)
+    view = m5o_parse.parse_m5o_file(file_path)
     return jsonify(view)
 
 
 @reposBP.route("/explores/<model_name>/<explore_name>", methods=["GET"])
 def explore_read(model_name, explore_name):
-    model = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
+    model = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
     with model.open() as f:
         model = json.load(f)
     explores = model["explores"]
