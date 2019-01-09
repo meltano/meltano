@@ -37,7 +37,12 @@
       </div>
     </div>
 
-    <Content custom/>
+    <Content custom />
+
+    <section class="hiring">
+      <h2 class="hiring__title">We're Hiring!</h2>
+      <p class="hiring__text">Want to be help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
+    </section>
 
     <div
       class="footer"
@@ -71,6 +76,30 @@ export default {
 
 <style lang="stylus">
 @import './styles/config.styl'
+
+.hiring {
+  border-top: 1px solid #eaecef;
+  padding: 1.2rem 0;
+  text-align: center;
+
+  &__text {
+    font-size: 1.2rem;
+    margin-bottom: 0.82rem;
+  }
+
+  &__title {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+@media (min-width: $MQNarrow) {
+  .hiring__text {
+    max-width: 60%;
+    margin: 1rem auto;
+  }
+}
 
 .home
   padding $navbarHeight 2rem 0
