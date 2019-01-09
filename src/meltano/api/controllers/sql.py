@@ -12,6 +12,7 @@ import sqlalchemy
 from .sqlhelper import SqlHelper
 from .settingshelper import SettingsHelper
 from meltano.core.mac_file import MACFile
+from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 meltano_model_path = join(os.getcwd(), "model")
@@ -55,6 +56,7 @@ def default(obj):
 
 
 def get_db_engine(connection_name):
+    project = Project.find()
     settings_helper = SettingsHelper()
     connections = settings_helper.get_connections()["settings"]["connections"]
 
@@ -69,8 +71,11 @@ def get_db_engine(connection_name):
             psql_params = ["username", "password", "host", "port", "database"]
             user, pw, host, port, db = [connection[param] for param in psql_params]
             connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        elif connection["dialect"] == "sqlite":
+            db_path = project.root.joinpath(connection["path"])
+            connection_url = f"sqlite:///{db_path}"
 
-            return sqlalchemy.create_engine(connection_url)
+        return sqlalchemy.create_engine(connection_url)
 
         raise ConnectionNotFound(connection_name)
     except StopIteration:
