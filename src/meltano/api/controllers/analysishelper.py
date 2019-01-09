@@ -1,6 +1,8 @@
 from .substitution import Substitution
 from pypika import Table
 
+from .aggregate import Aggregate
+
 
 class AnalysisHelper:
     @staticmethod
@@ -10,12 +12,12 @@ class AnalysisHelper:
 
     @staticmethod
     def dimensions_from_names(dimensions, view):
-        return list(filter(lambda x: x.name in dimensions, view.dimensions))
+        return list(filter(lambda x: x["name"] in dimensions, view["dimensions"]))
 
     # TODO: dedup this non dry situation
     @staticmethod
     def measures_from_names(measures, view):
-        return list(filter(lambda x: x.name in measures, view.measures))
+        return list(filter(lambda x: x["name"] in measures, view["measures"]))
 
     @staticmethod
     def dimensions(dimensions, table):
@@ -34,6 +36,6 @@ class AnalysisHelper:
 
     @staticmethod
     def field_from_dimension(d, table):
-        sql = d.settings["sql"]
+        sql = d["sql"]
         substitution = Substitution(sql, table, dimension=d)
         return substitution.sql

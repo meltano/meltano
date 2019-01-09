@@ -23,7 +23,7 @@ class Substitution:
         if not dimension:
             self.type = "string"
         else:
-            self.type = dimension.settings["type"]
+            self.type = dimension["type"]
 
         self.substitution_type = SubstitutionType.unknown
         self.get_substitution_type()
@@ -32,12 +32,12 @@ class Substitution:
 
     def get_substitution_type(self):
         # trying guess the substitution_type in a cheap way
-        if "." in self.input and "${TABLE}" not in self.input:
+        if "." in self.input and "{{table}}" not in self.input:
             if "SQL_TABLE_NAME" in self.input:
                 self.substitution_type = SubstitutionType.view_sql_table_name
             else:
                 self.substitution_type = SubstitutionType.view_dimension
-        elif "${TABLE}" in self.input:
+        elif "{{table}}" in self.input:
             self.substitution_type = SubstitutionType.table
         elif " " not in self.input:
             self.substitution_type = SubstitutionType.dimension
@@ -46,8 +46,8 @@ class Substitution:
 
     @staticmethod
     def placeholder_match(input_):
-        outer_pattern = r"(\$\{[\w\.]*\})"
-        inner_pattern = r"\$\{([\w\.]*)\}"
+        outer_pattern = r"(\{\{[\w\.]*\}\})"
+        inner_pattern = r"\{\{([\w\.]*)\}\}"
         outer_results = re.findall(outer_pattern, input_)
         inner_results = re.findall(inner_pattern, input_)
         Results = namedtuple("Results", "inner outer")
