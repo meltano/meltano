@@ -28,7 +28,7 @@
                     <strong>Dialect</strong>
                     <span class="is-pulled-right">{{connection.dialect}}</span>
                   </p>
-                  <div v-if="connection.dialect !== 'sqlite'">
+                  <div v-if="!isConnectionDialectSqlite(connection.dialect)">
                     <p>
                       <strong>Port</strong>
                       <span class="is-pulled-right">{{connection.port}}</span>
@@ -45,7 +45,7 @@
                       </span>
                     </p>
                   </div>
-                  <div v-if="connection.dialect === 'sqlite'">
+                  <div v-if="isConnectionDialectSqlite(connection.dialect)">
                     <p>
                       <strong>Path</strong>
                       <span class="ellipsis is-pulled-right"
@@ -84,7 +84,7 @@
           </div>
         </div>
 
-        <div class="field" v-if="connectionDialect !== 'sqlite'">
+        <div class="field" v-if="!isConnectionDialectSqlite(connectionDialect)">
           <div class="field is-grouped">
             <p class="control is-expanded">
               <input class="input"
@@ -131,7 +131,7 @@
           </div>
         </div>
 
-        <div class="field" v-if="connectionDialect === 'sqlite'">
+        <div class="field" v-if="isConnectionDialectSqlite(connectionDialect)">
           <div class="field is-grouped">
             <p class="control is-expanded">
               <input class="input"
@@ -185,6 +185,7 @@ export default {
     ]),
     ...mapGetters('settings', [
       'hasConnections',
+      'isConnectionDialectSqlite',
     ]),
   },
 
