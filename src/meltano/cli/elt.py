@@ -22,7 +22,7 @@ from meltano.core.plugin import PluginType
 )
 def elt(extractor, loader, dry, transform, job_id):
     """
-    meltano elt ${extractor_name} ${loader_name}
+    meltano elt EXTRACTOR_NAME LOADER_NAME
 
     extractor_name: Which extractor should be used in this extraction
     loader_name: Which loader should be used in this extraction
