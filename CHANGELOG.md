@@ -10,7 +10,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * ensure `meltano init <project-name>` runs on windows
-
 * add `target-sqlite` to available loaders for meltano projects
 * add new command `meltano add transformer [name_of_plugin]`
 * add transformers (dbt) to the available plugins
@@ -21,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * remove dbt installation from `meltano init`
 * move everything dbt related under `transform/`
 * update `meltano elt` to not run transforms by default
+* update `meltano elt` to auto generate the job_id (job_id has been converted to an optional argument)
 
 ### Fixes
 * fixed broken sql toggles in analyze view
