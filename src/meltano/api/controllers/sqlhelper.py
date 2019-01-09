@@ -6,13 +6,8 @@ from flask import jsonify
 from pypika import Query, Order
 
 from .analysishelper import AnalysisHelper
-from .aggregate import Aggregate
 from .date import Date
 from .joinhelper import JoinHelper
-from ..app import app, db
-from ..models.data import View, DimensionGroup, Join
-from ..models.projects import Project
-from ..models.settings import Settings
 
 
 class SqlHelper:
@@ -27,12 +22,13 @@ class SqlHelper:
         return (outer_results, inner_results)
 
     def get_names(self, things):
-        return [thing.name for thing in things]
+        return [thing["name"] for thing in things]
 
     def get_sql(self, explore, incoming_json):
         view_name = incoming_json["view"]
-        view = View.query.filter(View.name == view_name).first()
-        base_table = view.settings["sql_table_name"]
+        view = explore["related_view"]
+
+        base_table = view["sql_table_name"]
         (schema, table) = base_table.split(".")
         incoming_dimensions = incoming_json["dimensions"]
         incoming_dimension_groups = incoming_json["dimension_groups"]
@@ -58,7 +54,7 @@ class SqlHelper:
         dimensions_raw = dimensions
         measures_raw = measures
 
-        table = AnalysisHelper.table(base_table, explore.name)
+        table = AnalysisHelper.table(base_table, explore["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
         dimension_groups = self.dimension_groups(
             view_name, incoming_dimension_groups, table
@@ -99,7 +95,7 @@ class SqlHelper:
         }
 
     def column_headers(self, dimensions, measures):
-        return [d.label for d in dimensions + measures]
+        return [d["label"] for d in dimensions + measures]
 
     def dimension_groups(self, view_name, dimension_groups, table):
         fields = []

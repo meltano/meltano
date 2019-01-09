@@ -14,8 +14,8 @@ class AggregateType(Enum):
 
 class Aggregate:
     def __init__(self, measure, table):
-        sql = measure.settings["sql"]
-        self.substitution = Substitution(sql, table, None, measure.name)
+        sql = measure["sql"]
+        self.substitution = Substitution(sql, table, None, measure["name"])
         self.measure = measure
         self.table = table
         self.sql = self.substitution.sql
@@ -23,7 +23,7 @@ class Aggregate:
         self.getAggregateType()
 
     def getAggregateType(self):
-        type_ = self.measure.settings["type"]
+        type_ = self.measure["type"]
         if type_ == AggregateType.sum.value:
             self.aggregateType = AggregateType.sum
             self.setAggregateSQLSum()

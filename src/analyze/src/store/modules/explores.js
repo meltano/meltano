@@ -6,10 +6,7 @@ import utils from '../../api/utils';
 
 const state = {
   explore: {
-    settings: {
-      label: 'loading...',
-    },
-    view: {},
+    related_view: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -61,10 +58,9 @@ const getters = {
 
   isColumnSorted: () => key => state.sortColumn === key,
 
-  showJoinDimensionMeasureHeader: () => arr => !!(arr && arr.length),
+  showJoinDimensionMeasureHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
-  getLabelForJoin: () => join => ('view_label' in join.settings ? join.settings.view_label : join.name),
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -129,7 +125,7 @@ const actions = {
     exploreApi.index(model, explore)
       .then((data) => {
         commit('setExplore', data.data);
-        commit('selectedDimensions', data.data.view.dimensions);
+        commit('selectedDimensions', data.data.related_view.dimensions);
       });
   },
 
@@ -140,8 +136,8 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched dimensions
     commit('toggleJoinOpen', join);
-    if (join.dimensions.length) return;
-    exploreApi.getView(join.name)
+    if (join.related_view.dimensions.length) return;
+    exploreApi.getView(join.related_view.name)
       .then((data) => {
         commit('setJoinDimensions', {
           dimensions: data.data.dimensions,
@@ -189,7 +185,7 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('explores/resetErrorMessage');
-    const baseView = state.explore.view;
+    const baseView = state.explore.related_view;
     const dimensions = baseView
       .dimensions
       .filter(d => d.selected)
@@ -237,7 +233,7 @@ const actions = {
 
     let order = null;
     const dimensionGroups = baseView
-      .dimension_groups
+      .dimension_groups || [] // TODO update default empty array likely in the ma_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
         timeframes: dg.timeframes
@@ -438,7 +434,7 @@ const mutations = {
   },
 
   selectedDimensions(_, dimensions) {
-    dimensions.forEach((dimension) => {
+    Object.keys(dimensions).forEach(dimension => {
       state.selectedDimensions[dimension.unique_name] = false;
     });
   },
@@ -448,7 +444,7 @@ const mutations = {
   },
 
   toggleCollapsed() {
-    state.explore.view.collapsed = !state.explore.view.collapsed;
+    state.explore.related_view.collapsed = !state.explore.related_view.collapsed;
   },
 
   setCurrentTab(_, tab) {

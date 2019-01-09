@@ -1,17 +1,20 @@
 import json
+import os
 from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
+from pathlib import Path
+from os.path import join
 
 from flask import Blueprint, jsonify, request
-
-sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
-
 import sqlalchemy
 
 from .sqlhelper import SqlHelper
-from ..models.data import Model, Explore
-from ..models.settings import Settings
+from .settingshelper import SettingsHelper
+from meltano.core.mac_file import MACFile
+
+sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
+meltano_model_path = join(os.getcwd(), "model")
 
 
 class ConnectionNotFound(Exception):
@@ -52,7 +55,8 @@ def default(obj):
 
 
 def get_db_engine(connection_name):
-    connections = Settings.query.first().settings["connections"]
+    settings_helper = SettingsHelper()
+    connections = settings_helper.get_connections()["settings"]["connections"]
 
     try:
         connection = next(
@@ -80,8 +84,11 @@ def index():
 
 @sqlBP.route("/get/<model_name>/<explore_name>", methods=["POST"])
 def get_sql(model_name, explore_name):
-    model = Model.query.filter(Model.name == model_name).first()
-    explore = Explore.query.filter(Explore.name == explore_name).first()
+    mac_file = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
+    with mac_file.open() as f:
+        mac = MACFile.load(f)
+
+    explore = mac.explore(explore_name)
     incoming_json = request.get_json()
 
     to_run = incoming_json["run"]
@@ -98,7 +105,7 @@ def get_sql(model_name, explore_name):
     if not to_run:
         return json.dumps({"sql": outgoing_sql}, default=default)
 
-    connection_name = model.settings["connection"]
+    connection_name = mac.connection("connection")
     engine = get_db_engine(connection_name)
     results = engine.execute(outgoing_sql)
 
@@ -118,18 +125,19 @@ def get_sql(model_name, explore_name):
 
 @sqlBP.route("/distinct/<model_name>/<explore_name>", methods=["POST"])
 def get_distinct_field_name(model_name, explore_name):
-    incoming_json = request.get_json()
-    field_name = incoming_json["field"].replace("${TABLE}", explore_name)
-    model = Model.query.filter(Model.name == model_name).first()
-    explore = Explore.query.filter(Explore.name == explore_name).first()
+    # incoming_json = request.get_json()
+    # field_name = incoming_json["field"].replace("${TABLE}", explore_name)
+    # model = Model.query.filter(Model.name == model_name).first()
+    # explore = Explore.query.filter(Explore.name == explore_name).first()
 
-    base_table = explore.view.settings["sql_table_name"]
-    base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}"
+    # base_table = explore.view.settings["sql_table_name"]
+    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}"
 
-    engine = get_db_engine(model.settings["connection"])
-    results = engine.execute(base_sql)
-    results = [dict(row) for row in results]
-    return json.dumps(
-        {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
-        default=default,
-    )
+    # engine = get_db_engine(model.settings["connection"])
+    # results = engine.execute(base_sql)
+    # results = [dict(row) for row in results]
+    # return json.dumps(
+    #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
+    #     default=default,
+    # )
+    return json.dumps({"tester": "tester"})

@@ -69,3 +69,7 @@ a.disabled {
  cursor: default;
  color: #CCC;
 }
+
+.text-selection-off {
+  user-select: none;
+}
