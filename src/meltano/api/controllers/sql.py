@@ -105,7 +105,7 @@ def get_sql(model_name, design_name):
     names = sql_dict["names"]
 
     if not incoming_json["run"]:
-        return json.dumps({"sql": outgoing_sql}, default=default)
+        return jsonify({"sql": outgoing_sql})
 
     connection_name = m5oc.connection("connection")
     engine = get_db_engine(connection_name)
@@ -122,7 +122,7 @@ def get_sql(model_name, design_name):
         base_dict["keys"] = list(results[0].keys())
         base_dict["aggregates"] = sqlHelper.get_names(aggregates)
 
-    return json.dumps(base_dict, default=default)
+    return jsonify(base_dict)
 
 
 @sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
@@ -142,4 +142,4 @@ def get_distinct_field_name(model_name, design_name):
     #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
     #     default=default,
     # )
-    return json.dumps({"tester": "tester"})
+    return jsonify({"tester": "tester"})

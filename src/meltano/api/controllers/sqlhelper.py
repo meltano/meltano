@@ -55,7 +55,6 @@ class SqlHelper:
         timeframes = [t["timeframes"] for t in incoming_column_groups]
         timeframes = [y for x in timeframes for y in x]
 
-
         columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
         columns = AnalysisHelper.columns(columns_raw, table) + column_groups
 
@@ -137,9 +136,6 @@ class SqlHelper:
 
         q = q.limit(limit)
         return f"{str(q)};"
-
-    def get_column_headers(self, dimensions, measures, joins):
-        return 
 
     def reset_db(self):
         try:
