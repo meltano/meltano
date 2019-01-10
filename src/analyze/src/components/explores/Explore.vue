@@ -32,10 +32,10 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.related_view.dimensions)">
+                  v-if="showJoinDimensionMeasureHeader(join.related_table.dimensions)">
                   Dimensions
                 </a>
-                <template v-for="dimensionGroup in join.related_view.dimension_groups">
+                <template v-for="dimensionGroup in join.related_table.dimension_groups">
                   <a class="panel-block dimension-group"
                       :key="dimensionGroup.label"
                       v-if="!dimensionGroup.hidden"
@@ -54,7 +54,7 @@
                     </template>
                   </template>
                 </template>
-                <template v-for="dimension in join.related_view.dimensions">
+                <template v-for="dimension in join.related_table.dimensions">
                   <a class="panel-block"
                     v-if="!dimension.hidden"
                     :key="dimension.label"
@@ -72,7 +72,7 @@
                 </a>
                 <template v-for="measure in join.measures">
                   <a class="panel-block"
-                    v-if="measure.related_view.hidden"
+                    v-if="measure.related_table.hidden"
                     :key="measure.label"
                     :class="{'is-active': measure.selected}"
                     @click="joinMeasureSelected(join, measure)">
@@ -89,22 +89,22 @@
               has-background-white-ter
               has-text-grey
               is-expandable"
-              :class="{'is-collapsed': explore.related_view.collapsed}"
-              @click="viewRowClicked(explore.related_view)">
+              :class="{'is-collapsed': explore.related_table.collapsed}"
+              @click="tableRowClicked(explore.related_table)">
                 {{explore.label}}
               </a>
           </template>
-          <template v-if="!explore.related_view.collapsed">
+          <template v-if="!explore.related_table.collapsed">
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
+                v-if="showJoinDimensionMeasureHeader(explore.related_table.dimensions)">
               Dimensions
             </a>
-            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
+            <template v-for="dimensionGroup in explore.related_table.dimension_groups">
               <a class="panel-block dimension-group"
                   :key="dimensionGroup.label"
-                  v-if="!dimensionGroup.related_view.hidden"
+                  v-if="!dimensionGroup.related_table.hidden"
                   @click="dimensionGroupSelected(dimensionGroup)"
                   :class="{'is-active': dimensionGroup.selected}">
                 {{dimensionGroup.label}}
@@ -120,7 +120,7 @@
               </template>
             </template>
             <a class="panel-block"
-                v-for="dimension in explore.related_view.dimensions"
+                v-for="dimension in explore.related_table.dimensions"
                 :key="dimension.label"
                 v-if="!dimension.hidden"
                 @click="dimensionSelected(dimension)"
@@ -131,11 +131,11 @@
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
+                v-if="showJoinDimensionMeasureHeader(explore.related_table.measures)">
               Measures
             </a>
             <a class="panel-block"
-                v-for="measure in explore.related_view.measures"
+                v-for="measure in explore.related_table.measures"
                 :key="measure.label"
                 @click="measureSelected(measure)"
                 :class="{'is-active': measure.selected}">
@@ -385,8 +385,8 @@ export default {
       this.$store.dispatch('explores/setChartType', chartType);
     },
 
-    viewRowClicked(relatedView) {
-      ensureObjPropIsReactive(this.$set, relatedView, 'collapsed')
+    tableRowClicked(relatedTable) {
+      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed')
       this.$store.dispatch('explores/expandRow');
     },
 

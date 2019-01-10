@@ -6,7 +6,7 @@ import utils from '../../api/utils';
 
 const state = {
   explore: {
-    related_view: {},
+    related_table: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -125,7 +125,7 @@ const actions = {
     exploreApi.index(model, explore)
       .then((data) => {
         commit('setExplore', data.data);
-        commit('selectedDimensions', data.data.related_view.dimensions);
+        commit('selectedDimensions', data.data.related_table.dimensions);
       });
   },
 
@@ -136,8 +136,8 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched dimensions
     commit('toggleJoinOpen', join);
-    if (join.related_view.dimensions.length) return;
-    exploreApi.getView(join.related_view.name)
+    if (join.related_table.dimensions.length) return;
+    exploreApi.getTable(join.related_table.name)
       .then((data) => {
         commit('setJoinDimensions', {
           dimensions: data.data.dimensions,
@@ -185,20 +185,20 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('explores/resetErrorMessage');
-    const baseView = state.explore.related_view;
-    const dimensions = baseView
+    const baseTable = state.explore.related_table;
+    const dimensions = baseTable
       .dimensions
       .filter(d => d.selected)
       .map(d => d.name);
-    let sortColumn = baseView
+    let sortColumn = baseTable
       .dimensions
       .find(d => d.name === state.sortColumn);
     if (!sortColumn) {
-      sortColumn = baseView
+      sortColumn = baseTable
         .measures
         .find(d => d.name === state.sortColumn);
     }
-    const measures = baseView
+    const measures = baseTable
       .measures
       .filter(m => m.selected)
       .map(m => m.name);
@@ -232,7 +232,7 @@ const actions = {
       .filter(j => !!(j.dimensions || j.measures));
 
     let order = null;
-    const dimensionGroups = baseView
+    const dimensionGroups = baseTable
       .dimension_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
@@ -250,7 +250,7 @@ const actions = {
     }
 
     const postData = {
-      view: baseView.name,
+      table: baseTable.name,
       dimensions,
       dimension_groups: dimensionGroups,
       measures,
@@ -444,7 +444,7 @@ const mutations = {
   },
 
   toggleCollapsed() {
-    state.explore.related_view.collapsed = !state.explore.related_view.collapsed;
+    state.explore.related_table.collapsed = !state.explore.related_table.collapsed;
   },
 
   setCurrentTab(_, tab) {

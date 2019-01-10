@@ -52,7 +52,7 @@ const actions = {
   getFile({ commit }, file) {
     repoApi.file(file.unique)
       .then((response) => {
-        commit('setCurrentFileView', response.data);
+        commit('setCurrentFileTable', response.data);
       });
   },
 
@@ -111,7 +111,7 @@ const mutations = {
     state.files = files;
   },
 
-  setCurrentFileView(_, file) {
+  setCurrentFileTable(_, file) {
     state.activeView = file;
   },
 

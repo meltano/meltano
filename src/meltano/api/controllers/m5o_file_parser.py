@@ -13,12 +13,12 @@ class MeltanoAnalysisFileParserError(Exception):
         )
 
 
-class MeltanoAnalysisFileParserMissingViewError(MeltanoAnalysisFileParserError):
+class MeltanoAnalysisFileParserMissingTableError(MeltanoAnalysisFileParserError):
     def __init__(self, field, your_choice, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
-        self.message = f'Missing accompanying view "{your_choice}" in "{field}" field in {cls} in {file_name}.'
-        super(MeltanoAnalysisFileParserMissingViewError, self).__init__(
+        self.message = f'Missing accompanying table "{your_choice}" in "{field}" field in {cls} in {file_name}.'
+        super(MeltanoAnalysisFileParserMissingTableError, self).__init__(
             self.message, self.file_name, *args
         )
 
@@ -60,7 +60,7 @@ class MeltanoAnalysisFileParser:
         self.required_model_properties = ["name", "connection", "label", "explores"]
         self.required_explore_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
-        self.required_view_properties = ["sql_table_name", "dimensions"]
+        self.required_table_properties = ["sql_table_name", "dimensions"]
         self.join_relationship_types = [
             "one_to_one",
             "one_to_many",
@@ -106,7 +106,7 @@ class MeltanoAnalysisFileParser:
         index_file.close()
 
     def parse(self):
-        self.m5o_views = list(Path(self.directory).glob("*.view.m5o"))
+        self.m5o_tables = list(Path(self.directory).glob("*.table.m5o"))
         self.m5o_models = list(Path(self.directory).glob("*.model.m5o"))
         self.m5o_dashboards = list(Path(self.directory).glob("*.dashboards.m5o"))
         for model in self.m5o_models:
@@ -131,16 +131,16 @@ class MeltanoAnalysisFileParser:
                 temp_model[prop_name] = self.explores(prop_def, file_name)
         return temp_model
 
-    def view_conf_by_name(self, view_name, cls, prop, file_name):
+    def table_conf_by_name(self, table_name, cls, prop, file_name):
         try:
             return next(
-                view
-                for view in self.m5o_views
-                if view.parts[-1] == f"{view_name}.view.m5o"
+                table
+                for table in self.m5o_tables
+                if table.parts[-1] == f"{table_name}.table.m5o"
             )
         except StopIteration as e:
-            raise MeltanoAnalysisFileParserMissingViewError(
-                prop, view_name, cls, file_name
+            raise MeltanoAnalysisFileParserMissingTableError(
+                prop, table_name, cls, file_name
             )
 
     def explores(self, ma_file_explores_dict, file_name):
@@ -158,11 +158,11 @@ class MeltanoAnalysisFileParser:
             for prop_name, prop_def in explore_def.items():
                 temp_explore[prop_name] = prop_def
                 if prop_name == "from":
-                    matching_view = self.view_conf_by_name(
+                    matching_table = self.table_conf_by_name(
                         temp_explore[prop_name], "explore", prop_name, file_name
                     )
-                    temp_explore["related_view"] = self.view(
-                        self.parse_m5o_file(matching_view), matching_view.parts[-1]
+                    temp_explore["related_table"] = self.table(
+                        self.parse_m5o_file(matching_table), matching_table.parts[-1]
                     )
                 if prop_name == "joins":
                     temp_explore[prop_name] = self.joins(prop_def, file_name)
@@ -174,11 +174,11 @@ class MeltanoAnalysisFileParser:
         for join_name, join_def in ma_file_joins_dict.items():
             temp_join = {}
             temp_join["name"] = join_name
-            matching_view = self.view_conf_by_name(
+            matching_table = self.table_conf_by_name(
                 temp_join["name"], "join", "name", file_name
             )
-            temp_join["related_view"] = self.view(
-                self.parse_m5o_file(matching_view), matching_view.parts[-1]
+            temp_join["related_table"] = self.table(
+                self.parse_m5o_file(matching_table), matching_table.parts[-1]
             )
             missing_properties = self.missing_properties(
                 self.required_join_properties, join_def
@@ -205,22 +205,22 @@ class MeltanoAnalysisFileParser:
             explore_joins.append(temp_join)
         return explore_joins
 
-    def view(self, view_file, file_name):
-        temp_view = {}
+    def table(self, table_file, file_name):
+        temp_table = {}
         missing_properties = self.missing_properties(
-            self.required_view_properties, view_file
+            self.required_table_properties, table_file
         )
         if missing_properties:
             raise MeltanoAnalysisFileParserMissingFieldsError(
-                missing_properties, "view", file_name
+                missing_properties, "table", file_name
             )
-        for prop_name, prop_def in view_file.items():
-            temp_view[prop_name] = prop_def
+        for prop_name, prop_def in table_file.items():
+            temp_table[prop_name] = prop_def
             if prop_name == "dimensions":
-                temp_view[prop_name] = self.dimensions(prop_def)
+                temp_table[prop_name] = self.dimensions(prop_def)
             elif prop_name == "measures":
-                temp_view[prop_name] = self.measures(prop_def)
-        return temp_view
+                temp_table[prop_name] = self.measures(prop_def)
+        return temp_table
 
     def dimensions(self, ma_file_dimensions_dict):
         temp_dimensions = []

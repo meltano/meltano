@@ -13,26 +13,11 @@ class JoinType(Enum):
 class JoinHelper:
     @staticmethod
     def get_join(join):
-        # view = JoinHelper.get_view(join)
-        # table = AnalysisHelper.table(view.settings["sql_table_name"], view.name)
-        # dimensions = JoinHelper.get_dimensions(join, view, table)
-        # # TODO finish this implementation with measures
-        # measures = []
-        # join = Join.query.filter(Join.name == join["name"]).first()
-        # return {
-        #     "view": view,
-        #     "dimensions": dimensions,
-        #     "measures": measures,
-        #     "table": table,
-        #     "on": join.settings["sql_on"],
-        #     "join": join,
-        # }
         return {"get_join": "get_join"}
 
-    def get_dimensions(join, view, table):
-        dimensions = AnalysisHelper.dimensions_from_names(join["dimensions"], view)
+    def get_dimensions(join, table, table):
+        dimensions = AnalysisHelper.dimensions_from_names(join["dimensions"], table)
         return AnalysisHelper.dimensions(dimensions, table)
 
-    def get_view(join):
-        # return View.query.filter(View.name == join["name"]).first()
+    def get_table(join):
         return {}

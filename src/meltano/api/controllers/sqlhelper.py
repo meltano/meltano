@@ -25,10 +25,10 @@ class SqlHelper:
         return [thing["name"] for thing in things]
 
     def get_sql(self, explore, incoming_json):
-        view_name = incoming_json["view"]
-        view = explore["related_view"]
+        table_name = incoming_json["table"]
+        table = explore["related_table"]
 
-        base_table = view["sql_table_name"]
+        base_table = table["sql_table_name"]
         incoming_dimensions = incoming_json["dimensions"]
         incoming_dimension_groups = incoming_json["dimension_groups"]
         incoming_measures = incoming_json["measures"]
@@ -48,15 +48,15 @@ class SqlHelper:
         timeframes = [t["timeframes"] for t in incoming_dimension_groups]
         # flatten list of timeframes
         timeframes = [y for x in timeframes for y in x]
-        dimensions = AnalysisHelper.dimensions_from_names(incoming_dimensions, view)
-        measures = AnalysisHelper.measures_from_names(incoming_measures, view)
+        dimensions = AnalysisHelper.dimensions_from_names(incoming_dimensions, table)
+        measures = AnalysisHelper.measures_from_names(incoming_measures, table)
         dimensions_raw = dimensions
         measures_raw = measures
 
         table = AnalysisHelper.table(base_table, explore["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
         dimension_groups = self.dimension_groups(
-            view_name, incoming_dimension_groups, table
+            table_name, incoming_dimension_groups, table
         )
         dimensions = AnalysisHelper.dimensions(dimensions, table)
         dimensions = dimensions + dimension_groups
@@ -96,12 +96,12 @@ class SqlHelper:
     def column_headers(self, dimensions, measures):
         return [d["label"] for d in dimensions + measures]
 
-    def dimension_groups(self, view_name, dimension_groups, table):
+    def dimension_groups(self, table_name, dimension_groups, table):
         fields = []
         for dimension_group in dimension_groups:
             dimension_group_queried = (
-                DimensionGroup.query.join(View, DimensionGroup.view_id == View.id)
-                .filter(View.name == view_name)
+                DimensionGroup.query.join(Table, DimensionGroup.table_id == Table.id)
+                .filter(Table.name == table_name)
                 .filter(DimensionGroup.name == dimension_group["name"])
                 .first()
             )

@@ -32,7 +32,7 @@
     # Postgres DB
     connection = runners_db
     label = carbon intensity
-    explores {
+    designs {
       region {
         label = Region
         from = region
@@ -48,11 +48,11 @@
       }
     }
   }
-"model/entry.view.m5o": |
+"model/entry.table.m5o": |
   {
     sql_table_name = gitlab.entry
     name = entry
-    dimensions {
+    columns {
       id {
         label = ID
         primary_key = yes
@@ -67,7 +67,7 @@
         sql = "{{table}}.id"
       }
     }
-    dimension_groups {
+    column_groups {
       from {
         label = From
         description = Selected from range in carbon data
@@ -86,11 +86,11 @@
       }
     }
   }
-"model/region.view.m5o": |
+"model/region.table.m5o": |
   {
     sql_table_name = gitlab.region
     name = region
-    dimensions {
+    columns {
       id {
         primary_key = true
         hidden = true
@@ -110,7 +110,7 @@
         sql = "{{table}}.shortname"
       }
     }
-    measures {
+    aggregates {
       count {
         label = Count
         description = Runner Count

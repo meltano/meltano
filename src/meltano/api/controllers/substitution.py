@@ -9,8 +9,8 @@ class SubstitutionType(Enum):
     unknown = "UNKNOWN"
     table = "TABLE"
     dimension = "DIMENSION"
-    view_dimension = "VIEW_DIMENSION"
-    view_sql_table_name = "VIEW_SQL_TABLE_NAME"
+    table_column = "TABLE_COLUMN"
+    table_sql_table_name = "TABLE_SQL_TABLE_NAME"
 
 
 class Substitution:
@@ -34,9 +34,9 @@ class Substitution:
         # trying guess the substitution_type in a cheap way
         if "." in self.input and "{{table}}" not in self.input:
             if "SQL_TABLE_NAME" in self.input:
-                self.substitution_type = SubstitutionType.view_sql_table_name
+                self.substitution_type = SubstitutionType.table_sql_table_name
             else:
-                self.substitution_type = SubstitutionType.view_dimension
+                self.substitution_type = SubstitutionType.table_column
         elif "{{table}}" in self.input:
             self.substitution_type = SubstitutionType.table
         elif " " not in self.input:

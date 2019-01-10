@@ -14,13 +14,13 @@ class AnalysisHelper:
             return Table(name, alias=alias)
 
     @staticmethod
-    def dimensions_from_names(dimensions, view):
-        return list(filter(lambda x: x["name"] in dimensions, view["dimensions"]))
+    def dimensions_from_names(dimensions, table):
+        return list(filter(lambda x: x["name"] in dimensions, table["dimensions"]))
 
     # TODO: dedup this non dry situation
     @staticmethod
-    def measures_from_names(measures, view):
-        return list(filter(lambda x: x["name"] in measures, view["measures"]))
+    def measures_from_names(measures, table):
+        return list(filter(lambda x: x["name"] in measures, table["measures"]))
 
     @staticmethod
     def dimensions(dimensions, table):

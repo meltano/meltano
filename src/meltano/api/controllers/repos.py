@@ -25,7 +25,7 @@ def index():
         for f in os.listdir(meltano_model_path)
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
-    sortedM5oFiles = {"documents": [], "views": [], "models": [], "dashboards": []}
+    sortedM5oFiles = {"documents": [], "tables": [], "models": [], "dashboards": []}
     onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
         file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
@@ -46,8 +46,8 @@ def index():
 
         filename, ext = os.path.splitext(filename)
         file_dict["visual"] = filename
-        if ext == ".view":
-            sortedM5oFiles["views"].append(file_dict)
+        if ext == ".table":
+            sortedM5oFiles["tables"].append(file_dict)
         if ext == ".model":
             sortedM5oFiles["models"].append(file_dict)
         if ext == ".dashboard":
@@ -128,12 +128,12 @@ def explores():
     return jsonify(explores_json)
 
 
-@reposBP.route("/views/<view_name>", methods=["GET"])
-def view_read(view_name):
-    file_path = Path(meltano_model_path).joinpath(f"{view_name}.view.m5o")
+@reposBP.route("/tables/<table_name>", methods=["GET"])
+def table_read(table_name):
+    file_path = Path(meltano_model_path).joinpath(f"{table_name}.table.m5o")
     m5o_parse = MeltanoAnalysisFileParser(meltano_model_path)
-    view = m5o_parse.parse_m5o_file(file_path)
-    return jsonify(view)
+    table = m5o_parse.parse_m5o_file(file_path)
+    return jsonify(table)
 
 
 @reposBP.route("/explores/<model_name>/<explore_name>", methods=["GET"])
