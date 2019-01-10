@@ -2,6 +2,16 @@
 
 Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
 
+## Why Tmuxinator?
+
+In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command. 
+
+1. Start up Docker
+1. Start Meltano API
+1. Start the web app
+
+It's a game changer for development and it's worth the effort!
+
 ## Requirements
 
 1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew
