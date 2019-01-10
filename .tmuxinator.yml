@@ -1,0 +1,21 @@
+name: meltano
+root: <%= ENV["MELTANO_ROOT"] || '.' %>
+pre_window: source <%= ENV["MELTANO_VENV"] || ".venv" %>/bin/activate
+startup_window: shell
+
+windows:
+  - services:
+      layout: main-vertical
+      panes:
+        - docker-compose up warehouse_db    # start the warehouse
+        - python -m meltano.api             # start the api
+        - cd src/analyze; yarn && yarn dev  # start the ui
+  - shell:
+      layout: main-vertical
+      panes:
+        - clear
+  - logs:
+      layout: main-vertical
+      panes:
+        - tail -f meltano.log
+        - less +G meltano.yml
