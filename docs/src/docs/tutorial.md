@@ -44,7 +44,7 @@ meltano add loader target-postgres
 meltano elt carbon tap-carbon-intensity target-postgres
 
 # Start up the Meltano Analyze web application!
-meltano www
+meltano ui
 ```
 
 Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
