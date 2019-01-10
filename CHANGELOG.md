@@ -55,6 +55,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * update `meltano elt` to auto generate the job_id (job_id has been converted to an optional argument)
 
 ### Fixes
+* left joins now work correctly in analyze.
 * fixed broken sql toggles in analyze view
 * fixed sql output based on sql toggles in analyze view
 
