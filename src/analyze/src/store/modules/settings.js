@@ -10,6 +10,9 @@ const getters = {
   hasConnections() {
     return state.settings.connections && state.settings.connections.length;
   },
+  isConnectionDialectSqlite() {
+    return connectionDialect => connectionDialect === 'sqlite';
+  },
 };
 
 const actions = {
