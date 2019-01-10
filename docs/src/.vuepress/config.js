@@ -48,6 +48,7 @@ module.exports = {
 				'/docs/superset',
 				'/docs/taps-targets',
 				'/docs/security-privacy',
+				'/docs/tmuxinator',
 				'/docs/license',
 				'/docs/release',
 				'/docs/roadmap',
