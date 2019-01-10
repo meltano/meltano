@@ -22,6 +22,6 @@
   },
   "homepage": "https://gitlab.com/meltano/meltano#readme",
   "devDependencies": {
-    "vuepress": "^0.14.5"
+    "vuepress": "^1.0.0-alpha.30"
   }
 }
