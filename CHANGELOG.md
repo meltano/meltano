@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Auto install missing plugins when `meltano elt` runs
 
 ### Fixes
+* Edit links on the bottom of doc pages are working now
 
 ### Breaks
 
