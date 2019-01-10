@@ -57,6 +57,7 @@ module.exports = {
 				'/docs/about'
 			]
 		},
+		logo:'/meltano-logo.svg',
 		repo: 'https://gitlab.com/meltano/meltano',
 		repoLabel: 'Repo',
 		lastUpdated: 'Last Updated',
