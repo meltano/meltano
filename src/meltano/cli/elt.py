@@ -4,11 +4,14 @@ import click
 import datetime
 
 from . import cli
+from .add import add_plugin
 from .params import db_options
+from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginMissingError
 
 
 @cli.command()
@@ -31,6 +34,8 @@ def elt(extractor, loader, dry, transform, job_id):
         project = Project.find()
     except ProjectNotFound as e:
         raise click.ClickException(e)
+
+    install_missing_plugins(project, extractor, loader, transform)
 
     if job_id is None:
         # Autogenerate a job_id if it is not provided by the user
@@ -64,3 +69,33 @@ def elt(extractor, loader, dry, transform, job_id):
         raise click.ClickException(
             f"ELT could not complete, an error happened during the process: {err}."
         )
+
+
+def install_missing_plugins(
+    project: Project, extractor: str, loader: str, transform: str
+):
+    config_service = ConfigService(project)
+
+    if transform != "only":
+        try:
+            config_service.get_plugin(PluginType.EXTRACTORS, extractor)
+        except PluginMissingError as e:
+            click.secho(
+                f"Extractor {extractor} is missing. Trying to install it.", fg="green"
+            )
+            add_plugin(project, PluginType.EXTRACTORS, extractor)
+
+        try:
+            config_service.get_plugin(PluginType.LOADERS, loader)
+        except PluginMissingError as e:
+            click.secho(
+                f"Loader {loader} is missing. Trying to install it.", fg="green"
+            )
+            add_plugin(project, PluginType.LOADERS, loader)
+
+    if transform != "skip":
+        try:
+            config_service.get_plugin(PluginType.TRANSFORMERS, "dbt")
+        except PluginMissingError as e:
+            click.secho(f"dbt is missing. Trying to install it.", fg="green")
+            add_plugin(project, PluginType.TRANSFORMERS, "dbt")
