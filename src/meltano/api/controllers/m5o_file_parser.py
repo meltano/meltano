@@ -106,9 +106,9 @@ class MeltanoAnalysisFileParser:
         index_file.close()
 
     def parse(self):
-        self.m5o_views = Path(self.directory).glob("*.view.m5o")
-        self.m5o_models = Path(self.directory).glob("*.model.m5o")
-        self.m5o_dashboards = Path(self.directory).glob("*.dashboards.m5o")
+        self.m5o_views = list(Path(self.directory).glob("*.view.m5o"))
+        self.m5o_models = list(Path(self.directory).glob("*.model.m5o"))
+        self.m5o_dashboards = list(Path(self.directory).glob("*.dashboards.m5o"))
         for model in self.m5o_models:
             file_name = model.parts[-1]
             conf = self.parse_m5o_file(model)
