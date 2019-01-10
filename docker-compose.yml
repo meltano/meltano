@@ -18,24 +18,11 @@ services:
     env_file:
       - .env.dev
     working_dir: /meltano
-    command: ['meltano', 'www']
+    command: ['meltano', 'ui']
     volumes:
     - ./:/meltano
     ports:
     - 5000:5000
-    depends_on:
-    - api_db
-
-  api_db:
-    image: postgres
-    environment:
-      POSTGRES_DB: meltano
-      POSTGRES_PASSWORD: meltano
-      POSTGRES_USER: meltano
-    ports:
-    - '5501:5432'
-    volumes:
-    - pgdata:/var/lib/postgresql/data
 
   warehouse_db:
     image: postgres
