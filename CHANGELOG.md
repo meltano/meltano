@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-
+* Updated docs with `.m5o` authoring requirements and examples
 ### Changes
 * Auto install missing plugins when `meltano elt` runs
 
