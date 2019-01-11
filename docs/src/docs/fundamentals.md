@@ -8,7 +8,7 @@ A Column relates directly to a column in a table of a database. Relieving us for
 
 ## Aggregate 
 
-An Aggregate relates to a calculatable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through DBT.
+An Aggregate relates to a calculatable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through dbt.
 
 ## Table 
 
