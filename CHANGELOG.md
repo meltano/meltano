@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 * Auto install missing plugins when `meltano elt` runs
+* Terminology updates for simpler understanding
 
 ### Fixes
 * Edit links on the bottom of doc pages are working now
