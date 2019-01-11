@@ -106,12 +106,12 @@ const chartMixin = {
     },
   },
   computed: {
-    ...mapState('explores', [
+    ...mapState('designs', [
       'results',
       'resultAggregates',
       'chartType',
     ]),
-    ...mapGetters('explores', [
+    ...mapGetters('designs', [
       'getChartYAxis',
     ]),
   },

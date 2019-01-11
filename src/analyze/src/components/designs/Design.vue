@@ -4,7 +4,7 @@
     <div class="columns">
       <nav class="panel column is-one-quarter">
         <p class="panel-heading">
-          {{explore.label}}
+          {{design.label}}
         </p>
         <div class="panel-block">
           <p class="control">
@@ -15,7 +15,7 @@
         <div class="inner-scroll text-selection-off">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
-            <template v-for="join in explore.joins">
+            <template v-for="join in design.joins">
               <a
                 class="panel-block
                   panel-block-heading
@@ -89,19 +89,19 @@
               has-background-white-ter
               has-text-grey
               is-expandable"
-              :class="{'is-collapsed': explore.related_table.collapsed}"
-              @click="tableRowClicked(explore.related_table)">
-                {{explore.label}}
+              :class="{'is-collapsed': design.related_table.collapsed}"
+              @click="tableRowClicked(design.related_table)">
+                {{design.label}}
               </a>
           </template>
-          <template v-if="!explore.related_table.collapsed">
+          <template v-if="!design.related_table.collapsed">
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinColumnAggregateHeader(explore.related_table.columns)">
+                v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
               Columns
             </a>
-            <template v-for="columnGroup in explore.related_table.column_groups">
+            <template v-for="columnGroup in design.related_table.column_groups">
               <a class="panel-block column-group"
                   :key="columnGroup.label"
                   v-if="!columnGroup.related_table.hidden"
@@ -120,7 +120,7 @@
               </template>
             </template>
             <a class="panel-block"
-                v-for="column in explore.related_table.columns"
+                v-for="column in design.related_table.columns"
                 :key="column.label"
                 v-if="!column.hidden"
                 @click="columnSelected(column)"
@@ -131,11 +131,11 @@
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinColumnAggregateHeader(explore.related_table.aggregates)">
+                v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
               Aggregates
             </a>
             <a class="panel-block"
-                v-for="aggregate in explore.related_table.aggregates"
+                v-for="aggregate in design.related_table.aggregates"
                 :key="aggregate.label"
                 @click="aggregateSelected(aggregate)"
                 :class="{'is-active': aggregate.selected}">
@@ -158,7 +158,7 @@
               @click="runQuery">Run</a>
           </div>
         </div>
-        <template v-if="explore.has_filters">
+        <template v-if="design.has_filters">
           <div class="has-background-grey-darker
             section-header
             has-text-white-bis
@@ -166,12 +166,12 @@
             @click="toggleFilterOpen"
             :class="{'is-collapsed': !filtersOpen}">Filters</div>
           <div class="has-background-white-ter filter-item"
-                v-for="filter in explore.always_filter.filters"
+                v-for="filter in design.always_filter.filters"
                 :key="filter.label"
                 v-if="filtersOpen">
             <div class="columns">
               <div class="column is-3">
-                <strong>{{filter.explore_label}}</strong>
+                <strong>{{filter.design_label}}</strong>
                 <span>{{filter.label}}</span>
                 <span>({{filter.type}})</span>
               </div>
@@ -310,11 +310,11 @@ import Chart from './Chart';
 import { ensureObjPropIsReactive } from '../utils/utils'
 
 export default {
-  name: 'Explore',
+  name: 'Design',
   created() {
-    this.$store.dispatch('explores/getExplore', {
+    this.$store.dispatch('designs/getDesign', {
       model: this.$route.params.model,
-      explore: this.$route.params.explore,
+      design: this.$route.params.design,
     });
   },
   filters: {
@@ -327,18 +327,18 @@ export default {
     Chart,
   },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('explores/getExplore', {
+    this.$store.dispatch('designs/getDesign', {
       model: to.params.model,
-      explore: to.params.explore,
+      design: to.params.design,
     });
     next();
   },
   computed: {
-    ...mapState('explores', [
-      'explore',
+    ...mapState('designs', [
+      'design',
       'selectedColumns',
       'currentModel',
-      'currentExplore',
+      'currentDesign',
       'currentSQL',
       'loadingQuery',
       'filtersOpen',
@@ -347,9 +347,9 @@ export default {
       'hasSQLError',
       'sqlErrorMessage',
     ]),
-    ...mapGetters('explores', [
+    ...mapGetters('designs', [
       'currentModelLabel',
-      'currentExploreLabel',
+      'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
       'numResults',
@@ -366,106 +366,106 @@ export default {
 
     limit: {
       get() {
-        return this.$store.getters['explores/currentLimit'];
+        return this.$store.getters['designs/currentLimit'];
       },
       set(value) {
-        this.$store.dispatch('explores/limitSet', value);
-        this.$store.dispatch('explores/getSQL', { run: false });
+        this.$store.dispatch('designs/limitSet', value);
+        this.$store.dispatch('designs/getSQL', { run: false });
       },
     },
   },
   methods: {
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
-        this.$store.dispatch('explores/getDistinct', field);
+        this.$store.dispatch('designs/getDistinct', field);
       }
     },
 
     setChartType(chartType) {
-      this.$store.dispatch('explores/setChartType', chartType);
+      this.$store.dispatch('designs/setChartType', chartType);
     },
 
     tableRowClicked(relatedTable) {
       ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed')
-      this.$store.dispatch('explores/expandRow');
+      this.$store.dispatch('designs/expandRow');
     },
 
     joinRowClicked(join) {
       ensureObjPropIsReactive(this.$set, join, 'collapsed')
-      this.$store.dispatch('explores/expandJoinRow', join);
+      this.$store.dispatch('designs/expandJoinRow', join);
     },
 
     columnSelected(column) {
-      this.$store.dispatch('explores/removeSort', column);
-      this.$store.dispatch('explores/toggleColumn', column);
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/removeSort', column);
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     columnGroupSelected(columnGroup) {
       ensureObjPropIsReactive(this.$set, columnGroup, 'selected')
-      this.$store.dispatch('explores/toggleColumnGroup', columnGroup);
+      this.$store.dispatch('designs/toggleColumnGroup', columnGroup);
     },
 
     columnGroupTimeframeSelected(columnGroup, timeframe) {
       ensureObjPropIsReactive(this.$set, timeframe, 'selected')
-      this.$store.dispatch('explores/toggleColumnGroupTimeframe', {
+      this.$store.dispatch('designs/toggleColumnGroupTimeframe', {
         columnGroup,
         timeframe,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     aggregateSelected(aggregate) {
-      this.$store.dispatch('explores/toggleAggregate', aggregate);
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     joinColumnSelected(join, column) {
-      this.$store.dispatch('explores/toggleColumn', column);
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('explores/toggleAggregate', aggregate);
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     runQuery() {
-      this.$store.dispatch('explores/getSQL', { run: true });
+      this.$store.dispatch('designs/getSQL', { run: true });
     },
 
     setCurrentTab(tab) {
-      this.$store.dispatch('explores/switchCurrentTab', tab);
+      this.$store.dispatch('designs/switchCurrentTab', tab);
     },
 
     toggleFilterOpen() {
-      this.$store.dispatch('explores/toggleFilterOpen');
+      this.$store.dispatch('designs/toggleFilterOpen');
     },
 
     toggleDataOpen() {
-      this.$store.dispatch('explores/toggleDataOpen');
+      this.$store.dispatch('designs/toggleDataOpen');
     },
 
     toggleChartsOpen() {
-      this.$store.dispatch('explores/toggleChartsOpen');
+      this.$store.dispatch('designs/toggleChartsOpen');
     },
 
     dropdownSelected(item, field) {
-      this.$store.dispatch('explores/addDistinctSelection', {
+      this.$store.dispatch('designs/addDistinctSelection', {
         item,
         field,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     modifierChanged(item, field) {
-      this.$store.dispatch('explores/addDistinctModifier', {
+      this.$store.dispatch('designs/addDistinctModifier', {
         item,
         field,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
-    ...mapActions('explores', [
+    ...mapActions('designs', [
       'resetErrorMessage',
     ]),
   },

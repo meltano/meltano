@@ -16,7 +16,7 @@ export default {
     ScatterChart,
   },
   computed: {
-    ...mapState('explores', [
+    ...mapState('designs', [
       'results',
       'chartType',
     ]),

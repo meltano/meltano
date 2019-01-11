@@ -45,7 +45,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 export default {
   name: 'ResultTable',
   computed: {
-    ...mapState('explores', [
+    ...mapState('designs', [
       'resultAggregates',
       'columnHeaders',
       'names',
@@ -53,7 +53,7 @@ export default {
       'keys',
       'sortDesc',
     ]),
-    ...mapGetters('explores', [
+    ...mapGetters('designs', [
       'hasResults',
       'isColumnSorted',
       'getFormattedValue',
@@ -63,7 +63,7 @@ export default {
   },
 
   methods: {
-    ...mapActions('explores', [
+    ...mapActions('designs', [
       'sortBy',
     ]),
   },

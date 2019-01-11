@@ -109,8 +109,8 @@ def sync():
 
 @reposBP.route("/test", methods=["GET"])
 def db_test():
-    explore = Explore.query.first()
-    return jsonify({"explore": {"name": explore.name, "settings": explore.settings}})
+    design = Design.query.first()
+    return jsonify({"design": {"name": design.name, "settings": design.settings}})
 
 
 @reposBP.route("/models", methods=["GET"])
@@ -119,13 +119,13 @@ def models():
     return jsonify(json.loads(open(models, "r").read()))
 
 
-@reposBP.route("/explores", methods=["GET"])
-def explores():
-    explores = Explore.query.all()
-    explores_json = []
-    for explore in explores:
-        explores_json.append(explore.serializable())
-    return jsonify(explores_json)
+@reposBP.route("/designs", methods=["GET"])
+def designs():
+    designs = Design.query.all()
+    designs_json = []
+    for design in designs:
+        designs_json.append(design.serializable())
+    return jsonify(designs_json)
 
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])
@@ -136,11 +136,11 @@ def table_read(table_name):
     return jsonify(table)
 
 
-@reposBP.route("/explores/<model_name>/<explore_name>", methods=["GET"])
-def explore_read(model_name, explore_name):
+@reposBP.route("/designs/<model_name>/<design_name>", methods=["GET"])
+def design_read(model_name, design_name):
     model = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
     with model.open() as f:
         model = json.load(f)
-    explores = model["explores"]
-    explore = next(e for e in explores if e["from"] == explore_name)
-    return jsonify(explore)
+    designs = model["designs"]
+    design = next(e for e in designs if e["from"] == design_name)
+    return jsonify(design)

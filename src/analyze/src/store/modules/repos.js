@@ -24,7 +24,7 @@ const getters = {
     return state.activeView.populated && state.activeView.is_markdown;
   },
 
-  urlForModelExplore: () => (model, explore) => `/explore/${model}/${explore}`,
+  urlForModelDesign: () => (model, design) => `/design/${model}/${design}`,
 
   hasCode() {
     return state.activeView.populated && !state.activeView.is_markdown;

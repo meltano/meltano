@@ -57,8 +57,8 @@ class MeltanoAnalysisFileParser:
     def __init__(self, directory):
         self.directory = directory
         self.models = []
-        self.required_model_properties = ["name", "connection", "label", "explores"]
-        self.required_explore_properties = ["from", "label", "description"]
+        self.required_model_properties = ["name", "connection", "label", "designs"]
+        self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
         self.required_table_properties = ["sql_table_name", "columns"]
         self.join_relationship_types = [
@@ -94,7 +94,7 @@ class MeltanoAnalysisFileParser:
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
             indices[model["name"]] = {
-                "explores": [e["name"] for e in model["explores"]]
+                "designs": [e["name"] for e in model["designs"]]
             }
             compiled_model.write(json.dumps(model))
             compiled_model.close()
@@ -127,8 +127,8 @@ class MeltanoAnalysisFileParser:
             )
         for prop_name, prop_def in ma_file_model_dict.items():
             temp_model[prop_name] = prop_def
-            if prop_name == "explores":
-                temp_model[prop_name] = self.explores(prop_def, file_name)
+            if prop_name == "designs":
+                temp_model[prop_name] = self.designs(prop_def, file_name)
         return temp_model
 
     def table_conf_by_name(self, table_name, cls, prop, file_name):
@@ -143,34 +143,34 @@ class MeltanoAnalysisFileParser:
                 prop, table_name, cls, file_name
             )
 
-    def explores(self, ma_file_explores_dict, file_name):
-        model_explores = []
-        for explore_name, explore_def in ma_file_explores_dict.items():
-            temp_explore = {}
-            temp_explore["name"] = explore_name
+    def designs(self, ma_file_designs_dict, file_name):
+        model_designs = []
+        for design_name, design_def in ma_file_designs_dict.items():
+            temp_design = {}
+            temp_design["name"] = design_name
             missing_properties = self.missing_properties(
-                self.required_explore_properties, explore_def
+                self.required_design_properties, design_def
             )
             if missing_properties:
                 raise MeltanoAnalysisFileParserMissingFieldsError(
-                    missing_properties, "explore", file_name
+                    missing_properties, "design", file_name
                 )
-            for prop_name, prop_def in explore_def.items():
-                temp_explore[prop_name] = prop_def
+            for prop_name, prop_def in design_def.items():
+                temp_design[prop_name] = prop_def
                 if prop_name == "from":
                     matching_table = self.table_conf_by_name(
-                        temp_explore[prop_name], "explore", prop_name, file_name
+                        temp_design[prop_name], "design", prop_name, file_name
                     )
-                    temp_explore["related_table"] = self.table(
+                    temp_design["related_table"] = self.table(
                         self.parse_m5o_file(matching_table), matching_table.parts[-1]
                     )
                 if prop_name == "joins":
-                    temp_explore[prop_name] = self.joins(prop_def, file_name)
-            model_explores.append(temp_explore)
-        return model_explores
+                    temp_design[prop_name] = self.joins(prop_def, file_name)
+            model_designs.append(temp_design)
+        return model_designs
 
     def joins(self, ma_file_joins_dict, file_name):
-        explore_joins = []
+        design_joins = []
         for join_name, join_def in ma_file_joins_dict.items():
             temp_join = {}
             temp_join["name"] = join_name
@@ -202,8 +202,8 @@ class MeltanoAnalysisFileParser:
                             file_name,
                         )
 
-            explore_joins.append(temp_join)
-        return explore_joins
+            design_joins.append(temp_join)
+        return design_joins
 
     def table(self, table_file, file_name):
         temp_table = {}

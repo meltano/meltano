@@ -1,17 +1,17 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
-import exploreApi from '../../api/explore';
+import designApi from '../../api/design';
 import utils from '../../api/utils';
 
 const state = {
-  explore: {
+  design: {
     related_table: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
   currentModel: '',
-  currentExplore: '',
+  currentDesign: '',
   results: [],
   keys: [],
   columnHeaders: [],
@@ -53,7 +53,7 @@ const getters = {
   },
 
   hasJoins() {
-    return !!(state.explore.joins && state.explore.joins.length);
+    return !!(state.design.joins && state.design.joins.length);
   },
 
   isColumnSorted: () => key => state.sortColumn === key,
@@ -93,7 +93,7 @@ const getters = {
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
-  currentExploreLabel() {
+  currentDesignLabel() {
     return utils.titleCase(state.currentModel);
   },
 
@@ -119,12 +119,12 @@ const getters = {
 };
 
 const actions = {
-  getExplore({ commit }, { model, explore }) {
+  getDesign({ commit }, { model, design }) {
     state.currentModel = model;
-    state.currentExplore = explore;
-    exploreApi.index(model, explore)
+    state.currentDesign = design;
+    designApi.index(model, design)
       .then((data) => {
-        commit('setExplore', data.data);
+        commit('setDesign', data.data);
         commit('selectedColumns', data.data.related_table.columns);
       });
   },
@@ -137,7 +137,7 @@ const actions = {
     // already fetched columns
     commit('toggleJoinOpen', join);
     if (join.related_table.columns.length) return;
-    exploreApi.getTable(join.related_table.name)
+    designApi.getTable(join.related_table.name)
       .then((data) => {
         commit('setJoinColumns', {
           columns: data.data.columns,
@@ -184,8 +184,8 @@ const actions = {
   },
 
   getSQL({ commit }, { run }) {
-    this.dispatch('explores/resetErrorMessage');
-    const baseTable = state.explore.related_table;
+    this.dispatch('designs/resetErrorMessage');
+    const baseTable = state.design.related_table;
     const columns = baseTable
       .columns
       .filter(d => d.selected)
@@ -210,7 +210,7 @@ const actions = {
       delete filters[prop].sql;
     });
 
-    const joins = state.explore
+    const joins = state.design
       .joins
       .map((j) => {
         const newJoin = {};
@@ -261,7 +261,7 @@ const actions = {
       run,
     };
     if (run) state.loadingQuery = true;
-    exploreApi.getSql(state.currentModel, state.currentExplore, postData)
+    designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((data) => {
         if (run) {
           commit('setQueryResults', data.data);
@@ -282,7 +282,7 @@ const actions = {
   },
 
   getDistinct({ commit }, field) {
-    exploreApi.getDistinct(state.currentModel, state.currentExplore, field)
+    designApi.getDistinct(state.currentModel, state.currentDesign, field)
       .then((data) => {
         commit('setDistincts', {
           data: data.data,
@@ -317,7 +317,7 @@ const actions = {
 
   sortBy({ commit }, name) {
     commit('setSortColumn', name);
-    this.dispatch('explores/getSQL', {
+    this.dispatch('designs/getSQL', {
       run: true,
     });
   },
@@ -439,12 +439,12 @@ const mutations = {
     });
   },
 
-  setExplore(_, exploreData) {
-    state.explore = exploreData;
+  setDesign(_, designData) {
+    state.design = designData;
   },
 
   toggleCollapsed() {
-    state.explore.related_table.collapsed = !state.explore.related_table.collapsed;
+    state.design.related_table.collapsed = !state.design.related_table.collapsed;
   },
 
   setCurrentTab(_, tab) {

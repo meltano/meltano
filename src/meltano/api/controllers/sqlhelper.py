@@ -24,9 +24,9 @@ class SqlHelper:
     def get_names(self, things):
         return [thing["name"] for thing in things]
 
-    def get_sql(self, explore, incoming_json):
+    def get_sql(self, design, incoming_json):
         table_name = incoming_json["table"]
-        table = explore["related_table"]
+        table = design["related_table"]
 
         base_table = table["sql_table_name"]
         incoming_columns = incoming_json["columns"]
@@ -53,7 +53,7 @@ class SqlHelper:
         columns_raw = columns
         aggregates_raw = aggregates
 
-        table = AnalysisHelper.table(base_table, explore["name"])
+        table = AnalysisHelper.table(base_table, design["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
         column_groups = self.column_groups(
             table_name, incoming_column_groups, table
