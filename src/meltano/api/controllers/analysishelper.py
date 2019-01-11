@@ -19,22 +19,22 @@ class AnalysisHelper:
 
     # TODO: dedup this non dry situation
     @staticmethod
-    def measures_from_names(measures, table):
-        return list(filter(lambda x: x["name"] in measures, table["measures"]))
+    def aggregates_from_names(aggregates, table):
+        return list(filter(lambda x: x["name"] in aggregates, table["aggregates"]))
 
     @staticmethod
     def columns(columns, table):
         return [AnalysisHelper.field_from_column(d, table) for d in columns]
 
     @staticmethod
-    def measures(measures, table):
+    def aggregates(aggregates, table):
         return [
-            AnalysisHelper.field_from_measure(measure, table) for measure in measures
+            AnalysisHelper.field_from_aggregate(aggregate, table) for aggregate in aggregates
         ]
 
     @staticmethod
-    def field_from_measure(measure, table):
-        aggregate = Aggregate(measure, table)
+    def field_from_aggregate(aggregate, table):
+        aggregate = Aggregate(aggregate, table)
         return aggregate.sql
 
     @staticmethod

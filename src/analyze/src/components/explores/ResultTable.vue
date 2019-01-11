@@ -15,7 +15,7 @@
               class="sortable-header"
               :key="columnHeader"
               :class="{
-                'has-background-warning': isColumnSelectedMeasure(keys[i]),
+                'has-background-warning': isColumnSelectedAggregate(keys[i]),
                 'has-background-white-ter sorted': isColumnSorted(names[i]),
                 'is-desc': sortDesc,
               }"
@@ -27,8 +27,8 @@
           <!-- eslint-disable-next-line vue/require-v-for-key -->
           <tr v-for="result in results">
             <template v-for="key in keys">
-            <td :key="key" v-if="isColumnSelectedMeasure(key)">
-              {{getFormattedValue(resultMeasures[key]['value_format'], result[key])}}
+            <td :key="key" v-if="isColumnSelectedAggregate(key)">
+              {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}
             </td>
             <td :key="key" v-else>
               {{result[key]}}
@@ -46,7 +46,7 @@ export default {
   name: 'ResultTable',
   computed: {
     ...mapState('explores', [
-      'resultMeasures',
+      'resultAggregates',
       'columnHeaders',
       'names',
       'results',
@@ -57,7 +57,7 @@ export default {
       'hasResults',
       'isColumnSorted',
       'getFormattedValue',
-      'isColumnSelectedMeasure',
+      'isColumnSelectedAggregate',
       'isResultsTab',
     ]),
   },

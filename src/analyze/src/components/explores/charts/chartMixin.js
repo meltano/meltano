@@ -67,13 +67,13 @@ const chartMixin = {
       this.chart.data.labels = [];
       this.chart.data.datasets = [];
       const resultsKeys = Object.keys(this.results[0]);
-      const measures = this.resultMeasures;
-      const diff = utils.difference(resultsKeys, measures);
+      const aggregates = this.resultAggregates;
+      const diff = utils.difference(resultsKeys, aggregates);
       const dataSets = {};
       this.results.forEach((r) => {
         let label = [];
         resultsKeys.forEach((k, i) => {
-          // isn't this just measures?
+          // isn't this just aggregates?
           if (!diff.includes(k)) {
             const color = utils.getColor(i);
             if (!dataSets[k]) {
@@ -108,7 +108,7 @@ const chartMixin = {
   computed: {
     ...mapState('explores', [
       'results',
-      'resultMeasures',
+      'resultAggregates',
       'chartType',
     ]),
     ...mapGetters('explores', [

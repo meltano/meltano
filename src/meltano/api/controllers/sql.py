@@ -102,7 +102,7 @@ def get_sql(model_name, explore_name):
     sqlHelper = SqlHelper()
     sql_dict = sqlHelper.get_sql(explore, incoming_json)
     outgoing_sql = sql_dict["sql"]
-    measures = sql_dict["measures"]
+    aggregates = sql_dict["aggregates"]
     columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
     names = sql_dict["names"]
@@ -123,7 +123,7 @@ def get_sql(model_name, explore_name):
         base_dict["column_headers"] = column_headers
         base_dict["names"] = names
         base_dict["keys"] = list(results[0].keys())
-        base_dict["measures"] = sqlHelper.get_names(measures)
+        base_dict["aggregates"] = sqlHelper.get_names(aggregates)
 
     return json.dumps(base_dict, default=default)
 

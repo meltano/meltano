@@ -31,7 +31,7 @@ class SqlHelper:
         base_table = table["sql_table_name"]
         incoming_columns = incoming_json["columns"]
         incoming_column_groups = incoming_json["column_groups"]
-        incoming_measures = incoming_json["measures"]
+        incoming_aggregates = incoming_json["aggregates"]
         incoming_filters = incoming_json["filters"]
         incoming_joins = incoming_json["joins"]
         incoming_limit = incoming_json.get("limit", 50)
@@ -49,9 +49,9 @@ class SqlHelper:
         # flatten list of timeframes
         timeframes = [y for x in timeframes for y in x]
         columns = AnalysisHelper.columns_from_names(incoming_columns, table)
-        measures = AnalysisHelper.measures_from_names(incoming_measures, table)
+        aggregates = AnalysisHelper.aggregates_from_names(incoming_aggregates, table)
         columns_raw = columns
-        measures_raw = measures
+        aggregates_raw = aggregates
 
         table = AnalysisHelper.table(base_table, explore["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
@@ -60,32 +60,32 @@ class SqlHelper:
         )
         columns = AnalysisHelper.columns(columns, table)
         columns = columns + column_groups
-        measures = AnalysisHelper.measures(measures, table)
+        aggregates = AnalysisHelper.aggregates(aggregates, table)
 
         if orderby:
             ordered_by_column = [d for d in columns_raw if d.name == orderby]
             if ordered_by_column:
                 orderby = self.columns(ordered_by_column, table)[0]
             else:
-                ordered_by_column = [m for m in measures_raw if m.name == orderby]
+                ordered_by_column = [m for m in aggregates_raw if m.name == orderby]
                 if ordered_by_column:
-                    orderby = self.measures(ordered_by_column, table)[0]
+                    orderby = self.aggregates(ordered_by_column, table)[0]
                 else:
                     raise Exception(
-                        "Something is wrong, no column or measure column matching the column to sort by."
+                        "Something is wrong, no column or aggregate column matching the column to sort by."
                     )
 
-        column_headers = self.column_headers(columns_raw, measures_raw)
-        names = self.get_names(columns_raw + measures_raw)
+        column_headers = self.column_headers(columns_raw, aggregates_raw)
+        names = self.get_names(columns_raw + aggregates_raw)
         return {
             "columns": columns_raw,
-            "measures": measures_raw,
+            "aggregates": aggregates_raw,
             "column_headers": column_headers,
             "names": names,
             "sql": self.get_query(
                 from_=table,
                 columns=columns,
-                measures=measures,
+                aggregates=aggregates,
                 limit=incoming_limit,
                 joins=joins,
                 order=order,
@@ -93,8 +93,8 @@ class SqlHelper:
             ),
         }
 
-    def column_headers(self, columns, measures):
-        return [d["label"] for d in columns + measures]
+    def column_headers(self, columns, aggregates):
+        return [d["label"] for d in columns + aggregates]
 
     def column_groups(self, table_name, column_groups, table):
         fields = []
@@ -112,16 +112,16 @@ class SqlHelper:
         return fields
 
     def get_query(
-        self, from_, columns, measures, limit, joins=None, order=None, orderby=None
+        self, from_, columns, aggregates, limit, joins=None, order=None, orderby=None
     ):
-        select = columns + measures
+        select = columns + aggregates
         q = Query.from_(from_)
         if joins:
             region = from_
             entry = joins[0]["table"]
             join_columns = joins[0]["columns"]
-            join_measures = joins[0]["measures"]
-            select = select + join_columns + join_measures
+            join_aggregates = joins[0]["aggregates"]
+            select = select + join_columns + join_aggregates
             columns = columns + join_columns
             q = q.join(joins[0]["table"]).on(
                 region.id == entry.region_id and region.id == entry.region_id

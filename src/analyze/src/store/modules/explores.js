@@ -16,7 +16,7 @@ const state = {
   keys: [],
   columnHeaders: [],
   names: [],
-  resultMeasures: {},
+  resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
   selectedColumns: {},
@@ -58,7 +58,7 @@ const getters = {
 
   isColumnSorted: () => key => state.sortColumn === key,
 
-  showJoinColumnMeasureHeader: () => obj => !!obj,
+  showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
   getKeyFromDistinct: () => (field) => {
@@ -81,12 +81,12 @@ const getters = {
   },
 
   getChartYAxis() {
-    if (!state.resultMeasures) return [];
-    const measures = Object.keys(state.resultMeasures);
-    return measures;
+    if (!state.resultAggregates) return [];
+    const aggregates = Object.keys(state.resultAggregates);
+    return aggregates;
   },
 
-  isColumnSelectedMeasure: () => columnName => columnName in state.resultMeasures,
+  isColumnSelectedAggregate: () => columnName => columnName in state.resultAggregates,
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
@@ -147,8 +147,8 @@ const actions = {
           columnGroups: data.data.column_groups,
           join,
         });
-        commit('setJoinMeasures', {
-          measures: data.data.measures,
+        commit('setJoinAggregates', {
+          aggregates: data.data.aggregates,
           join,
         });
       });
@@ -171,8 +171,8 @@ const actions = {
     commit('toggleColumnGroupTimeframeSelected', columnGroupObj);
   },
 
-  toggleMeasure({ commit }, measure) {
-    commit('toggleMeasureSelected', measure);
+  toggleAggregate({ commit }, aggregate) {
+    commit('toggleAggregateSelected', aggregate);
   },
 
   limitSet({ commit }, limit) {
@@ -195,11 +195,11 @@ const actions = {
       .find(d => d.name === state.sortColumn);
     if (!sortColumn) {
       sortColumn = baseTable
-        .measures
+        .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    const measures = baseTable
-      .measures
+    const aggregates = baseTable
+      .aggregates
       .filter(m => m.selected)
       .map(m => m.name);
 
@@ -221,15 +221,15 @@ const actions = {
             .map(d => d.name);
           if (!newJoin.columns.length) delete newJoin.columns;
         }
-        if (j.measures) {
-          newJoin.measures = j.measures
+        if (j.aggregates) {
+          newJoin.aggregates = j.aggregates
             .filter(m => m.selected)
             .map(m => m.name);
-          if (!newJoin.measures.length) delete newJoin.measures;
+          if (!newJoin.aggregates.length) delete newJoin.aggregates;
         }
         return newJoin;
       })
-      .filter(j => !!(j.columns || j.measures));
+      .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
     const columnGroups = baseTable
@@ -253,7 +253,7 @@ const actions = {
       table: baseTable.name,
       columns,
       column_groups: columnGroups,
-      measures,
+      aggregates,
       joins,
       order,
       limit: state.limit,
@@ -352,8 +352,8 @@ const mutations = {
     join.column_groups = columnGroups;
   },
 
-  setJoinMeasures(_, { measures, join }) {
-    join.measures = measures;
+  setJoinAggregates(_, { aggregates, join }) {
+    join.aggregates = aggregates;
   },
 
   toggleJoinOpen(_, join) {
@@ -395,7 +395,7 @@ const mutations = {
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
     state.names = results.names;
-    state.resultMeasures = results.measures;
+    state.resultAggregates = results.aggregates;
   },
 
   setSqlErrorMessage(_, e) {
@@ -428,9 +428,9 @@ const mutations = {
     selectedTimeframe.selected = !selectedTimeframe.selected;
   },
 
-  toggleMeasureSelected(_, measure) {
-    const selectedMeasure = measure;
-    selectedMeasure.selected = !measure.selected;
+  toggleAggregateSelected(_, aggregate) {
+    const selectedAggregate = aggregate;
+    selectedAggregate.selected = !aggregate.selected;
   },
 
   selectedColumns(_, columns) {

@@ -218,8 +218,8 @@ class MeltanoAnalysisFileParser:
             temp_table[prop_name] = prop_def
             if prop_name == "columns":
                 temp_table[prop_name] = self.columns(prop_def)
-            elif prop_name == "measures":
-                temp_table[prop_name] = self.measures(prop_def)
+            elif prop_name == "aggregates":
+                temp_table[prop_name] = self.aggregates(prop_def)
         return temp_table
 
     def columns(self, ma_file_columns_dict):
@@ -231,11 +231,11 @@ class MeltanoAnalysisFileParser:
             temp_columns.append(temp_column)
         return temp_columns
 
-    def measures(self, ma_file_measures_dict):
-        temp_measures = []
-        for measure_name, measure_def in ma_file_measures_dict.items():
-            temp_measure = {"name": measure_name}
-            for prop_name, prop_def in measure_def.items():
-                temp_measure[prop_name] = prop_def
-            temp_measures.append(temp_measure)
-        return temp_measures
+    def aggregates(self, ma_file_aggregates_dict):
+        temp_aggregates = []
+        for aggregate_name, aggregate_def in ma_file_aggregates_dict.items():
+            temp_aggregate = {"name": aggregate_name}
+            for prop_name, prop_def in aggregate_def.items():
+                temp_aggregate[prop_name] = prop_def
+            temp_aggregates.append(temp_aggregate)
+        return temp_aggregates

@@ -32,7 +32,7 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinColumnMeasureHeader(join.related_table.columns)">
+                  v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                   Columns
                 </a>
                 <template v-for="columnGroup in join.related_table.column_groups">
@@ -67,16 +67,16 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinColumnMeasureHeader(join.measures)">
-                  Measures
+                  v-if="showJoinColumnAggregateHeader(join.aggregates)">
+                  Aggregates
                 </a>
-                <template v-for="measure in join.measures">
+                <template v-for="aggregate in join.aggregates">
                   <a class="panel-block"
-                    v-if="measure.related_table.hidden"
-                    :key="measure.label"
-                    :class="{'is-active': measure.selected}"
-                    @click="joinMeasureSelected(join, measure)">
-                  {{measure.label}}
+                    v-if="aggregate.related_table.hidden"
+                    :key="aggregate.label"
+                    :class="{'is-active': aggregate.selected}"
+                    @click="joinAggregateSelected(join, aggregate)">
+                  {{aggregate.label}}
                   </a>
                 </template>
               </template>
@@ -98,7 +98,7 @@
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinColumnMeasureHeader(explore.related_table.columns)">
+                v-if="showJoinColumnAggregateHeader(explore.related_table.columns)">
               Columns
             </a>
             <template v-for="columnGroup in explore.related_table.column_groups">
@@ -131,15 +131,15 @@
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinColumnMeasureHeader(explore.related_table.measures)">
-              Measures
+                v-if="showJoinColumnAggregateHeader(explore.related_table.aggregates)">
+              Aggregates
             </a>
             <a class="panel-block"
-                v-for="measure in explore.related_table.measures"
-                :key="measure.label"
-                @click="measureSelected(measure)"
-                :class="{'is-active': measure.selected}">
-              {{measure.label}}
+                v-for="aggregate in explore.related_table.aggregates"
+                :key="aggregate.label"
+                @click="aggregateSelected(aggregate)"
+                :class="{'is-active': aggregate.selected}">
+              {{aggregate.label}}
             </a>
           </template>
         </div>
@@ -360,7 +360,7 @@ export default {
       'getSelectionsFromDistinct',
       'getChartYAxis',
       'hasJoins',
-      'showJoinColumnMeasureHeader',
+      'showJoinColumnAggregateHeader',
       'formattedSql',
     ]),
 
@@ -415,8 +415,8 @@ export default {
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
-    measureSelected(measure) {
-      this.$store.dispatch('explores/toggleMeasure', measure);
+    aggregateSelected(aggregate) {
+      this.$store.dispatch('explores/toggleAggregate', aggregate);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
@@ -425,8 +425,8 @@ export default {
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
-    joinMeasureSelected(join, measure) {
-      this.$store.dispatch('explores/toggleMeasure', measure);
+    joinAggregateSelected(join, aggregate) {
+      this.$store.dispatch('explores/toggleAggregate', aggregate);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
