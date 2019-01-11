@@ -40,6 +40,17 @@ It leverages open source software and software development best practices includ
 - _Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields._
 - _The sample Zuora python scripts have been written to support GitLab's Zuora implementation. This includes a workaround to handle some subscriptions that should have been created as a single subscription._
 
+## Interfaces
+
+As far as how you will interface with the various parts of Meltano, they are as follows:
+
+- Collections, Extract, Load, Transform: CLI
+- Designs: Superset or Plotly
+- Notebook: Jupyter
+- Orchestrate: Airflow
+
+In addition, please note that Transform also has a viewer.
+
 ## Meltano CLI
 
 Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
