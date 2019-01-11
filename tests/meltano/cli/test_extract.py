@@ -12,6 +12,10 @@ from meltano.core.dbt_service import DbtService
 PERFORM_TEST_ARGS = ["elt", "tap-test", "target-test"]
 
 
+def mock_install_missing_plugins(project, extractor, loader, transform):
+    pass
+
+
 def test_elt(request, project):
     cli_runner = CliRunner()
 
@@ -19,14 +23,18 @@ def test_elt(request, project):
     assert result.exit_code == 2
 
     # exit cleanly when everything is fine
-    with patch.object(SingerRunner, "perform", return_value=None), patch.object(
-        DbtRunner, "perform", return_value=None
-    ), patch.object(DbtService, "deps", return_value=None):
+    with patch.object(SingerRunner, "perform", return_value=None), patch(
+        "meltano.cli.elt.install_missing_plugins",
+        side_effect=mock_install_missing_plugins,
+    ):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 0
 
     # aborts when there is an exception
-    with patch.object(SingerRunner, "perform", side_effect=Exception):
+    with patch(
+        "meltano.cli.elt.install_missing_plugins",
+        side_effect=mock_install_missing_plugins,
+    ):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 1
 

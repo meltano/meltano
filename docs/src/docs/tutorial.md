@@ -41,10 +41,10 @@ meltano add loader target-postgres
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt carbon tap-carbon-intensity target-postgres
+meltano elt tap-carbon-intensity target-postgres
 
 # Start up the Meltano Analyze web application!
-meltano www
+meltano ui
 ```
 
 Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
