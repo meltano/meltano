@@ -65,3 +65,15 @@ This will exclude all `longitude` and `latitude` attributes.
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
+
+## How ELT Commands Fetches Dependencies
+
+When you run ELT commands again a tap or target, you might be wondering where it's coming from. As far 
+
+- First, the CLI looks in the project (that you initialized) directory itself.
+- Then it looks in the global file (discovery.yml) for urls of a package or repo
+  - Note: This will eventually be moved into its own repository to prevent confusion - since you can't have local references
+- When first accessed, it will either download to a local directory (if it is a package) or cloned (if it is a repo)
+- By doing this, you ensure that packages are version controlled `discovery.yml` will live in two places:
+  - in the project itself for the user to edit
+  - in a global repo for meltano employees to edit
