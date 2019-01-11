@@ -60,7 +60,7 @@ Meltano Models allow you to define your data model and generate SQL so that you 
 
 ## Meltano Analyze
 
-Meltano Analyze is a dashboard that allows you to run SQL queries and produce data visualizations, charts, and graphs based on your data.
+Meltano Analyze is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
 
 ## Meltano Transform
 
