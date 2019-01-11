@@ -55,9 +55,7 @@ class SqlHelper:
 
         table = AnalysisHelper.table(base_table, design["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
-        column_groups = self.column_groups(
-            table_name, incoming_column_groups, table
-        )
+        column_groups = self.column_groups(table_name, incoming_column_groups, table)
         columns = AnalysisHelper.columns(columns, table)
         columns = columns + column_groups
         aggregates = AnalysisHelper.aggregates(aggregates, table)

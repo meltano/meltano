@@ -29,7 +29,8 @@ class AnalysisHelper:
     @staticmethod
     def aggregates(aggregates, table):
         return [
-            AnalysisHelper.field_from_aggregate(aggregate, table) for aggregate in aggregates
+            AnalysisHelper.field_from_aggregate(aggregate, table)
+            for aggregate in aggregates
         ]
 
     @staticmethod

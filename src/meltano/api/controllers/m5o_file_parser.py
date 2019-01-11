@@ -93,9 +93,7 @@ class MeltanoAnalysisFileParser:
             compiled_file_name = f"{model['name']}.model.m5oc"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
-            indices[model["name"]] = {
-                "designs": [e["name"] for e in model["designs"]]
-            }
+            indices[model["name"]] = {"designs": [e["name"] for e in model["designs"]]}
             compiled_model.write(json.dumps(model))
             compiled_model.close()
 
