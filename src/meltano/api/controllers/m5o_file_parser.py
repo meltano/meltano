@@ -60,7 +60,7 @@ class MeltanoAnalysisFileParser:
         self.required_model_properties = ["name", "connection", "label", "explores"]
         self.required_explore_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
-        self.required_table_properties = ["sql_table_name", "dimensions"]
+        self.required_table_properties = ["sql_table_name", "columns"]
         self.join_relationship_types = [
             "one_to_one",
             "one_to_many",
@@ -216,20 +216,20 @@ class MeltanoAnalysisFileParser:
             )
         for prop_name, prop_def in table_file.items():
             temp_table[prop_name] = prop_def
-            if prop_name == "dimensions":
-                temp_table[prop_name] = self.dimensions(prop_def)
+            if prop_name == "columns":
+                temp_table[prop_name] = self.columns(prop_def)
             elif prop_name == "measures":
                 temp_table[prop_name] = self.measures(prop_def)
         return temp_table
 
-    def dimensions(self, ma_file_dimensions_dict):
-        temp_dimensions = []
-        for dimension_name, dimension_def in ma_file_dimensions_dict.items():
-            temp_dimension = {"name": dimension_name}
-            for prop_name, prop_def in dimension_def.items():
-                temp_dimension[prop_name] = prop_def
-            temp_dimensions.append(temp_dimension)
-        return temp_dimensions
+    def columns(self, ma_file_columns_dict):
+        temp_columns = []
+        for column_name, column_def in ma_file_columns_dict.items():
+            temp_column = {"name": column_name}
+            for prop_name, prop_def in column_def.items():
+                temp_column[prop_name] = prop_def
+            temp_columns.append(temp_column)
+        return temp_columns
 
     def measures(self, ma_file_measures_dict):
         temp_measures = []

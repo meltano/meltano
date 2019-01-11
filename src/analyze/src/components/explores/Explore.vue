@@ -32,42 +32,42 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.related_table.dimensions)">
-                  Dimensions
+                  v-if="showJoinColumnMeasureHeader(join.related_table.columns)">
+                  Columns
                 </a>
-                <template v-for="dimensionGroup in join.related_table.dimension_groups">
-                  <a class="panel-block dimension-group"
-                      :key="dimensionGroup.label"
-                      v-if="!dimensionGroup.hidden"
-                      @click="dimensionGroupSelected(dimensionGroup)"
-                      :class="{'is-active': dimensionGroup.selected}">
-                    {{dimensionGroup.label}}
+                <template v-for="columnGroup in join.related_table.column_groups">
+                  <a class="panel-block column-group"
+                      :key="columnGroup.label"
+                      v-if="!columnGroup.hidden"
+                      @click="columnGroupSelected(columnGroup)"
+                      :class="{'is-active': columnGroup.selected}">
+                    {{columnGroup.label}}
                   </a>
-                  <template v-if="dimensionGroup.selected">
-                    <template v-for="timeframe in dimensionGroup.timeframes">
+                  <template v-if="columnGroup.selected">
+                    <template v-for="timeframe in columnGroup.timeframes">
                       <a class="panel-block indented"
-                          :key="dimensionGroup.label.concat('-', timeframe.label)"
-                          @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
+                          :key="columnGroup.label.concat('-', timeframe.label)"
+                          @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
                           :class="{'is-active': timeframe.selected}">
                         {{timeframe.label}}
                       </a>
                     </template>
                   </template>
                 </template>
-                <template v-for="dimension in join.related_table.dimensions">
+                <template v-for="column in join.related_table.columns">
                   <a class="panel-block"
-                    v-if="!dimension.hidden"
-                    :key="dimension.label"
-                    :class="{'is-active': dimension.selected}"
-                    @click="joinDimensionSelected(join, dimension)">
-                  {{dimension.label}}
+                    v-if="!column.hidden"
+                    :key="column.label"
+                    :class="{'is-active': column.selected}"
+                    @click="joinColumnSelected(join, column)">
+                  {{column.label}}
                   </a>
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.measures)">
+                  v-if="showJoinColumnMeasureHeader(join.measures)">
                   Measures
                 </a>
                 <template v-for="measure in join.measures">
@@ -98,40 +98,40 @@
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_table.dimensions)">
-              Dimensions
+                v-if="showJoinColumnMeasureHeader(explore.related_table.columns)">
+              Columns
             </a>
-            <template v-for="dimensionGroup in explore.related_table.dimension_groups">
-              <a class="panel-block dimension-group"
-                  :key="dimensionGroup.label"
-                  v-if="!dimensionGroup.related_table.hidden"
-                  @click="dimensionGroupSelected(dimensionGroup)"
-                  :class="{'is-active': dimensionGroup.selected}">
-                {{dimensionGroup.label}}
+            <template v-for="columnGroup in explore.related_table.column_groups">
+              <a class="panel-block column-group"
+                  :key="columnGroup.label"
+                  v-if="!columnGroup.related_table.hidden"
+                  @click="columnGroupSelected(columnGroup)"
+                  :class="{'is-active': columnGroup.selected}">
+                {{columnGroup.label}}
               </a>
-              <template v-for="timeframe in dimensionGroup.timeframes">
+              <template v-for="timeframe in columnGroup.timeframes">
                 <a class="panel-block indented"
                     :key="timeframe.label"
-                    @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
-                    v-if="dimensionGroup.selected"
+                    @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
+                    v-if="columnGroup.selected"
                     :class="{'is-active': timeframe.selected}">
                   {{timeframe.label}}
                 </a>
               </template>
             </template>
             <a class="panel-block"
-                v-for="dimension in explore.related_table.dimensions"
-                :key="dimension.label"
-                v-if="!dimension.hidden"
-                @click="dimensionSelected(dimension)"
-                :class="{'is-active': dimension.selected}">
-              {{dimension.label}}
+                v-for="column in explore.related_table.columns"
+                :key="column.label"
+                v-if="!column.hidden"
+                @click="columnSelected(column)"
+                :class="{'is-active': column.selected}">
+              {{column.label}}
             </a>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_table.measures)">
+                v-if="showJoinColumnMeasureHeader(explore.related_table.measures)">
               Measures
             </a>
             <a class="panel-block"
@@ -336,7 +336,7 @@ export default {
   computed: {
     ...mapState('explores', [
       'explore',
-      'selectedDimensions',
+      'selectedColumns',
       'currentModel',
       'currentExplore',
       'currentSQL',
@@ -360,7 +360,7 @@ export default {
       'getSelectionsFromDistinct',
       'getChartYAxis',
       'hasJoins',
-      'showJoinDimensionMeasureHeader',
+      'showJoinColumnMeasureHeader',
       'formattedSql',
     ]),
 
@@ -395,21 +395,21 @@ export default {
       this.$store.dispatch('explores/expandJoinRow', join);
     },
 
-    dimensionSelected(dimension) {
-      this.$store.dispatch('explores/removeSort', dimension);
-      this.$store.dispatch('explores/toggleDimension', dimension);
+    columnSelected(column) {
+      this.$store.dispatch('explores/removeSort', column);
+      this.$store.dispatch('explores/toggleColumn', column);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
-    dimensionGroupSelected(dimensionGroup) {
-      ensureObjPropIsReactive(this.$set, dimensionGroup, 'selected')
-      this.$store.dispatch('explores/toggleDimensionGroup', dimensionGroup);
+    columnGroupSelected(columnGroup) {
+      ensureObjPropIsReactive(this.$set, columnGroup, 'selected')
+      this.$store.dispatch('explores/toggleColumnGroup', columnGroup);
     },
 
-    dimensionGroupTimeframeSelected(dimensionGroup, timeframe) {
+    columnGroupTimeframeSelected(columnGroup, timeframe) {
       ensureObjPropIsReactive(this.$set, timeframe, 'selected')
-      this.$store.dispatch('explores/toggleDimensionGroupTimeframe', {
-        dimensionGroup,
+      this.$store.dispatch('explores/toggleColumnGroupTimeframe', {
+        columnGroup,
         timeframe,
       });
       this.$store.dispatch('explores/getSQL', { run: false });
@@ -420,8 +420,8 @@ export default {
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
-    joinDimensionSelected(join, dimension) {
-      this.$store.dispatch('explores/toggleDimension', dimension);
+    joinColumnSelected(join, column) {
+      this.$store.dispatch('explores/toggleColumn', column);
       this.$store.dispatch('explores/getSQL', { run: false });
     },
 
@@ -490,7 +490,7 @@ code {
     }
   }
 
-  &.dimension-group {
+  &.column-group {
     &::after {
       border: 3px solid #363636;
       border-radius: 2px;

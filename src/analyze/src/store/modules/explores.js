@@ -19,7 +19,7 @@ const state = {
   resultMeasures: {},
   loadingQuery: false,
   currentDataTab: 'sql',
-  selectedDimensions: {},
+  selectedColumns: {},
   currentSQL: '',
   filtersOpen: false,
   dataOpen: true,
@@ -58,7 +58,7 @@ const getters = {
 
   isColumnSorted: () => key => state.sortColumn === key,
 
-  showJoinDimensionMeasureHeader: () => obj => !!obj,
+  showJoinColumnMeasureHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
   getKeyFromDistinct: () => (field) => {
@@ -125,7 +125,7 @@ const actions = {
     exploreApi.index(model, explore)
       .then((data) => {
         commit('setExplore', data.data);
-        commit('selectedDimensions', data.data.related_table.dimensions);
+        commit('selectedColumns', data.data.related_table.columns);
       });
   },
 
@@ -134,17 +134,17 @@ const actions = {
   },
 
   expandJoinRow({ commit }, join) {
-    // already fetched dimensions
+    // already fetched columns
     commit('toggleJoinOpen', join);
-    if (join.related_table.dimensions.length) return;
+    if (join.related_table.columns.length) return;
     exploreApi.getTable(join.related_table.name)
       .then((data) => {
-        commit('setJoinDimensions', {
-          dimensions: data.data.dimensions,
+        commit('setJoinColumns', {
+          columns: data.data.columns,
           join,
         });
-        commit('setJoinDimensionGroups', {
-          dimensionGroups: data.data.dimension_groups,
+        commit('setJoinColumnGroups', {
+          columnGroups: data.data.column_groups,
           join,
         });
         commit('setJoinMeasures', {
@@ -154,21 +154,21 @@ const actions = {
       });
   },
 
-  removeSort({ commit }, dimension) {
-    if (!state.sortColumn || state.sortColumn !== dimension.name) return;
-    commit('setRemoveSort', dimension);
+  removeSort({ commit }, column) {
+    if (!state.sortColumn || state.sortColumn !== column.name) return;
+    commit('setRemoveSort', column);
   },
 
-  toggleDimension({ commit }, dimension) {
-    commit('toggleDimensionSelected', dimension);
+  toggleColumn({ commit }, column) {
+    commit('toggleColumnSelected', column);
   },
 
-  toggleDimensionGroup({ commit }, dimensionGroup) {
-    commit('toggleDimensionGroupSelected', dimensionGroup);
+  toggleColumnGroup({ commit }, columnGroup) {
+    commit('toggleColumnGroupSelected', columnGroup);
   },
 
-  toggleDimensionGroupTimeframe({ commit }, dimensionGroupObj) {
-    commit('toggleDimensionGroupTimeframeSelected', dimensionGroupObj);
+  toggleColumnGroupTimeframe({ commit }, columnGroupObj) {
+    commit('toggleColumnGroupTimeframeSelected', columnGroupObj);
   },
 
   toggleMeasure({ commit }, measure) {
@@ -186,12 +186,12 @@ const actions = {
   getSQL({ commit }, { run }) {
     this.dispatch('explores/resetErrorMessage');
     const baseTable = state.explore.related_table;
-    const dimensions = baseTable
-      .dimensions
+    const columns = baseTable
+      .columns
       .filter(d => d.selected)
       .map(d => d.name);
     let sortColumn = baseTable
-      .dimensions
+      .columns
       .find(d => d.name === state.sortColumn);
     if (!sortColumn) {
       sortColumn = baseTable
@@ -215,11 +215,11 @@ const actions = {
       .map((j) => {
         const newJoin = {};
         newJoin.name = j.name;
-        if (j.dimensions) {
-          newJoin.dimensions = j.dimensions
+        if (j.columns) {
+          newJoin.columns = j.columns
             .filter(d => d.selected)
             .map(d => d.name);
-          if (!newJoin.dimensions.length) delete newJoin.dimensions;
+          if (!newJoin.columns.length) delete newJoin.columns;
         }
         if (j.measures) {
           newJoin.measures = j.measures
@@ -229,11 +229,11 @@ const actions = {
         }
         return newJoin;
       })
-      .filter(j => !!(j.dimensions || j.measures));
+      .filter(j => !!(j.columns || j.measures));
 
     let order = null;
-    const dimensionGroups = baseTable
-      .dimension_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
+    const columnGroups = baseTable
+      .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
         timeframes: dg.timeframes
@@ -251,8 +251,8 @@ const actions = {
 
     const postData = {
       table: baseTable.name,
-      dimensions,
-      dimension_groups: dimensionGroups,
+      columns,
+      column_groups: columnGroups,
       measures,
       joins,
       order,
@@ -344,12 +344,12 @@ const mutations = {
     Vue.set(state.distincts, field, data);
   },
 
-  setJoinDimensions(_, { dimensions, join }) {
-    join.dimensions = dimensions;
+  setJoinColumns(_, { columns, join }) {
+    join.columns = columns;
   },
 
-  setJoinDimensionGroups(_, { dimensionGroups, join }) {
-    join.dimension_groups = dimensionGroups;
+  setJoinColumnGroups(_, { columnGroups, join }) {
+    join.column_groups = columnGroups;
   },
 
   setJoinMeasures(_, { measures, join }) {
@@ -413,17 +413,17 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleDimensionSelected(_, dimension) {
-    const selectedDimension = dimension;
-    selectedDimension.selected = !dimension.selected;
+  toggleColumnSelected(_, column) {
+    const selectedColumn = column;
+    selectedColumn.selected = !column.selected;
   },
 
-  toggleDimensionGroupSelected(_, dimensionGroup) {
-    const selectedDimensionGroup = dimensionGroup;
-    selectedDimensionGroup.selected = !selectedDimensionGroup.selected;
+  toggleColumnGroupSelected(_, columnGroup) {
+    const selectedColumnGroup = columnGroup;
+    selectedColumnGroup.selected = !selectedColumnGroup.selected;
   },
 
-  toggleDimensionGroupTimeframeSelected(_, { timeframe }) {
+  toggleColumnGroupTimeframeSelected(_, { timeframe }) {
     const selectedTimeframe = timeframe;
     selectedTimeframe.selected = !selectedTimeframe.selected;
   },
@@ -433,9 +433,9 @@ const mutations = {
     selectedMeasure.selected = !measure.selected;
   },
 
-  selectedDimensions(_, dimensions) {
-    Object.keys(dimensions).forEach(dimension => {
-      state.selectedDimensions[dimension.unique_name] = false;
+  selectedColumns(_, columns) {
+    Object.keys(columns).forEach(column => {
+      state.selectedColumns[column.unique_name] = false;
     });
   },
 

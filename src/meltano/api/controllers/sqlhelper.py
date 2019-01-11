@@ -29,8 +29,8 @@ class SqlHelper:
         table = explore["related_table"]
 
         base_table = table["sql_table_name"]
-        incoming_dimensions = incoming_json["dimensions"]
-        incoming_dimension_groups = incoming_json["dimension_groups"]
+        incoming_columns = incoming_json["columns"]
+        incoming_column_groups = incoming_json["column_groups"]
         incoming_measures = incoming_json["measures"]
         incoming_filters = incoming_json["filters"]
         incoming_joins = incoming_json["joins"]
@@ -45,46 +45,46 @@ class SqlHelper:
         orderby = incoming_order["column"] if incoming_order else None
 
         # get all timeframes
-        timeframes = [t["timeframes"] for t in incoming_dimension_groups]
+        timeframes = [t["timeframes"] for t in incoming_column_groups]
         # flatten list of timeframes
         timeframes = [y for x in timeframes for y in x]
-        dimensions = AnalysisHelper.dimensions_from_names(incoming_dimensions, table)
+        columns = AnalysisHelper.columns_from_names(incoming_columns, table)
         measures = AnalysisHelper.measures_from_names(incoming_measures, table)
-        dimensions_raw = dimensions
+        columns_raw = columns
         measures_raw = measures
 
         table = AnalysisHelper.table(base_table, explore["name"])
         joins = [JoinHelper.get_join(j) for j in incoming_joins]
-        dimension_groups = self.dimension_groups(
-            table_name, incoming_dimension_groups, table
+        column_groups = self.column_groups(
+            table_name, incoming_column_groups, table
         )
-        dimensions = AnalysisHelper.dimensions(dimensions, table)
-        dimensions = dimensions + dimension_groups
+        columns = AnalysisHelper.columns(columns, table)
+        columns = columns + column_groups
         measures = AnalysisHelper.measures(measures, table)
 
         if orderby:
-            ordered_by_column = [d for d in dimensions_raw if d.name == orderby]
+            ordered_by_column = [d for d in columns_raw if d.name == orderby]
             if ordered_by_column:
-                orderby = self.dimensions(ordered_by_column, table)[0]
+                orderby = self.columns(ordered_by_column, table)[0]
             else:
                 ordered_by_column = [m for m in measures_raw if m.name == orderby]
                 if ordered_by_column:
                     orderby = self.measures(ordered_by_column, table)[0]
                 else:
                     raise Exception(
-                        "Something is wrong, no dimension or measure column matching the column to sort by."
+                        "Something is wrong, no column or measure column matching the column to sort by."
                     )
 
-        column_headers = self.column_headers(dimensions_raw, measures_raw)
-        names = self.get_names(dimensions_raw + measures_raw)
+        column_headers = self.column_headers(columns_raw, measures_raw)
+        names = self.get_names(columns_raw + measures_raw)
         return {
-            "dimensions": dimensions_raw,
+            "columns": columns_raw,
             "measures": measures_raw,
             "column_headers": column_headers,
             "names": names,
             "sql": self.get_query(
                 from_=table,
-                dimensions=dimensions,
+                columns=columns,
                 measures=measures,
                 limit=incoming_limit,
                 joins=joins,
@@ -93,40 +93,40 @@ class SqlHelper:
             ),
         }
 
-    def column_headers(self, dimensions, measures):
-        return [d["label"] for d in dimensions + measures]
+    def column_headers(self, columns, measures):
+        return [d["label"] for d in columns + measures]
 
-    def dimension_groups(self, table_name, dimension_groups, table):
+    def column_groups(self, table_name, column_groups, table):
         fields = []
-        for dimension_group in dimension_groups:
-            dimension_group_queried = (
-                DimensionGroup.query.join(Table, DimensionGroup.table_id == Table.id)
+        for column_group in column_groups:
+            column_group_queried = (
+                ColumnGroup.query.join(Table, ColumnGroup.table_id == Table.id)
                 .filter(Table.name == table_name)
-                .filter(DimensionGroup.name == dimension_group["name"])
+                .filter(ColumnGroup.name == column_group["name"])
                 .first()
             )
-            (_table, name) = dimension_group_queried.table_column_name.split(".")
-            for timeframe in dimension_group["timeframes"]:
+            (_table, name) = column_group_queried.table_column_name.split(".")
+            for timeframe in column_group["timeframes"]:
                 d = Date(timeframe, table, name)
                 fields.append(d.sql)
         return fields
 
     def get_query(
-        self, from_, dimensions, measures, limit, joins=None, order=None, orderby=None
+        self, from_, columns, measures, limit, joins=None, order=None, orderby=None
     ):
-        select = dimensions + measures
+        select = columns + measures
         q = Query.from_(from_)
         if joins:
             region = from_
             entry = joins[0]["table"]
-            join_dimensions = joins[0]["dimensions"]
+            join_columns = joins[0]["columns"]
             join_measures = joins[0]["measures"]
-            select = select + join_dimensions + join_measures
-            dimensions = dimensions + join_dimensions
+            select = select + join_columns + join_measures
+            columns = columns + join_columns
             q = q.join(joins[0]["table"]).on(
                 region.id == entry.region_id and region.id == entry.region_id
             )
-        q = q.select(*select).groupby(*dimensions)
+        q = q.select(*select).groupby(*columns)
         if order:
             q = q.orderby(orderby, order=order)
         q = q.limit(limit)

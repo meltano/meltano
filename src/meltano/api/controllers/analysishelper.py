@@ -14,8 +14,8 @@ class AnalysisHelper:
             return Table(name, alias=alias)
 
     @staticmethod
-    def dimensions_from_names(dimensions, table):
-        return list(filter(lambda x: x["name"] in dimensions, table["dimensions"]))
+    def columns_from_names(columns, table):
+        return list(filter(lambda x: x["name"] in columns, table["columns"]))
 
     # TODO: dedup this non dry situation
     @staticmethod
@@ -23,8 +23,8 @@ class AnalysisHelper:
         return list(filter(lambda x: x["name"] in measures, table["measures"]))
 
     @staticmethod
-    def dimensions(dimensions, table):
-        return [AnalysisHelper.field_from_dimension(d, table) for d in dimensions]
+    def columns(columns, table):
+        return [AnalysisHelper.field_from_column(d, table) for d in columns]
 
     @staticmethod
     def measures(measures, table):
@@ -38,7 +38,7 @@ class AnalysisHelper:
         return aggregate.sql
 
     @staticmethod
-    def field_from_dimension(d, table):
+    def field_from_column(d, table):
         sql = d["sql"]
-        substitution = Substitution(sql, table, dimension=d)
+        substitution = Substitution(sql, table, column=d)
         return substitution.sql

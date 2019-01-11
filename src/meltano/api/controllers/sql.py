@@ -103,7 +103,7 @@ def get_sql(model_name, explore_name):
     sql_dict = sqlHelper.get_sql(explore, incoming_json)
     outgoing_sql = sql_dict["sql"]
     measures = sql_dict["measures"]
-    dimensions = sql_dict["dimensions"]
+    columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
     names = sql_dict["names"]
 
