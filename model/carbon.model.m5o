@@ -4,7 +4,7 @@
   # Postgres DB
   connection = runners_db
   label = carbon intensity
-  explores {
+  designs {
     region {
       label = Region
       from = region

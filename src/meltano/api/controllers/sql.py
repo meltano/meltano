@@ -135,7 +135,7 @@ def get_distinct_field_name(model_name, design_name):
     # model = Model.query.filter(Model.name == model_name).first()
     # design = Design.query.filter(Design.name == design_name).first()
 
-    # base_table = design.view.settings["sql_table_name"]
+    # base_table = design.table.settings["sql_table_name"]
     # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {design_name} ORDER BY {field_name}"
 
     # engine = get_db_engine(model.settings["connection"])

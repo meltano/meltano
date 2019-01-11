@@ -1,7 +1,7 @@
 {
   sql_table_name = gitlab.region
   name = region
-  dimensions {
+  columns {
     id {
       primary_key = true
       hidden = true
@@ -21,7 +21,7 @@
       sql = "{{table}}.shortname"
     }
   }
-  measures {
+  aggregates {
     count {
       label = Count
       description = Runner Count
