@@ -16,7 +16,7 @@ class DbtRunner(Runner):
         self.dbt_service.deps()
 
         if models is not None:
-            models = models.replace('-', '_')
+            models = models.replace("-", "_")
 
         if dry_run:
             self.dbt_service.compile(models)

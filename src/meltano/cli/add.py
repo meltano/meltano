@@ -77,6 +77,27 @@ def transformer(plugin_name):
         click.ClickException(e)
 
 
+@add.command()
+@click.argument("plugin_name")
+def transform(plugin_name):
+    try:
+        project = Project.find()
+
+        print()
+        print(" !!!! Meltano add transform !!!")
+        print()
+
+        add_service = ProjectAddService(project)
+        plugin = add_service.add(PluginType.TRANSFORMS, plugin_name)
+        click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
+
+        # Add repo to my-test-project/transform/packages.yml
+
+        # Add model and vars to my-test-project/transform/dbt_project.yml
+    except ProjectNotFound as e:
+        click.ClickException(e)
+
+
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project)
