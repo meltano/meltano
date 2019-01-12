@@ -152,7 +152,7 @@
         user: "{{ env_var('PG_USERNAME') }}"
         pass: "{{ env_var('PG_PASSWORD') }}"
         dbname: "{{ env_var('PG_DATABASE') }}"
-        schema: "{{ env_var('PG_SCHEMA') }}"
+        schema: "analytics"
 "/analyze": []
 "/notebook": []
 "/orchestrate": []
