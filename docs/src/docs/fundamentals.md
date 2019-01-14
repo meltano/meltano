@@ -12,13 +12,13 @@ An Aggregate relates to a calculatable column, via count, sum or other. AKA aggr
 
 ## Table 
 
-A Table relates to a table in a database. It defines a direct link to a table in the database. In adition, it also defines and contains columns and aggregates so you can sdelect which you want to show.
+A Table relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains columns and aggregates so you can sdelect which you want to show.
 
 It can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
 
 ## Design
 
-An Design maps multiple tables together via joins. It points to many tables by names and can also add filters. At a high level, it does the following:
+A Design maps multiple tables together via joins. It points to many tables by names and can also add filters. At a high level, it does the following:
 
 1. Takes selected columns to generate SQL from the `.m5oc` file
 1. Runs the SQL query
@@ -30,7 +30,7 @@ It can be identified by the file naming schema: `design-name.design.m5o`.
 
 ## Collection 
 
-A Collection is a single of group of designs together. It also determines how they will be mapped together.
+A Collection represents a group of designs and determines how they will be mapped together.
 
 It can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
 
