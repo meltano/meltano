@@ -54,5 +54,3 @@ There are two primary types of `.m5o` files:
 2. `.mtoc` are compiled and are not typically modified manually
 
 `.m5o` is based on HOCON syntax and serve as input for the compiled files that contain JSON.
-
-
