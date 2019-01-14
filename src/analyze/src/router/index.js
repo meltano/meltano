@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
-import Explore from '@/components/explores/Explore';
+import Design from '@/components/designs/Design';
 import Settings from '@/components/settings/Settings';
 import Extract from '@/components/extract/Extract';
 import Load from '@/components/load/Load';
@@ -49,9 +49,9 @@ export default new Router({
       component: Repo,
     },
     {
-      path: '/explore/:model/:explore',
+      path: '/design/:model/:design',
       name: '',
-      component: Explore,
+      component: Design,
     },
     {
       path: '/settings',

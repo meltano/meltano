@@ -62,14 +62,6 @@ Helper functions to manage the data warehouse. At the moment, these are PGSQL sp
 
 Create and grant usage for a database schema.
 
-## Meltano Model
-
-Meltano Models allow you to define your data model and generate SQL so that you can easily analyze and visualize it in Meltano Analyze.
-
-## Meltano Analyze
-
-Meltano Analyze is a dashboard that allows you to run SQL queries and produce data visualizations, charts, and graphs based on your data.
-
 ## Meltano Transform
 
 ### dbt

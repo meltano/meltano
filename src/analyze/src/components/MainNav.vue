@@ -26,12 +26,12 @@
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
-            <router-link :to="urlForModelExplore(model, explore)"
+            <router-link :to="urlForModelDesign(model, design)"
             class="navbar-item navbar-child"
-            v-for="explore in v['explores']"
+            v-for="design in v['designs']"
             @click.native="menuSelected"
-            :key="explore">
-              {{explore | capitalize | underscoreToSpace}}
+            :key="design">
+              {{design | capitalize | underscoreToSpace}}
             </router-link>
             </template>
           </div>
@@ -94,7 +94,7 @@ export default {
       'navbarClicked',
     ]),
     ...mapGetters('repos', [
-      'urlForModelExplore',
+      'urlForModelDesign',
     ]),
   },
 

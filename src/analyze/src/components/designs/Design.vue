@@ -4,7 +4,7 @@
     <div class="columns">
       <nav class="panel column is-one-quarter">
         <p class="panel-heading">
-          {{explore.label}}
+          {{design.label}}
         </p>
         <div class="panel-block">
           <p class="control">
@@ -15,7 +15,7 @@
         <div class="inner-scroll text-selection-off">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
-            <template v-for="join in explore.joins">
+            <template v-for="join in design.joins">
               <a
                 class="panel-block
                   panel-block-heading
@@ -32,51 +32,51 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.related_view.dimensions)">
-                  Dimensions
+                  v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
+                  Columns
                 </a>
-                <template v-for="dimensionGroup in join.related_view.dimension_groups">
-                  <a class="panel-block dimension-group"
-                      :key="dimensionGroup.label"
-                      v-if="!dimensionGroup.hidden"
-                      @click="dimensionGroupSelected(dimensionGroup)"
-                      :class="{'is-active': dimensionGroup.selected}">
-                    {{dimensionGroup.label}}
+                <template v-for="columnGroup in join.related_table.column_groups">
+                  <a class="panel-block column-group"
+                      :key="columnGroup.label"
+                      v-if="!columnGroup.hidden"
+                      @click="columnGroupSelected(columnGroup)"
+                      :class="{'is-active': columnGroup.selected}">
+                    {{columnGroup.label}}
                   </a>
-                  <template v-if="dimensionGroup.selected">
-                    <template v-for="timeframe in dimensionGroup.timeframes">
+                  <template v-if="columnGroup.selected">
+                    <template v-for="timeframe in columnGroup.timeframes">
                       <a class="panel-block indented"
-                          :key="dimensionGroup.label.concat('-', timeframe.label)"
-                          @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
+                          :key="columnGroup.label.concat('-', timeframe.label)"
+                          @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
                           :class="{'is-active': timeframe.selected}">
                         {{timeframe.label}}
                       </a>
                     </template>
                   </template>
                 </template>
-                <template v-for="dimension in join.related_view.dimensions">
+                <template v-for="column in join.related_table.columns">
                   <a class="panel-block"
-                    v-if="!dimension.hidden"
-                    :key="dimension.label"
-                    :class="{'is-active': dimension.selected}"
-                    @click="joinDimensionSelected(join, dimension)">
-                  {{dimension.label}}
+                    v-if="!column.hidden"
+                    :key="column.label"
+                    :class="{'is-active': column.selected}"
+                    @click="joinColumnSelected(join, column)">
+                  {{column.label}}
                   </a>
                 </template>
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinDimensionMeasureHeader(join.measures)">
-                  Measures
+                  v-if="showJoinColumnAggregateHeader(join.aggregates)">
+                  Aggregates
                 </a>
-                <template v-for="measure in join.measures">
+                <template v-for="aggregate in join.aggregates">
                   <a class="panel-block"
-                    v-if="measure.related_view.hidden"
-                    :key="measure.label"
-                    :class="{'is-active': measure.selected}"
-                    @click="joinMeasureSelected(join, measure)">
-                  {{measure.label}}
+                    v-if="aggregate.related_table.hidden"
+                    :key="aggregate.label"
+                    :class="{'is-active': aggregate.selected}"
+                    @click="joinAggregateSelected(join, aggregate)">
+                  {{aggregate.label}}
                   </a>
                 </template>
               </template>
@@ -89,57 +89,57 @@
               has-background-white-ter
               has-text-grey
               is-expandable"
-              :class="{'is-collapsed': explore.related_view.collapsed}"
-              @click="viewRowClicked(explore.related_view)">
-                {{explore.label}}
+              :class="{'is-collapsed': design.related_table.collapsed}"
+              @click="tableRowClicked(design.related_table)">
+                {{design.label}}
               </a>
           </template>
-          <template v-if="!explore.related_view.collapsed">
+          <template v-if="!design.related_table.collapsed">
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_view.dimensions)">
-              Dimensions
+                v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
+              Columns
             </a>
-            <template v-for="dimensionGroup in explore.related_view.dimension_groups">
-              <a class="panel-block dimension-group"
-                  :key="dimensionGroup.label"
-                  v-if="!dimensionGroup.related_view.hidden"
-                  @click="dimensionGroupSelected(dimensionGroup)"
-                  :class="{'is-active': dimensionGroup.selected}">
-                {{dimensionGroup.label}}
+            <template v-for="columnGroup in design.related_table.column_groups">
+              <a class="panel-block column-group"
+                  :key="columnGroup.label"
+                  v-if="!columnGroup.related_table.hidden"
+                  @click="columnGroupSelected(columnGroup)"
+                  :class="{'is-active': columnGroup.selected}">
+                {{columnGroup.label}}
               </a>
-              <template v-for="timeframe in dimensionGroup.timeframes">
+              <template v-for="timeframe in columnGroup.timeframes">
                 <a class="panel-block indented"
                     :key="timeframe.label"
-                    @click="dimensionGroupTimeframeSelected(dimensionGroup, timeframe)"
-                    v-if="dimensionGroup.selected"
+                    @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
+                    v-if="columnGroup.selected"
                     :class="{'is-active': timeframe.selected}">
                   {{timeframe.label}}
                 </a>
               </template>
             </template>
             <a class="panel-block"
-                v-for="dimension in explore.related_view.dimensions"
-                :key="dimension.label"
-                v-if="!dimension.hidden"
-                @click="dimensionSelected(dimension)"
-                :class="{'is-active': dimension.selected}">
-              {{dimension.label}}
+                v-for="column in design.related_table.columns"
+                :key="column.label"
+                v-if="!column.hidden"
+                @click="columnSelected(column)"
+                :class="{'is-active': column.selected}">
+              {{column.label}}
             </a>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <a class="panel-block
                 panel-block-heading
                 has-background-white"
-                v-if="showJoinDimensionMeasureHeader(explore.related_view.measures)">
-              Measures
+                v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
+              Aggregates
             </a>
             <a class="panel-block"
-                v-for="measure in explore.related_view.measures"
-                :key="measure.label"
-                @click="measureSelected(measure)"
-                :class="{'is-active': measure.selected}">
-              {{measure.label}}
+                v-for="aggregate in design.related_table.aggregates"
+                :key="aggregate.label"
+                @click="aggregateSelected(aggregate)"
+                :class="{'is-active': aggregate.selected}">
+              {{aggregate.label}}
             </a>
           </template>
         </div>
@@ -158,7 +158,7 @@
               @click="runQuery">Run</a>
           </div>
         </div>
-        <template v-if="explore.has_filters">
+        <template v-if="design.has_filters">
           <div class="has-background-grey-darker
             section-header
             has-text-white-bis
@@ -166,12 +166,12 @@
             @click="toggleFilterOpen"
             :class="{'is-collapsed': !filtersOpen}">Filters</div>
           <div class="has-background-white-ter filter-item"
-                v-for="filter in explore.always_filter.filters"
+                v-for="filter in design.always_filter.filters"
                 :key="filter.label"
                 v-if="filtersOpen">
             <div class="columns">
               <div class="column is-3">
-                <strong>{{filter.explore_label}}</strong>
+                <strong>{{filter.design_label}}</strong>
                 <span>{{filter.label}}</span>
                 <span>({{filter.type}})</span>
               </div>
@@ -310,11 +310,11 @@ import Chart from './Chart';
 import { ensureObjPropIsReactive } from '../utils/utils'
 
 export default {
-  name: 'Explore',
+  name: 'Design',
   created() {
-    this.$store.dispatch('explores/getExplore', {
+    this.$store.dispatch('designs/getDesign', {
       model: this.$route.params.model,
-      explore: this.$route.params.explore,
+      design: this.$route.params.design,
     });
   },
   filters: {
@@ -327,18 +327,18 @@ export default {
     Chart,
   },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('explores/getExplore', {
+    this.$store.dispatch('designs/getDesign', {
       model: to.params.model,
-      explore: to.params.explore,
+      design: to.params.design,
     });
     next();
   },
   computed: {
-    ...mapState('explores', [
-      'explore',
-      'selectedDimensions',
+    ...mapState('designs', [
+      'design',
+      'selectedColumns',
       'currentModel',
-      'currentExplore',
+      'currentDesign',
       'currentSQL',
       'loadingQuery',
       'filtersOpen',
@@ -347,9 +347,9 @@ export default {
       'hasSQLError',
       'sqlErrorMessage',
     ]),
-    ...mapGetters('explores', [
+    ...mapGetters('designs', [
       'currentModelLabel',
-      'currentExploreLabel',
+      'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
       'numResults',
@@ -360,112 +360,112 @@ export default {
       'getSelectionsFromDistinct',
       'getChartYAxis',
       'hasJoins',
-      'showJoinDimensionMeasureHeader',
+      'showJoinColumnAggregateHeader',
       'formattedSql',
     ]),
 
     limit: {
       get() {
-        return this.$store.getters['explores/currentLimit'];
+        return this.$store.getters['designs/currentLimit'];
       },
       set(value) {
-        this.$store.dispatch('explores/limitSet', value);
-        this.$store.dispatch('explores/getSQL', { run: false });
+        this.$store.dispatch('designs/limitSet', value);
+        this.$store.dispatch('designs/getSQL', { run: false });
       },
     },
   },
   methods: {
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
-        this.$store.dispatch('explores/getDistinct', field);
+        this.$store.dispatch('designs/getDistinct', field);
       }
     },
 
     setChartType(chartType) {
-      this.$store.dispatch('explores/setChartType', chartType);
+      this.$store.dispatch('designs/setChartType', chartType);
     },
 
-    viewRowClicked(relatedView) {
-      ensureObjPropIsReactive(this.$set, relatedView, 'collapsed')
-      this.$store.dispatch('explores/expandRow');
+    tableRowClicked(relatedTable) {
+      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed')
+      this.$store.dispatch('designs/expandRow');
     },
 
     joinRowClicked(join) {
       ensureObjPropIsReactive(this.$set, join, 'collapsed')
-      this.$store.dispatch('explores/expandJoinRow', join);
+      this.$store.dispatch('designs/expandJoinRow', join);
     },
 
-    dimensionSelected(dimension) {
-      this.$store.dispatch('explores/removeSort', dimension);
-      this.$store.dispatch('explores/toggleDimension', dimension);
-      this.$store.dispatch('explores/getSQL', { run: false });
+    columnSelected(column) {
+      this.$store.dispatch('designs/removeSort', column);
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
-    dimensionGroupSelected(dimensionGroup) {
-      ensureObjPropIsReactive(this.$set, dimensionGroup, 'selected')
-      this.$store.dispatch('explores/toggleDimensionGroup', dimensionGroup);
+    columnGroupSelected(columnGroup) {
+      ensureObjPropIsReactive(this.$set, columnGroup, 'selected')
+      this.$store.dispatch('designs/toggleColumnGroup', columnGroup);
     },
 
-    dimensionGroupTimeframeSelected(dimensionGroup, timeframe) {
+    columnGroupTimeframeSelected(columnGroup, timeframe) {
       ensureObjPropIsReactive(this.$set, timeframe, 'selected')
-      this.$store.dispatch('explores/toggleDimensionGroupTimeframe', {
-        dimensionGroup,
+      this.$store.dispatch('designs/toggleColumnGroupTimeframe', {
+        columnGroup,
         timeframe,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
-    measureSelected(measure) {
-      this.$store.dispatch('explores/toggleMeasure', measure);
-      this.$store.dispatch('explores/getSQL', { run: false });
+    aggregateSelected(aggregate) {
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
-    joinDimensionSelected(join, dimension) {
-      this.$store.dispatch('explores/toggleDimension', dimension);
-      this.$store.dispatch('explores/getSQL', { run: false });
+    joinColumnSelected(join, column) {
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
-    joinMeasureSelected(join, measure) {
-      this.$store.dispatch('explores/toggleMeasure', measure);
-      this.$store.dispatch('explores/getSQL', { run: false });
+    joinAggregateSelected(join, aggregate) {
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     runQuery() {
-      this.$store.dispatch('explores/getSQL', { run: true });
+      this.$store.dispatch('designs/getSQL', { run: true });
     },
 
     setCurrentTab(tab) {
-      this.$store.dispatch('explores/switchCurrentTab', tab);
+      this.$store.dispatch('designs/switchCurrentTab', tab);
     },
 
     toggleFilterOpen() {
-      this.$store.dispatch('explores/toggleFilterOpen');
+      this.$store.dispatch('designs/toggleFilterOpen');
     },
 
     toggleDataOpen() {
-      this.$store.dispatch('explores/toggleDataOpen');
+      this.$store.dispatch('designs/toggleDataOpen');
     },
 
     toggleChartsOpen() {
-      this.$store.dispatch('explores/toggleChartsOpen');
+      this.$store.dispatch('designs/toggleChartsOpen');
     },
 
     dropdownSelected(item, field) {
-      this.$store.dispatch('explores/addDistinctSelection', {
+      this.$store.dispatch('designs/addDistinctSelection', {
         item,
         field,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
 
     modifierChanged(item, field) {
-      this.$store.dispatch('explores/addDistinctModifier', {
+      this.$store.dispatch('designs/addDistinctModifier', {
         item,
         field,
       });
-      this.$store.dispatch('explores/getSQL', { run: false });
+      this.$store.dispatch('designs/getSQL', { run: false });
     },
-    ...mapActions('explores', [
+    ...mapActions('designs', [
       'resetErrorMessage',
     ]),
   },
@@ -490,7 +490,7 @@ code {
     }
   }
 
-  &.dimension-group {
+  &.column-group {
     &::after {
       border: 3px solid #363636;
       border-radius: 2px;
