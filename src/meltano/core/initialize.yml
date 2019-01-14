@@ -113,17 +113,9 @@
 "/load": []
 "/transform": []
 "transform/dbt_project.yml": |
-  # Name your package! Package names should contain only lowercase characters
-  # and underscores. A good package name should reflect your organization's
-  # name or the intended use of these models
   name: 'my_meltano_project'
   version: '1.0'
-  # This setting configures which "profile" dbt uses for this project. Profiles contain
-  # database connection information, and should be configured in the  ~/.dbt/profiles.yml file
   profile: 'meltano'
-  # These configurations specify where dbt should look for different types of files.
-  # The `source-paths` config, for example, states that source models can be found
-  # in the "models/" directory. You probably won't need to change these!
   source-paths: ["models"]
   analysis-paths: ["analysis"]
   test-paths: ["tests"]
@@ -152,7 +144,9 @@
         user: "{{ env_var('PG_USERNAME') }}"
         pass: "{{ env_var('PG_PASSWORD') }}"
         dbname: "{{ env_var('PG_DATABASE') }}"
-        schema: "analytics"
+        schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
+"/transform/models": []
+"/transform/models/my_meltano_project": []
 "/analyze": []
 "/notebook": []
 "/orchestrate": []

@@ -91,9 +91,9 @@ transformers:
   - name: dbt
     pip_url: dbt
 transforms:
-  - name: dbt-tap-carbon-intensity
+  - name: tap-carbon-intensity
     pip_url: "https://gitlab.com/meltano/dbt-tap-carbon-intensity.git"
     vars:
-      entry_table: "gitlab.entry"
-      generationmix_table: "gitlab.generationmix"
-      region_table: "gitlab.region"
+      entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
+      generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
+      region_table: "{{ env_var('PG_SCHEMA') }}.region"
