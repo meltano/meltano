@@ -1,6 +1,15 @@
 # Fundamentals
 
-Within the Meltano ecosystem, here are some common terms that you will encounter and what they mean:
+Below are common terms used within the Meltano ecosystem. Many of these terms have associated `.m5o` (Meltano model) files, so we'll cover those first.
+
+## M5O Files
+
+There are two types of `.m5o` files:
+
+1. `.m5o` are uncompiled files that users define based on a schema
+2. `.m5oc` are compiled files generated from multiple `m5o` files
+
+The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano Analyze then leverages.
 
 ## Column
 
@@ -45,12 +54,3 @@ A `Report` can be identified by the file naming schema: `report-name.report.m5oc
 A `Dashboard` is a group of many `Reports`.
 
 A `Dashboard` is identified by the file naming schema: `set-name.dashboard.m5o` and is stored in the `/dashboards` directory.
-
-## M5O Files
-
-There are two primary types of `.m5o` files:
-
-1. `.m5o` are uncompiled files that users will normally interact with
-2. `.mtoc` are compiled and are not typically modified manually
-
-`.m5o` is based on HOCON syntax and serve as input for the compiled files that contain JSON.
