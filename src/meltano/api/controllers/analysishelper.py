@@ -2,14 +2,17 @@ from .substitution import Substitution
 from pypika import Table
 
 from .aggregate import Aggregate
+from .timeframe import TimeframePeriod
 
 
 class AnalysisHelper:
     @staticmethod
-    def table(name, **kwargs):
+    def db_table(name, **kwargs):
         try:
             schema, name = name.split(".")
-            return Table(name, schema=schema, **kwargs)
+            options = kwargs
+            options["schema"] = schema
+            return Table(name, **options)
         except ValueError:
             return Table(name, **kwargs)
 
@@ -47,13 +50,22 @@ class AnalysisHelper:
             cls.field_from_aggregate(aggregate, db_table) for aggregate in aggregates
         ]
 
-    @staticmethod
-    def field_from_aggregate(aggregate, db_table):
-        aggregate = Aggregate(aggregate, db_table)
-        return aggregate.sql
+    @classmethod
+    def periods(cls, timeframes, db_table):
+        return [
+            cls.field_from_timeframe_period(timeframe["timeframe"], period, db_table)
+            for timeframe in timeframes
+            for period in timeframe["periods"]
+        ]
 
-    @staticmethod
-    def field_from_column(d, db_table):
-        sql = d["sql"]
-        substitution = Substitution(sql, db_table, column=d)
-        return substitution.sql
+    @classmethod
+    def field_from_aggregate(cls, aggregate, db_table):
+        return Aggregate(aggregate, db_table).sql
+
+    @classmethod
+    def field_from_column(cls, d, db_table):
+        return Substitution(d["sql"], db_table, column=d).sql
+
+    @classmethod
+    def field_from_timeframe_period(cls, timeframe, period, db_table):
+        return TimeframePeriod(timeframe, period, db_table).sql

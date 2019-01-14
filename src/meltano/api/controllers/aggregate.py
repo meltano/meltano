@@ -1,21 +1,28 @@
 from enum import Enum
 
 from pypika import functions as fn
-
 from .substitution import Substitution
 
 
 class AggregateType(Enum):
-    unknown = "UNKNOWN"
-    count = "count"
-    sum = "sum"
-    number = "number"
+    Unknown = "UNKNOWN"
+    Count = "count"
+    Sum = "sum"
+    Number = "number"
+
+    def __eq__(self, other):
+        return self.value.lower() == str(other).lower()
+
+    @classmethod
+    def parse(cls, value: str):
+        try:
+            return next(e for e in cls if e.value.lower() == value)
+        except StopIteration:
+            return cls.Unknown
 
 
 class Aggregate:
-    def __init__(self, aggregate, table):
-        sql = aggregate["sql"]
-        self.substitution = Substitution(sql, table, None, aggregate["name"])
+    def __init__(self, aggregate, db_table):
         self.aggregate = aggregate
         self.field = Substitution(
             aggregate["sql"], db_table, None, alias=aggregate["name"]

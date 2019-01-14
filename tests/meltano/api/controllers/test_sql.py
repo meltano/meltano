@@ -66,7 +66,9 @@ class TestSqlController:
         assert res.status_code == 200
         assert res.json["sql"] == ";"
 
-        # with columns they should be included in the query
+    def assert_column_query(self, post):
+        """with columns they should be included in the query"""
+
         payload = {
             "table": "region",
             "columns": ["name"],

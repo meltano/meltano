@@ -37,6 +37,8 @@ class InvalidIdentifier(Exception):
 
 Identifier = namedtuple("Identifier", ("schema", "table", "field", "alias"))
 
+DimensionGroup = namedtuple("DimensionGroup", ("dimensions", "group"))
+
 
 class PypikaJoinExecutor:
     def __init__(self, design, join):
@@ -54,7 +56,7 @@ class PypikaJoinExecutor:
         right_alias = self.join["name"] if right.table == self.join["name"] else None
 
         left_field = getattr(
-            AnalysisHelper.table(
+            AnalysisHelper.db_table(
                 table["sql_table_name"] if left_alias else left.table,
                 schema=left.schema,
                 alias=left_alias or left.alias or left.table,
@@ -63,7 +65,7 @@ class PypikaJoinExecutor:
         )
 
         right_field = getattr(
-            AnalysisHelper.table(
+            AnalysisHelper.db_table(
                 table["sql_table_name"] if right_alias else right.table,
                 schema=right.schema,
                 alias=right_alias or right.alias or right.table,

@@ -59,11 +59,20 @@ class SqlHelper:
         for j in joins:
             columns_raw += j["columns"]
             aggregates_raw += j["aggregates"]
+            timeframes_raw += j["timeframes"]
 
             columns += AnalysisHelper.columns(j["columns"], j["db_table"])
             aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
             timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
 
+        order = None
+        orderby = None
+        orderby_field = None
+        if incoming_order:
+            orderby = incoming_order["column"]
+            order = Order.asc if incoming_order["direction"] == "asc" else Order.desc
+
+        # order by column
         if orderby:
             try:
                 orderby_field = next(
@@ -103,30 +112,20 @@ class SqlHelper:
                 from_=db_table,
                 columns=columns,
                 aggregates=aggregates,
+                periods=timeframe_periods,
                 limit=incoming_limit,
                 joins=joins,
-                order=order,
                 orderby=orderby,
+                order=order,
             ),
         }
 
-    def column_headers(self, columns, aggregates):
-        return [d["label"] for d in columns + aggregates]
+    def column_headers(self, columns, aggregates, timeframes):
+        labels = [l["label"] for l in columns + aggregates]
+        for timeframe in timeframes:
+            labels += timeframe["period_labels"]
 
-    def column_groups(self, table_name, column_groups, table):
-        fields = []
-        for column_group in column_groups:
-            column_group_queried = (
-                ColumnGroup.query.join(Table, ColumnGroup.table_id == Table.id)
-                .filter(Table.name == table_name)
-                .filter(ColumnGroup.name == column_group["name"])
-                .first()
-            )
-            (_table, name) = column_group_queried.table_column_name.split(".")
-            for timeframe in column_group["timeframes"]:
-                d = Date(timeframe, table, name)
-                fields.append(d.sql)
-        return fields
+        return labels
 
     def get_query(
         self,
@@ -139,12 +138,11 @@ class SqlHelper:
         order=None,
         orderby=None,
     ):
-        select = columns + aggregates
+        select = columns + aggregates + periods
         q = Query.from_(from_)
 
         for j in joins:
             join_db_table = j["db_table"]
-            # print(f"Jointing on {join_table} with {j['on']}")
             q = q.join(join_db_table).on(j["on"])
 
         q = q.select(*select).groupby(*columns, *periods)

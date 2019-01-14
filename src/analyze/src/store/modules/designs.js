@@ -61,6 +61,7 @@ const getters = {
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
+  
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -68,6 +69,7 @@ const getters = {
     }
     return thisDistinct.keys[0];
   },
+  
   getSelectionsFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -333,7 +335,6 @@ const actions = {
 };
 
 const mutations = {
-
   setRemoveSort() {
     state.sortColumn = null;
   },

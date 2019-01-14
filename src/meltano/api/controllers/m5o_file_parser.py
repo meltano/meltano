@@ -1,6 +1,7 @@
 from pyhocon import ConfigFactory
 from pathlib import Path
 from jinja2 import Template
+from typing import Dict, List
 
 import logging
 import json
@@ -216,6 +217,7 @@ class MeltanoAnalysisFileParser:
             raise MeltanoAnalysisFileParserMissingFieldsError(
                 missing_properties, "table", file_name
             )
+
         for prop_name, prop_def in table_file.items():
             subproperties = ("columns", "aggregates", "timeframes")
 
