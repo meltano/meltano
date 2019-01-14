@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* add new command `meltano add transform [name_of_dbt_transformation]`
+* add transforms to the available plugins
 
 ### Changes
 * Auto install missing plugins when `meltano elt` runs
