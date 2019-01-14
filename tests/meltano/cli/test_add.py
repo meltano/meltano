@@ -42,5 +42,6 @@ def test_add_transform(project):
 
     assert PluginType.TRANSFORMS in project.meltano
     assert any(
-        plugin["name"] == "tap-carbon-intensity" for plugin in project.meltano[PluginType.TRANSFORMS]
+        plugin["name"] == "tap-carbon-intensity"
+        for plugin in project.meltano[PluginType.TRANSFORMS]
     )
