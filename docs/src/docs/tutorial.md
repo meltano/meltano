@@ -74,8 +74,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 
 Then, we'll populate our data warehouse:
 - Click Model button (upper-left)
-- Click Validate button
-- Click Update Database button
+  - Everytime you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator.
 
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)
