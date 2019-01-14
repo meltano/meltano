@@ -7,36 +7,35 @@
       primary_key = yes
       hidden = yes
       type = string
-      sql = "{{table}}.id"
+      sql = "{{TABLE}}.id"
     }
     region_id {
       label = Region ID
       hidden = yes
       type = string
-      sql = "{{table}}.id"
+      sql = "{{TABLE}}.id"
     }
     forecast {
       label = Forecast
       type = number
-      sql = "{{table}}.forecast"
+      sql = "{{TABLE}}.forecast"
     }
   }
-  column_groups {
+  timeframes {
     from {
+      include "model/timeframe.proto.m5o"
+
       label = From
       description = Selected from range in carbon data
-      type = time
-      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
-      convert_tz = no
-      sql = "{{table}}.from"
+      sql = "{{TABLE}}.from"
     }
+
     to {
+      include "model/timeframe.proto.m5o"
+
       label = To
       description = Selected to range in carbon data
-      type = time
-      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
-      convert_tz = no
-      sql = "{{table}}.to"
+      sql = "{{TABLE}}.to"
     }
   }
 }

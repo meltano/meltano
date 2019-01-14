@@ -144,6 +144,14 @@ class DesignHelper:
         except KeyError:
             pass
 
+        try:
+            selected["timeframes"] = [
+                self.timeframe_periods_for(table, timeframe_selection)
+                for timeframe_selection in join_selection["timeframes"]
+            ]
+        except KeyError:
+            pass
+
         join_executor = PypikaJoinExecutor(self, join)
         visit(sqlparse.parse(join["sql_on"])[0], join_executor)
 
@@ -153,6 +161,21 @@ class DesignHelper:
             "on": join_executor.result,
             "join": join,
             **selected,
+        }
+
+    def timeframe_periods_for(self, view, timeframe_selection):
+        timeframe_name = timeframe_selection["name"]
+        period_names = [p["label"]
+                        for p in timeframe_selection["periods"]]
+
+        table = AnalysisHelper.db_table(view["sql_table_name"], alias=timeframe_name)
+        timeframe, periods = AnalysisHelper.timeframe_periods_from_names(timeframe_name, period_names, view)
+
+        return {
+            "table": table,
+            "timeframe": timeframe,
+            "periods": periods,
+            "period_labels": period_names
         }
 
     @classmethod

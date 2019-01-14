@@ -22,9 +22,22 @@ class AnalysisHelper:
     def aggregates_from_names(aggregates, table):
         return list(filter(lambda x: x["name"] in aggregates, table["aggregates"]))
 
-    @staticmethod
-    def columns(columns, db_table):
-        return [AnalysisHelper.field_from_column(d, db_table) for d in columns]
+    @classmethod
+    def columns(cls, columns, db_table):
+        return [cls.field_from_column(d, db_table) for d in columns]
+
+    @classmethod
+    def timeframe_periods_from_names(cls, timeframe_name, period_names, table):
+        timeframe = next(timeframe
+                         for timeframe in table["timeframes"]
+                         if timeframe["name"] == timeframe_name)
+
+        # filter out non-selected periods
+        periods = [period
+                   for period in timeframe["periods"]
+                   if period["label"] in period_names]
+
+        return timeframe, periods
 
     @staticmethod
     def aggregates(aggregates, db_table):

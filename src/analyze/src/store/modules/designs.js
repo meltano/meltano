@@ -143,8 +143,8 @@ const actions = {
           columns: data.data.columns,
           join,
         });
-        commit('setJoinColumnGroups', {
-          columnGroups: data.data.column_groups,
+        commit('setJoinTimeframes', {
+          timeframes: data.data.timeframes,
           join,
         });
         commit('setJoinAggregates', {
@@ -163,12 +163,12 @@ const actions = {
     commit('toggleColumnSelected', column);
   },
 
-  toggleColumnGroup({ commit }, columnGroup) {
-    commit('toggleColumnGroupSelected', columnGroup);
+  toggleTimeframe({ commit }, timeframe) {
+    commit('toggleTimeframeSelected', timeframe);
   },
 
-  toggleColumnGroupTimeframe({ commit }, columnGroupObj) {
-    commit('toggleColumnGroupTimeframeSelected', columnGroupObj);
+  toggleTimeframePeriod({ commit }, timeframePeriod) {
+    commit('toggleTimeframePeriodSelected', timeframePeriod);
   },
 
   toggleAggregate({ commit }, aggregate) {
@@ -225,23 +225,30 @@ const actions = {
         newJoin.columns = namesOfSelected(table.columns) || [];
         newJoin.aggregates = namesOfSelected(table.aggregates) || [];
 
+        if (table.timeframes)
+          newJoin.timeframes = table.timeframes
+              .filter(selected)
+              .map(({ name, periods }) => ({
+                name,
+                periods: periods.filter(selected),
+              }));
+
         return newJoin;
       })
       .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
-    /* *
-     * TODO update default empty array likely
-     * in the m5o_file_parser to set proper
-     * defaults if user's exclude certain properties in their models
-     * */
-    const columnGroups = baseTable
-      .column_groups || []
-      .map(dg => ({
-        name: dg.name,
-        timeframes: namesOfSelected(dg.timeframes),
+
+    // TODO update default empty array likely
+    // in the ma_file_parser to set proper defaults
+    // if user's exclude certain properties in their models
+    const timeframes = baseTable
+      .timeframes || [] 
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
       }))
-      .filter(dg => dg.timeframes.length);
+      .filter(tf => tf.periods.length);
 
     if (sortColumn) {
       order = {
@@ -253,8 +260,8 @@ const actions = {
     const postData = {
       table: baseTable.name,
       columns,
-      column_groups: columnGroups,
       aggregates,
+      timeframes,
       joins,
       order,
       limit: state.limit,
@@ -350,8 +357,8 @@ const mutations = {
     join.columns = columns;
   },
 
-  setJoinColumnGroups(_, { columnGroups, join }) {
-    join.column_groups = columnGroups;
+  setJoinTimeframes(_, { timeframes, join }) {
+    join.timeframes = timeframes;
   },
 
   setJoinAggregates(_, { aggregates, join }) {
@@ -420,14 +427,12 @@ const mutations = {
     selectedColumn.selected = !column.selected;
   },
 
-  toggleColumnGroupSelected(_, columnGroup) {
-    const selectedColumnGroup = columnGroup;
-    selectedColumnGroup.selected = !selectedColumnGroup.selected;
+  toggleTimeframeSelected(_, timeframe) {
+    timeframe.selected = !timeframe.selected;
   },
 
-  toggleColumnGroupTimeframeSelected(_, { timeframe }) {
-    const selectedTimeframe = timeframe;
-    selectedTimeframe.selected = !selectedTimeframe.selected;
+  toggleTimeframePeriodSelected(_, period) {
+    period.selected = !period.selected;
   },
 
   toggleAggregateSelected(_, aggregate) {

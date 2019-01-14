@@ -29,7 +29,7 @@ class SqlHelper:
 
         base_table = table["sql_table_name"]
         incoming_columns = incoming_json["columns"]
-        incoming_column_groups = incoming_json["column_groups"]
+        incoming_timeframes = incoming_json["timeframes"]
         incoming_aggregates = incoming_json["aggregates"]
         incoming_filters = incoming_json["filters"]
         incoming_joins = incoming_json["joins"]
@@ -54,7 +54,7 @@ class SqlHelper:
         timeframes = [y for x in timeframes for y in x]
 
         columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
-        columns = AnalysisHelper.columns(columns_raw, db_table) + column_groups
+        columns = AnalysisHelper.columns(columns_raw, db_table)
 
         aggregates_raw = AnalysisHelper.aggregates_from_names(
             incoming_aggregates, table
@@ -69,6 +69,7 @@ class SqlHelper:
 
             columns += AnalysisHelper.columns(j["columns"], j["db_table"])
             aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
+            timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
 
         if orderby:
             ordered_by_column = [d for d in columns_raw if d["name"] == orderby]
@@ -130,12 +131,13 @@ class SqlHelper:
             # print(f"Jointing on {join_table} with {j['on']}")
             q = q.join(join_db_table).on(j["on"])
 
-        q = q.select(*select).groupby(*columns)
+        q = q.select(*select).groupby(*columns, *periods)
+
         if order:
             q = q.orderby(orderby, order=order)
 
         q = q.limit(limit)
-        return f"{str(q)};"
+        return str(q) + ";"
 
     def reset_db(self):
         try:
