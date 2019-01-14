@@ -4,21 +4,21 @@ Within the Meltano ecosystem, here are some commmon terms that you will encounte
 
 ## Column
 
-A Column relates directly to a column in a table of a database. Relieving us for a sql field. AKA column definitions. Limited to column only. No custom SQL.
+A `Column` relates directly to a column in a table of a database. Relieving us for a sql field. AKA column definitions. Limited to column only. No custom SQL.
 
 ## Aggregate 
 
-An Aggregate relates to a calculatable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through dbt.
+An `Aggregate` relates to a calculatable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through dbt.
 
 ## Table 
 
-A Table relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains columns and aggregates so you can sdelect which you want to show.
+A `Table` relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains columns and aggregates so you can sdelect which you want to show.
 
 It can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
 
 ## Design
 
-A Design maps multiple tables together via joins. It points to many tables by names and can also add filters. At a high level, it does the following:
+A `Design` maps multiple tables together via joins. It points to many tables by names and can also add filters. At a high level, it does the following:
 
 1. Takes selected columns to generate SQL from the `.m5oc` file
 1. Runs the SQL query
@@ -30,19 +30,19 @@ It can be identified by the file naming schema: `design-name.design.m5o`.
 
 ## Collection 
 
-A Collection represents a group of designs and determines how they will be mapped together.
+A `Collection` is a group of one or many `Designs` and determines how they will be mapped together.
 
 It can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
 
 ## Report
 
-A Report is a saved state of selecting and analyzing a design. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
+A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
 
 It can be identified by the file naming schema: `report-name.report.m5oc`
 
 ## Dashboard
 
-A Dashboard is a group of many reports.
+A `Dashboard` is a group of many `Reports`.
 
 It is identified by the file naming schema: `set-name.dashboard.m5o` and is stored in the `/dashboards` directory.
 
