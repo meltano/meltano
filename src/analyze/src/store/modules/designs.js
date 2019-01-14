@@ -1,25 +1,25 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
-import exploreApi from '../../api/explore';
+import designApi from '../../api/design';
 import utils from '../../api/utils';
 
 const state = {
-  explore: {
-    related_view: {},
+  design: {
+    related_table: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
   currentModel: '',
-  currentExplore: '',
+  currentDesign: '',
   results: [],
   keys: [],
   columnHeaders: [],
   names: [],
-  resultMeasures: {},
+  resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
-  selectedDimensions: {},
+  selectedColumns: {},
   currentSQL: '',
   filtersOpen: false,
   dataOpen: true,
@@ -53,12 +53,12 @@ const getters = {
   },
 
   hasJoins() {
-    return !!(state.explore.joins && state.explore.joins.length);
+    return !!(state.design.joins && state.design.joins.length);
   },
 
   isColumnSorted: () => key => state.sortColumn === key,
 
-  showJoinDimensionMeasureHeader: () => obj => !!obj,
+  showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
   getKeyFromDistinct: () => (field) => {
@@ -81,19 +81,19 @@ const getters = {
   },
 
   getChartYAxis() {
-    if (!state.resultMeasures) return [];
-    const measures = Object.keys(state.resultMeasures);
-    return measures;
+    if (!state.resultAggregates) return [];
+    const aggregates = Object.keys(state.resultAggregates);
+    return aggregates;
   },
 
-  isColumnSelectedMeasure: () => columnName => columnName in state.resultMeasures,
+  isColumnSelectedAggregate: () => columnName => columnName in state.resultAggregates,
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
-  currentExploreLabel() {
+  currentDesignLabel() {
     return utils.titleCase(state.currentModel);
   },
 
@@ -119,13 +119,13 @@ const getters = {
 };
 
 const actions = {
-  getExplore({ commit }, { model, explore }) {
+  getDesign({ commit }, { model, design }) {
     state.currentModel = model;
-    state.currentExplore = explore;
-    exploreApi.index(model, explore)
+    state.currentDesign = design;
+    designApi.index(model, design)
       .then((data) => {
-        commit('setExplore', data.data);
-        commit('selectedDimensions', data.data.related_view.dimensions);
+        commit('setDesign', data.data);
+        commit('selectedColumns', data.data.related_table.columns);
       });
   },
 
@@ -134,45 +134,45 @@ const actions = {
   },
 
   expandJoinRow({ commit }, join) {
-    // already fetched dimensions
+    // already fetched columns
     commit('toggleJoinOpen', join);
-    if (join.related_view.dimensions.length) return;
-    exploreApi.getView(join.related_view.name)
+    if (join.related_table.columns.length) return;
+    designApi.getTable(join.related_table.name)
       .then((data) => {
-        commit('setJoinDimensions', {
-          dimensions: data.data.dimensions,
+        commit('setJoinColumns', {
+          columns: data.data.columns,
           join,
         });
-        commit('setJoinDimensionGroups', {
-          dimensionGroups: data.data.dimension_groups,
+        commit('setJoinColumnGroups', {
+          columnGroups: data.data.column_groups,
           join,
         });
-        commit('setJoinMeasures', {
-          measures: data.data.measures,
+        commit('setJoinAggregates', {
+          aggregates: data.data.aggregates,
           join,
         });
       });
   },
 
-  removeSort({ commit }, dimension) {
-    if (!state.sortColumn || state.sortColumn !== dimension.name) return;
-    commit('setRemoveSort', dimension);
+  removeSort({ commit }, column) {
+    if (!state.sortColumn || state.sortColumn !== column.name) return;
+    commit('setRemoveSort', column);
   },
 
-  toggleDimension({ commit }, dimension) {
-    commit('toggleDimensionSelected', dimension);
+  toggleColumn({ commit }, column) {
+    commit('toggleColumnSelected', column);
   },
 
-  toggleDimensionGroup({ commit }, dimensionGroup) {
-    commit('toggleDimensionGroupSelected', dimensionGroup);
+  toggleColumnGroup({ commit }, columnGroup) {
+    commit('toggleColumnGroupSelected', columnGroup);
   },
 
-  toggleDimensionGroupTimeframe({ commit }, dimensionGroupObj) {
-    commit('toggleDimensionGroupTimeframeSelected', dimensionGroupObj);
+  toggleColumnGroupTimeframe({ commit }, columnGroupObj) {
+    commit('toggleColumnGroupTimeframeSelected', columnGroupObj);
   },
 
-  toggleMeasure({ commit }, measure) {
-    commit('toggleMeasureSelected', measure);
+  toggleAggregate({ commit }, aggregate) {
+    commit('toggleAggregateSelected', aggregate);
   },
 
   limitSet({ commit }, limit) {
@@ -184,22 +184,22 @@ const actions = {
   },
 
   getSQL({ commit }, { run }) {
-    this.dispatch('explores/resetErrorMessage');
-    const baseView = state.explore.related_view;
-    const dimensions = baseView
-      .dimensions
+    this.dispatch('designs/resetErrorMessage');
+    const baseTable = state.design.related_table;
+    const columns = baseTable
+      .columns
       .filter(d => d.selected)
       .map(d => d.name);
-    let sortColumn = baseView
-      .dimensions
+    let sortColumn = baseTable
+      .columns
       .find(d => d.name === state.sortColumn);
     if (!sortColumn) {
-      sortColumn = baseView
-        .measures
+      sortColumn = baseTable
+        .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    const measures = baseView
-      .measures
+    const aggregates = baseTable
+      .aggregates
       .filter(m => m.selected)
       .map(m => m.name);
 
@@ -210,30 +210,30 @@ const actions = {
       delete filters[prop].sql;
     });
 
-    const joins = state.explore
+    const joins = state.design
       .joins
       .map((j) => {
         const newJoin = {};
         newJoin.name = j.name;
-        if (j.dimensions) {
-          newJoin.dimensions = j.dimensions
+        if (j.columns) {
+          newJoin.columns = j.columns
             .filter(d => d.selected)
             .map(d => d.name);
-          if (!newJoin.dimensions.length) delete newJoin.dimensions;
+          if (!newJoin.columns.length) delete newJoin.columns;
         }
-        if (j.measures) {
-          newJoin.measures = j.measures
+        if (j.aggregates) {
+          newJoin.aggregates = j.aggregates
             .filter(m => m.selected)
             .map(m => m.name);
-          if (!newJoin.measures.length) delete newJoin.measures;
+          if (!newJoin.aggregates.length) delete newJoin.aggregates;
         }
         return newJoin;
       })
-      .filter(j => !!(j.dimensions || j.measures));
+      .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
-    const dimensionGroups = baseView
-      .dimension_groups || [] // TODO update default empty array likely in the ma_file_parser to set proper defaults if user's exclude certain properties in their models
+    const columnGroups = baseTable
+      .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
       .map(dg => ({
         name: dg.name,
         timeframes: dg.timeframes
@@ -250,10 +250,10 @@ const actions = {
     }
 
     const postData = {
-      view: baseView.name,
-      dimensions,
-      dimension_groups: dimensionGroups,
-      measures,
+      table: baseTable.name,
+      columns,
+      column_groups: columnGroups,
+      aggregates,
       joins,
       order,
       limit: state.limit,
@@ -261,7 +261,7 @@ const actions = {
       run,
     };
     if (run) state.loadingQuery = true;
-    exploreApi.getSql(state.currentModel, state.currentExplore, postData)
+    designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((data) => {
         if (run) {
           commit('setQueryResults', data.data);
@@ -282,7 +282,7 @@ const actions = {
   },
 
   getDistinct({ commit }, field) {
-    exploreApi.getDistinct(state.currentModel, state.currentExplore, field)
+    designApi.getDistinct(state.currentModel, state.currentDesign, field)
       .then((data) => {
         commit('setDistincts', {
           data: data.data,
@@ -317,7 +317,7 @@ const actions = {
 
   sortBy({ commit }, name) {
     commit('setSortColumn', name);
-    this.dispatch('explores/getSQL', {
+    this.dispatch('designs/getSQL', {
       run: true,
     });
   },
@@ -344,16 +344,16 @@ const mutations = {
     Vue.set(state.distincts, field, data);
   },
 
-  setJoinDimensions(_, { dimensions, join }) {
-    join.dimensions = dimensions;
+  setJoinColumns(_, { columns, join }) {
+    join.columns = columns;
   },
 
-  setJoinDimensionGroups(_, { dimensionGroups, join }) {
-    join.dimension_groups = dimensionGroups;
+  setJoinColumnGroups(_, { columnGroups, join }) {
+    join.column_groups = columnGroups;
   },
 
-  setJoinMeasures(_, { measures, join }) {
-    join.measures = measures;
+  setJoinAggregates(_, { aggregates, join }) {
+    join.aggregates = aggregates;
   },
 
   toggleJoinOpen(_, join) {
@@ -395,7 +395,7 @@ const mutations = {
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
     state.names = results.names;
-    state.resultMeasures = results.measures;
+    state.resultAggregates = results.aggregates;
   },
 
   setSqlErrorMessage(_, e) {
@@ -413,38 +413,38 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleDimensionSelected(_, dimension) {
-    const selectedDimension = dimension;
-    selectedDimension.selected = !dimension.selected;
+  toggleColumnSelected(_, column) {
+    const selectedColumn = column;
+    selectedColumn.selected = !column.selected;
   },
 
-  toggleDimensionGroupSelected(_, dimensionGroup) {
-    const selectedDimensionGroup = dimensionGroup;
-    selectedDimensionGroup.selected = !selectedDimensionGroup.selected;
+  toggleColumnGroupSelected(_, columnGroup) {
+    const selectedColumnGroup = columnGroup;
+    selectedColumnGroup.selected = !selectedColumnGroup.selected;
   },
 
-  toggleDimensionGroupTimeframeSelected(_, { timeframe }) {
+  toggleColumnGroupTimeframeSelected(_, { timeframe }) {
     const selectedTimeframe = timeframe;
     selectedTimeframe.selected = !selectedTimeframe.selected;
   },
 
-  toggleMeasureSelected(_, measure) {
-    const selectedMeasure = measure;
-    selectedMeasure.selected = !measure.selected;
+  toggleAggregateSelected(_, aggregate) {
+    const selectedAggregate = aggregate;
+    selectedAggregate.selected = !aggregate.selected;
   },
 
-  selectedDimensions(_, dimensions) {
-    Object.keys(dimensions).forEach(dimension => {
-      state.selectedDimensions[dimension.unique_name] = false;
+  selectedColumns(_, columns) {
+    Object.keys(columns).forEach(column => {
+      state.selectedColumns[column.unique_name] = false;
     });
   },
 
-  setExplore(_, exploreData) {
-    state.explore = exploreData;
+  setDesign(_, designData) {
+    state.design = designData;
   },
 
   toggleCollapsed() {
-    state.explore.related_view.collapsed = !state.explore.related_view.collapsed;
+    state.design.related_table.collapsed = !state.design.related_table.collapsed;
   },
 
   setCurrentTab(_, tab) {

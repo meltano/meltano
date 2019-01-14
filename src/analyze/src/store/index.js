@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import repos from './modules/repos';
-import explores from './modules/explores';
+import designs from './modules/designs';
 import settings from './modules/settings';
 import orchestrations from './modules/orchestrations';
 
@@ -12,7 +12,7 @@ const debug = process.env.NODE_ENV !== 'production';
 export default new Vuex.Store({
   modules: {
     repos,
-    explores,
+    designs,
     settings,
     orchestrations,
   },

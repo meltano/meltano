@@ -8,22 +8,22 @@ from pypika import Field, Case
 class SubstitutionType(Enum):
     unknown = "UNKNOWN"
     table = "TABLE"
-    dimension = "DIMENSION"
-    view_dimension = "VIEW_DIMENSION"
-    view_sql_table_name = "VIEW_SQL_TABLE_NAME"
+    column = "COLUMN"
+    table_column = "TABLE_COLUMN"
+    table_sql_table_name = "TABLE_SQL_TABLE_NAME"
 
 
 class Substitution:
-    def __init__(self, _input, table, dimension=None, alias=None):
+    def __init__(self, _input, table, column=None, alias=None):
         self.input = _input
         self.alias = alias
         self.sql = None
         self.table = table
 
-        if not dimension:
+        if not column:
             self.type = "string"
         else:
-            self.type = dimension["type"]
+            self.type = column["type"]
 
         self.substitution_type = SubstitutionType.unknown
         self.get_substitution_type()
@@ -34,13 +34,13 @@ class Substitution:
         # trying guess the substitution_type in a cheap way
         if "." in self.input and "{{table}}" not in self.input:
             if "SQL_TABLE_NAME" in self.input:
-                self.substitution_type = SubstitutionType.view_sql_table_name
+                self.substitution_type = SubstitutionType.table_sql_table_name
             else:
-                self.substitution_type = SubstitutionType.view_dimension
+                self.substitution_type = SubstitutionType.table_column
         elif "{{table}}" in self.input:
             self.substitution_type = SubstitutionType.table
         elif " " not in self.input:
-            self.substitution_type = SubstitutionType.dimension
+            self.substitution_type = SubstitutionType.column
         else:
             self.substitution_type = SubstitutionType.unknown
 

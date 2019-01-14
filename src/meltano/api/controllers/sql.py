@@ -11,7 +11,7 @@ import sqlalchemy
 
 from .sqlhelper import SqlHelper
 from .settingshelper import SettingsHelper
-from meltano.core.mac_file import MACFile
+from meltano.core.m5oc_file import M5ocFile
 from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
@@ -87,30 +87,30 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/get/<model_name>/<explore_name>", methods=["POST"])
-def get_sql(model_name, explore_name):
-    mac_file = Path(meltano_model_path).joinpath(f"{model_name}.model.mac")
-    with mac_file.open() as f:
-        mac = MACFile.load(f)
+@sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
+def get_sql(model_name, design_name):
+    m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+    with m5oc_file.open() as f:
+        m5oc = M5ocFile.load(f)
 
-    explore = mac.explore(explore_name)
+    design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
     to_run = incoming_json["run"]
     incoming_order = incoming_json["order"]
 
     sqlHelper = SqlHelper()
-    sql_dict = sqlHelper.get_sql(explore, incoming_json)
+    sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
-    measures = sql_dict["measures"]
-    dimensions = sql_dict["dimensions"]
+    aggregates = sql_dict["aggregates"]
+    columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
     names = sql_dict["names"]
 
     if not to_run:
         return json.dumps({"sql": outgoing_sql}, default=default)
 
-    connection_name = mac.connection("connection")
+    connection_name = m5oc.connection("connection")
     engine = get_db_engine(connection_name)
     results = engine.execute(outgoing_sql)
 
@@ -123,20 +123,20 @@ def get_sql(model_name, explore_name):
         base_dict["column_headers"] = column_headers
         base_dict["names"] = names
         base_dict["keys"] = list(results[0].keys())
-        base_dict["measures"] = sqlHelper.get_names(measures)
+        base_dict["aggregates"] = sqlHelper.get_names(aggregates)
 
     return json.dumps(base_dict, default=default)
 
 
-@sqlBP.route("/distinct/<model_name>/<explore_name>", methods=["POST"])
-def get_distinct_field_name(model_name, explore_name):
+@sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
+def get_distinct_field_name(model_name, design_name):
     # incoming_json = request.get_json()
-    # field_name = incoming_json["field"].replace("${TABLE}", explore_name)
+    # field_name = incoming_json["field"].replace("${TABLE}", design_name)
     # model = Model.query.filter(Model.name == model_name).first()
-    # explore = Explore.query.filter(Explore.name == explore_name).first()
+    # design = Design.query.filter(Design.name == design_name).first()
 
-    # base_table = explore.view.settings["sql_table_name"]
-    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {explore_name} ORDER BY {field_name}"
+    # base_table = design.table.settings["sql_table_name"]
+    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {design_name} ORDER BY {field_name}"
 
     # engine = get_db_engine(model.settings["connection"])
     # results = engine.execute(base_sql)
