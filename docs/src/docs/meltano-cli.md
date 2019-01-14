@@ -70,7 +70,7 @@ Use `--list` to list the current selected tap attributes.
 
 When you run ELT commands on a tap or target, this is the general process for fetching dependencies:
 
-- First, the CLI looks in the project directory that you initialized.
+- First, the CLI looks in the project directory that you initialized
 - Then it looks in the global file (discovery.yml) for urls of a package or repo
   - Note: This will eventually be moved into its own repository to prevent confusion since you cannot have local references for dependencies
 - If this is the first time that the dependencies are requested, it will download to a local directory (if it is a package) or cloned (if it is a repo)
