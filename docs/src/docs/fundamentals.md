@@ -14,7 +14,7 @@ An `Aggregate` relates to a calculatable column, via count, sum or other. AKA ag
 
 A `Table` relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains columns and aggregates so you can sdelect which you want to show.
 
-It can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
+A `Table` can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
 
 ## Design
 
@@ -24,27 +24,27 @@ A `Design` maps multiple tables together via joins. It points to many tables by 
 1. Runs the SQL query
 1. Outputs the desired graph
 
-In addition, it is the file that you'd use to do the actual analysis because it defines the relationship between the tables. 
+In addition, a `Design` is the file that you would use to do the actual analysis because it defines the relationship between the tables. 
 
-It can be identified by the file naming schema: `design-name.design.m5o`.
+A `Design` can be identified by the file naming schema: `design-name.design.m5o`.
 
 ## Collection 
 
 A `Collection` is a group of one or many `Designs` and determines how they will be mapped together.
 
-It can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
+A `Collection` can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
 
 ## Report
 
 A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
 
-It can be identified by the file naming schema: `report-name.report.m5oc`
+A `Report` can be identified by the file naming schema: `report-name.report.m5oc`
 
 ## Dashboard
 
 A `Dashboard` is a group of many `Reports`.
 
-It is identified by the file naming schema: `set-name.dashboard.m5o` and is stored in the `/dashboards` directory.
+A `Dashboard` is identified by the file naming schema: `set-name.dashboard.m5o` and is stored in the `/dashboards` directory.
 
 ## M5O Files
 
