@@ -66,7 +66,7 @@ Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
-## How ELT Commands Fetches Dependencies
+## How ELT Commands Fetch Dependencies
 
 When you run ELT commands again a tap or target, you might be wondering where it's coming from. As far 
 
