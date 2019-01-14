@@ -11,19 +11,19 @@ There are two types of `.m5o` files:
 
 The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano Analyze then leverages.
 
-## Column
-
-A `Column` relates directly to a column in a table of a database. Relieving us for a sql field. AKA column definitions. Limited to column only. No custom SQL.
-
-## Aggregate
-
-An `Aggregate` relates to a calculable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through dbt.
-
 ## Table
 
 A `Table` relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains columns and aggregates so you can select which you want to show.
 
 A `Table` can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
+
+### Column
+
+A `Column` relates directly to a column in a table of a database. Relieving us for a sql field. AKA column definitions. Limited to column only. No custom SQL.
+
+### Aggregate
+
+An `Aggregate` relates to a calculable column, via count, sum or other. AKA aggregate definitions. Limited to predefined methods, no custom SQL. Custom SQL done via transforms through dbt.
 
 ## Design
 
