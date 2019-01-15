@@ -1,4 +1,5 @@
-FROM meltano/meltano/base
+ARG BASE_IMAGE=meltano/meltano/base
+FROM $BASE_IMAGE
 
 RUN pip install uwsgi gevent
 
