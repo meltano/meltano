@@ -102,9 +102,12 @@ class TestSqlController:
                     "name": "entry",
                     "columns": ["forecast"],
                     "timeframes": [
-                        {"name": "from", "periods": [{"label": "Week", "selected": True}]},
+                        {
+                            "name": "from",
+                            "periods": [{"label": "Week", "selected": True}],
+                        },
                         {"name": "to", "periods": []},
-                    ]
+                    ],
                 },
                 {"name": "generationmix", "columns": ["perc", "fuel"]},
             ],
@@ -120,4 +123,3 @@ class TestSqlController:
         assertIsSQL(res.json["sql"])
         assert 'EXTRACT(\'Week\' FROM "entry"."from") "from.week"' in res.json["sql"]
         assert re.search(r'GROUP BY.*"from.week"', res.json["sql"])
-

@@ -127,8 +127,8 @@ class DesignHelper:
         join = self.get_join(self, join_selection["name"])
         table = join["related_table"]
 
-        db_table = AnalysisHelper.table(table["sql_table_name"], alias=join["name"])
-        selected = {"columns": [], "aggregates": []}
+        db_table = AnalysisHelper.db_table(table["sql_table_name"], alias=join["name"])
+        selected = {"columns": [], "aggregates": [], "timeframes": []}
 
         try:
             selected["columns"] = AnalysisHelper.columns_from_names(
@@ -163,19 +163,23 @@ class DesignHelper:
             **selected,
         }
 
-    def timeframe_periods_for(self, view, timeframe_selection):
+    def timeframe_periods_for(self, table, timeframe_selection):
         timeframe_name = timeframe_selection["name"]
-        period_names = [p["label"]
-                        for p in timeframe_selection["periods"]]
+        period_names = [p["label"] for p in timeframe_selection["periods"]]
 
-        table = AnalysisHelper.db_table(view["sql_table_name"], alias=timeframe_name)
-        timeframe, periods = AnalysisHelper.timeframe_periods_from_names(timeframe_name, period_names, view)
+        db_table = AnalysisHelper.db_table(
+            table["sql_table_name"], alias=timeframe_name
+        )
+        timeframe, periods = AnalysisHelper.timeframe_periods_from_names(
+            timeframe_name, period_names, table
+        )
 
         return {
             "table": table,
+            "db_table": db_table,
             "timeframe": timeframe,
             "periods": periods,
-            "period_labels": period_names
+            "period_labels": period_names,
         }
 
     @classmethod

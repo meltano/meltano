@@ -17,31 +17,28 @@ class Aggregate:
         sql = aggregate["sql"]
         self.substitution = Substitution(sql, table, None, aggregate["name"])
         self.aggregate = aggregate
-        self.table = table
-        self.sql = self.substitution.sql
-        self.aggregateType = AggregateType.unknown
-        self.getAggregateType()
+        self.field = Substitution(
+            aggregate["sql"], db_table, None, alias=aggregate["name"]
+        )
+        self.aggregate_type = AggregateType.parse(aggregate["type"])
 
-    def getAggregateType(self):
-        type_ = self.aggregate["type"]
-        if type_ == AggregateType.sum.value:
-            self.aggregateType = AggregateType.sum
-            self.setAggregateSQLSum()
-        elif type_ == AggregateType.count.value:
-            self.aggregateType = AggregateType.count
-            self.setAggregateSQLCount()
-        elif type_ == AggregateType.number.value:
-            self.aggregateType = AggregateType.number
-            self.setAggregateSQLNumber()
-        else:
-            self.aggregateType = AggregateType.unknown
-            raise Exception(f"Aggregate Type {type_} not implemented yet")
+    @property
+    def alias(self):
+        return f"{self.field.table.alias}.{self.aggregate['name']}"
 
-    def setAggregateSQLSum(self):
-        self.sql = fn.Coalesce(fn.Sum(self.sql), 0, alias=self.substitution.alias)
+    @property
+    def sql(self):
+        if self.aggregate_type == AggregateType.Unknown:
+            raise NotImplementedError(f"Unknown aggregate type.")
 
-    def setAggregateSQLCount(self):
-        self.sql = fn.Coalesce(fn.Count(self.sql), 0, alias=self.substitution.alias)
+        return getattr(self, self.aggregate_type.value)()
 
-    def setAggregateSQLNumber(self):
-        self.sql.alias = self.substitution.alias
+    def sum(self):
+        return fn.Coalesce(fn.Sum(self.field.sql), 0, alias=self.alias)
+
+    def count(self):
+        return fn.Coalesce(fn.Count(self.field.sql), 0, alias=self.alias)
+
+    def number(self):
+        self.field.alias = self.field.alias
+        return self.field.sql

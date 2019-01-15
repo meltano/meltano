@@ -229,4 +229,3 @@ class MeltanoAnalysisFileParser:
     @classmethod
     def name_flatten_dict(cls, d: Dict) -> List:
         return [{"name": k, **rest} for k, rest in d.items()]
-        

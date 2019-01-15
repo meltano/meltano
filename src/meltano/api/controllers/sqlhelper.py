@@ -38,20 +38,13 @@ class SqlHelper:
 
         print(incoming_json)
 
-        order = None
-        if incoming_order:
-            if incoming_order["direction"] == "asc":
-                order = Order.asc
-            else:
-                order = Order.desc
-        orderby = incoming_order["column"] if incoming_order else None
-
-        db_table = AnalysisHelper.table(base_table, alias=design["name"])
-
-        column_groups = self.column_groups(table_name, incoming_column_groups, table)
-        # get a list of all the timeframes
-        timeframes = [t["timeframes"] for t in incoming_column_groups]
-        timeframes = [y for x in timeframes for y in x]
+        db_table = AnalysisHelper.db_table(base_table, alias=design["name"])
+        timeframes_raw = [
+            design.timeframe_periods_for(table, tf) for tf in incoming_timeframes
+        ]
+        timeframe_periods = [
+            AnalysisHelper.periods(timeframe, db_table) for timeframe in timeframes_raw
+        ]
 
         columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
         columns = AnalysisHelper.columns(columns_raw, db_table)
@@ -72,19 +65,34 @@ class SqlHelper:
             timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
 
         if orderby:
-            ordered_by_column = [d for d in columns_raw if d["name"] == orderby]
-            if ordered_by_column:
-                orderby = self.columns(ordered_by_column, table)[0]
-            else:
-                ordered_by_column = [m for m in aggregates_raw if m["name"] == orderby]
-                if ordered_by_column:
-                    orderby = self.aggregates(ordered_by_column, table)[0]
-                else:
-                    raise Exception(
-                        "Something is wrong, no column or aggregate column matching the column to sort by."
-                    )
+            try:
+                orderby_field = next(
+                    AnalysisHelper.field_from_column(c, db_table)
+                    for c in columns_raw
+                    if c["name"] == orderby
+                )
+            except StopIteration:
+                orderby_field = None
+                pass
 
-        column_headers = self.column_headers(columns_raw, aggregates_raw)
+        # order by aggregate
+        if orderby and not orderby_field:
+            try:
+                orderby_field = next(
+                    AnalysisHelper.field_from_aggregate(a, db_table)
+                    for a in aggregates_raw
+                    if a["name"] == orderby
+                )
+            except StopIteration:
+                orderby_field = None
+                raise Exception(
+                    "Something is wrong, no dimension or measure column matching the column to sort by."
+                )
+
+        orderby = orderby_field
+        column_headers = self.column_headers(
+            columns_raw, aggregates_raw, timeframes_raw
+        )
         names = self.get_names(columns_raw + aggregates_raw)
         return {
             "columns": columns_raw,
@@ -121,7 +129,15 @@ class SqlHelper:
         return fields
 
     def get_query(
-        self, from_, columns, aggregates, limit, joins=None, order=None, orderby=None
+        self,
+        from_,
+        columns,
+        aggregates,
+        periods,
+        limit,
+        joins=None,
+        order=None,
+        orderby=None,
     ):
         select = columns + aggregates
         q = Query.from_(from_)
