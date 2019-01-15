@@ -15,7 +15,7 @@ meltano init carbon
 # Change directory into your new carbon project
 cd carbon
 
-# Start Docker container, which will start a postgres database 
+# Start Docker container, which will start a postgres database
 # to act as our data warehouse.
 docker-compose up
 ```
@@ -24,7 +24,7 @@ Since Docker is running in this tab, let's open a new tab (and navigate to your 
 
 ```bash
 # Change directory to you new carbon project
-cd carbon 
+cd carbon
 
 # Source the environment variables. You won't see any output if it's working.
 source .env
@@ -32,7 +32,7 @@ source .env
 # let's see what extractors and loaders are available
 meltano discover all
 
-# It looks like a tap for carbon intensity data is available, 
+# It looks like a tap for carbon intensity data is available,
 # let's add that as a dependency. See https://api.carbonintensity.org.uk/
 meltano add extractor tap-carbon-intensity
 
@@ -49,7 +49,7 @@ meltano ui
 
 Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
 
-Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API. 
+Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API.
 
 ## Using Meltano on Your New Project
 
@@ -72,10 +72,9 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
   - Password = `warehouse`
 - Click "Save Connection"
 
-Then, we'll populate our data warehouse:
+Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
 - Click Model button (upper-left)
-- Click Validate button
-- Click Update Database button
+    - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
 
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)
