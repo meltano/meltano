@@ -1,1 +1,1 @@
-from .base import DbtPlugin
+from .base import DbtPlugin, DbtTransformPlugin
