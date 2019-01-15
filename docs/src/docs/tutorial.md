@@ -39,7 +39,7 @@ meltano add extractor tap-carbon-intensity
 # Since we have a postgres running, we can add a loader for a Postgres database
 meltano add loader target-postgres
 
-# Run elt (extract, load, transform) with an id of your choice and the extractor and
+# Run elt (extract, load, transform) with the extractor and
 # loader we just added without the need to transform the data
 meltano elt tap-carbon-intensity target-postgres
 
