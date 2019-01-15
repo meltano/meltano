@@ -52,13 +52,13 @@ The orchestration will use the GitLab CI, but running it and configuring it will
 
 ## Approach
 
-### Meltano is the market (data science) lifecycle, just like GitLab is the product (DevOps) lifecycle.
+### Meltano is the market (data science) life cycle, just like GitLab is the product (DevOps) life cycle.
 
-For many companies GitLab serves as the single data store for their engineering organization, shepherding their ideas all the way through to delivering them to customers. There are key gaps however in understanding the effectiveness of sales and marketing. By expanding the common data store to include go to market information, additional insights can be drawn across the customer lifecycle. This evolution is as follows:
+For many companies GitLab serves as the single data store for their engineering organization, shepherding their ideas all the way through to delivering them to customers. There are key gaps however in understanding the effectiveness of sales and marketing. By expanding the common data store to include go to market information, additional insights can be drawn across the customer life cycle. This evolution is as follows:
 
 1. Business intelligence; this is the current state of the project.
 2. Data science; add more machine learning (ML) and Artificial Intelligence (AI)
-3. Market lifecycle; the complete go-to-market lifecycle with the user/customer journey.
+3. Market life cycle; the complete go-to-market life cycle with the user/customer journey.
 
 ### Meltano is business intelligence (BI) as code.
 
@@ -138,7 +138,7 @@ We want the tools to be open source so we can ship this as a product.
 
 ## Meltano Data Flow
 
-Meltano uses Singer Taps and Targets to Extract the data from various data sources and load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. Subsequentially, the raw data is transformed to generate the dataset used for analysis and dashboard generation.
+Meltano uses Singer Taps and Targets to Extract the data from various data sources and load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. Subsequently, the raw data is transformed to generate the dataset used for analysis and dashboard generation.
 
 Meltano can be used in any ELT architecture by using the right taps and targets for the job. The strategies supported can range from dumping the source data in a data lake to keeping all historical versions for each record to storing well formatted, clean data in the target data store.
 
@@ -161,8 +161,7 @@ When considering which taps and targets Meltano will maintain, some assumptions 
     2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
     3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
 
-*  Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same
-composite key (combination of key_properties) then the new record updates the existing one.
+*  Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same composite key (combination of key_properties) then the new record updates the existing one.
 
     No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
 

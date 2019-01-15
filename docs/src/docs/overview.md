@@ -14,7 +14,7 @@ Meltano is an open source convention-over-configuration product for the whole da
 
 [![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
 
-Meltano stands for the steps of the data lifecycle:
+Meltano stands for the steps of the data life cycle:
 
 - Model
 - Extract
@@ -24,7 +24,7 @@ Meltano stands for the steps of the data lifecycle:
 - Notebook
 - Orchestrate
 
-To empower you and your team in this lifecycle, Meltano manifests as two tools:
+To empower you and your team in this life cycle, Meltano manifests as two tools:
 
 1. command line interface (CLI)
 1. web app (GUI)
@@ -48,9 +48,9 @@ It leverages open source software and software development best practices includ
 
 ## Meltano CLI
 
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
+Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
 
-Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
 
 ## Meltano Schema
 

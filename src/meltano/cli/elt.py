@@ -4,7 +4,7 @@ import click
 import datetime
 
 from . import cli
-from .add import add_plugin
+from .add import add_plugin, add_transform
 from .params import db_options
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
@@ -12,6 +12,7 @@ from meltano.core.runner.dbt import DbtRunner
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
+from meltano.core.transform_add_service import TransformAddService
 
 
 @cli.command()
@@ -99,3 +100,15 @@ def install_missing_plugins(
         except PluginMissingError as e:
             click.secho(f"dbt is missing. Trying to install it.", fg="green")
             add_plugin(project, PluginType.TRANSFORMERS, "dbt")
+
+        transform_add_service = TransformAddService(project)
+        try:
+            plugin = config_service.get_plugin(PluginType.TRANSFORMS, extractor)
+
+            # Update dbt_project.yml in case the vars values have changed in meltano.yml
+            transform_add_service.update_dbt_project(plugin)
+        except PluginMissingError as e:
+            click.secho(
+                f"Transform {extractor} is missing. Trying to install it.", fg="green"
+            )
+            add_transform(project, extractor)
