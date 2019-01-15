@@ -34,3 +34,14 @@ def test_add_transformer(project):
     assert any(
         plugin["name"] == "dbt" for plugin in project.meltano[PluginType.TRANSFORMERS]
     )
+
+
+def test_add_transform(project):
+    service = ProjectAddService(project)
+    service.add(PluginType.TRANSFORMS, "tap-carbon-intensity")
+
+    assert PluginType.TRANSFORMS in project.meltano
+    assert any(
+        plugin["name"] == "tap-carbon-intensity"
+        for plugin in project.meltano[PluginType.TRANSFORMS]
+    )

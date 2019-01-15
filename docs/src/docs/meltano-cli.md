@@ -1,7 +1,8 @@
 # Meltano CLI
 
 - `meltano init [project name]`: Create an empty meltano project.
-- {: #meltano-add}`meltano add [extractor | loader | transformer] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
+- {: #meltano-add}`meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
+- `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 - `meltano discover all`: list available extractors and loaders:
   - `meltano discover extractors`: list only available extractors

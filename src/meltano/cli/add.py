@@ -13,6 +13,7 @@ from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.project import Project, ProjectNotFound
+from meltano.core.transform_add_service import TransformAddService
 
 
 @cli.group()
@@ -77,6 +78,16 @@ def transformer(plugin_name):
         click.ClickException(e)
 
 
+@add.command()
+@click.argument("plugin_name")
+def transform(plugin_name):
+    try:
+        project = Project.find()
+        add_transform(project, plugin_name)
+    except ProjectNotFound as e:
+        click.ClickException(e)
+
+
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project)
@@ -105,4 +116,30 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
         raise click.Abort()
     except PluginNotFoundError as e:
         click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
+        raise click.Abort()
+
+
+def add_transform(project: Project, plugin_name: str):
+    try:
+        project_add_service = ProjectAddService(project)
+        plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
+        click.secho(
+            f"Transform {plugin_name} added to your meltano.yml config", fg="green"
+        )
+
+        # Add repo to my-test-project/transform/packages.yml
+        transform_add_service = TransformAddService(project)
+        transform_add_service.add_to_packages(plugin)
+        click.secho(f"Transform {plugin_name} added to your dbt packages", fg="green")
+
+        # Add model and vars to my-test-project/transform/dbt_project.yml
+        transform_add_service.update_dbt_project(plugin)
+        click.secho(
+            f"Transform {plugin_name} added to your dbt_project.yml", fg="green"
+        )
+    except PluginNotSupportedException:
+        click.secho(f"Transform {plugin_name} is not supported", fg="red")
+        raise click.Abort()
+    except PluginNotFoundError as e:
+        click.secho(f"Transform {plugin_name} is not supported", fg="red")
         raise click.Abort()
