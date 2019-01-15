@@ -2,7 +2,7 @@
   version = 1
   sql_table_name = generationmix
   name = generationmix
-  dimensions {
+  columns {
     id {
       label = ID
       primary_key = yes

@@ -35,20 +35,20 @@ class TestSqlController:
         return _post
 
     @classmethod
-    def url(cls, model, explore):
+    def url(cls, model, design):
         with app.test_request_context():
-            return url_for("sql.get_sql", model_name=model, explore_name=explore)
+            return url_for("sql.get_sql", model_name=model, design_name=design)
 
     def test_get_sql(self, post):
         # with no dimensions no query should be generated
         payload = {
-            "view": "region",
-            "dimensions": [],
-            "dimension_groups": [],
-            "measures": [],
+            "table": "region",
+            "columns": [],
+            "column_groups": [],
+            "aggregates": [],
             "joins": [
-                {"name": "entry", "dimensions": []},
-                {"name": "generationmix", "dimensions": []},
+                {"name": "entry", "columns": []},
+                {"name": "generationmix", "columns": []},
             ],
             "order": None,
             "limit": 3,
@@ -60,15 +60,15 @@ class TestSqlController:
         assert res.status_code == 200
         assert res.json["sql"] == ";"
 
-        # with dimensions they should be included in the query
+        # with columns they should be included in the query
         payload = {
-            "view": "region",
-            "dimensions": ["name"],
-            "dimension_groups": [],
-            "measures": [],
+            "table": "region",
+            "columns": ["name"],
+            "column_groups": [],
+            "aggregates": [],
             "joins": [
-                {"name": "entry", "dimensions": ["forecast"]},
-                {"name": "generationmix", "dimensions": ["perc", "fuel"]},
+                {"name": "entry", "columns": ["forecast"]},
+                {"name": "generationmix", "columns": ["perc", "fuel"]},
             ],
             "order": None,
             "limit": 3,

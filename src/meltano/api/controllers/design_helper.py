@@ -39,13 +39,13 @@ Identifier = namedtuple("Identifier", ("schema", "table", "field", "alias"))
 
 
 class PypikaJoinExecutor:
-    def __init__(self, explore, join):
-        self.explore = explore
+    def __init__(self, design, join):
+        self.design = design
         self.join = join
         self.result = None
 
     def comparison(self, node, depth):
-        view = self.join["related_view"]
+        table = self.join["related_table"]
 
         left = self.parse_identifier(node.left)
         right = self.parse_identifier(node.right)
@@ -55,7 +55,7 @@ class PypikaJoinExecutor:
 
         left_field = getattr(
             AnalysisHelper.table(
-                view["sql_table_name"] if left_alias else left.table,
+                table["sql_table_name"] if left_alias else left.table,
                 schema=left.schema,
                 alias=left_alias or left.alias or left.table,
             ),
@@ -64,7 +64,7 @@ class PypikaJoinExecutor:
 
         right_field = getattr(
             AnalysisHelper.table(
-                view["sql_table_name"] if right_alias else right.table,
+                table["sql_table_name"] if right_alias else right.table,
                 schema=right.schema,
                 alias=right_alias or right.alias or right.table,
             ),
@@ -107,39 +107,39 @@ class JoinType(Enum):
     cross_join = "cross"
 
 
-class ExploreHelper:
-    def __init__(self, explore):
-        self.explore = explore
+class DesignHelper:
+    def __init__(self, design):
+        self.design = design
 
     @property
     def name(self):
-        return self.explore["name"]
+        return self.design["name"]
 
     @property
     def joins(self):
-        return deepcopy(self.explore["joins"])
+        return deepcopy(self.design["joins"])
 
     @property
-    def views(self):
-        return deepcopy(self.explore["views"])
+    def tables(self):
+        return deepcopy(self.design["tables"])
 
     def join_for(self, join_selection: Dict):
         join = self.get_join(self, join_selection["name"])
-        view = join["related_view"]
+        table = join["related_table"]
 
-        table = AnalysisHelper.table(view["sql_table_name"], alias=join["name"])
-        selected = {"dimensions": [], "measures": []}
+        db_table = AnalysisHelper.table(table["sql_table_name"], alias=join["name"])
+        selected = {"columns": [], "aggregates": []}
 
         try:
-            selected["dimensions"] = AnalysisHelper.dimensions_from_names(
-                join_selection["dimensions"], view
+            selected["columns"] = AnalysisHelper.columns_from_names(
+                join_selection["columns"], table
             )
         except KeyError:
             pass
 
         try:
-            selected["measures"] = AnalysisHelper.measures_from_names(
-                join_selection["measures"], view
+            selected["aggregates"] = AnalysisHelper.aggregates_from_names(
+                join_selection["aggregates"], table
             )
         except KeyError:
             pass
@@ -148,21 +148,21 @@ class ExploreHelper:
         visit(sqlparse.parse(join["sql_on"])[0], join_executor)
 
         return {
-            "view": view,
             "table": table,
+            "db_table": db_table,
             "on": join_executor.result,
             "join": join,
             **selected,
         }
 
     @classmethod
-    def get_join(cls, explore, name):
+    def get_join(cls, design, name):
         try:
-            return next(join for join in explore.joins if join["name"] == name)
+            return next(join for join in design.joins if join["name"] == name)
         except StopIteration:
             raise JoinNotFound(
-                f"No join named '{name}' was found in explore '{explore.name}'."
+                f"No join named '{name}' was found in design '{design.name}'."
             )
 
     def __getitem__(self, idx):
-        return self.explore[idx]
+        return self.design[idx]

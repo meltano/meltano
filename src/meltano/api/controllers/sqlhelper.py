@@ -48,18 +48,18 @@ class SqlHelper:
 
         db_table = AnalysisHelper.table(base_table, alias=design["name"])
 
-        column_groups = self.column_groups(
-            table_name, incoming_column_groups, table
-        )
+        column_groups = self.column_groups(table_name, incoming_column_groups, table)
         # get a list of all the timeframes
         timeframes = [t["timeframes"] for t in incoming_column_groups]
         timeframes = [y for x in timeframes for y in x]
 
         columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
-        columns = AnalysisHelper.columns(columns_raw, table) + column_groups
+        columns = AnalysisHelper.columns(columns_raw, db_table) + column_groups
 
-        aggregates_raw = AnalysisHelper.aggregates_from_names(incoming_aggregates, table)
-        aggregates = AnalysisHelper.aggregates(aggregates_raw, table)
+        aggregates_raw = AnalysisHelper.aggregates_from_names(
+            incoming_aggregates, table
+        )
+        aggregates = AnalysisHelper.aggregates(aggregates_raw, db_table)
 
         # add the joins dimension and aggregates
         joins = [design.join_for(j) for j in incoming_joins]
@@ -91,7 +91,7 @@ class SqlHelper:
             "column_headers": column_headers,
             "names": names,
             "sql": self.get_query(
-                from_=table,
+                from_=db_table,
                 columns=columns,
                 aggregates=aggregates,
                 limit=incoming_limit,
