@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.6.0 - (2019-01-15)
+---
+
+### New
 * add new command `meltano add transform [name_of_dbt_transformation]`
 * add transforms to the available plugins
 
@@ -19,8 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Edit links on the bottom of doc pages are working now
 * Updated docs tutorial bullet regarding inaccurate "Validate" button
-
-### Breaks
 
 
 ## 0.5.0 - (2019-01-09)
