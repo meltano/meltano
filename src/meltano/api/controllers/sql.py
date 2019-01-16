@@ -11,11 +11,11 @@ import sqlalchemy
 
 from .sqlhelper import SqlHelper
 from .settingshelper import SettingsHelper
-from meltano.core.m5oc_file import M5ocFile
+from .m5oc_file import M5ocFile
 from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
-meltano_model_path = join(os.getcwd(), "model")
+meltano_model_path = Path(os.getcwd(), "model")
 
 
 class ConnectionNotFound(Exception):
@@ -96,9 +96,6 @@ def get_sql(model_name, design_name):
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
-    to_run = incoming_json["run"]
-    incoming_order = incoming_json["order"]
-
     sqlHelper = SqlHelper()
     sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
@@ -107,8 +104,8 @@ def get_sql(model_name, design_name):
     column_headers = sql_dict["column_headers"]
     names = sql_dict["names"]
 
-    if not to_run:
-        return json.dumps({"sql": outgoing_sql}, default=default)
+    if not incoming_json["run"]:
+        return jsonify({"sql": outgoing_sql})
 
     connection_name = m5oc.connection("connection")
     engine = get_db_engine(connection_name)
@@ -125,7 +122,7 @@ def get_sql(model_name, design_name):
         base_dict["keys"] = list(results[0].keys())
         base_dict["aggregates"] = sqlHelper.get_names(aggregates)
 
-    return json.dumps(base_dict, default=default)
+    return jsonify(base_dict)
 
 
 @sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
@@ -145,4 +142,4 @@ def get_distinct_field_name(model_name, design_name):
     #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
     #     default=default,
     # )
-    return json.dumps({"tester": "tester"})
+    return jsonify({"tester": "tester"})

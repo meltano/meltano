@@ -307,7 +307,7 @@ import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
-import { ensureObjPropIsReactive } from '../utils/utils'
+import ensureObjPropIsReactive from '../utils/utils';
 
 export default {
   name: 'Design',
@@ -386,12 +386,12 @@ export default {
     },
 
     tableRowClicked(relatedTable) {
-      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed')
+      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed');
       this.$store.dispatch('designs/expandRow');
     },
 
     joinRowClicked(join) {
-      ensureObjPropIsReactive(this.$set, join, 'collapsed')
+      ensureObjPropIsReactive(this.$set, join, 'collapsed');
       this.$store.dispatch('designs/expandJoinRow', join);
     },
 
@@ -402,12 +402,12 @@ export default {
     },
 
     columnGroupSelected(columnGroup) {
-      ensureObjPropIsReactive(this.$set, columnGroup, 'selected')
+      ensureObjPropIsReactive(this.$set, columnGroup, 'selected');
       this.$store.dispatch('designs/toggleColumnGroup', columnGroup);
     },
 
     columnGroupTimeframeSelected(columnGroup, timeframe) {
-      ensureObjPropIsReactive(this.$set, timeframe, 'selected')
+      ensureObjPropIsReactive(this.$set, timeframe, 'selected');
       this.$store.dispatch('designs/toggleColumnGroupTimeframe', {
         columnGroup,
         timeframe,

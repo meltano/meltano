@@ -1,5 +1,5 @@
-export function ensureObjPropIsReactive(vueSetFn, obj, prop, val = false) {
-         if (!obj.hasOwnProperty(prop)) {
-           vueSetFn(obj, prop, val);
-         }
-       }
+export default function ensureObjPropIsReactive(vueSetFn, obj, prop, val = false) {
+  if (!obj.prop) {
+    vueSetFn(obj, prop, val);
+  }
+}

@@ -6,12 +6,12 @@ from .aggregate import Aggregate
 
 class AnalysisHelper:
     @staticmethod
-    def table(name, alias):
+    def table(name, **kwargs):
         try:
-            (schema, name) = name.split(".")
-            return Table(name, schema=schema, alias=alias)
+            schema, name = name.split(".")
+            return Table(name, schema=schema, **kwargs)
         except ValueError:
-            return Table(name, alias=alias)
+            return Table(name, **kwargs)
 
     @staticmethod
     def columns_from_names(columns, table):
@@ -23,23 +23,23 @@ class AnalysisHelper:
         return list(filter(lambda x: x["name"] in aggregates, table["aggregates"]))
 
     @staticmethod
-    def columns(columns, table):
-        return [AnalysisHelper.field_from_column(d, table) for d in columns]
+    def columns(columns, db_table):
+        return [AnalysisHelper.field_from_column(d, db_table) for d in columns]
 
     @staticmethod
-    def aggregates(aggregates, table):
+    def aggregates(aggregates, db_table):
         return [
-            AnalysisHelper.field_from_aggregate(aggregate, table)
+            AnalysisHelper.field_from_aggregate(aggregate, db_table)
             for aggregate in aggregates
         ]
 
     @staticmethod
-    def field_from_aggregate(aggregate, table):
-        aggregate = Aggregate(aggregate, table)
+    def field_from_aggregate(aggregate, db_table):
+        aggregate = Aggregate(aggregate, db_table)
         return aggregate.sql
 
     @staticmethod
-    def field_from_column(d, table):
+    def field_from_column(d, db_table):
         sql = d["sql"]
-        substitution = Substitution(sql, table, column=d)
+        substitution = Substitution(sql, db_table, column=d)
         return substitution.sql

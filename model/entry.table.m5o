@@ -1,5 +1,5 @@
 {
-  sql_table_name = gitlab.entry
+  sql_table_name = entry
   name = entry
   columns {
     id {
@@ -15,6 +15,11 @@
       type = string
       sql = "{{table}}.id"
     }
+    forecast {
+      label = Forecast
+      type = number
+      sql = "{{table}}.forecast"
+    }
   }
   column_groups {
     from {
@@ -23,7 +28,7 @@
       type = time
       timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
       convert_tz = no
-      sql = "{{TABLE}}.from"
+      sql = "{{table}}.from"
     }
     to {
       label = To
@@ -31,7 +36,7 @@
       type = time
       timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
       convert_tz = no
-      sql = "{{TABLE}}.to"
+      sql = "{{table}}.to"
     }
   }
 }

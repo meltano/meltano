@@ -1,6 +1,8 @@
 from pyhocon import ConfigFactory
 from pathlib import Path
 from jinja2 import Template
+
+import logging
 import json
 
 
@@ -112,6 +114,7 @@ class MeltanoAnalysisFileParser:
             conf = self.parse_m5o_file(model)
             parsed_model = self.model(conf, file_name)
             self.models.append(parsed_model)
+
         return self.models
 
     def model(self, ma_file_model_dict, file_name):
@@ -172,8 +175,9 @@ class MeltanoAnalysisFileParser:
         for join_name, join_def in ma_file_joins_dict.items():
             temp_join = {}
             temp_join["name"] = join_name
+            related_table_name = join_def.get("from", join_name)
             matching_table = self.table_conf_by_name(
-                temp_join["name"], "join", "name", file_name
+                related_table_name, "join", "name", file_name
             )
             temp_join["related_table"] = self.table(
                 self.parse_m5o_file(matching_table), matching_table.parts[-1]

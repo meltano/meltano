@@ -29,9 +29,8 @@
   {
     version = 1
     name = carbon
-    # Postgres DB
     connection = runners_db
-    label = carbon intensity
+    label = Carbon intensity
     designs {
       region {
         label = Region
@@ -40,9 +39,13 @@
         joins {
           entry {
             label = Entry
-            fields = [entry.from, entry.to]
-            sql_on = "{{ region.id }} = {{ entry.region_id }}"
-            relationship = one_to_one
+            sql_on = "gitlab.region.id = gitlab.entry.region_id"
+            relationship = many_to_one
+          }
+          generationmix {
+            label = Generation Mix
+            sql_on = "gitlab.entry.id = gitlab.generationmix.entry_id"
+            relationship = many_to_one
           }
         }
       }
@@ -50,8 +53,8 @@
   }
 "model/entry.table.m5o": |
   {
+    version = 1
     sql_table_name = gitlab.entry
-    name = entry
     columns {
       id {
         label = ID
@@ -65,6 +68,11 @@
         hidden = yes
         type = string
         sql = "{{table}}.id"
+      }
+      forecast {
+        label = Forecast
+        type = number
+        sql = "{{table}}.forecast"
       }
     }
     column_groups {
@@ -88,8 +96,8 @@
   }
 "model/region.table.m5o": |
   {
+    version = 1
     sql_table_name = gitlab.region
-    name = region
     columns {
       id {
         primary_key = true
@@ -116,6 +124,35 @@
         description = Runner Count
         type = count
         sql = "{{table}}.id"
+      }
+    }
+  }
+"model/generationmix.view.ma": |
+  {
+    version = 1
+    sql_table_name = gitlab.generationmix
+    name = generationmix
+    dimensions {
+      id {
+        label = ID
+        primary_key = yes
+        type = string
+        sql = "{{table}}.id"
+      }
+      entry_id {
+        label = Entry ID
+        type = string
+        sql = "{{table}}.entry_id"
+      }
+      fuel {
+        label = Fuel Type
+        type = string
+        sql = "{{table}}.fuel"
+      }
+      perc {
+        label = Percent (%)
+        type = number
+        sql = "{{table}}.perc"
       }
     }
   }

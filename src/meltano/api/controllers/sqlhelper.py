@@ -7,7 +7,6 @@ from pypika import Query, Order
 
 from .analysishelper import AnalysisHelper
 from .date import Date
-from .joinhelper import JoinHelper
 
 
 class SqlHelper:
@@ -36,6 +35,9 @@ class SqlHelper:
         incoming_joins = incoming_json["joins"]
         incoming_limit = incoming_json.get("limit", 50)
         incoming_order = incoming_json["order"]
+
+        print(incoming_json)
+
         order = None
         if incoming_order:
             if incoming_order["direction"] == "asc":
@@ -44,28 +46,36 @@ class SqlHelper:
                 order = Order.desc
         orderby = incoming_order["column"] if incoming_order else None
 
-        # get all timeframes
-        timeframes = [t["timeframes"] for t in incoming_column_groups]
-        # flatten list of timeframes
-        timeframes = [y for x in timeframes for y in x]
-        columns = AnalysisHelper.columns_from_names(incoming_columns, table)
-        aggregates = AnalysisHelper.aggregates_from_names(incoming_aggregates, table)
-        columns_raw = columns
-        aggregates_raw = aggregates
+        db_table = AnalysisHelper.table(base_table, alias=design["name"])
 
-        table = AnalysisHelper.table(base_table, design["name"])
-        joins = [JoinHelper.get_join(j) for j in incoming_joins]
         column_groups = self.column_groups(table_name, incoming_column_groups, table)
-        columns = AnalysisHelper.columns(columns, table)
-        columns = columns + column_groups
-        aggregates = AnalysisHelper.aggregates(aggregates, table)
+        # get a list of all the timeframes
+        timeframes = [t["timeframes"] for t in incoming_column_groups]
+        timeframes = [y for x in timeframes for y in x]
+
+        columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
+        columns = AnalysisHelper.columns(columns_raw, db_table) + column_groups
+
+        aggregates_raw = AnalysisHelper.aggregates_from_names(
+            incoming_aggregates, table
+        )
+        aggregates = AnalysisHelper.aggregates(aggregates_raw, db_table)
+
+        # add the joins dimension and aggregates
+        joins = [design.join_for(j) for j in incoming_joins]
+        for j in joins:
+            columns_raw += j["columns"]
+            aggregates_raw += j["aggregates"]
+
+            columns += AnalysisHelper.columns(j["columns"], j["db_table"])
+            aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
 
         if orderby:
-            ordered_by_column = [d for d in columns_raw if d.name == orderby]
+            ordered_by_column = [d for d in columns_raw if d["name"] == orderby]
             if ordered_by_column:
                 orderby = self.columns(ordered_by_column, table)[0]
             else:
-                ordered_by_column = [m for m in aggregates_raw if m.name == orderby]
+                ordered_by_column = [m for m in aggregates_raw if m["name"] == orderby]
                 if ordered_by_column:
                     orderby = self.aggregates(ordered_by_column, table)[0]
                 else:
@@ -81,7 +91,7 @@ class SqlHelper:
             "column_headers": column_headers,
             "names": names,
             "sql": self.get_query(
-                from_=table,
+                from_=db_table,
                 columns=columns,
                 aggregates=aggregates,
                 limit=incoming_limit,
@@ -114,19 +124,16 @@ class SqlHelper:
     ):
         select = columns + aggregates
         q = Query.from_(from_)
-        if joins:
-            region = from_
-            entry = joins[0]["table"]
-            join_columns = joins[0]["columns"]
-            join_aggregates = joins[0]["aggregates"]
-            select = select + join_columns + join_aggregates
-            columns = columns + join_columns
-            q = q.join(joins[0]["table"]).on(
-                region.id == entry.region_id and region.id == entry.region_id
-            )
+
+        for j in joins:
+            join_db_table = j["db_table"]
+            # print(f"Jointing on {join_table} with {j['on']}")
+            q = q.join(join_db_table).on(j["on"])
+
         q = q.select(*select).groupby(*columns)
         if order:
             q = q.orderby(orderby, order=order)
+
         q = q.limit(limit)
         return f"{str(q)};"
 

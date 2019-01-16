@@ -185,23 +185,28 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
+    const namesOfSelected = (arr) => {
+      if (!Array.isArray(arr)) {
+        return null;
+      }
+
+      return arr.filter(x => x.selected).map(x => x.name);
+    };
+
     const baseTable = state.design.related_table;
-    const columns = baseTable
-      .columns
-      .filter(d => d.selected)
-      .map(d => d.name);
+    const columns = namesOfSelected(baseTable.columns);
+
     let sortColumn = baseTable
       .columns
       .find(d => d.name === state.sortColumn);
+
     if (!sortColumn) {
       sortColumn = baseTable
         .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    const aggregates = baseTable
-      .aggregates
-      .filter(m => m.selected)
-      .map(m => m.name);
+
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -213,32 +218,28 @@ const actions = {
     const joins = state.design
       .joins
       .map((j) => {
+        const table = j.related_table;
         const newJoin = {};
+
         newJoin.name = j.name;
-        if (j.columns) {
-          newJoin.columns = j.columns
-            .filter(d => d.selected)
-            .map(d => d.name);
-          if (!newJoin.columns.length) delete newJoin.columns;
-        }
-        if (j.aggregates) {
-          newJoin.aggregates = j.aggregates
-            .filter(m => m.selected)
-            .map(m => m.name);
-          if (!newJoin.aggregates.length) delete newJoin.aggregates;
-        }
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
+
         return newJoin;
       })
       .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
+    /* *
+     * TODO update default empty array likely
+     * in the m5o_file_parser to set proper
+     * defaults if user's exclude certain properties in their models
+     * */
     const columnGroups = baseTable
-      .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
+      .column_groups || []
       .map(dg => ({
         name: dg.name,
-        timeframes: dg.timeframes
-          .filter(tf => tf.selected)
-          .map(tf => tf.name),
+        timeframes: namesOfSelected(dg.timeframes),
       }))
       .filter(dg => dg.timeframes.length);
 
@@ -260,7 +261,8 @@ const actions = {
       filters,
       run,
     };
-    if (run) state.loadingQuery = true;
+
+    state.loadingQuery = !!run;
     designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((data) => {
         if (run) {
@@ -434,7 +436,7 @@ const mutations = {
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach(column => {
+    Object.keys(columns).forEach((column) => {
       state.selectedColumns[column.unique_name] = false;
     });
   },
