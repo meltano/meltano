@@ -14,7 +14,7 @@ A `Collection` can be identified by the naming schema: `collection-name.collecti
 
 ### Column
 
-A `Column` relates directly to a column in a table of a database. This relieves us for a SQL field since we will have `column definitions`. Some limitations of this are that it will be limited to column only and no custom SQL.
+A `Column` relates directly to a column in a table of a database. Some limitations of this are that it will be limited to column only and no custom SQL.
 
 ## Dashboard
 
