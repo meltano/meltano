@@ -1,5 +1,5 @@
 {
-  sql_table_name = entry
+  sql_table_name = gitlab.entry
   name = entry
   columns {
     id {
@@ -13,7 +13,7 @@
       label = Region ID
       hidden = yes
       type = string
-      sql = "{{TABLE}}.id"
+      sql = "{{TABLE}}.region_idness"
     }
     forecast {
       label = Forecast

@@ -408,6 +408,7 @@ export default {
 
     timeframePeriodSelected(period) {
       ensureObjPropIsReactive(this.$set, period, 'selected')
+
       this.$store.dispatch('designs/toggleTimeframePeriod', period);
       this.$store.dispatch('designs/getSQL', { run: false });
     },

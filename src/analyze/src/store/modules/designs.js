@@ -187,12 +187,13 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
+    const selected = x => x.selected;
     const namesOfSelected = (arr) => {
       if (!Array.isArray(arr)) {
         return null;
       }
 
-      return arr.filter(x => x.selected).map(x => x.name);
+      return arr.filter(selected).map(x => x.name);
     };
 
     const baseTable = state.design.related_table;
@@ -433,6 +434,7 @@ const mutations = {
   },
 
   toggleTimeframePeriodSelected(_, period) {
+    debugger;
     period.selected = !period.selected;
   },
 
