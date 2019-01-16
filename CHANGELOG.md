@@ -11,14 +11,32 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+
+### Fixes
+* Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
+
+### Breaks
+
+
+## 0.6.1 - (2019-01-15)
+---
+
+## 0.6.0 - (2019-01-15)
+---
+
+### New
+* add new command `meltano add transform [name_of_dbt_transformation]`
+* add transforms to the available plugins
+
+### Changes
 * Auto install missing plugins when `meltano elt` runs
 * Terminology updates for simpler understanding
 
 ### Fixes
 * Edit links on the bottom of doc pages are working now
-* Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
 
 ### Breaks
+* Updated docs tutorial bullet regarding inaccurate "Validate" button
 
 
 ## 0.5.0 - (2019-01-09)

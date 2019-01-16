@@ -4,7 +4,7 @@ from typing import Dict, List
 
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
-from .plugin.dbt import DbtPlugin
+from .plugin.dbt import DbtPlugin, DbtTransformPlugin
 
 
 class PluginNotFoundError(Exception):
@@ -41,6 +41,8 @@ class PluginDiscoveryService:
     def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
         if plugin_type == PluginType.TRANSFORMERS:
             return DbtPlugin(**plugin_def)
+        elif plugin_type == PluginType.TRANSFORMS:
+            return DbtTransformPlugin(**plugin_def)
         else:
             return plugin_factory(plugin_type, plugin_def)
 
@@ -57,7 +59,12 @@ class PluginDiscoveryService:
     def discover(self, plugin_type: PluginType):
         """Return a pretty printed list of available plugins."""
         enabled_plugin_types = (
-            (PluginType.EXTRACTORS, PluginType.LOADERS, PluginType.TRANSFORMERS)
+            (
+                PluginType.EXTRACTORS,
+                PluginType.LOADERS,
+                PluginType.TRANSFORMERS,
+                PluginType.TRANSFORMS,
+            )
             if plugin_type == PluginType.ALL
             else (plugin_type,)
         )

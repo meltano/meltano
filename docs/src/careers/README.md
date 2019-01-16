@@ -1,6 +1,6 @@
 # Careers
 
-Want to be help create a new product and make an impact in the world of data? You're in luck because we're hiring!
+Want to help create a new product and make an impact in the world of data? You are in luck because we're hiring!
 
 ## Open Positions
 
