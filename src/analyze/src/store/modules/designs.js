@@ -185,22 +185,28 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
-    const names_of_selected = arr => arr.filter(x => x.selected).map(x => x.name);
+    const namesOfSelected = (arr) => {
+      if (!Array.isArray(arr)) {
+        return null;
+      }
+
+      return arr.filter(x => x.selected).map(x => x.name);
+    };
 
     const baseTable = state.design.related_table;
-    const columns = names_of_selected(baseTable.columns);
-    
+    const columns = namesOfSelected(baseTable.columns);
+
     let sortColumn = baseTable
       .columns
       .find(d => d.name === state.sortColumn);
-    
+
     if (!sortColumn) {
       sortColumn = baseTable
         .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    
-    const aggregates = names_of_selected(baseTable.aggregates);
+
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -214,25 +220,26 @@ const actions = {
       .map((j) => {
         const table = j.related_table;
         const newJoin = {};
-        let selected = null;
 
         newJoin.name = j.name;
-        if (table.columns && (selected = names_of_selected(table.columns)))
-          newJoin.columns = selected;
-        
-        if (table.aggregates && (selected = names_of_selected(table.aggregates)))
-          newJoin.aggregates = selected;
-        
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
+
         return newJoin;
       })
       .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
+    /* *
+     * TODO update default empty array likely
+     * in the m5o_file_parser to set proper
+     * defaults if user's exclude certain properties in their models
+     * */
     const columnGroups = baseTable
-      .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
+      .column_groups || []
       .map(dg => ({
         name: dg.name,
-        timeframes: names_of_selected(dg.timeframes),
+        timeframes: namesOfSelected(dg.timeframes),
       }))
       .filter(dg => dg.timeframes.length);
 
@@ -429,7 +436,7 @@ const mutations = {
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach(column => {
+    Object.keys(columns).forEach((column) => {
       state.selectedColumns[column.unique_name] = false;
     });
   },

@@ -17,23 +17,23 @@ const getters = {
 
 const actions = {
   getSettings({ commit }) {
-    settingsApi.index().then(data => {
-      commit("setSettings", data.data.settings);
+    settingsApi.index().then((data) => {
+      commit('setSettings', data.data.settings);
     });
   },
   saveConnection({ commit }, connection) {
-    settingsApi.saveConnection(connection).then(data => {
-      commit("setSettings", data.data.settings);
+    settingsApi.saveConnection(connection).then((data) => {
+      commit('setSettings', data.data.settings);
     });
   },
   deleteConnection({ commit }, connection) {
-    const connectionToRemove = state.settings.connections.find(
-      item => item === connection
-    );
-    settingsApi.deleteConnection(connectionToRemove).then(data => {
-      commit("setSettings", data.data.settings);
-    });
-  }
+    const connectionToRemove = state.settings.connections
+      .find(item => item === connection);
+    settingsApi.deleteConnection(connectionToRemove)
+      .then((data) => {
+        commit('setSettings', data.data.settings);
+      });
+  },
 };
 
 const mutations = {
