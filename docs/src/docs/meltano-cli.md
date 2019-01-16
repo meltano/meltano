@@ -1,7 +1,8 @@
 # Meltano CLI
 
 - `meltano init [project name]`: Create an empty meltano project.
-- {: #meltano-add}`meltano add [extractor | loader | transformer] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
+- {: #meltano-add}`meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
+- `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 - `meltano discover all`: list available extractors and loaders:
   - `meltano discover extractors`: list only available extractors
@@ -65,3 +66,15 @@ This will exclude all `longitude` and `latitude` attributes.
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
+
+## How ELT Commands Fetch Dependencies
+
+When you run ELT commands on a tap or target, this is the general process for fetching dependencies:
+
+- First, the CLI looks in the project directory that you initialized
+- Then it looks in the global file (`discovery.yml`) for urls of a package or repo
+  - Note: This will eventually be moved into its own repository to prevent confusion since you cannot have local references for dependencies
+- If this is the first time that the dependencies are requested, it will download to a local directory (if it is a package) or cloned (if it is a repo)
+- By doing this, you ensure that packages are version controlled via `discovery.yml` and that it will live in two places:
+  - in the project itself for the user to edit
+  - in a global repo for meltano employees to edit

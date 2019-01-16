@@ -1,4 +1,6 @@
-FROM meltano/meltano/base
+ARG BASE_IMAGE=meltano/meltano/base
+FROM $BASE_IMAGE
+
 CMD ['bash']
 
 COPY ./ ./

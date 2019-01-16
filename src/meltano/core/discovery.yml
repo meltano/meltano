@@ -90,3 +90,10 @@ loaders:
 transformers:
   - name: dbt
     pip_url: dbt
+transforms:
+  - name: tap-carbon-intensity
+    pip_url: "https://gitlab.com/meltano/dbt-tap-carbon-intensity.git"
+    vars:
+      entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
+      generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
+      region_table: "{{ env_var('PG_SCHEMA') }}.region"

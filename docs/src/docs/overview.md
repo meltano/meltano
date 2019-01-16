@@ -2,13 +2,19 @@
 
 ## Introduction
 
-Meltano is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it.
+Meltano is an open source convention-over-configuration product for the whole data life cycle, all the way from loading data to analyzing it. It also leverages open source software and software development best practices including:
 
-It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, CI, CD, and review apps.
+- Version control
+- Consistent primitives and naming schema
+- Clear and powerful line interface
+- Consistent locations for storing data
+- Continuous integration and deployment
+- Review apps (through GitLab)
+- Making it easy to get started with up to date documentation
 
 [![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
 
-Meltano stands for the steps of the data lifecycle:
+Meltano stands for the steps of the data life cycle:
 
 - Model
 - Extract
@@ -18,9 +24,7 @@ Meltano stands for the steps of the data lifecycle:
 - Notebook
 - Orchestrate
 
-## Tooling
-
-To empower you and your team in this lifecycle, Meltano manifests as two tools:
+To empower you and your team in this life cycle, Meltano manifests as two tools:
 
 1. command line interface (CLI)
 1. web app (GUI)
@@ -51,9 +55,9 @@ In addition, Meltano allows you to utilize the following tools for various steps
 
 ## Meltano CLI
 
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
+Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
 
-Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
 
 ## Meltano Schema
 

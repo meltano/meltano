@@ -20,6 +20,7 @@ class PluginType(YAMLEnum):
     EXTRACTORS = "extractors"
     LOADERS = "loaders"
     TRANSFORMERS = "transformers"
+    TRANSFORMS = "transforms"
     ALL = "all"
 
     def __str__(self):
