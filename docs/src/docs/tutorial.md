@@ -17,14 +17,7 @@ cd carbon
 
 # Start Docker container, which will start a postgres database
 # to act as our data warehouse.
-docker-compose up
-```
-
-Since Docker is running in this tab, let's open a new tab (and navigate to your project) for the rest of tutorial.
-
-```bash
-# Change directory to you new carbon project
-cd carbon
+docker-compose up -d
 
 # Source the environment variables. You won't see any output if it's working.
 source .env
@@ -64,7 +57,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 - Enter connection settings
   - Name = `runners_db`
   - Dialect = `PostgresSQL`
-  - Host = `warehouse_db`
+  - Host = `localhost`
   - Port = `5502`
   - Database = `warehouse`
   - Schema = `gitlab`
