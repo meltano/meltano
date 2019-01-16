@@ -214,7 +214,7 @@ export default {
     },
     deleteConnection(connection) {
       this.$store.dispatch('settings/deleteConnection', connection);
-    }
-  }
+    },
+  },
 };
 </script>

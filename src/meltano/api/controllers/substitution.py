@@ -6,11 +6,11 @@ from pypika import Field, Case
 
 
 class SubstitutionType(Enum):
-    unknown = "UNKNOWN"
-    table = "TABLE"
-    column = "COLUMN"
-    table_column = "TABLE_COLUMN"
-    table_sql_table_name = "TABLE_SQL_TABLE_NAME"
+    Unknown = "UNKNOWN"
+    Table = "TABLE"
+    Column = "COLUMN"
+    TableColumn = "TABLE_COLUMN"
+    SQLTableName = "SQL_TABLE_NAME"
 
 
 class Substitution:
@@ -25,24 +25,24 @@ class Substitution:
         else:
             self.type = column["type"]
 
-        self.substitution_type = SubstitutionType.unknown
+        self.substitution_type = SubstitutionType.Unknown
         self.get_substitution_type()
         self.placeholders = Substitution.placeholder_match(self.input)
         self.set_sql()
 
     def get_substitution_type(self):
         # trying guess the substitution_type in a cheap way
-        if "." in self.input and "{{table}}" not in self.input:
+        if re.search(r"\{\{table\}\}", self.input, re.IGNORECASE):
+            self.substitution_type = SubstitutionType.Table
+        elif "." in self.input:
             if "SQL_TABLE_NAME" in self.input:
-                self.substitution_type = SubstitutionType.table_sql_table_name
+                self.substitution_type = SubstitutionType.SQLTableName
             else:
-                self.substitution_type = SubstitutionType.table_column
-        elif "{{table}}" in self.input:
-            self.substitution_type = SubstitutionType.table
+                self.substitution_type = SubstitutionType.TableColumn
         elif " " not in self.input:
-            self.substitution_type = SubstitutionType.column
+            self.substitution_type = SubstitutionType.Column
         else:
-            self.substitution_type = SubstitutionType.unknown
+            self.substitution_type = SubstitutionType.Unknown
 
     @staticmethod
     def placeholder_match(input_):
@@ -54,7 +54,7 @@ class Substitution:
         return Results(inner=inner_results, outer=outer_results)
 
     def set_sql(self):
-        if self.substitution_type is SubstitutionType.table:
+        if self.substitution_type is SubstitutionType.Table:
             self.set_sql_table_type()
         else:
             raise Exception(
@@ -66,6 +66,7 @@ class Substitution:
             self.placeholders.outer[0], self.table._table_name
         )
         (table, field) = self.sql.split(".")
+
         if not self.alias:
             self.alias = self.sql
         if self.type == "yesno":

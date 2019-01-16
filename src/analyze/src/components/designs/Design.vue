@@ -35,21 +35,21 @@
                   v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                   Columns
                 </a>
-                <template v-for="columnGroup in join.related_table.column_groups">
-                  <a class="panel-block column-group"
-                      :key="columnGroup.label"
-                      v-if="!columnGroup.hidden"
-                      @click="columnGroupSelected(columnGroup)"
-                      :class="{'is-active': columnGroup.selected}">
-                    {{columnGroup.label}}
+                <template v-for="timeframe in join.related_table.timeframes">
+                  <a class="panel-block timeframe"
+                      :key="timeframe.label"
+                      v-if="!timeframe.hidden"
+                      @click="timeframeSelected(timeframe)"
+                      :class="{'is-active': timeframe.selected}">
+                    {{timeframe.label}}
                   </a>
-                  <template v-if="columnGroup.selected">
-                    <template v-for="timeframe in columnGroup.timeframes">
+                  <template v-if="timeframe.selected">
+                    <template v-for="period in timeframe.periods">
                       <a class="panel-block indented"
-                          :key="columnGroup.label.concat('-', timeframe.label)"
-                          @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
-                          :class="{'is-active': timeframe.selected}">
-                        {{timeframe.label}}
+                          :key="timeframe.label.concat('-', period.label)"
+                          @click="timeframePeriodSelected(period)"
+                          :class="{'is-active': period.selected}">
+                        {{period.label}}
                       </a>
                     </template>
                   </template>
@@ -101,21 +101,21 @@
                 v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
               Columns
             </a>
-            <template v-for="columnGroup in design.related_table.column_groups">
-              <a class="panel-block column-group"
-                  :key="columnGroup.label"
-                  v-if="!columnGroup.related_table.hidden"
-                  @click="columnGroupSelected(columnGroup)"
-                  :class="{'is-active': columnGroup.selected}">
-                {{columnGroup.label}}
+            <template v-for="timeframe in design.related_table.timeframes">
+              <a class="panel-block dimension-group"
+                  :key="timeframe.label"
+                  v-if="!timeframe.related_view.hidden"
+                  @click="timeframeSelected(timeframe)"
+                  :class="{'is-active': timeframe.selected}">
+                {{timeframe.label}}
               </a>
-              <template v-for="timeframe in columnGroup.timeframes">
+              <template v-for="period in timeframe.periods">
                 <a class="panel-block indented"
-                    :key="timeframe.label"
-                    @click="columnGroupTimeframeSelected(columnGroup, timeframe)"
-                    v-if="columnGroup.selected"
-                    :class="{'is-active': timeframe.selected}">
-                  {{timeframe.label}}
+                    :key="period.label"
+                    @click="timeframePeriodSelected(period)"
+                    v-if="timeframe.selected"
+                    :class="{'is-active': period.selected}">
+                  {{period.label}}
                 </a>
               </template>
             </template>
@@ -307,7 +307,6 @@ import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
-import { ensureObjPropIsReactive } from '../utils/utils'
 
 export default {
   name: 'Design',
@@ -386,12 +385,10 @@ export default {
     },
 
     tableRowClicked(relatedTable) {
-      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed')
-      this.$store.dispatch('designs/expandRow');
+      this.$store.dispatch('designs/expandRow', relatedTable);
     },
 
     joinRowClicked(join) {
-      ensureObjPropIsReactive(this.$set, join, 'collapsed')
       this.$store.dispatch('designs/expandJoinRow', join);
     },
 
@@ -401,17 +398,12 @@ export default {
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 
-    columnGroupSelected(columnGroup) {
-      ensureObjPropIsReactive(this.$set, columnGroup, 'selected')
-      this.$store.dispatch('designs/toggleColumnGroup', columnGroup);
+    timeframeSelected(timeframe) {
+      this.$store.dispatch('designs/toggleTimeframe', timeframe);
     },
 
-    columnGroupTimeframeSelected(columnGroup, timeframe) {
-      ensureObjPropIsReactive(this.$set, timeframe, 'selected')
-      this.$store.dispatch('designs/toggleColumnGroupTimeframe', {
-        columnGroup,
-        timeframe,
-      });
+    timeframePeriodSelected(period) {
+      this.$store.dispatch('designs/toggleTimeframePeriod', period);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 
@@ -490,7 +482,7 @@ code {
     }
   }
 
-  &.column-group {
+  &.timeframe {
     &::after {
       border: 3px solid #363636;
       border-radius: 2px;

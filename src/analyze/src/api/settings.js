@@ -6,9 +6,9 @@ export default {
     return axios.get(utils.buildUrl('settings'));
   },
   saveConnection(connection) {
-    return axios.post(utils.buildUrl("settings", "save"), connection);
+    return axios.post(utils.buildUrl('settings', 'save'), connection);
   },
   deleteConnection(connection) {
     return axios.post(utils.buildUrl('settings', 'delete'), connection);
-  }
+  },
 };

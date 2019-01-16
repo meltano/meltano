@@ -2,16 +2,19 @@ from .substitution import Substitution
 from pypika import Table
 
 from .aggregate import Aggregate
+from .timeframe import TimeframePeriod
 
 
 class AnalysisHelper:
     @staticmethod
-    def table(name, alias):
+    def db_table(name, **kwargs):
         try:
-            (schema, name) = name.split(".")
-            return Table(name, schema=schema, alias=alias)
+            schema, name = name.split(".")
+            options = kwargs
+            options["schema"] = schema
+            return Table(name, **options)
         except ValueError:
-            return Table(name, alias=alias)
+            return Table(name, **kwargs)
 
     @staticmethod
     def columns_from_names(columns, table):
@@ -22,24 +25,47 @@ class AnalysisHelper:
     def aggregates_from_names(aggregates, table):
         return list(filter(lambda x: x["name"] in aggregates, table["aggregates"]))
 
-    @staticmethod
-    def columns(columns, table):
-        return [AnalysisHelper.field_from_column(d, table) for d in columns]
+    @classmethod
+    def timeframe_periods_from_names(cls, timeframe_name, period_names, table):
+        timeframe = next(
+            timeframe
+            for timeframe in table["timeframes"]
+            if timeframe["name"] == timeframe_name
+        )
 
-    @staticmethod
-    def aggregates(aggregates, table):
-        return [
-            AnalysisHelper.field_from_aggregate(aggregate, table)
-            for aggregate in aggregates
+        # filter out non-selected periods
+        periods = [
+            period for period in timeframe["periods"] if period["label"] in period_names
         ]
 
-    @staticmethod
-    def field_from_aggregate(aggregate, table):
-        aggregate = Aggregate(aggregate, table)
-        return aggregate.sql
+        return timeframe, periods
 
-    @staticmethod
-    def field_from_column(d, table):
-        sql = d["sql"]
-        substitution = Substitution(sql, table, column=d)
-        return substitution.sql
+    @classmethod
+    def columns(cls, columns, db_table):
+        return [cls.field_from_column(d, db_table) for d in columns]
+
+    @classmethod
+    def aggregates(cls, aggregates, db_table):
+        return [
+            cls.field_from_aggregate(aggregate, db_table) for aggregate in aggregates
+        ]
+
+    @classmethod
+    def periods(cls, timeframes, db_table):
+        return [
+            cls.field_from_timeframe_period(timeframe["timeframe"], period, db_table)
+            for timeframe in timeframes
+            for period in timeframe["periods"]
+        ]
+
+    @classmethod
+    def field_from_aggregate(cls, aggregate, db_table):
+        return Aggregate(aggregate, db_table).sql
+
+    @classmethod
+    def field_from_column(cls, d, db_table):
+        return Substitution(d["sql"], db_table, column=d).sql
+
+    @classmethod
+    def field_from_timeframe_period(cls, timeframe, period, db_table):
+        return TimeframePeriod(timeframe, period, db_table).sql

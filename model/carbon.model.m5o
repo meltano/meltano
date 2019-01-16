@@ -1,7 +1,6 @@
 {
   version = 1
-  name = carbon
-  # Postgres DB
+  name = gitlab.carbon
   connection = runners_db
   label = carbon intensity
   designs {
@@ -12,9 +11,13 @@
       joins {
         entry {
           label = Entry
-          fields = [entry.from, entry.to]
-          sql_on = "{{ region.id }} = {{ entry.region_id }}"
-          relationship = one_to_one
+          sql_on = "gitlab.region.id = entry.region_id"
+          relationship = many_to_one
+        }
+        generationmix {
+          label = Generation Mix
+          sql_on = "gitlab.entry.id = gitlab.generationmix.entry_id"
+          relationship = many_to_one
         }
       }
     }

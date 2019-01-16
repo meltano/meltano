@@ -61,6 +61,7 @@ const getters = {
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
+
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -68,6 +69,7 @@ const getters = {
     }
     return thisDistinct.keys[0];
   },
+
   getSelectionsFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -129,13 +131,13 @@ const actions = {
       });
   },
 
-  expandRow({ commit }) {
-    commit('toggleCollapsed');
+  expandRow({ commit }, row) {
+    commit('toggleCollapsed', row);
   },
 
   expandJoinRow({ commit }, join) {
     // already fetched columns
-    commit('toggleJoinOpen', join);
+    commit('toggleCollapsed', join);
     if (join.related_table.columns.length) return;
     designApi.getTable(join.related_table.name)
       .then((data) => {
@@ -143,8 +145,8 @@ const actions = {
           columns: data.data.columns,
           join,
         });
-        commit('setJoinColumnGroups', {
-          columnGroups: data.data.column_groups,
+        commit('setJoinTimeframes', {
+          timeframes: data.data.timeframes,
           join,
         });
         commit('setJoinAggregates', {
@@ -160,19 +162,19 @@ const actions = {
   },
 
   toggleColumn({ commit }, column) {
-    commit('toggleColumnSelected', column);
+    commit('toggleSelected', column);
   },
 
-  toggleColumnGroup({ commit }, columnGroup) {
-    commit('toggleColumnGroupSelected', columnGroup);
+  toggleTimeframe({ commit }, timeframe) {
+    commit('toggleSelected', timeframe);
   },
 
-  toggleColumnGroupTimeframe({ commit }, columnGroupObj) {
-    commit('toggleColumnGroupTimeframeSelected', columnGroupObj);
+  toggleTimeframePeriod({ commit }, timeframePeriod) {
+    commit('toggleSelected', timeframePeriod);
   },
 
   toggleAggregate({ commit }, aggregate) {
-    commit('toggleAggregateSelected', aggregate);
+    commit('toggleSelected', aggregate);
   },
 
   limitSet({ commit }, limit) {
@@ -185,23 +187,29 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
+    const selected = x => x.selected;
+    const namesOfSelected = (arr) => {
+      if (!Array.isArray(arr)) {
+        return null;
+      }
+
+      return arr.filter(selected).map(x => x.name);
+    };
+
     const baseTable = state.design.related_table;
-    const columns = baseTable
-      .columns
-      .filter(d => d.selected)
-      .map(d => d.name);
+    const columns = namesOfSelected(baseTable.columns);
+
     let sortColumn = baseTable
       .columns
       .find(d => d.name === state.sortColumn);
+
     if (!sortColumn) {
       sortColumn = baseTable
         .aggregates
         .find(d => d.name === state.sortColumn);
     }
-    const aggregates = baseTable
-      .aggregates
-      .filter(m => m.selected)
-      .map(m => m.name);
+
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -213,34 +221,38 @@ const actions = {
     const joins = state.design
       .joins
       .map((j) => {
+        const table = j.related_table;
         const newJoin = {};
+
         newJoin.name = j.name;
-        if (j.columns) {
-          newJoin.columns = j.columns
-            .filter(d => d.selected)
-            .map(d => d.name);
-          if (!newJoin.columns.length) delete newJoin.columns;
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
+
+        if (table.timeframes) {
+          newJoin.timeframes = table.timeframes
+            .filter(selected)
+            .map(({ name, periods }) => ({
+              name,
+              periods: periods.filter(selected),
+            }));
         }
-        if (j.aggregates) {
-          newJoin.aggregates = j.aggregates
-            .filter(m => m.selected)
-            .map(m => m.name);
-          if (!newJoin.aggregates.length) delete newJoin.aggregates;
-        }
+
         return newJoin;
       })
       .filter(j => !!(j.columns || j.aggregates));
 
     let order = null;
-    const columnGroups = baseTable
-      .column_groups || [] // TODO update default empty array likely in the m5o_file_parser to set proper defaults if user's exclude certain properties in their models
-      .map(dg => ({
-        name: dg.name,
-        timeframes: dg.timeframes
-          .filter(tf => tf.selected)
-          .map(tf => tf.name),
+
+    // TODO update default empty array likely
+    // in the ma_file_parser to set proper defaults
+    // if user's exclude certain properties in their models
+    const timeframes = baseTable
+      .timeframes || []
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
       }))
-      .filter(dg => dg.timeframes.length);
+      .filter(tf => tf.periods.length);
 
     if (sortColumn) {
       order = {
@@ -252,15 +264,16 @@ const actions = {
     const postData = {
       table: baseTable.name,
       columns,
-      column_groups: columnGroups,
       aggregates,
+      timeframes,
       joins,
       order,
       limit: state.limit,
       filters,
       run,
     };
-    if (run) state.loadingQuery = true;
+
+    state.loadingQuery = !!run;
     designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((data) => {
         if (run) {
@@ -324,7 +337,6 @@ const actions = {
 };
 
 const mutations = {
-
   setRemoveSort() {
     state.sortColumn = null;
   },
@@ -348,17 +360,12 @@ const mutations = {
     join.columns = columns;
   },
 
-  setJoinColumnGroups(_, { columnGroups, join }) {
-    join.column_groups = columnGroups;
+  setJoinTimeframes(_, { timeframes, join }) {
+    join.timeframes = timeframes;
   },
 
   setJoinAggregates(_, { aggregates, join }) {
     join.aggregates = aggregates;
-  },
-
-  toggleJoinOpen(_, join) {
-    const thisJoin = join;
-    thisJoin.collapsed = !thisJoin.collapsed;
   },
 
   setSelectedDistincts(_, { item, field }) {
@@ -413,38 +420,22 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleColumnSelected(_, column) {
-    const selectedColumn = column;
-    selectedColumn.selected = !column.selected;
+  toggleSelected(_, selectable) {
+    Vue.set(selectable, 'selected', !selectable.selected);
   },
 
-  toggleColumnGroupSelected(_, columnGroup) {
-    const selectedColumnGroup = columnGroup;
-    selectedColumnGroup.selected = !selectedColumnGroup.selected;
-  },
-
-  toggleColumnGroupTimeframeSelected(_, { timeframe }) {
-    const selectedTimeframe = timeframe;
-    selectedTimeframe.selected = !selectedTimeframe.selected;
-  },
-
-  toggleAggregateSelected(_, aggregate) {
-    const selectedAggregate = aggregate;
-    selectedAggregate.selected = !aggregate.selected;
+  toggleCollapsed(_, collapsable) {
+    Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach(column => {
+    Object.keys(columns).forEach((column) => {
       state.selectedColumns[column.unique_name] = false;
     });
   },
 
   setDesign(_, designData) {
     state.design = designData;
-  },
-
-  toggleCollapsed() {
-    state.design.related_table.collapsed = !state.design.related_table.collapsed;
   },
 
   setCurrentTab(_, tab) {

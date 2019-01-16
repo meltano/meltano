@@ -2,6 +2,7 @@ import json
 
 from typing import Dict
 from pathlib import Path
+from .design_helper import DesignHelper
 
 
 class DesignMissingError(Exception):
@@ -22,7 +23,7 @@ class M5ocFile:
 
     @property
     def designs(self):
-        return self.content["designs"]
+        return list(map(DesignHelper, self.content["designs"]))
 
     def design(self, design_name: str) -> Dict:
         try:
