@@ -92,15 +92,15 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
   name = carbon
   # Define the database connection
   connection = runners_db
-  # Define GUI label (TODO update to leverage label vs parsing name in GUI)
+  # Define GUI label
   label = carbon intensity
   # Define base tables and their respective join relationships
   designs {
-    # Define the base table(s) of interest (further defined in each my-table.table.m5o file) that will be GUI joinable and subsequently used for generating SQL queries (TODO assuming this description is accurate, should each base table be nested in a `base_tables` collection? This would seem more consistent (`columns` and `column_groups` for example))
+    # Define the base table(s) of interest (further defined in each my-table.table.m5o file) that will be GUI joinable and subsequently used for generating SQL queries
     region {
       # Define GUI label
       label = Region
-      # Define (TODO is this repetitive?)
+      # Define from table name
       from = region
       # Define GUI description
       description = Region Carbon Intensity Data
@@ -148,7 +148,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
       sql = "{{table}}.id"
     }
   }
-  # TODO - awaiting feedback regarding column_groups (timeframes?) being refactored into columns or not
+  # Define time-based column(s) of interest that will be GUI selectable and subsequently used for generating SQL queries
   column_groups {
     from {
       label = From
