@@ -2,9 +2,15 @@
 
 ## Introduction
 
-Meltano is an open source convention-over-configuration product for the whole data life cycle, all the way from loading data to analyzing it.
+Meltano is an open source convention-over-configuration product for the whole data life cycle, all the way from loading data to analyzing it. It also leverages open source software and software development best practices including:
 
-It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, CI, CD, and review apps.
+- Version control
+- Consistent primitives and naming schema
+- Clear and powerful line interface
+- Consistent locations for storing data
+- Continuous integration and deployment
+- Review apps (through GitLab)
+- Making it easy to get started with up to date documentation
 
 [![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
 
