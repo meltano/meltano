@@ -15,7 +15,7 @@
 "/.meltano": []
 "docker-compose.yml": |
   version: '3.1'
-  services: 
+  services:
     warehouse_db:
       image: postgres
       environment:
@@ -25,20 +25,21 @@
       ports:
       - '5502:5432'
 "/model": []
-"model/carbon.model.ma": |
+"model/carbon.model.m5o": |
   {
     version = 1
     name = carbon
     # Postgres DB
     connection = runners_db
     label = carbon intensity
-    explores {
+    designs {
       region {
+        label = Region
         from = region
-        label = region
         description = Region Carbon Intensity Data
         joins {
           entry {
+            label = Entry
             fields = [entry.from, entry.to]
             sql_on = "{{ region.id }} = {{ entry.region_id }}"
             relationship = one_to_one
@@ -47,43 +48,49 @@
       }
     }
   }
-"model/entry.view.ma": |
+"model/entry.table.m5o": |
   {
     sql_table_name = gitlab.entry
-    dimensions {
+    name = entry
+    columns {
       id {
+        label = ID
         primary_key = yes
         hidden = yes
         type = string
         sql = "{{table}}.id"
       }
       region_id {
+        label = Region ID
         hidden = yes
         type = string
         sql = "{{table}}.id"
       }
     }
-    dimension_groups {
+    column_groups {
       from {
+        label = From
         description = Selected from range in carbon data
         type = time
-        timeframes = [date, week, month, year]
+        timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
         convert_tz = no
         sql = "{{TABLE}}.from"
       }
       to {
+        label = To
         description = Selected to range in carbon data
         type = time
-        timeframes = [date, week, month, year]
+        timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
         convert_tz = no
         sql = "{{TABLE}}.to"
       }
     }
   }
-"model/region.view.ma": |
+"model/region.table.m5o": |
   {
     sql_table_name = gitlab.region
-    dimensions {
+    name = region
+    columns {
       id {
         primary_key = true
         hidden = true
@@ -91,21 +98,24 @@
         sql = "{{table}}.id"
       }
       name {
+        label = Name
         description = Carbon region long name
         type = string
         sql = "{{table}}.dnoregion"
       }
       short_name {
-        description: Carbon region short name
-        type: string
-        sql: "{{table}}.shortname"
+        label = Short Name
+        description = Carbon region short name
+        type = string
+        sql = "{{table}}.shortname"
       }
     }
-    measures {
+    aggregates {
       count {
-        description: Runner Count
-        type: count
-        sql: "{{table}}.id"
+        label = Count
+        description = Runner Count
+        type = count
+        sql = "{{table}}.id"
       }
     }
   }
@@ -113,17 +123,9 @@
 "/load": []
 "/transform": []
 "transform/dbt_project.yml": |
-  # Name your package! Package names should contain only lowercase characters
-  # and underscores. A good package name should reflect your organization's
-  # name or the intended use of these models
   name: 'my_meltano_project'
   version: '1.0'
-  # This setting configures which "profile" dbt uses for this project. Profiles contain
-  # database connection information, and should be configured in the  ~/.dbt/profiles.yml file
   profile: 'meltano'
-  # These configurations specify where dbt should look for different types of files.
-  # The `source-paths` config, for example, states that source models can be found
-  # in the "models/" directory. You probably won't need to change these!
   source-paths: ["models"]
   analysis-paths: ["analysis"]
   test-paths: ["tests"]
@@ -152,7 +154,9 @@
         user: "{{ env_var('PG_USERNAME') }}"
         pass: "{{ env_var('PG_PASSWORD') }}"
         dbname: "{{ env_var('PG_DATABASE') }}"
-        schema: "{{ env_var('PG_SCHEMA') }}"
+        schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
+"/transform/models": []
+"/transform/models/my_meltano_project": []
 "/analyze": []
 "/notebook": []
 "/orchestrate": []

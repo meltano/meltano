@@ -2,13 +2,19 @@
 
 ## Introduction
 
-Meltano is an open source convention-over-configuration product for the whole data lifecycle, all the way from loading data to analyzing it.
+Meltano is an open source convention-over-configuration product for the whole data life cycle, all the way from loading data to analyzing it. It also leverages open source software and software development best practices including:
 
-It does [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence, and data science. It leverages open source software and software development best practices including version control, continuous integration (CI), continuous deployment (CD), and review apps.
+- Version control
+- Consistent primitives and naming schema
+- Clear and powerful line interface
+- Consistent locations for storing data
+- Continuous integration and deployment
+- Review apps (through GitLab)
+- Making it easy to get started with up to date documentation
 
 [![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
 
-Meltano stands for the steps of the data lifecycle:
+Meltano stands for the steps of the data life cycle:
 
 - Model
 - Extract
@@ -18,12 +24,13 @@ Meltano stands for the steps of the data lifecycle:
 - Notebook
 - Orchestrate
 
-To empower you and your team in this lifecycle, Meltano manifests as two tools:
+To empower you and your team in this life cycle, Meltano manifests as two tools:
 
 1. command line interface (CLI)
 1. web app (GUI)
 
 These two tools enable you and your team to use Meltano in a few different ways:
+
 1. Meltano as **Project** (CLI + GUI)
     - From data extraction to analysis and visualization with orchestration for automating the process
 1. Meltano as **Framework** (CLI)
@@ -33,18 +40,24 @@ These two tools enable you and your team to use Meltano in a few different ways:
 1. Meltano as **Analyze** only (GUI)
     - Interactively query, explore, visualize, and model the data (warehouse)
 
-It leverages open source software and software development best practices including version control, CI, CD, and review apps for [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence and data science.
+In addition, Meltano allows you to utilize the following tools for various steps of the data life cycle:
+
+- **Collections**, Extract, Load, Transform: Meltano CLI
+- **Designs**: Superset or Plotly
+- **Notebook**: Jupyter
+- **Orchestrate**: Airflow
 
 **Notes**
 
 - _Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields._
 - _The sample Zuora python scripts have been written to support GitLab's Zuora implementation. This includes a workaround to handle some subscriptions that should have been created as a single subscription._
+- _In addition, please note that Transform also has a viewer._
 
 ## Meltano CLI
 
-Meltano provides a CLI to kickstart and help you manage the configuration and orchestration of all the components in the [Data Lifecycle].
+Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
 
-Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data lifecycle.
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
 
 ## Meltano Schema
 
@@ -53,14 +66,6 @@ Helper functions to manage the data warehouse. At the moment, these are PGSQL sp
 ### Create Schema and Roles
 
 Create and grant usage for a database schema.
-
-## Meltano Model
-
-Meltano Models allow you to define your data model and generate SQL so that you can easily analyze and visualize it in Meltano Analyze.
-
-## Meltano Analyze
-
-Meltano Analyze is a dashboard that allows you to run SQL queries and produce data visualizations, charts, and graphs based on your data.
 
 ## Meltano Transform
 

@@ -39,9 +39,12 @@ meltano add extractor tap-carbon-intensity
 # Since we have a postgres running, we can add a loader for a Postgres database
 meltano add loader target-postgres
 
+# Also add the default dbt transforms for tap-carbon-intensity
+meltano add transform tap-carbon-intensity
+
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt tap-carbon-intensity target-postgres
+meltano elt tap-carbon-intensity target-postgres --transform run
 
 # Start up the Meltano Analyze web application!
 meltano ui
@@ -49,7 +52,7 @@ meltano ui
 
 Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
 
-Now we are ready to analyze the data. We have provided some sample .ma (Meltano Analyze) files that will help you analyze the carbon intensity API. 
+Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API. 
 
 ## Using Meltano on Your New Project
 
@@ -74,8 +77,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 
 Then, we'll populate our data warehouse:
 - Click Model button (upper-left)
-- Click Validate button
-- Click Update Database button
+  - Everytime you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator.
 
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)

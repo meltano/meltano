@@ -44,6 +44,7 @@ module.exports = {
 				'/docs/',
 				'/docs/tutorial',
 				'/docs/overview',
+				'/docs/fundamentals',
 				'/docs/meltano-cli',
 				'/docs/best-practices',
 				'/docs/superset',
