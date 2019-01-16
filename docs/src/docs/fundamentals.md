@@ -20,7 +20,7 @@ A `Column` relates directly to a column in a table of a database. Some limitatio
 
 A `Dashboard` is a group of many `Reports`.
 
-A `Dashboard` is identified by the file naming schema: `set-name.dashboard.m5o` and is stored in the `/dashboards` directory.
+A `Dashboard` is identified by the file naming schema: `set-name.dashboard.m5o` and should be stored in the `/dashboards` directory.
 
 ## Design
 
@@ -53,4 +53,4 @@ A `Table` can be identified by the file naming schema: `table-name.table.m5o` an
 
 A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
 
-A `Report` can be identified by the file naming schema: `report-name.report.m5oc`
+A `Report` can be identified by the file naming schema: `report-name.report.m5oc`.
