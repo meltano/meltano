@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * Edit links on the bottom of doc pages are working now
+* Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
 
 ### Breaks
 
