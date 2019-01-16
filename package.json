@@ -4,8 +4,11 @@
   "description": "The source code for the Meltano.com site",
   "main": "index.js",
   "scripts": {
-    "dev:docs": "vuepress dev docs/src",
-    "build:docs": "vuepress build docs/src",
+    "copyDiscoveryYml": "cp ./discovery.yml ./docs/src/.vuepress/public",
+    "dev": "vuepress dev docs/src",
+    "build": "vuepress build docs/src",
+    "dev:docs": "npm run copyDiscoveryYml && npm run dev",
+    "build:docs": "npm run copyDiscoveryYml && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
