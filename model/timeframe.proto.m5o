@@ -1,0 +1,7 @@
+periods = [
+  { label = Quarter, part = QUARTER },
+  { label = Week, part = WEEK },
+  { label = Month, part = MONTH },
+  { label = Year, part = YEAR },
+]
+type = time

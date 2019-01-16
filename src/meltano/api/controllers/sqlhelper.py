@@ -29,7 +29,7 @@ class SqlHelper:
 
         base_table = table["sql_table_name"]
         incoming_columns = incoming_json["columns"]
-        incoming_column_groups = incoming_json["column_groups"]
+        incoming_timeframes = incoming_json["timeframes"]
         incoming_aggregates = incoming_json["aggregates"]
         incoming_filters = incoming_json["filters"]
         incoming_joins = incoming_json["joins"]
@@ -38,23 +38,16 @@ class SqlHelper:
 
         print(incoming_json)
 
-        order = None
-        if incoming_order:
-            if incoming_order["direction"] == "asc":
-                order = Order.asc
-            else:
-                order = Order.desc
-        orderby = incoming_order["column"] if incoming_order else None
-
-        db_table = AnalysisHelper.table(base_table, alias=design["name"])
-
-        column_groups = self.column_groups(table_name, incoming_column_groups, table)
-        # get a list of all the timeframes
-        timeframes = [t["timeframes"] for t in incoming_column_groups]
-        timeframes = [y for x in timeframes for y in x]
+        db_table = AnalysisHelper.db_table(base_table, alias=design["name"])
+        timeframes_raw = [
+            design.timeframe_periods_for(table, tf) for tf in incoming_timeframes
+        ]
+        timeframe_periods = [
+            AnalysisHelper.periods(timeframe, db_table) for timeframe in timeframes_raw
+        ]
 
         columns_raw = AnalysisHelper.columns_from_names(incoming_columns, table)
-        columns = AnalysisHelper.columns(columns_raw, db_table) + column_groups
+        columns = AnalysisHelper.columns(columns_raw, db_table)
 
         aggregates_raw = AnalysisHelper.aggregates_from_names(
             incoming_aggregates, table
@@ -66,24 +59,49 @@ class SqlHelper:
         for j in joins:
             columns_raw += j["columns"]
             aggregates_raw += j["aggregates"]
+            timeframes_raw += j["timeframes"]
 
             columns += AnalysisHelper.columns(j["columns"], j["db_table"])
             aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
+            timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
 
+        order = None
+        orderby = None
+        orderby_field = None
+        if incoming_order:
+            orderby = incoming_order["column"]
+            order = Order.asc if incoming_order["direction"] == "asc" else Order.desc
+
+        # order by column
         if orderby:
-            ordered_by_column = [d for d in columns_raw if d["name"] == orderby]
-            if ordered_by_column:
-                orderby = self.columns(ordered_by_column, table)[0]
-            else:
-                ordered_by_column = [m for m in aggregates_raw if m["name"] == orderby]
-                if ordered_by_column:
-                    orderby = self.aggregates(ordered_by_column, table)[0]
-                else:
-                    raise Exception(
-                        "Something is wrong, no column or aggregate column matching the column to sort by."
-                    )
+            try:
+                orderby_field = next(
+                    AnalysisHelper.field_from_column(c, db_table)
+                    for c in columns_raw
+                    if c["name"] == orderby
+                )
+            except StopIteration:
+                orderby_field = None
+                pass
 
-        column_headers = self.column_headers(columns_raw, aggregates_raw)
+        # order by aggregate
+        if orderby and not orderby_field:
+            try:
+                orderby_field = next(
+                    AnalysisHelper.field_from_aggregate(a, db_table)
+                    for a in aggregates_raw
+                    if a["name"] == orderby
+                )
+            except StopIteration:
+                orderby_field = None
+                raise Exception(
+                    "Something is wrong, no dimension or measure column matching the column to sort by."
+                )
+
+        orderby = orderby_field
+        column_headers = self.column_headers(
+            columns_raw, aggregates_raw, timeframes_raw
+        )
         names = self.get_names(columns_raw + aggregates_raw)
         return {
             "columns": columns_raw,
@@ -94,48 +112,46 @@ class SqlHelper:
                 from_=db_table,
                 columns=columns,
                 aggregates=aggregates,
+                periods=timeframe_periods,
                 limit=incoming_limit,
                 joins=joins,
-                order=order,
                 orderby=orderby,
+                order=order,
             ),
         }
 
-    def column_headers(self, columns, aggregates):
-        return [d["label"] for d in columns + aggregates]
+    def column_headers(self, columns, aggregates, timeframes):
+        labels = [l["label"] for l in columns + aggregates]
+        for timeframe in timeframes:
+            labels += timeframe["period_labels"]
 
-    def column_groups(self, table_name, column_groups, table):
-        fields = []
-        for column_group in column_groups:
-            column_group_queried = (
-                ColumnGroup.query.join(Table, ColumnGroup.table_id == Table.id)
-                .filter(Table.name == table_name)
-                .filter(ColumnGroup.name == column_group["name"])
-                .first()
-            )
-            (_table, name) = column_group_queried.table_column_name.split(".")
-            for timeframe in column_group["timeframes"]:
-                d = Date(timeframe, table, name)
-                fields.append(d.sql)
-        return fields
+        return labels
 
     def get_query(
-        self, from_, columns, aggregates, limit, joins=None, order=None, orderby=None
+        self,
+        from_,
+        columns,
+        aggregates,
+        periods,
+        limit,
+        joins=None,
+        order=None,
+        orderby=None,
     ):
-        select = columns + aggregates
+        select = columns + aggregates + periods
         q = Query.from_(from_)
 
         for j in joins:
             join_db_table = j["db_table"]
-            # print(f"Jointing on {join_table} with {j['on']}")
             q = q.join(join_db_table).on(j["on"])
 
-        q = q.select(*select).groupby(*columns)
+        q = q.select(*select).groupby(*columns, *periods)
+
         if order:
             q = q.orderby(orderby, order=order)
 
         q = q.limit(limit)
-        return f"{str(q)};"
+        return str(q) + ";"
 
     def reset_db(self):
         try:

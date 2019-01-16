@@ -40,12 +40,18 @@ class TestSqlController:
             return url_for("sql.get_sql", model_name=model, design_name=design)
 
     def test_get_sql(self, post):
-        # with no dimensions no query should be generated
+        self.assert_empty_query(post)
+        self.assert_column_query(post)
+        self.assert_timeframe_query(post)
+
+    def assert_empty_query(self, post):
+        """with no columns no query should be generated"""
+
         payload = {
             "table": "region",
             "columns": [],
-            "column_groups": [],
             "aggregates": [],
+            "timeframes": [],
             "joins": [
                 {"name": "entry", "columns": []},
                 {"name": "generationmix", "columns": []},
@@ -60,12 +66,14 @@ class TestSqlController:
         assert res.status_code == 200
         assert res.json["sql"] == ";"
 
-        # with columns they should be included in the query
+    def assert_column_query(self, post):
+        """with columns they should be included in the query"""
+
         payload = {
             "table": "region",
             "columns": ["name"],
-            "column_groups": [],
             "aggregates": [],
+            "timeframes": [],
             "joins": [
                 {"name": "entry", "columns": ["forecast"]},
                 {"name": "generationmix", "columns": ["perc", "fuel"]},
@@ -84,3 +92,36 @@ class TestSqlController:
         assert '"entry.forecast"' in res.json["sql"]
         assert '"generationmix.perc"' in res.json["sql"]
         assert '"generationmix.fuel"' in res.json["sql"]
+
+    def assert_timeframe_query(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [
+                {
+                    "name": "entry",
+                    "columns": ["forecast"],
+                    "timeframes": [
+                        {
+                            "name": "from",
+                            "periods": [{"label": "Week", "selected": True}],
+                        },
+                        {"name": "to", "periods": []},
+                    ],
+                },
+                {"name": "generationmix", "columns": ["perc", "fuel"]},
+            ],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        assertIsSQL(res.json["sql"])
+        assert 'EXTRACT(\'Week\' FROM "entry"."from") "from.week"' in res.json["sql"]
+        assert re.search(r'GROUP BY.*"from.week"', res.json["sql"])

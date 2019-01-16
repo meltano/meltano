@@ -37,6 +37,8 @@ class InvalidIdentifier(Exception):
 
 Identifier = namedtuple("Identifier", ("schema", "table", "field", "alias"))
 
+DimensionGroup = namedtuple("DimensionGroup", ("dimensions", "group"))
+
 
 class PypikaJoinExecutor:
     def __init__(self, design, join):
@@ -54,7 +56,7 @@ class PypikaJoinExecutor:
         right_alias = self.join["name"] if right.table == self.join["name"] else None
 
         left_field = getattr(
-            AnalysisHelper.table(
+            AnalysisHelper.db_table(
                 table["sql_table_name"] if left_alias else left.table,
                 schema=left.schema,
                 alias=left_alias or left.alias or left.table,
@@ -63,7 +65,7 @@ class PypikaJoinExecutor:
         )
 
         right_field = getattr(
-            AnalysisHelper.table(
+            AnalysisHelper.db_table(
                 table["sql_table_name"] if right_alias else right.table,
                 schema=right.schema,
                 alias=right_alias or right.alias or right.table,
@@ -127,8 +129,8 @@ class DesignHelper:
         join = self.get_join(self, join_selection["name"])
         table = join["related_table"]
 
-        db_table = AnalysisHelper.table(table["sql_table_name"], alias=join["name"])
-        selected = {"columns": [], "aggregates": []}
+        db_table = AnalysisHelper.db_table(table["sql_table_name"], alias=join["name"])
+        selected = {"columns": [], "aggregates": [], "timeframes": []}
 
         try:
             selected["columns"] = AnalysisHelper.columns_from_names(
@@ -144,6 +146,14 @@ class DesignHelper:
         except KeyError:
             pass
 
+        try:
+            selected["timeframes"] = [
+                self.timeframe_periods_for(table, timeframe_selection)
+                for timeframe_selection in join_selection["timeframes"]
+            ]
+        except KeyError:
+            pass
+
         join_executor = PypikaJoinExecutor(self, join)
         visit(sqlparse.parse(join["sql_on"])[0], join_executor)
 
@@ -153,6 +163,25 @@ class DesignHelper:
             "on": join_executor.result,
             "join": join,
             **selected,
+        }
+
+    def timeframe_periods_for(self, table, timeframe_selection):
+        timeframe_name = timeframe_selection["name"]
+        period_names = [p["label"] for p in timeframe_selection["periods"]]
+
+        db_table = AnalysisHelper.db_table(
+            table["sql_table_name"], alias=timeframe_name
+        )
+        timeframe, periods = AnalysisHelper.timeframe_periods_from_names(
+            timeframe_name, period_names, table
+        )
+
+        return {
+            "table": table,
+            "db_table": db_table,
+            "timeframe": timeframe,
+            "periods": periods,
+            "period_labels": period_names,
         }
 
     @classmethod

@@ -1,6 +1,7 @@
 from pyhocon import ConfigFactory
 from pathlib import Path
 from jinja2 import Template
+from typing import Dict, List
 
 import logging
 import json
@@ -216,28 +217,17 @@ class MeltanoAnalysisFileParser:
             raise MeltanoAnalysisFileParserMissingFieldsError(
                 missing_properties, "table", file_name
             )
+
         for prop_name, prop_def in table_file.items():
-            temp_table[prop_name] = prop_def
-            if prop_name == "columns":
-                temp_table[prop_name] = self.columns(prop_def)
-            elif prop_name == "aggregates":
-                temp_table[prop_name] = self.aggregates(prop_def)
+            subproperties = ("columns", "aggregates", "timeframes")
+
+            if prop_name in subproperties:
+                temp_table[prop_name] = self.name_flatten_dict(prop_def)
+            else:
+                temp_table[prop_name] = prop_def
+
         return temp_table
 
-    def columns(self, ma_file_columns_dict):
-        temp_columns = []
-        for column_name, column_def in ma_file_columns_dict.items():
-            temp_column = {"name": column_name}
-            for prop_name, prop_def in column_def.items():
-                temp_column[prop_name] = prop_def
-            temp_columns.append(temp_column)
-        return temp_columns
-
-    def aggregates(self, ma_file_aggregates_dict):
-        temp_aggregates = []
-        for aggregate_name, aggregate_def in ma_file_aggregates_dict.items():
-            temp_aggregate = {"name": aggregate_name}
-            for prop_name, prop_def in aggregate_def.items():
-                temp_aggregate[prop_name] = prop_def
-            temp_aggregates.append(temp_aggregate)
-        return temp_aggregates
+    @classmethod
+    def name_flatten_dict(cls, d: Dict) -> List:
+        return [{"name": k, **rest} for k, rest in d.items()]
