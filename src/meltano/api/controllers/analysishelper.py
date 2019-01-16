@@ -14,31 +14,32 @@ class AnalysisHelper:
             return Table(name, alias=alias)
 
     @staticmethod
-    def dimensions_from_names(dimensions, view):
-        return list(filter(lambda x: x["name"] in dimensions, view["dimensions"]))
+    def columns_from_names(columns, table):
+        return list(filter(lambda x: x["name"] in columns, table["columns"]))
 
     # TODO: dedup this non dry situation
     @staticmethod
-    def measures_from_names(measures, view):
-        return list(filter(lambda x: x["name"] in measures, view["measures"]))
+    def aggregates_from_names(aggregates, table):
+        return list(filter(lambda x: x["name"] in aggregates, table["aggregates"]))
 
     @staticmethod
-    def dimensions(dimensions, table):
-        return [AnalysisHelper.field_from_dimension(d, table) for d in dimensions]
+    def columns(columns, table):
+        return [AnalysisHelper.field_from_column(d, table) for d in columns]
 
     @staticmethod
-    def measures(measures, table):
+    def aggregates(aggregates, table):
         return [
-            AnalysisHelper.field_from_measure(measure, table) for measure in measures
+            AnalysisHelper.field_from_aggregate(aggregate, table)
+            for aggregate in aggregates
         ]
 
     @staticmethod
-    def field_from_measure(measure, table):
-        aggregate = Aggregate(measure, table)
+    def field_from_aggregate(aggregate, table):
+        aggregate = Aggregate(aggregate, table)
         return aggregate.sql
 
     @staticmethod
-    def field_from_dimension(d, table):
+    def field_from_column(d, table):
         sql = d["sql"]
-        substitution = Substitution(sql, table, dimension=d)
+        substitution = Substitution(sql, table, column=d)
         return substitution.sql

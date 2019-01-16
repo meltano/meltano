@@ -7,3 +7,10 @@ class DbtPlugin(Plugin, HookObject):
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
+
+
+class DbtTransformPlugin(Plugin, HookObject):
+    __plugin_type__ = PluginType.TRANSFORMS
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(self.__class__.__plugin_type__, *args, **kwargs)

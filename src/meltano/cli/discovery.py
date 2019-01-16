@@ -19,6 +19,7 @@ from meltano.core.plugin_discovery_service import (
             PluginType.EXTRACTORS,
             PluginType.LOADERS,
             PluginType.TRANSFORMERS,
+            PluginType.TRANSFORMS,
             PluginType.ALL,
         ]
     ),

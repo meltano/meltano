@@ -1,22 +1,163 @@
-# Build
+.docker_build_script: &docker_build_script |
+  export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
+  export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
+  docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+  docker build -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE $EXTRA_ARGS .
+  docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
-.kaniko_build: &kaniko_build
+.docker_build: &docker_build
+  image: docker:latest
   stage: build
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  before_script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
-    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
-    - mkdir -p /root/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /root/.docker/config.json
+  variables:
+    DOCKERFILE: .
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
   script:
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $EXTRA_ARGS
+    - *docker_build_script
+
+###############
+# Build Base  #
+###############
+
+# Manages:
+#  - meltano/meltano/base:<sha>
+meltano_base_dev:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
+  except:
+    - master
+    - tags
+
+# Manages:
+#  - meltano/meltano/base:edge
+meltano_base_edge:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
+    IMAGE_TAG: edge
+  only:
+    - master
+
+# Manages:
+#  - meltano/meltano/base:<tag>
+#  - meltano/meltano/base:latest
+meltano_base:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/base/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/base
+    IMAGE_TAG: $CI_COMMIT_TAG
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME:latest
+  only:
+    variables:
+      - $CI_COMMIT_TAG
+
+# Manages:
+#  - meltano/meltano/cli:<sha>
+meltano_cli_dev:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/cli/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
+  except:
+    - master
+    - tags
+
+# Manages:
+#  - meltano/meltano/cli:edge
+meltano_cli_edge:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/cli/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
+    IMAGE_TAG: edge
+  only:
+    - master
+
+# Manages:
+#  - meltano/meltano/cli:<tag>
+#  - meltano/meltano/cli:latest
+meltano_cli:
+  <<: *docker_build
+  stage: build_base
+  variables:
+    DOCKERFILE: docker/cli/Dockerfile
+    IMAGE_NAME: $CI_REGISTRY_IMAGE/cli
+    IMAGE_TAG: $CI_COMMIT_TAG
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME:latest
+  only:
+    variables:
+      - $CI_COMMIT_TAG
+
+#############
+# Build     #
+#############
+
+# Manages:
+#  - meltano/meltano:<sha>
+meltano_dev:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/prod/Dockerfile
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$CI_COMMIT_SHA"
+  except:
+    - master
+    - tags
+
+# Manages:
+#  - meltano/meltano:<sha>
+#  - meltano/meltano:edge
+meltano_edge:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/prod/Dockerfile
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:edge"
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:edge
+    - docker push $DOCKER_IMAGE_NAME:edge
+  only:
+    - master
+  except:
+    variables:
+      - $CI_COMMIT_TAG
+
+# Manages:
+#  - meltano/meltano:<tag>
+#  - meltano/meltano:latest
+meltano:
+  <<: *docker_build
+  variables:
+    DOCKERFILE: docker/prod/Dockerfile
+    IMAGE_TAG: $CI_COMMIT_TAG
+    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base"
+  script:
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME:latest
+  only:
+    variables:
+      - $CI_COMMIT_TAG
 
 # Manages:
 #   - meltano/meltano/runner:<sha>
 runner_dev:
-  <<: *kaniko_build
+  <<: *docker_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
@@ -24,18 +165,20 @@ runner_dev:
   except:
     - master
     - tags
-
+  
 # Manages:
 #   - meltano/meltano/runner:<sha>
 #   - meltano/meltano/runner:edge
 runner_edge:
-  <<: *kaniko_build
+  <<: *docker_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli:edge"
   script:
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG --destination $DOCKER_IMAGE_NAME:edge $EXTRA_ARGS
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:edge
+    - docker push $DOCKER_IMAGE_NAME:edge
   only:
     refs:
       - master
@@ -44,14 +187,16 @@ runner_edge:
 #   - meltano/meltano/runner:<tag>
 #   - meltano/meltano/runner:latest
 runner:
-  <<: *kaniko_build
+  <<: *docker_build
   variables:
     DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
     IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
     IMAGE_TAG: latest
     EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/cli"
   script:
-    - /kaniko/executor --single-snapshot --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE --destination $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG --destination $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG $EXTRA_ARGS
+    - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG
+    - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG
   only:
     variables:
       - $CI_COMMIT_TAG

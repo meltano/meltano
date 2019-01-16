@@ -1,5 +1,6 @@
 */__pycache__
 *.log
+logs/
 *.pyc
 *.DS_Store
 *.idea
@@ -108,7 +109,6 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-model/database.settings.ma
 src/meltano/api/templates/analyze.html
 src/meltano/api/static/css/app.*
 src/meltano/api/static/js/app.*
@@ -146,5 +146,5 @@ src/analyze/dist/
 
 meltano.log.*
 
-/model/*.mac
-/model/database.settings.ma
+/model/*.m5oc
+/model/database.settings.m5o

@@ -4,7 +4,7 @@ from typing import Dict
 from pathlib import Path
 
 
-class ExploreMissingError(Exception):
+class DesignMissingError(Exception):
     pass
 
 
@@ -12,23 +12,23 @@ class ConnectionNotFoundError(Exception):
     pass
 
 
-class MACFile:
+class M5ocFile:
     def __init__(self, content: Dict):
         self.content = content
 
     @classmethod
     def load(cls, file):
-        return MACFile(json.load(file))
+        return M5ocFile(json.load(file))
 
     @property
-    def explores(self):
-        return self.content["explores"]
+    def designs(self):
+        return self.content["designs"]
 
-    def explore(self, explore_name: str) -> Dict:
+    def design(self, design_name: str) -> Dict:
         try:
-            return next(e for e in self.explores if e["name"] == explore_name)
+            return next(e for e in self.designs if e["name"] == design_name)
         except StopIteration:
-            raise ExploreMissingError(f"{explore_name} not found.")
+            raise DesignMissingError(f"{design_name} not found.")
 
     def connection(self, connection_name: str) -> Dict:
         try:

@@ -1,7 +1,7 @@
 {
   sql_table_name = gitlab.entry
   name = entry
-  dimensions {
+  columns {
     id {
       label = ID
       primary_key = yes
@@ -16,7 +16,7 @@
       sql = "{{table}}.id"
     }
   }
-  dimension_groups {
+  column_groups {
     from {
       label = From
       description = Selected from range in carbon data

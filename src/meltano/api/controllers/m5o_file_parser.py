@@ -13,12 +13,12 @@ class MeltanoAnalysisFileParserError(Exception):
         )
 
 
-class MeltanoAnalysisFileParserMissingViewError(MeltanoAnalysisFileParserError):
+class MeltanoAnalysisFileParserMissingTableError(MeltanoAnalysisFileParserError):
     def __init__(self, field, your_choice, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
-        self.message = f'Missing accompanying view "{your_choice}" in "{field}" field in {cls} in {file_name}.'
-        super(MeltanoAnalysisFileParserMissingViewError, self).__init__(
+        self.message = f'Missing accompanying table "{your_choice}" in "{field}" field in {cls} in {file_name}.'
+        super(MeltanoAnalysisFileParserMissingTableError, self).__init__(
             self.message, self.file_name, *args
         )
 
@@ -57,10 +57,10 @@ class MeltanoAnalysisFileParser:
     def __init__(self, directory):
         self.directory = directory
         self.models = []
-        self.required_model_properties = ["name", "connection", "label", "explores"]
-        self.required_explore_properties = ["from", "label", "description"]
+        self.required_model_properties = ["name", "connection", "label", "designs"]
+        self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
-        self.required_view_properties = ["sql_table_name", "dimensions"]
+        self.required_table_properties = ["sql_table_name", "columns"]
         self.join_relationship_types = [
             "one_to_one",
             "one_to_many",
@@ -81,7 +81,7 @@ class MeltanoAnalysisFileParser:
                 continue
         return properties_copy
 
-    def parse_ma_file(self, file_path):
+    def parse_m5o_file(self, file_path):
         try:
             return ConfigFactory.parse_string(open(file_path, "r").read())
         except Exception as e:
@@ -90,28 +90,26 @@ class MeltanoAnalysisFileParser:
     def compile(self, models):
         indices = {}
         for model in models:
-            compiled_file_name = f"{model['name']}.model.mac"
+            compiled_file_name = f"{model['name']}.model.m5oc"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
-            indices[model["name"]] = {
-                "explores": [e["name"] for e in model["explores"]]
-            }
+            indices[model["name"]] = {"designs": [e["name"] for e in model["designs"]]}
             compiled_model.write(json.dumps(model))
             compiled_model.close()
 
         # index file
-        index_file_path = Path(self.directory).joinpath("models.index.mac")
+        index_file_path = Path(self.directory).joinpath("models.index.m5oc")
         index_file = open(index_file_path, "w")
         index_file.write(json.dumps(indices))
         index_file.close()
 
     def parse(self):
-        self.ma_views = Path(self.directory).glob("*.view.ma")
-        self.ma_models = Path(self.directory).glob("*.model.ma")
-        self.ma_dashboards = Path(self.directory).glob("*.dashboards.ma")
-        for model in self.ma_models:
+        self.m5o_tables = list(Path(self.directory).glob("*.table.m5o"))
+        self.m5o_models = list(Path(self.directory).glob("*.model.m5o"))
+        self.m5o_dashboards = list(Path(self.directory).glob("*.dashboards.m5o"))
+        for model in self.m5o_models:
             file_name = model.parts[-1]
-            conf = self.parse_ma_file(model)
+            conf = self.parse_m5o_file(model)
             parsed_model = self.model(conf, file_name)
             self.models.append(parsed_model)
         return self.models
@@ -127,58 +125,58 @@ class MeltanoAnalysisFileParser:
             )
         for prop_name, prop_def in ma_file_model_dict.items():
             temp_model[prop_name] = prop_def
-            if prop_name == "explores":
-                temp_model[prop_name] = self.explores(prop_def, file_name)
+            if prop_name == "designs":
+                temp_model[prop_name] = self.designs(prop_def, file_name)
         return temp_model
 
-    def view_conf_by_name(self, view_name, cls, prop, file_name):
+    def table_conf_by_name(self, table_name, cls, prop, file_name):
         try:
             return next(
-                view
-                for view in self.ma_views
-                if view.parts[-1] == f"{view_name}.view.ma"
+                table
+                for table in self.m5o_tables
+                if table.parts[-1] == f"{table_name}.table.m5o"
             )
         except StopIteration as e:
-            raise MeltanoAnalysisFileParserMissingViewError(
-                prop, view_name, cls, file_name
+            raise MeltanoAnalysisFileParserMissingTableError(
+                prop, table_name, cls, file_name
             )
 
-    def explores(self, ma_file_explores_dict, file_name):
-        model_explores = []
-        for explore_name, explore_def in ma_file_explores_dict.items():
-            temp_explore = {}
-            temp_explore["name"] = explore_name
+    def designs(self, ma_file_designs_dict, file_name):
+        model_designs = []
+        for design_name, design_def in ma_file_designs_dict.items():
+            temp_design = {}
+            temp_design["name"] = design_name
             missing_properties = self.missing_properties(
-                self.required_explore_properties, explore_def
+                self.required_design_properties, design_def
             )
             if missing_properties:
                 raise MeltanoAnalysisFileParserMissingFieldsError(
-                    missing_properties, "explore", file_name
+                    missing_properties, "design", file_name
                 )
-            for prop_name, prop_def in explore_def.items():
-                temp_explore[prop_name] = prop_def
+            for prop_name, prop_def in design_def.items():
+                temp_design[prop_name] = prop_def
                 if prop_name == "from":
-                    matching_view = self.view_conf_by_name(
-                        temp_explore[prop_name], "explore", prop_name, file_name
+                    matching_table = self.table_conf_by_name(
+                        temp_design[prop_name], "design", prop_name, file_name
                     )
-                    temp_explore["related_view"] = self.view(
-                        self.parse_ma_file(matching_view), matching_view.parts[-1]
+                    temp_design["related_table"] = self.table(
+                        self.parse_m5o_file(matching_table), matching_table.parts[-1]
                     )
                 if prop_name == "joins":
-                    temp_explore[prop_name] = self.joins(prop_def, file_name)
-            model_explores.append(temp_explore)
-        return model_explores
+                    temp_design[prop_name] = self.joins(prop_def, file_name)
+            model_designs.append(temp_design)
+        return model_designs
 
     def joins(self, ma_file_joins_dict, file_name):
-        explore_joins = []
+        design_joins = []
         for join_name, join_def in ma_file_joins_dict.items():
             temp_join = {}
             temp_join["name"] = join_name
-            matching_view = self.view_conf_by_name(
+            matching_table = self.table_conf_by_name(
                 temp_join["name"], "join", "name", file_name
             )
-            temp_join["related_view"] = self.view(
-                self.parse_ma_file(matching_view), matching_view.parts[-1]
+            temp_join["related_table"] = self.table(
+                self.parse_m5o_file(matching_table), matching_table.parts[-1]
             )
             missing_properties = self.missing_properties(
                 self.required_join_properties, join_def
@@ -202,40 +200,40 @@ class MeltanoAnalysisFileParser:
                             file_name,
                         )
 
-            explore_joins.append(temp_join)
-        return explore_joins
+            design_joins.append(temp_join)
+        return design_joins
 
-    def view(self, view_file, file_name):
-        temp_view = {}
+    def table(self, table_file, file_name):
+        temp_table = {}
         missing_properties = self.missing_properties(
-            self.required_view_properties, view_file
+            self.required_table_properties, table_file
         )
         if missing_properties:
             raise MeltanoAnalysisFileParserMissingFieldsError(
-                missing_properties, "view", file_name
+                missing_properties, "table", file_name
             )
-        for prop_name, prop_def in view_file.items():
-            temp_view[prop_name] = prop_def
-            if prop_name == "dimensions":
-                temp_view[prop_name] = self.dimensions(prop_def)
-            elif prop_name == "measures":
-                temp_view[prop_name] = self.measures(prop_def)
-        return temp_view
+        for prop_name, prop_def in table_file.items():
+            temp_table[prop_name] = prop_def
+            if prop_name == "columns":
+                temp_table[prop_name] = self.columns(prop_def)
+            elif prop_name == "aggregates":
+                temp_table[prop_name] = self.aggregates(prop_def)
+        return temp_table
 
-    def dimensions(self, ma_file_dimensions_dict):
-        temp_dimensions = []
-        for dimension_name, dimension_def in ma_file_dimensions_dict.items():
-            temp_dimension = {"name": dimension_name}
-            for prop_name, prop_def in dimension_def.items():
-                temp_dimension[prop_name] = prop_def
-            temp_dimensions.append(temp_dimension)
-        return temp_dimensions
+    def columns(self, ma_file_columns_dict):
+        temp_columns = []
+        for column_name, column_def in ma_file_columns_dict.items():
+            temp_column = {"name": column_name}
+            for prop_name, prop_def in column_def.items():
+                temp_column[prop_name] = prop_def
+            temp_columns.append(temp_column)
+        return temp_columns
 
-    def measures(self, ma_file_measures_dict):
-        temp_measures = []
-        for measure_name, measure_def in ma_file_measures_dict.items():
-            temp_measure = {"name": measure_name}
-            for prop_name, prop_def in measure_def.items():
-                temp_measure[prop_name] = prop_def
-            temp_measures.append(temp_measure)
-        return temp_measures
+    def aggregates(self, ma_file_aggregates_dict):
+        temp_aggregates = []
+        for aggregate_name, aggregate_def in ma_file_aggregates_dict.items():
+            temp_aggregate = {"name": aggregate_name}
+            for prop_name, prop_def in aggregate_def.items():
+                temp_aggregate[prop_name] = prop_def
+            temp_aggregates.append(temp_aggregate)
+        return temp_aggregates

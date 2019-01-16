@@ -41,7 +41,7 @@
 
     <section class="hiring">
       <h2 class="hiring__title">We're Hiring!</h2>
-      <p class="hiring__text">Want to be help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
+      <p class="hiring__text">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
     </section>
 
     <div
