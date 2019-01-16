@@ -39,12 +39,12 @@
         joins {
           entry {
             label = Entry
-            sql_on = "region.id = entry.region_id"
+            sql_on = "gitlab.region.id = gitlab.entry.region_id"
             relationship = many_to_one
           }
           generationmix {
             label = Generation Mix
-            sql_on = "entry.id = generationmix.entry_id"
+            sql_on = "gitlab.entry.id = gitlab.generationmix.entry_id"
             relationship = many_to_one
           }
         }
@@ -54,7 +54,7 @@
 "model/entry.table.m5o": |
   {
     version = 1
-    sql_table_name = entry
+    sql_table_name = gitlab.entry
     columns {
       id {
         label = ID
@@ -97,7 +97,7 @@
 "model/region.table.m5o": |
   {
     version = 1
-    sql_table_name = region
+    sql_table_name = gitlab.region
     columns {
       id {
         primary_key = true
@@ -130,7 +130,7 @@
 "model/generationmix.view.ma": |
   {
     version = 1
-    sql_table_name = generationmix
+    sql_table_name = gitlab.generationmix
     name = generationmix
     dimensions {
       id {
