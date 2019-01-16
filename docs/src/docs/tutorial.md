@@ -53,7 +53,7 @@ Now we are ready to analyze the data. We have provided some sample .m5o (Meltano
 
 ## Using Meltano on Your New Project
 
-First, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
+First, go to the Meltano UI [http://localhost:5000](http://localhost:5000)
 
 ::: warning Note
 Follow the [installation](/docs/#installation) steps if Meltano UI is not running
