@@ -4,28 +4,6 @@
 
     <Content :custom="false"/>
 
-    <div class="page-edit">
-      <div
-        class="edit-link"
-        v-if="editLink"
-      >
-        <a
-          :href="editLink"
-          target="_blank"
-          rel="noopener noreferrer"
-        >{{ editLinkText }}</a>
-        <OutboundLink/>
-      </div>
-
-      <div
-        class="last-updated"
-        v-if="lastUpdated"
-      >
-        <span class="prefix">{{ lastUpdatedText }}: </span>
-        <span class="time">{{ lastUpdated }}</span>
-      </div>
-    </div>
-
     <div class="page-nav" v-if="prev || next">
       <p class="inner">
         <span
@@ -55,6 +33,30 @@
           →
         </span>
       </p>
+    </div>
+
+    <div class="page-edit">
+      <div class="page-edit__inner">
+        <div
+          class="edit-link"
+          v-if="editLink"
+        >
+          <a
+            :href="editLink"
+            target="_blank"
+            rel="noopener noreferrer"
+          >{{ editLinkText }}</a>
+          <OutboundLink/>
+        </div>
+
+        <div
+          class="last-updated"
+          v-if="lastUpdated"
+        >
+          <span class="prefix">{{ lastUpdatedText }}: </span>
+          <span class="time">{{ lastUpdated }}</span>
+        </div>
+      </div>
     </div>
 
     <slot name="bottom"/>
@@ -203,8 +205,7 @@ function find (page, items, offset) {
 
 .page-edit
   @extend $wrapper
-  padding-top 1rem
-  padding-bottom 1rem
+  padding-top 0
   overflow auto
   .edit-link
     display inline-block
@@ -221,21 +222,31 @@ function find (page, items, offset) {
       font-weight 400
       color #aaa
 
+.page-edit__inner {
+  border-top: 1px solid $borderColor;
+  padding-top: 1.5rem;
+}
+
 .page-nav
   @extend $wrapper
   padding-top 1rem
   padding-bottom 0
   .inner
+    border-top 1px solid $borderColor
     min-height 2rem
     margin-top 0
-    border-top 1px solid $borderColor
     padding-top 1rem
     overflow auto // clear float
   .next
     float right
+    line-height 2
+  .prev
+    line-height 2
 
 @media (max-width: $MQMobile)
   .page-edit
+    margin 0 2rem
+    border 1px solid blue
     .edit-link
       margin-bottom .5rem
     .last-updated
