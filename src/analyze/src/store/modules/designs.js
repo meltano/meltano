@@ -61,7 +61,7 @@ const getters = {
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
-  
+
   getKeyFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -69,7 +69,7 @@ const getters = {
     }
     return thisDistinct.keys[0];
   },
-  
+
   getSelectionsFromDistinct: () => (field) => {
     const thisDistinct = state.distincts[field];
     if (!thisDistinct) {
@@ -131,8 +131,8 @@ const actions = {
       });
   },
 
-  expandRow({ commit }) {
-    commit('toggleCollapsed', state.design.related_table);
+  expandRow({ commit }, row) {
+    commit('toggleCollapsed', row);
   },
 
   expandJoinRow({ commit }, join) {
@@ -228,13 +228,14 @@ const actions = {
         newJoin.columns = namesOfSelected(table.columns) || [];
         newJoin.aggregates = namesOfSelected(table.aggregates) || [];
 
-        if (table.timeframes)
+        if (table.timeframes) {
           newJoin.timeframes = table.timeframes
-              .filter(selected)
-              .map(({ name, periods }) => ({
-                name,
-                periods: periods.filter(selected),
-              }));
+            .filter(selected)
+            .map(({ name, periods }) => ({
+              name,
+              periods: periods.filter(selected),
+            }));
+        }
 
         return newJoin;
       })
@@ -246,7 +247,7 @@ const actions = {
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
     const timeframes = baseTable
-      .timeframes || [] 
+      .timeframes || []
       .map(tf => ({
         name: tf.name,
         periods: tf.periods.filter(selected),

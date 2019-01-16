@@ -385,7 +385,7 @@ export default {
     },
 
     tableRowClicked(relatedTable) {
-      this.$store.dispatch('designs/expandRow');
+      this.$store.dispatch('designs/expandRow', relatedTable);
     },
 
     joinRowClicked(join) {
