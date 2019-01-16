@@ -112,7 +112,7 @@
               <template v-for="period in timeframe.periods">
                 <a class="panel-block indented"
                     :key="period.label"
-                    @click="timeframePeriodSelected(timeframe, period)"
+                    @click="timeframePeriodSelected(period)"
                     v-if="timeframe.selected"
                     :class="{'is-active': period.selected}">
                   {{period.label}}
@@ -307,7 +307,6 @@ import ResultTable from './ResultTable';
 import SelectDropdown from '../SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
-import ensureObjPropIsReactive from '../utils/utils';
 
 export default {
   name: 'Design',
@@ -386,12 +385,10 @@ export default {
     },
 
     tableRowClicked(relatedTable) {
-      ensureObjPropIsReactive(this.$set, relatedTable, 'collapsed');
       this.$store.dispatch('designs/expandRow');
     },
 
     joinRowClicked(join) {
-      ensureObjPropIsReactive(this.$set, join, 'collapsed');
       this.$store.dispatch('designs/expandJoinRow', join);
     },
 
@@ -402,13 +399,10 @@ export default {
     },
 
     timeframeSelected(timeframe) {
-      ensureObjPropIsReactive(this.$set, timeframe, 'selected')
       this.$store.dispatch('designs/toggleTimeframe', timeframe);
     },
 
     timeframePeriodSelected(period) {
-      ensureObjPropIsReactive(this.$set, period, 'selected')
-
       this.$store.dispatch('designs/toggleTimeframePeriod', period);
       this.$store.dispatch('designs/getSQL', { run: false });
     },

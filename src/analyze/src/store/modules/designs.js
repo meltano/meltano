@@ -132,12 +132,12 @@ const actions = {
   },
 
   expandRow({ commit }) {
-    commit('toggleCollapsed');
+    commit('toggleCollapsed', state.design.related_table);
   },
 
   expandJoinRow({ commit }, join) {
     // already fetched columns
-    commit('toggleJoinOpen', join);
+    commit('toggleCollapsed', join);
     if (join.related_table.columns.length) return;
     designApi.getTable(join.related_table.name)
       .then((data) => {
@@ -162,19 +162,19 @@ const actions = {
   },
 
   toggleColumn({ commit }, column) {
-    commit('toggleColumnSelected', column);
+    commit('toggleSelected', column);
   },
 
   toggleTimeframe({ commit }, timeframe) {
-    commit('toggleTimeframeSelected', timeframe);
+    commit('toggleSelected', timeframe);
   },
 
   toggleTimeframePeriod({ commit }, timeframePeriod) {
-    commit('toggleTimeframePeriodSelected', timeframePeriod);
+    commit('toggleSelected', timeframePeriod);
   },
 
   toggleAggregate({ commit }, aggregate) {
-    commit('toggleAggregateSelected', aggregate);
+    commit('toggleSelected', aggregate);
   },
 
   limitSet({ commit }, limit) {
@@ -367,11 +367,6 @@ const mutations = {
     join.aggregates = aggregates;
   },
 
-  toggleJoinOpen(_, join) {
-    const thisJoin = join;
-    thisJoin.collapsed = !thisJoin.collapsed;
-  },
-
   setSelectedDistincts(_, { item, field }) {
     if (!state.distincts[field].selections) {
       Vue.set(state.distincts[field], 'selections', []);
@@ -424,23 +419,12 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleColumnSelected(_, column) {
-    const selectedColumn = column;
-    selectedColumn.selected = !column.selected;
+  toggleSelected(_, selectable) {
+    Vue.set(selectable, 'selected', !selectable.selected);
   },
 
-  toggleTimeframeSelected(_, timeframe) {
-    timeframe.selected = !timeframe.selected;
-  },
-
-  toggleTimeframePeriodSelected(_, period) {
-    debugger;
-    period.selected = !period.selected;
-  },
-
-  toggleAggregateSelected(_, aggregate) {
-    const selectedAggregate = aggregate;
-    selectedAggregate.selected = !aggregate.selected;
+  toggleCollapsed(_, collapsable) {
+    Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
   selectedColumns(_, columns) {
@@ -451,10 +435,6 @@ const mutations = {
 
   setDesign(_, designData) {
     state.design = designData;
-  },
-
-  toggleCollapsed() {
-    state.design.related_table.collapsed = !state.design.related_table.collapsed;
   },
 
   setCurrentTab(_, tab) {
