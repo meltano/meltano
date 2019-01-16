@@ -8,7 +8,7 @@ An `Aggregate` relates to a calculable column, via `count`, `sum` or other (i.e.
 
 ## Collection
 
-A `Collection` is a group of one or many `Designs` and determines how they will be mapped together.
+A `Collection` is a group of one or many `Designs` that determines how they will be mapped together.
 
 A `Collection` can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
 
