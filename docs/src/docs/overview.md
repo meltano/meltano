@@ -30,6 +30,7 @@ To empower you and your team in this life cycle, Meltano manifests as two tools:
 1. web app (GUI)
 
 These two tools enable you and your team to use Meltano in a few different ways:
+
 1. Meltano as **Project** (CLI + GUI)
     - From data extraction to analysis and visualization with orchestration for automating the process
 1. Meltano as **Framework** (CLI)
@@ -39,12 +40,18 @@ These two tools enable you and your team to use Meltano in a few different ways:
 1. Meltano as **Analyze** only (GUI)
     - Interactively query, explore, visualize, and model the data (warehouse)
 
-It leverages open source software and software development best practices including version control, CI, CD, and review apps for [data ops](https://en.wikipedia.org/wiki/DataOps), data engineering, analytics, business intelligence and data science.
+In addition, Meltano allows you to utilize the following tools for various steps of the data life cycle:
+
+- **Collections**, Extract, Load, Transform: Meltano CLI
+- **Designs**: Superset or Plotly
+- **Notebook**: Jupyter
+- **Orchestrate**: Airflow
 
 **Notes**
 
 - _Most implementations of SFDC, and to a lesser degree Zuora, require custom fields. You will likely need to edit the transformations to map to your custom fields._
 - _The sample Zuora python scripts have been written to support GitLab's Zuora implementation. This includes a workaround to handle some subscriptions that should have been created as a single subscription._
+- _In addition, please note that Transform also has a viewer._
 
 ## Meltano CLI
 
