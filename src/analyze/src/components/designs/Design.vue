@@ -36,12 +36,14 @@
                   Columns
                 </a>
                 <template v-for="timeframe in join.related_table.timeframes">
-                  <a class="panel-block timeframe"
-                      :key="timeframe.label"
+                  <a class="button is-radiusless panel-block timeframe"
                       v-if="!timeframe.hidden"
-                      @click="timeframeSelected(timeframe)"
-                      :class="{'is-active': timeframe.selected}">
+                      @click="!isConnectionDialectSqlite(connectionDialect) || timeframeSelected(timeframe)"
+                      :key="timeframe.label"
+                      :class="{'is-active': timeframe.selected}"
+                      :disabled='!isConnectionDialectSqlite(connectionDialect)'>
                     {{timeframe.label}}
+                    <small v-if='!isConnectionDialectSqlite(connectionDialect)'>SQLite</small>
                   </a>
                   <template v-if="timeframe.selected">
                     <template v-for="period in timeframe.periods">
