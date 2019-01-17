@@ -30,6 +30,7 @@ DCRN=${DCR} --no-deps
 
 MELTANO_ANALYZE = src/analyze
 MELTANO_API = src/meltano/api
+MELTANO_CORE_BUNDLE = src/meltano/core/bundle
 
 .PHONY: build test init_db clean docker_images release
 
@@ -120,7 +121,17 @@ requirements.txt: setup.py
 build_templates:
 	cd src/analyze && yarn && yarn build
 
-bundle: build_templates
+MODELS := $(wildcard model/*.m5o)
+MODELS := $(filter-out *.m5oc, $(MODELS)) # remove compiled files
+MODELS_TARGETS := $(patsubst %, ${MELTANO_CORE_BUNDLE}/%, $(MODELS))
+
+${MELTANO_CORE_BUNDLE}/model/%:
+	mkdir -p $(@D)
+	cp model/$* $@
+
+models: $(MODELS_TARGETS)
+
+bundle: build_templates models
 	mkdir -p src/meltano/api/templates && \
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
