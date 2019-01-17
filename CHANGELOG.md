@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * add support for timeframes in tables
 
 ### Changes
+* sample designs are now packaged with meltano
 
 ### Fixes
 
