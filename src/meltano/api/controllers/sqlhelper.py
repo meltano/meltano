@@ -4,7 +4,6 @@ import re
 import sqlalchemy
 from flask import jsonify
 from pypika import Query, Order
-
 from .analysishelper import AnalysisHelper
 from .date import Date
 
@@ -35,8 +34,6 @@ class SqlHelper:
         incoming_joins = incoming_json["joins"]
         incoming_limit = incoming_json.get("limit", 50)
         incoming_order = incoming_json["order"]
-
-        print(incoming_json)
 
         db_table = AnalysisHelper.db_table(base_table, alias=design["name"])
         timeframes_raw = [
