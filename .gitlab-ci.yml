@@ -39,6 +39,7 @@ test:
   services:
     - postgres:latest
   before_script:
+    - make bundle
     - pip install '.[dev]'
   script:
     - pytest -v
