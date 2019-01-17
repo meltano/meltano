@@ -112,7 +112,7 @@ def get_sql(model_name, design_name):
     results = engine.execute(outgoing_sql)
 
     results = [OrderedDict(row) for row in results]
-    base_dict = {"sql": outgoing_sql, "results": results, "error": False}
+    base_dict = {"sql": outgoing_sql, "results": results, "error": False, "connection_dialect": engine.dialect.name}
     if not len(results):
         base_dict["empty"] = True
     else:

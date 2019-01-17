@@ -345,6 +345,7 @@ export default {
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
+      'connectionDialect',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
@@ -361,6 +362,9 @@ export default {
       'hasJoins',
       'showJoinColumnAggregateHeader',
       'formattedSql',
+    ]),
+    ...mapGetters('settings', [
+      'isConnectionDialectSqlite',
     ]),
 
     limit: {

@@ -29,6 +29,7 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
+  connectionDialect: null,
 };
 
 const getters = {
@@ -279,6 +280,7 @@ const actions = {
         if (run) {
           commit('setQueryResults', data.data);
           commit('setSQLResults', data.data);
+          commit('setConnectionDialect', data.data);
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', data.data);
@@ -395,6 +397,10 @@ const mutations = {
 
   setSQLResults(_, results) {
     state.currentSQL = results.sql;
+  },
+
+  setConnectionDialect(_, results) {
+    state.connectionDialect = results.connection_dialect;
   },
 
   setQueryResults(_, results) {
