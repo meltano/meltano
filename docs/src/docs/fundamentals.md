@@ -12,7 +12,7 @@ A `Collection` is a group of one or many `Designs` that determines how they will
 
 A `Collection` can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
 
-### Column
+## Column
 
 A `Column` relates directly to a column in a table of a database. Some limitations of this are that it will be limited to column only and no custom SQL.
 
