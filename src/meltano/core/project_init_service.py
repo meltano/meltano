@@ -25,23 +25,23 @@ class Executor:
 
 
 @singledispatch
-def visit(node, executor): 
+def visit(node, executor):
     pass
 
 
 @visit.register(dict)
 def _(node: Dict, target_path: Path = None):
     created = []
-    
+
     logging.debug(f"{target_path}")
     for name, definition in node.items():
         directory = target_path.joinpath(os.path.dirname(name))
-        
+
         # always create the base directory
         os.makedirs(directory, exist_ok=True)
 
         # recurse for the nested definition
-        created += visit(definition, target_path.joinpath(name)) 
+        created += visit(definition, target_path.joinpath(name))
 
     return created
 
@@ -86,9 +86,7 @@ class ProjectInitService:
         self.project_echo("", True)
 
         for path in visit(default_project_yaml, Path(self.project_name)):
-            self.project_echo(filename=path,
-                              star=path.is_file(),
-                              check=path.is_dir())
+            self.project_echo(filename=path, star=path.is_file(), check=path.is_dir())
 
         return new_project
 
