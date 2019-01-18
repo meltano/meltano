@@ -29,5 +29,5 @@ def project(test_dir):
     project = service.init()
 
     # cd into the new project root
-    project.chdir()
+    project.activate()
     return project

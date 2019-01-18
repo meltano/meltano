@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
 from functools import wraps
+from dotenv import load_dotenv
 
 from .plugin import Plugin
 from .error import Error
@@ -23,31 +24,40 @@ class Project:
 
     _meltano = {}
 
-    def __init__(self, root: Union[Path, str]):
-        self.root = Path(root)
+    def __init__(self, root: Union[Path, str] = None):
+        self.root = Path(root or os.getcwd()).resolve()
 
-    def chdir(self):
+    def activate(self):
+        load_dotenv(dotenv_path=self.root.joinpath(".env"))
         os.chdir(self.root)
-        self.root = Path(".")
+        logging.debug(f"Activated project at {self.root}")
 
     @classmethod
-    def find(self, from_dir: Union[Path, str] = ".", chdir=True):
+    def find(self, from_dir: Union[Path, str] = None, activate=True):
         """
-        Recursively search for a `meltano.yml` file. Once found,
-        return a `Project` correct dir.
+        Recursively search for a `meltano.yml` file.
         """
+        # pushd
         cwd = os.getcwd()
 
-        while not Project(".").meltanofile.exists():
-            if os.getcwd() == "/":
-                raise ProjectNotFound()
+        try:
+            if from_dir:
+                os.chdir(from_dir)
 
-            os.chdir("..")
+            project = Project()
+            while not project.meltanofile.exists():
+                if os.getcwd() == "/":
+                    raise ProjectNotFound()
 
-        if not chdir:
-            os.chdir(cwd)
+                os.chdir("..")
+                project = Project()
+        finally:
+            os.chdir(cwd)  # popd
 
-        return Project(os.getcwd())
+        if activate:
+            project.activate()
+
+        return project
 
     @property
     def meltano(self) -> Dict:
@@ -112,3 +122,6 @@ class Project:
     @makedirs
     def plugin_dir(self, plugin: Plugin, *joinpaths):
         return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
+
+    def __eq__(self, other):
+        return self.root == other.root

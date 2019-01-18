@@ -26,9 +26,6 @@ Since Docker is running in this tab, let's open a new tab (and navigate to your 
 # Change directory to you new carbon project
 cd carbon 
 
-# Source the environment variables. You won't see any output if it's working.
-source .env
-
 # let's see what extractors and loaders are available
 meltano discover all
 
