@@ -149,7 +149,7 @@ ui_%:
 	${DCRN} ui yarn run $(@:ui_%=%)
 
 ${MELTANO_ANALYZE}/node_modules: ${MELTANO_ANALYZE}/yarn.lock
-	${DCRN} ui yarn
+	cd ${MELTANO_ANALYZE} && yarn install --frozen-lockfile
 
 APP_DEPS = ${MELTANO_ANALYZE}/node_modules
 APP_DEPS += ${MELTANO_ANALYZE}/build ${MELTANO_ANALYZE}/config ${MELTANO_ANALYZE}/.babelrc
@@ -191,12 +191,22 @@ docs/serve: docs/build
 .PHONY: lint show_lint
 
 BLACK_RUN = black src/ tests/ --exclude src/analyze
+ESLINT_RUN = cd ${MELTANO_ANALYZE} && yarn run lint
 
-lint:
+lint_black:
 	${BLACK_RUN}
 
-show_lint:
+lint_eslint: ${MELTANO_ANALYZE}/node_modules
+	${ESLINT_RUN} --fix
+
+show_lint_black:
 	${BLACK_RUN} --check --diff
+
+show_lint_eslint: ${MELTANO_ANALYZE}/node_modules
+	${ESLINT_RUN}
+
+lint: lint_black lint_eslint
+show_lint: show_lint_black show_lint_eslint
 
 # Makefile Related Tasks
 # ======================

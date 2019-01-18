@@ -36,9 +36,7 @@ npm run dev
 
 ## Code style
 
-Meltano uses [Black](https://github.com/ambv/black) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
-
-You can also have black run automatically using a `git` hook. See https://github.com/ambv/black#version-control-integration for more details.
+Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.org/docs/rules/) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
 
 ## Merge Requests
 
