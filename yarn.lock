@@ -863,6 +863,11 @@
   dependencies:
     lodash.throttle "^4.1.1"
 
+"@vuepress/plugin-google-analytics@^1.0.0-alpha.0":
+  version "1.0.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/@vuepress/plugin-google-analytics/-/plugin-google-analytics-1.0.0-alpha.0.tgz#97acb3a512dca9b2b6e4014fa2d58da38e2a01b9"
+  integrity sha512-WNUIayJFBmTb06bjvFeJd5TlT4qoYcCLN15zkEGeAGH8tCH2BtrwMkSG3BiiWSh3xRUy7kDHhsuclSZcRY08EQ==
+
 "@vuepress/plugin-last-updated@^1.0.0-alpha.30":
   version "1.0.0-alpha.30"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-last-updated/-/plugin-last-updated-1.0.0-alpha.30.tgz#d7b237128c9d00ceb38e8038e9d0b240b332991b"
