@@ -1,6 +1,7 @@
 import os
 import yaml
 from typing import Dict, List
+from requests import get
 
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
@@ -17,16 +18,29 @@ class PluginDiscoveryInvalidError(Exception):
 
 
 class PluginDiscoveryService:
-    def __init__(self):
-        self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.yml")
-        self.load()
+    def __init__(self, project):
+        self.project = project
+        self._discovery = None
+    
+    @property
+    def discovery(self):
+        local_discovery = self.project.root.joinpath("discovery.yml")
 
-    def load(self):
-        with open(self.discovery_file) as f:
-            try:
-                self.discovery_data = yaml.load(f)
-            except Exception as e:
-                raise PluginDiscoveryInvalidError()
+        if self._discovery:
+            return self._discovery
+
+        try:
+            if local_discovery.is_file():
+                with local_discovery.open() as local:
+                    self._discovery = yaml.load(local)
+            else:
+                response = get('https://www.meltano.com/discovery.yml')
+                response.raise_for_status()
+                self._discovery = yaml.load(response.text)
+            
+            return self._discovery
+        except Exception as e:
+                raise PluginDiscoveryInvalidError() from e
 
     def plugins(self) -> List[Plugin]:
         """Parse the discovery file and returns it as `Plugin` instances."""
@@ -34,7 +48,7 @@ class PluginDiscoveryService:
         # corresponding `plugin_class` for all the plugins.
         return (
             self.plugin_generator(plugin_type, plugin_def)
-            for plugin_type, plugin_defs in self.discovery_data.items()
+            for plugin_type, plugin_defs in self.discovery.items()
             for plugin_def in plugin_defs
         )
 
