@@ -130,6 +130,10 @@ const actions = {
         commit('setDesign', data.data);
         commit('selectedColumns', data.data.related_table.columns);
       });
+    designApi.getDialect(model)
+      .then((data) => {
+        commit('setConnectionDialect', data.data);
+      });
   },
 
   expandRow({ commit }, row) {
@@ -280,7 +284,6 @@ const actions = {
         if (run) {
           commit('setQueryResults', data.data);
           commit('setSQLResults', data.data);
-          commit('setConnectionDialect', data.data);
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', data.data);

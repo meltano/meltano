@@ -87,6 +87,17 @@ def index():
     return jsonify({"result": True})
 
 
+@sqlBP.route("/get/<model_name>/dialect", methods=["GET"])
+def get_dialect(model_name):
+    m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+    with m5oc_file.open() as f:
+        m5oc = M5ocFile.load(f)
+
+    connection_name = m5oc.connection("connection")
+    engine = get_db_engine(connection_name)
+
+    return jsonify({"connection_dialect": engine.dialect.name})
+
 @sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
 def get_sql(model_name, design_name):
     m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
@@ -112,7 +123,7 @@ def get_sql(model_name, design_name):
     results = engine.execute(outgoing_sql)
 
     results = [OrderedDict(row) for row in results]
-    base_dict = {"sql": outgoing_sql, "results": results, "error": False, "connection_dialect": engine.dialect.name}
+    base_dict = {"sql": outgoing_sql, "results": results, "error": False}
     if not len(results):
         base_dict["empty"] = True
     else:
