@@ -13,7 +13,6 @@ def test_init(project):
     dirs = (
         project.root.joinpath(dir)
         for dir in (
-            ".meltano",
             "model",
             "extract",
             "load",
