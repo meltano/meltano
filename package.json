@@ -25,6 +25,7 @@
   },
   "homepage": "https://gitlab.com/meltano/meltano#readme",
   "devDependencies": {
+    "@vuepress/plugin-google-analytics": "^1.0.0-alpha.0",
     "vuepress": "^1.0.0-alpha.30"
   }
 }

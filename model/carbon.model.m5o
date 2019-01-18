@@ -1,6 +1,6 @@
 {
   version = 1
-  name = gitlab.carbon
+  name = carbon
   connection = runners_db
   label = carbon intensity
   designs {
