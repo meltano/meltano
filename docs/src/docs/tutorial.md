@@ -70,11 +70,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 
 Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
 - Click Model button (upper-left)
-<<<<<<< HEAD
     - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
-=======
-  - Everytime you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator.
->>>>>>> 2afc73de20b194acf776950c43981c0a9a1b6874
 
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)
