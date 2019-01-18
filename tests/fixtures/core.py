@@ -1,7 +1,9 @@
 import pytest
+from unittest import mock
 
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.config_service import ConfigService
 
 
@@ -14,8 +16,22 @@ def project_init_service():
 
 
 @pytest.fixture
+def plugin_discovery_service(project):
+    # let's mock the discovery.yml
+    with mock.patch.object(PluginDiscoveryService, "discovery", new_callable=mock.PropertyMock) as discovery:
+        discovery.return_value={}
+
+        p = PluginDiscoveryService(project)
+        import pdb; pdb.set_trace()
+        return p
+
+
+@pytest.fixture
 def project_add_service(project):
-    return ProjectAddService(project)
+    plugin_discovery = plugin_discovery_service(project)
+    import pdb; pdb.set_trace()
+    return ProjectAddService(project,
+                             plugin_discovery_service=plugin_discovery)
 
 
 @pytest.fixture

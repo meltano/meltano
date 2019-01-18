@@ -8,7 +8,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
-    PluginDiscoveryInvalidError,
+    DiscoveryInvalidError,
 )
 
 
@@ -32,6 +32,6 @@ def discover(plugin_type):
         for key, value in discovery_dict.items():
             click.secho(key, fg="green")
             click.echo(value)
-    except PluginDiscoveryInvalidError:
-        click.secho(PluginDiscoveryInvalidError.invalid_message, fg="red")
-        raise click.Abort()
+    except Exception as e:
+        click.secho("Cannot list available plugins.", fg="red")
+        raise click.ClickException(str(e))

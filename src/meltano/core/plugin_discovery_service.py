@@ -1,7 +1,7 @@
 import os
 import yaml
+import requests
 from typing import Dict, List
-from requests import get
 
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
@@ -12,9 +12,17 @@ class PluginNotFoundError(Exception):
     pass
 
 
-class PluginDiscoveryInvalidError(Exception):
-    invalid_message = "Invalid discovery file."
+class DiscoveryInvalidError(Exception):
+    """Occurs when the discovery.yml fails to be parsed."""
     pass
+
+
+class DiscoveryUnavailableError(Exception):
+    """Occurs when the discovery.yml cannot be found or downloaded."""
+    pass
+
+
+MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService:
@@ -24,23 +32,25 @@ class PluginDiscoveryService:
     
     @property
     def discovery(self):
-        local_discovery = self.project.root.joinpath("discovery.yml")
-
         if self._discovery:
             return self._discovery
 
         try:
+            local_discovery = self.project.root.joinpath("discovery.yml")
+
             if local_discovery.is_file():
                 with local_discovery.open() as local:
-                    self._discovery = yaml.load(local)
+                    self._discovery = yaml.load(local) or {}
             else:
-                response = get('https://www.meltano.com/discovery.yml')
+                response = requests.get(MELTANO_DISCOVERY_URL)
                 response.raise_for_status()
                 self._discovery = yaml.load(response.text)
             
             return self._discovery
-        except Exception as e:
-                raise PluginDiscoveryInvalidError() from e
+        except yaml.YAMLError as e:
+            raise DiscoveryInvalidError("discovery.yml is corrupted.") from e
+        except requests.exceptions.HTTPError as e:
+            raise DiscoveryUnavailableError(f"{MELTANO_DISCOVERY_URL} returned status {e.response.status_code}") from e
 
     def plugins(self) -> List[Plugin]:
         """Parse the discovery file and returns it as `Plugin` instances."""
