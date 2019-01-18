@@ -30,14 +30,11 @@ meltano discover all
 meltano add extractor tap-carbon-intensity
 
 # Since we have a postgres running, we can add a loader for a Postgres database
-meltano add loader target-postgres
-
-# Also add the default dbt transforms for tap-carbon-intensity
-meltano add transform tap-carbon-intensity
+meltano add loader target-sqlite
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt tap-carbon-intensity target-postgres --transform run
+meltano elt tap-carbon-intensity target-sqlite
 
 # Start up the Meltano Analyze web application!
 meltano ui
