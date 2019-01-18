@@ -1,4 +1,5 @@
 import pytest
+import os
 
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
@@ -27,6 +28,9 @@ def config_service(project):
 def project(test_dir):
     service = ProjectInitService(PROJECT_NAME)
     project = service.init()
+
+    # this is a test repo, let's remove the `.env`
+    os.unlink(project.root.joinpath(".env"))
 
     # cd into the new project root
     project.activate()
