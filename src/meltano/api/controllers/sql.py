@@ -98,6 +98,7 @@ def get_dialect(model_name):
 
     return jsonify({"connection_dialect": engine.dialect.name})
 
+
 @sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
 def get_sql(model_name, design_name):
     m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
