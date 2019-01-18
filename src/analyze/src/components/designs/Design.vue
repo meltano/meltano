@@ -36,14 +36,18 @@
                   Columns
                 </a>
                 <template v-for="timeframe in join.related_table.timeframes">
-                  <a class="button is-radiusless panel-block timeframe"
+                  <a class="panel-block timeframe"
                       v-if="!timeframe.hidden"
-                      @click="!isConnectionDialectSqlite(connectionDialect) || timeframeSelected(timeframe)"
+                      @click="isConnectionDialectSqlite(connectionDialect) || timeframeSelected(timeframe)"
                       :key="timeframe.label"
-                      :class="{'is-active': timeframe.selected}"
-                      :disabled='!isConnectionDialectSqlite(connectionDialect)'>
+                      :class="{
+                        'is-active': timeframe.selected,
+                        'is-sqlite-unsupported': isConnectionDialectSqlite(connectionDialect)
+                      }">
                     {{timeframe.label}}
-                    <small v-if='!isConnectionDialectSqlite(connectionDialect)'>SQLite</small>
+                    <div class='sqlite-unsupported-container' v-if='isConnectionDialectSqlite(connectionDialect)'>
+                      <small>Unsupported in SQLite</small>
+                    </div>
                   </a>
                   <template v-if="timeframe.selected">
                     <template v-for="period in timeframe.periods">
@@ -485,6 +489,27 @@ code {
     font-weight: bold;
     &:hover {
       background: white;
+    }
+  }
+
+  &.is-sqlite-unsupported {
+    opacity: .5;
+    cursor: not-allowed;
+    .sqlite-unsupported-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      flex-grow: 1;
+
+      small {
+        font-size: 60%;
+        font-style: italic;
+      }
+    }
+    &.timeframe {
+      &::after {
+        display: none;
+      }
     }
   }
 
