@@ -29,6 +29,9 @@ lint:
 
 test:
   stage: test
+  image:
+    name: registry.gitlab.com/meltano/meltano/base
+    entrypoint: [""]
   variables:
     POSTGRES_USER: runner
     POSTGRES_DB: pytest
