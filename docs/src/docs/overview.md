@@ -67,6 +67,115 @@ Helper functions to manage the data warehouse. At the moment, these are PGSQL sp
 
 Create and grant usage for a database schema.
 
+## Meltano Model
+
+Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano Analyze.
+
+### Model Setup
+There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano Analyze:
+1. Author `my-database-setup.model.m5o` file(s)
+    - Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano Analyze GUI
+1. Author `my-table.table.m5o` file(s)
+    - Define a database table for connecting to using Meltano's CLI and/or Analyze GUI
+
+### Model Authoring (`.m5o` files)
+The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are examples with comments to aid the authoring of your `...model.m5o` and `...table.m5o` files mentioned above.
+
+#### Example `carbon.model.m5o` file
+
+```
+# Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano Analyze GUI
+{
+  # Define version metadata
+  version = 1
+  # Define the name of the database used to denote automatically generated .m5oc for use by Meltano
+  name = carbon
+  # Define the database connection
+  connection = runners_db
+  # Define GUI label
+  label = carbon intensity
+  # Define base tables and their respective join relationships
+  designs {
+    # Define the base table(s) of interest (further defined in each my-table.table.m5o file) that will be GUI joinable and subsequently used for generating SQL queries
+    region {
+      # Define GUI label
+      label = Region
+      # Define from table name
+      from = region
+      # Define GUI description
+      description = Region Carbon Intensity Data
+      # Define joinable table(s) of this base table
+      joins {
+        # Define name of join table
+        entry {
+          # Define GUI label
+          label = Entry
+          # Define table columns of interest that will be GUI selectable and subsequently used for generating SQL queries
+          fields = [entry.from, entry.to]
+          # Define the SQL join condition
+          sql_on = "{{ region.id }} = {{ entry.region_id }}"
+          # Define join relationship
+          relationship = one_to_one
+        }
+      }
+    }
+  }
+}
+```
+
+#### Example `entry.table.m5o` file
+
+```
+# Define a database table for connecting to using Meltano's CLI and/or Analyze GUI
+{
+  # Define the schema.table-name pattern used for connecting to a specific table in a database
+  sql_table_name = gitlab.entry
+  # Define the table name
+  name = entry
+  # Define the column(s) of interest that will be GUI selectable and subsequently used for generating SQL queries
+  columns {
+    # Define column name
+    id {
+      # Define GUI label
+      label = ID
+      # Define the primary key (only one per colums definition)
+      primary_key = yes
+      # Define GUI visibility
+      hidden = yes
+      # Define data type so ELT process properly updates the data warehouse
+      type = string
+      # Define the SQL that selects this column
+      sql = "{{table}}.id"
+    }
+  }
+  # Define time-based column(s) of interest that will be GUI selectable and subsequently used for generating SQL queries
+  column_groups {
+    from {
+      label = From
+      description = Selected from range in carbon data
+      type = time
+      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
+      convert_tz = no
+      sql = "{{TABLE}}.from"
+    }
+    to {
+      label = To
+      description = Selected to range in carbon data
+      type = time
+      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
+      convert_tz = no
+      sql = "{{TABLE}}.to"
+    }
+  }
+}
+```
+
+With these files the Meltano CLI (or in conjunction with the Meltano Analyze GUI) can properly extract, load, and transform your data for analysis using Meltano Analyze.
+
+## Meltano Analyze
+
+Meltano Analyze is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
+
 ## Meltano Transform
 
 ### dbt
