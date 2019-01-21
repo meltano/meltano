@@ -24,6 +24,12 @@ class TestFullInstall:
         result = cli_runner.invoke(cli, cli_args)
         assert result.exit_code == 0
 
-        cli_args = ["elt", "tap-carbon-intensity", "target-postgres", "--transform", "run"]
+        cli_args = [
+            "elt",
+            "tap-carbon-intensity",
+            "target-postgres",
+            "--transform",
+            "run",
+        ]
         result = cli_runner.invoke(cli, cli_args)
         assert result.exit_code == 0
