@@ -12,7 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
 * add disabled UI for the lack of timeframes support in sqlite
+<<<<<<< HEAD
 * update Results vs. SQL UI focus based on a results response or query update respectively
+=======
+>>>>>>> a9d47dd0c3b8472e47caa8cd0d5577a3f379a383
 
 ### Changes
 
