@@ -3,6 +3,7 @@ import json
 import logging
 from unittest import mock
 from pathlib import Path
+from copy import deepcopy
 
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
@@ -251,7 +252,7 @@ def select_all_executor():
 class TestSingerTap:
     @pytest.fixture
     def subject(self, project_add_service):
-        return project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
+        return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
     def config_files(self, subject, dir: Path):
         return {key: dir.join(file) for key, file in subject.config_files.items()}
@@ -455,7 +456,7 @@ class TestListExecutor:
 class TestSingerTarget:
     @pytest.fixture
     def subject(self, project_add_service):
-        return project_add_service.add(PluginType.LOADERS, "target-csv")
+        return project_add_service.add(PluginType.LOADERS, "target-mock")
 
     def test_exec_args(self, subject):
         base_files = subject.config_files

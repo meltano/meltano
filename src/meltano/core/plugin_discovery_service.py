@@ -1,7 +1,7 @@
 import os
 import yaml
 import requests
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
@@ -26,10 +26,10 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService:
-    def __init__(self, project):
+    def __init__(self, project, discovery: Optional[Dict] = None):
         self.project = project
-        self._discovery = None
-    
+        self._discovery = discovery
+
     @property
     def discovery(self):
         if self._discovery:
@@ -45,7 +45,7 @@ class PluginDiscoveryService:
                 response = requests.get(MELTANO_DISCOVERY_URL)
                 response.raise_for_status()
                 self._discovery = yaml.load(response.text)
-            
+
             return self._discovery
         except yaml.YAMLError as e:
             raise DiscoveryInvalidError("discovery.yml is corrupted.") from e

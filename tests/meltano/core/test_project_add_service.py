@@ -9,19 +9,23 @@ from meltano.core.plugin import PluginType
 
 
 class TestProjectAddService:
-    def test_default_init_should_not_fail(self, project):
-        add_service = ProjectAddService(project)
-        assert add_service
+    @pytest.fixture
+    def subject(self, project_add_service):
+        return project_add_service
 
-    def test_missing_plugin_exception(self, project):
-        add_service = ProjectAddService(project)
+    def test_missing_plugin_exception(self, subject):
         try:
-            add_service.add(PluginType.EXTRACTORS, "tap-missing")
+            subject.add(PluginType.EXTRACTORS, "tap-missing")
         except Exception as e:
             assert type(e) is PluginNotFoundError
 
-    def test_add_extractor(self, project):
-        add_service = ProjectAddService(project)
-        added = add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
-
-        assert added.canonical() in project.meltano[PluginType.EXTRACTORS]
+    @pytest.mark.parametrize(("plugin_type", "plugin_name"),
+                             [
+                               (PluginType.EXTRACTORS, "tap-mock"),
+                               (PluginType.LOADERS, "target-mock"),
+                               (PluginType.TRANSFORMERS, "transformer-mock"),
+                               (PluginType.TRANSFORMS, "tap-mock-transform"),
+                             ])
+    def test_add(self, plugin_type, plugin_name, subject, project):
+        added = subject.add(plugin_type, plugin_name)
+        assert added.canonical() in project.meltano[plugin_type]
