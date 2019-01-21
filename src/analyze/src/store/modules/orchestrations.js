@@ -40,15 +40,15 @@ const getters = {
 const actions = {
   getAll({ commit }) {
     orchestrationsApi.index()
-      .then((data) => {
-        commit('setAll', data.data);
+      .then((response) => {
+        commit('setAll', response.data);
       });
   },
 
   getConnectionNames({ commit }) {
     orchestrationsApi.connectionNames()
-      .then((data) => {
-        commit('setConnectionNames', data.data);
+      .then((response) => {
+        commit('setConnectionNames', response.data);
       });
   },
 
@@ -74,24 +74,24 @@ const actions = {
   runExtractor() {
     state.log = 'Running...';
     orchestrationsApi.extract(state.currentExtractor)
-      .then((data) => {
-        state.log = `Output saved to \n${data.data.output_file_paths.join(',\n')}`;
+      .then((response) => {
+        state.log = `Output saved to \n${response.data.output_file_paths.join(',\n')}`;
       });
   },
 
   runLoader() {
     state.log = 'Running...';
     orchestrationsApi.load(state.currentExtractor, state.currentLoader)
-      .then((data) => {
-        state.log = `CSV's Loaded \n${data.data.inserted_files.join(',\n')}`;
+      .then((response) => {
+        state.log = `CSV's Loaded \n${response.data.inserted_files.join(',\n')}`;
       });
   },
 
   runTransform() {
     state.log = 'Running...';
     orchestrationsApi.transform(state.currentExtractor, state.currentConnectionName)
-      .then((data) => {
-        state.log = `${data.data.command}\n${data.data.output}`;
+      .then((response) => {
+        state.log = `${response.data.command}\n${response.data.output}`;
       });
   },
 
@@ -103,8 +103,8 @@ const actions = {
     };
     state.log = 'Running...';
     orchestrationsApi.run(payload)
-      .then((data) => {
-        state.log = data.data.append;
+      .then((response) => {
+        state.log = response.data.append;
       });
   },
 };

@@ -9,13 +9,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
+* add disabled UI for the lack of timeframes support in sqlite
 
 ### Changes
 * Meltano will now discover components based on `https://meltano.com/discovery.yml`
 
 ### Fixes
+* Updated mobile menu to work as expected
 * Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
 
 ### Breaks
