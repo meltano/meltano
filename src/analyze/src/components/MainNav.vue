@@ -81,7 +81,7 @@ export default {
     Logo,
   },
   watch: {
-    $route(to, from) { // eslint-disable-line no-unused-vars
+    $route() {
       if (this.isMobileMenuOpen) { this.closeMobileMenu(); }
     },
   },
