@@ -38,14 +38,17 @@
                 <template v-for="timeframe in join.related_table.timeframes">
                   <a class="panel-block timeframe"
                       v-if="!timeframe.hidden"
-                      @click="isConnectionDialectSqlite(connectionDialect) || timeframeSelected(timeframe)"
+                      @click="isConnectionDialectSqlite(connectionDialect)
+                        || timeframeSelected(timeframe)"
                       :key="timeframe.label"
                       :class="{
                         'is-active': timeframe.selected,
                         'is-sqlite-unsupported': isConnectionDialectSqlite(connectionDialect)
                       }">
                     {{timeframe.label}}
-                    <div class='sqlite-unsupported-container' v-if='isConnectionDialectSqlite(connectionDialect)'>
+                    <div class='sqlite-unsupported-container'
+                      v-if='isConnectionDialectSqlite(connectionDialect)'
+                    >
                       <small>Unsupported by SQLite</small>
                     </div>
                   </a>
