@@ -58,7 +58,7 @@ module.exports = {
 				'/docs/about'
 			]
 		},
-		logo:'/meltano-logo.svg',
+		logo: '/meltano-logo.svg',
 		repo: 'https://gitlab.com/meltano/meltano',
 		repoLabel: 'Repo',
 		lastUpdated: 'Last Updated',
@@ -66,5 +66,13 @@ module.exports = {
 		docsRepo: 'https://gitlab.com/meltano/meltano',
 		editLinks: true,
 		editLinkText: 'Help us improve this page!'
-	}
+	},
+	plugins: [
+		[
+			'@vuepress/google-analytics',
+			{
+				ga: 'UA-132758957-1'
+			}
+		]
+	]
 }

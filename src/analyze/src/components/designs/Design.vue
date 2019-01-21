@@ -37,11 +37,17 @@
                 </a>
                 <template v-for="timeframe in join.related_table.timeframes">
                   <a class="panel-block timeframe"
-                      :key="timeframe.label"
                       v-if="!timeframe.hidden"
-                      @click="timeframeSelected(timeframe)"
-                      :class="{'is-active': timeframe.selected}">
+                      @click="isConnectionDialectSqlite(connectionDialect) || timeframeSelected(timeframe)"
+                      :key="timeframe.label"
+                      :class="{
+                        'is-active': timeframe.selected,
+                        'is-sqlite-unsupported': isConnectionDialectSqlite(connectionDialect)
+                      }">
                     {{timeframe.label}}
+                    <div class='sqlite-unsupported-container' v-if='isConnectionDialectSqlite(connectionDialect)'>
+                      <small>Unsupported by SQLite</small>
+                    </div>
                   </a>
                   <template v-if="timeframe.selected">
                     <template v-for="period in timeframe.periods">
@@ -345,6 +351,7 @@ export default {
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
+      'connectionDialect',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
@@ -361,6 +368,9 @@ export default {
       'hasJoins',
       'showJoinColumnAggregateHeader',
       'formattedSql',
+    ]),
+    ...mapGetters('settings', [
+      'isConnectionDialectSqlite',
     ]),
 
     limit: {
@@ -479,6 +489,27 @@ code {
     font-weight: bold;
     &:hover {
       background: white;
+    }
+  }
+
+  &.is-sqlite-unsupported {
+    opacity: .5;
+    cursor: not-allowed;
+    .sqlite-unsupported-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      flex-grow: 1;
+
+      small {
+        font-size: 60%;
+        font-style: italic;
+      }
+    }
+    &.timeframe {
+      &::after {
+        display: none;
+      }
     }
   }
 

@@ -15,36 +15,23 @@ meltano init carbon
 # Change directory into your new carbon project
 cd carbon
 
-# Start Docker container, which will start a postgres database 
+# Start Docker container, which will start a postgres database
 # to act as our data warehouse.
-docker-compose up
-```
-
-Since Docker is running in this tab, let's open a new tab (and navigate to your project) for the rest of tutorial.
-
-```bash
-# Change directory to you new carbon project
-cd carbon 
-
-# Source the environment variables. You won't see any output if it's working.
-source .env
+docker-compose up -d
 
 # let's see what extractors and loaders are available
 meltano discover all
 
-# It looks like a tap for carbon intensity data is available, 
+# It looks like a tap for carbon intensity data is available,
 # let's add that as a dependency. See https://api.carbonintensity.org.uk/
 meltano add extractor tap-carbon-intensity
 
 # Since we have a postgres running, we can add a loader for a Postgres database
-meltano add loader target-postgres
-
-# Also add the default dbt transforms for tap-carbon-intensity
-meltano add transform tap-carbon-intensity
+meltano add loader target-sqlite
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt tap-carbon-intensity target-postgres --transform run
+meltano elt tap-carbon-intensity target-sqlite
 
 # Start up the Meltano Analyze web application!
 meltano ui
@@ -52,11 +39,11 @@ meltano ui
 
 Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
 
-Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API. 
+Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API.
 
 ## Using Meltano on Your New Project
 
-First, go to the Meltano UI [http://localhost:8080](http://localhost:8080)
+First, go to the Meltano UI [http://localhost:5000](http://localhost:5000)
 
 ::: warning Note
 Follow the [installation](/docs/#installation) steps if Meltano UI is not running
@@ -67,7 +54,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 - Enter connection settings
   - Name = `runners_db`
   - Dialect = `PostgresSQL`
-  - Host = `warehouse_db`
+  - Host = `localhost`
   - Port = `5502`
   - Database = `warehouse`
   - Schema = `gitlab`
@@ -75,9 +62,9 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
   - Password = `warehouse`
 - Click "Save Connection"
 
-Then, we'll populate our data warehouse:
+Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
 - Click Model button (upper-left)
-  - Everytime you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator.
+    - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
 
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)

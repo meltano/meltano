@@ -155,6 +155,10 @@ docker_sdist: base_image
 ui:
 	cd src/analyze && yarn && yarn build
 
+${MELTANO_ANALYZE}/node_modules: ${MELTANO_ANALYZE}/yarn.lock
+	cd ${MELTANO_ANALYZE} && yarn install --frozen-lockfile
+
+
 # Docs Related Tasks
 # ==================
 #
@@ -186,12 +190,22 @@ docs/serve: docs/build
 .PHONY: lint show_lint
 
 BLACK_RUN = black src/ tests/ --exclude src/analyze
+ESLINT_RUN = cd ${MELTANO_ANALYZE} && yarn run lint
 
-lint:
+lint_black:
 	${BLACK_RUN}
 
-show_lint:
+lint_eslint: ${MELTANO_ANALYZE}/node_modules
+	${ESLINT_RUN} --fix
+
+show_lint_black:
 	${BLACK_RUN} --check --diff
+
+show_lint_eslint: ${MELTANO_ANALYZE}/node_modules
+	${ESLINT_RUN}
+
+lint: lint_black lint_eslint
+show_lint: show_lint_black show_lint_eslint
 
 # Makefile Related Tasks
 # ======================

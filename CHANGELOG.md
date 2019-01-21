@@ -9,13 +9,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
+* add disabled UI for the lack of timeframes support in sqlite
 
 ### Changes
 * sample designs are now packaged with meltano
 
 ### Fixes
+* Updated mobile menu to work as expected
+* Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
 
 ### Breaks
 
@@ -36,6 +40,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * Edit links on the bottom of doc pages are working now
+
+### Breaks
 * Updated docs tutorial bullet regarding inaccurate "Validate" button
 
 
