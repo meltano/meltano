@@ -22,6 +22,9 @@ cache:
 
 lint:
   stage: lint
+  image:
+    name: registry.gitlab.com/meltano/meltano/base
+    entrypoint: [""]
   before_script:
     - pip install black
   script:
