@@ -80,18 +80,18 @@ export default {
   components: {
     Logo,
   },
-  watch:{
-    $route (to, from){
-      if(this.isMobileMenuOpen) { this.closeMobileMenu(); }
-    }
+  watch: {
+    $route(to, from) { // eslint-disable-line no-unused-vars
+      if (this.isMobileMenuOpen) { this.closeMobileMenu(); }
+    },
   },
   created() {
     this.$store.dispatch('repos/getModels');
   },
-  data: function() {
+  data() {
     return {
-      isMobileMenuOpen: false
-    }
+      isMobileMenuOpen: false,
+    };
   },
   filters: {
     printable(value) {
@@ -113,7 +113,7 @@ export default {
   methods: {
     menuSelected() {
       this.$store.dispatch('repos/navbarHideDropdown');
-      if(this.isMobileMenuOpen) { this.closeMobileMenu(); }
+      if (this.isMobileMenuOpen) { this.closeMobileMenu(); }
     },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
