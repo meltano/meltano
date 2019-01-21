@@ -1,0 +1,99 @@
+extractors:
+  - name: tap-gitlab
+    pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
+    config:
+      api_key: "$GITLAB_API_TOKEN"
+  - name: tap-zendesk
+    pip_url: "tap-zendesk"
+    config:
+      email: "$ZENDESK_EMAIL"
+      api_token: "$ZENDESK_API_TOKEN"
+      subdomain: "$ZENDESK_SUBDOMAIN"
+      start_date: "$ZENDESK_START_DATE"
+  - name: tap-zuora
+    pip_url: "tap-zuora"
+    config:
+      username: $ZUORA_USERNAME
+      password: $ZUORA_PASSWORD
+      api_type: $ZUORA_API_TYPE
+      partner_id: $ZUORA_PARTNER_ID
+      api_token: $ZUORA_API_TOKEN
+      start_date: $ZUORA_START_DATE
+  - name: tap-marketo
+    pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
+    config:
+      endpoint: $MARKETO_ENDPOINT
+      identity: $MARKETO_IDENTITY
+      client_id: $MARKETO_CLIENT_ID
+      client_secret: $MARKETO_CLIENT_SECRET
+      start_time: $MARKETO_START_TIME
+  - name: tap-salesforce
+    pip_url: "git+https://github.com/meltano/tap-salesforce.git@add-password-auth"
+    config:
+      api_type: BULK
+      client_id: $SFDC_CLIENT_ID
+      username: $SFDC_USERNAME
+      password: $SFDC_PASSWORD
+      security_token: $SFDC_SECURITY_TOKEN
+      select_fields_by_default: true
+      start_date: $SFDC_START_DATE
+  - name: tap-mongodb
+    pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
+    config:
+      host: $MONGODB_HOST
+      port: $MONGODB_PORT
+      user: $MONGODB_USERNAME
+      password: $MONGODB_PASSWORD
+      dbname: $MONGODB_DBNAME
+  - name: tap-stripe
+    pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
+    config:
+      client_secret: $STRIPE_API_KEY
+      start_date: $STRIPE_START_DATE
+      account_id:
+  - name: tap-fastly
+    pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
+    config:
+      api_token: $FASTLY_API_TOKEN
+      start_date: $FASTLY_START_DATE
+  - name: tap-carbon-intensity
+    pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
+loaders:
+  - name: target-csv
+    pip_url: "git+https://gitlab.com/meltano/target-csv.git"
+    config:
+      delimiter": "\t"
+      quotechar": "'"
+  - name: target-snowflake
+    pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
+    config:
+      account: "$SF_ACCOUNT"
+      username: "$SF_USER"
+      password: "$SF_PASSWORD"
+      role: "$SF_ROLE"
+      database: "$SF_DATABASE"
+      schema: "$SF_SCHEMA"
+      warehouse: "$SF_WAREHOUSE"
+  - name: target-postgres
+    pip_url: "git+https://github.com/meltano/target-postgres.git"
+    config:
+      host: "$PG_ADDRESS"
+      user: "$PG_USERNAME"
+      port: "$PG_PORT"
+      password: "$PG_PASSWORD"
+      dbname: "$PG_DATABASE"
+      schema: "$PG_SCHEMA"
+  - name: target-sqlite
+    pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
+    config:
+      database: "meltano"
+transformers:
+  - name: dbt
+    pip_url: dbt
+transforms:
+  - name: tap-carbon-intensity
+    pip_url: "https://gitlab.com/meltano/dbt-tap-carbon-intensity.git"
+    vars:
+      entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
+      generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
+      region_table: "{{ env_var('PG_SCHEMA') }}.region"
