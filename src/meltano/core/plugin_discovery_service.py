@@ -2,6 +2,7 @@ import os
 import yaml
 from typing import Dict, List
 
+import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
 from .plugin.dbt import DbtPlugin, DbtTransformPlugin
@@ -18,7 +19,7 @@ class PluginDiscoveryInvalidError(Exception):
 
 class PluginDiscoveryService:
     def __init__(self):
-        self.discovery_file = os.path.join(os.path.dirname(__file__), "discovery.yml")
+        self.discovery_file = bundle.find("discovery.yml")
         self.load()
 
     def load(self):

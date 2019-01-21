@@ -1,10 +1,10 @@
-FROM python:latest
+FROM python:3.6
 
 COPY . /meltano
+WORKDIR /meltano
 
-RUN pip install -r /meltano/requirements.txt && \
-    pip install /meltano[cli]
-
-WORKDIR /meltano_project
+RUN make bundle_models
+RUN pip install -r requirements.txt && \
+    pip install .
 
 ENTRYPOINT ["meltano"]

@@ -1,0 +1,65 @@
+requirements.txt: ""
+meltano.yml: ""
+README.md: ""
+.env: |
+  export PG_PASSWORD=warehouse
+  export PG_USERNAME=warehouse
+  export PG_ADDRESS=localhost
+  export PG_SCHEMA=gitlab
+  export PG_PORT=5502
+  export PG_DATABASE=warehouse
+.gitignore: |
+  /venv
+  /.meltano
+  .env
+docker-compose.yml: |
+  version: '3.1'
+  services:
+    warehouse_db:
+      image: postgres
+      environment:
+        POSTGRES_DB: warehouse
+        POSTGRES_PASSWORD: warehouse
+        POSTGRES_USER: warehouse
+      ports:
+      - '5502:5432'
+model: "bundle://model"
+extract/.gitkeep: ""
+load/.gitkeep: ""
+transform/:
+  dbt_project.yml: |
+    name: 'my_meltano_project'
+    version: '1.0'
+    profile: 'meltano'
+    source-paths: ["models"]
+    analysis-paths: ["analysis"]
+    test-paths: ["tests"]
+    data-paths: ["data"]
+    macro-paths: ["macros"]
+    target-path: "../.meltano/transformers/dbt/target"  # directory which will store compiled SQL files
+    clean-targets:                                      # directories to be removed by `dbt clean`
+        - "../.meltano/transformers/dbt/target"
+        - "dbt_modules"
+    models:
+        my_meltano_project:
+        enabled: true
+  profile/profiles.yml: |
+    config:
+      send_anonymous_usage_stats: False
+      use_colors: True
+    meltano:
+      target: postgres
+      outputs:
+        postgres:
+          type: postgres
+          threads: 2
+          host: "{{ env_var('PG_ADDRESS') }}"
+          port: "{{ env_var('PG_PORT') }}"
+          user: "{{ env_var('PG_USERNAME') }}"
+          pass: "{{ env_var('PG_PASSWORD') }}"
+          dbname: "{{ env_var('PG_DATABASE') }}"
+          schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
+  models/my_meltano_project/.gitkeep: ""
+analyze/.gitkeep: ""
+notebook/.gitkeep: ""
+orchestrate/.gitkeep: ""

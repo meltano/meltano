@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * update Results vs. SQL UI focus based on a results response or query update respectively
 
 ### Changes
+* sample designs are now packaged with meltano
 
 ### Fixes
 * Updated mobile menu to work as expected

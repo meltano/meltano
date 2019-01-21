@@ -30,6 +30,7 @@ DCRN=${DCR} --no-deps
 
 MELTANO_ANALYZE = src/analyze
 MELTANO_API = src/meltano/api
+MELTANO_CORE_BUNDLE = src/meltano/core/bundle
 
 .PHONY: build test init_db clean docker_images release
 
@@ -108,22 +109,32 @@ api: prod_image ${MELTANO_API}/node_modules
 ${MELTANO_API}/node_modules:
 	${DCRN} -w /meltano/${MELTANO_API} api yarn
 
-# Pip Related
+# Packaging Related
 # ===========
 #
 # - `make requirements.txt` pins dependency versions. We use requirements.txt
 #   as a lockfile essentially.
 
 requirements.txt: setup.py
-	${PYTHON_RUN} bash -c 'pip install -e .[all] && pip freeze --exclude-editable > $@'
+	${PYTHON_RUN} bash -c 'pip install -e .[dev] && pip freeze --exclude-editable > $@'
 
-build_templates:
-	cd src/analyze && yarn && yarn build
+MODELS := $(wildcard model/*.m5o)
+MODELS := $(filter-out *.m5oc, $(MODELS)) # remove compiled files
+MODELS_TARGETS := $(patsubst %, ${MELTANO_CORE_BUNDLE}/%, $(MODELS))
 
-bundle: build_templates
+${MELTANO_CORE_BUNDLE}/model/%:
+	mkdir -p $(@D)
+	cp model/$* $@
+
+bundle_models: $(MODELS_TARGETS)
+
+bundle_ui: ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
+
+.PHONY: bundle
+bundle: bundle_ui bundle_models
 
 sdist: bundle
 	python setup.py sdist
@@ -138,27 +149,15 @@ docker_sdist: base_image
 #
 # - `make ui` assembles the necessary UI dependencies and builds the static UI
 #   artifacts to ui/dist
-# - `make ui_*` will run a task from the scripts section of ui/package.json.
-#   For instance `make ui_lint` will run the the UI's `yarn run lint`
 
-.PHONY: ui ui_%
+.PHONY: ui
 
-ui: ${MELTANO_ANALYZE}/dist
-
-ui_%:
-	${DCRN} ui yarn run $(@:ui_%=%)
+ui:
+	cd src/analyze && yarn && yarn build
 
 ${MELTANO_ANALYZE}/node_modules: ${MELTANO_ANALYZE}/yarn.lock
 	cd ${MELTANO_ANALYZE} && yarn install --frozen-lockfile
 
-APP_DEPS = ${MELTANO_ANALYZE}/node_modules
-APP_DEPS += ${MELTANO_ANALYZE}/build ${MELTANO_ANALYZE}/config ${MELTANO_ANALYZE}/.babelrc
-APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.js)
-APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.json)
-APP_DEPS += $(wildcard ${MELTANO_ANALYZE}/*.html)
-
-${MELTANO_ANALYZE}/dist: ${APP_DEPS}
-	${MAKE} ui_build
 
 # Docs Related Tasks
 # ==================
