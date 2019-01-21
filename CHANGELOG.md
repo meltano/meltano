@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * add support for timeframes in tables
 
 ### Changes
+* Meltano will now discover components based on `https://meltano.com/discovery.yml`
 
 ### Fixes
 * Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
