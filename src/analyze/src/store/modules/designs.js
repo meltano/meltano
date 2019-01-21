@@ -284,9 +284,11 @@ const actions = {
         if (run) {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
+          commit('setCurrentTab', 'results');
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', response.data);
+          commit('setCurrentTab', 'sql');
         }
       })
       .catch((e) => {
