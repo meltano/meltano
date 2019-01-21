@@ -19,9 +19,6 @@ cd carbon
 # to act as our data warehouse.
 docker-compose up -d
 
-# Source the environment variables. You won't see any output if it's working.
-source .env
-
 # let's see what extractors and loaders are available
 meltano discover all
 
