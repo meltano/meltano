@@ -14,11 +14,13 @@ class PluginNotFoundError(Exception):
 
 class DiscoveryInvalidError(Exception):
     """Occurs when the discovery.yml fails to be parsed."""
+
     pass
 
 
 class DiscoveryUnavailableError(Exception):
     """Occurs when the discovery.yml cannot be found or downloaded."""
+
     pass
 
 
@@ -50,7 +52,9 @@ class PluginDiscoveryService:
         except yaml.YAMLError as e:
             raise DiscoveryInvalidError("discovery.yml is corrupted.") from e
         except requests.exceptions.HTTPError as e:
-            raise DiscoveryUnavailableError(f"{MELTANO_DISCOVERY_URL} returned status {e.response.status_code}") from e
+            raise DiscoveryUnavailableError(
+                f"{MELTANO_DISCOVERY_URL} returned status {e.response.status_code}"
+            ) from e
 
     def plugins(self) -> List[Plugin]:
         """Parse the discovery file and returns it as `Plugin` instances."""

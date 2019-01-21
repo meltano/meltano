@@ -16,8 +16,12 @@ def discovery():
     return {
         str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
         str(PluginType.LOADERS): [{"name": "target-mock", "pip_url": "target-mock"}],
-        str(PluginType.TRANSFORMERS): [{"name": "transformer-mock", "pip_url": "transformer-mock"}],
-        str(PluginType.TRANSFORMS): [{"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}],
+        str(PluginType.TRANSFORMERS): [
+            {"name": "transformer-mock", "pip_url": "transformer-mock"}
+        ],
+        str(PluginType.TRANSFORMS): [
+            {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+        ],
     }
 
 
@@ -28,14 +32,14 @@ def project_init_service():
 
 @pytest.fixture
 def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(project,
-                                  discovery=discovery) # TODO: discovery factory
+    return PluginDiscoveryService(
+        project, discovery=discovery
+    )  # TODO: discovery factory
 
 
 @pytest.fixture
 def project_add_service(project, plugin_discovery_service):
-    return ProjectAddService(project,
-                             plugin_discovery_service=plugin_discovery_service)
+    return ProjectAddService(project, plugin_discovery_service=plugin_discovery_service)
 
 
 @pytest.fixture

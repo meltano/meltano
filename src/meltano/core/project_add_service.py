@@ -28,7 +28,9 @@ class ProjectAddService:
         config_service: ConfigService = None,
     ):
         self.project = project
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(project)
+        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            project
+        )
         self.config_service = config_service or ConfigService(project)
 
     def add(self, plugin_type: PluginType, plugin_name: str):
