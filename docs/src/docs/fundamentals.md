@@ -47,7 +47,7 @@ The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for 
 
 A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
 
-A `Report` can be identified by the file naming schema: `report-name.report.m5oc`.
+A `Report` can be identified by the file naming schema: `report-name.report.m5o` and should be stored in the `/reports` directory.
 
 ## Table
 
