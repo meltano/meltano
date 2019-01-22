@@ -6,12 +6,16 @@ export default {
     return axios.get(utils.buildUrl('repos/designs', `${model}/${design}`));
   },
 
-  getSql(model, design, data) {
-    return axios.post(utils.buildUrl('sql/get', `${model}/${design}`), data);
+  getTable(table) {
+    return axios.get(utils.buildUrl('repos/tables', `${table}`));
   },
 
-  saveReport(model, design, data) {
-    console.log('api SaveReport', model, design, data);
+  saveReport(data) {
+    return axios.post(utils.buildUrl('repos/reports', 'save'), data);
+  },
+
+  getSql(model, design, data) {
+    return axios.post(utils.buildUrl('sql/get', `${model}/${design}`), data);
   },
 
   getDialect(model) {
@@ -20,9 +24,5 @@ export default {
 
   getDistinct(model, design, field) {
     return axios.post(utils.buildUrl('sql/distinct', `${model}/${design}`), { field });
-  },
-
-  getTable(table) {
-    return axios.get(utils.buildUrl('repos/tables', `${table}`));
   },
 };

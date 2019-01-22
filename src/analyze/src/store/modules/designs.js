@@ -314,9 +314,17 @@ const actions = {
   saveReport({ commit }, { name }) {
     const postData = {
       name,
+      model: state.currentModel,
+      design: state.currentDesign,
       queryPayload: getters.getQueryPayloadFromUI(),
     };
-    designApi.saveReport(state.currentModel, state.currentDesign, postData);
+    designApi.saveReport(postData)
+      .then((response) => {
+        console.log('response', response);
+      })
+      .catch((e) => {
+        console.log('e', e);
+      });
   },
 
   resetErrorMessage({ commit }) {

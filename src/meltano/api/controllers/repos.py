@@ -8,7 +8,7 @@ from os.path import join
 
 import markdown
 import pkg_resources
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from .m5o_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
 
@@ -126,6 +126,15 @@ def designs():
     for design in designs:
         designs_json.append(design.serializable())
     return jsonify(designs_json)
+
+
+@reposBP.route("/reports/save", methods=["POST"])
+def save_report():
+    # reports_helper = ReportsHelper()
+    # post_data = request.get_json()
+    # response_data = reports_helper.save_report(post_data)
+    response_data = { "save_status": "Success!" }
+    return jsonify(response_data)
 
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])
