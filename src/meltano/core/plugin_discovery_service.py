@@ -51,7 +51,7 @@ class PluginDiscoveryService:
 
             return self._discovery
         except yaml.YAMLError as e:
-            raise DiscoveryInvalidError("discovery.yml is corrupted.") from e
+            raise DiscoveryInvalidError("discovery.yml is not well formed.") from e
         except requests.exceptions.HTTPError as e:
             raise DiscoveryUnavailableError(
                 f"{MELTANO_DISCOVERY_URL} returned status {e.response.status_code}"
