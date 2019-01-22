@@ -46,9 +46,8 @@
 
     <div
       class="footer"
-      v-if="data.footer"
     >
-      {{ data.footer }}
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/README.md" target="_blank">Edit this page</a>
     </div>
   </div>
 </template>
