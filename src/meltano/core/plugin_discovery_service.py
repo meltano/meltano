@@ -1,6 +1,7 @@
 import os
 import yaml
-from typing import Dict, List
+import requests
+from typing import Dict, List, Optional
 
 import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
@@ -12,22 +13,49 @@ class PluginNotFoundError(Exception):
     pass
 
 
-class PluginDiscoveryInvalidError(Exception):
-    invalid_message = "Invalid discovery file."
+class DiscoveryInvalidError(Exception):
+    """Occurs when the discovery.yml fails to be parsed."""
+
     pass
 
 
-class PluginDiscoveryService:
-    def __init__(self):
-        self.discovery_file = bundle.find("discovery.yml")
-        self.load()
+class DiscoveryUnavailableError(Exception):
+    """Occurs when the discovery.yml cannot be found or downloaded."""
 
-    def load(self):
-        with open(self.discovery_file) as f:
-            try:
-                self.discovery_data = yaml.load(f)
-            except Exception as e:
-                raise PluginDiscoveryInvalidError()
+    pass
+
+
+MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
+
+
+class PluginDiscoveryService:
+    def __init__(self, project, discovery: Optional[Dict] = None):
+        self.project = project
+        self._discovery = discovery
+
+    @property
+    def discovery(self):
+        if self._discovery:
+            return self._discovery
+
+        try:
+            local_discovery = self.project.root.joinpath("discovery.yml")
+
+            if local_discovery.is_file():
+                with local_discovery.open() as local:
+                    self._discovery = yaml.load(local) or {}
+            else:
+                response = requests.get(MELTANO_DISCOVERY_URL)
+                response.raise_for_status()
+                self._discovery = yaml.load(response.text)
+
+            return self._discovery
+        except yaml.YAMLError as e:
+            raise DiscoveryInvalidError("discovery.yml is not well formed.") from e
+        except requests.exceptions.HTTPError as e:
+            raise DiscoveryUnavailableError(
+                f"{MELTANO_DISCOVERY_URL} returned status {e.response.status_code}"
+            ) from e
 
     def plugins(self) -> List[Plugin]:
         """Parse the discovery file and returns it as `Plugin` instances."""
@@ -35,7 +63,7 @@ class PluginDiscoveryService:
         # corresponding `plugin_class` for all the plugins.
         return (
             self.plugin_generator(plugin_type, plugin_def)
-            for plugin_type, plugin_defs in self.discovery_data.items()
+            for plugin_type, plugin_defs in self.discovery.items()
             for plugin_def in plugin_defs
         )
 
