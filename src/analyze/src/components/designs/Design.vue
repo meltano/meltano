@@ -448,7 +448,7 @@ export default {
 
     saveReport() {
       // TODO implement report naming UI
-      this.$store.dispatch('designs/saveReport', { name: 'report-' + Date.now() });
+      this.$store.dispatch('designs/saveReport', { name: `report-${Date.now()}` });
     },
 
     setCurrentTab(tab) {
