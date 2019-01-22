@@ -309,20 +309,14 @@ const actions = {
       });
   },
 
-  saveReport({ commit }, { name }) {
+  saveReport(_, { name }) {
     const postData = {
       name,
       model: state.currentModel,
       design: state.currentDesign,
       queryPayload: helpers.getQueryPayloadFromUI(),
     };
-    designApi.saveReport(postData)
-      .then((response) => {
-        console.log('response', response);
-      })
-      .catch((e) => {
-        console.log('e', e);
-      });
+    designApi.saveReport(postData);
   },
 
   resetErrorMessage({ commit }) {
