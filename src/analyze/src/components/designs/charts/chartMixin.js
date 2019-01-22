@@ -63,7 +63,9 @@ const chartMixin = {
       this.updateChart();
     },
     updateChart() {
-      if (!this.results.length) return;
+      if (!this.results.length) {
+        return;
+      }
       this.chart.data.labels = [];
       this.chart.data.datasets = [];
       const resultsKeys = Object.keys(this.results[0]);

@@ -34,12 +34,16 @@ const state = {
 
 const getters = {
   hasResults() {
-    if (!state.results) return false;
+    if (!state.results) {
+      return false;
+    }
     return !!state.results.length;
   },
 
   numResults() {
-    if (!state.results) return 0;
+    if (!state.results) {
+      return 0;
+    }
     return state.results.length;
   },
 
@@ -84,7 +88,9 @@ const getters = {
   },
 
   getChartYAxis() {
-    if (!state.resultAggregates) return [];
+    if (!state.resultAggregates) {
+      return [];
+    }
     const aggregates = Object.keys(state.resultAggregates);
     return aggregates;
   },
@@ -143,7 +149,9 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched columns
     commit('toggleCollapsed', join);
-    if (join.related_table.columns.length) return;
+    if (join.related_table.columns.length) {
+      return;
+    }
     designApi.getTable(join.related_table.name)
       .then((response) => {
         commit('setJoinColumns', {
@@ -162,7 +170,9 @@ const actions = {
   },
 
   removeSort({ commit }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) return;
+    if (!state.sortColumn || state.sortColumn !== column.name) {
+      return;
+    }
     commit('setRemoveSort', column);
   },
 
