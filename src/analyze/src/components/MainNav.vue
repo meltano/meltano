@@ -4,15 +4,18 @@
       <a class="navbar-item" href="#">
         <logo></logo>
       </a>
-      <div class="navbar-burger burger" data-target="meltnavbar-transparent">
+      <div class="navbar-burger burger"
+           :class="{'is-active': isMobileMenuOpen}"
+           data-target="meltnavbar-transparent"
+           @click="mobileMenuClicked">
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
-
     <div id="meltnavbar-transparent"
-        class="navbar-menu">
+         class="navbar-menu"
+         :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
         <router-link to="/model"
             class="navbar-item has-dropdown is-hoverable">
@@ -76,14 +79,25 @@ export default {
   components: {
     Logo,
   },
+  watch: {
+    $route() {
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu();
+      }
+    },
+  },
   created() {
     this.$store.dispatch('repos/getModels');
+  },
+  data() {
+    return {
+      isMobileMenuOpen: false,
+    };
   },
   filters: {
     printable(value) {
       return value.label ? value.label : value.name;
     },
-
     underscoreToSpace(value) {
       return value.replace(/_/g, ' ');
     },
@@ -97,10 +111,18 @@ export default {
       'urlForModelDesign',
     ]),
   },
-
   methods: {
     menuSelected() {
       this.$store.dispatch('repos/navbarHideDropdown');
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu();
+      }
+    },
+    mobileMenuClicked() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    },
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false;
     },
   },
 };

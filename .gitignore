@@ -144,8 +144,7 @@ static/tmp
 src/meltano/api/static
 src/meltano/api/templates
 src/analyze/dist/
-
 meltano.log.*
-
-/model/*.m5oc
-/model/database.settings.m5o
+*.m5oc
+database.settings.m5o
+src/meltano/core/bundle/model/

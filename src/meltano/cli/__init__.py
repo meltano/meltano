@@ -1,4 +1,4 @@
-from .main import cli
+from .cli import cli
 from . import (
     elt,
     schema,

@@ -3,6 +3,7 @@ import yaml
 import requests
 from typing import Dict, List, Optional
 
+import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
 from .plugin.dbt import DbtPlugin, DbtTransformPlugin

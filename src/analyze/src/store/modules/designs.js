@@ -29,16 +29,21 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
+  connectionDialect: null,
 };
 
 const getters = {
   hasResults() {
-    if (!state.results) return false;
+    if (!state.results) {
+      return false;
+    }
     return !!state.results.length;
   },
 
   numResults() {
-    if (!state.results) return 0;
+    if (!state.results) {
+      return 0;
+    }
     return state.results.length;
   },
 
@@ -83,7 +88,9 @@ const getters = {
   },
 
   getChartYAxis() {
-    if (!state.resultAggregates) return [];
+    if (!state.resultAggregates) {
+      return [];
+    }
     const aggregates = Object.keys(state.resultAggregates);
     return aggregates;
   },
@@ -125,9 +132,13 @@ const actions = {
     state.currentModel = model;
     state.currentDesign = design;
     designApi.index(model, design)
-      .then((data) => {
-        commit('setDesign', data.data);
-        commit('selectedColumns', data.data.related_table.columns);
+      .then((response) => {
+        commit('setDesign', response.data);
+        commit('selectedColumns', response.data.related_table.columns);
+      });
+    designApi.getDialect(model)
+      .then((response) => {
+        commit('setConnectionDialect', response.data);
       });
   },
 
@@ -138,26 +149,30 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched columns
     commit('toggleCollapsed', join);
-    if (join.related_table.columns.length) return;
+    if (join.related_table.columns.length) {
+      return;
+    }
     designApi.getTable(join.related_table.name)
-      .then((data) => {
+      .then((response) => {
         commit('setJoinColumns', {
-          columns: data.data.columns,
+          columns: response.data.columns,
           join,
         });
         commit('setJoinTimeframes', {
-          timeframes: data.data.timeframes,
+          timeframes: response.data.timeframes,
           join,
         });
         commit('setJoinAggregates', {
-          aggregates: data.data.aggregates,
+          aggregates: response.data.aggregates,
           join,
         });
       });
   },
 
   removeSort({ commit }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) return;
+    if (!state.sortColumn || state.sortColumn !== column.name) {
+      return;
+    }
     commit('setRemoveSort', column);
   },
 
@@ -275,13 +290,15 @@ const actions = {
 
     state.loadingQuery = !!run;
     designApi.getSql(state.currentModel, state.currentDesign, postData)
-      .then((data) => {
+      .then((response) => {
         if (run) {
-          commit('setQueryResults', data.data);
-          commit('setSQLResults', data.data);
+          commit('setQueryResults', response.data);
+          commit('setSQLResults', response.data);
+          commit('setCurrentTab', 'results');
           state.loadingQuery = false;
         } else {
-          commit('setSQLResults', data.data);
+          commit('setSQLResults', response.data);
+          commit('setCurrentTab', 'sql');
         }
       })
       .catch((e) => {
@@ -296,9 +313,9 @@ const actions = {
 
   getDistinct({ commit }, field) {
     designApi.getDistinct(state.currentModel, state.currentDesign, field)
-      .then((data) => {
+      .then((response) => {
         commit('setDistincts', {
-          data: data.data,
+          data: response.data,
           field,
         });
       });
@@ -395,6 +412,10 @@ const mutations = {
 
   setSQLResults(_, results) {
     state.currentSQL = results.sql;
+  },
+
+  setConnectionDialect(_, results) {
+    state.connectionDialect = results.connection_dialect;
   },
 
   setQueryResults(_, results) {
