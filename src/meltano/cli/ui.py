@@ -3,7 +3,8 @@ import subprocess
 import click
 
 from . import cli
-from meltano.api import app
+from meltano.api.app import start
+from meltano.core.project import Project
 
 
 @cli.command()
@@ -16,8 +17,7 @@ from meltano.api import app
 )
 @click.option("--hostname", default="0.0.0.0", help="The hostname of the webserver")
 def ui(debug, port, reload, hostname):
+    project = Project.find()
+
     # todo: run gunicorn if not in debug mode
-    if debug:
-        app.run(debug=debug, use_reloader=reload, port=port, host=hostname)
-    else:
-        pass
+    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)

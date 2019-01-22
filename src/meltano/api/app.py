@@ -1,68 +1,88 @@
 import datetime
 import logging
+import logging.handlers
 import os
-from logging.handlers import RotatingFileHandler
 from flask import Flask, request, render_template
 from flask import jsonify
-from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_security import login_required
 from jinja2.exceptions import TemplateNotFound
 
-from . import config
 from .external_connector import ExternalConnector
-
-app = Flask(__name__)
-
-app.config.from_object(config)
-
-flask_env = os.getenv("FLASK_ENV", "development")
-
-if flask_env == "development":
-    CORS(app)
+from .workers import MeltanoBackgroundCompiler
+from . import config
 
 connector = ExternalConnector()
-
-logger = logging.getLogger("melt_logger")
-handler = RotatingFileHandler(app.config["LOG_PATH"], maxBytes=2000, backupCount=10)
-logger.addHandler(handler)
-now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
-logger.warning(f"Melt started at: {now}")
+flask_env = os.getenv("FLASK_ENV", "development")
+logger = logging.getLogger(__name__)
 
 
-@app.before_request
-def before_request():
-    logger.info(f"[{request.remote_addr}] request: {now}")
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(config)
+
+    # Logging
+    file_handler = logging.handlers.RotatingFileHandler(
+        app.config["LOG_PATH"], maxBytes=2000, backupCount=10
+    )
+    stdout_handler = logging.StreamHandler()
+
+    logger.addHandler(file_handler)
+    logger.addHandler(stdout_handler)
+
+    now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
+    logger.warning(f"Melt started at: {now}")
+
+    # Extensions
+    from .models import db
+
+    db.init_app(app)
+
+    from .mail import mail
+
+    mail.init_app(app)
+
+    from .security import security, users
+
+    security.init_app(app, users)
+
+    from .auth import oauth, oauthBP
+
+    oauth.init_app(app)
+    app.register_blueprint(oauthBP)
+
+    if flask_env == "development":
+        from flask_cors import CORS
+
+        CORS(app)
+
+    @app.before_request
+    def before_request():
+        logger.info(f"[{request.remote_addr}] request: {now}")
+
+    from .controllers.root import root
+    from .controllers.repos import reposBP
+    from .controllers.settings import settingsBP
+    from .controllers.sql import sqlBP
+
+    app.register_blueprint(root)
+    app.register_blueprint(reposBP)
+    app.register_blueprint(settingsBP)
+    app.register_blueprint(sqlBP)
+
+    return app
 
 
-@app.errorhandler(500)
-def internal_error(exception):
-    logger.info(f"[{request.remote_addr}] request: {now}, error: {exception}")
-    return jsonify({"error": 1}), 500
+def start(project, **kwargs):
+    worker = MeltanoBackgroundCompiler(project)
+    worker.start()
 
+    app = create_app()
+    from .security import create_dev_user
 
-@app.route("/model")
-@app.route("/")
-def analyze():
-    try:
-        return render_template("analyze.html")
-    except TemplateNotFound:
-        return "Please run `yarn build` from src/analyze."
+    with app.app_context():
+        if flask_env == "development":
+            create_dev_user()
 
-
-@app.route("/drop")
-def drop_it():
-    from .controllers.sqlhelper import SqlHelper
-
-    SqlHelper().reset_db()
-    return jsonify({"dropped_it": "like it's hot"})
-
-
-from .controllers.repos import reposBP
-from .controllers.settings import settingsBP
-from .controllers.sql import sqlBP
-
-# from .controllers.orchestrations import orchestrationsBP
-
-app.register_blueprint(reposBP)
-app.register_blueprint(settingsBP)
-app.register_blueprint(sqlBP)
-# app.register_blueprint(orchestrationsBP)
+    app.run(**kwargs)
+    worker.stop()

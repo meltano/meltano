@@ -7,6 +7,7 @@ with open("README.md", "r") as fh:
 requires = [
     'aiohttp',
     'backoff',
+    'bcrypt',
     'click',
     'Cerberus',
     'dbt',
@@ -23,10 +24,17 @@ requires = [
     'flask',
     'flask-cors',
     'flask-sqlalchemy',
-    # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
-    'idna==2.7',
+    'flask-security @ git+https://github.com/meltano/flask-security.git@v3.0.0/meltano.0.1.0',
+    'flask-social',
     'pyhocon',
     'python-dotenv',
+    'python-gitlab',
+    'watchdog',
+]
+
+# conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
+conflicts = [
+    'idna==2.7',
 ]
 
 dev_requires = [

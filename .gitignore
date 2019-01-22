@@ -148,3 +148,6 @@ meltano.log.*
 *.m5oc
 database.settings.m5o
 src/meltano/core/bundle/model/
+
+# sqlite
+*.db
