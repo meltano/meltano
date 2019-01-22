@@ -9,10 +9,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* add ability to save reports
 
 ### Changes
 
 ### Fixes
+* Updated the Fundamentals documentation section regarding reports
 
 ### Breaks
 
