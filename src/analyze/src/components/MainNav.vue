@@ -13,7 +13,6 @@
         <span></span>
       </div>
     </div>
-
     <div id="meltnavbar-transparent"
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
@@ -82,7 +81,9 @@ export default {
   },
   watch: {
     $route() {
-      if (this.isMobileMenuOpen) { this.closeMobileMenu(); }
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu();
+      }
     },
   },
   created() {
@@ -113,7 +114,9 @@ export default {
   methods: {
     menuSelected() {
       this.$store.dispatch('repos/navbarHideDropdown');
-      if (this.isMobileMenuOpen) { this.closeMobileMenu(); }
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu();
+      }
     },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
