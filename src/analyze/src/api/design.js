@@ -11,7 +11,7 @@ export default {
   },
 
   saveReport(model, design, data) {
-    console.log('api SaveReport');
+    console.log('api SaveReport', model, design, data);
   },
 
   getDialect(model) {

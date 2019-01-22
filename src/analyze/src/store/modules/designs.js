@@ -102,6 +102,7 @@ const getters = {
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
+
   currentDesignLabel() {
     return utils.titleCase(state.currentModel);
   },
@@ -124,6 +125,93 @@ const getters = {
 
   formattedSql() {
     return sqlFormatter.format(state.currentSQL);
+  },
+
+  getQueryPayloadFromUI() {
+    const selected = x => x.selected;
+    const namesOfSelected = (arr) => {
+      if (!Array.isArray(arr)) {
+        return null;
+      }
+
+      return arr.filter(selected).map(x => x.name);
+    };
+
+    const baseTable = state.design.related_table;
+    const columns = namesOfSelected(baseTable.columns);
+
+    let sortColumn = baseTable
+      .columns
+      .find(d => d.name === state.sortColumn);
+
+    if (!sortColumn) {
+      sortColumn = baseTable
+        .aggregates
+        .find(d => d.name === state.sortColumn);
+    }
+
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
+
+    const filters = JSON.parse(JSON.stringify(state.distincts));
+    const filtersKeys = Object.keys(filters);
+    filtersKeys.forEach((prop) => {
+      delete filters[prop].results;
+      delete filters[prop].sql;
+    });
+
+    const joins = state.design
+      .joins
+      .map((j) => {
+        const table = j.related_table;
+        const newJoin = {};
+
+        newJoin.name = j.name;
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
+
+        if (table.timeframes) {
+          newJoin.timeframes = table.timeframes
+            .filter(selected)
+            .map(({ name, periods }) => ({
+              name,
+              periods: periods.filter(selected),
+            }));
+        }
+
+        return newJoin;
+      })
+      .filter(j => !!(j.columns || j.aggregates));
+
+    let order = null;
+
+    // TODO update default empty array likely
+    // in the ma_file_parser to set proper defaults
+    // if user's exclude certain properties in their models
+    const timeframes = baseTable
+      .timeframes || []
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
+      }))
+      .filter(tf => tf.periods.length);
+
+    if (sortColumn) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
+
+    return {
+      table: baseTable.name,
+      columns,
+      aggregates,
+      timeframes,
+      joins,
+      order,
+      limit: state.limit,
+      filters,
+    };
   },
 };
 
@@ -202,93 +290,9 @@ const actions = {
 
   getSQL({ commit }, { run }) {
     this.dispatch('designs/resetErrorMessage');
-    const selected = x => x.selected;
-    const namesOfSelected = (arr) => {
-      if (!Array.isArray(arr)) {
-        return null;
-      }
-
-      return arr.filter(selected).map(x => x.name);
-    };
-
-    const baseTable = state.design.related_table;
-    const columns = namesOfSelected(baseTable.columns);
-
-    let sortColumn = baseTable
-      .columns
-      .find(d => d.name === state.sortColumn);
-
-    if (!sortColumn) {
-      sortColumn = baseTable
-        .aggregates
-        .find(d => d.name === state.sortColumn);
-    }
-
-    const aggregates = namesOfSelected(baseTable.aggregates) || [];
-
-    const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters);
-    filtersKeys.forEach((prop) => {
-      delete filters[prop].results;
-      delete filters[prop].sql;
-    });
-
-    const joins = state.design
-      .joins
-      .map((j) => {
-        const table = j.related_table;
-        const newJoin = {};
-
-        newJoin.name = j.name;
-        newJoin.columns = namesOfSelected(table.columns) || [];
-        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
-
-        if (table.timeframes) {
-          newJoin.timeframes = table.timeframes
-            .filter(selected)
-            .map(({ name, periods }) => ({
-              name,
-              periods: periods.filter(selected),
-            }));
-        }
-
-        return newJoin;
-      })
-      .filter(j => !!(j.columns || j.aggregates));
-
-    let order = null;
-
-    // TODO update default empty array likely
-    // in the ma_file_parser to set proper defaults
-    // if user's exclude certain properties in their models
-    const timeframes = baseTable
-      .timeframes || []
-      .map(tf => ({
-        name: tf.name,
-        periods: tf.periods.filter(selected),
-      }))
-      .filter(tf => tf.periods.length);
-
-    if (sortColumn) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
-
-    const postData = {
-      table: baseTable.name,
-      columns,
-      aggregates,
-      timeframes,
-      joins,
-      order,
-      limit: state.limit,
-      filters,
-      run,
-    };
-
     state.loadingQuery = !!run;
+
+    const postData = Object.assign({ run }, getters.getQueryPayloadFromUI());
     designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
@@ -307,9 +311,12 @@ const actions = {
       });
   },
 
-  saveReport({ commit }) {
-    console.log('store saveReport');
-    designApi.saveReport();
+  saveReport({ commit }, { name }) {
+    const postData = {
+      name,
+      queryPayload: getters.getQueryPayloadFromUI(),
+    };
+    designApi.saveReport(state.currentModel, state.currentDesign, postData);
   },
 
   resetErrorMessage({ commit }) {
