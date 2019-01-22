@@ -10,6 +10,10 @@ export default {
     return axios.post(utils.buildUrl('sql/get', `${model}/${design}`), data);
   },
 
+  saveReport(model, design, data) {
+    console.log('api SaveReport');
+  },
+
   getDialect(model) {
     return axios.get(utils.buildUrl('sql/get', `${model}/dialect`));
   },

@@ -307,6 +307,11 @@ const actions = {
       });
   },
 
+  saveReport({ commit }) {
+    console.log('store saveReport');
+    designApi.saveReport();
+  },
+
   resetErrorMessage({ commit }) {
     commit('setErrorState');
   },

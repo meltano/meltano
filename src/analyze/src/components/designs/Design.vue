@@ -160,9 +160,14 @@
       <div class="column is-three-quarters">
         <div class="columns">
           <div class="column">
-            <a class="button is-primary is-pulled-right"
-              :class="{'is-loading': loadingQuery}"
-              @click="runQuery">Run</a>
+            <div class="buttons is-pulled-right">
+                <a class="button is-secondary"
+                    :class="{'is-loading': loadingQuery}"
+                    @click="saveReport">Save Report</a>
+                <a class="button is-primary"
+                    :class="{'is-loading': loadingQuery}"
+                    @click="runQuery">Run Query</a>
+            </div>
           </div>
         </div>
         <template v-if="design.has_filters">
@@ -439,6 +444,10 @@ export default {
 
     runQuery() {
       this.$store.dispatch('designs/getSQL', { run: true });
+    },
+
+    saveReport() {
+      this.$store.dispatch('designs/saveReport');
     },
 
     setCurrentTab(tab) {
