@@ -13,7 +13,7 @@ from meltano.core.plugin import PluginType
 class TestCliInvoke:
     @pytest.fixture
     def subject(self, project_add_service, config_service):
-        project_add_service.add(PluginType.EXTRACTORS, "tap-gitlab")
+        project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
         return CliRunner()
 
@@ -26,12 +26,12 @@ class TestCliInvoke:
 
     def test_invoke(self, subject, process_mock):
         with patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            basic = subject.invoke(cli, ["invoke", "tap-gitlab"])
+            basic = subject.invoke(cli, ["invoke", "tap-mock"])
             assert invoke.called_once
 
     def test_invoke_args(self, subject, process_mock):
         with patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            with_args = subject.invoke(cli, ["invoke", "tap-gitlab", "--discover"])
+            with_args = subject.invoke(cli, ["invoke", "tap-mock", "--discover"])
 
             assert invoke.called_with(["--discover"])
 
@@ -39,5 +39,5 @@ class TestCliInvoke:
         process_mock.wait.return_value = 2
 
         with patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            basic = subject.invoke(cli, ["invoke", "tap-gitlab"])
+            basic = subject.invoke(cli, ["invoke", "tap-mock"])
             assert basic.exit_code == 2

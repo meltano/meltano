@@ -28,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * update Results vs. SQL UI focus based on a results response or query update respectively
 
 ### Changes
+* Meltano will now discover components based on `https://meltano.com/discovery.yml`
 * sample designs are now packaged with meltano
 
 ### Fixes

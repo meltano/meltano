@@ -46,7 +46,8 @@
                       }">
                     {{timeframe.label}}
                     <div class='sqlite-unsupported-container'
-                         v-if='isConnectionDialectSqlite(connectionDialect)'>
+                      v-if='isConnectionDialectSqlite(connectionDialect)'
+                    >
                       <small>Unsupported by SQLite</small>
                     </div>
                   </a>
