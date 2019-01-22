@@ -3,10 +3,26 @@ import os
 
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.config_service import ConfigService
+from meltano.core.plugin import PluginType
 
 
 PROJECT_NAME = "a_meltano_project"
+
+
+@pytest.fixture
+def discovery():
+    return {
+        str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
+        str(PluginType.LOADERS): [{"name": "target-mock", "pip_url": "target-mock"}],
+        str(PluginType.TRANSFORMERS): [
+            {"name": "transformer-mock", "pip_url": "transformer-mock"}
+        ],
+        str(PluginType.TRANSFORMS): [
+            {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+        ],
+    }
 
 
 @pytest.fixture
@@ -15,8 +31,15 @@ def project_init_service():
 
 
 @pytest.fixture
-def project_add_service(project):
-    return ProjectAddService(project)
+def plugin_discovery_service(project, discovery):
+    return PluginDiscoveryService(
+        project, discovery=discovery
+    )  # TODO: discovery factory
+
+
+@pytest.fixture
+def project_add_service(project, plugin_discovery_service):
+    return ProjectAddService(project, plugin_discovery_service=plugin_discovery_service)
 
 
 @pytest.fixture
