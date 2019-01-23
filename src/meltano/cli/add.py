@@ -14,6 +14,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.transform_add_service import TransformAddService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.group()
@@ -54,6 +55,9 @@ def extractor(plugin_name):
     try:
         project = Project.find()
         add_plugin(project, PluginType.EXTRACTORS, plugin_name)
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
 
@@ -64,6 +68,9 @@ def loader(plugin_name):
     try:
         project = Project.find()
         add_plugin(project, PluginType.LOADERS, plugin_name)
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
 
@@ -74,6 +81,9 @@ def transformer(plugin_name):
     try:
         project = Project.find()
         add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
 
@@ -84,6 +94,9 @@ def transform(plugin_name):
     try:
         project = Project.find()
         add_transform(project, plugin_name)
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
 

@@ -8,6 +8,7 @@ from meltano.core.project_init_service import (
     ProjectInitServiceError,
 )
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
 
 EXTRACTORS = "extractors"
@@ -22,6 +23,9 @@ def init(project_name):
     try:
         project = init_service.init()
         init_service.echo_instructions()
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_init(project_name=project_name)
     except ProjectInitServiceError as e:
         print(e)
         click.secho(f"Directory {project_name} already exists!", fg="red")

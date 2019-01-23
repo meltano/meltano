@@ -10,6 +10,7 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     DiscoveryInvalidError,
 )
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
@@ -32,6 +33,9 @@ def discover(plugin_type):
         for key, value in discovery_dict.items():
             click.secho(key, fg="green")
             click.echo(value)
+
+        tracker = GoogleAnalyticsTracker()
+        tracker.track_meltano_discover(plugin_type=plugin_type)
     except Exception as e:
         click.secho("Cannot list available plugins.", fg="red")
         raise click.ClickException(str(e))
