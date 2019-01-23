@@ -10,6 +10,10 @@ export default {
     return axios.get(utils.buildUrl('repos/tables', `${table}`));
   },
 
+  loadReport(name) {
+    return axios.get(utils.buildUrl('reports/load', `${name}`));
+  },
+
   saveReport(data) {
     return axios.post(utils.buildUrl('reports', 'save'), data);
   },

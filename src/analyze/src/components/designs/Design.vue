@@ -164,6 +164,9 @@
             <div class="buttons is-pulled-right">
                 <a class="button is-secondary"
                     :class="{'is-loading': loadingQuery}"
+                    @click="loadReport">Load Report</a>
+                <a class="button is-secondary"
+                    :class="{'is-loading': loadingQuery}"
                     @click="saveReport">Save Report</a>
                 <a class="button is-primary"
                     :class="{'is-loading': loadingQuery}"
@@ -445,6 +448,11 @@ export default {
 
     runQuery() {
       this.$store.dispatch('designs/getSQL', { run: true });
+    },
+
+    loadReport() {
+      // TODO implement report load selection UI
+      this.$store.dispatch('designs/loadReport', { name: 'name-of-file' });
     },
 
     saveReport() {

@@ -309,6 +309,10 @@ const actions = {
       });
   },
 
+  loadReport(_, { name }) {
+    designApi.loadReport(name);
+  },
+
   saveReport(_, { name }) {
     const postData = {
       name,
