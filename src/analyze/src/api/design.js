@@ -11,7 +11,7 @@ export default {
   },
 
   saveReport(data) {
-    return axios.post(utils.buildUrl('repos/reports', 'save'), data);
+    return axios.post(utils.buildUrl('reports', 'save'), data);
   },
 
   getSql(model, design, data) {

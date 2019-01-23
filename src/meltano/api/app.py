@@ -56,12 +56,13 @@ def drop_it():
     return jsonify({"dropped_it": "like it's hot"})
 
 
+from .controllers.reports import reportsBP
 from .controllers.repos import reposBP
 from .controllers.settings import settingsBP
 from .controllers.sql import sqlBP
-
 # from .controllers.orchestrations import orchestrationsBP
 
+app.register_blueprint(reportsBP)
 app.register_blueprint(reposBP)
 app.register_blueprint(settingsBP)
 app.register_blueprint(sqlBP)
