@@ -22,7 +22,7 @@ def index():
         for f in os.listdir(meltano_model_path)
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
-    sortedM5oFiles = {"documents": [], "tables": [], "models": [], "dashboards": []}
+    sortedM5oFiles = {"documents": [], "tables": [], "models": [], "dashboards": [], "reports": []}
     onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
         file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
@@ -49,6 +49,8 @@ def index():
             sortedM5oFiles["models"].append(file_dict)
         if ext == ".dashboard":
             sortedM5oFiles["dashboards"].append(file_dict)
+        if ext == ".report":
+            sortedM5oFiles["reports"].append(file_dict)
 
     return jsonify(sortedM5oFiles)
 

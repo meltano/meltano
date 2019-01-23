@@ -10,12 +10,8 @@ class ReportsHelper:
     def __init__(self):
         self.meltano_model_path = join(os.getcwd(), "model")
 
-        self.reports_directory_path = Path(self.meltano_model_path).joinpath("reports")
-        if not Path.is_dir(self.reports_directory_path):
-            Path.mkdir(self.reports_directory_path)
-
     def get_report_m5oc(self):
-        m5oc_file = Path(self.reports_directory_path).joinpath("reports.m5oc")
+        m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
         with m5oc_file.open() as f:
             m5oc = M5ocFile.load(f)
         return m5oc
@@ -29,7 +25,7 @@ class ReportsHelper:
     def save_report(self, data):
         name = data["name"]
         file_name = name + ".report.m5o"
-        file_path = Path(self.reports_directory_path).joinpath(file_name)
+        file_path = Path(self.meltano_model_path).joinpath(file_name)
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data
