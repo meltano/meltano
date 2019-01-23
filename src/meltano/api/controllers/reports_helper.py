@@ -3,6 +3,7 @@ import json
 from os.path import join
 from pathlib import Path
 
+from .m5oc_file import M5ocFile
 
 class ReportsHelper:
     def __init__(self):
@@ -11,6 +12,18 @@ class ReportsHelper:
         self.reports_directory_path = Path(self.meltano_model_path).joinpath("reports")
         if not Path.is_dir(self.reports_directory_path):
             Path.mkdir(self.reports_directory_path)
+
+    def get_report_m5oc(self):
+        m5oc_file = Path(self.reports_directory_path).joinpath("reports.m5oc")
+        with m5oc_file.open() as f:
+            m5oc = M5ocFile.load(f)
+        return m5oc
+
+    def get_reports(self):
+        return self.get_report_m5oc().reports
+
+    def load_report(self, report_name):
+        return self.get_report_m5oc().report(report_name)
 
     def save_report(self, data):
         name = data["name"]
