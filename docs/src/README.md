@@ -1,9 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Get Started →
+actionText: Read the Docs →
 actionLink: /docs/
-footer: Meltano is a GitLab startup | MIT Licensed | Copyright © 2018-Present
 ---
 
 | Stage       | Meltano selected                                                                     | OSS considered but not selected                                                                                                          | Proprietary alternatives                                                                                                                                       |
