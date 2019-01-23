@@ -14,6 +14,7 @@ requires = [
     'dbt',
     'gitpython',
     'markdown',
+    'networkx',
     'pandas',
     'psycopg2',
     'pypika',

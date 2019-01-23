@@ -90,6 +90,15 @@ class MeltanoAnalysisFileParser:
         except Exception as e:
             raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
+    def graph_design(self, design):
+      print(json.dumps(design))
+      return design
+
+    def graph_model(self, model):
+        designs = model['designs']
+        model['designs'] = [self.graph_design(design) for design in designs]
+        return model
+
     def compile(self, models):
         indices = {}
         for model in models:
@@ -97,6 +106,7 @@ class MeltanoAnalysisFileParser:
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
             compiled_model = open(compiled_file_path, "w")
             indices[model["name"]] = {"designs": [e["name"] for e in model["designs"]]}
+            model = self.graph_model(model)
             compiled_model.write(json.dumps(model))
             compiled_model.close()
 

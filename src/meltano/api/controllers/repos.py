@@ -94,7 +94,7 @@ def lint_all(compile):
     models = m5o_parse.parse()
     if compile:
         m5o_parse.compile(models)
-    return jsonify({"result": True})
+    return jsonify({"result": True, "hi": "hello"})
 
 
 @reposBP.errorhandler(MeltanoAnalysisFileParserError)
@@ -112,7 +112,6 @@ def handle_file_not_found(e):
 @reposBP.route("/lint", methods=["GET"])
 def lint():
     return lint_all(False)
-
 
 @reposBP.route("/sync", methods=["GET"])
 def sync():
