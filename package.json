@@ -1,11 +1,16 @@
 {
   "name": "meltano.com",
-  "version": "0.0.1-alpha",
-  "description": "The source code for the Meltano.com site",
+  "author": "Meltano Team & Contributors <meltano@gitlab.com>",
+  "license": "MIT",
+  "version": "0.1.0",
+  "description": "https://meltano.com",
   "main": "index.js",
   "scripts": {
-    "dev:docs": "vuepress dev docs/src",
-    "build:docs": "vuepress build docs/src",
+    "discovery.yml": "cp ./discovery.yml ./docs/src/.vuepress/public",
+    "dev": "vuepress dev docs/src",
+    "build": "vuepress build docs/src",
+    "dev:docs": "npm run discovery.yml && npm run dev",
+    "build:docs": "npm run discovery.yml && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,8 +20,6 @@
   "keywords": [
     "meltano"
   ],
-  "author": "Ben Hong <bhong@gitlab.com>",
-  "license": "ISC",
   "bugs": {
     "url": "https://gitlab.com/meltano/meltano/issues"
   },

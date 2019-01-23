@@ -24,11 +24,13 @@ class ProjectAddService:
     def __init__(
         self,
         project: Project,
-        discovery_service: PluginDiscoveryService = None,
+        plugin_discovery_service: PluginDiscoveryService = None,
         config_service: ConfigService = None,
     ):
         self.project = project
-        self.discovery_service = discovery_service or PluginDiscoveryService()
+        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            project
+        )
         self.config_service = config_service or ConfigService(project)
 
     def add(self, plugin_type: PluginType, plugin_name: str):

@@ -93,6 +93,7 @@ instance/
 
 # VuePress Docs Build
 docs/public
+docs/src/.vuepress/public/discovery.yml
 
 # PyBuilder
 target/
