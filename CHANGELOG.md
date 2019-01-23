@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.7.0 - (2019-01-22)
+---
+
+### New
 * Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
@@ -16,13 +28,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * update Results vs. SQL UI focus based on a results response or query update respectively
 
 ### Changes
+* Meltano will now discover components based on `https://meltano.com/discovery.yml`
 * sample designs are now packaged with meltano
 
 ### Fixes
 * Updated mobile menu to work as expected
 * Updated tutorial docs with improved CLI commands and fixed the host setting to `localhost`
-
-### Breaks
 
 
 ## 0.6.1 - (2019-01-15)
