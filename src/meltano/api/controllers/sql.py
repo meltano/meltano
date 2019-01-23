@@ -104,6 +104,7 @@ def get_sql(model_name, design_name):
 
     return jsonify(base_dict)
 
+
 @sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
 def get_distinct_field_name(model_name, design_name):
     # incoming_json = request.get_json()

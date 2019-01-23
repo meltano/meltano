@@ -91,12 +91,12 @@ class MeltanoAnalysisFileParser:
             raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
     def graph_design(self, design):
-      print(json.dumps(design))
-      return design
+        print(json.dumps(design))
+        return design
 
     def graph_model(self, model):
-        designs = model['designs']
-        model['designs'] = [self.graph_design(design) for design in designs]
+        designs = model["designs"]
+        model["designs"] = [self.graph_design(design) for design in designs]
         return model
 
     def compile(self, models):

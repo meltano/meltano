@@ -113,6 +113,7 @@ def handle_file_not_found(e):
 def lint():
     return lint_all(False)
 
+
 @reposBP.route("/sync", methods=["GET"])
 def sync():
     return lint_all(True)
