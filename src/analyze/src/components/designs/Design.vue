@@ -452,7 +452,7 @@ export default {
 
     loadReport() {
       // TODO implement report load selection UI
-      this.$store.dispatch('designs/loadReport', { name: 'name-of-file' });
+      this.$store.dispatch('designs/loadReport', { name: 'report-1548272475255' });
     },
 
     saveReport() {

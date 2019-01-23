@@ -286,11 +286,12 @@ const actions = {
     commit('setChartType', chartType);
   },
 
-  getSQL({ commit }, { run }) {
+  getSQL({ commit }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
-    const postData = Object.assign({ run }, helpers.getQueryPayloadFromUI());
+    const queryPayload = load || helpers.getQueryPayloadFromUI();
+    const postData = Object.assign({ run }, queryPayload);
     designApi.getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
@@ -309,8 +310,20 @@ const actions = {
       });
   },
 
-  loadReport(_, { name }) {
-    designApi.loadReport(name);
+  loadReport({ commit }, { name }) {
+    designApi.loadReport(name)
+      .then((response) => {
+        state.currentModel = response.data.model;
+        state.currentDesign = response.data.design;
+        this.dispatch('designs/getSQL', {
+          run: true,
+          load: response.data.queryPayload,
+        });
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
   saveReport(_, { name }) {
