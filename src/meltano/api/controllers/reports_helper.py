@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .m5oc_file import M5ocFile
 
+
 class ReportsHelper:
     def __init__(self):
         self.meltano_model_path = join(os.getcwd(), "model")
