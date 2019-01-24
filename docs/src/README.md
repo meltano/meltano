@@ -2,7 +2,7 @@
 home: true
 heroImage: /meltano-logo.svg
 actionText: Read the Docs →
-actionLink: /docs/
+actionLink: /docs/introduction.html
 ---
 
 | Stage       | Meltano selected                                                                     | OSS considered but not selected                                                                                                          | Proprietary alternatives                                                                                                                                       |
