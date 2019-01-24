@@ -229,7 +229,8 @@
                           <button class="button is-link" @click="saveReport">Confirm</button>
                         </div>
                         <div class="control">
-                          <button class="button is-text" @click="toggleSaveReportOpen">Cancel</button>
+                          <button class="button is-text"
+                                  @click="toggleSaveReportOpen">Cancel</button>
                         </div>
                       </div>
                     </div>

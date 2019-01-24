@@ -346,7 +346,7 @@ const actions = {
       queryPayload: helpers.getQueryPayloadFromUI(),
     };
     designApi.saveReport(postData)
-      .then((response) => {
+      .then(() => {
         commit('resetSaveReportSettings');
       })
       .catch((e) => {
