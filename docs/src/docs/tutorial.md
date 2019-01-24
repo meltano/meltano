@@ -12,8 +12,9 @@ Navigate to a directory, in your terminal, where you want your Meltano project t
 # Initialize a new project with a folder called carbon
 meltano init carbon
 
-# Change directory into your new carbon project
+# Change directory into your new carbon project and source the enviroment variables
 cd carbon
+source .env
 
 # Start Docker container, which will start a postgres database
 # to act as our data warehouse.
@@ -27,11 +28,11 @@ meltano discover all
 meltano add extractor tap-carbon-intensity
 
 # Since we have a postgres running, we can add a loader for a Postgres database
-meltano add loader target-sqlite
+meltano add loader target-postgres
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
-meltano elt tap-carbon-intensity target-sqlite
+meltano elt tap-carbon-intensity target-postgres
 
 # Start up the Meltano Analyze web application!
 meltano ui
