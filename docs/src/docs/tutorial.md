@@ -19,7 +19,7 @@ cd carbon
 # environment tooling
 docker-compose up -d
 
-# let's see what extractors and loaders are available
+# Let's see what extractors and loaders are available
 meltano discover all
 
 # It looks like a tap for carbon intensity data is available,
