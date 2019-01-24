@@ -15,8 +15,8 @@ meltano init carbon
 # Change directory into your new carbon project
 cd carbon
 
-# Start Docker container, which will start a postgres database
-# to act as our data warehouse.
+# Start Docker container in order to setup some
+# environment tooling
 docker-compose up -d
 
 # let's see what extractors and loaders are available
@@ -26,7 +26,7 @@ meltano discover all
 # let's add that as a dependency. See https://api.carbonintensity.org.uk/
 meltano add extractor tap-carbon-intensity
 
-# Since we have a postgres running, we can add a loader for a Postgres database
+# Now we add a loader for the sqlite database
 meltano add loader target-sqlite
 
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
@@ -53,7 +53,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
 - Navigate to Settings (upper-right)
 - Enter connection settings
   - Name = `runners_db`
-  - Dialect = `PostgresSQL`
+  - Dialect = `sqlite`
   - Host = `localhost`
   - Port = `5502`
   - Database = `warehouse`
