@@ -11,7 +11,7 @@ requires = [
     'bcrypt',
     'click',
     'Cerberus',
-    'dbt',
+    'sqlparse',
     'gitpython',
     'markdown',
     'networkx',

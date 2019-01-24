@@ -28,7 +28,6 @@ def _(node: TokenList, executor, depth=0):
 def _(node: Comparison, executor, depth=0):
     logging.debug(f"Visiting node {node}")
     executor.comparison(node, depth)
-    print(node)
 
 
 class InvalidIdentifier(Exception):
@@ -39,19 +38,24 @@ Identifier = namedtuple("Identifier", ("schema", "table", "field", "alias"))
 
 DimensionGroup = namedtuple("DimensionGroup", ("dimensions", "group"))
 
+ComparisonFields = namedtuple("ComparisonFields", ("left", "right"))
+
 
 class PypikaJoinExecutor:
     def __init__(self, design, join):
         self.design = design
         self.join = join
         self.result = None
+        self.comparison_fields = None
+
+    def set_comparison_fields(self, left, right):
+        self.comparison_fields = ComparisonFields(left, right)
 
     def comparison(self, node, depth):
         table = self.join["related_table"]
 
         left = self.parse_identifier(node.left)
         right = self.parse_identifier(node.right)
-
         left_alias = self.join["name"] if left.table == self.join["name"] else None
         right_alias = self.join["name"] if right.table == self.join["name"] else None
 
@@ -72,6 +76,8 @@ class PypikaJoinExecutor:
             ),
             right.field,
         )
+
+        self.set_comparison_fields(left, right)
 
         # TODO: do a stack based approach to handle complex cases
         self.result = left_field == right_field
