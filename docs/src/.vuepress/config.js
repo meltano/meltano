@@ -36,15 +36,16 @@ module.exports = {
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
-			{ text: 'Documentation', link: '/docs/' },
+			{ text: 'Documentation', link: '/docs/introduction' },
 			{ text: 'Careers', link: '/careers/' }
 		],
 		sidebar: {
 			'/docs': [
-				'/docs/',
+				'/docs/introduction',
+				'/docs/installation',
 				'/docs/tutorial',
-				'/docs/overview',
-				'/docs/fundamentals',
+				'/docs/concepts',
+				'/docs/architecture',
 				'/docs/meltano-cli',
 				'/docs/best-practices',
 				'/docs/superset',
