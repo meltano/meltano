@@ -3,6 +3,12 @@ from .reports_helper import ReportsHelper
 
 reportsBP = Blueprint("reports", __name__, url_prefix="/reports")
 
+@reportsBP.route("/", methods=["GET"])
+def index():
+    reports_helper = ReportsHelper()
+    response_data = reports_helper.get_reports()
+    return jsonify(response_data)
+
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])
 def load_report(report_name):

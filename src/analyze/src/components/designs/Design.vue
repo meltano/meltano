@@ -163,7 +163,8 @@
           <div class="column">
             <div class="buttons is-pulled-right">
               <div class="dropdown"
-                    :class="{'is-active': loadReportOpen}">
+                    :class="{'is-active': loadReportOpen}"
+                    v-if="reports.length > 0">
                 <div class="dropdown-trigger">
                   <button class="button"
                           aria-haspopup="true"
@@ -179,7 +180,7 @@
                   <div class="dropdown-content">
                     <a class="dropdown-item"
                         :class="{'is-loading': loadingQuery}"
-                        v-for="report in [{'name': 'report-1548272475255'}, {'name': 'report-1548272581170'}]"
+                        v-for="report in reports"
                         :key="report.name"
                         @click="loadReport(report)">
                       {{report.name}}
@@ -381,6 +382,7 @@ export default {
       'filtersOpen',
       'dataOpen',
       'loadReportOpen',
+      'reports',
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',

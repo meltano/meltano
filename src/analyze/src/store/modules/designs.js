@@ -25,6 +25,7 @@ const state = {
   dataOpen: true,
   chartsOpen: false,
   loadReportOpen: false,
+  reports: [],
   chartType: 'BarChart',
   limit: 3,
   distincts: {},
@@ -225,6 +226,14 @@ const actions = {
     designApi.getDialect(model).then(response => {
       commit('setConnectionDialect', response.data);
     });
+    designApi.loadReports()
+      .then((response) => {
+        state.reports = response.data;
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
   expandRow({ commit }, row) {
