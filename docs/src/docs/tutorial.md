@@ -69,6 +69,6 @@ Then, we'll ensure our models are valid so Meltano Analyze can properly generate
 Lastly, we'll query and explore the data:
 - Navigate to Model > Region (Model dropdown)
 - Open Region accordion
-  - Toggle Dimensions and Measures buttons to generate SQL query
+  - Toggle Columns and Aggregates buttons to generate SQL query
   - Click Run button to query
 - Open Charts accordion and explore the data!
