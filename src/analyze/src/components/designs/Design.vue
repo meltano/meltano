@@ -530,7 +530,7 @@ export default {
     },
 
     saveReport() {
-      this.$store.dispatch('designs/saveReport', this.saveReportSettings );
+      this.$store.dispatch('designs/saveReport', this.saveReportSettings);
       this.toggleSaveReportOpen();
     },
 
