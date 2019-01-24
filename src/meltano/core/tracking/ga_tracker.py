@@ -21,7 +21,6 @@ class GoogleAnalyticsTracker:
     ) -> None:
         self.project = project
         self.tracking_id = tracking_id or MELTANO_TRACKING_ID
-        self.client_id = client_id or uuid.uuid4()
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
 
         config = self.project_config()
@@ -29,7 +28,10 @@ class GoogleAnalyticsTracker:
             config.get("send_anonymous_usage_stats", False) == True
         )
 
+        self.client_id = client_id or self.project_id()
+
     def project_config(self) -> Dict:
+        """Fetch the project config from the root directory."""
         config_file = self.project.root.joinpath("project_config.yml")
         if config_file.is_file():
             with config_file.open() as file:
@@ -40,6 +42,7 @@ class GoogleAnalyticsTracker:
         return config
 
     def update_permission_to_track(self, send_anonymous_usage_stats: bool) -> None:
+        """Update the send_anonymous_usage_stats in the project config."""
         config = self.project_config()
         config["send_anonymous_usage_stats"] = send_anonymous_usage_stats
 
@@ -47,7 +50,35 @@ class GoogleAnalyticsTracker:
         with open(config_file, "w") as f:
             f.write(yaml.dump(config, default_flow_style=False))
 
+    def project_id(self) -> None:
+        """
+        Fetch the project_id from the project config file.
+
+        If it is not found (e.g. first time run), generate a valid uuid4 and
+        store it in the project config file.
+        """
+        config = self.project_config()
+
+        try:
+            project_id_str = config.get("project_id", None) or ""
+            project_id = uuid.UUID(project_id_str, version=4)
+        except ValueError:
+            project_id = uuid.uuid4()
+
+            if self.send_anonymous_usage_stats:
+                # If we are set to track Anonymous Usage stats, also store
+                #  the generated project_id back to the project config file
+                #  so that it persists between meltano runs.
+                config["project_id"] = str(project_id)
+
+                config_file = self.project.root.joinpath("project_config.yml")
+                with open(config_file, "w") as f:
+                    f.write(yaml.dump(config, default_flow_style=False))
+
+        return project_id
+
     def event(self, category: str, action: str) -> Dict:
+        """Constract a GA event with all the required parameters."""
         event = {
             "v": "1",
             "tid": self.tracking_id,
@@ -60,6 +91,7 @@ class GoogleAnalyticsTracker:
         return event
 
     def track_data(self, data: Dict, debug: bool = False) -> None:
+        """Send usage statistics back to Google Analytics."""
         if self.send_anonymous_usage_stats == False:
             # Only send anonymous usage stats if you have explicit permission
             return
