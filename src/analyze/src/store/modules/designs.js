@@ -6,7 +6,7 @@ import utils from '../../api/utils';
 
 const state = {
   design: {
-    related_table: {}
+    related_table: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -32,7 +32,7 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
-  connectionDialect: null
+  connectionDialect: null,
 };
 
 const helpers = {
@@ -220,19 +220,19 @@ const actions = {
   getDesign({ commit }, { model, design }) {
     state.currentModel = model;
     state.currentDesign = design;
-    designApi.index(model, design).then(response => {
+    designApi.index(model, design).then((response) => {
       commit('setDesign', response.data);
       commit('selectedColumns', response.data.related_table.columns);
     });
-    designApi.getDialect(model).then(response => {
+    designApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
     designApi
       .loadReports()
-      .then(response => {
+      .then((response) => {
         state.reports = response.data;
       })
-      .catch(e => {
+      .catch((e) => {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
@@ -248,18 +248,18 @@ const actions = {
     if (join.related_table.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name).then(response => {
+    designApi.getTable(join.related_table.name).then((response) => {
       commit('setJoinColumns', {
         columns: response.data.columns,
-        join
+        join,
       });
       commit('setJoinTimeframes', {
         timeframes: response.data.timeframes,
-        join
+        join,
       });
       commit('setJoinAggregates', {
         aggregates: response.data.aggregates,
-        join
+        join,
       });
     });
   },
@@ -303,7 +303,7 @@ const actions = {
     const postData = Object.assign({ run }, queryPayload);
     designApi
       .getSql(state.currentModel, state.currentDesign, postData)
-      .then(response => {
+      .then((response) => {
         if (run) {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
@@ -314,7 +314,7 @@ const actions = {
           commit('setCurrentTab', 'sql');
         }
       })
-      .catch(e => {
+      .catch((e) => {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
@@ -323,15 +323,15 @@ const actions = {
   loadReport({ commit }, { name }) {
     designApi
       .loadReport(name)
-      .then(response => {
+      .then((response) => {
         state.currentModel = response.data.model;
         state.currentDesign = response.data.design;
         this.dispatch('designs/getSQL', {
           run: true,
-          load: response.data.queryPayload
+          load: response.data.queryPayload,
         });
       })
-      .catch(e => {
+      .catch((e) => {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
@@ -342,7 +342,7 @@ const actions = {
       name,
       model: state.currentModel,
       design: state.currentDesign,
-      queryPayload: helpers.getQueryPayloadFromUI()
+      queryPayload: helpers.getQueryPayloadFromUI(),
     };
     designApi.saveReport(postData);
   },
@@ -354,10 +354,10 @@ const actions = {
   getDistinct({ commit }, field) {
     designApi
       .getDistinct(state.currentModel, state.currentDesign, field)
-      .then(response => {
+      .then((response) => {
         commit('setDistincts', {
           data: response.data,
-          field
+          field,
         });
       });
   },
@@ -397,9 +397,9 @@ const actions = {
   sortBy({ commit }, name) {
     commit('setSortColumn', name);
     this.dispatch('designs/getSQL', {
-      run: true
+      run: true,
     });
-  }
+  },
 };
 
 const mutations = {
