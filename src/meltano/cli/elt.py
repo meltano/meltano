@@ -72,7 +72,7 @@ def elt(extractor, loader, dry, transform, job_id):
             f"ELT could not complete, an error happened during the process: {err}."
         )
 
-    tracker = GoogleAnalyticsTracker()
+    tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 

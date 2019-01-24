@@ -1,5 +1,7 @@
 requirements.txt: ""
 meltano.yml: ""
+project_config.yml: |
+  send_anonymous_usage_stats: True
 README.md: ""
 .env: |
   export PG_PASSWORD=warehouse

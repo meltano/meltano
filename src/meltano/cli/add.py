@@ -56,7 +56,7 @@ def extractor(plugin_name):
         project = Project.find()
         add_plugin(project, PluginType.EXTRACTORS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker()
+        tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
@@ -69,7 +69,7 @@ def loader(plugin_name):
         project = Project.find()
         add_plugin(project, PluginType.LOADERS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker()
+        tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
@@ -82,7 +82,7 @@ def transformer(plugin_name):
         project = Project.find()
         add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker()
+        tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
@@ -95,7 +95,7 @@ def transform(plugin_name):
         project = Project.find()
         add_transform(project, plugin_name)
 
-        tracker = GoogleAnalyticsTracker()
+        tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
     except ProjectNotFound as e:
         click.ClickException(e)
