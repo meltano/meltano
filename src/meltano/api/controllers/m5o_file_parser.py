@@ -146,8 +146,8 @@ class MeltanoAnalysisFileParser:
     def graph_model(self, model):
         designs = model["designs"]
         for design in designs:
-          design_graph = self.graph_design(design)
-          design["graph"] = design_graph
+            design_graph = self.graph_design(design)
+            design["graph"] = design_graph
         return model
 
     def compile(self, models):
