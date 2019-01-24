@@ -152,3 +152,47 @@ class GoogleAnalyticsTracker:
             action=f"meltano elt {extractor} {loader} --transform {transform}",
             debug=debug,
         )
+
+    def track_meltano_install(self, debug: bool = False) -> None:
+        event = self.track_event(
+            category="meltano install", action="meltano install", debug=debug
+        )
+
+    def track_meltano_invoke(
+        self, plugin_name: str, plugin_args: str, debug: bool = False
+    ) -> None:
+        event = self.track_event(
+            category="meltano invoke",
+            action=f"meltano invoke {plugin_name} {plugin_args}",
+            debug=debug,
+        )
+
+    def track_meltano_permissions_grant(
+        self, db: str, dry: bool, debug: bool = False
+    ) -> None:
+        action = f"meltano permissions grant --db {db}"
+        if dry:
+            action = action + " --dry"
+
+        event = self.track_event(
+            category="meltano permissions grant", action=action, debug=debug
+        )
+
+    def track_meltano_select(
+        self,
+        extractor: str,
+        entities_filter: str,
+        attributes_filter: str,
+        flags: [],
+        debug: bool = False,
+    ) -> None:
+        action = f"meltano select {extractor} {entities_filter} {attributes_filter}"
+
+        if flags["list"]:
+            action = action + " --list"
+        if flags["all"]:
+            action = action + " --all"
+        if flags["exclude"]:
+            action = action + " --exclude"
+
+        event = self.track_event(category="meltano select", action=action, debug=debug)

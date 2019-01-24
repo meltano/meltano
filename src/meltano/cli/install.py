@@ -4,6 +4,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 def install_status_update(data):
@@ -32,3 +33,6 @@ def install():
     install_status = install_service.install_all_plugins(install_status_update)
     num_installed = len(install_status["installed"])
     click.secho(f"{num_installed} plugins installed successfully", fg="green")
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_install()
