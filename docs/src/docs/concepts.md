@@ -1,4 +1,4 @@
-# Fundamentals
+# Concepts
 
 Below are common terms used within the Meltano ecosystem arranged alphabetically.
 

@@ -1,20 +1,4 @@
-# Guide
-
-## Introduction
-
-Welcome to Meltano! Meltano is your solution for taking you from data source to dashboard. What does that mean? It means we have you covered through the entire data life cycle:
-
-- Model
-- Extract
-- Load
-- Transform
-- Analyze
-- Notebook
-- Orchestrate
-
-::: tip Tip
-For developers who want to contribute to Meltano, check out our [contributing guide](/docs/contributing.html).
-:::
+# Installation
 
 ## Requirements
 
@@ -24,7 +8,7 @@ Before you get started, there are a couple of things your environment needs:
 - [Docker](https://www.docker.com/get-started)
 - [Python 3](https://realpython.com/installing-python/)
 
-## Installation
+## Instructions
 
 Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 
