@@ -3,6 +3,7 @@ from .reports_helper import ReportsHelper
 
 reportsBP = Blueprint("reports", __name__, url_prefix="/reports")
 
+
 @reportsBP.route("/", methods=["GET"])
 def index():
     reports_helper = ReportsHelper()
