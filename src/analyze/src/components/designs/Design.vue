@@ -207,7 +207,31 @@
                 <div class="dropdown-menu" id="dropdown-menu-save-report" role="menu">
                   <div class="dropdown-content">
                     <div class="dropdown-item">
-                      Test
+                      <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                          <input class="input"
+                                  type="text"
+                                  placeholder="Name your report"
+                                  v-model="saveReportSettings.name">
+                        </div>
+                      </div>
+                      <div class="field">
+                        <label class="label">Description</label>
+                        <div class="control">
+                          <textarea class="textarea"
+                                    placeholder="Describe your report for easier reference later"
+                                    v-model="saveReportSettings.description"></textarea>
+                        </div>
+                      </div>
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <button class="button is-link" @click="saveReport">Confirm</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-text" @click="toggleSaveReportOpen">Cancel</button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -406,6 +430,7 @@ export default {
       'dataOpen',
       'loadReportOpen',
       'saveReportOpen',
+      'saveReportSettings',
       'reports',
       'chartsOpen',
       'hasSQLError',
@@ -505,7 +530,7 @@ export default {
     },
 
     saveReport() {
-      this.$store.dispatch('designs/saveReport', { name: `report-${Date.now()}` });
+      this.$store.dispatch('designs/saveReport', this.saveReportSettings );
       this.toggleSaveReportOpen();
     },
 

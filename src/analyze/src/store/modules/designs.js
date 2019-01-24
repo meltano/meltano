@@ -26,6 +26,7 @@ const state = {
   chartsOpen: false,
   loadReportOpen: false,
   saveReportOpen: false,
+  saveReportSettings: { name: null, description: null },
   reports: [],
   chartType: 'BarChart',
   limit: 3,
@@ -321,8 +322,7 @@ const actions = {
   },
 
   loadReport({ commit }, { name }) {
-    designApi
-      .loadReport(name)
+    designApi.loadReport(name)
       .then((response) => {
         state.currentModel = response.data.model;
         state.currentDesign = response.data.design;
@@ -337,14 +337,22 @@ const actions = {
       });
   },
 
-  saveReport(_, { name }) {
+  saveReport({ commit }, { name, description }) {
     const postData = {
       name,
+      description,
       model: state.currentModel,
       design: state.currentDesign,
       queryPayload: helpers.getQueryPayloadFromUI(),
     };
-    designApi.saveReport(postData);
+    designApi.saveReport(postData)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
   resetErrorMessage({ commit }) {
@@ -463,6 +471,10 @@ const mutations = {
     state.saveReportOpen = !state.saveReportOpen;
   },
 
+  resetSaveReportSettings() {
+    state.saveReportSettings = { name: null, description: null };
+  },
+
   setChartToggle() {
     state.chartsOpen = !state.chartsOpen;
   },
@@ -487,7 +499,7 @@ const mutations = {
     state.hasSQLError = true;
     if (!e.response) {
       state.sqlErrorMessage = [
-        "Something went wrong on our end. We'll check our error logs and get back to you.",
+        "Something went wrong on our end. We'll check our error logs and get back to you."
       ];
       return;
     }
@@ -509,7 +521,7 @@ const mutations = {
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach((column) => {
+    Object.keys(columns).forEach(column => {
       state.selectedColumns[column.unique_name] = false;
     });
   },
@@ -524,7 +536,7 @@ const mutations = {
 
   setLimit(_, limit) {
     state.limit = limit;
-  },
+  }
 };
 
 export default {
