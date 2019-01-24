@@ -162,15 +162,37 @@
         <div class="columns">
           <div class="column">
             <div class="buttons is-pulled-right">
-                <a class="button is-secondary"
-                    :class="{'is-loading': loadingQuery}"
-                    @click="loadReport">Load Report</a>
-                <a class="button is-secondary"
-                    :class="{'is-loading': loadingQuery}"
-                    @click="saveReport">Save Report</a>
-                <a class="button is-primary"
-                    :class="{'is-loading': loadingQuery}"
-                    @click="runQuery">Run Query</a>
+              <div class="dropdown"
+                    :class="{'is-active': loadReportOpen}">
+                <div class="dropdown-trigger">
+                  <button class="button"
+                          aria-haspopup="true"
+                          aria-controls="dropdown-menu-load-report"
+                          @click="toggleLoadReportOpen">
+                    <span>Load Report</span>
+                    <span class="icon is-small">
+                      <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu-load-report" role="menu">
+                  <div class="dropdown-content">
+                    <a class="dropdown-item"
+                        :class="{'is-loading': loadingQuery}"
+                        v-for="report in [{'name': 'report-1548272475255'}, {'name': 'report-1548272581170'}]"
+                        :key="report.name"
+                        @click="loadReport(report)">
+                      {{report.name}}
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <a class="button is-secondary"
+                  :class="{'is-loading': loadingQuery}"
+                  @click="saveReport">Save Report</a>
+              <a class="button is-primary"
+                  :class="{'is-loading': loadingQuery}"
+                  @click="runQuery">Run Query</a>
             </div>
           </div>
         </div>
@@ -358,6 +380,7 @@ export default {
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
+      'loadReportOpen',
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
@@ -450,9 +473,9 @@ export default {
       this.$store.dispatch('designs/getSQL', { run: true });
     },
 
-    loadReport() {
-      // TODO implement report load selection UI
-      this.$store.dispatch('designs/loadReport', { name: 'report-1548272475255' });
+    loadReport(report) {
+      this.$store.dispatch('designs/loadReport', { name: report.name });
+      this.toggleLoadReportOpen();
     },
 
     saveReport() {
@@ -466,6 +489,10 @@ export default {
 
     toggleFilterOpen() {
       this.$store.dispatch('designs/toggleFilterOpen');
+    },
+
+    toggleLoadReportOpen() {
+      this.$store.dispatch('designs/toggleLoadReportOpen');
     },
 
     toggleDataOpen() {
