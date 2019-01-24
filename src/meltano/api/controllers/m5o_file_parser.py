@@ -4,10 +4,13 @@ from jinja2 import Template
 from typing import Dict, List
 from .design_helper import visit, PypikaJoinExecutor
 import networkx as nx
+from networkx.readwrite import json_graph
 import sqlparse
+from copy import deepcopy
 
 import logging
 import json
+
 
 class MeltanoAnalysisFileParserError(Exception):
     def __init__(self, message, file_name, *args):
@@ -57,11 +60,14 @@ class MeltanoAnalysisFileParserMissingFieldsError(MeltanoAnalysisFileParserError
     def __repr__(self):
         return f"{self.message} in {self.file_name}"
 
+
 class MeltanoAnalysisInvalidJoinDependencyError(MeltanoAnalysisFileParserError):
     def __init__(self, field, cls, file_name, *args):
         self.file_name = file_name
         self.cls = cls
-        self.message = f'Invalid join dependency in "{file_name}" in "{field}" join in {cls}.'
+        self.message = (
+            f'Invalid join dependency in "{file_name}" in "{field}" join in {cls}.'
+        )
         super(MeltanoAnalysisInvalidJoinDependencyError, self).__init__(
             self.message, self.file_name, *args
         )
@@ -102,47 +108,46 @@ class MeltanoAnalysisFileParser:
             raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
     def generate_join_graph_for_node(self, graph, node, joins):
-      remaining_joins = []
-      check_against = []
-      for join in joins:
-        join_executor = None
-        if 'executor' in join:
-          join_executor = join['executor']
-        else:
-          join_executor = PypikaJoinExecutor(self, join)
-          visit(sqlparse.parse(join["sql_on"])[0], join_executor)
-          join['executor'] = join_executor
-        left_table = join_executor.comparison_fields.left.table
-        right_table = join_executor.comparison_fields.right.table
-        if left_table == node:
-          graph.add_node(right_table)
-          graph.add_edge(node, right_table)
-          check_against.append(right_table)
-        elif right_table == node:
-          graph.add_node(left_table)
-          graph.add_edge(node, left_table)
-          check_against.append(left_table)
-        else:
-          remaining_joins.append(join)
+        remaining_joins = []
+        check_against = []
+        for join in joins:
+            join_executor = None
+            if "executor" in join:
+                join_executor = join["executor"]
+            else:
+                join_executor = PypikaJoinExecutor(self, join)
+                visit(sqlparse.parse(join["sql_on"])[0], join_executor)
+                join["executor"] = join_executor
+            left_table = join_executor.comparison_fields.left.table
+            right_table = join_executor.comparison_fields.right.table
+            if left_table == node:
+                graph.add_node(right_table)
+                graph.add_edge(node, right_table)
+                check_against.append(right_table)
+            elif right_table == node:
+                graph.add_node(left_table)
+                graph.add_edge(node, left_table)
+                check_against.append(left_table)
+            else:
+                remaining_joins.append(join)
 
-      if len(check_against):
-        for check in check_against:
-          self.generate_join_graph_for_node(graph, check, remaining_joins)
+        if len(check_against):
+            for check in check_against:
+                self.generate_join_graph_for_node(graph, check, remaining_joins)
 
-
-          
     def graph_design(self, design):
-      base_design = design['related_table']['name']
-      graph = nx.DiGraph()
-      graph.add_node(base_design)
-      print(graph)
-      joins = design['joins']
-      self.generate_join_graph_for_node(graph, base_design, joins)
-      return design
+        base_design = design["related_table"]["name"]
+        graph = nx.DiGraph()
+        graph.add_node(base_design)
+        joins = deepcopy(design["joins"])
+        self.generate_join_graph_for_node(graph, base_design, joins)
+        return json_graph.node_link_data(graph)
 
     def graph_model(self, model):
-        designs = model['designs']
-        model['designs'] = [self.graph_design(design) for design in designs]
+        designs = model["designs"]
+        for design in designs:
+          design_graph = self.graph_design(design)
+          design["graph"] = design_graph
         return model
 
     def compile(self, models):
