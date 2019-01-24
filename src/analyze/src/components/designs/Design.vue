@@ -162,6 +162,7 @@
         <div class="columns">
           <div class="column">
             <div class="buttons is-pulled-right">
+
               <div class="dropdown"
                     :class="{'is-active': loadReportOpen}"
                     v-if="reports.length > 0">
@@ -188,12 +189,34 @@
                   </div>
                 </div>
               </div>
-              <a class="button is-secondary"
-                  :class="{'is-loading': loadingQuery}"
-                  @click="saveReport">Save Report</a>
+
+              <div class="dropdown"
+                    :class="{'is-active': saveReportOpen}"
+                    v-if="numResults > 0">
+                <div class="dropdown-trigger">
+                  <button class="button"
+                          aria-haspopup="true"
+                          aria-controls="dropdown-menu-save-report"
+                          @click="toggleSaveReportOpen">
+                    <span>Save Report</span>
+                    <span class="icon is-small">
+                      <i class="fas fa-angle-down" aria-hidden="true"></i>
+                    </span>
+                  </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu-save-report" role="menu">
+                  <div class="dropdown-content">
+                    <div class="dropdown-item">
+                      Test
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <a class="button is-primary"
                   :class="{'is-loading': loadingQuery}"
                   @click="runQuery">Run Query</a>
+
             </div>
           </div>
         </div>
@@ -382,6 +405,7 @@ export default {
       'filtersOpen',
       'dataOpen',
       'loadReportOpen',
+      'saveReportOpen',
       'reports',
       'chartsOpen',
       'hasSQLError',
@@ -481,8 +505,8 @@ export default {
     },
 
     saveReport() {
-      // TODO implement report naming UI
       this.$store.dispatch('designs/saveReport', { name: `report-${Date.now()}` });
+      this.toggleSaveReportOpen();
     },
 
     setCurrentTab(tab) {
@@ -495,6 +519,10 @@ export default {
 
     toggleLoadReportOpen() {
       this.$store.dispatch('designs/toggleLoadReportOpen');
+    },
+
+    toggleSaveReportOpen() {
+      this.$store.dispatch('designs/toggleSaveReportOpen');
     },
 
     toggleDataOpen() {
