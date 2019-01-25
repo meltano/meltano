@@ -37,7 +37,9 @@
       </div>
     </div>
 
-    <!-- <Content custom /> -->
+    <h2 class="quote">Meltano does for data what docker did for containers</h2>
+
+    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software devlopment such as version control, continuous integration and deploymeent, a powerful command line interface, and more.</p>
 
     <table class="meltano-stages-table">
       <thead>
@@ -215,6 +217,21 @@ export default {
 
 <style lang="stylus">
 @import './styles/config.styl'
+
+.quote {
+  border-top: 1px solid #ddd;
+  border-bottom: 0;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-top: 5rem;
+  padding-top: 5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size: 1.5rem;
+}
 
 .meltano-stages-table {
   display: block;
