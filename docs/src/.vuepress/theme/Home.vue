@@ -50,7 +50,7 @@
           <th>Load</th>
           <th>Transform</th>
           <th>Analyze</th>
-          <th>Notebok</th>
+          <th>Notebook</th>
           <th>Orchestrate</th>
         </tr>
       </thead>
