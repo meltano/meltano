@@ -33,6 +33,9 @@ class SqlHelper:
         inner_results = re.findall(inner_pattern, input)
         return (outer_results, inner_results)
 
+    def get_aliases_from_aggregates(self, aggregates, db_table):
+        return [AnalysisHelper.field_from_aggregate(a, db_table).alias for a in aggregates]
+
     def get_names(self, things):
         return [thing["name"] for thing in things]
 
@@ -147,6 +150,7 @@ class SqlHelper:
         )
         names = self.get_names(columns_raw + aggregates_raw)
         return {
+            "db_table": db_table,
             "columns": columns_raw,
             "aggregates": aggregates_raw,
             "column_headers": column_headers,
