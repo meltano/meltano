@@ -161,7 +161,7 @@
       <div class="column is-three-quarters">
         <div class="columns">
           <div class="column">
-            <div class="buttons is-pulled-right">
+            <div class="is-grouped is-pulled-right">
 
               <div class="dropdown"
                     :class="{'is-active': loadReportOpen}"
@@ -173,7 +173,7 @@
                           @click="toggleLoadReportOpen">
                     <span>Load Report</span>
                     <span class="icon is-small">
-                      <i class="fas fa-angle-down" aria-hidden="true"></i>
+                      <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
                     </span>
                   </button>
                 </div>
@@ -200,7 +200,7 @@
                           @click="toggleSaveReportOpen">
                     <span>Save Report</span>
                     <span class="icon is-small">
-                      <i class="fas fa-angle-down" aria-hidden="true"></i>
+                      <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
                     </span>
                   </button>
                 </div>
