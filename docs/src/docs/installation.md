@@ -23,7 +23,7 @@ To start, open your terminal in the directory where you want Meltano to live. Ru
 pip install meltano
 ```
 
-::: warning Note
+::: tip 
 If you're having issues with the `pip` command, try `pip3 install meltano` instead!
 :::
 
