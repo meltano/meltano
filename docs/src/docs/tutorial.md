@@ -18,6 +18,9 @@ cd carbon
 # Start Docker container to setup logging
 docker-compose up -d
 
+# Set environment variables
+source .env
+
 # Let's see what extractors and loaders are available
 meltano discover all
 
