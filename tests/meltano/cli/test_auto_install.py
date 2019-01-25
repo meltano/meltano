@@ -1,8 +1,8 @@
 import pytest
-
 from click.testing import CliRunner
 
 from meltano.cli import cli
+from asserts import assert_cli_runner
 
 
 class TestAutoInstall:
@@ -14,4 +14,5 @@ class TestAutoInstall:
 
         cli_args = ["elt", "tap-carbon-intensity", "target-sqlite"]
         result = cli_runner.invoke(cli, cli_args)
-        assert result.exit_code == 0
+
+        assert_cli_runner(result)
