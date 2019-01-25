@@ -47,6 +47,35 @@ def default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
 
 
+def get_db_engine(connection_name):
+    project = Project.find()
+    settings_helper = SettingsHelper()
+    connections = settings_helper.get_connections()["settings"]["connections"]
+
+    try:
+        connection = next(
+            connection
+            for connection in connections
+            if connection["name"] == connection_name
+        )
+
+        if connection["dialect"] == "postgresql":
+            psql_params = ["username", "password", "host", "port", "database"]
+            user, pw, host, port, db = [connection[param] for param in psql_params]
+            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+            engine = sqlalchemy.create_engine(connection_url)
+            engine.execute(f"SET search_path TO {connection['schema']},public ")
+        elif connection["dialect"] == "sqlite":
+            db_path = project.root.joinpath(connection["path"])
+            connection_url = f"sqlite:///{db_path}"
+            engine = sqlalchemy.create_engine(connection_url)
+
+        return engine
+
+        raise ConnectionNotFound(connection_name)
+    except StopIteration:
+        raise ConnectionNotFound(connection_name)
+
 @sqlBP.before_request
 @api_auth_required
 def before_request():

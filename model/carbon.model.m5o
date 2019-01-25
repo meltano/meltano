@@ -11,12 +11,12 @@
       joins {
         entry {
           label = Entry
-          sql_on = "region.id = entry.region_id"
+          sql_on = "gitlab.region.id = gitlab.entry.region_id"
           relationship = many_to_one
         }
         generationmix {
           label = Generation Mix
-          sql_on = "entry.id = generationmix.entry_id"
+          sql_on = "gitlab.entry.id = gitlab.generationmix.entry_id"
           relationship = many_to_one
         }
       }
