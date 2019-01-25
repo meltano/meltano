@@ -10,6 +10,10 @@ class ReportsHelper:
     def __init__(self):
         self.meltano_model_path = join(os.getcwd(), "model")
 
+    def has_reports(self):
+        m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
+        return Path.is_file(m5oc_file)
+
     def get_report_m5oc(self):
         m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
         with m5oc_file.open() as f:
@@ -17,7 +21,8 @@ class ReportsHelper:
         return m5oc
 
     def get_reports(self):
-        return self.get_report_m5oc().reports
+        reports = self.get_report_m5oc().reports if self.has_reports() else []
+        return reports
 
     def load_report(self, report_name):
         return self.get_report_m5oc().report(report_name)
