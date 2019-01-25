@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * add ability to save reports
+* add ability to load reports
 
 ### Changes
 
