@@ -18,6 +18,9 @@ cd carbon
 # Start Docker container to setup logging
 docker-compose up -d
 
+# Set environment variables
+source .env
+
 # Let's see what extractors and loaders are available
 meltano discover all
 
@@ -49,17 +52,13 @@ Follow the [installation](/docs/#installation) steps if Meltano UI is not runnin
 :::
 
 Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
-- Navigate to Settings (upper-right)
-- Enter connection settings
+
+1. Navigate to Settings (upper-right)
+1. Enter connection settings
   - Name = `runners_db`
   - Dialect = `sqlite`
-  - Host = `localhost`
-  - Port = `5502`
-  - Database = `warehouse`
-  - Schema = `gitlab`
-  - Username = `warehouse`
-  - Password = `warehouse`
-- Click "Save Connection"
+  - Path to SQLite File = `meltano.db`
+1. Click "Save Connection"
 
 Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
 - Click Model button (upper-left)
