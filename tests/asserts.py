@@ -1,6 +1,4 @@
 def assert_cli_runner(runner, message=None):
-    assertion_message = str(message
-                            or runner.exception
-                            or runner.output)
+    assertion_message = str(message or runner.exception or runner.output)
 
     assert runner.exit_code == 0, assertion_message
