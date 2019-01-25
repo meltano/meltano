@@ -22,33 +22,15 @@ class GoogleAnalyticsTracker:
         self.project = project
         self.tracking_id = tracking_id or MELTANO_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
-
-        config = self.project_config()
         self.send_anonymous_usage_stats = (
-            config.get("send_anonymous_usage_stats", False) == True
+            self.project.meltano.get("send_anonymous_usage_stats", False) == True
         )
-
         self.client_id = client_id or self.project_id()
 
-    def project_config(self) -> Dict:
-        """Fetch the project config from the root directory."""
-        config_file = self.project.root.joinpath("project_config.yml")
-        if config_file.is_file():
-            with config_file.open() as file:
-                config = yaml.load(file) or {}
-        else:
-            config = {}
-
-        return config
-
     def update_permission_to_track(self, send_anonymous_usage_stats: bool) -> None:
-        """Update the send_anonymous_usage_stats in the project config."""
-        config = self.project_config()
-        config["send_anonymous_usage_stats"] = send_anonymous_usage_stats
-
-        config_file = self.project.root.joinpath("project_config.yml")
-        with open(config_file, "w") as f:
-            f.write(yaml.dump(config, default_flow_style=False))
+        """Update the send_anonymous_usage_stats in meltano.yml."""
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml["send_anonymous_usage_stats"] = send_anonymous_usage_stats
 
     def project_id(self) -> None:
         """
@@ -57,10 +39,8 @@ class GoogleAnalyticsTracker:
         If it is not found (e.g. first time run), generate a valid uuid4 and
         store it in the project config file.
         """
-        config = self.project_config()
-
         try:
-            project_id_str = config.get("project_id", None) or ""
+            project_id_str = self.project.meltano.get("project_id", None) or ""
             project_id = uuid.UUID(project_id_str, version=4)
         except ValueError:
             project_id = uuid.uuid4()
@@ -69,11 +49,8 @@ class GoogleAnalyticsTracker:
                 # If we are set to track Anonymous Usage stats, also store
                 #  the generated project_id back to the project config file
                 #  so that it persists between meltano runs.
-                config["project_id"] = str(project_id)
-
-                config_file = self.project.root.joinpath("project_config.yml")
-                with open(config_file, "w") as f:
-                    f.write(yaml.dump(config, default_flow_style=False))
+                with self.project.meltano_update() as meltano_yml:
+                    meltano_yml["project_id"] = str(project_id)
 
         return project_id
 

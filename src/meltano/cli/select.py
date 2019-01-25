@@ -75,7 +75,7 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
         extractor.add_select_filter(pattern)
 
         idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
-        meltano["extractors"][idx] = extractor.canonical()
+        meltano["plugins"]["extractors"][idx] = extractor.canonical()
 
 
 def show(project, extractor, entities_filter, attributes_filter, show_all=False):

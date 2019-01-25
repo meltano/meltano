@@ -1,6 +1,5 @@
 requirements.txt: ""
-meltano.yml: ""
-project_config.yml: |
+meltano.yml: |
   send_anonymous_usage_stats: True
 README.md: ""
 .env: |
