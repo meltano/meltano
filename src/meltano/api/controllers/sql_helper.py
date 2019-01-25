@@ -4,7 +4,7 @@ import re
 import sqlalchemy
 from flask import jsonify
 from pypika import Query, Order
-from .analysishelper import AnalysisHelper
+from .analysis_helper import AnalysisHelper
 from .date import Date
 
 
