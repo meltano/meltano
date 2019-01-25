@@ -67,6 +67,55 @@ Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
+## Transforms
+
+Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
+
+When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run.
+
+As an example, assume that the following command runs:
+
+```
+meltano elt tap-carbon-intensity target-postgres --transform run
+```
+
+After the Extract and Load steps are successfuly completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs. 
+
+Meltano uses the convention that the transform has the same name as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a meltano project manually:
+
+```
+(venv) $ meltano discover transforms
+
+transforms
+tap-carbon-intensity
+
+(venv) $ meltano add transform tap-carbon-intensity
+Transform tap-carbon-intensity added to your meltano.yml config
+Transform tap-carbon-intensity added to your dbt packages
+Transform tap-carbon-intensity added to your dbt_project.yml
+```
+
+Transforms are basically dbt packages that reside in their own repositories. If you want to see in more details how such a package can be defined, you can check the dbt documentation on [Package Management](https://docs.getdbt.com/docs/package-management) and [dbt-tap-carbon-intensity](https://gitlab.com/meltano/dbt-tap-carbon-intensity), the project used for defining the default transforms for `tap-carbon-intensity`.
+
+When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml` and loaded for usage the next time dbt runs.
+
+
+The format of the `meltano.yml` entries for transforms can have additional parameters, with most important the vars that will be used for parametrising the dbt package for the transformations. For example:
+
+```
+transforms:
+- name: tap-carbon-intensity
+  pip_url: https://gitlab.com/meltano/dbt-tap-carbon-intensity.git
+  vars:
+    entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
+    generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
+    region_table: "{{ env_var('PG_SCHEMA') }}.region"
+```
+
+Those follow dbt's syntax in order to fetch values from environment variables. In this case, $PG_SCHEMA must be available in order for the transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses $PG_SCHEMA by default as it is the same dafault schema also used by the Postgres Loader.  
+
+Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
+
 ## How ELT Commands Fetch Dependencies
 
 When you run ELT commands on a tap or target, this is the general process for fetching dependencies:
