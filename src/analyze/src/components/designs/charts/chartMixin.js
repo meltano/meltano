@@ -76,7 +76,7 @@ const chartMixin = {
         let label = [];
         resultsKeys.forEach((k, i) => {
           // isn't this just aggregates?
-          if (!diff.includes(k)) {
+          if (diff.includes(k)) {
             const color = utils.getColor(i);
             if (!dataSets[k]) {
               dataSets[k] = {
