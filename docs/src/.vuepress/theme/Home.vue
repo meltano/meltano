@@ -39,11 +39,11 @@
 
     <h2 class="quote">Meltano does for data what docker did for containers</h2>
 
-    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software devlopment such as version control, continuous integration and deploymeent, and a powerful command line interface so you can focus on your data.</p>
+    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
     <table class="meltano-stages-table">
       <thead>
-        <tr>
+        <tr class="meltano-header-row">
           <th><span class="sr-only">Description</span></th>
           <th>Model</th>
           <th>Extract</th>
@@ -241,6 +241,10 @@ export default {
   tr:nth-child(2n) {
     background-color: white;
   }
+}
+
+.meltano-header-row {
+  height: 75px;
 }
 
 .meltano-row {
