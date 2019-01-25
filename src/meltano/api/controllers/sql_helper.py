@@ -20,7 +20,9 @@ class SqlHelper:
         return (outer_results, inner_results)
 
     def get_aliases_from_aggregates(self, aggregates, db_table):
-        return [AnalysisHelper.field_from_aggregate(a, db_table).alias for a in aggregates]
+        return [
+            AnalysisHelper.field_from_aggregate(a, db_table).alias for a in aggregates
+        ]
 
     def get_names(self, things):
         return [thing["name"] for thing in things]
