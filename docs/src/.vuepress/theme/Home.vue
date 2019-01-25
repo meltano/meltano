@@ -221,7 +221,7 @@ export default {
 .quote {
   border-top: 1px solid #ddd;
   border-bottom: 0;
-  font-size: 2.5rem;
+  font-size: 2.4rem;
   text-align: center;
   margin-top: 5rem;
   padding-top: 5rem;
@@ -230,12 +230,13 @@ export default {
 }
 
 .description {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  margin-bottom: 0;
 }
 
 .meltano-stages-table {
   display: block;
-  margin: 4.5rem auto 5rem;
+  margin: 2.5rem auto 7rem;
 
   tr:nth-child(2n) {
     background-color: white;
@@ -265,11 +266,11 @@ export default {
 
 .hiring {
   border-top: 1px solid #eaecef;
-  padding: 1.2rem 0;
+  padding: 2rem 0 2.5rem;
   text-align: center;
 
   &__text {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     margin-bottom: 0.82rem;
   }
 
@@ -277,6 +278,7 @@ export default {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: 0;
+    font-size: 2rem;
   }
 }
 
