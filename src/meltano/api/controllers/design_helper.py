@@ -3,7 +3,7 @@ from enum import Enum
 from copy import deepcopy
 from typing import Dict
 
-from .analysishelper import AnalysisHelper
+from .analysis_helper import AnalysisHelper
 from collections import namedtuple
 
 
