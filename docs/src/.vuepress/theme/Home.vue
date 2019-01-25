@@ -82,7 +82,7 @@
           <td>
             <ul>
               <li>
-                <a href="http://www.modelsphere.com/org/">Open ModelSphere <OutboundLink /></a>
+                <a href="http://www.modelsphere.com/org/">Open ModelSphere</a>
               </li>
               <li>
                 <a href="https://looker.com/platform/data-modeling">LookML</a>
