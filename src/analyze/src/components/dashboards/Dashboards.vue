@@ -6,6 +6,9 @@
           <p class="panel-heading">
             Dashboards
           </p>
+          <div class="inner-scroll text-selection-off">
+
+          </div>
         </nav>
       </div>
     </section>
@@ -13,12 +16,28 @@
 </template>
 
 <script>
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Dashboards',
+  computed: {
+    ...mapState('dashboards', [
+      'dashboards',
+      'activeDashboard',
+    ]),
+    ...mapGetters('dashboards', [
+
+    ]),
+  },
+  methods: {
+    ...mapActions('dashboards', [
+      'getDashboard',
+    ]),
+  }
 }
 
-console.log('Dashboards loaded');
+
+
 </script>
 
 <style lang="scss" scoped>
