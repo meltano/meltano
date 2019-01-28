@@ -11,7 +11,9 @@
             <div class="inner-scroll text-selection-off">
               <ul>
                 <li v-for="dashboard in dashboards"
-                    :key="dashboard.id">
+                    :class="{'is-active': isActive(dashboard)}"
+                    :key="dashboard.id"
+                    @click="getDashboard(dashboard)">
                   {{dashboard.name}}
                 </li>
               </ul>
@@ -20,7 +22,7 @@
         </nav>
 
         <div class="column is-three-quarters">
-
+          {{activeDashboard.name}}
         </div>
 
       </div>
@@ -47,6 +49,9 @@ export default {
       'getDashboards',
       'getDashboard',
     ]),
+    isActive(dashboard) {
+      return dashboard.id === this.activeDashboard.id;
+    },
   },
 };
 

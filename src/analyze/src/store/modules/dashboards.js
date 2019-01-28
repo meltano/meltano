@@ -2,7 +2,7 @@ import dashboardApi from '../../api/dashboards';
 
 const state = {
   dashboards: [],
-  activeDashboard: null,
+  activeDashboard: {},
 };
 
 const actions = {
@@ -13,8 +13,8 @@ const actions = {
         commit('setDashboards', dashboards);
       });
   },
-  getDashboard({ commit }, id) {
-    dashboardApi.getDashboard(id)
+  getDashboard({ commit }, dashboard) {
+    dashboardApi.getDashboard(dashboard.id)
       .then((response) => {
         commit('setCurrentDashboard', response.data);
       });
