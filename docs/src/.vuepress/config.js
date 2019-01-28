@@ -49,7 +49,6 @@ module.exports = {
 				'/docs/meltano-cli',
 				'/docs/best-practices',
 				'/docs/superset',
-				'/docs/taps-targets',
 				'/docs/security-privacy',
 				'/docs/tmuxinator',
 				'/docs/license',

@@ -1,6 +1,10 @@
 # Meltano CLI
 
-- `meltano init <project name> [--no_usage_stats]`: Create an empty meltano project. Use the `--no_usage_stats` to not send anonymous usage statistics for any operation executed inside that project. This option can be changed at any time by updating the `project_config.yml` file at the root of a meltano project.
+Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
+
+Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
+
+- `meltano init [project name]`: Create an empty meltano project.
 - {: #meltano-add}`meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
