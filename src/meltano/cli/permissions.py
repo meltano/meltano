@@ -2,7 +2,9 @@ import logging
 import click
 import sys
 
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.permissions import grant_permissions, SpecLoadingError
+from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
 
 
@@ -29,6 +31,13 @@ def grant(db, spec, dry):
             sys.exit(1)
 
         sql_commands = grant_permissions(db, spec, dry_run=dry)
+
+        try:
+            project = Project.find()
+            tracker = GoogleAnalyticsTracker(project)
+            tracker.track_meltano_permissions_grant(db=db, dry=dry)
+        except ProjectNotFound as e:
+            pass
 
         click.secho()
         click.secho("SQL Commands generated for given spec file:")

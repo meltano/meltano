@@ -11,8 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * add ability to save reports
 * add ability to load reports
+* Add tracking of anonymous `meltano cli` usage stats to Meltano's Google Analytics Account
+* Add `project_config.yml` to all meltano projects to store concent for anonymous usage tracking and the project's UUID
 
 ### Changes
+* Add `--no_usage_stats` option to `meltano init <project_name>` to allow users to opt-out from anonymous usage stats tracking
+* Bundled Meltano models are now SQLite compatible.
 
 ### Fixes
 * Updated the Fundamentals documentation section regarding reports

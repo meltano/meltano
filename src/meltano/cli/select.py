@@ -15,6 +15,7 @@ from meltano.core.plugin.singer.catalog import (
     parse_select_pattern,
     ListSelectedExecutor,
 )
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
@@ -26,10 +27,32 @@ from meltano.core.plugin.singer.catalog import (
 @click.option("--exclude", is_flag=True)
 def select(extractor, entities_filter, attributes_filter, **flags):
     try:
+        project = Project.find()
+
         if flags["list"]:
-            show(extractor, entities_filter, attributes_filter, show_all=flags["all"])
+            show(
+                project,
+                extractor,
+                entities_filter,
+                attributes_filter,
+                show_all=flags["all"],
+            )
         else:
-            add(extractor, entities_filter, attributes_filter, exclude=flags["exclude"])
+            add(
+                project,
+                extractor,
+                entities_filter,
+                attributes_filter,
+                exclude=flags["exclude"],
+            )
+
+        tracker = GoogleAnalyticsTracker(project)
+        tracker.track_meltano_select(
+            extractor=extractor,
+            entities_filter=entities_filter,
+            attributes_filter=attributes_filter,
+            flags=flags,
+        )
     except PluginExecutionError as e:
         raise click.ClickException(
             f"Cannot list the selected properties: "
@@ -42,9 +65,8 @@ def select(extractor, entities_filter, attributes_filter, **flags):
         raise click.ClickException(str(e)) from e
 
 
-def add(extractor, entities_filter, attributes_filter, exclude=False):
+def add(project, extractor, entities_filter, attributes_filter, exclude=False):
     exclude = "!" if exclude else ""
-    project = Project.find()
     config = ConfigService(project)
     pattern = f"{exclude}{entities_filter}.{attributes_filter}"
 
@@ -53,11 +75,10 @@ def add(extractor, entities_filter, attributes_filter, exclude=False):
         extractor.add_select_filter(pattern)
 
         idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
-        meltano["extractors"][idx] = extractor.canonical()
+        meltano["plugins"]["extractors"][idx] = extractor.canonical()
 
 
-def show(extractor, entities_filter, attributes_filter, show_all=False):
-    project = Project.find()
+def show(project, extractor, entities_filter, attributes_filter, show_all=False):
     config = ConfigService(project)
     extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
     invoker = PluginInvoker(project, extractor)
