@@ -24,13 +24,6 @@ source .env
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# It looks like a tap for carbon intensity data is available,
-# let's add that as a dependency. See https://api.carbonintensity.org.uk/
-meltano add extractor tap-carbon-intensity
-
-# Now we add a loader for the sqlite database
-meltano add loader target-sqlite
-
 # Run elt (extract, load, transform) with an id of your choice and the extractor and
 # loader we just added without the need to transform the data
 meltano elt tap-carbon-intensity target-sqlite
