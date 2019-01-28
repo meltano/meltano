@@ -37,7 +37,10 @@ class ProjectAddService:
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
         with self.project.meltano_update() as meltano_yml:
-            meltano_yml[plugin_type] = meltano_yml.get(plugin_type, [])
+            meltano_yml["plugins"] = meltano_yml.get("plugins", {})
+            meltano_yml["plugins"][plugin_type] = meltano_yml["plugins"].get(
+                plugin_type, []
+            )
 
         if plugin.pip_url:
             self.add_to_file(plugin)
@@ -54,4 +57,4 @@ class ProjectAddService:
             return
 
         with self.project.meltano_update() as meltano_yml:
-            meltano_yml[plugin.type].append(plugin.canonical())
+            meltano_yml["plugins"][plugin.type].append(plugin.canonical())

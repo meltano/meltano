@@ -1,5 +1,6 @@
 import pytest
 import os
+import shutil
 
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
@@ -57,4 +58,7 @@ def project(test_dir):
 
     # cd into the new project root
     project.activate()
-    return project
+    yield project
+
+    os.chdir(test_dir)
+    shutil.rmtree(project.root)

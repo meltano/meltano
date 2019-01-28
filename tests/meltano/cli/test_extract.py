@@ -7,6 +7,7 @@ from meltano.cli import cli
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.dbt_service import DbtService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 PERFORM_TEST_ARGS = ["elt", "tap-test", "target-test"]
@@ -23,7 +24,9 @@ def test_elt(request, project):
     assert result.exit_code == 2
 
     # exit cleanly when everything is fine
-    with patch.object(SingerRunner, "perform", return_value=None), patch(
+    with patch.object(SingerRunner, "perform", return_value=None), patch.object(
+        GoogleAnalyticsTracker, "track_data", return_value=None
+    ), patch(
         "meltano.cli.elt.install_missing_plugins",
         side_effect=mock_install_missing_plugins,
     ):
