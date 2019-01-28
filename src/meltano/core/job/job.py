@@ -6,8 +6,9 @@ from contextlib import contextmanager
 from enum import Enum
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
-from meltano.core.db import SystemModel, session_open
+from meltano.core.db import SystemModel
 from meltano.core.error import Error
+from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag
 
 
 class InconsistentStateError(Error):
@@ -40,11 +41,12 @@ class Job(SystemModel):
     __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
-    elt_uri = Column(types.String)
+    job_id = Column(types.String)
     state = Column(types.Enum(State))
     started_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
-    payload = Column(MutableDict.as_mutable(types.JSON))
+    payload = Column(MutableDict.as_mutable(JSONEncodedDict))
+    payload_flags = Column(IntFlag, default=0)
 
     def __init__(self, **kwargs):
         kwargs["state"] = kwargs.get("state", State.IDLE)
@@ -67,46 +69,48 @@ class Job(SystemModel):
             return transition
 
         self.state = state
-        self.save()
 
         return transition
 
     @contextmanager
-    def run(self):
+    def run(self, session):
         try:
             self.start()
+            self.save(session)
+
             yield
+
             self.success()
+            self.save(session)
         except Exception as err:
             logging.error(err)
             self.fail(error=err)
+            self.save(session)
             raise
 
     def start(self):
         self.started_at = datetime.utcnow()
         self.transit(State.RUNNING)
-        self.save()
 
     def fail(self, error=None):
         self.ended_at = datetime.utcnow()
         self.transit(State.FAIL)
         if error:
             self.payload.update({"error": str(error)})
-        self.save()
 
     def success(self):
         self.ended_at = datetime.utcnow()
         self.transit(State.SUCCESS)
-        self.save()
 
     def __repr__(self):
-        return "<Job(id='%s', elt_uri='%s', state='%s')>" % (
+        return "<Job(id='%s', job_id='%s', state='%s')>" % (
             self.id,
-            self.elt_uri,
+            self.job_id,
             self.state,
         )
 
-    def save(self):
-        with session_open() as session:
-            session.add(self)
-            return self
+    def save(self, session):
+        session.add(self)
+        session.commit()
+
+        return self

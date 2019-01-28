@@ -5,14 +5,20 @@ import asyncio
 import os
 from pathlib import Path
 from datetime import datetime
+from enum import IntFlag
 
 from . import Runner
+from meltano.core.db import project_engine
 from meltano.core.job import Job, JobFinder
 from meltano.core.project import Project
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
+
+
+class SingerPayload(IntFlag):
+    STATE = 1
 
 
 class SingerRunner(Runner):
@@ -24,16 +30,22 @@ class SingerRunner(Runner):
         self.config_service = config_service or ConfigService(project)
         self.config = config
 
-        self.job = Job(elt_uri=self.job_id)
+        self.job = Job(job_id=self.job_id)
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")
         )
 
+        _, self._session_cls = project_engine(project)
+
     @property
     def database(self):
         return self.config.get("database", "default")
+
+    @property
+    def session(self):
+        return self._session_cls.object_session(self.job)
 
     def stop(self, process, **wait_args):
         while True:
@@ -91,7 +103,7 @@ class SingerRunner(Runner):
     def restore_bookmark(self, tap: PluginInvoker):
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
-        state_job = finder.latest_state()
+        state_job = finder.latest_with_payload(self.session, flags=SingerPayload.STATE)
 
         if state_job and "singer_state" in state_job.payload:
             logging.info(f"Found state from {state_job.started_at}.")
@@ -105,8 +117,8 @@ class SingerRunner(Runner):
             new_state = json.loads(new_state)
 
             self.job.payload["singer_state"] = new_state.get("value", {})
+            self.job.payload_flags |= SingerPayload.STATE
             self.job.ended_at = datetime.utcnow()
-            self.job.save()
             logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
@@ -130,7 +142,8 @@ class SingerRunner(Runner):
         logging.info(f"\textractor: {extractor.name} at '{tap_exec}'")
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
-    def run(self, extractor: str, loader: str, dry_run=False):
+    def run(self, extractor: str, loader: str, dry_run=False, session=None):
+        session = session or self._session_cls()
         tap = self.config_service.get_plugin(PluginType.EXTRACTORS, extractor)
         target = self.config_service.get_plugin(PluginType.LOADERS, loader)
 
@@ -141,7 +154,7 @@ class SingerRunner(Runner):
         if dry_run:
             return self.dry_run(tap, target)
 
-        with self.job.run():
+        with self.job.run(session):
             self.restore_bookmark(extractor)
             loop = asyncio.get_event_loop()
             loop.run_until_complete(self.invoke(extractor, loader))

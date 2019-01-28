@@ -56,14 +56,14 @@ def elt(extractor, loader, dry, transform, job_id):
     try:
         if transform != "only":
             click.echo("Running extract & load...")
-            singer_runner.perform(extractor, loader, dry_run=dry)
+            singer_runner.run(extractor, loader, dry_run=dry)
             click.secho("Extract & load complete!", fg="green")
         else:
             click.secho("Extract & load skipped.", fg="yellow")
 
         if transform != "skip":
             click.echo("Running transformation...")
-            dbt_runner.perform(dry_run=dry, models=extractor)
+            dbt_runner.run(dry_run=dry, models=extractor)
             click.secho("Transformation complete!", fg="green")
         else:
             click.secho("Transformation skipped.", fg="yellow")

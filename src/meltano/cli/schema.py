@@ -3,7 +3,8 @@ import click
 import psycopg2
 import psycopg2.sql
 
-from meltano.core.db import db_open
+from meltano.core.db import DB, project_engine
+from meltano.core.project import Project
 from . import cli
 from .params import db_options
 
@@ -18,5 +19,7 @@ def schema():
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)
 def create(schema, roles):
-    with db_open() as db:
-        db.ensure_schema_exists(schema, grant_roles=roles)
+    project = Project.find()
+    engine, _ = project_engine(project)
+
+    DB.ensure_schema_exists(engine, schema, grant_roles=roles)
