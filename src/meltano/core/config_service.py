@@ -44,12 +44,14 @@ class ConfigService:
         )
 
     def plugins(self) -> List[Plugin]:
-        """Parse the discovery file and returns it as `Plugin` instances."""
-        # this will parse the discovery file and create an instance of the
+        """Parse the meltano.yml file and return it as `Plugin` instances."""
+        # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
             self.plugin_generator(plugin_type, plugin_def)
-            for plugin_type, plugin_defs in self.project.meltano.items()
+            for plugin_type, plugin_defs in self.project.meltano.get(
+                "plugins", {}
+            ).items()
             for plugin_def in plugin_defs
         )
 

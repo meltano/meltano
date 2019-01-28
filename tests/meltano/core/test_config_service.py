@@ -12,18 +12,20 @@ def make_meltano_yml(project):
         f.write(
             yaml.dump(
                 {
-                    "extractors": [
-                        {
-                            "name": "gitlab",
-                            "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
-                        }
-                    ],
-                    "loaders": [
-                        {
-                            "name": "csv",
-                            "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
-                        }
-                    ],
+                    "plugins": {
+                        "extractors": [
+                            {
+                                "name": "gitlab",
+                                "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                            }
+                        ],
+                        "loaders": [
+                            {
+                                "name": "csv",
+                                "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                            }
+                        ],
+                    }
                 }
             )
         )

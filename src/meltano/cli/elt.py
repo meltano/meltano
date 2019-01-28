@@ -13,6 +13,7 @@ from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.transform_add_service import TransformAddService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
@@ -70,6 +71,9 @@ def elt(extractor, loader, dry, transform, job_id):
         raise click.ClickException(
             f"ELT could not complete, an error happened during the process: {err}."
         )
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
 
 
 def install_missing_plugins(
