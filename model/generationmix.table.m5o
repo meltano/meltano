@@ -1,6 +1,6 @@
 {
   version = 1
-  sql_table_name = gitlab.generationmix
+  sql_table_name = generationmix
   name = generationmix
   columns {
     id {

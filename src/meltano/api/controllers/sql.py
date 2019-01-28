@@ -9,8 +9,8 @@ from os.path import join
 from flask import Blueprint, jsonify, request
 import sqlalchemy
 
-from .sqlhelper import SqlHelper
-from .settingshelper import SettingsHelper
+from .sql_helper import SqlHelper
+from .settings_helper import SettingsHelper
 from .m5oc_file import M5ocFile
 from meltano.core.project import Project
 

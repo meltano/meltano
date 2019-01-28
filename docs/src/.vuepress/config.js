@@ -36,12 +36,12 @@ module.exports = {
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
-			{ text: 'Documentation', link: '/docs/introduction' },
+			{ text: 'Documentation', link: '/docs/' },
 			{ text: 'Careers', link: '/careers/' }
 		],
 		sidebar: {
 			'/docs': [
-				'/docs/introduction',
+				'/docs/',
 				'/docs/installation',
 				'/docs/tutorial',
 				'/docs/concepts',

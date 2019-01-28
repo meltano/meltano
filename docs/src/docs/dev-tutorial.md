@@ -1,4 +1,4 @@
-# Tutorial
+# Developer Tutorial
 
 In this section, we will create and walk through a sample project using Meltano! If you haven't installed it, check out our [installation guide](/docs/#installation).
 
@@ -17,9 +17,6 @@ cd carbon
 
 # Start Docker container to setup logging
 docker-compose up -d
-
-# Set environment variables
-source .env
 
 # Let's see what extractors and loaders are available
 meltano discover all
@@ -52,13 +49,17 @@ Follow the [installation](/docs/#installation) steps if Meltano UI is not runnin
 :::
 
 Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
-
-1. Navigate to Settings (upper-right)
-1. Enter connection settings
+- Navigate to Settings (upper-right)
+- Enter connection settings
   - Name = `runners_db`
   - Dialect = `sqlite`
-  - Path to SQLite File = `meltano.db`
-1. Click "Save Connection"
+  - Host = `localhost`
+  - Port = `5502`
+  - Database = `warehouse`
+  - Schema = `gitlab`
+  - Username = `warehouse`
+  - Password = `warehouse`
+- Click "Save Connection"
 
 Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
 - Click Model button (upper-left)
