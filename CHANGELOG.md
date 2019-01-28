@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* Bundled Meltano models are now SQLite compatible.
 
 ### Fixes
 
