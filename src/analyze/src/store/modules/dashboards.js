@@ -1,20 +1,16 @@
 import dashboardApi from '../../api/dashboards';
 
 const state = {
-  activeDashboard: null,
   dashboards: [],
-};
-
-const getters = {
-
+  activeDashboard: null,
 };
 
 const actions = {
   getDashboards({ commit }) {
-    dashboardApi.index()
+    dashboardApi.getDashboards()
       .then((response) => {
         const dashboards = response.data;
-        commit('setDashboards', { dashboards });
+        commit('setDashboards', dashboards);
       });
   },
   getDashboard({ commit }, id) {
@@ -37,7 +33,6 @@ const mutations = {
 export default {
   namespaced: true,
   state,
-  getters,
   actions,
   mutations,
 };
