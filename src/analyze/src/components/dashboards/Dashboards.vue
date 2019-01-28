@@ -33,10 +33,8 @@ export default {
     ...mapActions('dashboards', [
       'getDashboard',
     ]),
-  }
-}
-
-
+  },
+};
 
 </script>
 
