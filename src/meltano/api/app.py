@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 def create_app(config={}):
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
-    app.config.from_object(config)
+    app.config.update(**config)
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(

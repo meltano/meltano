@@ -5,7 +5,7 @@ from unittest import mock
 from sqlalchemy.orm import joinedload
 from meltano.api.security import AnonymousUser, FreeUser, users
 from meltano.api.auth import gitlab_token_identity, OAuthError
-from meltano.api.models import OAuth, User
+from meltano.api.models import db, OAuth, User
 from flask_login import current_user
 from flask_security import login_user, logout_user
 
@@ -23,7 +23,8 @@ def gitlab_client():
 class TestSecurity:
     @pytest.mark.parametrize(
         "flask_env,current_user_cls",
-        [("development", FreeUser), ("production", AnonymousUser)],
+        [("development", FreeUser),
+         ("production", AnonymousUser)],
     )
     def test_auth_mode(self, monkeypatch, create_app, flask_env, current_user_cls):
         monkeypatch.setenv("FLASK_ENV", flask_env)
@@ -34,7 +35,7 @@ class TestSecurity:
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     @pytest.mark.usefixtures("app_context")
-    def test_gitlab_token_identity(self, gitlab, app, api_db):
+    def test_gitlab_token_identity(self, gitlab, create_app):
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",
@@ -46,7 +47,7 @@ class TestSecurity:
             identity = gitlab_token_identity(token)
 
             assert (
-                api_db.session.query(OAuth)
+                db.session.query(OAuth)
                 .options(joinedload(OAuth.user))
                 .filter(
                     OAuth.access_token == token["access_token"]
@@ -57,11 +58,11 @@ class TestSecurity:
                 )
                 .first()
             )
-            api_db.session.rollback()
+            db.session.rollback()
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     @pytest.mark.usefixtures("app_context")
-    def test_gitlab_token_identity(self, gitlab, app, api_db):
+    def test_gitlab_token_identity(self, gitlab, app):
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",
