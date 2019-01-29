@@ -162,13 +162,6 @@
         <div class="columns">
           <div class="column">
 
-            <router-link to="/dashboards">
-              <a class="button is-secondary pull-left"
-                  :class="{'is-loading': loadingQuery}">
-                Dashboards
-              </a>
-            </router-link>
-
             <div class="is-grouped is-pulled-right">
 
               <div class="dropdown"
