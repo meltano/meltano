@@ -51,13 +51,11 @@ class OAuth(db.Model):
 
     @classmethod
     def from_token(cls, provider_id, provider_user_id, token, user=None):
-        token["created_at"] = datetime.utcfromtimestamp(token["created_at"])
-
         return cls(
             user=user,
             provider_id=provider_id,
             provider_user_id=provider_user_id,
             access_token=token["access_token"],
-            created_at=token["created_at"],
+            created_at=datetime.utcfromtimestamp(token["created_at"]),
             id_token=token["id_token"],
         )

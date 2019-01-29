@@ -13,6 +13,10 @@ import base64
 import gitlab
 
 
+class OAuthError(Exception):
+    pass
+
+
 def base64_pad(s):
     padding = 4 - (len(s) % 4)
     return s + ("=" * padding)
@@ -21,18 +25,16 @@ def base64_pad(s):
 jwt_decode = compose(json.loads, base64.urlsafe_b64decode, base64_pad)
 
 
-application_id = "823737b8779edff4193f3fcb9a47988cf4932dbc428e77706f04b206c44ad61b"
-secret = "def4bec76d470c7684b549946df0cb656c73712046abea3dd6dd89fdb32db662"
+def setup_oauth(app):
+    oauth = OAuthClient(app)
+    oauth.register(
+        "gitlab",
+        access_token_url="https://gitlab.com/oauth/token",
+        client_kwargs={"scope": "openid read_user"},
+        authorize_url="https://gitlab.com/oauth/authorize",
+    )
 
-oauth = OAuthClient()
-oauth.register(
-    "gitlab",
-    client_id=application_id,
-    client_secret=secret,
-    access_token_url="https://gitlab.com/oauth/token",
-    client_kwargs={"scope": "openid read_user"},
-    authorize_url="https://gitlab.com/oauth/authorize",
-)
+    app.register_blueprint(oauthBP)
 
 
 oauthBP = Blueprint("OAuth", __name__, url_prefix="/oauth")
@@ -48,6 +50,17 @@ def login():
 def authorize():
     token = oauth.gitlab.authorize_access_token()
 
+    try:
+        identity = gitlab_token_identity(token)
+        login_user(identity.user, remember=False)
+
+        return redirect(url_for("root.analyze"))
+    except OAuthError as e:
+        do_flash(str(e))
+        return redirect(url_for_security("login"))
+
+
+def gitlab_token_identity(token):
     # TODO: having to do another GET to grab the user info
     #       is subpar, but the returned JWT lacks the user's email
     #
@@ -58,7 +71,7 @@ def authorize():
     client.auth()
 
     if client.user.state != "active":
-        raise "Account is no longer active."
+        raise OAuthError("This account is not active.")
 
     user = current_user.is_authenticated and current_user
     token_user = users.get_user(client.user.email)
@@ -81,7 +94,7 @@ def authorize():
     elif not token_user:
         # no user has claimed this email yet
         # reserve it
-        token_user = users.create(email=client.user.email)
+        token_user = users.create_user(email=client.user.email)
         identity.user = token_user
         db.session.add(identity)
     elif identity.user == token_user:
@@ -89,10 +102,7 @@ def authorize():
         # TODO: update the identity if need be
         pass
     else:
-        do_flash("This identity is already claimed by another user.")
-        return redirect(url_for_security("login"))
+        raise OAuthError("This identity is already claimed by another user.")
 
     db.session.commit()
-    login_user(identity.user, remember=False)
-
-    return redirect(url_for("root.analyze"))
+    return identity

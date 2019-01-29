@@ -7,18 +7,20 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
 from jinja2.exceptions import TemplateNotFound
+from importlib import reload
 
 from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler
-from . import config
+from . import config as default_config
+
 
 connector = ExternalConnector()
-flask_env = os.getenv("FLASK_ENV", "development")
 logger = logging.getLogger(__name__)
 
 
-def create_app():
+def create_app(config={}):
     app = Flask(__name__)
+    app.config.from_object(reload(default_config))
     app.config.from_object(config)
 
     # Logging
@@ -34,6 +36,14 @@ def create_app():
     logger.warning(f"Melt started at: {now}")
 
     # Extensions
+    security_options = {}
+    if app.env == "development":
+        from flask_cors import CORS
+        from .security import FreeUser
+
+        CORS(app)
+        security_options["anonymous_user"] = FreeUser
+
     from .models import db
 
     db.init_app(app)
@@ -44,21 +54,15 @@ def create_app():
 
     from .security import security, users
 
-    security.init_app(app, users)
+    security.init_app(app, users, **security_options)
 
-    from .auth import oauth, oauthBP
+    from .auth import setup_oauth
 
-    oauth.init_app(app)
-    app.register_blueprint(oauthBP)
-
-    if flask_env == "development":
-        from flask_cors import CORS
-
-        CORS(app)
+    setup_oauth(app)
 
     @app.before_request
     def before_request():
-        logger.info(f"[{request.remote_addr}] request: {now}")
+        logger.info(f"[{request}] request: {now}")
 
     from .controllers.root import root
     from .controllers.repos import reposBP
@@ -74,6 +78,7 @@ def create_app():
 
 
 def start(project, **kwargs):
+    """Start Meltano UI as a single-threaded web server."""
     worker = MeltanoBackgroundCompiler(project)
     worker.start()
 
@@ -81,7 +86,7 @@ def start(project, **kwargs):
     from .security import create_dev_user
 
     with app.app_context():
-        if flask_env == "development":
+        if app.env == "development":
             create_dev_user()
 
     app.run(**kwargs)
