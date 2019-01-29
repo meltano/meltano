@@ -28,9 +28,9 @@ extractors:
       client_secret: $MARKETO_CLIENT_SECRET
       start_time: $MARKETO_START_TIME
   - name: tap-salesforce
-    pip_url: "git+https://github.com/meltano/tap-salesforce.git@add-password-auth"
+    pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     config:
-      api_type: BULK
+      api_type: REST
       client_id: $SFDC_CLIENT_ID
       username: $SFDC_USERNAME
       password: $SFDC_PASSWORD
