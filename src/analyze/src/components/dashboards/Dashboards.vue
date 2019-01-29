@@ -10,11 +10,12 @@
           <div class="panel-block">
             <div class="inner-scroll text-selection-off">
               <ul>
+                <li><a @click="setAddDashboard(true)">Add Dashboard</a></li>
                 <li v-for="dashboard in dashboards"
                     :class="{'is-active': isActive(dashboard)}"
                     :key="dashboard.id"
                     @click="getDashboard(dashboard)">
-                  {{dashboard.name}}
+                  <a>{{dashboard.name}}</a>
                 </li>
               </ul>
             </div>
@@ -22,7 +23,35 @@
         </nav>
 
         <div class="column is-three-quarters">
-          {{activeDashboard.name}}
+
+          <div v-if="isAddDashboard">
+            <div class="field">
+              <label class="label">Name</label>
+              <div class="control">
+                <input class="input"
+                        type="text"
+                        placeholder="Name your dashboard"
+                        v-model="saveDashboardSettings.name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Description</label>
+              <div class="control">
+                <textarea class="textarea"
+                          placeholder="Describe your dashboard for easier reference later"
+                          v-model="saveDashboardSettings.description"></textarea>
+              </div>
+            </div>
+            <div class="field is-grouped">
+              <div class="control">
+                <button class="button is-link" @click="saveDashboard">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="!isAddDashboard">
+            {{activeDashboard.name}}
+          </div>
         </div>
 
       </div>
@@ -40,17 +69,23 @@ export default {
   },
   computed: {
     ...mapState('dashboards', [
-      'dashboards',
       'activeDashboard',
+      'dashboards',
+      'isAddDashboard',
+      'saveDashboardSettings',
     ]),
   },
   methods: {
     ...mapActions('dashboards', [
       'getDashboards',
       'getDashboard',
+      'setAddDashboard',
     ]),
     isActive(dashboard) {
       return dashboard.id === this.activeDashboard.id;
+    },
+    saveDashboard() {
+      this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
     },
   },
 };
