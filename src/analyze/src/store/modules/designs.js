@@ -26,7 +26,7 @@ const state = {
   chartsOpen: false,
   loadReportOpen: false,
   saveReportOpen: false,
-  saveReportSettings: { name: null, description: null },
+  saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
   limit: 3,
@@ -337,10 +337,9 @@ const actions = {
       });
   },
 
-  saveReport({ commit }, { name, description }) {
+  saveReport({ commit }, { name }) {
     const postData = {
       name,
-      description,
       model: state.currentModel,
       design: state.currentDesign,
       queryPayload: helpers.getQueryPayloadFromUI(),
@@ -472,7 +471,7 @@ const mutations = {
   },
 
   resetSaveReportSettings() {
-    state.saveReportSettings = { name: null, description: null };
+    state.saveReportSettings = { name: null };
   },
 
   setChartToggle() {

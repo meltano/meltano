@@ -161,6 +161,14 @@
       <div class="column is-three-quarters">
         <div class="columns">
           <div class="column">
+
+            <router-link to="/dashboards">
+              <a class="button is-secondary pull-left"
+                  :class="{'is-loading': loadingQuery}">
+                Dashboards
+              </a>
+            </router-link>
+
             <div class="is-grouped is-pulled-right">
 
               <div class="dropdown"
@@ -214,14 +222,6 @@
                                   type="text"
                                   placeholder="Name your report"
                                   v-model="saveReportSettings.name">
-                        </div>
-                      </div>
-                      <div class="field">
-                        <label class="label">Description</label>
-                        <div class="control">
-                          <textarea class="textarea"
-                                    placeholder="Describe your report for easier reference later"
-                                    v-model="saveReportSettings.description"></textarea>
                         </div>
                       </div>
                       <div class="field is-grouped">
