@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import uuid
 from os.path import join
 from pathlib import Path
 from meltano.core.utils import slugify
@@ -29,6 +30,7 @@ class DashboardsHelper:
         return target_dashboard[0]
 
     def save_dashboard(self, data):
+        data["id"] = uuid.uuid4().hex
         data["version"] = self.dashboard_version
         data["created_at"] = time.time()
         data["slug"] = slugify(data["name"])
