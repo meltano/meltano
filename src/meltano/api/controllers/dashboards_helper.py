@@ -1,12 +1,15 @@
 import os
 import json
+import time
 from os.path import join
 from pathlib import Path
+from meltano.core.utils import slugify
 
 
 class DashboardsHelper:
     def __init__(self):
         self.meltano_model_path = join(os.getcwd(), "model")
+        self.dashboard_version = "0.1.0"
 
     def get_dashboards(self):
         contents = []
@@ -24,3 +27,14 @@ class DashboardsHelper:
             dashboard for dashboard in dashboards if dashboard["id"] == dashboard_id
         ]
         return target_dashboard[0]
+
+    def save_dashboard(self, data):
+        data["version"] = self.dashboard_version
+        data["created_at"] = time.time()
+        data["slug"] = slugify(data["name"])
+        data["report_ids"] = []
+        file_name = data["slug"] + ".dashboard.m5o"
+        file_path = Path(self.meltano_model_path).joinpath(file_name)
+        with open(file_path, "w") as f:
+            json.dump(data, f)
+        return data
