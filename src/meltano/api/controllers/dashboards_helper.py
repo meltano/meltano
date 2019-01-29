@@ -40,3 +40,8 @@ class DashboardsHelper:
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data
+
+    def save_report_to_dashboard(self, data):
+        dashboard = self.get_dashboard(data["dashboardId"])
+        dashboard["report_ids"].append(data["reportId"])
+        return dashboard

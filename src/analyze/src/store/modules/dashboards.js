@@ -37,6 +37,17 @@ const actions = {
         state.loadingQuery = false;
       });
   },
+  saveReportToDashboard({ commit }, data) {
+    dashboardApi.saveReportToDashboard(data)
+      .then((response) => {
+        commit('setAddDashboard', false);
+        commit('setCurrentDashboard', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
 };
 
 const mutations = {
@@ -47,7 +58,9 @@ const mutations = {
     state.dashboards = dashboards;
   },
   setCurrentDashboard(_, dashboard) {
+    console.log('was', state.activeDashboard);
     state.activeDashboard = dashboard;
+    console.log('TODO, ensure this updates the UI, now', state.activeDashboard);
   },
   setAddDashboard(_, value) {
     state.isAddDashboard = value;

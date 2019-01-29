@@ -50,7 +50,11 @@
           </div>
 
           <div v-if="!isAddDashboard">
-            {{activeDashboard.name}}
+            {{activeDashboard.name}} with reportIds:
+            <ul>
+              <li v-for="reportId in activeDashboard.reportIds" :key="reportId">Id: {{reportId}}</li>
+            </ul>
+            <button @click="saveReportToDashboard">TEMP ADD REPORT ID b47ff6b36e00440b9b0dfb3076537425</button>
           </div>
         </div>
 
@@ -86,6 +90,9 @@ export default {
     },
     saveDashboard() {
       this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
+    },
+    saveReportToDashboard() {
+      this.$store.dispatch('dashboards/saveReportToDashboard', {reportId: 'b47ff6b36e00440b9b0dfb3076537425', dashboardId: this.activeDashboard.id});
     },
   },
 };
