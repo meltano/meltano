@@ -6,7 +6,7 @@ We believe that information is the foundation of good decisions, and that compan
 
 In addition, we believe that the information a business uses to make decisions must come from all parts of that business. Meltano joins data from multiple systems used by Sales, Marketing, Product and others, thereby providing a comprehensive view of the relationship between business activities, associated costs, and customer long-term value.
 
-A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano Analyze. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
+A data analyst or scientist should be able to easily use Meltano to add whatever data they need by writing the ELT, know the jobs that are running, and then analyze the data within Meltano UI. It should enable individual data people to own the full stack of their analysis, even [if they’re not engineers](https://multithreaded.stitchfix.com/blog/2016/03/16/engineers-shouldnt-write-etl/).
 
 ### Milestones
 

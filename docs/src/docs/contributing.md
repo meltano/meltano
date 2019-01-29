@@ -24,13 +24,13 @@ python -m meltano.api
 Open a new terminal tab in the meltano project directory:
 
 ```bash
-# Change into the Meltano Analyze code directory
+# Change into the Meltano UI code directory
 cd src/analyze
 
-# Install the dependencies for Meltano Analyze
+# Install the dependencies for Meltano UI
 npm install
 
-# Start the web server for Meltano Analyze 
+# Start the web server for Meltano UI 
 npm run dev
 ```
 

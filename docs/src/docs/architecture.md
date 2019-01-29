@@ -10,14 +10,14 @@ Create and grant usage for a database schema.
 
 ## Meltano Model
 
-Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano Analyze.
+Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano UI.
 
 ### Model Setup
-There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano Analyze:
+There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano UI:
 1. Author `my-database-setup.model.m5o` file(s)
-    - Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano Analyze GUI
+    - Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
 1. Author `my-table.table.m5o` file(s)
-    - Define a database table for connecting to using Meltano's CLI and/or Analyze GUI
+    - Define a database table for connecting to using Meltano's CLI and/or UI
 
 ### Model Authoring (`.m5o` files)
 The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are examples with comments to aid the authoring of your `...model.m5o` and `...table.m5o` files mentioned above.
@@ -25,7 +25,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 #### Example `carbon.model.m5o` file
 
 ```
-# Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano Analyze GUI
+# Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
 {
   # Define version metadata
   version = 1
@@ -67,7 +67,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 #### Example `entry.table.m5o` file
 
 ```
-# Define a database table for connecting to using Meltano's CLI and/or Analyze GUI
+# Define a database table for connecting to using Meltano's CLI and/or UI
 {
   # Define the schema.table-name pattern used for connecting to a specific table in a database
   sql_table_name = gitlab.entry
@@ -111,11 +111,11 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 }
 ```
 
-With these files the Meltano CLI (or in conjunction with the Meltano Analyze GUI) can properly extract, load, and transform your data for analysis using Meltano Analyze.
+With these files the Meltano CLI (or in conjunction with the Meltano UI) can properly extract, load, and transform your data for analysis using Meltano UI.
 
-## Meltano Analyze
+## Meltano UI
 
-Meltano Analyze is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
+Meltano UI is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
 
 ## Meltano Transform
 
@@ -175,7 +175,7 @@ Meltano provides the following docker images:
 
 > Notes: All images are available in the GitLab's registry: `registry.gitlab.com`
 
-- `meltano/meltano`: Contains the API, CLI, and Meltano Analyze. This image should be deployed as Meltano Analyze.
+- `meltano/meltano`: Contains the API, CLI, and Meltano UI. This image should be deployed as Meltano UI.
 - `meltano/meltano/runner`: Contains the CLI and extra runner specific binaries. This image should be used on the CI runner.
 - `meltano/meltano/singer_runner`: **DEPRECATED: Use `meltano/meltano/runner` instead** Contains the CLI, and all curated taps/targets pre-installed.
 

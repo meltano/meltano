@@ -32,13 +32,13 @@ meltano add loader target-sqlite
 # loader we just added without the need to transform the data
 meltano elt tap-carbon-intensity target-sqlite
 
-# Start up the Meltano Analyze web application!
+# Start up the Meltano UI web application!
 meltano ui
 ```
 
-Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
+Assuming you don't have something else running on that port, you should be able to see Meltano UI at [http://localhost:5000](http://localhost:5000).
 
-Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API.
+Now we are ready to analyze the data. We have provided some sample .m5o (Meltano UI) files that will help you analyze the carbon intensity API.
 
 ## Using Meltano on Your New Project
 
@@ -61,7 +61,7 @@ Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
   - Password = `warehouse`
 - Click "Save Connection"
 
-Then, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
+Then, we'll ensure our models are valid so Meltano UI can properly generate queries for us:
 - Click Model button (upper-left)
     - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
 
