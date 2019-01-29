@@ -181,7 +181,7 @@ We use Airflow to orchestrate Meltano jobs. Jobs can be Extract, Load, Transform
 
 The personas are very much a work in progress and we will continue to add to them based on further insights revealed from user interviews.
 
-### Chris
+### Eric, the Data Engineer
 
 #### At a Glance
 Age: 38
@@ -205,7 +205,7 @@ I am responsible for designing, constructing, installing, testing and maintainin
 * I’m frustrated when the tools are not reliable because this means the data does not move consistently.
 * It is hard for me to maintain the management system when there is a problem with the foundation.
 
-### Megan
+### Ali, the Data Analyst
 
 #### At a glance
 Age: 32
