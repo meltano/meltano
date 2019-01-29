@@ -52,11 +52,22 @@
             </p>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <ul class="menu-list">
-              <li v-for="file in value" :key="file.abs">
-                <a :class="{'is-active': isActive(file)}"
-                  @click.prevent='getFile(file)'>{{file.visual}}</a>
-              </li>
+
+              <template v-if="!value.length">
+                <li>
+                  <a><small><em>No {{key}}</em></small></a>
+                </li>
+              </template>
+
+              <template v-if="value.length">
+                <li v-for="file in value" :key="file.abs">
+                  <a :class="{'is-active': isActive(file)}"
+                    @click.prevent='getFile(file)'>{{file.visual}}</a>
+                </li>
+              </template>
+
             </ul>
+
           </template>
         </aside>
       <div class="column" v-if="!activeView.populated">
