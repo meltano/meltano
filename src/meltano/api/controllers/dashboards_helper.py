@@ -44,4 +44,8 @@ class DashboardsHelper:
     def save_report_to_dashboard(self, data):
         dashboard = self.get_dashboard(data["dashboardId"])
         dashboard["reportIds"].append(data["reportId"])
+        file_name = dashboard["slug"] + ".dashboard.m5o"
+        file_path = Path(self.meltano_model_path).joinpath(file_name)
+        with open(file_path, "w") as f:
+            json.dump(dashboard, f)
         return dashboard

@@ -50,7 +50,7 @@
           </div>
 
           <div v-if="!isAddDashboard">
-            {{activeDashboard.name}} with reportIds:
+            {{activeDashboard.name}} with reportIds: ({{activeDashboard.reportIds.length}})
             <ul>
               <li v-for="reportId in activeDashboard.reportIds" :key="reportId">Id: {{reportId}}</li>
             </ul>
