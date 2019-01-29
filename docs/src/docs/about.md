@@ -184,13 +184,10 @@ The personas are very much a work in progress and we will continue to add to the
 ### Eric, the Data Engineer
 
 #### At a Glance
-Age: 38
-
-Location: Albany, NY
-
-Life stage: Married, two young kids
-
-Job Title: Data Engineer
+- **Age**: 38
+- **Location**: Albany, NY
+- **Life stage**: Married, two young kids
+- **Job Title**: Data Engineer
 
 #### Job Summary
 I am responsible for designing, constructing, installing, testing and maintaining highly scalable data management systems. I improve data foundational procedures, guidelines and standards. I work on  integrating new data management technologies and software engineering tools into existing structures. I also create custom software components and analytics applications.
@@ -207,14 +204,12 @@ I am responsible for designing, constructing, installing, testing and maintainin
 
 ### Ali, the Data Analyst
 
-#### At a glance
-Age: 32
+#### At a Glance
 
-Location:NYC, NY
-
-Life stage: Married, no children
-
-Job Title: Data Analyst
+- **Age**: 32
+- **Location**:NYC, NY
+- **Life stage**: Married, no children
+- **Job Title**: Data Analyst
 
 Alternative Titles:  Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst
 
