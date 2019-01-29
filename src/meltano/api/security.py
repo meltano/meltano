@@ -8,7 +8,7 @@ users = SQLAlchemyUserDatastore(db, User, Role)
 DEV_USER = {"email": "dev@meltano.com", "password": "meltano"}
 
 
-class FreeUser:
+class FreeUser(AnonymousUser):
     """FreeUser is free to do eveything and has no limits."""
 
     def has_role(*args):
@@ -16,6 +16,10 @@ class FreeUser:
 
     @property
     def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
         return True
 
 

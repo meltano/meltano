@@ -34,30 +34,27 @@ def setup_oauth(app):
         authorize_url="https://gitlab.com/oauth/authorize",
     )
 
+    oauthBP = Blueprint("OAuth", __name__, url_prefix="/oauth")
+
+    @oauthBP.route("/login")
+    def login():
+        redirect_uri = url_for(".authorize", _external=True)
+        return oauth.gitlab.authorize_redirect(redirect_uri)
+
+    @oauthBP.route("/authorize")
+    def authorize():
+        token = oauth.gitlab.authorize_access_token()
+
+        try:
+            identity = gitlab_token_identity(token)
+            login_user(identity.user, remember=False)
+
+            return redirect(url_for("root.analyze"))
+        except OAuthError as e:
+            do_flash(str(e))
+            return redirect(url_for_security("login"))
+
     app.register_blueprint(oauthBP)
-
-
-oauthBP = Blueprint("OAuth", __name__, url_prefix="/oauth")
-
-
-@oauthBP.route("/login")
-def login():
-    redirect_uri = url_for(".authorize", _external=True)
-    return oauth.gitlab.authorize_redirect(redirect_uri)
-
-
-@oauthBP.route("/authorize")
-def authorize():
-    token = oauth.gitlab.authorize_access_token()
-
-    try:
-        identity = gitlab_token_identity(token)
-        login_user(identity.user, remember=False)
-
-        return redirect(url_for("root.analyze"))
-    except OAuthError as e:
-        do_flash(str(e))
-        return redirect(url_for_security("login"))
 
 
 def gitlab_token_identity(token):

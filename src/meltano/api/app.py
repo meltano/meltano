@@ -37,32 +37,24 @@ def create_app(config={}):
 
     # Extensions
     security_options = {}
+
+    from .models import db
+    from .mail import mail
+    from .security import security, users
+    from .auth import setup_oauth
+
+    db.init_app(app)
+    mail.init_app(app)
+
     if app.env == "development":
         from flask_cors import CORS
         from .security import FreeUser
 
         CORS(app)
-        security_options["anonymous_user"] = FreeUser
-
-    from .models import db
-
-    db.init_app(app)
-
-    from .mail import mail
-
-    mail.init_app(app)
-
-    from .security import security, users
-
-    security.init_app(app, users, **security_options)
-
-    from .auth import setup_oauth
-
-    setup_oauth(app)
-
-    @app.before_request
-    def before_request():
-        logger.info(f"[{request}] request: {now}")
+        security.init_app(app, users, anonymous_user=FreeUser)
+    else:
+        security.init_app(app, users)
+        setup_oauth(app)
 
     from .controllers.root import root
     from .controllers.repos import reposBP
@@ -73,6 +65,10 @@ def create_app(config={}):
     app.register_blueprint(reposBP)
     app.register_blueprint(settingsBP)
     app.register_blueprint(sqlBP)
+
+    @app.before_request
+    def before_request():
+        logger.info(f"[{request}] request: {now}")
 
     return app
 
