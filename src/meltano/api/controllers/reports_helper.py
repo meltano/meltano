@@ -55,7 +55,7 @@ class ReportsHelper:
     def save_report(self, data):
         data["id"] = uuid.uuid4().hex
         data["version"] = self.report_version
-        data["created_at"] = time.time()
+        data["createdAt"] = time.time()
         data["slug"] = slugify(data["name"])
         file_name = data["slug"] + ".report.m5o"
         file_path = Path(self.meltano_model_path).joinpath(file_name)

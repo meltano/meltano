@@ -28,7 +28,6 @@ def save_dashboard():
 
 @dashboardsBP.route("/dashboard/report/save", methods=["POST"])
 def save_report_to_dashboard():
-    print('hit')
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
     response_data = dashboards_helper.save_report_to_dashboard(post_data)

@@ -32,9 +32,9 @@ class DashboardsHelper:
     def save_dashboard(self, data):
         data["id"] = uuid.uuid4().hex
         data["version"] = self.dashboard_version
-        data["created_at"] = time.time()
+        data["createdAt"] = time.time()
         data["slug"] = slugify(data["name"])
-        data["report_ids"] = []
+        data["reportIds"] = []
         file_name = data["slug"] + ".dashboard.m5o"
         file_path = Path(self.meltano_model_path).joinpath(file_name)
         with open(file_path, "w") as f:
@@ -43,5 +43,5 @@ class DashboardsHelper:
 
     def save_report_to_dashboard(self, data):
         dashboard = self.get_dashboard(data["dashboardId"])
-        dashboard["report_ids"].append(data["reportId"])
+        dashboard["reportIds"].append(data["reportId"])
         return dashboard
