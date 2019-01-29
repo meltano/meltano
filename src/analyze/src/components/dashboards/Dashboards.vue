@@ -92,7 +92,7 @@ export default {
       this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
     },
     saveReportToDashboard() {
-      this.$store.dispatch('dashboards/saveReportToDashboard', {reportId: 'b47ff6b36e00440b9b0dfb3076537425', dashboardId: this.activeDashboard.id});
+      this.$store.dispatch('dashboards/saveReportToDashboard', { reportId: 'b47ff6b36e00440b9b0dfb3076537425', dashboardId: this.activeDashboard.id });
     },
   },
 };
