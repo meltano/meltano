@@ -52,9 +52,13 @@
           <div v-if="!isAddDashboard">
             {{activeDashboard.name}} with reportIds: ({{activeDashboard.reportIds.length}})
             <ul>
-              <li v-for="reportId in activeDashboard.reportIds" :key="reportId">Id: {{reportId}}</li>
+              <li v-for="reportId in activeDashboard.reportIds"
+                  :key="reportId">
+                Id: {{reportId}}
+              </li>
             </ul>
-            <button @click="saveReportToDashboard">TEMP ADD REPORT ID b47ff6b36e00440b9b0dfb3076537425</button>
+            <button @click="saveReportToDashboard">
+              TEMP ADD REPORT ID b47ff6b36e00440b9b0dfb3076537425</button>
           </div>
         </div>
 
