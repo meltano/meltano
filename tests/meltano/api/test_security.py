@@ -23,8 +23,7 @@ def gitlab_client():
 class TestSecurity:
     @pytest.mark.parametrize(
         "flask_env,current_user_cls",
-        [("development", FreeUser),
-         ("production", AnonymousUser)],
+        [("development", FreeUser), ("production", AnonymousUser)],
     )
     def test_auth_mode(self, monkeypatch, create_app, flask_env, current_user_cls):
         monkeypatch.setenv("FLASK_ENV", flask_env)

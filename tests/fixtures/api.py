@@ -27,9 +27,11 @@ def app_context(app):
 @pytest.fixture(scope="session")
 def create_app():
     def _factory(config={}):
-        config = {**config,
-                  "TESTING": True,
-                  "SQLALCHEMY_DATABASE_URI": "sqlite://"}  # in-memory
+        config = {
+            **config,
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+        }  # in-memory
 
         return meltano.api.app.create_app(config)
 
