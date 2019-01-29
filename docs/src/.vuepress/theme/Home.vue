@@ -181,9 +181,15 @@
       </tbody>
     </table>
 
-    <section class="hiring">
-      <h2 class="hiring__title">We're Hiring!</h2>
-      <p class="hiring__text">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
+    <section class="section">
+      <h2 class="section__title">Join Our Slack Channel!</h2>
+      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel.</p> 
+      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button">Let's chat in Slack!</a>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">We're Hiring!</h2>
+      <p class="section__text mb0">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
     </section>
 
     <div
@@ -217,6 +223,24 @@ export default {
 
 <style lang="stylus">
 @import './styles/config.styl'
+
+.button {
+    display: inline-block;
+    font-size: 1.2rem;
+    color: $accentColor;
+    padding: 0.8rem 1.6rem 0.9rem;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+    box-sizing: border-box;
+    border: 2px solid $accentColor;
+    transition: all 0.2s ease-in;l
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-color: $accentColor;
+    }
+}
 
 .quote {
   border-top: 1px solid #ddd;
@@ -264,21 +288,18 @@ export default {
   }
 }
 
-.ta-c { 
-  text-align: center;
-}
-
-.hiring {
+.section {
   border-top: 1px solid #eaecef;
-  padding: 2rem 0 2.5rem;
+  padding: 2.5rem 0;
   text-align: center;
 
   &__text {
     font-size: 1.4rem;
-    margin-bottom: 0.82rem;
+    margin-bottom: 0;
   }
 
   &__title {
+    margin-top: 0;
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: 0;
@@ -287,9 +308,9 @@ export default {
 }
 
 @media (min-width: $MQNarrow) {
-  .hiring__text {
+  .section__text {
     max-width: 60%;
-    margin: 1rem auto;
+    margin: 1.5rem auto;
   }
 }
 
@@ -379,4 +400,12 @@ export default {
     .feature
       h2
         font-size 1.25rem
+
+.ta-c { 
+  text-align: center;
+}
+
+.mb0 {
+  margin-bottom: 0;
+}
 </style>
