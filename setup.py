@@ -6,6 +6,7 @@ with open("README.md", "r") as fh:
 
 requires = [
     'aiohttp',
+    'authlib',
     'backoff',
     'bcrypt',
     'click',
@@ -26,7 +27,6 @@ requires = [
     'flask-sqlalchemy',
     'flask-security @ git+https://github.com/meltano/flask-security.git@v3.0.0/meltano.0.1.0',
     'flask-social',
-    'flask-authlib',
     'pyhocon',
     'python-dotenv',
     'python-gitlab',
