@@ -105,12 +105,12 @@ export default {
       this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
     },
     toggleReportInDashboard(report) {
-      let methodName = this.isReportInActiveDashboard(report)
+      const methodName = this.isReportInActiveDashboard(report)
         ? 'removeReportFromDashboard'
         : 'addReportToDashboard';
-      this.$store.dispatch('dashboards/' + methodName, {
+      this.$store.dispatch(`dashboards/${methodName}`, {
         reportId: report.id,
-        dashboardId: this.activeDashboard.id
+        dashboardId: this.activeDashboard.id,
       });
     },
   },
