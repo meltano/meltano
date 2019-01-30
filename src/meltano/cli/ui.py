@@ -20,9 +20,4 @@ def ui(debug, port, reload, hostname):
     project = Project.find()
 
     # todo: run gunicorn if not in debug mode
-    start(project,
-          debug=debug,
-          use_reloader=reload,
-          port=port,
-          host=hostname,
-          app_config={"ENV": "development"})
+    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)

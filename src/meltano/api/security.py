@@ -1,4 +1,9 @@
-from flask_security import Security, SQLAlchemyUserDatastore, AnonymousUser, auth_required
+from flask_security import (
+    Security,
+    SQLAlchemyUserDatastore,
+    AnonymousUser,
+    auth_required,
+)
 from flask_security.utils import login_user
 from functools import wraps
 
@@ -11,6 +16,7 @@ DEV_USER = {"email": "dev@meltano.com", "password": "meltano"}
 
 class FreeUser(AnonymousUser):
     """FreeUser is free to do eveything and has no limits."""
+
     def has_role(*args):
         return True
 
