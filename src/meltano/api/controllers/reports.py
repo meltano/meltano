@@ -24,3 +24,11 @@ def save_report():
     post_data = request.get_json()
     response_data = reports_helper.save_report(post_data)
     return jsonify(response_data)
+
+
+@reportsBP.route("/update", methods=["POST"])
+def update_report():
+    reports_helper = ReportsHelper()
+    post_data = request.get_json()
+    response_data = reports_helper.update_report(post_data)
+    return jsonify(response_data)

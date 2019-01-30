@@ -5,6 +5,7 @@ import designApi from '../../api/design';
 import utils from '../../api/utils';
 
 const state = {
+  activeReport: {},
   design: {
     related_table: {},
   },
@@ -324,12 +325,14 @@ const actions = {
   loadReport({ commit }, { name }) {
     designApi.loadReport(name)
       .then((response) => {
-        state.currentModel = response.data.model;
-        state.currentDesign = response.data.design;
+        const report = response.data;
+        state.currentModel = report.model;
+        state.currentDesign = report.design;
         this.dispatch('designs/getSQL', {
           run: true,
-          load: response.data.queryPayload,
+          load: report.queryPayload,
         });
+        commit('setCurrentReport', report);
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
@@ -345,8 +348,22 @@ const actions = {
       queryPayload: helpers.getQueryPayloadFromUI(),
     };
     designApi.saveReport(postData)
-      .then(() => {
+      .then((response) => {
         commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
+
+  updateReport({ commit }) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromUI();
+    designApi.updateReport(state.activeReport)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
@@ -416,6 +433,10 @@ const mutations = {
 
   setChartType(context, chartType) {
     state.chartType = chartType;
+  },
+
+  setCurrentReport(_, report) {
+    state.activeReport = report;
   },
 
   setSortColumn(context, name) {
@@ -498,7 +519,7 @@ const mutations = {
     state.hasSQLError = true;
     if (!e.response) {
       state.sqlErrorMessage = [
-        "Something went wrong on our end. We'll check our error logs and get back to you.",
+        "Something went wrong on our end. We'll check our error logs and get back to you."
       ];
       return;
     }
@@ -520,7 +541,7 @@ const mutations = {
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach((column) => {
+    Object.keys(columns).forEach(column => {
       state.selectedColumns[column.unique_name] = false;
     });
   },
@@ -535,7 +556,7 @@ const mutations = {
 
   setLimit(_, limit) {
     state.limit = limit;
-  },
+  }
 };
 
 export default {

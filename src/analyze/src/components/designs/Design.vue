@@ -162,11 +162,15 @@
         <div class="columns">
           <div class="column">
 
+            <div class="is-grouped is-pulled-left">
+              <div v-if="activeReport.name">{{activeReport.name}}</div>
+              <div v-if="!activeReport.name"><em>Untitled Report</em></div>
+            </div>
+
             <div class="is-grouped is-pulled-right">
 
               <div class="dropdown"
-                    :class="{'is-active': loadReportOpen}"
-                    v-if="reports.length > 0">
+                    :class="{'is-active': loadReportOpen}">
                 <div class="dropdown-trigger">
                   <button class="button"
                           aria-haspopup="true"
@@ -192,8 +196,7 @@
               </div>
 
               <div class="dropdown"
-                    :class="{'is-active': saveReportOpen}"
-                    v-if="numResults > 0">
+                    :class="{'is-active': saveReportOpen}">
                 <div class="dropdown-trigger">
                   <button class="button"
                           aria-haspopup="true"
@@ -219,13 +222,20 @@
                       </div>
                       <div class="field is-grouped">
                         <div class="control">
-                          <button class="button is-link" @click="saveReport">Confirm</button>
+                          <button class="button is-link"
+                                  :disabled="!saveReportSettings.name"
+                                  @click="saveReport">Save</button>
                         </div>
                         <div class="control">
                           <button class="button is-text"
                                   @click="toggleSaveReportOpen">Cancel</button>
                         </div>
                       </div>
+                    </div>
+                    <hr class="dropdown-divider" v-if="activeReport.name">
+                    <div class="dropdown-item" v-if="activeReport.name">
+                      <button class="button is-link is-fullwidth"
+                              @click="updateReport">Update Existing</button>
                     </div>
                   </div>
                 </div>
@@ -414,6 +424,7 @@ export default {
   },
   computed: {
     ...mapState('designs', [
+      'activeReport',
       'design',
       'selectedColumns',
       'currentModel',
@@ -525,6 +536,11 @@ export default {
 
     saveReport() {
       this.$store.dispatch('designs/saveReport', this.saveReportSettings);
+      this.toggleSaveReportOpen();
+    },
+
+    updateReport() {
+      this.$store.dispatch('designs/updateReport');
       this.toggleSaveReportOpen();
     },
 

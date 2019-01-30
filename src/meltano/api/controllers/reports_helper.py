@@ -62,3 +62,10 @@ class ReportsHelper:
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data
+
+    def update_report(self, data):
+        file_name = data["slug"] + ".report.m5o"
+        file_path = Path(self.meltano_model_path).joinpath(file_name)
+        with open(file_path, "w") as f:
+            json.dump(data, f)
+        return data

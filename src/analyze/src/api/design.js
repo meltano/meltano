@@ -22,6 +22,10 @@ export default {
     return axios.post(utils.buildUrl('reports', 'save'), data);
   },
 
+  updateReport(data) {
+    return axios.post(utils.buildUrl('reports', 'update'), data);
+  },
+
   getSql(model, design, data) {
     return axios.post(utils.buildUrl('sql/get', `${model}/${design}`), data);
   },
