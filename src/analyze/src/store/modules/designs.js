@@ -519,7 +519,7 @@ const mutations = {
     state.hasSQLError = true;
     if (!e.response) {
       state.sqlErrorMessage = [
-        "Something went wrong on our end. We'll check our error logs and get back to you."
+        "Something went wrong on our end. We'll check our error logs and get back to you.",
       ];
       return;
     }
@@ -541,7 +541,7 @@ const mutations = {
   },
 
   selectedColumns(_, columns) {
-    Object.keys(columns).forEach(column => {
+    Object.keys(columns).forEach((column) => {
       state.selectedColumns[column.unique_name] = false;
     });
   },
@@ -556,7 +556,7 @@ const mutations = {
 
   setLimit(_, limit) {
     state.limit = limit;
-  }
+  },
 };
 
 export default {
