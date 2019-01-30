@@ -141,8 +141,6 @@ venv.bak/
 
 api/tmp/output.json
 static/tmp
-src/meltano/api/static
-src/meltano/api/templates
 src/analyze/dist/
 meltano.log.*
 *.m5oc
