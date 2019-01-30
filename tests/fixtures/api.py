@@ -4,18 +4,14 @@ import meltano.api.app
 from meltano.api.models import db
 
 
+def _cleanup(app):
+    with app.app_context():
+        db.drop_all()
+
+
 @pytest.fixture()
 def app(create_app):
-    app = create_app()
-
-    with app.app_context():
-        db.drop_all()
-        db.create_all()
-
-    yield app
-
-    with app.app_context():
-        db.drop_all()
+    return create_app()
 
 
 @pytest.fixture()
@@ -24,16 +20,24 @@ def app_context(app):
         yield
 
 
-@pytest.fixture(scope="session")
-def create_app():
-    def _factory(config={}):
+@pytest.fixture()
+def create_app(request):
+    def _factory(**config):
         config = {
-            **config,
             "TESTING": True,
+            "ENV": "development",
             "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            **config,
         }  # in-memory
 
-        return meltano.api.app.create_app(config)
+        app = meltano.api.app.create_app(config)
+        request.addfinalizer(lambda: _cleanup(app))
+
+        with app.app_context():
+            db.drop_all()
+            db.create_all()
+
+        return app
 
     return _factory
 

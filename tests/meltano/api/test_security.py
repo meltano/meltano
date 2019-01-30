@@ -34,7 +34,9 @@ class TestSecurity:
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     @pytest.mark.usefixtures("app_context")
-    def test_gitlab_token_identity(self, gitlab, create_app):
+    def test_gitlab_token_identity_creates_user(self, gitlab, create_app):
+        app = create_app(ENV="production")
+
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",
@@ -61,7 +63,9 @@ class TestSecurity:
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     @pytest.mark.usefixtures("app_context")
-    def test_gitlab_token_identity(self, gitlab, app):
+    def test_gitlab_token_identity_maps_user(self, gitlab, create_app):
+        app = create_app(ENV="production")
+
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",
