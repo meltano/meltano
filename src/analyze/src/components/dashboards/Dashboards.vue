@@ -50,15 +50,18 @@
           </div>
 
           <div v-if="!isAddDashboard">
-            {{activeDashboard.name}} with reportIds: ({{activeDashboard.reportIds.length}})
+            <h1><strong>{{activeDashboard.name}}</strong></h1>
+            <h2>Reports ({{activeDashboard.reportIds.length}})</h2>
             <ul>
-              <li v-for="reportId in activeDashboard.reportIds"
-                  :key="reportId">
-                Id: {{reportId}}
+              <li v-for="report in reports" :key="report.id">
+                <label for="'checkbox-' + report.id"
+                        @click="toggleReportInDashboard(report)">
+                  <input type="checkbox"
+                        :id="'checkbox-' + report.id"
+                        :checked="isReportInActiveDashboard(report)">
+                  {{report.name}}</label>
               </li>
             </ul>
-            <button @click="saveReportToDashboard">
-              TEMP ADD REPORT ID b47ff6b36e00440b9b0dfb3076537425</button>
           </div>
         </div>
 
@@ -74,12 +77,14 @@ export default {
   name: 'Dashboards',
   created() {
     this.getDashboards();
+    this.getReports();
   },
   computed: {
     ...mapState('dashboards', [
       'activeDashboard',
       'dashboards',
       'isAddDashboard',
+      'reports',
       'saveDashboardSettings',
     ]),
   },
@@ -87,16 +92,26 @@ export default {
     ...mapActions('dashboards', [
       'getDashboards',
       'getDashboard',
+      'getReports',
       'setAddDashboard',
     ]),
     isActive(dashboard) {
       return dashboard.id === this.activeDashboard.id;
     },
+    isReportInActiveDashboard(report) {
+      return this.activeDashboard.reportIds.includes(report.id);
+    },
     saveDashboard() {
       this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
     },
-    saveReportToDashboard() {
-      this.$store.dispatch('dashboards/saveReportToDashboard', { reportId: 'b47ff6b36e00440b9b0dfb3076537425', dashboardId: this.activeDashboard.id });
+    toggleReportInDashboard(report) {
+      let methodName = this.isReportInActiveDashboard(report)
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard';
+      this.$store.dispatch('dashboards/' + methodName, {
+        reportId: report.id,
+        dashboardId: this.activeDashboard.id
+      });
     },
   },
 };

@@ -1,9 +1,11 @@
 import dashboardApi from '../../api/dashboards';
+import designApi from '../../api/design';
 
 const state = {
   activeDashboard: {},
   dashboards: [],
   isAddDashboard: true,
+  reports: [],
   saveDashboardSettings: { name: null, description: null },
 };
 
@@ -22,6 +24,12 @@ const actions = {
         commit('setCurrentDashboard', response.data);
       });
   },
+  getReports({ commit }) {
+    designApi.loadReports()
+      .then((response) => {
+        commit('setReports', response.data);
+      });
+  },
   setAddDashboard({ commit }, value) {
     commit('setAddDashboard', value);
   },
@@ -31,21 +39,20 @@ const actions = {
         commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
         commit('resetSaveDashboardSettings');
-      })
-      .catch((e) => {
-        commit('setSqlErrorMessage', e);
-        state.loadingQuery = false;
       });
   },
-  saveReportToDashboard({ commit }, data) {
-    dashboardApi.saveReportToDashboard(data)
+  addReportToDashboard({ commit }, data) {
+    dashboardApi.addReportToDashboard(data)
       .then((response) => {
         commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
-      })
-      .catch((e) => {
-        commit('setSqlErrorMessage', e);
-        state.loadingQuery = false;
+      });
+  },
+  removeReportFromDashboard({ commit }, data) {
+    dashboardApi.removeReportFromDashboard(data)
+      .then((response) => {
+        commit('setAddDashboard', false);
+        commit('setCurrentDashboard', response.data);
       });
   },
 };
@@ -54,16 +61,17 @@ const mutations = {
   resetSaveDashboardSettings() {
     state.saveDashboardSettings = { name: null, description: null };
   },
+  setAddDashboard(_, value) {
+    state.isAddDashboard = value;
+  },
+  setCurrentDashboard(_, dashboard) {
+    state.activeDashboard = dashboard;
+  },
   setDashboards(_, dashboards) {
     state.dashboards = dashboards;
   },
-  setCurrentDashboard(_, dashboard) {
-    console.log('was', state.activeDashboard);
-    state.activeDashboard = dashboard;
-    console.log('TODO, ensure this updates the UI, now', state.activeDashboard);
-  },
-  setAddDashboard(_, value) {
-    state.isAddDashboard = value;
+  setReports(_, reports) {
+    state.reports = reports;
   },
 };
 

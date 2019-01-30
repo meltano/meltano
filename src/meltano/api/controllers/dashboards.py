@@ -26,9 +26,17 @@ def save_dashboard():
     return jsonify(response_data)
 
 
-@dashboardsBP.route("/dashboard/report/save", methods=["POST"])
-def save_report_to_dashboard():
+@dashboardsBP.route("/dashboard/report/add", methods=["POST"])
+def add_report_to_dashboard():
     dashboards_helper = DashboardsHelper()
     post_data = request.get_json()
-    response_data = dashboards_helper.save_report_to_dashboard(post_data)
+    response_data = dashboards_helper.add_report_to_dashboard(post_data)
+    return jsonify(response_data)
+
+
+@dashboardsBP.route("/dashboard/report/remove", methods=["POST"])
+def remove_report_from_dashboard():
+    dashboards_helper = DashboardsHelper()
+    post_data = request.get_json()
+    response_data = dashboards_helper.remove_report_from_dashboard(post_data)
     return jsonify(response_data)
