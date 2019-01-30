@@ -16,6 +16,19 @@
                     :key="dashboard.id"
                     @click="getDashboard(dashboard)">
                   <a>{{dashboard.name}}</a>
+                  <div v-if="dashboard.id === activeDashboard.id" style="margin-left: 15px;">
+                    <small>Reports ({{activeDashboard.reportIds.length}})</small>
+                    <ul>
+                      <li v-for="report in reports" :key="report.id">
+                        <label for="'checkbox-' + report.id"
+                                @click="toggleReportInDashboard(report)">
+                          <input type="checkbox"
+                                :id="'checkbox-' + report.id"
+                                :checked="isReportInActiveDashboard(report)">
+                          {{report.name}}</label>
+                      </li>
+                    </ul>
+                  </div>
                 </li>
               </ul>
             </div>
@@ -56,18 +69,6 @@
                 Graph: {{report.name}}
               </div>
             </div>
-            <hr>
-            <h2>Reports ({{activeDashboard.reportIds.length}})</h2>
-            <ul>
-              <li v-for="report in reports" :key="report.id">
-                <label for="'checkbox-' + report.id"
-                        @click="toggleReportInDashboard(report)">
-                  <input type="checkbox"
-                        :id="'checkbox-' + report.id"
-                        :checked="isReportInActiveDashboard(report)">
-                  {{report.name}}</label>
-              </li>
-            </ul>
           </div>
         </div>
 
