@@ -51,6 +51,12 @@
 
           <div v-if="!isAddDashboard">
             <h1><strong>{{activeDashboard.name}}</strong></h1>
+            <div v-for="report in reports" :key="report.id">
+              <div v-if="isReportInActiveDashboard(report)">
+                Graph: {{report.name}}
+              </div>
+            </div>
+            <hr>
             <h2>Reports ({{activeDashboard.reportIds.length}})</h2>
             <ul>
               <li v-for="report in reports" :key="report.id">
