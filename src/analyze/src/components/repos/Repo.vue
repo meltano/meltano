@@ -67,7 +67,8 @@
                     {{file.visual}}
                   </a>
                   <div v-if='isDeepRoutable(key)' class='level-right'>
-                    <router-link :to="getDeepRoute(key, value)" class="button is-secondary is-small is-light">
+                    <router-link :to="getDeepRoute(key)"
+                                  class="button is-secondary is-small is-light">
                       <span class="icon is-small">
                         <i class="fas fa-bold">*</i>
                       </span>
@@ -138,8 +139,8 @@ export default {
     isDeepRoutable(type) {
       return type === 'dashboards';
     },
-    getDeepRoute(key, value) {
-      return '/dashboards';
+    getDeepRoute(key) {
+      return `/${key}`;
     },
     getFile(file) {
       this.$store.dispatch('repos/getFile', file);
