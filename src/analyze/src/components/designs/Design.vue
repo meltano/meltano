@@ -184,13 +184,18 @@
                 </div>
                 <div class="dropdown-menu" id="dropdown-menu-load-report" role="menu">
                   <div class="dropdown-content">
-                    <a class="dropdown-item"
-                        :class="{'is-loading': loadingQuery}"
-                        v-for="report in reports"
-                        :key="report.name"
-                        @click="loadReport(report)">
-                      {{report.name}}
-                    </a>
+                    <div v-if="reports.length > 0">
+                      <a class="dropdown-item"
+                          :class="{'is-loading': loadingQuery}"
+                          v-for="report in reports"
+                          :key="report.name"
+                          @click="loadReport(report)">
+                        {{report.name}}
+                      </a>
+                    </div>
+                    <div class="dropdown-item" v-if="reports.length === 0">
+                      <p>Try saving one first</p>
+                    </div>
                   </div>
                 </div>
               </div>
