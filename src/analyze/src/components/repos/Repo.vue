@@ -60,9 +60,19 @@
               </template>
 
               <template v-if="value.length">
-                <li v-for="file in value" :key="file.abs">
-                  <a :class="{'is-active': isActive(file)}"
-                    @click.prevent='getFile(file)'>{{file.visual}}</a>
+                <li v-for="file in value" :key="file.abs" class='level'>
+                  <a class='level-left'
+                      :class="{'is-active': isActive(file)}"
+                      @click.prevent='getFile(file)'>
+                    {{file.visual}}
+                  </a>
+                  <div v-if='isDeepRoutable(key)' class='level-right'>
+                    <router-link :to="getDeepRoute(key, value)" class="button is-secondary is-small is-light">
+                      <span class="icon is-small">
+                        <i class="fas fa-bold">*</i>
+                      </span>
+                    </router-link>
+                  </div>
                 </li>
               </template>
 
@@ -123,6 +133,13 @@ export default {
     },
     isActive(f) {
       return f.unique === this.activeView.unique;
+    },
+    // TODO refactor isDeepRoutable/getDeepRoute https://gitlab.com/meltano/meltano/issues/347
+    isDeepRoutable(type) {
+      return type === 'dashboards';
+    },
+    getDeepRoute(key, value) {
+      return '/dashboards';
     },
     getFile(file) {
       this.$store.dispatch('repos/getFile', file);
