@@ -7,11 +7,13 @@ from pathlib import Path
 from os.path import join
 
 from flask import Blueprint, jsonify, request
+from flask_security import auth_required
 import sqlalchemy
 
 from .sql_helper import SqlHelper
 from .settings_helper import SettingsHelper
 from .m5oc_file import M5ocFile
+from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
@@ -80,6 +82,12 @@ def get_db_engine(connection_name):
         raise ConnectionNotFound(connection_name)
     except StopIteration:
         raise ConnectionNotFound(connection_name)
+
+
+@sqlBP.before_request
+@api_auth_required
+def before_request():
+    pass
 
 
 @sqlBP.route("/", methods=["GET"])

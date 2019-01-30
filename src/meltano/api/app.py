@@ -78,12 +78,13 @@ def start(project, **kwargs):
     worker = MeltanoBackgroundCompiler(project)
     worker.start()
 
-    app = create_app()
+    app_config = kwargs.pop("app_config", {})
+    app = create_app(app_config)
     from .security import create_dev_user
 
     with app.app_context():
-        if app.env == "development":
-            create_dev_user()
+        # TODO: alembic migration
+        create_dev_user()
 
     app.run(**kwargs)
     worker.stop()

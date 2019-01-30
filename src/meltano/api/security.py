@@ -1,5 +1,6 @@
-from flask_security import Security, SQLAlchemyUserDatastore, AnonymousUser
+from flask_security import Security, SQLAlchemyUserDatastore, AnonymousUser, auth_required
 from flask_security.utils import login_user
+from functools import wraps
 
 from .models import db, User, Role
 
@@ -10,7 +11,6 @@ DEV_USER = {"email": "dev@meltano.com", "password": "meltano"}
 
 class FreeUser(AnonymousUser):
     """FreeUser is free to do eveything and has no limits."""
-
     def has_role(*args):
         return True
 
@@ -21,6 +21,13 @@ class FreeUser(AnonymousUser):
     @property
     def is_active(self):
         return True
+
+    @property
+    def id(self):
+        return self.get_id()
+
+    def get_id(self):
+        return -1
 
 
 # normally one would setup the extension accordingly, but it
@@ -34,3 +41,7 @@ def create_dev_user():
         users.create_user(**DEV_USER)
 
     db.session.commit()
+
+
+def api_auth_required(f):
+    return auth_required("token", "session")(f)
