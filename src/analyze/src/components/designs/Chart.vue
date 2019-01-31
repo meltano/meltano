@@ -1,6 +1,9 @@
 <template>
   <div v-show="results.length">
-    <component :is="chartType"></component>
+    <component :is="chartType"
+                :chart-type='chartType'
+                :results='results'
+                :result-aggregates='resultAggregates'></component>
   </div>
 </template>
 <script>
@@ -15,11 +18,10 @@ export default {
     AreaChart,
     ScatterChart,
   },
-  computed: {
-    ...mapState('designs', [
-      'results',
-      'chartType',
-    ]),
-  },
+  props: [
+    'chartType',
+    'results',
+    'resultAggregates',
+  ],
 };
 </script>

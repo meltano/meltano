@@ -351,7 +351,9 @@
             </p>
           </div>
           <div class="has-background-white-ter chart-toggles">
-            <chart></chart>
+            <chart :chart-type='chartType'
+                    :results='results'
+                    :result-aggregates='resultAggregates'></chart>
           </div>
         </template>
 
@@ -447,6 +449,9 @@ export default {
       'hasSQLError',
       'sqlErrorMessage',
       'connectionDialect',
+      'results',
+      'resultAggregates',
+      'chartType',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',

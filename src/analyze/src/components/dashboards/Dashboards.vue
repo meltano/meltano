@@ -69,9 +69,10 @@
             <h1><strong>{{activeDashboard.name}}</strong></h1>
             <div v-for="report in reports" :key="report.id">
               <div v-if="isReportInActiveDashboard(report)">
-                <p>Graph: {{report.name}}</p>
-                <p>queryPayload: {{report.queryPayload}}</p>
-                <p>chartType: {{report.chartType}}</p>
+                <p>{{report.name}}</p>
+                <chart :chart-type='report.chartType'
+                        :results='report.queryPayload'
+                        :result-aggregates='report.queryPayload'></chart>
               </div>
             </div>
           </div>
@@ -84,12 +85,16 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
+import Chart from '../designs/Chart';
 
 export default {
   name: 'Dashboards',
   created() {
     this.getDashboards();
     this.getReports();
+  },
+  components: {
+    Chart,
   },
   computed: {
     ...mapState('dashboards', [
