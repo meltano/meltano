@@ -1,0 +1,5 @@
+{{ _('Welcome %(email)s!', email=user.email) }}
+
+{{ _('You can log into your account through the link below:') }}
+
+{{ login_link }}

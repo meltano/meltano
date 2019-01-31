@@ -1,7 +1,14 @@
 from flask import Blueprint, jsonify, request
+from meltano.api.security import api_auth_required
 from .settings_helper import SettingsHelper
 
 settingsBP = Blueprint("settings", __name__, url_prefix="/settings")
+
+
+@settingsBP.before_request
+@api_auth_required
+def before_request():
+    pass
 
 
 @settingsBP.route("/", methods=["GET"])

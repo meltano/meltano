@@ -10,10 +10,17 @@ import markdown
 import pkg_resources
 from flask import Blueprint, jsonify
 
+from meltano.api.security import api_auth_required
 from .m5o_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
+
+
+@reposBP.before_request
+@api_auth_required
+def before_request():
+    pass
 
 
 @reposBP.route("/", methods=["GET"])
