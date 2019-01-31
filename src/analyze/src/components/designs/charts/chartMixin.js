@@ -68,7 +68,6 @@ const chartMixin = {
       this.updateChart();
     },
     updateChart() {
-      console.log('updateChart', this);
       if (!this.results.length) {
         return;
       }

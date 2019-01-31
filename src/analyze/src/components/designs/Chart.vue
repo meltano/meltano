@@ -7,7 +7,6 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
 import { BarChart, LineChart, AreaChart, ScatterChart } from './charts';
 
 export default {
