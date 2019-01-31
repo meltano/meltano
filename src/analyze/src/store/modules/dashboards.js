@@ -3,6 +3,7 @@ import designApi from '../../api/design';
 
 const state = {
   activeDashboard: {},
+  activeDashboardReports: [],
   dashboards: [],
   isAddDashboard: true,
   reports: [],
@@ -29,6 +30,11 @@ const actions = {
       .then((response) => {
         commit('setReports', response.data);
       });
+  },
+  getActiveDashboardReportsWithSql({ commit }) {
+    const ids = state.activeDashboard.reportIds;
+    const activeReports = state.reports.filter(report => ids.includes(report.id));
+    // TODO implement round trip
   },
   setAddDashboard({ commit }, value) {
     commit('setAddDashboard', value);

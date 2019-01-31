@@ -67,13 +67,11 @@
 
           <div v-if="!isAddDashboard">
             <h1><strong>{{activeDashboard.name}}</strong></h1>
-            <div v-for="report in reports" :key="report.id">
-              <div v-if="isReportInActiveDashboard(report)">
-                <p>{{report.name}}</p>
-                <chart :chart-type='report.chartType'
-                        :results='report.queryPayload'
-                        :result-aggregates='report.queryPayload'></chart>
-              </div>
+            <div v-for="report in activeDashboardReports" :key="report.id">
+              <p>{{report.name}}</p>
+              <chart :chart-type='report.chartType'
+                      :results='report.results'
+                      :result-aggregates='report.resultAggregates'></chart>
             </div>
           </div>
         </div>
@@ -99,6 +97,7 @@ export default {
   computed: {
     ...mapState('dashboards', [
       'activeDashboard',
+      'activeDashboardReports',
       'dashboards',
       'isAddDashboard',
       'reports',
@@ -110,6 +109,7 @@ export default {
       'getDashboards',
       'getDashboard',
       'getReports',
+      'getActiveDashboardReportsWithSql',
       'setAddDashboard',
     ]),
     isActive(dashboard) {
@@ -129,6 +129,11 @@ export default {
         reportId: report.id,
         dashboardId: this.activeDashboard.id,
       });
+    },
+  },
+  watch: {
+    activeDashboard() {
+      this.getActiveDashboardReportsWithSql();
     },
   },
 };
