@@ -60,20 +60,19 @@
               </template>
 
               <template v-if="value.length">
-                <li v-for="file in value" :key="file.abs" class='level'>
-                  <a class='level-left'
-                      :class="{'is-active': isActive(file)}"
+                <li v-for="file in value" :key="file.abs">
+                  <a :class="{'is-active': isActive(file)}"
                       @click.prevent='getFile(file)'>
                     {{file.visual}}
+                    <div v-if='isDeepRoutable(key)' class='is-pulled-right'>
+                      <router-link :to="getDeepRoute(key)"
+                                    class="button is-secondary is-small is-light">
+                        <span class="icon is-small">
+                          <i class="fas fa-bold">*</i>
+                        </span>
+                      </router-link>
+                    </div>
                   </a>
-                  <div v-if='isDeepRoutable(key)' class='level-right'>
-                    <router-link :to="getDeepRoute(key)"
-                                  class="button is-secondary is-small is-light">
-                      <span class="icon is-small">
-                        <i class="fas fa-bold">*</i>
-                      </span>
-                    </router-link>
-                  </div>
                 </li>
               </template>
 
