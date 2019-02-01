@@ -58,7 +58,7 @@
         <tr class="meltano-row">
           <td>Meltano is a single workflow for the entire data life cycle.</td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
+            <a href="https://gitlab.com/meltano/meltano" target="_blank">Meltano</a>
           </td>
           <td class="ta-c">
             <a href="https://meltano.com/docs/taps-targets.html#tap">Singer Tap</a>
@@ -70,7 +70,7 @@
             <a href="https://www.getdbt.com/">dbt</a>
           </td>
           <td class="ta-c">
-            <a href="/docs/architecture.html#meltano-ui">Meltano UI</a>
+            <a href="https://gitlab.com/meltano/meltano">Meltano</a>
           </td>
           <td class="ta-c">
             <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
