@@ -109,7 +109,7 @@ export default {
       'getDashboards',
       'getDashboard',
       'getReports',
-      'getActiveDashboardReportsWithSql',
+      'getActiveDashboardReportsWithQueryResults',
       'setAddDashboard',
     ]),
     isActive(dashboard) {
@@ -133,7 +133,7 @@ export default {
   },
   watch: {
     activeDashboard() {
-      this.getActiveDashboardReportsWithSql();
+      this.getActiveDashboardReportsWithQueryResults();
     },
   },
 };

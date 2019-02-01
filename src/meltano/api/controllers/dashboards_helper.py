@@ -6,6 +6,8 @@ from os.path import join
 from pathlib import Path
 from meltano.core.utils import slugify
 
+from .sql import get_sql
+
 
 class DashboardsHelper:
     def __init__(self):
@@ -21,6 +23,11 @@ class DashboardsHelper:
             with file.open() as f:
                 contents.append(json.load(f))
         return contents
+
+    def get_dashboard_reports_with_query_results(self, reports):
+        for report in reports:
+            report["queryResults"] = "TODO"
+        return reports
 
     def get_dashboard(self, dashboard_id):
         dashboards = self.get_dashboards()

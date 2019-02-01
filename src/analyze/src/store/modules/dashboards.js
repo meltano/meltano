@@ -31,10 +31,14 @@ const actions = {
         commit('setReports', response.data);
       });
   },
-  getActiveDashboardReportsWithSql({ commit }) {
+  getActiveDashboardReportsWithQueryResults({ commit }) {
     const ids = state.activeDashboard.reportIds;
     const activeReports = state.reports.filter(report => ids.includes(report.id));
-    // TODO implement round trip
+    dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
+      .then((response) => {
+        console.log('got getActiveDashboardReportsWithQueryResults!', response.data);
+        // commit('setActiveDashboardReports', response.data);
+      });
   },
   setAddDashboard({ commit }, value) {
     commit('setAddDashboard', value);
@@ -67,6 +71,9 @@ const mutations = {
   resetSaveDashboardSettings() {
     state.saveDashboardSettings = { name: null, description: null };
   },
+  setActiveDashboardReports(_, reports) {
+    state.activeDashboardReports = reports;
+  },
   setAddDashboard(_, value) {
     state.isAddDashboard = value;
   },
@@ -78,7 +85,7 @@ const mutations = {
   },
   setReports(_, reports) {
     state.reports = reports;
-  },
+  }
 };
 
 export default {
