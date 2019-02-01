@@ -1,18 +1,19 @@
 # Roadmap
 
-1. [MVC](https://gitlab.com/meltano/meltano/issues/10)
+## Milestones
 
-    - [Horizontal slice of ELT sources](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=✓&state=opened&label_name[]=elt): Salesforce, Marketo, NetSuite, Zuora, etc.
-    - [Data Pipeline](https://gitlab.com/meltano/meltano/issues?label_name[]=pipeline): container, CI pipeline, review apps
+You can track our progress through [ our milestones](https://gitlab.com/groups/meltano/-/milestones).
 
-2. Data Model and Visualization
+## Release
 
-    - [Common Data Model](https://gitlab.com/meltano/meltano/issues?label_name[]=data-model): Conventions for common table and field names (but it allows you to make it organization specific)
-    - [Field Mapping](https://gitlab.com/meltano/meltano/issues/121): Mapping of user fields to common data model, if required
-    - [Visualization Sample](https://gitlab.com/meltano/meltano/issues/122): Documentation and samples for connecting a visualization engine
-    - [JupyterHub deployment](https://gitlab.com/meltano/jupyter-hub): Easily deploy JupyterHub for data exploration
+Meltano currently follows a weekly release schedule.
 
-3. [Ease of use & Automation](https://gitlab.com/meltano/meltano/issues?label_name%5B%5D=ease-of-use)
+For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md). 
 
-    - Seamless handle some schema changes, like a field rename
-    - Match user fields to common data model, without intervention
+## Monetization
+
+We are building Meltano to solve a problem that software companies share: How to acquire the highest-value customers at the lowest cost of acquisition? 
+
+We are solving this problem for by incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers. Next, we will focus on building a community around Meltano with more users and regular contributors to the code base.
+
+Right now Meltano is open source. In the future we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. An example of a proprietary/source available feature is fine grained access controls. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).

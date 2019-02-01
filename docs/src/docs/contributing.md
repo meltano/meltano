@@ -24,13 +24,13 @@ python -m meltano.api
 Open a new terminal tab in the meltano project directory:
 
 ```bash
-# Change into the Meltano Analyze code directory
+# Change into the Meltano UI code directory
 cd src/analyze
 
-# Install the dependencies for Meltano Analyze
+# Install the dependencies for Meltano UI
 npm install
 
-# Start the web server for Meltano Analyze 
+# Start the web server for Meltano UI 
 npm run dev
 ```
 
@@ -61,3 +61,83 @@ $ git add CHANGELOG.md
 ```
 
 Make sure to add CHANGELOG entries to your merge requests.
+
+## Releases
+
+Meltano uses [semver](https://semver.org/) as its version number scheme.
+
+### Requirements
+
+::: warning Requirement
+Ensure you have the latest `master` branch locally before continuing.
+```bash
+  # get latest master branch
+  $ git fetch origin
+```
+:::
+
+### Release process
+
+Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
+1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install dev dependencies:
+    ```bash
+    # activate your virtualenv
+    $ source ./venv/bin/activate
+    # pip install all the development dependencies
+    $ pip install '.[dev]'
+    ```
+1. Execute the commands below:
+    ```bash
+    # create and checkout release-next branch that's based off master branch
+    $ git checkout -b release-next origin/master
+
+    # view changelog (verify changes made match changes logged)
+    $ changelog view
+
+    # after changelog validation, build the release
+    $ make release
+
+    # validate that the tag auto increments based on semver
+    $ git push --tags
+
+    # update meltano repo with release-next branch
+    $ git push origin release-next
+    ```
+1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
+1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
+1. When the **publish** pipeline succeeds, the release is publicly available.
+
+## Tmuxinator
+
+Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
+
+### Why Tmuxinator?
+
+In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command. 
+
+1. Start up Docker
+1. Start Meltano API
+1. Start the web app
+
+It's a game changer for development and it's worth the effort!
+
+### Requirements
+
+1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew
+1. [tmuxinator](https://github.com/tmuxinator/tmuxinator)
+
+This config uses `$MELTANO_VENV` to source the virtual environment from. Set it to the correct directory before running tmuxinator. 
+
+### Instructions
+
+1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
+1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1. 
+
+```bash
+$ cd path/to/meltano
+$ MELTANO_VENV=.venv tmuxinator local
+```
+
+### Resources
+
+- [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
