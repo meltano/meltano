@@ -48,7 +48,7 @@ module.exports = {
 				'/docs/concepts',
 				'/docs/architecture',
 				'/docs/meltano-cli',
-				'/docs/best-practices',
+				'/docs/security-and-privacy',
 				'/docs/personas',
 				'/docs/roadmap',
 				'/docs/contributing'
