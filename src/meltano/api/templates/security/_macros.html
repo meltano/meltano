@@ -1,0 +1,31 @@
+{% macro render_field_with_errors(field) %}
+  {% set field_class = kwargs.pop("field_class", "input") %}
+  {% set label_class = kwargs.pop("label_class", "label is-small") %}
+  <div class="field">
+    {{ field.label(class_=label_class)}}
+    <div class="control">
+      {{ field(class_=field_class, **kwargs)|safe }}
+    </div>
+    {% if field.errors %}
+      <ul class="help">
+      {% for error in field.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{% macro render_field(field) %}
+  {% set cls = kwargs.pop("class_", "input") %}
+  <p class="control">{{ field(class_=cls, **kwargs)|safe }}</p>
+{% endmacro %}
+
+{% macro title(text) %}
+  <h1 style="margin-bottom: 1em;" class="has-text-grey-light has-text-weight-light has-text-centered">{{ text|safe }}</h1>
+{% endmacro %}
+
+{% macro render_button(field) %}
+  {% set cls = kwargs.pop("class_", "button") %}
+  <p class="control">{{ field(class_=cls, **kwargs)|safe }}</p>
+{% endmacro %}

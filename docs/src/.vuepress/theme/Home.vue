@@ -37,11 +37,159 @@
       </div>
     </div>
 
-    <Content custom />
+    <h2 class="quote">Meltano does for data what docker did for containers</h2>
 
-    <section class="hiring">
-      <h2 class="hiring__title">We're Hiring!</h2>
-      <p class="hiring__text">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
+    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+
+    <table class="meltano-stages-table">
+      <thead>
+        <tr class="meltano-header-row">
+          <th><span class="sr-only">Description</span></th>
+          <th>Model</th>
+          <th>Extract</th>
+          <th>Load</th>
+          <th>Transform</th>
+          <th>Analyze</th>
+          <th>Notebook</th>
+          <th>Orchestrate</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="meltano-row">
+          <td>Meltano is a single workflow for the entire data life cycle.</td>
+          <td class="ta-c">
+            <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://meltano.com/docs/taps-targets.html#tap">Singer Tap</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://meltano.com/docs/taps-targets.html#target">Singer Target</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://www.getdbt.com/">dbt</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://meltano.com/docs/architecture.html#meltano-analyze">Meltano Analyze</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
+          </td>
+          <td class="ta-c">
+            <a href="https://docs.gitlab.com/ee/ci/">GitLab CI</a> /  <a href="https://airflow.apache.org/">Airflow</a>
+          </td>
+        </tr>
+        <tr>
+          <td>Meltano can replace</td>
+          <td>
+            <ul>
+              <li>
+                <a href="http://www.modelsphere.com/org/">Open ModelSphere</a>
+              </li>
+              <li>
+                <a href="https://looker.com/platform/data-modeling">LookML</a>
+              </li>
+              <li>
+                <a href="http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/">Matillion</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+              </li>
+              <li>
+                <a href="https://www.talend.com/">Talend</a>
+              </li>
+              <li>
+                <a href="https://www.alooma.com/">Alooma</a></li>
+              <li>
+                <a href="https://fivetran.com/">Fivetran</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+              </li>
+              <li>
+                <a href="https://www.talend.com/">Talend</a>
+              </li>
+              <li>
+                <a href="https://www.alooma.com/">Alooma</a>
+              </li>
+              <li>
+                <a href="https://fivetran.com/">Fivetran</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="https://meltano.com/docs/best-practices.html#stored-procedures">Stored procedures</a>
+              </li>
+              <li>
+                <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+              </li>
+              <li>
+                <a href="https://www.alooma.com/">Alooma</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="https://www.metabase.com/">Metabase</a>
+              </li>
+              <li>
+                <a href="https://looker.com/">Looker</a>
+              </li>
+              <li>
+                <a href="https://www.periscopedata.com/">Periscope</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="https://www.gnu.org/software/octave/">GNU Octave</a>
+              </li>
+              <li>
+                <a href="https://www.nurtch.com/">Nurtch</a>
+              </li>
+              <li>
+                <a href="https://www.datadoghq.com/blog/data-driven-notebooks/">Datadog Notebooks</a>
+              </li>
+            </ul>
+          </td>
+          <td>
+            <ul>
+              <li>
+                <a href="https://github.com/spotify/luigi">Luigi</a>
+              </li>
+              <li>
+                <a href="https://nifi.apache.org/">Nifi</a>
+              </li>
+              <li>
+                <a href="https://fivetran.com/">Fivetran</a>
+              </li>
+            </ul>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <section class="section">
+      <h2 class="section__title">Join Our Slack Channel!</h2>
+      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel.</p> 
+      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Let's chat in Slack!</a>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">We're Hiring!</h2>
+      <p class="section__text mb0">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
     </section>
 
     <div
@@ -76,33 +224,99 @@ export default {
 <style lang="stylus">
 @import './styles/config.styl'
 
-.hiring {
+.button {
+    display: inline-block;
+    font-size: 1.2rem;
+    color: $accentColor;
+    padding: 0.8rem 1.6rem 0.9rem;
+    border-radius: 4px;
+    transition: background-color 0.1s ease;
+    box-sizing: border-box;
+    border: 2px solid $accentColor;
+    transition: all 0.2s ease-in;l
+
+    &:hover,
+    &:focus {
+      color: #fff;
+      background-color: $accentColor;
+    }
+}
+
+.quote {
+  border-top: 1px solid #ddd;
+  border-bottom: 0;
+  font-size: 2.4rem;
+  text-align: center;
+  margin-top: 5rem;
+  padding-top: 5rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.description {
+  font-size: 1.4rem;
+  margin-bottom: 0;
+}
+
+.meltano-stages-table {
+  display: block;
+  margin: 2.5rem auto 7rem;
+
+  tr:nth-child(2n) {
+    background-color: white;
+  }
+}
+
+.meltano-header-row {
+  height: 75px;
+}
+
+.meltano-row {
+  background-color: #3915c0;
+  color: white;
+  font-weight: bold;
+  padding: 10px 0;
+  height: 200px;
+
+  a {
+    color: white;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.section {
   border-top: 1px solid #eaecef;
-  padding: 1.2rem 0;
+  padding: 2.5rem 0;
   text-align: center;
 
   &__text {
-    font-size: 1.2rem;
-    margin-bottom: 0.82rem;
+    font-size: 1.4rem;
+    margin-bottom: 0;
   }
 
   &__title {
+    margin-top: 0;
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: 0;
+    font-size: 2rem;
   }
 }
 
 @media (min-width: $MQNarrow) {
-  .hiring__text {
+  .section__text {
     max-width: 60%;
-    margin: 1rem auto;
+    margin: 1.5rem auto;
   }
 }
 
 .home
   padding $navbarHeight 2rem 0
-  max-width 960px
+  max-width 1080px
   margin 0px auto
   .hero
     text-align center
@@ -186,4 +400,12 @@ export default {
     .feature
       h2
         font-size 1.25rem
+
+.ta-c { 
+  text-align: center;
+}
+
+.mb0 {
+  margin-bottom: 0;
+}
 </style>

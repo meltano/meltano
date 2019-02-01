@@ -10,14 +10,26 @@ from meltano.core.config_service import ConfigService
 class TestPluginInstallService:
     @pytest.fixture
     def subject(self, project):
-        with project.meltanofile.open("w") as f:
+        with open(project.meltanofile, "w") as f:
             f.write(
-                """
-                    extractors:
-                    - {name: tap-gitlab, pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'}
-                    loaders:
-                    - {name: target-csv, pip_url: 'git+https://gitlab.com/meltano/target-csv.git'}
-            """
+                yaml.dump(
+                    {
+                        "plugins": {
+                            "extractors": [
+                                {
+                                    "name": "tap-gitlab",
+                                    "pip_url": "git+https://gitlab.com/meltano/tap-gitlab.git",
+                                }
+                            ],
+                            "loaders": [
+                                {
+                                    "name": "target-csv",
+                                    "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
+                                }
+                            ],
+                        }
+                    }
+                )
             )
 
         return PluginInstallService(project)

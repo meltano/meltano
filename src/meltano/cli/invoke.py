@@ -5,6 +5,7 @@ from . import cli
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.config_service import ConfigService
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
@@ -27,6 +28,12 @@ def invoke(plugin_name, plugin_args):
 
     try:
         exit_code = handle.wait()
+
+        tracker = GoogleAnalyticsTracker(project)
+        tracker.track_meltano_invoke(
+            plugin_name=plugin_name, plugin_args=" ".join(plugin_args)
+        )
+
         sys.exit(exit_code)
     except Exception as err:
         click.secho(f"An error occured: {err}.", fg="red")

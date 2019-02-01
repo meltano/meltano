@@ -1,5 +1,5 @@
 {
-  sql_table_name = gitlab.entry
+  sql_table_name = entry
   name = entry
   columns {
     id {

@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * add ability to load reports
 
 ### Changes
+* Generate default `Meltano UI` connection for the `meltano.db` SQLite DB when a new project is created with `meltano init`
 
 ### Fixes
 * Updated the Fundamentals documentation section regarding reports
@@ -20,10 +21,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 0.8.0 - (2019-01-29)
+---
+
+### New
+* Add tracking of anonymous `meltano cli` usage stats to Meltano's Google Analytics Account
+* Add `project_config.yml` to all meltano projects to store concent for anonymous usage tracking and the project's UUID
+
+### Changes
+* Add `--no_usage_stats` option to `meltano init <project_name>` to allow users to opt-out from anonymous usage stats tracking
+* Bundled Meltano models are now SQLite compatible.
+
+
 ## 0.7.0 - (2019-01-22)
 ---
 
 ### New
+* Added basic authentication support for meltano ui.
 * Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
