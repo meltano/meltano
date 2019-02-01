@@ -185,13 +185,14 @@
     </table>
 
     <section class="section">
-      <h2 class="section__title">Join Our Slack Channel!</h2>
-      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel.</p> 
-      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Let's chat in Slack!</a>
+      <h2 class="section__title">Communicate with the team!</h2>
+      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel and watch our videos on YouTube!</p> 
+      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
+      <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
     </section>
 
     <section class="section">
-      <h2 class="section__title">We're Hiring!</h2>
+      <h2 class="section__title">We are hiring!</h2>
       <p class="section__text mb0">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
     </section>
 
