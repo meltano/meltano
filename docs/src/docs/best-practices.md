@@ -1,71 +1,21 @@
 # Best Practices
 
-## How to use sub pipelines to effectively create a DAG like architecture
+## Security & Privacy
 
-An example of this can be seen in the [gitlab-ci.yml](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/.gitlab-ci.yml#L251) which is being used to trigger the gitlab-qa project. This will trigger a [`SCRIPT_NAME`:`trigger-build`](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/scripts/trigger-build) which has the API calls written in Ruby, for which we can use Python. From there the sky is the limit.
+When using Meltano, like any data science tool, it is important to consider the security and privacy implications.
 
-## Managing API requests and limits
+- Meltano expects the required credentials for each extractor to be stored as a project variable. Project members with the role [`Maintainer` or `Owner`](https://docs.gitlab.com/ee/user/permissions.html#project-members-permissions) will be able to see these in plaintext, as well as any instance wide administrators. If you are using GitLab.com, this includes select GitLab employees responsible for the service.
+  - Support for KMS systems is being considered for a future release.
+- Because these variables are passed to GitLab CI jobs, it is possible to accidentally or maliciously compromise them:
+  - For example, a developer who normally cannot see the variables in project settings, could accidentally print the environment variables when debugging a CI job, causing them to be readable by a wider audience than intended.
+  - Similarly it is possible for a malicious developer to utilize the variables to extract data from a source, then send it to an unauthorized destination.
+  - These risks can be mitigated by [restricting the production variables](https://docs.gitlab.com/ee/ci/variables/#protected-variables) to only protected branches, so code is reviewed before it is able to run with access to the credentials. It is also possible to set job logs to be available to only those with `Developer` roles or above, in CI/CD settings.
+- When designing your data warehouse, consider any relevant laws and regulations, like GDPR. For example, historical data being retained as part of a snapshot could present challenges in the event a user requests to be forgotten.
 
-Many of the SaaS sources have various types of API limits, typically a given quota per day. If you are nearing the limit of a given source, or are iterating frequently on your repo, you may need to implement some additional measures to manage usage.
+### Meltano Data Security and Privacy at GitLab
 
-### Reducing API usage by review apps
+We take user security and privacy seriously at GitLab. We internally use Meltano to learn about how users interact with GitLab.com, build a better product, and efficiently run our organization. We adhere to the following guidelines:
 
-One of the easiest ways to reduce consumption of API calls for problematic ELT sources is to make that job manual for branches other than `master`. This way when iterating on a particular branch, this job can be manually run only if it specifically needs to be tested.
-
-We don't want the job on `master` to be manual, so we will need to create two jobs. The best way to do this is to convert the existing job into a template, which can then be referenced so we don't duplicate most of the settings.
-
-For example take a sample Zuora ELT job:
-
-```yaml
-zuora:
-  stage: extract
-  image: registry.gitlab.com/meltano/meltano-elt/extract:latest
-  script:
-    - set_sql_instance_name
-    - setup_cloudsqlproxy
-    - envsubst < "elt/config/environment.conf.template" > "elt/config/environment.conf"
-    - python3 elt/zuora/zuora_export.py
-    - stop_cloudsqlproxy
-```
-
-The first thing to do would to convert this into an anchor, and preface the job name with `.` so it is ignored:
-
-```yaml
-.zuora: &zuora
-  stage: extract
-  image: registry.gitlab.com/meltano/meltano-elt/extract:latest
-  script:
-    - set_sql_instance_name
-    - setup_cloudsqlproxy
-    - envsubst < "elt/config/environment.conf.template" > "elt/config/environment.conf"
-    - python3 elt/zuora/zuora_export.py
-    - stop_cloudsqlproxy
-```
-
-Next, we can define two new jobs. One for `master` and another manual job for any review branches:
-
-```yaml
-zuora_prod:
-  <<: *zuora
-  only:
-    - master
-
-zuora_review:
-  <<: *zuora
-  only:
-    - branches
-  except:
-    - master
-  when: manual
-```
-
-## Pipeline configuration
-
-Data integration stages are configurable using `Project variables` for the CI/CD pipeline. The following variables may help you control what needs to run:
-
-- `EXTRACT_SKIP`: either `all` (to skip the `extract` stage) or job names, like `marketo,zendesk,zuora` to be skipped from the pipeline.
-- `UPDATE_SKIP`: either `all` (to skip the `update` stage) or job names, like `sfdc_update`.
-
-## Stored procedures
-
-We don't use stored procedures because they are hard to keep under version control.
+1. GitLab employees have access to the data warehouse and can see pseudonymized data. In some cases due to public projects, it is possible to tie a pseudonymized account to a public account. It is not possible to learn the private projects a user is working on or contents of their communications.
+1. We will never release the pseudonymized dataset publicly, in the event it is possible to reverse engineer unintended content.
+1. Select GitLab employees have administrative access to GitLab.com, and the credentials used for our extractors. As noted above, developers on the Meltano project could maliciously emit credentials into a job log, however, the logs are not publicly available.
