@@ -35,7 +35,7 @@ These two tools enable you and your team to use Meltano in a few different ways:
     - Helps you create and test extractors, loaders, and transforms
 1. Meltano as **ELT** only (CLI)
     - Runtime for extracting, loading, and transforming of data
-1. Meltano as **Analyze** only (GUI)
+1. Meltano as **UI** only (GUI)
     - Interactively query, explore, visualize, and model the data (warehouse)
 
 In addition, Meltano allows you to utilize the following tools for various steps of the data life cycle:
