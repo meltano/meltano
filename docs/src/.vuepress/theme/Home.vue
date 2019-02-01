@@ -199,7 +199,7 @@
     <div
       class="footer"
     >
-      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/README.md" target="_blank">Edit this page</a>
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/Home.vue" target="_blank">Edit this page</a>
     </div>
   </div>
 </template>
