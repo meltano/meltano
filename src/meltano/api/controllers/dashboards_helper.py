@@ -35,7 +35,9 @@ class DashboardsHelper:
             outgoing_sql = sql_dict["sql"]
             aggregates = sql_dict["aggregates"]
 
-            report["queryResults"] = sqlHelper.get_query_results(connection_name, outgoing_sql)
+            report["queryResults"] = sqlHelper.get_query_results(
+                connection_name, outgoing_sql
+            )
             report["queryResultAggregates"] = sqlHelper.get_names(aggregates)
         return reports
 
