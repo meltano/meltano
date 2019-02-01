@@ -36,8 +36,7 @@ const actions = {
     const activeReports = state.reports.filter(report => ids.includes(report.id));
     dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
       .then((response) => {
-        console.log('got getActiveDashboardReportsWithQueryResults!', response.data);
-        // commit('setActiveDashboardReports', response.data);
+        commit('setActiveDashboardReports', response.data);
       });
   },
   setAddDashboard({ commit }, value) {

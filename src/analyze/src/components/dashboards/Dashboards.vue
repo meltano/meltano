@@ -70,8 +70,8 @@
             <div v-for="report in activeDashboardReports" :key="report.id">
               <p>{{report.name}}</p>
               <chart :chart-type='report.chartType'
-                      :results='report.results'
-                      :result-aggregates='report.resultAggregates'></chart>
+                      :results='report.queryResults'
+                      :result-aggregates='[]'></chart>
             </div>
           </div>
         </div>

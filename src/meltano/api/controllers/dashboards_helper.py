@@ -6,7 +6,7 @@ from os.path import join
 from pathlib import Path
 from meltano.core.utils import slugify
 
-from .sql import get_sql
+from .sql_helper import SqlHelper
 
 
 class DashboardsHelper:
@@ -25,8 +25,15 @@ class DashboardsHelper:
         return contents
 
     def get_dashboard_reports_with_query_results(self, reports):
+        sqlHelper = SqlHelper()
         for report in reports:
-            report["queryResults"] = "TODO"
+            m5oc = sqlHelper.get_m5oc_model(report["model"])
+            design = m5oc.design(report["design"])
+            connection_name = m5oc.connection("connection")
+
+            sql_dict = sqlHelper.get_sql(design, report["queryPayload"])
+            outgoing_sql = sql_dict["sql"]
+            report["queryResults"] = sqlHelper.get_query_results(connection_name, outgoing_sql)
         return reports
 
     def get_dashboard(self, dashboard_id):

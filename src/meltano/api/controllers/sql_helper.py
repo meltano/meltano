@@ -1,5 +1,7 @@
 import logging
 import re
+import os
+from pathlib import Path
 from collections import OrderedDict
 
 import sqlalchemy
@@ -8,7 +10,10 @@ from pypika import Query, Order
 from .analysis_helper import AnalysisHelper
 from .settings_helper import SettingsHelper
 from meltano.core.project import Project
+from .m5oc_file import M5ocFile
 from .date import Date
+
+meltano_model_path = Path(os.getcwd(), "model")
 
 
 class ConnectionNotFound(Exception):
@@ -30,6 +35,12 @@ class SqlHelper:
 
     def get_names(self, things):
         return [thing["name"] for thing in things]
+
+    def get_m5oc_model(self, model_name):
+        m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+        with m5oc_file.open() as f:
+            m5oc = M5ocFile.load(f)
+        return m5oc
 
     def get_db_engine(self, connection_name):
         project = Project.find()
@@ -187,6 +198,7 @@ class SqlHelper:
 
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)
+        print("SQL = ", sql)
         results = engine.execute(sql)
         results = [OrderedDict(row) for row in results]
         return results

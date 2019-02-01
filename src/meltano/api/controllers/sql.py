@@ -2,8 +2,6 @@ import json
 import os
 from datetime import date, datetime
 from decimal import Decimal
-from pathlib import Path
-from os.path import join
 
 from flask import Blueprint, jsonify, request
 import sqlalchemy
@@ -11,11 +9,8 @@ import sqlalchemy
 from .sql_helper import ConnectionNotFound
 from .sql_helper import SqlHelper
 from .settings_helper import SettingsHelper
-from .m5oc_file import M5ocFile
-from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
-meltano_model_path = Path(os.getcwd(), "model")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -56,27 +51,20 @@ def index():
 
 @sqlBP.route("/get/<model_name>/dialect", methods=["GET"])
 def get_dialect(model_name):
-    m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
-    with m5oc_file.open() as f:
-        m5oc = M5ocFile.load(f)
-
-    connection_name = m5oc.connection("connection")
     sqlHelper = SqlHelper()
+    m5oc = sqlHelper.get_m5oc_model(model_name)
+    connection_name = m5oc.connection("connection")
     engine = sqlHelper.get_db_engine(connection_name)
-
     return jsonify({"connection_dialect": engine.dialect.name})
 
 
 @sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
 def get_sql(model_name, design_name):
-    m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
-    with m5oc_file.open() as f:
-        m5oc = M5ocFile.load(f)
-
+    sqlHelper = SqlHelper()
+    m5oc = sqlHelper.get_m5oc_model(model_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
-    sqlHelper = SqlHelper()
     sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
