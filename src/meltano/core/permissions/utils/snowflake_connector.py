@@ -97,20 +97,19 @@ class SnowflakeConnector:
         return names
 
     def show_grants_to_role(self, role) -> List[str]:
-        grants = []
+        grants = {}
 
         query = f"SHOW GRANTS TO ROLE {SnowflakeConnector.snowflaky(role)}"
         with self.engine.connect() as connection:
             results = connection.execute(query).fetchall()
 
             for result in results:
-                grants.append(
-                    {
-                        "privilege": result["privilege"].upper(),
-                        "granted_on": result["granted_on"].upper(),
-                        "name": result["name"].upper(),
-                    }
-                )
+                privilege = result["privilege"].upper()
+                granted_on = result["granted_on"].upper()
+
+                grants[privilege] = grants.get(privilege, {})
+                grants[privilege][granted_on] = grants[privilege].get(granted_on, [])
+                grants[privilege][granted_on].append(result["name"].upper())
 
         return grants
 

@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple
 from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
 from meltano.core.permissions.spec_schemas.snowflake import *
-from meltano.core.permissions.utils.snowflake_grants import *
+from meltano.core.permissions.utils.snowflake_grants import SnowflakeGrantsGenerator
 
 
 VALIDATION_ERR_MSG = 'Spec error: {} "{}", field "{}": {}'
@@ -548,6 +548,10 @@ class SnowflakeSpecLoader:
         """
         sql_commands = []
 
+        generator = SnowflakeGrantsGenerator(
+            self.grants_to_role, self.roles_granted_to_user
+        )
+
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
         for entity_type, entry in self.spec.items():
@@ -564,23 +568,25 @@ class SnowflakeSpecLoader:
                 for entity_name, config in entity_configs:
                     if entity_type == "roles":
                         sql_commands.extend(
-                            generate_grant_roles("ROLE", entity_name, config)
+                            generator.generate_grant_roles("ROLE", entity_name, config)
                         )
 
                         sql_commands.extend(
-                            generate_grant_ownership(entity_name, config)
+                            generator.generate_grant_ownership(entity_name, config)
                         )
 
                         sql_commands.extend(
-                            generate_grant_privileges_to_role(
+                            generator.generate_grant_privileges_to_role(
                                 entity_name, config, self.entities["shared_databases"]
                             )
                         )
                     elif entity_type == "users":
-                        sql_commands.extend(generate_alter_user(entity_name, config))
+                        sql_commands.extend(
+                            generator.generate_alter_user(entity_name, config)
+                        )
 
                         sql_commands.extend(
-                            generate_grant_roles("USER", entity_name, config)
+                            generator.generate_grant_roles("USER", entity_name, config)
                         )
 
         return sql_commands

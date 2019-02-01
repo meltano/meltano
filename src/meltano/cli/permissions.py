@@ -43,7 +43,12 @@ def grant(db, spec, dry):
         click.secho("SQL Commands generated for given spec file:")
 
         for command in sql_commands:
-            click.secho(f"{command};", fg="green")
+            if command["already_granted"]:
+                fg = "cyan"
+            else:
+                fg = "green"
+
+            click.secho(f"{command['sql']};", fg=fg)
             click.secho()
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():
