@@ -198,7 +198,6 @@ class SqlHelper:
 
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)
-        print("SQL = ", sql)
         results = engine.execute(sql)
         results = [OrderedDict(row) for row in results]
         return results

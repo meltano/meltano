@@ -71,7 +71,7 @@
               <p>{{report.name}}</p>
               <chart :chart-type='report.chartType'
                       :results='report.queryResults'
-                      :result-aggregates='[]'></chart>
+                      :result-aggregates='report.queryResultAggregates'></chart>
             </div>
           </div>
         </div>
