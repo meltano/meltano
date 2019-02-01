@@ -45,7 +45,7 @@ Follow the [installation](/docs/#installation) steps if Meltano UI is not runnin
 :::
 
 Next, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
-- Click Model button (upper-left)
+- By default the Model page is loaded, same as clicking the Model button (upper-left)
     - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
 
 Lastly, we'll query and explore the data:
