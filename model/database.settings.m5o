@@ -1,0 +1,1 @@
+{"settings": {"connections": [{"name": "runners_db", "database": "", "schema": "", "dialect": "sqlite", "host": "", "port": "", "username": "", "password": "", "path": "meltano.db"}]}}

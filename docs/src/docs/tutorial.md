@@ -44,17 +44,8 @@ First, go to the Meltano UI [http://localhost:5000](http://localhost:5000)
 Follow the [installation](/docs/#installation) steps if Meltano UI is not running
 :::
 
-Next, we'll wire up our data warehouse to store data from the *carbon dataset*:
-
-1. Navigate to Settings (upper-right)
-1. Enter connection settings
-  - Name = `runners_db`
-  - Dialect = `sqlite`
-  - Path to SQLite File = `meltano.db`
-1. Click "Save Connection"
-
-Then, we'll ensure our models are valid so Meltano UI can properly generate queries for us:
-- Click Model button (upper-left)
+Next, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
+- By default the Model page is loaded, same as clicking the Model button (upper-left)
     - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
 
 Lastly, we'll query and explore the data:
