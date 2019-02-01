@@ -85,7 +85,7 @@ const mutations = {
   },
   setReports(_, reports) {
     state.reports = reports;
-  }
+  },
 };
 
 export default {
