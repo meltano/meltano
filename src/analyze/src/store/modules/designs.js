@@ -328,6 +328,7 @@ const actions = {
         const report = response.data;
         state.currentModel = report.model;
         state.currentDesign = report.design;
+        state.chartType = report.chartType;
         this.dispatch('designs/getSQL', {
           run: true,
           load: report.queryPayload,
@@ -345,6 +346,7 @@ const actions = {
       name,
       model: state.currentModel,
       design: state.currentDesign,
+      chartType: state.chartType,
       queryPayload: helpers.getQueryPayloadFromUI(),
     };
     designApi.saveReport(postData)
@@ -360,6 +362,7 @@ const actions = {
 
   updateReport({ commit }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromUI();
+    state.activeReport.chartType = state.chartType;
     designApi.updateReport(state.activeReport)
       .then((response) => {
         commit('resetSaveReportSettings');

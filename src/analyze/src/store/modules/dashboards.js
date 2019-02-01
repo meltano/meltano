@@ -3,6 +3,7 @@ import designApi from '../../api/design';
 
 const state = {
   activeDashboard: {},
+  activeDashboardReports: [],
   dashboards: [],
   isAddDashboard: true,
   reports: [],
@@ -28,6 +29,14 @@ const actions = {
     designApi.loadReports()
       .then((response) => {
         commit('setReports', response.data);
+      });
+  },
+  getActiveDashboardReportsWithQueryResults({ commit }) {
+    const ids = state.activeDashboard.reportIds;
+    const activeReports = state.reports.filter(report => ids.includes(report.id));
+    dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
+      .then((response) => {
+        commit('setActiveDashboardReports', response.data);
       });
   },
   setAddDashboard({ commit }, value) {
@@ -60,6 +69,9 @@ const actions = {
 const mutations = {
   resetSaveDashboardSettings() {
     state.saveDashboardSettings = { name: null, description: null };
+  },
+  setActiveDashboardReports(_, reports) {
+    state.activeDashboardReports = reports;
   },
   setAddDashboard(_, value) {
     state.isAddDashboard = value;

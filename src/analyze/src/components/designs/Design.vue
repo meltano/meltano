@@ -160,13 +160,14 @@
       </nav>
       <div class="column is-three-quarters">
         <div class="columns">
-          <div class="column">
-
+          <div class="column column-flex-v">
             <div class="is-grouped is-pulled-left">
               <div v-if="activeReport.name">{{activeReport.name}}</div>
               <div v-if="!activeReport.name"><em>Untitled Report</em></div>
             </div>
+          </div>
 
+          <div class="column">
             <div class="is-grouped is-pulled-right">
 
               <div class="dropdown"
@@ -350,7 +351,9 @@
             </p>
           </div>
           <div class="has-background-white-ter chart-toggles">
-            <chart></chart>
+            <chart :chart-type='chartType'
+                    :results='results'
+                    :result-aggregates='resultAggregates'></chart>
           </div>
         </template>
 
@@ -446,6 +449,9 @@ export default {
       'hasSQLError',
       'sqlErrorMessage',
       'connectionDialect',
+      'results',
+      'resultAggregates',
+      'chartType',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
