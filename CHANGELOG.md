@@ -10,12 +10,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * add ability to save reports
+* add ability to update an active report during analysis
 * add ability to load reports
+* add dashboards page and related add/remove report functionality
 
 ### Changes
+- updated main navigation to Files, Analysis, and Dashboards
 
 ### Fixes
 * Updated the Fundamentals documentation section regarding reports
+* Fixed Files page for empty state of Dashboards and Reports
 
 ### Breaks
 
