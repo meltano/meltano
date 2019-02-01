@@ -80,7 +80,7 @@
           </td>
         </tr>
         <tr>
-          <td>Meltano can replace</td>
+          <td>Meltano is an alternative for</td>
           <td>
             <ul>
               <li>
