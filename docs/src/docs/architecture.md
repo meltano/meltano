@@ -117,7 +117,7 @@ With these files the Meltano CLI (or in conjunction with the Meltano UI) can pro
 
 Meltano UI is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
 
-## Meltano Data Flow
+## Meltano ELT
 
 Meltano uses Singer Taps and Targets to Extract the data from various data sources and load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. Subsequently, the raw data is transformed to generate the dataset used for analysis and dashboard generation.
 
