@@ -70,7 +70,7 @@
             <a href="https://www.getdbt.com/">dbt</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/architecture.html#meltano-analyze">Meltano Analyze</a>
+            <a href="/docs/architecture.html#meltano-ui">Meltano UI</a>
           </td>
           <td class="ta-c">
             <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>

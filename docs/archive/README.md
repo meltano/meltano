@@ -190,7 +190,7 @@ Create and grant usage for a database schema.
 
 ### Meltano Model
 
-Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano Analyze.
+Meltano uses models based on the [LookML](https://docs.looker.com/data-modeling/learning-lookml/lookml-terms-and-concepts#model) language. They allow you to model your data so you can easily analyze and visualize it in Meltano UI.
 
 ### Meltano Transform
 
@@ -250,7 +250,7 @@ Meltano provides the following docker images:
 
 > Notes: All images are available in the GitLab's registry: `registry.gitlab.com`
 
-- `meltano/meltano`: Contains the API, CLI, and Meltano Analyze. This image should be deployed as Meltano Analyze.
+- `meltano/meltano`: Contains the API, CLI, and Meltano UI. This image should be deployed as Meltano UI.
 - `meltano/meltano/runner`: Contains the CLI and extra runner specific binaries. This image should be used on the CI runner.
 - `meltano/meltano/singer_runner`: **DEPRECATED: Use `meltano/meltano/runner` instead** Contains the CLI, and all curated taps/targets pre-installed.
 

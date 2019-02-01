@@ -41,7 +41,7 @@ There are two types of `.m5o` files:
 1. `.m5o` are user defined files that model the data in your database
 2. `.m5oc` are compiled files generated from multiple `m5o` files
 
-The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano Analyze then leverages.
+The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano UI then leverages.
 
 ## Report
 
