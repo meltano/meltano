@@ -38,7 +38,7 @@ module.exports = {
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
 			{ text: 'Careers', link: '/careers/' },
-			{ text: 'About', link: '/about/' }
+			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {
 			'/docs': [
