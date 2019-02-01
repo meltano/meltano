@@ -49,6 +49,7 @@ module.exports = {
 				'/docs/architecture',
 				'/docs/meltano-cli',
 				'/docs/best-practices',
+				'/docs/personas',
 				'/docs/roadmap',
 				'/docs/contributing'
 			]
