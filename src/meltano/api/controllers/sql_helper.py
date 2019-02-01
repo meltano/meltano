@@ -1,5 +1,6 @@
 import logging
 import re
+from collections import OrderedDict
 
 import sqlalchemy
 from flask import jsonify
@@ -183,6 +184,12 @@ class SqlHelper:
 
         q = q.limit(limit)
         return str(q) + ";"
+
+    def get_query_results(self, connection_name, sql):
+        engine = self.get_db_engine(connection_name)
+        results = engine.execute(sql)
+        results = [OrderedDict(row) for row in results]
+        return results
 
     def reset_db(self):
         try:

@@ -1,6 +1,5 @@
 import json
 import os
-from collections import OrderedDict
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -89,10 +88,8 @@ def get_sql(model_name, design_name):
         return jsonify({"sql": outgoing_sql})
 
     connection_name = m5oc.connection("connection")
-    engine = sqlHelper.get_db_engine(connection_name)
-    results = engine.execute(outgoing_sql)
+    results = sqlHelper.get_query_results(connection_name, outgoing_sql)
 
-    results = [OrderedDict(row) for row in results]
     base_dict = {"sql": outgoing_sql, "results": results, "error": False}
     if not len(results):
         base_dict["empty"] = True
