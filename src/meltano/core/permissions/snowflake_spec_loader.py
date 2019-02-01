@@ -28,6 +28,13 @@ class SnowflakeSpecLoader:
         #  spec file are also defined in Snowflake (no missing databases, etc)
         self.check_entities_on_snowflake_server()
 
+        # Get the privileges granted to users and roles in the Snowflake account
+        # Used in order to figure out which permissions in the spec file are
+        #  new ones and which already exist (and there is no need to re-grant them)
+        self.grants_to_role = {}
+        self.roles_granted_to_user = {}
+        self.get_privileges_from_snowflake_server()
+
     def load_spec(self, spec_path: str) -> Dict:
         """
         Load a permissions specification from a file.
@@ -517,6 +524,18 @@ class SnowflakeSpecLoader:
 
         if error_messages:
             raise SpecLoadingError("\n".join(error_messages))
+
+    def get_privileges_from_snowflake_server(self) -> None:
+        """
+        Get the privileges granted to users and roles in the Snowflake account
+        """
+        conn = SnowflakeConnector()
+
+        for role in self.entities["roles"]:
+            self.grants_to_role[role] = conn.show_grants_to_role(role)
+
+        for user in self.entities["users"]:
+            self.roles_granted_to_user[user] = conn.show_roles_granted_to_user(user)
 
     def generate_permission_queries(self) -> List[str]:
         """

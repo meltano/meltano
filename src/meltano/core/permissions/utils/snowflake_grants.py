@@ -1,5 +1,4 @@
 import logging
-import re
 
 from typing import Dict, List, Tuple, Set
 
@@ -21,30 +20,6 @@ GRANT_OWNERSHIP_TEMPLATE = (
 )
 
 
-def snowflaky(name: str) -> str:
-    """
-    Convert an entity name to an object identifier that will most probably be
-    the proper name for Snoflake.
-
-    e.g. gitlab-ci --> "gitlab-ci"
-         527-INVESTIGATE$ISSUES.ANALYTICS.COUNTRY_CODES -->
-         --> "527-INVESTIGATE$ISSUES".ANALYTICS.COUNTRY_CODES;
-
-    Pronounced /snəʊfleɪkɪ/ like saying very fast snowflak[e and clarif]y
-    Permission granted to use snowflaky as a verb.
-    """
-    name_parts = name.split(".")
-    new_name_parts = []
-
-    for part in name_parts:
-        if re.match("^[0-9a-zA-Z_]*$", part) is None:
-            new_name_parts.append(f'"{part}"')
-        else:
-            new_name_parts.append(part)
-
-    return ".".join(new_name_parts)
-
-
 def generate_grant_roles(entity_type: str, entity: str, config: str) -> List[str]:
     """
     Generate the GRANT statements for both roles and users.
@@ -61,9 +36,9 @@ def generate_grant_roles(entity_type: str, entity: str, config: str) -> List[str
         for member_role in config["member_of"]:
             sql_commands.append(
                 GRANT_ROLE_TEMPLATE.format(
-                    role_name=snowflaky(member_role),
+                    role_name=SnowflakeConnector.snowflaky(member_role),
                     type=entity_type,
-                    entity_name=snowflaky(entity),
+                    entity_name=SnowflakeConnector.snowflaky(entity),
                 )
             )
     except KeyError:
@@ -235,8 +210,8 @@ def generate_warehouse_grants(role: str, warehouse: str) -> str:
     sql_grant = GRANT_PRIVILEGES_TEMPLATE.format(
         privileges="USAGE",
         resource_type="WAREHOUSE",
-        resource_name=snowflaky(warehouse),
-        role=snowflaky(role),
+        resource_name=SnowflakeConnector.snowflaky(warehouse),
+        role=SnowflakeConnector.snowflaky(role),
     )
 
     return sql_grant
@@ -269,8 +244,8 @@ def generate_database_grants(
             GRANT_PRIVILEGES_TEMPLATE.format(
                 privileges="IMPORTED PRIVILEGES",
                 resource_type="DATABASE",
-                resource_name=snowflaky(database),
-                role=snowflaky(role),
+                resource_name=SnowflakeConnector.snowflaky(database),
+                role=SnowflakeConnector.snowflaky(role),
             )
         )
 
@@ -290,8 +265,8 @@ def generate_database_grants(
         GRANT_PRIVILEGES_TEMPLATE.format(
             privileges=privileges,
             resource_type="DATABASE",
-            resource_name=snowflaky(database),
-            role=snowflaky(role),
+            resource_name=SnowflakeConnector.snowflaky(database),
+            role=SnowflakeConnector.snowflaky(role),
         )
     )
 
@@ -355,8 +330,8 @@ def generate_schema_grants(
             GRANT_PRIVILEGES_TEMPLATE.format(
                 privileges=privileges,
                 resource_type="ALL SCHEMAS IN DATABASE",
-                resource_name=snowflaky(name_parts[0]),
-                role=snowflaky(role),
+                resource_name=SnowflakeConnector.snowflaky(name_parts[0]),
+                role=SnowflakeConnector.snowflaky(role),
             )
         )
     else:
@@ -364,8 +339,8 @@ def generate_schema_grants(
             GRANT_PRIVILEGES_TEMPLATE.format(
                 privileges=privileges,
                 resource_type="SCHEMA",
-                resource_name=snowflaky(schema),
-                role=snowflaky(role),
+                resource_name=SnowflakeConnector.snowflaky(schema),
+                role=SnowflakeConnector.snowflaky(role),
             )
         )
 
@@ -464,8 +439,8 @@ def generate_table_grants(
                 GRANT_PRIVILEGES_TEMPLATE.format(
                     privileges=privileges,
                     resource_type="ALL TABLES IN SCHEMA",
-                    resource_name=snowflaky(schema),
-                    role=snowflaky(role),
+                    resource_name=SnowflakeConnector.snowflaky(schema),
+                    role=SnowflakeConnector.snowflaky(role),
                 )
             )
     else:
@@ -489,8 +464,8 @@ def generate_table_grants(
             GRANT_PRIVILEGES_TEMPLATE.format(
                 privileges=privileges,
                 resource_type="TABLE",
-                resource_name=snowflaky(table),
-                role=snowflaky(role),
+                resource_name=SnowflakeConnector.snowflaky(table),
+                role=SnowflakeConnector.snowflaky(role),
             )
         )
 
@@ -518,7 +493,8 @@ def generate_alter_user(user: str, config: str) -> List[str]:
     if alter_privileges:
         sql_commands.append(
             ALTER_USER_TEMPLATE.format(
-                user_name=snowflaky(user), privileges=", ".join(alter_privileges)
+                user_name=SnowflakeConnector.snowflaky(user),
+                privileges=", ".join(alter_privileges),
             )
         )
 
@@ -541,8 +517,8 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
             sql_commands.append(
                 GRANT_OWNERSHIP_TEMPLATE.format(
                     resource_type="DATABASE",
-                    resource_name=snowflaky(database),
-                    role_name=snowflaky(role),
+                    resource_name=SnowflakeConnector.snowflaky(database),
+                    role_name=SnowflakeConnector.snowflaky(role),
                 )
             )
     except KeyError:
@@ -570,16 +546,16 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
                     sql_commands.append(
                         GRANT_OWNERSHIP_TEMPLATE.format(
                             resource_type="SCHEMA",
-                            resource_name=snowflaky(db_schema),
-                            role_name=snowflaky(role),
+                            resource_name=SnowflakeConnector.snowflaky(db_schema),
+                            role_name=SnowflakeConnector.snowflaky(role),
                         )
                     )
             else:
                 sql_commands.append(
                     GRANT_OWNERSHIP_TEMPLATE.format(
                         resource_type="SCHEMA",
-                        resource_name=snowflaky(schema),
-                        role_name=snowflaky(role),
+                        resource_name=SnowflakeConnector.snowflaky(schema),
+                        role_name=SnowflakeConnector.snowflaky(role),
                     )
                 )
     except KeyError:
@@ -611,16 +587,16 @@ def generate_grant_ownership(role: str, config: str) -> List[str]:
                     sql_commands.append(
                         GRANT_OWNERSHIP_TEMPLATE.format(
                             resource_type="ALL TABLES IN SCHEMA",
-                            resource_name=snowflaky(schema),
-                            role_name=snowflaky(role),
+                            resource_name=SnowflakeConnector.snowflaky(schema),
+                            role_name=SnowflakeConnector.snowflaky(role),
                         )
                     )
             else:
                 sql_commands.append(
                     GRANT_OWNERSHIP_TEMPLATE.format(
                         resource_type="TABLE",
-                        resource_name=snowflaky(table),
-                        role_name=snowflaky(role),
+                        resource_name=SnowflakeConnector.snowflaky(table),
+                        role_name=SnowflakeConnector.snowflaky(role),
                     )
                 )
     except KeyError:
