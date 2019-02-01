@@ -9,6 +9,7 @@ from os.path import join
 from flask import Blueprint, jsonify, request
 import sqlalchemy
 
+from .sql_helper import ConnectionNotFound
 from .sql_helper import SqlHelper
 from .settings_helper import SettingsHelper
 from .m5oc_file import M5ocFile
@@ -16,12 +17,6 @@ from meltano.core.project import Project
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
 meltano_model_path = Path(os.getcwd(), "model")
-
-
-class ConnectionNotFound(Exception):
-    def __init__(self, connection_name: str):
-        self.connection_name = connection_name
-        super().__init__("{connection_name} is missing.")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -55,33 +50,6 @@ def default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
 
 
-def get_db_engine(connection_name):
-    project = Project.find()
-    settings_helper = SettingsHelper()
-    connections = settings_helper.get_connections()["settings"]["connections"]
-
-    try:
-        connection = next(
-            connection
-            for connection in connections
-            if connection["name"] == connection_name
-        )
-
-        if connection["dialect"] == "postgresql":
-            psql_params = ["username", "password", "host", "port", "database"]
-            user, pw, host, port, db = [connection[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
-        elif connection["dialect"] == "sqlite":
-            db_path = project.root.joinpath(connection["path"])
-            connection_url = f"sqlite:///{db_path}"
-
-        return sqlalchemy.create_engine(connection_url)
-
-        raise ConnectionNotFound(connection_name)
-    except StopIteration:
-        raise ConnectionNotFound(connection_name)
-
-
 @sqlBP.route("/", methods=["GET"])
 def index():
     return jsonify({"result": True})
@@ -94,7 +62,8 @@ def get_dialect(model_name):
         m5oc = M5ocFile.load(f)
 
     connection_name = m5oc.connection("connection")
-    engine = get_db_engine(connection_name)
+    sqlHelper = SqlHelper()
+    engine = sqlHelper.get_db_engine(connection_name)
 
     return jsonify({"connection_dialect": engine.dialect.name})
 
@@ -120,7 +89,7 @@ def get_sql(model_name, design_name):
         return jsonify({"sql": outgoing_sql})
 
     connection_name = m5oc.connection("connection")
-    engine = get_db_engine(connection_name)
+    engine = sqlHelper.get_db_engine(connection_name)
     results = engine.execute(outgoing_sql)
 
     results = [OrderedDict(row) for row in results]

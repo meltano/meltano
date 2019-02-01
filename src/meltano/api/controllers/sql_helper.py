@@ -5,7 +5,15 @@ import sqlalchemy
 from flask import jsonify
 from pypika import Query, Order
 from .analysis_helper import AnalysisHelper
+from .settings_helper import SettingsHelper
+from meltano.core.project import Project
 from .date import Date
+
+
+class ConnectionNotFound(Exception):
+    def __init__(self, connection_name: str):
+        self.connection_name = connection_name
+        super().__init__("{connection_name} is missing.")
 
 
 class SqlHelper:
@@ -21,6 +29,32 @@ class SqlHelper:
 
     def get_names(self, things):
         return [thing["name"] for thing in things]
+
+    def get_db_engine(self, connection_name):
+        project = Project.find()
+        settings_helper = SettingsHelper()
+        connections = settings_helper.get_connections()["settings"]["connections"]
+
+        try:
+            connection = next(
+                connection
+                for connection in connections
+                if connection["name"] == connection_name
+            )
+
+            if connection["dialect"] == "postgresql":
+                psql_params = ["username", "password", "host", "port", "database"]
+                user, pw, host, port, db = [connection[param] for param in psql_params]
+                connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+            elif connection["dialect"] == "sqlite":
+                db_path = project.root.joinpath(connection["path"])
+                connection_url = f"sqlite:///{db_path}"
+
+            return sqlalchemy.create_engine(connection_url)
+
+            raise ConnectionNotFound(connection_name)
+        except StopIteration:
+            raise ConnectionNotFound(connection_name)
 
     def get_sql(self, design, incoming_json):
         table_name = incoming_json["table"]
