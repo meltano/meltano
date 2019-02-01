@@ -123,11 +123,11 @@ class MeltanoAnalysisFileParser:
             sql_on = join_executor.join['sql_on']
             if left_table == node:
                 graph.add_node(right_table)
-                graph.add_edge(node, right_table, sql_on=sql_on)
+                graph.add_edge(node, right_table)
                 check_against.append(right_table)
             elif right_table == node:
                 graph.add_node(left_table)
-                graph.add_edge(node, left_table, sql_on=sql_on)
+                graph.add_edge(node, left_table)
                 check_against.append(left_table)
             else:
                 remaining_joins.append(join)

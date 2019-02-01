@@ -104,6 +104,7 @@ class SqlHelper:
 
         # add the joins dimension and aggregates
         joins = [design.join_for(j) for j in incoming_joins]
+        join_order = []
         for j in joins:
             columns_raw += j["columns"]
             aggregates_raw += j["aggregates"]
@@ -112,6 +113,15 @@ class SqlHelper:
             columns += AnalysisHelper.columns(j["columns"], j["db_table"])
             aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
             timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
+            if j.get("columns") or j.get("aggregates") or j.get("timeframes"):
+              join_deps = design.joins_for_table(j["name"])
+              for i in range(0, len(join_deps)):
+                if len(join_order) < i + 1:
+                  join_order.append(set())
+                join_order[i].add(join_deps[i])
+
+        # flatten
+        join_order = [name for joins in join_order for name in joins]
 
         order = None
         orderby = None
@@ -164,6 +174,7 @@ class SqlHelper:
                 periods=timeframe_periods,
                 limit=incoming_limit,
                 joins=joins,
+                join_order=join_order,
                 orderby=orderby,
                 order=order,
             ),
@@ -184,13 +195,16 @@ class SqlHelper:
         periods,
         limit,
         joins=None,
+        join_order=None,
         order=None,
         orderby=None,
     ):
         select = columns + aggregates + periods
         q = Query.from_(from_)
+        sorted_joins = filter(lambda j: j["name"] in join_order, joins)
+        sorted_joins = sorted(sorted_joins, key=lambda j: join_order.index(j["name"]))
+        for j in sorted_joins:
 
-        for j in joins:
             join_db_table = j["db_table"]
             q = q.join(join_db_table).on(j["on"])
 
@@ -220,3 +234,4 @@ class SqlHelper:
         db.session.add(settings)
         db.session.commit()
         return jsonify({"dropped_it": "like_its_hot"})
+''

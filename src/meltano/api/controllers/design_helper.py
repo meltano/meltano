@@ -2,6 +2,8 @@ import logging
 from enum import Enum
 from copy import deepcopy
 from typing import Dict
+import networkx as nx
+from networkx.readwrite import json_graph
 
 from .analysis_helper import AnalysisHelper
 from collections import namedtuple
@@ -131,6 +133,16 @@ class DesignHelper:
     def tables(self):
         return deepcopy(self.design["tables"])
 
+    @property
+    def base_table_name(self):
+      return self.design["related_table"]["name"]
+    
+    def joins_for_table(self, table_name: str):
+        # get the graph for networkx
+        G = json_graph.node_link_graph(self.design["graph"])
+        return nx.shortest_path(G,source=self.base_table_name,target=table_name)
+
+
     def join_for(self, join_selection: Dict):
         join = self.get_join(self, join_selection["name"])
         table = join["related_table"]
@@ -168,6 +180,7 @@ class DesignHelper:
             "db_table": db_table,
             "on": join_executor.result,
             "join": join,
+            "name": join_selection["name"],
             **selected,
         }
 
