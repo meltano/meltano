@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* Generate default `Meltano UI` connection for the `meltano.db` SQLite DB when a new project is created with `meltano init`
 
 ### Fixes
 
