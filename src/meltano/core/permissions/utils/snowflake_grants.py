@@ -25,6 +25,25 @@ class SnowflakeGrantsGenerator:
         self.grants_to_role = grants_to_role
         self.roles_granted_to_user = roles_granted_to_user
 
+    def check_grant_to_role(
+        self, role: str, privilege: str, entity_type: str, entity_name: str
+    ) -> bool:
+        """
+        Check if <role> has been granted the privilege <privilege> on entity type
+        <entity_type> with name <entity_name>.
+
+        For example:
+        check_grant_to_role('reporter', 'USAGE', 'DATABASE', 'ANALYTICS') -> True
+        means that role reported has been granted the privilege to use the
+        Database ANALYTICS on the Snowflake server.
+        """
+        if SnowflakeConnector.snowflaky(entity_name).upper() in self.grants_to_role.get(
+            role, {}
+        ).get(privilege, {}).get(entity_type, []):
+            return True
+        else:
+            return False
+
     def generate_grant_roles(
         self, entity_type: str, entity: str, config: str
     ) -> List[str]:
@@ -46,11 +65,10 @@ class SnowflakeGrantsGenerator:
                 if (
                     entity_type == "USER"
                     and granted_role in self.roles_granted_to_user[entity]
+                ) or (
+                    entity_type == "ROLE"
+                    and self.check_grant_to_role(entity, "USAGE", "ROLE", member_role)
                 ):
-                    already_granted = True
-                elif entity_type == "ROLE" and granted_role in self.grants_to_role.get(
-                    entity, {}
-                ).get("USAGE", {}).get("ROLE", []):
                     already_granted = True
 
                 sql_commands.append(
@@ -227,8 +245,13 @@ class SnowflakeGrantsGenerator:
 
         Returns the SQL command generated
         """
+        if self.check_grant_to_role(role, "USAGE", "WAREHOUSE", warehouse):
+            already_granted = True
+        else:
+            already_granted = False
+
         sql_grant = {
-            "already_granted": False,
+            "already_granted": already_granted,
             "sql": GRANT_PRIVILEGES_TEMPLATE.format(
                 privileges="USAGE",
                 resource_type="WAREHOUSE",
@@ -262,38 +285,21 @@ class SnowflakeGrantsGenerator:
         sql_commands = []
 
         usage_granted["databases"].add(database.upper())
-
-        proper_db_name = SnowflakeConnector.snowflaky(database)
         already_granted = False
 
         if grant_type == "read":
             privileges = "USAGE"
 
-            if proper_db_name.upper() in self.grants_to_role.get(role, {}).get(
-                "USAGE", {}
-            ).get("DATABASE", []):
+            if self.check_grant_to_role(role, "USAGE", "DATABASE", database):
                 already_granted = True
         elif grant_type == "write":
             privileges = "USAGE, MONITOR, CREATE SCHEMA"
 
             if (
-                (
-                    proper_db_name.upper()
-                    in self.grants_to_role.get(role, {})
-                    .get("USAGE", {})
-                    .get("DATABASE", [])
-                )
-                and (
-                    proper_db_name.upper()
-                    in self.grants_to_role.get(role, {})
-                    .get("MONITOR", {})
-                    .get("DATABASE", [])
-                )
-                and (
-                    proper_db_name.upper()
-                    in self.grants_to_role.get(role, {})
-                    .get("CREATE SCHEMA", {})
-                    .get("DATABASE", [])
+                self.check_grant_to_role(role, "USAGE", "DATABASE", database)
+                and self.check_grant_to_role(role, "MONITOR", "DATABASE", database)
+                and self.check_grant_to_role(
+                    role, "CREATE SCHEMA", "DATABASE", database
                 )
             ):
                 already_granted = True
@@ -312,7 +318,7 @@ class SnowflakeGrantsGenerator:
                     "sql": GRANT_PRIVILEGES_TEMPLATE.format(
                         privileges="IMPORTED PRIVILEGES",
                         resource_type="DATABASE",
-                        resource_name=proper_db_name,
+                        resource_name=SnowflakeConnector.snowflaky(database),
                         role=SnowflakeConnector.snowflaky(role),
                     ),
                 }
@@ -327,7 +333,7 @@ class SnowflakeGrantsGenerator:
                 "sql": GRANT_PRIVILEGES_TEMPLATE.format(
                     privileges=privileges,
                     resource_type="DATABASE",
-                    resource_name=proper_db_name,
+                    resource_name=SnowflakeConnector.snowflaky(database),
                     role=SnowflakeConnector.snowflaky(role),
                 ),
             }
@@ -392,11 +398,10 @@ class SnowflakeGrantsGenerator:
             )
             sql_commands.extend(new_commands)
 
-        already_granted = False
         if name_parts[1] == "*":
             sql_commands.append(
                 {
-                    "already_granted": already_granted,
+                    "already_granted": False,
                     "sql": GRANT_PRIVILEGES_TEMPLATE.format(
                         privileges=privileges,
                         resource_type="ALL SCHEMAS IN DATABASE",
@@ -406,6 +411,27 @@ class SnowflakeGrantsGenerator:
                 }
             )
         else:
+            already_granted = False
+
+            if (
+                grant_type == "read"
+                and self.check_grant_to_role(role, "USAGE", "SCHEMA", schema)
+            ) or (
+                grant_type == "write"
+                and self.check_grant_to_role(role, "USAGE", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "MONITOR", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "CREATE TABLE", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "CREATE VIEW", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "CREATE STAGE", "SCHEMA", schema)
+                and self.check_grant_to_role(
+                    role, "CREATE FILE FORMAT", "SCHEMA", schema
+                )
+                and self.check_grant_to_role(role, "CREATE SEQUENCE", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "CREATE FUNCTION", "SCHEMA", schema)
+                and self.check_grant_to_role(role, "CREATE PIPE", "SCHEMA", schema)
+            ):
+                already_granted = True
+
             sql_commands.append(
                 {
                     "already_granted": already_granted,
@@ -540,10 +566,25 @@ class SnowflakeGrantsGenerator:
                 )
                 sql_commands.extend(new_commands)
 
+            already_granted = False
+            if (
+                grant_type == "read"
+                and self.check_grant_to_role(role, "SELECT", "TABLE", table)
+            ) or (
+                grant_type == "write"
+                and self.check_grant_to_role(role, "SELECT", "TABLE", table)
+                and self.check_grant_to_role(role, "INSERT", "TABLE", table)
+                and self.check_grant_to_role(role, "UPDATE", "TABLE", table)
+                and self.check_grant_to_role(role, "DELETE", "TABLE", table)
+                and self.check_grant_to_role(role, "TRUNCATE", "TABLE", table)
+                and self.check_grant_to_role(role, "REFERENCES", "TABLE", table)
+            ):
+                already_granted = True
+
             # And then grant privileges to the table
             sql_commands.append(
                 {
-                    "already_granted": False,
+                    "already_granted": already_granted,
                     "sql": GRANT_PRIVILEGES_TEMPLATE.format(
                         privileges=privileges,
                         resource_type="TABLE",
@@ -599,9 +640,14 @@ class SnowflakeGrantsGenerator:
 
         try:
             for database in config["owns"]["databases"]:
+                if self.check_grant_to_role(role, "OWNERSHIP", "DATABASE", database):
+                    already_granted = True
+                else:
+                    already_granted = False
+
                 sql_commands.append(
                     {
-                        "already_granted": False,
+                        "already_granted": already_granted,
                         "sql": GRANT_OWNERSHIP_TEMPLATE.format(
                             resource_type="DATABASE",
                             resource_name=SnowflakeConnector.snowflaky(database),
@@ -631,9 +677,16 @@ class SnowflakeGrantsGenerator:
                             schemas.append(db_schema)
 
                     for db_schema in schemas:
+                        if self.check_grant_to_role(
+                            role, "OWNERSHIP", "SCHEMA", db_schema
+                        ):
+                            already_granted = True
+                        else:
+                            already_granted = False
+
                         sql_commands.append(
                             {
-                                "already_granted": False,
+                                "already_granted": already_granted,
                                 "sql": GRANT_OWNERSHIP_TEMPLATE.format(
                                     resource_type="SCHEMA",
                                     resource_name=SnowflakeConnector.snowflaky(
@@ -644,9 +697,14 @@ class SnowflakeGrantsGenerator:
                             }
                         )
                 else:
+                    if self.check_grant_to_role(role, "OWNERSHIP", "SCHEMA", schema):
+                        already_granted = True
+                    else:
+                        already_granted = False
+
                     sql_commands.append(
                         {
-                            "already_granted": False,
+                            "already_granted": already_granted,
                             "sql": GRANT_OWNERSHIP_TEMPLATE.format(
                                 resource_type="SCHEMA",
                                 resource_name=SnowflakeConnector.snowflaky(schema),
@@ -691,9 +749,14 @@ class SnowflakeGrantsGenerator:
                             }
                         )
                 else:
+                    if self.check_grant_to_role(role, "OWNERSHIP", "TABLE", table):
+                        already_granted = True
+                    else:
+                        already_granted = False
+
                     sql_commands.append(
                         {
-                            "already_granted": False,
+                            "already_granted": already_granted,
                             "sql": GRANT_OWNERSHIP_TEMPLATE.format(
                                 resource_type="TABLE",
                                 resource_name=SnowflakeConnector.snowflaky(table),
