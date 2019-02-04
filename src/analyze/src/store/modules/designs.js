@@ -436,23 +436,43 @@ const mutations = {
   },
 
   setStateFromLoadedReport(_, report) {
+    // General UI state updates
     state.currentModel = report.model;
     state.currentDesign = report.design;
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
 
-    // UI selected state adornment
+    // UI selected state adornment (columns, aggregates, filters, joins, timeframes)
     const baseTable = state.design.related_table;
     const queryPayload = report.queryPayload;
-    const setSelected = (collectionName) => {
-      baseTable[collectionName].forEach((item) => {
-        if (queryPayload[collectionName].includes(item.name)) {
+    const setSelected = (targetCollection, matchCollection) => {
+      targetCollection.forEach((item) => {
+        if (matchCollection.includes(item.name)) {
           item.selected = true;
         }
       });
     };
-    setSelected('aggregates');
-    setSelected('columns');
+    // columns
+    setSelected(baseTable.columns, queryPayload.columns);
+    // aggregates
+    setSelected(baseTable.aggregates, queryPayload.aggregates);
+    // filters
+    // TODO
+    // joins
+    const joinColumnGroups = state.design.joins.reduce(
+      (acc, curr) => {
+        acc.push({
+          name: curr.name,
+          columns: curr.related_table.columns,
+          timeframes: curr.related_table.timeframes,
+        });
+        return acc;
+      }, []);
+    joinColumnGroups.forEach((joinGroup) => {
+      const targetJoin = queryPayload.joins.find(j => j.name === joinGroup.name);
+      setSelected(joinGroup.columns, targetJoin.columns);
+      // TODO timeframes
+    });
   },
 
   addSavedReportToReports(_, report) {
