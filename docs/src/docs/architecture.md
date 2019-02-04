@@ -154,6 +154,17 @@ When considering which taps and targets Meltano will maintain, some assumptions 
 
 *  At the moment we do not deconstruct nested arrays. Arrays are stored as JSON or STRING data types (depending on the support provided by the target Data Store) with the relevant JSON representation stored as is. e.g. "['banana','apple']". It can then be extracted and used in the Transform Step.
 
+### Concurrency
+
+The Singer spec doesn't define how to handle concurrency at the ELT level.
+
+Making the streams concurrent themselves is pretty straightforward, but making sure the state handles concurrent updates is the real challenge, and also source specific.
+Some sources supports pagination endpoints or a cursor-like API, but not all APIs are made equal.
+
+Also depending on the data source, you might have some limit on how concurrent you can be, for example Salesforce limits to 25 concurrent request, but Netsuite allows only one query at a time per account.
+
+For now, Meltano will try to implement concurrent taps when possible.
+
 ## Meltano Transform
 
 ### dbt
