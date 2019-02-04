@@ -38,6 +38,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
+* add basic analytics to understand usage
 * add disabled UI for the lack of timeframes support in sqlite
 * update Results vs. SQL UI focus based on a results response or query update respectively
 

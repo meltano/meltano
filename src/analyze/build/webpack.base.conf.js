@@ -56,7 +56,7 @@ const baseConf = {
       },
       {
         test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        loader: "file-loader" 
+        loader: "file-loader"
       },
       {
         test: /\.s[a|c]ss$/,
