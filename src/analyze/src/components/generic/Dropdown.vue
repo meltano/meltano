@@ -24,14 +24,15 @@ import hyphenate from '@/filters/hyphenate';
 export default {
   name: 'Dropdown',
   created() {
-
+    document.addEventListener('click', this.onDocumentClick);
   },
   beforeDestroy() {
-
+    document.removeEventListener('click', this.onDocumentClick);
   },
   data() {
     return {
       isOpen: false,
+      lastDropdownOpen: null,
     };
   },
   computed: {
@@ -53,6 +54,13 @@ export default {
     },
     toggleDropdown() {
       this.isOpen = !this.isOpen;
+    },
+    onDocumentClick(el) {
+      const targetEl = el.target.closest('.dropdown');
+      const matchEl = this.$el.closest('.dropdown');
+      if (targetEl !== matchEl) {
+        this.forceClose();
+      }
     },
   },
 };
