@@ -47,6 +47,7 @@ const actions = {
       .then((response) => {
         commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
+        commit('addSavedDashboardToDashboards', response.data);
         commit('resetSaveDashboardSettings');
       });
   },
@@ -67,6 +68,9 @@ const actions = {
 };
 
 const mutations = {
+  addSavedDashboardToDashboards(_, dashboard) {
+    state.dashboards.push(dashboard);
+  },
   resetSaveDashboardSettings() {
     state.saveDashboardSettings = { name: null, description: null };
   },
