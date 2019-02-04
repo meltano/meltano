@@ -207,7 +207,7 @@
                       </div>
                       <div class="control">
                         <button class="button is-text"
-                                @click="toggleSaveReportOpen(); dropdownForceClose();">
+                                @click="dropdownForceClose();">
                           Cancel</button>
                       </div>
                     </div>
@@ -416,8 +416,6 @@ export default {
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
-      'loadReportOpen',
-      'saveReportOpen',
       'saveReportSettings',
       'reports',
       'chartsOpen',
@@ -517,17 +515,14 @@ export default {
 
     loadReport(report) {
       this.$store.dispatch('designs/loadReport', { name: report.name });
-      this.toggleLoadReportOpen();
     },
 
     saveReport() {
       this.$store.dispatch('designs/saveReport', this.saveReportSettings);
-      this.toggleSaveReportOpen();
     },
 
     updateReport() {
       this.$store.dispatch('designs/updateReport');
-      this.toggleSaveReportOpen();
     },
 
     setCurrentTab(tab) {
@@ -536,14 +531,6 @@ export default {
 
     toggleFilterOpen() {
       this.$store.dispatch('designs/toggleFilterOpen');
-    },
-
-    toggleLoadReportOpen() {
-      this.$store.dispatch('designs/toggleLoadReportOpen');
-    },
-
-    toggleSaveReportOpen() {
-      this.$store.dispatch('designs/toggleSaveReportOpen');
     },
 
     toggleDataOpen() {

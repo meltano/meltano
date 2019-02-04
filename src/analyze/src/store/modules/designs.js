@@ -25,8 +25,6 @@ const state = {
   filtersOpen: false,
   dataOpen: true,
   chartsOpen: false,
-  loadReportOpen: false,
-  saveReportOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
@@ -414,10 +412,6 @@ const actions = {
     commit('setLoadReportToggle');
   },
 
-  toggleSaveReportOpen({ commit }) {
-    commit('setSaveReportToggle');
-  },
-
   toggleChartsOpen({ commit }) {
     commit('setChartToggle');
   },
@@ -489,14 +483,6 @@ const mutations = {
 
   setDataToggle() {
     state.dataOpen = !state.dataOpen;
-  },
-
-  setLoadReportToggle() {
-    state.loadReportOpen = !state.loadReportOpen;
-  },
-
-  setSaveReportToggle() {
-    state.saveReportOpen = !state.saveReportOpen;
   },
 
   resetSaveReportSettings() {
