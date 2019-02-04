@@ -23,7 +23,10 @@ def permissions():
     required=True,
 )
 @click.option("--dry", help="Do not actually run, just check.", is_flag=True)
-def grant(db, spec, dry):
+@click.option(
+    "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
+)
+def grant(db, spec, dry, diff):
     """Grant the permissions provided in the provided specification file."""
     try:
         if not dry:
@@ -40,16 +43,28 @@ def grant(db, spec, dry):
             pass
 
         click.secho()
-        click.secho("SQL Commands generated for given spec file:")
+        if diff:
+            click.secho(
+                "SQL Commands generated for given spec file (Full diff with both new and already granted commands):"
+            )
+        else:
+            click.secho("SQL Commands generated for given spec file:")
+        click.secho()
 
+        diff_prefix = ""
         for command in sql_commands:
             if command["already_granted"]:
-                fg = "cyan"
+                if diff:
+                    fg = "cyan"
+                    diff_prefix = "  "
+                else:
+                    continue
             else:
                 fg = "green"
+                if diff:
+                    diff_prefix = "+ "
 
-            click.secho(f"{command['sql']};", fg=fg)
-            click.secho()
+            click.secho(f"{diff_prefix}{command['sql']};", fg=fg)
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():
             click.secho(line, fg="red")

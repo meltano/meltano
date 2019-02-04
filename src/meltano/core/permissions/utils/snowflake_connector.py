@@ -80,10 +80,16 @@ class SnowflakeConnector:
 
         return names
 
-    def show_tables(self) -> List[str]:
+    def show_tables(self, database: str = None, schema: str = None) -> List[str]:
         names = []
 
-        query = f"SHOW TERSE TABLES IN ACCOUNT"
+        if schema:
+            query = f"SHOW TERSE TABLES IN SCHEMA {schema}"
+        elif database:
+            query = f"SHOW TERSE TABLES IN DATABASE {database}"
+        else:
+            query = f"SHOW TERSE TABLES IN ACCOUNT"
+
         with self.engine.connect() as connection:
             results = connection.execute(query).fetchall()
 
