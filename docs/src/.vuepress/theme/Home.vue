@@ -61,10 +61,10 @@
             <a href="https://gitlab.com/meltano/meltano" target="_blank">Meltano</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/taps-targets.html#tap">Singer Tap</a>
+            <a href="https://www.singer.io/#taps">Singer Taps</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/taps-targets.html#target">Singer Target</a>
+            <a href="https://www.singer.io/#targets">Singer Targets</a>
           </td>
           <td class="ta-c">
             <a href="https://www.getdbt.com/">dbt</a>
