@@ -101,7 +101,7 @@
       </div>
       <div class="column is-paddingless code-container" v-else-if="hasCode">
         <div class="content has-background-white">
-          <pre>{{activeView.file}}</pre>
+          <pre>{{activeView.file | pretty}}</pre>
         </div>
       </div>
     </div>
@@ -109,12 +109,16 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import pretty from '@/filters/pretty';
 
 export default {
   name: 'Repo',
   created() {
     this.getRepo();
     this.sync();
+  },
+  filters: {
+    pretty,
   },
   computed: {
     ...mapGetters('repos', [
