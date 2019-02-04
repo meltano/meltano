@@ -447,9 +447,7 @@ const mutations = {
     const queryPayload = report.queryPayload;
     const setSelected = (targetCollection, matchCollection) => {
       targetCollection.forEach((item) => {
-        if (matchCollection.includes(item.name)) {
-          item.selected = true;
-        }
+        item.selected = matchCollection.includes(item.name);
       });
     };
     // columns
