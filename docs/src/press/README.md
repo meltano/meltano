@@ -8,7 +8,7 @@ Meltano related news, logos, and how to get in touch.
 
 ## Top Stories
 
-- [GitLab to create tool for data teams](https://sdtimes.com/data/gitlab-to-create-tool-for-data-teams/), SD Times
+- [GitLab to create tool for data teams](https://sdtimes.com/data/gitlab-to-create-tool-for-data-teams/)
 - [Hey, data teams - We're working on a tool just for you](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/)
 - [Meltano Meeting Agenda](https://docs.google.com/document/d/1nayKquFLL8DN3h8mnLo3pVZsEKyPcBgQm2mqc5GggPA)
 - [Hacker News discussion](https://news.ycombinator.com/item?id=17667399)
