@@ -170,82 +170,54 @@
           <div class="column">
             <div class="is-grouped is-pulled-right">
 
-              <div class="dropdown"
-                    :class="{'is-active': loadReportOpen}">
-                <div class="dropdown-trigger">
-                  <button class="button"
-                          aria-haspopup="true"
-                          aria-controls="dropdown-menu-load-report"
-                          @click="toggleLoadReportOpen">
-                    <span>Load Report</span>
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
-                    </span>
-                  </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu-load-report" role="menu">
-                  <div class="dropdown-content">
-                    <div v-if="reports.length > 0">
-                      <a class="dropdown-item"
-                          :class="{'is-loading': loadingQuery}"
-                          v-for="report in reports"
-                          :key="report.name"
-                          @click="loadReport(report)">
-                        {{report.name}}
-                      </a>
-                    </div>
-                    <div class="dropdown-item" v-if="reports.length === 0">
-                      <p>Try saving one first</p>
-                    </div>
+              <Dropdown label="Load Report" >
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <div v-if="reports.length > 0">
+                    <a class="dropdown-item"
+                        :class="{'is-loading': loadingQuery}"
+                        v-for="report in reports"
+                        :key="report.name"
+                        @click="loadReport(report); dropdownForceClose();">
+                      {{report.name}}
+                    </a>
+                  </div>
+                  <div class="dropdown-item" v-if="reports.length === 0">
+                    <p>Try saving one first</p>
                   </div>
                 </div>
-              </div>
+              </Dropdown>
 
-              <div class="dropdown"
-                    :class="{'is-active': saveReportOpen}">
-                <div class="dropdown-trigger">
-                  <button class="button"
-                          aria-haspopup="true"
-                          aria-controls="dropdown-menu-save-report"
-                          @click="toggleSaveReportOpen">
-                    <span>Save Report</span>
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
-                    </span>
-                  </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu-save-report" role="menu">
-                  <div class="dropdown-content">
-                    <div class="dropdown-item">
-                      <div class="field">
-                        <label class="label">Name</label>
-                        <div class="control">
-                          <input class="input"
-                                  type="text"
-                                  placeholder="Name your report"
-                                  v-model="saveReportSettings.name">
-                        </div>
-                      </div>
-                      <div class="field is-grouped">
-                        <div class="control">
-                          <button class="button is-link"
-                                  :disabled="!saveReportSettings.name"
-                                  @click="saveReport">Save</button>
-                        </div>
-                        <div class="control">
-                          <button class="button is-text"
-                                  @click="toggleSaveReportOpen">Cancel</button>
-                        </div>
+              <Dropdown label="Save Report">
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <div class="dropdown-item">
+                    <div class="field">
+                      <label class="label">Name</label>
+                      <div class="control">
+                        <input class="input"
+                                type="text"
+                                placeholder="Name your report"
+                                v-model="saveReportSettings.name">
                       </div>
                     </div>
-                    <hr class="dropdown-divider" v-if="activeReport.name">
-                    <div class="dropdown-item" v-if="activeReport.name">
-                      <button class="button is-link is-fullwidth"
-                              @click="updateReport">Update Existing</button>
+                    <div class="field is-grouped">
+                      <div class="control">
+                        <button class="button is-link"
+                                :disabled="!saveReportSettings.name"
+                                @click="saveReport(); dropdownForceClose();">Save</button>
+                      </div>
+                      <div class="control">
+                        <button class="button is-text"
+                                @click="toggleSaveReportOpen(); dropdownForceClose();">Cancel</button>
+                      </div>
                     </div>
                   </div>
+                  <hr class="dropdown-divider" v-if="activeReport.name">
+                  <div class="dropdown-item" v-if="activeReport.name">
+                    <button class="button is-link is-fullwidth"
+                            @click="updateReport(); dropdownForceClose();">Update Existing</button>
+                  </div>
                 </div>
-              </div>
+              </Dropdown>
 
               <a class="button is-primary"
                   :class="{'is-loading': loadingQuery}"
@@ -401,8 +373,9 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
+import Dropdown from '../generic/Dropdown';
 import ResultTable from './ResultTable';
-import SelectDropdown from '../SelectDropdown';
+import SelectDropdown from '../generic/SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
 
@@ -418,10 +391,11 @@ export default {
     capitalize,
   },
   components: {
+    Chart,
+    Dropdown,
     ResultTable,
     SelectDropdown,
     YesNoFilter,
-    Chart,
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('designs/getDesign', {
