@@ -36,7 +36,7 @@ const state = {
 };
 
 const helpers = {
-  getQueryPayloadFromUI() {
+  getQueryPayloadFromDesign() {
     const selected = x => x.selected;
     const namesOfSelected = (arr) => {
       if (!Array.isArray(arr)) {
@@ -299,7 +299,7 @@ const actions = {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
-    const queryPayload = load || helpers.getQueryPayloadFromUI();
+    const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
     designApi
       .getSql(state.currentModel, state.currentDesign, postData)
@@ -324,14 +324,12 @@ const actions = {
     designApi.loadReport(name)
       .then((response) => {
         const report = response.data;
-        state.currentModel = report.model;
-        state.currentDesign = report.design;
-        state.chartType = report.chartType;
         this.dispatch('designs/getSQL', {
           run: true,
           load: report.queryPayload,
         });
         commit('setCurrentReport', report);
+        commit('setStateFromLoadedReport', report);
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
@@ -345,7 +343,7 @@ const actions = {
       model: state.currentModel,
       design: state.currentDesign,
       chartType: state.chartType,
-      queryPayload: helpers.getQueryPayloadFromUI(),
+      queryPayload: helpers.getQueryPayloadFromDesign(),
     };
     designApi.saveReport(postData)
       .then((response) => {
@@ -360,7 +358,7 @@ const actions = {
   },
 
   updateReport({ commit }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromUI();
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
     state.activeReport.chartType = state.chartType;
     designApi.updateReport(state.activeReport)
       .then((response) => {
@@ -435,6 +433,26 @@ const mutations = {
 
   setCurrentReport(_, report) {
     state.activeReport = report;
+  },
+
+  setStateFromLoadedReport(_, report) {
+    state.currentModel = report.model;
+    state.currentDesign = report.design;
+    state.chartType = report.chartType;
+    state.limit = report.queryPayload.limit;
+
+    // UI selected state adornment
+    const baseTable = state.design.related_table;
+    const queryPayload = report.queryPayload;
+    const setSelected = (collectionName) => {
+      baseTable[collectionName].forEach((item) => {
+        if (queryPayload[collectionName].includes(item.name)) {
+          item.selected = true;
+        }
+      });
+    };
+    setSelected('aggregates');
+    setSelected('columns');
   },
 
   addSavedReportToReports(_, report) {
