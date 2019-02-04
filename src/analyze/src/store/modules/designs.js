@@ -353,6 +353,7 @@ const actions = {
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
+        commit('addSavedReportToReports', response.data);
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
@@ -440,6 +441,10 @@ const mutations = {
 
   setCurrentReport(_, report) {
     state.activeReport = report;
+  },
+
+  addSavedReportToReports(_, report) {
+    state.reports.push(report);
   },
 
   setSortColumn(context, name) {
