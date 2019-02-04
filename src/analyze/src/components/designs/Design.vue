@@ -207,7 +207,8 @@
                       </div>
                       <div class="control">
                         <button class="button is-text"
-                                @click="toggleSaveReportOpen(); dropdownForceClose();">Cancel</button>
+                                @click="toggleSaveReportOpen(); dropdownForceClose();">
+                          Cancel</button>
                       </div>
                     </div>
                   </div>

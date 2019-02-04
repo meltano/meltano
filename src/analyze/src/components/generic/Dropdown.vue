@@ -22,12 +22,12 @@
 import hyphenate from '@/filters/hyphenate';
 
 export default {
-  name: "Dropdown",
+  name: 'Dropdown',
   created() {
-    console.log('add listener')
+
   },
   beforeDestroy() {
-    console.log('kill listener')
+
   },
   data() {
     return {
@@ -37,7 +37,7 @@ export default {
   computed: {
     getHyphenatedLabel() {
       return hyphenate(this.label, 'dropdown');
-    }
+    },
   },
   filters: {
     hyphenate,
@@ -54,8 +54,8 @@ export default {
     toggleDropdown() {
       this.isOpen = !this.isOpen;
     },
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss">
