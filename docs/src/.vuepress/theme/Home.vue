@@ -58,19 +58,19 @@
         <tr class="meltano-row">
           <td>Meltano is a single workflow for the entire data life cycle.</td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
+            <a href="https://gitlab.com/meltano/meltano" target="_blank">Meltano</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/taps-targets.html#tap">Singer Tap</a>
+            <a href="https://www.singer.io/#taps">Singer Taps</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/taps-targets.html#target">Singer Target</a>
+            <a href="https://www.singer.io/#targets">Singer Targets</a>
           </td>
           <td class="ta-c">
             <a href="https://www.getdbt.com/">dbt</a>
           </td>
           <td class="ta-c">
-            <a href="https://meltano.com/docs/architecture.html#meltano-analyze">Meltano Analyze</a>
+            <a href="https://gitlab.com/meltano/meltano">Meltano</a>
           </td>
           <td class="ta-c">
             <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
@@ -80,7 +80,7 @@
           </td>
         </tr>
         <tr>
-          <td>Meltano can replace</td>
+          <td>Meltano is an alternative for</td>
           <td>
             <ul>
               <li>
@@ -141,6 +141,9 @@
           <td>
             <ul>
               <li>
+                <a href="https://www.tableau.com/)">Tableau</a>
+              </li>
+              <li>
                 <a href="https://www.metabase.com/">Metabase</a>
               </li>
               <li>
@@ -182,20 +185,21 @@
     </table>
 
     <section class="section">
-      <h2 class="section__title">Join Our Slack Channel!</h2>
-      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel.</p> 
-      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Let's chat in Slack!</a>
+      <h2 class="section__title">Communicate with the team!</h2>
+      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel and watch our videos on YouTube!</p> 
+      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
+      <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
     </section>
 
     <section class="section">
-      <h2 class="section__title">We're Hiring!</h2>
+      <h2 class="section__title">We are hiring!</h2>
       <p class="section__text mb0">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a> and a <a href="https://boards.greenhouse.io/gitlab/jobs/4059265002">Senior Product Manager</a>. </p> 
     </section>
 
     <div
       class="footer"
     >
-      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/README.md" target="_blank">Edit this page</a>
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/Home.vue" target="_blank">Edit this page</a>
     </div>
   </div>
 </template>

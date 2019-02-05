@@ -32,7 +32,7 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
-  connectionDialect: null,
+  dialect: null,
 };
 
 const helpers = {
@@ -547,7 +547,7 @@ const mutations = {
   },
 
   setConnectionDialect(_, results) {
-    state.connectionDialect = results.connection_dialect;
+    state.dialect = results.connection_dialect;
   },
 
   setQueryResults(_, results) {

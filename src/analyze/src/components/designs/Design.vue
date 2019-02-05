@@ -38,16 +38,15 @@
                 <template v-for="timeframe in join.related_table.timeframes">
                   <a class="panel-block timeframe"
                       v-if="!timeframe.hidden"
-                      @click="timeframeSelected(timeframe)"
+                      @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
                       :key="timeframe.label"
                       :class="{
                         'is-active': timeframe.selected,
-                        'is-sqlite-unsupported': isConnectionDialectSqlite(connectionDialect)
+                        'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
                       }">
                     {{timeframe.label}}
                     <div class='sqlite-unsupported-container'
-                      v-if='isConnectionDialectSqlite(connectionDialect)'
-                    >
+                          v-if='isConnectionDialectSqlite(dialect)'>
                       <small>Unsupported by SQLite</small>
                     </div>
                   </a>
@@ -421,10 +420,10 @@ export default {
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
-      'connectionDialect',
       'results',
       'resultAggregates',
       'chartType',
+      'dialect',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
@@ -446,7 +445,7 @@ export default {
       'isConnectionDialectSqlite',
     ]),
     canToggleTimeframe() {
-      return !this.isConnectionDialectSqlite(this.connectionDialect);
+      return !this.isConnectionDialectSqlite(this.dialect);
     },
     limit: {
       get() {

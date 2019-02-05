@@ -28,13 +28,13 @@ meltano discover all
 # loader we just added without the need to transform the data
 meltano elt tap-carbon-intensity target-sqlite
 
-# Start up the Meltano Analyze web application!
+# Start up the Meltano UI web application!
 meltano ui
 ```
 
-Assuming you don't have something else running on that port, you should be able to see Meltano Analyze at [http://localhost:5000](http://localhost:5000).
+Assuming you don't have something else running on that port, you should be able to see Meltano UI at [http://localhost:5000](http://localhost:5000).
 
-Now we are ready to analyze the data. We have provided some sample .m5o (Meltano Analyze) files that will help you analyze the carbon intensity API.
+Now we are ready to analyze the data. We have provided some sample .m5o (Meltano UI) files that will help you analyze the carbon intensity API.
 
 ## Using Meltano on Your New Project
 

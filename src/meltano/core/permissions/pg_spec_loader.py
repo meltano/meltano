@@ -100,9 +100,12 @@ class PGSpecLoader:
 
         if alter_privileges:
             sql_commands.append(
-                ALTER_ROLE_TEMPLATE.format(
-                    role=role, privileges=" ".join(alter_privileges)
-                )
+                {
+                    "already_granted": False,
+                    "sql": ALTER_ROLE_TEMPLATE.format(
+                        role=role, privileges=" ".join(alter_privileges)
+                    ),
+                }
             )
 
         return sql_commands
@@ -115,7 +118,12 @@ class PGSpecLoader:
 
         if role_names:
             sql_commands.append(
-                GRANT_ROLE_TEMPLATE.format(role=role, role_names=", ".join(role_names))
+                {
+                    "already_granted": False,
+                    "sql": GRANT_ROLE_TEMPLATE.format(
+                        role=role, role_names=", ".join(role_names)
+                    ),
+                }
             )
 
         return sql_commands
@@ -127,7 +135,12 @@ class PGSpecLoader:
         try:
             for schema in config["owns"]["schemas"]:
                 sql_commands.append(
-                    ALTER_SCHEMA_OWNER_TEMPLATE.format(role=role, schema=schema)
+                    {
+                        "already_granted": False,
+                        "sql": ALTER_SCHEMA_OWNER_TEMPLATE.format(
+                            role=role, schema=schema
+                        ),
+                    }
                 )
         except KeyError:
             logging.debug(
@@ -159,7 +172,12 @@ class PGSpecLoader:
         try:
             for schema in config["privileges"]["schemas"]["read"]:
                 sql_commands.append(
-                    GRANT_READ_ON_SCHEMA_TEMPLATE.format(role=role, schema=schema)
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_READ_ON_SCHEMA_TEMPLATE.format(
+                            role=role, schema=schema
+                        ),
+                    }
                 )
         except KeyError:
             logging.debug(
@@ -171,7 +189,12 @@ class PGSpecLoader:
         try:
             for schema in config["privileges"]["schemas"]["write"]:
                 sql_commands.append(
-                    GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(role=role, schema=schema)
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_WRITE_ON_SCHEMA_TEMPLATE.format(
+                            role=role, schema=schema
+                        ),
+                    }
                 )
         except KeyError:
             logging.debug(
@@ -185,13 +208,21 @@ class PGSpecLoader:
                 if table.endswith(".*"):
                     schema = table[:-2]
                     sql_commands.append(
-                        GRANT_READ_ON_ALL_TABLES_TEMPLATE.format(
-                            role=role, schema=schema
-                        )
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_READ_ON_ALL_TABLES_TEMPLATE.format(
+                                role=role, schema=schema
+                            ),
+                        }
                     )
                 else:
                     sql_commands.append(
-                        GRANT_READ_ON_TABLE_TEMPLATE.format(role=role, table=table)
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_READ_ON_TABLE_TEMPLATE.format(
+                                role=role, table=table
+                            ),
+                        }
                     )
         except KeyError:
             logging.debug(
@@ -205,13 +236,21 @@ class PGSpecLoader:
                 if table.endswith(".*"):
                     schema = table[:-2]
                     sql_commands.append(
-                        GRANT_WRITE_ON_ALL_TABLE_TEMPLATE.format(
-                            role=role, schema=schema
-                        )
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_WRITE_ON_ALL_TABLE_TEMPLATE.format(
+                                role=role, schema=schema
+                            ),
+                        }
                     )
                 else:
                     sql_commands.append(
-                        GRANT_WRITE_ON_TABLE_TEMPLATE.format(role=role, table=table)
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_WRITE_ON_TABLE_TEMPLATE.format(
+                                role=role, table=table
+                            ),
+                        }
                     )
         except KeyError:
             logging.debug(
