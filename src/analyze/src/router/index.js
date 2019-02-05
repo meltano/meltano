@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
 import Design from '@/components/designs/Design';
+import Dashboards from '@/components/dashboards/Dashboards';
 import Settings from '@/components/settings/Settings';
 import Extract from '@/components/extract/Extract';
 import Load from '@/components/load/Load';
@@ -52,6 +53,16 @@ export default new Router({
       path: '/design/:model/:design',
       name: '',
       component: Design,
+    },
+    {
+      path: '/dashboards/',
+      name: 'Dashboards',
+      component: Dashboards,
+    },
+    {
+      path: '/dashboards/:id',
+      name: 'Dashboards',
+      component: Dashboards,
     },
     {
       path: '/settings',

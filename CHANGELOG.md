@@ -9,13 +9,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* add ability to save reports
+* add ability to update an active report during analysis
+* add ability to load reports
+* add dashboards page and related add/remove report functionality
 
 ### Changes
 * Generate default `Meltano UI` connection for the `meltano.db` SQLite DB when a new project is created with `meltano init`
+* updated main navigation to Files, Analysis, and Dashboards
 * Update the `meltano permissions grant` command to fetch the existing permissions from the Snowflake server and only return sql commands for permissions not already assigned
 * Add `--diff` option to the `meltano permissions grant` command to get a full diff with the permissions already assigned and new ones that must be assigned
 
 ### Fixes
+* Updated the Fundamentals documentation section regarding reports
+* Fixed Files page for empty state of Dashboards and Reports
+* Fixed Analyze page's left column to accurately preselect columns and aggregates after loading a report
 
 ### Breaks
 

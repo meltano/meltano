@@ -8,6 +8,7 @@ import {
   faGlobeAmericas,
   faCertificate,
   faDotCircle,
+  faCaretDown,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon,
   FontAwesomeLayers,
@@ -25,6 +26,7 @@ library.add(faChartPie);
 library.add(faGlobeAmericas);
 library.add(faCertificate);
 library.add(faDotCircle);
+library.add(faCaretDown);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);

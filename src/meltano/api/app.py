@@ -57,11 +57,15 @@ def create_app(config={}):
         setup_oauth(app)
 
     from .controllers.root import root
+    from .controllers.dashboards import dashboardsBP
+    from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
     from .controllers.settings import settingsBP
     from .controllers.sql import sqlBP
 
     app.register_blueprint(root)
+    app.register_blueprint(dashboardsBP)
+    app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
     app.register_blueprint(settingsBP)
     app.register_blueprint(sqlBP)

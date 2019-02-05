@@ -159,10 +159,71 @@
       </nav>
       <div class="column is-three-quarters">
         <div class="columns">
+          <div class="column column-flex-v">
+            <div class="is-grouped is-pulled-left">
+              <div v-if="activeReport.name">{{activeReport.name}}</div>
+              <div v-if="!activeReport.name"><em>Untitled Report</em></div>
+            </div>
+          </div>
+
           <div class="column">
-            <a class="button is-primary is-pulled-right"
-              :class="{'is-loading': loadingQuery}"
-              @click="runQuery">Run</a>
+            <div class="is-grouped is-pulled-right">
+
+              <Dropdown label="Load Report" >
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <div v-if="reports.length > 0">
+                    <a class="dropdown-item"
+                        :class="{'is-loading': loadingQuery}"
+                        v-for="report in reports"
+                        :key="report.name"
+                        @click="loadReport(report); dropdownForceClose();">
+                      {{report.name}}
+                    </a>
+                  </div>
+                  <div class="dropdown-item" v-if="reports.length === 0">
+                    <p>Try saving one first</p>
+                  </div>
+                </div>
+              </Dropdown>
+
+              <Dropdown label="Save Report">
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <div class="dropdown-item">
+                    <div class="field">
+                      <label class="label">Name</label>
+                      <div class="control">
+                        <input class="input"
+                                type="text"
+                                placeholder="Name your report"
+                                v-model="saveReportSettings.name">
+                      </div>
+                    </div>
+                    <div class="field is-grouped">
+                      <div class="control">
+                        <button class="button is-link"
+                                :disabled="!saveReportSettings.name"
+                                @click="saveReport(); dropdownForceClose();">Save</button>
+                      </div>
+                      <div class="control">
+                        <button class="button is-text"
+                                @click="dropdownForceClose();">
+                          Cancel</button>
+                      </div>
+                    </div>
+                  </div>
+                  <hr class="dropdown-divider" v-if="activeReport.name">
+                  <div class="dropdown-item" v-if="activeReport.name">
+                    <button class="button is-link is-fullwidth"
+                            @click="updateReport(); dropdownForceClose();">Update Existing</button>
+                  </div>
+                </div>
+              </Dropdown>
+
+              <a class="button is-primary"
+                  :class="{'is-loading': loadingQuery}"
+                  @click="runQuery">Run Query</a>
+
+            </div>
           </div>
         </div>
         <template v-if="design.has_filters">
@@ -262,7 +323,9 @@
             </p>
           </div>
           <div class="has-background-white-ter chart-toggles">
-            <chart></chart>
+            <chart :chart-type='chartType'
+                    :results='results'
+                    :result-aggregates='resultAggregates'></chart>
           </div>
         </template>
 
@@ -310,8 +373,9 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
+import Dropdown from '../generic/Dropdown';
 import ResultTable from './ResultTable';
-import SelectDropdown from '../SelectDropdown';
+import SelectDropdown from '../generic/SelectDropdown';
 import YesNoFilter from '../filters/YesNoFilter';
 import Chart from './Chart';
 
@@ -327,10 +391,11 @@ export default {
     capitalize,
   },
   components: {
+    Chart,
+    Dropdown,
     ResultTable,
     SelectDropdown,
     YesNoFilter,
-    Chart,
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('designs/getDesign', {
@@ -341,6 +406,7 @@ export default {
   },
   computed: {
     ...mapState('designs', [
+      'activeReport',
       'design',
       'selectedColumns',
       'currentModel',
@@ -349,9 +415,14 @@ export default {
       'loadingQuery',
       'filtersOpen',
       'dataOpen',
+      'saveReportSettings',
+      'reports',
       'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
+      'results',
+      'resultAggregates',
+      'chartType',
       'dialect',
     ]),
     ...mapGetters('designs', [
@@ -374,7 +445,7 @@ export default {
       'isConnectionDialectSqlite',
     ]),
     canToggleTimeframe() {
-      return !this.isConnectionDialectSqlite(this.connectionDialect);
+      return !this.isConnectionDialectSqlite(this.dialect);
     },
     limit: {
       get() {
@@ -439,6 +510,18 @@ export default {
 
     runQuery() {
       this.$store.dispatch('designs/getSQL', { run: true });
+    },
+
+    loadReport(report) {
+      this.$store.dispatch('designs/loadReport', { name: report.name });
+    },
+
+    saveReport() {
+      this.$store.dispatch('designs/saveReport', this.saveReportSettings);
+    },
+
+    updateReport() {
+      this.$store.dispatch('designs/updateReport');
     },
 
     setCurrentTab(tab) {

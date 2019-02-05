@@ -5,6 +5,7 @@ import designApi from '../../api/design';
 import utils from '../../api/utils';
 
 const state = {
+  activeReport: {},
   design: {
     related_table: {},
   },
@@ -24,12 +25,97 @@ const state = {
   filtersOpen: false,
   dataOpen: true,
   chartsOpen: false,
+  saveReportSettings: { name: null },
+  reports: [],
   chartType: 'BarChart',
   limit: 3,
   distincts: {},
   sortColumn: null,
   sortDesc: false,
   dialect: null,
+};
+
+const helpers = {
+  getQueryPayloadFromDesign() {
+    const selected = x => x.selected;
+    const namesOfSelected = (arr) => {
+      if (!Array.isArray(arr)) {
+        return null;
+      }
+
+      return arr.filter(selected).map(x => x.name);
+    };
+
+    const baseTable = state.design.related_table;
+    const columns = namesOfSelected(baseTable.columns);
+
+    let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn);
+
+    if (!sortColumn) {
+      sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn);
+    }
+
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
+
+    const filters = JSON.parse(JSON.stringify(state.distincts));
+    const filtersKeys = Object.keys(filters);
+    filtersKeys.forEach((prop) => {
+      delete filters[prop].results;
+      delete filters[prop].sql;
+    });
+
+    const joins = state.design.joins
+      .map((j) => {
+        const table = j.related_table;
+        const newJoin = {};
+
+        newJoin.name = j.name;
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
+
+        if (table.timeframes) {
+          newJoin.timeframes = table.timeframes
+            .filter(selected)
+            .map(({ name, periods }) => ({
+              name,
+              periods: periods.filter(selected),
+            }));
+        }
+
+        return newJoin;
+      })
+      .filter(j => !!(j.columns || j.aggregates));
+
+    let order = null;
+
+    // TODO update default empty array likely
+    // in the ma_file_parser to set proper defaults
+    // if user's exclude certain properties in their models
+    const timeframes = baseTable.timeframes || []
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
+      }))
+      .filter(tf => tf.periods.length);
+
+    if (sortColumn) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
+
+    return {
+      table: baseTable.name,
+      columns,
+      aggregates,
+      timeframes,
+      joins,
+      order,
+      limit: state.limit,
+      filters,
+    };
+  },
 };
 
 const getters = {
@@ -102,6 +188,7 @@ const getters = {
   currentModelLabel() {
     return utils.titleCase(state.currentModel);
   },
+
   currentDesignLabel() {
     return utils.titleCase(state.currentModel);
   },
@@ -131,14 +218,21 @@ const actions = {
   getDesign({ commit }, { model, design }) {
     state.currentModel = model;
     state.currentDesign = design;
-    designApi.index(model, design)
+    designApi.index(model, design).then((response) => {
+      commit('setDesign', response.data);
+      commit('selectedColumns', response.data.related_table.columns);
+    });
+    designApi.getDialect(model).then((response) => {
+      commit('setConnectionDialect', response.data);
+    });
+    designApi
+      .loadReports()
       .then((response) => {
-        commit('setDesign', response.data);
-        commit('selectedColumns', response.data.related_table.columns);
-      });
-    designApi.getDialect(model)
-      .then((response) => {
-        commit('setConnectionDialect', response.data);
+        state.reports = response.data;
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
       });
   },
 
@@ -152,21 +246,20 @@ const actions = {
     if (join.related_table.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name)
-      .then((response) => {
-        commit('setJoinColumns', {
-          columns: response.data.columns,
-          join,
-        });
-        commit('setJoinTimeframes', {
-          timeframes: response.data.timeframes,
-          join,
-        });
-        commit('setJoinAggregates', {
-          aggregates: response.data.aggregates,
-          join,
-        });
+    designApi.getTable(join.related_table.name).then((response) => {
+      commit('setJoinColumns', {
+        columns: response.data.columns,
+        join,
       });
+      commit('setJoinTimeframes', {
+        timeframes: response.data.timeframes,
+        join,
+      });
+      commit('setJoinAggregates', {
+        aggregates: response.data.aggregates,
+        join,
+      });
+    });
   },
 
   removeSort({ commit }, column) {
@@ -200,96 +293,14 @@ const actions = {
     commit('setChartType', chartType);
   },
 
-  getSQL({ commit }, { run }) {
+  getSQL({ commit }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
-    const selected = x => x.selected;
-    const namesOfSelected = (arr) => {
-      if (!Array.isArray(arr)) {
-        return null;
-      }
-
-      return arr.filter(selected).map(x => x.name);
-    };
-
-    const baseTable = state.design.related_table;
-    const columns = namesOfSelected(baseTable.columns);
-
-    let sortColumn = baseTable
-      .columns
-      .find(d => d.name === state.sortColumn);
-
-    if (!sortColumn) {
-      sortColumn = baseTable
-        .aggregates
-        .find(d => d.name === state.sortColumn);
-    }
-
-    const aggregates = namesOfSelected(baseTable.aggregates) || [];
-
-    const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters);
-    filtersKeys.forEach((prop) => {
-      delete filters[prop].results;
-      delete filters[prop].sql;
-    });
-
-    const joins = state.design
-      .joins
-      .map((j) => {
-        const table = j.related_table;
-        const newJoin = {};
-
-        newJoin.name = j.name;
-        newJoin.columns = namesOfSelected(table.columns) || [];
-        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
-
-        if (table.timeframes) {
-          newJoin.timeframes = table.timeframes
-            .filter(selected)
-            .map(({ name, periods }) => ({
-              name,
-              periods: periods.filter(selected),
-            }));
-        }
-
-        return newJoin;
-      })
-      .filter(j => !!(j.columns || j.aggregates));
-
-    let order = null;
-
-    // TODO update default empty array likely
-    // in the ma_file_parser to set proper defaults
-    // if user's exclude certain properties in their models
-    const timeframes = baseTable
-      .timeframes || []
-      .map(tf => ({
-        name: tf.name,
-        periods: tf.periods.filter(selected),
-      }))
-      .filter(tf => tf.periods.length);
-
-    if (sortColumn) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
-
-    const postData = {
-      table: baseTable.name,
-      columns,
-      aggregates,
-      timeframes,
-      joins,
-      order,
-      limit: state.limit,
-      filters,
-      run,
-    };
-
     state.loadingQuery = !!run;
-    designApi.getSql(state.currentModel, state.currentDesign, postData)
+
+    const queryPayload = load || helpers.getQueryPayloadFromDesign();
+    const postData = Object.assign({ run }, queryPayload);
+    designApi
+      .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
           commit('setQueryResults', response.data);
@@ -307,12 +318,64 @@ const actions = {
       });
   },
 
+  loadReport({ commit }, { name }) {
+    designApi.loadReport(name)
+      .then((response) => {
+        const report = response.data;
+        this.dispatch('designs/getSQL', {
+          run: true,
+          load: report.queryPayload,
+        });
+        commit('setCurrentReport', report);
+        commit('setStateFromLoadedReport', report);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
+
+  saveReport({ commit }, { name }) {
+    const postData = {
+      name,
+      model: state.currentModel,
+      design: state.currentDesign,
+      chartType: state.chartType,
+      queryPayload: helpers.getQueryPayloadFromDesign(),
+    };
+    designApi.saveReport(postData)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
+        commit('addSavedReportToReports', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
+
+  updateReport({ commit }) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
+    state.activeReport.chartType = state.chartType;
+    designApi.updateReport(state.activeReport)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
+
   resetErrorMessage({ commit }) {
     commit('setErrorState');
   },
 
   getDistinct({ commit }, field) {
-    designApi.getDistinct(state.currentModel, state.currentDesign, field)
+    designApi
+      .getDistinct(state.currentModel, state.currentDesign, field)
       .then((response) => {
         commit('setDistincts', {
           data: response.data,
@@ -341,6 +404,10 @@ const actions = {
     commit('setDataToggle');
   },
 
+  toggleLoadReportOpen({ commit }) {
+    commit('setLoadReportToggle');
+  },
+
   toggleChartsOpen({ commit }) {
     commit('setChartToggle');
   },
@@ -360,6 +427,67 @@ const mutations = {
 
   setChartType(context, chartType) {
     state.chartType = chartType;
+  },
+
+  setCurrentReport(_, report) {
+    state.activeReport = report;
+  },
+
+  setStateFromLoadedReport(_, report) {
+    // General UI state updates
+    state.currentModel = report.model;
+    state.currentDesign = report.design;
+    state.chartType = report.chartType;
+    state.limit = report.queryPayload.limit;
+
+    // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
+    const baseTable = state.design.related_table;
+    const queryPayload = report.queryPayload;
+    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+      acc.push({
+        name: curr.name,
+        columns: curr.related_table.columns,
+        timeframes: curr.related_table.timeframes,
+      });
+      return acc;
+    }, []);
+    const nameMatcher = (source, target) => source.name === target.name;
+    const nameMapper = item => item.name;
+    const setSelected = (sourceCollection, targetCollection) => {
+      sourceCollection.forEach((item) => {
+        item.selected = targetCollection.includes(item.name);
+      });
+    };
+
+    // columns
+    setSelected(baseTable.columns, queryPayload.columns);
+    // aggregates
+    setSelected(baseTable.aggregates, queryPayload.aggregates);
+    // filters
+    // TODO
+    // joins, timeframes, and periods
+    joinColumnGroups.forEach((joinGroup) => {
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
+      // joins
+      setSelected(joinGroup.columns, targetJoin.columns);
+      // timeframes
+      if (joinGroup.timeframes) {
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
+        // periods
+        joinGroup.timeframes.forEach((timeframe) => {
+          const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
+          setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
+        });
+      }
+    });
+    // order
+    // TODO
+    // base_table timeframes
+    // TODO
+  },
+
+  addSavedReportToReports(_, report) {
+    state.reports.push(report);
   },
 
   setSortColumn(context, name) {
@@ -406,6 +534,10 @@ const mutations = {
     state.dataOpen = !state.dataOpen;
   },
 
+  resetSaveReportSettings() {
+    state.saveReportSettings = { name: null };
+  },
+
   setChartToggle() {
     state.chartsOpen = !state.chartsOpen;
   },
@@ -429,7 +561,9 @@ const mutations = {
   setSqlErrorMessage(_, e) {
     state.hasSQLError = true;
     if (!e.response) {
-      state.sqlErrorMessage = ['Something went wrong on our end. We\'ll check our error logs and get back to you.'];
+      state.sqlErrorMessage = [
+        "Something went wrong on our end. We'll check our error logs and get back to you.",
+      ];
       return;
     }
     const error = e.response.data;
