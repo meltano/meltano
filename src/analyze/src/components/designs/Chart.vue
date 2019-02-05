@@ -1,10 +1,12 @@
 <template>
   <div v-show="results.length">
-    <component :is="chartType"></component>
+    <component :is="chartType"
+                :chart-type='chartType'
+                :results='results'
+                :result-aggregates='resultAggregates'></component>
   </div>
 </template>
 <script>
-import { mapState } from 'vuex';
 import { BarChart, LineChart, AreaChart, ScatterChart } from './charts';
 
 export default {
@@ -15,11 +17,10 @@ export default {
     AreaChart,
     ScatterChart,
   },
-  computed: {
-    ...mapState('designs', [
-      'results',
-      'chartType',
-    ]),
-  },
+  props: [
+    'chartType',
+    'results',
+    'resultAggregates',
+  ],
 };
 </script>

@@ -1,7 +1,23 @@
 periods = [
-  { label = Quarter, part = QUARTER },
-  { label = Week, part = WEEK },
-  { label = Month, part = MONTH },
-  { label = Year, part = YEAR },
+  {
+    name = quarter,
+    label = Quarter,
+    part = QUARTER
+  },
+  {
+    name = week,
+    label = Week,
+    part = WEEK
+  },
+  {
+    name = month,
+    label = Month,
+    part = MONTH
+  },
+  {
+    name = year,
+    label = Year,
+    part = YEAR
+  },
 ]
 type = time
