@@ -8,14 +8,10 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 
 
-def engine_uri(**db_config):
-    return "postgresql://{user}:{password}@{host}:{port}/{database}".format(**db_config)
-
-
 BACKEND = os.getenv("PYTEST_BACKEND", "sqlite")
 
 
-if BACKEND == "postgres":
+if BACKEND == "postgresql":
 
     @pytest.fixture()
     def engine(project, monkeypatch):
@@ -25,7 +21,7 @@ if BACKEND == "postgres":
         user = os.getenv("PG_USERNAME")
         password = os.getenv("PG_PASSWORD")
 
-        engine_uri = f"postgres://{user}:{password}@{host}:{port}/{database}"
+        engine_uri = f"postgresql://{user}:{password}@{host}:{port}/{database}"
 
         engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
         with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
