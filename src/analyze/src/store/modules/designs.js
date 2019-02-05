@@ -91,14 +91,12 @@ const helpers = {
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
-    const timeframes =
-      baseTable.timeframes ||
-      []
-        .map(tf => ({
-          name: tf.name,
-          periods: tf.periods.filter(selected),
-        }))
-        .filter(tf => tf.periods.length);
+    const timeframes = baseTable.timeframes || []
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
+      }))
+      .filter(tf => tf.periods.length);
 
     if (sortColumn) {
       order = {
@@ -442,35 +440,48 @@ const mutations = {
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
 
-    // UI selected state adornment (columns, aggregates, filters, joins, timeframes)
+    // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
     const baseTable = state.design.related_table;
     const queryPayload = report.queryPayload;
-    const setSelected = (targetCollection, matchCollection) => {
-      targetCollection.forEach((item) => {
-        item.selected = matchCollection.includes(item.name);
+    const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
+      acc.push({
+        name: curr.name,
+        columns: curr.related_table.columns,
+        timeframes: curr.related_table.timeframes,
+      });
+      return acc;
+    }, []);
+    const nameMatcher = (source, target) => source.name === target.name;
+    const setSelected = (sourceCollection, targetCollection) => {
+      sourceCollection.forEach((item) => {
+        item.selected = targetCollection.includes(item.name);
       });
     };
+
     // columns
     setSelected(baseTable.columns, queryPayload.columns);
     // aggregates
     setSelected(baseTable.aggregates, queryPayload.aggregates);
     // filters
     // TODO
-    // joins
-    const joinColumnGroups = state.design.joins.reduce(
-      (acc, curr) => {
-        acc.push({
-          name: curr.name,
-          columns: curr.related_table.columns,
-          timeframes: curr.related_table.timeframes,
-        });
-        return acc;
-      }, []);
+    // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
-      const targetJoin = queryPayload.joins.find(j => j.name === joinGroup.name);
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
+      // joins
       setSelected(joinGroup.columns, targetJoin.columns);
-      // TODO timeframes
+      // timeframes
+      if (joinGroup.timeframes) {
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(tf => tf.name));
+        // periods
+        // TODO 1. determine if queryPayload.timeframes should have data
+        // TODO 2. ensure name prop gets written to timeframe.proto.m5o (instead of just label/part)
+        joinGroup.timeframes.forEach((timeframe) => {
+          console.log(queryPayload, joinGroup, timeframe);
+        });
+      }
     });
+
+    console.log(joinColumnGroups, queryPayload.joins);
   },
 
   addSavedReportToReports(_, report) {
