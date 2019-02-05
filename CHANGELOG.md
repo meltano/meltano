@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.9.0 - (2019-02-05)
+---
+
+### New
 * add ability to save reports
 * add ability to update an active report during analysis
 * add ability to load reports
@@ -25,8 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Updated the Fundamentals documentation section regarding reports
 * Fixed Files page for empty state of Dashboards and Reports
 * Fixed Analyze page's left column to accurately preselect columns and aggregates after loading a report
-
-### Breaks
 
 
 ## 0.8.0 - (2019-01-29)
