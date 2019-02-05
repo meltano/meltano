@@ -1,4 +1,5 @@
 {
+  version = 1
   sql_table_name = region
   name = region
   columns {
