@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Updated the Fundamentals documentation section regarding reports
 * Fixed Files page for empty state of Dashboards and Reports
+* Fixed Analyze page's left column to accurately preselect columns and aggregates after loading a report
 
 ### Breaks
 
