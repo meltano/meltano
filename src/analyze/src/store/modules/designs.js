@@ -452,6 +452,7 @@ const mutations = {
       return acc;
     }, []);
     const nameMatcher = (source, target) => source.name === target.name;
+    const nameMapper = item => item.name;
     const setSelected = (sourceCollection, targetCollection) => {
       sourceCollection.forEach((item) => {
         item.selected = targetCollection.includes(item.name);
@@ -471,17 +472,18 @@ const mutations = {
       setSelected(joinGroup.columns, targetJoin.columns);
       // timeframes
       if (joinGroup.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(tf => tf.name));
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
         // periods
-        // TODO 1. determine if queryPayload.timeframes should have data
-        // TODO 2. ensure name prop gets written to timeframe.proto.m5o (instead of just label/part)
         joinGroup.timeframes.forEach((timeframe) => {
-          console.log(queryPayload, joinGroup, timeframe);
+          const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
+          setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
         });
       }
     });
-
-    console.log(joinColumnGroups, queryPayload.joins);
+    // order
+    // TODO
+    // base_table timeframes
+    // TODO
   },
 
   addSavedReportToReports(_, report) {
