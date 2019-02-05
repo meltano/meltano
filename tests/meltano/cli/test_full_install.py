@@ -8,7 +8,8 @@ from asserts import assert_cli_runner
 # Use One Class per End to End test in order to setup a new project each time
 class TestFullInstall:
     @pytest.mark.slow
-    def test_carbon_intensity_postgres_dbt(request, db, monkeypatch, project):
+    @pytest.mark.backend("postgresql")
+    def test_carbon_intensity_postgres_dbt(request, engine, monkeypatch, project):
         monkeypatch.setenv("PG_SCHEMA", "carbon")
         monkeypatch.setenv("PG_DATABASE", "pytest")
 

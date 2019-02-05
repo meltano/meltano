@@ -7,10 +7,7 @@ from asserts import assert_cli_runner
 
 class TestAutoInstall:
     @pytest.mark.slow
-    def test_carbon_intensity_sqlite(request, db, monkeypatch, project):
-        monkeypatch.setenv("PG_SCHEMA", "carbon")
-        monkeypatch.setenv("PG_DATABASE", "pytest")
-
+    def test_carbon_intensity_sqlite(request, project):
         # Directly run `meltano add loader target-sqlite` in a new project
         # So that the extractor and the loader are auto installed by meltano
         cli_runner = CliRunner()

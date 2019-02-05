@@ -30,11 +30,19 @@ lint:
   script:
     - make show_lint
 
-test:
+.test: &test
   stage: test
   image:
     name: registry.gitlab.com/meltano/meltano/base
     entrypoint: [""]
+  before_script:
+    - make bundle
+    - pip install '.[dev]'
+  script:
+    - pytest -v
+
+test_postgres:
+  <<: *test
   variables:
     POSTGRES_ADDRESS: postgres
     POSTGRES_USER: runner
@@ -47,13 +55,14 @@ test:
     PG_PASSWORD: $POSTGRES_PASSWORD
     PG_DATABASE: $POSTGRES_DB
     PG_PORT: $POSTGRES_PORT
+    PYTEST_BACKEND: postgresql
   services:
     - postgres:latest
-  before_script:
-    - make bundle
-    - pip install '.[dev]'
-  script:
-    - pytest -v
+
+test_sqlite:
+  <<: *test
+  variables:
+    PYTEST_BACKEND: sqlite
 
 package:
   stage: test
