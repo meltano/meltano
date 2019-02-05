@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add `--diff` option to the `meltano permissions grant` command to get a full diff with the permissions already assigned and new ones that must be assigned
 
 ### Fixes
+* Entry model definition correctly defines `region_id`.
 
 ### Breaks
 
