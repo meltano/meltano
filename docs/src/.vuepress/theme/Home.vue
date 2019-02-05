@@ -152,6 +152,9 @@
               <li>
                 <a href="https://www.periscopedata.com/">Periscope</a>
               </li>
+              <li>
+                <a href="https://redash.io/">Redash</a>
+              </li>
             </ul>
           </td>
           <td>
