@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture()
-def engine(project, monkeypatch):
+def engine(project):
     database = "postgres"
     host = os.getenv("PG_ADDRESS")
     port = os.getenv("PG_PORT", 5432)

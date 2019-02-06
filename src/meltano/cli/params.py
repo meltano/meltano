@@ -5,8 +5,6 @@ import urllib
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
-from meltano.core.db import project_register_engine
-from sqlalchemy import create_engine
 
 
 def db_options(func):
@@ -44,7 +42,6 @@ def db_options(func):
     @click.password_option(envvar="PG_PASSWORD")
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        project = Project.find()
         engine_uri = None
         backend = kwargs.pop("backend")
 
@@ -66,9 +63,6 @@ def db_options(func):
         else:
             raise Exception(f"Invalid backend: {backend} is not supported.")
 
-        engine = create_engine(engine_uri)
-        project_register_engine(project, engine)
-
-        return func(*args, **kwargs)
+        return func(*args, **kwargs, engine_uri=engine_uri)
 
     return wrapper

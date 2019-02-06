@@ -10,7 +10,6 @@ from .params import db_options
 
 
 @cli.group()
-@db_options
 def schema():
     pass
 
@@ -18,8 +17,9 @@ def schema():
 @schema.command()
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)
-def create(schema, roles):
+@db_options
+def create(schema, roles, engine_uri):
     project = Project.find()
-    engine, _ = project_engine(project)
+    engine, _ = project_engine(project, engine_uri)
 
     DB.ensure_schema_exists(engine, schema, grant_roles=roles)

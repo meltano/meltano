@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture()
-def engine(monkeypatch, project):
+def engine(project):
     engine_uri = "sqlite://"
     engine, _ = project_engine(project, engine_uri)
     return engine

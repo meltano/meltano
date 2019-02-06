@@ -14,10 +14,10 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 @cli.command()
-@db_options
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
@@ -25,7 +25,8 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-def elt(extractor, loader, dry, transform, job_id):
+@db_options
+def elt(extractor, loader, dry, transform, job_id, engine_uri):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
@@ -34,6 +35,7 @@ def elt(extractor, loader, dry, transform, job_id):
     """
     try:
         project = Project.find()
+        engine, _ = project_engine(project, engine_uri)
     except ProjectNotFound as e:
         raise click.ClickException(e)
 
