@@ -54,3 +54,11 @@ Lastly, we'll query and explore the data:
   - Toggle Columns and Aggregates buttons to generate SQL query
   - Click Run button to query
 - Open Charts accordion and explore the data!
+
+## Upcoming Tutorials
+
+Additional tutorials we are working on include:
+
+- Salesforce
+- GitLab Runners
+- Google Analytics
