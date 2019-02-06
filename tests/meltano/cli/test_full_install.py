@@ -9,7 +9,7 @@ from asserts import assert_cli_runner
 class TestFullInstall:
     @pytest.mark.slow
     @pytest.mark.backend("postgresql")
-    def test_carbon_intensity_postgres_dbt(request, engine, monkeypatch, project):
+    def test_carbon_intensity_postgres_dbt(request, monkeypatch, project):
         monkeypatch.setenv("PG_SCHEMA", "carbon")
         monkeypatch.setenv("PG_DATABASE", "pytest")
 

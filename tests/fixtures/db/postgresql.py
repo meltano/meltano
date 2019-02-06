@@ -8,22 +8,26 @@ from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import sessionmaker
 
 
-@pytest.fixture()
-def engine(project):
-    database = "postgres"
+@pytest.fixture(scope="session")
+def test_engine_uri():
     host = os.getenv("PG_ADDRESS")
     port = os.getenv("PG_PORT", 5432)
     user = os.getenv("PG_USERNAME")
     password = os.getenv("PG_PASSWORD")
 
-    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/{database}"
-
+    # create the database
+    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
     with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
         DB.create_database(engine, "pytest")
 
-    # register the current engine
-    engine, _ = project_engine(project, engine_uri)
+    return f"postgresql://{user}:{password}@{host}:{port}/pytest"
+
+
+@pytest.fixture()
+def engine(project, test_engine_uri):
+    # create the engine
+    engine, _ = project_engine(project, test_engine_uri)
     truncate_tables(engine, schema="meltano")
 
     return engine

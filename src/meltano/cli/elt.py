@@ -35,7 +35,7 @@ def elt(extractor, loader, dry, transform, job_id, engine_uri):
     """
     try:
         project = Project.find()
-        engine, _ = project_engine(project, engine_uri)
+        engine, _ = project_engine(project, engine_uri, default=True)
     except ProjectNotFound as e:
         raise click.ClickException(e)
 

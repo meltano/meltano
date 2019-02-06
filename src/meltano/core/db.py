@@ -17,19 +17,29 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
-_engines = weakref.WeakKeyDictionary()
+_engines = dict()
 
 
-def project_engine(project, engine_uri=None):
+def project_engine(project, engine_uri=None, default=False):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
-    if project in _engines:
+
+    # return the default engine if it is registered
+    if not engine_uri and project in _engines:
         return _engines[project]
+    elif (project, engine_uri) in _engines:
+        return _engines[(project, engine_uri)]
 
     engine_uri = engine_uri or os.getenv("SQL_ENGINE_URI", "sqlite:///meltano.db")
     engine = create_engine(engine_uri)
 
     Session = sessionmaker(bind=engine)
-    _engines[project] = engine, Session
+
+    if default:
+        # register the default engine
+        _engines[project] = engine, Session
+    else:
+        _engines[(project, engine_uri)] = engine, Session
+
     init_hook(engine)
 
     return engine, Session
