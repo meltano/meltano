@@ -42,7 +42,7 @@ def db_options(func):
     @click.password_option(envvar="PG_PASSWORD")
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        engine_uri = None
+        engine_uri = os.getenv("SQL_ENGINE_URI")
         backend = kwargs.pop("backend")
 
         config = {
@@ -52,16 +52,15 @@ def db_options(func):
             ),
         }
 
-        if backend == "sqlite":
+        if not engine_uri and backend == "sqlite" and config[backend]["path"]:
             engine_uri = "sqlite:///{path}".format(**config[backend])
-        elif backend == "postgresql":
+
+        if not engine_uri and backend == "postgresql":
             pg_config = config[backend]
             pg_config["password"] = urllib.parse.quote(pg_config["password"])
             engine_uri = "postgresql://{username}:{password}@{host}:{port}/{database}".format(
                 **pg_config
             )
-        else:
-            raise Exception(f"Invalid backend: {backend} is not supported.")
 
         return func(*args, **kwargs, engine_uri=engine_uri)
 

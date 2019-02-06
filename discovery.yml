@@ -86,7 +86,7 @@ loaders:
   - name: target-sqlite
     pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
     config:
-      database: "meltano"
+      database: "$SQLITE_DATABASE"
 transformers:
   - name: dbt
     pip_url: dbt

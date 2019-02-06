@@ -29,9 +29,10 @@ def project_engine(project, engine_uri=None, default=False):
     elif (project, engine_uri) in _engines:
         return _engines[(project, engine_uri)]
 
-    engine_uri = engine_uri or os.getenv("SQL_ENGINE_URI", "sqlite:///meltano.db")
-    engine = create_engine(engine_uri)
+    if not engine_uri:
+        raise ValueError("No engine registered for this project.")
 
+    engine = create_engine(engine_uri)
     Session = sessionmaker(bind=engine)
 
     if default:
