@@ -11,11 +11,23 @@ git clone git@gitlab.com:meltano/meltano.git
 # Change directory into the Meltano project
 cd meltano
 
+# Optional, but it's best to have the latest pip
+pip install --upgrade pip
+
+# Optional, but it's best to have the latest setuptools
+pip install --upgrade setuptools
+
 # Activate your virtual environment
 source ./venv/bin/activate
 
-# Install dependencies with the edit flag on to detect changes
-pip install -e .
+# Install all the dependencies
+pip install -r requirements.txt
+
+# Install dev dependencies with the edit flag on to detect changes
+pip install -e '.[dev]'
+
+# Run scripts
+make bundle
 
 # Run Meltano APIs
 python -m meltano.api
