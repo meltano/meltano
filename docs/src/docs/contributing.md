@@ -26,11 +26,8 @@ pip install -r requirements.txt
 # Install dev dependencies with the edit flag on to detect changes
 pip install -e '.[dev]'
 
-# Run scripts
+# Run scripts to create remaining required files
 make bundle
-
-# Run Meltano APIs
-python -m meltano.api
 ```
 
 Open a new terminal tab in the meltano project directory:
