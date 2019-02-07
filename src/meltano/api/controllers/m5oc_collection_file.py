@@ -3,7 +3,7 @@ import json
 from typing import Dict
 from pathlib import Path
 from .design_helper import DesignHelper
-
+from meltano.core.compiler.m5oc_file import M5ocFile
 
 class DesignMissingError(Exception):
     pass
@@ -13,14 +13,7 @@ class ConnectionNotFoundError(Exception):
     pass
 
 
-class M5ocFile:
-    def __init__(self, content: Dict):
-        self.content = content
-
-    @classmethod
-    def load(cls, file):
-        return M5ocFile(json.load(file))
-
+class M5ocCollectionFile(M5ocFile):
     @property
     def designs(self):
         return list(map(DesignHelper, self.content["designs"]))

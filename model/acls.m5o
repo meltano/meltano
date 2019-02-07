@@ -1,0 +1,30 @@
+roles {
+  admin: {
+    users: ["dev:dev@meltano.com"] ${roles.regular.users}
+    acl {
+      view {
+        designs: ["region"]
+        reports: ["*"]
+        dashboards: ["*"]
+      }
+      create {
+        reports: ["*"]
+      }
+      delete {
+        reports: ["*"]
+        dashboards: ["*"]
+      }
+    }
+  }
+
+  regular {
+    users: ["mbergeron"]
+    acl: {
+      view {
+        designs: ["region"]
+        reports: ["*"]
+        dashboards: ["*"]
+      }
+    }
+  }
+}

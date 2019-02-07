@@ -10,7 +10,7 @@ from pypika import Query, Order
 from .analysis_helper import AnalysisHelper
 from .settings_helper import SettingsHelper
 from meltano.core.project import Project
-from .m5oc_file import M5ocFile
+from .m5oc_collection_file import M5ocCollectionFile
 from .date import Date
 
 meltano_model_path = Path(os.getcwd(), "model")
@@ -44,7 +44,7 @@ class SqlHelper:
     def get_m5oc_model(self, model_name):
         m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
         with m5oc_file.open() as f:
-            m5oc = M5ocFile.load(f)
+            m5oc = M5ocCollectionFile.load(f)
         return m5oc
 
     def get_db_engine(self, connection_name):

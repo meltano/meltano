@@ -88,6 +88,17 @@ def pop_all(keys, d: dict):
 def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
+def nest(d: dict, path: str):
+    cursor = d
+
+    # create the list of dicts
+    for key in path.split("."):
+        if key not in cursor:
+            cursor[key] = {}
+        cursor = cursor[key]
+
+    return cursor
+
 
 def file_has_data(file: Union[Path, str]):
     file = Path(file)  # ensure it is a Path object
