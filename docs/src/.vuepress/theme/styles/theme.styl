@@ -128,6 +128,9 @@ h2
 h3
   font-size 1.35rem
 
+h5
+  font-size: 1rem
+
 a.header-anchor
   font-size 0.85em
   float left
@@ -188,3 +191,14 @@ th, td
       padding-left 0
 
 @require './mobile.styl'
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  border: 0;
+}

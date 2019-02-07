@@ -25,6 +25,9 @@ $primary-invert: $pink-invert;
 
 @import "../../node_modules/bulma/bulma";
 @import './mixins.scss';
+
+/* Main */
+
 .log-output {
   background: black;
   color: white;
@@ -33,6 +36,7 @@ $primary-invert: $pink-invert;
   white-space: pre-wrap;
   @include courier;
 }
+
 .fixed-sidebar {
   position: fixed;
   overflow: scroll;
@@ -41,7 +45,7 @@ $primary-invert: $pink-invert;
   left: 0;
 }
 
-.ellipsis{
+.ellipsis {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -69,6 +73,15 @@ a.disabled {
  cursor: default;
  color: #CCC;
 }
+
+/* Utilities - Bulma Layout Additions */
+
+.column-flex-v {
+  display: flex;
+  align-items: center;
+}
+
+/* Utilities - General */
 
 .text-selection-off {
   user-select: none;

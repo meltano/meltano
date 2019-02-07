@@ -37,7 +37,8 @@ module.exports = {
 		nav: [
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
-			{ text: 'Careers', link: '/careers/' }
+			{ text: 'Careers', link: '/careers/' },
+			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {
 			'/docs': [
@@ -47,16 +48,10 @@ module.exports = {
 				'/docs/concepts',
 				'/docs/architecture',
 				'/docs/meltano-cli',
-				'/docs/best-practices',
-				'/docs/superset',
-				'/docs/taps-targets',
-				'/docs/security-privacy',
-				'/docs/tmuxinator',
-				'/docs/license',
-				'/docs/release',
+				'/docs/security-and-privacy',
+				'/docs/personas',
 				'/docs/roadmap',
-				'/docs/contributing',
-				'/docs/about'
+				'/docs/contributing'
 			]
 		},
 		logo: '/meltano-logo.svg',

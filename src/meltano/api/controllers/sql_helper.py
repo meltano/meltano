@@ -1,11 +1,25 @@
 import logging
 import re
+import os
+from pathlib import Path
+from collections import OrderedDict
 
 import sqlalchemy
 from flask import jsonify
 from pypika import Query, Order
 from .analysis_helper import AnalysisHelper
+from .settings_helper import SettingsHelper
+from meltano.core.project import Project
+from .m5oc_file import M5ocFile
 from .date import Date
+
+meltano_model_path = Path(os.getcwd(), "model")
+
+
+class ConnectionNotFound(Exception):
+    def __init__(self, connection_name: str):
+        self.connection_name = connection_name
+        super().__init__("{connection_name} is missing.")
 
 
 class SqlHelper:
@@ -26,6 +40,38 @@ class SqlHelper:
 
     def get_names(self, things):
         return [thing["name"] for thing in things]
+
+    def get_m5oc_model(self, model_name):
+        m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+        with m5oc_file.open() as f:
+            m5oc = M5ocFile.load(f)
+        return m5oc
+
+    def get_db_engine(self, connection_name):
+        project = Project.find()
+        settings_helper = SettingsHelper()
+        connections = settings_helper.get_connections()["settings"]["connections"]
+
+        try:
+            connection = next(
+                connection
+                for connection in connections
+                if connection["name"] == connection_name
+            )
+
+            if connection["dialect"] == "postgresql":
+                psql_params = ["username", "password", "host", "port", "database"]
+                user, pw, host, port, db = [connection[param] for param in psql_params]
+                connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+            elif connection["dialect"] == "sqlite":
+                db_path = project.root.joinpath(connection["path"])
+                connection_url = f"sqlite:///{db_path}"
+
+            return sqlalchemy.create_engine(connection_url)
+
+            raise ConnectionNotFound(connection_name)
+        except StopIteration:
+            raise ConnectionNotFound(connection_name)
 
     def get_sql(self, design, incoming_json):
         table_name = incoming_json["table"]
@@ -155,6 +201,12 @@ class SqlHelper:
 
         q = q.limit(limit)
         return str(q) + ";"
+
+    def get_query_results(self, connection_name, sql):
+        engine = self.get_db_engine(connection_name)
+        results = engine.execute(sql)
+        results = [OrderedDict(row) for row in results]
+        return results
 
     def reset_db(self):
         try:

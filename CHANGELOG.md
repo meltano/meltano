@@ -18,13 +18,49 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 0.9.0 - (2019-02-05)
+---
+
+### New
+* add ability to save reports
+* add ability to update an active report during analysis
+* add ability to load reports
+* add dashboards page and related add/remove report functionality
+
+### Changes
+* Generate default `Meltano UI` connection for the `meltano.db` SQLite DB when a new project is created with `meltano init`
+* updated main navigation to Files, Analysis, and Dashboards
+* Update the `meltano permissions grant` command to fetch the existing permissions from the Snowflake server and only return sql commands for permissions not already assigned
+* Add `--diff` option to the `meltano permissions grant` command to get a full diff with the permissions already assigned and new ones that must be assigned
+
+### Fixes
+* Entry model definition correctly defines `region_id`.
+* Updated the Fundamentals documentation section regarding reports
+* Fixed Files page for empty state of Dashboards and Reports
+* Fixed Analyze page's left column to accurately preselect columns and aggregates after loading a report
+
+
+## 0.8.0 - (2019-01-29)
+---
+
+### New
+* Add tracking of anonymous `meltano cli` usage stats to Meltano's Google Analytics Account
+* Add `project_config.yml` to all meltano projects to store concent for anonymous usage tracking and the project's UUID
+
+### Changes
+* Add `--no_usage_stats` option to `meltano init <project_name>` to allow users to opt-out from anonymous usage stats tracking
+* Bundled Meltano models are now SQLite compatible.
+
+
 ## 0.7.0 - (2019-01-22)
 ---
 
 ### New
+* Added basic authentication support for meltano ui.
 * Meltano will now automatically source the .env
 * Updated docs with `.m5o` authoring requirements and examples
 * add support for timeframes in tables
+* add basic analytics to understand usage
 * add disabled UI for the lack of timeframes support in sqlite
 * update Results vs. SQL UI focus based on a results response or query update respectively
 

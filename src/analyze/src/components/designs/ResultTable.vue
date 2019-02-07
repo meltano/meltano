@@ -13,7 +13,7 @@
         <thead>
           <th v-for="(columnHeader, i) in columnHeaders"
               class="sortable-header"
-              :key="columnHeader"
+              :key="columnHeader + i"
               :class="{
                 'has-background-warning': isColumnSelectedAggregate(keys[i]),
                 'has-background-white-ter sorted': isColumnSorted(names[i]),

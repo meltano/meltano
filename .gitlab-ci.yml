@@ -36,12 +36,17 @@ test:
     name: registry.gitlab.com/meltano/meltano/base
     entrypoint: [""]
   variables:
+    POSTGRES_ADDRESS: postgres
     POSTGRES_USER: runner
     POSTGRES_DB: pytest
     POSTGRES_PASSWORD: ""
-    PG_ADDRESS: postgres
+    POSTGRES_PORT: 5432
+    # these are the Meltano specific config
+    PG_ADDRESS: $POSTGRES_ADDRESS
     PG_USERNAME: $POSTGRES_USER
     PG_PASSWORD: $POSTGRES_PASSWORD
+    PG_DATABASE: $POSTGRES_DB
+    PG_PORT: $POSTGRES_PORT
   services:
     - postgres:latest
   before_script:

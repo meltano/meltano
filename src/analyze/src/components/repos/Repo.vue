@@ -52,11 +52,37 @@
             </p>
             <!-- eslint-disable-next-line vue/require-v-for-key -->
             <ul class="menu-list">
-              <li v-for="file in value" :key="file.abs">
-                <a :class="{'is-active': isActive(file)}"
-                  @click.prevent='getFile(file)'>{{file.visual}}</a>
-              </li>
+
+              <template v-if="!value.length">
+                <li>
+                  <a><small><em>No {{key}}</em></small></a>
+                </li>
+              </template>
+
+              <template v-if="value.length">
+                <li v-for="file in value" :key="file.abs">
+                  <div class="columns">
+                    <div class="column">
+                      <a :class="{'is-active': isActive(file)}"
+                          @click.prevent='getFile(file)'>
+                        {{file.visual}}
+                      </a>
+                    </div>
+                    <div v-if='isDeepRoutable(key)' class='column is-one-fifth'>
+                      <router-link :to="getDeepRoute(key)"
+                                    class="button is-secondary is-light is-pulled-right">
+                        <span class="icon is-small">
+                          <i class="fas fa-bold">*</i>
+                        </span>
+                      </router-link>
+                    </div>
+                  </div>
+
+                </li>
+              </template>
+
             </ul>
+
           </template>
         </aside>
       <div class="column" v-if="!activeView.populated">
@@ -75,7 +101,7 @@
       </div>
       <div class="column is-paddingless code-container" v-else-if="hasCode">
         <div class="content has-background-white">
-          <pre>{{activeView.file}}</pre>
+          <pre>{{activeView.file | pretty}}</pre>
         </div>
       </div>
     </div>
@@ -83,12 +109,16 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import pretty from '@/filters/pretty';
 
 export default {
   name: 'Repo',
   created() {
     this.getRepo();
     this.sync();
+  },
+  filters: {
+    pretty,
   },
   computed: {
     ...mapGetters('repos', [
@@ -112,6 +142,13 @@ export default {
     },
     isActive(f) {
       return f.unique === this.activeView.unique;
+    },
+    // TODO refactor isDeepRoutable/getDeepRoute https://gitlab.com/meltano/meltano/issues/347
+    isDeepRoutable(type) {
+      return type === 'dashboards';
+    },
+    getDeepRoute(key) {
+      return `/${key}`;
     },
     getFile(file) {
       this.$store.dispatch('repos/getFile', file);

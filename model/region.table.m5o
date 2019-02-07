@@ -1,5 +1,6 @@
 {
-  sql_table_name = gitlab.region
+  version = 1
+  sql_table_name = region
   name = region
   columns {
     id {

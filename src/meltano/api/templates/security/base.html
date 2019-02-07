@@ -1,0 +1,42 @@
+{% block doc -%}
+<!DOCTYPE html>
+<html{% block html_attribs %}{% endblock html_attribs %}>
+  {%- block html %}
+  <head>
+    {%- block head %}
+    <title>{% block title %}{{ title|default }}{% endblock title %}</title>
+
+      {%- block metas %}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      {%- endblock metas %}
+
+      {%- block styles %}
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+      {%- endblock styles %}
+    {%- endblock head %}
+  </head>
+  <body style="margin-top: 6rem" {% block body_attribs %}{% endblock body_attribs %}>
+    {% block body -%}
+      {% block navbar %}
+      {%- endblock navbar %}
+      <div class="columns is-centered is-vcentered">
+        <div class="column is-one-third">
+          <figure style="margin: 1rem 2rem;" class="image">
+            <img src="/static/meltano-logo.png">
+          </figure>
+          <div class="box">
+          {% block content -%}
+          {%- endblock content %}
+          </div>
+          <div class="box">
+          {% include "security/_menu.html" %}
+          </div>
+        </div>
+      </div>
+      {% block scripts %}
+      {%- endblock scripts %}
+    {%- endblock body %}
+  </body>
+  {%- endblock html %}
+</html>
+{% endblock doc -%}

@@ -1,4 +1,4 @@
-import { mapState, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import Chart from 'chart.js';
 import utils from '../../../api/utils';
 
@@ -49,6 +49,11 @@ const chartMixin = {
       },
     };
   },
+  props: [
+    'chartType',
+    'results',
+    'resultAggregates',
+  ],
   methods: {
     createChart() {
       const chart = this.$refs.chart.getContext('2d');
@@ -108,11 +113,6 @@ const chartMixin = {
     },
   },
   computed: {
-    ...mapState('designs', [
-      'results',
-      'resultAggregates',
-      'chartType',
-    ]),
     ...mapGetters('designs', [
       'getChartYAxis',
     ]),

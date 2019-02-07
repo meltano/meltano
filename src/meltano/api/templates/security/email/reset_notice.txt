@@ -1,0 +1,1 @@
+{{ _('Your password has been reset') }}

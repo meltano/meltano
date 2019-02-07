@@ -2,20 +2,11 @@ import pytest
 import re
 
 from flask import url_for
-from meltano.api.app import app
-
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-
-    client = app.test_client()
-    yield client
 
 
 @pytest.fixture()
-def compile_models(client):
-    client.get("/repos/sync")
+def compile_models(api):
+    api.get("/repos/sync")
 
 
 def assertIsSQL(value: str) -> bool:
@@ -28,14 +19,14 @@ def assertIsSQL(value: str) -> bool:
 @pytest.mark.usefixtures("compile_models")
 class TestSqlController:
     @pytest.fixture
-    def post(self, client):
+    def post(self, app, api):
         def _post(payload):
-            return client.post(self.url("carbon", "region"), json=payload)
+            return api.post(self.url(app, "carbon", "region"), json=payload)
 
         return _post
 
     @classmethod
-    def url(cls, model, design):
+    def url(cls, app, model, design):
         with app.test_request_context():
             return url_for("sql.get_sql", model_name=model, design_name=design)
 

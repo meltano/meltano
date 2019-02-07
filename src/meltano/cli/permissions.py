@@ -2,7 +2,9 @@ import logging
 import click
 import sys
 
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.permissions import grant_permissions, SpecLoadingError
+from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
 
 
@@ -21,7 +23,10 @@ def permissions():
     required=True,
 )
 @click.option("--dry", help="Do not actually run, just check.", is_flag=True)
-def grant(db, spec, dry):
+@click.option(
+    "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
+)
+def grant(db, spec, dry, diff):
     """Grant the permissions provided in the provided specification file."""
     try:
         if not dry:
@@ -30,12 +35,36 @@ def grant(db, spec, dry):
 
         sql_commands = grant_permissions(db, spec, dry_run=dry)
 
-        click.secho()
-        click.secho("SQL Commands generated for given spec file:")
+        try:
+            project = Project.find()
+            tracker = GoogleAnalyticsTracker(project)
+            tracker.track_meltano_permissions_grant(db=db, dry=dry)
+        except ProjectNotFound as e:
+            pass
 
+        click.secho()
+        if diff:
+            click.secho(
+                "SQL Commands generated for given spec file (Full diff with both new and already granted commands):"
+            )
+        else:
+            click.secho("SQL Commands generated for given spec file:")
+        click.secho()
+
+        diff_prefix = ""
         for command in sql_commands:
-            click.secho(f"{command};", fg="green")
-            click.secho()
+            if command["already_granted"]:
+                if diff:
+                    fg = "cyan"
+                    diff_prefix = "  "
+                else:
+                    continue
+            else:
+                fg = "green"
+                if diff:
+                    diff_prefix = "+ "
+
+            click.secho(f"{diff_prefix}{command['sql']};", fg=fg)
     except SpecLoadingError as exc:
         for line in str(exc).splitlines():
             click.secho(line, fg="red")

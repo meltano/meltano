@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 from typing import Dict, List
 from sqlalchemy import create_engine
@@ -79,10 +80,16 @@ class SnowflakeConnector:
 
         return names
 
-    def show_tables(self) -> List[str]:
+    def show_tables(self, database: str = None, schema: str = None) -> List[str]:
         names = []
 
-        query = f"SHOW TERSE TABLES IN ACCOUNT"
+        if schema:
+            query = f"SHOW TERSE TABLES IN SCHEMA {schema}"
+        elif database:
+            query = f"SHOW TERSE TABLES IN DATABASE {database}"
+        else:
+            query = f"SHOW TERSE TABLES IN ACCOUNT"
+
         with self.engine.connect() as connection:
             results = connection.execute(query).fetchall()
 
@@ -94,3 +101,55 @@ class SnowflakeConnector:
                 )
 
         return names
+
+    def show_grants_to_role(self, role) -> List[str]:
+        grants = {}
+
+        query = f"SHOW GRANTS TO ROLE {SnowflakeConnector.snowflaky(role)}"
+        with self.engine.connect() as connection:
+            results = connection.execute(query).fetchall()
+
+            for result in results:
+                privilege = result["privilege"].upper()
+                granted_on = result["granted_on"].upper()
+
+                grants[privilege] = grants.get(privilege, {})
+                grants[privilege][granted_on] = grants[privilege].get(granted_on, [])
+                grants[privilege][granted_on].append(result["name"].upper())
+
+        return grants
+
+    def show_roles_granted_to_user(self, user) -> List[str]:
+        roles = []
+
+        query = f"SHOW GRANTS TO USER {SnowflakeConnector.snowflaky(user)}"
+        with self.engine.connect() as connection:
+            results = connection.execute(query).fetchall()
+
+            for result in results:
+                roles.append(result["role"].upper())
+
+        return roles
+
+    def snowflaky(name: str) -> str:
+        """
+        Convert an entity name to an object identifier that will most probably be
+        the proper name for Snoflake.
+
+        e.g. gitlab-ci --> "gitlab-ci"
+             527-INVESTIGATE$ISSUES.ANALYTICS.COUNTRY_CODES -->
+             --> "527-INVESTIGATE$ISSUES".ANALYTICS.COUNTRY_CODES;
+
+        Pronounced /snəʊfleɪkɪ/ like saying very fast snowflak[e and clarif]y
+        Permission granted to use snowflaky as a verb.
+        """
+        name_parts = name.split(".")
+        new_name_parts = []
+
+        for part in name_parts:
+            if re.match("^[0-9a-zA-Z_]*$", part) is None:
+                new_name_parts.append(f'"{part}"')
+            else:
+                new_name_parts.append(part)
+
+        return ".".join(new_name_parts)
