@@ -91,7 +91,9 @@ def gitlab_token_identity(token):
     elif not token_user:
         # no user has claimed this email yet
         # reserve it
-        token_user = users.create_user(email=client.user.email)
+        token_user = users.create_user(
+            username=client.user.username, email=client.user.email
+        )
         identity.user = token_user
         db.session.add(identity)
     elif identity.user == token_user:

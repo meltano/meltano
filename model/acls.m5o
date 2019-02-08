@@ -1,6 +1,6 @@
 roles {
   admin: {
-    users: ["dev:dev@meltano.com"] ${roles.regular.users}
+    users: ["dev"]
     acl {
       view {
         designs: ["region"]
@@ -18,10 +18,10 @@ roles {
   }
 
   regular {
-    users: ["mbergeron"]
+    users: ["dev"]
     acl: {
       view {
-        designs: ["region"]
+        designs: ["*"]
         reports: ["*"]
         dashboards: ["*"]
       }

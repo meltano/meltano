@@ -29,12 +29,8 @@ class ACLCompiler:
         # the compiled representation should be easy to use
         compiled = {
             "version": self.VERSION,
-            "acl": {
-                "view": {},
-                "create": {},
-                "delete": {},
-            },
-            "roles": {}
+            "acl": {"view": {}, "create": {}, "delete": {}},
+            "roles": {},
         }
 
         # start at the `roles` definition
@@ -45,10 +41,12 @@ class ACLCompiler:
             # perm: view | create | delete
             # target: designs | reports | dashboards
             # declaration: name of the shown entity | * (for all)
-            acls = ((perm, target, declaration)
-                    for perm, acl_def in role_def.get("acl", {}).items()
-                    for target, declarations in acl_def.items()
-                    for declaration in declarations)
+            acls = (
+                (perm, target, declaration)
+                for perm, acl_def in role_def.get("acl", {}).items()
+                for target, declarations in acl_def.items()
+                for declaration in declarations
+            )
 
             for perm, target, declaration in acls:
                 # _default will be treated as the fallback for

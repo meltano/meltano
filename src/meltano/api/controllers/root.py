@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, jsonify
-from flask_security import login_required
+from flask import Blueprint, render_template, jsonify, redirect
+from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
 from meltano.api.security import api_auth_required
@@ -25,9 +25,11 @@ def analyze():
 
 
 @root.route("/drop")
+@roles_required("admin")
 @api_auth_required
 def drop_it():
-    from .sqlhelper import SqlHelper
+    from .sql_helper import SqlHelper
 
     SqlHelper().reset_db()
-    return jsonify({"dropped_it": "like it's hot"})
+
+    return "Database reset.", 200

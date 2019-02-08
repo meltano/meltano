@@ -5,6 +5,7 @@ from pathlib import Path
 from .design_helper import DesignHelper
 from meltano.core.compiler.m5oc_file import M5ocFile
 
+
 class DesignMissingError(Exception):
     pass
 
