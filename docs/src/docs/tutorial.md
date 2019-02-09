@@ -1,6 +1,6 @@
 # Tutorial
 
-In this section, we will create and walk through a sample project using Meltano! If you haven't installed it, check out our [installation guide](/docs/#installation).
+In this section, we will create and walk through a sample project using Meltano! If you haven't installed it, check out our [installation guide](/docs/installation.html).
 
 ## Initialize a New Project
 
@@ -41,7 +41,7 @@ Now we are ready to analyze the data. We have provided some sample .m5o (Meltano
 First, go to the Meltano UI [http://localhost:5000](http://localhost:5000)
 
 ::: warning Note
-Follow the [installation](/docs/#installation) steps if Meltano UI is not running
+Follow the [installation](/docs/installation.html) steps if Meltano UI is not running
 :::
 
 Next, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
