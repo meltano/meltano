@@ -125,3 +125,6 @@ class Project:
 
     def __eq__(self, other):
         return self.root == other.root
+
+    def __hash__(self):
+        return self.root.__hash__()

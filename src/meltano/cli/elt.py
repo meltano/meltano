@@ -14,10 +14,10 @@ from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 @cli.command()
-@db_options
 @click.argument("extractor")
 @click.argument("loader")
 @click.option("--dry", help="Do not actually run.", is_flag=True)
@@ -25,7 +25,8 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-def elt(extractor, loader, dry, transform, job_id):
+@db_options
+def elt(extractor, loader, dry, transform, job_id, engine_uri):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
@@ -34,6 +35,7 @@ def elt(extractor, loader, dry, transform, job_id):
     """
     try:
         project = Project.find()
+        engine, _ = project_engine(project, engine_uri, default=True)
     except ProjectNotFound as e:
         raise click.ClickException(e)
 
@@ -56,14 +58,14 @@ def elt(extractor, loader, dry, transform, job_id):
     try:
         if transform != "only":
             click.echo("Running extract & load...")
-            singer_runner.perform(extractor, loader, dry_run=dry)
+            singer_runner.run(extractor, loader, dry_run=dry)
             click.secho("Extract & load complete!", fg="green")
         else:
             click.secho("Extract & load skipped.", fg="yellow")
 
         if transform != "skip":
             click.echo("Running transformation...")
-            dbt_runner.perform(dry_run=dry, models=extractor)
+            dbt_runner.run(dry_run=dry, models=extractor)
             click.secho("Transformation complete!", fg="green")
         else:
             click.secho("Transformation skipped.", fg="yellow")

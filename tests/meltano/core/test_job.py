@@ -6,23 +6,23 @@ from datetime import datetime
 
 class TestJob:
     def sample_job(self, payload={}):
-        return Job(elt_uri="elt://bizops/sample-elt", state=State.IDLE, payload=payload)
+        return Job(job_id="meltano:sample-elt", state=State.IDLE, payload=payload)
 
     def test_save(self, session):
-        subject = self.sample_job().save()
+        subject = self.sample_job().save(session)
 
         assert subject.id > 0
 
     def test_load(self, session):
         [session.add(self.sample_job({"key": i})) for i in range(0, 10)]
 
-        subjects = session.query(Job).filter_by(elt_uri="elt://bizops/sample-elt")
+        subjects = session.query(Job).filter_by(job_id="meltano:sample-elt")
 
         assert len(subjects.all()) == 10
         session.rollback()
 
     def test_transit(self, session):
-        subject = self.sample_job().save()
+        subject = self.sample_job().save(session)
 
         transition = subject.transit(State.RUNNING)
         assert transition == (State.IDLE, State.RUNNING)
@@ -33,10 +33,10 @@ class TestJob:
         subject.ended_at = datetime.utcnow()
 
     def test_run(self, session):
-        subject = self.sample_job().save()
+        subject = self.sample_job().save(session)
 
         # A successful run will mark the subject as SUCCESS and set the `ended_at`
-        with subject.run():
+        with subject.run(session):
             assert subject.state is State.RUNNING
             assert subject.ended_at is None
 
@@ -45,11 +45,11 @@ class TestJob:
 
     def test_run_failed(self, session):
         # A failed run will mark the subject as FAILED an set the payload['error']
-        subject = self.sample_job({"original_state": 1}).save()
+        subject = self.sample_job({"original_state": 1}).save(session)
         exception = Exception("This is a test.")
 
         with pytest.raises(Exception) as e:
-            with subject.run():
+            with subject.run(session):
                 raise exception
 
             # raise the same exception
