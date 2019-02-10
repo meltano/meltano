@@ -8,12 +8,21 @@ from meltano.core.compiler.acl_file import ACLFile
 from .models import db, User
 
 
-DEV_USER = {
-    "username": "dev",
-    "email": "dev@meltano.com",
-    "password": "meltano",
-    "confirmed_at": date(2000, 1, 1),
-}
+SEED_USERS = [
+    {
+        "username": "regular",
+        "email": "regular@meltano.com",
+        "password": "meltano",
+        "confirmed_at": date(2000, 1, 1),
+    },
+    {
+        "username": "admin",
+        "email": "admin@meltano.com",
+        "password": "meltano",
+        "confirmed_at": date(2000, 1, 1),
+    },
+]
+
 
 from flask_security.forms import LoginForm, RegisterForm
 from wtforms import StringField
@@ -157,8 +166,10 @@ security = Security()
 
 def create_dev_user():
     db.create_all()
-    if not users.get_user(DEV_USER["email"]):
-        users.create_user(**DEV_USER)
+
+    for user in SEED_USERS:
+        if not users.get_user(user["email"]):
+            users.create_user(**user)
 
     db.session.commit()
 

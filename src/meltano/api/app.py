@@ -14,8 +14,9 @@ from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler
 from . import config as default_config
 
-from meltano.core.compiler.acl_file import ACLFile
 from meltano.core.project import Project
+from meltano.core.compiler.acl_file import ACLFile
+from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 connector = ExternalConnector()
@@ -28,6 +29,10 @@ def create_app(config={}):
     app.config.update(**config)
 
     project = Project.find()
+
+    # Initial compilation
+    compiler = ProjectCompiler(project)
+    compiler.compile()
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
@@ -92,16 +97,17 @@ def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
     worker = MeltanoBackgroundCompiler(project)
-    worker.compile()
     worker.start()
 
-    app_config = kwargs.pop("app_config", {})
-    app = create_app(app_config)
-    from .security import create_dev_user
+    try:
+        app_config = kwargs.pop("app_config", {})
+        app = create_app(app_config)
+        from .security import create_dev_user
 
-    with app.app_context():
-        # TODO: alembic migration
-        create_dev_user()
+        with app.app_context():
+            # TODO: alembic migration
+            create_dev_user()
 
-    app.run(**kwargs)
-    worker.stop()
+        app.run(**kwargs)
+    finally:
+        worker.stop()

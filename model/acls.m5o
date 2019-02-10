@@ -1,6 +1,6 @@
 roles {
   admin: {
-    users: ["dev"]
+    users: ["admin"]
     acl {
       view {
         designs: ["region"]
@@ -18,7 +18,7 @@ roles {
   }
 
   regular {
-    users: ["dev"]
+    users: ["regular"]
     acl: {
       view {
         designs: ["*"]

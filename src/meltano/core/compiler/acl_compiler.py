@@ -19,7 +19,7 @@ class ACLCompiler:
         self.output_path = Path(output_dir, self.OUTPUT_NAME)
 
     def sources(self) -> Iterator[Path]:
-        return self.sources_dir.glob("*acls.m5o")
+        return self.sources_dir.glob("acls.m5o")
 
     def parse(self, input: PathBasis) -> Dict:
         """Parse single file to its compiled representation."""

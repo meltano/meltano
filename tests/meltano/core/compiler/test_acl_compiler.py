@@ -7,9 +7,7 @@ from meltano.core.compiler.acl_file import ACLFile
 
 @pytest.fixture
 def compiler(project):
-    compiler = ACLCompiler(
-        project.root.joinpath("model"), project.root.joinpath("model")
-    )
+    compiler = ACLCompiler(project.root.joinpath("model"), project.run_dir("model"))
 
     return compiler
 
