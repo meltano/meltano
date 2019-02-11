@@ -23,6 +23,7 @@ The MAU of the UI are called MAUI, this is pronounce like [the island](https://e
 ## Focus
 
 The focus of our team is to grow [MAUI](#maui) by 10% every week.
+A week is measured from Sunday to Saturday.
 Every improvement we make should be optimized by that.
 This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
 
