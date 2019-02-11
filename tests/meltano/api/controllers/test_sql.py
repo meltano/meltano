@@ -107,7 +107,7 @@ class TestSqlController:
 
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
-        # TODO ...
+        assert '"region.dnoregion",COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region"' in res.json["sql"]
 
     def assert_timeframe_query(self, post):
         payload = {
