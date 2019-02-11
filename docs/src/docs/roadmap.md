@@ -18,7 +18,7 @@ We track the Monthly Active Users (MAU) of three things:
 2. CLI
 3. UI
 
-The MAU of the UI are called MAUI, this is pronounce like [the island](https://en.wikipedia.org/wiki/Maui).
+The MAU of the UI are called MAUI, this is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
 
 ## Focus
 
