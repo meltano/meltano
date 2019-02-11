@@ -44,6 +44,14 @@ RESET_URL = SECURITY_URL_PREFIX + "/reset"
 CHANGE_URL = SECURITY_URL_PREFIX + "/change"
 CONFIRM_URL = SECURITY_URL_PREFIX + "/confirm"
 
+SECURITY_MSG_USERNAME_NOT_PROVIDED = ("You must provide a username.", "error")
+SECURITY_MSG_USERNAME_INVALID = (
+    "Username must be at least 6 characters long.",
+    "error",
+)
+SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
+
+
 # Flask-Mail
 # -----------------
 

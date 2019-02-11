@@ -71,7 +71,19 @@ def gitlab_token_identity(token):
         raise OAuthError("This account is not active.")
 
     user = current_user.is_authenticated and current_user
-    token_user = users.get_user(client.user.email)
+    token_user_email = users.get_user(client.user.email)
+    token_user_username = users.get_user(client.user.username)
+
+    if (
+        token_user_email
+        and token_user_username
+        and token_user_email != token_user_username
+    ):
+        raise OAuthError(
+            "This identity is already claimed by another user, please login."
+        )
+    else:
+        token_user = token_user_email or token_user_username
 
     identity = None
     try:

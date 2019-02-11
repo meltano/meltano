@@ -24,10 +24,10 @@ SEED_USERS = [
 ]
 
 
-from flask_security.forms import LoginForm, RegisterForm
+from flask_security.forms import LoginForm, RegisterForm, ConfirmRegisterForm
 from wtforms import StringField
 from wtforms.validators import Required, ValidationError, Length
-from flask_security.utils import _datastore
+from flask_security.utils import _datastore, get_message
 
 
 username_required = Required(message="USERNAME_NOT_PROVIDED")
@@ -44,10 +44,18 @@ class MeltanoLoginForm(LoginForm):
     email = StringField("Username or Email Address", validators=[Required()])
 
 
-class MeltanoRegisterFrom(RegisterForm):
+class UniqueUsernameMixin:
     username = StringField(
         "Username", validators=[username_required, username_validator, unique_username]
     )
+
+
+class MeltanoConfirmRegisterForm(ConfirmRegisterForm, UniqueUsernameMixin):
+    pass
+
+
+class MeltanoRegisterFrom(RegisterForm, UniqueUsernameMixin):
+    pass
 
 
 class FreeUser(AnonymousUser):
@@ -188,7 +196,11 @@ def unauthorized_callback():
 
 
 def init_app(app, project):
-    options = {"login_form": MeltanoLoginForm, "register_form": MeltanoRegisterFrom}
+    options = {
+        "login_form": MeltanoLoginForm,
+        "register_form": MeltanoRegisterFrom,
+        "confirm_register_form": MeltanoConfirmRegisterForm,
+    }
 
     if app.env == "development":
         options["anonymous_user"] = FreeUser
