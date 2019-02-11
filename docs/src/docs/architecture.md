@@ -228,7 +228,7 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
 
-### Access control
+### Access Control
 
 Meltano manages authorization using a role based access control scheme.
 
@@ -274,7 +274,7 @@ roles {
 }
 ```
 
-#### Available permissions
+#### Available Permissions
 
 Here is a list of currently available permissions.
 
