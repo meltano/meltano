@@ -24,7 +24,7 @@ def test_elt(request, project):
     assert result.exit_code == 2
 
     # exit cleanly when everything is fine
-    with patch.object(SingerRunner, "perform", return_value=None), patch.object(
+    with patch.object(SingerRunner, "run", return_value=None), patch.object(
         GoogleAnalyticsTracker, "track_data", return_value=None
     ), patch(
         "meltano.cli.elt.install_missing_plugins",
@@ -41,6 +41,6 @@ def test_elt(request, project):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 1
 
-    with patch.object(SingerRunner, "perform", side_effect=Exception):
+    with patch.object(SingerRunner, "run", side_effect=Exception):
         result = cli_runner.invoke(cli, PERFORM_TEST_ARGS)
         assert result.exit_code == 1

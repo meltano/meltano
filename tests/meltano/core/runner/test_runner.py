@@ -8,7 +8,7 @@ from meltano.core.job import Job, State
 from meltano.core.plugin import Plugin
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer import SingerTap, SingerTarget
-from meltano.core.runner.singer import SingerRunner
+from meltano.core.runner.singer import SingerRunner, SingerPayload
 from pathlib import Path
 
 
@@ -26,7 +26,7 @@ def create_plugin_files(config_dir: Path, plugin: Plugin):
 
 class TestSingerRunner:
     @pytest.fixture()
-    def subject(self, db_setup, mkdtemp, project):
+    def subject(self, session, mkdtemp, project):
         tap_config_dir = mkdtemp()
         target_config_dir = mkdtemp()
 
@@ -34,10 +34,11 @@ class TestSingerRunner:
         create_plugin_files(target_config_dir, TARGET)
 
         Job(
-            elt_uri=TEST_JOB_ID,
+            job_id=TEST_JOB_ID,
             state=State.SUCCESS,
+            payload_flags=SingerPayload.STATE,
             payload={"singer_state": {"bookmarks": []}},
-        ).save()
+        ).save(session)
 
         return SingerRunner(
             project,
@@ -113,7 +114,7 @@ class TestSingerRunner:
             target_process.wait.assert_awaited()
 
     @pytest.mark.asyncio
-    async def test_bookmark(self, subject, tap_process, target_process):
+    async def test_bookmark(self, subject, session, tap_process, target_process):
         lines = (
             b'{"type": "STATE", "value": {"line": 1}}\n',
             b'{"type": "STATE", "value": {"line": 2}}\n',
@@ -126,7 +127,7 @@ class TestSingerRunner:
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
         target_process.stdout.readline = CoroutineMock(side_effect=lines)
 
-        with subject.job.run():
+        with subject.job.run(session):
             await subject.bookmark(target_process.stdout)
 
         # assert the STATE's `value` was saved

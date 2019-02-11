@@ -10,6 +10,16 @@ Meltano currently follows a weekly release schedule.
 
 For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md). 
 
+## Focus
+
+We track the Monthly Active Users (MAU) of three things:
+
+1. Website
+2. CLI
+3. UI
+
+Our focus is to grow the MAU of the UI (which we call Maui) by 20% every two weeks.
+
 ## Monetization
 
 We are building Meltano to solve a problem that software companies share: How to acquire the highest-value customers at the lowest cost of acquisition? 
