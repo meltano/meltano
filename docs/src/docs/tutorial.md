@@ -57,7 +57,7 @@ Lastly, we'll query and explore the data:
 
 ## Upcoming Tutorials
 
-Additional tutorials we are working on include:
+Looking for more advanced tutorials? You can look forward to the following tutorials in the future:
 
 - Salesforce
 - GitLab Runners
