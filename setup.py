@@ -25,7 +25,7 @@ requires = [
     'flask',
     'flask-cors',
     'flask-sqlalchemy',
-    'flask-security @ git+https://github.com/meltano/flask-security.git@v3.0.0/meltano.0.1.0',
+    'meltano-flask-security',
     'pyhocon',
     'python-dotenv',
     'python-gitlab',
