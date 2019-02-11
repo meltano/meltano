@@ -373,11 +373,11 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
-import Dropdown from '../generic/Dropdown';
-import ResultTable from './ResultTable';
-import SelectDropdown from '../generic/SelectDropdown';
-import YesNoFilter from '../filters/YesNoFilter';
-import Chart from './Chart';
+import Dropdown from '../components/generic/Dropdown';
+import ResultTable from '../components/designs/ResultTable';
+import SelectDropdown from '../components/generic/SelectDropdown';
+import YesNoFilter from '../components/filters/YesNoFilter';
+import Chart from '../components/designs/Chart';
 
 export default {
   name: 'Design',
