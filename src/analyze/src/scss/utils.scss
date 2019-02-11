@@ -1,0 +1,19 @@
+/* Utilities - Bulma Layout Additions */
+
+.column-flex-v {
+  display: flex;
+  align-items: center;
+}
+
+/* Utilities - General */
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.text-selection-off {
+  user-select: none;
+}
