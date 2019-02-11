@@ -7,18 +7,17 @@ Before you get started, there are a couple of things your environment needs:
 - [Git](https://git-scm.com/)
 - [Docker](https://www.docker.com/get-started)
 - [Python 3.6.1](https://realpython.com/installing-python/)
-- [pip 18.1](https://pypi.org/project/pip/)
+- [pip](https://pypi.org/project/pip/)
 
 ::: warning
-If you want to install Meltano in a virtual environment: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment. 
-Also, make sure the installed `pip` is at least version **18.1**; run `pip install --upgrade pip` inside the virtual environment to make sure it is up to date.  
+If you want to install Meltano in a virtual environment: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment.
 
 See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
 :::
 
 ## Instructions
 
-::: tip 
+::: tip
 If you're having issues with the `pip` command, try `pip3` instead!
 :::
 
@@ -26,7 +25,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 
 Let's make sure our requirements are up to date:
 
-#### Python  
+#### Python
 You may refer to https://realpython.com/installing-python/ for platform specific installation instructions.
 
 ```
@@ -34,12 +33,12 @@ $ python --version
 Python 3.6.1
 ```
 
-#### pip  
+#### pip
 Run `pip install --upgrade pip` to update `pip` to the latest version.
 
 ```bash
 $ pip --version
-pip 18.1 from … (python 3.6)
+pip 10.0.1 from … (python 3.6)
 ```
 
 ### Installation
