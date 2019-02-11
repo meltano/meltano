@@ -107,6 +107,7 @@ class TestSqlController:
 
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
+        assert "region.count" in res.json["aggregates"]
         assert (
             '"region.dnoregion",COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region"'
             in res.json["sql"]
