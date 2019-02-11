@@ -95,7 +95,7 @@ class TestSqlController:
             "timeframes": [],
             "joins": [
                 {"name": "entry", "columns": [], "aggregates": [], "timeframes": []},
-                {"name": "generationmix", "columns": [], "aggregates": []}
+                {"name": "generationmix", "columns": [], "aggregates": []},
             ],
             "order": None,
             "limit": 3,
@@ -107,7 +107,10 @@ class TestSqlController:
 
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
-        assert '"region.dnoregion",COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region"' in res.json["sql"]
+        assert (
+            '"region.dnoregion",COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region"'
+            in res.json["sql"]
+        )
 
     def assert_timeframe_query(self, post):
         payload = {
