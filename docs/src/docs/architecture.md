@@ -228,6 +228,62 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
 
+### Access control
+
+Meltano manages authorization using a role based access control scheme.
+
+> Note: Meltano uses HOCON as its configuration format;
+> see https://github.com/lightbend/config/blob/master/HOCON.md for more details.
+
+Roles are defined in the `model/acls.m5o` file, as a descriptive permission layout.
+
+```json
+# namespace
+roles {
+
+    # the role name must be unique
+    admin {
+
+      # list the users that are member of this role
+      # users are referenced by `username`
+      users: [
+          "user1",
+          "user2",
+      ]
+
+      # the Access Control List (ACL) of this role
+      acl {
+
+          # permissions name
+          view {
+
+              # the permission context, defines upon
+              # what this permission applies
+
+              # contexts are referenced by name (* for all)
+              designs: ["*"]
+              reports: ["admin_report_1"]
+              …
+          }
+
+          …
+      }
+    }
+
+    …
+}
+```
+
+#### Available permissions
+
+Here is a list of currently available permissions.
+
+|        | Designs | Collections | Reports | Dashboards |
+|--------|:-------:|:-----------:|:-------:|:----------:|
+| View   |         | ✓           | ✓       | ✓          |
+| Create |         |             | ✓       | ✓          |
+| Delete |         |             | ✓       | ✓          |
+
 ### Docker images
 
 Meltano provides the following docker images:
