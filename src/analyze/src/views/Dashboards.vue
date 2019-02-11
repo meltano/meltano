@@ -83,7 +83,7 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import Chart from '../designs/Chart';
+import Chart from '../components/designs/Chart';
 
 export default {
   name: 'Dashboards',
