@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Breaks
 * Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
+* URL routing updates ('/model' to '/files', removed currently unused '/extract', '/load', '/transform' and '/project/new')
 
 
 ## 0.9.0 - (2019-02-05)
