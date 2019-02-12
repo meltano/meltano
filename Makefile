@@ -43,7 +43,7 @@ init_db:
 	${DCR} api python -m meltano.api.init_db
 
 # pip related
-TO_CLEAN  = ./build ./dist ./*.pyc ./*.tgz ./*.egg-info
+TO_CLEAN  = ./build ./dist ./*.egg-info
 # node_modules
 TO_CLEAN += ./${MELTANO_API}/static/*
 TO_CLEAN += ./${MELTANO_API}/templates/*
@@ -51,9 +51,10 @@ TO_CLEAN += ./${MELTANO_ANALYZE}/node_modules
 TO_CLEAN += ./${MELTANO_ANALYZE}/dist
 
 clean:
-	# rm is run inside a container to support cross-platform volume mount permissions.
-	# see: https://github.com/moby/moby/issues/2259
 	rm -rf ${TO_CLEAN}
+
+clean_bundle_models:
+	rm -rf ${MELTANO_CORE_BUNDLE}/model/*
 
 clean_all: clean
 	docker rmi -f ${base_image_tag}
@@ -126,7 +127,7 @@ ${MELTANO_CORE_BUNDLE}/model/%:
 	mkdir -p $(@D)
 	cp model/$* $@
 
-bundle_models: $(MODELS_TARGETS)
+bundle_models: clean_bundle_models $(MODELS_TARGETS)
 
 bundle_ui: ui
 	mkdir -p src/meltano/api/templates && \
@@ -209,7 +210,7 @@ show_lint: show_lint_black show_lint_eslint
 
 # Makefile Related Tasks
 # ======================
-# 
+#
 # - `make explain_makefile` will bring up a web server with this makefile annotated.
 explain_makefile:
 	docker stop explain_makefile || echo 'booting server'
