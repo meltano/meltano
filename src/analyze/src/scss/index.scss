@@ -24,6 +24,7 @@ $primary-invert: $pink-invert;
 */
 
 /* Bulma framework styles */
+@import './bulma-preset-overrides.scss';
 @import "../../node_modules/bulma/bulma";
 
 /* Meltano dynamic styles */
@@ -32,4 +33,5 @@ $primary-invert: $pink-invert;
 
 /* Meltano app styles */
 @import './main.scss';
+@import './elements.scss';
 @import './utils.scss';
