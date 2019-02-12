@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.10.0 - (2019-02-12)
+---
+
+### New
 * Add gunicorn support for Meltano UI as a WSGI application - [!377](https://gitlab.com/meltano/meltano/merge_requests/377)
 * Meltano will now generate the minimal joins when building SQL queries  - [!382](https://gitlab.com/meltano/meltano/merge_requests/382)
 
@@ -19,8 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
-
-### Breaks
 
 
 ## 0.9.0 - (2019-02-05)
