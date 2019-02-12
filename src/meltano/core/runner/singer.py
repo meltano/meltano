@@ -43,10 +43,6 @@ class SingerRunner(Runner):
     def database(self):
         return self.config.get("database", "default")
 
-    @property
-    def session(self):
-        return self._session_cls.object_session(self.job)
-
     def stop(self, process, **wait_args):
         while True:
             try:
@@ -100,10 +96,10 @@ class SingerRunner(Runner):
                 f"Subprocesses didn't exit cleanly: tap({tap_code}), target({target_code})"
             )
 
-    def restore_bookmark(self, tap: PluginInvoker):
+    def restore_bookmark(self, session, tap: PluginInvoker):
         # the `state.json` is stored in the database
         finder = JobFinder(self.job_id)
-        state_job = finder.latest_with_payload(self.session, flags=SingerPayload.STATE)
+        state_job = finder.latest_with_payload(session, flags=SingerPayload.STATE)
 
         if state_job and "singer_state" in state_job.payload:
             logging.info(f"Found state from {state_job.started_at}.")
@@ -142,8 +138,7 @@ class SingerRunner(Runner):
         logging.info(f"\textractor: {extractor.name} at '{tap_exec}'")
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
-    def run(self, extractor: str, loader: str, dry_run=False, session=None):
-        session = session or self._session_cls()
+    def run(self, extractor: str, loader: str, dry_run=False):
         tap = self.config_service.get_plugin(PluginType.EXTRACTORS, extractor)
         target = self.config_service.get_plugin(PluginType.LOADERS, loader)
 
@@ -154,7 +149,11 @@ class SingerRunner(Runner):
         if dry_run:
             return self.dry_run(tap, target)
 
-        with self.job.run(session):
-            self.restore_bookmark(extractor)
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.invoke(extractor, loader))
+        try:
+            session = self._session_cls()
+            with self.job.run(session):
+                self.restore_bookmark(session, extractor)
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(self.invoke(extractor, loader))
+        finally:
+            session.close()

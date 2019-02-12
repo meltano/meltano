@@ -135,7 +135,7 @@ class TestSingerRunner:
 
         # test the restore
         tap_invoker = PluginInvoker(subject.project, TAP)
-        subject.restore_bookmark(tap_invoker)
+        subject.restore_bookmark(session, tap_invoker)
         state_json = json.dumps(subject.job.payload["singer_state"])
         assert tap_invoker.files["state"].exists()
         assert tap_invoker.files["state"].open().read() == state_json
