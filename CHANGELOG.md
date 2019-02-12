@@ -13,13 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-<<<<<<< HEAD
 * Meltano will correctly source the `.env`
-- fixed charts to render as previously they were blank
-=======
-- fixed charts to render as previously they were blank
-* Meltano will correctly source the `.env`
->>>>>>> conflict resolve saved properly
+* fixed charts to render as previously they were blank
 
 ### Breaks
 * Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
