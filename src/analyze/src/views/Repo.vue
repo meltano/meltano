@@ -90,7 +90,6 @@
       <div v-if="!activeView.populated">
         <div
           class="empty-state
-          content
           has-background-white
           has-text-centered
           is-size-4
@@ -99,10 +98,10 @@
         </div>
       </div>
       <div v-if="hasMarkdown">
-        <div class="content has-background-white" v-html="activeView.file"></div>
+        <div class="has-background-white" v-html="activeView.file"></div>
       </div>
       <div class="is-paddingless code-container" v-else-if="hasCode">
-        <div class="content has-background-white">
+        <div class="has-background-white">
           <pre>{{activeView.file | pretty}}</pre>
         </div>
       </div>
@@ -171,20 +170,20 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.content {
-  padding: 10px;
-  position: fixed;
-  top: 52px;
-  left: 430px;
-  right: 0;
-  bottom: 0;
-  overflow: scroll;
-  z-index: 1;
-}
+// .content {
+//   padding: 10px;
+//   position: fixed;
+//   top: 52px;
+//   left: 430px;
+//   right: 0;
+//   bottom: 0;
+//   overflow: scroll;
+//   z-index: 1;
+// }
 
 .code-container {
   // to overcome the important on paddingless
-  padding-left: 1rem !important;
+  // padding-left: 1rem !important;
 }
 
 .error-desc-cont {
