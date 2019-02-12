@@ -9,14 +9,6 @@
   @include courier;
 }
 
-.fixed-sidebar {
-  position: fixed;
-  overflow: scroll;
-  top: 52px;
-  bottom: 0;
-  left: 0;
-}
-
 .is-expandable::after {
   content: "-";
   width: 20px;
