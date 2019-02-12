@@ -159,7 +159,7 @@
       </nav>
       <div class="column is-three-quarters">
         <div class="columns">
-          <div class="column column-flex-v">
+          <div class="column is-one-quarter column-flex-v">
             <div class="is-grouped is-pulled-left">
               <div v-if="activeReport.name">{{activeReport.name}}</div>
               <div v-if="!activeReport.name"><em>Untitled Report</em></div>
