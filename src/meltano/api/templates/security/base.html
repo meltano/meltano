@@ -36,6 +36,17 @@
       {% block scripts %}
       {%- endblock scripts %}
     {%- endblock body %}
+
+    <!-- TODO Standardize on SSOT once authentication is first-class with main UI -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132758957-2"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+
+      gtag('config', 'UA-132758957-2');
+    </script>
+
   </body>
   {%- endblock html %}
 </html>

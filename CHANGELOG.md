@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add gunicorn support for Meltano UI as a WSGI application - [!377](https://gitlab.com/meltano/meltano/merge_requests/377)
 
 ### Changes
+* Add analytics to authentication page
 
 ### Fixes
 * Meltano will correctly source the `.env`
