@@ -2,6 +2,8 @@ import logging
 from enum import Enum
 from copy import deepcopy
 from typing import Dict
+import networkx as nx
+from networkx.readwrite import json_graph
 
 from .analysis_helper import AnalysisHelper
 from collections import namedtuple
@@ -28,7 +30,6 @@ def _(node: TokenList, executor, depth=0):
 def _(node: Comparison, executor, depth=0):
     logging.debug(f"Visiting node {node}")
     executor.comparison(node, depth)
-    print(node)
 
 
 class InvalidIdentifier(Exception):
@@ -39,19 +40,24 @@ Identifier = namedtuple("Identifier", ("schema", "table", "field", "alias"))
 
 DimensionGroup = namedtuple("DimensionGroup", ("dimensions", "group"))
 
+ComparisonFields = namedtuple("ComparisonFields", ("left", "right"))
+
 
 class PypikaJoinExecutor:
     def __init__(self, design, join):
         self.design = design
         self.join = join
         self.result = None
+        self.comparison_fields = None
+
+    def set_comparison_fields(self, left, right):
+        self.comparison_fields = ComparisonFields(left, right)
 
     def comparison(self, node, depth):
         table = self.join["related_table"]
 
         left = self.parse_identifier(node.left)
         right = self.parse_identifier(node.right)
-
         left_alias = self.join["name"] if left.table == self.join["name"] else None
         right_alias = self.join["name"] if right.table == self.join["name"] else None
 
@@ -72,6 +78,8 @@ class PypikaJoinExecutor:
             ),
             right.field,
         )
+
+        self.set_comparison_fields(left, right)
 
         # TODO: do a stack based approach to handle complex cases
         self.result = left_field == right_field
@@ -125,6 +133,15 @@ class DesignHelper:
     def tables(self):
         return deepcopy(self.design["tables"])
 
+    @property
+    def base_table_name(self):
+        return self.design["related_table"]["name"]
+
+    def joins_for_table(self, table_name: str):
+        # get the graph for networkx
+        G = json_graph.node_link_graph(self.design["graph"])
+        return nx.shortest_path(G, source=self.base_table_name, target=table_name)
+
     def join_for(self, join_selection: Dict):
         join = self.get_join(self, join_selection["name"])
         table = join["related_table"]
@@ -162,6 +179,7 @@ class DesignHelper:
             "db_table": db_table,
             "on": join_executor.result,
             "join": join,
+            "name": join_selection["name"],
             **selected,
         }
 

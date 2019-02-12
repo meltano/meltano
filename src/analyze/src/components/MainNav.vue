@@ -17,7 +17,6 @@
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
-
         <router-link to="/" class="navbar-item navbar-child">
           Files
         </router-link>

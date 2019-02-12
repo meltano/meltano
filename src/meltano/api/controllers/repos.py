@@ -94,7 +94,7 @@ def lint_all(compile):
     models = m5o_parse.parse()
     if compile:
         m5o_parse.compile(models)
-    return jsonify({"result": True})
+    return jsonify({"result": True, "hi": "hello"})
 
 
 @reposBP.errorhandler(MeltanoAnalysisFileParserError)

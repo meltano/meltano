@@ -16,6 +16,7 @@ def assertIsSQL(value: str) -> bool:
     )
 
 
+@pytest.mark.usefixtures("project")
 @pytest.mark.usefixtures("compile_models")
 class TestSqlController:
     @pytest.fixture
@@ -35,6 +36,9 @@ class TestSqlController:
         self.assert_column_query(post)
         self.assert_aggregate_query(post)
         self.assert_timeframe_query(post)
+        self.assert_join_graph_no_dependencies(post)
+        self.assert_join_graph_one_dependency(post)
+        self.assert_join_graph_two_dependency(post)
 
     def assert_empty_query(self, post):
         """with no columns no query should be generated"""
@@ -145,3 +149,65 @@ class TestSqlController:
         assertIsSQL(res.json["sql"])
         assert 'EXTRACT(\'Week\' FROM "entry"."from") "from.week"' in res.json["sql"]
         assert re.search(r'GROUP BY.*"from.week"', res.json["sql"])
+
+    def assert_join_graph_no_dependencies(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        assert (
+            'SELECT "region"."dnoregion" "region.dnoregion" FROM "region" "region" GROUP BY "region.dnoregion" LIMIT 3;'
+            in res.json["sql"]
+        )
+
+    def assert_join_graph_one_dependency(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [{"name": "entry", "columns": ["forecast"]}],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        sql = 'SELECT "region"."dnoregion" "region.dnoregion","entry"."forecast" "entry.forecast" FROM "region" "region" JOIN "entry" "entry" ON "region"."id"="entry"."region_id" GROUP BY "region.dnoregion","entry.forecast" LIMIT 3;'
+        assert sql in res.json["sql"]
+
+    def assert_join_graph_two_dependency(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [
+                {"name": "entry", "columns": ["forecast"]},
+                {"name": "generationmix", "columns": ["perc", "fuel"]},
+            ],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        sql = 'SELECT "region"."dnoregion" "region.dnoregion","entry"."forecast" "entry.forecast","generationmix"."fuel" "generationmix.fuel","generationmix"."perc" "generationmix.perc" FROM "region" "region" JOIN "entry" "entry" ON "region"."id"="entry"."region_id" JOIN "generationmix" "generationmix" ON "entry"."id"="generationmix"."entry_id" GROUP BY "region.dnoregion","entry.forecast","generationmix.fuel","generationmix.perc" LIMIT 3;'
+        assert sql in res.json["sql"]
