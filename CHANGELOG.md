@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
+* Fixed Analyze button groupd CSS to align as a single row
 
 ### Breaks
 * Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
