@@ -10,6 +10,7 @@ from . import (
     ui,
     permissions,
     select,
+    version
 )
 
 
