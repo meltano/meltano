@@ -33,6 +33,7 @@ class TestSqlController:
     def test_get_sql(self, post):
         self.assert_empty_query(post)
         self.assert_column_query(post)
+        self.assert_aggregate_query(post)
         self.assert_timeframe_query(post)
 
     def assert_empty_query(self, post):
@@ -83,6 +84,34 @@ class TestSqlController:
         assert '"entry.forecast"' in res.json["sql"]
         assert '"generationmix.perc"' in res.json["sql"]
         assert '"generationmix.fuel"' in res.json["sql"]
+
+    def assert_aggregate_query(self, post):
+        """with aggregates they should be included in the query"""
+
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": ["count"],
+            "timeframes": [],
+            "joins": [
+                {"name": "entry", "columns": [], "aggregates": [], "timeframes": []},
+                {"name": "generationmix", "columns": [], "aggregates": []},
+            ],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        assertIsSQL(res.json["sql"])
+        assert "region.count" in res.json["aggregates"]
+        assert (
+            '"region.dnoregion",COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region"'
+            in res.json["sql"]
+        )
 
     def assert_timeframe_query(self, post):
         payload = {

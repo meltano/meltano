@@ -80,22 +80,27 @@ def get_sql(model_name, design_name):
     columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
     names = sql_dict["names"]
+    db_table = sql_dict["db_table"]
+
+    base_dict = {"sql": outgoing_sql, "error": False}
+    base_dict["column_headers"] = column_headers
+    base_dict["names"] = names
+    base_dict["aggregates"] = sqlHelper.get_aliases_from_aggregates(
+        aggregates, db_table
+    )
 
     if not incoming_json["run"]:
-        return jsonify({"sql": outgoing_sql})
+        return jsonify(base_dict)
 
     connection_name = m5oc.connection("connection")
     results = sqlHelper.get_query_results(connection_name, outgoing_sql)
 
-    base_dict = {"sql": outgoing_sql, "results": results, "error": False}
+    base_dict["results"] = results
     if not len(results):
         base_dict["empty"] = True
     else:
         base_dict["empty"] = False
-        base_dict["column_headers"] = column_headers
-        base_dict["names"] = names
         base_dict["keys"] = list(results[0].keys())
-        base_dict["aggregates"] = sqlHelper.get_names(aggregates)
 
     return jsonify(base_dict)
 

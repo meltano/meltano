@@ -73,15 +73,15 @@ const chartMixin = {
       }
       this.chart.data.labels = [];
       this.chart.data.datasets = [];
-      const resultsKeys = Object.keys(this.results[0]);
+      const fields = Object.keys(this.results[0]);
       const aggregates = this.resultAggregates;
-      const diff = utils.difference(resultsKeys, aggregates);
+      const columns = utils.difference(fields, aggregates);
       const dataSets = {};
       this.results.forEach((r) => {
         let label = [];
-        resultsKeys.forEach((k, i) => {
+        fields.forEach((k, i) => {
           // isn't this just aggregates?
-          if (!diff.includes(k)) {
+          if (!columns.includes(k)) {
             const color = utils.getColor(i);
             if (!dataSets[k]) {
               dataSets[k] = {
