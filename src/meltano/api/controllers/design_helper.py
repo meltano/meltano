@@ -135,13 +135,12 @@ class DesignHelper:
 
     @property
     def base_table_name(self):
-      return self.design["related_table"]["name"]
-    
+        return self.design["related_table"]["name"]
+
     def joins_for_table(self, table_name: str):
         # get the graph for networkx
         G = json_graph.node_link_graph(self.design["graph"])
-        return nx.shortest_path(G,source=self.base_table_name,target=table_name)
-
+        return nx.shortest_path(G, source=self.base_table_name, target=table_name)
 
     def join_for(self, join_selection: Dict):
         join = self.get_join(self, join_selection["name"])

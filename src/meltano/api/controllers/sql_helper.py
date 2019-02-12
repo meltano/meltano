@@ -114,11 +114,11 @@ class SqlHelper:
             aggregates += AnalysisHelper.aggregates(j["aggregates"], j["db_table"])
             timeframe_periods += AnalysisHelper.periods(j["timeframes"], j["db_table"])
             if j.get("columns") or j.get("aggregates") or j.get("timeframes"):
-              join_deps = design.joins_for_table(j["name"])
-              for i in range(0, len(join_deps)):
-                if len(join_order) < i + 1:
-                  join_order.append(set())
-                join_order[i].add(join_deps[i])
+                join_deps = design.joins_for_table(j["name"])
+                for i in range(0, len(join_deps)):
+                    if len(join_order) < i + 1:
+                        join_order.append(set())
+                    join_order[i].add(join_deps[i])
 
         # flatten
         join_order = [name for joins in join_order for name in joins]
@@ -234,4 +234,6 @@ class SqlHelper:
         db.session.add(settings)
         db.session.commit()
         return jsonify({"dropped_it": "like_its_hot"})
-''
+
+
+""

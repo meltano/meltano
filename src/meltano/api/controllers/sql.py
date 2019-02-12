@@ -76,6 +76,7 @@ def get_db_engine(connection_name):
     except StopIteration:
         raise ConnectionNotFound(connection_name)
 
+
 @sqlBP.before_request
 @api_auth_required
 def before_request():
