@@ -19,6 +19,11 @@ We are looking over the following toolkits to build the Meltano ML workflow:
 
 ## Training
 
+We are looking over the following toolkits to build the training workflow:
+
+  - [Ludwig](https://uber.github.io/ludwig/)
+  - [Pachyderm](https://www.pachyderm.io/)
+  
 Meltano aims at making your training set versionable and re-usable.
 
 ## Validating
