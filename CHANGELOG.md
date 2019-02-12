@@ -14,13 +14,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 * Add analytics to authentication page
+* Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
 
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
 
 ### Breaks
-* Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
 
 
 ## 0.9.0 - (2019-02-05)
