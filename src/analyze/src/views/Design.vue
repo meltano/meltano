@@ -12,7 +12,7 @@
           </p>
         </div>
 
-        <div class="inner-scroll text-selection-off">
+        <div class="text-selection-off">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
             <template v-for="join in design.joins">
@@ -228,6 +228,7 @@
           </div>
         </div>
       </div>
+
       <template v-if="design.has_filters">
         <div class="has-background-grey-darker
           section-header
@@ -333,39 +334,39 @@
 
       <!-- results/SQL tab -->
       <div class="has-background-grey-darker
-      section-header
-      has-text-white-bis
-      is-expandable"
-      @click="toggleDataOpen"
-      :class="{'is-collapsed': !dataOpen}">Data</div>
+        section-header
+        has-text-white-bis
+        is-expandable"
+        @click="toggleDataOpen"
+        :class="{'is-collapsed': !dataOpen}">Data</div>
       <template v-if="dataOpen">
-      <div class="notification is-danger" v-if="hasSQLError">
-        <button class="delete" @click="resetErrorMessage"></button>
-        <ul>
-          <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
-        </ul>
-      </div>
-      <div class="has-background-white-ter data-toggles">
-        <div class="field is-pulled-right">
-          <div class="control">
-            <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+        <div class="notification is-danger" v-if="hasSQLError">
+          <button class="delete" @click="resetErrorMessage"></button>
+          <ul>
+            <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+          </ul>
+        </div>
+        <div class="has-background-white-ter data-toggles">
+          <div class="field is-pulled-right">
+            <div class="control">
+              <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+            </div>
+          </div>
+          <div class="buttons has-addons">
+            <span class="button"
+                  :class="{'is-active': isResultsTab}"
+                  @click="setCurrentTab('results')">Results ({{numResults}})</span>
+            <span class="button"
+                  :class="{'is-active': isSQLTab}"
+                  @click="setCurrentTab('sql')">SQL</span>
           </div>
         </div>
-        <div class="buttons has-addons">
-          <span class="button"
-                :class="{'is-active': isResultsTab}"
-                @click="setCurrentTab('results')">Results ({{numResults}})</span>
-          <span class="button"
-                :class="{'is-active': isSQLTab}"
-                @click="setCurrentTab('sql')">SQL</span>
+        <ResultTable></ResultTable>
+        <div>
+          <div class="" v-if="isSQLTab && currentSQL">
+            <code>{{formattedSql}}</code>
+          </div>
         </div>
-      </div>
-      <ResultTable></ResultTable>
-      <div>
-        <div class="" v-if="isSQLTab && currentSQL">
-          <code>{{formattedSql}}</code>
-        </div>
-      </div>
       </template>
     </div>
 
@@ -651,14 +652,6 @@ code {
 }
 .filter-item {
   padding: 1.5rem;
-}
-
-.inner-scroll {
-  position: relative;
-  height: calc(100vh - 252px);
-  border-left: 1px solid #dbdbdb;
-  border-right: 1px solid #dbdbdb;
-  overflow: scroll;
 }
 
 .selected-filters {
