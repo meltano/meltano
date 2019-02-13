@@ -20,7 +20,6 @@ const state = {
   resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
-  selectedColumns: {},
   currentSQL: '',
   filtersOpen: false,
   dataOpen: true,
@@ -220,7 +219,6 @@ const actions = {
     state.currentDesign = design;
     designApi.index(model, design).then((response) => {
       commit('setDesign', response.data);
-      commit('selectedColumns', response.data.related_table.columns);
     });
     designApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
@@ -581,12 +579,6 @@ const mutations = {
 
   toggleCollapsed(_, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
-  },
-
-  selectedColumns(_, columns) {
-    Object.keys(columns).forEach((column) => {
-      state.selectedColumns[column.unique_name] = false;
-    });
   },
 
   setDesign(_, designData) {
