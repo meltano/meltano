@@ -1,15 +1,15 @@
 <template>
-<div class="container">
-  <div class="columns">
-    <aside class="menu column is-one-quarter section has-background-light">
+  <router-view-layout>
+
+    <div slot='left'>
       <p class="menu-label">
         Database
       </p>
       <ul class="menu-list">
         <li><a>Connections</a></li>
       </ul>
-    </aside>
-    <div class="column section">
+    </div>
+    <div slot="right">
       <section class="section">
         <p v-if="!hasConnections">No Database Connections</p>
         <div class="columns is-multiline is-mobile">
@@ -152,15 +152,15 @@
         </div>
       </section>
     </div>
-  </div>
-</div>
+
+  </router-view-layout>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Settings',
-
   data() {
     return {
       connectionName: '',
@@ -174,11 +174,12 @@ export default {
       connectionSqlitePath: '',
     };
   },
-
   created() {
     this.$store.dispatch('settings/getSettings');
   },
-
+  components: {
+    RouterViewLayout,
+  },
   computed: {
     ...mapState('settings', [
       'settings',
@@ -188,7 +189,6 @@ export default {
       'isConnectionDialectSqlite',
     ]),
   },
-
   methods: {
     saveConnection() {
       this.$store.dispatch('settings/saveConnection', {
