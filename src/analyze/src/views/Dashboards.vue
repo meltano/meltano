@@ -82,8 +82,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import Chart from '../components/designs/Chart';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import Chart from '../components/designs/Chart';
 
 export default {
   name: 'Dashboards',
