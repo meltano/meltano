@@ -23,7 +23,7 @@ requires = [
     'snowflake-connector-python',
     'snowflake-sqlalchemy',
     'sqlalchemy',
-    'flask',
+    'flask>=1.0.2',
     'flask-cors',
     'flask-sqlalchemy',
     'meltano-flask-security',
