@@ -118,11 +118,13 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '@/scss/bulma-preset-overrides.scss';
+
 .navbar.is-info {
-  background: #0F3B66;
+  background: $primary;
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken(#0F3B66, 20%);
+    background: darken($primary, 20%);
   }
 }
 .navbar-item .navbar-child {
