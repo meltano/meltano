@@ -15,9 +15,6 @@ meltano init carbon
 # Change directory into your new carbon project
 cd carbon
 
-# Start Docker container to setup logging
-docker-compose up -d
-
 # Let's see what extractors and loaders are available
 meltano discover all
 
