@@ -3,7 +3,8 @@
     <aside class="column is-one-quarter vh-scrollable has-background-white-bis">
       <div class='box is-radiusless is-shadowless'>
         <slot name="left"></slot>
-      </div>    </aside>
+      </div>
+    </aside>
     <section class="column is-three-quarters vh-scrollable">
       <div class='box is-radiusless is-shadowless'>
         <slot name="right"></slot>
