@@ -27,6 +27,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 * Add analytics to authentication page
 * Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
+* Removed manual `source .env` step in favor of it running automatically
 
 ### Fixes
 * Meltano will correctly source the `.env`

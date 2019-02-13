@@ -101,8 +101,6 @@ class ProjectInitService:
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.echo(f"🏃\tRun", nl=False)
-        click.secho(" source .env", fg="green")
         click.echo("Try it out:")
         click.secho("🏃\tRun", nl=False)
         click.secho(" meltano add extractor tap-carbon-intensity", fg="green")
