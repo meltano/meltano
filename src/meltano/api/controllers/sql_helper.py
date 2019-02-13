@@ -214,7 +214,8 @@ class SqlHelper:
             q = q.orderby(orderby, order=order)
 
         q = q.limit(limit)
-        return str(q) + ";"
+        q = str(q)
+        return q + ";" if len(q) > 0 else ""
 
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)

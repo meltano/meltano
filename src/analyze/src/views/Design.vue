@@ -221,9 +221,10 @@
               </div>
             </Dropdown>
 
-            <a class="button is-primary"
+            <button class="button is-primary"
                 :class="{'is-loading': loadingQuery}"
-                @click="runQuery">Run Query</a>
+                :disabled="!currentSQL"
+                @click="runQuery">Run Query</button>
 
           </div>
         </div>
@@ -412,7 +413,6 @@ export default {
     ...mapState('designs', [
       'activeReport',
       'design',
-      'selectedColumns',
       'currentModel',
       'currentDesign',
       'currentSQL',
@@ -485,6 +485,7 @@ export default {
       this.$store.dispatch('designs/toggleColumn', column);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
+
     timeframeSelected(timeframe) {
       if (!this.canToggleTimeframe) {
         return;
