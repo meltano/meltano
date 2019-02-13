@@ -4,7 +4,9 @@
       <slot name="left"></slot>
     </aside>
     <section class="column is-three-quarters vh-scrollable">
-      <slot name="right"></slot>
+      <div class='box is-radiusless is-shadowless'>
+        <slot name="right"></slot>
+      </div>
     </section>
   </div>
 </template>

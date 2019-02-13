@@ -12,7 +12,7 @@
           </p>
         </div>
 
-        <div class="text-selection-off">
+        <div class="is-unselectable">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
             <template v-for="join in design.joins">
