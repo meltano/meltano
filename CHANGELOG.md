@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 * Add analytics to authentication page
+* Removed manual `source .env` step in favor of it running automatically
 
 ### Fixes
 * Meltano will correctly source the `.env`
