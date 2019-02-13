@@ -227,7 +227,7 @@
               </div>
             </Dropdown>
 
-            <button class="button is-primary"
+            <button class="button is-success"
                 :class="{'is-loading': loadingQuery}"
                 :disabled="!currentSQL"
                 @click="runQuery">Run Query</button>
