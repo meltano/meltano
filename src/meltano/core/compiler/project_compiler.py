@@ -1,7 +1,6 @@
 import logging
 
 from meltano.core.project import Project
-from .acl_compiler import ACLCompiler
 
 # TODO 2019-02: move to `meltano.core`
 from meltano.api.controllers.m5o_file_parser import MeltanoAnalysisFileParser
@@ -17,13 +16,6 @@ class ProjectCompiler:
 
     def compile(self):
         output_dir = self.project.run_dir()
-
-        try:
-            acl_compiler = ACLCompiler(self.source_dir, output_dir)
-            acl_compiler.compile()
-            logging.info(f"ACL have been compiled.")
-        except Exception:
-            logging.error(f"Failed to compile ACL.")
 
         try:
             m5o_parse = MeltanoAnalysisFileParser(self.source_dir)

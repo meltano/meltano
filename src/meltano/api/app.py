@@ -81,9 +81,6 @@ def create_app(config={}):
 
     @app.before_request
     def before_request():
-        acl_file = ACLFile.load(project.run_dir("acls.m5oc").open())
-        users.update_acl(acl_file)
-
         request_message = f"[{request.url}]"
         if current_user:
             request_message += f" as {current_user}"
