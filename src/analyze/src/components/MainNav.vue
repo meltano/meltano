@@ -119,16 +119,15 @@ export default {
 </script>
 <style lang="scss">
 .navbar.is-info {
-  background: #464ACB;
+  background: #0F3B66;
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken(#464ACB, 20%);
+    background: darken(#0F3B66, 20%);
   }
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
 }
-
 .navbar-dropdown.is-boxed.has-been-clicked {
   // trick to unhover the menu dropdown
   display: none !important;
