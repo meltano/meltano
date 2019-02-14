@@ -179,12 +179,17 @@
                     New Dashboard
                   </a>
                   <div v-if="dashboards.length > 0">
-                    <a class="dropdown-item"
+                    <div class="dropdown-item"
                         v-for="dashboard in dashboards"
-                        :key="dashboard.name"
-                        @click="dropdownForceClose();">
-                      {{dashboard.name}}
-                    </a>
+                        :key="dashboard.id">
+                      <label for="'checkbox-' + dashboard.id"
+                              >
+                        <input type="checkbox"
+                              :id="'checkbox-' + dashboard.id"
+                              :checked="isActiveReportInDashboard(dashboard)">
+                        {{dashboard.name}}
+                      </label>
+                    </div>
                   </div>
                 </div>
               </Dropdown>
@@ -523,6 +528,10 @@ export default {
     ...mapActions('dashboards', [
       'getDashboards',
     ]),
+
+    isActiveReportInDashboard(dashboard) {
+      return dashboard.reportIds.includes(this.activeReport.id);
+    },
 
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
