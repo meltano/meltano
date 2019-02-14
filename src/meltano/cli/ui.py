@@ -19,8 +19,4 @@ from meltano.api.app import start
 @click.option("--hostname", default="0.0.0.0", help="The hostname of the webserver")
 def ui(project, debug, port, reload, hostname):
     # todo: run gunicorn if not in debug mode
-    start(project,
-          debug=debug,
-          use_reloader=reload,
-          port=port,
-          host=hostname)
+    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)

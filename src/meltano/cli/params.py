@@ -16,9 +16,7 @@ def db_options(func):
         type=click.Choice(["sqlite", "postgresql"]),
         help="Database backend for Meltano.",
     )
-    @click.option("--path",
-                  envvar="SQLITE_DATABASE",
-                  default="meltano")
+    @click.option("--path", envvar="SQLITE_DATABASE", default="meltano")
     @click.option(
         "-H",
         "--host",
@@ -41,8 +39,7 @@ def db_options(func):
         default=lambda: os.getenv("USER", ""),
         help="Specifies the user to connect to the database with.",
     )
-    @click.password_option(prompt=False,
-                           envvar="PG_PASSWORD")
+    @click.password_option(prompt=False, envvar="PG_PASSWORD")
     def wrapper(*args, **kwargs):
         engine_uri = os.getenv("SQL_ENGINE_URI")
         backend = kwargs.pop("backend")
@@ -74,7 +71,7 @@ def project(func):
     def decorate(ctx, *args, **kwargs):
         project = ctx.obj["project"]
         if not project:
-           raise ProjectNotFound()
+            raise ProjectNotFound()
 
         ctx.invoke(func, project, *args, **kwargs)
 
