@@ -180,16 +180,16 @@
 
             <div class="control field has-addons">
               <p class="control">
-                <a class="button">
+                <a class="button is-success is-outlined">
                   <span>Save</span>
                 </a>
               </p>
               <p class="control">
-                <Dropdown is-right-aligned>
+                <Dropdown button-classes='is-success is-outlined' is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <div class="dropdown-item">
                       <div class="field">
-                        <label class="label">Name</label>
+                        <label class="label">Save as</label>
                         <div class="control">
                           <input class="input"
                                   type="text"
@@ -217,6 +217,7 @@
                     </div>
                     <div v-if="reports.length > 0">
                       <hr class="dropdown-divider">
+                      <p class="dropdown-item label">Load Report</p>
                       <a class="dropdown-item"
                           :class="{'is-loading': loadingQuery}"
                           v-for="report in reports"
