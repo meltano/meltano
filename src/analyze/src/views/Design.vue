@@ -172,6 +172,24 @@
         <div class="column">
           <div class="field is-grouped is-pulled-right">
 
+            <p class="control" @click="getDashboards">
+              <Dropdown label="No Dashboard" is-right-aligned>
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <a class="dropdown-item" @click="dropdownForceClose();">
+                    New Dashboard
+                  </a>
+                  <div v-if="dashboards.length > 0">
+                    <a class="dropdown-item"
+                        v-for="dashboard in dashboards"
+                        :key="dashboard.name"
+                        @click="dropdownForceClose();">
+                      {{dashboard.name}}
+                    </a>
+                  </div>
+                </div>
+              </Dropdown>
+            </p>
+
             <div class="control field has-addons">
               <p class="control">
                 <a class="button is-success is-outlined">
@@ -213,7 +231,6 @@
                       <hr class="dropdown-divider">
                       <p class="dropdown-item label">Load Report</p>
                       <a class="dropdown-item"
-                          :class="{'is-loading': loadingQuery}"
                           v-for="report in reports"
                           :key="report.name"
                           @click="loadReport(report); dropdownForceClose();">
@@ -483,6 +500,9 @@ export default {
       'showJoinColumnAggregateHeader',
       'formattedSql',
     ]),
+    ...mapState('dashboards', [
+      'dashboards',
+    ]),
     ...mapGetters('settings', [
       'isConnectionDialectSqlite',
     ]),
@@ -500,6 +520,10 @@ export default {
     },
   },
   methods: {
+    ...mapActions('dashboards', [
+      'getDashboards',
+    ]),
+
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
         this.$store.dispatch('designs/getDistinct', field);
