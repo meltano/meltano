@@ -173,7 +173,7 @@
           <div class="field is-grouped is-pulled-right">
 
             <p v-if="activeReport.name" class="control" @click="getDashboards">
-              <Dropdown label="No Dashboard" is-right-aligned>
+              <Dropdown label="Add to Dashboard" is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                   <a class="dropdown-item" @click="dropdownForceClose();">
                     New Dashboard
