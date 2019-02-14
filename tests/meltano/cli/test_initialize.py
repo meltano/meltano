@@ -6,7 +6,7 @@ from meltano.cli import cli
 from meltano.core.project import Project, ProjectNotFound
 
 
-def test_init(test_dir):
+def test_init(request, test_dir, pushd):
     runner = CliRunner()
 
     # there are no project actually
@@ -15,7 +15,7 @@ def test_init(test_dir):
 
     # create one with the CLI
     runner.invoke(cli, ["init", "test_project"])
-    os.chdir("test_project")
+    pushd("test_project")
 
     project = Project.find()
 

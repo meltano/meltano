@@ -1,21 +1,32 @@
 import pytest
 import os
+import shutil
 from copy import copy
 from click.testing import CliRunner
 
 from meltano.cli import cli
 
 
-def test_activate_project(project_init_service, test_dir):
-    # create a project and `cd` into it
+@pytest.fixture
+def project(test_dir, project_init_service):
+    """This fixture returns the non-activated project."""
     project = project_init_service.init()
-    os.chdir(project.root)
+
+    yield project
+
+    os.chdir(test_dir)
+    shutil.rmtree(project.root)
+
+
+def test_activate_project(project, pushd):
+    # `cd` into a project
+    pushd(project.root)
 
     # let's overwrite the `.env` to add a sentinel value
     with project.root.joinpath(".env").open("w") as env:
         env.write("CLI_TEST_ACTIVATE_PROJECT=1")
 
-    # run a cli command - that should activate the project
+    # run any cli command - that should activate the project
     runner = CliRunner()
     runner.invoke(cli, ["install"])
 

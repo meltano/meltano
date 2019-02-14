@@ -59,5 +59,6 @@ def project(test_dir, project_init_service):
     project.activate()
     yield project
 
+    # clean-up
     os.chdir(test_dir)
     shutil.rmtree(project.root)
