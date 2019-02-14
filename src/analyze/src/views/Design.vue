@@ -183,7 +183,9 @@
                         v-for="dashboard in dashboards"
                         :key="dashboard.id">
                       <label for="'checkbox-' + dashboard.id"
-                              >
+                              @click="
+                                toggleActiveReportInDashboard(dashboard);
+                                dropdownForceClose();">
                         <input type="checkbox"
                               :id="'checkbox-' + dashboard.id"
                               :checked="isActiveReportInDashboard(dashboard)">
@@ -531,6 +533,16 @@ export default {
 
     isActiveReportInDashboard(dashboard) {
       return dashboard.reportIds.includes(this.activeReport.id);
+    },
+
+    toggleActiveReportInDashboard(dashboard) {
+      const methodName = this.isActiveReportInDashboard(dashboard)
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard';
+      this.$store.dispatch(`dashboards/${methodName}`, {
+        reportId: this.activeReport.id,
+        dashboardId: dashboard.id,
+      });
     },
 
     inputFocused(field) {
