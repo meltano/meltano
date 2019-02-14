@@ -177,55 +177,57 @@
         <div class="column">
           <div class="is-grouped is-pulled-right">
 
-            <Dropdown label="Load Report" >
-              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                <div v-if="reports.length > 0">
-                  <a class="dropdown-item"
-                      :class="{'is-loading': loadingQuery}"
-                      v-for="report in reports"
-                      :key="report.name"
-                      @click="loadReport(report); dropdownForceClose();">
-                    {{report.name}}
-                  </a>
-                </div>
-                <div class="dropdown-item" v-if="reports.length === 0">
-                  <p>Try saving one first</p>
-                </div>
-              </div>
-            </Dropdown>
-
-            <Dropdown label="Save Report">
-              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                <div class="dropdown-item">
-                  <div class="field">
-                    <label class="label">Name</label>
-                    <div class="control">
-                      <input class="input"
-                              type="text"
-                              placeholder="Name your report"
-                              v-model="saveReportSettings.name">
+            <div class="field has-addons">
+              <p class="control">
+                <a class="button">
+                  <span>Save</span>
+                </a>
+              </p>
+              <p class="control">
+                <Dropdown is-right-aligned>
+                  <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    <div class="dropdown-item">
+                      <div class="field">
+                        <label class="label">Name</label>
+                        <div class="control">
+                          <input class="input"
+                                  type="text"
+                                  placeholder="Name your report"
+                                  v-model="saveReportSettings.name">
+                        </div>
+                      </div>
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <button class="button is-link"
+                                  :disabled="!saveReportSettings.name"
+                                  @click="saveReport(); dropdownForceClose();">Save</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-text"
+                                  @click="dropdownForceClose();">
+                            Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                    <hr class="dropdown-divider" v-if="activeReport.name">
+                    <div class="dropdown-item" v-if="activeReport.name">
+                      <button class="button is-link is-fullwidth"
+                              @click="updateReport(); dropdownForceClose();">Update Existing</button>
+                    </div>
+                    <div v-if="reports.length > 0">
+                      <hr class="dropdown-divider">
+                      <a class="dropdown-item"
+                          :class="{'is-loading': loadingQuery}"
+                          v-for="report in reports"
+                          :key="report.name"
+                          @click="loadReport(report); dropdownForceClose();">
+                        {{report.name}}
+                      </a>
                     </div>
                   </div>
-                  <div class="field is-grouped">
-                    <div class="control">
-                      <button class="button is-link"
-                              :disabled="!saveReportSettings.name"
-                              @click="saveReport(); dropdownForceClose();">Save</button>
-                    </div>
-                    <div class="control">
-                      <button class="button is-text"
-                              @click="dropdownForceClose();">
-                        Cancel</button>
-                    </div>
-                  </div>
-                </div>
-                <hr class="dropdown-divider" v-if="activeReport.name">
-                <div class="dropdown-item" v-if="activeReport.name">
-                  <button class="button is-link is-fullwidth"
-                          @click="updateReport(); dropdownForceClose();">Update Existing</button>
-                </div>
-              </div>
-            </Dropdown>
+                </Dropdown>
+              </p>
+            </div>
 
             <button class="button is-success"
                 :class="{'is-loading': loadingQuery}"
