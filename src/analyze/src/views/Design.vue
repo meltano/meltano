@@ -178,7 +178,7 @@
         <div class="column">
           <div class="field is-grouped is-pulled-right">
 
-            <p class="control" @click="getDashboards">
+            <p v-if="activeReport.name" class="control" @click="getDashboards">
               <Dropdown label="No Dashboard" is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                   <a class="dropdown-item" @click="dropdownForceClose();">
