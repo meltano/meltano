@@ -1,12 +1,12 @@
 <template>
   <div class="dropdown"
-        :class="{'is-active': isOpen}">
+        :class="{'is-active': isOpen, 'is-right': isRightAligned}">
     <div class="dropdown-trigger">
       <button class="button"
               aria-haspopup="true"
               :aria-controls="getHyphenatedLabel"
               @click="toggleDropdown">
-        <span>{{label}}</span>
+        <span v-if="label">{{label}}</span>
         <span class="icon is-small">
           <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
         </span>
@@ -46,6 +46,9 @@ export default {
   props: {
     label: {
       type: String,
+    },
+    isRightAligned: {
+      type: Boolean,
     },
   },
   methods: {
