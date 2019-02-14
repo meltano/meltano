@@ -232,7 +232,10 @@
                     <hr class="dropdown-divider" v-if="activeReport.name">
                     <div class="dropdown-item" v-if="activeReport.name">
                       <button class="button is-link is-fullwidth"
-                              @click="updateReport(); dropdownForceClose();">Update Existing</button>
+                              @click="
+                                updateReport();
+                                dropdownForceClose();">
+                        Update Existing</button>
                     </div>
                     <div v-if="reports.length > 0">
                       <hr class="dropdown-divider">
@@ -273,7 +276,8 @@
           <div class="accordion-toggle">
             <a class="button is-primary is-small">
               <span class="icon is-small">
-                <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+                <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'">
+                </font-awesome-icon>
               </span>
             </a>
           </div>
