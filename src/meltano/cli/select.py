@@ -5,7 +5,7 @@ import fnmatch
 import json
 
 from . import cli
-from meltano.core.project import Project
+from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin.error import PluginExecutionError
@@ -19,16 +19,15 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
+@project
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
-def select(extractor, entities_filter, attributes_filter, **flags):
+def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
-        project = Project.find()
-
         if flags["list"]:
             show(
                 project,

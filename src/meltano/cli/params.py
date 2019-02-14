@@ -16,7 +16,9 @@ def db_options(func):
         type=click.Choice(["sqlite", "postgresql"]),
         help="Database backend for Meltano.",
     )
-    @click.option("--path", default="meltano.db")
+    @click.option("--path",
+                  envvar="SQLITE_DATABASE",
+                  default="meltano")
     @click.option(
         "-H",
         "--host",
@@ -39,8 +41,8 @@ def db_options(func):
         default=lambda: os.getenv("USER", ""),
         help="Specifies the user to connect to the database with.",
     )
-    @click.password_option(envvar="PG_PASSWORD")
-    @functools.wraps(func)
+    @click.password_option(prompt=False,
+                           envvar="PG_PASSWORD")
     def wrapper(*args, **kwargs):
         engine_uri = os.getenv("SQL_ENGINE_URI")
         backend = kwargs.pop("backend")
@@ -53,7 +55,7 @@ def db_options(func):
         }
 
         if not engine_uri and backend == "sqlite" and config[backend]["path"]:
-            engine_uri = "sqlite:///{path}".format(**config[backend])
+            engine_uri = "sqlite:///{path}.db".format(**config[backend])
 
         if not engine_uri and backend == "postgresql":
             pg_config = config[backend]
@@ -64,4 +66,16 @@ def db_options(func):
 
         return func(*args, **kwargs, engine_uri=engine_uri)
 
-    return wrapper
+    return functools.update_wrapper(wrapper, func)
+
+
+def project(func):
+    @click.pass_context
+    def decorate(ctx, *args, **kwargs):
+        project = ctx.obj["project"]
+        if not project:
+           raise ProjectNotFound()
+
+        ctx.invoke(func, project, *args, **kwargs)
+
+    return functools.update_wrapper(decorate, func)

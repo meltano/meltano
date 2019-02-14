@@ -4,6 +4,7 @@ import json
 import click
 from urllib.parse import urlparse
 from . import cli
+from .params import project
 from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
@@ -11,8 +12,8 @@ from meltano.core.project_add_service import (
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType
+from meltano.core.project import Project
 from meltano.core.database_add_service import DatabaseAddService
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -23,6 +24,7 @@ def add():
 
 
 @add.command()
+@project
 @click.option("--name", prompt="Database connection name")
 @click.option("--host", prompt="Database host")
 @click.option("--database", prompt="Database database")
@@ -31,12 +33,7 @@ def add():
 @click.option(
     "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
 )
-def database(name, host, database, schema, username, password):
-    try:
-        project = Project.find()
-    except ProjectNotFound as e:
-        click.ClickException(e)
-
+def database(project, name, host, database, schema, username, password):
     database_add_service = DatabaseAddService(project)
     database_add_service.add(
         name=name,
@@ -50,55 +47,43 @@ def database(name, host, database, schema, username, password):
 
 
 @add.command()
+@project
 @click.argument("plugin_name")
-def extractor(plugin_name):
-    try:
-        project = Project.find()
-        add_plugin(project, PluginType.EXTRACTORS, plugin_name)
+def extractor(project, plugin_name):
+    add_plugin(project, PluginType.EXTRACTORS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-    except ProjectNotFound as e:
-        click.ClickException(e)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
 
 
 @add.command()
+@project
 @click.argument("plugin_name")
-def loader(plugin_name):
-    try:
-        project = Project.find()
-        add_plugin(project, PluginType.LOADERS, plugin_name)
+def loader(project, plugin_name):
+    add_plugin(project, PluginType.LOADERS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
-    except ProjectNotFound as e:
-        click.ClickException(e)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
 
 
 @add.command()
+@project
 @click.argument("plugin_name")
-def transformer(plugin_name):
-    try:
-        project = Project.find()
-        add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
+def transformer(project, plugin_name):
+    add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
 
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
-    except ProjectNotFound as e:
-        click.ClickException(e)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
 
 
 @add.command()
+@project
 @click.argument("plugin_name")
-def transform(plugin_name):
-    try:
-        project = Project.find()
-        add_transform(project, plugin_name)
+def transform(project, plugin_name):
+    add_transform(project, plugin_name)
 
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
-    except ProjectNotFound as e:
-        click.ClickException(e)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
 
 
 def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):

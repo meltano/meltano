@@ -1,22 +1,18 @@
 import click
 import sys
 from . import cli
+from .params import project
 
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
+@project
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
-def invoke(plugin_name, plugin_args):
-    try:
-        project = Project.find()
-    except ProjectNotFound as e:
-        click.ClickException(e)
-
+def invoke(project, plugin_name, plugin_args):
     config_service = ConfigService(project)
 
     plugin = next(
