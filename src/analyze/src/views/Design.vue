@@ -295,7 +295,7 @@
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'BarChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setChartType('BarChart')">
+                <span class="icon is-small" @click.stop="setAndOpenChart('BarChart')">
                   <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                 </span>
               </button>
@@ -305,7 +305,7 @@
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'LineChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setChartType('LineChart')">
+                <span class="icon is-small" @click.stop="setAndOpenChart('LineChart')">
                   <font-awesome-icon icon="chart-line"></font-awesome-icon>
                 </span>
               </button>
@@ -315,7 +315,7 @@
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'AreaChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setChartType('AreaChart')">
+                <span class="icon is-small" @click.stop="setAndOpenChart('AreaChart')">
                   <font-awesome-icon icon="chart-area"></font-awesome-icon>
                 </span>
               </button>
@@ -325,7 +325,7 @@
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'ScatterChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setChartType('ScatterChart')">
+                <span class="icon is-small" @click.stop="setAndOpenChart('ScatterChart')">
                   <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                 </span>
               </button>
@@ -335,7 +335,7 @@
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'number'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setChartType('number')">
+                <span class="icon is-small" @click.stop="setAndOpenChart('number')">
                   <font-awesome-icon icon="hashtag"></font-awesome-icon>
                 </span>
               </button>
@@ -515,8 +515,11 @@ export default {
       }
     },
 
-    setChartType(chartType) {
+    setAndOpenChart(chartType) {
       this.$store.dispatch('designs/setChartType', chartType);
+      if (!this.chartsOpen) {
+        this.$store.dispatch('designs/toggleChartsOpen');
+      }
     },
 
     tableRowClicked(relatedTable) {
