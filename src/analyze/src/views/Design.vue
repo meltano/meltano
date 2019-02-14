@@ -238,7 +238,7 @@
 
       <template v-if="design.has_filters">
         <div class="has-background-grey-darker
-          section-header
+          accordion-header
           has-text-white-bis
           is-expandable"
           @click="toggleFilterOpen"
@@ -280,101 +280,141 @@
       </template>
 
       <!-- charts tab -->
-      <div class="has-background-grey-darker
-        section-header
+      <div class="has-background-primary
+        accordion-header
         has-text-white-bis
         is-expandable"
         @click="toggleChartsOpen"
-        :class="{'is-collapsed': !chartsOpen}">Charts</div>
+        :class="{'is-collapsed': !chartsOpen}">
 
-      <template v-if="chartsOpen">
-        <div class="field has-addons chart-buttons">
-          <p class="control">
-            <a class="button is-small" @click="setChartType('BarChart')">
-              <span class="icon is-small">
-                <font-awesome-icon icon="chart-bar" style="color:white;"></font-awesome-icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button is-small">
-              <span class="icon is-small" @click="setChartType('LineChart')">
-                <font-awesome-icon icon="chart-line" style="color:white;"></font-awesome-icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button is-small">
-              <span class="icon is-small" @click="setChartType('AreaChart')">
-                <font-awesome-icon icon="chart-area" style="color:white;"></font-awesome-icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button is-small">
-              <span class="icon is-small" @click="setChartType('ScatterChart')">
-                <font-awesome-icon icon="dot-circle" style="color:white;"></font-awesome-icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button is-small">
-              <span class="icon is-small" @click="setChartType('pie')">
-                <font-awesome-icon icon="chart-pie" style="color:white;"></font-awesome-icon>
-              </span>
-            </a>
-          </p>
-          <p class="control">
-            <a class="button is-small" @click="setChartType('number')">
-              <span class="icon is-small" style="color:white;font-weight: bold;">
-                9
-              </span>
-            </a>
-          </p>
+        <span class="accordion-title">Charts</span>
+        <div>
+          <div class="field has-addons chart-buttons">
+            <p class="control">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'BarChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small" @click.stop="setChartType('BarChart')">
+                  <font-awesome-icon icon="chart-bar"></font-awesome-icon>
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'LineChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small" @click.stop="setChartType('LineChart')">
+                  <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'AreaChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small" @click.stop="setChartType('AreaChart')">
+                  <font-awesome-icon icon="chart-area"></font-awesome-icon>
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'ScatterChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small" @click.stop="setChartType('ScatterChart')">
+                  <font-awesome-icon icon="dot-circle"></font-awesome-icon>
+                </span>
+              </button>
+            </p>
+            <p class="control">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'number'}"
+                :disabled="!hasResults">
+                <span class="icon is-small" @click.stop="setChartType('number')">
+                  <font-awesome-icon icon="hashtag"></font-awesome-icon>
+                </span>
+              </button>
+            </p>
+          </div>
         </div>
-        <div class="has-background-white-bis chart-toggles">
-          <chart :chart-type='chartType'
-                  :results='results'
-                  :result-aggregates='resultAggregates'></chart>
+
+        <div class="accordion-toggle">
+          <a class="button is-primary is-small">
+            <span class="icon is-small">
+              <font-awesome-icon :icon="chartsOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+            </span>
+          </a>
         </div>
-      </template>
+
+      </div>
+      <div class="accordion-body">
+        <div v-if="chartsOpen" >
+          <div v-if="hasResults" class="chart-toggles">
+            <chart :chart-type='chartType'
+                    :results='results'
+                    :result-aggregates='resultAggregates'></chart>
+          </div>
+          <div v-if="!hasResults">
+            <div class="box is-radiusless is-shadowless">
+              Load a report or run a query first
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- results/SQL tab -->
-      <div class="has-background-grey-darker
-        section-header
+      <div class="has-background-primary
+        accordion-header
         has-text-white-bis
         is-expandable"
         @click="toggleDataOpen"
-        :class="{'is-collapsed': !dataOpen}">Data</div>
-      <template v-if="dataOpen">
-        <div class="notification is-danger" v-if="hasSQLError">
-          <button class="delete" @click="resetErrorMessage"></button>
-          <ul>
-            <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
-          </ul>
+        :class="{'is-collapsed': !dataOpen}">
+
+        <span>Data</span>
+        <div class="accordion-toggle">
+          <a class="button is-primary is-small">
+            <span class="icon is-small">
+              <font-awesome-icon :icon="dataOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+            </span>
+          </a>
         </div>
-        <div class="has-background-white-bis data-toggles">
-          <div class="field is-pulled-right">
-            <div class="control">
-              <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+      </div>
+      <div class="accordion-body">
+        <div v-if="dataOpen">
+          <div class="notification is-danger" v-if="hasSQLError">
+            <button class="delete" @click="resetErrorMessage"></button>
+            <ul>
+              <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+            </ul>
+          </div>
+          <div class="data-toggles">
+            <div class="field is-pulled-right">
+              <div class="control">
+                <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+              </div>
+            </div>
+            <div class="buttons has-addons">
+              <span class="button"
+                    :class="{'is-active': isResultsTab}"
+                    @click="setCurrentTab('results')">Results ({{numResults}})</span>
+              <span class="button"
+                    :class="{'is-active': isSQLTab}"
+                    @click="setCurrentTab('sql')">SQL</span>
             </div>
           </div>
-          <div class="buttons has-addons">
-            <span class="button"
-                  :class="{'is-active': isResultsTab}"
-                  @click="setCurrentTab('results')">Results ({{numResults}})</span>
-            <span class="button"
-                  :class="{'is-active': isSQLTab}"
-                  @click="setCurrentTab('sql')">SQL</span>
+          <ResultTable></ResultTable>
+          <div>
+            <div class="" v-if="isSQLTab && currentSQL">
+              <code>{{formattedSql}}</code>
+            </div>
           </div>
         </div>
-        <ResultTable></ResultTable>
-        <div>
-          <div class="" v-if="isSQLTab && currentSQL">
-            <code>{{formattedSql}}</code>
-          </div>
-        </div>
-      </template>
+      </div>
     </div>
 
   </router-view-layout>
@@ -440,6 +480,7 @@ export default {
       'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
+      'hasResults',
       'numResults',
       'isSQLTab',
       'getDistinctsForField',
@@ -653,15 +694,36 @@ code {
   padding: 1.5rem;
 }
 
-.section-header {
-  padding: 0.25rem;
-  margin-bottom: 0.25rem;
+.accordion-header {
+  padding: .5rem .5rem .5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   cursor: pointer;
-
-  &.is-expandable::after {
-    right: 30px;
-    text-align: center;
-    margin-top: -7px;
+  @extend .is-unselectable;
+  .accordion-title {
+    padding-right: 1.5rem;
+  }
+  .button:not([disabled]) {
+    &.is-active {
+      @extend .has-text-primary;
+      @extend .has-background-white-ter;
+    }
+    &.is-text:hover,
+    &.is-text:focus {
+      @extend .has-text-primary;
+      @extend .has-background-white;
+    }
+  }
+  .accordion-toggle {
+    margin-left: auto;
+  }
+}
+.accordion-body {
+  margin-bottom: 0.25rem;
+  @extend .has-background-white-bis;
+  .box {
+    @extend .has-background-white-bis;
   }
 }
 .filter-item {
@@ -673,10 +735,6 @@ code {
   padding-left: 0;
 }
 .chart-buttons {
-  margin-top: -34px;
-  margin-left: 70px;
-  width: 20%;
-
   .button {
     background: transparent;
   }

@@ -9,7 +9,10 @@ import {
   faCertificate,
   faDotCircle,
   faCaretDown,
+  faAngleDown,
+  faAngleUp,
   faSearch,
+  faHashtag,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon,
   FontAwesomeLayers,
@@ -28,7 +31,10 @@ library.add(faGlobeAmericas);
 library.add(faCertificate);
 library.add(faDotCircle);
 library.add(faCaretDown);
+library.add(faAngleDown);
+library.add(faAngleUp);
 library.add(faSearch);
+library.add(faHashtag);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
