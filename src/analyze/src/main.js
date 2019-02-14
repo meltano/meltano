@@ -9,6 +9,7 @@ import {
   faCertificate,
   faDotCircle,
   faCaretDown,
+  faCaretUp,
   faAngleDown,
   faAngleUp,
   faSearch,
@@ -31,6 +32,7 @@ library.add(faGlobeAmericas);
 library.add(faCertificate);
 library.add(faDotCircle);
 library.add(faCaretDown);
+library.add(faCaretUp);
 library.add(faAngleDown);
 library.add(faAngleUp);
 library.add(faSearch);

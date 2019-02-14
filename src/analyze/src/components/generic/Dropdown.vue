@@ -8,7 +8,7 @@
               @click="toggleDropdown">
         <span v-if="label">{{label}}</span>
         <span class="icon is-small">
-          <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
+          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'" style="color:black;"></font-awesome-icon>
         </span>
       </button>
     </div>
