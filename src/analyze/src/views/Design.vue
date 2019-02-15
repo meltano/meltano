@@ -429,36 +429,43 @@
         </div>
       </div>
       <div class="accordion-body">
-        <div v-if="dataOpen">
+        <div v-if="dataOpen" class="box is-radiusless is-shadowless">
           <div class="notification is-danger" v-if="hasSQLError">
             <button class="delete" @click="resetErrorMessage"></button>
             <ul>
               <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
             </ul>
           </div>
-          <div class="data-toggles">
-            <div class="field is-horizontal is-marginless is-pulled-right">
-              <div class="field-label">
-                <label class="label">Limit</label>
+          <div class="columns is-vcentered">
+
+            <div class="column">
+              <div class="tabs">
+                <ul>
+                  <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
+                    <a>Results ({{numResults}})</a>
+                  </li>
+                  <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
+                    <a>SQL</a>
+                  </li>
+                </ul>
               </div>
-              <div class="field-body">
-                <div class="field">
-                  <div class="control">
-                    <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+            </div>
+
+            <div class="column">
+              <div class="field is-horizontal is-marginless is-pulled-right">
+                <div class="field-label">
+                  <label class="label">Limit</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="tabs">
-              <ul>
-                <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
-                  <a>Results ({{numResults}})</a>
-                </li>
-                <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
-                  <a>SQL</a>
-                </li>
-              </ul>
-            </div>
+
           </div>
           <ResultTable></ResultTable>
           <div>
