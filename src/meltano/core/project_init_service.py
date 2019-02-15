@@ -101,8 +101,6 @@ class ProjectInitService:
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.echo(f"🏃\tRun", nl=False)
-        click.secho(" source .env", fg="green")
         click.echo("Try it out:")
         click.secho("🏃\tRun", nl=False)
         click.secho(" meltano add extractor tap-carbon-intensity", fg="green")
@@ -115,7 +113,6 @@ class ProjectInitService:
         click.secho("\t sqlite> .tables", fg="green")
         click.secho("\t sqlite> SELECT * FROM region;", fg="green")
         click.secho("\t sqlite> SELECT * FROM entry LIMIT 20;", fg="green")
-        click.echo("WOW! NEATO!")
         click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
             " https://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"
