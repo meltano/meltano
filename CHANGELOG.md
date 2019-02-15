@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
+* Fixed dashboards initial load issue due to legacy (and empty) `carbon.dashboard.m5o` file
 
 ### Breaks
 
