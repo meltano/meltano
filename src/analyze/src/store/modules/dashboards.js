@@ -10,6 +10,12 @@ const state = {
   saveDashboardSettings: { name: null, description: null },
 };
 
+const getters = {
+  hasDashboards() {
+    return state.dashboards.length > 0;
+  },
+};
+
 const actions = {
   getDashboards({ commit }) {
     dashboardApi.getDashboards()
@@ -94,6 +100,7 @@ const mutations = {
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations,
 };
