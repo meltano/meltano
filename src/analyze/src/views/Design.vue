@@ -80,12 +80,12 @@
                 <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinColumnAggregateHeader(join.aggregates)">
+                  v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
                   Aggregates
                 </a>
-                <template v-for="aggregate in join.aggregates">
+                <template v-for="aggregate in join.related_table.aggregates">
                   <a class="panel-block"
-                    v-if="aggregate.related_table.hidden"
+                    v-if="!aggregate.hidden"
                     :key="aggregate.label"
                     :class="{'is-active': aggregate.selected}"
                     @click="joinAggregateSelected(join, aggregate)">
