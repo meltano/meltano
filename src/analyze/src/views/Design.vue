@@ -2,20 +2,14 @@
   <router-view-layout>
 
     <div slot='left'>
-      <nav class="panel ">
+      <nav class="panel">
+        <p class="panel-heading">
+          {{design.label}}
+        </p>
         <div class="panel-block">
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <input class="input" type="text" placeholder="Filter">
-            </div>
-            <div class="control">
-              <a class="button">
-                <span class="icon">
-                  <font-awesome-icon icon="search"></font-awesome-icon>
-                </span>
-              </a>
-            </div>
-          </div>
+          <p class="control">
+            <input class="input is-small" type="text" placeholder="search">
+          </p>
         </div>
 
         <div class="is-unselectable">
@@ -25,7 +19,7 @@
               <a
                 class="panel-block
                   panel-block-heading
-                  has-background-white-bis
+                  has-background-white-ter
                   has-text-grey
                   is-expandable"
                   :class="{'is-collapsed': join.collapsed}"
@@ -99,7 +93,7 @@
             <a
               class="panel-block
               panel-block-heading
-              has-background-white-bis
+              has-background-white-ter
               has-text-grey
               is-expandable"
               :class="{'is-collapsed': design.related_table.collapsed}"
@@ -227,10 +221,9 @@
               </div>
             </Dropdown>
 
-            <button class="button is-success"
+            <a class="button is-primary"
                 :class="{'is-loading': loadingQuery}"
-                :disabled="!currentSQL"
-                @click="runQuery">Run Query</button>
+                @click="runQuery">Run Query</a>
 
           </div>
         </div>
@@ -243,7 +236,7 @@
           is-expandable"
           @click="toggleFilterOpen"
           :class="{'is-collapsed': !filtersOpen}">Filters</div>
-        <div class="has-background-white-bis filter-item"
+        <div class="has-background-white-ter filter-item"
               v-for="filter in design.always_filter.filters"
               :key="filter.label"
               v-if="filtersOpen">
@@ -332,7 +325,7 @@
             </a>
           </p>
         </div>
-        <div class="has-background-white-bis chart-toggles">
+        <div class="has-background-white-ter chart-toggles">
           <chart :chart-type='chartType'
                   :results='results'
                   :result-aggregates='resultAggregates'></chart>
@@ -374,7 +367,7 @@
             <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
           </ul>
         </div>
-        <div class="has-background-white-bis data-toggles">
+        <div class="has-background-white-ter data-toggles">
           <div class="field is-pulled-right">
             <div class="control">
               <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
@@ -440,6 +433,7 @@ export default {
     ...mapState('designs', [
       'activeReport',
       'design',
+      'selectedColumns',
       'currentModel',
       'currentDesign',
       'currentSQL',
@@ -512,7 +506,6 @@ export default {
       this.$store.dispatch('designs/toggleColumn', column);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
-
     timeframeSelected(timeframe) {
       if (!this.canToggleTimeframe) {
         return;
@@ -594,9 +587,6 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-@import '@/scss/bulma-preset-overrides.scss';
-@import "../../node_modules/bulma/bulma";
-
 code {
   white-space: pre;
   word-wrap: break-word;
@@ -606,11 +596,6 @@ code {
   &.indented {
     padding-left: 1.75rem;
   }
-  &.is-active {
-    border-left-color: $primary;
-    border-left-width: 4px;
-    @extend .has-background-white-ter;
-  }
   &.panel-block-heading {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -619,6 +604,7 @@ code {
       background: white;
     }
   }
+
   &.is-sqlite-unsupported {
     opacity: .5;
     cursor: not-allowed;
