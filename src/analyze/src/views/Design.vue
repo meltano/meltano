@@ -437,18 +437,27 @@
             </ul>
           </div>
           <div class="data-toggles">
-            <div class="field is-pulled-right">
-              <div class="control">
-                <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+            <div class="field is-horizontal is-marginless is-pulled-right">
+              <div class="field-label">
+                <label class="label">Limit</label>
+              </div>
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                  </div>
+                </div>
               </div>
             </div>
-            <div class="buttons has-addons">
-              <span class="button"
-                    :class="{'is-active': isResultsTab}"
-                    @click="setCurrentTab('results')">Results ({{numResults}})</span>
-              <span class="button"
-                    :class="{'is-active': isSQLTab}"
-                    @click="setCurrentTab('sql')">SQL</span>
+            <div class="tabs">
+              <ul>
+                <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
+                  <a>Results ({{numResults}})</a>
+                </li>
+                <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
+                  <a>SQL</a>
+                </li>
+              </ul>
             </div>
           </div>
           <ResultTable></ResultTable>
@@ -759,7 +768,7 @@ code {
 }
 
 .data-toggles {
-  padding: 1.5rem;
+  padding-top: .5rem;
 }
 
 .accordion-header {
