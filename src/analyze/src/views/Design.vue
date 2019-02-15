@@ -161,6 +161,7 @@
 
     <div slot="right">
       <div class="columns">
+
         <div class="column is-one-quarter column-flex-v">
           <div class="is-grouped is-pulled-left">
             <div v-if="activeReport.name">{{activeReport.name}}</div>
@@ -169,9 +170,9 @@
         </div>
 
         <div class="column">
-          <div class="is-grouped is-pulled-right">
+          <div class="field is-grouped is-pulled-right">
 
-            <div class="field has-addons">
+            <div class="control field has-addons">
               <p class="control">
                 <a class="button">
                   <span>Save</span>
@@ -223,9 +224,12 @@
               </p>
             </div>
 
-            <a class="button is-primary"
+            <p class="control">
+              <button class="button is-success"
                 :class="{'is-loading': loadingQuery}"
-                @click="runQuery">Run Query</a>
+                :disabled="!currentSQL"
+                @click="runQuery">Run Query</button>
+            </p>
 
           </div>
         </div>
