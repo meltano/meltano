@@ -33,7 +33,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
-
+* URL routing updates ('/model' to '/files', removed currently unused '/extract', '/load', '/transform' and '/project/new')
 
 ## 0.9.0 - (2019-02-05)
 ---
