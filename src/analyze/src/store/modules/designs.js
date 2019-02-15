@@ -474,6 +474,7 @@ const mutations = {
         // periods
         joinGroup.timeframes.forEach((timeframe) => {
           const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
+          if (!targetTimeframe) return;
           setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
         });
       }
