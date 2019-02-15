@@ -229,48 +229,58 @@
         </div>
       </div>
 
-      <template v-if="design.has_filters">
-        <div class="has-background-grey-darker
-          section-header
+      <!-- filters tab -->
+      <div v-if="design.has_filters">
+        <div class="has-background-primary
+          accordion-header
           has-text-white-bis
           is-expandable"
           @click="toggleFilterOpen"
-          :class="{'is-collapsed': !filtersOpen}">Filters</div>
-        <div class="has-background-white-ter filter-item"
-              v-for="filter in design.always_filter.filters"
-              :key="filter.label"
-              v-if="filtersOpen">
-          <div class="columns">
-            <div class="column is-3">
-              <strong>{{filter.design_label}}</strong>
-              <span>{{filter.label}}</span>
-              <span>({{filter.type}})</span>
-            </div>
-            <div class="column is-9">
-              <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
-              <div class="field" v-if="filter.type == 'string'">
-                <select-dropdown
-                  :placeholder="filter.field"
-                  :field="filter.sql"
-                  :dropdownList="getResultsFromDistinct(filter.sql)"
-                  :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
-                  @focused="inputFocused(filter.sql)"
-                  @selected="dropdownSelected"
-                  @modifierChanged="modifierChanged">
-                </select-dropdown>
+          :class="{'is-collapsed': !filtersOpen}">
+
+          <span>Filters</span>
+          <div class="accordion-toggle">
+            <a class="button is-primary is-small">
+              <span class="icon is-small">
+                <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="accordion-body">
+          <div v-if="filtersOpen">
+            <div class="columns">
+              <div class="column is-3">
+                <strong>{{filter.design_label}}</strong>
+                <span>{{filter.label}}</span>
+                <span>({{filter.type}})</span>
               </div>
-              <div class="tags selected-filters">
-                <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
-                  <span class="tag is-link" :key="key">
-                    {{selected}}
-                    <button class="delete is-small"></button>
-                  </span>
-                </template>
+              <div class="column is-9">
+                <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
+                <div class="field" v-if="filter.type == 'string'">
+                  <select-dropdown
+                    :placeholder="filter.field"
+                    :field="filter.sql"
+                    :dropdownList="getResultsFromDistinct(filter.sql)"
+                    :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
+                    @focused="inputFocused(filter.sql)"
+                    @selected="dropdownSelected"
+                    @modifierChanged="modifierChanged">
+                  </select-dropdown>
+                </div>
+                <div class="tags selected-filters">
+                  <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
+                    <span class="tag is-link" :key="key">
+                      {{selected}}
+                      <button class="delete is-small"></button>
+                    </span>
+                  </template>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </template>
+      </div>
 
       <!-- charts tab -->
       <div class="has-background-grey-darker
