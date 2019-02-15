@@ -166,9 +166,9 @@
     </div>
 
     <div slot="right">
-      <div class="columns">
+      <div class="columns is-vcentered">
 
-        <div class="column is-one-quarter column-flex-v">
+        <div class="column is-one-quarter">
           <div class="is-grouped is-pulled-left">
             <div v-if="activeReport.name">{{activeReport.name}}</div>
             <div v-if="!activeReport.name"><em>Untitled Report</em></div>
