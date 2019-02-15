@@ -489,8 +489,11 @@ export default {
       }
     },
 
-    setChartType(chartType) {
+    setAndOpenChart(chartType) {
       this.$store.dispatch('designs/setChartType', chartType);
+      if (!this.chartsOpen) {
+        this.$store.dispatch('designs/toggleChartsOpen');
+      }
     },
 
     tableRowClicked(relatedTable) {
