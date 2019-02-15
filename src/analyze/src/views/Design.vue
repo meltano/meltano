@@ -346,27 +346,48 @@
             <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
           </ul>
         </div>
-        <div class="has-background-white-ter data-toggles">
-          <div class="field is-pulled-right">
-            <div class="control">
-              <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-            </div>
-          </div>
-          <div class="buttons has-addons">
-            <span class="button"
-                  :class="{'is-active': isResultsTab}"
-                  @click="setCurrentTab('results')">Results ({{numResults}})</span>
-            <span class="button"
-                  :class="{'is-active': isSQLTab}"
-                  @click="setCurrentTab('sql')">SQL</span>
+        <div class="has-background-white-ter chart-toggles">
+          <chart :chart-type='chartType'
+                  :results='results'
+                  :result-aggregates='resultAggregates'></chart>
+        </div>
+      </template>
+
+      <!-- results/SQL tab -->
+      <div class="has-background-grey-darker
+      section-header
+      has-text-white-bis
+      is-expandable"
+      @click="toggleDataOpen"
+      :class="{'is-collapsed': !dataOpen}">Data</div>
+      <template v-if="dataOpen">
+      <div class="notification is-danger" v-if="hasSQLError">
+        <button class="delete" @click="resetErrorMessage"></button>
+        <ul>
+          <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+        </ul>
+      </div>
+      <div class="has-background-white-ter data-toggles">
+        <div class="field is-pulled-right">
+          <div class="control">
+            <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
           </div>
         </div>
-        <ResultTable></ResultTable>
-        <div>
-          <div class="" v-if="isSQLTab && currentSQL">
-            <code>{{formattedSql}}</code>
-          </div>
+        <div class="buttons has-addons">
+          <span class="button"
+                :class="{'is-active': isResultsTab}"
+                @click="setCurrentTab('results')">Results ({{numResults}})</span>
+          <span class="button"
+                :class="{'is-active': isSQLTab}"
+                @click="setCurrentTab('sql')">SQL</span>
         </div>
+      </div>
+      <ResultTable></ResultTable>
+      <div>
+        <div class="" v-if="isSQLTab && currentSQL">
+          <code>{{formattedSql}}</code>
+        </div>
+      </div>
       </template>
     </div>
 
