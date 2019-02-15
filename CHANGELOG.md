@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* UI cleanup across routes (Analyze focus) and baseline polish to mitigate "that looks off comments"
 
 ### Changes
 
