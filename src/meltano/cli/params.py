@@ -71,7 +71,10 @@ def project(func):
     def decorate(ctx, *args, **kwargs):
         project = ctx.obj["project"]
         if not project:
-            raise ProjectNotFound()
+            raise click.ClickException(
+                f"`{ctx.command_path}` must be run inside a Meltano project."
+                "\nUse `meltano init <project_name>` to create one."
+            )
 
         ctx.invoke(func, project, *args, **kwargs)
 

@@ -34,7 +34,9 @@ def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
     extractor_name: Which extractor should be used in this extraction
     loader_name: Which loader should be used in this extraction
     """
-    engine, _ = project_engine(project, engine_uri, default=True)
+
+    # register the project engine
+    project_engine(project, engine_uri, default=True)
     install_missing_plugins(project, extractor, loader, transform)
 
     if job_id is None:

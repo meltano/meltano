@@ -16,8 +16,7 @@ def assertIsSQL(value: str) -> bool:
     )
 
 
-@pytest.mark.usefixtures("project")
-@pytest.mark.usefixtures("compile_models")
+@pytest.mark.usefixtures("project", "compile_models")
 class TestSqlController:
     @pytest.fixture
     def post(self, app, api):

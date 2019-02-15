@@ -2,7 +2,6 @@ import pytest
 import os
 import shutil
 from copy import copy
-from click.testing import CliRunner
 
 from meltano.cli import cli
 
@@ -18,7 +17,7 @@ def project(test_dir, project_init_service):
     shutil.rmtree(project.root)
 
 
-def test_activate_project(project, pushd):
+def test_activate_project(project, cli_runner, pushd):
     # `cd` into a project
     pushd(project.root)
 
@@ -27,7 +26,6 @@ def test_activate_project(project, pushd):
         env.write("CLI_TEST_ACTIVATE_PROJECT=1")
 
     # run any cli command - that should activate the project
-    runner = CliRunner()
-    runner.invoke(cli, ["install"])
+    cli_runner.invoke(cli, ["install"])
 
     assert os.getenv("CLI_TEST_ACTIVATE_PROJECT") == "1"

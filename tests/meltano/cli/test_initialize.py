@@ -6,15 +6,18 @@ from meltano.cli import cli
 from meltano.core.project import Project, ProjectNotFound
 
 
-def test_init(request, test_dir, pushd):
-    runner = CliRunner()
+@pytest.fixture()
+def cli_runner():
+    return CliRunner()
 
+
+def test_init(request, cli_runner, test_dir, pushd):
     # there are no project actually
     with pytest.raises(ProjectNotFound):
         Project.find()
 
     # create one with the CLI
-    runner.invoke(cli, ["init", "test_project"])
+    cli_runner.invoke(cli, ["init", "test_project"])
     pushd("test_project")
 
     project = Project.find()

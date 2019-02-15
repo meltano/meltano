@@ -5,30 +5,27 @@ import contextlib
 
 from meltano.core.db import DB, project_engine
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture()
-def engine(project):
+def engine_sessionmaker(project):
     engine_uri = "sqlite://"
-    engine, _ = project_engine(project, engine_uri)
-    return engine
+    return project_engine(project, engine_uri, default=True)
 
 
 @pytest.fixture()
-def session(request, engine, create_session):
+def session(request, engine_sessionmaker):
     """Creates a new database session for a test."""
+    engine, create_session = engine_sessionmaker
     session = create_session()
 
-    def _cleanup():
-        session.close()
+    yield session
 
-        meta = MetaData(bind=engine)
-        meta.reflect()
+    # teardown
+    session.close()
+    meta = MetaData(bind=engine)
+    meta.reflect()
 
-        with engine.connect() as con:
-            for table in reversed(meta.sorted_tables):
-                con.execute(table.delete())
-
-    request.addfinalizer(_cleanup)
-    return session
+    with engine.connect() as con:
+        for table in reversed(meta.sorted_tables):
+            con.execute(table.delete())

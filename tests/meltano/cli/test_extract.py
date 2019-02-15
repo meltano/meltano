@@ -1,7 +1,7 @@
+import pytest
 import os
 from unittest.mock import patch
 from functools import partial
-from click.testing import CliRunner
 
 from meltano.cli import cli
 from meltano.core.runner.singer import SingerRunner
@@ -17,9 +17,8 @@ def mock_install_missing_plugins(project, extractor, loader, transform):
     pass
 
 
-def test_elt(request, project):
-    cli_runner = CliRunner()
-
+@pytest.mark.backend("sqlite")
+def test_elt(cli_runner, monkeypatch, project):
     result = cli_runner.invoke(cli, ["elt"])
     assert result.exit_code == 2
 
