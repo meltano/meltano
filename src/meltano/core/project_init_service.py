@@ -113,7 +113,6 @@ class ProjectInitService:
         click.secho("\t sqlite> .tables", fg="green")
         click.secho("\t sqlite> SELECT * FROM region;", fg="green")
         click.secho("\t sqlite> SELECT * FROM entry LIMIT 20;", fg="green")
-        click.echo("WOW! NEATO!")
         click.echo("📖\tRead the Meltano README.", nl=False)
         click.secho(
             " https://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"

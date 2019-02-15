@@ -14,4 +14,4 @@ from . import (
 
 
 def main():
-    cli()
+    cli(obj={"project": None})

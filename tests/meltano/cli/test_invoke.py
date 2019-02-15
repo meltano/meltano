@@ -1,6 +1,5 @@
 import yaml
 import pytest
-from click.testing import CliRunner
 from unittest.mock import Mock, patch
 
 from meltano.cli import cli
@@ -13,10 +12,10 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 class TestCliInvoke:
     @pytest.fixture
-    def subject(self, project_add_service, config_service):
+    def subject(self, cli_runner, project_add_service, config_service):
         project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
-        return CliRunner()
+        return cli_runner
 
     @pytest.fixture
     def process_mock(self):

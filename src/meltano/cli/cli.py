@@ -6,6 +6,7 @@ import warnings
 # this needs to run before `psycopg2` is imported
 warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import setup_logging
 
 
@@ -23,3 +24,9 @@ LEVELS = {
 @click.pass_context
 def cli(ctx, log_level):
     setup_logging(log_level=LEVELS[log_level])
+    ctx.ensure_object(dict)
+
+    try:
+        ctx.obj["project"] = Project.find()
+    except ProjectNotFound as err:
+        ctx.obj["project"] = None

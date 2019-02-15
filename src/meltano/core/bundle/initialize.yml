@@ -9,7 +9,7 @@ README.md: ""
   export PG_PASSWORD=warehouse
   export PG_USERNAME=warehouse
   export PG_ADDRESS=localhost
-  export PG_SCHEMA=gitlab
+  export PG_SCHEMA=meltano
   export PG_PORT=5502
   export PG_DATABASE=warehouse
 .gitignore: |

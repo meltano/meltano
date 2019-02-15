@@ -26,9 +26,9 @@ def discovery():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def project_init_service():
-    return ProjectInitService()
+    return ProjectInitService(PROJECT_NAME)
 
 
 @pytest.fixture
@@ -49,9 +49,8 @@ def config_service(project):
 
 
 @pytest.fixture(scope="class")
-def project(test_dir):
-    service = ProjectInitService(PROJECT_NAME)
-    project = service.init()
+def project(test_dir, project_init_service):
+    project = project_init_service.init()
 
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root.joinpath(".env"))
@@ -60,5 +59,6 @@ def project(test_dir):
     project.activate()
     yield project
 
+    # clean-up
     os.chdir(test_dir)
     shutil.rmtree(project.root)

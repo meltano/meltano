@@ -20,7 +20,7 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 _engines = dict()
 
 
-def project_engine(project, engine_uri=None, default=False):
+def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
     """Creates and register a SQLAlchemy engine for a Meltano project instance."""
 
     # return the default engine if it is registered
@@ -30,20 +30,23 @@ def project_engine(project, engine_uri=None, default=False):
         return _engines[(project, engine_uri)]
 
     if not engine_uri:
+        logging.debug(f"Can't find engine for {project}@{engine_uri}")
         raise ValueError("No engine registered for this project.")
 
+    logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri)
-    Session = sessionmaker(bind=engine)
+    init_hook(engine)
+
+    create_session = sessionmaker(bind=engine)
+    engine_session = (engine, create_session)
 
     if default:
         # register the default engine
-        _engines[project] = engine, Session
+        _engines[project] = engine_session
     else:
-        _engines[(project, engine_uri)] = engine, Session
+        _engines[(project, engine_uri)] = engine_session
 
-    init_hook(engine)
-
-    return engine, Session
+    return engine_session
 
 
 def init_hook(engine):
