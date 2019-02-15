@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 @include tablet() {
    // Favor RouterViewLayout's control of scrollable columns unless on mobile
   html {
     overflow-y: hidden;
   }
-=======
-html {
-  overflow-y: hidden; // Favor RouterViewLayout's control of scrollable columns
->>>>>>> added page-level reusable shell RouterViewLayout to ensure consistency across pages/Views, minor CSS organization cleanup
 }
