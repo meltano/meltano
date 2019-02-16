@@ -17,6 +17,9 @@ pip install --upgrade pip
 # Optional, but it's best to have the latest setuptools
 pip install --upgrade setuptools
 
+# Optional, but it's best to create a virtual environemnt
+python -m venv venv
+
 # Activate your virtual environment
 source ./venv/bin/activate
 
