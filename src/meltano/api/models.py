@@ -25,6 +25,9 @@ class User(db.Model, UserMixin):
         roles = ",".join(r.name for r in self.roles)
         return f"@{self.username}({roles})"
 
+    def canonical(self, _scopes):
+        return self.username
+
 
 class RolesUsers(db.Model):
     __tablename__ = "roles_users"
@@ -33,10 +36,34 @@ class RolesUsers(db.Model):
     role_id = db.Column("role_id", db.Integer(), db.ForeignKey("role.id"))
 
 
+class RolePermissions(db.Model):
+    __tablename__ = "role_permissions"
+    id = db.Column(db.Integer(), primary_key=True)
+    role_id = db.Column("role_id", db.Integer(), db.ForeignKey("role.id"))
+    type = db.Column(db.String())
+    context = db.Column(db.String())
+    role = db.relationship("Role", backref="permissions")
+
+    def canonical(self, scopes=[]):
+        canonical = {
+            "role_id": self.role_id,
+            "type": self.type,
+            "context": self.context,
+        }
+
+        if Role in scopes:
+            del canonical["role_id"]
+
+        return canonical
+
+
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
+
+    def canonical(self, _scopes):
+        return self.name
 
 
 class OAuth(db.Model):

@@ -4,7 +4,9 @@ import NewProjectForm from '@/components/projects/NewProjectForm';
 import Repo from '@/components/repos/Repo';
 import Design from '@/components/designs/Design';
 import Dashboards from '@/components/dashboards/Dashboards';
-import Settings from '@/components/settings/Settings';
+import Settings from '@/components/settings/Main';
+import SettingsDatabase from '@/components/settings/Database';
+import SettingsRoles from '@/components/settings/Roles';
 import Extract from '@/components/extract/Extract';
 import Load from '@/components/load/Load';
 import Transform from '@/components/transform/Transform';
@@ -66,8 +68,15 @@ export default new Router({
     },
     {
       path: '/settings',
-      name: '',
+      name: 'Settings',
       component: Settings,
+      children: [{
+        path: 'roles',
+        component: SettingsRoles,
+      }, {
+        path: 'database',
+        component: SettingsDatabase,
+      }],
     },
     {
       path: '/orchestrations',
