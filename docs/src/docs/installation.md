@@ -10,7 +10,9 @@ Before you get started, there are a couple of things your environment needs:
 - [pip](https://pypi.org/project/pip/)
 
 ::: warning
-If you want to install Meltano in a virtual environment: virtualenv and pipenv are not supported. Please use `python -m venv venv` to create your virtual environment.
+If you want to install Meltano in a virtual environment `virtualenv` and `pipenv` are not supported. Python 3 has built-in support for [virtual environments](https://docs.python.org/3/tutorial/venv.html) (see `venv`).
+
+Please use `python -m venv venv` to create your virtual environment.
 
 See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
 :::
