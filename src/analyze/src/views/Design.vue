@@ -166,6 +166,7 @@
     </div>
 
     <div slot="right">
+
       <div class="columns is-vcentered">
 
         <div class="column is-one-quarter">

@@ -10,7 +10,7 @@
 
         <div class='panel-block'>
           <a class='button is-secondary is-fullwidth'
-              @click="setAddDashboard(true)">New Dashboard</a>
+              @click="toggleNewDashboardModal">New Dashboard</a>
         </div>
 
         <div v-for="dashboard in dashboards"
@@ -41,19 +41,17 @@
     </div>
 
     <div slot='right'>
-      <div v-if="isAddDashboard">
-        <CreateDashboard />
+      <h1><strong>{{activeDashboard.name}}</strong></h1>
+      <div v-for="report in activeDashboardReports" :key="report.id">
+        <p>{{report.name}}</p>
+        <chart :chart-type='report.chartType'
+                :results='report.queryResults'
+                :result-aggregates='report.queryResultAggregates'></chart>
       </div>
 
-      <div v-if="!isAddDashboard">
-        <h1><strong>{{activeDashboard.name}}</strong></h1>
-        <div v-for="report in activeDashboardReports" :key="report.id">
-          <p>{{report.name}}</p>
-          <chart :chart-type='report.chartType'
-                  :results='report.queryResults'
-                  :result-aggregates='report.queryResultAggregates'></chart>
-        </div>
-      </div>
+      <!-- New Dashboard Modal -->
+      <CreateDashboard v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+
     </div>
 
   </router-view-layout>
@@ -71,6 +69,11 @@ export default {
     this.getDashboards();
     this.getReports();
   },
+  data() {
+    return {
+      isNewDashboardModalOpen: false,
+    };
+  },
   components: {
     Chart,
     CreateDashboard,
@@ -81,7 +84,6 @@ export default {
       'activeDashboard',
       'activeDashboardReports',
       'dashboards',
-      'isAddDashboard',
       'reports',
     ]),
   },
@@ -91,7 +93,6 @@ export default {
       'getDashboard',
       'getReports',
       'getActiveDashboardReportsWithQueryResults',
-      'setAddDashboard',
     ]),
     isActive(dashboard) {
       return dashboard.id === this.activeDashboard.id;
@@ -107,6 +108,9 @@ export default {
         reportId: report.id,
         dashboardId: this.activeDashboard.id,
       });
+    },
+    toggleNewDashboardModal() {
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
     },
   },
   watch: {

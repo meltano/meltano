@@ -5,7 +5,6 @@ const state = {
   activeDashboard: {},
   activeDashboardReports: [],
   dashboards: [],
-  isAddDashboard: true,
   reports: [],
 };
 
@@ -71,9 +70,6 @@ const mutations = {
   },
   setActiveDashboardReports(_, reports) {
     state.activeDashboardReports = reports;
-  },
-  setAddDashboard(_, value) {
-    state.isAddDashboard = value;
   },
   setCurrentDashboard(_, dashboard) {
     state.activeDashboard = dashboard;

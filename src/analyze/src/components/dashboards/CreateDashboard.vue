@@ -1,11 +1,11 @@
 <template>
 
   <div class="modal is-active">
-    <div class="modal-background"></div>
+    <div class="modal-background" @click="close"></div>
     <div class="modal-card">
       <header class="modal-card-head">
         <p class="modal-card-title">New Dashboard</p>
-        <button class="delete" aria-label="close" @click="close()"></button>
+        <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
           <div>
@@ -29,7 +29,7 @@
         </div>
       </section>
       <footer class="modal-card-foot is-pull-right">
-        <button class="button" @click="close()">Cancel</button>
+        <button class="button" @click="close">Cancel</button>
         <button class="button is-success" @click="saveDashboard">Create</button>
       </footer>
     </div>
