@@ -182,7 +182,9 @@
             <p v-if="activeReport.name" class="control" @click="getDashboards">
               <Dropdown label="Add to Dashboard" is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                  <a class="dropdown-item" @click="toggleNewDashboardModal(); dropdownForceClose();">
+                  <a
+                    class="dropdown-item"
+                    @click="toggleNewDashboardModal(); dropdownForceClose();">
                     New Dashboard
                   </a>
                   <div v-if="dashboards.length > 0">

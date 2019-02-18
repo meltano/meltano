@@ -38,8 +38,6 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
-
 export default {
   name: 'CreateDashboard',
   data() {
@@ -56,7 +54,7 @@ export default {
       this.close();
     },
   },
-}
+};
 </script>
 
 <style scoped>
