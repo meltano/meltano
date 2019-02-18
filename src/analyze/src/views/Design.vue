@@ -181,7 +181,7 @@
             <p v-if="activeReport.name" class="control" @click="getDashboards">
               <Dropdown label="Add to Dashboard" is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                  <a class="dropdown-item" @click="dropdownForceClose();">
+                  <a class="dropdown-item" @click="toggleNewDashboardModal(); dropdownForceClose();">
                     New Dashboard
                   </a>
                   <div v-if="dashboards.length > 0">
@@ -475,6 +475,10 @@
           </div>
         </div>
       </div>
+
+      <!-- New Dashboard Modal -->
+      <CreateDashboard v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+
     </div>
 
   </router-view-layout>
@@ -488,9 +492,15 @@ import ResultTable from '../components/designs/ResultTable';
 import SelectDropdown from '../components/generic/SelectDropdown';
 import YesNoFilter from '../components/filters/YesNoFilter';
 import Chart from '../components/designs/Chart';
+import CreateDashboard from '../components/dashboards/CreateDashboard';
 
 export default {
   name: 'Design',
+  data() {
+    return {
+      isNewDashboardModalOpen: false,
+    };
+  },
   created() {
     this.$store.dispatch('designs/getDesign', {
       model: this.$route.params.model,
@@ -502,6 +512,7 @@ export default {
   },
   components: {
     Chart,
+    CreateDashboard,
     Dropdown,
     ResultTable,
     RouterViewLayout,
@@ -674,6 +685,10 @@ export default {
 
     toggleChartsOpen() {
       this.$store.dispatch('designs/toggleChartsOpen');
+    },
+
+    toggleNewDashboardModal() {
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
     },
 
     dropdownSelected(item, field) {

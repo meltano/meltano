@@ -10,7 +10,7 @@
 
         <div class='panel-block'>
           <a class='button is-secondary is-fullwidth'
-              @click="setAddDashboard(true)">Create Dashboard</a>
+              @click="setAddDashboard(true)">New Dashboard</a>
         </div>
 
         <div v-for="dashboard in dashboards"
