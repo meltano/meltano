@@ -28,9 +28,12 @@
           </div>
         </div>
       </section>
-      <footer class="modal-card-foot is-pull-right">
+      <footer class="modal-card-foot">
         <button class="button" @click="close">Cancel</button>
-        <button class="button is-success" @click="saveDashboard">Create</button>
+        <button
+          class="button is-success"
+          :disabled="!saveDashboardSettings.name"
+          @click="saveDashboard">Create</button>
       </footer>
     </div>
   </div>
@@ -66,6 +69,11 @@ export default {
   },
 };
 </script>
+
 <style scoped>
+
+.modal-card-foot {
+  justify-content: flex-end;
+}
 
 </style>
