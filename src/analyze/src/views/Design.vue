@@ -159,7 +159,7 @@
 
         <div class="panel-block">
           <button class="button is-link is-outlined is-fullwidth">
-            Reset All Filters
+            Clear Selections
           </button>
         </div>
       </nav>
