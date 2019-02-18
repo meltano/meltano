@@ -334,52 +334,52 @@
         <span class="accordion-title">Charts</span>
         <div>
           <div class="field has-addons chart-buttons">
-            <p class="control">
+            <p class="control" @click.stop="setAndOpenChart('BarChart')">
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'BarChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setAndOpenChart('BarChart')">
+                <span class="icon is-small">
                   <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                 </span>
               </button>
             </p>
-            <p class="control">
+            <p class="control" @click.stop="setAndOpenChart('LineChart')">
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'LineChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setAndOpenChart('LineChart')">
+                <span class="icon is-small">
                   <font-awesome-icon icon="chart-line"></font-awesome-icon>
                 </span>
               </button>
             </p>
-            <p class="control">
+            <p class="control" @click.stop="setAndOpenChart('AreaChart')">
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'AreaChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setAndOpenChart('AreaChart')">
+                <span class="icon is-small">
                   <font-awesome-icon icon="chart-area"></font-awesome-icon>
                 </span>
               </button>
             </p>
-            <p class="control">
+            <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'ScatterChart'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setAndOpenChart('ScatterChart')">
+                <span class="icon is-small">
                   <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                 </span>
               </button>
             </p>
-            <p class="control">
+            <p class="control" @click.stop="setAndOpenChart('number')">
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'number'}"
                 :disabled="!hasResults">
-                <span class="icon is-small" @click.stop="setAndOpenChart('number')">
+                <span class="icon is-small">
                   <font-awesome-icon icon="hashtag"></font-awesome-icon>
                 </span>
               </button>
