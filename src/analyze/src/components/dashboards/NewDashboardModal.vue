@@ -50,9 +50,19 @@ export default {
       this.$emit('close');
     },
     saveDashboard() {
-      this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
+      if (this.report) {
+        this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
+          'data': this.saveDashboardSettings,
+          'report': this.report,
+        });
+      } else {
+        this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
+      }
       this.close();
     },
+  },
+  props: {
+    report: Object
   },
 };
 </script>

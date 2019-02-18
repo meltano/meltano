@@ -480,7 +480,11 @@
       </div>
 
       <!-- New Dashboard Modal -->
-      <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+      <NewDashboardModal
+        v-if="isNewDashboardModalOpen"
+        @close="toggleNewDashboardModal"
+        :report="activeReport">
+      </NewDashboardModal>
 
     </div>
 
