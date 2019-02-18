@@ -39,7 +39,7 @@
 
 <script>
 export default {
-  name: 'CreateDashboard',
+  name: 'NewDashboardModal',
   data() {
     return {
       saveDashboardSettings: { name: null, description: null },

@@ -50,7 +50,7 @@
       </div>
 
       <!-- New Dashboard Modal -->
-      <CreateDashboard v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+      <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
 
     </div>
 
@@ -61,7 +61,7 @@
 import { mapState, mapActions } from 'vuex';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Chart from '../components/designs/Chart';
-import CreateDashboard from '../components/dashboards/CreateDashboard';
+import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Dashboards',
@@ -76,7 +76,7 @@ export default {
   },
   components: {
     Chart,
-    CreateDashboard,
+    NewDashboardModal,
     RouterViewLayout,
   },
   computed: {

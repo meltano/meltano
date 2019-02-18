@@ -480,7 +480,7 @@
       </div>
 
       <!-- New Dashboard Modal -->
-      <CreateDashboard v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+      <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
 
     </div>
 
@@ -495,7 +495,7 @@ import ResultTable from '../components/designs/ResultTable';
 import SelectDropdown from '../components/generic/SelectDropdown';
 import YesNoFilter from '../components/filters/YesNoFilter';
 import Chart from '../components/designs/Chart';
-import CreateDashboard from '../components/dashboards/CreateDashboard';
+import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Design',
@@ -515,7 +515,7 @@ export default {
   },
   components: {
     Chart,
-    CreateDashboard,
+    NewDashboardModal,
     Dropdown,
     ResultTable,
     RouterViewLayout,
