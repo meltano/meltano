@@ -42,28 +42,7 @@
 
     <div slot='right'>
       <div v-if="isAddDashboard">
-        <div class="field">
-          <label class="label">Name</label>
-          <div class="control">
-            <input class="input"
-                    type="text"
-                    placeholder="Name your dashboard"
-                    v-model="saveDashboardSettings.name">
-          </div>
-        </div>
-        <div class="field">
-          <label class="label">Description</label>
-          <div class="control">
-            <textarea class="textarea"
-                      placeholder="Describe your dashboard for easier reference later"
-                      v-model="saveDashboardSettings.description"></textarea>
-          </div>
-        </div>
-        <div class="field is-grouped">
-          <div class="control">
-            <button class="button is-link" @click="saveDashboard">Save</button>
-          </div>
-        </div>
+        <CreateDashboard />
       </div>
 
       <div v-if="!isAddDashboard">
@@ -84,6 +63,7 @@
 import { mapState, mapActions } from 'vuex';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Chart from '../components/designs/Chart';
+import CreateDashboard from '../components/dashboards/CreateDashboard';
 
 export default {
   name: 'Dashboards',
@@ -93,6 +73,7 @@ export default {
   },
   components: {
     Chart,
+    CreateDashboard,
     RouterViewLayout,
   },
   computed: {
@@ -102,7 +83,6 @@ export default {
       'dashboards',
       'isAddDashboard',
       'reports',
-      'saveDashboardSettings',
     ]),
   },
   methods: {
@@ -118,9 +98,6 @@ export default {
     },
     isReportInActiveDashboard(report) {
       return this.activeDashboard.reportIds.includes(report.id);
-    },
-    saveDashboard() {
-      this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
     },
     toggleReportInDashboard(report) {
       const methodName = this.isReportInActiveDashboard(report)

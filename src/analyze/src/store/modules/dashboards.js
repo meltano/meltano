@@ -7,7 +7,6 @@ const state = {
   dashboards: [],
   isAddDashboard: true,
   reports: [],
-  saveDashboardSettings: { name: null, description: null },
 };
 
 const actions = {
@@ -48,7 +47,6 @@ const actions = {
         commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
-        commit('resetSaveDashboardSettings');
       });
   },
   addReportToDashboard({ commit }, data) {
@@ -70,9 +68,6 @@ const actions = {
 const mutations = {
   addSavedDashboardToDashboards(_, dashboard) {
     state.dashboards.push(dashboard);
-  },
-  resetSaveDashboardSettings() {
-    state.saveDashboardSettings = { name: null, description: null };
   },
   setActiveDashboardReports(_, reports) {
     state.activeDashboardReports = reports;
