@@ -52,8 +52,8 @@ export default {
     saveDashboard() {
       if (this.report) {
         this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
-          'data': this.saveDashboardSettings,
-          'report': this.report,
+          data: this.saveDashboardSettings,
+          report: this.report,
         });
       } else {
         this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
@@ -62,11 +62,10 @@ export default {
     },
   },
   props: {
-    report: Object
+    report: Object,
   },
 };
 </script>
-
 <style scoped>
 
 </style>
