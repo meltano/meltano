@@ -19,7 +19,6 @@ const actions = {
   getDashboard({ commit }, dashboard) {
     dashboardApi.getDashboard(dashboard.id)
       .then((response) => {
-        commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
       });
   },
@@ -37,13 +36,9 @@ const actions = {
         commit('setActiveDashboardReports', response.data);
       });
   },
-  setAddDashboard({ commit }, value) {
-    commit('setAddDashboard', value);
-  },
   saveDashboard({ commit }, data) {
     dashboardApi.saveDashboard(data)
       .then((response) => {
-        commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
       });
@@ -51,14 +46,12 @@ const actions = {
   addReportToDashboard({ commit }, data) {
     dashboardApi.addReportToDashboard(data)
       .then((response) => {
-        commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
       });
   },
   removeReportFromDashboard({ commit }, data) {
     dashboardApi.removeReportFromDashboard(data)
       .then((response) => {
-        commit('setAddDashboard', false);
         commit('setCurrentDashboard', response.data);
       });
   },
