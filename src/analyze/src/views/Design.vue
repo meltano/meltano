@@ -201,24 +201,25 @@
               </Dropdown>
             </p>
 
-            <div class="control field has-addons">
+            <div class="control field" :class="{'has-addons': activeReport.id}">
               <p class="control">
                 <button
                   class="button is-success is-outlined"
-                  :disabled="!hasResults"
-                  @click="saveOrUpdateReport();">
+                  v-if="activeReport.id"
+                  @click="updateReport();">
                   <span>Save</span>
                 </button>
               </p>
               <p class="control">
                 <Dropdown
-                  :disabled="!reports.length && !activeReport.id"
+                  :disabled="!hasResults"
+                  :label="activeReport.id ? '' : 'Save'"
                   button-classes='is-success is-outlined'
                   is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                    <div class="dropdown-item" v-if="activeReport.id">
+                    <div class="dropdown-item">
                       <div class="field">
-                        <label class="label">Save as</label>
+                        <label class="label" v-if="activeReport.id">Save as</label>
                         <div class="control">
                           <input class="input"
                                   type="text"
@@ -239,20 +240,27 @@
                         </div>
                       </div>
                     </div>
-                    <hr class="dropdown-divider" v-if="reports.length && activeReport.id">
-                    <div v-if="reports.length">
-                      <p class="dropdown-item label">Load Report</p>
-                      <a class="dropdown-item"
-                          v-for="report in reports"
-                          :key="report.name"
-                          @click="loadReport(report); dropdownForceClose();">
-                        {{report.name}}
-                      </a>
-                    </div>
                   </div>
                 </Dropdown>
               </p>
             </div>
+
+            <p class="control">
+              <Dropdown
+                :disabled="!reports.length"
+                label="Load"
+                button-classes='is-success is-outlined'
+                is-right-aligned>
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <a class="dropdown-item"
+                      v-for="report in reports"
+                      :key="report.name"
+                      @click="loadReport(report); dropdownForceClose();">
+                    {{report.name}}
+                  </a>
+                </div>
+              </Dropdown>
+            </p>
 
             <p class="control">
               <button class="button is-success"
@@ -669,14 +677,6 @@ export default {
 
     updateReport() {
       this.$store.dispatch('designs/updateReport');
-    },
-
-    saveOrUpdateReport() {
-      if (this.activeReport.id) {
-        this.updateReport();
-      } else {
-        this.focusReportInput();
-      }
     },
 
     focusReportInput() {
