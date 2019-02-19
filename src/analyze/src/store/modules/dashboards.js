@@ -44,16 +44,13 @@ const actions = {
       });
   },
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
-    const promiseDashboard = dashboardApi.saveDashboard(data);
-    const promiseReport = designApi.saveReport(report);
-    Promise.all([promiseDashboard, promiseReport])
-      .then((values) => {
-        const dashboard = values[0].data;
-        const reportWithId = values[1].data;
+    dashboardApi.saveDashboard(data)
+      .then((response) => {
+        const dashboard = response.data;
         commit('setCurrentDashboard', dashboard);
         commit('addSavedDashboardToDashboards', dashboard);
         dispatch('addReportToDashboard', {
-          reportId: reportWithId.id,
+          reportId: report.id,
           dashboardId: dashboard.id,
         });
       });
