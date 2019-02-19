@@ -47,6 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
+* Fixed Analyze button groupd CSS to align as a single row
 
 
 ## 0.9.0 - (2019-02-05)
