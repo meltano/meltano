@@ -166,15 +166,15 @@
 
         <div class="column is-one-quarter">
           <div class="is-grouped is-pulled-left">
-            <div v-if="activeReport.name">{{activeReport.name}}</div>
-            <div v-if="!activeReport.name"><em>Untitled Report</em></div>
+            <div v-if="hasActiveReport()">{{activeReport.name}}</div>
+            <div v-else><em>Untitled Report</em></div>
           </div>
         </div>
 
         <div class="column">
           <div class="field is-grouped is-pulled-right">
 
-            <p v-if="activeReport.name" class="control" @click="getDashboards">
+            <p v-if="hasActiveReport()" class="control" @click="getDashboards">
               <Dropdown label="Add to Dashboard" is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                   <a
@@ -201,11 +201,11 @@
               </Dropdown>
             </p>
 
-            <div class="control field" :class="{'has-addons': activeReport.id}">
+            <div class="control field" :class="{'has-addons': hasActiveReport()}">
               <p class="control">
                 <button
                   class="button is-success is-outlined"
-                  v-if="activeReport.id"
+                  v-if="hasActiveReport()"
                   @click="updateReport();">
                   <span>Save</span>
                 </button>
@@ -213,13 +213,13 @@
               <p class="control">
                 <Dropdown
                   :disabled="!hasResults"
-                  :label="activeReport.id ? '' : 'Save'"
+                  :label="hasActiveReport() ? '' : 'Save'"
                   button-classes='is-success is-outlined'
                   is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <div class="dropdown-item">
                       <div class="field">
-                        <label class="label" v-if="activeReport.id">Save as</label>
+                        <label class="label" v-if="hasActiveReport()">Save as</label>
                         <div class="control">
                           <input class="input"
                                   type="text"
@@ -597,6 +597,10 @@ export default {
 
     isActiveReportInDashboard(dashboard) {
       return dashboard.reportIds.includes(this.activeReport.id);
+    },
+
+    hasActiveReport() {
+      return Object.keys(this.activeReport).length > 0;
     },
 
     toggleActiveReportInDashboard(dashboard) {
