@@ -149,7 +149,7 @@ class RolePermissionsResource(Resource):
         payload = request.get_json()
         return payload["role"], payload["permissionType"], payload["context"]
 
-    @roles_required("manager")
+    @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)
     def post(self):
         role, permission_type, context = self._parse_request()
@@ -174,7 +174,7 @@ class RolePermissionsResource(Resource):
 
         return role, 200
 
-    @roles_required("manager")
+    @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)
     def delete(self):
         role, permission_type, context = self._parse_request()

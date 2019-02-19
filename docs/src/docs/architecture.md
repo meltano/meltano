@@ -237,8 +237,6 @@ Meltano manages authorization using a role based access control scheme.
 
 A Permission has a context for with it is valid: anything that matches the context is permitted.
 
-```
-
 
 ### Docker images
 

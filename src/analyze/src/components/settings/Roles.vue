@@ -9,19 +9,20 @@
           <div class="field is-grouped">
             <div class="control">
               <input v-model="model.role"
+                     @keyup.enter="createRole(model)"
                      type="text"
                      class="input"
                      placeholder="Role name" />
             </div>
             <div class="control">
               <button class="button is-success"
-                      @click.prevent="createRole">
+                      @click.prevent="createRole(model)">
                 Create
               </button>
             </div>
             <div class="control">
               <button class="button is-danger"
-                      @click.prevent="deleteRole">
+                      @click.prevent="deleteRole(model)">
                 Delete
               </button>
             </div>
@@ -31,210 +32,32 @@
 
       <div class="segment">
         <h2 class="subtitle is-4">Members</h2>
-        <roles-members :users="acl.users"
-                       :roles="rolesName"
-                       v-on:assignRole="assignRole"
-                       v-on:unassignRole="unassignRole"
-                       inline-template>
-          <table class="table is-fullwidth">
-            <thead>
-              <tr>
-                <th>User</th>
-                <th>Roles</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="user in users">
-                <tr :key="user.username">
-                  <td>{{ user.username }}</td>
-                  <td>
-                    <div class="field is-grouped is-grouped-multiline">
-                      <role-pill v-for="role in user.roles"
-                                 v-on:unassign="unassignRole(user, role)"
-                                 :key="role"
-                                 :name="role"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-            <tfoot>
-              <tr>
-                <td>
-                  <div class="field">
-                    <div class="control">
-                      <div class="select">
-                        <select v-model="model.user">
-                          <option :value="null">Select a user</option>
-                          <option v-for="user in users"
-                                  :key="user.username"
-                          >{{user.username}}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div class="field is-grouped">
-                    <div class="control">
-                      <div class="select">
-                        <select v-model="model.role">
-                          <option :value="null">Select a role</option>
-                          <option v-for="role in roles"
-                                  :key="role"
-                          >{{role}}</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div class="control">
-                      <button class="button is-primary"
-                              v-on:click="$emit('assignRole', model)">
-                        Assign
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </roles-members>
+        <role-members :users="acl.users"
+                      :roles="rolesName"
+                      @add="assignRoleUser($event)"
+                      @remove="unassignRole($event)"
+        />
       </div>
 
       <h1 class="title is-2">Permissions</h1>
 
       <div class="segment">
-        <roles-perms v-for="perm in permissions"
-                     :key="perm.type"
-                     :permission_type="perm.type"
-                     :roles="rolesContexts(perm.type)"
-                     @addPermission="addRolePermission(perm.type, $event)"
-                     @removePermission="removeRolePermission(perm.type, $event)"
-                     inline-template>
-          <div style="margin-bottom: 2em;">
-            <h2 class="subtitle is-4">{{perm.name}}</h2>
-          <table class="table is-fullwidth">
-              <thead>
-                <tr>
-                  <th>Role</th>
-                <th>Context</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-for="role in roles">
-                  <tr :key="role.name">
-                    <td>{{role.name}}</td>
-                  <td>
-                    <div class="field is-grouped is-grouped-multiline">
-                      <role-pill v-for="context in role.contexts"
-                                 :key="context"
-                                 :name="context"
-                                 @unassign="removePermission(role, context)"
-                      />
-                    </div>
-                  </td>
-                </tr>
-              </template>
-            </tbody>
-            <tfoot>
-                <tr>
-                  <td>
-                    <div class="field">
-                      <div class="control">
-                        <div class="select">
-                          <select v-model="model.role">
-                            <option :value="null">Select a role</option>
-                            <option v-for="role in roles"
-                                    :key="role.name"
-                            >{{role.name}}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <td>
-                    <div class="field is-grouped">
-                      <div class="control">
-                        <input v-model="model.context"
-                             type="text"
-                             class="input"
-                             placeholder="Design filter" />
-                    </div>
-                    <div class="control">
-                        <button @click="$emit('addPermission', model)"
-                                class="button is-primary">
-                          Assign
-                      </button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-          </div>
-        </roles-perms>
+        <role-permissions v-for="perm in permissions"
+                          :key="perm.type"
+                          :permission="perm"
+                          :roles="rolesContexts(perm.type)"
+                          @add="addRolePermission($event)"
+                          @remove="removeRolePermission($event)"
+        />
       </div>
     </section>
   </div>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import RoleMembers from './RoleMembers';
+import RolePermissions from './RolePermissions';
 
-const RolePill = {
-  props: ['user', 'name'],
-  template: `
-     <div class="control">
-       <div class="tags has-addons">
-         <span class="tag">{{name}}</span>
-         <a class="tag is-delete" @click.prevent="$emit('unassign')"></a>
-       </div>
-     </div>`,
-};
-
-const RolesMembers = {
-  props: ['users', 'roles'],
-  data() {
-    return {
-      model: {
-        user: null,
-        role: null,
-      },
-    };
-  },
-
-  components: {
-    RolePill,
-  },
-
-  methods: {
-    unassignRole(user, role) {
-      this.$emit('unassignRole', { role, user: user.username });
-    },
-  },
-};
-
-const RolesPerms = {
-  props: ['roles', 'permission_type', 'contexts'],
-  data() {
-    return {
-      model: {
-        role: null,
-        context: null,
-      },
-    };
-  },
-
-  components: {
-    RolePill,
-  },
-
-  methods: {
-    removePermission(role, context) {
-      this.$emit('removePermission', { role: role.name, context });
-    },
-  },
-};
 
 export default {
   name: 'Roles',
@@ -252,8 +75,8 @@ export default {
   },
 
   components: {
-    RolesMembers,
-    RolesPerms,
+    RoleMembers,
+    RolePermissions,
   },
 
   created() {
@@ -271,54 +94,19 @@ export default {
   },
 
   methods: {
-    saveConnection() {
-      this.$store.dispatch('settings/saveConnection', {
-        name: this.connectionName,
-        database: this.connectionDatabase,
-        schema: this.connectionSchema,
-        dialect: this.connectionDialect,
-        host: this.connectionHost,
-        port: this.connectionPort,
-        username: this.connectionUsername,
-        password: this.connectionPassword,
-        path: this.connectionSqlitePath,
-      });
-      this.connectionName = '';
-      this.connectionDatabase = '';
-      this.connectionSchema = '';
-      this.connectionDialect = '';
-      this.connectionHost = '';
-      this.connectionPort = '';
-      this.connectionUsername = '';
-      this.connectionPassword = '';
-      this.connectionSqlitePath = '';
-    },
-    deleteConnection(connection) {
-      this.$store.dispatch('settings/deleteConnection', connection);
-    },
-    createRole() {
-      this.$store.dispatch('settings/createRole', this.model);
-    },
-    deleteRole() {
-      this.$store.dispatch('settings/deleteRole', this.model);
-    },
-    unassignRole({ role, user }) {
-      this.$store.dispatch('settings/unassignRoleUser', { role, user });
-    },
-    assignRole({ role, user }) {
-      this.$store.dispatch('settings/assignRoleUser', { role, user });
-    },
-    addRolePermission(permissionType, { role, context }) {
-      this.$store.dispatch('settings/addRolePermission', { permissionType, role, context });
-    },
-    removeRolePermission(permissionType, { role, context }) {
-      this.$store.dispatch('settings/removeRolePermission', { permissionType, role, context });
-    },
+    ...mapActions('settings', [
+      'createRole',
+      'deleteRole',
+      'unassignRoleUser',
+      'assignRoleUser',
+      'addRolePermission',
+      'removeRolePermission',
+    ]),
   },
 };
 </script>
 <style scoped>
  .segment {
-   margin-bottom: 2em;
+   margin-bottom: 2rem;
  }
 </style>

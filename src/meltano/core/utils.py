@@ -26,8 +26,8 @@ def compose(*fs):
 def slugify(s):
     """
     Simplifies ugly strings into something URL-friendly.
-    >>> print slugify("[Some] _ Article's Title--")
-    some-articles-title
+    >>> slugify("[Some] _ Article's Title--")
+    'some-articles-title'
     """
 
     # "[Some] _ Article's Title--"
@@ -90,6 +90,20 @@ def get_all(keys, d: dict, default=None):
 
 
 def nest(d: dict, path: str):
+    """
+    Create a hierarchical dictionary path and return the leaf dict.
+
+    >>> d = dict()
+    >>> test = nest(d, "foo.bar.test")
+    >>> test
+    {}
+    >>> d
+    {'foo': {'bar': {'test': {}}}}
+    >>> test["a"] = 1
+    >>> d
+    {'foo': {'bar': {'test': {'a': 1}}}}
+
+    """
     cursor = d
 
     # create the list of dicts
