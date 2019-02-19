@@ -157,11 +157,6 @@
           </template>
         </div>
 
-        <div class="panel-block">
-          <button class="button is-link is-outlined is-fullwidth">
-            Clear Selections
-          </button>
-        </div>
       </nav>
     </div>
 
