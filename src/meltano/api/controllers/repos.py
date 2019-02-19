@@ -8,7 +8,10 @@ import markdown
 from flask import Blueprint, jsonify, request
 
 from meltano.api.security import api_auth_required
-from .m5o_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
+from meltano.core.m5o.m5o_file_parser import (
+    MeltanoAnalysisFileParser,
+    MeltanoAnalysisFileParserError,
+)
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")

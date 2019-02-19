@@ -3,7 +3,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 
 from meltano.core.project import Project
-from meltano.api.controllers.m5o_file_parser import MeltanoAnalysisFileParser
+from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 
 
 class CompileEventHandler(PatternMatchingEventHandler):

@@ -1,15 +1,17 @@
-from pyhocon import ConfigFactory
-from pathlib import Path
-from jinja2 import Template
-from typing import Dict, List
-from .design_helper import visit, PypikaJoinExecutor
-import networkx as nx
-from networkx.readwrite import json_graph
-import sqlparse
-from copy import deepcopy
-
-import logging
 import json
+import logging
+import sqlparse
+
+import networkx as nx
+
+from copy import deepcopy
+from jinja2 import Template
+from networkx.readwrite import json_graph
+from pathlib import Path
+from pyhocon import ConfigFactory
+from typing import Dict, List
+
+from meltano.core.sql.design_helper import visit, PypikaJoinExecutor
 
 
 class MeltanoAnalysisFileParserError(Exception):

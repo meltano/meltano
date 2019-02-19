@@ -25,4 +25,12 @@
       sql = "{{table}}.perc"
     }
   }
+  aggregates {
+    avg_perc {
+      label = Average Percent (%)
+      description = Average Percent (%)
+      type = avg
+      sql = "{{table}}.perc"
+    }
+  }
 }
