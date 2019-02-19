@@ -1,17 +1,18 @@
 import logging
-from enum import Enum
-from copy import deepcopy
-from typing import Dict
-import networkx as nx
-from networkx.readwrite import json_graph
-
-from .analysis_helper import AnalysisHelper
-from collections import namedtuple
-
-
 import sqlparse
+
+import networkx as nx
+
+from copy import deepcopy
+from collections import namedtuple
+from enum import Enum
 from functools import singledispatch
+from networkx.readwrite import json_graph
 from sqlparse.sql import TokenList, Comparison
+from typing import Dict
+
+from .base import MeltanoTable
+from .analysis_helper import AnalysisHelper
 
 # Visitor pattern on the SQL AST
 @singledispatch
@@ -131,7 +132,9 @@ class DesignHelper:
 
     @property
     def tables(self):
-        return deepcopy(self.design["tables"])
+        tables = [self.design["related_table"]]
+        tables += [j["related_table"] for j in self.design["joins"]]
+        return list(map(MeltanoTable, tables))
 
     @property
     def base_table_name(self):

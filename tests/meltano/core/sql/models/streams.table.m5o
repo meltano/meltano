@@ -1,0 +1,57 @@
+{
+  version = 1
+  sql_table_name = streams
+  name = streams
+  columns {
+    id {
+      primary_key = true
+      hidden = true
+      type = int
+      sql = "{{table}}.id"
+    }
+    user_id {
+      label = User ID
+      hidden = yes
+      type = int
+      sql = "{{TABLE}}.user_id"
+    }
+    episode_id {
+      label = Episode ID
+      hidden = yes
+      type = int
+      sql = "{{TABLE}}.episode_id"
+    }
+    day {
+      label = day
+      description = day
+      type = int
+      sql = "{{table}}.day"
+    }
+    month {
+      label = month
+      description = month
+      type = int
+      sql = "{{table}}.month"
+    }
+    year {
+      label = year
+      description = year
+      type = int
+      sql = "{{table}}.year"
+    }
+  }
+  aggregates {
+    count {
+      label = Streams Count
+      description = Total Streams Count
+      type = count
+      sql = "{{table}}.id"
+    }
+    sum_minutes {
+      label = Total Minutes
+      description = Total Minutes Watched
+      type = sum
+      sql = "{{table}}.minutes"
+    }
+  }
+}

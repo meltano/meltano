@@ -10,8 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * Update installation and contributing docs
+* Add support for generating Hyper Dimensional Aggregates (HDA)
+* Add internal Meltano Classes for representing and managing Designs, Table/Column/Aggregate/etc Definitions, Query Definitions and for generating SQL queries in a structured way.
 
 ### Changes
+* Move core functionality out of `api/controllers` to `/core/m5o` (for m5o and m5oc management) and `/core/sql` (for anything related to sql generation)
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
