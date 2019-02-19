@@ -683,14 +683,6 @@ export default {
       this.$store.dispatch('designs/updateReport');
     },
 
-    focusReportInput() {
-      console.log('focus input');
-    },
-
-    blurReportInput() {
-      console.log('focus input');
-    },
-
     setCurrentTab(tab) {
       this.$store.dispatch('designs/switchCurrentTab', tab);
     },
