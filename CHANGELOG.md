@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.11.0 - (2019-02-19)
+---
+
+### New
 * Update installation and contributing docs
 * Add support for generating Hyper Dimensional Aggregates (HDA)
 * Add internal Meltano classes for representing and managing Designs, Table, Column, Aggregate, Definitions, and Query definitions
@@ -18,8 +30,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
-
-### Breaks
 
 
 ## 0.10.0 - (2019-02-12)
