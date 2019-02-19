@@ -203,7 +203,10 @@
 
             <div class="control field has-addons">
               <p class="control">
-                <button class="button is-success is-outlined" :disabled="!currentSQL">
+                <button
+                  class="button is-success is-outlined"
+                  :disabled="!hasResults"
+                  @click="updateReport();">
                   <span>Save</span>
                 </button>
               </p>
