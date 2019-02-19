@@ -6,14 +6,14 @@
         <div class="panel-block">
           <div class="field has-addons">
             <div class="control is-expanded">
-              <input class="input" type="text" placeholder="Filter">
+              <input class="input" type="text" placeholder="Filter" disabled>
             </div>
             <div class="control">
-              <a class="button">
+              <button class="button" disabled>
                 <span class="icon">
                   <font-awesome-icon icon="search"></font-awesome-icon>
                 </span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
