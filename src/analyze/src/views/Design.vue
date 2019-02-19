@@ -182,7 +182,7 @@
                     @click="toggleNewDashboardModal(); dropdownForceClose();">
                     New Dashboard
                   </a>
-                  <div v-if="dashboards.length > 0">
+                  <div v-if="dashboards.length">
                     <div class="dropdown-item"
                         v-for="dashboard in dashboards"
                         :key="dashboard.id">
@@ -203,14 +203,17 @@
 
             <div class="control field has-addons">
               <p class="control">
-                <a class="button is-success is-outlined">
+                <button class="button is-success is-outlined" :disabled="!currentSQL">
                   <span>Save</span>
-                </a>
+                </button>
               </p>
               <p class="control">
-                <Dropdown button-classes='is-success is-outlined' is-right-aligned>
+                <Dropdown
+                  :disabled="!reports.length && !activeReport.id"
+                  button-classes='is-success is-outlined'
+                  is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                    <div class="dropdown-item">
+                    <div class="dropdown-item" v-if="activeReport.id">
                       <div class="field">
                         <label class="label">Save as</label>
                         <div class="control">
@@ -233,16 +236,8 @@
                         </div>
                       </div>
                     </div>
-                    <hr class="dropdown-divider" v-if="activeReport.name">
-                    <div class="dropdown-item" v-if="activeReport.name">
-                      <button class="button is-link is-fullwidth"
-                              @click="
-                                updateReport();
-                                dropdownForceClose();">
-                        Update Existing</button>
-                    </div>
-                    <div v-if="reports.length > 0">
-                      <hr class="dropdown-divider">
+                    <hr class="dropdown-divider" v-if="reports.length && activeReport.id">
+                    <div v-if="reports.length">
                       <p class="dropdown-item label">Load Report</p>
                       <a class="dropdown-item"
                           v-for="report in reports"

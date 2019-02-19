@@ -4,8 +4,9 @@
     <div class="dropdown-trigger">
       <button class="button"
               :class="buttonClasses"
-              aria-haspopup="true"
+              :disabled="disabled"
               :aria-controls="getHyphenatedLabel"
+              aria-haspopup="true"
               @click="toggleDropdown">
         <span v-if="label">{{label}}</span>
         <span class="icon is-small">
@@ -50,6 +51,10 @@ export default {
     },
     buttonClasses: {
       type: String,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
     },
     isRightAligned: {
       type: Boolean,
