@@ -206,7 +206,7 @@
                 <button
                   class="button is-success is-outlined"
                   :disabled="!hasResults"
-                  @click="updateReport();">
+                  @click="saveOrUpdateReport();">
                   <span>Save</span>
                 </button>
               </p>
@@ -669,6 +669,22 @@ export default {
 
     updateReport() {
       this.$store.dispatch('designs/updateReport');
+    },
+
+    saveOrUpdateReport() {
+      if (this.activeReport.id) {
+        this.updateReport();
+      } else {
+        this.focusReportInput();
+      }
+    },
+
+    focusReportInput() {
+      console.log('focus input');
+    },
+
+    blurReportInput() {
+      console.log('focus input');
     },
 
     setCurrentTab(tab) {
