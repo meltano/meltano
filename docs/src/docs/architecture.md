@@ -232,57 +232,13 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 Meltano manages authorization using a role based access control scheme.
 
-> Note: Meltano uses HOCON as its configuration format;
-> see https://github.com/lightbend/config/blob/master/HOCON.md for more details.
+  * Users have multiple roles;
+  * Roles have multiple permissions;
 
-Roles are defined in the `model/acls.m5o` file, as a descriptive permission layout.
+A Permission has a context for with it is valid: anything that matches the context is permitted.
 
-```json
-# namespace
-roles {
-
-    # the role name must be unique
-    admin {
-
-      # list the users that are member of this role
-      # users are referenced by `username`
-      users: [
-          "user1",
-          "user2",
-      ]
-
-      # the Access Control List (ACL) of this role
-      acl {
-
-          # permissions name
-          view {
-
-              # the permission context, defines upon
-              # what this permission applies
-
-              # contexts are referenced by name (* for all)
-              designs: ["*"]
-              reports: ["admin_report_1"]
-              …
-          }
-
-          …
-      }
-    }
-
-    …
-}
 ```
 
-#### Available Permissions
-
-Here is a list of currently available permissions.
-
-|        | Designs | Collections | Reports | Dashboards |
-|--------|:-------:|:-----------:|:-------:|:----------:|
-| View   |         | ✓           | ✓       | ✓          |
-| Create |         |             | ✓       | ✓          |
-| Delete |         |             | ✓       | ✓          |
 
 ### Docker images
 
