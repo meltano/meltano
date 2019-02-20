@@ -82,9 +82,10 @@ pages:
     paths:
       - node_modules/
   script:
+    - cd docs
     - yarn
     - yarn build:docs
-    - mv docs/public public
+    - mv public ../public
   artifacts:
     paths:
       - public
