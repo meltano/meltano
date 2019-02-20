@@ -9,11 +9,11 @@ from pypika import Query, Order
 from meltano.core.project import Project
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
-from .analysis_helper import AnalysisHelper
-from .settings_helper import SettingsHelper
 from meltano.core.project import Project
 from meltano.core.m5o.m5oc_file import M5ocFile
+from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
+from .settings_helper import SettingsHelper
 
 
 meltano_model_path = Path(os.getcwd(), "model")

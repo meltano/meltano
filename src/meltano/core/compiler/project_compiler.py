@@ -1,9 +1,7 @@
 import logging
 
 from meltano.core.project import Project
-
-# TODO 2019-02: move to `meltano.core`
-from meltano.api.controllers.m5o_file_parser import MeltanoAnalysisFileParser
+from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 
 
 class ProjectCompiler:
