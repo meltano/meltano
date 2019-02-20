@@ -3,33 +3,29 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 
 from meltano.core.project import Project
-from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
+from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 class CompileEventHandler(PatternMatchingEventHandler):
-    def __init__(self, root_path):
+    def __init__(self, compiler):
+        self.compiler = compiler
+
         super().__init__(ignore_patterns=["*.m5oc"])
-        self.root_path = root_path
 
     def on_any_event(self, event):
-        try:
-            m5o_parse = MeltanoAnalysisFileParser(self.root_path)
-            models = m5o_parse.parse()
-            m5o_parse.compile(models)
-            logging.info(f"Models have been compiled (via {event})")
-        except Exception:
-            logging.warn(f"Failed to compile models (via {event})")
+        self.compiler.compile()
 
 
 class MeltanoBackgroundCompiler:
-    def __init__(self, project: Project):
+    def __init__(self, project: Project, compiler: ProjectCompiler = None):
         self.project = project
-        self.observer = self.setup_observer(project.root.joinpath("model"))
+        self.compiler = compiler or ProjectCompiler(project)
+        self.observer = self.setup_observer()
 
-    def setup_observer(self, path):
-        event_handler = CompileEventHandler(path)
+    def setup_observer(self):
+        event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
-        observer.schedule(event_handler, str(event_handler.root_path), recursive=True)
+        observer.schedule(event_handler, str(self.compiler.source_dir), recursive=True)
 
         return observer
 
