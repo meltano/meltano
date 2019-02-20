@@ -87,8 +87,8 @@ class TestSecurity:
             assert identity.user == user
 
     def test_roles_from_acl(self, app_context):
-        assert users.get_user("admin@meltano.com").roles == {"admin"}
-        assert users.get_user("regular@meltano.com").roles == {"regular"}
+        assert users.get_user("admin@meltano.com").roles == ["admin"]
+        assert users.get_user("regular@meltano.com").roles == ["regular"]
 
         # no permissions for `@gitlabfan`
         users.create_user(username="gitlabfan", email="gitlabfan@meltano.com")
