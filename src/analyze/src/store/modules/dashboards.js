@@ -14,6 +14,7 @@ const getters = {
   hasDashboards() {
     return state.dashboards.length > 0;
   },
+  getIsActiveDashboardMatch: () => dashboard => dashboard.id === state.activeDashboard.id,
 };
 
 const actions = {

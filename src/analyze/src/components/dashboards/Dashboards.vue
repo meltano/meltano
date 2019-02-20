@@ -21,7 +21,7 @@
                 @click="getDashboard(dashboard)">
               <div>
                 <div>{{dashboard.name}}</div>
-                <div v-if="dashboard.id === activeDashboard.id">
+                <div v-if="getIsActiveDashboardMatch(dashboard)">
                   <small>Reports ({{activeDashboard.reportIds.length}})</small>
                   <ul>
                     <li v-for="report in reports" :key="report.id">
@@ -107,6 +107,7 @@ export default {
     ]),
     ...mapGetters('dashboards', [
       'hasDashboards',
+      'getIsActiveDashboardMatch',
     ]),
   },
   methods: {
