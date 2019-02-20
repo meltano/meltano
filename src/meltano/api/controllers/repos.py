@@ -35,7 +35,7 @@ def index():
     sortedM5oFiles = {
         "documents": [],
         "tables": [],
-        "models": [],
+        "topics": [],
         "dashboards": [],
         "reports": [],
     }
@@ -62,7 +62,7 @@ def index():
         if ext == ".table":
             sortedM5oFiles["tables"].append(file_dict)
         if ext == ".model":
-            sortedM5oFiles["models"].append(file_dict)
+            sortedM5oFiles["topics"].append(file_dict)
         if ext == ".dashboard":
             sortedM5oFiles["dashboards"].append(file_dict)
         if ext == ".report":
