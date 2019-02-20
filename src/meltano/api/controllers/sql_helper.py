@@ -1,15 +1,20 @@
 import logging
 import os
 import sqlalchemy
-
-from collections import OrderedDict
-from flask import jsonify
 from pathlib import Path
+from collections import OrderedDict
+from flask import jsonify, redirect, url_for
+from pypika import Query, Order
 
-from .settings_helper import SettingsHelper
+from meltano.core.project import Project
+from meltano.api.models import db
+from meltano.api.security import create_dev_user
 from meltano.core.project import Project
 from meltano.core.m5o.m5oc_file import M5ocFile
+from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
+from .settings_helper import SettingsHelper
+
 
 meltano_model_path = Path(os.getcwd(), "model")
 
@@ -69,13 +74,9 @@ class SqlHelper(SqlUtils):
 
     def reset_db(self):
         try:
-            Settings.__table__.drop(db.engine)
-            Project.__table__.drop(db.engine)
             db.drop_all()
         except sqlalchemy.exc.OperationalError as err:
             logging.error("Failed drop database.")
+
         db.create_all()
-        settings = Settings()
-        db.session.add(settings)
-        db.session.commit()
-        return jsonify({"dropped_it": "like_its_hot"})
+        create_dev_user()

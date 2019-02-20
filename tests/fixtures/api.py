@@ -1,6 +1,7 @@
 import pytest
 
 import meltano.api.app
+from meltano.api.security import create_dev_user
 from meltano.api.models import db
 
 
@@ -21,7 +22,7 @@ def app_context(app):
 
 
 @pytest.fixture()
-def create_app(request):
+def create_app(request, project):
     def _factory(**config):
         config = {
             "TESTING": True,
@@ -36,6 +37,7 @@ def create_app(request):
         with app.app_context():
             db.drop_all()
             db.create_all()
+            create_dev_user()
 
         return app
 

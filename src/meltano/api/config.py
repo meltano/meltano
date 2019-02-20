@@ -21,8 +21,8 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 
 # Flask-SQLAlchemy
 # -----------------
-SQLALCHEMY_ECHO = True
-SQLALCHEMY_DATABASE_URI = "sqlite:///meltano_api.db"
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_DATABASE_URI = "sqlite:///meltano.db"
 
 # Flask-security
 # -----------------
@@ -35,6 +35,7 @@ SECURITY_CHANGEABLE = True
 SECURITY_RECOVERABLE = True
 SECURITY_CONFIRMABLE = True
 SECURITY_URL_PREFIX = "/auth"
+SECURITY_USER_IDENTITY_ATTRIBUTES = ("username", "email")
 
 LOGIN_URL = SECURITY_URL_PREFIX + "/login"
 LOGOUT_URL = SECURITY_URL_PREFIX + "/logout"
@@ -42,6 +43,14 @@ REGISTER_URL = SECURITY_URL_PREFIX + "/register"
 RESET_URL = SECURITY_URL_PREFIX + "/reset"
 CHANGE_URL = SECURITY_URL_PREFIX + "/change"
 CONFIRM_URL = SECURITY_URL_PREFIX + "/confirm"
+
+SECURITY_MSG_USERNAME_NOT_PROVIDED = ("You must provide a username.", "error")
+SECURITY_MSG_USERNAME_INVALID = (
+    "Username must be at least 6 characters long.",
+    "error",
+)
+SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
+
 
 # Flask-Mail
 # -----------------

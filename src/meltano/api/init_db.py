@@ -3,8 +3,7 @@
 import backoff
 from sqlalchemy.exc import OperationalError
 
-from .app import db
-from .models import settings
+from .models import db, settings
 
 
 # to get the desired UX we should wait for the db to be available

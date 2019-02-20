@@ -1,14 +1,7 @@
 <template>
 <div class="container">
   <div class="columns">
-    <aside class="menu column is-one-quarter section has-background-light">
-      <p class="menu-label">
-        Database
-      </p>
-      <ul class="menu-list">
-        <li><a>Connections</a></li>
-      </ul>
-    </aside>
+    <SettingsMenu />
     <div class="column section">
       <section class="section">
         <p v-if="!hasConnections">No Database Connections</p>
@@ -163,6 +156,7 @@ export default {
 
   data() {
     return {
+
       connectionName: '',
       connectionDatabase: '',
       connectionSchema: '',
