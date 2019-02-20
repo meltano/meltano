@@ -6,9 +6,9 @@
   "description": "https://meltano.com",
   "main": "index.js",
   "scripts": {
-    "discovery.yml": "cp ./discovery.yml ./docs/src/.vuepress/public",
-    "dev": "vuepress dev docs/src",
-    "build": "vuepress build docs/src",
+    "discovery.yml": "cp ../discovery.yml ./src/.vuepress/public",
+    "dev": "vuepress dev src",
+    "build": "vuepress build src",
     "dev:docs": "npm run discovery.yml && npm run dev",
     "build:docs": "npm run discovery.yml && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
