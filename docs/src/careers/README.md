@@ -4,9 +4,7 @@ Want to help create a new product and make an impact in the world of data? You a
 
 ## Open Positions
 
-Here are the open positions that we currently have:
-
-- [General Manager](https://boards.greenhouse.io/gitlab/jobs/4059274002)
+We are currently not hiring at this time, but we will be sure to update this page when we are!
 
 ## Benefits
 
