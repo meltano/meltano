@@ -37,7 +37,6 @@ module.exports = {
 		nav: [
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
-			{ text: 'Careers', link: '/careers/' },
 			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {
