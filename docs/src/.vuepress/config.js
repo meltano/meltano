@@ -35,7 +35,7 @@ module.exports = {
 	dest: 'public',
 	themeConfig: {
 		nav: [
-			{ text: 'Home', link: '/' },
+			{ text: 'Home', link: '/test' },
 			{ text: 'Documentation', link: '/docs/' },
 			{ text: 'Careers', link: '/careers/' },
 			{ text: 'Press', link: '/press/' }
