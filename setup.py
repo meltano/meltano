@@ -17,7 +17,7 @@ requires = [
     'networkx',
     'pandas',
     'psycopg2',
-    'pypika',
+    'pypika==0.25.1',
     'python-dotenv',
     'pyyaml',
     'snowflake-connector-python',
@@ -37,6 +37,7 @@ requires = [
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
 conflicts = [
     'idna==2.7',
+    'aenum==2.1.2'
 ]
 
 dev_requires = [
@@ -50,7 +51,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.10.0",
+    version="0.11.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

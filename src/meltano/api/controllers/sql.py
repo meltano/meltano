@@ -1,15 +1,14 @@
 import json
 import os
-from datetime import date, datetime
-from decimal import Decimal
-
-from flask import Blueprint, jsonify, request
-from flask_security import auth_required
 import sqlalchemy
 
-from .sql_helper import ConnectionNotFound
-from .sql_helper import SqlHelper
+from datetime import date, datetime
+from decimal import Decimal
+from flask import Blueprint, jsonify, request
+from flask_security import auth_required
+
 from .settings_helper import SettingsHelper
+from .sql_helper import ConnectionNotFound, SqlHelper
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 

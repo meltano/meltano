@@ -15,9 +15,23 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-* Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
 
 ### Breaks
+
+
+## 0.11.0 - (2019-02-19)
+---
+
+### New
+* Update installation and contributing docs
+* Add support for generating Hyper Dimensional Aggregates (HDA)
+* Add internal Meltano classes for representing and managing Designs, Table, Column, Aggregate, Definitions, and Query definitions
+
+### Changes
+* Move core functionality out of `api/controllers` to `/core/m5o` (for m5o and m5oc management) and `/core/sql` (for anything related to sql generation)
+
+### Fixes
+* Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
 
 
 ## 0.10.0 - (2019-02-12)
@@ -35,6 +49,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
+* Fixed Analyze button groupd CSS to align as a single row
 
 
 ## 0.9.0 - (2019-02-05)

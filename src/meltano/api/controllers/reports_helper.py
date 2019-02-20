@@ -2,11 +2,12 @@ import os
 import json
 import time
 import uuid
+
 from os.path import join
 from pathlib import Path
-from meltano.core.utils import slugify
 
-from .m5oc_collection_file import M5ocCollectionFile
+from meltano.core.m5o.m5oc_file import M5ocFile
+from meltano.core.utils import slugify
 
 
 class ReportsHelper:
@@ -20,9 +21,7 @@ class ReportsHelper:
 
     def get_report_m5oc(self):
         m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
-        with m5oc_file.open() as f:
-            m5oc = M5ocCollectionFile.load(f)
-        return m5oc
+        return M5ocFile.load(m5oc_file)
 
     def get_reports(self):
 
