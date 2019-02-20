@@ -7,6 +7,14 @@ from meltano.api.controllers.m5o_file_parser import MeltanoAnalysisFileParser
 
 
 class ProjectCompiler:
+    """
+    Meltano projects have multiple .m5o files that need to be
+    compiled.
+
+    This component is responsible for the compilation of
+    the whole Meltano project.
+    """
+
     def __init__(self, project):
         self.project = project
 

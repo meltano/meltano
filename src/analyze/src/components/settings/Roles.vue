@@ -1,10 +1,21 @@
 <template>
   <div class="container">
     <section class="section">
-      <h1 class="title is-2">Roles</h1>
+      <h1 class="title is-2">Users</h1>
 
       <div class="segment">
-        <h2 class="subtitle is-4">Create a new role</h2>
+        <h2 class="subtitle is-5">Assign roles</h2>
+        <role-members :users="acl.users"
+                      :roles="rolesName"
+                      @add="assignRoleUser($event)"
+                      @remove="unassignRoleUser($event)"
+        />
+      </div>
+      <hr/>
+
+      <h1 class="title is-2">Roles</h1>
+      <div class="segment">
+        <h2 class="subtitle is-5">Create a new role</h2>
         <form>
           <div class="field is-grouped">
             <div class="control">
@@ -31,18 +42,9 @@
           </div>
         </form>
       </div>
+      <hr/>
 
-      <div class="segment">
-        <h2 class="subtitle is-4">Members</h2>
-        <role-members :users="acl.users"
-                      :roles="rolesName"
-                      @add="assignRoleUser($event)"
-                      @remove="unassignRole($event)"
-        />
-      </div>
-
-      <h1 class="title is-2">Permissions</h1>
-
+      <h1 class="title is-4">Permissions</h1>
       <div class="segment">
         <role-permissions v-for="perm in permissions"
                           :key="perm.type"

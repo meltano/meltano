@@ -24,6 +24,7 @@ SEED_ROLES = [
         "name": "admin",
         "_permissions": [
             {"type": "view:design", "context": "*"},
+            {"type": "view:reports", "context": "*"},
             {"type": "modify:acl", "context": "*"},
         ],
     },
@@ -117,12 +118,14 @@ def create_dev_user():
     db.create_all()
 
     for role in SEED_ROLES:
+        role = role.copy()
         role_name = role.pop("name")
         permissions = [RolePermissions(**perm) for perm in role.pop("_permissions")]
 
         role = users.find_or_create_role(role_name, **role, permissions=permissions)
 
     for user in SEED_USERS:
+        user = user.copy()
         if users.get_user(user["email"]):
             continue
 

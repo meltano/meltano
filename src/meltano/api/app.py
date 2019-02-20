@@ -52,13 +52,16 @@ def create_app(config={}):
     from .mail import mail
     from .security import security, users, init_app as security_init_app
     from .auth import setup_oauth
-    from flask_cors import CORS
 
     db.init_app(app)
     mail.init_app(app)
     security_init_app(app, project)
     setup_oauth(app)
-    CORS(app, origins="http://localhost:8080")
+
+    if app.env == "development":
+        from flask_cors import CORS
+
+        CORS(app, origins="http://localhost:8080")
 
     from .controllers.root import root
     from .controllers.dashboards import dashboardsBP

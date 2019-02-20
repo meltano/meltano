@@ -1,7 +1,7 @@
 
 <template>
   <div style="margin-bottom: 2em;">
-    <h2 class="subtitle is-4">{{permission.name}}</h2>
+    <h2 class="subtitle is-5">{{permission.name}}</h2>
     <table class="table is-fullwidth">
       <thead>
         <tr>
