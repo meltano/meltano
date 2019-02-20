@@ -52,7 +52,8 @@
             </div>
             <div class="control">
               <button class="button is-primary"
-                      @click="$emit('add', model)">
+                      @click="$emit('add', model)"
+                      :disabled="!enabled">
                 Assign
               </button>
             </div>
@@ -63,6 +64,7 @@
   </table>
 </template>
 <script>
+import _ from 'lodash';
 import Pill from './Pill';
 
 export default {
@@ -75,6 +77,13 @@ export default {
         role: null,
       },
     };
+  },
+
+  computed: {
+    enabled() {
+      return !(_.isEmpty(this.model.role) ||
+               _.isEmpty(this.model.user));
+    },
   },
 
   components: {

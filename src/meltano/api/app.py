@@ -15,7 +15,6 @@ from .workers import MeltanoBackgroundCompiler
 from . import config as default_config
 
 from meltano.core.project import Project
-from meltano.core.compiler.acl_file import ACLFile
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 

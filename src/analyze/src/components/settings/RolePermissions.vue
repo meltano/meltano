@@ -54,7 +54,8 @@
               </div>
               <div class="control">
                 <button @click="add"
-                        class="button is-primary">
+                        class="button is-primary"
+                        :disabled="!enabled">
                   Add
                 </button>
               </div>
@@ -67,6 +68,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import Pill from './Pill';
 
 export default {
@@ -84,6 +86,13 @@ export default {
 
   components: {
     'context-pill': Pill,
+  },
+
+  computed: {
+    enabled() {
+      return !(_.isEmpty(this.model.role) ||
+               _.isEmpty(this.model.context));
+    },
   },
 
   methods: {

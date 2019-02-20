@@ -16,12 +16,14 @@
             </div>
             <div class="control">
               <button class="button is-success"
+                      :disabled="!has(model.role)"
                       @click.prevent="createRole(model)">
                 Create
               </button>
             </div>
             <div class="control">
               <button class="button is-danger"
+                      :disabled="!has(model.role)"
                       @click.prevent="deleteRole(model)">
                 Delete
               </button>
@@ -54,6 +56,7 @@
   </div>
 </template>
 <script>
+import _ from 'lodash';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import RoleMembers from './RoleMembers';
 import RolePermissions from './RolePermissions';
@@ -84,6 +87,9 @@ export default {
   },
 
   computed: {
+    has() {
+      return _.negate(_.isEmpty);
+    },
     ...mapState('settings', [
       'acl',
     ]),
