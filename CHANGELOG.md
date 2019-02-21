@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* UI cleanup across routes (Analyze focus) and baseline polish to mitigate "that looks off comments"
 * Update installation and contributing docs
 * Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
 * Add deep linking to dashboards
@@ -54,6 +55,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
 * Fixed Analyze button groupd CSS to align as a single row
+
+### Breaks
+* Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
+* URL routing updates ('/model' to '/files', removed currently unused '/extract', '/load', '/transform' and '/project/new')
 
 
 ## 0.9.0 - (2019-02-05)
