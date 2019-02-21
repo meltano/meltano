@@ -1,7 +1,6 @@
 <template>
 <div class="container">
   <div class="columns">
-    <SettingsMenu />
     <div class="column section">
       <section class="section">
         <p v-if="!hasConnections">No Database Connections</p>
