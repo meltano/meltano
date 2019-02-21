@@ -1,17 +1,18 @@
 import json
-import logging
 import sqlparse
+import time
 
 import networkx as nx
 
 from copy import deepcopy
-from jinja2 import Template
 from networkx.readwrite import json_graph
 from pathlib import Path
 from pyhocon import ConfigFactory
 from typing import Dict, List
 
 from meltano.core.sql.design_helper import visit, PypikaJoinExecutor
+from meltano.core.utils import encode_id_from_file_path
+from meltano.core.utils import slugify
 
 
 class MeltanoAnalysisFileParserError(Exception):
@@ -173,7 +174,6 @@ class MeltanoAnalysisFileParser:
     def parse(self):
         self.m5o_tables = list(Path(self.directory).glob("*.table.m5o"))
         self.m5o_models = list(Path(self.directory).glob("*.model.m5o"))
-        self.m5o_dashboards = list(Path(self.directory).glob("*.dashboards.m5o"))
         for model in self.m5o_models:
             file_name = model.parts[-1]
             conf = self.parse_m5o_file(model)
@@ -295,3 +295,15 @@ class MeltanoAnalysisFileParser:
     @classmethod
     def name_flatten_dict(cls, d: Dict) -> List:
         return [{"name": k, **rest} for k, rest in d.items()]
+
+    @staticmethod
+    def fill_base_m5o_dict(file, name, file_dict=None):
+        if file_dict is None:
+            file_dict = {}
+        file_dict["path"] = str(file)
+        file_dict["abs"] = str(file)
+        file_dict["id"] = encode_id_from_file_path(file_dict["abs"])
+        file_dict["name"] = name
+        file_dict["slug"] = slugify(file_dict["name"])
+        file_dict["createdAt"] = time.time()
+        return file_dict
