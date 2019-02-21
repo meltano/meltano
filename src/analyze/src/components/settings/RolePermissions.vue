@@ -49,7 +49,7 @@
                        type="text"
                        class="input"
                        placeholder="Design filter"
-                       @keyup.enter="add"
+                       @keyup.enter="enabled && add"
                 />
               </div>
               <div class="control">
