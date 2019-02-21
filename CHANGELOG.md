@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * Update installation and contributing docs
 * Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
+* Add version CLI commands for checking current Meltano version
 
 ### Changes
 
