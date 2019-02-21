@@ -17,20 +17,9 @@
             class='panel-block'
             :class="{'is-active': isActive(dashboard)}"
             :key="dashboard.id"
-            @click="getDashboard(dashboard)">
+            @click="setDashboard(dashboard)">
           <div>
             <div>{{dashboard.name}}</div>
-            <div v-if="dashboard.id === activeDashboard.id">
-              <small>Reports ({{activeDashboard.reportIds.length}})</small>
-              <ul>
-                <li v-for="report in reports" :key="report.id">
-                  <label @click="toggleReportInDashboard(report)">
-                    <input type="checkbox"
-                          :checked="isReportInActiveDashboard(report)">
-                    {{report.name}}</label>
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
 
@@ -87,24 +76,11 @@ export default {
   methods: {
     ...mapActions('dashboards', [
       'initialize',
-      'getDashboard',
-      'getReports',
+      'setDashboard',
       'getActiveDashboardReportsWithQueryResults',
     ]),
     isActive(dashboard) {
       return dashboard.id === this.activeDashboard.id;
-    },
-    isReportInActiveDashboard(report) {
-      return this.activeDashboard.reportIds.includes(report.id);
-    },
-    toggleReportInDashboard(report) {
-      const methodName = this.isReportInActiveDashboard(report)
-        ? 'removeReportFromDashboard'
-        : 'addReportToDashboard';
-      this.$store.dispatch(`dashboards/${methodName}`, {
-        reportId: report.id,
-        dashboardId: this.activeDashboard.id,
-      });
     },
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;

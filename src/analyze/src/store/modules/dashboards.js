@@ -31,11 +31,8 @@ const actions = {
         });
     });
   },
-  getDashboard({ dispatch }, dashboard) {
-    dashboardApi.getDashboard(dashboard.id)
-      .then((response) => {
-        dispatch('updateCurrentDashboard', response.data);
-      });
+  setDashboard({ dispatch }, dashboard) {
+    dispatch('updateCurrentDashboard', dashboard);
   },
   getReports({ commit }) {
     return new Promise((resolve) => {
