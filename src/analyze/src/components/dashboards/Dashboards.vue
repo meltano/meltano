@@ -12,7 +12,6 @@
             <a class='button is-secondary is-fullwidth'
                 @click="setAddDashboard(true)">Create Dashboard</a>
           </div>
-
           <div v-if="hasDashboards">
             <div v-for="dashboard in dashboards"
                 class='panel-block'
@@ -25,10 +24,8 @@
                   <small>Reports ({{activeDashboard.reportIds.length}})</small>
                   <ul>
                     <li v-for="report in reports" :key="report.id">
-                      <label for="'checkbox-' + report.id"
-                              @click="toggleReportInDashboard(report)">
+                      <label @click="toggleReportInDashboard(report)">
                         <input type="checkbox"
-                              :id="'checkbox-' + report.id"
                               :checked="isReportInActiveDashboard(report)">
                         {{report.name}}</label>
                     </li>
@@ -37,7 +34,6 @@
               </div>
             </div>
           </div>
-
         </nav>
 
         <div class="column is-three-quarters">
@@ -90,8 +86,7 @@ import Chart from '../designs/Chart';
 export default {
   name: 'Dashboards',
   created() {
-    this.getDashboards();
-    this.getReports();
+    this.initialize(this.$route.params.slug);
   },
   components: {
     Chart,
@@ -112,10 +107,8 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', [
-      'getDashboards',
+      'initialize',
       'getDashboard',
-      'getReports',
-      'getActiveDashboardReportsWithQueryResults',
       'setAddDashboard',
     ]),
     isActive(dashboard) {
@@ -135,11 +128,6 @@ export default {
         reportId: report.id,
         dashboardId: this.activeDashboard.id,
       });
-    },
-  },
-  watch: {
-    activeDashboard() {
-      this.getActiveDashboardReportsWithQueryResults();
     },
   },
 };

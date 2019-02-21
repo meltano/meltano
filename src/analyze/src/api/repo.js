@@ -6,8 +6,8 @@ export default {
     return axios.get(utils.buildUrl('repos'));
   },
 
-  file(unique) {
-    return axios.get(utils.buildUrl('repos', `file/${unique}`));
+  file(id) {
+    return axios.get(utils.buildUrl('repos', `file/${id}`));
   },
 
   lint() {
