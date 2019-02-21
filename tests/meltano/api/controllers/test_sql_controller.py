@@ -38,6 +38,7 @@ class TestSqlController:
         self.assert_join_graph_no_dependencies(post)
         self.assert_join_graph_one_dependency(post)
         self.assert_join_graph_two_dependency(post)
+        self.assert_join_graph_derived_dependency(post)
 
     def assert_empty_query(self, post):
         """with no columns no query should be generated"""
@@ -83,7 +84,7 @@ class TestSqlController:
 
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
-        assert '"region.dnoregion"' in res.json["sql"]  # should it be `region.name`?
+        assert '"region.dnoregion"' in res.json["sql"]
         assert '"entry.forecast"' in res.json["sql"]
         assert '"generationmix.perc"' in res.json["sql"]
         assert '"generationmix.fuel"' in res.json["sql"]
@@ -209,4 +210,26 @@ class TestSqlController:
 
         assert res.status_code == 200
         sql = 'SELECT "region"."dnoregion" "region.dnoregion","entry"."forecast" "entry.forecast","generationmix"."fuel" "generationmix.fuel","generationmix"."perc" "generationmix.perc" FROM "region" "region" JOIN "entry" "entry" ON "region"."id"="entry"."region_id" JOIN "generationmix" "generationmix" ON "entry"."id"="generationmix"."entry_id" GROUP BY "region.dnoregion","entry.forecast","generationmix.fuel","generationmix.perc" LIMIT 3;'
+        assert sql in res.json["sql"]
+
+    def assert_join_graph_derived_dependency(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [
+                {"name": "entry", "columns": []},
+                {"name": "generationmix", "columns": ["perc", "fuel"]},
+            ],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        sql = 'SELECT "region"."dnoregion" "region.dnoregion","generationmix"."fuel" "generationmix.fuel","generationmix"."perc" "generationmix.perc" FROM "region" "region" JOIN "entry" "entry" ON "region"."id"="entry"."region_id" JOIN "generationmix" "generationmix" ON "entry"."id"="generationmix"."entry_id" GROUP BY "region.dnoregion","generationmix.fuel","generationmix.perc" LIMIT 3;'
         assert sql in res.json["sql"]

@@ -513,6 +513,7 @@ export default {
     this.$store.dispatch('designs/getDesign', {
       model: this.$route.params.model,
       design: this.$route.params.design,
+      slug: this.$route.params.slug,
     });
   },
   filters: {

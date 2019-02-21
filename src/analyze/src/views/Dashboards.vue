@@ -24,10 +24,8 @@
               <small>Reports ({{activeDashboard.reportIds.length}})</small>
               <ul>
                 <li v-for="report in reports" :key="report.id">
-                  <label for="'checkbox-' + report.id"
-                          @click="toggleReportInDashboard(report)">
+                  <label @click="toggleReportInDashboard(report)">
                     <input type="checkbox"
-                          :id="'checkbox-' + report.id"
                           :checked="isReportInActiveDashboard(report)">
                     {{report.name}}</label>
                 </li>
@@ -66,8 +64,7 @@ import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 export default {
   name: 'Dashboards',
   created() {
-    this.getDashboards();
-    this.getReports();
+    this.initialize(this.$route.params.slug);
   },
   data() {
     return {
@@ -89,7 +86,7 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', [
-      'getDashboards',
+      'initialize',
       'getDashboard',
       'getReports',
       'getActiveDashboardReportsWithQueryResults',

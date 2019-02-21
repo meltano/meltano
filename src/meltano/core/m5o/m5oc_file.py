@@ -1,8 +1,9 @@
 import json
 
-from typing import Dict
 from pathlib import Path
-from .design_helper import DesignHelper
+from typing import Dict
+
+from meltano.core.sql.design_helper import DesignHelper
 
 
 class DesignMissingError(Exception):
@@ -18,8 +19,11 @@ class M5ocFile:
         self.content = content
 
     @classmethod
-    def load(cls, file):
-        return M5ocFile(json.load(file))
+    def load(cls, file_path):
+        with file_path.open() as f:
+            m5oc = M5ocFile(json.load(f))
+
+        return m5oc
 
     @property
     def designs(self):

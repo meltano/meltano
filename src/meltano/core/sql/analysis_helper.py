@@ -1,7 +1,8 @@
-from .substitution import Substitution
 from pypika import Table
 
+from .substitution import Substitution
 from .aggregate import Aggregate
+from .substitution import Substitution
 from .timeframe import TimeframePeriod
 
 

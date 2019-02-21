@@ -214,7 +214,7 @@ const getters = {
 };
 
 const actions = {
-  getDesign({ commit }, { model, design }) {
+  getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentModel = model;
     state.currentDesign = design;
     designApi.index(model, design).then((response) => {
@@ -223,10 +223,15 @@ const actions = {
     designApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
-    designApi
-      .loadReports()
+    designApi.loadReports()
       .then((response) => {
         state.reports = response.data;
+        if (slug) {
+          const reportMatch = state.reports.find(report => report.slug === slug);
+          if (reportMatch) {
+            dispatch('loadReport', reportMatch);
+          }
+        }
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
@@ -465,19 +470,18 @@ const mutations = {
     // TODO
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
-      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
       // joins
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
       setSelected(joinGroup.columns, targetJoin.columns);
       // timeframes
-      if (joinGroup.timeframes) {
+      if (targetJoin && targetJoin.timeframes) {
         setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
         // periods
         joinGroup.timeframes.forEach((timeframe) => {
           const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
-          if (!targetTimeframe) {
-            return;
+          if (targetTimeframe && targetTimeframe.periods) {
+            setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
           }
-          setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
         });
       }
     });

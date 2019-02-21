@@ -6,12 +6,16 @@ from flask import Flask, request, render_template
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
+from flask_login import current_user
 from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
 from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler
 from . import config as default_config
+
+from meltano.core.project import Project
+from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 connector = ExternalConnector()
@@ -22,6 +26,12 @@ def create_app(config={}):
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
     app.config.update(**config)
+
+    project = Project.find()
+
+    # Initial compilation
+    compiler = ProjectCompiler(project)
+    compiler.compile()
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
@@ -40,21 +50,18 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
-    from .security import security, users
+    from .security import security, users, init_app as security_init_app
     from .auth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
+    security_init_app(app, project)
+    setup_oauth(app)
 
     if app.env == "development":
         from flask_cors import CORS
-        from .security import FreeUser
 
-        CORS(app)
-        security.init_app(app, users, anonymous_user=FreeUser)
-    else:
-        security.init_app(app, users)
-        setup_oauth(app)
+        CORS(app, origins="http://localhost:8080")
 
     from .controllers.root import root
     from .controllers.dashboards import dashboardsBP
@@ -72,23 +79,30 @@ def create_app(config={}):
 
     @app.before_request
     def before_request():
-        logger.info(f"[{request}] request: {now}")
+        request_message = f"[{request.url}]"
+        if current_user:
+            request_message += f" as {current_user}"
+
+        logger.info(request_message)
 
     return app
 
 
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
+
     worker = MeltanoBackgroundCompiler(project)
     worker.start()
 
-    app_config = kwargs.pop("app_config", {})
-    app = create_app(app_config)
-    from .security import create_dev_user
+    try:
+        app_config = kwargs.pop("app_config", {})
+        app = create_app(app_config)
+        from .security import create_dev_user
 
-    with app.app_context():
-        # TODO: alembic migration
-        create_dev_user()
+        with app.app_context():
+            # TODO: alembic migration
+            create_dev_user()
 
-    app.run(**kwargs)
-    worker.stop()
+        app.run(**kwargs)
+    finally:
+        worker.stop()

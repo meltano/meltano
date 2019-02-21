@@ -50,12 +50,21 @@
 
       </div>
       <div class="navbar-end">
-
-        <router-link to="/settings"
-        class="navbar-item navbar-child">
-          Settings
-        </router-link>
-
+        <div class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">
+            Settings
+          </div>
+          <div class="navbar-dropdown is-boxed">
+            <router-link to="/settings/database"
+                         class="navbar-item navbar-child">
+              Database
+            </router-link>
+            <router-link to="/settings/roles"
+                         class="navbar-item navbar-child">
+              Roles
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
   </nav>

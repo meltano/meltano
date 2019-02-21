@@ -1,14 +1,21 @@
-import base64
 import json
 import os
-from pathlib import Path
 from os.path import join
+from pathlib import Path
 
 import markdown
 from flask import Blueprint, jsonify, request
 
+from meltano.core.utils import decode_file_path_from_id
 from meltano.api.security import api_auth_required
-from .m5o_file_parser import MeltanoAnalysisFileParser, MeltanoAnalysisFileParserError
+from meltano.core.m5o.m5o_file_parser import (
+    MeltanoAnalysisFileParser,
+    MeltanoAnalysisFileParserError,
+)
+from meltano.core.m5o.m5o_collection_parser import (
+    M5oCollectionParser,
+    M5oCollectionParserTypes,
+)
 
 reposBP = Blueprint("repos", __name__, url_prefix="/repos")
 meltano_model_path = join(os.getcwd(), "model")
@@ -29,48 +36,42 @@ def index():
         for f in os.listdir(meltano_model_path)
         if os.path.isfile(os.path.join(meltano_model_path, f))
     ]
+
+    path = Path(meltano_model_path)
+    dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
+    reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
     sortedM5oFiles = {
-        "documents": [],
-        "tables": [],
-        "models": [],
-        "dashboards": [],
-        "reports": [],
+        "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
+        "documents": {"label": "Documents", "items": []},
+        "models": {"label": "Models", "items": []},
+        "reports": {"label": "Reports", "items": reportsParser.contents()},
+        "tables": {"label": "Tables", "items": []},
     }
     onlydocs = Path(meltano_model_path).parent.glob("*.md")
     for d in onlydocs:
-        file_dict = {"path": str(d), "abs": str(d), "visual": str(d.name)}
-        file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
-            "utf-8"
-        )
-        sortedM5oFiles["documents"].append(file_dict)
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
+        sortedM5oFiles["documents"]["items"].append(file_dict)
 
     for f in onlyfiles:
         filename, ext = os.path.splitext(f)
         if ext != ".m5o":
             continue
-        file_dict = {"path": f, "abs": f, "visual": f}
-        file_dict["unique"] = base64.b32encode(bytes(file_dict["abs"], "utf-8")).decode(
-            "utf-8"
-        )
-        filename = filename.lower()
 
+        # filename splittext twice occurs due to current *.type.extension convention (two dots)
+        filename = filename.lower()
         filename, ext = os.path.splitext(filename)
-        file_dict["visual"] = filename
-        if ext == ".table":
-            sortedM5oFiles["tables"].append(file_dict)
+        file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
         if ext == ".model":
-            sortedM5oFiles["models"].append(file_dict)
-        if ext == ".dashboard":
-            sortedM5oFiles["dashboards"].append(file_dict)
-        if ext == ".report":
-            sortedM5oFiles["reports"].append(file_dict)
+            sortedM5oFiles["models"]["items"].append(file_dict)
+        if ext == ".table":
+            sortedM5oFiles["tables"]["items"].append(file_dict)
 
     return jsonify(sortedM5oFiles)
 
 
-@reposBP.route("/file/<unique>", methods=["GET"])
-def file(unique):
-    file_path = base64.b32decode(unique).decode("utf-8")
+@reposBP.route("/file/<unique_id>", methods=["GET"])
+def file(unique_id):
+    file_path = decode_file_path_from_id(unique_id)
     (filename, ext) = os.path.splitext(file_path)
     is_markdown = False
     path_to_file = os.path.abspath(os.path.join(meltano_model_path, file_path))
@@ -83,7 +84,7 @@ def file(unique):
             {
                 "file": data,
                 "is_markdown": is_markdown,
-                "unique": unique,
+                "id": unique_id,
                 "populated": True,
             }
         )

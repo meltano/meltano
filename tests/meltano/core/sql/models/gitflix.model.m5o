@@ -1,0 +1,25 @@
+{
+  version = 1
+  name = gitflix
+  connection = runners_db
+  label = GitFlix Example
+  designs {
+    users {
+      label = HDA Example
+      from = users
+      description = Base for Hyper Dymensional Aggregates
+      joins {
+        streams {
+          label = Streams
+          sql_on = "users.id = streams.user_id"
+          relationship = many_to_one
+        }
+        episodes {
+          label = Episodes
+          sql_on = "episodes.id = streams.episode_id"
+          relationship = many_to_one
+        }
+      }
+    }
+  }
+}

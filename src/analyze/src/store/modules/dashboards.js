@@ -9,24 +9,42 @@ const state = {
 };
 
 const actions = {
-  getDashboards({ commit }) {
-    dashboardApi.getDashboards()
-      .then((response) => {
-        const dashboards = response.data;
-        commit('setDashboards', dashboards);
-      });
+  initialize({ dispatch }, slug) {
+    dispatch('getReports').then(() => {
+      dispatch('getDashboards', slug);
+    });
   },
-  getDashboard({ commit }, dashboard) {
+  getDashboards({ dispatch, commit }, slug) {
+    return new Promise((resolve) => {
+      dashboardApi.getDashboards()
+        .then((response) => {
+          const dashboards = response.data;
+          commit('setDashboards', dashboards);
+          resolve();
+
+          if (slug) {
+            const dashboardMatch = dashboards.find(dashboard => dashboard.slug === slug);
+            if (dashboardMatch) {
+              dispatch('updateCurrentDashboard', dashboardMatch);
+            }
+          }
+        });
+    });
+  },
+  getDashboard({ dispatch }, dashboard) {
     dashboardApi.getDashboard(dashboard.id)
       .then((response) => {
-        commit('setCurrentDashboard', response.data);
+        dispatch('updateCurrentDashboard', response.data);
       });
   },
   getReports({ commit }) {
-    designApi.loadReports()
-      .then((response) => {
-        commit('setReports', response.data);
-      });
+    return new Promise((resolve) => {
+      designApi.loadReports()
+        .then((response) => {
+          commit('setReports', response.data);
+          resolve();
+        });
+    });
   },
   getActiveDashboardReportsWithQueryResults({ commit }) {
     const ids = state.activeDashboard.reportIds;
@@ -36,10 +54,10 @@ const actions = {
         commit('setActiveDashboardReports', response.data);
       });
   },
-  saveDashboard({ commit }, data) {
+  saveDashboard({ dispatch, commit }, data) {
     dashboardApi.saveDashboard(data)
       .then((response) => {
-        commit('setCurrentDashboard', response.data);
+        dispatch('updateCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
       });
   },
@@ -55,17 +73,20 @@ const actions = {
         });
       });
   },
-  addReportToDashboard({ commit }, data) {
+  addReportToDashboard({ dispatch }, data) {
     dashboardApi.addReportToDashboard(data)
       .then((response) => {
-        commit('setCurrentDashboard', response.data);
+        dispatch('updateCurrentDashboard', response.data);
       });
   },
-  removeReportFromDashboard({ commit }, data) {
+  removeReportFromDashboard({ dispatch }, data) {
     dashboardApi.removeReportFromDashboard(data)
       .then((response) => {
-        commit('setCurrentDashboard', response.data);
+        dispatch('updateCurrentDashboard', response.data);
       });
+  },
+  updateCurrentDashboard({ commit }, dashboard) {
+    commit('setCurrentDashboard', dashboard);
   },
 };
 

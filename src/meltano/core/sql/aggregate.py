@@ -1,6 +1,6 @@
 from enum import Enum
-
 from pypika import functions as fn
+
 from .substitution import Substitution
 
 
@@ -8,6 +8,7 @@ class AggregateType(Enum):
     Unknown = "UNKNOWN"
     Count = "count"
     Sum = "sum"
+    Avg = "avg"
     Number = "number"
 
     def __eq__(self, other):
@@ -45,6 +46,9 @@ class Aggregate:
 
     def count(self):
         return fn.Coalesce(fn.Count(self.field.sql), 0, alias=self.alias)
+
+    def avg(self):
+        return fn.Coalesce(fn.Avg(self.field.sql), 0, alias=self.alias)
 
     def number(self):
         self.field.alias = self.field.alias

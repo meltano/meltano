@@ -1,4 +1,5 @@
 from pypika import functions as fn
+
 from .substitution import Substitution
 
 
