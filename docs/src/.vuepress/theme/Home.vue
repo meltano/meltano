@@ -194,11 +194,6 @@
       <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
     </section>
 
-    <section class="section">
-      <h2 class="section__title">We are hiring!</h2>
-      <p class="section__text mb0">Want to help create a new product and make an impact in the world of data? We are currently looking for a <a href="https://boards.greenhouse.io/gitlab/jobs/4059274002">General Manager</a>.</p> 
-    </section>
-
     <div
       class="footer"
     >

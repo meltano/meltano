@@ -1,8 +1,9 @@
+import base64
 import re
 import sys
 import logging
-from typing import Union
 
+from typing import Union
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
@@ -26,8 +27,8 @@ def compose(*fs):
 def slugify(s):
     """
     Simplifies ugly strings into something URL-friendly.
-    >>> print slugify("[Some] _ Article's Title--")
-    some-articles-title
+    >>> slugify("[Some] _ Article's Title--")
+    'some-articles-title'
     """
 
     # "[Some] _ Article's Title--"
@@ -89,9 +90,43 @@ def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
+def nest(d: dict, path: str):
+    """
+    Create a hierarchical dictionary path and return the leaf dict.
+
+    >>> d = dict()
+    >>> test = nest(d, "foo.bar.test")
+    >>> test
+    {}
+    >>> d
+    {'foo': {'bar': {'test': {}}}}
+    >>> test["a"] = 1
+    >>> d
+    {'foo': {'bar': {'test': {'a': 1}}}}
+
+    """
+    cursor = d
+
+    # create the list of dicts
+    for key in path.split("."):
+        if key not in cursor:
+            cursor[key] = {}
+        cursor = cursor[key]
+
+    return cursor
+
+
 def file_has_data(file: Union[Path, str]):
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
+
+
+def decode_file_path_from_id(unique_id):
+    return base64.b32decode(unique_id).decode("utf-8")
+
+
+def encode_id_from_file_path(file_path):
+    return base64.b32encode(bytes(file_path, "utf-8")).decode("utf-8")
 
 
 def noop(*_args, **_kwargs):

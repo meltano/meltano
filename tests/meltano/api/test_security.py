@@ -13,7 +13,7 @@ from flask_security import login_user, logout_user
 def gitlab_client():
     client_mock = mock.Mock()
     client_mock.auth.return_value = None
-    user = mock.Mock(email="valid@test.com", state="active", id=1)
+    user = mock.Mock(username="gitlabfan", email="valid@test.com", state="active", id=1)
 
     type(client_mock).user = mock.PropertyMock(return_value=user)
 
@@ -85,3 +85,11 @@ class TestSecurity:
             login_user(user)
             identity = gitlab_token_identity(token)
             assert identity.user == user
+
+    def test_roles_from_acl(self, app_context):
+        assert users.get_user("admin@meltano.com").roles == ["admin"]
+        assert users.get_user("regular@meltano.com").roles == ["regular"]
+
+        # no permissions for `@gitlabfan`
+        users.create_user(username="gitlabfan", email="gitlabfan@meltano.com")
+        assert len(users.get_user("gitlabfan").roles) == 0

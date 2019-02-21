@@ -228,6 +228,16 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
 
+### Access Control
+
+Meltano manages authorization using a role based access control scheme.
+
+  * Users have multiple roles;
+  * Roles have multiple permissions;
+
+A Permission has a context for with it is valid: anything that matches the context is permitted.
+
+
 ### Docker images
 
 Meltano provides the following docker images:

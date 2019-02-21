@@ -8,14 +8,7 @@ const state = {
   validated: false,
   navbarClicked: false,
   errors: [],
-  files: {
-    dashboards:
-    [{
-      abs: 'loading',
-      path: 'loading',
-      visual: 'loading',
-    }],
-  },
+  files: {},
 };
 
 const getters = {
@@ -24,7 +17,7 @@ const getters = {
     return state.activeView.populated && state.activeView.is_markdown;
   },
 
-  urlForModelDesign: () => (model, design) => `/design/${model}/${design}`,
+  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`,
 
   hasCode() {
     return state.activeView.populated && !state.activeView.is_markdown;
@@ -50,7 +43,7 @@ const actions = {
   },
 
   getFile({ commit }, file) {
-    repoApi.file(file.unique)
+    repoApi.file(file.id)
       .then((response) => {
         commit('setCurrentFileTable', response.data);
       });
