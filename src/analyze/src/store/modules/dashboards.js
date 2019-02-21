@@ -5,16 +5,7 @@ const state = {
   activeDashboard: {},
   activeDashboardReports: [],
   dashboards: [],
-  isAddDashboard: true,
   reports: [],
-  saveDashboardSettings: { name: null, description: null },
-};
-
-const getters = {
-  hasDashboards() {
-    return state.dashboards.length > 0;
-  },
-  getIsActiveDashboardMatch: () => dashboard => dashboard.id === state.activeDashboard.id,
 };
 
 const actions = {
@@ -40,11 +31,8 @@ const actions = {
         });
     });
   },
-  getDashboard({ dispatch }, dashboard) {
-    dashboardApi.getDashboard(dashboard.id)
-      .then((response) => {
-        dispatch('updateCurrentDashboard', response.data);
-      });
+  setDashboard({ dispatch }, dashboard) {
+    dispatch('updateCurrentDashboard', dashboard);
   },
   getReports({ commit }) {
     return new Promise((resolve) => {
@@ -55,15 +43,31 @@ const actions = {
         });
     });
   },
-  setAddDashboard({ commit }, value) {
-    commit('setAddDashboard', value);
+  getActiveDashboardReportsWithQueryResults({ commit }) {
+    const ids = state.activeDashboard.reportIds;
+    const activeReports = state.reports.filter(report => ids.includes(report.id));
+    dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
+      .then((response) => {
+        commit('setActiveDashboardReports', response.data);
+      });
   },
   saveDashboard({ dispatch, commit }, data) {
     dashboardApi.saveDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
-        commit('resetSaveDashboardSettings');
+      });
+  },
+  saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
+    dashboardApi.saveDashboard(data)
+      .then((response) => {
+        const dashboard = response.data;
+        commit('setCurrentDashboard', dashboard);
+        commit('addSavedDashboardToDashboards', dashboard);
+        dispatch('addReportToDashboard', {
+          reportId: report.id,
+          dashboardId: dashboard.id,
+        });
       });
   },
   addReportToDashboard({ dispatch }, data) {
@@ -78,18 +82,8 @@ const actions = {
         dispatch('updateCurrentDashboard', response.data);
       });
   },
-  updateCurrentDashboard({ dispatch, commit }, dashboard) {
-    commit('setAddDashboard', false);
+  updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard);
-    dispatch('updateActiveDashboardReportsWithQueryResults');
-  },
-  updateActiveDashboardReportsWithQueryResults({ commit }) {
-    const ids = state.activeDashboard.reportIds;
-    const activeReports = state.reports.filter(report => ids.includes(report.id));
-    dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
-      .then((response) => {
-        commit('setActiveDashboardReports', response.data);
-      });
   },
 };
 
@@ -97,14 +91,8 @@ const mutations = {
   addSavedDashboardToDashboards(_, dashboard) {
     state.dashboards.push(dashboard);
   },
-  resetSaveDashboardSettings() {
-    state.saveDashboardSettings = { name: null, description: null };
-  },
   setActiveDashboardReports(_, reports) {
     state.activeDashboardReports = reports;
-  },
-  setAddDashboard(_, value) {
-    state.isAddDashboard = value;
   },
   setCurrentDashboard(_, dashboard) {
     state.activeDashboard = dashboard;
@@ -120,7 +108,6 @@ const mutations = {
 export default {
   namespaced: true,
   state,
-  getters,
   actions,
   mutations,
 };

@@ -1,16 +1,12 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import NewProjectForm from '@/components/projects/NewProjectForm';
-import Repo from '@/components/repos/Repo';
-import Design from '@/components/designs/Design';
-import Dashboards from '@/components/dashboards/Dashboards';
-import Settings from '@/components/settings/Main';
+import Repo from '@/views/Repo';
+import Design from '@/views/Design';
+import Dashboards from '@/views/Dashboards';
+import Orchestrate from '@/views/Orchestrate';
+import Settings from '@/views/Settings';
 import SettingsDatabase from '@/components/settings/Database';
 import SettingsRoles from '@/components/settings/Roles';
-import Extract from '@/components/extract/Extract';
-import Load from '@/components/load/Load';
-import Transform from '@/components/transform/Transform';
-import Orchestrate from '@/components/orchestrations/Orchestrate';
 
 Vue.use(Router);
 
@@ -19,35 +15,10 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/model',
+      redirect: '/files',
     },
     {
-      path: '/extract',
-      name: 'Extract',
-      component: Extract,
-    },
-    {
-      path: '/load',
-      name: 'Load',
-      component: Load,
-    },
-    {
-      path: '/transform',
-      name: 'Transform',
-      component: Transform,
-    },
-    {
-      path: '/project/new',
-      name: 'NewProjectForm',
-      component: NewProjectForm,
-    },
-    {
-      path: '/repo/',
-      name: 'Repo',
-      component: Repo,
-    },
-    {
-      path: '/model/',
+      path: '/files/',
       name: 'Repo',
       component: Repo,
     },
