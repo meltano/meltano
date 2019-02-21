@@ -17,6 +17,22 @@ Our CLI tool provides a single source of truth for the entire data pipeline. The
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
 
+## Version
+
+In the event you want to check what version of Meltano you are using, we have provided the following options for you:
+
+```bash
+meltano version
+
+meltano --version
+
+meltano --v
+
+meltano -v
+```
+
+Once you run any of those commands, you should see a version number output in your terminal.
+
 ## meltano select
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
