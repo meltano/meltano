@@ -9,20 +9,30 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.12.0 - (2019-02-21)
+---
+
+### New
 * UI cleanup across routes (Analyze focus) and baseline polish to mitigate "that looks off comments"
 * Update installation and contributing docs
 * Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
 * Add deep linking to dashboards
 * Add deep linking to reports
 
-### Changes
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
 * Fixed dashboards initial load issue due to legacy (and empty) `carbon.dashboard.m5o` file
 * New standardized approach for `.m5o` id generation (will need to remove any dashboard.m5o and report.m5o)
 
-### Breaks
 
 ## 0.11.0 - (2019-02-19)
 ---
