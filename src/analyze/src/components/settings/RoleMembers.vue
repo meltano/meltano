@@ -13,7 +13,7 @@
           <td>
             <div class="field is-grouped is-grouped-multiline">
               <role-pill v-for="role in user.roles"
-                         @delete="$emit('remove', { role: role.name, user })"
+                         @delete="$emit('remove', { role, user: user.username })"
                          :key="role"
                          :name="role"
                          />
