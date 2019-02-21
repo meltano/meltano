@@ -15,12 +15,12 @@
 
       <h1 class="title is-2">Roles</h1>
       <div class="segment">
-        <h2 class="subtitle is-5">Create a new role</h2>
+        <h2 class="subtitle is-5">Manage</h2>
         <form>
           <div class="field is-grouped">
             <div class="control">
               <input v-model="model.role"
-                     @keyup.enter="createRole(model)"
+                     @keyup.enter="has(model.role) && createRole(model)"
                      type="text"
                      class="input"
                      placeholder="Role name" />
@@ -44,7 +44,22 @@
       </div>
       <hr/>
 
-      <h1 class="title is-4">Permissions</h1>
+      <h1 class="title is-4">
+        Permissions
+        <span class="has-text-warning">
+          <font-awesome-icon icon="exclamation-triangle"/>
+        </span>
+      </h1>
+
+      <article class="message is-warning">
+        <div class="message-body">
+          <p>Permissions are not yet enforced for each resource.</p>
+          <p>
+            For more details, see <a href="https://gitlab.com/meltano/meltano/issues/370">https://gitlab.com/meltano/meltano/issues/370</a>
+          </p>
+        </div>
+      </article>
+
       <div class="segment">
         <role-permissions v-for="perm in permissions"
                           :key="perm.type"
