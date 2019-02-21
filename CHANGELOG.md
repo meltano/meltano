@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
-* Changes "Models" to "Topics"
+* Rename "Models" to "Topics"
 
 ### Fixes
 
