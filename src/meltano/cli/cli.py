@@ -31,6 +31,10 @@ def print_version(ctx, param, value):
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
 @click.option('--version', is_flag=True, callback=print_version,
               expose_value=False, is_eager=True)
+@click.option('--v', is_flag=True, callback=print_version,
+              expose_value=False, is_eager=True)
+@click.option('-v', is_flag=True, callback=print_version,
+              expose_value=False, is_eager=True)
 @click.pass_context
 def cli(ctx, log_level):
     setup_logging(log_level=LEVELS[log_level])
