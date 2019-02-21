@@ -38,8 +38,7 @@ class DashboardsHelper:
                 connection_name, outgoing_sql
             )
             report["queryResultAggregates"] = sqlHelper.get_aliases_from_aggregates(
-                aggregates,
-                db_table
+                aggregates, db_table
             )
         return reports
 
