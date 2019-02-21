@@ -46,30 +46,31 @@
         </nav>
       </template>
       <template v-for="(value, key) in files">
+
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <p class="menu-label">
-          <a href="#">{{key}}</a>
+          <a href="#">{{value.label}}</a>
         </p>
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <ul class="menu-list">
 
-          <template v-if="!value.length">
+          <template v-if="!value.items.length">
             <li>
-              <a><small><em>No {{key}}</em></small></a>
+              <a><small><em>No {{value.label}}</em></small></a>
             </li>
           </template>
 
-          <template v-if="value.length">
-            <li v-for="file in value" :key="file.abs">
+          <template v-if="value.items.length">
+            <li v-for="file in value.items" :key="file.abs">
               <div class="columns">
                 <div class="column">
                   <a :class="{'is-active': isActive(file)}"
                       @click.prevent='getFile(file)'>
-                    {{file.visual}}
+                    {{file.name}}
                   </a>
                 </div>
                 <div v-if='isDeepRoutable(key)' class='column is-one-fifth'>
-                  <router-link :to="getDeepRoute(key)"
+                  <router-link :to="getDeepRoute(key, file)"
                                 class="button is-secondary is-light is-pulled-right">
                     <span class="icon is-small">
                       <i class="fas fa-bold">*</i>
@@ -112,6 +113,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import capitalize from '@/filters/capitalize';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
@@ -125,6 +127,7 @@ export default {
     RouterViewLayout,
   },
   filters: {
+    capitalize,
     pretty,
   },
   computed: {
@@ -148,14 +151,19 @@ export default {
       this.$store.dispatch('repos/getRepo');
     },
     isActive(f) {
-      return f.unique === this.activeView.unique;
+      return f.id === this.activeView.id;
     },
-    // TODO refactor isDeepRoutable/getDeepRoute https://gitlab.com/meltano/meltano/issues/347
     isDeepRoutable(type) {
-      return type === 'dashboards';
+      return type === 'dashboards' || type === 'reports';
     },
-    getDeepRoute(key) {
-      return `/${key}`;
+    getDeepRoute(key, file) {
+      const name = capitalize(key).slice(0, -1);
+      const params = { slug: file.slug };
+      if (file.model && file.design) {
+        params.model = file.model;
+        params.design = file.design;
+      }
+      return { name, params };
     },
     getFile(file) {
       this.$store.dispatch('repos/getFile', file);
@@ -170,20 +178,20 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-// .content {
-//   padding: 10px;
-//   position: fixed;
-//   top: 52px;
-//   left: 430px;
-//   right: 0;
-//   bottom: 0;
-//   overflow: scroll;
-//   z-index: 1;
-// }
+.content {
+  padding: 10px;
+  position: fixed;
+  top: 52px;
+  left: 430px;
+  right: 0;
+  bottom: 0;
+  overflow: scroll;
+  z-index: 1;
+}
 
 .code-container {
   // to overcome the important on paddingless
-  // padding-left: 1rem !important;
+  padding-left: 1rem !important;
 }
 
 .error-desc-cont {
