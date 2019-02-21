@@ -13,25 +13,27 @@
                 @click="setAddDashboard(true)">Create Dashboard</a>
           </div>
 
-          <div v-for="dashboard in dashboards"
-              class='panel-block'
-              :class="{'is-active': isActive(dashboard)}"
-              :key="dashboard.id"
-              @click="getDashboard(dashboard)">
-            <div>
-              <div>{{dashboard.name}}</div>
-              <div v-if="dashboard.id === activeDashboard.id">
-                <small>Reports ({{activeDashboard.reportIds.length}})</small>
-                <ul>
-                  <li v-for="report in reports" :key="report.id">
-                    <label for="'checkbox-' + report.id"
-                            @click="toggleReportInDashboard(report)">
-                      <input type="checkbox"
-                            :id="'checkbox-' + report.id"
-                            :checked="isReportInActiveDashboard(report)">
-                      {{report.name}}</label>
-                  </li>
-                </ul>
+          <div v-if="hasDashboards">
+            <div v-for="dashboard in dashboards"
+                class='panel-block'
+                :class="{'is-active': isActive(dashboard)}"
+                :key="dashboard.id"
+                @click="getDashboard(dashboard)">
+              <div>
+                <div>{{dashboard.name}}</div>
+                <div v-if="getIsActiveDashboardMatch(dashboard)">
+                  <small>Reports ({{activeDashboard.reportIds.length}})</small>
+                  <ul>
+                    <li v-for="report in reports" :key="report.id">
+                      <label for="'checkbox-' + report.id"
+                              @click="toggleReportInDashboard(report)">
+                        <input type="checkbox"
+                              :id="'checkbox-' + report.id"
+                              :checked="isReportInActiveDashboard(report)">
+                        {{report.name}}</label>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -82,7 +84,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import Chart from '../designs/Chart';
 
 export default {
@@ -102,6 +104,10 @@ export default {
       'isAddDashboard',
       'reports',
       'saveDashboardSettings',
+    ]),
+    ...mapGetters('dashboards', [
+      'hasDashboards',
+      'getIsActiveDashboardMatch',
     ]),
   },
   methods: {
