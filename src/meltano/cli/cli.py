@@ -35,9 +35,6 @@ def print_version(ctx, param, value):
     "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
 )
 @click.option(
-    "--v", is_flag=True, callback=print_version, expose_value=False, is_eager=True
-)
-@click.option(
     "-v", is_flag=True, callback=print_version, expose_value=False, is_eager=True
 )
 @click.pass_context

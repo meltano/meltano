@@ -22,11 +22,7 @@ Our CLI tool provides a single source of truth for the entire data pipeline. The
 In the event you want to check what version of Meltano you are using, we have provided the following options for you:
 
 ```bash
-meltano version
-
 meltano --version
-
-meltano --v
 
 meltano -v
 ```
