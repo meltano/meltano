@@ -1,5 +1,5 @@
 ### Problem to solve
-(Summarize the problem we are trying to solve)
+(Summarize the problem we are trying to solve in the form of we need to do [A], so that [B] can [C])
 * [ ]
 
 ### Target audience
@@ -21,5 +21,3 @@
 ### Links / references
 
 _Please note that this was taken from GitLab, to be changed accordingly_
-
-/label ~feature
