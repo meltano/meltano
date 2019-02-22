@@ -1,76 +1,80 @@
 <template>
-  <div class="container">
-    <section class="section">
-      <h1 class="title is-2">Users</h1>
-
-      <div class="segment">
-        <h2 class="subtitle is-5">Assign roles</h2>
-        <role-members :users="acl.users"
-                      :roles="rolesName"
-                      @add="assignRoleUser($event)"
-                      @remove="unassignRoleUser($event)"
-        />
+  <section class="section">
+    <article class="message is-warning">
+      <div class="message-header">
+        <p>
+          <span>
+            <font-awesome-icon icon="exclamation-triangle"/>
+          </span>
+          Warning &mdash; Experimental feature
+        </p>
       </div>
-      <hr/>
+      <div class="message-body">
+        <p class="has-text-weight-semibold">Permissions are not yet enforced.</p>
+        <p>
+          This is a demo of the role-based access control (RBAC) we are planning to build.
+          Please let us know what would be of interest to you on this <a href="https://gitlab.com/meltano/meltano/issues/370">issue</a>.
+        </p>
+      </div>
+    </article>
 
-      <h1 class="title is-2">Roles</h1>
-      <div class="segment">
-        <h2 class="subtitle is-5">Manage</h2>
-        <form>
-          <div class="field is-grouped">
-            <div class="control">
-              <input v-model="model.role"
-                     @keyup.enter="has(model.role) && createRole(model)"
-                     type="text"
-                     class="input"
-                     placeholder="Role name" />
-            </div>
-            <div class="control">
-              <button class="button is-success"
-                      :disabled="!has(model.role)"
-                      @click.prevent="createRole(model)">
-                Create
-              </button>
-            </div>
-            <div class="control">
-              <button class="button is-danger"
-                      :disabled="!has(model.role)"
-                      @click.prevent="deleteRole(model)">
-                Delete
-              </button>
-            </div>
+    <h1 class="title is-2">Users</h1>
+
+    <div class="segment">
+      <h2 class="subtitle is-5">Assign roles</h2>
+      <role-members :users="acl.users"
+                    :roles="rolesName"
+                    @add="assignRoleUser($event)"
+                    @remove="unassignRoleUser($event)"
+      />
+    </div>
+    <hr/>
+
+    <h1 class="title is-2">Roles</h1>
+    <div class="segment">
+      <h2 class="subtitle is-5">Manage</h2>
+      <form>
+        <div class="field is-grouped">
+          <div class="control">
+            <input v-model="model.role"
+                   @keyup.enter="has(model.role) && createRole(model)"
+                   type="text"
+                   class="input"
+                   placeholder="Role name" />
           </div>
-        </form>
-      </div>
-      <hr/>
-
-      <h1 class="title is-4">
-        Permissions
-        <span class="has-text-warning">
-          <font-awesome-icon icon="exclamation-triangle"/>
-        </span>
-      </h1>
-
-      <article class="message is-warning">
-        <div class="message-body">
-          <p>Permissions are not yet enforced for each resource.</p>
-          <p>
-            For more details, see <a href="https://gitlab.com/meltano/meltano/issues/370">https://gitlab.com/meltano/meltano/issues/370</a>
-          </p>
+          <div class="control">
+            <button class="button is-success"
+                    :disabled="!has(model.role)"
+                    @click.prevent="createRole(model)">
+              Create
+            </button>
+          </div>
+          <div class="control">
+            <button class="button is-danger"
+                    :disabled="!has(model.role)"
+                    @click.prevent="deleteRole(model)">
+              Delete
+            </button>
+          </div>
         </div>
-      </article>
+      </form>
+    </div>
+    <hr/>
 
-      <div class="segment">
-        <role-permissions v-for="perm in permissions"
-                          :key="perm.type"
-                          :permission="perm"
-                          :roles="rolesContexts(perm.type)"
-                          @add="addRolePermission($event)"
-                          @remove="removeRolePermission($event)"
-        />
-      </div>
-    </section>
-  </div>
+    <h1 class="title is-4">
+      Permissions
+    </h1>
+
+    <div class="segment">
+      <role-permissions v-for="perm in permissions"
+                        :key="perm.type"
+                        :permission="perm"
+                        :roles="rolesContexts(perm.type)"
+                        @add="addRolePermission($event)"
+                        @remove="removeRolePermission($event)"
+      />
+    </div>
+  </section>
 </template>
 <script>
 import _ from 'lodash';
