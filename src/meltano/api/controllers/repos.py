@@ -43,7 +43,7 @@ def index():
     sortedM5oFiles = {
         "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
         "documents": {"label": "Documents", "items": []},
-        "topics": {"label": "Topics": "items": []},
+        "topics": {"label": "Topics", "items": []},
         "reports": {"label": "Reports", "items": reportsParser.contents()},
         "tables": {"label": "Tables", "items": []},
     }
