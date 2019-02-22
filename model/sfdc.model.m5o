@@ -1,0 +1,20 @@
+{
+  version = 1
+  name = sfdc
+  connection = postgres_db
+  label = Salesforce
+  designs {
+    sf_opportunity_history_joined {
+      label = Opportunity History
+      from = sf_opportunity_history_joined
+      description = SFDC Opportunity History Data
+      joins {
+        sf_opportunity {
+          label = Opportunity
+          sql_on = "sf_opportunity_history_joined.opportunity_id = sf_opportunity.opportunity_id"
+          relationship = many_to_one
+        }
+      }
+    }
+  }
+}

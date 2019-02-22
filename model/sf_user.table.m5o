@@ -1,0 +1,49 @@
+{
+  version = 1
+  sql_table_name = sf_user
+  name = sf_user
+  columns {
+    user_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.user_id"
+    }
+    first_name {
+      label = User First Name
+      description = User First Name
+      type = string
+      sql = "{{table}}.first_name"
+    }
+    last_name {
+      label = User Last Name
+      description = User Last Name
+      type = string
+      sql = "{{table}}.last_name"
+    }
+    title {
+      label = User Title
+      description = User Title
+      type = string
+      sql = "{{table}}.title"
+    }
+    email {
+      label = User email
+      description = User email
+      type = string
+      sql = "{{table}}.email"
+    }
+    work_phone {
+      label = User Work Phone
+      description = User Work Phone
+      type = string
+      sql = "{{table}}.work_phone"
+    }
+    mobile_phone {
+      label = User Mobile Phone
+      description = User Mobile Phone
+      type = string
+      sql = "{{table}}.mobile_phone"
+    }
+  }
+}
