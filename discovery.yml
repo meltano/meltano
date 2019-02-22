@@ -97,3 +97,9 @@ transforms:
       entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
       generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
       region_table: "{{ env_var('PG_SCHEMA') }}.region"
+models:
+  - name: model-carbon-intensity-sqlite
+    pip_url: "https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
+  - name: model-carbon-intensity
+    pip_url: "https://gitlab.com/meltano/model-carbon-intensity.git"
+
