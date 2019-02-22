@@ -1,4 +1,4 @@
-import pkg_resources 
+import pkg_resources
 import click
 import logging
 import warnings
@@ -20,6 +20,7 @@ LEVELS = {
 
 # __version__ = pkg_resources.get_distribution('meltano').version
 __version__ = pkg_resources.require("meltano")[0].version
+
 
 @click.group(invoke_without_command=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
