@@ -43,7 +43,7 @@ def index():
     sortedM5oFiles = {
         "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
         "documents": {"label": "Documents", "items": []},
-        "models": {"label": "Models", "items": []},
+        "topics": {"label": "Topics", "items": []},
         "reports": {"label": "Reports", "items": reportsParser.contents()},
         "tables": {"label": "Tables", "items": []},
     }
@@ -61,11 +61,14 @@ def index():
         filename = filename.lower()
         filename, ext = os.path.splitext(filename)
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
-        if ext == ".model":
-            sortedM5oFiles["models"]["items"].append(file_dict)
+        if ext == ".topic":
+            sortedM5oFiles["topics"]["items"].append(file_dict)
+        if ext == ".dashboard":
+            sortedM5oFiles["dashboards"]["items"].append(file_dict)
+        if ext == ".report":
+            sortedM5oFiles["reports"]["items"].append(file_dict)
         if ext == ".table":
             sortedM5oFiles["tables"]["items"].append(file_dict)
-
     return jsonify(sortedM5oFiles)
 
 

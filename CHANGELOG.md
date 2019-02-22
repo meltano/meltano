@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add m5o model and tables for tap-salesforce
 
 ### Changes
+* Rename "Models" to "Topics"
 
 ### Fixes
 
@@ -28,7 +29,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
 * Add deep linking to dashboards
 * Add deep linking to reports
-
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
