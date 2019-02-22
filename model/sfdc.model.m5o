@@ -5,23 +5,13 @@
   label = Salesforce
   designs {
     sf_opportunity_history_joined {
-      label = SFDC Opportunity History
+      label = Opportunity History
       from = sf_opportunity_history_joined
       description = SFDC Opportunity History Data
       joins {
         sf_opportunity {
-          label = SFDC Opportunity
+          label = Opportunity
           sql_on = "sf_opportunity_history_joined.opportunity_id = sf_opportunity.opportunity_id"
-          relationship = many_to_one
-        }
-        sf_account {
-          label = SFDC Opportunity
-          sql_on = "sf_opportunity_history_joined.account_id = sf_account.account_id"
-          relationship = many_to_one
-        }
-        sf_user {
-          label = SFDC Opportunity
-          sql_on = "sf_opportunity_history_joined.created_by_id = sf_user.user_id"
           relationship = many_to_one
         }
       }
