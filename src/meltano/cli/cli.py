@@ -1,3 +1,4 @@
+import pkg_resources 
 import click
 import logging
 import warnings
@@ -8,7 +9,6 @@ warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import setup_logging
-from meltano import __version__
 
 LEVELS = {
     "debug": logging.DEBUG,
@@ -18,27 +18,12 @@ LEVELS = {
     "critical": logging.CRITICAL,
 }
 
-
-def print_version(ctx, param, value):
-    """
-    Print out Meltano version currently in use
-    """
-    if not value or ctx.resilient_parsing:
-        return
-    click.echo(__version__)
-    ctx.exit()
-
+# __version__ = pkg_resources.get_distribution('meltano').version
+__version__ = pkg_resources.require("meltano")[0].version
 
 @click.group(invoke_without_command=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
-@click.option(
-    "-v",
-    "--version",
-    is_flag=True,
-    callback=print_version,
-    expose_value=False,
-    is_eager=True,
-)
+@click.version_option(version=__version__)
 @click.pass_context
 def cli(ctx, log_level):
     setup_logging(log_level=LEVELS[log_level])
