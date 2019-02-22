@@ -13,7 +13,7 @@ SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
 # Meltano
 # -----------------
 LOG_PATH = os.getenv("MELTANO_LOG_PATH", "meltano.log")
-ENV = os.getenv("FLASK_ENV")
+ENV = os.getenv("FLASK_ENV", "development")
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
