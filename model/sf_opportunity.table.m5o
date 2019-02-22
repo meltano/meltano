@@ -23,9 +23,9 @@
     }
   }
   aggregates {
-    total_oportunities {
-      label = Total Oportunities
-      description = Total Oportunities
+    total_opportunities {
+      label = Total Opportunities
+      description = Total Opportunities
       type = count
       sql = "{{table}}.opportunity_id"
     }
