@@ -163,4 +163,5 @@ class SqlUtils:
             q = q.orderby(orderby, order=order)
 
         q = q.limit(limit)
-        return str(q) + ";"
+        q = str(q)
+        return f"{q};" if len(q) > 0 else ""

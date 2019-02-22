@@ -60,7 +60,7 @@ class TestSqlController:
 
         res = post(payload)
         assert res.status_code == 200
-        assert res.json["sql"] == ";"
+        assert res.json["sql"] == ""
 
     def assert_column_query(self, post):
         """with columns they should be included in the query"""

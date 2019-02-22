@@ -127,17 +127,18 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '@/scss/bulma-preset-overrides.scss';
+
 .navbar.is-info {
-  background: #464ACB;
+  background: $primary;
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken(#464ACB, 20%);
+    background: darken($primary, 20%);
   }
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
 }
-
 .navbar-dropdown.is-boxed.has-been-clicked {
   // trick to unhover the menu dropdown
   display: none !important;

@@ -1,6 +1,7 @@
 <template>
-  <div class="columns">
-    <aside class="menu column is-one-quarter section has-background-light">
+  <router-view-layout>
+
+    <div slot='left'>
       <template v-for="category in categories">
         <div :key="category.name">
           <p class="menu-label">
@@ -13,16 +14,22 @@
           </ul>
         </div>
       </template>
-    </aside>
-    <div class="column">
+    </div>
+
+    <div slot="right">
       <router-view />
     </div>
-  </div>
+
+  </router-view-layout>
 </template>
 <script>
+import RouterViewLayout from '@/views/RouterViewLayout';
+
 export default {
   name: 'Settings',
-
+  components: {
+    RouterViewLayout,
+  },
   data() {
     return {
       categories: [{
