@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add m5o model and tables for tap-salesforce
 
 ### Changes
+* Polished the RBAC view, making it clearer the feature is experimental.
 
 ### Fixes
 
