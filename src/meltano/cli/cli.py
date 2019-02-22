@@ -18,6 +18,7 @@ LEVELS = {
     "critical": logging.CRITICAL,
 }
 
+
 def print_version(ctx, param, value):
     """
     Print out Meltano version currently in use
@@ -27,10 +28,16 @@ def print_version(ctx, param, value):
     click.echo(__version__)
     ctx.exit()
 
+
 @click.group(invoke_without_command=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
 @click.option(
-    "-v", "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+    "-v",
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
 )
 @click.pass_context
 def cli(ctx, log_level):
