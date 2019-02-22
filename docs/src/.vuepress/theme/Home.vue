@@ -39,12 +39,12 @@
 
     <h2 class="quote">Meltano does for data what docker did for containers</h2>
 
-    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+    <p class="description">Meltano is a single workflow for the entire data life cycle. From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
     <table class="meltano-stages-table">
       <thead>
         <tr class="meltano-header-row">
-          <th><span class="sr-only">Description</span></th>
+          <th>Stage</th>
           <th>Model</th>
           <th>Extract</th>
           <th>Load</th>
@@ -56,9 +56,9 @@
       </thead>
       <tbody>
         <tr class="meltano-row">
-          <td>Meltano is a single workflow for the entire data life cycle.</td>
+          <td>Meltano uses</td>
           <td class="ta-c">
-            <a href="https://gitlab.com/meltano/meltano" target="_blank">Meltano</a>
+            <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
           </td>
           <td class="ta-c">
             <a href="https://www.singer.io/#taps">Singer Taps</a>
@@ -70,17 +70,17 @@
             <a href="https://www.getdbt.com/">dbt</a>
           </td>
           <td class="ta-c">
-            <a href="https://gitlab.com/meltano/meltano">Meltano</a>
+            <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
           </td>
           <td class="ta-c">
             <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
           </td>
           <td class="ta-c">
-            <a href="https://docs.gitlab.com/ee/ci/">GitLab CI</a> /  <a href="https://airflow.apache.org/">Airflow</a>
+            <a href="https://airflow.apache.org/">Airflow</a>
           </td>
         </tr>
         <tr>
-          <td>Meltano is an alternative for</td>
+          <td>Meltano can replace</td>
           <td>
             <ul>
               <li>

@@ -1,0 +1,57 @@
+{
+  version = 1
+  sql_table_name = sf_opportunity_history_joined
+  name = sf_opportunity_history_joined
+  columns {
+    opportunity_history_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.opportunity_history_id"
+    }
+    opportunity_id {
+      label = Opportunity ID
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.opportunity_id"
+    }
+    created_by_id {
+      label = Created By ID (User)
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.created_by_id"
+    }
+    account_id {
+      label = Account ID
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.account_id"
+    }
+    owner_name {
+      label = Owner Name
+      description = Owner Name
+      type = string
+      sql = "{{table}}.owner_name"
+    }
+    stage_name {
+      label = Stage Name
+      description = Stage Name
+      type = string
+      sql = "{{table}}.stage_name"
+    }
+    last_event_status {
+      label = Last Event Status
+      description = Last Event Status
+      type = string
+      sql = "{{table}}.last_event_status"
+    }
+  }
+  aggregates {
+    count {
+      label = Row Count
+      description = Row Count
+      type = count
+      sql = "{{table}}.opportunity_history_id"
+    }
+  }
+}

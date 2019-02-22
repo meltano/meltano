@@ -9,20 +9,32 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Update installation and contributing docs
-* Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
-* Add deep linking to dashboards
-* Add deep linking to reports
+* Add the `tap-salesforce` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-salesforce
+* Add m5o model and tables for tap-salesforce
 
 ### Changes
 * Rename "Models" to "Topics"
 
 ### Fixes
-* Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
-* Fixed dashboards initial load issue due to legacy (and empty) `carbon.dashboard.m5o` file
 
 ### Breaks
+
+
+## 0.12.0 - (2019-02-21)
+---
+
+### New
+* UI cleanup across routes (Analyze focus) and baseline polish to mitigate "that looks off comments"
+* Update installation and contributing docs
+* Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
+* Add deep linking to dashboards
+* Add deep linking to reports
+
+### Fixes
+* Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
+* Fixed dashboards initial load issue due to legacy (and empty) `carbon.dashboard.m5o` file
 * New standardized approach for `.m5o` id generation (will need to remove any dashboard.m5o and report.m5o)
+
 
 ## 0.11.0 - (2019-02-19)
 ---
@@ -55,6 +67,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Meltano will correctly source the `.env`
 * fixed charts to render as previously they were blank
 * Fixed Analyze button groupd CSS to align as a single row
+
+### Breaks
+* Meltano will now use SQLite for the job log. See https://meltano.com/docs/architecture.html#job-logging for more details.
+* URL routing updates ('/model' to '/files', removed currently unused '/extract', '/load', '/transform' and '/project/new')
 
 
 ## 0.9.0 - (2019-02-05)

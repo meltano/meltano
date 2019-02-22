@@ -1,0 +1,39 @@
+{
+  version = 1
+  sql_table_name = sf_account
+  name = sf_account
+  columns {
+    account_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.account_id"
+    }
+    account_type {
+      label = Account Type
+      description = Account Type
+      type = string
+      sql = "{{table}}.account_type"
+    }
+    company_name {
+      label = Company Name
+      description = Company Name
+      type = string
+      sql = "{{table}}.company_name"
+    }
+    industry {
+      label = Industry
+      description = Industry
+      type = string
+      sql = "{{table}}.industry"
+    }
+  }
+  aggregates {
+    avg_employees {
+      label = Average Number of Employees (%)
+      description = Average Number of Employees (%)
+      type = avg
+      sql = "{{table}}.number_of_employees"
+    }
+  }
+}

@@ -1,14 +1,16 @@
 <template>
   <div class="dropdown"
-        :class="{'is-active': isOpen}">
+        :class="{'is-active': isOpen, 'is-right': isRightAligned}">
     <div class="dropdown-trigger">
       <button class="button"
-              aria-haspopup="true"
+              :class="buttonClasses"
+              :disabled="disabled"
               :aria-controls="getHyphenatedLabel"
+              aria-haspopup="true"
               @click="toggleDropdown">
-        <span>{{label}}</span>
+        <span v-if="label">{{label}}</span>
         <span class="icon is-small">
-          <font-awesome-icon icon="caret-down" style="color:black;"></font-awesome-icon>
+          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
         </span>
       </button>
     </div>
@@ -46,6 +48,16 @@ export default {
   props: {
     label: {
       type: String,
+    },
+    buttonClasses: {
+      type: String,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    isRightAligned: {
+      type: Boolean,
     },
   },
   methods: {

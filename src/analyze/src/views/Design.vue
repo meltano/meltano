@@ -1,25 +1,31 @@
 <template>
-<div class="container">
-  <section class="section">
-    <div class="columns">
-      <nav class="panel column is-one-quarter">
-        <p class="panel-heading">
-          {{design.label}}
-        </p>
+  <router-view-layout>
+
+    <div slot='left'>
+      <nav class="panel ">
         <div class="panel-block">
-          <p class="control">
-            <input class="input is-small" type="text" placeholder="search">
-          </p>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" type="text" placeholder="Filter" disabled>
+            </div>
+            <div class="control">
+              <button class="button" disabled>
+                <span class="icon">
+                  <font-awesome-icon icon="search"></font-awesome-icon>
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div class="inner-scroll text-selection-off">
+        <div class="is-unselectable">
           <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
           <template v-if="hasJoins">
             <template v-for="join in design.joins">
               <a
                 class="panel-block
                   panel-block-heading
-                  has-background-white-ter
+                  has-background-white-bis
                   has-text-grey
                   is-expandable"
                   :class="{'is-collapsed': join.collapsed}"
@@ -93,7 +99,7 @@
             <a
               class="panel-block
               panel-block-heading
-              has-background-white-ter
+              has-background-white-bis
               has-text-grey
               is-expandable"
               :class="{'is-collapsed': design.related_table.collapsed}"
@@ -151,92 +157,143 @@
           </template>
         </div>
 
-        <div class="panel-block">
-          <button class="button is-link is-outlined is-fullwidth">
-            Reset All Filters
-          </button>
-        </div>
       </nav>
-      <div class="column is-three-quarters">
-        <div class="columns is-vcentered">
-          <div class="column is-one-quarter">
-            <div class="is-grouped is-pulled-left">
-              <div v-if="activeReport.name">{{activeReport.name}}</div>
-              <div v-if="!activeReport.name"><em>Untitled Report</em></div>
-            </div>
-          </div>
+    </div>
 
-          <div class="column">
-            <div class="is-grouped is-pulled-right">
+    <div slot="right">
 
-              <Dropdown label="Load Report" >
-                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                  <div v-if="reports.length > 0">
-                    <a class="dropdown-item"
-                        :class="{'is-loading': loadingQuery}"
-                        v-for="report in reports"
-                        :key="report.name"
-                        @click="loadReport(report); dropdownForceClose();">
-                      {{report.name}}
-                    </a>
-                  </div>
-                  <div class="dropdown-item" v-if="reports.length === 0">
-                    <p>Try saving one first</p>
-                  </div>
-                </div>
-              </Dropdown>
+      <div class="columns is-vcentered">
 
-              <Dropdown label="Save Report">
-                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                  <div class="dropdown-item">
-                    <div class="field">
-                      <label class="label">Name</label>
-                      <div class="control">
-                        <input class="input"
-                                type="text"
-                                placeholder="Name your report"
-                                v-model="saveReportSettings.name">
-                      </div>
-                    </div>
-                    <div class="field is-grouped">
-                      <div class="control">
-                        <button class="button is-link"
-                                :disabled="!saveReportSettings.name"
-                                @click="saveReport(); dropdownForceClose();">Save</button>
-                      </div>
-                      <div class="control">
-                        <button class="button is-text"
-                                @click="dropdownForceClose();">
-                          Cancel</button>
-                      </div>
-                    </div>
-                  </div>
-                  <hr class="dropdown-divider" v-if="activeReport.name">
-                  <div class="dropdown-item" v-if="activeReport.name">
-                    <button class="button is-link is-fullwidth"
-                            @click="updateReport(); dropdownForceClose();">Update Existing</button>
-                  </div>
-                </div>
-              </Dropdown>
-
-              <a class="button is-primary"
-                  :class="{'is-loading': loadingQuery}"
-                  @click="runQuery">Run Query</a>
-
-            </div>
+        <div class="column is-one-quarter">
+          <div class="is-grouped is-pulled-left">
+            <div v-if="hasActiveReport()">{{activeReport.name}}</div>
+            <div v-else><em>Untitled Report</em></div>
           </div>
         </div>
-        <template v-if="design.has_filters">
-          <div class="has-background-grey-darker
-            section-header
-            has-text-white-bis
-            is-expandable"
-            @click="toggleFilterOpen"
-            :class="{'is-collapsed': !filtersOpen}">Filters</div>
-          <div class="has-background-white-ter filter-item"
-                v-for="filter in design.always_filter.filters"
-                :key="filter.label"
-                v-if="filtersOpen">
+
+        <div class="column">
+          <div class="field is-grouped is-pulled-right">
+
+            <p v-if="hasActiveReport()" class="control" @click="getDashboards">
+              <Dropdown label="Add to Dashboard" is-right-aligned>
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <a
+                    class="dropdown-item"
+                    @click="toggleNewDashboardModal(); dropdownForceClose();">
+                    New Dashboard
+                  </a>
+                  <div v-if="dashboards.length">
+                    <div class="dropdown-item"
+                        v-for="dashboard in dashboards"
+                        :key="dashboard.id">
+                      <label for="'checkbox-' + dashboard.id"
+                              @click="
+                                toggleActiveReportInDashboard(dashboard);
+                                dropdownForceClose();">
+                        <input type="checkbox"
+                              :id="'checkbox-' + dashboard.id"
+                              :checked="isActiveReportInDashboard(dashboard)">
+                        {{dashboard.name}}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </Dropdown>
+            </p>
+
+            <div class="control field" :class="{'has-addons': hasActiveReport()}">
+              <p class="control">
+                <button
+                  class="button is-success is-outlined"
+                  v-if="hasActiveReport()"
+                  @click="updateReport();">
+                  <span>Save</span>
+                </button>
+              </p>
+              <p class="control">
+                <Dropdown
+                  :disabled="!hasResults"
+                  :label="hasActiveReport() ? '' : 'Save'"
+                  button-classes='is-success is-outlined'
+                  is-right-aligned>
+                  <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    <div class="dropdown-item">
+                      <div class="field">
+                        <label class="label" v-if="hasActiveReport()">Save as</label>
+                        <div class="control">
+                          <input class="input"
+                                  type="text"
+                                  placeholder="Name your report"
+                                  v-model="saveReportSettings.name">
+                        </div>
+                      </div>
+                      <div class="field is-grouped">
+                        <div class="control">
+                          <button class="button is-link"
+                                  :disabled="!saveReportSettings.name"
+                                  @click="saveReport(); dropdownForceClose();">Save</button>
+                        </div>
+                        <div class="control">
+                          <button class="button is-text"
+                                  @click="dropdownForceClose();">
+                            Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Dropdown>
+              </p>
+            </div>
+
+            <p class="control">
+              <Dropdown
+                :disabled="!reports.length"
+                label="Load"
+                button-classes='is-success is-outlined'
+                is-right-aligned>
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <a class="dropdown-item"
+                      v-for="report in reports"
+                      :key="report.name"
+                      @click="loadReport(report); dropdownForceClose();">
+                    {{report.name}}
+                  </a>
+                </div>
+              </Dropdown>
+            </p>
+
+            <p class="control">
+              <button class="button is-success"
+                :class="{'is-loading': loadingQuery}"
+                :disabled="!currentSQL"
+                @click="runQuery">Run Query</button>
+            </p>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- filters tab -->
+      <div v-if="design.has_filters">
+        <div class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+          @click="toggleFilterOpen"
+          :class="{'is-collapsed': !filtersOpen}">
+
+          <span>Filters</span>
+          <div class="accordion-toggle">
+            <a class="button is-primary is-small">
+              <span class="icon is-small">
+                <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'">
+                </font-awesome-icon>
+              </span>
+            </a>
+          </div>
+        </div>
+        <div class="accordion-body">
+          <div v-if="filtersOpen">
             <div class="columns">
               <div class="column is-3">
                 <strong>{{filter.design_label}}</strong>
@@ -267,120 +324,191 @@
               </div>
             </div>
           </div>
-        </template>
+        </div>
+      </div>
 
-        <!-- charts tab -->
-        <div class="has-background-grey-darker
-          section-header
-          has-text-white-bis
-          is-expandable"
-          @click="toggleChartsOpen"
-          :class="{'is-collapsed': !chartsOpen}">Charts</div>
+      <!-- charts tab -->
+      <div class="has-background-primary
+        accordion-header
+        has-text-white-bis
+        is-expandable"
+        @click="toggleChartsOpen"
+        :class="{'is-collapsed': !chartsOpen}">
 
-        <template v-if="chartsOpen">
+        <span class="accordion-title">Charts</span>
+        <div>
           <div class="field has-addons chart-buttons">
-            <p class="control">
-              <a class="button is-small" @click="setChartType('BarChart')">
+            <p class="control" @click.stop="setAndOpenChart('BarChart')">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'BarChart'}"
+                :disabled="!hasResults">
                 <span class="icon is-small">
-                  <font-awesome-icon icon="chart-bar" style="color:white;"></font-awesome-icon>
+                  <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                 </span>
-              </a>
+              </button>
             </p>
-            <p class="control">
-              <a class="button is-small">
-                <span class="icon is-small" @click="setChartType('LineChart')">
-                  <font-awesome-icon icon="chart-line" style="color:white;"></font-awesome-icon>
+            <p class="control" @click.stop="setAndOpenChart('LineChart')">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'LineChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small">
+                  <font-awesome-icon icon="chart-line"></font-awesome-icon>
                 </span>
-              </a>
+              </button>
             </p>
-            <p class="control">
-              <a class="button is-small">
-                <span class="icon is-small" @click="setChartType('AreaChart')">
-                  <font-awesome-icon icon="chart-area" style="color:white;"></font-awesome-icon>
+            <p class="control" @click.stop="setAndOpenChart('AreaChart')">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'AreaChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small">
+                  <font-awesome-icon icon="chart-area"></font-awesome-icon>
                 </span>
-              </a>
+              </button>
             </p>
-            <p class="control">
-              <a class="button is-small">
-                <span class="icon is-small" @click="setChartType('ScatterChart')">
-                  <font-awesome-icon icon="dot-circle" style="color:white;"></font-awesome-icon>
+            <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'ScatterChart'}"
+                :disabled="!hasResults">
+                <span class="icon is-small">
+                  <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                 </span>
-              </a>
+              </button>
             </p>
-            <p class="control">
-              <a class="button is-small">
-                <span class="icon is-small" @click="setChartType('pie')">
-                  <font-awesome-icon icon="chart-pie" style="color:white;"></font-awesome-icon>
+            <p class="control" @click.stop="setAndOpenChart('number')">
+              <button
+                class="button is-small is-text has-text-white"
+                :class="{'is-active': chartType === 'number'}"
+                :disabled="!hasResults">
+                <span class="icon is-small">
+                  <font-awesome-icon icon="hashtag"></font-awesome-icon>
                 </span>
-              </a>
-            </p>
-            <p class="control">
-              <a class="button is-small" @click="setChartType('number')">
-                <span class="icon is-small" style="color:white;font-weight: bold;">
-                  9
-                </span>
-              </a>
+              </button>
             </p>
           </div>
-          <div class="has-background-white-ter chart-toggles">
+        </div>
+
+        <div class="accordion-toggle">
+          <a class="button is-primary is-small">
+            <span class="icon is-small">
+              <font-awesome-icon :icon="chartsOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+            </span>
+          </a>
+        </div>
+
+      </div>
+      <div class="accordion-body">
+        <div v-if="chartsOpen" >
+          <div v-if="hasResults" class="chart-toggles">
             <chart :chart-type='chartType'
                     :results='results'
                     :result-aggregates='resultAggregates'></chart>
           </div>
-        </template>
+          <div v-if="!hasResults">
+            <div class="box is-radiusless is-shadowless">
+              Load a report or run a query first
+            </div>
+          </div>
+        </div>
+      </div>
 
-        <!-- results/SQL tab -->
-        <div class="has-background-grey-darker
-        section-header
+      <!-- results/SQL tab -->
+      <div class="has-background-primary
+        accordion-header
         has-text-white-bis
         is-expandable"
         @click="toggleDataOpen"
-        :class="{'is-collapsed': !dataOpen}">Data</div>
-        <template v-if="dataOpen">
-        <div class="notification is-danger" v-if="hasSQLError">
-          <button class="delete" @click="resetErrorMessage"></button>
-          <ul>
-            <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
-          </ul>
+        :class="{'is-collapsed': !dataOpen}">
+
+        <span>Data</span>
+        <div class="accordion-toggle">
+          <a class="button is-primary is-small">
+            <span class="icon is-small">
+              <font-awesome-icon :icon="dataOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+            </span>
+          </a>
         </div>
-        <div class="has-background-white-ter data-toggles">
-          <div class="field is-pulled-right">
-            <div class="control">
-              <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+      </div>
+      <div class="accordion-body">
+        <div v-if="dataOpen" class="box is-radiusless is-shadowless">
+          <div class="notification is-danger" v-if="hasSQLError">
+            <button class="delete" @click="resetErrorMessage"></button>
+            <ul>
+              <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+            </ul>
+          </div>
+          <div class="columns is-vcentered">
+
+            <div class="column">
+              <div class="tabs">
+                <ul>
+                  <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
+                    <a>Results ({{numResults}})</a>
+                  </li>
+                  <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
+                    <a>SQL</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="field is-horizontal is-marginless is-pulled-right">
+                <div class="field-label">
+                  <label class="label">Limit</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <ResultTable></ResultTable>
+          <div>
+            <div class="" v-if="isSQLTab && currentSQL">
+              <code>{{formattedSql}}</code>
             </div>
           </div>
-          <div class="buttons has-addons">
-            <span class="button"
-                  :class="{'is-active': isResultsTab}"
-                  @click="setCurrentTab('results')">Results ({{numResults}})</span>
-            <span class="button"
-                  :class="{'is-active': isSQLTab}"
-                  @click="setCurrentTab('sql')">SQL</span>
-          </div>
         </div>
-        <ResultTable></ResultTable>
-        <div>
-          <div class="" v-if="isSQLTab && currentSQL">
-            <code>{{formattedSql}}</code>
-          </div>
-        </div>
-        </template>
       </div>
+
+      <!-- New Dashboard Modal -->
+      <NewDashboardModal
+        v-if="isNewDashboardModalOpen"
+        @close="toggleNewDashboardModal"
+        :report="activeReport">
+      </NewDashboardModal>
+
     </div>
-  </section>
-</div>
+
+  </router-view-layout>
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
-import Dropdown from '../generic/Dropdown';
-import ResultTable from './ResultTable';
-import SelectDropdown from '../generic/SelectDropdown';
-import YesNoFilter from '../filters/YesNoFilter';
-import Chart from './Chart';
+import RouterViewLayout from '@/views/RouterViewLayout';
+import Dropdown from '../components/generic/Dropdown';
+import ResultTable from '../components/designs/ResultTable';
+import SelectDropdown from '../components/generic/SelectDropdown';
+import YesNoFilter from '../components/filters/YesNoFilter';
+import Chart from '../components/designs/Chart';
+import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Design',
+  data() {
+    return {
+      isNewDashboardModalOpen: false,
+    };
+  },
   created() {
     this.$store.dispatch('designs/getDesign', {
       model: this.$route.params.model,
@@ -393,8 +521,10 @@ export default {
   },
   components: {
     Chart,
+    NewDashboardModal,
     Dropdown,
     ResultTable,
+    RouterViewLayout,
     SelectDropdown,
     YesNoFilter,
   },
@@ -409,7 +539,6 @@ export default {
     ...mapState('designs', [
       'activeReport',
       'design',
-      'selectedColumns',
       'currentModel',
       'currentDesign',
       'currentSQL',
@@ -431,6 +560,7 @@ export default {
       'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
+      'hasResults',
       'numResults',
       'isSQLTab',
       'getDistinctsForField',
@@ -441,6 +571,9 @@ export default {
       'hasJoins',
       'showJoinColumnAggregateHeader',
       'formattedSql',
+    ]),
+    ...mapState('dashboards', [
+      'dashboards',
     ]),
     ...mapGetters('settings', [
       'isConnectionDialectSqlite',
@@ -459,14 +592,39 @@ export default {
     },
   },
   methods: {
+    ...mapActions('dashboards', [
+      'getDashboards',
+    ]),
+
+    isActiveReportInDashboard(dashboard) {
+      return dashboard.reportIds.includes(this.activeReport.id);
+    },
+
+    hasActiveReport() {
+      return Object.keys(this.activeReport).length > 0;
+    },
+
+    toggleActiveReportInDashboard(dashboard) {
+      const methodName = this.isActiveReportInDashboard(dashboard)
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard';
+      this.$store.dispatch(`dashboards/${methodName}`, {
+        reportId: this.activeReport.id,
+        dashboardId: dashboard.id,
+      });
+    },
+
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
         this.$store.dispatch('designs/getDistinct', field);
       }
     },
 
-    setChartType(chartType) {
+    setAndOpenChart(chartType) {
       this.$store.dispatch('designs/setChartType', chartType);
+      if (!this.chartsOpen) {
+        this.$store.dispatch('designs/toggleChartsOpen');
+      }
     },
 
     tableRowClicked(relatedTable) {
@@ -482,6 +640,7 @@ export default {
       this.$store.dispatch('designs/toggleColumn', column);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
+
     timeframeSelected(timeframe) {
       if (!this.canToggleTimeframe) {
         return;
@@ -541,6 +700,10 @@ export default {
       this.$store.dispatch('designs/toggleChartsOpen');
     },
 
+    toggleNewDashboardModal() {
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
+    },
+
     dropdownSelected(item, field) {
       this.$store.dispatch('designs/addDistinctSelection', {
         item,
@@ -563,6 +726,9 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
+@import '@/scss/bulma-preset-overrides.scss';
+@import "../../node_modules/bulma/bulma";
+
 code {
   white-space: pre;
   word-wrap: break-word;
@@ -572,6 +738,11 @@ code {
   &.indented {
     padding-left: 1.75rem;
   }
+  &.is-active {
+    border-left-color: $primary;
+    border-left-width: 4px;
+    @extend .has-background-white-ter;
+  }
   &.panel-block-heading {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
@@ -580,7 +751,6 @@ code {
       background: white;
     }
   }
-
   &.is-sqlite-unsupported {
     opacity: .5;
     cursor: not-allowed;
@@ -633,30 +803,43 @@ code {
 }
 
 .data-toggles {
-  padding: 1.5rem;
+  padding-top: .5rem;
 }
 
-.section-header {
-  padding: 0.25rem;
-  margin-bottom: 0.25rem;
+.accordion-header {
+  padding: .5rem .5rem .5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   cursor: pointer;
-
-  &.is-expandable::after {
-    right: 30px;
-    text-align: center;
-    margin-top: -7px;
+  @extend .is-unselectable;
+  .accordion-title {
+    padding-right: 1.5rem;
+  }
+  .button:not([disabled]) {
+    &.is-active {
+      @extend .has-text-primary;
+      @extend .has-background-white-ter;
+    }
+    &.is-text:hover,
+    &.is-text:focus {
+      @extend .has-text-primary;
+      @extend .has-background-white;
+    }
+  }
+  .accordion-toggle {
+    margin-left: auto;
+  }
+}
+.accordion-body {
+  margin-bottom: 0.25rem;
+  @extend .has-background-white-bis;
+  .box {
+    @extend .has-background-white-bis;
   }
 }
 .filter-item {
   padding: 1.5rem;
-}
-
-.inner-scroll {
-  position: relative;
-  height: calc(100vh - 252px);
-  border-left: 1px solid #dbdbdb;
-  border-right: 1px solid #dbdbdb;
-  overflow: scroll;
 }
 
 .selected-filters {
@@ -664,10 +847,6 @@ code {
   padding-left: 0;
 }
 .chart-buttons {
-  margin-top: -34px;
-  margin-left: 70px;
-  width: 20%;
-
   .button {
     background: transparent;
   }
