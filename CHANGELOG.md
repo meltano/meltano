@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 * Polished the RBAC view, making it clearer the feature is experimental.
 * Rename "Models" to "Topics"
+* Use the current connection's schema when generating queries at run time for Postgres Connections.
+* Add support for multiple Aggregates over the same attribute when generating HDA queries.
 
 ### Fixes
 

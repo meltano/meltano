@@ -41,5 +41,11 @@
       type = sum
       sql = "{{table}}.amount"
     }
+    avg_amount {
+      label = Average Amount
+      description = Average Amount
+      type = avg
+      sql = "{{table}}.amount"
+    }
   }
 }

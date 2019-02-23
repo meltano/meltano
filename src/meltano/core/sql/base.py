@@ -503,10 +503,22 @@ class MeltanoQuery(MeltanoBase):
             for c in table.columns() + table.optional_pkeys:
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
 
+            # We have to track wich columns have been added to the SELECT clause
+            #  for being used in Aggregates as it is valid to have multiple
+            #  Aggregates over the same column (e.g. AVG(price), SUM(price))
+            # In that case, we don't want to add the column multiple times in the
+            #  select clause cause will cause an Error in followup with clauses:
+            #  Error: column reference {COLUMN} is ambiguous
+            aggregate_columns_selected = set()
+
             for a in table.aggregates():
+                if a.column_name() in aggregate_columns_selected:
+                    continue
+
                 select.append(
                     Field(a.column_name(), table=pika_table, alias=a.column_alias())
                 )
+                aggregate_columns_selected.add(a.column_name())
 
             # Skip timeframes for this iteration
             # for t in table.timeframes():
