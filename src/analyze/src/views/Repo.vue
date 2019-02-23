@@ -62,7 +62,7 @@
 
           <template v-if="value.items.length">
             <li v-for="file in value.items" :key="file.abs">
-              <div class="columns">
+              <div class="columns is-vcentered">
                 <div class="column">
                   <a :class="{'is-active': isActive(file)}"
                       @click.prevent='getFile(file)'>
@@ -71,10 +71,9 @@
                 </div>
                 <div v-if='isDeepRoutable(key)' class='column is-one-fifth'>
                   <router-link :to="getDeepRoute(key, file)"
-                                class="button is-secondary is-light is-pulled-right">
-                    <span class="icon is-small">
-                      <i class="fas fa-bold">*</i>
-                    </span>
+                                class="button is-secondary is-light is-small is-pulled-right">
+                      <!-- TODO temporary icon, find better solution -->
+                      <font-awesome-icon icon="arrow-right"/>
                   </router-link>
                 </div>
               </div>
