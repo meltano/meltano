@@ -13,7 +13,7 @@ lighthouse:
     paths:
       - "/builds/meltano/meltano/lighthouse-results.html"
   script:
-    - apt-get install build-essential
+    - sudo apt-get install build-essential
     - curl -O https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
     - tar -xvzf Python-3.7.2.tgz
     - cd Python-3.7.2 && ./configure && make && make install
