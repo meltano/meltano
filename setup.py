@@ -31,6 +31,7 @@ requires = [
     'pyhocon',
     'python-dotenv',
     'python-gitlab',
+    'simplejson',
     'watchdog',
 ]
 
