@@ -15,6 +15,7 @@ import {
   faSearch,
   faHashtag,
   faExclamationTriangle,
+  faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon,
   FontAwesomeLayers,
@@ -39,6 +40,7 @@ library.add(faAngleUp);
 library.add(faSearch);
 library.add(faHashtag);
 library.add(faExclamationTriangle);
+library.add(faArrowRight);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
