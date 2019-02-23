@@ -7,10 +7,14 @@ from .base import MeltanoDesign, MeltanoQuery
 
 
 class HyperDimensionalAggregatesHelper:
-    def __init__(self, design_helper: DesignHelper, incoming_json: Dict) -> None:
+    def __init__(
+        self, design_helper: DesignHelper, incoming_json: Dict, schema: str = None
+    ) -> None:
         self.design_helper = design_helper
         self.incoming_json = incoming_json
-        self.query = MeltanoQuery(definition=incoming_json, design_helper=design_helper)
+        self.query = MeltanoQuery(
+            definition=incoming_json, design_helper=design_helper, schema=schema
+        )
 
     def needs_hda(self) -> bool:
         has_join_columns = next(
