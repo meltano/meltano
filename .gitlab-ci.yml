@@ -13,5 +13,8 @@ lighthouse:
     paths:
       - "/builds/meltano/meltano/lighthouse-results.html"
   script:
-    - python --version
+    - apt-get install build-essential
+    - curl -O https://www.python.org/ftp/python/3.7.2/Python-3.7.2.tgz
+    - tar -xvzf Python-3.7.2.tgz
+    - cd Python-3.7.2 && ./configure && make && make install
     - lighthouse --output-path="./lighthouse-results.html" --chrome-flags="--headless --disable-gpu" http://jacobschatz.com
