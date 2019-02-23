@@ -13,7 +13,5 @@ lighthouse:
     paths:
       - "/builds/meltano/meltano/lighthouse-results.html"
   script:
-    - make bundle
-    - pip install '.[dev]'
     - python --version
     - lighthouse --output-path="./lighthouse-results.html" --chrome-flags="--headless --disable-gpu" http://jacobschatz.com
