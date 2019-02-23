@@ -47,7 +47,6 @@ class SqlHelper(SqlUtils):
         return M5ocFile.load(m5oc_file)
 
     def get_connection(self, connection_name):
-        project = Project.find()
         settings_helper = SettingsHelper()
         connections = settings_helper.get_connections()["settings"]["connections"]
 
@@ -63,6 +62,7 @@ class SqlHelper(SqlUtils):
             raise ConnectionNotFound(connection_name)
 
     def get_db_engine(self, connection_name):
+        project = Project.find()
         connection = self.get_connection(connection_name)
 
         if connection["dialect"] == "postgresql":
