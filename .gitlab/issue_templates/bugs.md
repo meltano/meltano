@@ -7,14 +7,6 @@ filtered by the "regression" or "bug" label.
 and verify the issue you're about to submit isn't a duplicate.
 --->
 
-### Summary
-(Summarize the bug encountered concisely)
-* [ ]
-
-### Steps to reproduce
-(How one can reproduce the issue)
-* [ ]
-
 ### What is the current *bug* behavior?
 (What is happening now)
 * [ ]
@@ -23,20 +15,16 @@ and verify the issue you're about to submit isn't a duplicate.
 (What should be happening)
 * [ ]
 
-### Relevant logs and/or screenshots
-(Paste any relevant logs - please use code blocks (```) to format console output)
+### Steps to reproduce
+(How one can reproduce the issue)
 * [ ]
 
-### Output of checks
-(If you are reporting a bug on GitLab.com, write: This bug happens on GitLab.com)
+### Relevant logs and/or screenshots
+(Paste any relevant logs - please use code blocks (```) to format console output)
 * [ ]
 
 ### Possible fixes
 (If you can, link to the line of code that might be responsible for the problem or suggest a fix)
 * [ ]
-
-### Links / references
-
-_Please note that this was taken from GitLab, to be changed accordingly_
 
 /label ~bug
