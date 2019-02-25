@@ -473,9 +473,10 @@ class MeltanoQuery(MeltanoBase):
         """
 
         # Lists with the column names and headers of the final result when the
-        #  HDA query is exuted
+        #  HDA query is executed
         column_headers = []
         column_names = []
+        aggregate_columns = []
 
         # Build the base_join table
         base_join_query = Query
@@ -512,6 +513,8 @@ class MeltanoQuery(MeltanoBase):
             aggregate_columns_selected = set()
 
             for a in table.aggregates():
+                aggregate_columns.append(a.alias())
+
                 if a.column_name() in aggregate_columns_selected:
                     continue
 
@@ -670,7 +673,7 @@ class MeltanoQuery(MeltanoBase):
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_hda_query(str(hda_query))
-        return (final_query + ";", column_headers, column_names)
+        return (final_query + ";", column_headers, column_names, aggregate_columns)
 
     def add_schema_to_hda_query(self, hda_query: str) -> str:
         """

@@ -103,11 +103,16 @@ class SqlUtils:
         column_headers = self.column_headers(
             columns_raw, aggregates_raw, timeframes_raw
         )
-        names = self.get_names(columns_raw + aggregates_raw)
+        column_names = self.get_names(columns_raw + aggregates_raw)
 
         hda_helper = HyperDimensionalAggregatesHelper(design, incoming_json, schema)
         if hda_helper.needs_hda():
-            (sql, column_headers, names) = hda_helper.get_query()
+            (
+                sql,
+                column_headers,
+                column_names,
+                aggregate_columns,
+            ) = hda_helper.get_query()
         else:
             sql = self.get_query(
                 from_=db_table,
@@ -123,12 +128,14 @@ class SqlUtils:
                 base_table=base_table,
             )
 
+            aggregate_columns = aggregates_raw
+
         return {
             "db_table": db_table,
             "columns": columns_raw,
-            "aggregates": aggregates_raw,
+            "aggregates": aggregate_columns,
             "column_headers": column_headers,
-            "names": names,
+            "names": column_names,
             "sql": sql,
         }
 
