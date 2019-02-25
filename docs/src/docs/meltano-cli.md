@@ -4,7 +4,6 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 
 Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
 
-- `meltano init [project name]`: Create an empty meltano project.
 - {: #meltano-add}`meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
@@ -16,6 +15,21 @@ Our CLI tool provides a single source of truth for the entire data pipeline. The
 - `meltano elt <extractor> <loader> [--dry] [--transform run]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
+
+## `init`
+
+The `init` command is used to creates a new meltano project with a basic infrastructure in place. 
+
+### Example
+
+```bash
+# Format
+meltano init [project_name]
+```
+
+#### Parameters
+
+**project_name** - This determines the folder name for the project
 
 ## meltano select
 
