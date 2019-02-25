@@ -1,5 +1,2 @@
-import os
-from pathlib import Path
-
-
-__version__ = Path(os.path.dirname(__file__), "../../VERSION").open("r").read().strip()
+# Managed by bumpversion
+current_version = "0.12.0"
