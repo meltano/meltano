@@ -25,6 +25,12 @@ class ConnectionNotFound(Exception):
         super().__init__("{connection_name} is missing.")
 
 
+class UnsupportedConnectionDialect(Exception):
+    def __init__(self, connection_dialect: str):
+        self.connection_dialect = connection_dialect
+        super().__init__("Dialect {connection_dialect} is not supprted.")
+
+
 class SqlHelper(SqlUtils):
     def parse_sql(self, input):
         placeholders = self.placeholder_match(input)
@@ -40,8 +46,7 @@ class SqlHelper(SqlUtils):
         m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
         return M5ocFile.load(m5oc_file)
 
-    def get_db_engine(self, connection_name):
-        project = Project.find()
+    def get_connection(self, connection_name):
         settings_helper = SettingsHelper()
         connections = settings_helper.get_connections()["settings"]["connections"]
 
@@ -52,19 +57,25 @@ class SqlHelper(SqlUtils):
                 if connection["name"] == connection_name
             )
 
-            if connection["dialect"] == "postgresql":
-                psql_params = ["username", "password", "host", "port", "database"]
-                user, pw, host, port, db = [connection[param] for param in psql_params]
-                connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
-            elif connection["dialect"] == "sqlite":
-                db_path = project.root.joinpath(connection["path"])
-                connection_url = f"sqlite:///{db_path}"
-
-            return sqlalchemy.create_engine(connection_url)
-
-            raise ConnectionNotFound(connection_name)
+            return connection
         except StopIteration:
             raise ConnectionNotFound(connection_name)
+
+    def get_db_engine(self, connection_name):
+        project = Project.find()
+        connection = self.get_connection(connection_name)
+
+        if connection["dialect"] == "postgresql":
+            psql_params = ["username", "password", "host", "port", "database"]
+            user, pw, host, port, db = [connection[param] for param in psql_params]
+            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        elif connection["dialect"] == "sqlite":
+            db_path = project.root.joinpath(connection["path"])
+            connection_url = f"sqlite:///{db_path}"
+        else:
+            raise UnsupportedConnectionDialect(connection["dialect"])
+
+        return sqlalchemy.create_engine(connection_url)
 
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)

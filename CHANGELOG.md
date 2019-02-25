@@ -10,8 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * Add the `tap-salesforce` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-salesforce
+* Add m5o model and tables for tap-salesforce
+* Updated the deep-link icon (for Dashboards/Reports on the Files page)
 
 ### Changes
+* Polished the RBAC view, making it clearer the feature is experimental.
+* Rename "Models" to "Topics"
+* Use the current connection's schema when generating queries at run time for Postgres Connections.
+* Add support for multiple Aggregates over the same attribute when generating HDA queries.
 
 ### Fixes
 
@@ -28,7 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add version CLI commands for checking current Meltano version
 * Add deep linking to dashboards
 * Add deep linking to reports
-
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
