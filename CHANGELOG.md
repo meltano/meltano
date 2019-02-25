@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * UI cleanup across routes (Analyze focus) and baseline polish to mitigate "that looks off comments"
 * Update installation and contributing docs
 * Meltano implement role-based access control - [!368](https://gitlab.com/meltano/meltano/merge_requests/368)
+* Add version CLI commands for checking current Meltano version
 * Add deep linking to dashboards
 * Add deep linking to reports
 
