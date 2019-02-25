@@ -37,9 +37,7 @@ class DashboardsHelper:
             report["queryResults"] = sqlHelper.get_query_results(
                 connection_name, outgoing_sql
             )
-            report["queryResultAggregates"] = sqlHelper.get_aliases_from_aggregates(
-                aggregates, db_table
-            )
+            report["queryResultAggregates"] = aggregates
         return reports
 
     def get_dashboard(self, dashboard_id):
