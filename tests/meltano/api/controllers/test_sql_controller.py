@@ -95,7 +95,7 @@ class TestSqlController:
         payload = {
             "table": "region",
             "columns": ["name"],
-            "aggregates": ["region.count"],
+            "aggregates": ["count"],
             "timeframes": [],
             "joins": [
                 {"name": "entry", "columns": [], "aggregates": [], "timeframes": []},
