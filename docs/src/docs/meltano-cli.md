@@ -35,6 +35,13 @@ meltano init [project_name] [--no_usage_stats]
 
 * **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project. 
 
+::: tip
+To disable tracking manually, you can add the following to the `meltano.yml` file:
+```yaml
+send_anonymous_usage_stats: false
+```
+:::
+
 ## meltano select
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
