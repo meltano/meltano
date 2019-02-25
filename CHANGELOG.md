@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Rename "Models" to "Topics"
 
 ### Fixes
+* Resolved duplicate display issue of Dashboards and Reports on the Files page
 
 ### Breaks
 
