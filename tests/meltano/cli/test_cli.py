@@ -4,6 +4,7 @@ import shutil
 from copy import copy
 
 from meltano.cli import cli
+from meltano import current_version
 
 
 @pytest.fixture
@@ -29,3 +30,8 @@ def test_activate_project(project, cli_runner, pushd):
     cli_runner.invoke(cli, ["install"])
 
     assert os.getenv("CLI_TEST_ACTIVATE_PROJECT") == "1"
+
+def test_version(cli_runner):
+    cli_version = cli_runner.invoke(cli, ["--version"])
+
+    assert cli_version.output == f"meltano, version {current_version}\n"

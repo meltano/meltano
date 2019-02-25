@@ -21,7 +21,7 @@ LEVELS = {
 
 @click.group(invoke_without_command=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
-@click.version_option(version=current_version)
+@click.version_option(version=current_version, prog_name="meltano")
 @click.pass_context
 def cli(ctx, log_level):
     setup_logging(log_level=LEVELS[log_level])
