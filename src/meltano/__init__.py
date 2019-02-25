@@ -1,2 +1,2 @@
 # Managed by bumpversion
-current_version = "0.12.0"
+__version__ = "0.12.0"

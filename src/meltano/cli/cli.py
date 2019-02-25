@@ -6,9 +6,9 @@ import warnings
 # this needs to run before `psycopg2` is imported
 warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
+import meltano
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import setup_logging
-from meltano import current_version
 
 LEVELS = {
     "debug": logging.DEBUG,
@@ -21,7 +21,7 @@ LEVELS = {
 
 @click.group(invoke_without_command=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
-@click.version_option(version=current_version, prog_name="meltano")
+@click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(ctx, log_level):
     setup_logging(log_level=LEVELS[log_level])
