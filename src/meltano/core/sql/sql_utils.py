@@ -128,7 +128,9 @@ class SqlUtils:
                 base_table=base_table,
             )
 
-            aggregate_columns = aggregates_raw
+            aggregate_columns = self.get_aliases_from_aggregates(
+                aggregates_raw, db_table
+            )
 
         return {
             "db_table": db_table,
