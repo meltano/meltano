@@ -63,10 +63,6 @@ def index():
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
         if ext == ".topic":
             sortedM5oFiles["topics"]["items"].append(file_dict)
-        if ext == ".dashboard":
-            sortedM5oFiles["dashboards"]["items"].append(file_dict)
-        if ext == ".report":
-            sortedM5oFiles["reports"]["items"].append(file_dict)
         if ext == ".table":
             sortedM5oFiles["tables"]["items"].append(file_dict)
     return jsonify(sortedM5oFiles)
