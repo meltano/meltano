@@ -44,7 +44,7 @@
     <table class="meltano-stages-table">
       <thead>
         <tr class="meltano-header-row">
-          <th>Stage</th>
+          <th>Stage:</th>
           <th>Model</th>
           <th>Extract</th>
           <th>Load</th>
@@ -56,7 +56,7 @@
       </thead>
       <tbody>
         <tr class="meltano-row">
-          <td>Meltano uses</td>
+          <td>Meltano uses:</td>
           <td class="ta-c">
             <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
           </td>
@@ -80,7 +80,7 @@
           </td>
         </tr>
         <tr>
-          <td>Meltano can replace</td>
+          <td>Meltano can replace:</td>
           <td>
             <ul>
               <li>
