@@ -24,12 +24,16 @@ The `init` command is used to creates a new meltano project with a basic infrast
 
 ```bash
 # Format
-meltano init [project_name]
+meltano init [project_name] [--no_usage_stats]
 ```
 
-#### Parameters
+### Parameters
 
-**project_name** - This determines the folder name for the project
+* **project_name** - This determines the folder name for the project
+
+### Options
+
+* **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project. 
 
 ## meltano select
 
