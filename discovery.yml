@@ -101,9 +101,3 @@ transforms:
     pip_url: "https://gitlab.com/meltano/dbt-tap-salesforce.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
-models:
-  - name: model-carbon-intensity-sqlite
-    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
-  - name: model-carbon-intensity
-    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity.git"
-
