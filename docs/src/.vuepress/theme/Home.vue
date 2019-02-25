@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <h2 class="quote">Meltano does for data what docker did for containers</h2>
+    <h2 class="quote">Meltano does for data what Docker did for containers</h2>
 
     <p class="description">Meltano is a single workflow for the entire data life cycle. From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
