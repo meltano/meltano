@@ -1,4 +1,3 @@
-import pkg_resources
 import click
 import logging
 import warnings
