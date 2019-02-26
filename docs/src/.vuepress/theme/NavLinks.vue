@@ -22,7 +22,7 @@
     <div
       class="nav-item nav-item--icon"
     >
-      <a href="#">
+      <a href="https://twitter.com/meltanodata" target="_blank">
         <TwitterIcon />
       </a>
     </div>
