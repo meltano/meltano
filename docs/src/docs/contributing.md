@@ -33,6 +33,21 @@ pip install -e '.[dev]'
 make bundle
 ```
 
+## Starting Meltano API
+
+Open a new terminal tab in the meltano project directory:
+
+```bash
+# Starts Flask API in development mode
+python -m meltano.api
+```
+
+::: warning
+At this time, changes made to the API are not being dynamically reloaded and must be manually restarted to see the changes.
+:::
+
+## Starting Meltano UI
+
 Open a new terminal tab in the meltano project directory:
 
 ```bash
