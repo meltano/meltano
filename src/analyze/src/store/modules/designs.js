@@ -454,6 +454,7 @@ const mutations = {
       acc.push({
         name: curr.name,
         columns: curr.related_table.columns,
+        aggregates: curr.related_table.aggregates,
         timeframes: curr.related_table.timeframes,
       });
       return acc;
@@ -474,9 +475,13 @@ const mutations = {
     // TODO
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
-      // joins
+      // joins - columns
       const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
       setSelected(joinGroup.columns, targetJoin.columns);
+      // joins - aggregates
+      if (joinGroup.aggregates) {
+        setSelected(joinGroup.aggregates, targetJoin.aggregates);
+      }
       // timeframes
       if (targetJoin && targetJoin.timeframes) {
         setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
