@@ -21,4 +21,16 @@ export default {
       return value;
     }
   },
+  singularize: (value) => {
+    if (!value) {
+      return '';
+    }
+    // A more robust implementation is encouraged (currently assumes English and 's' at tail)
+    let singularizeMe = value.toString();
+    const lastChar = singularizeMe[singularizeMe.length - 1];
+    if (lastChar.toLowerCase() === 's') {
+      singularizeMe = singularizeMe.slice(0, -1);
+    }
+    return singularizeMe;
+  },
 };

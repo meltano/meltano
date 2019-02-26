@@ -155,7 +155,7 @@ export default {
       return type === 'dashboards' || type === 'reports';
     },
     getDeepRoute(key, file) {
-      const name = StringUtils.capitalize(key).slice(0, -1);
+      const name = StringUtils.capitalize(StringUtils.singularize(key));
       const params = { slug: file.slug };
       if (file.model && file.design) {
         params.model = file.model;
