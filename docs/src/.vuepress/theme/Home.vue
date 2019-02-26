@@ -55,32 +55,32 @@
         </tr>
       </thead>
       <tbody>
-        <tr class="meltano-row">
+        <tr class="meltano-use-row">
           <td>Meltano uses:</td>
-          <td class="ta-c">
+          <td>
             <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://www.singer.io/#taps">Singer Taps</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://www.singer.io/#targets">Singer Targets</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://www.getdbt.com/">dbt</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
           </td>
-          <td class="ta-c">
+          <td>
             <a href="https://airflow.apache.org/">Airflow</a>
           </td>
         </tr>
-        <tr>
-          <td>Meltano can replace:</td>
+        <tr class="meltano-replace-row">
+          <td>Meltano can be an alternative to:</td>
           <td>
             <ul>
               <li>
@@ -271,14 +271,21 @@ export default {
 
 .meltano-header-row {
   height: 75px;
+
+  th:first-child {
+    background: #eee;
+    //width: 80px;
+    text-align: left;
+  }
 }
 
-.meltano-row {
+.meltano-use-row {
   background-color: #3915c0;
   color: white;
   font-weight: bold;
   padding: 10px 0;
   height: 200px;
+  text-align: center;
 
   a {
     color: white;
@@ -287,6 +294,18 @@ export default {
     &:hover {
       text-decoration: underline;
     }
+  }
+
+  td:first-child {
+    background: #2A0F8D;
+    text-align: left;
+  }
+}
+
+.meltano-replace-row {
+  td:first-child {
+    background: #eee;
+    font-weight: bold;
   }
 }
 
@@ -402,10 +421,6 @@ export default {
     .feature
       h2
         font-size 1.25rem
-
-.ta-c { 
-  text-align: center;
-}
 
 .mb0 {
   margin-bottom: 0;
