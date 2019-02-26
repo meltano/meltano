@@ -378,16 +378,6 @@
                 </span>
               </button>
             </p>
-            <p class="control" @click.stop="setAndOpenChart('number')">
-              <button
-                class="button is-small is-text has-text-white"
-                :class="{'is-active': chartType === 'number'}"
-                :disabled="!hasChartableResults">
-                <span class="icon is-small">
-                  <font-awesome-icon icon="hashtag"></font-awesome-icon>
-                </span>
-              </button>
-            </p>
           </div>
         </div>
 
