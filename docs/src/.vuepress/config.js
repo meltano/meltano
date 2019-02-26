@@ -37,8 +37,7 @@ module.exports = {
 		nav: [
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
-			{ text: 'Press', link: '/press/' },
-			{ text: 'Twitter', link: 'https://twitter.com/meltanodata' }
+			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {
 			'/docs': [
