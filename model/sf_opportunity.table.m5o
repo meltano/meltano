@@ -11,13 +11,13 @@
     }
     opportunity_type {
       label = Name
-      description = Carbon region long name
+      description = Oportunity Type
       type = string
       sql = "{{table}}.opportunity_type"
     }
     lead_source {
       label = Short Name
-      description = Carbon region short name
+      description = Lead Source
       type = string
       sql = "{{table}}.lead_source"
     }
@@ -39,6 +39,12 @@
       label = Total Amount
       description = Total Amount
       type = sum
+      sql = "{{table}}.amount"
+    }
+    avg_amount {
+      label = Average Amount
+      description = Average Amount
+      type = avg
       sql = "{{table}}.amount"
     }
   }

@@ -37,14 +37,14 @@
       </div>
     </div>
 
-    <h2 class="quote">Meltano does for data what docker did for containers</h2>
+    <h2 class="quote">Meltano does for data what Docker did for containers</h2>
 
     <p class="description">Meltano is a single workflow for the entire data life cycle. From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
     <table class="meltano-stages-table">
       <thead>
         <tr class="meltano-header-row">
-          <th>Stage</th>
+          <th>Stage:</th>
           <th>Model</th>
           <th>Extract</th>
           <th>Load</th>
@@ -56,7 +56,7 @@
       </thead>
       <tbody>
         <tr class="meltano-row">
-          <td>Meltano uses</td>
+          <td>Meltano uses:</td>
           <td class="ta-c">
             <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
           </td>
@@ -80,7 +80,7 @@
           </td>
         </tr>
         <tr>
-          <td>Meltano can replace</td>
+          <td>Meltano can replace:</td>
           <td>
             <ul>
               <li>

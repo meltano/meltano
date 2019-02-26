@@ -155,7 +155,7 @@ def init_app(app, project):
         "confirm_register_form": MeltanoConfirmRegisterForm,
     }
 
-    if app.env == "development":
+    if app.env != "production":
         options["anonymous_user"] = FreeUser
 
     security.init_app(app, users, **options)
