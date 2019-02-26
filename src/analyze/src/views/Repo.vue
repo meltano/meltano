@@ -112,9 +112,9 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import capitalize from '@/filters/capitalize';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import StringUtils from '@/utils/StringUtils';
 
 export default {
   name: 'Repo',
@@ -126,7 +126,6 @@ export default {
     RouterViewLayout,
   },
   filters: {
-    capitalize,
     pretty,
   },
   computed: {
@@ -156,7 +155,7 @@ export default {
       return type === 'dashboards' || type === 'reports';
     },
     getDeepRoute(key, file) {
-      const name = capitalize(key).slice(0, -1);
+      const name = StringUtils.capitalize(key).slice(0, -1);
       const params = { slug: file.slug };
       if (file.model && file.design) {
         params.model = file.model;

@@ -1,7 +1,5 @@
+import StringUtils from '@/utils/StringUtils';
+
 export default function pretty(value) {
-  try {
-    return JSON.stringify(JSON.parse(value), null, 2);
-  } catch (e) {
-    return value;
-  }
+  return StringUtils.pretty(value);
 }
