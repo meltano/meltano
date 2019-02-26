@@ -101,23 +101,8 @@ class ProjectInitService:
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.echo("Try it out:")
-        click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano add extractor tap-carbon-intensity", fg="green")
-        click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano add loader target-sqlite", fg="green")
-        click.secho("🏃\tRun", nl=False)
-        click.secho(" meltano elt tap-carbon-intensity target-sqlite", fg="green")
-        click.echo("🏃\tRun SQLite to check the results:")
-        click.secho("\tsqlite3 meltano.db", fg="green")
-        click.secho("\t sqlite> .tables", fg="green")
-        click.secho("\t sqlite> SELECT * FROM region;", fg="green")
-        click.secho("\t sqlite> SELECT * FROM entry LIMIT 20;", fg="green")
-        click.echo("📖\tRead the Meltano README.", nl=False)
-        click.secho(
-            " https://gitlab.com/meltano/meltano/blob/master/README.md", fg="red"
-        )
-        click.echo("✏️\tEdit the meltano.yml file.")
+        click.secho("🚀\tPlease visit https://meltano.com/docs/tutorial.html in order to try us out", fg="green")
+
 
     def join_with_project_base(self, filename):
         return os.path.join(".", self.project_name, filename)
