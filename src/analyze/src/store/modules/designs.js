@@ -16,7 +16,7 @@ const state = {
   results: [],
   keys: [],
   columnHeaders: [],
-  names: [],
+  columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
@@ -559,7 +559,7 @@ const mutations = {
     state.results = results.results;
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
-    state.names = results.names;
+    state.columnNames = results.column_names;
     state.resultAggregates = results.aggregates;
   },
 
