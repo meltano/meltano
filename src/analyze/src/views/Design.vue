@@ -562,7 +562,6 @@ export default {
       'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
-      'hasResults',
       'hasChartableResults',
       'numResults',
       'isSQLTab',
