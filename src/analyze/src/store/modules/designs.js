@@ -126,8 +126,7 @@ const getters = {
   },
 
   hasChartableResults() {
-    // TODO use hasResults getter + check if aggregates isn't empty
-    return false;
+    return getters.hasResults() && state.resultAggregates.length;
   },
 
   numResults() {
