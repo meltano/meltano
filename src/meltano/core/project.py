@@ -22,6 +22,7 @@ class Project:
     perspective.
     """
 
+    meltano_model_path = Path(os.getcwd(), "model")
     _meltano = {}
 
     def __init__(self, root: Union[Path, str] = None):

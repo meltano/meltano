@@ -11,6 +11,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
+from meltano.core.project import Project
 from meltano.core.utils import slugify
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
@@ -22,18 +23,18 @@ class ReportsHelper:
     VERSION = "1.0.0"
 
     def __init__(self):
-        self.meltano_model_path = join(os.getcwd(), "model")
+        pass
 
     def has_reports(self):
-        m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
+        m5oc_file = Path(Project.meltano_model_path).joinpath("reports.m5oc")
         return Path.is_file(m5oc_file)
 
     def get_report_m5oc(self):
-        m5oc_file = Path(self.meltano_model_path).joinpath("reports.m5oc")
+        m5oc_file = Path(Project.meltano_model_path).joinpath("reports.m5oc")
         return M5ocFile.load(m5oc_file)
 
     def get_reports(self):
-        path = Path(self.meltano_model_path)
+        path = Path(Project.meltano_model_path)
         reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
         return reportsParser.contents()
 
@@ -45,7 +46,7 @@ class ReportsHelper:
     def save_report(self, data):
         slug = slugify(data["name"])
         file_name = f"{slug}.report.m5o"
-        file_path = Path(self.meltano_model_path).joinpath(file_name)
+        file_path = Path(Project.meltano_model_path).joinpath(file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = ReportsHelper.VERSION
         with open(file_path, "w") as f:
@@ -54,7 +55,7 @@ class ReportsHelper:
 
     def update_report(self, data):
         file_name = f"{data['slug']}.report.m5o"
-        file_path = Path(self.meltano_model_path).joinpath(file_name)
+        file_path = Path(Project.meltano_model_path).joinpath(file_name)
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data
