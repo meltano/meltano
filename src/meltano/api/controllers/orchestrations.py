@@ -1,29 +1,18 @@
-import os
-import subprocess
-import logging
-from io import StringIO
-import pandas as pd
-from sqlalchemy import TIMESTAMP, DATE, DATETIME
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin import PluginType
+from meltano.core.project import Project
+
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
-from meltano.core.runner.meltano import (
-    MeltanoRunner,
-    EXTRACTOR_REGISTRY,
-    LOADER_REGISTRY,
-)
-from ..config import TEMP_FOLDER, PROJECT_ROOT_DIR
-from ..models.settings import Settings
 
 
 orchestrationsBP = Blueprint("orchestrations", __name__, url_prefix="/orchestrations")
-DATETIME_TYPES_TO_PARSE = (TIMESTAMP, DATE, DATETIME)
-TRANSFORM_DIR = "transform"
-PROFILES_DIR = "profile"
 
 
 @orchestrationsBP.route("/", methods=["GET"])
 def index():
-    result = {}
-    # eh
+    new_project = Project()
+    new_plugin_discovery_service = PluginDiscoveryService(new_project)
+    result = new_plugin_discovery_service.discover(PluginType.ALL)
     return jsonify(result)
 
 

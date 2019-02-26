@@ -73,6 +73,7 @@ def create_app(config={}):
     from .controllers.repos import reposBP
     from .controllers.settings import settingsBP
     from .controllers.sql import sqlBP
+    from .controllers.orchestrations import orchestrationsBP
 
     app.register_blueprint(root)
     app.register_blueprint(dashboardsBP)
@@ -80,6 +81,7 @@ def create_app(config={}):
     app.register_blueprint(reposBP)
     app.register_blueprint(settingsBP)
     app.register_blueprint(sqlBP)
+    app.register_blueprint(orchestrationsBP)
 
     @app.before_request
     def before_request():
