@@ -7,6 +7,7 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
 from flask_login import current_user
+from flask_cors import CORS
 from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
@@ -57,11 +58,7 @@ def create_app(config={}):
     mail.init_app(app)
     security_init_app(app, project)
     setup_oauth(app)
-
-    if app.env != "production":
-        from flask_cors import CORS
-
-        CORS(app, origins="http://localhost:8080")
+    CORS(app, origins="*")
 
     from .controllers.root import root
     from .controllers.dashboards import dashboardsBP
@@ -80,8 +77,9 @@ def create_app(config={}):
     @app.before_request
     def before_request():
         request_message = f"[{request.url}]"
-        if current_user:
-            request_message += f" as {current_user}"
+
+        # if request.method != "OPTIONS":
+        #     request_message += f" as {current_user}"
 
         logger.info(request_message)
 

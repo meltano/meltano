@@ -1,5 +1,7 @@
 from functools import wraps
 from datetime import date
+from flask import request, redirect
+from flask_login import current_user
 from flask_security import (
     Security,
     AnonymousUser,
@@ -13,6 +15,7 @@ from flask_security.utils import (
     get_message,
 )
 from flask_security.forms import LoginForm, RegisterForm, ConfirmRegisterForm
+from flask_principal import identity_loaded, Permission, Need
 from wtforms import StringField
 from wtforms.validators import Required, ValidationError, Length
 
@@ -106,6 +109,9 @@ class FreeUser(AnonymousUser):
     def roles(self, _):
         pass
 
+    def get_auth_token(self):
+        return None
+
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 
@@ -136,7 +142,16 @@ def create_dev_user():
 
 
 def api_auth_required(f):
-    return auth_required("token", "session")(f)
+    auth_decorated = auth_required("token", "session")(f)
+
+    @wraps(f)
+    def decorated():
+        if request.method == "OPTIONS":
+            return f()
+        else:
+            return auth_decorated()
+
+    return decorated
 
 
 def unauthorized_callback():
@@ -146,6 +161,23 @@ def unauthorized_callback():
     """
 
     return "Unauthorized", 401
+
+
+def _identity_loaded_hook(sender, identity):
+    """
+    Meltano uses a resource permission scheme.
+    This hook will add the specific Permission
+    to the current identity.
+    """
+
+    # each permission is a Need(permission_type, context),
+    # i.e. ("view:design", "finance.*")
+    permissions = [Need(perm.type, perm.context)
+                   for role in current_user.roles
+                   for perm in role.permissions]
+
+    for perm in permissions:
+        identity.provides.add(perm)
 
 
 def init_app(app, project):
@@ -160,3 +192,25 @@ def init_app(app, project):
 
     security.init_app(app, users, **options)
     security.unauthorized_handler(unauthorized_callback)
+    identity_loaded.connect_via(app)(_identity_loaded_hook)
+
+    bp = app.blueprints['security']
+
+    @bp.route("/token")
+    def token():
+        if isinstance(current_user, AnonymousUser):
+            redirect(url_for(".login"))
+
+        callback = request.args.get("redirect")
+
+        if not callback:
+            return "`redirect` must be set.", 400
+
+        return redirect(callback + f"?auth_token={current_user.get_auth_token()}")
+
+    @bp.route("/bootstrap")
+    def bootstrap_app():
+        import pdb; pdb.set_trace()
+        return redirect(f"http://localhost:8080?auth_token={current_user.get_auth_token()}")
+
+    app.register_blueprint(bp)
