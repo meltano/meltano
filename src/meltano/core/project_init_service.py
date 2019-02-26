@@ -101,8 +101,10 @@ class ProjectInitService:
         click.echo(" has been created. Next steps:")
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.secho("🚀\tPlease visit https://meltano.com/docs/tutorial.html in order to try us out", fg="green")
-
+        click.secho(
+            "🚀\tPlease visit https://meltano.com/docs/tutorial.html in order to try us out",
+            fg="green",
+        )
 
     def join_with_project_base(self, filename):
         return os.path.join(".", self.project_name, filename)
