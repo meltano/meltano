@@ -80,7 +80,7 @@
           </td>
         </tr>
         <tr class="meltano-replace-row">
-          <td>Meltano replaces:</td>
+          <td>Meltano can be an alternative to:</td>
           <td>
             <ul>
               <li>
