@@ -33,7 +33,7 @@ pip install -e '.[dev]'
 make bundle
 ```
 
-### API Server & Production UI
+### Meltano API Development
 
 For all changes that do not involve working on Meltano UI itself, run the following command:
 
@@ -42,7 +42,7 @@ For all changes that do not involve working on Meltano UI itself, run the follow
 meltano ui
 ```
 
-### API Server & Local UI Development
+### Meltano UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
