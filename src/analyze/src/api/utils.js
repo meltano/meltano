@@ -17,10 +17,12 @@ export default {
       'rgba(255, 159, 64, 1)',
     ],
   },
+
   root() {
     // eslint-disable-next-line no-undef
     return 'http://localhost:5000';
   },
+
   buildUrl(blueprint, location = '') {
     return [this.root(), blueprint, location].join('/');
   },
@@ -49,6 +51,7 @@ export default {
           .toUpperCase() + txt.substr(1)
           .toLowerCase());
   },
+
   difference(arr1, arr2) {
     return arr1.filter(x => !arr2.includes(x))
       .concat(arr2.filter(x => !arr1.includes(x)));
