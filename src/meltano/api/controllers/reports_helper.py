@@ -22,9 +22,6 @@ from meltano.core.m5o.m5o_collection_parser import (
 class ReportsHelper:
     VERSION = "1.0.0"
 
-    def __init__(self):
-        pass
-
     def has_reports(self):
         m5oc_file = Path(Project.meltano_model_path).joinpath("reports.m5oc")
         return Path.is_file(m5oc_file)

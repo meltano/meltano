@@ -16,9 +16,6 @@ from .sql_helper import SqlHelper
 class DashboardsHelper:
     VERSION = "1.0.0"
 
-    def __init__(self):
-        pass
-
     def get_dashboards(self):
         path = Path(Project.meltano_model_path)
         dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
