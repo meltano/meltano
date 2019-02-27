@@ -39,7 +39,7 @@ class SqlHelper(SqlUtils):
         return (outer_results, inner_results)
 
     def get_m5oc_model(self, model_name):
-        m5oc_file = Path(Project.meltano_model_path).joinpath(
+        m5oc_file = Path(Project.meltano_model_path()).joinpath(
             f"{model_name}.model.m5oc"
         )
         return M5ocFile.load(m5oc_file)

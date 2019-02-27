@@ -17,7 +17,7 @@ class DashboardsHelper:
     VERSION = "1.0.0"
 
     def get_dashboards(self):
-        path = Path(Project.meltano_model_path)
+        path = Path(Project.meltano_model_path())
         dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
         return dashboardsParser.contents()
 
@@ -51,7 +51,7 @@ class DashboardsHelper:
     def save_dashboard(self, data):
         slug = slugify(data["name"])
         file_name = f"{slug}.dashboard.m5o"
-        file_path = Path(Project.meltano_model_path).joinpath(file_name)
+        file_path = Path(Project.meltano_model_path()).joinpath(file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = DashboardsHelper.VERSION
         data["description"] = data["description"] or ""
@@ -65,7 +65,7 @@ class DashboardsHelper:
         if data["reportId"] not in dashboard["reportIds"]:
             dashboard["reportIds"].append(data["reportId"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = Path(Project.meltano_model_path).joinpath(file_name)
+            file_path = Path(Project.meltano_model_path()).joinpath(file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
         return dashboard
@@ -75,7 +75,7 @@ class DashboardsHelper:
         if data["reportId"] in dashboard["reportIds"]:
             dashboard["reportIds"].remove(data["reportId"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = Path(Project.meltano_model_path).joinpath(file_name)
+            file_path = Path(Project.meltano_model_path()).joinpath(file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
         return dashboard

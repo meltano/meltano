@@ -22,7 +22,6 @@ class Project:
     perspective.
     """
 
-    meltano_model_path = Path(os.getcwd(), "model")
     _meltano = {}
 
     def __init__(self, root: Union[Path, str] = None):
@@ -32,6 +31,10 @@ class Project:
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         os.chdir(self.root)
         logging.debug(f"Activated project at {self.root}")
+
+    @classmethod
+    def meltano_model_path(cls):
+        return Path(os.getcwd(), "model")
 
     @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
