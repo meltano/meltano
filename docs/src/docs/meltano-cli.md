@@ -42,6 +42,18 @@ send_anonymous_usage_stats: false
 ```
 :::
 
+## Version
+
+In the event you want to check what version of Meltano you are using, we have provided the following options for you:
+
+```bash
+meltano --version
+
+meltano -v
+```
+
+Once you run any of those commands, you should see a version number output in your terminal.
+
 ## meltano select
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
