@@ -33,32 +33,31 @@ pip install -e '.[dev]'
 make bundle
 ```
 
-## Starting Meltano API
+### API Server & Production UI
 
-Open a new terminal tab in the meltano project directory:
+For all changes that do not involve working on Meltano UI itself, run the following command:
 
 ```bash
-# Starts Flask API in development mode
-python -m meltano.api
+# Starts both Meltano API and a production build of Meltano UI
+meltano ui
 ```
 
-::: warning
-At this time, changes made to the API are not being dynamically reloaded and must be manually restarted to see the changes.
-:::
+### API Server & Local UI Development
 
-## Starting Meltano UI
-
-Open a new terminal tab in the meltano project directory:
+In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
-# Change into the Meltano UI code directory
+# Starts the Meltano API and a production build of Meltano UI that you can ignore
+meltano ui
+
+# Open a new terminal tab and go to your meltano directory. Then change directory to analyze
 cd src/analyze
 
-# Install the dependencies for Meltano UI
-npm install
+# Install dependencies
+npm install # or yarn
 
-# Start the web server for Meltano UI 
-npm run dev
+# Start local development environment
+npm run dev # or yarn dev
 ```
 
 ## Code style
