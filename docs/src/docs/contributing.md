@@ -17,7 +17,8 @@ pip install --upgrade pip
 # Optional, but it's best to have the latest setuptools
 pip install --upgrade setuptools
 
-# Optional, but it's recommended to create a virtual environment in order to minimize side effects from unknown environment variable
+# Optional, but it's recommended to create a virtual environment
+# in order to minimize side effects from unknown environment variable
 python -m venv venv
 
 # Activate your virtual environment
