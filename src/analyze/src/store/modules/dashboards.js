@@ -1,5 +1,6 @@
 import dashboardApi from '../../api/dashboards';
 import designApi from '../../api/design';
+import reportApi from '../../api/reports';
 
 const state = {
   activeDashboard: {},
@@ -36,7 +37,7 @@ const actions = {
   },
   getReports({ commit }) {
     return new Promise((resolve) => {
-      designApi.loadReports()
+      reportApi.loadReports()
         .then((response) => {
           commit('setReports', response.data);
           resolve();

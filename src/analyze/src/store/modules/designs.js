@@ -2,6 +2,7 @@ import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
 import designApi from '../../api/design';
+import reportApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 import utils from '../../api/utils';
 
@@ -224,7 +225,7 @@ const actions = {
     sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
-    designApi.loadReports()
+    reportApi.loadReports()
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -323,7 +324,7 @@ const actions = {
   },
 
   loadReport({ commit }, { name }) {
-    designApi.loadReport(name)
+    reportApi.loadReport(name)
       .then((response) => {
         const report = response.data;
         this.dispatch('designs/getSQL', {
@@ -347,7 +348,7 @@ const actions = {
       chartType: state.chartType,
       queryPayload: helpers.getQueryPayloadFromDesign(),
     };
-    designApi.saveReport(postData)
+    reportApi.saveReport(postData)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -362,7 +363,7 @@ const actions = {
   updateReport({ commit }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
     state.activeReport.chartType = state.chartType;
-    designApi.updateReport(state.activeReport)
+    reportApi.updateReport(state.activeReport)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
