@@ -1,5 +1,5 @@
 import axios from 'axios';
-import utils from './utils';
+import utils from '@/utils/utils';
 
 export default {
   index(model, design) {

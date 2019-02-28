@@ -112,9 +112,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import capitalize from '@/filters/capitalize';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import fileTypeEnums from '@/utils/fileTypeEnums';
+import utils from '@/utils/utils';
 
 export default {
   name: 'Repo',
@@ -126,7 +127,6 @@ export default {
     RouterViewLayout,
   },
   filters: {
-    capitalize,
     pretty,
   },
   computed: {
@@ -153,10 +153,10 @@ export default {
       return f.id === this.activeView.id;
     },
     isDeepRoutable(type) {
-      return type === 'dashboards' || type === 'reports';
+      return type === fileTypeEnums.dashboards || type === fileTypeEnums.reports;
     },
     getDeepRoute(key, file) {
-      const name = capitalize(key).slice(0, -1);
+      const name = utils.capitalize(utils.singularize(key));
       const params = { slug: file.slug };
       if (file.model && file.design) {
         params.model = file.model;
