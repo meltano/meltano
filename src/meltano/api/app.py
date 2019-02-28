@@ -79,6 +79,7 @@ def create_app(config={}):
 
     if app.config["PROFILE"]:
         from .profiler import init
+
         init(app)
 
     @app.before_request
