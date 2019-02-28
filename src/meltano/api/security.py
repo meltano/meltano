@@ -1,20 +1,26 @@
 from functools import wraps
 from datetime import date
-from flask import request, redirect
-from flask_login import current_user
+from flask import request, redirect, jsonify
+from flask_login import current_user, login_user
 from flask_security import (
     Security,
     AnonymousUser,
     auth_required,
     SQLAlchemyUserDatastore,
 )
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token, create_refresh_token,
+    get_jwt_identity, verify_jwt_refresh_token_in_request
+)
 from flask_security.utils import (
     login_user,
     get_identity_attributes,
     _datastore,
     get_message,
+    hash_password,
 )
 from flask_security.forms import LoginForm, RegisterForm, ConfirmRegisterForm
+from flask_jwt_extended import JWTManager, jwt_required
 from flask_principal import identity_loaded, Permission, Need
 from wtforms import StringField
 from wtforms.validators import Required, ValidationError, Length
@@ -136,13 +142,14 @@ def create_dev_user():
             continue
 
         roles = [users.find_or_create_role(r) for r in user.pop("_roles")]
+        user["password"] = hash_password(user["password"])
         users.create_user(**user, roles=roles)
 
     db.session.commit()
 
 
 def api_auth_required(f):
-    auth_decorated = auth_required("token", "session")(f)
+    auth_decorated = jwt_required(f)
 
     @wraps(f)
     def decorated():
@@ -193,24 +200,44 @@ def init_app(app, project):
     security.init_app(app, users, **options)
     security.unauthorized_handler(unauthorized_callback)
     identity_loaded.connect_via(app)(_identity_loaded_hook)
+    jwt = JWTManager(app)
+
+    @jwt.user_loader_callback_loader
+    def jwt_user_load(identity):
+        user = users.find_user(id=identity["id"])
+        login_user(user)
+
+        return user
 
     bp = app.blueprints['security']
 
-    @bp.route("/token")
-    def token():
-        if isinstance(current_user, AnonymousUser):
+    # we need to add two JWT routes for the API
+
+    @bp.route("/refresh_token")
+    def refresh_token():
+        if not verify_jwt_refresh_token_in_request():
             redirect(url_for(".login"))
 
-        callback = request.args.get("redirect")
+        auth_identity = {
+            "id": current_user.id,
+            "username": current_user.username,
+        }
 
-        if not callback:
-            return "`redirect` must be set.", 400
+        token = create_access_token(identity=auth_identity)
+        return jsonify(auth_token=token)
 
-        return redirect(callback + f"?auth_token={current_user.get_auth_token()}")
 
     @bp.route("/bootstrap")
     def bootstrap_app():
-        import pdb; pdb.set_trace()
-        return redirect(f"http://localhost:8080?auth_token={current_user.get_auth_token()}")
+        """Fire off the application with the current user logged in"""
+        auth_identity = {
+            "id": current_user.id,
+            "username": current_user.username,
+        }
+
+        access_token = create_access_token(identity=auth_identity)
+        refresh_token = create_refresh_token(identity=auth_identity)
+
+        return redirect(f"http://localhost:8080?auth_token={access_token}&refresh_token={refresh_token}")
 
     app.register_blueprint(bp)

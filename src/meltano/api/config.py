@@ -6,9 +6,11 @@ load_dotenv()
 # Flask
 # -----------------
 THREADS_PER_PAGE = 2
+PROFILE = os.getenv("FLASK_PROFILE", False) in ("True", "true", "1")
 
 # Change this value in production
 SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
+JWT_SECRET_KEY = SECRET_KEY
 
 # Meltano
 # -----------------
@@ -38,7 +40,6 @@ SECURITY_URL_PREFIX = "/auth"
 SECURITY_USER_IDENTITY_ATTRIBUTES = ("username", "email")
 SECURITY_POST_LOGIN_VIEW = "/auth/bootstrap"
 
-
 LOGIN_URL = SECURITY_URL_PREFIX + "/login"
 LOGOUT_URL = SECURITY_URL_PREFIX + "/logout"
 REGISTER_URL = SECURITY_URL_PREFIX + "/register"
@@ -52,7 +53,6 @@ SECURITY_MSG_USERNAME_INVALID = (
     "error",
 )
 SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
-
 
 # Flask-Mail
 # -----------------

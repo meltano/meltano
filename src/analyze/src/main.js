@@ -59,7 +59,7 @@ class AuthMiddleware {
 
   onRequest(req) {
     // this.auth.ensureToken();
-    req.headers["authentication-token"] = this.auth.token;
+    req.headers["Authorization"] = `Bearer ${this.auth.token}`;
     return req;
   }
 
