@@ -6,7 +6,6 @@ from collections import OrderedDict
 from flask import jsonify, redirect, url_for
 from pypika import Query, Order
 
-from meltano.core.project import Project
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
 from meltano.core.project import Project
@@ -14,9 +13,6 @@ from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
 from .settings_helper import SettingsHelper
-
-
-meltano_model_path = Path(os.getcwd(), "model")
 
 
 class ConnectionNotFound(Exception):
@@ -43,7 +39,9 @@ class SqlHelper(SqlUtils):
         return (outer_results, inner_results)
 
     def get_m5oc_model(self, model_name):
-        m5oc_file = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+        m5oc_file = Path(Project.meltano_model_path()).joinpath(
+            f"{model_name}.model.m5oc"
+        )
         return M5ocFile.load(m5oc_file)
 
     def get_connection(self, connection_name):

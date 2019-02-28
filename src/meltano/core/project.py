@@ -33,6 +33,10 @@ class Project:
         logging.debug(f"Activated project at {self.root}")
 
     @classmethod
+    def meltano_model_path(cls):
+        return Path(os.getcwd(), "model")
+
+    @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
         """
         Recursively search for a `meltano.yml` file.
