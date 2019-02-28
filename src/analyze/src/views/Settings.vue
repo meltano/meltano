@@ -3,16 +3,17 @@
 
     <div slot='left'>
       <template v-for="category in categories">
-        <div :key="category.name">
-          <p class="menu-label">
-            {{category.name}}
-          </p>
-          <ul class="menu-list">
-            <router-link tag="li" :key="page.href" :to="page.href" v-for="page in category.pages">
-              <a>{{page.title}}</a>
-            </router-link>
-          </ul>
-        </div>
+
+        <!-- eslint-disable-next-line vue/require-v-for-key -->
+        <p class="menu-label">
+          {{category.name}}
+        </p>
+        <!-- eslint-disable-next-line vue/require-v-for-key -->
+        <ul class="menu-list">
+          <router-link tag="li" :key="page.href" :to="page.href" v-for="page in category.pages">
+            <a>{{page.title}}</a>
+          </router-link>
+        </ul>
       </template>
     </div>
 
