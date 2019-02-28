@@ -51,12 +51,12 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
-    from .security import security, users, init_app as security_init_app
-    from .auth import setup_oauth
+    from .security import security, users, setup_security
+    from .security.oauth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
-    security_init_app(app, project)
+    setup_security(app, project)
     setup_oauth(app)
     CORS(app, origins="*")
 
@@ -99,7 +99,7 @@ def start(project, **kwargs):
     try:
         app_config = kwargs.pop("app_config", {})
         app = create_app(app_config)
-        from .security import create_dev_user
+        from .security.identity import create_dev_user
 
         with app.app_context():
             # TODO: alembic migration

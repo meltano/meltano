@@ -4,7 +4,7 @@ from flask_security import roles_required
 from flask_principal import Permission, Need
 from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
-from meltano.api.models import db, User, Role, RolesUsers, RolePermissions
+from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
 
 settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")

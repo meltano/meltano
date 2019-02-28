@@ -23,10 +23,7 @@ import { FontAwesomeIcon,
 import App from './App';
 import router from './router';
 import store from './store';
-
-import axios from 'axios';
-import { Service } from 'axios-middleware';
-
+import Auth from './auth';
 
 Vue.config.productionTip = false;
 
@@ -49,73 +46,6 @@ library.add(faArrowRight);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
-
-const service = new Service(axios);
-
-class AuthMiddleware {
-  constructor(handler) {
-    this.auth = handler;
-  }
-
-  onRequest(req) {
-    // this.auth.ensureToken();
-    req.headers["Authorization"] = `Bearer ${this.auth.token}`;
-    return req;
-  }
-
-  onResponseError(err) {
-    if (err.response && err.response.status !== 401) {
-      return err.response;
-    }
-  }
-}
-
-class AuthHandler {
-  authenticate(token) {
-    this.token = token;
-
-    window.localStorage.setItem("auth_token", this.token);
-  }
-
-  ensureToken() {
-    if (this.token !== undefined) {
-      return;
-    }
-
-    const savedToken = window.localStorage.getItem("auth_token");
-
-    if (savedToken !== undefined) {
-      this.authenticate(savedToken);
-      return;
-    }
-
-    // or try to authenticate
-    window.location.href = "http://localhost:5000/auth/token?redirect=http://localhost:8080";
-  }
-}
-
-
-const Auth = {
-  install(Vue, options) {
-    const handler = new AuthHandler();
-
-    Vue.mixin({
-      beforeRouteEnter(to, from, next) {
-        const token = to.query.auth_token;
-
-        if (token !== undefined) {
-          next(vm => vm.$auth.authenticate(token));
-        } else {
-          handler.ensureToken();
-          next()
-        }
-      }
-    })
-
-    Vue.prototype.$auth = handler;
-    service.register(new AuthMiddleware(handler));
-  }
-};
 
 Vue.use(Auth);
 

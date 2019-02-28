@@ -1,16 +1,16 @@
+import json
+import base64
+import gitlab
 from authlib.flask.client import OAuth as OAuthClient
 from flask import Blueprint, url_for, redirect, current_app
 from flask_security import current_user, AnonymousUser
 from flask_security.utils import login_user, do_flash, url_for_security
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
-from .security import users
-from .models import db, OAuth
-from meltano.core.utils import compose
 
-import json
-import base64
-import gitlab
+from .identity import users
+from meltano.api.models.oauth import db, OAuth
+from meltano.core.utils import compose
 
 
 class OAuthError(Exception):

@@ -1,7 +1,7 @@
 import pytest
 
 import meltano.api.app
-from meltano.api.security import create_dev_user
+from meltano.api.security.identity import create_dev_user
 from meltano.api.models import db
 
 

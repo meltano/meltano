@@ -24,6 +24,7 @@
     "bulma": "^0.7.1",
     "chart.js": "^2.7.2",
     "dotenv": "^6.0.0",
+    "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "sql-formatter": "^2.3.1",
     "ssf": "^0.10.2",
