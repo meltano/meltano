@@ -1,8 +1,10 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
+import utils from '@/utils/utils';
 import designApi from '../../api/design';
-import utils from '../../utils/utils';
+import reportsApi from '../../api/reports';
+import sqlApi from '../../api/sql';
 
 const state = {
   activeReport: {},
@@ -220,10 +222,10 @@ const actions = {
     designApi.index(model, design).then((response) => {
       commit('setDesign', response.data);
     });
-    designApi.getDialect(model).then((response) => {
+    sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
-    designApi.loadReports()
+    reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -302,7 +304,7 @@ const actions = {
 
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
-    designApi
+    sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
@@ -322,7 +324,7 @@ const actions = {
   },
 
   loadReport({ commit }, { name }) {
-    designApi.loadReport(name)
+    reportsApi.loadReport(name)
       .then((response) => {
         const report = response.data;
         this.dispatch('designs/getSQL', {
@@ -346,7 +348,7 @@ const actions = {
       chartType: state.chartType,
       queryPayload: helpers.getQueryPayloadFromDesign(),
     };
-    designApi.saveReport(postData)
+    reportsApi.saveReport(postData)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -361,7 +363,7 @@ const actions = {
   updateReport({ commit }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
     state.activeReport.chartType = state.chartType;
-    designApi.updateReport(state.activeReport)
+    reportsApi.updateReport(state.activeReport)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -377,7 +379,7 @@ const actions = {
   },
 
   getDistinct({ commit }, field) {
-    designApi
+    sqlApi
       .getDistinct(state.currentModel, state.currentDesign, field)
       .then((response) => {
         commit('setDistincts', {

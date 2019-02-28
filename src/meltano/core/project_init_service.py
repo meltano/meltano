@@ -102,6 +102,9 @@ class ProjectInitService:
         click.echo(f"🚪\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
         click.secho(
+            "📈\tMeltano sends anonymous usage data that helps us improve the product. For more information, see https://meltano.com/docs/meltano-cli.html#init"
+        )
+        click.secho(
             "🚀\tPlease visit https://meltano.com/docs/tutorial.html in order to try us out",
             fg="green",
         )

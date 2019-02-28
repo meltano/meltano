@@ -19,6 +19,14 @@
       />
     </div>
 
+    <div
+      class="nav-item nav-item--icon"
+    >
+      <a href="https://twitter.com/meltanodata" target="_blank">
+        <TwitterIcon />
+      </a>
+    </div>
+
     <!-- repo link -->
     <a
       v-if="repoLink"
@@ -37,9 +45,10 @@
 import DropdownLink from './DropdownLink.vue'
 import { resolveNavLinkItem } from './util'
 import NavLink from './NavLink.vue'
+import TwitterIcon from '../components/TwitterIcon'
 
 export default {
-  components: { NavLink, DropdownLink },
+  components: { NavLink, DropdownLink, TwitterIcon },
 
   computed: {
     userNav () {
@@ -119,7 +128,8 @@ export default {
 @import './styles/config.styl'
 
 .nav-links
-  display inline-block
+  display flex
+  align-items center
   a
     line-height 1.4rem
     color inherit
@@ -132,6 +142,8 @@ export default {
     line-height 2rem
     &:first-child
       margin-left 0
+    &--icon
+      display flex
   .repo-link
     margin-left 1.5rem
 
