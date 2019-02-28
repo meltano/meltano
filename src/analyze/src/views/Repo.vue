@@ -114,7 +114,7 @@
 import { mapState, mapGetters } from 'vuex';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
-import Constants from '@/utils/Constants';
+import fileTypeEnums from '@/utils/fileTypeEnums';
 import utils from '@/utils/utils';
 
 export default {
@@ -153,7 +153,7 @@ export default {
       return f.id === this.activeView.id;
     },
     isDeepRoutable(type) {
-      return type === Constants.dashboards || type === Constants.reports;
+      return type === fileTypeEnums.dashboards || type === fileTypeEnums.reports;
     },
     getDeepRoute(key, file) {
       const name = utils.capitalize(utils.singularize(key));
