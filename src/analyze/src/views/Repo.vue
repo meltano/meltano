@@ -49,7 +49,7 @@
 
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <p class="menu-label">
-          <a href="#">{{value.label}}</a>
+          {{value.label}}
         </p>
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <ul class="menu-list">

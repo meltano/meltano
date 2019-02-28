@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Resolved duplicate display issue of Dashboards and Reports on the Files page
 * Removed legacy `carbon.dashboard.m5o` (regression from merge)
 * Fix minor clipped display issue of right panel on `/settings/database`
+* Fix minor display spacing in left panel of Settings
 
 ### Breaks
 
