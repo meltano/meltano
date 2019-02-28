@@ -1,6 +1,6 @@
 import { mapGetters } from 'vuex';
 import Chart from 'chart.js';
-import utils from '../../../api/utils';
+import utils from '../../../utils/utils';
 
 const chartMixin = {
   data() {

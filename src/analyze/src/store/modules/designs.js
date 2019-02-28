@@ -2,7 +2,7 @@ import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
 import designApi from '../../api/design';
-import utils from '../../api/utils';
+import utils from '../../utils/utils';
 
 const state = {
   activeReport: {},

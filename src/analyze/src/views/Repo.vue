@@ -115,7 +115,7 @@ import { mapState, mapGetters } from 'vuex';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Constants from '@/utils/Constants';
-import utils from '@/api/utils';
+import utils from '@/utils/utils';
 
 export default {
   name: 'Repo',
