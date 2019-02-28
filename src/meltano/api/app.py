@@ -77,10 +77,15 @@ def create_app(config={}):
     app.register_blueprint(settingsBP)
     app.register_blueprint(sqlBP)
 
+    if app.config["PROFILE"]:
+        from .profiler import init
+        init(app)
+
     @app.before_request
     def before_request():
         request_message = f"[{request.url}]"
-        if current_user:
+
+        if request.method != "OPTIONS":
             request_message += f" as {current_user}"
 
         logger.info(request_message)

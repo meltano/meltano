@@ -6,6 +6,7 @@ load_dotenv()
 # Flask
 # -----------------
 THREADS_PER_PAGE = 2
+PROFILE = os.getenv("FLASK_PROFILE", False) in ("True", "true", "1")
 
 # Change this value in production
 SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
