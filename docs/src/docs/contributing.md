@@ -42,7 +42,7 @@ cd src/analyze
 # Install the dependencies for Meltano UI
 npm install
 
-# Start the web server for Meltano UI 
+# Start the web server for Meltano UI
 npm run dev
 ```
 
@@ -119,13 +119,23 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available.
 
+## Profiling
+
+To enable profiling on the API, set `FLASK_PROFILE=1` in either your `.env` or at invocation.
+
+```bash
+$ FLASK_PROFILE=1 meltano ui
+```
+
+This is helpful to figure out what is happening in your current requests.
+
 ## Tmuxinator
 
 Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
 
 ### Why Tmuxinator?
 
-In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command. 
+In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command.
 
 1. Start up Docker
 1. Start Meltano API
@@ -143,7 +153,7 @@ This config uses `$MELTANO_VENV` to source the virtual environment from. Set it 
 ### Instructions
 
 1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
-1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1. 
+1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
 
 ```bash
 $ cd path/to/meltano
