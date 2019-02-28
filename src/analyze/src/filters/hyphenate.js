@@ -1,5 +1,5 @@
-import StringUtils from '@/utils/StringUtils';
+import utils from '@/api/utils';
 
 export default function hyphenate(value, prepend) {
-  return StringUtils.hyphenate(value, prepend);
+  return utils.hyphenate(value, prepend);
 }

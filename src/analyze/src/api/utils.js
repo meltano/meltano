@@ -1,4 +1,15 @@
 export default {
+
+  // Server Utils
+  buildUrl(blueprint, location = '') {
+    return [this.root(), blueprint, location].join('/');
+  },
+  root() {
+    // eslint-disable-next-line no-undef
+    return 'http://localhost:5000';
+  },
+
+  // Color Utils
   colors: {
     backgroundColor: [
       'rgba(255, 99, 132, 0.2)',
@@ -17,14 +28,6 @@ export default {
       'rgba(255, 159, 64, 1)',
     ],
   },
-  root() {
-    // eslint-disable-next-line no-undef
-    return 'http://localhost:5000';
-  },
-  buildUrl(blueprint, location = '') {
-    return [this.root(), blueprint, location].join('/');
-  },
-
   getColor(i) {
     // assume they are the same length;
     const colorLength = this.colors.backgroundColor.length;
@@ -34,13 +37,47 @@ export default {
     };
   },
 
-  truncate(string, max = 50) {
-    if (string.length > max) {
-      return `${string.substring(0, max)}...`;
-    }
-    return string;
+  // Collection Utils
+  difference(arr1, arr2) {
+    return arr1.filter(x => !arr2.includes(x))
+      .concat(arr2.filter(x => !arr1.includes(x)));
   },
 
+  // String Utils
+  capitalize: (value) => {
+    if (!value) {
+      return '';
+    }
+    const capMe = value.toString();
+    return capMe.charAt(0).toUpperCase() + capMe.slice(1);
+  },
+  hyphenate: (value, prepend) => {
+    if (!value) {
+      return '';
+    }
+    let hyphenateMe = `${prepend}-` || '';
+    hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-');
+    return hyphenateMe;
+  },
+  pretty: (value) => {
+    try {
+      return JSON.stringify(JSON.parse(value), null, 2);
+    } catch (e) {
+      return value;
+    }
+  },
+  singularize: (value) => {
+    if (!value) {
+      return '';
+    }
+    // A more robust implementation is encouraged (currently assumes English and 's' at tail)
+    let singularizeMe = value.toString();
+    const lastChar = singularizeMe[singularizeMe.length - 1];
+    if (lastChar.toLowerCase() === 's') {
+      singularizeMe = singularizeMe.slice(0, -1);
+    }
+    return singularizeMe;
+  },
   titleCase(value) {
     return value
       .replace(
@@ -49,8 +86,10 @@ export default {
           .toUpperCase() + txt.substr(1)
           .toLowerCase());
   },
-  difference(arr1, arr2) {
-    return arr1.filter(x => !arr2.includes(x))
-      .concat(arr2.filter(x => !arr1.includes(x)));
+  truncate(string, max = 50) {
+    if (string.length > max) {
+      return `${string.substring(0, max)}...`;
+    }
+    return string;
   },
 };

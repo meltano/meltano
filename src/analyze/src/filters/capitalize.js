@@ -1,5 +1,5 @@
-import StringUtils from '@/utils/StringUtils';
+import utils from '@/api/utils';
 
 export default function capitalize(value) {
-  return StringUtils.capitalize(value);
+  return utils.capitalize(value);
 }

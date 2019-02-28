@@ -115,7 +115,7 @@ import { mapState, mapGetters } from 'vuex';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Constants from '@/utils/Constants';
-import StringUtils from '@/utils/StringUtils';
+import utils from '@/api/utils';
 
 export default {
   name: 'Repo',
@@ -156,7 +156,7 @@ export default {
       return type === Constants.dashboards || type === Constants.reports;
     },
     getDeepRoute(key, file) {
-      const name = StringUtils.capitalize(StringUtils.singularize(key));
+      const name = utils.capitalize(utils.singularize(key));
       const params = { slug: file.slug };
       if (file.model && file.design) {
         params.model = file.model;

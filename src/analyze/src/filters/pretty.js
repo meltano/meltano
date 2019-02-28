@@ -1,5 +1,5 @@
-import StringUtils from '@/utils/StringUtils';
+import utils from '@/api/utils';
 
 export default function pretty(value) {
-  return StringUtils.pretty(value);
+  return utils.pretty(value);
 }
