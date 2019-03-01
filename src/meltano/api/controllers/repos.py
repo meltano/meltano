@@ -61,7 +61,7 @@ def index():
         filename = filename.lower()
         filename, ext = os.path.splitext(filename)
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
-        if ext == ".topic":
+        if ext == ".model":
             sortedM5oFiles["topics"]["items"].append(file_dict)
         if ext == ".table":
             sortedM5oFiles["tables"]["items"].append(file_dict)
