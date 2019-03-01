@@ -299,11 +299,10 @@ class MeltanoAnalysisFileParser:
     @staticmethod
     def fill_base_m5o_dict(file, name, file_dict=None):
         if file_dict is None:
-            file_dict = {}
+            file_dict = {"name": name}
+
         file_dict["path"] = str(file)
-        file_dict["abs"] = str(file)
-        file_dict["id"] = encode_id_from_file_path(file_dict["abs"])
-        file_dict["name"] = name
-        file_dict["slug"] = slugify(file_dict["name"])
+        file_dict["id"] = encode_id_from_file_path(file_dict["path"])
+        file_dict["slug"] = slugify(name)
         file_dict["createdAt"] = time.time()
         return file_dict
