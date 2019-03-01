@@ -7,7 +7,7 @@ from meltano.api.security import api_auth_required, users
 from meltano.api.models import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
 
-settingsBP = Blueprint("settings", __name__, url_prefix="/settings")
+settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
 settingsApi = Api(settingsBP)
 
 

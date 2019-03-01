@@ -1,14 +1,5 @@
 export default {
 
-  // Server Utils
-  buildUrl(blueprint, location = '') {
-    return [this.root(), blueprint, location].join('/');
-  },
-  root() {
-    // eslint-disable-next-line no-undef
-    return 'http://localhost:5000';
-  },
-
   // Color Utils
   colors: {
     backgroundColor: [
@@ -28,6 +19,15 @@ export default {
       'rgba(255, 159, 64, 1)',
     ],
   },
+
+  root() {
+    return 'http://localhost:5000';
+  },
+
+  buildUrl(blueprint, location = '') {
+    return [this.root(), 'api/v1', blueprint, location].join('/');
+  },
+
   getColor(i) {
     // assume they are the same length;
     const colorLength = this.colors.backgroundColor.length;
