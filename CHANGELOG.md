@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Fix pre-selected selections for join aggregates when loading a report
 * Fix charts to display multiple aggregates (v1)
 * Fix 404 errors when refreshing the frontend
+* Fix a regression where the Topics would not be shown in the Files page
 
 ### Breaks
 
