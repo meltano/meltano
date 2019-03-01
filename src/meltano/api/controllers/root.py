@@ -14,10 +14,12 @@ def internal_error(exception):
     return jsonify({"error": str(exception)}), 500
 
 
-@root.route("/model")
-@root.route("/")
-@login_required
-def analyze():
+# this route is a catch-all route to forward
+# all oustanding request (not caught by any route)
+# to the front-end.
+@root.route("/", defaults={"path": ""})
+@root.route("/<path:path>")
+def default(path):
     try:
         return render_template("analyze.html")
     except TemplateNotFound:
