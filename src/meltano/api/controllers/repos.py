@@ -18,7 +18,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParserTypes,
 )
 
-reposBP = Blueprint("repos", __name__, url_prefix="/repos")
+reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
 
 
 @reposBP.before_request
