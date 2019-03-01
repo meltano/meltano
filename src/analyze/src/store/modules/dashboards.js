@@ -10,27 +10,30 @@ const state = {
 
 const actions = {
   initialize({ dispatch }, slug) {
-    dispatch('getReports').then(() => {
-      dispatch('getDashboards', slug);
+    const promiseGetReports = dispatch('getReports');
+    const promiseGetDashboards = dispatch('getDashboards');
+    Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
+      dispatch('preloadDashboard', slug);
     });
   },
-  getDashboards({ dispatch, commit }, slug) {
+  preloadDashboard({ dispatch }, slug) {
+    // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
+    if (slug) {
+      const dashboardMatch = state.dashboards.find(dashboard => dashboard.slug === slug);
+      if (dashboardMatch) {
+        dispatch('updateCurrentDashboard', dashboardMatch);
+      }
+    } else if (state.activeDashboard.reportIds) {
+      dispatch('getActiveDashboardReportsWithQueryResults');
+    }
+  },
+  getDashboards({ commit }) {
     return new Promise((resolve) => {
       dashboardsApi.getDashboards()
         .then((response) => {
           const dashboards = response.data;
           commit('setDashboards', dashboards);
           resolve();
-
-          // Load from slug or refresh existing activeDashboardReports
-          if (slug) {
-            const dashboardMatch = dashboards.find(dashboard => dashboard.slug === slug);
-            if (dashboardMatch) {
-              dispatch('updateCurrentDashboard', dashboardMatch);
-            }
-          } else if (state.activeDashboard.reportIds) {
-            dispatch('getActiveDashboardReportsWithQueryResults');
-          }
         });
     });
   },
