@@ -145,9 +145,10 @@ class TestQueryGeneration:
         assert q.join_order[2]["table"] == "episodes"
 
         # Test generating an HDA query
-        (sql, column_headers, names) = q.hda_query()
+        (sql, column_headers, column_names, aggregate_columns) = q.hda_query()
         assert "Average Age" in column_headers
-        assert "sum_minutes" in names
+        assert "sum_minutes" in column_names
+        assert "users.sum_clv" in aggregate_columns
 
         assert "WITH base_join AS (SELECT" in sql
         assert "base_streams AS (SELECT DISTINCT" in sql

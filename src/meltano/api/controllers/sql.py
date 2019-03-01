@@ -133,9 +133,7 @@ def get_sql(model_name, design_name):
     base_dict = {"sql": outgoing_sql, "error": False}
     base_dict["column_headers"] = column_headers
     base_dict["names"] = names
-    base_dict["aggregates"] = sqlHelper.get_aliases_from_aggregates(
-        aggregates, db_table
-    )
+    base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:
         return jsonify(base_dict)
