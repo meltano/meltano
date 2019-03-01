@@ -9,6 +9,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* Update stages table style in docs
+
+### Changes
+* Add api/v1 to every route
+
+### Fixes
+* Resolved duplicate display issue of Dashboards and Reports on the Files page
+* Removed legacy `carbon.dashboard.m5o` (regression from merge)
+* Updated dashboards and reports to use UI-friendly name vs slugified name
+* Fix minor clipped display issue of right panel on `/settings/database`
+* Fix minor display spacing in left panel of Settings
+
+### Breaks
+
+
+## 0.13.0 - (2019-02-25)
+---
+
+### New
 * Add the `tap-salesforce` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-salesforce
 * Add m5o model and tables for tap-salesforce
 * Updated the deep-link icon (for Dashboards/Reports on the Files page)
@@ -18,10 +37,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Rename "Models" to "Topics"
 * Use the current connection's schema when generating queries at run time for Postgres Connections.
 * Add support for multiple Aggregates over the same attribute when generating HDA queries.
-
-### Fixes
-
-### Breaks
 
 
 ## 0.12.0 - (2019-02-21)

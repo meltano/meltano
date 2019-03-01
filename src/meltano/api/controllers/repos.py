@@ -6,6 +6,7 @@ from pathlib import Path
 import markdown
 from flask import Blueprint, jsonify, request
 
+from meltano.core.project import Project
 from meltano.core.utils import decode_file_path_from_id
 from meltano.api.security import api_auth_required
 from meltano.core.m5o.m5o_file_parser import (
@@ -17,8 +18,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParserTypes,
 )
 
-reposBP = Blueprint("repos", __name__, url_prefix="/repos")
-meltano_model_path = join(os.getcwd(), "model")
+reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
 
 
 @reposBP.before_request
@@ -33,11 +33,11 @@ def index():
     # you want to work with
     onlyfiles = [
         f
-        for f in os.listdir(meltano_model_path)
-        if os.path.isfile(os.path.join(meltano_model_path, f))
+        for f in os.listdir(Project.meltano_model_path())
+        if os.path.isfile(os.path.join(Project.meltano_model_path(), f))
     ]
 
-    path = Path(meltano_model_path)
+    path = Path(Project.meltano_model_path())
     dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
     sortedM5oFiles = {
@@ -47,7 +47,7 @@ def index():
         "reports": {"label": "Reports", "items": reportsParser.contents()},
         "tables": {"label": "Tables", "items": []},
     }
-    onlydocs = Path(meltano_model_path).parent.glob("*.md")
+    onlydocs = Path(Project.meltano_model_path()).parent.glob("*.md")
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
         sortedM5oFiles["documents"]["items"].append(file_dict)
@@ -63,10 +63,6 @@ def index():
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(f, filename)
         if ext == ".topic":
             sortedM5oFiles["topics"]["items"].append(file_dict)
-        if ext == ".dashboard":
-            sortedM5oFiles["dashboards"]["items"].append(file_dict)
-        if ext == ".report":
-            sortedM5oFiles["reports"]["items"].append(file_dict)
         if ext == ".table":
             sortedM5oFiles["tables"]["items"].append(file_dict)
     return jsonify(sortedM5oFiles)
@@ -77,7 +73,9 @@ def file(unique_id):
     file_path = decode_file_path_from_id(unique_id)
     (filename, ext) = os.path.splitext(file_path)
     is_markdown = False
-    path_to_file = os.path.abspath(os.path.join(meltano_model_path, file_path))
+    path_to_file = os.path.abspath(
+        os.path.join(Project.meltano_model_path(), file_path)
+    )
     with open(path_to_file, "r") as read_file:
         data = read_file.read()
         if ext == ".md":
@@ -94,7 +92,7 @@ def file(unique_id):
 
 
 def lint_all(compile):
-    m5o_parse = MeltanoAnalysisFileParser(meltano_model_path)
+    m5o_parse = MeltanoAnalysisFileParser(Project.meltano_model_path())
     models = m5o_parse.parse()
     if compile:
         m5o_parse.compile(models)
@@ -131,7 +129,7 @@ def db_test():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    models = Path(meltano_model_path).joinpath("models.index.m5oc")
+    models = Path(Project.meltano_model_path()).joinpath("models.index.m5oc")
     return jsonify(json.loads(open(models, "r").read()))
 
 
@@ -146,15 +144,15 @@ def designs():
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])
 def table_read(table_name):
-    file_path = Path(meltano_model_path).joinpath(f"{table_name}.table.m5o")
-    m5o_parse = MeltanoAnalysisFileParser(meltano_model_path)
+    file_path = Path(Project.meltano_model_path()).joinpath(f"{table_name}.table.m5o")
+    m5o_parse = MeltanoAnalysisFileParser(Project.meltano_model_path())
     table = m5o_parse.parse_m5o_file(file_path)
     return jsonify(table)
 
 
 @reposBP.route("/designs/<model_name>/<design_name>", methods=["GET"])
 def design_read(model_name, design_name):
-    model = Path(meltano_model_path).joinpath(f"{model_name}.model.m5oc")
+    model = Path(Project.meltano_model_path()).joinpath(f"{model_name}.model.m5oc")
     with model.open() as f:
         model = json.load(f)
     designs = model["designs"]

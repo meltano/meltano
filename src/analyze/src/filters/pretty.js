@@ -1,7 +1,5 @@
+import utils from '@/utils/utils';
+
 export default function pretty(value) {
-  try {
-    return JSON.stringify(JSON.parse(value), null, 2);
-  } catch (e) {
-    return value;
-  }
+  return utils.pretty(value);
 }
