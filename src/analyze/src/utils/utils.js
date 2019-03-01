@@ -24,7 +24,7 @@ export default {
     return 'http://localhost:5000';
   },
 
-  buildUrl(blueprint, location = '') {
+  apiUrl(blueprint, location = '') {
     return [this.root(), 'api/v1', blueprint, location].join('/');
   },
 
