@@ -19,7 +19,6 @@ from meltano.core.m5o.m5o_collection_parser import (
 )
 
 reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
-meltano_model_path = join(os.getcwd(), "model")
 
 
 @reposBP.before_request
