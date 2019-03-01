@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Update stages table style in docs
 
 ### Changes
+* Add api/v1 to every route
 
 ### Fixes
 * Resolved duplicate display issue of Dashboards and Reports on the Files page
