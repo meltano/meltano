@@ -1,5 +1,4 @@
 <template>
-<div class="container">
   <div class="columns">
     <div class="column section">
       <section class="section">
@@ -145,7 +144,6 @@
       </section>
     </div>
   </div>
-</div>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
