@@ -28,3 +28,4 @@ and verify the issue you're about to submit isn't a duplicate.
 
 
 /label ~bug
+/label ~"To Do"
