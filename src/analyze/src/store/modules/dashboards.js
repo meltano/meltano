@@ -22,11 +22,14 @@ const actions = {
           commit('setDashboards', dashboards);
           resolve();
 
+          // Load from slug or refresh existing activeDashboardReports
           if (slug) {
             const dashboardMatch = dashboards.find(dashboard => dashboard.slug === slug);
             if (dashboardMatch) {
               dispatch('updateCurrentDashboard', dashboardMatch);
             }
+          } else if (state.activeDashboard.reportIds) {
+            dispatch('getActiveDashboardReportsWithQueryResults');
           }
         });
     });
