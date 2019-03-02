@@ -134,10 +134,9 @@ class SqlUtils:
 
         return {
             "db_table": db_table,
-            "columns": columns_raw,
             "aggregates": aggregate_columns,
             "column_headers": column_headers,
-            "names": column_names,
+            "column_names": column_names,
             "sql": sql,
         }
 
