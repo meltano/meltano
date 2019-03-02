@@ -10,13 +10,13 @@
       sql = "{{table}}.opportunity_id"
     }
     opportunity_type {
-      label = Name
+      label = Oportunity Type
       description = Oportunity Type
       type = string
       sql = "{{table}}.opportunity_type"
     }
     lead_source {
-      label = Short Name
+      label = Lead Source
       description = Lead Source
       type = string
       sql = "{{table}}.lead_source"
