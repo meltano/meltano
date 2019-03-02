@@ -173,44 +173,47 @@ class ListSelectedExecutor(CatalogExecutor):
     SelectedNode = namedtuple("SelectedNode", ("key", "selected"))
 
     def __init__(self):
+        self.streams = set()
         self.properties = OrderedDict()
         super().__init__()
 
     @property
     def selected_properties(self):
-        selected = {}
-        for stream, props in self.properties.items():
-            if not stream.selected:
-                continue
+        # we don't want to mutate the visitor result
+        selected = self.properties.copy()
 
-            selected[stream.key] = set()
-            for prop in filter(lambda node: node.selected, props):
-                selected[stream.key].add(prop.key)
+        # remove all non-selected streams
+        for stream in (name for name, selected in self.streams if not selected):
+            del selected[stream]
+
+        # remove all non-selected properties
+        for stream, props in selected.items():
+            selected[stream] = {name for name, selected in props if selected}
 
         return selected
 
     def is_node_selected(self, node):
         try:
             metadata = node["metadata"]
-            return metadata.get("inclusion") == "automatic" or metadata.get("selected")
+            return metadata.get("inclusion") == "automatic" or metadata.get(
+                "selected", False
+            )
         except KeyError:
             return False
 
     def stream_node(self, node, path):
         self._stream = node["stream"]
+        self.properties[self._stream] = set()
 
     def stream_metadata_node(self, node, path):
-        stream = self.SelectedNode(self._stream, self.is_node_selected(node))
-        if stream not in self.properties:
-            self.properties[stream] = set()
+        selection = self.SelectedNode(self._stream, self.is_node_selected(node))
+        self.streams.add(selection)
 
     def property_metadata_node(self, node, path):
         *_, name = node["breadcrumb"]
-        property = self.SelectedNode(name, self.is_node_selected(node))
+        selection = self.SelectedNode(name, self.is_node_selected(node))
 
-        # current stream
-        stream = next(reversed(self.properties))
-        self.properties[stream].add(property)
+        self.properties[self._stream].add(selection)
 
 
 @singledispatch
