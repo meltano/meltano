@@ -26,5 +26,9 @@ and verify the issue you're about to submit isn't a duplicate.
 ### Possible fixes
 (If you can, link to the line of code that might be responsible for the problem or suggest a fix)
 
+### Further regression test
+(Ensure we automatically catch similar issues in the future)
+
 
 /label ~bug
+/label ~"To Do"

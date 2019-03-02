@@ -22,6 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Fix minor display spacing in left panel of Settings
 * Fix pre-selected selections for join aggregates when loading a report
 * Fix charts to display multiple aggregates (v1)
+* Fix 404 errors when refreshing the frontend
 
 ### Breaks
 
