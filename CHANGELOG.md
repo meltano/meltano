@@ -10,9 +10,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * Update stages table style in docs
+* Add Custom Transforms and Models Tutorial to the docs
 
 ### Changes
 * Add api/v1 to every route
+* Update DbtService to always include the my_meltano_project model when transform runs
 
 ### Fixes
 * Resolved duplicate display issue of Dashboards and Reports on the Files page
