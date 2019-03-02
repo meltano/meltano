@@ -27,7 +27,9 @@ class DbtService:
     def compile(self, models=None):
         params = ["compile", "--profiles-dir", self.profile_dir, "--profile", "meltano"]
         if models:
-            params.extend(["--models", models])
+            # Always include the my_meltano_project model
+            all_models = f"{models} my_meltano_project"
+            params.extend(["--models", all_models])
 
         return self.call(*params)
 
@@ -37,6 +39,8 @@ class DbtService:
     def run(self, models=None):
         params = ["run", "--profiles-dir", self.profile_dir, "--profile", "meltano"]
         if models:
-            params.extend(["--models", models])
+            # Always include the my_meltano_project model
+            all_models = f"{models} my_meltano_project"
+            params.extend(["--models", all_models])
 
         return self.call(*params)
