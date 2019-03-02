@@ -16,10 +16,10 @@
               :key="columnHeader + i"
               :class="{
                 'has-background-warning': isColumnSelectedAggregate(keys[i]),
-                'has-background-white-ter sorted': isColumnSorted(names[i]),
+                'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
                 'is-desc': sortDesc,
               }"
-              @click="sortBy(names[i])">
+              @click="sortBy(columnNames[i])">
             {{columnHeader}}
           </th>
         </thead>
@@ -48,7 +48,7 @@ export default {
     ...mapState('designs', [
       'resultAggregates',
       'columnHeaders',
-      'names',
+      'columnNames',
       'results',
       'keys',
       'sortDesc',
