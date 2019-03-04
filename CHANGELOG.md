@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.14.0 - (2019-03-04)
+---
+
+### New
 * Update stages table style in docs
 
 ### Changes
@@ -23,8 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Fix pre-selected selections for join aggregates when loading a report
 * Fix charts to display multiple aggregates (v1)
 * Fix 404 errors when refreshing the frontend
-
-### Breaks
 
 
 ## 0.13.0 - (2019-02-25)
