@@ -79,8 +79,8 @@ class MeltanoAnalysisInvalidJoinDependencyError(MeltanoAnalysisFileParserError):
 class MeltanoAnalysisFileParser:
     def __init__(self, directory):
         self.directory = directory
-        self.models = []
-        self.required_model_properties = ["name", "connection", "label", "designs"]
+        self.topics = []
+        self.required_topic_properties = ["name", "connection", "label", "designs"]
         self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
         self.required_table_properties = ["sql_table_name", "columns"]
@@ -147,55 +147,55 @@ class MeltanoAnalysisFileParser:
         self.generate_join_graph_for_node(graph, base_design, joins)
         return json_graph.node_link_data(graph)
 
-    def graph_model(self, model):
-        designs = model["designs"]
+    def graph_topic(self, topic):
+        designs = topic["designs"]
         for design in designs:
             design_graph = self.graph_design(design)
             design["graph"] = design_graph
-        return model
+        return topic
 
-    def compile(self, models):
+    def compile(self, topics):
         indices = {}
-        for model in models:
-            compiled_file_name = f"{model['name']}.model.m5oc"
+        for topic in topics:
+            compiled_file_name = f"{topic['name']}.topic.m5oc"
             compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
-            compiled_model = open(compiled_file_path, "w")
-            indices[model["name"]] = {"designs": [e["name"] for e in model["designs"]]}
-            model = self.graph_model(model)
-            compiled_model.write(json.dumps(model))
-            compiled_model.close()
+            compiled_topic = open(compiled_file_path, "w")
+            indices[topic["name"]] = {"designs": [e["name"] for e in topic["designs"]]}
+            topic = self.graph_topic(topic)
+            compiled_topic.write(json.dumps(topic))
+            compiled_topic.close()
 
         # index file
-        index_file_path = Path(self.directory).joinpath("models.index.m5oc")
+        index_file_path = Path(self.directory).joinpath("topics.index.m5oc")
         index_file = open(index_file_path, "w")
         index_file.write(json.dumps(indices))
         index_file.close()
 
     def parse(self):
         self.m5o_tables = list(Path(self.directory).glob("*.table.m5o"))
-        self.m5o_models = list(Path(self.directory).glob("*.model.m5o"))
-        for model in self.m5o_models:
-            file_name = model.parts[-1]
-            conf = self.parse_m5o_file(model)
-            parsed_model = self.model(conf, file_name)
-            self.models.append(parsed_model)
+        self.m5o_topic = list(Path(self.directory).glob("*.topic.m5o"))
+        for topic in self.m5o_topic:
+            file_name = topic.parts[-1]
+            conf = self.parse_m5o_file(topic)
+            parsed_topic = self.topic(conf, file_name)
+            self.topics.append(parsed_topic)
 
-        return self.models
+        return self.topics
 
-    def model(self, ma_file_model_dict, file_name):
-        temp_model = {}
+    def topic(self, ma_file_topic_dict, file_name):
+        temp_topic = {}
         missing_properties = self.missing_properties(
-            self.required_model_properties, ma_file_model_dict
+            self.required_topic_properties, ma_file_topic_dict
         )
         if missing_properties:
             raise MeltanoAnalysisFileParserMissingFieldsError(
-                missing_properties, "model", file_name
+                missing_properties, "topic", file_name
             )
-        for prop_name, prop_def in ma_file_model_dict.items():
-            temp_model[prop_name] = prop_def
+        for prop_name, prop_def in ma_file_topic_dict.items():
+            temp_topic[prop_name] = prop_def
             if prop_name == "designs":
-                temp_model[prop_name] = self.designs(prop_def, file_name)
-        return temp_model
+                temp_topic[prop_name] = self.designs(prop_def, file_name)
+        return temp_topic
 
     def table_conf_by_name(self, table_name, cls, prop, file_name):
         try:
@@ -210,7 +210,7 @@ class MeltanoAnalysisFileParser:
             )
 
     def designs(self, ma_file_designs_dict, file_name):
-        model_designs = []
+        topic_designs = []
         for design_name, design_def in ma_file_designs_dict.items():
             temp_design = {}
             temp_design["name"] = design_name
@@ -232,8 +232,8 @@ class MeltanoAnalysisFileParser:
                     )
                 if prop_name == "joins":
                     temp_design[prop_name] = self.joins(prop_def, file_name)
-            model_designs.append(temp_design)
-        return model_designs
+            topic_designs.append(temp_design)
+        return topic_designs
 
     def joins(self, ma_file_joins_dict, file_name):
         design_joins = []
