@@ -23,7 +23,7 @@ from meltano.core.sql.base import (
 @pytest.fixture(scope="module")
 def setup_tmp_models_path(request, tmp_path_factory):
     # Find where the subfolder with the tmp models is by using request.fspath
-    #  as we switch to another dircetory for tests (check test_dir session fixture)
+    #  as we switch to another directory for tests (check test_dir session fixture)
     models_dir = request.fspath.join("..").join("models/")
 
     # And copy everything there to be compiled and used for tests
@@ -45,11 +45,11 @@ def models_path(setup_tmp_models_path):
 
 @pytest.fixture(scope="module")
 def design_helper(models_path):
-    model_name = "gitflix"
+    topic_name = "gitflix"
     design_name = "users"
 
     sqlHelper = SqlUtils()
-    m5oc_file = Path(models_path).joinpath(f"{model_name}.model.m5oc")
+    m5oc_file = Path(models_path).joinpath(f"{topic_name}.topic.m5oc")
     m5oc = M5ocFile.load(m5oc_file)
 
     return m5oc.design(design_name)
@@ -84,7 +84,7 @@ class TestQueryGeneration:
         m5o_parse.compile(models)
 
         # Load the m5oc file for gitflix
-        m5oc_file = Path(models_path).joinpath("gitflix.model.m5oc")
+        m5oc_file = Path(models_path).joinpath("gitflix.topic.m5oc")
         m5oc = M5ocFile.load(m5oc_file)
 
         design = m5oc.design("users")
