@@ -28,8 +28,8 @@
     </div>
 
     <div slot='right'>
-      <h1><strong>{{activeDashboard.name}}</strong></h1>
-      <h2 v-if="activeDashboard.description"><strong>{{activeDashboard.description}}</strong></h2>
+      <h1>{{activeDashboard.name}}</h1>
+      <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
       <hr v-if="activeDashboardReports.length">
       <div
         class='box'
