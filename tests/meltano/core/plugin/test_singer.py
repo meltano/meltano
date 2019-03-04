@@ -176,14 +176,6 @@ CATALOG = """
       },
       "metadata": [
         {
-          "breadcrumb": [],
-          "metadata": {
-            "table-key-properties": ["id"],
-            "valid-replication-keys": ["created_at"],
-            "forced-replication-method": "INCREMENTAL"
-          }
-        },
-        {
           "breadcrumb": [
             "properties",
             "id"
@@ -235,6 +227,14 @@ CATALOG = """
           ],
           "metadata": {
             "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [],
+          "metadata": {
+            "table-key-properties": ["id"],
+            "valid-replication-keys": ["created_at"],
+            "forced-replication-method": "INCREMENTAL"
           }
         }
       ]
@@ -315,7 +315,7 @@ class TestSingerTap:
                 "catalog"
             ].exists(), "Catalog should not be present."
 
-    def test_run_discovery_invalid(self, project, subject):
+    def test_apply_select_catalog_invalid(self, project, subject):
         process_mock = mock.Mock()
         process_mock.wait.return_value = 0
 
@@ -330,7 +330,7 @@ class TestSingerTap:
         with mock.patch.object(
             PluginInvoker, "invoke", side_effect=corrupt_catalog
         ) as invoke, pytest.raises(PluginExecutionError):
-            subject.run_discovery(invoker, [])
+            subject.apply_select(invoker, [])
 
             assert not invoker.files[
                 "catalog"
@@ -352,8 +352,7 @@ class TestLegacyCatalogSelectVisitor:
         if inclusion == "automatic":
             return True
 
-        if inclusion == "available":
-            return metadata.get("selected", False)
+        return metadata.get("selected", False)
 
     @classmethod
     def assert_catalog_is_selected(cls, catalog):
@@ -390,7 +389,13 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @classmethod
     def stream_is_selected(cls, stream):
         try:
-            return stream["metadata"][0]["metadata"]["selected"]
+            stream_metadata = next(
+                metadata
+                for metadata in stream["metadata"]
+                if len(metadata["breadcrumb"]) == 0
+            )
+
+            return cls.metadata_is_selected(stream_metadata["metadata"])
         except (KeyError, IndexError):
             return False
 

@@ -316,11 +316,16 @@ class MeltanoQuery(MeltanoBase):
     the attributes used in the group by, etc
     """
 
-    def __init__(self, definition: Dict, design_helper) -> None:
+    def __init__(self, definition: Dict, design_helper, schema: str = None) -> None:
         self.design_helper = design_helper
 
         # The Meltano Design this Query has been built for
         self.design = MeltanoDesign(design_helper.design)
+
+        # The schema used at run time.
+        # It is used in order to dynamically lookup the tables at that schema
+        #  if it is not None
+        self.schema = schema
 
         # A collection of all tables that arte defined in the Query
         #  with the Columns, Timeframes and Aggregates defined in the Query
@@ -468,9 +473,10 @@ class MeltanoQuery(MeltanoBase):
         """
 
         # Lists with the column names and headers of the final result when the
-        #  HDA query is exuted
+        #  HDA query is executed
         column_headers = []
         column_names = []
+        aggregate_columns = []
 
         # Build the base_join table
         base_join_query = Query
@@ -498,10 +504,24 @@ class MeltanoQuery(MeltanoBase):
             for c in table.columns() + table.optional_pkeys:
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
 
+            # We have to track wich columns have been added to the SELECT clause
+            #  for being used in Aggregates as it is valid to have multiple
+            #  Aggregates over the same column (e.g. AVG(price), SUM(price))
+            # In that case, we don't want to add the column multiple times in the
+            #  select clause cause will cause an Error in followup with clauses:
+            #  Error: column reference {COLUMN} is ambiguous
+            aggregate_columns_selected = set()
+
             for a in table.aggregates():
+                aggregate_columns.append(a.alias())
+
+                if a.column_name() in aggregate_columns_selected:
+                    continue
+
                 select.append(
                     Field(a.column_name(), table=pika_table, alias=a.column_alias())
                 )
+                aggregate_columns_selected.add(a.column_name())
 
             # Skip timeframes for this iteration
             # for t in table.timeframes():
@@ -652,4 +672,42 @@ class MeltanoQuery(MeltanoBase):
             for field in orderby_fields:
                 hda_query = hda_query.orderby(field, order=order)
 
-        return (str(hda_query) + ";", column_headers, column_names)
+        final_query = self.add_schema_to_hda_query(str(hda_query))
+        return (final_query + ";", column_headers, column_names, aggregate_columns)
+
+    def add_schema_to_hda_query(self, hda_query: str) -> str:
+        """
+        This is a temporary solution to address an issue in the way pypika
+        validates join conditions.
+
+        if you have a schema and an alias, the following SQL is perfectly fine:
+            FROM "analytics"."table1" "table1"
+            JOIN "analytics"."table2" "table2"
+              ON "table1"."id1"="table2"."id2"
+
+        But unfortunately, pypika considers that as not valid:
+            pypika.utils.JoinException: Invalid join criterion.
+            One field is required from the joined item and another from the
+                selected table or an existing join.
+            Found ["table1" "table1", "table2" "table2"]
+
+        Until they allow for "join .. on" clauses to be able to use the alias
+          of the tables, we have to construct the query without a schema and
+          then add the schema by replacing the table name with schema.table
+          Pretty ugly but the best we got at the moment.
+        """
+        if self.schema is None or self.schema == "":
+            return hda_query
+
+        schema_query = hda_query
+        for join in self.join_order:
+            if join["on"] is None:
+                schema_query = schema_query.replace(
+                    f'FROM "{join["table"]}"', f'FROM "{self.schema}"."{join["table"]}"'
+                )
+            else:
+                schema_query = schema_query.replace(
+                    f'JOIN "{join["table"]}"', f'JOIN "{self.schema}"."{join["table"]}"'
+                )
+
+        return schema_query

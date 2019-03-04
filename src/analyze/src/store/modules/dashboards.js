@@ -1,5 +1,5 @@
-import dashboardApi from '../../api/dashboards';
-import designApi from '../../api/design';
+import dashboardsApi from '../../api/dashboards';
+import reportsApi from '../../api/reports';
 
 const state = {
   activeDashboard: {},
@@ -16,7 +16,7 @@ const actions = {
   },
   getDashboards({ dispatch, commit }, slug) {
     return new Promise((resolve) => {
-      dashboardApi.getDashboards()
+      dashboardsApi.getDashboards()
         .then((response) => {
           const dashboards = response.data;
           commit('setDashboards', dashboards);
@@ -36,7 +36,7 @@ const actions = {
   },
   getReports({ commit }) {
     return new Promise((resolve) => {
-      designApi.loadReports()
+      reportsApi.loadReports()
         .then((response) => {
           commit('setReports', response.data);
           resolve();
@@ -46,20 +46,20 @@ const actions = {
   getActiveDashboardReportsWithQueryResults({ commit }) {
     const ids = state.activeDashboard.reportIds;
     const activeReports = state.reports.filter(report => ids.includes(report.id));
-    dashboardApi.getActiveDashboardReportsWithQueryResults(activeReports)
+    dashboardsApi.getActiveDashboardReportsWithQueryResults(activeReports)
       .then((response) => {
         commit('setActiveDashboardReports', response.data);
       });
   },
   saveDashboard({ dispatch, commit }, data) {
-    dashboardApi.saveDashboard(data)
+    dashboardsApi.saveDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
       });
   },
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
-    dashboardApi.saveDashboard(data)
+    dashboardsApi.saveDashboard(data)
       .then((response) => {
         const dashboard = response.data;
         commit('setCurrentDashboard', dashboard);
@@ -71,13 +71,13 @@ const actions = {
       });
   },
   addReportToDashboard({ dispatch }, data) {
-    dashboardApi.addReportToDashboard(data)
+    dashboardsApi.addReportToDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
       });
   },
   removeReportFromDashboard({ dispatch }, data) {
-    dashboardApi.removeReportFromDashboard(data)
+    dashboardsApi.removeReportFromDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
       });

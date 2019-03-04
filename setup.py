@@ -22,15 +22,16 @@ requires = [
     'pyyaml',
     'snowflake-connector-python',
     'snowflake-sqlalchemy',
-    'sqlalchemy',
+    'sqlalchemy==1.2.12',
     'flask>=1.0.2',
     'flask-cors',
-    'flask-sqlalchemy',
+    'flask-sqlalchemy==2.3.2',
     'flask-restful',
     'meltano-flask-security',
     'pyhocon',
     'python-dotenv',
     'python-gitlab',
+    'simplejson',
     'watchdog',
 ]
 
@@ -51,7 +52,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.12.0",
+    version="0.13.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

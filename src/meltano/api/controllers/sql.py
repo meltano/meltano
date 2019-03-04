@@ -8,11 +8,11 @@ from flask import Blueprint, jsonify, request
 from flask_security import auth_required
 
 from .settings_helper import SettingsHelper
-from .sql_helper import ConnectionNotFound, SqlHelper
+from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
+sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -22,6 +22,19 @@ def _handle(ex):
             {
                 "error": True,
                 "code": f"Missing connection details to '{ex.connection_name}'. Create a connection to '{ex.connection_name}' in the settings.",
+            }
+        ),
+        500,
+    )
+
+
+@sqlBP.errorhandler(UnsupportedConnectionDialect)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"The dialect ('{ex.connection_dialect}') for the connection provided is not supported.",
             }
         ),
         500,
@@ -103,25 +116,27 @@ def get_sql(model_name, design_name):
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
-    sql_dict = sqlHelper.get_sql(design, incoming_json)
+    # Get the connection currently used in Meltano UI
+    # It is used in order to dynamically generate the proper SQL queries
+    #  using the schema (Postgres) or even the database (Snowflake) at run time
+    connection_name = m5oc.connection("connection")
+    connection = sqlHelper.get_connection(connection_name)
+
+    sql_dict = sqlHelper.get_sql(design, incoming_json, connection.get("schema", None))
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
-    names = sql_dict["names"]
+    column_names = sql_dict["column_names"]
     db_table = sql_dict["db_table"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
     base_dict["column_headers"] = column_headers
-    base_dict["names"] = names
-    base_dict["aggregates"] = sqlHelper.get_aliases_from_aggregates(
-        aggregates, db_table
-    )
+    base_dict["column_names"] = column_names
+    base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
-    connection_name = m5oc.connection("connection")
     results = sqlHelper.get_query_results(connection_name, outgoing_sql)
 
     base_dict["results"] = results

@@ -58,7 +58,7 @@ def create_app(config={}):
     security_init_app(app, project)
     setup_oauth(app)
 
-    if app.env == "development":
+    if app.env != "production":
         from flask_cors import CORS
 
         CORS(app, origins="http://localhost:8080")

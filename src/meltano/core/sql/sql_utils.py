@@ -16,7 +16,7 @@ class SqlUtils:
     def get_names(self, things):
         return [thing["name"] for thing in things]
 
-    def get_sql(self, design, incoming_json):
+    def get_sql(self, design, incoming_json, schema=None):
         table_name = incoming_json["table"]
         table = design["related_table"]
 
@@ -103,11 +103,16 @@ class SqlUtils:
         column_headers = self.column_headers(
             columns_raw, aggregates_raw, timeframes_raw
         )
-        names = self.get_names(columns_raw + aggregates_raw)
+        column_names = self.get_names(columns_raw + aggregates_raw)
 
-        hda_helper = HyperDimensionalAggregatesHelper(design, incoming_json)
+        hda_helper = HyperDimensionalAggregatesHelper(design, incoming_json, schema)
         if hda_helper.needs_hda():
-            (sql, column_headers, names) = hda_helper.get_query()
+            (
+                sql,
+                column_headers,
+                column_names,
+                aggregate_columns,
+            ) = hda_helper.get_query()
         else:
             sql = self.get_query(
                 from_=db_table,
@@ -119,14 +124,19 @@ class SqlUtils:
                 join_order=join_order,
                 orderby=orderby,
                 order=order,
+                schema=schema,
+                base_table=base_table,
+            )
+
+            aggregate_columns = self.get_aliases_from_aggregates(
+                aggregates_raw, db_table
             )
 
         return {
             "db_table": db_table,
-            "columns": columns_raw,
-            "aggregates": aggregates_raw,
+            "aggregates": aggregate_columns,
             "column_headers": column_headers,
-            "names": names,
+            "column_names": column_names,
             "sql": sql,
         }
 
@@ -148,6 +158,8 @@ class SqlUtils:
         join_order=None,
         order=None,
         orderby=None,
+        schema=None,
+        base_table=None,
     ):
         select = columns + aggregates + periods
         q = Query.from_(from_)
@@ -164,4 +176,16 @@ class SqlUtils:
 
         q = q.limit(limit)
         q = str(q)
+
+        # Dynamically add at runtime the schema provided by the current connection
+        # Check .base.py: MeltanoQuery.add_schema_to_hda_query()
+        #   for more details on why we are doing this using replace
+        if schema:
+            if base_table:
+                q = q.replace(f'FROM "{base_table}"', f'FROM "{schema}"."{base_table}"')
+
+            for table in join_order:
+                q = q.replace(f'FROM "{table}"', f'FROM "{schema}"."{table}"')
+                q = q.replace(f'JOIN "{table}"', f'JOIN "{schema}"."{table}"')
+
         return f"{q};" if len(q) > 0 else ""

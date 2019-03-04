@@ -1,8 +1,10 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
+import utils from '@/utils/utils';
 import designApi from '../../api/design';
-import utils from '../../api/utils';
+import reportsApi from '../../api/reports';
+import sqlApi from '../../api/sql';
 
 const state = {
   activeReport: {},
@@ -16,7 +18,7 @@ const state = {
   results: [],
   keys: [],
   columnHeaders: [],
-  names: [],
+  columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
@@ -125,6 +127,10 @@ const getters = {
     return !!state.results.length;
   },
 
+  hasChartableResults() {
+    return getters.hasResults() && state.resultAggregates.length;
+  },
+
   numResults() {
     if (!state.results) {
       return 0;
@@ -220,10 +226,10 @@ const actions = {
     designApi.index(model, design).then((response) => {
       commit('setDesign', response.data);
     });
-    designApi.getDialect(model).then((response) => {
+    sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
-    designApi.loadReports()
+    reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -302,7 +308,7 @@ const actions = {
 
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
-    designApi
+    sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
@@ -322,7 +328,7 @@ const actions = {
   },
 
   loadReport({ commit }, { name }) {
-    designApi.loadReport(name)
+    reportsApi.loadReport(name)
       .then((response) => {
         const report = response.data;
         this.dispatch('designs/getSQL', {
@@ -346,7 +352,7 @@ const actions = {
       chartType: state.chartType,
       queryPayload: helpers.getQueryPayloadFromDesign(),
     };
-    designApi.saveReport(postData)
+    reportsApi.saveReport(postData)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -361,7 +367,7 @@ const actions = {
   updateReport({ commit }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
     state.activeReport.chartType = state.chartType;
-    designApi.updateReport(state.activeReport)
+    reportsApi.updateReport(state.activeReport)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -377,7 +383,7 @@ const actions = {
   },
 
   getDistinct({ commit }, field) {
-    designApi
+    sqlApi
       .getDistinct(state.currentModel, state.currentDesign, field)
       .then((response) => {
         commit('setDistincts', {
@@ -450,6 +456,7 @@ const mutations = {
       acc.push({
         name: curr.name,
         columns: curr.related_table.columns,
+        aggregates: curr.related_table.aggregates,
         timeframes: curr.related_table.timeframes,
       });
       return acc;
@@ -470,9 +477,13 @@ const mutations = {
     // TODO
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
-      // joins
+      // joins - columns
       const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
       setSelected(joinGroup.columns, targetJoin.columns);
+      // joins - aggregates
+      if (joinGroup.aggregates) {
+        setSelected(joinGroup.aggregates, targetJoin.aggregates);
+      }
       // timeframes
       if (targetJoin && targetJoin.timeframes) {
         setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
@@ -559,7 +570,7 @@ const mutations = {
     state.results = results.results;
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
-    state.names = results.names;
+    state.columnNames = results.column_names;
     state.resultAggregates = results.aggregates;
   },
 
