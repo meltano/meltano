@@ -17,10 +17,6 @@ describe('repos Vuex store', () => {
   });
 
   test('hasMarkdown', () => {
-    const state = {
-      activeView: { is_markdown: true, populated: true },
-    };
-
     expect(repos.getters.hasMarkdown).toBeInstanceOf(Function);
   });
 });
