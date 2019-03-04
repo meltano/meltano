@@ -73,7 +73,7 @@ Lastly, we'll query and explore the data:
   - Click Run button to query
 - Open Charts accordion and explore the data!
 
-## Salesforce > Postgres Tutorial
+## Salesforce API - Postgres DB Tutorial
 
 This is an advanced tutorial on how to extract data from your Salesforce account, load the extracted entities to a Postgres DB, transform the raw data and analyze the result.
 
@@ -105,7 +105,7 @@ meltano add extractor tap-salesforce
 meltano add loader target-postgres
 ```
 
-### Set your credentials
+### Set Your Credentials
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
@@ -136,7 +136,7 @@ Finally, make the credentials available to Meltano by executing the following co
 source .env
 ```
 
-### Select the Entities to export from Salesforce
+### Select The Entities to Export from Salesforce
 
 A Salesforce account may have more than 100 different entities. In this tutorial, we are going to work with a couple of the most common ones and show you how to select](docs/meltano-cli.html#meltano-select ) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
 
@@ -149,7 +149,7 @@ meltano select tap-salesforce "OpportunityHistory" "*"
 meltano select tap-salesforce "Contact" "*"
 ```
 
-### Run elt (extract, load, transform)
+### Run ELT (extract, load, transform)
 
 Run the full Extract > Load > Transform pipeline:
 
@@ -171,7 +171,7 @@ meltano elt tap-salesforce target-postgres --transform only
 
 The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
 
-### Interact with Your Data in the Web App
+### Interact with Your Data in The Web App
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
 
@@ -202,7 +202,7 @@ You can now query and explore the extracted data:
 
 ## Advanced Content
 
-Looking for even more advanced tutorials? You can look forward to the following tutorials in the future:
+You can look forward to the following tutorials in the future:
 
 - Salesforce > Snowflake Tutorial
 - How to add your own transforms
