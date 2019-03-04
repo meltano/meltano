@@ -59,15 +59,28 @@ class SingerTap(SingerPlugin):
                 f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
             )
 
+    @hook("before_invoke")
+    def apply_select(self, plugin_invoker, exec_args=[]):
+        if "--discover" in exec_args:
+            return
+
+        properties_file = plugin_invoker.files["catalog"]
+
         try:
             with properties_file.open() as catalog:
                 schema = json.load(catalog)
 
+            reset_executor = SelectExecutor(["!*.*"])
             select_executor = SelectExecutor(self.select)
+            visit(schema, reset_executor)
             visit(schema, select_executor)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
+        except FileNotFoundError:
+            raise PluginExecutionError(
+                f"Could not select stream, catalog file is missing."
+            )
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(

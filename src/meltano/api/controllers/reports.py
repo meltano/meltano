@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from .reports_helper import ReportsHelper
 
-reportsBP = Blueprint("reports", __name__, url_prefix="/reports")
+reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
 
 
 @reportsBP.route("/", methods=["GET"])

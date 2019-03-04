@@ -12,7 +12,7 @@ from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDial
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
+sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -125,14 +125,13 @@ def get_sql(model_name, design_name):
     sql_dict = sqlHelper.get_sql(design, incoming_json, connection.get("schema", None))
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
-    names = sql_dict["names"]
+    column_names = sql_dict["column_names"]
     db_table = sql_dict["db_table"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
     base_dict["column_headers"] = column_headers
-    base_dict["names"] = names
+    base_dict["column_names"] = column_names
     base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:

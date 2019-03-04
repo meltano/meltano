@@ -212,7 +212,7 @@
               </p>
               <p class="control">
                 <Dropdown
-                  :disabled="!hasResults"
+                  :disabled="!hasChartableResults"
                   :label="hasActiveReport() ? '' : 'Save'"
                   button-classes='is-success is-outlined'
                   is-right-aligned>
@@ -342,7 +342,7 @@
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'BarChart'}"
-                :disabled="!hasResults">
+                :disabled="!hasChartableResults">
                 <span class="icon is-small">
                   <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                 </span>
@@ -352,7 +352,7 @@
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'LineChart'}"
-                :disabled="!hasResults">
+                :disabled="!hasChartableResults">
                 <span class="icon is-small">
                   <font-awesome-icon icon="chart-line"></font-awesome-icon>
                 </span>
@@ -362,7 +362,7 @@
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'AreaChart'}"
-                :disabled="!hasResults">
+                :disabled="!hasChartableResults">
                 <span class="icon is-small">
                   <font-awesome-icon icon="chart-area"></font-awesome-icon>
                 </span>
@@ -372,19 +372,9 @@
               <button
                 class="button is-small is-text has-text-white"
                 :class="{'is-active': chartType === 'ScatterChart'}"
-                :disabled="!hasResults">
+                :disabled="!hasChartableResults">
                 <span class="icon is-small">
                   <font-awesome-icon icon="dot-circle"></font-awesome-icon>
-                </span>
-              </button>
-            </p>
-            <p class="control" @click.stop="setAndOpenChart('number')">
-              <button
-                class="button is-small is-text has-text-white"
-                :class="{'is-active': chartType === 'number'}"
-                :disabled="!hasResults">
-                <span class="icon is-small">
-                  <font-awesome-icon icon="hashtag"></font-awesome-icon>
                 </span>
               </button>
             </p>
@@ -402,14 +392,16 @@
       </div>
       <div class="accordion-body">
         <div v-if="chartsOpen" >
-          <div v-if="hasResults" class="chart-toggles">
+          <div v-if="hasChartableResults" class="chart-toggles">
             <chart :chart-type='chartType'
                     :results='results'
                     :result-aggregates='resultAggregates'></chart>
           </div>
-          <div v-if="!hasResults">
+          <div v-if="!hasChartableResults">
             <div class="box is-radiusless is-shadowless">
-              Load a report or run a query first
+              <p>
+                Run a query with at least one aggregate selected or load a report
+              </p>
             </div>
           </div>
         </div>
@@ -560,7 +552,7 @@ export default {
       'currentDesignLabel',
       'isDataTab',
       'isResultsTab',
-      'hasResults',
+      'hasChartableResults',
       'numResults',
       'isSQLTab',
       'getDistinctsForField',
