@@ -19,4 +19,8 @@ describe('repos Vuex store', () => {
   test('hasMarkdown', () => {
     expect(repos.getters.hasMarkdown).toBeInstanceOf(Function);
   });
+
+  test('hasCode', () => {
+    expect(repos.getters.hasCode).toBeInstanceOf(Function);
+  });
 });
