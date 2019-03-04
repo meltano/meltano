@@ -1,4 +1,4 @@
-# Salesforce Tutorials
+# Salesforce (SFDC) Tutorials
 
 ## Salesforce > Postgres Tutorial
 
@@ -6,7 +6,7 @@ This is an advanced tutorial on how to extract data from your Salesforce account
 
 ### Prerequisites
 
-You have successfully installed Meltano by following the instructions in the Installation section.
+You have successfully installed Meltano by following the instructions in the [Installation](/docs/installation.html) section. Please note you should have already installed and started Docker. 
 
 ### Initialize Your Project
 
@@ -19,47 +19,21 @@ meltano init sfdc-project
 # Change directory into your new sfdc-project project
 cd sfdc-project
 
+# Start docker postgres instance
+docker-compose up -d warehouse_db
+
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Add tap-salesforce (required as we'll want to select what will be extracted before running the meltano elt command)
+# Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
 meltano add extractor tap-salesforce
 
-# Add target-postgres (optional: it will be added automatically by Meltano if it is not there when )
+# Add target-postgres - to set the credentials for your Postgres DB
 meltano add loader target-postgres
 ```
 
-In contrast to the simple introducory tutorial for working with the Carbon Intensity API, in this case adding both `tap-salesforce` and `target-postgres` before running the `meltano elt` command is required, as we want to:
-
-- Select which Salesforce Entities to Extract from Salesforce
-- Set the credentials for your Salesforce account
-- Set the credentials for your Postgres DB
-
-### Select the Entities to export from Salesforce
-
-A Salesforce Account may have available for extraction more than 100 different entities. Some of those are common between all Salesforce Accounts and some are unique or uniquely customized per Account.
-
-Salesforce offers incredible customization to its customers, but there are still common threads we want to pull on for analytics. 
-
-In this tutorial, we are going to work with a couple of the most common entities: Account, Contact, Lead, User, Opportunity and Opportunity History:
-
-```bash
-meltano select tap-salesforce "User" "*"
-meltano select tap-salesforce "Account" "*"
-meltano select tap-salesforce "Lead" "*"
-meltano select tap-salesforce "Opportunity" "*"
-meltano select tap-salesforce "OpportunityHistory" "*"
-meltano select tap-salesforce "Contact" "*"
-```
-
-In general, when using Meltano, you can select which entities are extracted from a specific API.
-
-(!! Add proper link to the documentation for the Select Command: https://www.meltano.com/docs/meltano-cli.html#meltano-select !!)
-
-
 ### Set your credentials
-
-Update the .env file in your project directory with the SFDC and Postgres credentials.
+Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
 export FLASK_ENV=development
@@ -68,7 +42,7 @@ export SQLITE_DATABASE=meltano
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
 export PG_ADDRESS=localhost
-export PG_SCHEMA=meltano
+export PG_SCHEMA=analytics
 export PG_PORT=5502
 export PG_DATABASE=warehouse
 
@@ -78,17 +52,28 @@ export SFDC_PASSWORD=''
 export SFDC_SECURITY_TOKEN=''
 export SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-02-21T00:00:00Z'
+export SFDC_START_DATE='2019-04-01T00:00:00Z'
 ```
 
-You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` with the ones for your Salesforce Account. 
+You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences. 
 
-Set the `SFDC_START_DATE` to the earliest date you want to extract Opportunities and Leads for, by following the format in the example above (which stands for 21st of February, 2019).
-
-Finally, make the credentials available to Meltano:
+Finally, make the credentials available to Meltano by executing the following command in your terminal:
 
 ```bash
 source .env
+```
+
+### Select the Entities to export from Salesforce
+
+A Salesforce account may have more than 100 different entities. In this tutorial, we are going to work with a couple of the most common ones and show you how to select](docs/meltano-cli.html#meltano-select ) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+
+```bash
+meltano select tap-salesforce "User" "*"
+meltano select tap-salesforce "Account" "*"
+meltano select tap-salesforce "Lead" "*"
+meltano select tap-salesforce "Opportunity" "*"
+meltano select tap-salesforce "OpportunityHistory" "*"
+meltano select tap-salesforce "Contact" "*"
 ```
 
 ### Run elt (extract, load, transform)
@@ -101,7 +86,7 @@ meltano elt tap-salesforce target-postgres --transform run
 
 Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `SFDC_START_DATE` not too far in the past for your first test.
 
-You could also extract and load the data and then run the transformations at a later point (or run them again in case you have deleted something)
+You could also extract and load the data and then run the transformations at a later point. Please see example below:
 
 ```bash
 # Only run the Extract and Load steps
@@ -111,46 +96,35 @@ meltano elt tap-salesforce target-postgres
 meltano elt tap-salesforce target-postgres --transform only
 ```
 
-The raw data extracted from Salesforce, are stored in the Database and Schema defined in your .env. Database `warehouse` and Schema: `meltano` in the example above.
-
-The transform step uses the dbt transforms defined by default by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce). Those transformations clean the raw tables and store them together with a join table to an `analytics` schema in the same Database.
-
-You can check the section on how transforms work if you want to find more on how to change the default settings of the transform step or add additional transformations. 
-
-(!! Add proper link to the documentation for Transforms: https://www.meltano.com/docs/meltano-cli.html#transforms !!)
-
+The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
 
 ### Interact with Your Data in the Web App
 
-Now that your data is ready to be analyzed, it's time to start up the web app! Go back into your terminal and run the following command:
+In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
 
 ```bash
-# Start up the Meltano UI web application!
-$ meltano ui
+# This will start a local web server at [http://localhost:5000](http://localhost:5000)
+meltano ui
 ```
 
-This will start a local web server at [http://localhost:5000](http://localhost:5000). 
+When you visit the URL, you will be using the default connection to Meltano's SQLite database. In order to allow the UI to access your postgres DB instance, please follow the steps below:
 
-When you visit the URL, you will be using the default connection to Meltano's SQLite database. 
-
-Let's add one more connection for your Postgres DB:
-
-1. Navigate to Settings (upper-right) and select `Database`
-1. Enter connection settings
-  - Name = `postgres_db` (important to use that name)
+1. Navigate to Settings (upper-right corner) and select `Database`
+2. Enter connection settings
+  - Name = `postgres_db` (important to use that name if you are following the tutorial)
   - Dialect = `PostgresSQl`
-  - The rest of your Postgres creds
-1. Click "Save Connection"
-
-It's important to use the `postgres_db` name for the connection as it is used by default by the Salesforce Model used in Meltano UI.
+  - Host = `localhost`
+  - Port = `5502`
+  - Database, Username, Password = `warehouse`
+  - Schema = `analytics`
+3. Click "Save Connection"
 
 You can now query and explore the extracted data:
 
 - Navigate to `Analyze` > `sf opportunity history joined` (under SFDC in the drop-down)
 - Toggle Columns and Aggregates buttons to generate the SQL query.
 - Click the Run button to query the transformed tables in the `analytics` schema.
-- Check the Results or Open the Charts accordion and explore the data!
-
+- Check the Results or Open the Charts accordion and explore the data.
 
 
 ## Salesforce > Snowflake Tutorial
