@@ -26,9 +26,9 @@ class TestSqlController:
         return _post
 
     @classmethod
-    def url(cls, app, model, design):
+    def url(cls, app, topic, design):
         with app.test_request_context():
-            return url_for("sql.get_sql", model_name=model, design_name=design)
+            return url_for("sql.get_sql", topic_name=topic, design_name=design)
 
     def test_get_sql(self, post):
         self.assert_empty_query(post)

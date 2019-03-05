@@ -93,9 +93,9 @@ def file(unique_id):
 
 def lint_all(compile):
     m5o_parse = MeltanoAnalysisFileParser(Project.meltano_model_path())
-    models = m5o_parse.parse()
+    topics = m5o_parse.parse()
     if compile:
-        m5o_parse.compile(models)
+        m5o_parse.compile(topics)
     return jsonify({"result": True, "hi": "hello"})
 
 
@@ -129,8 +129,8 @@ def db_test():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    models = Path(Project.meltano_model_path()).joinpath("models.index.m5oc")
-    return jsonify(json.loads(open(models, "r").read()))
+    topics = Path(Project.meltano_model_path()).joinpath("topic.index.m5oc")
+    return jsonify(json.loads(open(topics, "r").read()))
 
 
 @reposBP.route("/designs", methods=["GET"])
@@ -150,11 +150,11 @@ def table_read(table_name):
     return jsonify(table)
 
 
-@reposBP.route("/designs/<model_name>/<design_name>", methods=["GET"])
-def design_read(model_name, design_name):
-    model = Path(Project.meltano_model_path()).joinpath(f"{model_name}.model.m5oc")
-    with model.open() as f:
-        model = json.load(f)
-    designs = model["designs"]
+@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
+def design_read(topic_name, design_name):
+    topic = Path(Project.meltano_model_path()).joinpath(f"{topic_name}.topic.m5oc")
+    with topic.open() as f:
+        topic = json.load(f)
+    designs = topic["designs"]
     design = next(e for e in designs if e["from"] == design_name)
     return jsonify(design)

@@ -100,19 +100,19 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/get/<model_name>/dialect", methods=["GET"])
-def get_dialect(model_name):
+@sqlBP.route("/get/<topic_name>/dialect", methods=["GET"])
+def get_dialect(topic_name):
     sqlHelper = SqlHelper()
-    m5oc = sqlHelper.get_m5oc_model(model_name)
+    m5oc = sqlHelper.get_m5oc_topic(topic_name)
     connection_name = m5oc.connection("connection")
     engine = sqlHelper.get_db_engine(connection_name)
     return jsonify({"connection_dialect": engine.dialect.name})
 
 
-@sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
-def get_sql(model_name, design_name):
+@sqlBP.route("/get/<topic_name>/<design_name>", methods=["POST"])
+def get_sql(topic_name, design_name):
     sqlHelper = SqlHelper()
-    m5oc = sqlHelper.get_m5oc_model(model_name)
+    m5oc = sqlHelper.get_m5oc_topic(topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
@@ -149,8 +149,8 @@ def get_sql(model_name, design_name):
     return jsonify(base_dict)
 
 
-@sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
-def get_distinct_field_name(model_name, design_name):
+@sqlBP.route("/distinct/<topic_name>/<design_name>", methods=["POST"])
+def get_distinct_field_name(topic_name, design_name):
     # incoming_json = request.get_json()
     # field_name = incoming_json["field"].replace("${TABLE}", design_name)
     # model = Model.query.filter(Model.name == model_name).first()

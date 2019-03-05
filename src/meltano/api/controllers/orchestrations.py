@@ -142,7 +142,7 @@ def load(loader_name: str) -> Response:
     return jsonify({"response": "done", "inserted_files": extractor_temp_files})
 
 
-@orchestrationsBP.route("/transform/<model_name>", methods=["POST"])
+@orchestrationsBP.route("/transform/<topic_name>", methods=["POST"])
 def transform(model_name):
     """
     {
@@ -156,10 +156,10 @@ def transform(model_name):
     incoming = request.get_json()
     connection_name = incoming.get("connection_name")
 
-    return jsonify(run_transform(model_name, connection_name))
+    return jsonify(run_transform(topic_name, connection_name))
 
 
-def run_transform(model_name, connection_name):
+def run_transform(topic_name, connection_name):
     settings = Settings.query.first()
     settings_connections = settings.settings["connections"]
     connection = next(
@@ -192,7 +192,7 @@ def run_transform(model_name, connection_name):
         "meltano_analyze",
     ]
     if model_name:
-        run_command.extend(["--models", f"{model_name}"])
+        run_command.extend(["--models", f"{topic_name}"])
 
     work_dir = os.getcwd()
     os.chdir(os.path.join(PROJECT_ROOT_DIR, TRANSFORM_DIR))
