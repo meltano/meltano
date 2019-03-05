@@ -25,8 +25,8 @@ class ProjectCompiler:
 
         try:
             m5o_parse = MeltanoAnalysisFileParser(self.source_dir)
-            models = m5o_parse.parse()
-            m5o_parse.compile(models)
-            logging.info(f"Models have been compiled.")
-        except Exception:
-            logging.warn(f"Failed to compile models.")
+            topics = m5o_parse.parse()
+            m5o_parse.compile(topics)
+            logging.info(f"Topics have been compiled.")
+        except Exception as err:
+            logging.warn(f"Failed to compile topics: {err}")

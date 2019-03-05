@@ -24,7 +24,8 @@ class DashboardsHelper:
     def get_dashboard_reports_with_query_results(self, reports):
         sqlHelper = SqlHelper()
         for report in reports:
-            m5oc = sqlHelper.get_m5oc_model(report["model"])
+            # TODO: refactor front-end `model` → `topic`
+            m5oc = sqlHelper.get_m5oc_topic(report["model"])
             design = m5oc.design(report["design"])
             connection_name = m5oc.connection("connection")
 

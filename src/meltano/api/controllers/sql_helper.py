@@ -38,9 +38,9 @@ class SqlHelper(SqlUtils):
         inner_results = re.findall(inner_pattern, input)
         return (outer_results, inner_results)
 
-    def get_m5oc_model(self, model_name):
+    def get_m5oc_topic(self, topic_name):
         m5oc_file = Path(Project.meltano_model_path()).joinpath(
-            f"{model_name}.model.m5oc"
+            f"{topic_name}.topic.m5oc"
         )
         return M5ocFile.load(m5oc_file)
 

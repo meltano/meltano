@@ -115,6 +115,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```
 1. Execute the commands below:
     ```bash
+    # if you've released before, you may need to delete the last local release branch you created
+    $ git branch -D release-next
+    
     # create and checkout release-next branch that's based off master branch
     $ git checkout -b release-next origin/master
 

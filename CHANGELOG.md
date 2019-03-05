@@ -6,12 +6,27 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
----
-
-### New
+CHANGELOG.md
 * Add the `tap-salesforce` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-salesforce
 * Add m5o model and tables for tap-salesforce
 * Add Salesforce Tutorial to the docs
+
+### New
+
+
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.14.0 - (2019-03-04)
+---
+
+### New
+CHANGELOG.md
 * Update stages table style in docs
 
 ### Changes
@@ -26,8 +41,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Fix pre-selected selections for join aggregates when loading a report
 * Fix charts to display multiple aggregates (v1)
 * Fix 404 errors when refreshing the frontend
-
-### Breaks
+* Fix a regression where the Topics would not be shown in the Files page
 
 
 ## 0.13.0 - (2019-02-25)
