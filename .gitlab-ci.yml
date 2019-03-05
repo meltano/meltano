@@ -59,10 +59,11 @@ test_postgres:
   services:
     - postgres:latest
 
-.test_sqlite:
+test_sqlite:
   <<: *test
   variables:
     PYTEST_BACKEND: sqlite
+    SQLITE_DATABASE: pytest
 
 package:
   stage: test
