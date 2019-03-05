@@ -37,7 +37,7 @@ const getters = {
 
 const actions = {
   getSettings({ commit }) {
-    settingsApi.index().then((response) => {
+    return settingsApi.index().then((response) => {
       commit('setSettings', response.data.settings);
     });
   },
@@ -55,10 +55,10 @@ const actions = {
       });
   },
   fetchACL({ commit }) {
-    settingsApi.fetchACL()
-      .then((response) => {
-        commit('setACL', response.data);
-      });
+    return settingsApi.fetchACL()
+                      .then((response) => {
+                        commit('setACL', response.data);
+                      });
   },
   createRole({ commit }, { role }) {
     settingsApi.createRole({ name: role })

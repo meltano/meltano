@@ -1,7 +1,8 @@
+from datetime import timedelta
 from functools import wraps
 from flask import current_app, request, redirect, jsonify
 from flask_login import current_user
-from flask_security import Security
+from flask_security import Security, login_required
 from flask_security.utils import login_user
 from flask_jwt_extended import (
     JWTManager,
@@ -52,8 +53,7 @@ def setup_security(app, project):
     # we need to add two JWT routes for the API
     @bp.route("/refresh_token")
     def refresh_token():
-        if not verify_jwt_refresh_token_in_request():
-            redirect(url_for(".login"))
+        verify_jwt_refresh_token_in_request()
 
         auth_identity = {
             "id": current_user.id,
@@ -65,6 +65,7 @@ def setup_security(app, project):
 
 
     @bp.route("/bootstrap")
+    @login_required
     def bootstrap_app():
         """Fire off the application with the current user logged in"""
         auth_identity = {

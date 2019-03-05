@@ -19,6 +19,7 @@ def internal_error(exception):
 # to the front-end.
 @root.route("/", defaults={"path": ""})
 @root.route("/<path:path>")
+@login_required
 def default(path):
     try:
         return render_template("analyze.html")

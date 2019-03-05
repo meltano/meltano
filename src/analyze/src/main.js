@@ -24,6 +24,7 @@ import App from './App';
 import router from './router';
 import store from './store';
 import Auth from './auth';
+import Toasted from 'vue-toasted';
 
 Vue.config.productionTip = false;
 
@@ -47,7 +48,18 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
 
-Vue.use(Auth);
+Vue.use(Auth, { router });
+Vue.use(Toasted, {
+  router,
+  position: "bottom-right",
+  iconPack: "fontawesome",
+  duration: 6000,
+});
+
+// Lets Register a Global Error Notification Toast.
+Vue.toasted.register('forbidden', "You can't access this resource at this moment.", {
+    type: 'error',
+});
 
 /* eslint-disable no-new */
 new Vue({

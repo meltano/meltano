@@ -30,6 +30,7 @@
     "ssf": "^0.10.2",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
+    "vue-toasted": "^1.1.26",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

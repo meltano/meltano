@@ -9,7 +9,7 @@ import jwtDecode from 'jwt-decode';
 
 export default {
   data() {
-    const jwt = jwtDecode(this.$auth.token);
+    const jwt = jwtDecode(this.$auth.authToken);
 
     return {
       identity: jwt.identity,

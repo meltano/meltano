@@ -127,12 +127,6 @@ def sync():
     return lint_all(True)
 
 
-@reposBP.route("/test", methods=["GET"])
-def db_test():
-    design = Design.query.first()
-    return jsonify({"design": {"name": design.name, "settings": design.settings}})
-
-
 @reposBP.route("/models", methods=["GET"])
 def models():
     topics = Path(Project.meltano_model_path()).joinpath("topic.index.m5oc")
@@ -149,20 +143,13 @@ def models():
             for topic, topic_def in index.items():
                 topic_def["designs"] = self.filter_designs(topic_def["designs"])
 
-            return index
+            return {topic: topic_def
+                    for topic, topic_def in index.items()
+                    if topic_def["designs"]}
 
     topics = next(IndexFilter().filter("view:topic", [topics]))
 
     return jsonify(topics)
-
-
-@reposBP.route("/designs", methods=["GET"])
-def designs():
-    designs = Design.query.all()
-    designs_json = []
-    for design in designs:
-        designs_json.append(design.serializable())
-    return jsonify(designs_json)
 
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])

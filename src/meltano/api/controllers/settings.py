@@ -18,12 +18,14 @@ def before_request():
 
 
 @settingsBP.route("/", methods=["GET"])
+@roles_required("admin")
 def index():
     settings_helper = SettingsHelper()
     return jsonify(settings_helper.get_connections())
 
 
 @settingsBP.route("/save", methods=["POST"])
+@roles_required("admin")
 def save():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -90,6 +92,7 @@ class AclResource(Resource):
     }
 
     @marshal_with(AclDefinition)
+    @roles_required("admin")
     def get(self):
         return {
             "users": User.query.options(joinedload("roles")).all(),
@@ -119,8 +122,8 @@ class RolesResource(Resource):
         db.session.commit()
         return role, 201
 
-    @marshal_with(AclResource.RoleDefinition)
     @roles_required("admin")
+    @marshal_with(AclResource.RoleDefinition)
     def delete(self):
         payload = request.get_json()
         role = payload["role"]

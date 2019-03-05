@@ -51,7 +51,7 @@
 
       </div>
       <div class="navbar-end">
-        <div v-if="$auth.token"
+        <div v-if="$auth.authenticated()"
              class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             <Profile />

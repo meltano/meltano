@@ -73,11 +73,11 @@ def api_auth_required(f):
 
 def unauthorized_callback():
     """
-    Meltano is mainly an API, so let's return plain 401
+    Meltano is mainly an API, so let's return plain 403 (Forbidden)
     instead of redirecting anywhere.
     """
 
-    return "Unauthorized", 401
+    return "You do not have the required permissions.", 403
 
 
 def _identity_loaded_hook(sender, identity):
