@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * Update stages table style in docs
-* Add Custom Transforms and Models Tutorial to the docs
+* Add custom transforms and models tutorial to the docs
 
 ### Changes
 * Add api/v1 to every route
