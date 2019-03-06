@@ -39,6 +39,7 @@ describe('Repo.vue', () => {
 
   it('renders no code or markdown by default', () => {
     const wrapper = mount(Repo, { store, localVue });
+
     expect(wrapper.contains('#code-container')).toBe(false);
     expect(wrapper.contains('#markdown-container')).toBe(false);
   });
@@ -46,12 +47,14 @@ describe('Repo.vue', () => {
   it('renders markdown in the preview pane for markdown files', () => {
     state.activeView = { is_markdown: true, file: '<h1>Title</h1>', populated: true };
     const wrapper = mount(Repo, { store, localVue });
+
     expect(wrapper.contains('#markdown-container')).toBe(true);
   });
 
   it('renders code in the preview pane for code files', () => {
     state.activeView = { is_markdown: false, file: '{ "title": "Title" }', populated: true };
     const wrapper = mount(Repo, { store, localVue });
+
     expect(wrapper.contains('#code-container')).toBe(true);
   });
 });
