@@ -29,9 +29,11 @@ CHANGELOG.md
 ### New
 CHANGELOG.md
 * Update stages table style in docs
+* Add custom transforms and models tutorial to the docs
 
 ### Changes
 * Add api/v1 to every route
+* Update DbtService to always include the my_meltano_project model when transform runs
 
 ### Fixes
 * Resolved duplicate display issue of Dashboards and Reports on the Files page
