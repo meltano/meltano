@@ -1,29 +1,41 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Repo from '@/views/Repo';
+import repos from '@/store/modules/repos';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
 
 describe('Repo.vue', () => {
   let actions;
+  let state;
   let store;
 
   beforeEach(() => {
+    state = {
+      activeView: {},
+    };
     actions = {
-      'repos/getRepo': jest.fn(),
-      'repos/sync': jest.fn(),
+      getRepo: jest.fn(),
+      sync: jest.fn(),
     };
     store = new Vuex.Store({
-      state: {},
       modules: {
-        repos: actions,
+        repos: {
+          namespaced: true,
+          state,
+          actions,
+          getters: repos.getters,
+        },
       },
     });
   });
 
-  test('is a Vue instance', () => {
+  it('calls getRepo() and sync() via created() lifecycle hook', () => {
     const wrapper = shallowMount(Repo, { store, localVue });
-    expect(wrapper.isVueInstance()).toBeTruthy();
+
+    expect(wrapper).toBeTruthy();
+    expect(actions.getRepo).toHaveBeenCalled();
+    expect(actions.sync).toHaveBeenCalled();
   });
 });

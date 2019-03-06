@@ -16,11 +16,11 @@ describe('repos Vuex store', () => {
     expect(repos.state).toMatchObject(state);
   });
 
-  test('hasMarkdown', () => {
+  test('hasMarkdown exists and is a function', () => {
     expect(repos.getters.hasMarkdown).toBeInstanceOf(Function);
   });
 
-  test('hasCode', () => {
+  test('hasCode exists and is a function', () => {
     expect(repos.getters.hasCode).toBeInstanceOf(Function);
   });
 });
