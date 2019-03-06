@@ -98,9 +98,9 @@
         </div>
       </div>
       <div v-if="hasMarkdown">
-        <div class="has-background-white" v-html="activeView.file"></div>
+        <div id='markdown-container' class="has-background-white" v-html="activeView.file"></div>
       </div>
-      <div class="is-paddingless code-container" v-else-if="hasCode">
+      <div id='code-container' class="is-paddingless code-container" v-else-if="hasCode">
         <div class="has-background-white">
           <pre>{{activeView.file | pretty}}</pre>
         </div>

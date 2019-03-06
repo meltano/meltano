@@ -1,4 +1,4 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { mount, createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import Repo from '@/views/Repo';
 import repos from '@/store/modules/repos';
@@ -12,9 +12,7 @@ describe('Repo.vue', () => {
   let store;
 
   beforeEach(() => {
-    state = {
-      activeView: {},
-    };
+    state = repos.state;
     actions = {
       getRepo: jest.fn(),
       sync: jest.fn(),
@@ -34,8 +32,26 @@ describe('Repo.vue', () => {
   it('calls getRepo() and sync() via created() lifecycle hook', () => {
     const wrapper = shallowMount(Repo, { store, localVue });
 
-    expect(wrapper).toBeTruthy();
+    expect(wrapper.html()).toBeTruthy();
     expect(actions.getRepo).toHaveBeenCalled();
     expect(actions.sync).toHaveBeenCalled();
+  });
+
+  it('renders no code or markdown by default', () => {
+    const wrapper = mount(Repo, { store, localVue });
+    expect(wrapper.contains('#code-container')).toBe(false);
+    expect(wrapper.contains('#markdown-container')).toBe(false);
+  });
+
+  it('renders markdown in the preview pane for markdown files', () => {
+    state.activeView = { is_markdown: true, file: '<h1>Title</h1>', populated: true };
+    const wrapper = mount(Repo, { store, localVue });
+    expect(wrapper.contains('#markdown-container')).toBe(true);
+  });
+
+  it('renders code in the preview pane for code files', () => {
+    state.activeView = { is_markdown: false, file: '{ "title": "Title" }', populated: true };
+    const wrapper = mount(Repo, { store, localVue });
+    expect(wrapper.contains('#code-container')).toBe(true);
   });
 });
