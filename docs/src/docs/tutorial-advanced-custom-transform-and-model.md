@@ -1,36 +1,24 @@
 # Custom Transforms and Models
 
-This is an advanced tutorial on how to add custom Transforms and Meltano Models.
-
-Custom Transforms are required if you want to generate additional transformed tables after the Extract and Load steps have brought the raw data from a data source or a 3rd party API.
-
-Custom Models are required if you want to Analyze your data using different preset tables, columns or aggregates than the ones that come by default with Meltano.
+This tutorial explains how to add custom data transformations and Meltano models.
 
 ## Prerequisites
 
-You have successfully extracted data from your Salesforce account by following the steps described in the Salesforce Tutorial.
+You have successfully extracted and loaded data from your Salesforce account by following the steps described in the Salesforce Tutorial.
 
-That means that:
+## Context and Examples
 
-- You have successfully installed Meltano and initialized a project named `sfdc-project`
-- You have added `tap-salesforce` and `target-postgres` to your project and you have set the credentials required for connecting to both.
-- You have selected to extract from Salesforce at least the Account and Opportunity Entities, which will be used in this example.
-- You have run successfully `meltano elt tap-salesforce target-postgres --transform run` to extract from Salesforce, load the the raw data to your Postgres and generate the analytics schema.
-- You have setup Meltano UI to connect to your Postgres, interacted with Meltano's default Model for Salesforce and were able to fetch the proper results.
+In this example, we would like to focus on closed opportunities only (i.e. actual sales) and allow grouping by year, quarter and the following categorical dimensions:
 
-## Motivation and Example Scenario
+- size of the deal, defined by the following buckets: Small (<5k$), Medium (5k$ - 25k$), Big (25k$ - 100k$), Jumbo (>100k$)
+- type of deal, i.e. "New Business" vs "Renewal" vs "Add-On Business"
+- client's location
+- client's industry
+- client's size, defined by the following buckets: Small (<100 employees), Medium (100 - 999 employees), Large (1k - 20k employees), Strategic (>20k employees)
 
-Let's assume that we only want to check won opportunities (i.e. actual sales) by the year, quarter or month the opportunity closed and, optionally, by a couple additional categories (categorical dimensions):
+Please see example table outputs below.
 
-- The size of the deal, using the following segments: Small (<5k$), Medium (5k$ - 25k$), Big (25k$ - 100k$), Jumbo (>100k$)
-- The Company's Country, so that we know our sales per country
-- The Company's Industry, so that we know our sales per Industry sector
-- The Company's size, using the following segments: Small (<100 employees), Medium (100 - 999), Large (1k - 20k), Strategic (>20k)
-- The Type of the deal (e.g. "New Business" vs "Renewal" vs "Add-On Business")
-
-The reports we want to generate should be similar to the following. 
-
-Geting how many won opportunities we had per Country and Company size:
+Size and number of won opportunities by country and company size. 
 
 ```
   company_country   |      company_size      | total_contract_value | average_contract_value | total_contracts 
@@ -49,7 +37,7 @@ Geting how many won opportunities we had per Country and Company size:
  United States      | 5 - Unknown            |               384.00 |                  96.00 |               4
 ```
 
-Checking won opportunities by the quarter and year the deal closed and by industry segment:
+Number of won opportunities by quarter, year and industry segment:
 
 ```
  closed_quarter | closed_year |               industry                | total_contracts 
@@ -71,7 +59,7 @@ Checking won opportunities by the quarter and year the deal closed and by indust
               1 |        2019 | Technology                            |               2
 ```
 
-Checking won opportunities by opportunity type, deal size and company size:
+Number of won opportunities by quarter, year, deal type, deal size and company size:
 
 ```
  closed_quarter | closed_year | opportunity_type |       deal_size       |      company_size      | total_contracts 
@@ -97,28 +85,20 @@ Checking won opportunities by opportunity type, deal size and company size:
               4 |        2017 | New Business     | 1 - Small (<5k)       | 5 - Unknown            |               1
 ```
 
-Meltano's default Transforms and Model for SFDC are very simple examples. It is clear that they do not provide all of the aforementioned custom categories and segments.
-
-We already have the raw data for Opportunities and Accounts extracted from Salesforce, so let's add the custom Transforms and a custom Model for enabling the generation of reports similar to the ones we described.
-
 ## Adding Custom Transforms
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
+Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations (i.e. `sfdc-project/transform`). When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the `transform/` directory are being performed. 
 
-In our case, the transforms for our project reside under `sfdc-project/transform`.
+If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](https://www.meltano.com/docs/meltano-cli.html#transforms) for more details.
 
-When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run together with any custom transformations defined in the dbt project under the `transform/` directory.
+Let's generate two additional transformations, which will produce:
 
-If you are not familiar with dbt, you can check [dbt's documentation](https://docs.getdbt.com/) to understand how dbt works and all the available options for building powerful custom transformations. You can also check the section on Meltano's documentation on [Transforms](https://www.meltano.com/docs/meltano-cli.html#transforms) for more details.
+- A table that includes won opportunities only and a custom category column for deal_size.
+- A table that includes account categories, clients' countries, industries and a custom category column for company_size. 
 
-In our case, we want to generate two additional tables in the analytics schema when the transformations run:
+These tables must be added as `dbt models`, i.e. `.sql` files under the `sfdc-project/transform/models/my_meltano_project/` directory or any of its subdirectories. This will allow Meltano to discover the new transformations and execute. 
 
-- A table that will only include won opportunities and the custom category column for the deal_size.
-- A table that will include account categories with the company's country, the company's industry and the custom category column for the company_size. 
-
-Those tables must be added as dbt models in the dbt project, under the `sfdc-project/transform/models/my_meltano_project/` directory. This will allow Meltano to discover the new transformations and run them; Meltano always runs all the prepackaged transforms for an extractor and any custom transforms defined under `sfdc-project/transform/models/my_meltano_project/`.
-
-We can add a new dbt model just by adding `.sql` files in the `sfdc-project/transform/models/my_meltano_project/` directory or any of its subdirectories. Following dbt's design patterns, we'll create a new `sfdc/transform` directory and put the sql for those two models in there.
+In this case, we'll create a new `sfdc/transform` subdirectory and save the sql files there.
 
 ```bash
 cd sfdc-project/transform/models/my_meltano_project/
@@ -127,8 +107,6 @@ cd sfdc
 mkdir transform
 cd transform
 ```
-
-Let's add the two models: 
 
 `sfdc-project/transform/models/my_meltano_project/sfdc/transform/opportunity_won.sql`:
 
@@ -225,7 +203,7 @@ account_category as (
 select * from account_category
 ```
 
-And finally, let's update the `dbt_project.yml` to reflect the fact that there are transformations to run for the `my_meltano_project` and that we want the results to be materialized in the analytics schema. For more details on materialization options, check dbt's documentation.
+Before we execute the transformation, we need to update `my_meltano_project` in `dbt_project.yml` in order to have the results of the transformations materialized in the `analytics` schema. For more details on materialization options, please check dbt's documentation.
 
 Update the `my_meltano_project: null` in `sfdc-project/transform/dbt_project.yml` to:
 
@@ -244,30 +222,17 @@ models:
 ... ... ...
 ```
 
-
-And we are ready to run our new transformations and check the results!
-
 ```bash
 source .env
-
+#Runs transformation step only from the ELT step
 meltano elt tap-salesforce target-postgres --transform only
 ```
 
-
-If you check your analytics schema in Postgres, two new tables should be there with all the transformed data included: `analytics.opportunity_won` and `analytics.account_category`
-
 ## Adding Custom Models
 
-The final step is to add a new Meltano Model for allowing access to the new data from the Analyze Section of Meltano UI.
+In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `model.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model) and [concepts related to Meltano Models](https://www.meltano.com/docs/concepts.html).
 
-Meltano stores all relevant files under the `model/` directory as `.m5o` files. For more details on how `.m5o` files are structured, check the Meltano documentation on [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model) and the [concepts related to Models](https://www.meltano.com/docs/concepts.html).
-
-We need to add two `table.m5o` files, one for each table that we added and a `model.m5o` file for representing how the tables are connected.
-
-A `table.m5o` file defines what will be available in Meltano UI for a specific table, the columns that can be used from that table for grouping the results and the available aggregates.
-
-The account category table is very simple as it is only used as a table defining dimensions for grouping the data, with no aggregates defined:
-
+Account Category Table
 `sfdc-project/model/account_category.table.m5o` 
 ```
 {
@@ -303,9 +268,7 @@ The account category table is very simple as it is only used as a table defining
 }
 ```
 
-
-For the opportunity_won table, we are going to just make all the columns available and define a couple aggregates as options. We could include less columns if we wanted, but we want all the options available in Meltano UI:
-
+Opportunities Won Table
 `sfdc-project/model/opportunity_won.table.m5o` 
 ```
 {
@@ -397,7 +360,7 @@ For the opportunity_won table, we are going to just make all the columns availab
 }
 ```
 
-Finally, we want to add a model that will tie everything together and will make the results available in Meltano UI. We'll name our model `custom_sfdc` in order to differentiate it from the sfdc model that comes by default with Meltano:
+Please note, the name this model will be `custom_sfdc` in order to differentiate it from the sfdc model that comes by default with Meltano:
 
 `sfdc-project/model/custom_sfdc.model.m5o` 
 ```
@@ -423,11 +386,9 @@ Finally, we want to add a model that will tie everything together and will make 
 }
 ```
 
-And we are set to run Meltano UI and check the results!
-
 ## Interact with Your Data in the Meltano UI
 
-Now that your data is ready to be analyzed, it's time to start up the web app! Go back into your terminal and run the following command:
+In order to start the Meltano UI, please go back into your terminal and run the following command:
 
 ```bash
 # Start up the Meltano UI web application!
@@ -446,9 +407,7 @@ As we have properly set the connection to our Postgres Database in the Salesforc
 
 ## Closing Remarks
 
-The same process for adding custom Transforms and Model(s) would be followed if we wanted to extract and analyze additional Salesforce Entities that were not fetched in the Salesforce Tutorial.
-
-We would just have to: 
+The same process for adding custom Transforms and Model(s) would be followed if we wanted to extract and analyze additional Salesforce Entities that were not fetched in the Salesforce Tutorial:
 
 (1) Add the additional Entities to the list of Entities to be extracted when `meltano elt` runs.
 
@@ -458,14 +417,13 @@ As described in the Salesforce Tutorial, this can be done by using the meltano s
 meltano select tap-salesforce "Entity Name" "*"
 ```
 
-You can find the proper names for the supported entities by running:
+You can find the names for the supported entities by running:
 
 ```bash
 meltano select tap-salesforce --list --all
 ```
 
-
-(2) Follow the steps above to add custom Transforms and Models for the new Entities.
+(2) Follow the steps above to add custom transformations and models for the new Entities.
 
 (3) Run meltano elt to extract and transform the data.
 
