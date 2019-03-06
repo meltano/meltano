@@ -15,5 +15,5 @@ export default {
       identity: jwt.identity,
     };
   },
-}
+};
 </script>

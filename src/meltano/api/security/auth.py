@@ -13,8 +13,7 @@ from .identity import FreeUser
 
 class ResourcePermission(Permission):
     def in_scope(self, need, scopes):
-        matches = (fnmatch(need.value, scope.value)
-                   for scope in scopes)
+        matches = (fnmatch(need.value, scope.value) for scope in scopes)
 
         return any(matches)
 
@@ -23,18 +22,18 @@ class ResourcePermission(Permission):
         needs_scoped = []
         for need in self.needs:
             # included
-            scopes = (scope
-                      for scope in identity.provides
-                      if scope.method == need.method)
+            scopes = (
+                scope for scope in identity.provides if scope.method == need.method
+            )
 
             scoped = self.in_scope(need, scopes)
             needs_scoped.append(scoped)
 
         for excluded in self.excludes:
             # excluded
-            scopes = (scope
-                      for scope in identity.provides
-                      if scope.method == excluded.method)
+            scopes = (
+                scope for scope in identity.provides if scope.method == excluded.method
+            )
 
             if self.in_scope(need, scopes):
                 return False
@@ -89,9 +88,7 @@ def _identity_loaded_hook(sender, identity):
 
     # each permission is a Need(permission_type, context),
     # i.e. ("view", "finance.*", "design")
-    for perm in (perm
-                 for role in current_user.roles
-                 for perm in role.permissions):
+    for perm in (perm for role in current_user.roles for perm in role.permissions):
         perm = Need(perm.type, perm.context)
 
         identity.provides.add(perm)

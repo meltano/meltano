@@ -34,7 +34,7 @@ class ResourceFilter:
         return resource
 
 
-class NameFilterMixin(ResourceFilter):
+class NameFilterMixin:
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -44,17 +44,19 @@ class NameFilterMixin(ResourceFilter):
         return Need(permission_type, resource["name"])
 
 
-class TopicFilter(NameFilterMixin):
-    def __init__(self, *args, design_filter = None):
+class TopicFilter(NameFilterMixin, ResourceFilter):
+    def __init__(self, *args, design_filter=None):
         super().__init__(*args)
 
         self._design_filter = design_filter or DesignFilter()
 
     def scope(self, permission_type, topic):
-        topic["designs"] = list(self._design_filter.filter("view:design", topic["designs"]))
+        topic["designs"] = list(
+            self._design_filter.filter("view:design", topic["designs"])
+        )
 
         return topic
 
 
-class DesignFilter(NameFilterMixin):
+class DesignFilter(NameFilterMixin, ResourceFilter):
     pass

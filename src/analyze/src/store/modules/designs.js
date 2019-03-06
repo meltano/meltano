@@ -226,9 +226,9 @@ const actions = {
 
     // TODO: chain callbacks to keep a single Promise
     const index = designApi.index(model, design)
-                           .then((response) => {
-                             commit('setDesign', response.data);
-                           });
+      .then((response) => {
+        commit('setDesign', response.data);
+      });
 
     sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);

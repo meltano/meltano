@@ -505,10 +505,10 @@ export default {
   beforeRouteEnter(to, from, next) {
     const { model, design, slug } = to.params;
     store.dispatch('designs/getDesign', { model, design, slug })
-         .then(next)
-         .catch((err) => {
-           next(from.path);
-         });
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
   },
   beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('designs/getDesign', {

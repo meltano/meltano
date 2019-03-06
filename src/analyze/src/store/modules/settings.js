@@ -56,9 +56,9 @@ const actions = {
   },
   fetchACL({ commit }) {
     return settingsApi.fetchACL()
-                      .then((response) => {
-                        commit('setACL', response.data);
-                      });
+      .then((response) => {
+        commit('setACL', response.data);
+      });
   },
   createRole({ commit }, { role }) {
     settingsApi.createRole({ name: role })

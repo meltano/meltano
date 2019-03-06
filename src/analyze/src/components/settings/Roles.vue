@@ -78,7 +78,7 @@
 </template>
 <script>
 import _ from 'lodash';
-import store from '@/store'
+import store from '@/store';
 import { mapState, mapGetters, mapActions } from 'vuex';
 import RoleMembers from './RoleMembers';
 import RolePermissions from './RolePermissions';
@@ -106,10 +106,10 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     store.dispatch('settings/fetchACL')
-         .then(next)
-         .catch((err) => {
-           next(from.path);
-         });
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
   },
 
   computed: {

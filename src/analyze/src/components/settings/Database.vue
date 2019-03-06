@@ -168,10 +168,10 @@ export default {
 
   beforeRouteEnter(to, from, next) {
     store.dispatch('settings/getSettings')
-         .then(next)
-         .catch((err) => {
-           next(from.path);
-         });
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
   },
 
   computed: {

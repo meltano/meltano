@@ -9,7 +9,7 @@ from flask_jwt_extended import (
     create_access_token,
     create_refresh_token,
     get_jwt_identity,
-    verify_jwt_refresh_token_in_request
+    verify_jwt_refresh_token_in_request,
 )
 from flask_jwt_extended import JWTManager
 from flask_principal import identity_loaded, Identity
@@ -43,40 +43,36 @@ def setup_security(app, project):
     @jwt.user_loader_callback_loader
     def jwt_user_load(identity):
         user = users.find_user(id=identity["id"])
-        login_user(user) # sets `flask_security` current_user
+        login_user(user)  # sets `flask_security` current_user
         # identity_loaded.send(current_app._get_current_object(), identity=Identity(user.id))
 
         return user
 
-    bp = app.blueprints['security']
+    bp = app.blueprints["security"]
 
     # we need to add two JWT routes for the API
     @bp.route("/refresh_token")
     def refresh_token():
         verify_jwt_refresh_token_in_request()
 
-        auth_identity = {
-            "id": current_user.id,
-            "username": current_user.username,
-        }
+        auth_identity = {"id": current_user.id, "username": current_user.username}
 
         token = create_access_token(identity=auth_identity)
         return jsonify(auth_token=token)
-
 
     @bp.route("/bootstrap")
     @login_required
     def bootstrap_app():
         """Fire off the application with the current user logged in"""
-        auth_identity = {
-            "id": current_user.id,
-            "username": current_user.username,
-        }
+        auth_identity = {"id": current_user.id, "username": current_user.username}
 
         access_token = create_access_token(identity=auth_identity)
         refresh_token = create_refresh_token(identity=auth_identity)
 
-        uri = app.config["MELTANO_UI_URL"] + f"?auth_token={access_token}&refresh_token={refresh_token}"
+        uri = (
+            app.config["MELTANO_UI_URL"]
+            + f"?auth_token={access_token}&refresh_token={refresh_token}"
+        )
         return redirect(uri)
 
     app.register_blueprint(bp)
