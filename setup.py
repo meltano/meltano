@@ -27,6 +27,7 @@ requires = [
     'flask-cors',
     'flask-sqlalchemy==2.3.2',
     'flask-restful',
+    'flask-jwt-extended',
     'meltano-flask-security',
     'pyhocon',
     'python-dotenv',
