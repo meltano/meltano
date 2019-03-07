@@ -18,6 +18,17 @@ README.md: ""
   .env
 model: "bundle://model"
 extract/.gitkeep: ""
+docker-compose.yml: |
+  version: '3.1'
+  services:
+    warehouse_db:
+      image: postgres
+      environment:
+        POSTGRES_DB: warehouse
+        POSTGRES_PASSWORD: warehouse
+        POSTGRES_USER: warehouse
+      ports:
+      - '5502:5432'
 load/.gitkeep: ""
 transform/:
   dbt_project.yml: |
