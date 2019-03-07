@@ -274,3 +274,655 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
   </section>
 </div>
 `;
+
+exports[`Repo.vue renders the dashboard list when dashboards exist 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        Dashboards
+      
+        </p>
+         
+        <ul
+          class="menu-list"
+        >
+          <!---->
+           
+          <li>
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <a
+                  class=""
+                >
+                  
+                  Some
+                
+                </a>
+              </div>
+               
+              <div
+                class="column is-one-fifth"
+              >
+                <router-link
+                  class="button is-secondary is-light is-small is-pulled-right"
+                  to="[object Object]"
+                >
+                  <font-awesome-icon
+                    icon="arrow-right"
+                  />
+                </router-link>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders the document list when documents exist 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        Documents
+      
+        </p>
+         
+        <ul
+          class="menu-list"
+        >
+          <!---->
+           
+          <li>
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <a
+                  class=""
+                >
+                  
+                  README.md
+                
+                </a>
+              </div>
+               
+              <!---->
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders the report list when reports exist 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        Reports
+      
+        </p>
+         
+        <ul
+          class="menu-list"
+        >
+          <!---->
+           
+          <li>
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <a
+                  class=""
+                >
+                  
+                  Some
+                
+                </a>
+              </div>
+               
+              <div
+                class="column is-one-fifth"
+              >
+                <router-link
+                  class="button is-secondary is-light is-small is-pulled-right"
+                  to="[object Object]"
+                >
+                  <font-awesome-icon
+                    icon="arrow-right"
+                  />
+                </router-link>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders the table list when tables exist 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        Tables
+      
+        </p>
+         
+        <ul
+          class="menu-list"
+        >
+          <!---->
+           
+          <li>
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <a
+                  class=""
+                >
+                  
+                  episodes
+                
+                </a>
+              </div>
+               
+              <!---->
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders the topic list when topics exist 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        Topics
+      
+        </p>
+         
+        <ul
+          class="menu-list"
+        >
+          <!---->
+           
+          <li>
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <a
+                  class="is-active"
+                >
+                  
+                  carbon
+                
+                </a>
+              </div>
+               
+              <!---->
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
