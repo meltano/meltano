@@ -5,6 +5,7 @@ from flask_security import auth_required
 from flask_login import current_user
 from flask_jwt_extended import jwt_required
 from flask_principal import Permission, Need
+from .identity import FreeUser
 
 
 def api_auth_required(f):
@@ -14,8 +15,12 @@ def api_auth_required(f):
     def decorated():
         if request.method == "OPTIONS":
             return f()
-        else:
-            return auth_decorated()
+
+        session_user = current_user._get_current_object()
+        if isinstance(session_user, FreeUser):
+            return f()
+
+        return auth_decorated()
 
     return decorated
 

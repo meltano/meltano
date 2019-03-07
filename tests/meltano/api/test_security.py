@@ -5,7 +5,8 @@ from unittest import mock
 from sqlalchemy.orm import joinedload
 from meltano.api.security import AnonymousUser, FreeUser, users
 from meltano.api.auth import gitlab_token_identity, OAuthError
-from meltano.api.models import db, OAuth, User
+from meltano.api.models.security import db, User
+from meltano.api.models.oauth import OAuth
 from flask_login import current_user
 from flask_security import login_user, logout_user
 
