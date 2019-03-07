@@ -18,7 +18,7 @@ class GoogleAnalyticsTracker:
         tracking_id: str = None,
         client_id: str = None,
         request_timeout: float = None,
-    ) -> None:
+    ):
         self.project = project
         self.tracking_id = tracking_id or MELTANO_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
@@ -173,3 +173,7 @@ class GoogleAnalyticsTracker:
             action = action + " --exclude"
 
         event = self.track_event(category="meltano select", action=action, debug=debug)
+
+    def track_meltano_ui(self, debug: bool = False) -> None:
+        action = f"meltano ui"
+        event = self.track_event(category="meltano ui", action=action, debug=debug)
