@@ -1,0 +1,276 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Repo.vue renders code in the preview pane for code files 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div
+          class="is-paddingless code-container"
+        >
+          <div
+            class="has-background-white"
+          >
+            <pre>
+              {
+  "title": "Title"
+}
+            </pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <!---->
+         
+        <div>
+          <div
+            class="has-background-white"
+          >
+            <h1>
+              Title
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
+
+exports[`Repo.vue renders no code or markdown by default 1`] = `
+<div
+  class="columns is-gapless"
+>
+  <aside
+    class="column is-one-quarter vh-scrollable has-background-white-bis"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div
+          class="level"
+        >
+          <div
+            class="level-left"
+          >
+            <div
+              class="field has-addons"
+            >
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Lint
+                </a>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <a
+                  class="button is-small"
+                  href="#"
+                >
+                  Sync
+                </a>
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="level-right"
+          >
+            <!---->
+             
+            <span
+              class="tag is-warning"
+            >
+              Unvalidated
+            </span>
+             
+            <!---->
+          </div>
+        </div>
+         
+        <!---->
+         
+      </div>
+    </div>
+  </aside>
+   
+  <section
+    class="column is-three-quarters vh-scrollable"
+  >
+    <div
+      class="box is-radiusless is-shadowless"
+    >
+      <div>
+        <div>
+          <div
+            class="empty-state
+        has-background-white
+        has-text-centered
+        is-size-4
+        is-uppercase"
+          >
+            
+        Select a file
+      
+          </div>
+        </div>
+         
+        <!---->
+      </div>
+    </div>
+  </section>
+</div>
+`;
