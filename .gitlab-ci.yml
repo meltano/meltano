@@ -8,7 +8,7 @@ include:
 stages:
   - lint
   - test
-  - pages
+  - docs
   - build_base
   - build
   - publish
@@ -29,6 +29,28 @@ lint:
     - pip install black
   script:
     - make show_lint
+
+docs:
+  stage: docs
+  image: node:9.11.1
+  cache:
+    paths:
+      - node_modules/
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - cd docs
+    - yarn
+    - yarn build:docs
+    - tar -zcvf $SSH_BACKUP_DIRECTORY-$(date -u -Iminutes).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY
+    - ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
+    - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
+  only:
+    - master
 
 .test: &test
   stage: test
@@ -75,23 +97,6 @@ package:
   artifacts:
     paths:
       - dist
-
-pages:
-  stage: pages
-  image: node:9.11.1
-  cache:
-    paths:
-      - node_modules/
-  script:
-    - cd docs
-    - yarn
-    - yarn build:docs
-    - mv public ../public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
 
 publish:
   image:
