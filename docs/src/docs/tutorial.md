@@ -165,7 +165,7 @@ meltano elt tap-salesforce target-postgres --transform run
 
 Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `SFDC_START_DATE` not too far in the past for your first test.
 
-You could also extract and load the data and then run the transformations at a later point. Please see example below:
+You could also extract and load the data and then run the transformations at a later point (examples below):
 
 ```bash
 # Only run the Extract and Load steps
