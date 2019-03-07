@@ -8,7 +8,7 @@ from flask_security.utils import login_user, do_flash, url_for_security
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 
-from .identity import users
+from .identity import users, FreeUser
 from meltano.api.models.oauth import db, OAuth
 from meltano.core.utils import compose
 
@@ -49,7 +49,7 @@ def setup_oauth(app):
             identity = gitlab_token_identity(token)
             login_user(identity.user, remember=False)
 
-            return redirect(url_for("root.analyze"))
+            return redirect(url_for("root.default"))
         except OAuthError as e:
             do_flash(str(e))
             return redirect(url_for_security("login"))
@@ -70,7 +70,6 @@ def gitlab_token_identity(token):
     if client.user.state != "active":
         raise OAuthError("This account is not active.")
 
-    user = current_user.is_authenticated and current_user
     token_user_email = users.get_user(client.user.email)
     token_user_username = users.get_user(client.user.username)
 
@@ -96,7 +95,8 @@ def gitlab_token_identity(token):
     except NoResultFound:
         identity = OAuth.from_token("gitlab", client.user.id, token)
 
-    if current_user.is_authenticated:
+    if (current_user.is_authenticated and not
+        isinstance(current_user._get_current_object(), FreeUser)):
         # map the identity to the current_user
         identity.user = current_user
         db.session.add(identity)

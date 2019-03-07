@@ -39,16 +39,16 @@ class TestResourcePermission:
 
 
 @pytest.mark.usefixtures("compile_models")
-class TestResourceFilter:
+class TestTopicFilter:
     @pytest.fixture
     def subject(self):
-        return ResourceFilter()
+        return TopicFilter()
 
     def test_filter(self, project, identity, app):
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.model.m5oc"))
+        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.topic.m5oc"))
 
         topic_filter = TopicFilter()
 
@@ -61,7 +61,7 @@ class TestResourceFilter:
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.model.m5oc"))
+        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.topic.m5oc"))
 
         topic_filter = TopicFilter()
 
