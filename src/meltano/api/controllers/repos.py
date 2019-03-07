@@ -129,7 +129,7 @@ def db_test():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    topics = Path(Project.meltano_model_path()).joinpath("topic.index.m5oc")
+    topics = Path(Project.meltano_model_path()).joinpath("topics.index.m5oc")
     return jsonify(json.loads(open(topics, "r").read()))
 
 
