@@ -163,7 +163,7 @@ def sync():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    topics = Path(Project.meltano_model_path()).joinpath("topic.index.m5oc")
+    topics = Path(Project.meltano_model_path()).joinpath("topics.index.m5oc")
     topics = json.load(open(topics, "r"))
     topics = next(M5ocFilter().filter("view:topic", [topics]))
 
