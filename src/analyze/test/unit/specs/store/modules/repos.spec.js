@@ -20,11 +20,7 @@ describe('repos Vuex store', () => {
     expect(repos.state).toMatchObject(state);
   });
 
-  it('has the hasMarkdown function', () => {
-    expect(repos.getters.hasMarkdown).toBeInstanceOf(Function);
-  });
-
-  it('validates the hasMarkdown function properly', () => {
+  it('validates that the hasMarkdown functions properly', () => {
     repos.state.activeView.is_markdown = true;
     repos.state.activeView.populated = true;
 
@@ -36,11 +32,7 @@ describe('repos Vuex store', () => {
     expect(repos.getters.hasMarkdown()).toBe(false);
   });
 
-  it('has the hasCode function', () => {
-    expect(repos.getters.hasCode).toBeInstanceOf(Function);
-  });
-
-  it('validates the hasCode function properly', () => {
+  it('validates that the hasCode functions properly', () => {
     repos.state.activeView.is_markdown = false;
     repos.state.activeView.populated = true;
 
