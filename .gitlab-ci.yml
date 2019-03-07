@@ -6,9 +6,9 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - docs
   - lint
   - test
+  - docs
   - build_base
   - build
   - publish
@@ -51,6 +51,8 @@ docs:
     - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"
     - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
     - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
+  only:
+    - master
 
 .test: &test
   stage: test
