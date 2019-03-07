@@ -37,7 +37,7 @@ SEED_USERS = [
 ]
 
 
-class FreeUser():
+class FreeUser:
     """
     FreeUser is free to do everything and has no limits.
 
