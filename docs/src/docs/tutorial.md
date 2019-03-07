@@ -92,7 +92,7 @@ meltano init sfdc-project
 # Change directory into your new sfdc-project project
 cd sfdc-project
 
-# Start docker postgres instance
+# Start docker postgres instance - you only need to do this once
 docker-compose up -d warehouse_db
 
 # Let's see what extractors and loaders are available
@@ -165,7 +165,7 @@ meltano elt tap-salesforce target-postgres --transform run
 
 Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `SFDC_START_DATE` not too far in the past for your first test.
 
-You could also extract and load the data and then run the transformations at a later point. Please see example below:
+You could also extract and load the data and then run the transformations at a later point. Please see the examples below:
 
 ```bash
 # Only run the Extract and Load steps
