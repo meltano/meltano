@@ -6,6 +6,7 @@ from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.config_service import ConfigService
+from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginType
 
 
@@ -36,6 +37,11 @@ def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(
         project, discovery=discovery
     )  # TODO: discovery factory
+
+
+@pytest.fixture
+def project_compiler(project):
+    return ProjectCompiler(project)
 
 
 @pytest.fixture

@@ -40,6 +40,7 @@ def create_app(config={}):
     )
     stdout_handler = logging.StreamHandler()
 
+    logger.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     logger.addHandler(stdout_handler)
 
@@ -78,14 +79,15 @@ def create_app(config={}):
         from .profiler import init
         init(app)
 
-    @app.before_request
-    def before_request():
+    @app.after_request
+    def after_request(res):
         request_message = f"[{request.url}]"
 
         if request.method != "OPTIONS":
             request_message += f" as {current_user}"
 
         logger.info(request_message)
+        return res
 
     return app
 

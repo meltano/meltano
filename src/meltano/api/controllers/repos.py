@@ -4,7 +4,7 @@ from os.path import join
 from pathlib import Path
 
 import markdown
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 
 from meltano.core.project import Project
 from meltano.core.utils import decode_file_path_from_id
@@ -17,6 +17,10 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
+from flask_principal import Need
+from meltano.api.security.resource_filter import ResourceFilter
+from meltano.api.security.auth import permit
+
 
 reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
 
@@ -47,6 +51,7 @@ def index():
         "reports": {"label": "Reports", "items": reportsParser.contents()},
         "tables": {"label": "Tables", "items": []},
     }
+
     onlydocs = Path(Project.meltano_model_path()).parent.glob("*.md")
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
@@ -65,6 +70,7 @@ def index():
             sortedM5oFiles["topics"]["items"].append(file_dict)
         if ext == ".table":
             sortedM5oFiles["tables"]["items"].append(file_dict)
+
     return jsonify(sortedM5oFiles)
 
 
@@ -130,7 +136,24 @@ def db_test():
 @reposBP.route("/models", methods=["GET"])
 def models():
     topics = Path(Project.meltano_model_path()).joinpath("topic.index.m5oc")
-    return jsonify(json.loads(open(topics, "r").read()))
+    topics = json.load(open(topics, "r"))
+
+    class IndexFilter(ResourceFilter):
+        def filter_designs(self, designs):
+            return ResourceFilter().needs(self.design_need).filter_all("view:design", designs)
+
+        def design_need(self, permission_type, design_name):
+            return Need(permission_type, design_name)
+
+        def scope(self, permission_type, index):
+            for topic, topic_def in index.items():
+                topic_def["designs"] = self.filter_designs(topic_def["designs"])
+
+            return index
+
+    topics = next(IndexFilter().filter("view:topic", [topics]))
+
+    return jsonify(topics)
 
 
 @reposBP.route("/designs", methods=["GET"])
@@ -152,6 +175,8 @@ def table_read(table_name):
 
 @reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
 def design_read(topic_name, design_name):
+    permit("view:design", design_name)
+
     topic = Path(Project.meltano_model_path()).joinpath(f"{topic_name}.topic.m5oc")
     with topic.open() as f:
         topic = json.load(f)

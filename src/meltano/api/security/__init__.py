@@ -1,7 +1,8 @@
 from functools import wraps
-from flask import request, redirect, jsonify
-from flask_login import current_user, login_user
+from flask import current_app, request, redirect, jsonify
+from flask_login import current_user
 from flask_security import Security
+from flask_security.utils import login_user
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
@@ -10,7 +11,7 @@ from flask_jwt_extended import (
     verify_jwt_refresh_token_in_request
 )
 from flask_jwt_extended import JWTManager
-from flask_principal import identity_loaded
+from flask_principal import identity_loaded, Identity
 
 from .identity import users, FreeUser, create_dev_user
 from .forms import MeltanoLoginForm, MeltanoRegisterFrom, MeltanoConfirmRegisterForm
@@ -41,7 +42,8 @@ def setup_security(app, project):
     @jwt.user_loader_callback_loader
     def jwt_user_load(identity):
         user = users.find_user(id=identity["id"])
-        login_user(user)
+        login_user(user) # sets `flask_security` current_user
+        # identity_loaded.send(current_app._get_current_object(), identity=Identity(user.id))
 
         return user
 

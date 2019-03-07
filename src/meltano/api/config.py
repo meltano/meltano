@@ -5,7 +5,7 @@ load_dotenv()
 
 # Flask
 # -----------------
-THREADS_PER_PAGE = 2
+THREADS_PER_PAGE = 1
 PROFILE = os.getenv("FLASK_PROFILE", False) in ("True", "true", "1")
 
 # Change this value in production
