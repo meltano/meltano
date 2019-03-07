@@ -21,15 +21,15 @@ SEED_ROLES = [
 
 SEED_USERS = [
     {
-        "username": "regular",
-        "email": "regular@meltano.com",
+        "username": "rob",
+        "email": "rob@meltano.com",
         "password": "meltano",
         "confirmed_at": date(2000, 1, 1),
         "_roles": {"regular"},
     },
     {
-        "username": "admin",
-        "email": "admin@meltano.com",
+        "username": "alice",
+        "email": "alice@meltano.com",
         "password": "meltano",
         "confirmed_at": date(2000, 1, 1),
         "_roles": {"admin"},
