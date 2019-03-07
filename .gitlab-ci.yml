@@ -46,6 +46,7 @@ docs:
     - cd docs
     - yarn
     - yarn build:docs
+    - tar -zcvf $SSH_BACKUP_DIRECTORY-$(date -u -Iminutes).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY
     - ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
     - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
   only:
