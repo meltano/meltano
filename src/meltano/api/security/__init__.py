@@ -31,7 +31,9 @@ def setup_security(app, project):
         "confirm_register_form": MeltanoConfirmRegisterForm,
     }
 
-    if app.env == "development":
+    if not app.config["MELTANO_AUTHENTICATION"]:
+        # the FreeUser is free to do everything and has all
+        # roles and permissions automatically.
         options["anonymous_user"] = FreeUser
 
     security.init_app(app, users, **options)
@@ -44,7 +46,6 @@ def setup_security(app, project):
     def jwt_user_load(identity):
         user = users.find_user(id=identity["id"])
         login_user(user)  # sets `flask_security` current_user
-        # identity_loaded.send(current_app._get_current_object(), identity=Identity(user.id))
 
         return user
 

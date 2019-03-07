@@ -1,23 +1,5 @@
 <template>
   <section class="section">
-    <article class="message is-warning">
-      <div class="message-header">
-        <p>
-          <span>
-            <font-awesome-icon icon="exclamation-triangle"/>
-          </span>
-          Warning &mdash; Experimental feature
-        </p>
-      </div>
-      <div class="message-body">
-        <p class="has-text-weight-semibold">Permissions are not yet enforced.</p>
-        <p>
-          This is a demo of the role-based access control (RBAC) we are planning to build.
-          Please let us know what would be of interest to you on this <a href="https://gitlab.com/meltano/meltano/issues/370">issue</a>.
-        </p>
-      </div>
-    </article>
-
     <h1 class="title is-2">Users</h1>
 
     <div class="segment">

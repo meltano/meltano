@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import axios from 'axios';
 import { Service } from 'axios-middleware';
+import jwtDecode from 'jwt-decode';
 
 
 export class AuthMiddleware {
@@ -110,14 +111,23 @@ class AuthHandler {
   }
 
   authenticated() {
-    return this.authToken !== undefined
-        && this.refreshToken !== undefined;
+    return this.authToken && this.refreshToken;
   }
 
   ensureAuthenticated() {
     if (!this.authenticated()) {
       window.location.href = 'http://localhost:5000/auth/bootstrap';
     }
+  }
+
+  get user() {
+    const jwt = jwtDecode(this.tokens.auth);
+
+    if (jwt.identity.id === null) {
+      return null;
+    }
+
+    return jwt.identity;
   }
 }
 

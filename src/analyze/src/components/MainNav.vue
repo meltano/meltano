@@ -51,10 +51,10 @@
 
       </div>
       <div class="navbar-end">
-        <div v-if="$auth.authenticated()"
+        <div v-if="$auth.user"
              class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
-            <Profile />
+            @{{ $auth.user.username }}
           </div>
           <div class="navbar-dropdown is-boxed">
             <a class="navbar-item navbar-child"

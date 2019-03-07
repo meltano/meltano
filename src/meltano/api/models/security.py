@@ -66,7 +66,10 @@ class Role(db.Model, RoleMixin):
         return self.name == other
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.name)
+
+    def __repr__(self):
+        return f"<Role({self.name})>"
 
     def canonical(self, _scopes):
         return self.name

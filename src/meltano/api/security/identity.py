@@ -37,11 +37,21 @@ SEED_USERS = [
 ]
 
 
-class FreeUser(AnonymousUser):
-    """FreeUser is free to do everything and has no limits."""
+class FreeUser():
+    """
+    FreeUser is free to do everything and has no limits.
+
+    Even though this class overrides `flask_security`'s AnonymousUser
+    it doens't inherit from AnonymousUser to bypass some type check
+    regarding the loading of the identity.
+    """
 
     def has_role(*args):
         return True
+
+    @property
+    def username(self):
+        return None
 
     @property
     def is_authenticated(self):
@@ -56,7 +66,7 @@ class FreeUser(AnonymousUser):
         return self.get_id()
 
     def get_id(self):
-        return -1
+        return None
 
     @property
     def roles(self):
