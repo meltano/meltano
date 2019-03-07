@@ -95,8 +95,9 @@ def gitlab_token_identity(token):
     except NoResultFound:
         identity = OAuth.from_token("gitlab", client.user.id, token)
 
-    if (current_user.is_authenticated and not
-        isinstance(current_user._get_current_object(), FreeUser)):
+    if current_user.is_authenticated and not isinstance(
+        current_user._get_current_object(), FreeUser
+    ):
         # map the identity to the current_user
         identity.user = current_user
         db.session.add(identity)

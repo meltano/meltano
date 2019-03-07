@@ -200,5 +200,7 @@ class RolePermissionsResource(Resource):
 
 
 settingsApi.add_resource(AclResource, "/acl")
-settingsApi.add_resource(RolePermissionsResource, "/acl/roles/permissions", endpoint="role_permissions")
+settingsApi.add_resource(
+    RolePermissionsResource, "/acl/roles/permissions", endpoint="role_permissions"
+)
 settingsApi.add_resource(RolesResource, "/acl/roles", endpoint="roles")

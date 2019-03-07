@@ -23,9 +23,7 @@ def gitlab_client():
 
 class TestSecurity:
     @pytest.mark.parametrize(
-        "authentication,current_user_cls",
-        [(False, FreeUser),
-         (True, AnonymousUser)],
+        "authentication,current_user_cls", [(False, FreeUser), (True, AnonymousUser)]
     )
     def test_auth_mode(self, monkeypatch, create_app, authentication, current_user_cls):
         app = create_app(MELTANO_AUTHENTICATION=authentication)
