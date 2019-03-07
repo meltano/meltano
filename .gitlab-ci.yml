@@ -8,10 +8,10 @@ include:
 stages:
   - lint
   - test
+  - docs
   - build_base
   - build
   - publish
-  - docs
   - review
   # - production
 
