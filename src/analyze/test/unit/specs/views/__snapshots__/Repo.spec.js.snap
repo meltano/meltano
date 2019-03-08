@@ -75,7 +75,7 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"
@@ -169,7 +169,7 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
          
         <div>
           <div
-            class="has-background-white"
+            class="js-markdown-preview has-background-white"
           >
             <h1>
               Title
@@ -275,7 +275,7 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
 </div>
 `;
 
-exports[`Repo.vue renders the dashboard list when dashboards exist 1`] = `
+exports[`Repo.vue renders the dashboard list when dashboards exist and calls getFile() when a dashboard is clicked 1`] = `
 <div
   class="columns is-gapless"
 >
@@ -357,7 +357,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist 1`] = `
                 class="column"
               >
                 <a
-                  class=""
+                  class="js-dashboards-some"
                 >
                   
                   Some
@@ -394,7 +394,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"
@@ -412,7 +412,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist 1`] = `
 </div>
 `;
 
-exports[`Repo.vue renders the document list when documents exist 1`] = `
+exports[`Repo.vue renders the document list when documents exist and calls getFile() when a document is clicked 1`] = `
 <div
   class="columns is-gapless"
 >
@@ -494,10 +494,10 @@ exports[`Repo.vue renders the document list when documents exist 1`] = `
                 class="column"
               >
                 <a
-                  class=""
+                  class="js-documents-readme"
                 >
                   
-                  README.md
+                  README
                 
                 </a>
               </div>
@@ -520,7 +520,7 @@ exports[`Repo.vue renders the document list when documents exist 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"
@@ -538,7 +538,7 @@ exports[`Repo.vue renders the document list when documents exist 1`] = `
 </div>
 `;
 
-exports[`Repo.vue renders the report list when reports exist 1`] = `
+exports[`Repo.vue renders the report list when reports exist and calls getFile() when a report is clicked 1`] = `
 <div
   class="columns is-gapless"
 >
@@ -620,7 +620,7 @@ exports[`Repo.vue renders the report list when reports exist 1`] = `
                 class="column"
               >
                 <a
-                  class=""
+                  class="js-reports-some"
                 >
                   
                   Some
@@ -657,7 +657,7 @@ exports[`Repo.vue renders the report list when reports exist 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"
@@ -675,7 +675,7 @@ exports[`Repo.vue renders the report list when reports exist 1`] = `
 </div>
 `;
 
-exports[`Repo.vue renders the table list when tables exist 1`] = `
+exports[`Repo.vue renders the table list when tables exist and calls getFile() when a table is clicked 1`] = `
 <div
   class="columns is-gapless"
 >
@@ -757,7 +757,7 @@ exports[`Repo.vue renders the table list when tables exist 1`] = `
                 class="column"
               >
                 <a
-                  class=""
+                  class="js-tables-episodes"
                 >
                   
                   episodes
@@ -783,7 +783,7 @@ exports[`Repo.vue renders the table list when tables exist 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"
@@ -801,7 +801,7 @@ exports[`Repo.vue renders the table list when tables exist 1`] = `
 </div>
 `;
 
-exports[`Repo.vue renders the topic list when topics exist 1`] = `
+exports[`Repo.vue renders the topic list when topics exist and calls getFile() when a topic is clicked 1`] = `
 <div
   class="columns is-gapless"
 >
@@ -883,7 +883,7 @@ exports[`Repo.vue renders the topic list when topics exist 1`] = `
                 class="column"
               >
                 <a
-                  class="is-active"
+                  class="is-active js-topics-carbon"
                 >
                   
                   carbon
@@ -909,7 +909,7 @@ exports[`Repo.vue renders the topic list when topics exist 1`] = `
         <!---->
          
         <div
-          class="is-paddingless code-container"
+          class="js-code-preview is-paddingless code-container"
         >
           <div
             class="has-background-white"

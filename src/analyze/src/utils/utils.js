@@ -44,14 +44,14 @@ export default {
   },
 
   // String Utils
-  capitalize: (value) => {
+  capitalize(value) {
     if (!value) {
       return '';
     }
     const capMe = value.toString();
     return capMe.charAt(0).toUpperCase() + capMe.slice(1);
   },
-  hyphenate: (value, prepend) => {
+  hyphenate(value, prepend) {
     if (!value) {
       return '';
     }
@@ -59,14 +59,20 @@ export default {
     hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-');
     return hyphenateMe;
   },
-  pretty: (value) => {
+  jsDashify(type, name) {
+    if (!type || !name) {
+      return '';
+    }
+    return this.hyphenate(name, `js-${type.toLowerCase()}`);
+  },
+  pretty(value) {
     try {
       return JSON.stringify(JSON.parse(value), null, 2);
     } catch (e) {
       return value;
     }
   },
-  singularize: (value) => {
+  singularize(value) {
     if (!value) {
       return '';
     }

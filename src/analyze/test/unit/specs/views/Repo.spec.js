@@ -15,6 +15,7 @@ describe('Repo.vue', () => {
     state = repos.state;
     actions = {
       getRepo: jest.fn(),
+      getFile: jest.fn(),
       sync: jest.fn(),
     };
     store = new Vuex.Store({
@@ -57,7 +58,7 @@ describe('Repo.vue', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('renders the dashboard list when dashboards exist', () => {
+  it('renders the dashboard list when dashboards exist and calls getFile() when a dashboard is clicked', () => {
     state.files = {
       dashboards: {
         label: 'Dashboards',
@@ -76,16 +77,20 @@ describe('Repo.vue', () => {
     const wrapper = mount(Repo, { store, localVue });
 
     expect(wrapper.element).toMatchSnapshot();
+
+    wrapper.find('.js-dashboards-some').trigger('click');
+
+    expect(actions.getFile).toHaveBeenCalled();
   });
 
-  it('renders the document list when documents exist', () => {
+  it('renders the document list when documents exist and calls getFile() when a document is clicked', () => {
     state.files = {
       documents: {
         label: 'Documents',
         items: [{
           createdAt: 1551990614.693281,
           id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OFVTWS5DGNRUXQL2SIVAUITKFFZWWI===',
-          name: 'README.md',
+          name: 'README',
           path: 'README.md',
           slug: 'readme-md',
         }],
@@ -94,9 +99,13 @@ describe('Repo.vue', () => {
     const wrapper = mount(Repo, { store, localVue });
 
     expect(wrapper.element).toMatchSnapshot();
+
+    wrapper.find('.js-documents-readme').trigger('click');
+
+    expect(actions.getFile).toHaveBeenCalled();
   });
 
-  it('renders the report list when reports exist', () => {
+  it('renders the report list when reports exist and calls getFile() when a report is clicked', () => {
     state.files = {
       reports: {
         label: 'Reports',
@@ -117,9 +126,13 @@ describe('Repo.vue', () => {
     const wrapper = mount(Repo, { store, localVue });
 
     expect(wrapper.element).toMatchSnapshot();
+
+    wrapper.find('.js-reports-some').trigger('click');
+
+    expect(actions.getFile).toHaveBeenCalled();
   });
 
-  it('renders the table list when tables exist', () => {
+  it('renders the table list when tables exist and calls getFile() when a table is clicked', () => {
     state.files = {
       tables: {
         label: 'Tables',
@@ -135,9 +148,13 @@ describe('Repo.vue', () => {
     const wrapper = mount(Repo, { store, localVue });
 
     expect(wrapper.element).toMatchSnapshot();
+
+    wrapper.find('.js-tables-episodes').trigger('click');
+
+    expect(actions.getFile).toHaveBeenCalled();
   });
 
-  it('renders the topic list when topics exist', () => {
+  it('renders the topic list when topics exist and calls getFile() when a topic is clicked', () => {
     state.files = {
       topics: {
         label: 'Topics',
@@ -153,5 +170,9 @@ describe('Repo.vue', () => {
     const wrapper = mount(Repo, { store, localVue });
 
     expect(wrapper.element).toMatchSnapshot();
+
+    wrapper.find('.js-topics-carbon').trigger('click');
+
+    expect(actions.getFile).toHaveBeenCalled();
   });
 });
