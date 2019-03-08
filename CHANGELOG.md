@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add Salesforce Tutorial to the docs
 * Add documentation for the permissions command
 * Add tracking for the `meltano ui` command
+* Add MAU tracking links to Roadmap section of the docs
 
 ### Changes
 
