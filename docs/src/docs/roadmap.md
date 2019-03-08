@@ -14,11 +14,13 @@ For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano
 
 We track the Monthly Active Users (MAU) of three things:
 
-1. Website
-2. CLI
-3. UI
+1. [Website](https://meltano.com)
+2. [CLI](https://meltano.com/docs/meltano-cli.html)
+3. [UI](https://meltano.com/docs/architecture.html#meltano-ui)
 
 The MAU of the UI are called MAUI, this is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
+
+(internal [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/))
 
 ## Focus
 
