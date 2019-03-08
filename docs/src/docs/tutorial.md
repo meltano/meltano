@@ -125,7 +125,7 @@ export SFDC_PASSWORD=''
 export SFDC_SECURITY_TOKEN=''
 export SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-04-01T00:00:00Z'
+export SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
 You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences. 
@@ -165,7 +165,7 @@ meltano elt tap-salesforce target-postgres --transform run
 
 Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `SFDC_START_DATE` not too far in the past for your first test.
 
-You could also extract and load the data and then run the transformations at a later point. Please see example below:
+You could also extract and load the data and then run the transformations at a later point (examples below):
 
 ```bash
 # Only run the Extract and Load steps
