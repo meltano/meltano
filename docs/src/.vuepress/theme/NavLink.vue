@@ -2,7 +2,7 @@
   <router-link
     class="nav-link"
     :to="link"
-    v-if="!isExternal(link)"
+    v-if="!isExternal(link) || item.disableIcon"
     :exact="exact"
   >{{ item.text }}</router-link>
   <a
