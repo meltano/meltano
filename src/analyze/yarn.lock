@@ -134,6 +134,18 @@
   resolved "https://registry.yarnpkg.com/@fortawesome/vue-fontawesome/-/vue-fontawesome-0.1.0.tgz#ff45bb6efe2f585f5faebf174a10b1887c06547b"
   integrity sha512-FBbNA1ymu46UDjfbzMmVWhEeTineUiWHoU1WTsauodC9tQRj96/d0gBUQl3UkM3wMJ18jMq2H5+nXCuNq0SsZw==
 
+"@types/jest-diff@*":
+  version "20.0.1"
+  resolved "https://registry.yarnpkg.com/@types/jest-diff/-/jest-diff-20.0.1.tgz#35cc15b9c4f30a18ef21852e255fdb02f6d59b89"
+  integrity sha512-yALhelO3i0hqZwhjtcr6dYyaLoCHbAMshwtj6cGxTvHZAKXHsYGdff6E8EPw3xLKY0ELUTQ69Q1rQiJENnccMA==
+
+"@types/jest@^24.0.9":
+  version "24.0.9"
+  resolved "https://registry.yarnpkg.com/@types/jest/-/jest-24.0.9.tgz#74ce9cf337f25e189aa18f76ab3d65e8669b55f2"
+  integrity sha512-k3OOeevcBYLR5pdsOv5g3OP94h3mrJmLPHFEPWgbbVy2tGv0TZ/TlygiC848ogXhK8NL0I5up7YYtwpCp8xCJA==
+  dependencies:
+    "@types/jest-diff" "*"
+
 "@types/strip-bom@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@types/strip-bom/-/strip-bom-3.0.0.tgz#14a8ec3956c2e81edb7520790aecf21c290aebd2"
@@ -143,6 +155,14 @@
   version "0.0.30"
   resolved "https://registry.yarnpkg.com/@types/strip-json-comments/-/strip-json-comments-0.0.30.tgz#9aa30c04db212a9a0649d6ae6fd50accc40748a1"
   integrity sha512-7NQmHra/JILCd1QqpSzl8+mJRc8ZHz3uDm8YV1Ks9IhK0epEiTw8aIErbvH9PI+6XbqhyIQy3462nEsn7UVzjQ==
+
+"@vue/test-utils@^1.0.0-beta.29":
+  version "1.0.0-beta.29"
+  resolved "https://registry.yarnpkg.com/@vue/test-utils/-/test-utils-1.0.0-beta.29.tgz#c942cf25e891cf081b6a03332b4ae1ef430726f0"
+  integrity sha512-yX4sxEIHh4M9yAbLA/ikpEnGKMNBCnoX98xE1RwxfhQVcn0MaXNSj1Qmac+ZydTj6VBSEVukchBogXBTwc+9iA==
+  dependencies:
+    dom-event-types "^1.0.0"
+    lodash "^4.17.4"
 
 abab@^1.0.4:
   version "1.0.4"
@@ -2733,6 +2753,11 @@ dom-converter@~0.1:
   integrity sha1-pF71cnuJDJv/5tfIduexnLDhfzs=
   dependencies:
     utila "~0.3"
+
+dom-event-types@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/dom-event-types/-/dom-event-types-1.0.0.tgz#5830a0a29e1bf837fe50a70cd80a597232813cae"
+  integrity sha512-2G2Vwi2zXTHBGqXHsJ4+ak/iP0N8Ar+G8a7LiD2oup5o4sQWytwqqrZu/O6hIMV0KMID2PL69OhpshLO0n7UJQ==
 
 dom-serializer@0:
   version "0.1.0"

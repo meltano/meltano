@@ -12,11 +12,13 @@ First time using Meltano? No worries. We got you covered with tutorials that wil
 
 This tutorial is perfect if your goal is to get Meltano up and running as quickly as possible.
 
-For this tutorial, we will be working with the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) which is free and does not require any authentication.
+For this tutorial, we will be working with the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) because it is:
+- free to access
+- does not require authentication
 
 ### Initialize Your Project
 
-To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
 
 ```bash
 # Initialize a new project with a folder called carbon
@@ -44,7 +46,7 @@ Now that your data is ready to be analyzed, it's time to start up the web app! G
 $ meltano ui
 ```
 
-This will start a local web server at [http://localhost:5000](http://localhost:5000). 
+This will start a local web server at [http://localhost:5000](http://localhost:5000).
 
 When you visit the URL, you should see:
 
@@ -79,7 +81,7 @@ This is an advanced tutorial on how to extract data from your Salesforce account
 
 ### Prerequisites
 
-You have successfully installed Meltano by following the instructions in the [Installation](/docs/installation.html) section. Please note you should have already installed and started Docker. 
+You have successfully installed Meltano by following the instructions in the [Installation](/docs/installation.html) section. Please note you should have already installed and started Docker.
 
 ### Initialize Your Project
 
@@ -87,7 +89,7 @@ To get started, navigate to a directory, in your terminal, where you want your M
 
 ```bash
 # Initialize a new project with a folder called sfdc-project
-meltano init sfdc-project 
+meltano init sfdc-project
 
 # Change directory into your new sfdc-project project
 cd sfdc-project
@@ -128,7 +130,7 @@ export SFDC_CLIENT_ID='secret_client_id'
 export SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
-You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences. 
+You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
 
 Finally, make the credentials available to Meltano by executing the following command in your terminal:
 
