@@ -71,6 +71,8 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import capitalize from '@/filters/capitalize';
+import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
 
 export default {
@@ -94,12 +96,8 @@ export default {
     };
   },
   filters: {
-    printable(value) {
-      return value.label ? value.label : value.name;
-    },
-    underscoreToSpace(value) {
-      return value.replace(/_/g, ' ');
-    },
+    capitalize,
+    underscoreToSpace,
   },
   computed: {
     ...mapState('repos', [
