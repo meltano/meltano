@@ -64,16 +64,20 @@
             <li v-for="file in value.items" :key="file.abs">
               <div class="columns is-vcentered">
                 <div class="column">
-                  <a :class="{'is-active': isActive(file)}"
-                      @click.prevent='getFile(file)'>
+                  <a
+                    :class="[
+                      {'is-active': isActive(file)},
+                      jsDashify(value.label, file.name)
+                    ]"
+                    @click.prevent='getFile(file)'>
                     {{file.name}}
                   </a>
                 </div>
                 <div v-if='isDeepRoutable(key)' class='column is-one-fifth'>
                   <router-link :to="getDeepRoute(key, file)"
                                 class="button is-secondary is-light is-small is-pulled-right">
-                      <!-- TODO temporary icon, find better solution -->
-                      <font-awesome-icon icon="arrow-right"/>
+                    <!-- TODO temporary icon, find better solution -->
+                    <font-awesome-icon icon="arrow-right"/>
                   </router-link>
                 </div>
               </div>
@@ -98,9 +102,9 @@
         </div>
       </div>
       <div v-if="hasMarkdown">
-        <div class="has-background-white" v-html="activeView.file"></div>
+        <div class="js-markdown-preview has-background-white" v-html="activeView.file"></div>
       </div>
-      <div class="is-paddingless code-container" v-else-if="hasCode">
+      <div class="js-code-preview is-paddingless code-container" v-else-if="hasCode">
         <div class="has-background-white">
           <pre>{{activeView.file | pretty}}</pre>
         </div>
@@ -148,6 +152,9 @@ export default {
   methods: {
     getRepo() {
       this.$store.dispatch('repos/getRepo');
+    },
+    jsDashify(type, name) {
+      return utils.jsDashify(type, name);
     },
     isActive(f) {
       return f.id === this.activeView.id;
