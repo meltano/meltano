@@ -9,16 +9,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Add Salesforce Tutorial to the docs
-* Add documentation for the permissions command
-* Add tracking for the `meltano ui` command
 
 ### Changes
 
 ### Fixes
-* Updated analytics to properly recognize SPA route changes as pageview changes
 
 ### Breaks
+
+
+## 0.15.0 - (2019-03-11)
+---
+
+### New
+* Add Salesforce Tutorial to the docs
+* Add documentation for the permissions command
+* Add tracking for the `meltano ui` command
+
+
+### Fixes
+* Updated analytics to properly recognize SPA route changes as pageview changes
 
 
 ## 0.14.0 - (2019-03-04)
