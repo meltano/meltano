@@ -28,8 +28,13 @@
     </div>
 
     <div slot='right'>
-      <h1><strong>{{activeDashboard.name}}</strong></h1>
-      <div v-for="report in activeDashboardReports" :key="report.id">
+      <h1>{{activeDashboard.name}}</h1>
+      <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
+      <hr v-if="activeDashboardReports.length">
+      <div
+        class='box'
+        v-for="report in activeDashboardReports"
+        :key="report.id">
         <p>{{report.name}}</p>
         <chart :chart-type='report.chartType'
                 :results='report.queryResults'
