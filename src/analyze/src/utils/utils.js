@@ -98,4 +98,7 @@ export default {
     }
     return string;
   },
+  underscoreToSpace(value) {
+    return value.replace(/_/g, ' ');
+  },
 };

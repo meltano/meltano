@@ -54,18 +54,6 @@ new Vue({
   render: h => h(App),
 });
 
-Vue.filter('capitalize', (value) => {
-  if (!value) {
-    return '';
-  }
-  let newVal = value;
-  newVal = newVal.toString();
-  return newVal.charAt(0).toUpperCase() + newVal.slice(1);
-});
-
-Vue.filter('camelToRegular', value => value.replace(/([A-Z])/g, ' $1'));
-Vue.filter('underscoreToSpace', value => value.replace(/_/g, ' '));
-
 // Analytics SPA route change hook (no initial ping as the gtag init step does this automatically)
 router.afterEach((to) => {
   if (window.gtag) {
