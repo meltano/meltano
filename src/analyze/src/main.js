@@ -65,3 +65,13 @@ Vue.filter('capitalize', (value) => {
 
 Vue.filter('camelToRegular', value => value.replace(/([A-Z])/g, ' $1'));
 Vue.filter('underscoreToSpace', value => value.replace(/_/g, ' '));
+
+// Analytics SPA route change hook (no initial ping as the gtag init step does this automatically)
+router.afterEach((to) => {
+  if (window.gtag) {
+    window.gtag('config', 'UA-132758957-2', {
+      page_title: to.name,
+      page_path: to.path,
+    });
+  }
+});
