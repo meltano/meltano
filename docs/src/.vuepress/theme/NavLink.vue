@@ -6,6 +6,13 @@
     :exact="exact"
   >{{ item.text }}</router-link>
   <a
+    v-else-if="item.disableIcon"
+    :href="link"
+    class="nav-link external"
+  >
+    {{ item.text }}
+  </a>
+  <a
     v-else
     :href="link"
     class="nav-link external"

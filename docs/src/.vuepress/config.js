@@ -37,6 +37,7 @@ module.exports = {
 		nav: [
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
+			{ text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
 			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {
