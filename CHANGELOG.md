@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * locks down depdencies for issues with sqlalchemy snowflake connector
+* fix the API database being mislocated per default
 
 ### Breaks
 
