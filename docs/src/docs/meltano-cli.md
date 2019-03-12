@@ -44,15 +44,17 @@ send_anonymous_usage_stats: false
 
 ## Version
 
-In the event you want to check what version of Meltano you are using, we have provided the following options for you:
+To check which version of Meltano you are using, run the following command:
 
 ```bash
 meltano --version
-
-meltano -v
 ```
 
-Once you run any of those commands, you should see a version number output in your terminal.
+To update Meltano to the latest version, run the following command in your terminal:
+
+```bash
+pip install --upgrade meltano
+```
 
 ## meltano select
 
