@@ -13,9 +13,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-* locks down depdencies for issues with sqlalchemy snowflake connector
 
 ### Breaks
+
+
+## 0.15.1 - (2019-03-12)
+---
+
+### Fixes
+* locks down depdencies for issues with sqlalchemy snowflake connector
 
 
 ## 0.15.0 - (2019-03-11)
