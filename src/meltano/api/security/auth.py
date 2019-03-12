@@ -9,6 +9,7 @@ from flask_jwt_extended import jwt_required
 from flask_principal import Permission, Need
 from werkzeug.exceptions import Forbidden
 from .identity import FreeUser
+from meltano.api.models import db
 
 
 class ResourcePermission(Permission):
@@ -63,8 +64,14 @@ def api_auth_required(f):
 
         session_user = current_user._get_current_object()
         if isinstance(session_user, FreeUser):
+            logging.debug(f"Authentication bypassed`")
             return f()
 
+        if session_user.is_authenticated:
+            logging.debug(f"@{session_user.username} authenticated via `session`")
+            return f()
+
+        logging.debug("JWT authentication pending")
         return auth_decorated()
 
     return decorated
@@ -85,6 +92,12 @@ def _identity_loaded_hook(sender, identity):
     This hook will add the specific Permission
     to the current identity.
     """
+
+    # something weird is going on here when testing
+    # SQLAlchemy complains about the roles not being
+    # in a session.
+    for role in current_user.roles:
+        db.session.add(role)
 
     # each permission is a Need(permission_type, context),
     # i.e. ("view", "finance.*", "design")
