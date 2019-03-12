@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* locks down depdencies for issues with sqlalchemy snowflake connector
 
 ### Breaks
 
