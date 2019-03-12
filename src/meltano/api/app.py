@@ -23,11 +23,12 @@ logger = logging.getLogger(__name__)
 
 
 def create_app(config={}):
+    project = Project.find()
+
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
     app.config.update(**config)
-
-    project = Project.find()
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{project.root.joinpath('meltano.db')}"
 
     # Initial compilation
     compiler = ProjectCompiler(project)
