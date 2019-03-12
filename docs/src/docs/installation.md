@@ -58,3 +58,12 @@ Usage: meltano [OPTIONS] COMMAND [ARGS]
 ```
 
 That's it! Meltano should now be available in your local environment.
+
+### Troubleshooting: Getting the Latest Version
+
+To update Meltano to the latest version, run the following command in your terminal:
+
+```
+pip install --upgrade meltano
+```
+
