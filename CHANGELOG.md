@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* fix the API database being mislocated per default
 
 ### Breaks
 
