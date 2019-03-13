@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* Add support for extracting data from Gitlab through the updated tap-gitlab 
 
 ### Changes
 
