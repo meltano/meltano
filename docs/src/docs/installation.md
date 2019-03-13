@@ -58,3 +58,7 @@ See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more informa
 :::
 
 That's it! Meltano should now be available in your local environment.
+
+## Troubleshooting
+
+Are you having installation problems? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=).
