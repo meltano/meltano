@@ -2,7 +2,11 @@ extractors:
   - name: tap-gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
-      api_key: "$GITLAB_API_TOKEN"
+      api_url: "https://gitlab.com/api/v4"
+      private_token: "$GITLAB_API_TOKEN"
+      groups: "$GITLAB_API_GROUPS"
+      projects: "$GITLAB_API_PROJECTS"
+      start_date: "$GITLAB_API_START_DATE"
   - name: tap-zendesk
     pip_url: "tap-zendesk"
     config:
