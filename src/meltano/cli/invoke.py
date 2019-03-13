@@ -13,16 +13,14 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
 def invoke(project, plugin_name, plugin_args):
-    config_service = ConfigService(project)
-
-    plugin = next(
-        plugin for plugin in config_service.plugins() if plugin.name == plugin_name
-    )
-
-    service = PluginInvoker(project, plugin)
-    handle = service.invoke(*plugin_args)
-
     try:
+        config_service = ConfigService(project)
+        plugin = config_service.get_plugin(plugin_name)
+        import pdb; pdb.set_trace()
+
+        service = PluginInvoker(project, plugin)
+        handle = service.invoke(*plugin_args)
+
         exit_code = handle.wait()
 
         tracker = GoogleAnalyticsTracker(project)

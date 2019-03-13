@@ -11,9 +11,12 @@ from meltano.core.project_add_service import (
     PluginNotSupportedException,
     PluginAlreadyAddedException,
 )
+from meltano.core.project_add_custom_service import (
+    ProjectAddCustomService,
+)
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.transform_add_service import TransformAddService
@@ -22,12 +25,21 @@ from meltano.core.error import SubprocessError
 
 
 @cli.group()
-def add():
-    pass
+@project
+@click.pass_context
+@click.option("--custom", is_flag=True)
+def add(ctx, project, custom):
+    if custom:
+        if ctx.invoked_subcommand in ("transformer", "transform"):
+            click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
+            raise click.Abort()
+
+        ctx.obj["add_service"] = ProjectAddCustomService(project)
+    else:
+        ctx.obj["add_service"] = ProjectAddService(project)
 
 
 @add.command()
-@project
 @click.option("--name", prompt="Database connection name")
 @click.option("--host", prompt="Database host")
 @click.option("--database", prompt="Database database")
@@ -51,9 +63,14 @@ def database(project, name, host, database, schema, username, password):
 
 @add.command()
 @project
+@click.pass_context
 @click.argument("plugin_name")
-def extractor(project, plugin_name):
-    add_plugin(project, PluginType.EXTRACTORS, plugin_name)
+def extractor(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"],
+               project,
+               PluginType.EXTRACTORS,
+               plugin_name,
+               verbosity=ctx.obj["verbosity"])
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
@@ -71,9 +88,14 @@ def model(project, plugin_name):
 
 @add.command()
 @project
+@click.pass_context
 @click.argument("plugin_name")
-def loader(project, plugin_name):
-    add_plugin(project, PluginType.LOADERS, plugin_name)
+def loader(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"],
+               project,
+               PluginType.LOADERS,
+               plugin_name,
+               verbosity=ctx.obj["verbosity"])
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
@@ -81,9 +103,14 @@ def loader(project, plugin_name):
 
 @add.command()
 @project
+@click.pass_context
 @click.argument("plugin_name")
 def transformer(project, plugin_name):
-    add_plugin(project, PluginType.TRANSFORMERS, plugin_name)
+    add_plugin(ctx.obj["add_service"],
+               project,
+               PluginType.TRANSFORMERS,
+               plugin_name,
+               verbosity=ctx.obj["verbosity"])
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
@@ -99,9 +126,12 @@ def transform(project, plugin_name):
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
 
 
-def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
+def add_plugin(add_service,
+               project: Project,
+               plugin_type: PluginType,
+               plugin_name: str,
+               verbosity=0):
     try:
-        add_service = ProjectAddService(project)
         plugin = add_service.add(plugin_type, plugin_name)
         click.secho(f"Added '{plugin_name}' to your Meltano project.")
     except PluginAlreadyAddedException as err:
