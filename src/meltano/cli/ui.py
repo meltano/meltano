@@ -11,15 +11,17 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 @cli.command()
 @project
 @click.option("--debug/--no-debug", default=True, help="Run webserver in debug mode")
-@click.option("--port",
-              default=5000,
-              help="Port to run webserver on",
-              envvar="MELTANO_API_PORT",
-              type=int)
+@click.option(
+    "--port",
+    default=5000,
+    help="Port to run webserver on",
+    envvar="MELTANO_API_PORT",
+    type=int,
+)
 @click.option(
     "--reload/--no-reload",
     default=True,
-    help="To reload the server or not on file changes"
+    help="To reload the server or not on file changes",
 )
 @click.option(
     "--hostname",
