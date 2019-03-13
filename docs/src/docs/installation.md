@@ -62,6 +62,25 @@ Usage: meltano [OPTIONS] COMMAND [ARGS]
 
 That's it! Meltano is now be available in the virtual environment we setup. Now, we can [create a Meltano project](/docs/tutorial.html).
 
+## Using Docker
+
+Meltano provides the (meltano/meltano)[http://dockerhub.com/meltano/meltano] docker image ready to use.
+
+> Note: The **meltano/meltano** docker image is also available in the GitLab's registry: `registry.gitlab.com`
+
+This image contains everything you need to get started with Meltano.
+
+```
+# to download or update to the latest version
+$ docker pull meltano/meltano
+
+# to look the currently installed version
+$ docker run meltano/meltano --version
+meltano, version …
+```
+
+Please refer to the [docker tutorial](docs/tutorial.html#using-docker) for more details.
+
 ## Troubleshooting
 
 ### Getting the Latest Version

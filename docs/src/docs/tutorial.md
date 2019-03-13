@@ -212,6 +212,55 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
+## Using Docker
+
+It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
+
+> This tutorial is inspired of the [Starter tutorial](#starter) but with Meltano running inside a Docker container.
+
+We will use `docker run` to execute Meltano using the pre-built docker images.
+
+### Create your project
+
+First things first, let's create a new Meltano project named **carbon**.
+
+```
+$ docker run -v $(pwd):/projects \
+             -w /projects \
+             meltano/meltano init carbon
+```
+
+Then you can `cd` into your new project:
+
+```
+$ cd carbon
+```
+
+### Run the ELT
+
+Now let's extract some data from the **tap-carbon-intensity** into **target-sqlite**:
+
+```
+$ docker run -v $(pwd):/project \
+             -w /project \
+             meltano/meltano elt tap-carbon-intensity target-sqlite
+```
+
+### Open the UI
+
+Now that we have data in our database, let's open the Meltano UI to explore it.
+
+```
+# `ui` is the default command, we can omit it.
+$ docker run -v $(pwd):/project \
+             -w /project \
+             -p 5000:5000 \
+             meltano/meltano
+```
+
+You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
+
+For furter analysis, please head to the [Analyze](#analyze) section.
 
 ## Advanced
 
