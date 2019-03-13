@@ -7,7 +7,7 @@ Before you get started, there are a couple of things your environment needs:
 - [Git](https://git-scm.com/)
 - [Docker](https://www.docker.com/get-started)
 - [Python 3.6.1](https://realpython.com/installing-python/)
-- [pip](https://pypi.org/project/pip/)
+- [pip](https://pip.pypa.io/en/stable/installing/)
 
 ::: warning
 If you want to install Meltano in a virtual environment `virtualenv` and `pipenv` are not supported. Python 3 has built-in support for [virtual environments](https://docs.python.org/3/tutorial/venv.html) (see `venv`).
