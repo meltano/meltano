@@ -32,14 +32,23 @@ pip 10.0.1 from … (python 3.6)
 ```
 
 ::: tip
-If `pip` is not working, try `pip3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
+If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
 :::
 
 ### Installation
 
-Open your terminal in the directory where you want Meltano to live. For example `/Users/YOUR_USER_NAME/Documents/Meltano`. Then run the following command:
+Open your terminal in the directory where you want Meltano installed. For example `/Users/YOUR_USER_NAME/Documents/Meltano`.
 
+::: tip
+We highly recommend installing Meltano using Python 3's virtual environment (`venv` snippet below). Doing so prevents Meltano's dependencies from clashing with current versions already installed on your machine.
+
+See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
+:::
+
+Then run the following commands:
 ```
+$ python -m venv venv
+
 $ pip install meltano
 ```
 
@@ -49,15 +58,7 @@ Usage: meltano [OPTIONS] COMMAND [ARGS]
     …
 ```
 
-::: tip
-If you want to install Meltano in a virtual environment `virtualenv` and `pipenv` are not supported. Python 3 has built-in support for [virtual environments](https://docs.python.org/3/tutorial/venv.html) (see `venv`).
-
-Please use `python -m venv venv` to create your virtual environment.
-
-See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
-:::
-
-That's it! Meltano should now be available in your local environment.
+That's it! Meltano should now be available in your local environment. Now, we can [create a Meltano project](/docs/tutorial.html).
 
 ## Troubleshooting
 
