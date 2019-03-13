@@ -62,6 +62,7 @@ That's it! Meltano is now be available in the virtual environment we setup. Now,
 
 ## Troubleshooting
 
+<<<<<<< HEAD
 ### Getting the Latest Version
 
 To update Meltano to the latest version, run the following command in your terminal:
@@ -71,3 +72,6 @@ pip install --upgrade meltano
 ```
 
 Are you having installation problems? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=).
+=======
+Are you having installation problems? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
+>>>>>>> updated troubleshooting link to prefill to bug template
