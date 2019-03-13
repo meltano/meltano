@@ -7,7 +7,7 @@ Meltano minimally requires:
 
 Meltano conditionally requires:
 - [Git](https://git-scm.com/) (if you want to version control your Meltano projects)
-- [Docker](https://www.docker.com/get-started) (if you want to use databases other than SQLite)
+- [Docker Desktop](https://www.docker.com/get-started) (if you want to use databases other than SQLite)
 
 ## Instructions
 
@@ -58,7 +58,7 @@ Usage: meltano [OPTIONS] COMMAND [ARGS]
     …
 ```
 
-That's it! Meltano should now be available in your local environment. Now, we can [create a Meltano project](/docs/tutorial.html).
+That's it! Meltano is now be available in the virtual environment we setup. Now, we can [create a Meltano project](/docs/tutorial.html).
 
 ## Troubleshooting
 
