@@ -18,7 +18,7 @@ Let's make sure our requirements are up to date:
 #### Python
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
 
-```
+```bash
 $ python --version
 Python 3.6.1
 ```
@@ -46,13 +46,13 @@ See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more informa
 :::
 
 Then run the following commands:
-```
+```bash
 $ python -m venv venv
 
 $ pip install meltano
 ```
 
-```
+```bash
 $ meltano --help
 Usage: meltano [OPTIONS] COMMAND [ARGS]
     …
