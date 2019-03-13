@@ -50,7 +50,7 @@ This will start a local web server at [http://localhost:5000](http://localhost:5
 
 When you visit the URL, you should see:
 
-![](/screenshots/01-meltano-ui.png)
+![](/screenshots/meltano-ui-carbon-tutorial-output.png)
 
 ---
 #### Run a Simple Analysis on Your Data
