@@ -25,3 +25,4 @@ install_e2e:
     - source ./venv/bin/activate
     - pip install -e .
     - ls
+    - pwd
