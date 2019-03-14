@@ -26,7 +26,7 @@ install_e2e:
     - source ./venv/bin/activate
     - pip install -e .
     - apt-get update
-    - apt-get install nodejs
+    - apt-get -y install nodejs
     - npm install yarn
     - make bundle
     - meltano --versiong
