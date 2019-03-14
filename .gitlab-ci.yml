@@ -27,6 +27,8 @@ install_e2e:
     - pip install -e .
     - apt-get update
     - curl -sL https://deb.nodesource.com/setup_10.x | bash -
+    - apt-get -y install nodejs
+    - apt-get -y install gcc g++ make
     - node -v
     - npm -v
     - npm install yarn
