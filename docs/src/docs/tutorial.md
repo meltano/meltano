@@ -64,21 +64,9 @@ When you visit the URL, you should see:
 ![](/screenshots/01-meltano-ui.png)
 
 ---
-#### Run a Simple Analysis on Your Data
+#### Analyze
 
-Meltano uses custom data files wth the extension `.m5o` that define the structure for your data.
-
-In your project directory, you will see some examples under the `model` folder: `carbon.model.m5o`.
-
-
-
-
-Next, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
-
-- By default the Model page is loaded, same as clicking the Model button (upper-left)
-  - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
-
-Lastly, we'll query and explore the data:
+With Meltano UI up and running, we can automatically generate queries with as little as a single click and then explore the query results:
 
 - Navigate to Model > Region (Model dropdown)
 - Open Region accordion
