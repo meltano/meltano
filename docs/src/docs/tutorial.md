@@ -4,9 +4,11 @@ sidebarDepth: 2
 
 # Tutorials
 
-## Quick Start
+First time using Meltano? No worries. We have you covered with tutorials that will guide you through how Meltano works. Let's get started!
 
-First time using Meltano? No worries. We got you covered with tutorials that will guide you through how Meltano works. Let's get started!
+<TutorialTable />
+
+## Starter
 
 ### Carbon API
 
@@ -75,9 +77,9 @@ Lastly, we'll query and explore the data:
   - Click Run button to query
 - Open Charts accordion and explore the data!
 
-## Salesforce API - Postgres DB Tutorial
+## Intermediate
 
-This is an advanced tutorial on how to extract data from your Salesforce account, load the extracted entities to a Postgres DB, transform the raw data and analyze the result.
+This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the result.
 
 ### Prerequisites
 
@@ -208,7 +210,7 @@ You can now query and explore the extracted data:
 - Check the Results or Open the Charts accordion and explore the data.
 
 
-## Advanced Content
+## Advanced
 
 You can look forward to the following tutorials in the future:
 

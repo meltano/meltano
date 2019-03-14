@@ -2,7 +2,7 @@
 
 ## Requirements
 
-Meltano minimally requires:
+Meltano requires:
 - [Python 3.6.1](https://realpython.com/installing-python/)
 
 Meltano conditionally requires:
