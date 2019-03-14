@@ -17,11 +17,6 @@ stages:
   - review
   # - production
 
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 lint:
   stage: lint
   image:
