@@ -31,7 +31,7 @@ install_e2e:
     - apt-get -y install gcc g++ make
     - node -v
     - npm -v
-    - npm install yarn
+    - npm install -g yarn
     - make bundle
     - meltano --versiong
     - ls
