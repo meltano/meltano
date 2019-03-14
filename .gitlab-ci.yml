@@ -26,8 +26,7 @@ install_e2e:
     - source ./venv/bin/activate
     - pip install -e .
     - apt-get update
-    - apt-get -y install curl python-software-properties
-    - curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
     - node -v
     - npm -v
     - npm install yarn
