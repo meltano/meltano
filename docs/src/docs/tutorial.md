@@ -48,7 +48,7 @@ It extracts data from various sources like Salesforce, Zendesk, and Google Analy
 Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from it using Meltano UI with its automatic SQL generation.
 :::
 
-### Interact with Your Data in the Web App
+### Analyze with Meltano UI
 
 Now that your data is extracted and loaded, it is ready to be analyzed. Time to start up the web app! Go back into your terminal and run the following command:
 
@@ -62,6 +62,10 @@ This will start a local web server at [http://localhost:5000](http://localhost:5
 When you visit the URL, you should see:
 
 ![](/screenshots/01-meltano-ui.png)
+
+:::warning Troubleshooting
+Having issues with Meltano? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
+:::
 
 ---
 #### Analyze
