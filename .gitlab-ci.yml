@@ -24,8 +24,8 @@ install_e2e:
     - python -m venv venv
     - python --version
     - source ./venv/bin/activate
-    - meltano --version
     - pip install -e .
+    - meltano --version
     - ls
     - pwd
     - mkdir -p /home/projects
