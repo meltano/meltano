@@ -28,6 +28,8 @@ install_e2e:
     - apt-get update
     - apt-get -y install nodejs
     - apt-get -y install npm
+    - nodejs -v
+    - npm -v
     - npm install yarn
     - make bundle
     - meltano --versiong
