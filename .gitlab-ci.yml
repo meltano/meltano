@@ -33,9 +33,12 @@ install_e2e:
     - npm -v
     - npm install -g yarn
     - make bundle
-    - meltano --versiong
-    - ls
-    - pwd
+    - meltano --version
     - mkdir -p /home/projects
     - cd /home/projects
     - meltano init test_project
+    - cd test_project
+    - meltano discover all
+    - meltano add extractor tap-carbon-intensity
+    - meltano add loader target-sqlite
+    - meltano elt tap-carbon-intensity target-sqlite
