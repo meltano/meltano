@@ -23,6 +23,10 @@ install_e2e:
   script:
     - python -m venv venv
     - source ./venv/bin/activate
+    - meltano --version
     - pip install -e .
     - ls
     - pwd
+    - mkdir -p /home/projects
+    - cd /home/projects
+    - meltano init test_project
