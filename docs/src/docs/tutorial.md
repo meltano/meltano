@@ -34,11 +34,19 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Run extractior (tap) and loader (target)
+# Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
 ```
 
 Congratulations! You have just extracted all the data from the Carbon Intensity API and loaded it into your local SQLite database.
+
+:::tip
+Meltano is magical and powerful.
+
+It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
+
+Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from it using Meltano UI with its automatic SQL generation.
+:::
 
 ### Interact with Your Data in the Web App
 
