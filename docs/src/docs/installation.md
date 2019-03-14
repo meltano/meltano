@@ -40,7 +40,7 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 Open your terminal in the directory where you want Meltano installed. For example `/Users/YOUR_USER_NAME/Documents/Meltano`.
 
 ::: tip
-We highly recommend installing Meltano using Python 3's virtual environment (`venv` snippet below). Doing so prevents Meltano's dependencies from clashing with current versions already installed on your machine.
+We highly recommend installing Meltano using Python 3's virtual environment (`venv` snippet below) to isolate it from the rest of your python packages.
 
 See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
 :::
