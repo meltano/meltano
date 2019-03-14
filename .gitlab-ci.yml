@@ -6,13 +6,14 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - lint
-  - test
-  - docs
-  - build_base
-  - build
-  - publish
-  - review
+  - initial
+  # - lint
+  # - test
+  # - docs
+  # - build_base
+  # - build
+  # - publish
+  # - review
   # - production
 
 cache:
@@ -99,6 +100,15 @@ package:
   artifacts:
     paths:
       - dist
+
+install_e2e:
+  stage: initial
+  image: python 3.7
+  script:
+    - python -m venv venv
+    - source ./venv/bin/activate
+    - pip install -e .
+    - ls
 
 publish:
   image:
