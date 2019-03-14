@@ -105,3 +105,7 @@ transforms:
     pip_url: "https://gitlab.com/meltano/dbt-tap-salesforce.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-gitlab
+    pip_url: "https://gitlab.com/meltano/dbt-tap-gitlab.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
