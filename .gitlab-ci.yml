@@ -25,6 +25,9 @@ install_e2e:
     - python --version
     - source ./venv/bin/activate
     - pip install -e .
+    - apt-get update
+    - apt-get install nodejs
+    - npm install yarn
     - make bundle
     - meltano --versiong
     - ls
