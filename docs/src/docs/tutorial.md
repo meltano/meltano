@@ -12,7 +12,9 @@ First time using Meltano? No worries. We have you covered with tutorials that wi
 
 This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) (carbon emissions/footprint) and SQLite tutorial. This datasource was chosen as it is public, free, and does not require credentials to access. It guides you through data extraction from the Carbon Intensity API, loading extracted entities to a SQLite database, and analyzing the results.
 
+:::tip
 This tutorial is perfect if your goal is to get Meltano up and running as quickly as possible.
+:::
 
 ### Prerequisites
 
