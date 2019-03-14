@@ -2,12 +2,12 @@
 
 ## Requirements
 
-Meltano requires:
+Minimum:
 - [Python 3.6.1](https://realpython.com/installing-python/)
 
-Meltano conditionally requires:
-- [Git](https://git-scm.com/) (if you want to version control your Meltano projects)
-- [Docker Desktop](https://www.docker.com/get-started) (if you want to use databases other than SQLite)
+Additional:
+- [Git](https://git-scm.com/): to version control your Meltano project
+- [Docker Desktop](https://www.docker.com/get-started): to create a sample/default database
 
 ## Instructions
 
