@@ -22,6 +22,7 @@ install_e2e:
   stage: initial
   script:
     - python -m venv venv
+    - python --version
     - source ./venv/bin/activate
     - meltano --version
     - pip install -e .
