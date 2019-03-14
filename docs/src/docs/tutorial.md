@@ -34,20 +34,19 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Run elt (extract, load, transform) with an id of your choice and the extractor and
-# loader we just added without the need to transform the data
+# Run extractior (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
 ```
 
-Congratulations! You have just loaded all the data from Carbon Intensity API into your local warehouse.
+Congratulations! You have just extracted all the data from the Carbon Intensity API and loaded it into your local SQLite database.
 
 ### Interact with Your Data in the Web App
 
-Now that your data is ready to be analyzed, it's time to start up the web app! Go back into your terminal and run the following command:
+Now that your data is extracted and loaded, it is ready to be analyzed. Time to start up the web app! Go back into your terminal and run the following command:
 
 ```bash
 # Start up the Meltano UI web application!
-$ meltano ui
+meltano ui
 ```
 
 This will start a local web server at [http://localhost:5000](http://localhost:5000).
