@@ -109,3 +109,8 @@ transforms:
     pip_url: "https://gitlab.com/meltano/dbt-tap-gitlab.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-stripe
+    pip_url: "https://gitlab.com/meltano/dbt-tap-stripe.git"
+    vars:
+      livemode: false
+      schema: "{{ env_var('PG_SCHEMA') }}"
