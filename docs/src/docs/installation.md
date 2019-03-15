@@ -5,7 +5,7 @@
 Minimum:
 - [Python 3.6.1](https://realpython.com/installing-python/)
 
-Additional:
+Optional:
 - [Git](https://git-scm.com/): to version control your Meltano project
 - [Docker Desktop](https://www.docker.com/get-started): to create a sample/default database
 
