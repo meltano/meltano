@@ -1,5 +1,7 @@
 # Installation
 
+Meltano is a powerful combination of command line tool and web app. It leverages the file system, coordinates across databases, and automates data extraction, loading, and transforming in addition to providing reporting and dashboarding. As such, installing and getting up and running takes a bit longer than double-clicking an installer. At least for now...
+
 ## Requirements
 
 Minimum:
