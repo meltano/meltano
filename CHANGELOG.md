@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
 
 ### Changes
+* Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
 
 ### Fixes
 
@@ -23,7 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### Fixes
-* locks down depdencies for issues with sqlalchemy snowflake connector
+* locks down dependencies for issues with sqlalchemy snowflake connector
 
 
 ## 0.15.0 - (2019-03-11)
