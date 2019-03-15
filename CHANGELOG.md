@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Added troubleshooting button to help users add context to a pre-filled bug issue
 
 ### Fixes
+* Lock down the version of everything in setup.py
 * Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
 
 ### Breaks
