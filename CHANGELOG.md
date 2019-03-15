@@ -12,12 +12,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add support for extracting data from Gitlab through the updated tap-gitlab (https://gitlab.com/meltano/tap-gitlab)
 * Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
 * Added "Copy to Clipboard" functionality to code block snippets in the documentation
+* Add support for extracting data from Gitlab through the updated tap-gitlab
 
 ### Changes
 * Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
 * Added troubleshooting button to help users add context to a pre-filled bug issue
 
 ### Fixes
+* Lock down the version of everything in setup.py
+* Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
 
 ### Breaks
 
