@@ -31,7 +31,6 @@ module.exports = {
 		['link', { rel: 'manifest', href: '/site.webmanifest' }],
 		['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
 		['meta', { name: 'theme-color', content: '#ffffff' }],
-		['script', { src: '/code-block-clipboard.js' }]
 	],
 	dest: 'public',
 	themeConfig: {
