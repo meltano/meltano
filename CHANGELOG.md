@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
 
 ### Fixes
 
@@ -21,7 +22,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### Fixes
-* locks down depdencies for issues with sqlalchemy snowflake connector
+* locks down dependencies for issues with sqlalchemy snowflake connector
 
 
 ## 0.15.0 - (2019-03-11)
