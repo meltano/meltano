@@ -31,11 +31,11 @@ export default ({
     copyElement.title = 'Copy to clipboard';
 
     // Button append
-    const pre = container.querySelector('pre');
     copyElement.addEventListener('click', () => {
+      const pre = container.querySelector('pre');
       copyToClipboard(pre.innerText);
     });
-    pre.appendChild(copyElement);
+    container.appendChild(copyElement);
 
     // Button style offset
     const pseudoBefore = getComputedStyle(container, ':before');

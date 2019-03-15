@@ -12,18 +12,13 @@ export default {
     z-index: 999;
     top: 10px;
     right: 8px;
-    width: 20px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     content: url(../public/copy-to-clipboard-icon.svg);
-    transition: opacity .3s, transform .2s;
+    background-color: #282c34;
+    transition: transform .2s;
   }
   .code-block-copy-button:active {
     transform: scale(.8);
-  }
-  .code-block-copy-button:hover {
-    opacity: .5;
-  }
-  .code-block-copy-button-offset {
-    top: 34px;
   }
 </style>
