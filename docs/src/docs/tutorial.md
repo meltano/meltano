@@ -74,9 +74,10 @@ With Meltano UI up and running, we can automatically generate queries with as li
 
 - Navigate to Model > Region (Model dropdown)
 - Open Region accordion
-  - Toggle Columns and Aggregates buttons to generate SQL query
-  - Click Run button to query
-- Open Charts accordion and explore the data!
+  - Toggle *at least one* aggregate button to generate SQL
+  - Toggle any number of column buttons to generate SQL
+  - Click the Run button to query using the generated SQL
+- Open the Charts accordion to visualize the data!
 
 ## Intermediate
 
