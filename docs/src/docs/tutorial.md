@@ -61,7 +61,7 @@ This will start a local web server at [http://localhost:5000](http://localhost:5
 
 When you visit the URL, you should see:
 
-![](/screenshots/01-meltano-ui.png)
+![](/screenshots/meltano-ui-carbon-tutorial-output.png)
 
 :::warning Troubleshooting
 Having issues with Meltano? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
