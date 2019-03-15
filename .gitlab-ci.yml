@@ -43,6 +43,7 @@ install_e2e:
     - npm install -g yarn
     - make bundle
     - meltano --version
+    - pip list
     - mkdir -p /home/projects
     - cd /home/projects
     - meltano init test_project
