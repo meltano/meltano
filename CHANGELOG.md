@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * Lock down the version of everything in setup.py
 * Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
+* 473: Fix the docker image (meltano/meltano) from failing to expose the API
 
 ### Breaks
 
