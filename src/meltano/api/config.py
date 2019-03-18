@@ -13,7 +13,6 @@ ENV = os.getenv("FLASK_ENV", "development")
 
 ## Change this value in production
 SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
-JWT_SECRET_KEY = SECRET_KEY
 
 # Meltano
 # -----------------
@@ -52,6 +51,11 @@ SECURITY_MSG_USERNAME_INVALID = (
     "error",
 )
 SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
+
+# Flask-JWT-Extended
+# ------------------
+JWT_SECRET_KEY = SECRET_KEY
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=7)
 
 # Flask-Mail
 # -----------------

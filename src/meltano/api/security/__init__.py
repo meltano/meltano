@@ -7,7 +7,6 @@ from flask_security.utils import login_user
 from flask_jwt_extended import (
     JWTManager,
     create_access_token,
-    create_refresh_token,
     get_jwt_identity,
     verify_jwt_refresh_token_in_request,
 )
@@ -51,28 +50,16 @@ def setup_security(app, project):
 
     bp = app.blueprints["security"]
 
-    # we need to add two JWT routes for the API
-    @bp.route("/refresh_token")
-    def refresh_token():
-        verify_jwt_refresh_token_in_request()
-
-        auth_identity = {"id": current_user.id, "username": current_user.username}
-
-        token = create_access_token(identity=auth_identity)
-        return jsonify(auth_token=token)
-
     @bp.route("/bootstrap")
     @login_required
     def bootstrap_app():
         """Fire off the application with the current user logged in"""
         auth_identity = {"id": current_user.id, "username": current_user.username}
-
         access_token = create_access_token(identity=auth_identity)
-        refresh_token = create_refresh_token(identity=auth_identity)
 
         uri = (
             app.config["MELTANO_UI_URL"]
-            + f"?auth_token={access_token}&refresh_token={refresh_token}"
+            + f"?auth_token={access_token}"
         )
         return redirect(uri)
 

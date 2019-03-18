@@ -11,11 +11,7 @@ export class AuthMiddleware {
   }
 
   onRequest(req) {
-    const token = this.auth.authToken;
-
-    if (req.headers.Authorization === undefined) {
-      req.headers.Authorization = `Bearer ${token}`;
-    }
+    req.headers.Authorization = `Bearer ${this.auth.authToken}`;
 
     return req;
   }
@@ -26,15 +22,9 @@ export class AuthMiddleware {
       throw err;
     }
 
-    while (err.response
-        && !err.config.retried
-        && err.response.status === 401) {
-      err.config.retried = true;
-      return this.auth.refresh().then(() => {
-        // let's retry the call
-        delete err.config.headers.Authorization;
-        return axios(err.config);
-      });
+    // 401 should be sent to login
+    if (err.response && err.response.status === 401) {
+      window.location.href = 'http://localhost:5000/auth/login';
     }
 
     // 422 should be sent when the JWT is invalid
@@ -51,19 +41,10 @@ class AuthHandler {
     this.tokens = {};
   }
 
-  authenticate(authToken, refreshToken) {
+  authenticate(authToken) {
     this.tokens = {
       auth: authToken,
-      refresh: refreshToken,
     };
-  }
-
-  refresh() {
-    const headers = { Authorization: `Bearer ${this.refreshToken}` };
-    return axios.get('http://localhost:5000/auth/refresh_token', { headers })
-      .then((response) => {
-        this.authenticate(response.data.auth_token, this.refreshToken);
-      });
   }
 
   get authToken() {
@@ -72,15 +53,6 @@ class AuthHandler {
     }
 
     return this.tokens.auth;
-  }
-
-
-  get refreshToken() {
-    if (!this.tokens.refresh) {
-      this.tokens.refresh = window.localStorage.getItem('refreshToken');
-    }
-
-    return this.tokens.refresh;
   }
 
   set authToken(token) {
@@ -93,25 +65,14 @@ class AuthHandler {
     }
   }
 
-  set refreshToken(token) {
-    this.tokens.refresh = token;
-
-    if (token) {
-      window.localStorage.setItem('refreshToken', token);
-    } else {
-      window.localStorage.removeItem('refreshToken');
-    }
-  }
-
   logout() {
     this.authToken = null;
-    this.refreshToken = null;
 
     window.location.href = 'http://localhost:5000/auth/logout';
   }
 
   authenticated() {
-    return this.authToken && this.refreshToken;
+    return this.authToken;
   }
 
   ensureAuthenticated() {
@@ -121,7 +82,7 @@ class AuthHandler {
   }
 
   get user() {
-    const jwt = jwtDecode(this.tokens.auth);
+    const jwt = jwtDecode(this.authToken);
 
     if (jwt.identity.id === null) {
       return null;
@@ -141,11 +102,10 @@ export default {
       beforeRouteEnter(to, from, next) {
         const {
           auth_token: authToken,
-          refresh_token: refreshToken,
         } = to.query;
 
-        if (authToken && refreshToken) {
-          handler.authenticate(authToken, refreshToken);
+        if (authToken) {
+          handler.authenticate(authToken);
         } else {
           handler.ensureAuthenticated();
         }
