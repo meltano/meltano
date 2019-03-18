@@ -16,7 +16,7 @@ export class AuthMiddleware {
     return req;
   }
 
-  onResponseError(err) {
+  onResponseError(err) { // eslint-disable-line class-methods-use-this
     if (err.response && err.response.status === 403) {
       Vue.toasted.global.forbidden();
       throw err;
@@ -59,6 +59,7 @@ class AuthHandler {
     this.tokens.auth = token;
 
     if (token) {
+      debugger;
       window.localStorage.setItem('authToken', token);
     } else {
       window.localStorage.removeItem('authToken');
@@ -82,6 +83,10 @@ class AuthHandler {
   }
 
   get user() {
+    if (!this.authToken) {
+      return null;
+    }
+
     const jwt = jwtDecode(this.authToken);
 
     if (jwt.identity.id === null) {

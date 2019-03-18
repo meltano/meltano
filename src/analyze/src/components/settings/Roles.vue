@@ -1,20 +1,8 @@
 <template>
   <section class="section">
-    <h1 class="title is-2">Users</h1>
-
-    <div class="segment">
-      <h2 class="subtitle is-5">Assign roles</h2>
-      <role-members :users="acl.users"
-                    :roles="rolesName"
-                    @add="assignRoleUser($event)"
-                    @remove="unassignRoleUser($event)"
-      />
-    </div>
-    <hr/>
-
     <h1 class="title is-2">Roles</h1>
     <div class="segment">
-      <h2 class="subtitle is-5">Manage</h2>
+      <h2 class="title is-4">Manage roles</h2>
       <form>
         <div class="field is-grouped">
           <div class="control">
@@ -41,12 +29,10 @@
         </div>
       </form>
     </div>
-    <hr/>
 
-    <h1 class="title is-4">
+    <h2 class="title is-4">
       Permissions
-    </h1>
-
+    </h2>
     <div class="segment">
       <role-permissions v-for="perm in permissions"
                         :key="perm.type"
@@ -54,6 +40,15 @@
                         :roles="rolesContexts(perm.type)"
                         @add="addRolePermission($event)"
                         @remove="removeRolePermission($event)"
+      />
+    </div>
+
+    <h2 class="title is-4">Users</h2>
+    <div class="segment">
+      <role-members :users="acl.users"
+                    :roles="rolesName"
+                    @add="assignRoleUser($event)"
+                    @remove="unassignRoleUser($event)"
       />
     </div>
   </section>
@@ -122,5 +117,9 @@ export default {
 <style scoped>
  .segment {
    margin-bottom: 2rem;
+ }
+
+ .action {
+   margin-bottom: 0.33rem;
  }
 </style>

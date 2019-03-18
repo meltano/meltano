@@ -1,4 +1,5 @@
 import os
+import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -55,7 +56,7 @@ SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error
 # Flask-JWT-Extended
 # ------------------
 JWT_SECRET_KEY = SECRET_KEY
-JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=7)
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
 
 # Flask-Mail
 # -----------------
