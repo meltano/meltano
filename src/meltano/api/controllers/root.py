@@ -23,7 +23,7 @@ def default(path):
     try:
         return render_template("analyze.html")
     except TemplateNotFound:
-        return "Please run `yarn build` from src/analyze."
+        return "Please run `make bundle` from src/analyze of the Meltano project."
 
 
 @root.route("/drop")

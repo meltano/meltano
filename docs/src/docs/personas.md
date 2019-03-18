@@ -1,6 +1,8 @@
 # Personas
 
-The personas are very much a work in progress and we will continue to add to them based on further insights revealed from user interviews.
+Meltano provides tools to help data teams manage their end-to-end pipeline. This process usually involves collaboration between software engineers and data analysts. In the personas below, we have begun to capture our insights revealed from user interviews.
+
+Ultimately, we are looking to help Meltano users successfully complete a wide range of user stories. To help users onboard quickly, we have created some [simple user stories](https://docs.google.com/document/d/1axKIKtC65Zf9yAV6pApwbZD6Hml-EPh7HEg7W-fPbg0/edit) and we are working to support them through our tutorials.
 
 ## Eric the Data Engineer
 
@@ -13,6 +15,8 @@ Location: Albany, NY
 Life stage: Married, two young kids
 
 Job Title: Data Engineer
+
+Alternative Titles:  Business Intelligence Engineer, Software Developer
 
 ### Job Summary
 
@@ -36,13 +40,13 @@ I am responsible for designing, constructing, installing, testing and maintainin
 
 Age: 32
 
-Location:NYC, NY
+Location: NYC, NY
 
 Life stage: Married, no children
 
 Job Title: Data Analyst
 
-Alternative Titles:  Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst
+Alternative Titles:  Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst, Business Analyst
 
 ### Job Summary
 

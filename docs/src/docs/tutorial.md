@@ -4,17 +4,21 @@ sidebarDepth: 2
 
 # Tutorials
 
-## Quick Start
+First time using Meltano? No worries. We have you covered with tutorials that will guide you through how Meltano works. Let's get started!
 
-First time using Meltano? No worries. We got you covered with tutorials that will guide you through how Meltano works. Let's get started!
+<TutorialTable />
 
-### Carbon API
+## Starter
 
+This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) (carbon emissions/footprint) and SQLite tutorial. This datasource was chosen as it is public, free, and does not require credentials to access. It guides you through data extraction from the Carbon Intensity API, loading extracted entities to a SQLite database, and analyzing the results.
+
+:::tip
 This tutorial is perfect if your goal is to get Meltano up and running as quickly as possible.
+:::
 
-For this tutorial, we will be working with the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) because it is:
-- free to access
-- does not require authentication
+### Prerequisites
+
+- Meltano's [minimum requirements](/installation.html#requirements) installed
 
 ### Initialize Your Project
 
@@ -30,58 +34,59 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Run elt (extract, load, transform) with an id of your choice and the extractor and
-# loader we just added without the need to transform the data
+# Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
 ```
 
-Congratulations! You have just loaded all the data from Carbon Intensity API into your local warehouse.
+Congratulations! You have just extracted all the data from the Carbon Intensity API and loaded it into your local SQLite database.
 
-### Interact with Your Data in the Web App
+:::tip
+Meltano is magical and powerful.
 
-Now that your data is ready to be analyzed, it's time to start up the web app! Go back into your terminal and run the following command:
+It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
+
+Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from it using Meltano UI with its automatic SQL generation.
+:::
+
+### Analyze with Meltano UI
+
+Now that your data is extracted and loaded, it is ready to be analyzed. Time to start up the web app! Go back into your terminal and run the following command:
 
 ```bash
 # Start up the Meltano UI web application!
-$ meltano ui
+meltano ui
 ```
 
 This will start a local web server at [http://localhost:5000](http://localhost:5000).
 
 When you visit the URL, you should see:
 
-![](/screenshots/01-meltano-ui.png)
+![](/screenshots/meltano-ui-carbon-tutorial-output.png)
+
+:::warning Troubleshooting
+Having issues with Meltano? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
+:::
 
 ---
-#### Run a Simple Analysis on Your Data
+#### Analyze
 
-Meltano uses custom data files wth the extension `.m5o` that define the structure for your data.
-
-In your project directory, you will see some examples under the `model` folder: `carbon.model.m5o`.
-
-
-
-
-Next, we'll ensure our models are valid so Meltano Analyze can properly generate queries for us:
-
-- By default the Model page is loaded, same as clicking the Model button (upper-left)
-  - Every time you go to this page, the models are linted, synced, and the UI updates with an error if a model is invalid. Otherwise you'll see the "Passed" indicator meaning you're clear to analyze.
-
-Lastly, we'll query and explore the data:
+With Meltano UI up and running, we can automatically generate queries with as little as a single click and then explore the query results:
 
 - Navigate to Model > Region (Model dropdown)
 - Open Region accordion
-  - Toggle Columns and Aggregates buttons to generate SQL query
-  - Click Run button to query
-- Open Charts accordion and explore the data!
+  - Toggle *at least one* aggregate button to generate SQL
+  - Toggle any number of column buttons to generate SQL
+  - Click the Run button to query using the generated SQL
+- Open the Charts accordion to visualize the data!
 
-## Salesforce API - Postgres DB Tutorial
+## Intermediate
 
-This is an advanced tutorial on how to extract data from your Salesforce account, load the extracted entities to a Postgres DB, transform the raw data and analyze the result.
+This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results.
 
 ### Prerequisites
 
-You have successfully installed Meltano by following the instructions in the [Installation](/docs/installation.html) section. Please note you should have already installed and started Docker.
+- Meltano's minimum and [optional requirements](/installation.html#requirements) installed
+- Docker started
 
 ### Initialize Your Project
 
@@ -146,7 +151,7 @@ A Salesforce account may have more than 100 different entities. In order to see 
 meltano select tap-salesforce --list --all
 ```
 
-In this tutorial, we are going to work with a couple of the most common ones and show you how to select](docs/meltano-cli.html#meltano-select ) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](docs/meltano-cli.html#meltano-select ) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
 
 ```bash
 meltano select tap-salesforce "User" "*"
@@ -208,7 +213,7 @@ You can now query and explore the extracted data:
 - Check the Results or Open the Charts accordion and explore the data.
 
 
-## Advanced Content
+## Advanced
 
 You can look forward to the following tutorials in the future:
 

@@ -45,6 +45,11 @@
           </div>
         </nav>
       </template>
+      <template v-if="!hasFiles">
+        <p class="menu-label">
+          No files found
+        </p>
+      </template>
       <template v-for="(value, key) in files">
 
         <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -53,14 +58,7 @@
         </p>
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <ul class="menu-list">
-
-          <template v-if="!value.items.length">
-            <li>
-              <a><small><em>No {{value.label}}</em></small></a>
-            </li>
-          </template>
-
-          <template v-if="value.items.length">
+          <template v-if="value.items">
             <li v-for="file in value.items" :key="file.abs">
               <div class="columns is-vcentered">
                 <div class="column">
@@ -135,6 +133,7 @@ export default {
   },
   computed: {
     ...mapGetters('repos', [
+      'hasFiles',
       'hasError',
       'passedValidation',
       'hasMarkdown',

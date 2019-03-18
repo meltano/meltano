@@ -16,7 +16,7 @@ def assertIsSQL(value: str) -> bool:
     )
 
 
-@pytest.mark.usefixtures("project", "compile_models")
+@pytest.mark.usefixtures("project", "add_model")
 class TestSqlController:
     @pytest.fixture
     def post(self, app, api):
@@ -59,7 +59,7 @@ class TestSqlController:
         }
 
         res = post(payload)
-        assert res.status_code == 200
+        assert res.status_code == 200, res.data
         assert res.json["sql"] == ""
 
     def assert_column_query(self, post):
@@ -144,8 +144,7 @@ class TestSqlController:
         }
 
         res = post(payload)
-
-        assert res.status_code == 200
+        assert res.status_code == 200, res.data
         assertIsSQL(res.json["sql"])
         assert 'EXTRACT(\'Week\' FROM "entry"."from") "from.week"' in res.json["sql"]
         assert re.search(r'GROUP BY.*"from.week"', res.json["sql"])

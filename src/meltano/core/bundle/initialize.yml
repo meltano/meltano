@@ -16,7 +16,25 @@ README.md: ""
   /venv
   /.meltano
   .env
-model: "bundle://model"
+model/.gitkeep: ""
+model/:
+  database.settings.m5o: |
+    {
+      "version": 1,
+      "settings": {
+        "connections": [{
+          "name": "runners_db", 
+          "database": "", 
+          "schema": "", 
+          "dialect": "sqlite", 
+          "host": "", 
+          "port": "", 
+          "username": "", 
+          "password": "", 
+          "path": "meltano.db"
+        }]
+      }
+    }
 extract/.gitkeep: ""
 docker-compose.yml: |
   version: '3.1'

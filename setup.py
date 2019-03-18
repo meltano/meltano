@@ -5,35 +5,35 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 requires = [
-    'aiohttp',
-    'authlib',
-    'backoff',
+    'aiohttp==3.4.4',
+    'authlib==0.10',
+    'backoff==1.8.0',
     'urllib3==1.23',
-    'bcrypt',
-    'click',
-    'Cerberus',
-    'sqlparse',
-    'gitpython',
-    'markdown',
-    'networkx',
-    'pandas',
-    'psycopg2',
+    'bcrypt==3.1.6',
+    'click==7.0',
+    'Cerberus==1.2',
+    'sqlparse==0.3.0',
+    'gitpython==2.1.11',
+    'markdown==3.0.1',
+    'networkx==2.2',
+    'pandas==0.24.1',
+    'psycopg2==2.7.7',
     'pypika==0.25.1',
-    'python-dotenv',
-    'pyyaml',
+    'python-dotenv==0.10.1',
+    'pyyaml==3.13',
     'snowflake-connector-python==1.6.10',
     'snowflake-sqlalchemy==1.1.2',
     'sqlalchemy==1.2.12',
     'flask>=1.0.2',
-    'flask-cors',
+    'flask-cors==3.0.7',
     'flask-sqlalchemy==2.3.2',
-    'flask-restful',
-    'meltano-flask-security',
-    'pyhocon',
-    'python-dotenv',
-    'python-gitlab',
-    'simplejson',
-    'watchdog',
+    'flask-restful==0.3.7',
+    'meltano-flask-security==0.1.0',
+    'pyhocon==0.3.51',
+    'python-dotenv==0.10.1',
+    'python-gitlab==1.8.0',
+    'simplejson==3.16.0',
+    'watchdog==0.9.0',
 ]
 
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
@@ -43,17 +43,17 @@ conflicts = [
 ]
 
 dev_requires = [
-    'pytest',
-    'pytest-asyncio',
-    'asynctest',
-    'black',
-    'bumpversion',
-    'changelog-cli'
+    'pytest==4.3.1',
+    'pytest-asyncio==0.10.0',
+    'asynctest==0.12.2',
+    'black==18.9b0',
+    'bumpversion==0.5.3',
+    'changelog-cli==0.6.2'
 ]
 
 setup(
     name="meltano",
-    version="0.15.0",
+    version="0.15.1",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

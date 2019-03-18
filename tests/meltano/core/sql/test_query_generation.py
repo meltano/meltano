@@ -9,6 +9,7 @@ from os.path import join
 from meltano.core.sql.sql_utils import SqlUtils
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.date import Date
+from meltano.core.project import Project
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.base import (
@@ -43,16 +44,19 @@ def models_path(setup_tmp_models_path):
     return setup_tmp_models_path
 
 
-@pytest.fixture(scope="module")
-def design_helper(models_path):
-    topic_name = "gitflix"
-    design_name = "users"
+@pytest.fixture()
+def design_helper(project, add_model, models_path):
 
-    sqlHelper = SqlUtils()
-    m5oc_file = Path(models_path).joinpath(f"{topic_name}.topic.m5oc")
+    # Compile the test files and make sure that the proper m5oc file was generated
+    project = Project.find()
+    m5o_parse = MeltanoAnalysisFileParser(project)
+    models = m5o_parse.parse_packages()
+    m5o_parse.compile(models)
+
+    # Load the m5oc file for gitflix
+    m5oc_file = project.root_dir("model", "gitflix.topic.m5oc")
     m5oc = M5ocFile.load(m5oc_file)
-
-    return m5oc.design(design_name)
+    return m5oc.design("users")
 
 
 @pytest.fixture(scope="module")
@@ -77,24 +81,14 @@ def query_payload():
 
 
 class TestQueryGeneration:
-    def test_compile_and_load_m5o_files(self, models_path):
-        # Compile the test files and make sure that the proper m5oc file was generated
-        m5o_parse = MeltanoAnalysisFileParser(models_path)
-        models = m5o_parse.parse()
-        m5o_parse.compile(models)
-
-        # Load the m5oc file for gitflix
-        m5oc_file = Path(models_path).joinpath("gitflix.topic.m5oc")
-        m5oc = M5ocFile.load(m5oc_file)
-
-        design = m5oc.design("users")
+    def test_compile_and_load_m5o_files(self, project, design_helper):
+        design = MeltanoDesign(definition=design_helper.design)
 
         assert design.name == "users"
-        assert len(design.tables) == 3
-        assert len(design.joins) == 2
+        assert len(design.tables()) == 3
+        assert len(design.joins()) == 2
 
     def test_meltano_base_classes(self, design_helper):
-        # Test Meltano Designs
         design = MeltanoDesign(definition=design_helper.design)
 
         assert design.name == "users"

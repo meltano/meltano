@@ -6,6 +6,7 @@ from .project import Project
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
 from .plugin.dbt import DbtPlugin, DbtTransformPlugin
+from .plugin.model import ModelPlugin
 from .plugin.error import PluginMissingError
 
 
@@ -38,6 +39,9 @@ class ConfigService:
     def get_transforms(self):
         return filter(lambda p: p.type == PluginType.TRANSFORMS, self.plugins())
 
+    def get_models(self):
+        return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
+
     def get_database(self, database_name):
         return yaml.load(
             open(self.project.meltano_dir(f".database_{database_name}.yml"))
@@ -60,5 +64,7 @@ class ConfigService:
             return DbtPlugin(**plugin_def)
         elif plugin_type == PluginType.TRANSFORMS:
             return DbtTransformPlugin(**plugin_def)
+        elif plugin_type == PluginType.MODELS:
+            return ModelPlugin(**plugin_def)
         else:
             return plugin_factory(plugin_type, plugin_def)
