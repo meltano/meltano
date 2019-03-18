@@ -18,7 +18,7 @@ This tutorial is perfect if your goal is to get Meltano up and running as quickl
 
 ### Prerequisites
 
-- Meltano's [minimum requirements](/installation.html#requirements) installed
+- Meltano's [minimum requirements](./installation.html#requirements) installed
 
 ### Initialize Your Project
 
@@ -88,7 +88,7 @@ This is the Salesforce API and Postgres database tutorial. It guides you through
 
 ### Prerequisites
 
-- Meltano's minimum and [optional requirements](/installation.html#requirements) installed
+- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 
 ### Initialize Your Project
