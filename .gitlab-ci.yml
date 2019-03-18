@@ -17,11 +17,6 @@ stages:
   - review
   # - production
 
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 lint:
   stage: lint
   image:
@@ -31,6 +26,32 @@ lint:
     - pip install black
   script:
     - make show_lint
+
+install_e2e:
+  stage: test
+  script:
+    - python -m venv venv
+    - python --version
+    - source ./venv/bin/activate
+    - pip install -e .
+    - apt-get update
+    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
+    - apt-get -y install nodejs
+    - apt-get -y install gcc g++ make
+    - node -v
+    - npm -v
+    - npm install -g yarn
+    - make bundle
+    - meltano --version
+    - pip list
+    - mkdir -p /home/projects
+    - cd /home/projects
+    - meltano init test_project
+    - cd test_project
+    - meltano discover all
+    - meltano add extractor tap-carbon-intensity
+    - meltano add loader target-sqlite
+    - meltano elt tap-carbon-intensity target-sqlite
 
 docs:
   variables:
