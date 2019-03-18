@@ -57,10 +57,7 @@ def setup_security(app, project):
         auth_identity = {"id": current_user.id, "username": current_user.username}
         access_token = create_access_token(identity=auth_identity)
 
-        uri = (
-            app.config["MELTANO_UI_URL"]
-            + f"?auth_token={access_token}"
-        )
+        uri = app.config["MELTANO_UI_URL"] + f"?auth_token={access_token}"
         return redirect(uri)
 
     app.register_blueprint(bp)
