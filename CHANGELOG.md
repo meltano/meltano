@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.16.0 - (2019-03-18)
+---
+
+### New
 * Add support for extracting data from Gitlab through the updated tap-gitlab (https://gitlab.com/meltano/tap-gitlab)
 * Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
 * Add "Copy to Clipboard" functionality to code block snippets in the documentation
@@ -24,8 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Lock down the version of everything in setup.py
 * Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
 * 473: Fix the docker image (meltano/meltano) from failing to expose the API
-
-### Breaks
 
 
 ## 0.15.1 - (2019-03-12)
