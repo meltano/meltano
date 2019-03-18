@@ -30,7 +30,9 @@ def create_app(config={}):
     app.config.update(**config)
 
     if not app.config["SQLALCHEMY_DATABASE_URI"]:
-        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{project.root.joinpath('meltano.db')}"
+        app.config[
+            "SQLALCHEMY_DATABASE_URI"
+        ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
 
     # Initial compilation
     compiler = ProjectCompiler(project)
