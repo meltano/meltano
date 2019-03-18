@@ -9,7 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit test to the Analyze page
+- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
 
 ### Changes
 
