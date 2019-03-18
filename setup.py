@@ -11,6 +11,7 @@ requires = [
     'urllib3==1.23',
     'bcrypt==3.1.6',
     'click==7.0',
+    'colorama==0.3.9',
     'Cerberus==1.2',
     'sqlparse==0.3.0',
     'gitpython==2.1.11',
