@@ -22,6 +22,7 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 # Flask-SQLAlchemy
 # -----------------
 SQLALCHEMY_ECHO = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_URI = "sqlite:///meltano.db"
 
 # Flask-security

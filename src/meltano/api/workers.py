@@ -1,4 +1,9 @@
 import logging
+import threading
+import time
+import requests
+from colorama import Fore
+
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 
@@ -38,3 +43,26 @@ class MeltanoBackgroundCompiler:
 
     def stop(self):
         self.observer.stop()
+
+
+class UIAvailableWorker(threading.Thread):
+    def __init__(self, url):
+        super().__init__()
+
+        self._terminate = False
+        self.url = url
+
+    def run(self):
+        while not self._terminate:
+            try:
+                response = requests.get(self.url)
+                if response.status_code == 200:
+                    print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
+                    self._terminate = True
+            except:
+                pass
+
+            time.sleep(2)
+
+    def stop(self):
+        self._terminate = True
