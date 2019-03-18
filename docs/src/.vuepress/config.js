@@ -30,13 +30,14 @@ module.exports = {
 		],
 		['link', { rel: 'manifest', href: '/site.webmanifest' }],
 		['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
-		['meta', { name: 'theme-color', content: '#ffffff' }]
+		['meta', { name: 'theme-color', content: '#ffffff' }],
 	],
 	dest: 'public',
 	themeConfig: {
 		nav: [
 			{ text: 'Home', link: '/' },
 			{ text: 'Documentation', link: '/docs/' },
+			{ text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
 			{ text: 'Press', link: '/press/' }
 		],
 		sidebar: {

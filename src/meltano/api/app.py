@@ -32,7 +32,10 @@ def create_app(config={}):
 
     # Initial compilation
     compiler = ProjectCompiler(project)
-    compiler.compile()
+    try:
+        compiler.compile()
+    except Exception as e:
+        pass
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
@@ -44,7 +47,7 @@ def create_app(config={}):
     logger.addHandler(stdout_handler)
 
     now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
-    logger.warning(f"Melt started at: {now}")
+    logger.warning(f"Meltano UI started at: {now}")
 
     # Extensions
     security_options = {}

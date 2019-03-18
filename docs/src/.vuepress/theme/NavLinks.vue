@@ -28,16 +28,20 @@
     </div>
 
     <!-- repo link -->
-    <a
-      v-if="repoLink"
-      :href="repoLink"
-      class="repo-link"
-      target="_blank"
-      rel="noopener noreferrer"
+    <div 
+      class="nav-item nav-item--repo"
     >
-      {{ repoLabel }}
-      <OutboundLink/>
-    </a>
+      <a
+        v-if="repoLink"
+        :href="repoLink"
+        class="repo-link"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {{ repoLabel }}
+        <OutboundLink/>
+      </a>
+    </div>
   </nav>
 </template>
 
@@ -144,6 +148,16 @@ export default {
       margin-left 0
     &--icon
       display flex
+      svg
+        margin-top 5px
+    &--repo
+      margin-left 0
+      a
+        display flex
+        align-items center
+      svg
+        margin-left 4px
+        margin-bottom 1px
   .repo-link
     margin-left 1.5rem
 

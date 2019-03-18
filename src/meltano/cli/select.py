@@ -88,6 +88,8 @@ def show(project, extractor, entities_filter, attributes_filter, show_all=False)
         if not invoker.files["catalog"].exists():
             logging.info("Catalog not found, trying to run the tap with --discover.")
             extractor.run_discovery(invoker)
+        else:
+            extractor.apply_select(invoker)
 
         with invoker.files["catalog"].open() as catalog:
             schema = json.load(catalog)
@@ -97,8 +99,6 @@ def show(project, extractor, entities_filter, attributes_filter, show_all=False)
             "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
         )
         raise e
-    else:
-        invoker.files["catalog"].unlink()
 
     # report
     click.secho("Enabled patterns:")
@@ -113,8 +113,8 @@ def show(project, extractor, entities_filter, attributes_filter, show_all=False)
     color = lambda selected: "white" if selected else "red"
     for stream, prop in (
         (stream, prop)
-        for stream, props in list_all.properties.items()
-        for prop in props
+        for stream in list_all.streams
+        for prop in list_all.properties[stream.key]
     ):
         if show_all:
             click.secho(f"\t{stream.key}", fg=color(stream.selected), nl=False)

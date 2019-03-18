@@ -5,6 +5,7 @@ import click
 from . import cli
 from .params import project
 from meltano.api.app import start
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
@@ -16,9 +17,10 @@ from meltano.api.app import start
     default=True,
     help="To reload the server or not on file changes",
 )
-@click.option(
-    "--hostname", default="127.0.0.1", help="The hostname (or IP address) to bind on"
-)
+@click.option("--hostname", default="0.0.0.0", help="The hostname of the webserver")
 def ui(project, debug, port, reload, hostname):
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_ui()
+
     # todo: run gunicorn if not in debug mode
     start(project, debug=debug, use_reloader=reload, port=port, host=hostname)

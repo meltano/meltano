@@ -103,6 +103,9 @@ class Project:
 
         return decorate
 
+    def root_dir(self, *joinpaths):
+        return self.root.joinpath(*joinpaths)
+
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
@@ -118,6 +121,10 @@ class Project:
     @makedirs
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
+
+    @makedirs
+    def model_dir(self, *joinpaths):
+        return self.meltano_dir("models", *joinpaths)
 
     @makedirs
     def plugin_dir(self, plugin: Plugin, *joinpaths):

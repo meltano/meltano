@@ -23,6 +23,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
             PluginType.EXTRACTORS,
             PluginType.LOADERS,
             PluginType.TRANSFORMERS,
+            PluginType.MODELS,
             PluginType.TRANSFORMS,
             PluginType.ALL,
         ]

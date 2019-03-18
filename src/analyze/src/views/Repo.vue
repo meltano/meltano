@@ -45,35 +45,37 @@
           </div>
         </nav>
       </template>
+      <template v-if="!hasFiles">
+        <p class="menu-label">
+          No files found
+        </p>
+      </template>
       <template v-for="(value, key) in files">
 
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <p class="menu-label">
-          <a href="#">{{value.label}}</a>
+          {{value.label}}
         </p>
         <!-- eslint-disable-next-line vue/require-v-for-key -->
         <ul class="menu-list">
-
-          <template v-if="!value.items.length">
-            <li>
-              <a><small><em>No {{value.label}}</em></small></a>
-            </li>
-          </template>
-
-          <template v-if="value.items.length">
+          <template v-if="value.items">
             <li v-for="file in value.items" :key="file.abs">
               <div class="columns is-vcentered">
                 <div class="column">
-                  <a :class="{'is-active': isActive(file)}"
-                      @click.prevent='getFile(file)'>
+                  <a
+                    :class="[
+                      {'is-active': isActive(file)},
+                      jsDashify(value.label, file.name)
+                    ]"
+                    @click.prevent='getFile(file)'>
                     {{file.name}}
                   </a>
                 </div>
                 <div v-if='isDeepRoutable(key)' class='column is-one-fifth'>
                   <router-link :to="getDeepRoute(key, file)"
                                 class="button is-secondary is-light is-small is-pulled-right">
-                      <!-- TODO temporary icon, find better solution -->
-                      <font-awesome-icon icon="arrow-right"/>
+                    <!-- TODO temporary icon, find better solution -->
+                    <font-awesome-icon icon="arrow-right"/>
                   </router-link>
                 </div>
               </div>
@@ -98,9 +100,9 @@
         </div>
       </div>
       <div v-if="hasMarkdown">
-        <div class="has-background-white" v-html="activeView.file"></div>
+        <div class="js-markdown-preview has-background-white" v-html="activeView.file"></div>
       </div>
-      <div class="is-paddingless code-container" v-else-if="hasCode">
+      <div class="js-code-preview is-paddingless code-container" v-else-if="hasCode">
         <div class="has-background-white">
           <pre>{{activeView.file | pretty}}</pre>
         </div>
@@ -112,9 +114,10 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import capitalize from '@/filters/capitalize';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import fileTypeEnums from '@/utils/fileTypeEnums';
+import utils from '@/utils/utils';
 
 export default {
   name: 'Repo',
@@ -126,11 +129,11 @@ export default {
     RouterViewLayout,
   },
   filters: {
-    capitalize,
     pretty,
   },
   computed: {
     ...mapGetters('repos', [
+      'hasFiles',
       'hasError',
       'passedValidation',
       'hasMarkdown',
@@ -149,14 +152,17 @@ export default {
     getRepo() {
       this.$store.dispatch('repos/getRepo');
     },
+    jsDashify(type, name) {
+      return utils.jsDashify(type, name);
+    },
     isActive(f) {
       return f.id === this.activeView.id;
     },
     isDeepRoutable(type) {
-      return type === 'dashboards' || type === 'reports';
+      return type === fileTypeEnums.dashboards || type === fileTypeEnums.reports;
     },
     getDeepRoute(key, file) {
-      const name = capitalize(key).slice(0, -1);
+      const name = utils.capitalize(utils.singularize(key));
       const params = { slug: file.slug };
       if (file.model && file.design) {
         params.model = file.model;

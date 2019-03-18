@@ -2,7 +2,7 @@
 
 We welcome contributions and improvements, please see the contribution guidelines below:
 
-## Getting Setup
+## Installation from source
 
 ```bash
 # Clone the Meltano repo
@@ -18,6 +18,7 @@ pip install --upgrade pip
 pip install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
+# in order to minimize side effects from unknown environment variable
 python -m venv venv
 
 # Activate your virtual environment
@@ -33,17 +34,36 @@ pip install -e '.[dev]'
 make bundle
 ```
 
-Open a new terminal tab in the meltano project directory:
+Meltano is now installed and available at `meltano`.
+
+Head out to the [tutorials](/docs/tutorial.html) to create your first project.
+
+
+### Meltano API Development
+
+For all changes that do not involve working on Meltano UI itself, run the following command:
 
 ```bash
-# Change into the Meltano UI code directory
+# Starts both Meltano API and a production build of Meltano UI
+meltano ui
+```
+
+### Meltano UI Development
+
+In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
+
+```bash
+# Starts the Meltano API and a production build of Meltano UI that you can ignore
+meltano ui
+
+# Open a new terminal tab and go to your meltano directory. Then change directory to analyze
 cd src/analyze
 
-# Install the dependencies for Meltano UI
-npm install
+# Install dependencies
+npm install # or yarn
 
-# Start the web server for Meltano UI 
-npm run dev
+# Start local development environment
+npm run dev # or yarn dev
 ```
 
 ## Code style
@@ -100,6 +120,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```
 1. Execute the commands below:
     ```bash
+    # if you've released before, you may need to delete the last local release branch you created
+    $ git branch -D release-next
+    
     # create and checkout release-next branch that's based off master branch
     $ git checkout -b release-next origin/master
 

@@ -12,7 +12,7 @@ from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDial
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/sql")
+sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -100,19 +100,19 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/get/<model_name>/dialect", methods=["GET"])
-def get_dialect(model_name):
+@sqlBP.route("/get/<topic_name>/dialect", methods=["GET"])
+def get_dialect(topic_name):
     sqlHelper = SqlHelper()
-    m5oc = sqlHelper.get_m5oc_model(model_name)
+    m5oc = sqlHelper.get_m5oc_topic(topic_name)
     connection_name = m5oc.connection("connection")
     engine = sqlHelper.get_db_engine(connection_name)
     return jsonify({"connection_dialect": engine.dialect.name})
 
 
-@sqlBP.route("/get/<model_name>/<design_name>", methods=["POST"])
-def get_sql(model_name, design_name):
+@sqlBP.route("/get/<topic_name>/<design_name>", methods=["POST"])
+def get_sql(topic_name, design_name):
     sqlHelper = SqlHelper()
-    m5oc = sqlHelper.get_m5oc_model(model_name)
+    m5oc = sqlHelper.get_m5oc_topic(topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
@@ -125,17 +125,14 @@ def get_sql(model_name, design_name):
     sql_dict = sqlHelper.get_sql(design, incoming_json, connection.get("schema", None))
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    columns = sql_dict["columns"]
     column_headers = sql_dict["column_headers"]
-    names = sql_dict["names"]
+    column_names = sql_dict["column_names"]
     db_table = sql_dict["db_table"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
     base_dict["column_headers"] = column_headers
-    base_dict["names"] = names
-    base_dict["aggregates"] = sqlHelper.get_aliases_from_aggregates(
-        aggregates, db_table
-    )
+    base_dict["column_names"] = column_names
+    base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:
         return jsonify(base_dict)
@@ -152,8 +149,8 @@ def get_sql(model_name, design_name):
     return jsonify(base_dict)
 
 
-@sqlBP.route("/distinct/<model_name>/<design_name>", methods=["POST"])
-def get_distinct_field_name(model_name, design_name):
+@sqlBP.route("/distinct/<topic_name>/<design_name>", methods=["POST"])
+def get_distinct_field_name(topic_name, design_name):
     # incoming_json = request.get_json()
     # field_name = incoming_json["field"].replace("${TABLE}", design_name)
     # model = Model.query.filter(Model.name == model_name).first()

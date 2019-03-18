@@ -9,16 +9,64 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Update stages table style in docs
+* Add support for extracting data from Gitlab through the updated tap-gitlab (https://gitlab.com/meltano/tap-gitlab)
+* Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
+* Added "Copy to Clipboard" functionality to code block snippets in the documentation
+* Add the `tap-stripe` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-stripe
 
 ### Changes
+* Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
+* Added troubleshooting button to help users add context to a pre-filled bug issue
+
+### Fixes
+* Lock down the version of everything in setup.py
+* Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
+
+### Breaks
+
+
+## 0.15.1 - (2019-03-12)
+---
+
+### Fixes
+* locks down dependencies for issues with sqlalchemy snowflake connector
+
+
+## 0.15.0 - (2019-03-11)
+---
+
+### New
+* Add Salesforce Tutorial to the docs
+* Add documentation for the permissions command
+* Add tracking for the `meltano ui` command
+
+
+### Fixes
+* Updated analytics to properly recognize SPA route changes as pageview changes
+
+
+## 0.14.0 - (2019-03-04)
+---
+
+### New
+* Update stages table style in docs
+* Add custom transforms and models tutorial to the docs
+
+### Changes
+* Add api/v1 to every route
+* Update DbtService to always include the my_meltano_project model when transform runs
 
 ### Fixes
 * Resolved duplicate display issue of Dashboards and Reports on the Files page
 * Removed legacy `carbon.dashboard.m5o` (regression from merge)
+* Updated dashboards and reports to use UI-friendly name vs slugified name
 * Fix minor clipped display issue of right panel on `/settings/database`
-
-### Breaks
+* Fix minor display spacing in left panel of Settings
+* Fix dashboard page to properly display a previously active dashboard's updated reports
+* Fix pre-selected selections for join aggregates when loading a report
+* Fix charts to display multiple aggregates (v1)
+* Fix 404 errors when refreshing the frontend
+* Fix a regression where the Topics would not be shown in the Files page
 
 
 ## 0.13.0 - (2019-02-25)
@@ -46,6 +94,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add version CLI commands for checking current Meltano version
 * Add deep linking to dashboards
 * Add deep linking to reports
+* add new command `meltano add model [name_of_model]`
+* add models to the available plugins
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
