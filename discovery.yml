@@ -114,3 +114,12 @@ transforms:
     vars:
       livemode: false
       schema: "{{ env_var('PG_SCHEMA') }}"
+models:
+  - name: model-carbon-intensity-sqlite
+    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
+  - name: model-carbon-intensity
+    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity.git"
+  - name: model-salesforce
+    pip_url: "git+https://gitlab.com/meltano/model-salesforce.git"
+  - name: model-gitflix
+    pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"

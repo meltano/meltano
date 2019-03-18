@@ -5,13 +5,14 @@ from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 class TestMeltanoAnalysisFileParser:
     @pytest.fixture
     def subject(self, project):
-        models_dir = project.root.joinpath("model")
-        return MeltanoAnalysisFileParser(models_dir)
+        return MeltanoAnalysisFileParser(project)
 
-    def test_parse(self, subject):
-        topics = subject.parse()
+    def test_parse(self, add_model, subject):
+        topics = subject.parse_packages()
 
-        assert len(topics) == 2
+        print("")
+
+        assert len(topics) == 3
 
         for topic in topics:
             if topic["name"] == "carbon":
@@ -20,10 +21,12 @@ class TestMeltanoAnalysisFileParser:
             elif topic["name"] == "sfdc":
                 assert len(topic["designs"]) == 1
 
-    def test_compile(self, project, subject):
+    def test_compile(self, project, add_model, subject):
         topics = subject.parse()
         subject.compile(topics)
 
-        assert project.root.joinpath("model/topics.index.m5oc").exists()
-        assert project.root.joinpath("model/carbon.topic.m5oc").exists()
-        assert project.root.joinpath("model/sfdc.topic.m5oc").exists()
+        models = [f.parts[-1] for f in project.model_dir().iterdir()]
+
+        assert "model-gitflix" in models
+        assert "model-carbon-intensity-sqlite" in models
+        assert "model-salesforce" in models
