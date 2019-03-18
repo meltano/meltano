@@ -62,4 +62,21 @@ describe('Design.vue', () => {
 
     expect(wrapper.element).toMatchSnapshot();
   });
+
+  it('Load report button enabled if reports exist', () => {
+    state.reports = [{ chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' }];
+    const wrapper = mount(Design, { store, localVue, router });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled', () => {
+    const report = { chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' };
+    state.activeReport = report;
+    state.chartType = 'BarChart';
+    state.reports = [report];
+    const wrapper = shallowMount(Design, { store, localVue, router });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
 });
