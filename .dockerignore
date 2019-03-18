@@ -14,7 +14,11 @@
 !/MANIFEST.in
 !/Makefile
 !/src
+
 !/transform
 !/.pyre_configuration
 
 docs/build
+src/analyze/node_modules
+src/analyze/dist
+src/meltano/api/static

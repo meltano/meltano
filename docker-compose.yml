@@ -1,28 +1,15 @@
 version: '3.1'
 services:
   ui:
-    image: node:10
+    image: meltano/meltano
     env_file:
     - .env.dev
-    working_dir: /meltano/analyze
+    working_dir: /analyze
     volumes:
-    - ./src/analyze:/meltano/analyze
+    - ./src/analyze:/analyze
     ports:
     - 8080:8080
     command: ['bash', '-c', 'yarn && yarn run dev']
-    depends_on:
-    - api
-
-  api:
-    image: meltano/meltano
-    env_file:
-      - .env.dev
-    working_dir: /meltano
-    command: ['meltano', 'ui']
-    volumes:
-    - ./:/meltano
-    ports:
-    - 5000:5000
 
   warehouse_db:
     image: postgres
@@ -34,4 +21,4 @@ services:
     - '5502:5432'
 
 volumes:
-  pgdata:
+  pgdata: {}

@@ -9,8 +9,10 @@ stages:
   - lint
   - test
   - docs
-  - build_base
-  - build
+  - build-base
+  - build-meltano
+  - build-runner
+  - test-docker
   - publish
   - review
   # - production
