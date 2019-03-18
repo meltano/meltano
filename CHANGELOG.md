@@ -94,6 +94,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add version CLI commands for checking current Meltano version
 * Add deep linking to dashboards
 * Add deep linking to reports
+* add new command `meltano add model [name_of_model]`
+* add models to the available plugins
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)

@@ -7,6 +7,7 @@ import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
 from .plugin.dbt import DbtPlugin, DbtTransformPlugin
+from .plugin.model import ModelPlugin
 
 
 class PluginNotFoundError(Exception):
@@ -72,6 +73,8 @@ class PluginDiscoveryService:
             return DbtPlugin(**plugin_def)
         elif plugin_type == PluginType.TRANSFORMS:
             return DbtTransformPlugin(**plugin_def)
+        elif plugin_type == PluginType.MODELS:
+            return ModelPlugin(**plugin_def)
         else:
             return plugin_factory(plugin_type, plugin_def)
 
@@ -92,6 +95,7 @@ class PluginDiscoveryService:
                 PluginType.EXTRACTORS,
                 PluginType.LOADERS,
                 PluginType.TRANSFORMERS,
+                PluginType.MODELS,
                 PluginType.TRANSFORMS,
             )
             if plugin_type == PluginType.ALL
