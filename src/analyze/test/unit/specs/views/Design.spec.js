@@ -15,7 +15,7 @@ describe('Design.vue', () => {
   let store;
 
   beforeEach(() => {
-    state = designs.state;
+    state = Object.assign(Design.data(), designs.state);
     actions = {
       getDesign: jest.fn(),
       loadReport: jest.fn(),
@@ -41,7 +41,23 @@ describe('Design.vue', () => {
     expect(actions.getDesign).toHaveBeenCalled();
   });
 
-  it('Renders no selections, chart, SQL, or results by default', () => {
+  it('no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default', () => {
+    const wrapper = mount(Design, { store, localVue, router });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('Run Query button enabled and SQL tab focused and displayed if selection(s) are made', () => {
+    state.currentSQL = 'SELECT COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region" LIMIT 3;';
+    const wrapper = mount(Design, { store, localVue, router });
+
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('Save report button enabled if query has ran', () => {
+    state.currentSQL = 'SELECT COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region" LIMIT 3;';
+    state.resultAggregates = ['region.count'];
+    state.results = [{ 'region.count': 17 }];
     const wrapper = mount(Design, { store, localVue, router });
 
     expect(wrapper.element).toMatchSnapshot();
