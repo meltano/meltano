@@ -11,6 +11,7 @@ requires = [
     'bcrypt',
     'click',
     'Cerberus',
+    'colorama',
     'sqlparse',
     'gitpython',
     'markdown',
