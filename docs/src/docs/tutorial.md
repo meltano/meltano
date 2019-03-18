@@ -34,6 +34,9 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
+# Ensure Meltano UI will know how to use data from ELT
+meltano add model model-carbon-intensity-sqlite
+
 # Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
 ```
@@ -104,6 +107,9 @@ docker-compose up -d warehouse_db
 
 # Let's see what extractors and loaders are available
 meltano discover all
+
+# Add a m5o model so Meltano UI will know how to use data from ELT
+meltano add model model-salesforce
 
 # Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
 meltano add extractor tap-salesforce
