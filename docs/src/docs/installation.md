@@ -64,7 +64,7 @@ That's it! Meltano is now be available in the virtual environment we setup. Now,
 
 ## Docker Images
 
-Meltano provides the [meltano/meltano](http://dockerhub.com/meltano/meltano) docker image ready to use.
+Meltano provides the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image ready to use.
 
 > Note: The **meltano/meltano** docker image is also available in the GitLab's registry: `registry.gitlab.com`
 

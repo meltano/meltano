@@ -251,7 +251,7 @@ Now that we have data in ur database, let's add the corresponding model bundle a
 ```
 $ docker run -v $(pwd):/project \
              -w /project \
-             meltano/meltano add model model-carbon-intenisty-sqlite
+             meltano/meltano add model model-carbon-intensity-sqlite
 ```
 
 We can then start the Meltano UI.
