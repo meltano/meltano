@@ -1,7 +1,10 @@
 import logging
 
 from meltano.core.project import Project
-from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
+from meltano.core.m5o.m5o_file_parser import (
+    MeltanoAnalysisFileParser,
+    MeltanoAnalysisFileParserError,
+)
 
 
 class ProjectCompiler:
@@ -15,18 +18,31 @@ class ProjectCompiler:
 
     def __init__(self, project):
         self.project = project
+        self._parsed = False
 
     @property
     def source_dir(self):
-        return self.project.root.joinpath("model")
+        return self.project.model_dir()
+
+    def parse(self):
+        self.m5o_parse = MeltanoAnalysisFileParser(self.project)
+        try:
+            self.topics = self.m5o_parse.parse()
+            self.package_topics = self.m5o_parse.parse_packages()
+            self._parsed = True
+        except MeltanoAnalysisFileParserError as e:
+            logging.warn(f"Failed to compile topics: {e}")
+            raise e
 
     def compile(self):
-        output_dir = self.project.run_dir()
-
         try:
-            m5o_parse = MeltanoAnalysisFileParser(self.source_dir)
-            topics = m5o_parse.parse()
-            m5o_parse.compile(topics)
-            logging.info(f"Topics have been compiled.")
-        except Exception as err:
-            logging.warn(f"Failed to compile topics: {err}")
+            if not self._parsed:
+                self.parse()
+            if self.topics:
+                self.m5o_parse.compile(self.topics)
+            if self.package_topics:
+                self.m5o_parse.compile(self.package_topics)
+            logging.debug(f"Successfully compiled topics")
+        except MeltanoAnalysisFileParserError as e:
+            logging.warn(f"Failed to compile topics: {e}")
+            raise e

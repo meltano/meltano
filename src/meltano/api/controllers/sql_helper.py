@@ -39,9 +39,8 @@ class SqlHelper(SqlUtils):
         return (outer_results, inner_results)
 
     def get_m5oc_topic(self, topic_name):
-        m5oc_file = Path(Project.meltano_model_path()).joinpath(
-            f"{topic_name}.topic.m5oc"
-        )
+        project = Project.find()
+        m5oc_file = project.root_dir("model", f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
     def get_connection(self, connection_name):

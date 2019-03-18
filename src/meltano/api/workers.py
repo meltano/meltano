@@ -25,7 +25,10 @@ class MeltanoBackgroundCompiler:
     def setup_observer(self):
         event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
-        observer.schedule(event_handler, str(self.compiler.source_dir), recursive=True)
+        observer.schedule(
+            event_handler, str(self.project.root_dir("model")), recursive=True
+        )
+        observer.schedule(event_handler, str(self.project.model_dir()), recursive=True)
 
         return observer
 

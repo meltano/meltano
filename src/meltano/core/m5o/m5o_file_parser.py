@@ -1,6 +1,8 @@
+import os
 import json
 import sqlparse
 import time
+import glob
 
 import networkx as nx
 
@@ -13,49 +15,48 @@ from typing import Dict, List
 from meltano.core.sql.design_helper import visit, PypikaJoinExecutor
 from meltano.core.utils import encode_id_from_file_path
 from meltano.core.utils import slugify
+from meltano.core.project import Project
+from meltano.core.plugin.model import Package
 
 
 class MeltanoAnalysisFileParserError(Exception):
-    def __init__(self, message, file_name, *args):
+    def __init__(self, message, file_name):
         self.message = message
         self.file_name = file_name
-        super(MeltanoAnalysisFileParserError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message)
 
 
 class MeltanoAnalysisFileParserMissingTableError(MeltanoAnalysisFileParserError):
-    def __init__(self, field, your_choice, cls, file_name, *args):
+    def __init__(self, field, your_choice, cls, file_name):
         self.file_name = file_name
         self.cls = cls
         self.message = f'Missing accompanying table "{your_choice}" in "{field}" field in {cls} in {file_name}.'
-        super(MeltanoAnalysisFileParserMissingTableError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message, self.file_name)
+
+
+class MeltanoAnalysisMissingTopicFilesError(MeltanoAnalysisFileParserError):
+    def __init__(self, message):
+        super().__init__(message, "topic file")
 
 
 class MeltanoAnalysisFileParserUnacceptableChoiceError(MeltanoAnalysisFileParserError):
-    def __init__(self, field, your_choice, acceptable_choices, cls, file_name, *args):
+    def __init__(self, field, your_choice, acceptable_choices, cls, file_name):
         self.file_name = file_name
         self.cls = cls
         quoted_choices = [f'"{a}"' for a in acceptable_choices]
         self.message = f"Unacceptable choice for field {field}. You wrote \"{your_choice}\". Acceptable choices are: {', '.join(quoted_choices)}. In {file_name}"
-        super(MeltanoAnalysisFileParserUnacceptableChoiceError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message, self.file_name)
 
 
 class MeltanoAnalysisFileParserMissingFieldsError(MeltanoAnalysisFileParserError):
-    def __init__(self, fields, cls, file_name, *args):
+    def __init__(self, fields, cls, file_name):
         self.file_name = file_name
         self.cls = cls
         field = "field" if len(fields) == 1 else "fields"
         self.message = (
             f"Missing {field} in {cls}: \"{', '.join(fields)}\" in {self.file_name}"
         )
-        super(MeltanoAnalysisFileParserMissingFieldsError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message, self.file_name)
 
     def __str__(self):
         return f"{self.message} in {self.file_name}"
@@ -65,21 +66,21 @@ class MeltanoAnalysisFileParserMissingFieldsError(MeltanoAnalysisFileParserError
 
 
 class MeltanoAnalysisInvalidJoinDependencyError(MeltanoAnalysisFileParserError):
-    def __init__(self, field, cls, file_name, *args):
+    def __init__(self, field, cls, file_name):
         self.file_name = file_name
         self.cls = cls
         self.message = (
             f'Invalid join dependency in "{file_name}" in "{field}" join in {cls}.'
         )
-        super(MeltanoAnalysisInvalidJoinDependencyError, self).__init__(
-            self.message, self.file_name, *args
-        )
+        super().__init__(self.message, self.file_name)
 
 
 class MeltanoAnalysisFileParser:
-    def __init__(self, directory):
-        self.directory = directory
+    def __init__(self, project: Project):
+        self.project = project
+        self._output_dir = self.project.root_dir("model")
         self.topics = []
+        self.packaged_topics = []
         self.required_topic_properties = ["name", "connection", "label", "designs"]
         self.required_design_properties = ["from", "label", "description"]
         self.required_join_properties = ["sql_on", "relationship"]
@@ -90,6 +91,7 @@ class MeltanoAnalysisFileParser:
             "many_to_one",
             "many_to_many",
         ]
+        self.project = Project()
 
     def uses_accepted_choice(self, choices, choice):
         return choice in choices
@@ -106,7 +108,7 @@ class MeltanoAnalysisFileParser:
 
     def parse_m5o_file(self, file_path):
         try:
-            return ConfigFactory.parse_string(open(file_path, "r").read())
+            return ConfigFactory.parse_file(file_path)
         except Exception as e:
             raise MeltanoAnalysisFileParserError(str(e), str(file_path.parts[-1]))
 
@@ -158,28 +160,44 @@ class MeltanoAnalysisFileParser:
         indices = {}
         for topic in topics:
             compiled_file_name = f"{topic['name']}.topic.m5oc"
-            compiled_file_path = Path(self.directory).joinpath(compiled_file_name)
-            compiled_topic = open(compiled_file_path, "w")
+            compiled_file_path = self._output_dir.joinpath(compiled_file_name)
             indices[topic["name"]] = {"designs": [e["name"] for e in topic["designs"]]}
             topic = self.graph_topic(topic)
-            compiled_topic.write(json.dumps(topic))
-            compiled_topic.close()
+            with compiled_file_path.open("w") as compiled_topic:
+                compiled_topic.write(json.dumps(topic))
 
         # index file
-        index_file_path = Path(self.directory).joinpath("topics.index.m5oc")
-        index_file = open(index_file_path, "w")
-        index_file.write(json.dumps(indices))
-        index_file.close()
+        index_file_path = self._output_dir.joinpath("topics.index.m5oc")
+        with index_file_path.open("w") as index_file:
+            index_file.write(json.dumps(indices))
+
+    def parse_packages(self):
+        for package in self.packages():
+            self.m5o_tables = package.tables
+            self.m5o_topics = package.topics
+            if not self.m5o_topics and self.m5o_tables:
+                raise MeltanoAnalysisMissingTopicFilesError(
+                    f"Missing topic file(s) for package {package}"
+                )
+            for topic in self.m5o_topics:
+                file_name = topic.parts[-1]
+                conf = self.parse_m5o_file(topic)
+                parsed_topic = self.topic(conf, file_name)
+                self.packaged_topics.append(parsed_topic)
+
+        return self.packaged_topics
 
     def parse(self):
-        self.m5o_tables = list(Path(self.directory).glob("*.table.m5o"))
-        self.m5o_topic = list(Path(self.directory).glob("*.topic.m5o"))
-        for topic in self.m5o_topic:
+        models = self.project.root_dir("model")
+        self.m5o_tables = list(models.glob("*.table.m5o"))
+        self.m5o_topics = list(models.glob("*.topic.m5o"))
+        if not self.m5o_topics and self.m5o_tables:
+            raise MeltanoAnalysisMissingTopicFilesError("Missing topic file(s)")
+        for topic in self.m5o_topics:
             file_name = topic.parts[-1]
             conf = self.parse_m5o_file(topic)
             parsed_topic = self.topic(conf, file_name)
             self.topics.append(parsed_topic)
-
         return self.topics
 
     def topic(self, ma_file_topic_dict, file_name):
@@ -197,7 +215,16 @@ class MeltanoAnalysisFileParser:
                 temp_topic[prop_name] = self.designs(prop_def, file_name)
         return temp_topic
 
+    def table_from_full_table_name(self, table_name):
+        delimiter = "."
+        if not delimiter in table_name:
+            return table_name
+        else:
+            return table_name.split(".")[1]
+
     def table_conf_by_name(self, table_name, cls, prop, file_name):
+        # grab just the table from schema table
+        table_name = self.table_from_full_table_name(table_name)
         try:
             return next(
                 table
@@ -306,3 +333,33 @@ class MeltanoAnalysisFileParser:
         file_dict["slug"] = slugify(name)
         file_dict["createdAt"] = time.time()
         return file_dict
+
+    def packages(self) -> List[Package]:
+        return [
+            Package(f.name, self.project)
+            for f in self.project.model_dir().iterdir()
+            if f.is_dir()
+        ]
+
+    @classmethod
+    def package_files(cls, package):
+        m5oFiles = {
+            "topics": {"label": "Topics", "items": []},
+            "tables": {"label": "Tables", "items": []},
+        }
+        for f in package.files:
+            basename = os.path.basename(f)
+            filename, ext = os.path.splitext(basename)
+            if ext != ".m5o":
+                continue
+
+            # filename splittext twice occurs due to current *.type.extension convention (two dots)
+            filename = f"{package.name}/{filename.lower()}"
+            filename, ext = os.path.splitext(filename)
+            file_dict = cls.fill_base_m5o_dict(f, filename)
+            if ext == ".topic":
+                m5oFiles["topics"]["items"].append(file_dict)
+            if ext == ".table":
+                m5oFiles["tables"]["items"].append(file_dict)
+
+        return m5oFiles

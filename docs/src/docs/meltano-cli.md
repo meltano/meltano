@@ -6,10 +6,12 @@ Our CLI tool provides a single source of truth for the entire data pipeline. The
 
 - {: #meltano-add}`meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
+- `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** and installs it inside the `.meltano` directory. Installed models are available to use in the Meltano UI.
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 - `meltano discover all`: list available extractors and loaders:
   - `meltano discover extractors`: list only available extractors
   - `meltano discover loaders`: list only available loaders
+  - `meltano discover models`: list only available models
 - `meltano extract [name of extractor] --to [name of loader]`: Extract data to a loader and optionally transform the data
 - `meltano transform [name of transformation] --warehouse [name of warehouse]`: \*\*
 - `meltano elt <extractor> <loader> [--dry] [--transform run]`: Extract, Load, and Transform the data.

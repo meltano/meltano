@@ -59,6 +59,16 @@ def extractor(project, plugin_name):
 @add.command()
 @project
 @click.argument("plugin_name")
+def model(project, plugin_name):
+    add_plugin(project, PluginType.MODELS, plugin_name)
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="model", plugin_name=plugin_name)
+
+
+@add.command()
+@project
+@click.argument("plugin_name")
 def loader(project, plugin_name):
     add_plugin(project, PluginType.LOADERS, plugin_name)
 

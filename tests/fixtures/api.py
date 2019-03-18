@@ -22,7 +22,7 @@ def app_context(app):
 
 
 @pytest.fixture()
-def create_app(request, project):
+def create_app(request, add_model, project):
     def _factory(**config):
         config = {
             "TESTING": True,

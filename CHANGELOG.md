@@ -11,11 +11,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * Add support for extracting data from Gitlab through the updated tap-gitlab (https://gitlab.com/meltano/tap-gitlab)
 * Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
+* Added "Copy to Clipboard" functionality to code block snippets in the documentation
+* Add the `tap-stripe` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-stripe
 
 ### Changes
+* Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
+* Added troubleshooting button to help users add context to a pre-filled bug issue
 
 ### Fixes
-* fix the API database being mislocated per default
+* Fix the API database being mislocated
+* Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
 
 ### Breaks
 
@@ -24,7 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### Fixes
-* locks down depdencies for issues with sqlalchemy snowflake connector
+* locks down dependencies for issues with sqlalchemy snowflake connector
 
 
 ## 0.15.0 - (2019-03-11)
@@ -89,6 +94,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Add version CLI commands for checking current Meltano version
 * Add deep linking to dashboards
 * Add deep linking to reports
+* add new command `meltano add model [name_of_model]`
+* add models to the available plugins
 
 ### Fixes
 * Fixed a problem when environment variables where used as default values for the CLI - [!390](https://gitlab.com/meltano/meltano/merge_requests/390)
