@@ -220,7 +220,7 @@ It is possible to run Meltano as a Docker container to simplify usage, deploymen
 
 We will use `docker run` to execute Meltano using the pre-built docker images.
 
-### Create your project
+### Initialize Your Project
 
 First things first, let's create a new Meltano project named **carbon**.
 
@@ -236,8 +236,6 @@ Then you can `cd` into your new project:
 $ cd carbon
 ```
 
-### Run the ELT
-
 Now let's extract some data from the **tap-carbon-intensity** into **target-sqlite**:
 
 ```
@@ -246,9 +244,17 @@ $ docker run -v $(pwd):/project \
              meltano/meltano elt tap-carbon-intensity target-sqlite
 ```
 
-### Open the UI
+### Analyze with Meltano UI
 
-Now that we have data in our database, let's open the Meltano UI to explore it.
+Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
+
+```
+$ docker run -v $(pwd):/project \
+             -w /project \
+             meltano/meltano add model model-carbon-intenisty-sqlite
+```
+
+We can then start the Meltano UI.
 
 ```
 # `ui` is the default command, we can omit it.
