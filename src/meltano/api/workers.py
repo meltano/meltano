@@ -54,9 +54,7 @@ class UIAvailableWorker(threading.Thread):
             try:
                 response = requests.get(self.url)
                 if response.status_code == 200:
-                    print(
-                        Fore.GREEN + f"Meltano is available at {self.url}" + Fore.RESET
-                    )
+                    print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
                     self._terminate = True
             except:
                 pass

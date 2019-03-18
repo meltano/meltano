@@ -94,6 +94,7 @@ def start(project, **kwargs):
 
     compiler_worker = MeltanoBackgroundCompiler(project)
     compiler_worker.start()
+    available_worker.start()
 
     try:
         app_config = kwargs.pop("app_config", {})
@@ -104,7 +105,6 @@ def start(project, **kwargs):
             # TODO: alembic migration
             create_dev_user()
 
-        available_worker.start()
         app.run(**kwargs)
     finally:
         compiler_worker.stop()
