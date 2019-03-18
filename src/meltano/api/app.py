@@ -11,7 +11,7 @@ from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
 from .external_connector import ExternalConnector
-from .workers import MeltanoBackgroundCompiler, UIAvailableWorker
+from .workers import MeltanoBackgroundCompiler
 from . import config as default_config
 
 from meltano.core.project import Project
@@ -20,7 +20,6 @@ from meltano.core.compiler.project_compiler import ProjectCompiler
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
-available_worker = UIAvailableWorker("http://localhost:5000")
 
 
 def create_app(config={}):
@@ -95,9 +94,8 @@ def create_app(config={}):
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
-    compiler_worker = MeltanoBackgroundCompiler(project)
-    compiler_worker.start()
-    available_worker.start()
+    worker = MeltanoBackgroundCompiler(project)
+    worker.start()
 
     try:
         app_config = kwargs.pop("app_config", {})
@@ -110,5 +108,4 @@ def start(project, **kwargs):
 
         app.run(**kwargs)
     finally:
-        compiler_worker.stop()
-        available_worker.stop()
+        worker.stop()
