@@ -29,6 +29,7 @@ lint:
     - pip install black
   script:
     - make show_lint
+  allow_failure: true
 
 docs:
   variables:
