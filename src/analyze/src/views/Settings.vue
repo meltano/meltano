@@ -33,19 +33,35 @@ export default {
   },
   data() {
     return {
-      categories: [{
-        name: 'Database',
-        pages: [{
-          title: 'Database',
-          href: '/settings/database',
-        }],
-      }, {
-        name: 'Access control',
-        pages: [{
-          title: 'Roles',
-          href: '/settings/roles',
-        }],
-      }],
+      categories: [
+        {
+          name: 'Database',
+          pages: [{
+            title: 'Database',
+            href: '/settings/database',
+          }],
+        }, 
+        {
+          name: 'Access control',
+          pages: [{
+            title: 'Roles',
+            href: '/settings/roles',
+          }],
+        },
+        {
+          name: 'Pipeline',
+          pages: [
+            { 
+              title: 'Taps',
+              href: '/settings/taps'
+            },
+            {
+              title: 'Targets',
+              href: '/settings/targets'
+            }
+          ]
+        }
+      ],
     };
   },
 };
