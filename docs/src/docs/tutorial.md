@@ -8,7 +8,7 @@ First time using Meltano? No worries. We have you covered with tutorials that wi
 
 <TutorialTable />
 
-## Starter
+## Starter - Carbon Emissions
 
 This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) (carbon emissions/footprint) and SQLite tutorial. This datasource was chosen as it is public, free, and does not require credentials to access. It guides you through data extraction from the Carbon Intensity API, loading extracted entities to a SQLite database, and analyzing the results.
 
@@ -82,7 +82,7 @@ With Meltano UI up and running, we can automatically generate queries with as li
   - Click the Run button to query using the generated SQL
 - Open the Charts accordion to visualize the data!
 
-## Intermediate
+## Intermediate - Salesforce
 
 This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results.
 
@@ -218,6 +218,14 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
+## Advanced - Coming Soon
+
+You can look forward to the following tutorials in the future:
+
+- Salesforce > Snowflake Tutorial
+- How to add your own transforms
+- How to add your own .m5o models for generating reports
+
 ## Using Docker
 
 It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
@@ -273,11 +281,3 @@ $ docker run -v $(pwd):/project \
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
 For furter analysis, please head to the [Analyze](#analyze) section.
-
-## Advanced
-
-You can look forward to the following tutorials in the future:
-
-- Salesforce > Snowflake Tutorial
-- How to add your own transforms
-- How to add your own .m5o models for generating reports
