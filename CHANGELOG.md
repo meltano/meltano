@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
+* [#492](https://gitlab.com/meltano/meltano/issues/492) A few small contextual additions to help streamline the release process
 
 ### Breaks
 
