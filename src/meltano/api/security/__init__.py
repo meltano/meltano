@@ -54,10 +54,14 @@ def setup_security(app, project):
     @login_required
     def bootstrap_app():
         """Fire off the application with the current user logged in"""
+        uri = app.config["MELTANO_UI_URL"]
+
+        if not app.config["MELTANO_AUTHENTICATION"]:
+            return redirect(uri)
+
         auth_identity = {"id": current_user.id, "username": current_user.username}
         access_token = create_access_token(identity=auth_identity)
 
-        uri = app.config["MELTANO_UI_URL"] + f"?auth_token={access_token}"
-        return redirect(uri)
+        return redirect(uri + f"?auth_token={access_token}")
 
     app.register_blueprint(bp)

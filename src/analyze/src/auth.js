@@ -1,13 +1,14 @@
-import Vue from 'vue';
 import axios from 'axios';
 import { Service } from 'axios-middleware';
+import utils from '@/utils/utils';
 import jwtDecode from 'jwt-decode';
 
 
 export class AuthMiddleware {
-  constructor({ handler, router }) {
+  constructor({ handler, router, toasted }) {
     this.auth = handler;
     this.router = router;
+    this.toasted = toasted;
   }
 
   onRequest(req) {
@@ -18,18 +19,18 @@ export class AuthMiddleware {
 
   onResponseError(err) { // eslint-disable-line class-methods-use-this
     if (err.response && err.response.status === 403) {
-      Vue.toasted.global.forbidden();
+      this.toasted.global.forbidden();
       throw err;
     }
 
     // 401 should be sent to login
     if (err.response && err.response.status === 401) {
-      window.location.href = 'http://localhost:5000/auth/login';
+      window.location.href = utils.root('/auth/login');
     }
 
     // 422 should be sent when the JWT is invalid
     if (err.response && err.response.status === 422) {
-      window.location.href = 'http://localhost:5000/auth/bootstrap';
+      window.location.href = utils.root('/auth/bootstrap');
     }
 
     throw err;
@@ -38,13 +39,13 @@ export class AuthMiddleware {
 
 class AuthHandler {
   constructor() {
-    this.tokens = {};
+    this.tokens = {
+      auth: null,
+    };
   }
 
   authenticate(authToken) {
-    this.tokens = {
-      auth: authToken,
-    };
+    this.authToken = authToken;
   }
 
   get authToken() {
@@ -59,7 +60,6 @@ class AuthHandler {
     this.tokens.auth = token;
 
     if (token) {
-      debugger;
       window.localStorage.setItem('authToken', token);
     } else {
       window.localStorage.removeItem('authToken');
@@ -69,17 +69,11 @@ class AuthHandler {
   logout() {
     this.authToken = null;
 
-    window.location.href = 'http://localhost:5000/auth/logout';
+    window.location.href = utils.root('/auth/logout');
   }
 
   authenticated() {
     return this.authToken;
-  }
-
-  ensureAuthenticated() {
-    if (!this.authenticated()) {
-      window.location.href = 'http://localhost:5000/auth/bootstrap';
-    }
   }
 
   get user() {
@@ -89,7 +83,9 @@ class AuthHandler {
 
     const jwt = jwtDecode(this.authToken);
 
-    if (jwt.identity.id === null) {
+    // that means the current token is either invalid
+    // we should ignore it
+    if (!jwt.identity.id) {
       return null;
     }
 
@@ -99,11 +95,11 @@ class AuthHandler {
 
 
 export default {
-  install(vue, options) {
+  install(Vue, options) {
     const service = new Service(axios);
     const handler = new AuthHandler();
 
-    vue.mixin({
+    Vue.mixin({
       beforeRouteEnter(to, from, next) {
         const {
           auth_token: authToken,
@@ -111,18 +107,17 @@ export default {
 
         if (authToken) {
           handler.authenticate(authToken);
-        } else {
-          handler.ensureAuthenticated();
         }
 
         next();
       },
     });
 
-    vue.prototype.$auth = handler;
+    Vue.prototype.$auth = handler;
     service.register(new AuthMiddleware({
       handler,
       router: options.router,
+      toasted: options.toasted,
     }));
   },
 };

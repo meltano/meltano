@@ -20,8 +20,8 @@ export default {
     ],
   },
 
-  root() {
-    return 'http://localhost:5000';
+  root(path = '') {
+    return `http://localhost:5000${path}`;
   },
 
   apiUrl(blueprint, location = '') {

@@ -50,12 +50,16 @@ Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
 
-Vue.use(Auth, { router });
 Vue.use(Toasted, {
   router,
   position: 'bottom-right',
   iconPack: 'fontawesome',
   duration: 6000,
+});
+
+Vue.use(Auth, {
+  router,
+  toasted: Vue.toasted,
 });
 
 // Lets Register a Global Error Notification Toast.
