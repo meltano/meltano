@@ -12,7 +12,7 @@ from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
 from .external_connector import ExternalConnector
-from .workers import MeltanoBackgroundCompiler
+from .workers import MeltanoBackgroundCompiler, UIAvailableWorker
 from . import config as default_config
 
 from meltano.core.project import Project
@@ -21,6 +21,7 @@ from meltano.core.compiler.project_compiler import ProjectCompiler
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
+available_worker = UIAvailableWorker("http://localhost:5000")
 
 
 def create_app(config={}):
@@ -32,7 +33,10 @@ def create_app(config={}):
 
     # Initial compilation
     compiler = ProjectCompiler(project)
-    compiler.compile()
+    try:
+        compiler.compile()
+    except Exception as e:
+        pass
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
@@ -45,7 +49,7 @@ def create_app(config={}):
     logger.addHandler(stdout_handler)
 
     now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
-    logger.warning(f"Melt started at: {now}")
+    logger.warning(f"Meltano UI started at: {now}")
 
     # Extensions
     security_options = {}
@@ -96,8 +100,9 @@ def create_app(config={}):
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
-    worker = MeltanoBackgroundCompiler(project)
-    worker.start()
+    compiler_worker = MeltanoBackgroundCompiler(project)
+    compiler_worker.start()
+    available_worker.start()
 
     try:
         app_config = kwargs.pop("app_config", {})
@@ -110,4 +115,5 @@ def start(project, **kwargs):
 
         app.run(**kwargs)
     finally:
-        worker.stop()
+        compiler_worker.stop()
+        available_worker.stop()

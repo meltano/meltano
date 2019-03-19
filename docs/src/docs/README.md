@@ -30,8 +30,8 @@ These two tools enable you and your team to use Meltano in a few different ways:
 1. Meltano as a **Project** (CLI + GUI)
     - From data extraction to analysis and visualization with orchestration for automating the process
 1. Meltano as a **Framework** (CLI)
-    - Helps you create and test extractors, loaders, and transforms
+    - Helps you create and test extractors, loaders, and transformers
 1. Meltano as an **ELT** only (CLI)
-    - Runtime for extracting, loading, and transforming of data
+    - Runtime for extracting, loading, and transforming data
 1. Meltano as a **UI** only (GUI)
-    - Interactively query, explore, visualize, and model the data (warehouse)
+    - Interactively query, explore, and visualize data using various charts, reports, and dashboards

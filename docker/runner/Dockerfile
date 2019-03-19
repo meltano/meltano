@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=meltano/meltano/cli
+ARG BASE_IMAGE=meltano/meltano
 FROM $BASE_IMAGE
 
 LABEL maintainer="Meltano Team <meltano@gitlab.com>"

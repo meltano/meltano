@@ -12,13 +12,19 @@ For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano
 
 ## MAUI
 
-We track the Monthly Active Users (MAU) of three things:
+The focus of our team is to grow [MAUI](#maui) by 10% every week. We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
-1. Website
-2. CLI
-3. UI
+1. [Meltano.com Website](https://meltano.com)
+2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/meltano-cli.html)
+3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
 
 The MAU of the UI are called MAUI, this is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
+
+Internal metrics:
+
+1. [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
+2. [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
+3. [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
 
 ## Focus
 

@@ -2,7 +2,7 @@
 
 We welcome contributions and improvements, please see the contribution guidelines below:
 
-## Getting Setup
+## Installation from source
 
 ```bash
 # Clone the Meltano repo
@@ -33,6 +33,11 @@ pip install -e '.[dev]'
 # Run scripts to create remaining required files
 make bundle
 ```
+
+Meltano is now installed and available at `meltano`.
+
+Head out to the [tutorials](/docs/tutorial.html) to create your first project.
+
 
 ### Meltano API Development
 

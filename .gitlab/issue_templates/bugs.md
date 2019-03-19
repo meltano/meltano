@@ -34,6 +34,8 @@ If you are submitting an issue with a tap, please include:
 
 ### Further regression test
 (Ensure we automatically catch similar issues in the future)
+- [ ] Write additional adequate test cases and submit test results
+- [ ] Test results should be reviewed by a person from the team
 
 
 /label ~bug

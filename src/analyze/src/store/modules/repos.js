@@ -24,11 +24,15 @@ const getters = {
   },
 
   hasError() {
-    return state.errors.length;
+    return state.errors && state.errors.length;
+  },
+
+  hasFiles() {
+    return Object.hasOwnProperty.call(state.files, 'topics') && state.files.topics.items;
   },
 
   passedValidation() {
-    return state.validated && !state.errors.length;
+    return state.validated && state.errors && !state.errors.length;
   },
 
 };
@@ -38,6 +42,8 @@ const actions = {
     repoApi.index()
       .then((response) => {
         const files = response.data;
+        commit('setValidatedState', response.data);
+        state.loadingValidation = false;
         commit('setRepoFiles', { files });
       });
   },

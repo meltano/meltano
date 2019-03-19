@@ -9,14 +9,54 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Add Salesforce Tutorial to the docs
-* Add documentation for the permissions command
 
 ### Changes
 
 ### Fixes
+* [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
 
 ### Breaks
+
+
+## 0.16.0 - (2019-03-18)
+---
+
+### New
+* Add support for extracting data from Gitlab through the updated tap-gitlab (https://gitlab.com/meltano/tap-gitlab)
+* Add the `tap-gitlab` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-gitlab
+* Add "Copy to Clipboard" functionality to code block snippets in the documentation
+* Add the `tap-stripe` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-stripe
+* Add new command `meltano add model [name_of_model]`
+* Add models to the available plugins
+
+### Changes
+* Various documentation [installation and tutorial improvements](https://gitlab.com/meltano/meltano/issues/467#note_149858308)
+* Added troubleshooting button to help users add context to a pre-filled bug issue
+
+### Fixes
+* Lock down the version of everything in setup.py
+* Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
+* 473: Fix the docker image (meltano/meltano) from failing to expose the API
+
+
+## 0.15.1 - (2019-03-12)
+---
+
+### Fixes
+* locks down dependencies for issues with sqlalchemy snowflake connector
+
+
+## 0.15.0 - (2019-03-11)
+---
+
+### New
+* Add Salesforce Tutorial to the docs
+* Add documentation for the permissions command
+* Add tracking for the `meltano ui` command
+
+
+### Fixes
+* Updated analytics to properly recognize SPA route changes as pageview changes
 
 
 ## 0.14.0 - (2019-03-04)
@@ -36,6 +76,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Updated dashboards and reports to use UI-friendly name vs slugified name
 * Fix minor clipped display issue of right panel on `/settings/database`
 * Fix minor display spacing in left panel of Settings
+* Fix dashboard page to properly display a previously active dashboard's updated reports
 * Fix pre-selected selections for join aggregates when loading a report
 * Fix charts to display multiple aggregates (v1)
 * Fix 404 errors when refreshing the frontend
