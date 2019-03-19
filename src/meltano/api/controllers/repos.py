@@ -4,7 +4,7 @@ from os.path import join
 from pathlib import Path
 
 import markdown
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request
 
 from meltano.core.project import Project
 from meltano.core.utils import decode_file_path_from_id

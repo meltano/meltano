@@ -13,11 +13,6 @@ class OAuth(db.Model):
     access_token = db.Column(db.String(255))
     created_at = db.Column(db.DateTime())
     id_token = db.Column(db.String())
-    # secret = db.Column(db.String(255))
-    # display_name = db.Column(db.String(255))
-    # profile_url = db.Column(db.String(512))
-    # image_url = db.Column(db.String(512))
-    # rank = db.Column(db.Integer)
 
     user = db.relationship("User", backref="identities")
 
