@@ -40,7 +40,7 @@ export default {
             title: 'Database',
             href: '/settings/database',
           }],
-        }, 
+        },
         {
           name: 'Access control',
           pages: [{
@@ -51,16 +51,16 @@ export default {
         {
           name: 'Pipeline',
           pages: [
-            { 
+            {
               title: 'Taps',
-              href: '/settings/taps'
+              href: '/settings/taps',
             },
             {
               title: 'Targets',
-              href: '/settings/targets'
-            }
-          ]
-        }
+              href: '/settings/targets',
+            },
+          ],
+        },
       ],
     };
   },

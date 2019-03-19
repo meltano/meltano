@@ -52,19 +52,19 @@ export default new Router({
         {
           path: 'roles',
           component: SettingsRoles,
-        }, 
+        },
         {
           path: 'database',
           component: SettingsDatabase,
         },
         {
           path: 'taps',
-          component: TapsPage
+          component: TapsPage,
         },
         {
           path: 'targets',
-          component: TargetsPage
-        }
+          component: TargetsPage,
+        },
       ],
     },
     {
