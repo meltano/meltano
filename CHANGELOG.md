@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
 
 ### Fixes
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
