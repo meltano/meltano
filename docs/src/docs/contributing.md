@@ -104,6 +104,9 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 ```bash
   # get latest master branch
   $ git fetch origin
+
+  # checkout a reset/created release-next branch based on master
+  $ git checkout -B release-next origin/master
 ```
 
 ### Release process
