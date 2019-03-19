@@ -24,6 +24,10 @@ This tutorial is perfect if your goal is to get Meltano up and running as quickl
 
 Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
 
+::: tip Remember
+Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
+:::
+
 ```bash
 # Initialize a new project with a folder called carbon
 meltano init carbon
@@ -48,7 +52,7 @@ Meltano is magical and powerful.
 
 It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
 
-Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from it using Meltano UI with its automatic SQL generation.
+Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from them using Meltano UI with its automatic SQL generation.
 :::
 
 ### Analyze with Meltano UI
@@ -94,6 +98,10 @@ This is the Salesforce API and Postgres database tutorial. It guides you through
 ### Initialize Your Project
 
 To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+
+::: tip Remember
+Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
+:::
 
 ```bash
 # Initialize a new project with a folder called sfdc-project
