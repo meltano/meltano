@@ -99,14 +99,10 @@ Make sure to add CHANGELOG entries to your merge requests.
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
 ### Prerequisites
-1. Navigate to your Meltano git project
-2. Ensure you have the latest `master` branch locally before continuing
+Ensure you have the latest `master` branch locally before continuing.
 ```bash
   # get latest master branch
   $ git fetch origin
-
-  # checkout a reset/created release-next branch based on master
-  $ git checkout -B release-next origin/master
 ```
 
 ### Release process
@@ -116,6 +112,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```bash
     # activate your virtualenv
     $ source ./venv/bin/activate
+
     # pip install all the development dependencies
     $ pip install '.[dev]'
     ```
