@@ -35,14 +35,14 @@ class TestRoles:
 
             with impersonate(users.get_user(user)):
                 res = api.post(
-                    url_for("settings.roles"), json={"role": {"name": "pytest"}, "user": empty_user.username}
+                    url_for("settings.roles"),
+                    json={"role": {"name": "pytest"}, "user": empty_user.username},
                 )
 
             assert res.status_code == status_code, res.data
             if status_code == 201:
                 db.session.add(empty_user)
                 assert "pytest" in empty_user.roles
-
 
     @pytest.mark.parametrize(
         "user,status_code", [("alice", 403), ("rob", 403), (None, 401)]
@@ -94,7 +94,8 @@ class TestRoles:
 
             with impersonate(users.get_user(user)):
                 res = api.delete(
-                    url_for("settings.roles"), json={"role": {"name": "pytest"}, "user": empty_user.username}
+                    url_for("settings.roles"),
+                    json={"role": {"name": "pytest"}, "user": empty_user.username},
                 )
 
             assert res.status_code == status_code, res.data

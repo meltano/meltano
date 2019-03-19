@@ -20,6 +20,7 @@ def identity(app):
 
 
 @pytest.fixture
+@pytest.mark.usefixtures("add_model")
 def compile_models(project_compiler):
     project_compiler.compile()
 
@@ -48,7 +49,7 @@ class TestTopicFilter:
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.topic.m5oc"))
+        m5o_file = M5ocFile.load(project.root_dir("model", "carbon.topic.m5oc"))
 
         topic_filter = TopicFilter()
 
@@ -61,7 +62,7 @@ class TestTopicFilter:
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        m5o_file = M5ocFile.load(project.root.joinpath("model", "carbon.topic.m5oc"))
+        m5o_file = M5ocFile.load(project.root_dir("model", "carbon.topic.m5oc"))
 
         topic_filter = TopicFilter()
 
