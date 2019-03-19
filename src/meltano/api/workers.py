@@ -27,19 +27,32 @@ class MeltanoBackgroundCompiler:
         self.compiler = compiler or ProjectCompiler(project)
         self.observer = self.setup_observer()
 
+    @property
+    def model_dirs(self):
+        return (
+            self.project.root_dir("model"),
+            self.project.model_dir(),
+        )
+
     def setup_observer(self):
         event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
-        observer.schedule(
-            event_handler, str(self.project.root_dir("model")), recursive=True
-        )
-        observer.schedule(event_handler, str(self.project.model_dir()), recursive=True)
+
+        for source in self.model_dirs:
+            observer.schedule(
+                event_handler, str(source), recursive=True
+            )
 
         return observer
 
     def start(self):
-        self.observer.start()
-        logging.info(f"Auto-compiling models in {self.observer}.")
+        try:
+            self.observer.start()
+            for source in self.model_dirs:
+                logging.info(f"Auto-compiling models in '{str(source)}'")
+        except OSError:
+            # most probably INotify being full
+            logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
 
     def stop(self):
         self.observer.stop()
