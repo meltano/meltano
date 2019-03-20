@@ -11,7 +11,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import slugify
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
@@ -33,7 +33,11 @@ class ReportsHelper:
         return M5ocFile.load(m5oc_file)
 
     def get_reports(self):
-        project = Project.find()
+        try:
+            project = Project.find()
+        except ProjectNotFound as e:
+            return None
+
         path = project.root_dir("model")
         reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
         return reportsParser.contents()

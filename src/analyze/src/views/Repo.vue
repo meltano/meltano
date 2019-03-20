@@ -114,6 +114,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import startApi from '@/api/start';
 import pretty from '@/filters/pretty';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import fileTypeEnums from '@/utils/fileTypeEnums';
@@ -122,6 +123,7 @@ import utils from '@/utils/utils';
 export default {
   name: 'Repo',
   created() {
+    this.$store.dispatch('start/getProject', this.$router);
     this.getRepo();
     this.sync();
   },

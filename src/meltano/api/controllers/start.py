@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from flask import Blueprint, jsonify, request
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_init_service import (
     ProjectInitService,
     ProjectInitServiceError,
@@ -8,6 +9,15 @@ from meltano.core.project_init_service import (
 
 startBP = Blueprint("start", __name__, url_prefix="/api/v1/start")
 
+@startBP.route("/has_project", methods=["GET"])
+def has_project():
+    try:
+      Project.find()
+      project = True
+    except ProjectNotFound as e:
+      project = False
+
+    return jsonify({ 'has_project': project })
 
 @startBP.route("/cwd", methods=["GET"])
 def get_cwd():

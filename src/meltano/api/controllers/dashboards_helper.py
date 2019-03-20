@@ -8,7 +8,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParserTypes,
 )
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import slugify
 from .sql_helper import SqlHelper
 
@@ -17,7 +17,10 @@ class DashboardsHelper:
     VERSION = "1.0.0"
 
     def get_dashboards(self):
-        project = Project.find()
+        try:
+            project = Project.find()
+        except ProjectNotFound as e:
+            return None
         path = project.root_dir("model")
         dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
         return dashboardsParser.contents()
@@ -49,7 +52,11 @@ class DashboardsHelper:
         return target_dashboard[0]
 
     def save_dashboard(self, data):
-        project = Project.find()
+        try:
+          project = Project.find()
+        except ProjectNotFound as e:
+          return None
+
         slug = slugify(data["name"])
         file_name = f"{slug}.dashboard.m5o"
         file_path = project.root_dir("model", file_name)

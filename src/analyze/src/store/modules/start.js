@@ -12,6 +12,16 @@ const state = {
 const getters = {};
 
 const actions = {
+
+  getProject(_, router) {
+    startApi.hasProject()
+      .then((data) => {
+        if (!data.data.has_project) {
+          router.push({ path: '/start' });
+        }
+      });
+  },
+
   getCwd({ commit }) {
     startApi.getCwd()
       .then((data) => {
