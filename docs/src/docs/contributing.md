@@ -98,15 +98,12 @@ Make sure to add CHANGELOG entries to your merge requests.
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
-### Requirements
-
-::: warning Requirement
+### Prerequisites
 Ensure you have the latest `master` branch locally before continuing.
 ```bash
   # get latest master branch
   $ git fetch origin
 ```
-:::
 
 ### Release process
 
@@ -115,6 +112,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```bash
     # activate your virtualenv
     $ source ./venv/bin/activate
+
     # pip install all the development dependencies
     $ pip install '.[dev]'
     ```
@@ -122,7 +120,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```bash
     # if you've released before, you may need to delete the last local release branch you created
     $ git branch -D release-next
-    
+
     # create and checkout release-next branch that's based off master branch
     $ git checkout -b release-next origin/master
 
@@ -148,7 +146,7 @@ Tmuxinator is a way for you to efficiently manage multiple services when startin
 
 ### Why Tmuxinator?
 
-In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command. 
+In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command.
 
 1. Start up Docker
 1. Start Meltano API
@@ -166,7 +164,7 @@ This config uses `$MELTANO_VENV` to source the virtual environment from. Set it 
 ### Instructions
 
 1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
-1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1. 
+1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
 
 ```bash
 $ cd path/to/meltano

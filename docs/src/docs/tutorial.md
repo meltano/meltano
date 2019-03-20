@@ -18,7 +18,7 @@ This tutorial is perfect if your goal is to get Meltano up and running as quickl
 
 ### Prerequisites
 
-- Meltano's [minimum requirements](/installation.html#requirements) installed
+- Meltano's [minimum requirements](./installation.html#requirements) installed
 
 ### Initialize Your Project
 
@@ -33,6 +33,9 @@ cd carbon
 
 # Let's see what extractors and loaders are available
 meltano discover all
+
+# Ensure Meltano UI will know how to use data from ELT
+meltano add model model-carbon-intensity-sqlite
 
 # Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
@@ -85,7 +88,7 @@ This is the Salesforce API and Postgres database tutorial. It guides you through
 
 ### Prerequisites
 
-- Meltano's minimum and [optional requirements](/installation.html#requirements) installed
+- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 
 ### Initialize Your Project
@@ -104,6 +107,9 @@ docker-compose up -d warehouse_db
 
 # Let's see what extractors and loaders are available
 meltano discover all
+
+# Add a m5o model so Meltano UI will know how to use data from ELT
+meltano add model model-salesforce
 
 # Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
 meltano add extractor tap-salesforce
@@ -212,6 +218,61 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
+## Using Docker
+
+It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
+
+> This tutorial is inspired of the [Starter tutorial](#starter) but with Meltano running inside a Docker container.
+
+We will use `docker run` to execute Meltano using the pre-built docker images.
+
+### Initialize Your Project
+
+First things first, let's create a new Meltano project named **carbon**.
+
+```
+$ docker run -v $(pwd):/projects \
+             -w /projects \
+             meltano/meltano init carbon
+```
+
+Then you can `cd` into your new project:
+
+```
+$ cd carbon
+```
+
+Now let's extract some data from the **tap-carbon-intensity** into **target-sqlite**:
+
+```
+$ docker run -v $(pwd):/project \
+             -w /project \
+             meltano/meltano elt tap-carbon-intensity target-sqlite
+```
+
+### Analyze with Meltano UI
+
+Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
+
+```
+$ docker run -v $(pwd):/project \
+             -w /project \
+             meltano/meltano add model model-carbon-intensity-sqlite
+```
+
+We can then start the Meltano UI.
+
+```
+# `ui` is the default command, we can omit it.
+$ docker run -v $(pwd):/project \
+             -w /project \
+             -p 5000:5000 \
+             meltano/meltano
+```
+
+You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
+
+For furter analysis, please head to the [Analyze](#analyze) section.
 
 ## Advanced
 

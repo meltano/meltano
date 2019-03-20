@@ -41,8 +41,8 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 Open your terminal in the directory where you want Meltano installed. For example `/Users/YOUR_USER_NAME/Documents/Meltano`.
 
-::: tip
-We highly recommend installing Meltano using Python 3's virtual environment (`venv` snippet below) to isolate it from the rest of your python packages.
+::: tip Note
+We currently require installing Meltano using Python 3's virtual environment (`venv` snippet below) to isolate it from the rest of your python packages.
 
 See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
 :::
@@ -61,6 +61,25 @@ Usage: meltano [OPTIONS] COMMAND [ARGS]
 ```
 
 That's it! Meltano is now be available in the virtual environment we setup. Now, we can [create a Meltano project](/docs/tutorial.html).
+
+## Docker Images
+
+Meltano provides the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image ready to use.
+
+> Note: The **meltano/meltano** docker image is also available in the GitLab's registry: `registry.gitlab.com`
+
+This image contains everything you need to get started with Meltano.
+
+```
+# to download or update to the latest version
+$ docker pull meltano/meltano
+
+# to look the currently installed version
+$ docker run meltano/meltano --version
+meltano, version …
+```
+
+Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
 
 ## Troubleshooting
 

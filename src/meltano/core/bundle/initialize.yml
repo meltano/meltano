@@ -39,6 +39,13 @@ extract/.gitkeep: ""
 docker-compose.yml: |
   version: '3.1'
   services:
+    meltano:
+      image: meltano/meltano
+      working_dir: /project
+      volumes:
+        - ./:/project
+      ports:
+        - '5000:5000'
     warehouse_db:
       image: postgres
       environment:
