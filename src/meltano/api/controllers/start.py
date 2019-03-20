@@ -24,11 +24,11 @@ def get_dir_exists(directory):
 @startBP.route("/create", methods=["POST"])
 def post_create_project():
     post_data = request.get_json()
-    project_name = post_data.get('project', False)
+    project_name = post_data.get("project", False)
     init_service = ProjectInitService(project_name)
     try:
         project = init_service.init()
     except Exception as e:
         return jsonify({"result": False, "message": e.message})
     os.chdir(project.root_dir())
-    return jsonify({"result": True })
+    return jsonify({"result": True})
