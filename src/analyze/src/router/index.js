@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Repo from '@/views/Repo';
+import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
 import Orchestrate from '@/views/Orchestrate';
@@ -16,6 +17,11 @@ export default new Router({
     {
       path: '/',
       redirect: '/files',
+    },
+    {
+      path: '/start/',
+      name: 'Start',
+      component: Start,
     },
     {
       path: '/files/',

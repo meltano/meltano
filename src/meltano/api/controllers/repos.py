@@ -6,7 +6,7 @@ from pathlib import Path
 import markdown
 from flask import Blueprint, jsonify, request
 
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import decode_file_path_from_id
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.api.security import api_auth_required
@@ -65,7 +65,18 @@ def before_request():
 
 @reposBP.route("/", methods=["GET"])
 def index():
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        project = None
+        return jsonify(
+            {
+                "result": False,
+                "errors": [{"message": "Not inside a project", "file_name": "*"}],
+                "files": [],
+            }
+        )
+
     onlyfiles = [f for f in project.model_dir().iterdir() if f.is_file()]
 
     path = project.model_dir()
@@ -143,7 +154,17 @@ def file(unique_id):
 
 
 def lint_all(compile):
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        project = None
+        return jsonify(
+            {
+                "result": False,
+                "errors": [{"message": "Not inside a project", "file_name": "*"}],
+                "files": [],
+            }
+        )
     compiler = ProjectCompiler(project)
     try:
         compiler.parse()
@@ -183,7 +204,18 @@ def sync():
 
 @reposBP.route("/models", methods=["GET"])
 def models():
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        project = None
+        return jsonify(
+            {
+                "result": False,
+                "errors": [{"message": "Not inside a project", "file_name": "*"}],
+                "files": [],
+            }
+        )
+
     topics = project.root_dir("model", "topics.index.m5oc")
     topics = json.load(open(topics, "r"))
     topics = next(M5ocFilter().filter("view:topic", [topics]))

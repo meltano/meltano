@@ -18,10 +18,8 @@ from . import config as default_config
 from meltano.core.project import Project
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
-
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
-available_worker = UIAvailableWorker("http://localhost:5000")
 
 
 def create_app(config={}):
@@ -36,8 +34,14 @@ def create_app(config={}):
             "SQLALCHEMY_DATABASE_URI"
         ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
 
+    try:
+        project = Project.find()
+    except Exception as e:
+        project = None
+
     # Initial compilation
-    compiler = ProjectCompiler(project)
+    if project:
+        compiler = ProjectCompiler(project)
     try:
         compiler.compile()
     except Exception as e:
@@ -71,6 +75,7 @@ def create_app(config={}):
     CORS(app, origins="*")
 
     from .controllers.root import root
+    from .controllers.start import startBP
     from .controllers.dashboards import dashboardsBP
     from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
@@ -78,6 +83,7 @@ def create_app(config={}):
     from .controllers.sql import sqlBP
 
     app.register_blueprint(root)
+    app.register_blueprint(startBP)
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
@@ -104,9 +110,15 @@ def create_app(config={}):
 
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
+    start = "files" if project else "start"
 
-    compiler_worker = MeltanoBackgroundCompiler(project)
-    compiler_worker.start()
+    available_worker = UIAvailableWorker(
+        f"http://localhost:5000/{start}", not kwargs.get("use_reloader", False)
+    )
+    if project:
+        compiler_worker = MeltanoBackgroundCompiler(project)
+        compiler_worker.start()
+
     available_worker.start()
 
     try:
@@ -120,5 +132,7 @@ def start(project, **kwargs):
 
         app.run(**kwargs)
     finally:
-        compiler_worker.stop()
+        if project:
+            compiler_worker.stop()
+
         available_worker.stop()
