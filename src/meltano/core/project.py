@@ -29,14 +29,11 @@ class Project:
 
     def activate(self):
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
-        os.chdir(self.root)
         logging.debug(f"Activated project at {self.root}")
 
     @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
-        # pushd
-
-        project = Project()
+        project = Project(from_dir)
 
         if not project.meltanofile.exists():
             raise ProjectNotFound()
