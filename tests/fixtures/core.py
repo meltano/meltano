@@ -104,6 +104,8 @@ def project(test_dir, project_init_service):
 
     # cd into the new project root
     project.activate()
+    os.chdir(project.root)
+
     yield project
 
     # clean-up
