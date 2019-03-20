@@ -39,7 +39,7 @@ class Project:
         project = Project()
 
         if not project.meltanofile.exists():
-            raise ProjectNotFound() 
+            raise ProjectNotFound()
 
         if activate:
             project.activate()
