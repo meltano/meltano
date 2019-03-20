@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [#283](https://gitlab.com/meltano/meltano/issues/283) Silence pip`s output when there is not error
 
 ### Fixes
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
