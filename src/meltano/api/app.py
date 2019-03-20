@@ -24,11 +24,16 @@ available_worker = UIAvailableWorker("http://localhost:5000")
 
 
 def create_app(config={}):
+    project = Project.find()
+
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
     app.config.update(**config)
 
-    project = Project.find()
+    if not app.config["SQLALCHEMY_DATABASE_URI"]:
+        app.config[
+            "SQLALCHEMY_DATABASE_URI"
+        ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
 
     # Initial compilation
     compiler = ProjectCompiler(project)
