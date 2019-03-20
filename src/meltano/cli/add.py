@@ -111,6 +111,9 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
             err=True,
         )
         plugin = err.plugin
+    except (PluginNotSupportedException, PluginNotFoundError):
+        click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
+        raise click.Abort()
 
     try:
         install_service = PluginInstallService(project)
@@ -125,8 +128,6 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     except SubprocessError as proc_err:
         click.secho(str(proc_err), fg="red")
         click.secho(proc_err.process.stderr, err=True)
-    except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
 
 
