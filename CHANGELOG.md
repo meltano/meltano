@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
 
 ### Changes
 * [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
