@@ -1,7 +1,12 @@
 <script>
 import { mapState } from 'vuex';
 
+import BaseAccordion from '@/components/generic/BaseAccordion.vue';
+
 export default {
+  components: {
+    BaseAccordion
+  },
   data () {
     return {
       filterText: '',
@@ -66,28 +71,73 @@ export default {
 </script>
 
 <template>
-  <article class="content">
-    <h1 class="title is-2">Taps</h1>
-    <input type="text" v-model="filterText">
-    <h2 class="title is-3">Installed</h2>
-    <ul>
-      <li v-for="(extractor, index) in filteredInstalledPlugins" 
-        :key="`${extractor.name}`"
-      >
-        {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button>
-      </li>
-    </ul>
-    <h2 class="title is-3">Available</h2>
-    <ul>
-      <li v-for="(extractor, index) in filteredExtractors" 
-        :key="`${extractor}`"
-      >
-        {{ extractor }} <button @click="installPlugin(index)">Install</button>
-      </li>
-    </ul>
-  </article>
+  <div class="content">
+    <h1 class="title is-2">Connectors</h1>
+    <base-accordion>
+      <template slot="header">
+        <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
+      </template>
+      <template slot="body">
+        <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
+        <h2 class="title is-4">Installed</h2>
+        <p v-if="filteredInstalledPlugins.length === 0">No extractors currently installed</p>
+        <ul v-else>
+          <li v-for="(extractor, index) in filteredInstalledPlugins" 
+            :key="`${extractor.name}`"
+          >
+            {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>
+            <div>
+              <label for="Database"></label>
+              <input type="text">
+            </div>
+          </li>
+        </ul>
+        <h2 class="title is-4">Available</h2>
+        <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
+        <ul v-else>
+          <li v-for="(extractor, index) in filteredExtractors" 
+            :key="`${extractor}`"
+          >
+            {{ extractor }} <button @click="installPlugin(index)">Install</button>
+          </li>
+        </ul>
+      </template>
+    </base-accordion>
+        <base-accordion>
+      <template slot="header">
+        <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
+      </template>
+      <template slot="body">
+        <input type="text" v-model="filterText" placeholder="Filter loaders..." class="input">
+        <h2 class="title is-4">Installed</h2>
+        <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p>
+        <ul v-else>
+          <li v-for="(extractor, index) in filteredInstalledPlugins" 
+            :key="`${extractor.name}`"
+          >
+            {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>
+            <div>
+              <label for="Database"></label>
+              <input type="text">
+            </div>
+          </li>
+        </ul>
+        <h2 class="title is-4">Available</h2>
+        <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
+        <ul v-else>
+          <li v-for="(extractor, index) in filteredExtractors" 
+            :key="`${extractor}`"
+          >
+            {{ extractor }} <button @click="installPlugin(index)">Install</button>
+          </li>
+        </ul>
+      </template>
+    </base-accordion>
+  </div>
 </template>
 
-<style>
-
+<style lang="scss">
+.content {
+  padding: 20px;
+}
 </style>

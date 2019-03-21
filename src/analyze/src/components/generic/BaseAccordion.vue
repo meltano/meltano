@@ -11,11 +11,11 @@ export default {
 <template>
   <section class="accordion">
     <div class="accordion-header" @click="showContent = !showContent">
-      <p>Accordion Title</p>
+      <slot name="header"></slot>
     </div>
     <div class="accordion-body" :class="{ 'is-open': showContent }">
       <div class="accordion-content">
-        <p>Pariatur culpa consectetur consectetur eu duis do eiusmod labore cupidatat id et voluptate. Amet veniam exercitation dolor consectetur nulla ex nostrud esse qui. Sint commodo excepteur voluptate non adipisicing nisi commodo minim veniam anim laboris irure pariatur aute. Exercitation consequat consectetur non do consectetur minim ad eu elit ex est.</p>
+        <slot name="body"></slot>
       </div>
     </div>
   </section>
@@ -28,6 +28,7 @@ export default {
   background-color: #f5f5f5;
   border-radius: 4px;
   font-size: 1rem;
+  margin-bottom: 2rem;
 }
 
 .accordion-header {
