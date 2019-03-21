@@ -1,4 +1,5 @@
 import orchestrationsApi from '../../api/orchestrations';
+import orchestrations from '../../api/orchestrations';
 
 const state = {
   extractors: [],
@@ -8,6 +9,7 @@ const state = {
   currentConnectionName: '',
   connectionNames: [],
   currentLoader: '',
+  installedPlugins: {},
   log: 'Job log will appear when run.',
 };
 
@@ -43,6 +45,13 @@ const actions = {
       .then((response) => {
         commit('setAll', response.data);
       });
+  },
+
+  getInstalledPlugins({ commit }) {
+    orchestrationsApi.installedPlugins()
+      .then((response) => {
+        commit('setInstalledPlugins', response.data)
+      })
   },
 
   getConnectionNames({ commit }) {
@@ -134,6 +143,10 @@ const mutations = {
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
   },
+
+  setInstalledPlugins(_, projectConfig) {
+    state.installedPlugins = projectConfig.plugins;
+  }
 };
 
 export default {

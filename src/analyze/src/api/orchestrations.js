@@ -10,6 +10,10 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
   },
 
+  installedPlugins() {
+    return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
+  },
+
   load(extractor, loader) {
     return axios.post(utils.apiUrl('orchestrations', `load/${loader}`), {
       extractor,
