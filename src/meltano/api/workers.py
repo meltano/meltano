@@ -29,19 +29,14 @@ class MeltanoBackgroundCompiler:
 
     @property
     def model_dirs(self):
-        return (
-            self.project.root_dir("model"),
-            self.project.model_dir(),
-        )
+        return (self.project.root_dir("model"), self.project.model_dir())
 
     def setup_observer(self):
         event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
 
         for source in self.model_dirs:
-            observer.schedule(
-                event_handler, str(source), recursive=True
-            )
+            observer.schedule(event_handler, str(source), recursive=True)
 
         return observer
 
