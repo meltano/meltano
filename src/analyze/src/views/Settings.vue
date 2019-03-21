@@ -49,15 +49,15 @@ export default {
           }],
         },
         {
-          name: 'Pipeline',
+          name: 'Connectors',
           pages: [
             {
-              title: 'Taps',
-              href: '/settings/taps',
+              title: 'Extractors',
+              href: '/settings/connectors#extractors',
             },
             {
-              title: 'Targets',
-              href: '/settings/targets',
+              title: 'Loaders',
+              href: '/settings/connectors#loaders',
             },
           ],
         },

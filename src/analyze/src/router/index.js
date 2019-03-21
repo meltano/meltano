@@ -5,8 +5,7 @@ import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
 import Orchestrate from '@/views/Orchestrate';
 import Settings from '@/views/Settings';
-import TapsPage from '@/views/TapsPage';
-import TargetsPage from '@/views/TargetsPage';
+import ConnectorsPage from '@/views/ConnectorsPage';
 import SettingsDatabase from '@/components/settings/Database';
 import SettingsRoles from '@/components/settings/Roles';
 
@@ -58,12 +57,8 @@ export default new Router({
           component: SettingsDatabase,
         },
         {
-          path: 'taps',
-          component: TapsPage,
-        },
-        {
-          path: 'targets',
-          component: TargetsPage,
+          path: 'connectors',
+          component: ConnectorsPage,
         },
       ],
     },
