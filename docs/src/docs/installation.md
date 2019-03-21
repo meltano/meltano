@@ -49,8 +49,10 @@ See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more informa
 
 Then run the following commands:
 ```bash
+# create a virtual environment to run Meltano isolated from OS-level packages
 $ python -m venv venv
 
+# install Meltano in the aforementioned virtual environment
 $ pip install meltano
 ```
 
@@ -64,9 +66,9 @@ That's it! Meltano is now be available in the virtual environment we setup. Now,
 
 ## Docker Images
 
-Meltano provides the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image ready to use.
+We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
 
-> Note: The **meltano/meltano** docker image is also available in the GitLab's registry: `registry.gitlab.com`
+> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
 
 This image contains everything you need to get started with Meltano.
 
@@ -86,6 +88,10 @@ Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more
 ### Getting the Latest Version
 
 To update Meltano to the latest version, run the following command in your terminal:
+
+::: tip Remember
+Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
+:::
 
 ```
 pip install --upgrade meltano
