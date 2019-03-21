@@ -120,8 +120,8 @@ const actions = {
 
 const mutations = {
   setAll(_, orchestrationData) {
-    state.extractors = orchestrationData.extractors;
-    state.loaders = orchestrationData.loaders;
+    state.extractors = orchestrationData.extractors.split('\n');
+    state.loaders = orchestrationData.loaders.split('\n');
   },
 
   setConnectionNames(_, connectionNames) {
