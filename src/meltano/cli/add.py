@@ -119,6 +119,10 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
             click.secho(run_install_plugin["stderr"], fg="red")
 
         click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")
+
+        docs_link = plugin._extras.get("docs")
+        if docs_link:
+            click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
     except PluginNotSupportedException:
         click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
         raise click.Abort()
