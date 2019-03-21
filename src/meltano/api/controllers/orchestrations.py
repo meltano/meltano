@@ -1,11 +1,13 @@
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
+from meltano.core.tracking import GoogleAnalyticsTracker
+
+from meltano.cli.add import extractor
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
-
-orchestrationsBP = Blueprint("orchestrations", __name__, url_prefix="/orchestrations")
+orchestrationsBP = Blueprint("orchestrations", __name__, url_prefix="/api/v1/orchestrations")
 
 
 @orchestrationsBP.route("/", methods=["GET"])
@@ -15,6 +17,10 @@ def index():
     result = new_plugin_discovery_service.discover(PluginType.ALL)
     return jsonify(result)
 
+@orchestrationsBP.route("/installed-plugins", methods=["GET"])
+def installed_plugins():
+    project = Project.find()
+    return jsonify(project.meltano)
 
 @orchestrationsBP.route("/connection_names", methods=["GET"])
 def connection_names():
