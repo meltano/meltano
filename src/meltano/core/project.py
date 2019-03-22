@@ -29,7 +29,6 @@ class Project:
 
     def activate(self):
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
-        os.chdir(self.root)
         logging.debug(f"Activated project at {self.root}")
 
     def reload(self):
@@ -38,25 +37,10 @@ class Project:
 
     @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
-        """
-        Recursively search for a `meltano.yml` file.
-        """
-        # pushd
-        cwd = os.getcwd()
+        project = Project(from_dir)
 
-        try:
-            if from_dir:
-                os.chdir(from_dir)
-
-            project = Project()
-            while not project.meltanofile.exists():
-                if os.getcwd() == "/":
-                    raise ProjectNotFound()
-
-                os.chdir("..")
-                project = Project()
-        finally:
-            os.chdir(cwd)  # popd
+        if not project.meltanofile.exists():
+            raise ProjectNotFound()
 
         if activate:
             project.activate()

@@ -61,6 +61,14 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
          
         <!---->
          
+        <p
+          class="menu-label"
+        >
+          
+        No files found
+      
+        </p>
+         
       </div>
     </div>
   </aside>
@@ -154,6 +162,14 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
          
         <!---->
          
+        <p
+          class="menu-label"
+        >
+          
+        No files found
+      
+        </p>
+         
       </div>
     </div>
   </aside>
@@ -242,6 +258,14 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
         </div>
          
         <!---->
+         
+        <p
+          class="menu-label"
+        >
+          
+        No files found
+      
+        </p>
          
       </div>
     </div>
@@ -340,6 +364,14 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
           class="menu-label"
         >
           
+        No files found
+      
+        </p>
+         
+        <p
+          class="menu-label"
+        >
+          
         Dashboards
       
         </p>
@@ -347,8 +379,6 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
         <ul
           class="menu-list"
         >
-          <!---->
-           
           <li>
             <div
               class="columns is-vcentered"
@@ -477,6 +507,14 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
           class="menu-label"
         >
           
+        No files found
+      
+        </p>
+         
+        <p
+          class="menu-label"
+        >
+          
         Documents
       
         </p>
@@ -484,8 +522,6 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
         <ul
           class="menu-list"
         >
-          <!---->
-           
           <li>
             <div
               class="columns is-vcentered"
@@ -603,6 +639,14 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
           class="menu-label"
         >
           
+        No files found
+      
+        </p>
+         
+        <p
+          class="menu-label"
+        >
+          
         Reports
       
         </p>
@@ -610,8 +654,6 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
         <ul
           class="menu-list"
         >
-          <!---->
-           
           <li>
             <div
               class="columns is-vcentered"
@@ -740,6 +782,14 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
           class="menu-label"
         >
           
+        No files found
+      
+        </p>
+         
+        <p
+          class="menu-label"
+        >
+          
         Tables
       
         </p>
@@ -747,8 +797,6 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
         <ul
           class="menu-list"
         >
-          <!---->
-           
           <li>
             <div
               class="columns is-vcentered"
@@ -862,6 +910,8 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
          
         <!---->
          
+        <!---->
+         
         <p
           class="menu-label"
         >
@@ -873,8 +923,6 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
         <ul
           class="menu-list"
         >
-          <!---->
-           
           <li>
             <div
               class="columns is-vcentered"

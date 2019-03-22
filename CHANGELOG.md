@@ -9,12 +9,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
 
 ### Changes
 * [#283](https://gitlab.com/meltano/meltano/issues/283) Silence pip`s output when there is not error
+* [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
 
 ### Fixes
+* [#510](https://gitlab.com/meltano/meltano/issues/510) Fix an issue when finding the current Meltano project in a multi-threaded environment.
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
+* [#492](https://gitlab.com/meltano/meltano/issues/492) A few small contextual additions to help streamline the release process
 
 ### Breaks
 
@@ -35,7 +39,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Added troubleshooting button to help users add context to a pre-filled bug issue
 
 ### Fixes
-* Lock down the version of everything in setup.py
+* Fix the API database being mislocated
 * Replaced the stale Meltano UI example image in the Carbon Emissions tutorial
 * 473: Fix the docker image (meltano/meltano) from failing to expose the API
 

@@ -8,7 +8,7 @@ First time using Meltano? No worries. We have you covered with tutorials that wi
 
 <TutorialTable />
 
-## Starter
+## Starter - Carbon Emissions
 
 This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) (carbon emissions/footprint) and SQLite tutorial. This datasource was chosen as it is public, free, and does not require credentials to access. It guides you through data extraction from the Carbon Intensity API, loading extracted entities to a SQLite database, and analyzing the results.
 
@@ -23,6 +23,10 @@ This tutorial is perfect if your goal is to get Meltano up and running as quickl
 ### Initialize Your Project
 
 Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
+
+::: tip Remember
+Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
+:::
 
 ```bash
 # Initialize a new project with a folder called carbon
@@ -48,7 +52,7 @@ Meltano is magical and powerful.
 
 It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
 
-Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from it using Meltano UI with its automatic SQL generation.
+Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from them using Meltano UI with its automatic SQL generation.
 :::
 
 ### Analyze with Meltano UI
@@ -82,7 +86,7 @@ With Meltano UI up and running, we can automatically generate queries with as li
   - Click the Run button to query using the generated SQL
 - Open the Charts accordion to visualize the data!
 
-## Intermediate
+## Intermediate - Salesforce
 
 This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results.
 
@@ -94,6 +98,10 @@ This is the Salesforce API and Postgres database tutorial. It guides you through
 ### Initialize Your Project
 
 To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+
+::: tip Remember
+Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
+:::
 
 ```bash
 # Initialize a new project with a folder called sfdc-project
@@ -218,6 +226,14 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
+## Advanced - Coming Soon
+
+You can look forward to the following tutorials in the future:
+
+- Salesforce > Snowflake Tutorial
+- How to add your own transforms
+- How to add your own .m5o models for generating reports
+
 ## Using Docker
 
 It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
@@ -273,11 +289,3 @@ $ docker run -v $(pwd):/project \
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
 For furter analysis, please head to the [Analyze](#analyze) section.
-
-## Advanced
-
-You can look forward to the following tutorials in the future:
-
-- Salesforce > Snowflake Tutorial
-- How to add your own transforms
-- How to add your own .m5o models for generating reports
