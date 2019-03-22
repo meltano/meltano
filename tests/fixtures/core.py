@@ -30,7 +30,7 @@ def discovery():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(
         project, discovery=discovery
@@ -67,7 +67,7 @@ def add_model(project, plugin_install_service, project_add_service):
     plugin_install_service.install_plugin(plugin)
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project)
 

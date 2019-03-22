@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
 
 ### Changes
+* [#283](https://gitlab.com/meltano/meltano/issues/283) Silence pip`s output when there is not error
 * [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
 
 ### Fixes
