@@ -1,8 +1,9 @@
 <script>
 export default {
-  data () {
-    return {
-      showContent: false
+  props: {
+    isOpen: {
+      type: Boolean,
+      default: false
     }
   }
 }
@@ -10,10 +11,10 @@ export default {
 
 <template>
   <section class="accordion">
-    <div class="accordion-header" @click="showContent = !showContent">
+    <div class="accordion-header" @click="isOpen = !isOpen">
       <slot name="header"></slot>
     </div>
-    <div class="accordion-body" :class="{ 'is-open': showContent }">
+    <div class="accordion-body" :class="{ 'is-open': isOpen }">
       <div class="accordion-content">
         <slot name="body"></slot>
       </div>

@@ -74,7 +74,7 @@ export default {
 <template>
   <div class="content">
     <h1 class="title is-2">Connectors</h1>
-    <base-accordion>
+    <base-accordion :isOpen="true">
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
       </template>
@@ -83,7 +83,7 @@ export default {
         <h2 class="title is-4">Installed</h2>
         <p v-if="filteredInstalledPlugins.length === 0">No extractors currently installed</p>
         <ul v-else>
-          <li v-for="(extractor, index) in filteredInstalledPlugins" 
+          <li v-for="extractor in filteredInstalledPlugins" 
             :key="`${extractor.name}`"
           >
             {{ extractor.name }}
