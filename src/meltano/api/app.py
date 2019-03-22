@@ -7,6 +7,7 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
 from flask_login import current_user
+from flask_cors import CORS
 from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
@@ -48,6 +49,7 @@ def create_app(config={}):
     )
     stdout_handler = logging.StreamHandler()
 
+    logger.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     logger.addHandler(stdout_handler)
 
@@ -59,18 +61,14 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
-    from .security import security, users, init_app as security_init_app
-    from .auth import setup_oauth
+    from .security import security, users, setup_security
+    from .security.oauth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
-    security_init_app(app, project)
+    setup_security(app, project)
     setup_oauth(app)
-
-    if app.env != "production":
-        from flask_cors import CORS
-
-        CORS(app, origins="http://localhost:8080")
+    CORS(app, origins="*")
 
     from .controllers.root import root
     from .controllers.dashboards import dashboardsBP
@@ -86,13 +84,20 @@ def create_app(config={}):
     app.register_blueprint(settingsBP)
     app.register_blueprint(sqlBP)
 
-    @app.before_request
-    def before_request():
+    if app.config["PROFILE"]:
+        from .profiler import init
+
+        init(app)
+
+    @app.after_request
+    def after_request(res):
         request_message = f"[{request.url}]"
-        if current_user:
+
+        if request.method != "OPTIONS":
             request_message += f" as {current_user}"
 
         logger.info(request_message)
+        return res
 
     return app
 
@@ -107,7 +112,7 @@ def start(project, **kwargs):
     try:
         app_config = kwargs.pop("app_config", {})
         app = create_app(app_config)
-        from .security import create_dev_user
+        from .security.identity import create_dev_user
 
         with app.app_context():
             # TODO: alembic migration
