@@ -6,7 +6,6 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - lint
   - test
   - docs
   - build-base
@@ -18,7 +17,7 @@ stages:
   # - production
 
 lint:
-  stage: lint
+  stage: test
   image:
     name: registry.gitlab.com/meltano/meltano/base
     entrypoint: [""]
