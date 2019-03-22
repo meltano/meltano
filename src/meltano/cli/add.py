@@ -2,12 +2,14 @@ import os
 import yaml
 import json
 import click
+import sys
 from urllib.parse import urlparse
 from . import cli
 from .params import project
 from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
+    PluginAlreadyAddedException,
 )
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
@@ -16,6 +18,7 @@ from meltano.core.project import Project
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.error import SubprocessError
 
 
 @cli.group()
@@ -100,30 +103,31 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         add_service = ProjectAddService(project)
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(f"{plugin_name} added to your meltano.yml config", fg="green")
-
-        install_service = PluginInstallService(project)
-        click.secho("Activating your virtual environment", fg="green")
-        run_venv = install_service.create_venv(plugin)
-
-        if run_venv["stdout"]:
-            click.echo(run_venv["stdout"])
-        if run_venv["stderr"]:
-            click.secho(run_venv["stderr"], fg="red")
-
-        click.secho(f"Installing {plugin_name} via pip...", fg="green")
-        run_install_plugin = install_service.install_plugin(plugin)
-        if run_install_plugin["stdout"]:
-            click.echo(run_install_plugin["stdout"])
-        if run_install_plugin["stderr"]:
-            click.secho(run_install_plugin["stderr"], fg="red")
-
-        click.secho(f"Added and installed {plugin_type} {plugin_name}", fg="green")
-    except PluginNotSupportedException:
-        click.secho(f"The {plugin_type} {plugin_name} is not supported", fg="red")
+        click.secho(f"Added '{plugin_name}' to your Meltano project.")
+    except PluginAlreadyAddedException as err:
+        click.secho(
+            f"'{plugin_name}' was found in your Meltano project. Use `meltano install` to install it.",
+            fg="yellow",
+            err=True,
+        )
+        plugin = err.plugin
+    except (PluginNotSupportedException, PluginNotFoundError):
+        click.secho(f"Error: {plugin_type} '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
-    except PluginNotFoundError as e:
-        click.secho(f"{plugin_type.title()} {plugin_name} not supported", fg="red")
+
+    try:
+        install_service = PluginInstallService(project)
+        install_service.create_venv(plugin)
+        click.secho(f"Activated '{plugin_name}' virtual environment.", fg="green")
+
+        run = install_service.install_plugin(plugin)
+        click.secho(run.stdout)
+        click.secho(f"Installed '{plugin_name}'.", fg="green")
+
+        click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
+    except SubprocessError as proc_err:
+        click.secho(str(proc_err), fg="red")
+        click.secho(proc_err.process.stderr, err=True)
         raise click.Abort()
 
 
@@ -131,23 +135,18 @@ def add_transform(project: Project, plugin_name: str):
     try:
         project_add_service = ProjectAddService(project)
         plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
-        click.secho(
-            f"Transform {plugin_name} added to your meltano.yml config", fg="green"
-        )
+        click.secho(f"Added transform '{plugin_name}' to your Meltano project.")
 
         # Add repo to my-test-project/transform/packages.yml
         transform_add_service = TransformAddService(project)
         transform_add_service.add_to_packages(plugin)
-        click.secho(f"Transform {plugin_name} added to your dbt packages", fg="green")
+        click.secho(f"Added transform '{plugin_name}' to your dbt packages", fg="green")
 
         # Add model and vars to my-test-project/transform/dbt_project.yml
         transform_add_service.update_dbt_project(plugin)
         click.secho(
-            f"Transform {plugin_name} added to your dbt_project.yml", fg="green"
+            f"Added transform '{plugin_name}' to your dbt_project.yml", fg="green"
         )
-    except PluginNotSupportedException:
-        click.secho(f"Transform {plugin_name} is not supported", fg="red")
-        raise click.Abort()
-    except PluginNotFoundError as e:
-        click.secho(f"Transform {plugin_name} is not supported", fg="red")
+    except (PluginNotSupportedException, PluginNotFoundError):
+        click.secho(f"Error: transform '{plugin_name}' is not supported", fg="red")
         raise click.Abort()
