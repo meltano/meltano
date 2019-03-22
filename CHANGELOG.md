@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 - [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
+- [#370](https://gitlab.com/meltano/meltano/issues/370) Enabled resource protection using role-based access control
 
 ### Changes
 * [#283](https://gitlab.com/meltano/meltano/issues/283) Silence pip`s output when there is not error
