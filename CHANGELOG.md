@@ -34,7 +34,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
 
 ### Fixes
+<<<<<<< HEAD
 * [#433](https://gitlab.com/meltano/meltano/issues/433) Add the `sandbox` configuration to `tap-zuora`.
+=======
+* When m5o contains no joins it still works
+
+>>>>>>> Add changelog
 * [#501](https://gitlab.com/meltano/meltano/issues/501) Fix `meltano ui` crashing when the OS ran out of file watcher.
 * [#510](https://gitlab.com/meltano/meltano/issues/510) Fix an issue when finding the current Meltano project in a multi-threaded environment.
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Improved documentation around tutorials and Meltano requirements
