@@ -11,7 +11,8 @@ export default {
   },
   data () {
     return {
-      filterText: ''
+      filterText: '',
+      installingPlugin: false
     }
   },
   computed: {
@@ -36,11 +37,16 @@ export default {
   },
   methods: {
     installPlugin(index, extractor) {
+      this.installingPlugin = true;
+
       orchestrationsApi.addExtractors({
         name: extractor
       }).then((response) => {
         if (response.status === 200) {
-          this.$store.dispatch('orchestrations/getInstalledPlugins');
+          this.$store.dispatch('orchestrations/getInstalledPlugins')
+            .then((response) => {
+              this.installingPlugin = false;
+            });
         }
       })
     }
@@ -71,6 +77,8 @@ export default {
           </li>
         </ul>
         <h2 class="title is-4">Available</h2>
+        <p v-if="installingPlugin">Installing...</p>
+        <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
         <ul v-else>
           <li v-for="(extractor, index) in filteredExtractors" 
