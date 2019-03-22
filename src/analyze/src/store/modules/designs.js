@@ -70,6 +70,7 @@ const helpers = {
       delete filters[prop].sql;
     });
 
+    if(!state.design.joins) state.design.joins = [];
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
