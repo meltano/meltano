@@ -145,7 +145,7 @@ class MeltanoAnalysisFileParser:
         base_design = design["related_table"]["name"]
         graph = nx.DiGraph()
         graph.add_node(base_design)
-        joins = deepcopy(design["joins"])
+        joins = deepcopy(design.get("joins", []))
         self.generate_join_graph_for_node(graph, base_design, joins)
         return json_graph.node_link_data(graph)
 
