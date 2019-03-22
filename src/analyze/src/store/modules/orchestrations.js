@@ -116,9 +116,17 @@ const actions = {
         state.log = response.data.append;
       });
   },
+
+  updateExtractors({ commit }, itemIndex) {
+    commit('removeExtractor', itemIndex);
+  },
 };
 
 const mutations = {
+  removeExtractor(_, itemIndex) {
+    state.extractors.splice(itemIndex, 1);
+  },
+
   setAll(_, orchestrationData) {
     state.extractors = orchestrationData.extractors.split('\n');
     state.loaders = orchestrationData.loaders.split('\n');

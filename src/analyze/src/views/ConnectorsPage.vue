@@ -43,6 +43,7 @@ export default {
         name: extractor
       }).then((response) => {
         if (response.status === 200) {
+          this.$store.dispatch('orchestrations/updateExtractors', index);
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then((response) => {
               this.installingPlugin = false;
