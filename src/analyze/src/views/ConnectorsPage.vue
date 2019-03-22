@@ -38,16 +38,16 @@ export default {
     ]),
     filteredExtractors() {
       if (this.filterText) {
-        return this.tempExtractors.filter((item) => item.indexOf(this.filterText) > -1)
+        return this.extractors.filter((item) => item.indexOf(this.filterText) > -1)
       } else {
-        return this.tempExtractors
+        return this.extractors
       }
     },
     filteredInstalledPlugins() {
       if (this.filterText) {
-        return this.tempInstalledPlugins.extractors.filter((item) => item.name.indexOf(this.filterText) > -1)
+        return this.installedPlugins.extractors.filter((item) => item.name.indexOf(this.filterText) > -1)
       } else {
-        return this.tempInstalledPlugins.extractors
+        return this.installedPlugins.extractors
       }
     }
   },
@@ -57,16 +57,11 @@ export default {
 
       orchestrationsApi.addExtractors({
         name: extractor
+      }).then((response) => {
+        if (response.status === 200) {
+          this.$store.dispatch('orchestrations/getInstalledPlugins');
+        }
       })
-
-      this.tempInstalledPlugins.extractors.push({
-        name: plugin[0]
-      })
-    },
-    uninstallPlugin(index) {
-      const extractor = this.tempInstalledPlugins.extractors.splice(index, 1)
-
-      this.tempExtractors.push(extractor[0].name)
     }
   },
   created () {
@@ -91,11 +86,7 @@ export default {
           <li v-for="(extractor, index) in filteredInstalledPlugins" 
             :key="`${extractor.name}`"
           >
-            {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>
-            <div>
-              <label for="Database"></label>
-              <input type="text">
-            </div>
+            {{ extractor.name }}
           </li>
         </ul>
         <h2 class="title is-4">Available</h2>
