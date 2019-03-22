@@ -1,7 +1,9 @@
 <script>
+import BaseAccordion from '@/components/generic/BaseAccordion.vue';
+
 import { mapState } from 'vuex';
 
-import BaseAccordion from '@/components/generic/BaseAccordion.vue';
+import orchestrationsApi from '../api/orchestrations';
 
 export default {
   components: {
@@ -50,8 +52,12 @@ export default {
     }
   },
   methods: {
-    installPlugin(index) {
+    installPlugin(index, extractor) {
       const plugin = this.tempExtractors.splice(index, 1)
+
+      orchestrationsApi.addExtractors({
+        name: extractor
+      })
 
       this.tempInstalledPlugins.extractors.push({
         name: plugin[0]
@@ -98,7 +104,7 @@ export default {
           <li v-for="(extractor, index) in filteredExtractors" 
             :key="`${extractor}`"
           >
-            {{ extractor }} <button @click="installPlugin(index)">Install</button>
+            {{ extractor }} <button @click="installPlugin(index, extractor)">Install</button>
           </li>
         </ul>
       </template>
