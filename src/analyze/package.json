@@ -21,7 +21,7 @@
     "@fortawesome/vue-fontawesome": "^0.1.0",
     "@types/jest": "^24.0.9",
     "axios": "^0.18.0",
-    "bulma": "^0.7.1",
+    "bulma": "^0.7.4",
     "chart.js": "^2.7.2",
     "dotenv": "^6.0.0",
     "lodash": "^4.17.11",
