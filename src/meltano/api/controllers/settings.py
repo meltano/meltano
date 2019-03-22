@@ -2,9 +2,10 @@ from flask import Blueprint, jsonify, request
 from flask_restful import Api, Resource, fields, marshal, marshal_with
 from flask_security import roles_required
 from flask_principal import Permission, Need
+from werkzeug.exceptions import Forbidden
 from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
-from meltano.api.models import db, User, Role, RolesUsers, RolePermissions
+from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
 
 settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
@@ -18,12 +19,14 @@ def before_request():
 
 
 @settingsBP.route("/", methods=["GET"])
+@roles_required("admin")
 def index():
     settings_helper = SettingsHelper()
     return jsonify(settings_helper.get_connections())
 
 
 @settingsBP.route("/save", methods=["POST"])
+@roles_required("admin")
 def save():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -90,6 +93,7 @@ class AclResource(Resource):
     }
 
     @marshal_with(AclDefinition)
+    @roles_required("admin")
     def get(self):
         return {
             "users": User.query.options(joinedload("roles")).all(),
@@ -119,8 +123,8 @@ class RolesResource(Resource):
         db.session.commit()
         return role, 201
 
-    @marshal_with(AclResource.RoleDefinition)
     @roles_required("admin")
+    @marshal_with(AclResource.RoleDefinition)
     def delete(self):
         payload = request.get_json()
         role = payload["role"]
@@ -130,6 +134,9 @@ class RolesResource(Resource):
             role = Role.query.filter_by(name=role["name"]).one()
 
             if not user:
+                if role == "admin":
+                    return "The `admin` role cannot be deleted.", 403
+
                 # delete the role
                 db.session.delete(role)
             else:
@@ -193,5 +200,7 @@ class RolePermissionsResource(Resource):
 
 
 settingsApi.add_resource(AclResource, "/acl")
-settingsApi.add_resource(RolePermissionsResource, "/acl/roles/permissions")
-settingsApi.add_resource(RolesResource, "/acl/roles")
+settingsApi.add_resource(
+    RolePermissionsResource, "/acl/roles/permissions", endpoint="role_permissions"
+)
+settingsApi.add_resource(RolesResource, "/acl/roles", endpoint="roles")
