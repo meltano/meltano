@@ -11,24 +11,7 @@ export default {
   },
   data () {
     return {
-      filterText: '',
-      tempInstalledPlugins: {
-        extractors: [
-          {
-            name: 'tap-carbon-intensity'
-          }
-        ]
-      },
-      tempExtractors: [
-        "tap-gitlab",
-        "tap-zendesk",
-        "tap-zuora",
-        "tap-marketo",
-        "tap-salesforce",
-        "tap-mongodb",
-        "tap-stripe",
-        "tap-fastly",
-      ]
+      filterText: ''
     }
   },
   computed: {
@@ -53,8 +36,6 @@ export default {
   },
   methods: {
     installPlugin(index, extractor) {
-      const plugin = this.tempExtractors.splice(index, 1)
-
       orchestrationsApi.addExtractors({
         name: extractor
       }).then((response) => {
