@@ -53,9 +53,9 @@ class DashboardsHelper:
 
     def save_dashboard(self, data):
         try:
-          project = Project.find()
+            project = Project.find()
         except ProjectNotFound as e:
-          return None
+            return None
 
         slug = slugify(data["name"])
         file_name = f"{slug}.dashboard.m5o"

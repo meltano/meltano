@@ -1,6 +1,7 @@
-import startApi from '../../api/start';
+import projectsApi from '../../api/projects';
 
 const state = {
+  projects: [],
   project: '',
   cwdLoaded: false,
   existingPath: '',
@@ -9,21 +10,34 @@ const state = {
   creatingProject: false,
 };
 
-const getters = {};
+const getters = {
+  hasProjects() {
+    return state.projects.length;
+  },
+};
 
 const actions = {
 
+  getProjects({ commit }) {
+    projectsApi.getProjects()
+      .then((data) => {
+        commit('setProjects', data.data);
+      })
+      .catch(() => {});
+  },
+
   getProject(_, router) {
-    startApi.hasProject()
+    projectsApi.hasProject()
       .then((data) => {
         if (!data.data.has_project) {
-          router.push({ path: '/start' });
+          router.push({ path: '/projects' });
         }
-      });
+      })
+      .catch(() => {});
   },
 
   getCwd({ commit }) {
-    startApi.getCwd()
+    projectsApi.getCwd()
       .then((data) => {
         commit('setCwd', data.data.cwd);
       })
@@ -32,7 +46,7 @@ const actions = {
 
   projectNameChanged({ commit }, project) {
     const nonAlphaProject = project.replace(/[^0-9A-Za-z\-_]/gi, '').toLowerCase();
-    startApi.getExists(nonAlphaProject)
+    projectsApi.getExists(nonAlphaProject)
       .then((data) => {
         commit('setExists', data.data);
         commit('setProjectName', nonAlphaProject);
@@ -41,11 +55,15 @@ const actions = {
   },
 
   createProject() {
-    return startApi.createProject(state.project);
+    return projectsApi.createProject(state.project);
   },
 };
 
 const mutations = {
+  setProjects(_, projects) {
+    state.projects = projects;
+  },
+
   setCwd(_, cwd) {
     state.cwd = cwd;
     state.cwdLoaded = true;

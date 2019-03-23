@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Repo from '@/views/Repo';
+import Projects from '@/views/Projects';
 import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
@@ -16,16 +17,22 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'files',
       redirect: '/files',
     },
     {
+      path: '/projects/',
+      name: 'projects',
+      component: Projects,
+    },
+    {
       path: '/start/',
-      name: 'Start',
+      name: 'start',
       component: Start,
     },
     {
-      path: '/files/',
-      name: 'Repo',
+      path: '/projects/:slug/files/',
+      name: 'projectFiles',
       component: Repo,
     },
     {
@@ -35,22 +42,22 @@ export default new Router({
     },
     {
       path: '/analyze/:model/:design/reports/report/:slug',
-      name: 'Report',
+      name: 'design_report',
       component: Design,
     },
     {
       path: '/dashboards/',
-      name: 'Dashboards',
+      name: 'dashboards',
       component: Dashboards,
     },
     {
       path: '/dashboards/dashboard/:slug',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: Dashboards,
     },
     {
       path: '/settings',
-      name: 'Settings',
+      name: 'settings',
       component: Settings,
       children: [{
         path: 'roles',
@@ -62,7 +69,7 @@ export default new Router({
     },
     {
       path: '/orchestrations',
-      name: 'Orchestrate',
+      name: 'orchestrate',
       component: Orchestrate,
     },
   ],

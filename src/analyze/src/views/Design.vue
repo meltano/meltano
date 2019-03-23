@@ -485,8 +485,6 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import store from '@/store';
-import startApi from '@/api/start';
 import capitalize from '@/filters/capitalize';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Dropdown from '../components/generic/Dropdown';
@@ -513,7 +511,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
   created() {
-    this.$store.dispatch('start/getProject', this.$router);
+    this.$store.dispatch('projects/getProject', this.$router);
     this.$store.dispatch('designs/getDesign', {
       model: to.params.model,
       design: to.params.design,

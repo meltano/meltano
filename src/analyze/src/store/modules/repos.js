@@ -5,6 +5,7 @@ const state = {
   loadingValidation: false,
   loadingUpdate: false,
   models: [],
+  slug: '',
   validated: false,
   navbarClicked: false,
   errors: [],
@@ -38,8 +39,9 @@ const getters = {
 };
 
 const actions = {
-  getRepo({ commit }) {
-    repoApi.index()
+  getRepo({ commit }, slug) {
+    commit('setSlug', slug);
+    repoApi.project_by_slug(slug)
       .then((response) => {
         const files = response.data;
         commit('setValidatedState', response.data);
@@ -49,7 +51,7 @@ const actions = {
   },
 
   getFile({ commit }, file) {
-    repoApi.file(file.id)
+    repoApi.file(state.slug, file.id)
       .then((response) => {
         commit('setCurrentFileTable', response.data);
       });
@@ -58,7 +60,7 @@ const actions = {
   lint({ commit }) {
     state.loadingValidation = true;
     repoApi
-      .lint()
+      .lint(state.slug)
       .then((response) => {
         commit('setValidatedState', response.data);
         state.loadingValidation = false;
@@ -71,7 +73,7 @@ const actions = {
   sync({ commit, dispatch }) {
     state.loadingUpdate = true;
     repoApi
-      .sync()
+      .sync(state.slug)
       .then((response) => {
         dispatch('getModels');
         commit('setValidatedState', response.data);
@@ -83,7 +85,8 @@ const actions = {
   },
 
   getModels({ commit }) {
-    repoApi.models()
+    if(!state.slug) return;
+    repoApi.models(state.slug)
       .then((response) => {
         commit('setModels', response.data);
       });
@@ -100,6 +103,10 @@ const mutations = {
     setTimeout(() => {
       state.navbarClicked = false;
     }, 500);
+  },
+
+  setSlug(_, slug) {
+    state.slug = slug;
   },
 
   setModels(_, models) {

@@ -63,16 +63,16 @@ def before_request():
     pass
 
 
-@reposBP.route("/", methods=["GET"])
-def index():
+@reposBP.route("/projects/<project_slug>", methods=["GET"])
+def project_by_slug(project_slug):
     try:
-        project = Project.find()
+        project = Project.find_by_slug(project_slug)
     except ProjectNotFound as e:
         project = None
         return jsonify(
             {
                 "result": False,
-                "errors": [{"message": "Not inside a project", "file_name": "*"}],
+                "errors": [{"message": "Not a project", "file_name": "*"}],
                 "files": [],
             }
         )
@@ -93,7 +93,7 @@ def index():
         "reports": {"label": "Reports", "items": reportsFiles},
         "tables": {"label": "Tables", "items": []},
     }
-    onlydocs = project.model_dir().parent.glob("*.md")
+    onlydocs = path.parent.glob("*.md")
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
         sortedM5oFiles["documents"]["items"].append(file_dict)
@@ -131,12 +131,22 @@ def index():
     return jsonify(sortedM5oFiles)
 
 
-@reposBP.route("/file/<unique_id>", methods=["GET"])
-def file(unique_id):
+@reposBP.route("/projects/<project_slug>/file/<unique_id>", methods=["GET"])
+def file(project_slug, unique_id):
     file_path = decode_file_path_from_id(unique_id)
     (filename, ext) = os.path.splitext(file_path)
     is_markdown = False
-    project = Project.find()
+    try:
+        project = Project.find_by_slug(project_slug)
+    except ProjectNotFound as e:
+        project = None
+        return jsonify(
+            {
+                "result": False,
+                "errors": [{"message": "Not a project", "file_name": "*"}],
+                "files": [],
+            }
+        )
     path_to_file = project.model_dir(file_path).resolve()
     with open(path_to_file, "r") as read_file:
         data = read_file.read()
@@ -153,9 +163,9 @@ def file(unique_id):
         )
 
 
-def lint_all(compile):
+def lint_all(compile, project_slug):
     try:
-        project = Project.find()
+        project = Project.find_by_slug(project_slug)
     except ProjectNotFound as e:
         project = None
         return jsonify(
@@ -192,20 +202,25 @@ def handle_file_not_found(e):
     return jsonify({"result": False, "error": str(e)})
 
 
-@reposBP.route("/lint", methods=["GET"])
-def lint():
-    return lint_all(False)
+@reposBP.route("/projects/<project_slug>/lint", methods=["GET"])
+def lint(project_slug):
+    return lint_all(False, project_slug)
 
 
-@reposBP.route("/sync", methods=["GET"])
-def sync():
-    return lint_all(True)
+@reposBP.route("/projects/<project_slug>/sync", methods=["GET"])
+def sync(project_slug):
+    return lint_all(True, project_slug)
+
+@reposBP.route("/test", methods=["GET"])
+def db_test():
+    design = Design.query.first()
+    return jsonify({"design": {"name": design.name, "settings": design.settings}})
 
 
-@reposBP.route("/models", methods=["GET"])
-def models():
+@reposBP.route("projects/<project_slug>/models", methods=["GET"])
+def models(project_slug):
     try:
-        project = Project.find()
+        project = Project.find_by_slug(project_slug)
     except ProjectNotFound as e:
         project = None
         return jsonify(

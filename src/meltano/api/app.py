@@ -75,7 +75,7 @@ def create_app(config={}):
     CORS(app, origins="*")
 
     from .controllers.root import root
-    from .controllers.start import startBP
+    from .controllers.projects import projectsBP
     from .controllers.dashboards import dashboardsBP
     from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
@@ -83,7 +83,7 @@ def create_app(config={}):
     from .controllers.sql import sqlBP
 
     app.register_blueprint(root)
-    app.register_blueprint(startBP)
+    app.register_blueprint(projectsBP)
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
@@ -110,10 +110,10 @@ def create_app(config={}):
 
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
-    start = "files" if project else "start"
+    starting_url = project.slug_url("files") if project else "projects"
 
     available_worker = UIAvailableWorker(
-        f"http://localhost:5000/{start}", not kwargs.get("use_reloader", False)
+        f"http://localhost:5000/{starting_url}", not kwargs.get("use_reloader", False)
     )
     if project:
         compiler_worker = MeltanoBackgroundCompiler(project)

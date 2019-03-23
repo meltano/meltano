@@ -18,12 +18,18 @@
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
-        <router-link to="/" class="navbar-item navbar-child">
+        <router-link
+          :to="{name: 'projects'}"
+          class="navbar-item navbar-child">Projects</router-link>
+        <router-link
+          v-if="slug"
+          :to="{name: 'projectFiles', params: {slug: slug}}"
+          class="navbar-item navbar-child">
           Files
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
+          <a class="navbar-link" v-if="slug">
             Analyze
           </a>
           <div class="navbar-dropdown
@@ -44,8 +50,10 @@
           </div>
         </div>
 
-        <router-link to="/dashboards"
-        class="navbar-item navbar-child">
+        <router-link
+          v-if="slug"
+          to="/dashboards"
+          class="navbar-item navbar-child">
           Dashboards
         </router-link>
 
@@ -98,6 +106,7 @@ export default {
   },
   watch: {
     $route() {
+      this.slug = this.$route.params.slug;
       if (this.isMobileMenuOpen) {
         this.closeMobileMenu();
       }
@@ -105,10 +114,12 @@ export default {
   },
   created() {
     this.$store.dispatch('repos/getModels');
+    this.slug = this.$route.params.slug;
   },
   data() {
     return {
       isMobileMenuOpen: false,
+      slug: '',
     };
   },
   filters: {

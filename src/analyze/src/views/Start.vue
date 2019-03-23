@@ -49,7 +49,7 @@ export default {
     this.getCwd();
   },
   computed: {
-    ...mapState('start', [
+    ...mapState('projects', [
       'project',
       'cwdLoaded',
       'cwd',
@@ -58,22 +58,22 @@ export default {
     ]),
   },
   methods: {
-    ...mapActions('start', [
+    ...mapActions('projects', [
       'getCwd',
     ]),
 
     createProjectClicked() {
-      this.$store.dispatch('start/createProject')
+      this.$store.dispatch('projects/createProject')
         .then((data) => {
           if (data.data.result) {
-            this.$router.push({ path: 'files' });
+            this.$router.push({ name: 'projectFiles', params: { slug: data.data.project } });
           }
         })
         .catch(() => {});
     },
 
     projectNameInput(e) {
-      this.$store.dispatch('start/projectNameChanged', e.currentTarget.value);
+      this.$store.dispatch('projects/projectNameChanged', e.currentTarget.value);
     },
   },
 };
