@@ -511,7 +511,7 @@ export default {
   },
   beforeRouteUpdate(to, from, next) {
   created() {
-    this.$store.dispatch('projects/getProject', this.$router);
+    this.$store.dispatch('designs/getSlug', this.$route.params.slug);
     this.$store.dispatch('designs/getDesign', {
       model: to.params.model,
       design: to.params.design,

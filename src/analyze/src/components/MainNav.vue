@@ -39,7 +39,15 @@
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
-            <router-link :to="urlForModelDesign(model, design)"
+            <router-link
+              :to="{name:'analyze',
+                    params:
+                      {
+                        slug: slug,
+                        model: model,
+                        design: design
+                      }
+                    }"
             class="navbar-item navbar-child"
             v-for="design in v['designs']"
             @click.native="menuSelected"
@@ -120,6 +128,8 @@ export default {
     return {
       isMobileMenuOpen: false,
       slug: '',
+      design: '',
+      model: '',
     };
   },
   filters: {

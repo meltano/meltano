@@ -36,8 +36,8 @@ export default new Router({
       component: Repo,
     },
     {
-      path: '/analyze/:model/:design',
-      name: '',
+      path: '/projects/:slug/analyze/:model/:design',
+      name: 'analyze',
       component: Design,
     },
     {
