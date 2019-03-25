@@ -16,7 +16,6 @@ def invoke(project, plugin_name, plugin_args):
     try:
         config_service = ConfigService(project)
         plugin = config_service.get_plugin(plugin_name)
-        import pdb; pdb.set_trace()
 
         service = PluginInvoker(project, plugin)
         handle = service.invoke(*plugin_args)

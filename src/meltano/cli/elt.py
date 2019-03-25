@@ -115,7 +115,9 @@ def install_missing_plugins(
         transform_add_service = TransformAddService(project)
         try:
             # the extractor name should match the transform name
-            plugin = config_service.get_plugin(extractor, plugin_type=PluginType.TRANSFORMS)
+            plugin = config_service.get_plugin(
+                extractor, plugin_type=PluginType.TRANSFORMS
+            )
 
             # Update dbt_project.yml in case the vars values have changed in meltano.yml
             transform_add_service.update_dbt_project(plugin)
