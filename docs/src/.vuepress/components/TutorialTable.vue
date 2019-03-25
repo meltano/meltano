@@ -32,13 +32,12 @@ export default {
     <div class="tutorial-item">
       <div class='tutorial-header'><a href="#advanced">Advanced - Coming Soon</a></div>
       <div>
-        <p>Experience the full ELT pipeline with Snowflake, custom transforms, custom models, and authentication using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
+        <p>Experience building custom transforms and models.</p>
         <ul>
           <li>Postgres database</li>
           <li>Authentication</li>
           <li>Your private Salesforce dataset</li>
-          <li>Snowflake integration</li>
-          <li>Custom Transforms</li>
+          <li>Custom transforms</li>
           <li>Custom models</li>
         </ul>
       </div>
