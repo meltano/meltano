@@ -49,14 +49,19 @@ const helpers = {
 
     const baseTable = state.design.related_table;
     const columns = namesOfSelected(baseTable.columns);
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn);
-
     if (!sortColumn) {
       sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn);
     }
-
-    const aggregates = namesOfSelected(baseTable.aggregates) || [];
+    let order = null;
+    if (sortColumn && sortColumn.selected) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -87,8 +92,6 @@ const helpers = {
       })
       .filter(j => !!(j.columns || j.aggregates));
 
-    let order = null;
-
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
@@ -98,13 +101,6 @@ const helpers = {
         periods: tf.periods.filter(selected),
       }))
       .filter(tf => tf.periods.length);
-
-    if (sortColumn) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
 
     return {
       table: baseTable.name,
