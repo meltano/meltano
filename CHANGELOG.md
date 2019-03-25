@@ -9,6 +9,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.17.0 - (2019-03-25)
+---
+
+### New
 - [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
 - [#370](https://gitlab.com/meltano/meltano/issues/370) Enabled authorization using role-based access control for Designs and Reports
 
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#510](https://gitlab.com/meltano/meltano/issues/510) Fix an issue when finding the current Meltano project in a multi-threaded environment.
 * [#494](https://gitlab.com/meltano/meltano/issues/494) Improved documentation around tutorials and Meltano requirements
 * [#492](https://gitlab.com/meltano/meltano/issues/492) A few small contextual additions to help streamline the release process
-
-### Breaks
 
 
 ## 0.16.0 - (2019-03-18)
