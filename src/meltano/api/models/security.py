@@ -1,9 +1,6 @@
-from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
-from datetime import datetime
 
-
-db = SQLAlchemy()
+from . import db
 
 
 class User(db.Model, UserMixin):
@@ -69,37 +66,10 @@ class Role(db.Model, RoleMixin):
         return self.name == other
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.name)
+
+    def __repr__(self):
+        return f"<Role({self.name})>"
 
     def canonical(self, _scopes):
         return self.name
-
-
-class OAuth(db.Model):
-    __tablename__ = "oauth"
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    provider_id = db.Column(db.String(255))
-    provider_user_id = db.Column(db.String(255))
-    access_token = db.Column(db.String(255))
-    created_at = db.Column(db.DateTime())
-    id_token = db.Column(db.String())
-    # secret = db.Column(db.String(255))
-    # display_name = db.Column(db.String(255))
-    # profile_url = db.Column(db.String(512))
-    # image_url = db.Column(db.String(512))
-    # rank = db.Column(db.Integer)
-
-    user = db.relationship("User", backref="identities")
-
-    @classmethod
-    def from_token(cls, provider_id, provider_user_id, token, user=None):
-        return cls(
-            user=user,
-            provider_id=provider_id,
-            provider_user_id=provider_user_id,
-            access_token=token["access_token"],
-            created_at=datetime.utcfromtimestamp(token["created_at"]),
-            id_token=token["id_token"],
-        )

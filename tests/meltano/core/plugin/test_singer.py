@@ -250,7 +250,7 @@ def select_all_executor():
 
 
 class TestSingerTap:
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 

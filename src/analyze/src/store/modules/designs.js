@@ -223,12 +223,17 @@ const actions = {
   getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentModel = model;
     state.currentDesign = design;
-    designApi.index(model, design).then((response) => {
-      commit('setDesign', response.data);
-    });
+
+    // TODO: chain callbacks to keep a single Promise
+    const index = designApi.index(model, design)
+      .then((response) => {
+        commit('setDesign', response.data);
+      });
+
     sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
+
     reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
@@ -243,6 +248,8 @@ const actions = {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
+
+    return index;
   },
 
   expandRow({ commit }, row) {

@@ -13,6 +13,7 @@
         <span></span>
       </div>
     </div>
+
     <div id="meltnavbar-transparent"
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
@@ -50,6 +51,19 @@
 
       </div>
       <div class="navbar-end">
+        <div v-if="$auth.user"
+             class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">
+            @{{ $auth.user.username }}
+          </div>
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item navbar-child"
+               @click.capture="$auth.logout()">
+              Logout
+            </a>
+          </div>
+        </div>
+
         <div class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             Settings
@@ -74,11 +88,13 @@ import { mapState, mapGetters } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
+import Profile from './Profile';
 
 export default {
   name: 'MainNav',
   components: {
     Logo,
+    Profile,
   },
   watch: {
     $route() {

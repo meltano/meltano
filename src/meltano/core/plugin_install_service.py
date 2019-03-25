@@ -3,7 +3,7 @@ from .venv_service import VenvService
 from .utils import noop
 from .plugin import Plugin
 from .project import Project
-from .error import PluginInstallError, PluginInstallWarning
+from .error import PluginInstallError, PluginInstallWarning, SubprocessError
 
 
 class PluginInstallService:
@@ -34,26 +34,25 @@ class PluginInstallService:
 
                 status["status"] = "success"
                 installed.append(status)
-                status_cb(status)
             except PluginInstallError as err:
                 status["status"] = "error"
                 status["message"] = str(err)
+                status["details"] = err.process.stderr
                 errors.append(status)
-                status_cb(status)
             except PluginInstallWarning as warn:
                 status["status"] = "warning"
                 status["message"] = str(warn)
                 errors.append(status)
-                status_cb(status)
+
+            status_cb(status)
 
         return {"errors": errors, "installed": installed}
 
     def install_plugin(self, plugin: Plugin):
         try:
             with plugin.trigger_hooks("install", self.project):
-                install_result = self.venv_service.install(
+                return self.venv_service.install(
                     namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
                 )
-                return install_result
-        except Exception as err:
-            raise PluginInstallError()
+        except SubprocessError as err:
+            raise PluginInstallError(str(err), err.process)

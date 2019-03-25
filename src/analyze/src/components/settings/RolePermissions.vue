@@ -1,69 +1,59 @@
 
 <template>
-  <div style="margin-bottom: 2em;">
-    <h2 class="subtitle is-5">{{permission.name}}</h2>
+  <div class="box" style="margin-bottom: 2em;">
+    <p class="is-italic">{{permission.name}}</p>
     <table class="table is-fullwidth">
-      <thead>
-        <tr>
-          <th>Role</th>
-          <th>Context</th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="role in roles">
-          <tr :key="role.name">
-            <td>{{role.name}}</td>
-            <td>
-              <div class="field is-grouped is-grouped-multiline">
-                <context-pill v-for="context in role.contexts"
-                              :key="context"
-                              :name="context"
-                              @delete="remove(role, context)"
-                />
-              </div>
-            </td>
+              <thead>
+                <tr>
+                  <th>Roles</th>
+            <th>Context</th>
           </tr>
-        </template>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>
-            <div class="field">
-              <div class="control">
-                <div class="select">
-                  <select v-model="model.role">
-                    <option :value="null">Select a role</option>
-                    <option v-for="role in roles"
-                            :key="role.name"
-                            >{{role.name}}</option>
-                  </select>
+        </thead>
+        <tbody>
+                <template v-for="role in roles">
+                  <tr :key="role.name">
+                    <td>{{role.name}}</td>
+              <td>
+                      <div class="field is-grouped is-grouped-multiline">
+                        <context-pill v-for="context in role.contexts"
+                                :key="context"
+                                :name="context"
+                                @delete="remove(role, context)"
+                  />
                 </div>
-              </div>
-            </div>
-          </td>
-
-          <td>
-            <div class="field is-grouped">
-              <div class="control">
-                <input v-model="model.context"
-                       type="text"
-                       class="input"
-                       placeholder="Design filter"
-                       @keyup.enter="enabled && add"
-                />
-              </div>
-              <div class="control">
-                <button @click="add"
-                        class="button is-primary"
-                        :disabled="!enabled">
-                  Add
-                </button>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </tfoot>
+              </td>
+            </tr>
+          </template>
+        </tbody>
     </table>
+    <label class="action">Assign filter</label>
+    <div class="controls field is-grouped">
+      <div class="control">
+        <div class="select">
+          <select v-model="model.role">
+            <option :value="null">Select a role</option>
+            <option v-for="role in roles"
+                    :key="role.name"
+            >{{role.name}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="control is-expanded">
+        <input v-model="model.context"
+               type="text"
+               class="input"
+               placeholder="Design filter"
+               @keyup.enter="enabled && add"
+        />
+      </div>
+      <div class="control">
+        <button @click="add"
+                class="button is-primary"
+                :disabled="!enabled">
+          Add
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -110,3 +100,11 @@ export default {
   },
 };
 </script>
+<style scoped>
+ .action {
+   font-weight: bold;
+ }
+ .controls {
+   margin-top: 0.5rem;
+ }
+</style>
