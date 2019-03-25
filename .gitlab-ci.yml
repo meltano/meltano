@@ -177,15 +177,6 @@ hub_meltano: &docker_hub_publish
     variables:
       - $CI_COMMIT_TAG
 
-# registry.gitlab.com/meltano/meltano/cli:<tag> → docker.io/meltano/cli:<tag>
-# registry.gitlab.com/meltano/meltano/cli:latest → docker.io/meltano/cli:latest
-hub_meltano_cli:
-  <<: *docker_hub_publish
-  variables:
-    IMAGE_NAME: meltano/cli
-    IMAGE_TAG: $CI_COMMIT_TAG
-    SOURCE_IMAGE: $CI_REGISTRY_IMAGE/cli
-
 .production:
   image: silvs/kubectl:latest
   stage: production
