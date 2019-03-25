@@ -125,7 +125,7 @@ def add_plugin(project: Project, plugin_type: PluginType, plugin_name: str):
         click.secho(f"Installed '{plugin_name}'.", fg="green")
 
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
-        
+
         docs_link = plugin._extras.get("docs")
         if docs_link:
             click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
