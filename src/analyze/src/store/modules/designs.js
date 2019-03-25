@@ -617,6 +617,7 @@ const mutations = {
 
 export default {
   namespaced: true,
+  helpers,
   state,
   getters,
   actions,

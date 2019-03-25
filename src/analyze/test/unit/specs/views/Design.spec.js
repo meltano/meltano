@@ -18,6 +18,7 @@ describe('Design.vue', () => {
     state = Object.assign(Design.data(), designs.state);
     actions = {
       getDesign: jest.fn(),
+      getSQL: jest.fn(),
       loadReport: jest.fn(),
       saveReport: jest.fn(),
     };
@@ -26,6 +27,7 @@ describe('Design.vue', () => {
       modules: {
         designs: {
           namespaced: true,
+          helpers: designs.helpers,
           state,
           actions,
           getters: designs.getters,
