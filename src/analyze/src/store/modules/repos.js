@@ -83,7 +83,9 @@ const actions = {
   },
 
   getModels({ commit }) {
-    if(!state.slug) return;
+    if (!state.slug) {
+      return;
+    }
     repoApi.models(state.slug)
       .then((response) => {
         commit('setModels', response.data);

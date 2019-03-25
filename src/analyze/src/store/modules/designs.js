@@ -221,14 +221,16 @@ const getters = {
 
 const actions = {
   getSlug({ commit }, slug) {
-    console.log('setting slug', slug)
     commit('setSlug', slug);
   },
 
   getDesign({ dispatch, commit }, { model, design }) {
     state.currentModel = model;
     state.currentDesign = design;
+<<<<<<< HEAD
 
+=======
+>>>>>>> Linted again
     designApi.index(state.slug, model, design).then((response) => {
       commit('setDesign', response.data);
     });
@@ -239,8 +241,8 @@ const actions = {
     reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
-        if (slug) {
-          const reportMatch = state.reports.find(report => report.slug === slug);
+        if (state.slug) {
+          const reportMatch = state.reports.find(report => report.slug === state.slug);
           if (reportMatch) {
             dispatch('loadReport', reportMatch);
           }

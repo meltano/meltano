@@ -65,6 +65,7 @@ class M5ocFilter(ResourceFilter):
 def before_request():
     pass
 
+
 @reposBP.route("/projects/<project_slug>", methods=["GET"])
 @project_from_slug
 def project_by_slug(project):
@@ -219,7 +220,9 @@ def design_read(topic_name, design_name):
 
     project = Project.find()
 
-@reposBP.route("projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"])
+@reposBP.route(
+    "projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"]
+)
 @project_from_slug
 def design_read(topic_name, design_name, project):
     topic = project.root_dir("model", f"{topic_name}.topic.m5oc")

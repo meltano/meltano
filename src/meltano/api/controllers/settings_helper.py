@@ -9,7 +9,9 @@ from meltano.core.project import Project
 class SettingsHelper:
     def __init__(self, project):
         self.project = project
-        self.settings_file_path = self.project.root_dir("model", "database.settings.m5o")
+        self.settings_file_path = self.project.root_dir(
+            "model", "database.settings.m5o"
+        )
         if not self.settings_file_path.is_file():
             with open(self.settings_file_path, "w") as f:
                 settings = {"settings": {"connections": []}}

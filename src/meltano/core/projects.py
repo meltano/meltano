@@ -6,7 +6,4 @@ class Projects:
         self.cwd = Path(cwd)
 
     def find(self):
-        return [
-            {"name": p.parent.parts[-1]}
-            for p in self.cwd.glob("./*/meltano.yml")
-        ]
+        return [{"name": p.parent.parts[-1]} for p in self.cwd.glob("./*/meltano.yml")]

@@ -48,11 +48,11 @@ class Project:
         return project
 
     @classmethod
-    def find_by_slug(self, name:str):
+    def find_by_slug(self, name: str):
         cwd = Path(os.getcwd()).resolve()
         has_project = cwd.joinpath("meltano.yml").exists()
         if has_project:
-          cwd = cwd.parent
+            cwd = cwd.parent
 
         project_path = cwd.joinpath(name)
         if not project_path.exists():
@@ -110,10 +110,10 @@ class Project:
 
     @property
     def slug(self):
-      return self.root_dir().parts[-1]
+        return self.root_dir().parts[-1]
 
     def slug_url(self, *joinpaths):
-      return Path("projects").joinpath(self.slug, *joinpaths)
+        return Path("projects").joinpath(self.slug, *joinpaths)
 
     @property
     def meltanofile(self):
