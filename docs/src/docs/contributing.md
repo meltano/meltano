@@ -70,6 +70,10 @@ npm run dev # or yarn dev
 
 Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.org/docs/rules/) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
 
+:::warning Troubleshooting
+When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
+:::
+
 ## Merge Requests
 
 Meltano uses an approval workflow for all merge requests.
