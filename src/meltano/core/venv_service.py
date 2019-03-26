@@ -1,5 +1,7 @@
 import subprocess
 import platform
+import sys
+import os
 from .project import Project
 from .error import SubprocessError
 
@@ -26,6 +28,20 @@ class VenvService:
             raise SubprocessError(
                 f"Could not create of the virtualenv for '{namespace}/{name}'", run
             )
+
+        # we want the plugin to inherit our current venv
+        sys_paths = []
+        for path in sys.path:
+            if path.startswith(os.environ["VIRTUAL_ENV"]) and path.endswith("site-packages"):
+                sys_paths.append(path)
+            if path.endswith("meltano/src"): # meltano is installed as editable
+                sys_paths.append(path)
+
+        # inject a .pth to include the current virtualenv if possible
+        meltano_pth_path = venv_path.joinpath("lib", "python" + sys.version[:3], "site-packages", "meltano_venv.pth")
+        with meltano_pth_path.open("w") as pth:
+            for path in sys_paths:
+                pth.write(path + "\n")
 
         return run
 

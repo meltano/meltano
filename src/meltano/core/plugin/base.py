@@ -1,5 +1,6 @@
 import yaml
 import fnmatch
+from typing import Dict
 from collections import namedtuple
 from enum import Enum
 
@@ -24,6 +25,7 @@ class PluginType(YAMLEnum):
     MODELS = "models"
     TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
+    ORCHESTRATORS = "orchestrators"
     ALL = "all"
 
     def __str__(self):
@@ -70,14 +72,17 @@ class Plugin(HookObject):
 
         return canonical
 
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
+    def exec_args(self, files: Dict):
         return []
 
     @property
+    def config_files(self):
+        """Return a list of stubbed files created for this plugin."""
+        return dict()
+
+    @property
     def output_files(self):
-        return []
+        return dict()
 
     @property
     def select(self):

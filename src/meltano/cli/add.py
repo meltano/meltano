@@ -113,9 +113,17 @@ def transform(project, plugin_name):
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
 
 
-def add_plugin(
-    add_service, project: Project, plugin_type: PluginType, plugin_name: str
-):
+@add.command()
+@project
+@click.argument("plugin_name")
+def orchestrator(project, plugin_name):
+    add_plugin(project, PluginType.ORCHESTRATORS, plugin_name)
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
+
+
+def add_plugin(add_service, project: Project, plugin_type: PluginType, plugin_name: str):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
         click.secho(f"Added '{plugin_name}' to your Meltano project.")
