@@ -1,6 +1,7 @@
+import json
 import pytest
 from flask import url_for
-
+from asserts import assert_valid_schema
 
 def assert_has_items(entry, count):
     return len(entry["items"]) == count
