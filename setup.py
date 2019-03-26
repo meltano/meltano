@@ -6,6 +6,7 @@ with open("README.md", "r") as fh:
 
 requires = [
     'aiohttp==3.4.4',
+    'apache-airflow==1.10.3b1',
     'authlib==0.10',
     'backoff==1.8.0',
     'urllib3==1.23',
@@ -15,7 +16,7 @@ requires = [
     'Cerberus==1.2',
     'sqlparse==0.3.0',
     'gitpython==2.1.11',
-    'markdown==3.0.1',
+    'markdown<3.0',
     'networkx==2.2',
     'pandas==0.24.1',
     'psycopg2==2.7.7',
@@ -41,7 +42,7 @@ requires = [
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
 conflicts = [
     'idna==2.7',
-    'aenum==2.1.2'
+    'aenum==2.1.2',
 ]
 
 dev_requires = [
