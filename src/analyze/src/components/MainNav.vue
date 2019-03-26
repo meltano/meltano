@@ -29,15 +29,16 @@
           <div class="navbar-dropdown
                 is-boxed"
                 :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v,model) in models">
+            <template v-for="(v, model) in models">
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
-            <router-link :to="urlForModelDesign(model, design)"
-            class="navbar-item navbar-child"
-            v-for="design in v['designs']"
-            @click.native="menuSelected"
-            :key="design">
+            <router-link
+              :to="urlForModelDesign(model, design)"
+              class="navbar-item navbar-child"
+              v-for="design in v['designs']"
+              @click.native="menuSelected"
+              :key="design">
               {{design | capitalize | underscoreToSpace}}
             </router-link>
             </template>
