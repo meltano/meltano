@@ -17,7 +17,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Updated [Contributing - Code Style](https://meltano.com/docs/contributing.html#code-style) documentation to including __pycache__ troubleshooting
 
 ### Fixes
+<<<<<<< HEAD
 * [#529](https://gitlab.com/meltano/meltano/issues/529) Resolved "SFDC Tutorial - ELT Fails due to invalid schema.yml" by [#4 dbt-tap-salesforce](https://gitlab.com/meltano/dbt-tap-salesforce/issues/4) removing the schema.yml files from the dbt models for tap-salesforce 
+=======
+- [#507](https://gitlab.com/meltano/meltano/issues/507) Ensure design name and table name don't need to match so multiple designs can leverage a single base table
+>>>>>>> updated changelog
 
 ### Breaks
 
