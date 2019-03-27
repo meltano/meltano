@@ -1,10 +1,12 @@
+import logging
+
 from .config_service import ConfigService
 from .venv_service import VenvService
 from .utils import noop
 from .plugin import Plugin
 from .project import Project
+from .behavior.hookable import TriggerError
 from .error import PluginInstallError, PluginInstallWarning, SubprocessError
-
 
 class PluginInstallService:
     def __init__(
@@ -52,7 +54,15 @@ class PluginInstallService:
         try:
             with plugin.trigger_hooks("install", self.project):
                 return self.venv_service.install(
-                    namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
+                    namespace=plugin.type,
+                    name=plugin.name,
+                    pip_url=plugin.pip_url
                 )
         except SubprocessError as err:
             raise PluginInstallError(str(err), err.process)
+        except TriggerError as trig:
+            for err in trig.before_hooks.values():
+                raise err
+
+            for err in trig.after_hooks.values():
+                raise err

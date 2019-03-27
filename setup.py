@@ -6,7 +6,6 @@ with open("README.md", "r") as fh:
 
 requires = [
     'aiohttp==3.4.4',
-    'apache-airflow==1.10.3b1',
     'authlib==0.10',
     'backoff==1.8.0',
     'urllib3==1.23',
