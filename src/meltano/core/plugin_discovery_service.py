@@ -2,6 +2,7 @@ import os
 import yaml
 import requests
 from typing import Dict, List, Optional
+from itertools import groupby
 
 import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
@@ -64,6 +65,7 @@ class PluginDiscoveryService:
             plugin_factory(plugin_type, plugin_def)
             for plugin_type, plugin_defs in self.discovery.items()
             for plugin_def in plugin_defs
+            if PluginType.value_exists(plugin_type)
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
@@ -91,8 +93,9 @@ class PluginDiscoveryService:
             else (plugin_type,)
         )
         return {
-            plugin_type: self.list_discovery(plugin_type)
-            for plugin_type in enabled_plugin_types
+            plugin_type: plugins
+            for plugin_type, plugins in groupby(self.plugins(), lambda p: p.type)
+            if plugin_type in enabled_plugin_types
         }
 
     def list_discovery(self, discovery):

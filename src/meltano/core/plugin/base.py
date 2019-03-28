@@ -31,6 +31,10 @@ class PluginType(YAMLEnum):
     def __str__(self):
         return self.value
 
+    @classmethod
+    def value_exists(cls, value):
+        return value in cls._value2member_map_
+
 
 class Plugin(HookObject):
     """
