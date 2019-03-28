@@ -35,12 +35,9 @@ def schedule(project, name, extractor, loader, interval, transform, job_id):
     tracker = GoogleAnalyticsTracker(project)
 
     try:
-        schedule = schedule_service.add(name,
-                                        extractor,
-                                        loader,
-                                        transform,
-                                        interval,
-                                        MELTANO_JOB_ID=job_id or "")
+        schedule = schedule_service.add(
+            name, extractor, loader, transform, interval, MELTANO_JOB_ID=job_id or ""
+        )
 
         tracker.track_meltano_schedule(schedule)
         click.echo(f"Scheduled '{name}' at {interval}")

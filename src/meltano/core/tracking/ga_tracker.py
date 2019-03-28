@@ -144,9 +144,7 @@ class GoogleAnalyticsTracker:
             debug=debug,
         )
 
-    def track_meltano_schedule(
-        self, schedule, debug=False
-    ) -> None:
+    def track_meltano_schedule(self, schedule, debug=False) -> None:
         self.track_event(
             category="meltano schedule",
             action=f"meltano schedule {schedule.name} {schedule.extractor} {schedule.loader} {schedule.interval} --transform={schedule.transform}",

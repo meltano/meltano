@@ -7,30 +7,23 @@ from .utils import nest
 
 class ScheduleAlreadyExistsError(Exception):
     """Occurs when a schedule already exists."""
+
     pass
 
 
-Schedule = namedtuple("Schedule", (
-    "name",
-    "extractor",
-    "loader",
-    "transform",
-    "interval",
-    "env"
-))
+Schedule = namedtuple(
+    "Schedule", ("name", "extractor", "loader", "transform", "interval", "env")
+)
 
 
 class ScheduleService:
     def __init__(self, project: Project):
         self.project = project
 
-    def add(self, name, extractor: str, loader: str, transform: str, interval: str, **env):
-        schedule = Schedule(name,
-                            extractor,
-                            loader,
-                            transform,
-                            interval,
-                            env=env)
+    def add(
+        self, name, extractor: str, loader: str, transform: str, interval: str, **env
+    ):
+        schedule = Schedule(name, extractor, loader, transform, interval, env=env)
 
         return self.add_schedule(schedule)
 
@@ -47,5 +40,7 @@ class ScheduleService:
         return schedule
 
     def schedules(self):
-        return (Schedule(**schedule_def)
-                for schedule_def in self.project.meltano.get("schedules", []))
+        return (
+            Schedule(**schedule_def)
+            for schedule_def in self.project.meltano.get("schedules", [])
+        )

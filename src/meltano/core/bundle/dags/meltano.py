@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 from meltano.core.schedule_service import ScheduleService
 
 import o
+
 print("\n==== CWD ====")
 print(os.getcwd())
 
 import sys
+
 print("\n==== sys.path ====")
 print(sys.path)
 
@@ -16,6 +18,7 @@ print("\n==== PATH ====")
 print(os.environ["PATH"])
 
 from meltano.core.project import Project
+
 project = Project.find()
 
 
@@ -38,9 +41,7 @@ schedule_service = ScheduleService(project)
 
 for schedule in schedule_service.schedules():
     dag_id = f"meltano_{schedule.name}"
-    dag = DAG(dag_id,
-              default_args=default_args,
-              schedule_interval=schedule.interval)
+    dag = DAG(dag_id, default_args=default_args, schedule_interval=schedule.interval)
 
     elt = BashOperator(
         task_id="extract_load",
@@ -49,8 +50,8 @@ for schedule in schedule_service.schedules():
         env={
             # inherit the current env
             **os.environ,
-            **schedule.env
-        }
+            **schedule.env,
+        },
     )
 
     # register the dag
