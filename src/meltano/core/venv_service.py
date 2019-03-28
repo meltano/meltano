@@ -32,13 +32,17 @@ class VenvService:
         # we want the plugin to inherit our current venv
         sys_paths = []
         for path in sys.path:
-            if path.startswith(os.environ["VIRTUAL_ENV"]) and path.endswith("site-packages"):
+            if path.startswith(os.environ["VIRTUAL_ENV"]) and path.endswith(
+                "site-packages"
+            ):
                 sys_paths.append(path)
-            if path.endswith("meltano/src"): # meltano is installed as editable
+            if path.endswith("meltano/src"):  # meltano is installed as editable
                 sys_paths.append(path)
 
         # inject a .pth to include the current virtualenv if possible
-        meltano_pth_path = venv_path.joinpath("lib", "python" + sys.version[:3], "site-packages", "meltano_venv.pth")
+        meltano_pth_path = venv_path.joinpath(
+            "lib", "python" + sys.version[:3], "site-packages", "meltano_venv.pth"
+        )
         with meltano_pth_path.open("w") as pth:
             for path in sys_paths:
                 pth.write(path + "\n")

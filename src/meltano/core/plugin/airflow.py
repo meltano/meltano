@@ -19,9 +19,7 @@ class Airflow(HookObject, Plugin):
 
     @property
     def config_files(self):
-        return {
-            "config": "airflow.cfg"
-        }
+        return {"config": "airflow.cfg"}
 
     @hook("before_prepare")
     def set_run_dir(self, invoker, *args):
@@ -29,20 +27,20 @@ class Airflow(HookObject, Plugin):
 
     @hook("after_install")
     def after_install(self, project, *args):
-        plugin_config_service = PluginConfigService(project, self, run_dir=project.root_dir("orchestrate"))
+        plugin_config_service = PluginConfigService(
+            project, self, run_dir=project.root_dir("orchestrate")
+        )
 
         # create the database directory
         project.run_dir(self.name)
 
-        invoker = PluginInvoker(project, self,
-                                config_service=plugin_config_service)
+        invoker = PluginInvoker(project, self, config_service=plugin_config_service)
 
         airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
         stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
-        handle = invoker.invoke("--help",
-                                prepare=False,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        handle = invoker.invoke(
+            "--help", prepare=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         handle.wait()
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
@@ -68,8 +66,8 @@ class Airflow(HookObject, Plugin):
         logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
         # initdb
-        handle = invoker.invoke("initdb",
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE)
+        handle = invoker.invoke(
+            "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        )
         handle.wait()
         logging.debug(f"Completed `airflow initdb`")

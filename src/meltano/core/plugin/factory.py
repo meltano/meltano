@@ -1,6 +1,6 @@
 from typing import Dict
 
-from .import PluginType
+from . import PluginType
 from .singer import SingerTap, SingerTarget
 from .dbt import DbtPlugin, DbtTransformPlugin
 from .model import ModelPlugin
