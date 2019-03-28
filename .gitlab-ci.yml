@@ -51,9 +51,13 @@ install_e2e:
     - meltano add extractor tap-carbon-intensity
     - meltano add loader target-sqlite
     - meltano elt tap-carbon-intensity target-sqlite
-    - cd ../../../src/analyze
+
+test_meltano_ui:
+  stage: test
+  script:
+    - cd src/analyze
     - yarn
-    - yarn test
+    - yarn unit # change `unit` to `test` once e2e is wired up
 
 docs:
   variables:
