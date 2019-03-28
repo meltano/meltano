@@ -116,6 +116,10 @@ transforms:
     vars:
       livemode: false
       schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-zuora
+    pip_url: "https://gitlab.com/meltano/dbt-tap-zuora.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
 models:
   - name: model-carbon-intensity-sqlite
     pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
