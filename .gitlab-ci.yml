@@ -54,6 +54,7 @@ install_e2e:
 
 test_meltano_ui:
   stage: test
+  image: node:9.11.1
   script:
     - cd src/analyze
     - yarn
