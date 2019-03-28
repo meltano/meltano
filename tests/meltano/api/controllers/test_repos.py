@@ -48,3 +48,6 @@ def test_design_read(api, app):
     assert "label" in json_data
     assert "name" in json_data
     assert "related_table" in json_data
+
+    assert json_data["from"] == "region"
+    assert json_data["name"] == "region"
