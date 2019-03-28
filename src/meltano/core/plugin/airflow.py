@@ -1,6 +1,8 @@
 import configparser
 import shutil
 import logging
+import subprocess
+import time
 from . import Plugin, PluginType
 
 from meltano.core.behavior.hookable import HookObject, hook
@@ -38,8 +40,10 @@ class Airflow(HookObject, Plugin):
         airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
         stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
         handle = invoker.invoke("--help",
-                                prepare=False)
-
+                                prepare=False,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        handle.wait()
         logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
         # move it to the config dir
@@ -64,5 +68,8 @@ class Airflow(HookObject, Plugin):
         logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
         # initdb
-        handle = invoker.invoke("initdb")
+        handle = invoker.invoke("initdb",
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE)
+        handle.wait()
         logging.debug(f"Completed `airflow initdb`")

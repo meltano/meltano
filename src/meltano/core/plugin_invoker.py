@@ -73,8 +73,6 @@ class PluginInvoker:
                 logging.debug(f"Invoking: {popen_args}")
                 process = subprocess.Popen(popen_args,
                                            env=env,
-                                           stdout=subprocess.PIPE,
-                                           stderr=subprocess.PIPE,
                                            **Popen)
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")

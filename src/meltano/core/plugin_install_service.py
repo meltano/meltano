@@ -62,7 +62,7 @@ class PluginInstallService:
             raise PluginInstallError(str(err), err.process)
         except TriggerError as trig:
             for err in trig.before_hooks.values():
-                raise err
+                raise err from trig
 
             for err in trig.after_hooks.values():
-                raise err
+                raise err from trig
