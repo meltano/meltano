@@ -14,7 +14,7 @@ from .error import Error
 
 class ProjectNotFound(Error):
     def __init__(self):
-        super().__init__("Cannot find `meltano.yml`. Are you in a meltano project?")
+        super().__init__(f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?")
 
 
 class Project:

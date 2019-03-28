@@ -2,8 +2,20 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from datetime import datetime, timedelta
 
-from meltano.core.project import Project
+from meltano.core.schedule_service import ScheduleService
 
+import o
+print("\n==== CWD ====")
+print(os.getcwd())
+
+import sys
+print("\n==== sys.path ====")
+print(sys.path)
+
+print("\n==== PATH ====")
+print(os.environ["PATH"])
+
+from meltano.core.project import Project
 project = Project.find()
 
 
@@ -22,11 +34,24 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG("meltano", default_args=default_args, schedule_interval="@daily")
+schedule_service = ScheduleService(project)
 
-# t1, t2 and t3 are examples of tasks created by instantiating operators
-t1 = BashOperator(
-    task_id="extract_load",
-    bash_command=f"cd {str(project.root)} && meltano elt tap-carbon-intensity target-sqlite",
-    dag=dag,
-)
+for schedule in schedule_service.schedules():
+    dag_id = f"meltano_{schedule.name}"
+    dag = DAG(dag_id,
+              default_args=default_args,
+              schedule_interval=schedule.interval)
+
+    elt = BashOperator(
+        task_id="extract_load",
+        bash_command=f"echo $PATH; echo $VIRTUAL_ENV; cd {str(project.root)} && meltano elt {schedule.extractor} {schedule.loader} --transform={schedule.transform}",
+        dag=dag,
+        env={
+            # inherit the current env
+            **os.environ,
+            **schedule.env
+        }
+    )
+
+    # register the dag
+    globals()[dag_id] = dag

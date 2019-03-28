@@ -142,7 +142,7 @@ models:
     pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
 orchestrators:
   - name: airflow
-    pip_url: "apache-airflow==1.10.3b1"
+    pip_url: "apache-airflow==1.10.2"
     config:
       core:
         dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
