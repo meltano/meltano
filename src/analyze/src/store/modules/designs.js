@@ -227,18 +227,22 @@ const actions = {
   getDesign({ dispatch, commit }, { model, design }) {
     state.currentModel = model;
     state.currentDesign = design;
-<<<<<<< HEAD
 
-=======
->>>>>>> Linted again
-    designApi.index(state.slug, model, design).then((response) => {
-      commit('setDesign', response.data);
-    });
-    sqlApi.getDialect(state.slug, model).then((response) => {
-      commit('setConnectionDialect', response.data);
-    });
+    designApi.index(state.slug, model, design)
+      .then((response) => {
+        commit('setDesign', response.data);
+      })
+      .catch((e) => {});
 
-    reportsApi.loadReports()
+    sqlApi.getDialect(state.slug, model)
+      .then((response) => {
+        commit('setConnectionDialect', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+      });
+
+    reportsApi.loadReports(state.slug)
       .then((response) => {
         state.reports = response.data;
         if (state.slug) {
@@ -320,7 +324,7 @@ const actions = {
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
-      .getSql(state.currentModel, state.currentDesign, postData)
+      .getSql(state.currentModel, state.currentDesign, postData, state.slug)
       .then((response) => {
         if (run) {
           commit('setQueryResults', response.data);

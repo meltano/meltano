@@ -67,6 +67,7 @@
 
       </div>
       <div class="navbar-end">
+<<<<<<< HEAD
         <div v-if="$auth.user"
              class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
@@ -81,6 +82,11 @@
         </div>
 
         <div class="navbar-item has-dropdown is-hoverable">
+=======
+        <div
+          v-if="slug"
+          class="navbar-item has-dropdown is-hoverable">
+>>>>>>> Fix broken API call
           <div class="navbar-link">
             Settings
           </div>

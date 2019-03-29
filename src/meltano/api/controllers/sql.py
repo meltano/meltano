@@ -111,8 +111,11 @@ def get_dialect(topic_name, project):
     return jsonify({"connection_dialect": engine.dialect.name})
 
 
-@sqlBP.route("/get/<topic_name>/<design_name>", methods=["POST"])
-def get_sql(topic_name, design_name):
+@sqlBP.route(
+    "/projects/<project_slug>/get/<topic_name>/<design_name>", methods=["POST"]
+)
+@project_from_slug
+def get_sql(topic_name, project, design_name):
     sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(topic_name)
     design = m5oc.design(design_name)

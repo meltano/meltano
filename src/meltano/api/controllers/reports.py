@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from .reports_helper import ReportsHelper
+from .project_helper import project_from_slug
 
 from meltano.api.security import api_auth_required
 from meltano.api.security.auth import permit
@@ -8,6 +9,7 @@ from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
 
 
+<<<<<<< HEAD
 @reportsBP.before_request
 @api_auth_required
 def before_request():
@@ -32,6 +34,14 @@ def index():
     reports = ReportFilter().filter_all("view:reports", reports)
 
     return jsonify(reports)
+=======
+@reportsBP.route("/projects/<project_slug>", methods=["GET"])
+@project_from_slug
+def index(project):
+    reports_helper = ReportsHelper(project)
+    response_data = reports_helper.get_reports()
+    return jsonify(response_data)
+>>>>>>> Fix broken API call
 
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])
