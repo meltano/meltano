@@ -17,8 +17,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'files',
-      redirect: '/files',
+      name: 'home',
+      redirect: '/projects',
     },
     {
       path: '/projects/',

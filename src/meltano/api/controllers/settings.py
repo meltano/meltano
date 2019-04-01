@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
+from .project_helper import project_from_slug
 
 settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
 settingsApi = Api(settingsBP)
@@ -25,10 +26,12 @@ def index():
     return jsonify(settings_helper.get_connections())
 
 
-@settingsBP.route("/save", methods=["POST"])
+@settingsBP.route("/projects/<project_slug>/save", methods=["POST"])
+@project_from_slug
 @roles_required("admin")
-def save():
-    settings_helper = SettingsHelper()
+def save(project):
+    settings_helper = SettingsHelper(project)
+
     connection = request.get_json()
     settings = settings_helper.save_connection(connection)
     return jsonify(settings)

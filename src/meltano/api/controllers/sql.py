@@ -115,8 +115,8 @@ def get_dialect(topic_name, project):
     "/projects/<project_slug>/get/<topic_name>/<design_name>", methods=["POST"]
 )
 @project_from_slug
-def get_sql(topic_name, project, design_name):
-    sqlHelper = SqlHelper()
+def get_sql(topic_name, design_name, project):
+    sqlHelper = SqlHelper(project)
     m5oc = sqlHelper.get_m5oc_topic(topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()

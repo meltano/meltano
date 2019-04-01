@@ -65,7 +65,7 @@
           </div>
           <div class="control">
             <div class="select">
-              <select v-model="connectionDialect">
+              <select v-model="connectionDialect" placeholder="dialect">
                 <option value="" disabled selected>Dialect</option>
                 <option value="postgresql">PostgreSQL</option>
                 <option value="mysql">MySQL</option>
@@ -148,6 +148,7 @@
 <script>
 import store from '@/store';
 import { mapState, mapGetters } from 'vuex';
+import RouteMixin from '@/mixins/routeMixin';
 
 export default {
   name: 'Settings',

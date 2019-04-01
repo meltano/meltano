@@ -3,13 +3,10 @@
 
     <div slot='left'>
       <template v-for="category in categories">
-
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <p class="menu-label">
+        <p class="menu-label" :key="category.name">
           {{category.name}}
         </p>
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <ul class="menu-list">
+        <ul class="menu-list" :key="category.pages[0].name">
           <router-link tag="li" :key="page.href" :to="page.href" v-for="page in category.pages">
             <a>{{page.title}}</a>
           </router-link>

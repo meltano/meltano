@@ -6,8 +6,8 @@ export default {
     return axios.get(utils.apiUrl('settings'));
   },
 
-  saveConnection(connection) {
-    return axios.post(utils.apiUrl('settings', 'save'), connection);
+  saveConnection(connection, slug) {
+    return axios.post(utils.apiUrl('settings', `projects/${slug}/save`), connection);
   },
 
   deleteConnection(connection) {

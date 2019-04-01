@@ -75,6 +75,8 @@ new Vue({
   render: h => h(App),
 });
 
+console.log(router);
+
 // Analytics SPA route change hook (no initial ping as the gtag init step does this automatically)
 router.afterEach((to) => {
   if (window.gtag) {
