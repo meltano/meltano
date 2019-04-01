@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * [#432](https://gitlab.com/meltano/meltano/issues/432) Add the `tap-zuora` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-zuora
+* [#513](https://gitlab.com/meltano/meltano/issues/513) Added initial e2e tests for the UI
 
 ### Changes
 * Removed Snowflake references from advanced tutorial.
@@ -17,7 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * Updated [Contributing - Code Style](https://meltano.com/docs/contributing.html#code-style) documentation to including __pycache__ troubleshooting
 
 ### Fixes
-* [#529](https://gitlab.com/meltano/meltano/issues/529) Resolved "SFDC Tutorial - ELT Fails due to invalid schema.yml" by [#4 dbt-tap-salesforce](https://gitlab.com/meltano/dbt-tap-salesforce/issues/4) removing the schema.yml files from the dbt models for tap-salesforce 
+* [#529](https://gitlab.com/meltano/meltano/issues/529) Resolved "SFDC Tutorial - ELT Fails due to invalid schema.yml" by [#4 dbt-tap-salesforce](https://gitlab.com/meltano/dbt-tap-salesforce/issues/4) removing the schema.yml files from the dbt models for tap-salesforce
 
 ### Breaks
 
