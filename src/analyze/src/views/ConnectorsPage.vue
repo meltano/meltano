@@ -28,7 +28,7 @@ export default {
       }
     },
     filteredInstalledPlugins() {
-      if (this.installedPlugins.extractors) {
+      if (this.installedPlugins) {
         if (this.filterText) {
           return this.installedPlugins.extractors.filter((item) => item.name.indexOf(this.filterText) > -1)
         } else {
@@ -84,10 +84,11 @@ export default {
         <h2 class="title is-4">Available</h2>
         <p v-if="installingPlugin">Installing...</p>
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
-        <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
-        <ul v-else>
+        <!-- <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p> -->
+        <ul>
           <li v-for="(extractor, index) in filteredExtractors" 
             :key="`${extractor}`"
+            v-if="index !== 0"
           >
             {{ extractor }} <button @click="installPlugin(index, extractor)">Install</button>
           </li>
@@ -101,8 +102,8 @@ export default {
       <template slot="body">
         <input type="text" v-model="filterText" placeholder="Filter loaders..." class="input">
         <h2 class="title is-4">Installed</h2>
-        <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p>
-        <ul v-else>
+        <!-- <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p> -->
+        <ul>
           <li v-for="(extractor, index) in filteredInstalledPlugins" 
             :key="`${extractor.name}`"
           >

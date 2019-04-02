@@ -1,5 +1,4 @@
 import orchestrationsApi from '../../api/orchestrations';
-import orchestrations from '../../api/orchestrations';
 
 const state = {
   extractors: [],
@@ -50,8 +49,8 @@ const actions = {
   getInstalledPlugins({ commit }) {
     orchestrationsApi.installedPlugins()
       .then((response) => {
-        commit('setInstalledPlugins', response.data)
-      })
+        commit('setInstalledPlugins', response.data);
+      });
   },
 
   getConnectionNames({ commit }) {
@@ -154,7 +153,7 @@ const mutations = {
 
   setInstalledPlugins(_, projectConfig) {
     state.installedPlugins = projectConfig.plugins;
-  }
+  },
 };
 
 export default {
