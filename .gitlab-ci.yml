@@ -52,14 +52,6 @@ install_e2e:
     - meltano add loader target-sqlite
     - meltano elt tap-carbon-intensity target-sqlite
 
-test_meltano_ui:
-  stage: test
-  image: node:9.11.1
-  script:
-    - cd src/analyze
-    - yarn
-    - yarn unit # change `unit` to `test` once e2e is wired up
-
 docs:
   variables:
     REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
