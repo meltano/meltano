@@ -10,9 +10,7 @@ class TestMeltanoAnalysisFileParser:
     def test_parse(self, add_model, subject):
         topics = subject.parse_packages()
 
-        print("")
-
-        assert len(topics) == 3
+        assert len(topics) == 4
 
         for topic in topics:
             if topic["name"] == "carbon":
