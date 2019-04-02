@@ -109,7 +109,10 @@ def project(test_dir, project_init_service):
         {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
     )
     discovery_dict[PluginType.MODELS].append(
-        {"name": "model-gitlab", "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git"}
+        {
+            "name": "model-gitlab",
+            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
     )
     # copy discovery.yml into this project
     with open(project.root.joinpath("discovery.yml"), "w") as f:
