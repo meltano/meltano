@@ -72,6 +72,10 @@ def add_model(project, plugin_install_service, project_add_service):
     plugin_install_service.create_venv(plugin)
     plugin_install_service.install_plugin(plugin)
 
+    plugin = project_add_service.add(PluginType.MODELS, "model-gitlab")
+    plugin_install_service.create_venv(plugin)
+    plugin_install_service.install_plugin(plugin)
+
 
 @pytest.fixture(scope="class")
 def config_service(project):
@@ -103,6 +107,12 @@ def project(test_dir, project_init_service):
     )
     discovery_dict[PluginType.TRANSFORMS].append(
         {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+    )
+    discovery_dict[PluginType.MODELS].append(
+        {
+            "name": "model-gitlab",
+            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
     )
     # copy discovery.yml into this project
     with open(project.root.joinpath("discovery.yml"), "w") as f:
