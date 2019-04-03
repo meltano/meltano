@@ -1,3 +1,4 @@
+import json
 import pytest
 from flask import url_for
 
@@ -30,3 +31,23 @@ def test_models(api, app):
     # each topics has designs
     for topic_def in payload.values():
         assert topic_def["designs"]
+
+
+def test_design_read(api, app):
+    with app.test_request_context():
+        res = api.get(
+            url_for("repos.design_read", topic_name="carbon", design_name="region")
+        )
+
+    json_data = json.loads(res.data)
+
+    assert "description" in json_data
+    assert "from" in json_data
+    assert "graph" in json_data
+    assert "joins" in json_data
+    assert "label" in json_data
+    assert "name" in json_data
+    assert "related_table" in json_data
+
+    assert json_data["from"] == "region"
+    assert json_data["name"] == "region"
