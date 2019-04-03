@@ -214,17 +214,12 @@ def table_read(table_name):
     table = m5o_parse.parse_m5o_file(file_path)
     return jsonify(table)
 
-@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
-def design_read(topic_name, design_name):
-    permit("view:design", design_name)
-
-    project = Project.find()
-
 @reposBP.route(
     "projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"]
 )
 @project_from_slug
 def design_read(topic_name, design_name, project):
+    permit("view:design", design_name)
     topic = project.root_dir("model", f"{topic_name}.topic.m5oc")
     with topic.open() as f:
         topic = json.load(f)

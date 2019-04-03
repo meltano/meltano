@@ -67,7 +67,6 @@
 
       </div>
       <div class="navbar-end">
-<<<<<<< HEAD
         <div v-if="$auth.user"
              class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
@@ -80,24 +79,16 @@
             </a>
           </div>
         </div>
-
-        <div class="navbar-item has-dropdown is-hoverable">
-=======
         <div
           v-if="slug"
           class="navbar-item has-dropdown is-hoverable">
->>>>>>> Fix broken API call
           <div class="navbar-link">
             Settings
           </div>
           <div class="navbar-dropdown is-boxed">
-            <router-link to="/settings/database"
+            <router-link :to="{name:'database', params: {slug}}"
                          class="navbar-item navbar-child">
               Database
-            </router-link>
-            <router-link to="/settings/roles"
-                         class="navbar-item navbar-child">
-              Roles
             </router-link>
           </div>
         </div>

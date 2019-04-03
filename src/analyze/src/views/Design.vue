@@ -501,21 +501,10 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-  beforeRouteEnter(to, from, next) {
-    const { model, design, slug } = to.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug })
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
-  },
-  beforeRouteUpdate(to, from, next) {
-  created() {
-    this.$store.dispatch('designs/getSlug', this.$route.params.slug);
-    this.$store.dispatch('designs/getDesign', {
-      model: to.params.model,
-      design: to.params.design,
-    }).then(next);
+
+  mounted() {
+    const { slug, model, design } = this.$route.params;
+    this.$store.dispatch('designs/getDesign', { model, design, slug });
   },
   filters: {
     capitalize,

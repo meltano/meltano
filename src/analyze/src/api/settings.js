@@ -2,41 +2,41 @@ import axios from 'axios';
 import utils from '@/utils/utils';
 
 export default {
-  index() {
-    return axios.get(utils.apiUrl('settings'));
+  index(slug) {
+    return axios.get(utils.apiUrl('settings', `projects/${slug}`));
   },
 
   saveConnection(connection, slug) {
     return axios.post(utils.apiUrl('settings', `projects/${slug}/save`), connection);
   },
 
-  deleteConnection(connection) {
-    return axios.post(utils.apiUrl('settings', 'delete'), connection);
+  deleteConnection(connection, slug) {
+    return axios.post(utils.apiUrl('settings', `projects/${slug}/delete`), connection);
   },
 
-  fetchACL() {
-    return axios.get(utils.apiUrl('settings', 'acl'));
+  fetchACL(slug) {
+    return axios.get(utils.apiUrl('settings', `projects/${slug}/acl`));
   },
 
-  createRole(role, user) {
+  createRole(role, user, slug) {
     const payload = { role, user };
-    return axios.post(utils.apiUrl('settings', 'acl/roles'), payload);
+    return axios.post(utils.apiUrl('settings', `projects/${slug}/acl/roles`), payload);
   },
 
-  deleteRole(role, user) {
+  deleteRole(role, user, slug) {
     const payload = { role, user };
 
-    return axios.delete(utils.apiUrl('settings', 'acl/roles'), { data: payload });
+    return axios.delete(utils.apiUrl('settings', `projects/${slug}/acl/roles`), { data: payload });
   },
 
-  addRolePermission(role, permissionType, context) {
+  addRolePermission(role, permissionType, context, slug) {
     const payload = { permissionType, role, context };
-    return axios.post(utils.apiUrl('settings', 'acl/roles/permissions'), payload);
+    return axios.post(utils.apiUrl('settings', `projects/${slug}/acl/roles/permissions`), payload);
   },
 
-  removeRolePermission(role, permissionType, context) {
+  removeRolePermission(role, permissionType, context, slug) {
     const payload = { permissionType, role, context };
 
-    return axios.delete(utils.apiUrl('settings', 'acl/roles/permissions'), { data: payload });
+    return axios.delete(utils.apiUrl('settings', `projects/${slug}/acl/roles/permissions`), { data: payload });
   },
 };

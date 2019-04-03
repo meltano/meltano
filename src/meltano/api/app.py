@@ -15,16 +15,15 @@ from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker
 from . import config as default_config
 
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
 
 
-def create_app(config={}):
-    project = Project.find()
-
+def create_app(projects, config={}):
+    project = None
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
     app.config.update(**config)
@@ -32,12 +31,7 @@ def create_app(config={}):
     if not app.config["SQLALCHEMY_DATABASE_URI"]:
         app.config[
             "SQLALCHEMY_DATABASE_URI"
-        ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
-
-    try:
-        project = Project.find()
-    except Exception as e:
-        project = None
+        ] = f"sqlite:///{projects.meltano_projects_dir.joinpath('meltano.db')}"
 
     # Initial compilation
     if project:
@@ -108,9 +102,10 @@ def create_app(config={}):
     return app
 
 
-def start(project, **kwargs):
+def start(projects, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
-    starting_url = project.slug_url("files") if project else "projects"
+    starting_url = "projects"
+    project = None
 
     available_worker = UIAvailableWorker(
         f"http://localhost:5000/{starting_url}", not kwargs.get("use_reloader", False)
@@ -123,7 +118,7 @@ def start(project, **kwargs):
 
     try:
         app_config = kwargs.pop("app_config", {})
-        app = create_app(app_config)
+        app = create_app(projects, app_config)
         from .security.identity import create_dev_user
 
         with app.app_context():

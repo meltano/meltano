@@ -5,6 +5,7 @@ import click
 from . import cli
 from .params import project
 from meltano.core.project import Project, ProjectNotFound
+from meltano.core.projects import Projects
 from meltano.api.app import start
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -37,7 +38,9 @@ def ui(debug, port, reload, hostname):
         project = False
 
     if project:
-        tracker = GoogleAnalyticsTracker(project)
-        tracker.track_meltano_ui()
+        click.secho("We found a Meltano project here. Start meltano ui in the directory where your meltano projects exist or will exist.", fg="red")
+        raise click.Abort()
+
+    projects = Projects()
     # todo: run gunicorn if not in debug mode
-    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)
+    start(projects, debug=debug, use_reloader=reload, port=port, host=hostname)

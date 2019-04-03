@@ -19,7 +19,8 @@ def before_request():
     pass
 
 
-@settingsBP.route("/", methods=["GET"])
+@settingsBP.route("/projects/<project_slug>/", methods=["GET"])
+@project_from_slug
 @roles_required("admin")
 def index():
     settings_helper = SettingsHelper()
@@ -37,7 +38,8 @@ def save(project):
     return jsonify(settings)
 
 
-@settingsBP.route("/delete", methods=["POST"])
+@settingsBP.route("/projects/<project_slug>/delete", methods=["POST"])
+@project_from_slug
 def delete():
     settings_helper = SettingsHelper()
     connection = request.get_json()
@@ -45,7 +47,8 @@ def delete():
     return jsonify(settings)
 
 
-@settingsBP.route("/connections/<name>/test")
+@settingsBP.route("/projects/<project_slug>/connections/<name>/test")
+@project_from_slug
 def test(name):
     current_settings = Settings.query.first().settings
     connections = current_settings["connections"]

@@ -146,9 +146,7 @@
   </div>
 </template>
 <script>
-import store from '@/store';
 import { mapState, mapGetters } from 'vuex';
-import RouteMixin from '@/mixins/routeMixin';
 
 export default {
   name: 'Settings',
@@ -167,12 +165,11 @@ export default {
     };
   },
 
-  beforeRouteEnter(to, from, next) {
-    store.dispatch('settings/getSettings')
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
+  mounted() {
+    this.$store.dispatch('settings/saveSlug', {
+      slug: this.$route.params.slug,
+    });
+    this.$store.dispatch('settings/getSettings');
   },
 
   computed: {

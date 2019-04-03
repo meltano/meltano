@@ -9,7 +9,6 @@ from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
 
 
-<<<<<<< HEAD
 @reportsBP.before_request
 @api_auth_required
 def before_request():
@@ -26,22 +25,12 @@ class ReportFilter(NameFilterMixin, ResourceFilter):
         if permission_type == "view:reports":
             return Need("view:design", report["design"])
 
-
-@reportsBP.route("/", methods=["GET"])
-def index():
-    reports_helper = ReportsHelper()
-    reports = reports_helper.get_reports()
-    reports = ReportFilter().filter_all("view:reports", reports)
-
-    return jsonify(reports)
-=======
 @reportsBP.route("/projects/<project_slug>", methods=["GET"])
 @project_from_slug
 def index(project):
     reports_helper = ReportsHelper(project)
     response_data = reports_helper.get_reports()
     return jsonify(response_data)
->>>>>>> Fix broken API call
 
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])

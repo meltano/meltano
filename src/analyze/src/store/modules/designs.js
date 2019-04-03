@@ -220,19 +220,15 @@ const getters = {
 };
 
 const actions = {
-  getSlug({ commit }, slug) {
-    commit('setSlug', slug);
-  },
-
-  getDesign({ dispatch, commit }, { model, design }) {
+  getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentModel = model;
     state.currentDesign = design;
-
-    designApi.index(state.slug, model, design)
+    commit('setSlug', slug);
+    // TODO: chain callbacks to keep a single Promise
+    const index = designApi.index(state.slug, model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      })
-      .catch((e) => {});
+      });
 
     sqlApi.getDialect(state.slug, model)
       .then((response) => {
@@ -245,8 +241,8 @@ const actions = {
     reportsApi.loadReports(state.slug)
       .then((response) => {
         state.reports = response.data;
-        if (state.slug) {
-          const reportMatch = state.reports.find(report => report.slug === state.slug);
+        if (slug) {
+          const reportMatch = state.reports.find(report => report.slug === slug);
           if (reportMatch) {
             dispatch('loadReport', reportMatch);
           }

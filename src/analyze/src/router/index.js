@@ -56,14 +56,16 @@ export default new Router({
       component: Dashboards,
     },
     {
-      path: '/settings',
+      path: '/projects/:slug/settings',
       name: 'settings',
       component: Settings,
       children: [{
         path: 'roles',
+        name: 'roles',
         component: SettingsRoles,
       }, {
         path: 'database',
+        name: 'database',
         component: SettingsDatabase,
       }],
     },
