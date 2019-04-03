@@ -1,7 +1,9 @@
 import os
 import yaml
-from typing import Dict, List
+import logging
+from typing import Dict, List, Optional
 
+from meltano.core.utils import nest
 from .project import Project
 from .plugin import Plugin, PluginType
 from .plugin.singer import plugin_factory
@@ -17,12 +19,29 @@ class ConfigService:
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
-    def get_plugin(self, plugin_type: PluginType, plugin_name: str):
+    def add_to_file(self, plugin: Plugin):
+        with self.project.meltano_update() as meltano_yml:
+            plugins = nest(meltano_yml, "plugins")
+            plugins[plugin.type] = plugins.get(plugin.type, [])
+
+        if plugin in self.plugins():
+            logging.warning(
+                f"{plugin.name} is already present, use `meltano install` to install it."
+            )
+            return
+
+        with self.project.meltano_update() as meltano_yml:
+            meltano_yml["plugins"][plugin.type].append(plugin.canonical())
+
+    def get_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
         try:
             return next(
                 plugin
                 for plugin in self.plugins()
-                if plugin.type == plugin_type and plugin.name == plugin_name
+                if (
+                    plugin.name == plugin_name
+                    and (plugin_type is None or plugin.type == plugin_type)
+                )
             )
         except StopIteration:
             raise PluginMissingError(plugin_name)

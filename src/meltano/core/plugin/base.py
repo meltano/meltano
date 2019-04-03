@@ -3,6 +3,8 @@ import fnmatch
 from collections import namedtuple
 from enum import Enum
 
+from meltano.core.behavior.hookable import HookObject
+
 
 class YAMLEnum(str, Enum):
     def __str__(self):
@@ -28,7 +30,14 @@ class PluginType(YAMLEnum):
         return self.value
 
 
-class Plugin:
+class Plugin(HookObject):
+    """
+    Args:
+    name: The unique name for the installed plugin
+    pip_url: The pip-compatible installation URI, like `git+https://…` or `-e /path/to/pkg`
+    executable: The plugin executable name (default: <name>)
+    """
+
     def __init__(
         self,
         plugin_type: PluginType,
@@ -77,6 +86,10 @@ class Plugin:
     @select.setter
     def select(self, patterns):
         self._select = set(patterns)
+
+    @property
+    def executable(self):
+        return self._extras.get("executable", self.name)
 
     def add_select_filter(self, filter: str):
         self._select.add(filter)
