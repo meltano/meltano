@@ -4,6 +4,7 @@ import orchestrations from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
+  extractorEntities: [],
   currentView: 'intro',
   currentExtractor: '',
   currentConnectionName: '',
@@ -47,11 +48,18 @@ const actions = {
       });
   },
 
+  getExtractorEntities({ commit }, extractorName) {
+    orchestrationsApi.getExtractorEntities(extractorName)
+      .then((response) => {
+        commit('setAllExtractorEntities', response.data);
+      });
+  },
+
   getInstalledPlugins({ commit }) {
     orchestrationsApi.installedPlugins()
       .then((response) => {
-        commit('setInstalledPlugins', response.data)
-      })
+        commit('setInstalledPlugins', response.data);
+      });
   },
 
   getConnectionNames({ commit }) {
@@ -132,6 +140,12 @@ const mutations = {
     state.loaders = orchestrationData.loaders.split('\n');
   },
 
+  setAllExtractorEntities(_, entitiesData) {
+    // TODO likely update/adorn the specific entity in question with the entities so they're cached
+    // Though depending on count we may want to only ever show "entities of focused extractor"
+    state.extractorEntities = entitiesData.entities;
+  },
+
   setConnectionNames(_, connectionNames) {
     state.connectionNames = connectionNames;
   },
@@ -154,7 +168,7 @@ const mutations = {
 
   setInstalledPlugins(_, projectConfig) {
     state.installedPlugins = projectConfig.plugins;
-  }
+  },
 };
 
 export default {

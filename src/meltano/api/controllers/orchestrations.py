@@ -10,7 +10,9 @@ from meltano.cli.add import extractor
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
-orchestrationsBP = Blueprint("orchestrations", __name__, url_prefix="/api/v1/orchestrations")
+orchestrationsBP = Blueprint(
+    "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
+)
 
 
 @orchestrationsBP.route("/", methods=["GET"])
@@ -20,23 +22,26 @@ def index():
     result = new_plugin_discovery_service.discover(PluginType.ALL)
     return jsonify(result)
 
+
 @orchestrationsBP.route("/installed-plugins", methods=["GET"])
 def installed_plugins():
     project = Project.find()
     return jsonify(project.meltano)
 
+
 @orchestrationsBP.route("/add-extractor", methods=["POST"])
 def add_extractor():
     project = Project.find()
     add_service = ProjectAddService(project)
-    plugin_name = request.get_json()['name']
+    plugin_name = request.get_json()["name"]
     plugin = add_service.add("extractors", plugin_name)
     install_service = PluginInstallService(project)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-    return jsonify({ 'test': 123 })
+    return jsonify({"test": 123})
+
 
 @orchestrationsBP.route("/connection_names", methods=["GET"])
 def connection_names():
@@ -93,6 +98,15 @@ def extract(extractor_name: str) -> Response:
     return jsonify(
         {"extractor_name": extractor_name, "output_file_paths": csv_files_url}
     )
+
+
+@orchestrationsBP.route("/entities/<extractor_name>", methods=["POST"])
+def entities(extractor_name: str) -> Response:
+    """
+    endpoint that returns the entities associated with a particular extractor
+    """
+    # TODO leverage new SelectService
+    return jsonify({"entities": ["winning", extractor_name]})
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])

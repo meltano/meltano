@@ -18,6 +18,10 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
   },
 
+  getExtractorEntities(extractor) {
+    return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`));
+  },
+
   load(extractor, loader) {
     return axios.post(utils.apiUrl('orchestrations', `load/${loader}`), {
       extractor,
