@@ -1,5 +1,6 @@
 <script>
 import BaseAccordion from '@/components/generic/BaseAccordion.vue';
+import BaseCard from '@/components/generic/BaseCard.vue';
 
 import { mapState } from 'vuex';
 
@@ -7,7 +8,8 @@ import orchestrationsApi from '../api/orchestrations';
 
 export default {
   components: {
-    BaseAccordion
+    BaseAccordion,
+    BaseCard
   },
   data () {
     return {
@@ -73,26 +75,29 @@ export default {
       <template slot="body">
         <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
         <h2 class="title is-4">Installed</h2>
-        <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p>
-        <ul v-else>
-          <li v-for="extractor in filteredInstalledPlugins" 
+        <!-- <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p> -->
+        <div>
+          <BaseCard v-for="extractor in filteredInstalledPlugins" 
             :key="`${extractor.name}`"
           >
-            {{ extractor.name }}
-          </li>
-        </ul>
+            <div>
+              <img :src="`/static/logos/${extractor.name.replace('tap-', '')}-logo.svg`" width="100" height="100" alt="" />
+             {{ extractor.name }}
+            </div>
+          </BaseCard>
+        </div>
         <h2 class="title is-4">Available</h2>
         <p v-if="installingPlugin">Installing...</p>
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <!-- <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p> -->
-        <ul>
-          <li v-for="(extractor, index) in filteredExtractors" 
+        <div>
+          <BaseCard v-for="(extractor, index) in filteredExtractors" 
             :key="`${extractor}`"
-            v-if="index !== 0"
           >
+            <img :src="`/static/logos/${extractor.name.replace('tap-', '')}-logo.svg`" width="100" height="100" alt="" />
             {{ extractor }} <button @click="installPlugin(index, extractor)">Install</button>
-          </li>
-        </ul>
+          </BaseCard>
+        </div>
       </template>
     </base-accordion>
         <base-accordion>
@@ -115,9 +120,9 @@ export default {
           </li>
         </ul>
         <h2 class="title is-4">Available</h2>
-        <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
-        <ul v-else>
-          <li v-for="(extractor, index) in filteredExtractors" 
+        <!-- <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p> -->
+        <ul>
+          <li v-for="(extractor, index) in filteredExtractors"
             :key="`${extractor}`"
           >
             {{ extractor }} <button @click="installPlugin(index)">Install</button>

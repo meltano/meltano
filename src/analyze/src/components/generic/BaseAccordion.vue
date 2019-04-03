@@ -36,7 +36,7 @@ export default {
   align-items: center;
   background-color: #4a4a4a;
   border-radius: 4px 4px 0 0;
-  color: #fff;
+  color: #dbdbdb;
   display: flex;
   justify-content: space-between;
   line-height: 1.25;
