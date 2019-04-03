@@ -107,13 +107,12 @@ def loader(ctx, project, plugin_name):
 @project
 @click.pass_context
 @click.argument("plugin_name")
-def transformer(project, plugin_name):
+def transformer(ctx, project, plugin_name):
     add_plugin(
         ctx.obj["add_service"],
         project,
         PluginType.TRANSFORMERS,
         plugin_name,
-        verbosity=ctx.obj["verbosity"],
     )
 
     tracker = GoogleAnalyticsTracker(project)
