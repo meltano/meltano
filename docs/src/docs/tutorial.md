@@ -230,7 +230,6 @@ You can now query and explore the extracted data:
 
 You can look forward to the following tutorials in the future:
 
-- Salesforce > Snowflake Tutorial
 - How to add your own transforms
 - How to add your own .m5o models for generating reports
 

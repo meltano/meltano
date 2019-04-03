@@ -13,6 +13,12 @@ class PluginNotSupportedException(Exception):
     pass
 
 
+class PluginAlreadyAddedException(Exception):
+    def __init__(self, plugin: Plugin):
+        self.plugin = plugin
+        super().__init__()
+
+
 class MissingPluginException(Exception):
     pass
 
@@ -33,7 +39,7 @@ class ProjectAddService:
         )
         self.config_service = config_service or ConfigService(project)
 
-    def add(self, plugin_type: PluginType, plugin_name: str):
+    def add(self, plugin_type: PluginType, plugin_name: str, **kwargs):
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
         with self.project.meltano_update() as meltano_yml:
@@ -43,17 +49,16 @@ class ProjectAddService:
             )
 
         if plugin.pip_url:
-            self.add_to_file(plugin)
+            self.add_to_file(plugin, **kwargs)
         else:
             raise PluginNotSupportedException()
 
         return plugin
 
-    def add_to_file(self, plugin: Plugin):
+    def add_to_file(self, plugin: Plugin, exists_ok=False):
         if plugin in self.config_service.plugins():
-            logging.warning(
-                f"{plugin.name} is already present, use `meltano install` to install it."
-            )
+            if not exists_ok:
+                raise PluginAlreadyAddedException(plugin)
             return
 
         with self.project.meltano_update() as meltano_yml:

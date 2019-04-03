@@ -49,14 +49,19 @@ const helpers = {
 
     const baseTable = state.design.related_table;
     const columns = namesOfSelected(baseTable.columns);
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn);
-
     if (!sortColumn) {
       sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn);
     }
-
-    const aggregates = namesOfSelected(baseTable.aggregates) || [];
+    let order = null;
+    if (sortColumn && sortColumn.selected) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -65,6 +70,9 @@ const helpers = {
       delete filters[prop].sql;
     });
 
+    if (!state.design.joins) {
+      state.design.joins = [];
+    }
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
@@ -87,8 +95,6 @@ const helpers = {
       })
       .filter(j => !!(j.columns || j.aggregates));
 
-    let order = null;
-
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
@@ -98,13 +104,6 @@ const helpers = {
         periods: tf.periods.filter(selected),
       }))
       .filter(tf => tf.periods.length);
-
-    if (sortColumn) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
 
     return {
       table: baseTable.name,
@@ -223,12 +222,17 @@ const actions = {
   getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentModel = model;
     state.currentDesign = design;
-    designApi.index(model, design).then((response) => {
-      commit('setDesign', response.data);
-    });
+
+    // TODO: chain callbacks to keep a single Promise
+    const index = designApi.index(model, design)
+      .then((response) => {
+        commit('setDesign', response.data);
+      });
+
     sqlApi.getDialect(model).then((response) => {
       commit('setConnectionDialect', response.data);
     });
+
     reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
@@ -243,6 +247,8 @@ const actions = {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
+
+    return index;
   },
 
   expandRow({ commit }, row) {
@@ -614,6 +620,7 @@ const mutations = {
 
 export default {
   namespaced: true,
+  helpers,
   state,
   getters,
   actions,

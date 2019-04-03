@@ -19,8 +19,42 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
+from flask_principal import Need
+from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
+from meltano.api.security.auth import permit
+
 
 reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
+
+
+class ReportIndexFilter(NameFilterMixin, ResourceFilter):
+    def __init__(self, *args):
+        super().__init__(*args)
+
+        self.needs(self.design_need)
+
+    def design_need(self, permission_type, report):
+        return Need("view:design", report["design"])
+
+
+class M5ocFilter(ResourceFilter):
+    def filter_designs(self, designs):
+        return (
+            ResourceFilter().needs(self.design_need).filter_all("view:design", designs)
+        )
+
+    def design_need(self, permission_type, design_name):
+        return Need(permission_type, design_name)
+
+    def scope(self, permission_type, m5oc):
+        for topic, topic_def in m5oc.items():
+            topic_def["designs"] = self.filter_designs(topic_def["designs"])
+
+        return {
+            topic: topic_def
+            for topic, topic_def in m5oc.items()
+            if topic_def["designs"]
+        }
 
 
 @reposBP.before_request
@@ -37,11 +71,15 @@ def index():
     path = project.model_dir()
     dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
+
+    items = reportsParser.contents()
+    reportsFiles = ReportIndexFilter().filter_all("view:reports", items)
+
     sortedM5oFiles = {
         "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
         "documents": {"label": "Documents", "items": []},
         "topics": {"label": "Topics", "items": []},
-        "reports": {"label": "Reports", "items": reportsParser.contents()},
+        "reports": {"label": "Reports", "items": reportsFiles},
         "tables": {"label": "Tables", "items": []},
     }
     onlydocs = project.model_dir().parent.glob("*.md")
@@ -143,26 +181,14 @@ def sync():
     return lint_all(True)
 
 
-@reposBP.route("/test", methods=["GET"])
-def db_test():
-    design = Design.query.first()
-    return jsonify({"design": {"name": design.name, "settings": design.settings}})
-
-
 @reposBP.route("/models", methods=["GET"])
 def models():
     project = Project.find()
     topics = project.root_dir("model", "topics.index.m5oc")
-    return jsonify(json.loads(open(topics, "r").read()))
+    topics = json.load(open(topics, "r"))
+    topics = next(M5ocFilter().filter("view:topic", [topics]))
 
-
-@reposBP.route("/designs", methods=["GET"])
-def designs():
-    designs = Design.query.all()
-    designs_json = []
-    for design in designs:
-        designs_json.append(design.serializable())
-    return jsonify(designs_json)
+    return jsonify(topics)
 
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])
@@ -176,10 +202,12 @@ def table_read(table_name):
 
 @reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
 def design_read(topic_name, design_name):
+    permit("view:design", design_name)
+
     project = Project.find()
     topic = project.root_dir("model", f"{topic_name}.topic.m5oc")
     with topic.open() as f:
         topic = json.load(f)
     designs = topic["designs"]
-    design = next(e for e in designs if e["from"] == design_name)
+    design = next(e for e in designs if e["name"] == design_name)
     return jsonify(design)

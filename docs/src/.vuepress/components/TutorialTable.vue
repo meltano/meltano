@@ -8,7 +8,7 @@ export default {
   <div class='tutorial-container'>
 
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#starter">Starter - Carbon Emissions</a></div>
+      <div class='tutorial-header'><a href="#starter-carbon-emissions">Starter - Carbon Emissions</a></div>
       <div>
         <p>Experience a taste of data extraction and loading using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
         <ul>
@@ -19,7 +19,7 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#intermediate">Intermediate - Salesforce</a></div>
+      <div class='tutorial-header'><a href="#intermediate-salesforce">Intermediate - Salesforce</a></div>
       <div>
         <p>Experience the full extract, load, and transorm pipeline with authentication using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
         <ul>
@@ -30,15 +30,14 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#advanced">Advanced - Coming Soon</a></div>
+      <div class='tutorial-header'><a href="#advanced-coming-soon">Advanced - Coming Soon</a></div>
       <div>
-        <p>Experience the full ELT pipeline with Snowflake, custom transforms, custom models, and authentication using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
+        <p>Experience building custom transforms and models.</p>
         <ul>
           <li>Postgres database</li>
           <li>Authentication</li>
           <li>Your private Salesforce dataset</li>
-          <li>Snowflake integration</li>
-          <li>Custom Transforms</li>
+          <li>Custom transforms</li>
           <li>Custom models</li>
         </ul>
       </div>

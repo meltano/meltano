@@ -17,12 +17,16 @@ import {
   faExclamationTriangle,
   faArrowRight,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon,
+import {
+  FontAwesomeIcon,
   FontAwesomeLayers,
-  FontAwesomeLayersText } from '@fortawesome/vue-fontawesome';
+  FontAwesomeLayersText,
+} from '@fortawesome/vue-fontawesome';
+import Toasted from 'vue-toasted';
 import App from './App';
 import router from './router';
 import store from './store';
+import Auth from './auth';
 
 Vue.config.productionTip = false;
 
@@ -45,6 +49,23 @@ library.add(faArrowRight);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
+
+Vue.use(Toasted, {
+  router,
+  position: 'bottom-right',
+  iconPack: 'fontawesome',
+  duration: 6000,
+});
+
+Vue.use(Auth, {
+  router,
+  toasted: Vue.toasted,
+});
+
+// Lets Register a Global Error Notification Toast.
+Vue.toasted.register('forbidden', "You can't access this resource at this moment.", {
+  type: 'error',
+});
 
 /* eslint-disable no-new */
 new Vue({

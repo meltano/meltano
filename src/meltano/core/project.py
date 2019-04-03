@@ -31,6 +31,10 @@ class Project:
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")
 
+    def reload(self):
+        """Force a reload from `meltano.yml`"""
+        self._meltano = yaml.load(self.meltanofile.open()) or {}
+
     @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
         project = Project(from_dir)
@@ -47,7 +51,8 @@ class Project:
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         if not self._meltano:
-            self._meltano = yaml.load(self.meltanofile.open()) or {}
+            self.reload()
+
         return self._meltano.copy()
 
     @contextmanager

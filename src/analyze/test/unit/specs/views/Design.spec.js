@@ -18,6 +18,7 @@ describe('Design.vue', () => {
     state = Object.assign(Design.data(), designs.state);
     actions = {
       getDesign: jest.fn(),
+      getSQL: jest.fn(),
       loadReport: jest.fn(),
       saveReport: jest.fn(),
     };
@@ -34,11 +35,16 @@ describe('Design.vue', () => {
     });
   });
 
-  it('calls getDesign() via created() lifecycle hook', () => {
-    const wrapper = shallowMount(Design, { store, localVue, router });
+  it('calls getDesign() via beforeRouteEnter() router lifecycle hook', () => {
+    const params = { model: 'model', design: 'design', slug: 'slug' };
+    const $route = { params };
+    const wrapper = mount(Design, { $route, store, localVue, router });
 
-    expect(wrapper.html()).toBeTruthy();
-    expect(actions.getDesign).toHaveBeenCalled();
+    wrapper.vm.$nextTick(() => {
+      expect(wrapper.html()).toBeTruthy();
+      expect(wrapper.vm.$route.params).toEqual(params);
+      expect(actions.getDesign).toHaveBeenCalled();
+    });
   });
 
   it('no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default', () => {

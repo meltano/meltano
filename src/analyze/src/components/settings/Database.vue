@@ -146,6 +146,7 @@
   </div>
 </template>
 <script>
+import store from '@/store';
 import { mapState, mapGetters } from 'vuex';
 
 export default {
@@ -153,7 +154,6 @@ export default {
 
   data() {
     return {
-
       connectionName: '',
       connectionDatabase: '',
       connectionSchema: '',
@@ -166,8 +166,12 @@ export default {
     };
   },
 
-  created() {
-    this.$store.dispatch('settings/getSettings');
+  beforeRouteEnter(to, from, next) {
+    store.dispatch('settings/getSettings')
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
   },
 
   computed: {

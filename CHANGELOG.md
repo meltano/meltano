@@ -9,17 +9,51 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
+* [#513](https://gitlab.com/meltano/meltano/issues/513) Added initial e2e tests for the UI
+* [#431](https://gitlab.com/meltano/meltano/issues/431) Add the `tap-zendesk` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-zendesk
 
 ### Changes
+
+### Fixes
+* [#507](https://gitlab.com/meltano/meltano/issues/507) Ensure design name and table name don't need to match so multiple designs can leverage a single base table
+
+### Breaks
+
+
+## 0.18.0 - (2019-04-02)
+---
+
+### New
+* [#432](https://gitlab.com/meltano/meltano/issues/432) Add the `tap-zuora` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-zuora
+
+### Changes
+* Remove Snowflake references from advanced tutorial.
+* [#2 dbt-tap-zuora](https://gitlab.com/meltano/dbt-tap-zuora/issues/2) Remove custom SFDC related attributes from Zuora Account and Subscription Models
+* Update [Contributing - Code Style](https://meltano.com/docs/contributing.html#code-style) documentation to including __pycache__ troubleshooting
+
+### Fixes
+* [#529](https://gitlab.com/meltano/meltano/issues/529) Resolve "SFDC Tutorial - ELT Fails due to invalid schema.yml" by [#4 dbt-tap-salesforce](https://gitlab.com/meltano/dbt-tap-salesforce/issues/4) removing the schema.yml files from the dbt models for tap-salesforce.
+* [#502](https://gitlab.com/meltano/meltano/issues/502) Fix the situation where an m5o has no joins, the design still will work.
+
+
+## 0.17.0 - (2019-03-25)
+---
+
+### New
+- [#485](https://gitlab.com/meltano/meltano/issues/485) Added various UI unit tests to the Analyze page
+- [#370](https://gitlab.com/meltano/meltano/issues/370) Enabled authorization using role-based access control for Designs and Reports
+
+### Changes
+* [#283](https://gitlab.com/meltano/meltano/issues/283) Silence pip's output when there is not error
 * [#468](https://gitlab.com/meltano/meltano/issues/468) Added reminder in docs regarding the need for `source venv/bin/activate` in various situations and added minor copy updates
 
 ### Fixes
+* [#433](https://gitlab.com/meltano/meltano/issues/433) Add the `sandbox` configuration to `tap-zuora`.
+* [#501](https://gitlab.com/meltano/meltano/issues/501) Fix `meltano ui` crashing when the OS ran out of file watcher.
 * [#510](https://gitlab.com/meltano/meltano/issues/510) Fix an issue when finding the current Meltano project in a multi-threaded environment.
-* [#494](https://gitlab.com/meltano/meltano/issues/494) Fix broken links to installation requirements for Starter and Intermediate tutorials + Updated messaging around `venv` as requirement vs. recommendation
+* [#494](https://gitlab.com/meltano/meltano/issues/494) Improved documentation around tutorials and Meltano requirements
 * [#492](https://gitlab.com/meltano/meltano/issues/492) A few small contextual additions to help streamline the release process
-
-### Breaks
+* [#503](https://gitlab.com/meltano/meltano/issues/503) Fix a frontend sorting issue so the backend can properly generate an up-to-date query
 
 
 ## 0.16.0 - (2019-03-18)
