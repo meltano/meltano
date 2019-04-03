@@ -1,5 +1,4 @@
 import orchestrationsApi from '../../api/orchestrations';
-import orchestrations from '../../api/orchestrations';
 
 const state = {
   extractors: [],
