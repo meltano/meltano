@@ -64,13 +64,7 @@ def database(project, name, host, database, schema, username, password):
 @click.pass_context
 @click.argument("plugin_name")
 def extractor(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.EXTRACTORS,
-        plugin_name,
-        verbosity=ctx.obj["verbosity"],
-    )
+    add_plugin(ctx.obj["add_service"], project, PluginType.EXTRACTORS, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
@@ -78,9 +72,10 @@ def extractor(ctx, project, plugin_name):
 
 @add.command()
 @project
+@click.pass_context
 @click.argument("plugin_name")
-def model(project, plugin_name):
-    add_plugin(project, PluginType.MODELS, plugin_name)
+def model(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"], project, PluginType.MODELS, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="model", plugin_name=plugin_name)
@@ -91,13 +86,7 @@ def model(project, plugin_name):
 @click.pass_context
 @click.argument("plugin_name")
 def loader(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.LOADERS,
-        plugin_name,
-        verbosity=ctx.obj["verbosity"],
-    )
+    add_plugin(ctx.obj["add_service"], project, PluginType.LOADERS, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
@@ -125,11 +114,7 @@ def transform(project, plugin_name):
 
 
 def add_plugin(
-    add_service,
-    project: Project,
-    plugin_type: PluginType,
-    plugin_name: str,
-    verbosity=0,
+    add_service, project: Project, plugin_type: PluginType, plugin_name: str
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
