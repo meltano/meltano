@@ -21,36 +21,27 @@ from meltano.core.sql.base import (
 )
 
 
-@pytest.fixture(scope="module")
-def setup_tmp_models_path(request, tmp_path_factory):
+@pytest.fixture(scope="class")
+def setup_test_models(project, request):
     # Find where the subfolder with the tmp models is by using request.fspath
     #  as we switch to another directory for tests (check test_dir session fixture)
     models_dir = request.fspath.join("..").join("models/")
 
-    # And copy everything there to be compiled and used for tests
-    tmp_path = tmp_path_factory.mktemp("tmp_models")
+    # And copy everything to the model/ directory of the test Project
+    project_models_dir = project.root_dir("model")
 
-    try:
-        tmp_models_dir = Path(tmp_path, "models/")
-        shutil.copytree(models_dir, tmp_models_dir)
-        yield tmp_models_dir
-    finally:
-        shutil.rmtree(tmp_path)
-
-
-@pytest.fixture(scope="module")
-def models_path(setup_tmp_models_path):
-    """Get the full path for the test m5o models"""
-    return setup_tmp_models_path
+    test_models = os.listdir(models_dir)
+    for file_name in test_models:
+        full_file_name = os.path.join(models_dir, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, project_models_dir)
 
 
-@pytest.fixture()
-def design_helper(project, add_model, models_path):
-
+@pytest.fixture(scope="class")
+def design_helper(project, setup_test_models):
     # Compile the test files and make sure that the proper m5oc file was generated
-    project = Project.find()
     m5o_parse = MeltanoAnalysisFileParser(project)
-    models = m5o_parse.parse_packages()
+    models = m5o_parse.parse()
     m5o_parse.compile(models)
 
     # Load the m5oc file for gitflix
@@ -69,7 +60,7 @@ def query_payload():
      "aggregates":["count", "avg_age", "sum_clv"],
      "timeframes":[],
      "joins":[
-      {"name":"streams","columns":["day", "month", "year"],"aggregates":["count", "sum_minutes"]},
+      {"name":"streams","columns":["day", "month", "year"],"aggregates":["count", "sum_minutes", "count_days"]},
       {"name":"episodes","columns":["tv_series"],"aggregates":["count", "avg_rating"]}
      ],
      "order":null,
@@ -117,8 +108,9 @@ class TestQueryGeneration:
         assert "minutes" in [a.column_name() for a in table.aggregates()]
         assert "streams.id" in [a.column_alias() for a in table.aggregates()]
         assert "streams.sum_minutes" in [a.alias() for a in table.aggregates()]
+        assert "streams.count_days" in [a.alias() for a in table.aggregates()]
 
-        assert len(table.aggregates()) == 2
+        assert len(table.aggregates()) == 3
         new_a = MeltanoAggregate(table)
         new_a.name = "avg_price"
         new_a.type = "avg"
@@ -126,7 +118,7 @@ class TestQueryGeneration:
         new_a.description = "Average Price"
         new_a.sql = "{{table}}.price"
         table.add_aggregate(new_a)
-        assert len(table.aggregates()) == 3
+        assert len(table.aggregates()) == 4
 
     def test_meltano_query(self, design_helper, query_payload):
         # Test parsing a json payload using a Design generated from a m5oc file
@@ -151,3 +143,9 @@ class TestQueryGeneration:
         assert 'COALESCE(COUNT("users.id"),0)' in sql
         assert 'COALESCE(SUM("users.clv"),0)' in sql
         assert 'SELECT * FROM "result"' in sql
+
+        # Check that the attribute used both as a column and as an aggregate
+        # 1. Only appears once in the select clause of the base query
+        # 2. Properly appears as an aggregate
+        assert sql.count('"streams"."day" "streams.day"') == 1
+        assert 'COALESCE(COUNT("streams.day"),0)' in sql
