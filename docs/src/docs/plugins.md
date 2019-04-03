@@ -43,10 +43,9 @@ We aim to make Meltano as thin as possible on top of the components it abstracts
 
 ### How to create a tap
 
-First things first, you'll need a data source to integrate: in this example, let's use the `GitLab`'s API as an example of new integration.
+First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
-::: tip
-If you are really looking to integrate GitLab, please use our [https://gitlab.com/meltano/tap-gitlab](tap-gitlab)
+If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
 :::
 
 ### Create the plugin's package
