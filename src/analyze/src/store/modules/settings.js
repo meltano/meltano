@@ -44,7 +44,6 @@ const actions = {
   getSettings({ commit }) {
     settingsApi.index(state.slug)
       .then((response) => {
-        console.log(response)
         commit('setSettings', response.data.settings);
       });
   },
@@ -127,7 +126,6 @@ const mutations = {
     state.slug = slug;
   },
   setSettings(_store, settings) {
-    console.log("SETSETTINGS", settings)
     state.settings = settings;
   },
   setACL(_store, acl) {

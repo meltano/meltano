@@ -38,7 +38,10 @@ def ui(debug, port, reload, hostname):
         project = False
 
     if project:
-        click.secho("We found a Meltano project here. Start meltano ui in the directory where your meltano projects exist or will exist.", fg="red")
+        click.secho(
+            "We found a Meltano project here. Start meltano ui in the directory where your meltano projects exist or will exist.",
+            fg="red",
+        )
         raise click.Abort()
 
     projects = Projects()

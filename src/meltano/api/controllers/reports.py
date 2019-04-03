@@ -25,6 +25,7 @@ class ReportFilter(NameFilterMixin, ResourceFilter):
         if permission_type == "view:reports":
             return Need("view:design", report["design"])
 
+
 @reportsBP.route("/projects/<project_slug>", methods=["GET"])
 @project_from_slug
 def index(project):

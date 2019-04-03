@@ -7,7 +7,7 @@ class Projects:
         if cwd is None:
             cwd = os.getcwd()
         self.cwd = Path(cwd)
-        self.meltano_projects_dir = self.cwd.joinpath('.meltano_projects')
+        self.meltano_projects_dir = self.cwd.joinpath(".meltano_projects")
         if not self.meltano_projects_dir.exists():
             self.create_meltano_projects_dir()
 

@@ -184,6 +184,7 @@ def lint(project):
 def sync(project):
     return lint_all(True, project)
 
+
 @reposBP.route("/test", methods=["GET"])
 def db_test():
     design = Design.query.first()
@@ -198,6 +199,7 @@ def models(project):
     topics = next(M5ocFilter().filter("view:topic", [topics]))
     return jsonify(topics)
 
+
 @reposBP.route("/designs/", methods=["GET"])
 def designs():
     designs = Design.query.all()
@@ -206,6 +208,7 @@ def designs():
         designs_json.append(design.serializable())
     return jsonify(designs_json)
 
+
 @reposBP.route("/tables/<table_name>", methods=["GET"])
 def table_read(table_name):
     project = Project.find()
@@ -213,6 +216,7 @@ def table_read(table_name):
     m5o_parse = MeltanoAnalysisFileParser(project)
     table = m5o_parse.parse_m5o_file(file_path)
     return jsonify(table)
+
 
 @reposBP.route(
     "projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"]

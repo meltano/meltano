@@ -44,9 +44,9 @@ class MeltanoBackgroundCompiler:
     def start(self):
         try:
             if self.observer:
-              self.observer.start()
-              for source in self.model_dirs:
-                  logging.info(f"Auto-compiling models in '{str(source)}'")
+                self.observer.start()
+                for source in self.model_dirs:
+                    logging.info(f"Auto-compiling models in '{str(source)}'")
         except OSError:
             # most probably INotify being full
             logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
