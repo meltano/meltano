@@ -39,7 +39,7 @@ class ProjectAddCustomService:
         click.secho(
             "The plugin has been added to your `meltano.yml`.\n"
             "If your plugin requires configuration options, you must add them directly "
-            "in the created plugin defininion under the `config` section.\n\n"
+            "in the created plugin definition under the `config` section.\n\n"
             "Then, run `meltano install` to update the plugin configuration.",
             fg="yellow",
         )
