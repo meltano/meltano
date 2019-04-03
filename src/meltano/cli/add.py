@@ -108,12 +108,7 @@ def loader(ctx, project, plugin_name):
 @click.pass_context
 @click.argument("plugin_name")
 def transformer(ctx, project, plugin_name):
-    add_plugin(
-        ctx.obj["add_service"],
-        project,
-        PluginType.TRANSFORMERS,
-        plugin_name,
-    )
+    add_plugin(ctx.obj["add_service"], project, PluginType.TRANSFORMERS, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="transformer", plugin_name=plugin_name)
