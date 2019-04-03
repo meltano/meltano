@@ -1,5 +1,10 @@
 from functools import wraps
+from pathlib import Path
 from meltano.core.project import Project, ProjectNotFound
+
+
+def project_api_route(controller):
+    return str(Path("/api/v1/projects/<project_slug>").joinpath(controller))
 
 
 def project_from_slug(f):
@@ -8,6 +13,7 @@ def project_from_slug(f):
         try:
             project = Project.find_by_slug(kwargs["project_slug"])
         except ProjectNotFound as e:
+            print("~~~~~~", kwargs)
             project = None
             return jsonify(
                 {

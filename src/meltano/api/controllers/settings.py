@@ -7,27 +7,27 @@ from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
-from .project_helper import project_from_slug
+from .project_helper import project_from_slug, project_api_route
 
-settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
+settingsBP = Blueprint("settings", __name__, url_prefix=project_api_route("settings"))
 settingsApi = Api(settingsBP)
 
 
 @settingsBP.before_request
-@api_auth_required
+# @api_auth_required
 def before_request():
     pass
 
 
-@settingsBP.route("/projects/<project_slug>/", methods=["GET"])
+@settingsBP.route("/", methods=["GET"])
 @project_from_slug
-@roles_required("admin")
-def index():
-    settings_helper = SettingsHelper()
+# @roles_required("admin")
+def index(project):
+    settings_helper = SettingsHelper(project)
     return jsonify(settings_helper.get_connections())
 
 
-@settingsBP.route("/projects/<project_slug>/save", methods=["POST"])
+@settingsBP.route("/save", methods=["POST"])
 @project_from_slug
 @roles_required("admin")
 def save(project):
@@ -38,18 +38,18 @@ def save(project):
     return jsonify(settings)
 
 
-@settingsBP.route("/projects/<project_slug>/delete", methods=["POST"])
+@settingsBP.route("/delete", methods=["POST"])
 @project_from_slug
-def delete():
-    settings_helper = SettingsHelper()
+def delete(project):
+    settings_helper = SettingsHelper(project)
     connection = request.get_json()
     settings = settings_helper.delete_connection(connection)
     return jsonify(settings)
 
 
-@settingsBP.route("/projects/<project_slug>/connections/<name>/test")
+@settingsBP.route("/connections/<name>/test")
 @project_from_slug
-def test(name):
+def test(name, project):
     current_settings = Settings.query.first().settings
     connections = current_settings["connections"]
     try:

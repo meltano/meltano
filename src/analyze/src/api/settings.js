@@ -3,40 +3,40 @@ import utils from '@/utils/utils';
 
 export default {
   index(slug) {
-    return axios.get(utils.apiUrl('settings', `projects/${slug}`));
+    return axios.get(utils.apiUrl(`projects/${slug}/settings`));
   },
 
   saveConnection(connection, slug) {
-    return axios.post(utils.apiUrl('settings', `projects/${slug}/save`), connection);
+    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'save'), connection);
   },
 
   deleteConnection(connection, slug) {
-    return axios.post(utils.apiUrl('settings', `projects/${slug}/delete`), connection);
+    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'delete'), connection);
   },
 
   fetchACL(slug) {
-    return axios.get(utils.apiUrl('settings', `projects/${slug}/acl`));
+    return axios.get(utils.apiUrl(`projects/${slug}/settings`, 'acl'));
   },
 
   createRole(role, user, slug) {
     const payload = { role, user };
-    return axios.post(utils.apiUrl('settings', `projects/${slug}/acl/roles`), payload);
+    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles'), payload);
   },
 
   deleteRole(role, user, slug) {
     const payload = { role, user };
 
-    return axios.delete(utils.apiUrl('settings', `projects/${slug}/acl/roles`), { data: payload });
+    return axios.delete(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles'), { data: payload });
   },
 
   addRolePermission(role, permissionType, context, slug) {
     const payload = { permissionType, role, context };
-    return axios.post(utils.apiUrl('settings', `projects/${slug}/acl/roles/permissions`), payload);
+    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles/permissions'), payload);
   },
 
   removeRolePermission(role, permissionType, context, slug) {
     const payload = { permissionType, role, context };
 
-    return axios.delete(utils.apiUrl('settings', `projects/${slug}/acl/roles/permissions`), { data: payload });
+    return axios.delete(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles/permissions'), { data: payload });
   },
 };
