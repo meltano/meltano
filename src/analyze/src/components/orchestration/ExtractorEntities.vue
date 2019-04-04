@@ -11,11 +11,11 @@
         @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
       <div
         v-for='attribute in entityGroup.attributes'
-        :key='`${attribute.name}`'
-        @click.stop="entityAttributeSelected({entityGroup, attribute})">
+        :key='`${attribute.name}`'>
         <a
           class="button is-rounded is-small"
-          :class="{'is-primary': attribute.selected}">
+          :class="{'is-primary': attribute.selected}"
+          @click.stop="entityAttributeSelected({entityGroup, attribute})">
           {{attribute.name}}
         </a>
       </div>
