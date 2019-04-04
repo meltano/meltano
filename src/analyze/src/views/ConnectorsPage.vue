@@ -90,17 +90,28 @@ export default {
         <p v-if="installingPlugin">Installing...</p>
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <!-- <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p> -->
-        <div>
+        <div class="card-grid">
           <BaseCard v-for="(extractor, index) in filteredExtractors" 
             :key="`${extractor}`"
           >
-            <img :src="`/static/logos/${extractor.name.replace('tap-', '')}-logo.svg`" width="100" height="100" alt="" />
-            {{ extractor }} <button @click="installPlugin(index, extractor)">Install</button>
+            <div style="display: flex; margin: 20px 0; align-items: center; flex: 1">
+              <div style="display: flex; align-items: center;  margin-bottom: 0; justify-content: center; margin-top: 15px; margin-bottom: 10px; min-width: 150px; padding: 30px; box-sizing: border-box;">
+                <img :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`" alt="" style="max-width: 150px; padding: 15px;" />
+              </div>
+              <div style="padding-top: 0;">
+                <h3 style="margin-top: 0; margin-bottom: 10px;">{{ extractor }}</h3>
+                <p style="font-size: 1rem;">This data source focuses on getting emissions data from local areas.</p>
+                <p><a href="#">More information about Carbon Intensity tap</a></p>
+              </div>
+            </div>
+            <div>
+              <button @click="installPlugin(index, extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+            </div>
           </BaseCard>
         </div>
       </template>
     </base-accordion>
-        <base-accordion>
+    <base-accordion>
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
@@ -136,5 +147,12 @@ export default {
 <style lang="scss">
 .content {
   padding: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 15px;
+  grid-row-gap: 15px;
 }
 </style>
