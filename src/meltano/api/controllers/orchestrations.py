@@ -118,14 +118,9 @@ def entities(extractor_name: str) -> Response:
     # TODO leverage new SelectService
     entityGroups = [
         {"name": "User", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
-        {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]}
+        {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
     ]
-    return jsonify(
-        {
-            "extractorName": extractor_name,
-            "entityGroups": entityGroups,
-        }
-    )
+    return jsonify({"extractorName": extractor_name, "entityGroups": entityGroups})
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])
