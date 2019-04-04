@@ -100,13 +100,32 @@ def extract(extractor_name: str) -> Response:
     )
 
 
+@orchestrationsBP.route("/extract-entities/<extractor_data>", methods=["POST"])
+def extractEntities(extractor_data: str) -> Response:
+    """
+    endpoint that performs extraction of the user selected entities and attributes
+    """
+    # TODO parse extractor_data and selectively `meltano select extractor_data["extractorName"] ...`
+    print(extractor_data)
+    return jsonify("winning")
+
+
 @orchestrationsBP.route("/entities/<extractor_name>", methods=["POST"])
 def entities(extractor_name: str) -> Response:
     """
     endpoint that returns the entities associated with a particular extractor
     """
     # TODO leverage new SelectService
-    return jsonify({"entities": ["winning", extractor_name]})
+    entityGroups = [
+        {"name": "User", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
+        {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]}
+    ]
+    return jsonify(
+        {
+            "extractorName": extractor_name,
+            "entityGroups": entityGroups,
+        }
+    )
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])

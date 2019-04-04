@@ -1,9 +1,10 @@
+import Vue from 'vue';
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
   extractors: [],
   loaders: [],
-  extractorEntities: [],
+  extractorEntities: {},
   currentView: 'intro',
   currentExtractor: '',
   currentConnectionName: '',
@@ -87,6 +88,13 @@ const actions = {
     commit('setCurrentConnectionName', selectedConnectionName);
   },
 
+  extractEntities({ commit }) {
+    orchestrationsApi.extractEntities(state.extractorEntities)
+      .then(() => {
+        // TODO confirm entity extraction worked
+      });
+  },
+
   runExtractor() {
     state.log = 'Running...';
     orchestrationsApi.extract(state.currentExtractor)
@@ -124,6 +132,25 @@ const actions = {
       });
   },
 
+  toggleEntityGroup({ commit }, entityGroup) {
+    commit('toggleSelected', entityGroup);
+    const selected = entityGroup.selected;
+    entityGroup.attributes.forEach((attribute) => {
+      if (attribute.selected !== selected) {
+        commit('toggleSelected', attribute);
+      }
+    });
+  },
+
+  toggleEntityAttribute({ commit }, { entityGroup, attribute }) {
+    commit('toggleSelected', attribute);
+    const hasDeselectedAttribute = attribute.selected === false && entityGroup.selected;
+    const hasAllSelectedAttributes = !entityGroup.attributes.find(attr => !attr.selected);
+    if (hasDeselectedAttribute || hasAllSelectedAttributes) {
+      commit('toggleSelected', entityGroup);
+    }
+  },
+
   updateExtractors({ commit }, itemIndex) {
     commit('removeExtractor', itemIndex);
   },
@@ -140,9 +167,7 @@ const mutations = {
   },
 
   setAllExtractorEntities(_, entitiesData) {
-    // TODO likely update/adorn the specific entity in question with the entities so they're cached
-    // Though depending on count we may want to only ever show "entities of focused extractor"
-    state.extractorEntities = entitiesData.entities;
+    state.extractorEntities = entitiesData;
   },
 
   setConnectionNames(_, connectionNames) {
@@ -167,6 +192,10 @@ const mutations = {
 
   setInstalledPlugins(_, projectConfig) {
     state.installedPlugins = projectConfig.plugins;
+  },
+
+  toggleSelected(_, selectable) {
+    Vue.set(selectable, 'selected', !selectable.selected);
   },
 };
 
