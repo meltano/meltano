@@ -68,7 +68,7 @@ def before_request():
 
 @reposBP.route("/projects/<project_slug>", methods=["GET"])
 @project_from_slug
-def project_by_slug(project):
+def index(project):
     onlyfiles = [f for f in project.model_dir().iterdir() if f.is_file()]
 
     path = project.model_dir()

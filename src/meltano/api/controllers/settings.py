@@ -14,7 +14,7 @@ settingsApi = Api(settingsBP)
 
 
 @settingsBP.before_request
-# @api_auth_required
+@api_auth_required
 def before_request():
     pass
 
@@ -99,8 +99,9 @@ class AclResource(Resource):
     }
 
     @marshal_with(AclDefinition)
+    @project_from_slug
     @roles_required("admin")
-    def get(self):
+    def get(self, project):
         return {
             "users": User.query.options(joinedload("roles")).all(),
             "roles": Role.query.options(joinedload("permissions")).all(),
@@ -110,12 +111,12 @@ class AclResource(Resource):
 
 class RolesResource(Resource):
     @marshal_with(AclResource.RoleDefinition)
+    @project_from_slug
     @roles_required("admin")
-    def post(self):
+    def post(self, project):
         payload = request.get_json()
         role = payload["role"]
         user = payload.get("user")
-
         try:
             role_name = role.pop("name")
             role = users.find_or_create_role(role_name, **role)
@@ -130,8 +131,9 @@ class RolesResource(Resource):
         return role, 201
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def delete(self):
+    def delete(self, project):
         payload = request.get_json()
         role = payload["role"]
         user = payload.get("user")
@@ -163,8 +165,9 @@ class RolePermissionsResource(Resource):
         return payload["role"], payload["permissionType"], payload["context"]
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def post(self):
+    def post(self, project):
         role, permission_type, context = self._parse_request()
 
         try:
@@ -188,8 +191,9 @@ class RolePermissionsResource(Resource):
         return role, 200
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def delete(self):
+    def delete(self, project):
         role, permission_type, context = self._parse_request()
         role = Role.query.filter_by(name=role["name"]).one()
 

@@ -5,9 +5,8 @@ import click
 from . import cli
 from .params import project
 from meltano.core.project import Project, ProjectNotFound
-from meltano.core.projects import Projects
 from meltano.api.app import start
-from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.tracking import GoogleAnalyticsAnonymousTracker
 
 
 @cli.command()
@@ -31,6 +30,9 @@ from meltano.core.tracking import GoogleAnalyticsTracker
     envvar="MELTANO_API_HOSTNAME",
 )
 def ui(debug, port, reload, hostname):
+    tracker = GoogleAnalyticsAnonymousTracker()
+    tracker.track_meltano_ui("startup")
+
     project = False
     try:
         project = Project.find()
@@ -44,6 +46,5 @@ def ui(debug, port, reload, hostname):
         )
         raise click.Abort()
 
-    projects = Projects()
     # todo: run gunicorn if not in debug mode
-    start(projects, debug=debug, use_reloader=reload, port=port, host=hostname)
+    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)

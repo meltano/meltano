@@ -11,7 +11,7 @@ class Projects:
         if not self.meltano_projects_dir.exists():
             self.create_meltano_projects_dir()
 
-    def create_meltano_projects_dir():
+    def create_meltano_projects_dir(self):
         self.meltano_projects_dir.mkdir(parents=False, exist_ok=False)
 
     def find(self):

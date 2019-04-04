@@ -6,9 +6,9 @@ def assert_has_items(entry, count):
     return len(entry["items"]) == count
 
 
-def test_index(api, app):
+def test_index(api, app, project):
     with app.test_request_context():
-        res = api.get(url_for("repos.index"))
+        res = api.get(url_for("repos.index", project_slug=project.slug))
 
     payload = res.json
 
@@ -18,9 +18,9 @@ def test_index(api, app):
     assert_has_items(payload["documents"], 1)
 
 
-def test_models(api, app):
+def test_models(api, app, project):
     with app.test_request_context():
-        res = api.get(url_for("repos.models"))
+        res = api.get(url_for("repos.models", project_slug=project.slug))
 
     payload = res.json
 
