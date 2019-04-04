@@ -27,6 +27,6 @@ dag = DAG("meltano", default_args=default_args, schedule_interval="@daily")
 # t1, t2 and t3 are examples of tasks created by instantiating operators
 t1 = BashOperator(
     task_id="extract_load",
-    bash_command=f"cd {str(project.root)} && meltano elt tap-carbon-intensity target-sqlite --transform=skip",
+    bash_command=f"cd {str(project.root)} && meltano elt tap-carbon-intensity target-sqlite",
     dag=dag,
 )

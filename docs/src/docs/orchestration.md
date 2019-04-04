@@ -27,9 +27,9 @@ Meltano ships out-of-the-box with a sample DAG for your current project, which i
 We are now ready to use Airflow, here's a little tour of what we can do.
 
 ::: tip
-Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano shall facada more of these feature to create a seamless experience using this orchestrator.
+Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator.
 
-Please refer to the [Airflow documentation]() for more in-depth knowledge about Airflow.
+Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
 :::
 
 ```bash

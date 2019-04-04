@@ -15,7 +15,7 @@ requires = [
     'Cerberus==1.2',
     'sqlparse==0.3.0',
     'gitpython==2.1.11',
-    'markdown<3.0',
+    'markdown==3.0.1',
     'networkx==2.2',
     'pandas==0.24.1',
     'psycopg2==2.7.7',

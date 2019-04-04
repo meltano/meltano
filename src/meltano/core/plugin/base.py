@@ -31,6 +31,14 @@ class PluginType(YAMLEnum):
     def __str__(self):
         return self.value
 
+    @property
+    def cli_command(self):
+        """Makes it singular for `meltano add PLUGIN_TYPE`"""
+        if self is self.__class__.ALL:
+            raise NotImplemented()
+
+        return self.value[:-1]
+
     @classmethod
     def value_exists(cls, value):
         return value in cls._value2member_map_

@@ -123,7 +123,9 @@ def orchestrator(project, plugin_name):
     tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
 
 
-def add_plugin(add_service, project: Project, plugin_type: PluginType, plugin_name: str):
+def add_plugin(
+    add_service, project: Project, plugin_type: PluginType, plugin_name: str
+):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
         click.secho(f"Added '{plugin_name}' to your Meltano project.")
@@ -174,6 +176,7 @@ def add_transform(project: Project, plugin_name: str):
         click.secho(
             f"Added transform '{plugin_name}' to your dbt_project.yml", fg="green"
         )
+        click.secho(f"Installed '{plugin_name}'.", fg="green")
     except (PluginNotSupportedException, PluginNotFoundError):
         click.secho(f"Error: transform '{plugin_name}' is not supported", fg="red")
         raise click.Abort()
