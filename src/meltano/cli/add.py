@@ -28,7 +28,7 @@ from meltano.core.error import SubprocessError
 @click.option("--custom", is_flag=True)
 def add(ctx, project, custom):
     if custom:
-        if ctx.invoked_subcommand in ("transformer", "transform"):
+        if ctx.invoked_subcommand in ("transformer", "transform", "orchestrator"):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
@@ -105,22 +105,23 @@ def transformer(ctx, project, plugin_name):
 
 @add.command()
 @project
+@click.pass_context
+@click.argument("plugin_name")
+def orchestrator(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"], project, PluginType.ORCHESTRATORS, plugin_name)
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
+
+
+@add.command()
+@project
 @click.argument("plugin_name")
 def transform(project, plugin_name):
     add_transform(project, plugin_name)
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
-
-
-@add.command()
-@project
-@click.argument("plugin_name")
-def orchestrator(project, plugin_name):
-    add_plugin(project, PluginType.ORCHESTRATORS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="orchestrator", plugin_name=plugin_name)
 
 
 def add_plugin(

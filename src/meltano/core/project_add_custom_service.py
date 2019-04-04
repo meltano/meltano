@@ -6,6 +6,7 @@ import click
 
 from .project import Project
 from .plugin import PluginType, Plugin
+from .plugin.factory import plugin_factory
 from .config_service import ConfigService
 
 
@@ -44,4 +45,4 @@ class ProjectAddCustomService:
             fg="yellow",
         )
 
-        return self.config_service.plugin_generator(plugin.type, plugin.canonical())
+        return plugin_factory(plugin.type, plugin.canonical())
