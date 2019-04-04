@@ -4,16 +4,20 @@
     <div
       class='is-unselectable'
       v-for='entityGroup in extractorEntities.entityGroups'
-      :key='`${entityGroup.name}`'
-      @click.stop="entityGroupSelected(entityGroup)">
-      <h3 :class="{'has-text-success': entityGroup.selected}">{{entityGroup.name}}</h3>
+      :key='`${entityGroup.name}`'>
+      <a
+        class='button is-rounded'
+        :class="{'is-primary': entityGroup.selected}"
+        @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
       <div
         v-for='attribute in entityGroup.attributes'
         :key='`${attribute.name}`'
         @click.stop="entityAttributeSelected({entityGroup, attribute})">
-        <div :class="{'has-text-success': attribute.selected}">
+        <a
+          class="button is-rounded is-small"
+          :class="{'is-primary': attribute.selected}">
           {{attribute.name}}
-        </div>
+        </a>
       </div>
     </div>
     <a
@@ -27,6 +31,7 @@ export default {
   name: 'ExtractorEntities',
   props: ['extractorEntities'],
   created() {
+    // TODO pull out and place in Ben's tap card implementation
     this.$store.dispatch('orchestrations/getExtractorEntities', 'tap-carbon-intensity');
   },
   methods: {
