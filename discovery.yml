@@ -133,3 +133,5 @@ models:
     pip_url: "git+https://gitlab.com/meltano/model-salesforce.git"
   - name: model-gitflix
     pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"
+  - name: model-zendesk
+    pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
