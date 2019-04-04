@@ -39,6 +39,7 @@
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
+            <!-- TODO move to getter -->
             <router-link
               :to="{name:'analyze',
                     params:
