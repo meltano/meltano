@@ -106,7 +106,7 @@ def extractEntities(extractor_data: str) -> Response:
     endpoint that performs extraction of the user selected entities and attributes
     """
     # TODO parse extractor_data and selectively `meltano select extractor_data["extractorName"] ...`
-    print(extractor_data)
+    # TODO refactor and leverage extract() method above?
     return jsonify("winning")
 
 
