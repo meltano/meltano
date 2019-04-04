@@ -5,13 +5,13 @@ import subprocess
 import time
 from . import Plugin, PluginType
 
-from meltano.core.behavior.hookable import HookObject, hook
+from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.venv_service import VenvService
 from meltano.core.plugin_invoker import PluginInvoker
 
 
-class Airflow(HookObject, Plugin):
+class Airflow(Plugin):
     __plugin_type__ = PluginType.ORCHESTRATORS
 
     def __init__(self, *args, **kwargs):
