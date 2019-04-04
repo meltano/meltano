@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 from os.path import join
 
+from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.sql.sql_utils import SqlUtils
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.date import Date
@@ -40,9 +41,7 @@ def setup_test_models(project, request):
 @pytest.fixture(scope="class")
 def design_helper(project, setup_test_models):
     # Compile the test files and make sure that the proper m5oc file was generated
-    m5o_parse = MeltanoAnalysisFileParser(project)
-    models = m5o_parse.parse()
-    m5o_parse.compile(models)
+    ProjectCompiler(project).compile()
 
     # Load the m5oc file for gitflix
     m5oc_file = project.root_dir("model", "gitflix.topic.m5oc")
