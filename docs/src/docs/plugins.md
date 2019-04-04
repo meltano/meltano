@@ -35,6 +35,47 @@ ZUORA_START_DATE
 ZUORA_SANDBOX     # specifically 'true' or 'false'
 ```
 
+### tap-csv
+
+<table>
+  <tr>
+    <th>Data Source</th>
+    <td>Traditionally-delimited CSV files (commas separated columns, newlines indicate new rows, double quoted values) as defined by the defaults of the python csv library.</td>
+  </tr>
+  <tr>
+    <th>Repository</th>
+    <td><a target="_blank" href="https://gitlab.com/meltano/tap-csv">https://gitlab.com/meltano/tap-csv</a></td>
+  </tr>
+</table>
+
+#### Default configuration
+
+**.env**
+```bash
+export TAP_CSV_FILES_DEFINITION="files_def.json"
+```
+
+Where `files_def.json` is a json file with all the CSV files to be loaded:
+
+**files_def.json**
+```json
+[   
+  { "entity" : "leads",
+    "file" : "/path/to/leads.csv",
+    "keys" : ["Id"]
+  },
+  { "entity" : "opportunities",
+    "file" : "/path/to/opportunities.csv",
+    "keys" : ["Id"]
+  }
+]
+```
+
+Description of available options:
+  - entity: The entity name to be passed to singer (i.e. the table name).
+  - file: Local path to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed.
+  - keys: The names of the columns that constitute the unique keys for that entity.
+
 ## Create your own
 
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
