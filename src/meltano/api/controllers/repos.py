@@ -228,5 +228,5 @@ def design_read(topic_name, design_name, project):
     with topic.open() as f:
         topic = json.load(f)
     designs = topic["designs"]
-    design = next(e for e in designs if e["from"] == design_name)
+    design = next(e for e in designs if e["name"] == design_name)
     return jsonify(design)

@@ -35,7 +35,7 @@
           <div class="navbar-dropdown
                 is-boxed"
                 :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v,model) in models">
+            <template v-for="(v, model) in models">
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
@@ -137,9 +137,6 @@ export default {
     ...mapState('repos', [
       'models',
       'navbarClicked',
-    ]),
-    ...mapGetters('repos', [
-      'urlForModelDesign',
     ]),
   },
   methods: {

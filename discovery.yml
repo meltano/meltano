@@ -64,6 +64,11 @@ extractors:
       start_date: $FASTLY_START_DATE
   - name: tap-carbon-intensity
     pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
+  - name: tap-csv
+    pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
+    config:
+      csv_files_definition: "$TAP_CSV_FILES_DEFINITION"
+    docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
@@ -133,3 +138,5 @@ models:
     pip_url: "git+https://gitlab.com/meltano/model-salesforce.git"
   - name: model-gitflix
     pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"
+  - name: model-zendesk
+    pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
