@@ -98,7 +98,7 @@
   </nav>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
