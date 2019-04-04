@@ -1,6 +1,7 @@
 <script>
 import BaseAccordion from '@/components/generic/BaseAccordion';
 import BaseCard from '@/components/generic/BaseCard';
+import ConnectorCard from '@/components/ConnectorCard';
 
 import { mapState } from 'vuex';
 
@@ -10,6 +11,7 @@ export default {
   components: {
     BaseAccordion,
     BaseCard,
+    ConnectorCard
   },
   data() {
     return {
@@ -73,38 +75,26 @@ export default {
         <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
         <h2 class="title is-4">Installed</h2>
         <!-- <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p> -->
-        <div>
-          <BaseCard v-for="extractor in filteredInstalledPlugins"
+        <div class="installed-connectors">
+          <ConnectorCard v-for="extractor in filteredInstalledPlugins"
+            :connector="extractor.name"
             :key="`${extractor.name}`"
           >
-            <div>
-              <img :src="`/static/logos/${extractor.name.replace('tap-', '')}-logo.svg`" width="100" height="100" alt="" />
-             {{ extractor.name }}
-            </div>
-          </BaseCard>
+          </ConnectorCard>
         </div>
         <h2 class="title is-4">Available</h2>
         <p v-if="installingPlugin">Installing...</p>
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
-        <!-- <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p> -->
-        <div class="card-grid">
-          <BaseCard v-for="(extractor, index) in filteredExtractors"
-            :key="`${extractor}`"
+        <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
+        <div v-else class="card-grid">
+          <ConnectorCard v-for="(extractor, index) in filteredExtractors"filteredExtractors
+            :connector="extractor" 
+            :key="`${extractor}-${index}`"
           >
-            <div style="display: flex; margin: 20px 0; align-items: center; flex: 1">
-              <div style="display: flex; align-items: center;  margin-bottom: 0; justify-content: center; margin-top: 15px; margin-bottom: 10px; min-width: 150px; padding: 30px; box-sizing: border-box;">
-                <img :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`" alt="" style="max-width: 150px; padding: 15px;" />
-              </div>
-              <div style="padding-top: 0;">
-                <h3 style="margin-top: 0; margin-bottom: 10px;">{{ extractor }}</h3>
-                <p style="font-size: 1rem;">This data source focuses on getting emissions data from local areas.</p>
-                <p><a href="#">More information about Carbon Intensity tap</a></p>
-              </div>
-            </div>
-            <div>
+            <template v-slot:callToAction>
               <button @click="installPlugin(index, extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
-            </div>
-          </BaseCard>
+            </template>
+          </ConnectorCard>
         </div>
       </template>
     </base-accordion>
@@ -150,6 +140,11 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 15px;
+  grid-row-gap: 15px;
+}
+
+.installed-connectors {
+  display: grid;
   grid-row-gap: 15px;
 }
 </style>
