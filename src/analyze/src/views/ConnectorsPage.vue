@@ -1,6 +1,6 @@
 <script>
-import BaseAccordion from '@/components/generic/BaseAccordion.vue';
-import BaseCard from '@/components/generic/BaseCard.vue';
+import BaseAccordion from '@/components/generic/BaseAccordion';
+import BaseCard from '@/components/generic/BaseCard';
 
 import { mapState } from 'vuex';
 
@@ -9,59 +9,56 @@ import orchestrationsApi from '../api/orchestrations';
 export default {
   components: {
     BaseAccordion,
-    BaseCard
+    BaseCard,
   },
-  data () {
+  data() {
     return {
       filterText: '',
-      installingPlugin: false
-    }
+      installingPlugin: false,
+    };
   },
   computed: {
     ...mapState('orchestrations', [
       'extractors',
-      'installedPlugins'
+      'installedPlugins',
     ]),
     filteredExtractors() {
       if (this.filterText) {
-        return this.extractors.filter((item) => item.indexOf(this.filterText) > -1)
-      } else {
-        return this.extractors
+        return this.extractors.filter(item => item.indexOf(this.filterText) > -1);
       }
+      return this.extractors;
     },
     filteredInstalledPlugins() {
       if (this.installedPlugins) {
         if (this.filterText) {
-          return this.installedPlugins.extractors.filter((item) => item.name.indexOf(this.filterText) > -1)
-        } else {
-          return this.installedPlugins.extractors
+          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
         }
-      } else {
-        return []
+        return this.installedPlugins.extractors;
       }
-    }
+      return [];
+    },
   },
   methods: {
     installPlugin(index, extractor) {
       this.installingPlugin = true;
 
       orchestrationsApi.addExtractors({
-        name: extractor
+        name: extractor,
       }).then((response) => {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/updateExtractors', index);
           this.$store.dispatch('orchestrations/getInstalledPlugins')
-            .then((response) => {
+            .then(() => {
               this.installingPlugin = false;
             });
         }
-      })
-    }
+      });
+    },
   },
-  created () {
+  created() {
     this.$store.dispatch('orchestrations/getAll');
     this.$store.dispatch('orchestrations/getInstalledPlugins');
-  }
+  },
 };
 </script>
 
@@ -77,7 +74,7 @@ export default {
         <h2 class="title is-4">Installed</h2>
         <!-- <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p> -->
         <div>
-          <BaseCard v-for="extractor in filteredInstalledPlugins" 
+          <BaseCard v-for="extractor in filteredInstalledPlugins"
             :key="`${extractor.name}`"
           >
             <div>
@@ -91,7 +88,7 @@ export default {
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <!-- <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p> -->
         <div class="card-grid">
-          <BaseCard v-for="(extractor, index) in filteredExtractors" 
+          <BaseCard v-for="(extractor, index) in filteredExtractors"
             :key="`${extractor}`"
           >
             <div style="display: flex; margin: 20px 0; align-items: center; flex: 1">
@@ -120,7 +117,7 @@ export default {
         <h2 class="title is-4">Installed</h2>
         <!-- <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p> -->
         <ul>
-          <li v-for="(extractor, index) in filteredInstalledPlugins" 
+          <li v-for="(extractor, index) in filteredInstalledPlugins"
             :key="`${extractor.name}`"
           >
             {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>

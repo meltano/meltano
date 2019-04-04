@@ -1,11 +1,11 @@
 <script>
 export default {
 
-}
+};
 </script>
 
 <template>
-	<section class="card">
+  <section class="card">
     <slot></slot>
   </section>
 </template>
