@@ -25,10 +25,6 @@ class TestFullInstall:
         result = cli_runner.invoke(cli, cli_args)
         assert_cli_runner(result)
 
-        cli_args = ["add", "orchestrator", "airflow"]
-        result = cli_runner.invoke(cli, cli_args)
-        assert_cli_runner(result)
-
         cli_args = ["add", "model", "model-carbon-intensity"]
         result = cli_runner.invoke(cli, cli_args)
         assert_cli_runner(result)
