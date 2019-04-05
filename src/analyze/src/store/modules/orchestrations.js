@@ -91,7 +91,7 @@ const actions = {
   selectEntities({ commit }) {
     orchestrationsApi.selectEntities(state.extractorEntities)
       .then((response) => {
-        console.log('hit', response.data);
+        console.log('select success:', response.data);
       });
   },
 

@@ -101,13 +101,29 @@ def extract(extractor_name: str) -> Response:
     )
 
 
-@orchestrationsBP.route("/select-entities/<extractor_data>", methods=["POST"])
-def selectEntities(extractor_data: str) -> Response:
+@orchestrationsBP.route("/select-entities", methods=["POST"])
+def selectEntities() -> Response:
     """
-    endpoint that performs extraction of the user selected entities and attributes
+    endpoint that performs selection of the user selected entities and attributes
     """
-    # TODO parse extractor_data and selectively `meltano select extractor_data["extractorName"] ...`
-    # TODO refactor and leverage extract() method above?
+    incoming = request.get_json()
+    extractor_name = incoming["extractorName"]
+    entity_groups = incoming["entityGroups"]
+
+    selects = []
+    for entity_group in entity_groups:
+        entities_filter = entity_group["name"]
+        attributes_filter = ""
+
+        group_is_selected = "selected" in entity_group
+
+        for attribute in entity_group["attributes"]:
+            if(group_is_selected or "selected" in attribute):
+                attributes_filter += f'{attribute["name"]},'
+
+        if(len(attributes_filter) > 0):
+            selects.append(f"{entities_filter} {attributes_filter[:-1]}")
+
     # TODO may need to refactor select cli add method into SelectService
     return jsonify("winning")
 

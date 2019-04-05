@@ -1,6 +1,5 @@
 import os
 import click
-import logging
 import fnmatch
 import json
 

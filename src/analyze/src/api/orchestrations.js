@@ -15,7 +15,7 @@ export default {
   },
 
   selectEntities(extractorEntities) {
-    return axios.post(utils.apiUrl('orchestrations', `select-entities/${extractorEntities}`));
+    return axios.post(utils.apiUrl('orchestrations', 'select-entities'), extractorEntities);
   },
 
   installedPlugins() {
