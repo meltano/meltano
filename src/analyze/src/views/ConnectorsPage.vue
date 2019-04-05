@@ -133,7 +133,7 @@ export default {
         </div>
       </template>
     </base-accordion>
-    <base-accordion>
+    <base-accordion :isOpen="true">
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
