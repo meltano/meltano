@@ -16,6 +16,10 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 
 
 @cli.command()
@@ -122,8 +126,18 @@ def install_missing_plugins(
             # Update dbt_project.yml in case the vars values have changed in meltano.yml
             transform_add_service.update_dbt_project(plugin)
         except PluginMissingError:
-            click.secho(
-                f"Transform '{extractor}' is missing, trying to install it...",
-                fg="yellow",
-            )
-            add_transform(project, extractor)
+            try:
+                # Check if there is a default transform for this extractor
+                PluginDiscoveryService(project).find_plugin(
+                    PluginType.TRANSFORMS, extractor
+                )
+
+                click.secho(
+                    f"Transform '{extractor}' is missing, trying to install it...",
+                    fg="yellow",
+                )
+                add_transform(project, extractor)
+            except PluginNotFoundError:
+                # There is no default transform for this extractor..
+                # Don't panic, everything is cool - just run custom transforms
+                pass
