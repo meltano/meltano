@@ -22,6 +22,7 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'extractors',
+      'loaders',
       'installedPlugins',
     ]),
     filteredExtractors() {
@@ -31,6 +32,21 @@ export default {
       return this.extractors;
     },
     filteredInstalledPlugins() {
+      if (this.installedPlugins) {
+        if (this.filterText) {
+          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
+        }
+        return this.installedPlugins.extractors;
+      }
+      return [];
+    },
+    filteredLoaders() {
+      if (this.filterText) {
+        return this.loaders.filter(item => item.indexOf(this.filterText) > -1);
+      }
+      return this.loaders;
+    },
+    filteredInstalledLoaders() {
       if (this.installedPlugins) {
         if (this.filterText) {
           return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
@@ -119,13 +135,16 @@ export default {
         </ul>
         <h2 class="title is-4">Available</h2>
         <!-- <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p> -->
-        <ul>
-          <li v-for="(extractor, index) in filteredExtractors"
-            :key="`${extractor}`"
+        <div class="card-grid">
+          <ConnectorCard v-for="(loader, index) in filteredLoaders"
+            :connector="loader" 
+            :key="`${loader}-${index}`"
           >
-            {{ extractor }} <button @click="installPlugin(index)">Install</button>
-          </li>
-        </ul>
+            <template v-slot:callToAction>
+              <button @click="installPlugin(index, loader)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+            </template>
+          </ConnectorCard>
+        </div>
       </template>
     </base-accordion>
   </div>

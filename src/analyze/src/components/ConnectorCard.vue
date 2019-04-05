@@ -13,7 +13,11 @@ export default {
   },
   computed: {
     connectorName() {
-      return this.connector.replace('tap-', '')
+      if (this.connector.indexOf('tap') > -1) {
+        return this.connector.replace('tap-', '');
+      } else {
+        return this.connector.replace('target-', '');
+      }
     }
   }
 }
