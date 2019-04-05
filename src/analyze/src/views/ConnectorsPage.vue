@@ -124,7 +124,7 @@ export default {
             :key="`${extractor}-${index}`"
           >
             <template v-slot:callToAction>
-              <button @click="installExtractor(extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+              <button @click="installExtractor(extractor)" class="card-button">Install</button>
             </template>
           </ConnectorCard>
         </div>
@@ -153,7 +153,7 @@ export default {
             :key="`${loader}-${index}`"
           >
             <template v-slot:callToAction>
-              <button @click="installLoader(loader)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+              <button @click="installLoader(loader)" class="card-button">Install</button>
             </template>
           </ConnectorCard>
         </div>
@@ -177,5 +177,19 @@ export default {
 .installed-connectors {
   display: grid;
   grid-row-gap: 15px;
+}
+
+.card-button {
+  width: 100%;
+  background-color: hsl(210, 100%, 42%);
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 1rem;
+  transition: background 0.2s ease-in;
+
+  &:hover {
+    background-color: hsl(210, 74%, 22%);
+  }
 }
 </style>
