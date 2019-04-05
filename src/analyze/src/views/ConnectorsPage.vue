@@ -66,7 +66,6 @@ export default {
         name: extractor,
       }).then((response) => {
         if (response.status === 200) {
-          this.$store.dispatch('orchestrations/updateExtractors', index);
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
               this.installingPlugin = false;
@@ -125,7 +124,7 @@ export default {
             :key="`${extractor}-${index}`"
           >
             <template v-slot:callToAction>
-              <button @click="installExtractor(index, extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+              <button @click="installExtractor(extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
             </template>
           </ConnectorCard>
         </div>

@@ -155,10 +155,6 @@ const actions = {
         state.log = response.data.append;
       });
   },
-
-  updateExtractors({ commit }, itemIndex) {
-    commit('removeExtractor', itemIndex);
-  },
 };
 
 const mutations = {
