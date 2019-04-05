@@ -4,10 +4,8 @@ from .project import Project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer.catalog import (
-    visit,
-    ListSelectedExecutor,
-)
+from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
+
 
 class SelectService:
     def __init__(self, project: Project):
@@ -22,7 +20,9 @@ class SelectService:
         list_all = ListSelectedExecutor()
         try:
             if not invoker.files["catalog"].exists():
-                logging.info("Catalog not found, trying to run the tap with --discover.")
+                logging.info(
+                    "Catalog not found, trying to run the tap with --discover."
+                )
                 extractor.run_discovery(invoker)
             else:
                 extractor.apply_select(invoker)

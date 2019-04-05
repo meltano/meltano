@@ -9,9 +9,7 @@ from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import (
-    parse_select_pattern,
-)
+from meltano.core.plugin.singer.catalog import parse_select_pattern
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -77,7 +75,9 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
 
 def show(project, extractor, entities_filter, attributes_filter, show_all=False):
     select_service = SelectService(project)
-    extractor, list_all = select_service.select(project, extractor, entities_filter, attributes_filter)
+    extractor, list_all = select_service.select(
+        project, extractor, entities_filter, attributes_filter
+    )
 
     # report
     click.secho("Enabled patterns:")

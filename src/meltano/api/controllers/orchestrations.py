@@ -118,24 +118,28 @@ def entities(extractor_name: str) -> Response:
     """
     project = Project.find()
     select_service = SelectService(project)
-    extractor, list_all = select_service.select(project, extractor_name, "*",  "*")
+    extractor, list_all = select_service.select(project, extractor_name, "*", "*")
 
-    # entityGroups = [
-    #     {"name": "User", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
-    #     {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
-    # ]
-    # TODO likely refactor name from entities to selectEntities/getAllEntities
     entityGroups = []
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
-        match = next((entityGroup for entityGroup in entityGroups if entityGroup["name"] == stream.key), None)
-        if(match):
+        match = next(
+            (
+                entityGroup
+                for entityGroup in entityGroups
+                if entityGroup["name"] == stream.key
+            ),
+            None,
+        )
+        if match:
             match["attributes"].append({"name": prop.key})
         else:
-            entityGroups.append({"name": stream.key, "attributes": [{"name": prop.key}]})
+            entityGroups.append(
+                {"name": stream.key, "attributes": [{"name": prop.key}]}
+            )
 
     return jsonify({"extractorName": extractor_name, "entityGroups": entityGroups})
 
