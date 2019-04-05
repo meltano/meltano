@@ -36,6 +36,26 @@ const getters = {
   canRun() {
     return !!state.currentExtractor && !!state.currentLoader;
   },
+
+  remainingExtractors() {
+    const installedExtractors = state.installedPlugins.extractors
+
+    if (installedExtractors && installedExtractors.length > 0) {
+      return state.extractors.filter((extractor) => {
+        let matchFound = false;
+
+        for (let i = 0; i < installedExtractors.length; i++) {
+          if (extractor === installedExtractors[i].name) {
+            matchFound = true;
+          }
+        }
+
+        return !matchFound;
+      });
+    }
+    
+    return state.extractors;
+  },
 };
 
 const actions = {

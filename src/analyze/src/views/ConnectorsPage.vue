@@ -3,7 +3,7 @@ import BaseAccordion from '@/components/generic/BaseAccordion';
 import BaseCard from '@/components/generic/BaseCard';
 import ConnectorCard from '@/components/ConnectorCard';
 
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 import orchestrationsApi from '../api/orchestrations';
 
@@ -21,15 +21,17 @@ export default {
   },
   computed: {
     ...mapState('orchestrations', [
-      'extractors',
       'loaders',
       'installedPlugins',
     ]),
+    ...mapGetters('orchestrations', [
+      'remainingExtractors'
+    ]),
     filteredExtractors() {
       if (this.filterText) {
-        return this.extractors.filter(item => item.indexOf(this.filterText) > -1);
+        return this.remainingExtractors.filter(item => item.indexOf(this.filterText) > -1);
       }
-      return this.extractors;
+      return this.remainingExtractors;
     },
     filteredInstalledPlugins() {
       if (this.installedPlugins) {
