@@ -56,7 +56,7 @@ export default {
   transition: max-height .2s ease;
 
   &.is-open {
-    max-height: 100rem;
+    max-height: 1000rem;
   }
 }
 
