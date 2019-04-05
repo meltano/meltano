@@ -7,14 +7,12 @@ import json
 from . import cli
 from .params import project
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.singer.catalog import (
-    visit,
     parse_select_pattern,
-    ListSelectedExecutor,
 )
+from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
@@ -78,27 +76,8 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
 
 
 def show(project, extractor, entities_filter, attributes_filter, show_all=False):
-    config = ConfigService(project)
-    extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
-    invoker = PluginInvoker(project, extractor)
-    pattern = f"{entities_filter}.{attributes_filter}"
-
-    list_all = ListSelectedExecutor()
-    try:
-        if not invoker.files["catalog"].exists():
-            logging.info("Catalog not found, trying to run the tap with --discover.")
-            extractor.run_discovery(invoker)
-        else:
-            extractor.apply_select(invoker)
-
-        with invoker.files["catalog"].open() as catalog:
-            schema = json.load(catalog)
-            visit(schema, list_all)
-    except FileNotFoundError as e:
-        logging.error(
-            "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
-        )
-        raise e
+    select_service = SelectService(project)
+    extractor, list_all = select_service.select(project, extractor, entities_filter, attributes_filter)
 
     # report
     click.secho("Enabled patterns:")
