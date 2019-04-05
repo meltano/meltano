@@ -78,7 +78,7 @@ Description of available options:
 
 ## Loaders
 
-Data Loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
+A loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
 
 ### target-snowflake
 
