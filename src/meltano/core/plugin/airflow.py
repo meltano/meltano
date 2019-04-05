@@ -3,6 +3,7 @@ import shutil
 import logging
 import subprocess
 import time
+import os
 from . import Plugin, PluginType
 
 from meltano.core.behavior.hookable import hook
@@ -21,9 +22,21 @@ class Airflow(Plugin):
     def config_files(self):
         return {"config": "airflow.cfg"}
 
+    @classmethod
+    def home(cls, project):
+        return project.root_dir("orchestrate")
+
     @hook("before_prepare")
     def set_run_dir(self, invoker, *args):
-        invoker.config_service.run_dir = invoker.project.root_dir("orchestrate")
+        home = self.home(invoker.project)
+        os.environ["AIRFLOW_HOME"] = str(home)
+        invoker.config_service.run_dir = home
+
+    @hook("before_install")
+    def setup_env(self, project, *args):
+        # to make airflow installable
+        os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
+        os.environ["AIRFLOW_HOME"] = str(self.home(project))
 
     @hook("after_install")
     def after_install(self, project, *args):

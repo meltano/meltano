@@ -33,7 +33,6 @@ class Project:
     def activate(self):
         # helpful to refer to the current absolute project path
         os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
-        os.environ["AIRFLOW_HOME"] = str(self.root_dir("orchestrate"))
 
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")

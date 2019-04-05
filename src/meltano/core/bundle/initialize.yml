@@ -12,7 +12,6 @@ README.md: ""
   export PG_SCHEMA=meltano
   export PG_PORT=5502
   export PG_DATABASE=warehouse
-  export SLUGIFY_USES_TEXT_UNIDECODE=yes
 .gitignore: |
   /venv
   /.meltano
