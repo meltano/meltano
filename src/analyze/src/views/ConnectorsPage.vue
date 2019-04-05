@@ -15,7 +15,8 @@ export default {
   },
   data() {
     return {
-      filterText: '',
+      filterExtractorsText: '',
+      filterLoadersText: '',
       installingPlugin: false,
     };
   },
@@ -28,15 +29,15 @@ export default {
       'remainingLoaders',
     ]),
     filteredExtractors() {
-      if (this.filterText) {
-        return this.remainingExtractors.filter(item => item.indexOf(this.filterText) > -1);
+      if (this.filterExtractorsText) {
+        return this.remainingExtractors.filter(item => item.indexOf(this.filterExtractorsText) > -1);
       }
       return this.remainingExtractors;
     },
     filteredInstalledExtractors() {
       if (this.installedPlugins) {
-        if (this.filterText) {
-          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
+        if (this.filterExtractorsText) {
+          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterExtractorsText) > -1);
         }
         return this.installedPlugins.extractors;
       }
@@ -44,16 +45,16 @@ export default {
     },
     filteredInstalledLoaders() {
       if (this.installedPlugins && this.installedPlugins.loaders) {
-        if (this.filterText) {
-          return this.installedPlugins.loaders.filter(item => item.name.indexOf(this.filterText) > -1);
+        if (this.filterLoadersText) {
+          return this.installedPlugins.loaders.filter(item => item.name.indexOf(this.filterLoadersText) > -1);
         }
         return this.installedPlugins.loaders;
       }
       return [];
     },
     filteredLoaders() {
-      if (this.filterText) {
-        return this.remainingLoaders.filter(item => item.indexOf(this.filterText) > -1);
+      if (this.filterLoadersText) {
+        return this.remainingLoaders.filter(item => item.indexOf(this.filterLoadersText) > -1);
       }
       return this.remainingLoaders;
     },
@@ -104,7 +105,7 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
+        <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input">
         <h2 class="title is-4">Installed</h2>
         <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
         <div class="installed-connectors">
@@ -135,7 +136,7 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterText" placeholder="Filter loaders..." class="input">
+        <input type="text" v-model="filterLoadersText" placeholder="Filter loaders..." class="input">
         <h2 class="title is-4">Installed</h2>
         <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
         <div v-else class="installed-connectors">
