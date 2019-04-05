@@ -48,5 +48,9 @@ class SelectService:
         with self.project.meltano_update() as meltano:
             self.extractor.add_select_filter(pattern)
 
-            idx = next(i for i, it in enumerate(self.config.get_extractors()) if it == self.extractor)
+            idx = next(
+                i
+                for i, it in enumerate(self.config.get_extractors())
+                if it == self.extractor
+            )
             meltano["plugins"]["extractors"][idx] = self.extractor.canonical()

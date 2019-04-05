@@ -126,7 +126,6 @@ def selectEntities() -> Response:
         if len(attributes_filter) > 0:
             select_service.select(entities_filter, f"{attributes_filter[:-1]}")
 
-
     return jsonify("winning")
 
 

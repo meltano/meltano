@@ -32,7 +32,9 @@ export default {
     filteredInstalledPlugins() {
       if (this.installedPlugins.extractors) {
         if (this.filterText) {
-          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
+          return this.installedPlugins.extractors.filter(
+            item => item.name.indexOf(this.filterText) > -1,
+          );
         }
         return this.installedPlugins.extractors;
       }
@@ -49,7 +51,7 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/updateExtractors', index);
           this.$store.dispatch('orchestrations/getInstalledPlugins')
-            .then((response) => {
+            .then(() => {
               this.installingPlugin = false;
             });
         }
@@ -73,7 +75,9 @@ export default {
       <template slot="body">
         <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
         <h2 class="title is-4">Installed</h2>
-        <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p>
+        <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">
+          No extractors currently installed
+        </p>
         <ul v-else>
           <li v-for="extractor in filteredInstalledPlugins"
             :key="`${extractor.name}`"
@@ -109,7 +113,9 @@ export default {
           <li v-for="(extractor, index) in filteredInstalledPlugins"
             :key="`${extractor.name}`"
           >
-            {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>
+            {{ extractor.name }}
+            <button @click="uninstallPlugin(index)">Uninstall</button>
+            <button>Configure</button>
             <div>
               <label for="Database"></label>
               <input type="text">

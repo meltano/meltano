@@ -24,11 +24,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:
-            show(
-                project,
-                extractor,
-                show_all=flags["all"],
-            )
+            show(project, extractor, show_all=flags["all"])
         else:
             add(
                 project,
@@ -60,6 +56,7 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):
     select_service = SelectService(project, extractor)
     select_service.select(entities_filter, attributes_filter, exclude)
+
 
 def show(project, extractor, show_all=False):
     select_service = SelectService(project, extractor)

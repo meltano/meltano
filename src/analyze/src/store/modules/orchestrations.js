@@ -88,10 +88,10 @@ const actions = {
     commit('setCurrentConnectionName', selectedConnectionName);
   },
 
-  selectEntities({ commit }) {
+  selectEntities() {
     orchestrationsApi.selectEntities(state.extractorEntities)
-      .then((response) => {
-        console.log('select success:', response.data);
+      .then(() => {
+        // TODO confirm success or handle error in UI
       });
   },
 
