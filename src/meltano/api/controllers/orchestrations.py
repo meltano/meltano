@@ -114,17 +114,13 @@ def selectEntities() -> Response:
     select_service = SelectService(project, extractor_name)
 
     for entity_group in entity_groups:
-        entities_filter = entity_group["name"]
-        attributes_filter = ""
-
         group_is_selected = "selected" in entity_group
 
         for attribute in entity_group["attributes"]:
             if group_is_selected or "selected" in attribute:
-                attributes_filter += f'{attribute["name"]},'
-
-        if len(attributes_filter) > 0:
-            select_service.select(entities_filter, f"{attributes_filter[:-1]}")
+                entities_filter = entity_group["name"]
+                attributes_filter = attribute["name"]
+                select_service.select(entities_filter, attributes_filter)
 
     return jsonify("winning")
 
