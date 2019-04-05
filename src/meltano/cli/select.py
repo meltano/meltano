@@ -27,8 +27,6 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             show(
                 project,
                 extractor,
-                entities_filter,
-                attributes_filter,
                 show_all=flags["all"],
             )
         else:
@@ -60,23 +58,13 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
 
 
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):
-    exclude = "!" if exclude else ""
-    config = ConfigService(project)
-    pattern = f"{exclude}{entities_filter}.{attributes_filter}"
+    select_service = SelectService(project, extractor)
+    select_service.select(entities_filter, attributes_filter, exclude)
 
-    with project.meltano_update() as meltano:
-        extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
-        extractor.add_select_filter(pattern)
-
-        idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
-        meltano["plugins"]["extractors"][idx] = extractor.canonical()
-
-
-def show(project, extractor, entities_filter, attributes_filter, show_all=False):
-    select_service = SelectService(project)
-    extractor, list_all = select_service.select(
-        project, extractor, entities_filter, attributes_filter
-    )
+def show(project, extractor, show_all=False):
+    select_service = SelectService(project, extractor)
+    extractor = select_service.get_extractor()
+    list_all = select_service.get_extractor_entities()
 
     # report
     click.secho("Enabled patterns:")

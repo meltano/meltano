@@ -9,13 +9,16 @@ from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
 
 
 class SelectService:
-    def __init__(self, project: Project):
+    def __init__(self, project: Project, extractor: str):
         self.project = project
+        self.config = ConfigService(project)
+        self.extractor = self.config.get_plugin(PluginType.EXTRACTORS, extractor)
 
-    def select(self, project, extractor, entities_filter, attributes_filter):
-        config = ConfigService(project)
-        extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
-        invoker = PluginInvoker(project, extractor)
+    def get_extractor(self):
+        return self.extractor
+
+    def get_extractor_entities(self):
+        invoker = PluginInvoker(self.project, self.extractor)
 
         list_all = ListSelectedExecutor()
         try:
@@ -23,9 +26,9 @@ class SelectService:
                 logging.info(
                     "Catalog not found, trying to run the tap with --discover."
                 )
-                extractor.run_discovery(invoker)
+                self.extractor.run_discovery(invoker)
             else:
-                extractor.apply_select(invoker)
+                self.extractor.apply_select(invoker)
 
             with invoker.files["catalog"].open() as catalog:
                 schema = json.load(catalog)
@@ -36,4 +39,14 @@ class SelectService:
             )
             raise e
 
-        return (extractor, list_all)
+        return list_all
+
+    def select(self, entities_filter, attributes_filter, exclude=False):
+        exclude = "!" if exclude else ""
+        pattern = f"{exclude}{entities_filter}.{attributes_filter}"
+
+        with self.project.meltano_update() as meltano:
+            self.extractor.add_select_filter(pattern)
+
+            idx = next(i for i, it in enumerate(self.config.get_extractors()) if it == self.extractor)
+            meltano["plugins"]["extractors"][idx] = self.extractor.canonical()

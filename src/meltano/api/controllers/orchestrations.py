@@ -110,7 +110,9 @@ def selectEntities() -> Response:
     extractor_name = incoming["extractorName"]
     entity_groups = incoming["entityGroups"]
 
-    selects = []
+    project = Project.find()
+    select_service = SelectService(project, extractor_name)
+
     for entity_group in entity_groups:
         entities_filter = entity_group["name"]
         attributes_filter = ""
@@ -122,9 +124,9 @@ def selectEntities() -> Response:
                 attributes_filter += f'{attribute["name"]},'
 
         if len(attributes_filter) > 0:
-            selects.append(f"{entities_filter} {attributes_filter[:-1]}")
+            select_service.select(entities_filter, f"{attributes_filter[:-1]}")
 
-    # TODO may need to refactor select cli add method into SelectService
+
     return jsonify("winning")
 
 
@@ -134,8 +136,8 @@ def entities(extractor_name: str) -> Response:
     endpoint that returns the entities associated with a particular extractor
     """
     project = Project.find()
-    select_service = SelectService(project)
-    extractor, list_all = select_service.select(project, extractor_name, "*", "*")
+    select_service = SelectService(project, extractor_name)
+    list_all = select_service.get_extractor_entities()
 
     entity_groups = []
     for stream, prop in (
