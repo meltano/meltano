@@ -105,8 +105,8 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input">
-        <h2 class="title is-4">Installed</h2>
+        <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input connector-input">
+        <h2 class="title is-3">Installed</h2>
         <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
         <div class="installed-connectors">
           <ConnectorCard v-for="extractor in filteredInstalledExtractors"
@@ -115,7 +115,7 @@ export default {
           >
           </ConnectorCard>
         </div>
-        <h2 class="title is-4">Available</h2>
+        <h2 class="title is-3">Available</h2>
         <p v-if="installingPlugin">Installing...</p>
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
@@ -136,8 +136,8 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterLoadersText" placeholder="Filter loaders..." class="input">
-        <h2 class="title is-4">Installed</h2>
+        <input type="text" v-model="filterLoadersText" placeholder="Filter loaders..." class="input connector-input">
+        <h2 class="title is-3">Installed</h2>
         <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
         <div v-else class="installed-connectors">
           <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
@@ -146,7 +146,7 @@ export default {
           >
           </ConnectorCard>
         </div>
-        <h2 class="title is-4">Available</h2>
+        <h2 class="title is-3">Available</h2>
         <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(loader, index) in filteredLoaders"
@@ -192,5 +192,9 @@ export default {
   &:hover {
     background-color: hsl(210, 74%, 22%);
   }
+}
+
+.connector-input {
+  margin-top: 15px;
 }
 </style>
