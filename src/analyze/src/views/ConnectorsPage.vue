@@ -59,7 +59,7 @@ export default {
     },
   },
   methods: {
-    installPlugin(index, extractor) {
+    installExtractor(index, extractor) {
       this.installingPlugin = true;
 
       orchestrationsApi.addExtractors({
@@ -67,6 +67,21 @@ export default {
       }).then((response) => {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/updateExtractors', index);
+          this.$store.dispatch('orchestrations/getInstalledPlugins')
+            .then(() => {
+              this.installingPlugin = false;
+            });
+        }
+      });
+    },
+
+    installLoader(loader) {
+      this.installingPlugin = true;
+
+      orchestrationsApi.addLoaders({
+        name: loader,
+      }).then((response) => {
+        if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
               this.installingPlugin = false;
@@ -110,7 +125,7 @@ export default {
             :key="`${extractor}-${index}`"
           >
             <template v-slot:callToAction>
-              <button @click="installPlugin(index, extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+              <button @click="installExtractor(index, extractor)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
             </template>
           </ConnectorCard>
         </div>
@@ -139,7 +154,7 @@ export default {
             :key="`${loader}-${index}`"
           >
             <template v-slot:callToAction>
-              <button @click="installPlugin(index, loader)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
+              <button @click="installLoader(loader)" style="width: 100%; background-color: blue; color: #fff; text-align: center; padding: 10px 0; font-size: 1rem;">Install</button>
             </template>
           </ConnectorCard>
         </div>
