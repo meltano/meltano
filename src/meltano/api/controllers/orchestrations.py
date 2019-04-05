@@ -118,10 +118,10 @@ def selectEntities() -> Response:
         group_is_selected = "selected" in entity_group
 
         for attribute in entity_group["attributes"]:
-            if(group_is_selected or "selected" in attribute):
+            if group_is_selected or "selected" in attribute:
                 attributes_filter += f'{attribute["name"]},'
 
-        if(len(attributes_filter) > 0):
+        if len(attributes_filter) > 0:
             selects.append(f"{entities_filter} {attributes_filter[:-1]}")
 
     # TODO may need to refactor select cli add method into SelectService

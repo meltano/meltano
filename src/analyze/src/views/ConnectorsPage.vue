@@ -1,6 +1,6 @@
 <script>
-import BaseAccordion from '@/components/generic/BaseAccordion.vue';
-import ExtractorEntities from '@/components/orchestration/ExtractorEntities.vue';
+import BaseAccordion from '@/components/generic/BaseAccordion';
+import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
 
 import { mapState } from 'vuex';
 
