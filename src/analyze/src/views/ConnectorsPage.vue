@@ -11,7 +11,7 @@ export default {
   components: {
     BaseAccordion,
     BaseCard,
-    ConnectorCard
+    ConnectorCard,
   },
   data() {
     return {
@@ -25,7 +25,7 @@ export default {
     ]),
     ...mapGetters('orchestrations', [
       'remainingExtractors',
-      'remainingLoaders'
+      'remainingLoaders',
     ]),
     filteredExtractors() {
       if (this.filterText) {
@@ -105,8 +105,8 @@ export default {
         <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
         <div v-else class="card-grid">
-          <ConnectorCard v-for="(extractor, index) in filteredExtractors"filteredExtractors
-            :connector="extractor" 
+          <ConnectorCard v-for="(extractor, index) in filteredExtractors"
+            :connector="extractor"
             :key="`${extractor}-${index}`"
           >
             <template v-slot:callToAction>
@@ -126,7 +126,7 @@ export default {
         <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
         <div v-else class="installed-connectors">
           <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
-            :connector="loader.name" 
+            :connector="loader.name"
             :key="`${loader.name}-${index}`"
           >
           </ConnectorCard>
@@ -135,7 +135,7 @@ export default {
         <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(loader, index) in filteredLoaders"
-            :connector="loader" 
+            :connector="loader"
             :key="`${loader}-${index}`"
           >
             <template v-slot:callToAction>
