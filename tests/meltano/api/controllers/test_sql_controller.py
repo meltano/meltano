@@ -39,6 +39,7 @@ class TestSqlController:
         self.assert_join_graph_one_dependency(post)
         self.assert_join_graph_two_dependency(post)
         self.assert_join_graph_derived_dependency(post)
+        self.assert_no_join(post)
 
     def assert_empty_query(self, post):
         """with no columns no query should be generated"""
@@ -231,4 +232,23 @@ class TestSqlController:
 
         assert res.status_code == 200
         sql = 'SELECT "region"."dnoregion" "region.dnoregion","generationmix"."fuel" "generationmix.fuel","generationmix"."perc" "generationmix.perc" FROM "region" "region" JOIN "entry" "entry" ON "region"."id"="entry"."region_id" JOIN "generationmix" "generationmix" ON "entry"."id"="generationmix"."entry_id" GROUP BY "region.dnoregion","generationmix.fuel","generationmix.perc" LIMIT 3;'
+        assert sql in res.json["sql"]
+
+    def assert_no_join(self, post):
+        payload = {
+            "table": "region",
+            "columns": ["name"],
+            "aggregates": [],
+            "timeframes": [],
+            "joins": [],
+            "order": None,
+            "limit": 3,
+            "filters": {},
+            "run": False,
+        }
+
+        res = post(payload)
+
+        assert res.status_code == 200
+        sql = 'SELECT "region"."dnoregion" "region.dnoregion" FROM "region" "region" GROUP BY "region.dnoregion" LIMIT 3;'
         assert sql in res.json["sql"]

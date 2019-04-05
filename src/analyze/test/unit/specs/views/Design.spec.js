@@ -18,6 +18,7 @@ describe('Design.vue', () => {
     state = Object.assign(Design.data(), designs.state);
     actions = {
       getDesign: jest.fn(),
+      getSQL: jest.fn(),
       loadReport: jest.fn(),
       saveReport: jest.fn(),
     };
@@ -34,11 +35,16 @@ describe('Design.vue', () => {
     });
   });
 
-  it('calls getDesign() via created() lifecycle hook', () => {
-    const wrapper = shallowMount(Design, { store, localVue, router });
+  it('calls getDesign() via beforeRouteEnter() router lifecycle hook', () => {
+    const params = { model: 'model', design: 'design', slug: 'slug' };
+    const $route = { params };
+    const wrapper = mount(Design, { $route, store, localVue, router });
 
-    expect(wrapper.html()).toBeTruthy();
-    expect(actions.getDesign).toHaveBeenCalled();
+    wrapper.vm.$nextTick(() => {
+      expect(wrapper.html()).toBeTruthy();
+      expect(wrapper.vm.$route.params).toEqual(params);
+      expect(actions.getDesign).toHaveBeenCalled();
+    });
   });
 
   it('no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default', () => {
@@ -64,6 +70,7 @@ describe('Design.vue', () => {
   });
 
   it('Load report button enabled if reports exist', () => {
+    // eslint-disable-next-line
     state.reports = [{ chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' }];
     const wrapper = mount(Design, { store, localVue, router });
 
@@ -71,6 +78,7 @@ describe('Design.vue', () => {
   });
 
   it('a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled', () => {
+    // eslint-disable-next-line
     const report = { chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' };
     state.activeReport = report;
     state.chartType = 'BarChart';

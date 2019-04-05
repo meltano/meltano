@@ -23,6 +23,8 @@ extractors:
       partner_id: $ZUORA_PARTNER_ID
       api_token: $ZUORA_API_TOKEN
       start_date: $ZUORA_START_DATE
+      sandbox: $ZUORA_SANDBOX
+    docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
     config:
@@ -113,6 +115,14 @@ transforms:
     pip_url: "https://gitlab.com/meltano/dbt-tap-stripe.git"
     vars:
       livemode: false
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-zuora
+    pip_url: "https://gitlab.com/meltano/dbt-tap-zuora.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-zendesk
+    pip_url: "https://gitlab.com/meltano/dbt-tap-zendesk.git"
+    vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
 models:
   - name: model-carbon-intensity-sqlite

@@ -44,6 +44,20 @@ def add_extractor():
     return jsonify({"test": 123})
 
 
+@orchestrationsBP.route("/add-loader", methods=["POST"])
+def add_loader():
+    project = Project.find()
+    add_service = ProjectAddService(project)
+    plugin_name = request.get_json()["name"]
+    plugin = add_service.add("loaders", plugin_name)
+    install_service = PluginInstallService(project)
+    run_venv = install_service.create_venv(plugin)
+    run_install_plugin = install_service.install_plugin(plugin)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
+    return jsonify({"test": 123})
+
+
 @orchestrationsBP.route("/connection_names", methods=["GET"])
 def connection_names():
     settings = Settings.query.first()

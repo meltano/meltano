@@ -10,6 +10,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.config_service import ConfigService
+from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginType
 
 
@@ -30,11 +31,16 @@ def discovery():
     }
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(
         project, discovery=discovery
     )  # TODO: discovery factory
+
+
+@pytest.fixture
+def project_compiler(project):
+    return ProjectCompiler(project)
 
 
 @pytest.fixture(scope="class")
@@ -66,8 +72,12 @@ def add_model(project, plugin_install_service, project_add_service):
     plugin_install_service.create_venv(plugin)
     plugin_install_service.install_plugin(plugin)
 
+    plugin = project_add_service.add(PluginType.MODELS, "model-gitlab")
+    plugin_install_service.create_venv(plugin)
+    plugin_install_service.install_plugin(plugin)
 
-@pytest.fixture
+
+@pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project)
 
@@ -97,6 +107,12 @@ def project(test_dir, project_init_service):
     )
     discovery_dict[PluginType.TRANSFORMS].append(
         {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+    )
+    discovery_dict[PluginType.MODELS].append(
+        {
+            "name": "model-gitlab",
+            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
     )
     # copy discovery.yml into this project
     with open(project.root.joinpath("discovery.yml"), "w") as f:

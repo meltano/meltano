@@ -10,6 +10,10 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', 'add-extractor'), extractor);
   },
 
+  addLoaders(loader) {
+    return axios.post(utils.apiUrl('orchestrations', 'add-loader'), loader);
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
   },

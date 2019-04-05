@@ -485,6 +485,7 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import store from '@/store';
 import capitalize from '@/filters/capitalize';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Dropdown from '../components/generic/Dropdown';
@@ -501,12 +502,19 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-  created() {
+  beforeRouteEnter(to, from, next) {
+    const { model, design, slug } = to.params;
+    store.dispatch('designs/getDesign', { model, design, slug })
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
+  },
+  beforeRouteUpdate(to, from, next) {
     this.$store.dispatch('designs/getDesign', {
-      model: this.$route.params.model,
-      design: this.$route.params.design,
-      slug: this.$route.params.slug,
-    });
+      model: to.params.model,
+      design: to.params.design,
+    }).then(next);
   },
   filters: {
     capitalize,
@@ -519,13 +527,6 @@ export default {
     RouterViewLayout,
     SelectDropdown,
     YesNoFilter,
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/getDesign', {
-      model: to.params.model,
-      design: to.params.design,
-    });
-    next();
   },
   computed: {
     ...mapState('designs', [

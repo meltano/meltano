@@ -11,4 +11,4 @@ def cli_runner(session, pushd):
     # after this test is finished
     pushd(os.getcwd())
 
-    return CliRunner()
+    return CliRunner(mix_stderr=False)

@@ -1,58 +1,96 @@
 <script>
 import BaseAccordion from '@/components/generic/BaseAccordion';
+import BaseCard from '@/components/generic/BaseCard';
+import ConnectorCard from '@/components/ConnectorCard';
 import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
 
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 import orchestrationsApi from '../api/orchestrations';
 
 export default {
   components: {
     BaseAccordion,
+    BaseCard,
+    ConnectorCard,
     ExtractorEntities,
   },
   data() {
     return {
-      filterText: '',
-      installingPlugin: false,
+      filterExtractorsText: '',
+      filterLoadersText: '',
+      installingExtractor: false,
+      installingLoader: false,
     };
   },
   computed: {
     ...mapState('orchestrations', [
+      'installedPlugins',
       'extractors',
       'extractorEntities',
       'installedPlugins',
     ]),
+    ...mapGetters('orchestrations', [
+      'remainingExtractors',
+      'remainingLoaders',
+    ]),
     filteredExtractors() {
-      if (this.filterText) {
-        return this.extractors.filter(item => item.indexOf(this.filterText) > -1);
+      if (this.filterExtractorsText) {
+        return this.remainingExtractors.filter(item => item.indexOf(this.filterExtractorsText) > -1);
       }
-      return this.extractors;
+      return this.remainingExtractors;
     },
-    filteredInstalledPlugins() {
-      if (this.installedPlugins.extractors) {
-        if (this.filterText) {
-          return this.installedPlugins.extractors.filter(
-            item => item.name.indexOf(this.filterText) > -1,
-          );
+    filteredInstalledExtractors() {
+      if (this.installedPlugins) {
+        if (this.filterExtractorsText) {
+          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterExtractorsText) > -1);
         }
         return this.installedPlugins.extractors;
       }
       return [];
     },
+    filteredInstalledLoaders() {
+      if (this.installedPlugins && this.installedPlugins.loaders) {
+        if (this.filterLoadersText) {
+          return this.installedPlugins.loaders.filter(item => item.name.indexOf(this.filterLoadersText) > -1);
+        }
+        return this.installedPlugins.loaders;
+      }
+      return [];
+    },
+    filteredLoaders() {
+      if (this.filterLoadersText) {
+        return this.remainingLoaders.filter(item => item.indexOf(this.filterLoadersText) > -1);
+      }
+      return this.remainingLoaders;
+    },
   },
   methods: {
-    installPlugin(index, extractor) {
-      this.installingPlugin = true;
+    installExtractor(extractor) {
+      this.installingExtractor = true;
 
       orchestrationsApi.addExtractors({
         name: extractor,
       }).then((response) => {
         if (response.status === 200) {
-          this.$store.dispatch('orchestrations/updateExtractors', index);
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingPlugin = false;
+              this.installingExtractor = false;
+            });
+        }
+      });
+    },
+
+    installLoader(loader) {
+      this.installingLoader = true;
+
+      orchestrationsApi.addLoaders({
+        name: loader,
+      }).then((response) => {
+        if (response.status === 200) {
+          this.$store.dispatch('orchestrations/getInstalledPlugins')
+            .then(() => {
+              this.installingLoader = false;
             });
         }
       });
@@ -73,64 +111,64 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
-        <h2 class="title is-4">Installed</h2>
-        <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">
-          No extractors currently installed
-        </p>
-        <ul v-else>
-          <li v-for="extractor in filteredInstalledPlugins"
+        <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input connector-input">
+        <h2 class="title is-3">Installed</h2>
+        <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
+        <div class="installed-connectors">
+          <ConnectorCard v-for="extractor in filteredInstalledExtractors"
+            :connector="extractor.name"
             :key="`${extractor.name}`"
           >
-            {{ extractor.name }}
-          </li>
-        </ul>
-        <h2 class="title is-4">Available</h2>
-        <p v-if="installingPlugin">Installing...</p>
-        <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
+          </ConnectorCard>
+        </div>
+        <h2 class="title is-3">Available</h2>
+        <p v-if="installingExtractor">Installing...</p>
+        <progress v-if="installingExtractor" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
-        <ul v-else>
-          <li v-for="(extractor, index) in filteredExtractors"
-            :key="`${extractor}`"
+        <div v-else class="card-grid">
+          <ConnectorCard v-for="(extractor, index) in filteredExtractors"
+            :connector="extractor"
+            :key="`${extractor}-${index}`"
           >
-            {{ extractor }} <button @click="installPlugin(index, extractor)">Install</button>
-          </li>
-        </ul>
+            <template v-slot:callToAction>
+              <button @click="installExtractor(extractor)" class="card-button">Install</button>
+            </template>
+          </ConnectorCard>
+        </div>
 
         <ExtractorEntities :extractor-entities='extractorEntities'></ExtractorEntities>
 
       </template>
     </base-accordion>
-    <base-accordion>
+    <base-accordion :isOpen="true">
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterText" placeholder="Filter loaders..." class="input">
-        <h2 class="title is-4">Installed</h2>
-        <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p>
-        <ul v-else>
-          <li v-for="(extractor, index) in filteredInstalledPlugins"
-            :key="`${extractor.name}`"
+        <input type="text" v-model="filterLoadersText" placeholder="Filter loaders..." class="input connector-input">
+        <h2 class="title is-3">Installed</h2>
+        <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
+        <div v-else class="installed-connectors">
+          <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
+            :connector="loader.name"
+            :key="`${loader.name}-${index}`"
           >
-            {{ extractor.name }}
-            <button @click="uninstallPlugin(index)">Uninstall</button>
-            <button>Configure</button>
-            <div>
-              <label for="Database"></label>
-              <input type="text">
-            </div>
-          </li>
-        </ul>
-        <h2 class="title is-4">Available</h2>
+          </ConnectorCard>
+        </div>
+        <h2 class="title is-3">Available</h2>
+        <p v-if="installingLoader">Installing...</p>
+        <progress v-if="installingLoader" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
-        <ul v-else>
-          <li v-for="(extractor, index) in filteredExtractors"
-            :key="`${extractor}`"
+        <div v-else class="card-grid">
+          <ConnectorCard v-for="(loader, index) in filteredLoaders"
+            :connector="loader"
+            :key="`${loader}-${index}`"
           >
-            {{ extractor }} <button @click="installPlugin(index)">Install</button>
-          </li>
-        </ul>
+            <template v-slot:callToAction>
+              <button @click="installLoader(loader)" class="card-button">Install</button>
+            </template>
+          </ConnectorCard>
+        </div>
       </template>
     </base-accordion>
   </div>
@@ -139,5 +177,35 @@ export default {
 <style lang="scss">
 .content {
   padding: 20px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 15px;
+  grid-row-gap: 15px;
+}
+
+.installed-connectors {
+  display: grid;
+  grid-row-gap: 15px;
+}
+
+.card-button {
+  width: 100%;
+  background-color: hsl(210, 100%, 42%);
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  font-size: 1rem;
+  transition: background 0.2s ease-in;
+
+  &:hover {
+    background-color: hsl(210, 74%, 22%);
+  }
+}
+
+.connector-input {
+  margin-top: 15px;
 }
 </style>

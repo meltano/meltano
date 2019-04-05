@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome contributions and improvements, please see the contribution guidelines below:
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions:
 
 ## Installation from source
 
@@ -69,6 +69,10 @@ npm run dev # or yarn dev
 ## Code style
 
 Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.org/docs/rules/) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+
+:::warning Troubleshooting
+When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
+:::
 
 ## Merge Requests
 

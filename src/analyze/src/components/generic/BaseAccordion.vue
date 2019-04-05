@@ -34,13 +34,13 @@ export default {
 
 .accordion-header {
   align-items: center;
-  background-color: #4a4a4a;
+  background-color: #0F3B66;
   border-radius: 4px 4px 0 0;
-  color: #fff;
+  color: #dbdbdb;
   display: flex;
   justify-content: space-between;
   line-height: 1.25;
-  padding: .5em .75em;
+  padding: 1rem 1.5rem;
   position: relative;
 }
 
@@ -56,7 +56,7 @@ export default {
   transition: max-height .2s ease;
 
   &.is-open {
-    max-height: 100rem;
+    max-height: 1000rem;
   }
 }
 

@@ -47,7 +47,7 @@ def _handle(ex):
         jsonify(
             {"error": True, "code": ex.code, "orig": str(ex), "statement": ex.statement}
         ),
-        422,
+        500,
     )
 
 
