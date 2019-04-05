@@ -33,12 +33,21 @@ export default {
       }
       return this.remainingExtractors;
     },
-    filteredInstalledPlugins() {
+    filteredInstalledExtractors() {
       if (this.installedPlugins) {
         if (this.filterText) {
           return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
         }
         return this.installedPlugins.extractors;
+      }
+      return [];
+    },
+    filteredInstalledLoaders() {
+      if (this.installedPlugins && this.installedPlugins.loaders) {
+        if (this.filterText) {
+          return this.installedPlugins.loaders.filter(item => item.name.indexOf(this.filterText) > -1);
+        }
+        return this.installedPlugins.loaders;
       }
       return [];
     },
@@ -47,15 +56,6 @@ export default {
         return this.loaders.filter(item => item.indexOf(this.filterText) > -1);
       }
       return this.loaders;
-    },
-    filteredInstalledLoaders() {
-      if (this.installedPlugins) {
-        if (this.filterText) {
-          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterText) > -1);
-        }
-        return this.installedPlugins.extractors;
-      }
-      return [];
     },
   },
   methods: {
@@ -92,9 +92,9 @@ export default {
       <template slot="body">
         <input type="text" v-model="filterText" placeholder="Filter extractors..." class="input">
         <h2 class="title is-4">Installed</h2>
-        <!-- <p v-if="!filteredInstalledPlugins || filteredInstalledPlugins.length < 1">No extractors currently installed</p> -->
+        <!-- <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p> -->
         <div class="installed-connectors">
-          <ConnectorCard v-for="extractor in filteredInstalledPlugins"
+          <ConnectorCard v-for="extractor in filteredInstalledExtractors"
             :connector="extractor.name"
             :key="`${extractor.name}`"
           >
@@ -123,18 +123,14 @@ export default {
       <template slot="body">
         <input type="text" v-model="filterText" placeholder="Filter loaders..." class="input">
         <h2 class="title is-4">Installed</h2>
-        <!-- <p v-if="filteredInstalledPlugins.length === 0">No loaders currently installed</p> -->
-        <ul>
-          <li v-for="(extractor, index) in filteredInstalledPlugins"
-            :key="`${extractor.name}`"
+        <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
+        <div v-else class="installed-connectors">
+          <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
+            :connector="loader.name" 
+            :key="`${loader.name}-${index}`"
           >
-            {{ extractor.name }} <button @click="uninstallPlugin(index)">Uninstall</button> <button>Configure</button>
-            <div>
-              <label for="Database"></label>
-              <input type="text">
-            </div>
-          </li>
-        </ul>
+          </ConnectorCard>
+        </div>
         <h2 class="title is-4">Available</h2>
         <!-- <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p> -->
         <div class="card-grid">
