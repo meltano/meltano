@@ -141,7 +141,7 @@ def entities(extractor_name: str) -> Response:
                 {"name": stream.key, "attributes": [{"name": prop.key}]}
             )
 
-    return jsonify({"extractorName": extractor_name, "entityGroups": entityGroups})
+    return jsonify({"extractor_name": extractor_name, "entity_groups": entityGroups})
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])

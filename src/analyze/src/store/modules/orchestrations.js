@@ -167,7 +167,10 @@ const mutations = {
   },
 
   setAllExtractorEntities(_, entitiesData) {
-    state.extractorEntities = entitiesData;
+    state.extractorEntities = {
+      extractorName: entitiesData.extractor_name,
+      entityGroups: entitiesData.entity_groups,
+    };
   },
 
   setConnectionNames(_, connectionNames) {
