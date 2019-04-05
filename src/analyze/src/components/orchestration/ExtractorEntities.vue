@@ -32,7 +32,7 @@ export default {
   props: ['extractorEntities'],
   created() {
     // TODO pull out and place in Ben's tap card implementation
-    this.$store.dispatch('orchestrations/getExtractorEntities', 'tap-carbon-intensity');
+    this.$store.dispatch('orchestrations/getExtractorEntities', 'tap-salesforce');
   },
   methods: {
     extractEntities() {

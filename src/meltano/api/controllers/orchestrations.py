@@ -3,6 +3,7 @@ from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
@@ -115,11 +116,27 @@ def entities(extractor_name: str) -> Response:
     """
     endpoint that returns the entities associated with a particular extractor
     """
-    # TODO leverage new SelectService
-    entityGroups = [
-        {"name": "User", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
-        {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
-    ]
+    project = Project.find()
+    select_service = SelectService(project)
+    extractor, list_all = select_service.select(project, extractor_name, "*",  "*")
+
+    # entityGroups = [
+    #     {"name": "User", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
+    #     {"name": "Lead", "attributes": [{"name": "Email"}, {"name": "Phone"}]},
+    # ]
+    # TODO likely refactor name from entities to selectEntities/getAllEntities
+    entityGroups = []
+    for stream, prop in (
+        (stream, prop)
+        for stream in list_all.streams
+        for prop in list_all.properties[stream.key]
+    ):
+        match = next((entityGroup for entityGroup in entityGroups if entityGroup["name"] == stream.key), None)
+        if(match):
+            match["attributes"].append({"name": prop.key})
+        else:
+            entityGroups.append({"name": stream.key, "attributes": [{"name": prop.key}]})
+
     return jsonify({"extractorName": extractor_name, "entityGroups": entityGroups})
 
 
