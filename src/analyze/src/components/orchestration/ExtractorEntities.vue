@@ -1,6 +1,9 @@
 <template>
   <div>
     <h2>Entities for {{extractorEntities.extractorName}}</h2>
+    <a
+      class='button'
+      @click='extractEntities'>Collect</a>
     <div
       class='is-unselectable'
       v-for='entityGroup in extractorEntities.entityGroups'
@@ -20,9 +23,6 @@
         </a>
       </div>
     </div>
-    <a
-      class='button'
-      @click='extractEntities'>Collect</a>
   </div>
 </template>
 

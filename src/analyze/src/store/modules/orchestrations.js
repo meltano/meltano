@@ -90,8 +90,8 @@ const actions = {
 
   extractEntities({ commit }) {
     orchestrationsApi.extractEntities(state.extractorEntities)
-      .then(() => {
-        // TODO confirm entity extraction worked
+      .then((response) => {
+        console.log('hit', response.data);
       });
   },
 

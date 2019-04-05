@@ -120,7 +120,7 @@ def entities(extractor_name: str) -> Response:
     select_service = SelectService(project)
     extractor, list_all = select_service.select(project, extractor_name, "*", "*")
 
-    entityGroups = []
+    entity_groups = []
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
@@ -129,7 +129,7 @@ def entities(extractor_name: str) -> Response:
         match = next(
             (
                 entityGroup
-                for entityGroup in entityGroups
+                for entityGroup in entity_groups
                 if entityGroup["name"] == stream.key
             ),
             None,
@@ -137,11 +137,11 @@ def entities(extractor_name: str) -> Response:
         if match:
             match["attributes"].append({"name": prop.key})
         else:
-            entityGroups.append(
+            entity_groups.append(
                 {"name": stream.key, "attributes": [{"name": prop.key}]}
             )
 
-    return jsonify({"extractor_name": extractor_name, "entity_groups": entityGroups})
+    return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])
