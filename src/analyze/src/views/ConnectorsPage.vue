@@ -17,7 +17,8 @@ export default {
     return {
       filterExtractorsText: '',
       filterLoadersText: '',
-      installingPlugin: false,
+      installingExtractor: false,
+      installingLoader: false,
     };
   },
   computed: {
@@ -62,7 +63,7 @@ export default {
   },
   methods: {
     installExtractor(extractor) {
-      this.installingPlugin = true;
+      this.installingExtractor = true;
 
       orchestrationsApi.addExtractors({
         name: extractor,
@@ -70,14 +71,14 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingPlugin = false;
+              this.installingExtractor = false;
             });
         }
       });
     },
 
     installLoader(loader) {
-      this.installingPlugin = true;
+      this.installingLoader = true;
 
       orchestrationsApi.addLoaders({
         name: loader,
@@ -85,7 +86,7 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingPlugin = false;
+              this.installingLoader = false;
             });
         }
       });
@@ -117,8 +118,8 @@ export default {
           </ConnectorCard>
         </div>
         <h2 class="title is-3">Available</h2>
-        <p v-if="installingPlugin">Installing...</p>
-        <progress v-if="installingPlugin" class="progress is-small is-info" max="100">15%</progress>
+        <p v-if="installingExtractor">Installing...</p>
+        <progress v-if="installingExtractor" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(extractor, index) in filteredExtractors"
@@ -148,6 +149,8 @@ export default {
           </ConnectorCard>
         </div>
         <h2 class="title is-3">Available</h2>
+        <p v-if="installingLoader">Installing...</p>
+        <progress v-if="installingLoader" class="progress is-small is-info" max="100">15%</progress>
         <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(loader, index) in filteredLoaders"
