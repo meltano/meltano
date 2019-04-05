@@ -78,13 +78,12 @@ Description of available options:
 
 ## Loaders
 
-Loaders are defined as the component that integrate data into a database, using the best integration for updating bulk data.
-Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
+Data Loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
 
 ### target-snowflake
 
 ::: warning
-This plugin will enable data to be loaded in a [Snowflake](https://www.snowflake.com) database, but the Meltano UI doesn't support querying to Snowflake yet.
+This plugin will enable data to be loaded in a [Snowflake](https://www.snowflake.com) database. Please note that querying in the Meltano UI is not supported, yet.
 You can follow the progress on this feature in this issue: [meltano/meltano#428](https://gitlab.com/meltano/meltano/issues/428)
 :::
 
