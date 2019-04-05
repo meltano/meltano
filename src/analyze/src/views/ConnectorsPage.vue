@@ -23,6 +23,7 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'installedPlugins',
+      'extractors',
     ]),
     ...mapGetters('orchestrations', [
       'remainingExtractors',
@@ -60,7 +61,7 @@ export default {
     },
   },
   methods: {
-    installExtractor(index, extractor) {
+    installExtractor(extractor) {
       this.installingPlugin = true;
 
       orchestrationsApi.addExtractors({
