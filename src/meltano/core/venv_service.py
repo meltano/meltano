@@ -50,8 +50,16 @@ class VenvService:
     def install(self, pip_url, namespace="", name=""):
         pip_install_path = self.exec_path("pip", namespace=namespace, name=name)
 
+        # we run `pip install ... --ignore-installed` to make sure the plugin
+        # install ALL its dependencies, even if Meltano could provide some via
+        # its own virtualenv
         run = subprocess.run(
-            [str(pip_install_path), "install", *pip_url.split(" ")],
+            [
+                str(pip_install_path),
+                "install",
+                *pip_url.split(" "),
+                "--ignore-installed",
+            ],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,

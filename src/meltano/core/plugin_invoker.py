@@ -9,6 +9,7 @@ from .plugin import Plugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
+from .error import SubprocessError
 
 
 class PluginInvoker:
@@ -77,7 +78,7 @@ class PluginInvoker:
             raise
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
-            raise PluginMissingError(self.plugin)
+            raise
 
         return process
 
