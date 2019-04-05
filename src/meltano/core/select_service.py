@@ -15,7 +15,6 @@ class SelectService:
         config = ConfigService(project)
         extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
         invoker = PluginInvoker(project, extractor)
-        pattern = f"{entities_filter}.{attributes_filter}"
 
         list_all = ListSelectedExecutor()
         try:

@@ -101,13 +101,14 @@ def extract(extractor_name: str) -> Response:
     )
 
 
-@orchestrationsBP.route("/extract-entities/<extractor_data>", methods=["POST"])
-def extractEntities(extractor_data: str) -> Response:
+@orchestrationsBP.route("/select-entities/<extractor_data>", methods=["POST"])
+def selectEntities(extractor_data: str) -> Response:
     """
     endpoint that performs extraction of the user selected entities and attributes
     """
     # TODO parse extractor_data and selectively `meltano select extractor_data["extractorName"] ...`
     # TODO refactor and leverage extract() method above?
+    # TODO may need to refactor select cli add method into SelectService
     return jsonify("winning")
 
 

@@ -3,7 +3,7 @@
     <h2>Entities for {{extractorEntities.extractorName}}</h2>
     <a
       class='button'
-      @click='extractEntities'>Collect</a>
+      @click='selectEntities'>Collect</a>
     <div
       class='is-unselectable'
       v-for='entityGroup in extractorEntities.entityGroups'
@@ -35,8 +35,8 @@ export default {
     this.$store.dispatch('orchestrations/getExtractorEntities', 'tap-salesforce');
   },
   methods: {
-    extractEntities() {
-      this.$store.dispatch('orchestrations/extractEntities');
+    selectEntities() {
+      this.$store.dispatch('orchestrations/selectEntities');
     },
     entityGroupSelected(entityGroup) {
       this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);

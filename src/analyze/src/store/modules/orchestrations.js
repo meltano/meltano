@@ -88,8 +88,8 @@ const actions = {
     commit('setCurrentConnectionName', selectedConnectionName);
   },
 
-  extractEntities({ commit }) {
-    orchestrationsApi.extractEntities(state.extractorEntities)
+  selectEntities({ commit }) {
+    orchestrationsApi.selectEntities(state.extractorEntities)
       .then((response) => {
         console.log('hit', response.data);
       });
