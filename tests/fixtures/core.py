@@ -28,6 +28,10 @@ def discovery():
         str(PluginType.TRANSFORMS): [
             {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
         ],
+        str(PluginType.MODELS): [{"name": "model-mock", "pip_url": "model-mock"}],
+        str(PluginType.ORCHESTRATORS): [
+            {"name": "orchestrator-mock", "pip_url": "orchestrator-mock"}
+        ],
     }
 
 

@@ -8,15 +8,26 @@ from meltano.core.plugin.error import PluginMissingError
 
 
 class TestCliAdd:
-    def test_add(self, project, cli_runner, config_service):
+    @pytest.mark.parametrize(
+        "plugin_type,plugin_name",
+        [
+            (PluginType.EXTRACTORS, "tap-carbon-intensity"),
+            (PluginType.LOADERS, "target-sqlite"),
+            (PluginType.MODELS, "model-carbon-intensity-sqlite"),
+            (PluginType.TRANSFORMERS, "dbt"),
+            (PluginType.TRANSFORMS, "tap-carbon-intensity"),
+            (PluginType.ORCHESTRATORS, "airflow"),
+        ],
+    )
+    def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.get_plugin("tap-carbon-intensity", PluginType.EXTRACTORS)
+            config_service.get_plugin(plugin_type, plugin_name)
 
-        res = cli_runner.invoke(cli, ["add", "extractor", "tap-carbon-intensity"])
+        res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
 
-        assert res.exit_code == 0
-        assert "Installed 'tap-carbon-intensity'." in res.stdout
+        assert res.exit_code == 0, res.stdout
+        assert f"Installed '{plugin_name}'." in res.stdout
 
         project.reload()
         config_service.get_plugin("tap-carbon-intensity", PluginType.EXTRACTORS)

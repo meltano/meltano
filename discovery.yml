@@ -140,3 +140,10 @@ models:
     pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"
   - name: model-zendesk
     pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
+orchestrators:
+  - name: airflow
+    pip_url: "apache-airflow==1.10.3b1"
+    config:
+      core:
+        dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
+        sql_alchemy_conn: sqlite:///.meltano/run/airflow/airflow.db

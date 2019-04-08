@@ -6,6 +6,7 @@ import logging
 from .project import Project
 from .plugin import PluginType, Plugin
 from .plugin_discovery_service import PluginDiscoveryService
+from .plugin.factory import plugin_factory
 from .config_service import ConfigService
 
 
@@ -44,4 +45,4 @@ class ProjectAddService:
         else:
             raise PluginNotSupportedException()
 
-        return self.config_service.plugin_generator(plugin.type, plugin.canonical())
+        return plugin_factory(plugin.type, plugin.canonical())

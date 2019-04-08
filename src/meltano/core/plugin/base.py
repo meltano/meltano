@@ -1,5 +1,6 @@
 import yaml
 import fnmatch
+from typing import Dict
 from collections import namedtuple
 from enum import Enum
 
@@ -24,10 +25,23 @@ class PluginType(YAMLEnum):
     MODELS = "models"
     TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
+    ORCHESTRATORS = "orchestrators"
     ALL = "all"
 
     def __str__(self):
         return self.value
+
+    @property
+    def cli_command(self):
+        """Makes it singular for `meltano add PLUGIN_TYPE`"""
+        if self is self.__class__.ALL:
+            raise NotImplemented()
+
+        return self.value[:-1]
+
+    @classmethod
+    def value_exists(cls, value):
+        return value in cls._value2member_map_
 
 
 class Plugin(HookObject):
@@ -70,14 +84,17 @@ class Plugin(HookObject):
 
         return canonical
 
-    @property
-    def config_files(self):
-        """Return a list of stubbed files created for this plugin."""
+    def exec_args(self, files: Dict):
         return []
 
     @property
+    def config_files(self):
+        """Return a list of stubbed files created for this plugin."""
+        return dict()
+
+    @property
     def output_files(self):
-        return []
+        return dict()
 
     @property
     def select(self):
