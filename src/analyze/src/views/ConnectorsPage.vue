@@ -124,8 +124,7 @@ export default {
             </div>
             <div class="column">
               <div class="buttons is-pulled-right">
-                <button class="button is-outlined" @click="updateExtractorInFocus(null)">Cancel</button>
-                <button class="button is-success">Save</button>
+                <button class="button is-outlined" @click="updateExtractorInFocus(null)">Back</button>
               </div>
             </div>
           </div>
