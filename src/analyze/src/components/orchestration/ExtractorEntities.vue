@@ -42,13 +42,17 @@
 export default {
   name: 'ExtractorEntities',
   props: {
-    'extractor': {
+    extractor: {
       type: Object,
-      default: {},
+      default() {
+        return {};
+      },
     },
-    'extractorEntities': {
+    extractorEntities: {
       type: Object,
-      default: { loading: true },
+      default() {
+        return { loading: true };
+      },
     },
   },
   created() {
