@@ -3,12 +3,11 @@
 
     <!-- Loading -->
     <div v-if='isLoading'>
-      <h2>Loading {{extractorEntities.extractorName}} entities</h2>
+      <h2>Loading {{extractor.name}} entities</h2>
       <progress v-if="true" class="progress is-small is-info" max="100">0%</progress>
     </div>
 
     <!-- Loaded -->
-
     <div v-else>
       <h2>Entities for {{extractorEntities.extractorName}}</h2>
       <a
@@ -51,7 +50,7 @@ export default {
     extractorEntities: {
       type: Object,
       default() {
-        return { loading: true };
+        return {};
       },
     },
   },
@@ -60,8 +59,7 @@ export default {
   },
   computed: {
     isLoading() {
-      const entityGroups = this.extractorEntities.entityGroups;
-      return entityGroups && entityGroups.length === 0;
+      return !this.extractorEntities.hasOwnProperty('entityGroups');
     },
   },
   methods: {
