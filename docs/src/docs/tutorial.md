@@ -197,8 +197,9 @@ meltano elt tap-salesforce target-postgres --transform only
 ```
 
 The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
+When meltano elt tap-salesforce target-postgres --transform run is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
 
-In order to visualize the data with existing transformations in the UI, you would need to add models:
+In order to visualize the data with existing transformations in the UI, the final step would be to add models:
 
 ```bash
 # Add existing models
@@ -233,12 +234,320 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
-## Advanced - Coming Soon
+## Advanced - Adding Custom Transformations and Models
 
-You can look forward to the following tutorials in the future:
 
-- How to add your own transforms
-- How to add your own .m5o models for generating reports
+### Prerequisites
+
+- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
+- Docker started
+- Meltano SalesForce [project](./tutorial.html#initialize-your-project-2) is initialized and [credentials](./tutorial.html#set-your-credentials) set.
+- Meltano SalesForce [entities](./tutorial.html#select-the-entities-to-export-from-salesforce) are selected. 
+
+We assume that you have also run the [ELT steps](./tutorial.html#run-elt-extract-load-transform) in the SalesForce tutorial.
+Nothwithstanding, you can follow this tutorial in order to create entirely new transformations and run the whole ELT process in the end.
+
+### Context
+
+As an example, let's create transformations, which will allow us to look at closed opportunities (i.e. actual sales) by year, quarter and the following categorical dimensions:
+
+- Size of the deal, i.e. Small (<5k$), Medium (5k$ - 25k$), Big (25k$ - 100k$), Jumbo (>100k$)
+- Type of deal, i.e. New Business, Renewal, Add-On Business
+- Client's location
+- Client's industry
+- Client's size, i.e. Small (<100 employees), Medium (100 - 999 employees), Large (1k - 20k employees), Strategic (>20k employees)
+
+### Adding Custom Transforms
+
+Let's create two additional tables:
+
+- A table that includes won opportunities only and a custom category column for deal_size (opportunity_won.sql)
+- A table that includes account categories, clients' countries, industries and a custom category column for company_size (account_category.sql).
+
+These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories. This will allow Meltano to discover the new transformations and execute.
+
+```bash
+# opportunity_won.sql
+with source as (
+    
+    -- Use the base sf_opportunity model defined by Meltano's 
+    --  prepackaged tap_salesforce model
+    select * from {{ref('sf_opportunity')}}
+
+),
+
+opportunity_won as (
+    select
+        -- Attributes directly fetched from the Opportunity Table
+        opportunity_id,
+        account_id,
+        owner_id,
+
+        opportunity_type,
+        lead_source,
+
+        amount,
+
+        -- Additional Calculated Fields
+
+        -- Add a deal size categorical dimension
+        CASE WHEN
+          amount :: DECIMAL < 5000
+          THEN '1 - Small (<5k)'
+        WHEN amount :: DECIMAL >= 5000 AND amount :: DECIMAL < 25000
+          THEN '2 - Medium (5k - 25k)'
+        WHEN amount :: DECIMAL >= 25000 AND amount :: DECIMAL < 100000
+          THEN '3 - Big (25k - 100k)'
+        WHEN amount :: DECIMAL >= 100000
+          THEN '4 - Jumbo (>100k)'
+        ELSE '5 - Unknown'
+        END                         AS deal_size,
+
+        -- Add Closed Date, Month, Quarter and Year columns
+        CAST(closed_date AS DATE) as closed_date, 
+        EXTRACT(MONTH FROM closed_date) closed_month,
+        EXTRACT(QUARTER FROM closed_date) closed_quarter, 
+        EXTRACT(YEAR FROM closed_date) closed_year  
+
+    from source
+
+    where is_won = true and is_closed = true
+)
+
+select * from opportunity_won
+```
+
+```bash
+# account_category.sql
+with source as (
+    
+    -- Use the base sf_opportunity model defined by Meltano's 
+    --  prepackaged tap_salesforce model
+    select * from {{ref('sf_account')}}
+
+),
+
+account_category as (
+
+    select
+
+        account_id,
+
+        -- Set NULL values to 'Unknown'
+        COALESCE(company_country, 'Unknown') as company_country,
+
+        -- Set NULL values to 'Unknown'
+        COALESCE(industry, 'Unknown') as industry,
+        
+        -- Add a company size categorical dimension
+        CASE WHEN
+          number_of_employees < 100
+          THEN '1 - Small (<100)'
+        WHEN number_of_employees >= 100 AND number_of_employees < 1000
+          THEN '2 - Medium (100 - 999)'
+        WHEN number_of_employees >= 1000 AND number_of_employees < 20000
+          THEN '3 - Large (1k - 20k)'
+        WHEN number_of_employees >= 20000
+          THEN '4 - Strategic (>20k)'
+        ELSE '5 - Unknown'
+        END                         AS company_size
+
+    from source
+)
+
+select * from account_category
+
+```
+
+In order to have the results of the transformations materialized in the analytics schema, we need to update sfdc-project/transform/dbt_project.yml. For more details on materialization options, please check dbt's documentation.
+
+```bash
+# Update `my_meltano_project: null` to `my_meltano_project: materialized: table`
+models:
+  enabled: true
+  my_meltano_project:
+    materialized: table
+  tap_stripe:
+    vars:
+      livemode: false
+      schema: '{{ env_var(''PG_SCHEMA'') }}'
+```
+Before we re-run the ELT process, we should update our environment variables.
+
+```bash
+source .env
+```
+
+We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
+
+```bash
+# Runs transformation step only
+meltano elt tap-salesforce target-postgres --transform only
+
+```
+### Adding Custom Transforms
+
+In order to access the newly transformed data in the UI, three additional files must be created:
+
+- Table.m5o files, which define the available columns and aggregates for each table
+- A model.m5o file, which represents the connections between tables, i.e. what they can be joined on
+
+These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory
+
+```bash
+# opportunity_won.table.m5o
+{
+  version = 1
+  sql_table_name = opportunity_won
+  name = opportunity_won
+  columns {
+    opportunity_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.opportunity_id"
+    }
+    owner_id {
+      label = Owner ID (User)
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.owner_id"
+    }
+    account_id {
+      label = Account ID
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.account_id"
+    }
+    opportunity_type {
+      label = Oportunity Type
+      description = Oportunity Type
+      type = string
+      sql = "{{table}}.opportunity_type"
+    }
+    lead_source {
+      label = Lead Source
+      description = Lead Source
+      type = string
+      sql = "{{table}}.lead_source"
+    }
+    deal_size {
+      label = Deal Size
+      description = Deal Size
+      type = string
+      sql = "{{table}}.deal_size"
+    }
+    closed_date {
+      label = Closed Date
+      description = Date the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_date"
+    }
+    closed_month {
+      label = Closed Month
+      description = Month the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_month"
+    }
+    closed_quarter {
+      label = Closed Quarter
+      description = Quarter the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_quarter"
+    }
+    closed_year {
+      label = Closed Year
+      description = Year the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_year"
+    }
+  }
+  aggregates {
+    total_opportunities {
+      label = Total Opportunities
+      description = Total Opportunities
+      type = count
+      sql = "{{table}}.opportunity_id"
+    }
+    total_amount {
+      label = Total Amount
+      description = Total Amount
+      type = sum
+      sql = "{{table}}.amount"
+    }
+    avg_amount {
+      label = Average Amount
+      description = Average Amount
+      type = avg
+      sql = "{{table}}.amount"
+    }
+  }
+}
+```
+
+```bash
+# account_category.table.m5o
+{
+  version = 1
+  sql_table_name = account_category
+  name = account_category
+  columns {
+    account_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.account_id"
+    }
+    company_country {
+      label = Company Country
+      description = Company Country
+      type = string
+      sql = "{{table}}.company_country"
+    }
+    company_size {
+      label = Company Size
+      description = Company Size
+      type = string
+      sql = "{{table}}.company_size"
+    }
+    industry {
+      label = Industry
+      description = Industry
+      type = string
+      sql = "{{table}}.industry"
+    }
+  }
+}
+```
+
+```bash
+# custom_sfdc.model.m5o
+{
+  version = 1
+  name = custom_sfdc
+  connection = postgres_db
+  label = Salesforce (Custom)
+  designs {
+    opportunity_won {
+      label = Opportunities Won
+      from = opportunity_won
+      description = SFDC Opportunities Won
+      joins {
+        account_category {
+          label = Opportunity
+          sql_on = "opportunity_won.account_id = account_category.account_id"
+          relationship = many_to_one
+        }
+      }
+    }
+  }
+}
+
+```
+
+### Interact with Your Data in The Web App
+
+[Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 ## Using Docker
 
