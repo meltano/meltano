@@ -38,19 +38,17 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Ensure Meltano UI will know how to use data from ELT
-meltano add model model-carbon-intensity-sqlite
-
 # Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
+
+# Ensure Meltano UI will know how to use data from ELT
+meltano add model model-carbon-intensity-sqlite
 ```
 
 Congratulations! You have just extracted all the data from the Carbon Intensity API and loaded it into your local SQLite database.
 
 :::tip
-Meltano is magical and powerful.
-
-It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
+Meltano extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
 
 Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from them using Meltano UI with its automatic SQL generation.
 :::
@@ -115,9 +113,6 @@ docker-compose up -d warehouse_db
 
 # Let's see what extractors and loaders are available
 meltano discover all
-
-# Add a m5o model so Meltano UI will know how to use data from ELT
-meltano add model model-salesforce
 
 # Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
 meltano add extractor tap-salesforce
