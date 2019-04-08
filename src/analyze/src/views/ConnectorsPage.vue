@@ -21,6 +21,7 @@ export default {
       filterLoadersText: '',
       installingExtractor: false,
       installingLoader: false,
+      extractorInFocus: null,
     };
   },
   computed: {
@@ -80,7 +81,6 @@ export default {
         }
       });
     },
-
     installLoader(loader) {
       this.installingLoader = true;
 
@@ -95,6 +95,9 @@ export default {
         }
       });
     },
+    updateExtractorInFocus(extractor) {
+      this.extractorInFocus = extractor;
+    },
   },
   created() {
     this.$store.dispatch('orchestrations/getAll');
@@ -107,40 +110,55 @@ export default {
   <div class="content">
     <h1 class="title is-2">Connectors</h1>
     <base-accordion :isOpen="true">
+
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
       </template>
+
       <template slot="body">
-        <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input connector-input">
-        <h2 class="title is-3">Installed</h2>
-        <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
-        <div class="installed-connectors">
-          <ConnectorCard v-for="extractor in filteredInstalledExtractors"
-            :connector="extractor.name"
-            :key="`${extractor.name}`"
-          >
-          </ConnectorCard>
-        </div>
-        <h2 class="title is-3">Available</h2>
-        <p v-if="installingExtractor">Installing...</p>
-        <progress v-if="installingExtractor" class="progress is-small is-info" max="100">15%</progress>
-        <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
-        <div v-else class="card-grid">
-          <ConnectorCard v-for="(extractor, index) in filteredExtractors"
-            :connector="extractor"
-            :key="`${extractor}-${index}`"
-          >
-            <template v-slot:callToAction>
-              <button @click="installExtractor(extractor)" class="card-button">Install</button>
-            </template>
-          </ConnectorCard>
+
+        <div v-if='extractorInFocus'>
+          <button @click="updateExtractorInFocus(null)" class="button">Back</button>
+          <ExtractorEntities
+            :extractor='extractorInFocus'
+            :extractor-entities='extractorEntities'></ExtractorEntities>
         </div>
 
-        <ExtractorEntities :extractor-entities='extractorEntities'></ExtractorEntities>
+        <div v-else>
+          <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input connector-input">
+          <h2 class="title is-3">Installed</h2>
+          <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
+          <div class="installed-connectors">
+            <ConnectorCard v-for="extractor in filteredInstalledExtractors"
+              :connector="extractor.name"
+              :key="`${extractor.name}`"
+            >
+              <template v-slot:callToAction>
+                <button @click="updateExtractorInFocus(extractor)" class="card-button">Settings</button>
+              </template>
+            </ConnectorCard>
+          </div>
 
+          <h2 class="title is-3">Available</h2>
+          <p v-if="installingExtractor">Installing...</p>
+          <progress v-if="installingExtractor" class="progress is-small is-info" max="100">15%</progress>
+          <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
+          <div v-else class="card-grid">
+            <ConnectorCard v-for="(extractor, index) in filteredExtractors"
+              :connector="extractor"
+              :key="`${extractor}-${index}`"
+            >
+              <template v-slot:callToAction>
+                <button @click="installExtractor(extractor)" class="card-button">Install</button>
+              </template>
+            </ConnectorCard>
+          </div>
+        </div>
       </template>
+
     </base-accordion>
     <base-accordion :isOpen="true">
+
       <template slot="header">
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
@@ -170,6 +188,7 @@ export default {
           </ConnectorCard>
         </div>
       </template>
+
     </base-accordion>
   </div>
 </template>

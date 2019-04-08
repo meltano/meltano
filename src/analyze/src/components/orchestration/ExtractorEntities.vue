@@ -1,49 +1,74 @@
 <template>
   <div>
-    <h2>Entities for {{extractorEntities.extractorName}}</h2>
-    <a
-      class='button'
-      @click='selectEntities'>Collect</a>
-    <div
-      class='is-unselectable'
-      v-for='entityGroup in extractorEntities.entityGroups'
-      :key='`${entityGroup.name}`'>
+
+    <!-- Loading -->
+    <div v-if='isLoading'>
+      <h2>Loading {{extractorEntities.extractorName}} entities</h2>
+      <progress v-if="true" class="progress is-small is-info" max="100">0%</progress>
+    </div>
+
+    <!-- Loaded -->
+
+    <div v-else>
+      <h2>Entities for {{extractorEntities.extractorName}}</h2>
       <a
-        class='button is-rounded'
-        :class="{'is-primary': entityGroup.selected}"
-        @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
+        class='button'
+        @click='selectEntities'>Collect</a>
       <div
-        v-for='attribute in entityGroup.attributes'
-        :key='`${attribute.name}`'>
+        class='is-unselectable'
+        v-for='entityGroup in extractorEntities.entityGroups'
+        :key='`${entityGroup.name}`'>
         <a
-          class="button is-rounded is-small"
-          :class="{'is-primary': attribute.selected}"
-          @click.stop="entityAttributeSelected({entityGroup, attribute})">
-          {{attribute.name}}
-        </a>
+          class='button is-rounded'
+          :class="{'is-primary': entityGroup.selected}"
+          @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
+        <div
+          v-for='attribute in entityGroup.attributes'
+          :key='`${attribute.name}`'>
+          <a
+            class="button is-rounded is-small"
+            :class="{'is-primary': attribute.selected}"
+            @click.stop="entityAttributeSelected({entityGroup, attribute})">
+            {{attribute.name}}
+          </a>
+        </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script>
 export default {
   name: 'ExtractorEntities',
-  props: ['extractorEntities'],
+  props: {
+    'extractor': {
+      type: Object,
+      default: {},
+    },
+    'extractorEntities': {
+      type: Object,
+      default: { loading: true },
+    },
+  },
   created() {
-    // TODO pull out and place in Ben's tap card implementation
-    this.$store.dispatch('orchestrations/getExtractorEntities', 'tap-salesforce');
+    this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
+  },
+  computed: {
+    isLoading() {
+      const entityGroups = this.extractorEntities.entityGroups;
+      return entityGroups && entityGroups.length === 0;
+    },
   },
   methods: {
-    selectEntities() {
-      this.$store.dispatch('orchestrations/selectEntities');
+    entityAttributeSelected(payload) {
+      this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
     },
     entityGroupSelected(entityGroup) {
       this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
     },
-
-    entityAttributeSelected(payload) {
-      this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
+    selectEntities() {
+      this.$store.dispatch('orchestrations/selectEntities');
     },
   },
 };
