@@ -218,6 +218,7 @@ export default {
   padding: 10px 0;
   font-size: 1rem;
   transition: background 0.2s ease-in;
+  cursor: pointer;
 
   &:hover {
     background-color: hsl(210, 74%, 22%);
