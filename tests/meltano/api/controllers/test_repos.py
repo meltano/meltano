@@ -36,7 +36,12 @@ def test_models(api, app, project):
 def test_design_read(api, app, project):
     with app.test_request_context():
         res = api.get(
-            url_for("repos.design_read", topic_name="carbon", design_name="region", project_slug=project.slug,)
+            url_for(
+                "repos.design_read",
+                topic_name="carbon",
+                design_name="region",
+                project_slug=project.slug,
+            )
         )
 
     json_data = json.loads(res.data)
