@@ -264,7 +264,7 @@ Let's create two additional tables:
 - A table that includes won opportunities only and a custom category column for deal_size (opportunity_won.sql)
 - A table that includes account categories, clients' countries, industries and a custom category column for company_size (account_category.sql).
 
-These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories. This will allow Meltano to discover the new transformations and execute.
+These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories.
 
 ```bash
 # opportunity_won.sql
@@ -387,12 +387,12 @@ meltano elt tap-salesforce target-postgres --transform only
 ```
 ### Adding Custom Transforms
 
-In order to access the newly transformed data in the UI, three additional files must be created:
+In order to access the newly transformed data in the UI, 2 additional types of files must be created:
 
-- Table.m5o files, which define the available columns and aggregates for each table
-- A model.m5o file, which represents the connections between tables, i.e. what they can be joined on
+- A table.m5o file, which defines the available columns and aggregates for each table
+- A model.m5o file, which represents the connections between tables, i.e. what they can be joined on.
 
-These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory
+These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory.
 
 ```bash
 # opportunity_won.table.m5o
