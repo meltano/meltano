@@ -65,7 +65,7 @@
           </div>
           <div class="control">
             <div class="select">
-              <select v-model="connectionDialect">
+              <select v-model="connectionDialect" placeholder="dialect">
                 <option value="" disabled selected>Dialect</option>
                 <option value="postgresql">PostgreSQL</option>
                 <option value="mysql">MySQL</option>
@@ -146,7 +146,6 @@
   </div>
 </template>
 <script>
-import store from '@/store';
 import { mapState, mapGetters } from 'vuex';
 
 export default {
@@ -166,12 +165,11 @@ export default {
     };
   },
 
-  beforeRouteEnter(to, from, next) {
-    store.dispatch('settings/getSettings')
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
+  mounted() {
+    this.$store.dispatch('settings/saveSlug', {
+      slug: this.$route.params.slug,
+    });
+    this.$store.dispatch('settings/getSettings');
   },
 
   computed: {

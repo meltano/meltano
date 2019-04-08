@@ -11,7 +11,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
     M5oCollectionParserTypes,
 )
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import slugify
 from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParser,
@@ -22,19 +22,20 @@ from meltano.core.m5o.m5o_collection_parser import (
 class ReportsHelper:
     VERSION = "1.0.0"
 
+    def __init__(self, project):
+        self.project = project
+
     def has_reports(self):
-        project = Project.find()
-        m5oc_file = project.root_dir("model", "reports.m5oc")
+        m5oc_file = self.project.root_dir("model", "reports.m5oc")
         return Path.is_file(m5oc_file)
 
     def get_report_m5oc(self):
-        project = Project.find()
-        m5oc_file = project.root_dir("model", "reports.m5oc")
+        m5oc_file = self.project.root_dir("model", "reports.m5oc")
         return M5ocFile.load(m5oc_file)
 
     def get_reports(self):
-        project = Project.find()
-        path = project.root_dir("model")
+        print("~~~~", self.project)
+        path = self.project.root_dir("model")
         reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
         return reportsParser.contents()
 
@@ -44,10 +45,9 @@ class ReportsHelper:
         return target_report[0]
 
     def save_report(self, data):
-        project = Project.find()
         slug = slugify(data["name"])
         file_name = f"{slug}.report.m5o"
-        file_path = project.root_dir("model", file_name)
+        file_path = self.project.root_dir("model", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = ReportsHelper.VERSION
         with open(file_path, "w") as f:
@@ -55,9 +55,8 @@ class ReportsHelper:
         return data
 
     def update_report(self, data):
-        project = Project.find()
         file_name = f"{data['slug']}.report.m5o"
-        file_path = project.root_dir("model", file_name)
+        file_path = self.project.root_dir("model", file_name)
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data

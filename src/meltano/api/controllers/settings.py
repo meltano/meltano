@@ -7,8 +7,9 @@ from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
+from .project_helper import project_from_slug, project_api_route
 
-settingsBP = Blueprint("settings", __name__, url_prefix="/api/v1/settings")
+settingsBP = Blueprint("settings", __name__, url_prefix=project_api_route("settings"))
 settingsApi = Api(settingsBP)
 
 
@@ -19,31 +20,36 @@ def before_request():
 
 
 @settingsBP.route("/", methods=["GET"])
-@roles_required("admin")
-def index():
-    settings_helper = SettingsHelper()
+@project_from_slug
+# @roles_required("admin")
+def index(project):
+    settings_helper = SettingsHelper(project)
     return jsonify(settings_helper.get_connections())
 
 
 @settingsBP.route("/save", methods=["POST"])
+@project_from_slug
 @roles_required("admin")
-def save():
-    settings_helper = SettingsHelper()
+def save(project):
+    settings_helper = SettingsHelper(project)
+
     connection = request.get_json()
     settings = settings_helper.save_connection(connection)
     return jsonify(settings)
 
 
 @settingsBP.route("/delete", methods=["POST"])
-def delete():
-    settings_helper = SettingsHelper()
+@project_from_slug
+def delete(project):
+    settings_helper = SettingsHelper(project)
     connection = request.get_json()
     settings = settings_helper.delete_connection(connection)
     return jsonify(settings)
 
 
 @settingsBP.route("/connections/<name>/test")
-def test(name):
+@project_from_slug
+def test(name, project):
     current_settings = Settings.query.first().settings
     connections = current_settings["connections"]
     try:
@@ -93,8 +99,9 @@ class AclResource(Resource):
     }
 
     @marshal_with(AclDefinition)
+    @project_from_slug
     @roles_required("admin")
-    def get(self):
+    def get(self, project):
         return {
             "users": User.query.options(joinedload("roles")).all(),
             "roles": Role.query.options(joinedload("permissions")).all(),
@@ -104,12 +111,12 @@ class AclResource(Resource):
 
 class RolesResource(Resource):
     @marshal_with(AclResource.RoleDefinition)
+    @project_from_slug
     @roles_required("admin")
-    def post(self):
+    def post(self, project):
         payload = request.get_json()
         role = payload["role"]
         user = payload.get("user")
-
         try:
             role_name = role.pop("name")
             role = users.find_or_create_role(role_name, **role)
@@ -124,8 +131,9 @@ class RolesResource(Resource):
         return role, 201
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def delete(self):
+    def delete(self, project):
         payload = request.get_json()
         role = payload["role"]
         user = payload.get("user")
@@ -157,8 +165,9 @@ class RolePermissionsResource(Resource):
         return payload["role"], payload["permissionType"], payload["context"]
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def post(self):
+    def post(self, project):
         role, permission_type, context = self._parse_request()
 
         try:
@@ -182,8 +191,9 @@ class RolePermissionsResource(Resource):
         return role, 200
 
     @roles_required("admin")
+    @project_from_slug
     @marshal_with(AclResource.RoleDefinition)
-    def delete(self):
+    def delete(self, project):
         role, permission_type, context = self._parse_request()
         role = Role.query.filter_by(name=role["name"]).one()
 

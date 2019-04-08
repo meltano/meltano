@@ -122,7 +122,7 @@ import utils from '@/utils/utils';
 export default {
   name: 'Repo',
   created() {
-    this.getRepo();
+    this.getRepo(this.$route.params.slug);
     this.sync();
   },
   components: {
@@ -140,6 +140,7 @@ export default {
       'hasCode',
     ]),
     ...mapState('repos', [
+      'slug',
       'files',
       'activeView',
       'validated',
@@ -149,8 +150,8 @@ export default {
     ]),
   },
   methods: {
-    getRepo() {
-      this.$store.dispatch('repos/getRepo');
+    getRepo(slug) {
+      this.$store.dispatch('repos/getRepo', slug);
     },
     jsDashify(type, name) {
       return utils.jsDashify(type, name);

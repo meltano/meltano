@@ -47,6 +47,19 @@ class Project:
 
         return project
 
+    @classmethod
+    def find_by_slug(self, name: str):
+        cwd = Path(os.getcwd()).resolve()
+        has_project = cwd.joinpath("meltano.yml").exists()
+        if has_project:
+            cwd = cwd.parent
+
+        project_path = cwd.joinpath(name)
+        if not project_path.exists():
+            raise ProjectNotFound()
+
+        return Project(project_path)
+
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
@@ -94,6 +107,13 @@ class Project:
 
     def root_dir(self, *joinpaths):
         return self.root.joinpath(*joinpaths)
+
+    @property
+    def slug(self):
+        return self.root_dir().parts[-1]
+
+    def slug_url(self, *joinpaths):
+        return Path("projects").joinpath(self.slug, *joinpaths)
 
     @property
     def meltanofile(self):

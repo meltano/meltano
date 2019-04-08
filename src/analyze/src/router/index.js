@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Repo from '@/views/Repo';
+import Projects from '@/views/Projects';
+import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
 import Orchestrate from '@/views/Orchestrate';
@@ -15,48 +17,61 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/files',
+      name: 'home',
+      redirect: '/projects',
     },
     {
-      path: '/files/',
-      name: 'Repo',
+      path: '/projects/',
+      name: 'projects',
+      component: Projects,
+    },
+    {
+      path: '/start/',
+      name: 'start',
+      component: Start,
+    },
+    {
+      path: '/projects/:slug/files/',
+      name: 'projectFiles',
       component: Repo,
     },
     {
-      path: '/analyze/:model/:design',
-      name: '',
+      path: '/projects/:slug/analyze/:model/:design',
+      name: 'analyze',
       component: Design,
     },
     {
       path: '/analyze/:model/:design/reports/report/:slug',
-      name: 'Report',
+      name: 'design_report',
       component: Design,
     },
     {
       path: '/dashboards/',
-      name: 'Dashboards',
+      name: 'dashboards',
       component: Dashboards,
     },
     {
       path: '/dashboards/dashboard/:slug',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: Dashboards,
     },
     {
-      path: '/settings',
-      name: 'Settings',
+      path: '/projects/:slug/settings',
+      name: 'settings',
       component: Settings,
       children: [{
         path: 'roles',
+        name: 'roles',
         component: SettingsRoles,
       }, {
         path: 'database',
+        name: 'database',
         component: SettingsDatabase,
       }],
     },
     {
       path: '/orchestrations',
-      name: 'Orchestrate',
+      name: 'orchestrate',
       component: Orchestrate,
     },
   ],
