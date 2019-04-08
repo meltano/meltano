@@ -33,10 +33,10 @@ def test_models(api, app, project):
         assert topic_def["designs"]
 
 
-def test_design_read(api, app):
+def test_design_read(api, app, project):
     with app.test_request_context():
         res = api.get(
-            url_for("repos.design_read", topic_name="carbon", design_name="region")
+            url_for("repos.design_read", topic_name="carbon", design_name="region", project_slug=project.slug,)
         )
 
     json_data = json.loads(res.data)

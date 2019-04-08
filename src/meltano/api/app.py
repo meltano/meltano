@@ -125,7 +125,7 @@ def start(project, **kwargs):
 
     try:
         app_config = kwargs.pop("app_config", {})
-        app = create_app(project, app_config)
+        app = create_app(app_config)
         from .security.identity import create_dev_user
 
         with app.app_context():
