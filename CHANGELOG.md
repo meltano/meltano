@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.19.0 - (2019-04-08)
 
 ---
 
@@ -27,8 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#507](https://gitlab.com/meltano/meltano/issues/507) Ensure design name and table name don't need to match so multiple designs can leverage a single base table
 * [#551](https://gitlab.com/meltano/meltano/issues/551) Fix HDA queries generated when an attribute is used both as a column and as an aggregate.
 * [#559](https://gitlab.com/meltano/meltano/issues/559) Add support for running custom transforms for taps without default dbt transforms.
-
-### Breaks
 
 
 ## 0.18.0 - (2019-04-02)
