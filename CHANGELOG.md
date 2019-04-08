@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * [#513](https://gitlab.com/meltano/meltano/issues/513) Added initial e2e tests for the UI
 * [#431](https://gitlab.com/meltano/meltano/issues/431) Add the `tap-zendesk` transform to Meltano. It is using the dbt package defined in https://gitlab.com/meltano/dbt-tap-zendesk
+* [#400](https://gitlab.com/meltano/meltano/issues/400) Add initial UI for installing taps and targets with the browser instead of the CLI
 
 ### Changes
 
