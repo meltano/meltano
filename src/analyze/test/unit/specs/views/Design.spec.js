@@ -37,8 +37,7 @@ describe('Design.vue', () => {
 
   it('calls getDesign() via beforeRouteEnter() router lifecycle hook', () => {
     const params = { model: 'model', design: 'design', slug: 'slug' };
-    const $route = { params };
-    const wrapper = mount(Design, { $route, store, localVue, router });
+    const wrapper = mount(Design, { store, localVue, router });
 
     wrapper.vm.$nextTick(() => {
       expect(wrapper.html()).toBeTruthy();

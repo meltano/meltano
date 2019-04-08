@@ -398,14 +398,14 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
               <div
                 class="column is-one-fifth"
               >
-                <router-link
-                  class="button is-secondary is-light is-small is-pulled-right"
-                  to="[object Object]"
+                <a
+                  class="button is-secondary is-light is-small is-pulled-right router-link-exact-active router-link-active"
+                  href="#/"
                 >
                   <font-awesome-icon
                     icon="arrow-right"
                   />
-                </router-link>
+                </a>
               </div>
             </div>
           </li>
@@ -673,14 +673,14 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
               <div
                 class="column is-one-fifth"
               >
-                <router-link
-                  class="button is-secondary is-light is-small is-pulled-right"
-                  to="[object Object]"
+                <a
+                  class="button is-secondary is-light is-small is-pulled-right router-link-exact-active router-link-active"
+                  href="#/"
                 >
                   <font-awesome-icon
                     icon="arrow-right"
                   />
-                </router-link>
+                </a>
               </div>
             </div>
           </li>

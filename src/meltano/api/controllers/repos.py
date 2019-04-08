@@ -2,11 +2,14 @@ import json
 import os
 from os.path import join
 from pathlib import Path
+from functools import wraps
 
 import markdown
 from flask import Blueprint, jsonify, request
 
-from meltano.core.project import Project
+from .project_helper import project_from_slug
+
+from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import decode_file_path_from_id
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.api.security import api_auth_required
@@ -63,9 +66,9 @@ def before_request():
     pass
 
 
-@reposBP.route("/", methods=["GET"])
-def index():
-    project = Project.find()
+@reposBP.route("/projects/<project_slug>", methods=["GET"])
+@project_from_slug
+def index(project):
     onlyfiles = [f for f in project.model_dir().iterdir() if f.is_file()]
 
     path = project.model_dir()
@@ -82,7 +85,7 @@ def index():
         "reports": {"label": "Reports", "items": reportsFiles},
         "tables": {"label": "Tables", "items": []},
     }
-    onlydocs = project.model_dir().parent.glob("*.md")
+    onlydocs = path.parent.glob("*.md")
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
         sortedM5oFiles["documents"]["items"].append(file_dict)
@@ -120,12 +123,12 @@ def index():
     return jsonify(sortedM5oFiles)
 
 
-@reposBP.route("/file/<unique_id>", methods=["GET"])
-def file(unique_id):
+@reposBP.route("/projects/<project_slug>/file/<unique_id>", methods=["GET"])
+@project_from_slug
+def file(unique_id, project):
     file_path = decode_file_path_from_id(unique_id)
     (filename, ext) = os.path.splitext(file_path)
     is_markdown = False
-    project = Project.find()
     path_to_file = project.model_dir(file_path).resolve()
     with open(path_to_file, "r") as read_file:
         data = read_file.read()
@@ -142,8 +145,7 @@ def file(unique_id):
         )
 
 
-def lint_all(compile):
-    project = Project.find()
+def lint_all(compile, project):
     compiler = ProjectCompiler(project)
     try:
         compiler.parse()
@@ -171,24 +173,40 @@ def handle_file_not_found(e):
     return jsonify({"result": False, "error": str(e)})
 
 
-@reposBP.route("/lint", methods=["GET"])
-def lint():
-    return lint_all(False)
+@reposBP.route("/projects/<project_slug>/lint", methods=["GET"])
+@project_from_slug
+def lint(project):
+    return lint_all(False, project_slug)
 
 
-@reposBP.route("/sync", methods=["GET"])
-def sync():
-    return lint_all(True)
+@reposBP.route("/projects/<project_slug>/sync", methods=["GET"])
+@project_from_slug
+def sync(project):
+    return lint_all(True, project)
 
 
-@reposBP.route("/models", methods=["GET"])
-def models():
-    project = Project.find()
+@reposBP.route("/test", methods=["GET"])
+def db_test():
+    design = Design.query.first()
+    return jsonify({"design": {"name": design.name, "settings": design.settings}})
+
+
+@reposBP.route("projects/<project_slug>/models", methods=["GET"])
+@project_from_slug
+def models(project):
     topics = project.root_dir("model", "topics.index.m5oc")
     topics = json.load(open(topics, "r"))
     topics = next(M5ocFilter().filter("view:topic", [topics]))
-
     return jsonify(topics)
+
+
+@reposBP.route("/designs/", methods=["GET"])
+def designs():
+    designs = Design.query.all()
+    designs_json = []
+    for design in designs:
+        designs_json.append(design.serializable())
+    return jsonify(designs_json)
 
 
 @reposBP.route("/tables/<table_name>", methods=["GET"])
@@ -200,11 +218,12 @@ def table_read(table_name):
     return jsonify(table)
 
 
-@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
-def design_read(topic_name, design_name):
+@reposBP.route(
+    "projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"]
+)
+@project_from_slug
+def design_read(topic_name, design_name, project):
     permit("view:design", design_name)
-
-    project = Project.find()
     topic = project.root_dir("model", f"{topic_name}.topic.m5oc")
     with topic.open() as f:
         topic = json.load(f)

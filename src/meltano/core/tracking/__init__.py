@@ -1,1 +1,1 @@
-from .ga_tracker import GoogleAnalyticsTracker
+from .ga_tracker import GoogleAnalyticsTracker, GoogleAnalyticsAnonymousTracker

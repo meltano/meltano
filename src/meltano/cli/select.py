@@ -70,7 +70,7 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
     pattern = f"{exclude}{entities_filter}.{attributes_filter}"
 
     with project.meltano_update() as meltano:
-        extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
+        extractor = config.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
         extractor.add_select_filter(pattern)
 
         idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
@@ -79,7 +79,7 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
 
 def show(project, extractor, entities_filter, attributes_filter, show_all=False):
     config = ConfigService(project)
-    extractor = config.get_plugin(PluginType.EXTRACTORS, extractor)
+    extractor = config.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
     invoker = PluginInvoker(project, extractor)
     pattern = f"{entities_filter}.{attributes_filter}"
 

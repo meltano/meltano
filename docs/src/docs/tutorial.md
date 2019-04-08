@@ -198,6 +198,13 @@ meltano elt tap-salesforce target-postgres --transform only
 
 The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
 
+In order to visualize the data with existing transformations in the UI, you would need to add models:
+
+```bash
+# Add existing models
+meltano add model model-salesforce
+```
+
 ### Interact with Your Data in The Web App
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:

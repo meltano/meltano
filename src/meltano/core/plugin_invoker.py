@@ -46,7 +46,9 @@ class PluginInvoker:
             self._prepared = True
 
     def exec_path(self):
-        return self.venv_service.exec_path(self.plugin.name, namespace=self.plugin.type)
+        return self.venv_service.exec_path(
+            self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
+        )
 
     def exec_args(self):
         plugin_args = self.plugin.exec_args(self.files)
