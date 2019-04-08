@@ -10,6 +10,7 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.config_service import ConfigService
+from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginType
 
@@ -84,6 +85,11 @@ def add_model(project, plugin_install_service, project_add_service):
 @pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project)
+
+
+@pytest.fixture(scope="class")
+def schedule_service(project):
+    return ScheduleService(project)
 
 
 @pytest.fixture(scope="class")

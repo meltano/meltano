@@ -30,7 +30,7 @@ class TestCliAdd:
         assert f"Installed '{plugin_name}'." in res.stdout
 
         project.reload()
-        config_service.get_plugin("tap-carbon-intensity", PluginType.EXTRACTORS)
+        config_service.get_plugin(plugin_name, plugin_type)
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])

@@ -14,7 +14,9 @@ from .error import Error
 
 class ProjectNotFound(Error):
     def __init__(self):
-        super().__init__("Cannot find `meltano.yml`. Are you in a meltano project?")
+        super().__init__(
+            f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?"
+        )
 
 
 class Project:
@@ -31,7 +33,6 @@ class Project:
     def activate(self):
         # helpful to refer to the current absolute project path
         os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
-        os.environ["AIRFLOW_HOME"] = str(self.root_dir("orchestrate"))
 
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")

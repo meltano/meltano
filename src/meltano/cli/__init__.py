@@ -9,6 +9,7 @@ from . import (
     invoke,
     ui,
     permissions,
+    schedule,
     select,
 )
 
