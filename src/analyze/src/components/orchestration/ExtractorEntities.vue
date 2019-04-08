@@ -3,7 +3,6 @@
 
     <!-- Loading -->
     <div v-if='isLoading'>
-      <h2>Loading {{extractor.name}} entities</h2>
       <progress v-if="true" class="progress is-small is-info" max="100">0%</progress>
     </div>
 

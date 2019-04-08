@@ -118,7 +118,17 @@ export default {
       <template slot="body">
 
         <div v-if='extractorInFocus'>
-          <button @click="updateExtractorInFocus(null)" class="button">Back</button>
+          <div class="columns">
+            <div class="column">
+              <h2>Extractor Settings</h2>
+            </div>
+            <div class="column">
+              <div class="buttons is-pulled-right">
+                <button class="button is-outlined" @click="updateExtractorInFocus(null)">Cancel</button>
+                <button class="button is-success">Save</button>
+              </div>
+            </div>
+          </div>
           <ExtractorEntities
             :extractor='extractorInFocus'
             :extractor-entities='extractorEntities'></ExtractorEntities>
