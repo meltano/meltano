@@ -385,7 +385,7 @@ We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract
 meltano elt tap-salesforce target-postgres --transform only
 
 ```
-### Adding Custom Transforms
+### Adding Custom Models
 
 In order to access the newly transformed data in the UI, 2 additional types of files must be created:
 
