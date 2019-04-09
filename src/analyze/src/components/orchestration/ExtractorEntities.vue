@@ -23,15 +23,15 @@
         v-for='entityGroup in orderedEntityGroups'
         :key='`${entityGroup.name}`'>
         <a
-          class='button is-rounded'
-          :class="{'is-primary': entityGroup.selected}"
+          class='chip button is-rounded is-outlined entity'
+          :class="{'is-success is-outlined': entityGroup.selected}"
           @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
-        <div
-          v-for='attribute in orderedAttributes(entityGroup.attributes)'
-          :key='`${attribute.name}`'>
+        <div class='entity-group'>
           <a
-            class="button is-rounded is-small"
-            :class="{'is-primary': attribute.selected}"
+            v-for='attribute in orderedAttributes(entityGroup.attributes)'
+            :key='`${attribute.name}`'
+            :class="{'is-success is-outlined': attribute.selected}"
+            class="chip button is-rounded is-outlined is-small attribute"
             @click.stop="entityAttributeSelected({entityGroup, attribute})">
             {{attribute.name}}
           </a>
@@ -89,3 +89,17 @@ export default {
   },
 };
 </script>
+
+<style lang="scss">
+.chip {
+  background-color: transparent;
+}
+
+.entity-group {
+  margin: .25rem .75rem 1.25rem;
+}
+
+.attribute {
+  margin: .15rem;
+}
+</style>
