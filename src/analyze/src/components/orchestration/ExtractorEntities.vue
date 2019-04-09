@@ -2,9 +2,7 @@
   <div>
 
     <!-- Loading -->
-    <div v-if='isLoading'>
-      <progress v-if="true" class="progress is-small is-info"></progress>
-    </div>
+    <progress v-if="isLoading" class="progress is-small is-info"></progress>
 
     <!-- Loaded -->
     <div v-else>
