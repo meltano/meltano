@@ -25,6 +25,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
             PluginType.TRANSFORMERS,
             PluginType.MODELS,
             PluginType.TRANSFORMS,
+            PluginType.ORCHESTRATORS,
             PluginType.ALL,
         ]
     ),
@@ -33,9 +34,11 @@ def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     try:
         discovery_dict = discover_service.discover(plugin_type)
-        for key, value in discovery_dict.items():
-            click.secho(key, fg="green")
-            click.echo(value)
+
+        for plugin_type, plugins in discovery_dict.items():
+            click.secho(plugin_type, fg="green")
+            for plugin in plugins:
+                click.echo(plugin)
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_discover(plugin_type=plugin_type)

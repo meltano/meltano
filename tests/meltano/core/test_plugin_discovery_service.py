@@ -21,8 +21,6 @@ class TestPluginDiscoveryService:
 
     @pytest.mark.usefixtures("extraneous_plugin")
     def test_plugins_unknown(self, subject):
-        subject.discovery["turboencabulators"] = [{"name": "v1", "config": None}]
-
         plugins = list(subject.plugins())
         assert len(plugins) == 6
 
@@ -41,6 +39,7 @@ class TestPluginDiscoveryService:
                 continue
 
             assert t in discovery
+            assert isinstance(discovery[t], list)
 
     @pytest.mark.usefixtures("extraneous_plugin")
     def test_discovery_unknown(self, subject):
@@ -52,3 +51,5 @@ class TestPluginDiscoveryService:
                 continue
 
             assert t in discovery
+            assert isinstance(discovery[t], list)
+            assert "turboencabulator" not in discovery

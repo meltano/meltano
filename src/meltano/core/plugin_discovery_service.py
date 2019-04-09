@@ -93,7 +93,7 @@ class PluginDiscoveryService:
             else (plugin_type,)
         )
         return {
-            plugin_type: plugins
+            plugin_type: [p.name for p in plugins]
             for plugin_type, plugins in groupby(self.plugins(), lambda p: p.type)
             if plugin_type in enabled_plugin_types
         }
