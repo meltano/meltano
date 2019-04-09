@@ -66,14 +66,13 @@ export default {
   },
   computed: {
     isLoading() {
-      return !this.extractorEntities.hasOwnProperty('entityGroups');
+      return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
     },
     orderedEntityGroups() {
       return _.orderBy(this.extractorEntities.entityGroups, 'name');
     },
-    orderedAttributes() { return (attributes) => {
-        return _.orderBy(attributes, 'name');
-      }
+    orderedAttributes() {
+      return attributes => _.orderBy(attributes, 'name');
     },
   },
   methods: {
