@@ -18,7 +18,7 @@ from meltano.core.plugin import PluginType
 PROJECT_NAME = "a_meltano_project"
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def discovery():
     return {
         str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
@@ -36,7 +36,7 @@ def discovery():
     }
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture()
 def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(
         project, discovery=discovery
