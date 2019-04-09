@@ -14,29 +14,35 @@ If you are submitting an issue with a tap, please include:
 --->
 
 ### What is the current *bug* behavior?
-(What is happening now)
+_What is happening now?_
+
 
 
 ### What is the expected *correct* behavior?
-(What should be happening)
+_What should be happening?_
+
 
 
 ### Steps to reproduce
-(How one can reproduce the issue)
+_How one can reproduce the issue?_
+
 
 
 ### Relevant logs and/or screenshots
-(Paste any relevant logs - please use code blocks (```) to format console output)
+_Please use code blocks (\`\`\`) to format console output_
+
 
 
 ### Possible fixes
-(If you can, link to the line of code that might be responsible for the problem or suggest a fix)
+_If you can, link to the line of code that might be responsible for the problem or suggest a fix_
+
+
 
 ### Further regression test
-(Ensure we automatically catch similar issues in the future)
+_Ensure we automatically catch similar issues in the future_
+
 - [ ] Write additional adequate test cases and submit test results
 - [ ] Test results should be reviewed by a person from the team
-
 
 /label ~bug
 /label ~"To Do"
