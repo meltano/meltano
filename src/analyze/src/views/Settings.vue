@@ -23,7 +23,6 @@ export default {
   components: {
     RouterViewLayout,
   },
-<<<<<<< HEAD
   data() {
     return {
       categories: [
@@ -57,7 +56,5 @@ export default {
       ],
     };
   },
-=======
->>>>>>> 7ecc5e449c9987001e14375d8364ff39e41c7b63
 };
 </script>
