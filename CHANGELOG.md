@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
+* [#530](https://gitlab.com/meltano/meltano/issues/530) Fix query generation for star schemas
 
 ### Breaks
 

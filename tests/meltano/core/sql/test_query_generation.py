@@ -207,9 +207,6 @@ class TestQueryGeneration:
         assert 'COALESCE(COUNT("streams.day"),0)' in sql
 
     def test_meltano_disjointed_query(self, streams, gitflix):
-        import pdb
-
-        pdb.set_trace()
         # Test parsing a json payload using a Design generated from a m5oc file
         #  and generating a proper MeltanoQuery Object
         q = MeltanoQuery(
