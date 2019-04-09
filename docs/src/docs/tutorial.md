@@ -362,7 +362,7 @@ models:
   enabled: true
   my_meltano_project:
     materialized: table
-  tap_stripe:
+  tap_salesforce:
     vars:
       livemode: false
       schema: '{{ env_var(''PG_SCHEMA'') }}'
@@ -385,7 +385,7 @@ meltano elt tap-salesforce target-postgres --transform only
 In order to access the newly transformed data in the UI, 2 additional types of files must be created:
 
 - A table.m5o file, which defines the available columns and aggregates for each table
-- A model.m5o file, which represents the connections between tables, i.e. what they can be joined on.
+- A topic.m5o file, which represents the connections between tables, i.e. what they can be joined on.
 
 These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory.
 
