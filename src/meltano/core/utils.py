@@ -90,7 +90,7 @@ def get_all(keys, d: dict, default=None):
     return dict(map(lambda k: (k, d.get(k, default)), keys))
 
 
-def nest(d: dict, path: str):
+def nest(d: dict, path: str, value={}):
     """
     Create a hierarchical dictionary path and return the leaf dict.
 
@@ -103,6 +103,10 @@ def nest(d: dict, path: str):
     >>> test["a"] = 1
     >>> d
     {'foo': {'bar': {'test': {'a': 1}}}}
+    >>> alist = nest(d, "foo.bar.list", value=[])
+    >>> alist.append("works")
+    >>> d
+    {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
 
     """
     cursor = d
@@ -110,7 +114,7 @@ def nest(d: dict, path: str):
     # create the list of dicts
     for key in path.split("."):
         if key not in cursor:
-            cursor[key] = {}
+            cursor[key] = value
         cursor = cursor[key]
 
     return cursor

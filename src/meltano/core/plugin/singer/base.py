@@ -1,11 +1,11 @@
 import json
 import os
-from meltano.core.behavior.hookable import HookObject, hook
+from meltano.core.behavior.hookable import hook
 from meltano.core.project import Project
 from meltano.core.plugin import Plugin
 
 
-class SingerPlugin(Plugin, HookObject):
+class SingerPlugin(Plugin):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 

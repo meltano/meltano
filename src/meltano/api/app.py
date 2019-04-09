@@ -15,29 +15,35 @@ from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker
 from . import config as default_config
 
-from meltano.core.project import Project
+from meltano.core.project import Project, ProjectNotFound
+from meltano.core.projects import Projects
 from meltano.core.compiler.project_compiler import ProjectCompiler
-
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
-available_worker = UIAvailableWorker("http://localhost:5000")
 
 
 def create_app(config={}):
-    project = Project.find()
+    try:
+        project = Project.find()
+    except ProjectNotFound as e:
+        project = None
 
+    projects = Projects()
     app = Flask(__name__)
     app.config.from_object(reload(default_config))
     app.config.update(**config)
 
+    if project:
+        meltano_db_path = project.root.joinpath("meltano.db")
+    else:
+        meltano_db_path = projects.meltano_projects_dir.joinpath("meltano.db")
     if not app.config["SQLALCHEMY_DATABASE_URI"]:
-        app.config[
-            "SQLALCHEMY_DATABASE_URI"
-        ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
+        app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{meltano_db_path}"
 
     # Initial compilation
-    compiler = ProjectCompiler(project)
+    if project:
+        compiler = ProjectCompiler(project)
     try:
         compiler.compile()
     except Exception as e:
@@ -71,6 +77,7 @@ def create_app(config={}):
     CORS(app, origins="*")
 
     from .controllers.root import root
+    from .controllers.projects import projectsBP
     from .controllers.dashboards import dashboardsBP
     from .controllers.reports import reportsBP
     from .controllers.repos import reposBP
@@ -79,6 +86,7 @@ def create_app(config={}):
     from .controllers.orchestrations import orchestrationsBP
 
     app.register_blueprint(root)
+    app.register_blueprint(projectsBP)
     app.register_blueprint(dashboardsBP)
     app.register_blueprint(reportsBP)
     app.register_blueprint(reposBP)
@@ -106,9 +114,15 @@ def create_app(config={}):
 
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
+    starting_url = "projects"
 
-    compiler_worker = MeltanoBackgroundCompiler(project)
-    compiler_worker.start()
+    available_worker = UIAvailableWorker(
+        f"http://localhost:5000/{starting_url}", not kwargs.get("use_reloader", False)
+    )
+    if project:
+        compiler_worker = MeltanoBackgroundCompiler(project)
+        compiler_worker.start()
+
     available_worker.start()
 
     try:
@@ -122,5 +136,7 @@ def start(project, **kwargs):
 
         app.run(**kwargs)
     finally:
-        compiler_worker.stop()
+        if project:
+            compiler_worker.stop()
+
         available_worker.stop()

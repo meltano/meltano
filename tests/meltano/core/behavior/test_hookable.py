@@ -58,13 +58,16 @@ class TestHookable:
             "after_test_2",
         ]
         assert process.called_once
-        process.reset_mock()
+
+    def test_trigget_hook_raise(self):
+        subject = Hooked()
+        process = mock.MagicMock()
 
         # it raises exceptions correctly
         with pytest.raises(Exception), subject.trigger_hooks("test"):
             raise Exception()
 
-        assert not process.called
+        assert subject.calls == ["before_test", "before_test_2"]
 
     def test_trigger_derived_hook(self):
         subject = DerivedHooked()

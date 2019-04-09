@@ -41,7 +41,7 @@ requires = [
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
 conflicts = [
     'idna==2.7',
-    'aenum==2.1.2'
+    'aenum==2.1.2',
 ]
 
 dev_requires = [
@@ -55,7 +55,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.18.0",
+    version="0.19.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

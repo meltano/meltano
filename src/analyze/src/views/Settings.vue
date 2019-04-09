@@ -2,19 +2,11 @@
   <router-view-layout>
 
     <div slot='left'>
-      <template v-for="category in categories">
-
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <p class="menu-label">
-          {{category.name}}
-        </p>
-        <!-- eslint-disable-next-line vue/require-v-for-key -->
-        <ul class="menu-list">
-          <router-link tag="li" :key="page.href" :to="page.href" v-for="page in category.pages">
-            <a>{{page.title}}</a>
-          </router-link>
-        </ul>
-      </template>
+      <ul class="menu-list">
+        <router-link tag="li" :to="{name:'database', params: {slug: $route.params.slug}}">
+          <a>Database</a>
+        </router-link>
+      </ul>
     </div>
 
     <div slot="right">
@@ -31,6 +23,7 @@ export default {
   components: {
     RouterViewLayout,
   },
+<<<<<<< HEAD
   data() {
     return {
       categories: [
@@ -64,5 +57,7 @@ export default {
       ],
     };
   },
+=======
+>>>>>>> 7ecc5e449c9987001e14375d8364ff39e41c7b63
 };
 </script>

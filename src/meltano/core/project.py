@@ -1,6 +1,7 @@
 import os
 import yaml
 import logging
+import sys
 from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
@@ -13,7 +14,9 @@ from .error import Error
 
 class ProjectNotFound(Error):
     def __init__(self):
-        super().__init__("Cannot find `meltano.yml`. Are you in a meltano project?")
+        super().__init__(
+            f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?"
+        )
 
 
 class Project:
@@ -28,6 +31,9 @@ class Project:
         self.root = Path(root or os.getcwd()).resolve()
 
     def activate(self):
+        # helpful to refer to the current absolute project path
+        os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
+
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")
 
@@ -46,6 +52,19 @@ class Project:
             project.activate()
 
         return project
+
+    @classmethod
+    def find_by_slug(self, name: str):
+        cwd = Path(os.getcwd()).resolve()
+        has_project = cwd.joinpath("meltano.yml").exists()
+        if has_project:
+            cwd = cwd.parent
+
+        project_path = cwd.joinpath(name)
+        if not project_path.exists():
+            raise ProjectNotFound()
+
+        return Project(project_path)
 
     @property
     def meltano(self) -> Dict:
@@ -94,6 +113,13 @@ class Project:
 
     def root_dir(self, *joinpaths):
         return self.root.joinpath(*joinpaths)
+
+    @property
+    def slug(self):
+        return self.root_dir().parts[-1]
+
+    def slug_url(self, *joinpaths):
+        return Path("projects").joinpath(self.slug, *joinpaths)
 
     @property
     def meltanofile(self):

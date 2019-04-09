@@ -4,9 +4,10 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 
 Our CLI tool provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run and debug every step of the data life cycle.
 
-- `meltano add [extractor | loader ] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
+- `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** and installs it inside the `.meltano` directory. Installed models are available to use in the Meltano UI.
+- `meltano add orchestrator [name]`: Adds an orchestrator plugin to your **meltano.yml** and installs it.
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 - `meltano discover all`: list available extractors and loaders:
   - `meltano discover extractors`: list only available extractors
@@ -17,6 +18,7 @@ Our CLI tool provides a single source of truth for the entire data pipeline. The
 - `meltano elt <extractor> <loader> [--dry] [--transform run]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
+- `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
 
 ## `init`
 
@@ -174,6 +176,25 @@ transforms:
 When Meltano runs a new transformation, `transform/dbt_project.yml` is always kept up to date with whatever is provided in `meltano.yml`.
 
 Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
+
+## meltano schedule
+
+::: tip
+An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
+:::
+
+Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:
+
+```yaml
+schedules:
+- name: test
+  interval: '@daily'
+  extractor: tap-mock
+  loader: target-mock
+  transform: skip
+  env:
+    MELTANO_JOB_ID: ''
+```
 
 ## meltano permissions 
 

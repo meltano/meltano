@@ -91,4 +91,4 @@ transform/:
   models/my_meltano_project/.gitkeep: ""
 analyze/.gitkeep: ""
 notebook/.gitkeep: ""
-orchestrate/.gitkeep: ""
+orchestrate/dags: "bundle://dags"

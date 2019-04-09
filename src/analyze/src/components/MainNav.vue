@@ -18,12 +18,18 @@
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
-        <router-link to="/" class="navbar-item navbar-child">
+        <router-link
+          :to="{name: 'projects'}"
+          class="navbar-item navbar-child">Projects</router-link>
+        <router-link
+          v-if="slug"
+          :to="{name: 'projectFiles', params: {slug: slug}}"
+          class="navbar-item navbar-child">
           Files
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
+          <a class="navbar-link" v-if="slug">
             Analyze
           </a>
           <div class="navbar-dropdown
@@ -33,20 +39,30 @@
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
+            <!-- TODO move to getter -->
             <router-link
-              :to="urlForModelDesign(model, design)"
-              class="navbar-item navbar-child"
-              v-for="design in v['designs']"
-              @click.native="menuSelected"
-              :key="design">
+              :to="{name:'analyze',
+                    params:
+                      {
+                        slug: slug,
+                        model: model,
+                        design: design
+                      }
+                    }"
+            class="navbar-item navbar-child"
+            v-for="design in v['designs']"
+            @click.native="menuSelected"
+            :key="design">
               {{design | capitalize | underscoreToSpace}}
             </router-link>
             </template>
           </div>
         </div>
 
-        <router-link to="/dashboards"
-        class="navbar-item navbar-child">
+        <router-link
+          v-if="slug"
+          to="/dashboards"
+          class="navbar-item navbar-child">
           Dashboards
         </router-link>
 
@@ -64,19 +80,16 @@
             </a>
           </div>
         </div>
-
-        <div class="navbar-item has-dropdown is-hoverable">
+        <div
+          v-if="slug"
+          class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             Settings
           </div>
           <div class="navbar-dropdown is-boxed">
-            <router-link to="/settings/database"
+            <router-link :to="{name:'database', params: {slug}}"
                          class="navbar-item navbar-child">
               Database
-            </router-link>
-            <router-link to="/settings/roles"
-                         class="navbar-item navbar-child">
-              Roles
             </router-link>
           </div>
         </div>
@@ -85,7 +98,7 @@
   </nav>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
@@ -99,6 +112,7 @@ export default {
   },
   watch: {
     $route() {
+      this.slug = this.$route.params.slug;
       if (this.isMobileMenuOpen) {
         this.closeMobileMenu();
       }
@@ -106,10 +120,14 @@ export default {
   },
   created() {
     this.$store.dispatch('repos/getModels');
+    this.slug = this.$route.params.slug;
   },
   data() {
     return {
       isMobileMenuOpen: false,
+      slug: '',
+      design: '',
+      model: '',
     };
   },
   filters: {
@@ -120,9 +138,6 @@ export default {
     ...mapState('repos', [
       'models',
       'navbarClicked',
-    ]),
-    ...mapGetters('repos', [
-      'urlForModelDesign',
     ]),
   },
   methods: {
