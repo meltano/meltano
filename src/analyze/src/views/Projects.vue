@@ -34,7 +34,6 @@ export default {
       'projects',
     ]),
   },
-
   methods: {
     ...mapActions('projects', [
       'getProjects',

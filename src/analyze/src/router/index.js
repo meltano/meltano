@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Repo from '@/views/Repo';
 import Projects from '@/views/Projects';
+import store from '@/store/';
 import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
@@ -12,7 +13,7 @@ import SettingsRoles from '@/components/settings/Roles';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
@@ -76,3 +77,12 @@ export default new Router({
     },
   ],
 });
+
+// Update project at global level vs in each page/view component where subsequent API calls can
+// leverage the project store's `currentProjectSlug` for prefixing API calls with a project context
+router.afterEach((to) => {
+  const projectSlug = to.params.slug || '';
+  store.dispatch('projects/setProjectSlug', projectSlug);
+});
+
+export default router;
