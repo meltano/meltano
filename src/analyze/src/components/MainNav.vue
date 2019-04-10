@@ -22,14 +22,14 @@
           :to="{name: 'projects'}"
           class="navbar-item navbar-child">Projects</router-link>
         <router-link
-          v-if="slug"
-          :to="{name: 'projectFiles', params: {slug: slug}}"
+          v-if="projectSlug"
+          :to="{name: 'projectFiles', params: { projectSlug }}"
           class="navbar-item navbar-child">
           Files
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" v-if="slug">
+          <a class="navbar-link" v-if="projectSlug">
             Analyze
           </a>
           <div class="navbar-dropdown
@@ -44,7 +44,7 @@
               :to="{name:'analyze',
                     params:
                       {
-                        slug: slug,
+                        projectSlug: projectSlug,
                         model: model,
                         design: design
                       }
@@ -60,8 +60,8 @@
         </div>
 
         <router-link
-          v-if="slug"
-          to="/dashboards"
+          v-if="projectSlug"
+          :to="{name: 'dashboards', params: { projectSlug }}"
           class="navbar-item navbar-child">
           Dashboards
         </router-link>
@@ -81,13 +81,13 @@
           </div>
         </div>
         <div
-          v-if="slug"
+          v-if="projectSlug"
           class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             Settings
           </div>
           <div class="navbar-dropdown is-boxed">
-            <router-link :to="{name:'database', params: {slug}}"
+            <router-link :to="{name:'database', params: {projectSlug}}"
                          class="navbar-item navbar-child">
               Database
             </router-link>
@@ -112,7 +112,7 @@ export default {
   },
   watch: {
     $route() {
-      this.slug = this.$route.params.slug;
+      this.projectSlug = this.$route.params.projectSlug;
       if (this.isMobileMenuOpen) {
         this.closeMobileMenu();
       }
@@ -120,12 +120,12 @@ export default {
   },
   created() {
     this.$store.dispatch('repos/getModels');
-    this.slug = this.$route.params.slug;
+    this.projectSlug = this.$route.params.projectSlug;
   },
   data() {
     return {
       isMobileMenuOpen: false,
-      slug: '',
+      projectSlug: '',
       design: '',
       model: '',
     };
