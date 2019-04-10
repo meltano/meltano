@@ -22,14 +22,14 @@
           :to="{name: 'projects'}"
           class="navbar-item navbar-child">Projects</router-link>
         <router-link
-          v-if="projectSlug"
-          :to="{name: 'projectFiles', params: { projectSlug }}"
+          v-if="currentProjectSlug"
+          :to="{name: 'projectFiles', params: { projectSlug: currentProjectSlug }}"
           class="navbar-item navbar-child">
           Files
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" v-if="projectSlug">
+          <a class="navbar-link" v-if="currentProjectSlug">
             Analyze
           </a>
           <div class="navbar-dropdown
@@ -44,7 +44,7 @@
               :to="{name:'analyze',
                     params:
                       {
-                        projectSlug: projectSlug,
+                        projectSlug: currentProjectSlug,
                         model: model,
                         design: design
                       }
@@ -60,8 +60,8 @@
         </div>
 
         <router-link
-          v-if="projectSlug"
-          :to="{name: 'dashboards', params: { projectSlug }}"
+          v-if="currentProjectSlug"
+          :to="{name: 'dashboards', params: { projectSlug: currentProjectSlug }}"
           class="navbar-item navbar-child">
           Dashboards
         </router-link>
@@ -81,13 +81,13 @@
           </div>
         </div>
         <div
-          v-if="projectSlug"
+          v-if="currentProjectSlug"
           class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             Settings
           </div>
           <div class="navbar-dropdown is-boxed">
-            <router-link :to="{name:'database', params: {projectSlug}}"
+            <router-link :to="{name:'database', params: { projectSlug: currentProjectSlug }}"
                          class="navbar-item navbar-child">
               Database
             </router-link>
@@ -112,7 +112,6 @@ export default {
   },
   watch: {
     $route() {
-      this.projectSlug = this.$route.params.projectSlug;
       if (this.isMobileMenuOpen) {
         this.closeMobileMenu();
       }
@@ -120,12 +119,10 @@ export default {
   },
   created() {
     this.$store.dispatch('repos/getModels');
-    this.projectSlug = this.$route.params.projectSlug;
   },
   data() {
     return {
       isMobileMenuOpen: false,
-      projectSlug: '',
       design: '',
       model: '',
     };
@@ -138,6 +135,9 @@ export default {
     ...mapState('repos', [
       'models',
       'navbarClicked',
+    ]),
+    ...mapState('projects', [
+      'currentProjectSlug',
     ]),
   },
   methods: {
