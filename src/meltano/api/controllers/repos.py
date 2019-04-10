@@ -29,6 +29,7 @@ from meltano.api.security.auth import permit
 
 reposBP = Blueprint("repos", __name__, url_prefix=project_api_route("repos"))
 
+
 class ReportIndexFilter(NameFilterMixin, ResourceFilter):
     def __init__(self, *args):
         super().__init__(*args)
@@ -217,9 +218,7 @@ def table_read(table_name):
     return jsonify(table)
 
 
-@reposBP.route(
-    "/designs/<topic_name>/<design_name>", methods=["GET"]
-)
+@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
 @project_from_slug
 def design_read(topic_name, design_name, project):
     permit("view:design", design_name)
