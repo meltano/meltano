@@ -10,7 +10,13 @@ export default {
   apiUrl(blueprint, location = '') {
     const currentProjectSlug = store.getters['projects/getCurrentProjectSlug'];
     const projectPrefix = currentProjectSlug ? `projects/${currentProjectSlug}` : '';
-    return [this.root(), 'api/v1', blueprint, location].join('/');
+    let url = '';
+    if (projectPrefix) {
+      url = [this.root(), 'api/v1', projectPrefix, blueprint, location].join('/');
+    } else {
+      url = [this.root(), 'api/v1', blueprint, location].join('/');
+    }
+    return url;
   },
 
   // Color Utils
