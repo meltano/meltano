@@ -7,7 +7,6 @@ export default {
   },
 
   getDialect(model) {
-    console.log('getDialect', model);
     return axios.get(utils.apiUrl('sql/get', `${model}/dialect`));
   },
 
