@@ -354,11 +354,6 @@ class MeltanoQuery(MeltanoBase):
         }
         related_tables = [primary_table] + definition.get("joins", [])
 
-        # Keep track of the last table added to the join in order to iterativelly
-        #  build the join order from the design.graph
-        # Start with the primary_table as it should be always included
-        last_table_added = primary_table["name"]
-
         # get the graph defined in the design: it is used for finding the
         #  shortest path and adding missing tables in case a required table
         #  is missing
@@ -424,8 +419,13 @@ class MeltanoQuery(MeltanoBase):
                 if table.name != primary_table["name"] and (
                     table.columns() or table.aggregates() or table.timeframes()
                 ):
+                    # Find the related joins needed to gather this data
+                    #  Using the design graph, we can find the shortest path to a
+                    #  table from the primary table up to any table in the design.
+                    #
+                    #  primary_table → (related tables...) → table
                     new_joins = self.joins_for_table(
-                        design_graph, last_table_added, table.name
+                        design_graph, primary_table["name"], table.name
                     )
                     new_joins = list(
                         filter(
@@ -448,8 +448,6 @@ class MeltanoQuery(MeltanoBase):
                                 )
 
                         self.join_order.append({"table": join, "on": join_on})
-
-                    last_table_added = table.name
             else:
                 raise ParseError(
                     f'Requested table {related_table.get("name", None)} is not defined in the design'
