@@ -1,5 +1,17 @@
 export default {
 
+  // Path Utils
+  root(path = '') {
+    return `http://localhost:5000${path}`;
+  },
+
+  apiUrl(blueprint, location = '') {
+    // TODO import projectStore
+    // If a project is selected/focus, then the projectStore's project/projectName should be set otherwise it should be null
+    // If non null, then update the `api/v1` to `api/v1/project/project-slug`
+    return [this.root(), 'api/v1', blueprint, location].join('/');
+  },
+
   // Color Utils
   colors: {
     backgroundColor: [
@@ -18,14 +30,6 @@ export default {
       'rgba(153, 102, 255, 1)',
       'rgba(255, 159, 64, 1)',
     ],
-  },
-
-  root(path = '') {
-    return `http://localhost:5000${path}`;
-  },
-
-  apiUrl(blueprint, location = '') {
-    return [this.root(), 'api/v1', blueprint, location].join('/');
   },
 
   getColor(i) {
