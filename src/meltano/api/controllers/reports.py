@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 from .reports_helper import ReportsHelper
-from .project_helper import project_from_slug
+from .project_helper import project_api_route, project_from_slug
 
 from meltano.api.security import api_auth_required
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 
-reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
+reportsBP = Blueprint("reports", __name__, url_prefix=project_api_route("reports"))
 
 
 @reportsBP.before_request
@@ -26,7 +26,7 @@ class ReportFilter(NameFilterMixin, ResourceFilter):
             return Need("view:design", report["design"])
 
 
-@reportsBP.route("/projects/<project_slug>", methods=["GET"])
+@reportsBP.route("/", methods=["GET"])
 @project_from_slug
 def index(project):
     reports_helper = ReportsHelper(project)
