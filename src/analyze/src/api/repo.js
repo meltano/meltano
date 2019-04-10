@@ -2,23 +2,23 @@ import axios from 'axios';
 import utils from '@/utils/utils';
 
 export default {
-  project_by_slug(slug) {
-    return axios.get(utils.apiUrl('repos', `projects/${slug}`));
+  index() {
+    return axios.get(utils.apiUrl('repos'));
   },
 
-  file(slug, id) {
-    return axios.get(utils.apiUrl('repos', `projects/${slug}/file/${id}`));
+  file(id) {
+    return axios.get(utils.apiUrl('repos', `file/${id}`));
   },
 
-  lint(slug) {
-    return axios.get(utils.apiUrl('repos', `projects/${slug}/lint`));
+  lint() {
+    return axios.get(utils.apiUrl('repos', 'lint'));
   },
 
-  sync(slug) {
-    return axios.get(utils.apiUrl('repos', `projects/${slug}/sync`));
+  sync() {
+    return axios.get(utils.apiUrl('repos', 'sync'));
   },
 
-  models(slug) {
-    return axios.get(utils.apiUrl('repos', `projects/${slug}/models`));
+  models() {
+    return axios.get(utils.apiUrl('repos', 'models'));
   },
 };

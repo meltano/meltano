@@ -37,8 +37,8 @@ const getters = {
 };
 
 const actions = {
-  saveSlug({ commit }, { slug }) {
-    commit('setSlug', slug);
+  saveSlug({ commit }, { projectSlug }) {
+    commit('setSlug', projectSlug);
   },
 
   getSettings({ commit }) {

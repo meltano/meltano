@@ -4,7 +4,7 @@
     <div class="tile projects is-ancestor">
       <div class="tile is-parent is-3" v-for="project in projects" :key="project.name">
         <router-link
-          :to="{name: 'projectFiles', params: {slug: project.name}}"
+          :to="{name: 'projectFiles', params: {projectSlug: project.name}}"
           class="tile project is-child box">
           <h2 class="is-5">{{project.name}}</h2>
         </router-link>
