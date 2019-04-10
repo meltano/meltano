@@ -2,7 +2,9 @@ from flask import Blueprint, jsonify, request
 from .dashboards_helper import DashboardsHelper
 from .project_helper import project_api_route, project_from_slug
 
-dashboardsBP = Blueprint("dashboards", __name__, url_prefix=project_api_route("dashboards"))
+dashboardsBP = Blueprint(
+    "dashboards", __name__, url_prefix=project_api_route("dashboards")
+)
 
 
 @dashboardsBP.route("/all", methods=["GET"])
