@@ -16,6 +16,7 @@ Added documentation on custom transformations and models
 
 ### Fixes
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
+* [#571](https://gitlab.com/meltano/meltano/issues/571) Fix various routing and API endpoint issues related to recent `projects` addition
 
 ### Breaks
 
