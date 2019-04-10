@@ -3,7 +3,9 @@
 
     <div slot='left'>
       <ul class="menu-list">
-        <router-link tag="li" :to="{name:'database', params: {projectSlug: $route.params.projectSlug}}">
+        <router-link
+          tag="li"
+          :to="{name:'database', params: {projectSlug: $route.params.projectSlug}}">
           <a>Database</a>
         </router-link>
       </ul>
