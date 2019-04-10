@@ -166,9 +166,6 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('settings/saveSlug', {
-      projectSlug: this.$route.params.projectSlug,
-    });
     this.$store.dispatch('settings/getSettings');
   },
 
