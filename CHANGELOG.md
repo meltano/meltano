@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.19.1 - (2019-04-10)
 Added documentation on custom transformations and models
 ---
 
@@ -15,14 +27,11 @@ Added documentation on custom transformations and models
 * [#500](https://gitlab.com/meltano/meltano/issues/500) Add the `model-stripe` plugin to Meltano. It includes .m5o files for analyzing data fetched using the Stripe API. Repository used: https://gitlab.com/meltano/model-stripe
 * [#440](https://gitlab.com/meltano/meltano/issues/440) Add the `model-zuora` plugin to Meltano. It includes .m5o files for analyzing data fetched using the Zuora API. Repository used: https://gitlab.com/meltano/model-zuora
 
-### Changes
 
 ### Fixes
 * [#576](https://gitlab.com/meltano/meltano/issues/576) Fix switching between designs now works
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
 * [#530](https://gitlab.com/meltano/meltano/issues/530) Fix query generation for star schemas
-
-### Breaks
 
 
 ## 0.19.0 - (2019-04-08)
