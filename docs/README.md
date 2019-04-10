@@ -19,6 +19,8 @@ npm install
 npm run dev:docs
 ```
 
+5. To view changes, go to http://localhost:8080/ (Troubleshooting: if 8080 doesn't work, check the success message for the correct port)
+
 ## Build Artifacts
 
 To build the artifacts for the docs site, run the following commands:
