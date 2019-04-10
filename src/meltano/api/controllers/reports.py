@@ -35,10 +35,11 @@ def index(project):
 
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])
-def load_report(report_name):
+@project_from_slug
+def load_report(report_name, project):
     permit("view:reports", report_name)
 
-    reports_helper = ReportsHelper()
+    reports_helper = ReportsHelper(project)
     response_data = reports_helper.load_report(report_name)
 
     permit("view:design", response_data["design"])
@@ -47,16 +48,18 @@ def load_report(report_name):
 
 
 @reportsBP.route("/save", methods=["POST"])
-def save_report():
-    reports_helper = ReportsHelper()
+@project_from_slug
+def save_report(project):
+    reports_helper = ReportsHelper(project)
     post_data = request.get_json()
     response_data = reports_helper.save_report(post_data)
     return jsonify(response_data)
 
 
 @reportsBP.route("/update", methods=["POST"])
-def update_report():
-    reports_helper = ReportsHelper()
+@project_from_slug
+def update_report(project):
+    reports_helper = ReportsHelper(project)
     post_data = request.get_json()
     response_data = reports_helper.update_report(post_data)
     return jsonify(response_data)

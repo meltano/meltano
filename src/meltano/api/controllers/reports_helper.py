@@ -34,7 +34,6 @@ class ReportsHelper:
         return M5ocFile.load(m5oc_file)
 
     def get_reports(self):
-        print("~~~~", self.project)
         path = self.project.root_dir("model")
         reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
         return reportsParser.contents()
