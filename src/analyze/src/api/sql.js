@@ -2,12 +2,13 @@ import axios from 'axios';
 import utils from '@/utils/utils';
 
 export default {
-  getSql(model, design, data, slug) {
-    return axios.post(utils.apiUrl(`sql/projects/${slug}/get`, `${model}/${design}`), data);
+  getSql(model, design, data) {
+    return axios.post(utils.apiUrl('sql/get', `${model}/${design}`), data);
   },
 
-  getDialect(slug, model) {
-    return axios.get(utils.apiUrl('sql', `projects/${slug}/get/${model}/dialect`));
+  getDialect(model) {
+    console.log('getDialect', model);
+    return axios.get(utils.apiUrl('sql/get', `${model}/dialect`));
   },
 
   getDistinct(model, design, field) {
