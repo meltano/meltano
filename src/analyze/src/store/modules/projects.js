@@ -2,6 +2,7 @@ import projectsApi from '../../api/projects';
 
 const state = {
   projects: [],
+  currentProjectSlug: '',
   createProjectName: '',
   cwdLoaded: false,
   existingPath: '',
@@ -13,6 +14,9 @@ const state = {
 const getters = {
   hasProjects() {
     return state.projects.length;
+  },
+  getCurrentProjectSlug() {
+    return state.currentProjectSlug;
   },
 };
 
@@ -53,6 +57,10 @@ const actions = {
       .catch(() => {});
   },
 
+  setProjectSlug({ commit }, projectSlug) {
+    commit('setProjectSlug', projectSlug);
+  },
+
   createProject({ commit }) {
     const projectName = state.createProjectName;
     commit('setProjectName', '');
@@ -63,6 +71,10 @@ const actions = {
 const mutations = {
   setProjects(_, projects) {
     state.projects = projects;
+  },
+
+  setProjectSlug(_, projectSlug) {
+    state.currentProjectSlug = projectSlug;
   },
 
   setCwd(_, cwd) {

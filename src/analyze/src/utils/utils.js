@@ -1,3 +1,5 @@
+import store from '@/store/';
+
 export default {
 
   // Path Utils
@@ -6,9 +8,8 @@ export default {
   },
 
   apiUrl(blueprint, location = '') {
-    // TODO import projectStore
-    // If a project is selected/focus, then the projectStore's project/projectName should be set otherwise it should be null
-    // If non null, then update the `api/v1` to `api/v1/project/project-slug`
+    const currentProjectSlug = store.getters['projects/getCurrentProjectSlug'];
+    const projectPrefix = currentProjectSlug ? `projects/${currentProjectSlug}` : '';
     return [this.root(), 'api/v1', blueprint, location].join('/');
   },
 
