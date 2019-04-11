@@ -20,6 +20,7 @@ Added documentation on custom transformations and models
 ### Fixes
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
 * [#530](https://gitlab.com/meltano/meltano/issues/530) Fix query generation for star schemas
+* [#575](https://gitlab.com/meltano/meltano/issues/575) Move Airflow configuration to .meltano/run/airflow
 
 ### Breaks
 

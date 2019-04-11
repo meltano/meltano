@@ -1,4 +1,5 @@
 import contextlib
+import io
 from collections import OrderedDict
 
 
@@ -6,6 +7,17 @@ class TriggerError(Exception):
     def __init__(self, before_hooks={}, after_hooks={}):
         self.before_hooks = before_hooks
         self.after_hooks = after_hooks
+
+    def __str__(self):
+        buf = io.StringIO()
+
+        for hook, err in self.before_hooks.items():
+            buf.write(f"[{hook}] raised: {str(err)}")
+
+        for hook, err in self.after_hooks.items():
+            buf.write(f"[{hook}] raised: {str(err)}")
+
+        return buf.getvalue()
 
 
 class hook:
