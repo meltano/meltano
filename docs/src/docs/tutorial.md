@@ -516,7 +516,7 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 ```
 
 ```bash
-# custom_sfdc.model.m5o
+# custom_sfdc.topic.m5o
 {
   version = 1
   name = custom_sfdc
