@@ -91,6 +91,10 @@
                          class="navbar-item navbar-child">
               Database
             </router-link>
+            <router-link :to="{name:'connectors', params: { projectSlug: currentProjectSlug }}"
+                         class="navbar-item navbar-child">
+              Connectors
+            </router-link>
           </div>
         </div>
       </div>

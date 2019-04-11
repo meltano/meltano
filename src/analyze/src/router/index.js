@@ -63,14 +63,17 @@ const router = new Router({
       children: [
         {
           path: 'roles',
+          name: 'roles',
           component: SettingsRoles,
         },
         {
           path: 'database',
+          name: 'database',
           component: SettingsDatabase,
         },
         {
           path: 'connectors',
+          name: 'connectors',
           component: ConnectorsPage,
         },
       ],
