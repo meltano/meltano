@@ -42,7 +42,12 @@ class PluginConfigService:
             try:
                 # the variable can be in either group
                 var = next(var for var in match.groups() if var)
-                return str(env_override[var])
+                val = str(env_override[var])
+
+                if not val == "":
+                    logging.warning(f"Variable {var} is empty.")
+
+                return val
             except KeyError as e:
                 logging.warning(f"Variable {var} is missing from the environment.")
                 return None
