@@ -85,6 +85,10 @@ const getters = {
 };
 
 const actions = {
+  clearExtractorEntities({ commit }) {
+    commit('setAllExtractorEntities', null);
+  },
+
   getAll({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
@@ -211,10 +215,12 @@ const mutations = {
   },
 
   setAllExtractorEntities(_, entitiesData) {
-    state.extractorEntities = {
-      extractorName: entitiesData.extractor_name,
-      entityGroups: entitiesData.entity_groups,
-    };
+    state.extractorEntities = entitiesData
+      ? {
+        extractorName: entitiesData.extractor_name,
+        entityGroups: entitiesData.entity_groups,
+      }
+      : {};
   },
 
   setConnectionNames(_, connectionNames) {

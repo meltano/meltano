@@ -7,34 +7,43 @@
     <!-- Loaded -->
     <div v-else>
       <div class="columns">
-        <div class="column">
+        <div class="column is-10">
           <h3>Entities for {{extractorEntities.extractorName}}</h3>
         </div>
-        <div class="column">
+        <div class="column is-2">
           <div class="buttons is-pulled-right">
-            <a class='button is-success' @click='selectEntities'>Collect</a>
+            <button
+              class='button is-success'
+              :disabled="!hasEntities"
+              @click='selectEntities'>Collect</button>
           </div>
         </div>
       </div>
-      <div
-        class='is-unselectable'
-        v-for='entityGroup in orderedEntityGroups'
-        :key='`${entityGroup.name}`'>
-        <a
-          class='chip button is-rounded is-outlined entity'
-          :class="{'is-success is-outlined': entityGroup.selected}"
-          @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
-        <div class='entity-group'>
+
+      <template v-if='hasEntities'>
+        <div
+          class='is-unselectable'
+          v-for='entityGroup in orderedEntityGroups'
+          :key='`${entityGroup.name}`'>
           <a
-            v-for='attribute in orderedAttributes(entityGroup.attributes)'
-            :key='`${attribute.name}`'
-            :class="{'is-success is-outlined': attribute.selected}"
-            class="chip button is-rounded is-outlined is-small attribute"
-            @click.stop="entityAttributeSelected({entityGroup, attribute})">
-            {{attribute.name}}
-          </a>
+            class='chip button is-rounded is-outlined entity'
+            :class="{'is-success is-outlined': entityGroup.selected}"
+            @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
+          <div class='entity-group'>
+            <a
+              v-for='attribute in orderedAttributes(entityGroup.attributes)'
+              :key='`${attribute.name}`'
+              :class="{'is-success is-outlined': attribute.selected}"
+              class="chip button is-rounded is-outlined is-small attribute"
+              @click.stop="entityAttributeSelected({entityGroup, attribute})">
+              {{attribute.name}}
+            </a>
+          </div>
         </div>
-      </div>
+      </template>
+      <template v-else>
+        <p>No entities for this extractor.</p>
+      </template>
     </div>
 
   </div>
@@ -62,7 +71,13 @@ export default {
   created() {
     this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
   },
+  destroyed() {
+    this.$store.dispatch('orchestrations/clearExtractorEntities');
+  },
   computed: {
+    hasEntities() {
+      return this.orderedEntityGroups.length > 0;
+    },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
     },
