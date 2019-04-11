@@ -206,8 +206,8 @@ const mutations = {
   },
 
   setAll(_, orchestrationData) {
-    state.extractors = orchestrationData.extractors.split('\n');
-    state.loaders = orchestrationData.loaders.split('\n');
+    state.extractors = orchestrationData.extractors;
+    state.loaders = orchestrationData.loaders;
   },
 
   setAllExtractorEntities(_, entitiesData) {
