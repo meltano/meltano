@@ -198,17 +198,9 @@ const actions = {
       commit('toggleSelected', entityGroup);
     }
   },
-
-  updateExtractors({ commit }, itemIndex) {
-    commit('removeExtractor', itemIndex);
-  },
 };
 
 const mutations = {
-  removeExtractor(_, itemIndex) {
-    state.extractors.splice(itemIndex, 1);
-  },
-
   setAll(_, orchestrationData) {
     state.extractors = orchestrationData.extractors;
     state.loaders = orchestrationData.loaders;
