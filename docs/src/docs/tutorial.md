@@ -38,19 +38,17 @@ cd carbon
 # Let's see what extractors and loaders are available
 meltano discover all
 
-# Ensure Meltano UI will know how to use data from ELT
-meltano add model model-carbon-intensity-sqlite
-
 # Run the extractor (tap) and loader (target)
 meltano elt tap-carbon-intensity target-sqlite
+
+# Ensure Meltano UI will know how to use data from ELT
+meltano add model model-carbon-intensity-sqlite
 ```
 
 Congratulations! You have just extracted all the data from the Carbon Intensity API and loaded it into your local SQLite database.
 
 :::tip
-Meltano is magical and powerful.
-
-It extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
+Meltano extracts data from various sources like Salesforce, Zendesk, and Google Analytics and then loads that data into the database of your choice. You can use community extractors and loaders or write your own too.
 
 Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from them using Meltano UI with its automatic SQL generation.
 :::
@@ -115,9 +113,6 @@ docker-compose up -d warehouse_db
 
 # Let's see what extractors and loaders are available
 meltano discover all
-
-# Add a m5o model so Meltano UI will know how to use data from ELT
-meltano add model model-salesforce
 
 # Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
 meltano add extractor tap-salesforce
@@ -197,8 +192,9 @@ meltano elt tap-salesforce target-postgres --transform only
 ```
 
 The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
+When meltano elt tap-salesforce target-postgres --transform run is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
 
-In order to visualize the data with existing transformations in the UI, you would need to add models:
+In order to visualize the data with existing transformations in the UI, the final step would be to add models:
 
 ```bash
 # Add existing models
@@ -233,12 +229,320 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
-## Advanced - Coming Soon
+## Advanced - Adding Custom Transformations and Models
 
-You can look forward to the following tutorials in the future:
 
-- How to add your own transforms
-- How to add your own .m5o models for generating reports
+### Prerequisites
+
+- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
+- Docker started
+- Meltano SalesForce [project](./tutorial.html#initialize-your-project-2) is initialized and [credentials](./tutorial.html#set-your-credentials) set.
+- Meltano SalesForce [entities](./tutorial.html#select-the-entities-to-export-from-salesforce) are selected. 
+
+We assume that you have also run the [ELT steps](./tutorial.html#run-elt-extract-load-transform) in the SalesForce tutorial.
+Nothwithstanding, you can follow this tutorial in order to create entirely new transformations and run the whole ELT process in the end.
+
+### Context
+
+As an example, let's create transformations, which will allow us to look at closed opportunities (i.e. actual sales) by year, quarter and the following categorical dimensions:
+
+- Size of the deal, i.e. Small (<5k$), Medium (5k$ - 25k$), Big (25k$ - 100k$), Jumbo (>100k$)
+- Type of deal, i.e. New Business, Renewal, Add-On Business
+- Client's location
+- Client's industry
+- Client's size, i.e. Small (<100 employees), Medium (100 - 999 employees), Large (1k - 20k employees), Strategic (>20k employees)
+
+### Adding Custom Transforms
+
+Let's create two additional tables:
+
+- A table that includes won opportunities only and a custom category column for deal_size (opportunity_won.sql)
+- A table that includes account categories, clients' countries, industries and a custom category column for company_size (account_category.sql).
+
+These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories.
+
+```bash
+# opportunity_won.sql
+with source as (
+    
+    -- Use the base sf_opportunity model defined by Meltano's 
+    --  prepackaged tap_salesforce model
+    select * from {{ref('sf_opportunity')}}
+
+),
+
+opportunity_won as (
+    select
+        -- Attributes directly fetched from the Opportunity Table
+        opportunity_id,
+        account_id,
+        owner_id,
+
+        opportunity_type,
+        lead_source,
+
+        amount,
+
+        -- Additional Calculated Fields
+
+        -- Add a deal size categorical dimension
+        CASE WHEN
+          amount :: DECIMAL < 5000
+          THEN '1 - Small (<5k)'
+        WHEN amount :: DECIMAL >= 5000 AND amount :: DECIMAL < 25000
+          THEN '2 - Medium (5k - 25k)'
+        WHEN amount :: DECIMAL >= 25000 AND amount :: DECIMAL < 100000
+          THEN '3 - Big (25k - 100k)'
+        WHEN amount :: DECIMAL >= 100000
+          THEN '4 - Jumbo (>100k)'
+        ELSE '5 - Unknown'
+        END                         AS deal_size,
+
+        -- Add Closed Date, Month, Quarter and Year columns
+        CAST(closed_date AS DATE) as closed_date, 
+        EXTRACT(MONTH FROM closed_date) closed_month,
+        EXTRACT(QUARTER FROM closed_date) closed_quarter, 
+        EXTRACT(YEAR FROM closed_date) closed_year  
+
+    from source
+
+    where is_won = true and is_closed = true
+)
+
+select * from opportunity_won
+```
+
+```bash
+# account_category.sql
+with source as (
+    
+    -- Use the base sf_opportunity model defined by Meltano's 
+    --  prepackaged tap_salesforce model
+    select * from {{ref('sf_account')}}
+
+),
+
+account_category as (
+
+    select
+
+        account_id,
+
+        -- Set NULL values to 'Unknown'
+        COALESCE(company_country, 'Unknown') as company_country,
+
+        -- Set NULL values to 'Unknown'
+        COALESCE(industry, 'Unknown') as industry,
+        
+        -- Add a company size categorical dimension
+        CASE WHEN
+          number_of_employees < 100
+          THEN '1 - Small (<100)'
+        WHEN number_of_employees >= 100 AND number_of_employees < 1000
+          THEN '2 - Medium (100 - 999)'
+        WHEN number_of_employees >= 1000 AND number_of_employees < 20000
+          THEN '3 - Large (1k - 20k)'
+        WHEN number_of_employees >= 20000
+          THEN '4 - Strategic (>20k)'
+        ELSE '5 - Unknown'
+        END                         AS company_size
+
+    from source
+)
+
+select * from account_category
+
+```
+
+In order to have the results of the transformations materialized in the analytics schema, we need to update sfdc-project/transform/dbt_project.yml. For more details on materialization options, please check dbt's documentation.
+
+```bash
+# Update `my_meltano_project: null` to `my_meltano_project: materialized: table`
+models:
+  enabled: true
+  my_meltano_project:
+    materialized: table
+  tap_salesforce:
+    vars:
+      livemode: false
+      schema: '{{ env_var(''PG_SCHEMA'') }}'
+```
+Before we re-run the ELT process, we should update our environment variables.
+
+```bash
+source .env
+```
+
+We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
+
+```bash
+# Runs transformation step only
+meltano elt tap-salesforce target-postgres --transform only
+
+```
+### Adding Custom Models
+
+In order to access the newly transformed data in the UI, 2 additional types of files must be created:
+
+- A table.m5o file, which defines the available columns and aggregates for each table
+- A topic.m5o file, which represents the connections between tables, i.e. what they can be joined on.
+
+These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory.
+
+```bash
+# opportunity_won.table.m5o
+{
+  version = 1
+  sql_table_name = opportunity_won
+  name = opportunity_won
+  columns {
+    opportunity_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.opportunity_id"
+    }
+    owner_id {
+      label = Owner ID (User)
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.owner_id"
+    }
+    account_id {
+      label = Account ID
+      hidden = yes
+      type = string
+      sql = "{{TABLE}}.account_id"
+    }
+    opportunity_type {
+      label = Oportunity Type
+      description = Oportunity Type
+      type = string
+      sql = "{{table}}.opportunity_type"
+    }
+    lead_source {
+      label = Lead Source
+      description = Lead Source
+      type = string
+      sql = "{{table}}.lead_source"
+    }
+    deal_size {
+      label = Deal Size
+      description = Deal Size
+      type = string
+      sql = "{{table}}.deal_size"
+    }
+    closed_date {
+      label = Closed Date
+      description = Date the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_date"
+    }
+    closed_month {
+      label = Closed Month
+      description = Month the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_month"
+    }
+    closed_quarter {
+      label = Closed Quarter
+      description = Quarter the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_quarter"
+    }
+    closed_year {
+      label = Closed Year
+      description = Year the Opportunity Closed
+      type = string
+      sql = "{{table}}.closed_year"
+    }
+  }
+  aggregates {
+    total_opportunities {
+      label = Total Opportunities
+      description = Total Opportunities
+      type = count
+      sql = "{{table}}.opportunity_id"
+    }
+    total_amount {
+      label = Total Amount
+      description = Total Amount
+      type = sum
+      sql = "{{table}}.amount"
+    }
+    avg_amount {
+      label = Average Amount
+      description = Average Amount
+      type = avg
+      sql = "{{table}}.amount"
+    }
+  }
+}
+```
+
+```bash
+# account_category.table.m5o
+{
+  version = 1
+  sql_table_name = account_category
+  name = account_category
+  columns {
+    account_id {
+      primary_key = true
+      hidden = true
+      type = string
+      sql = "{{table}}.account_id"
+    }
+    company_country {
+      label = Company Country
+      description = Company Country
+      type = string
+      sql = "{{table}}.company_country"
+    }
+    company_size {
+      label = Company Size
+      description = Company Size
+      type = string
+      sql = "{{table}}.company_size"
+    }
+    industry {
+      label = Industry
+      description = Industry
+      type = string
+      sql = "{{table}}.industry"
+    }
+  }
+}
+```
+
+```bash
+# custom_sfdc.model.m5o
+{
+  version = 1
+  name = custom_sfdc
+  connection = postgres_db
+  label = Salesforce (Custom)
+  designs {
+    opportunity_won {
+      label = Opportunities Won
+      from = opportunity_won
+      description = SFDC Opportunities Won
+      joins {
+        account_category {
+          label = Opportunity
+          sql_on = "opportunity_won.account_id = account_category.account_id"
+          relationship = many_to_one
+        }
+      }
+    }
+  }
+}
+
+```
+
+### Interact with Your Data in The Web App
+
+[Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 ## Using Docker
 
@@ -295,3 +599,170 @@ $ docker run -v $(pwd):/project \
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
 For furter analysis, please head to the [Analyze](#analyze) section.
+
+
+## Using Jupyter Notebooks
+
+Once the `meltano elt` pipeline has successfully completed and data extracted from an API or a Data Source have been transformed and loaded to the `analytics` schema of your Data Warehouse, you can use Meltano UI or any data exploration tool to analyze and generate reports.
+
+In this tutorial, we are going to present how to connect [Jupyter Notebook](https://jupyter.org/) to a Meltano Project that uses Postgres to store the transformed data.
+
+
+### Prerequisites
+
+- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
+- Docker started
+- You have successfully extracted and loaded data from an API by following the steps described in the previous Tutorials.
+
+
+### Jupyter Notebook Installation
+
+If you have Jupyter already installed in your system, you can skip this step.
+
+The most common options for [installing Jupyter Notebook](https://jupyter.org/install) are by either using Anaconda or pip. We are going to use pip in this tutorial, as Meltano also uses pip for its installation.
+
+::: tip Remember
+If you used a virtual environment (`venv`) to install and run Meltano, don't forget to first navigate to the directory with your `venv` and run `source venv/bin/activate` to enable it.
+:::
+
+The following commands will install Jupyter Notebook and the most common python libraries required to connect to a Database (psycopg2, sqlalchemy), manipulate data (pandas) and generate some ad hoc plots (matplotlib):
+
+```bash
+pip install jupyter
+pip install numpy
+pip install pandas
+pip install psycopg2
+pip install sqlalchemy
+pip install matplotlib
+```
+
+Once the installation is completed, you are set to use Jupyter Notebooks with Meltano.
+
+### Running Jupyter Notebook 
+
+(**Optional**) Navigate to your Meltano Project and make the credentials you used with Meltano available to the environment the Jupyter Notebook will run:
+
+```bash
+cd /path/to/my/meltano/project
+source .env
+```
+
+This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.
+
+You can now navigate to Meltano's directory for storing your notebooks and [start Jupyter Notebook](https://jupyter.readthedocs.io/en/latest/running.html#running):
+
+```bash
+cd notebook/
+jupyter notebook
+```
+
+This will print some information about the notebook server in your terminal, including the URL of the web application (by default, http://localhost:8888):
+
+```bash
+$ jupyter notebook
+[I 13:18:36.606 NotebookApp] Serving notebooks from local directory: /home/iroussos/work/code/my-projects/jupyter-tutorial/notebook
+[I 13:18:36.609 NotebookApp] The Jupyter Notebook is running at:
+[I 13:18:36.610 NotebookApp] http://localhost:8888/
+[I 13:18:36.612 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+```
+
+It will then open your default web browser to this URL.
+
+When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories in the directory where the notebook server was started. 
+
+If this is the first time you start `jupyter notebook` from the `notebook` directory of your Meltano project, the list will be empty. Let's start a new Python notebook!
+
+### Notebook Basics
+
+While on the Notebook Dashboard, you can start a new Notebook by selecting `Python 3` from the `New` drop down menu.
+
+We are going to showcase the most simple and straightforward way to connect to your `analytics` schema, fetch some transformed data and generate some plots.
+
+The first step for a data exploration Notebook is to import the proper libraries required for data exploration and manipulation and then setup the connection to the Database (Postgres in our case) so that we can fetch data:
+
+**Cell 1**
+```python
+# Import required libraries
+import pandas as pd
+import psycopg2
+import sqlalchemy
+import matplotlib as plt 
+import os
+
+from sqlalchemy import create_engine
+
+%matplotlib inline
+
+# Get the Postgres username, password, and database name from the Environment
+# You can also set them directly here, but it's better not to include passwords
+#  or parameters specific to you inside the Notebook
+POSTGRES_ADDRESS = os.getenv("PG_ADDRESS")
+POSTGRES_PORT = os.getenv("PG_PORT")
+POSTGRES_DBNAME = os.getenv("PG_DATABASE")
+POSTGRES_USERNAME = os.getenv("PG_USERNAME")
+POSTGRES_PASSWORD = os.getenv("PG_PASSWORD")
+
+# Connect to the analytics schema, not one of the schemas with the raw data extracted
+PG_SCHEMA = 'analytics'
+
+# A long string that contains the necessary Postgres login information
+postgres_str = ('postgresql://{username}:{password}@{ipaddress}:{port}/{dbname}'
+                .format(username=POSTGRES_USERNAME, 
+                        password=POSTGRES_PASSWORD,
+                        ipaddress=POSTGRES_ADDRESS,
+                        port=POSTGRES_PORT,
+                        dbname=POSTGRES_DBNAME))
+
+# Create the connection
+cnx = create_engine(postgres_str)
+```
+
+Click `|>| Run` and we are set to start exploring the data in brought in with Meltano.
+
+You can then write queries and generate plots at will.
+
+As an example, assume that you have loaded data from your Zendesk Account by using `tap_zendesk`. You can then check the most important Ticket statistics by month:
+
+**Cell 2**
+```python
+# Query to send to the Database
+sql_query = f'''
+SELECT 
+  created_year || '-' || created_month as month, 
+  COUNT(*) as total_tickets,
+  SUM(ticket_unsolved_counter) as unsolved_tickets,
+  SUM(ticket_solved_counter) as solved_tickets,
+  SUM(ticket_one_touch_counter) as one_touch_tickets,
+  SUM(ticket_reopened_counter) as reopened_tickets,
+  SUM(replies) as total_replies,
+  ROUND(AVG(replies), 2) as avg_replies,
+  ROUND(AVG(full_resolution_time_in_minutes_business), 2) as avg_res_time_mins
+    
+FROM {PG_SCHEMA}.zendesk_tickets_xf
+
+GROUP BY created_year, created_month
+
+ORDER BY created_year, created_month;
+'''
+
+# Execute the query and store the result in a pandas dataframe
+result = pd.read_sql_query(sql_query, cnx)
+
+# Print the result to the output to check what the query brought in
+result
+```
+
+Or generate a bar plot:
+
+**Cell 3**
+```python
+plt.rcParams['figure.figsize'] = [15, 8]
+result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets','one_touch_tickets','reopened_tickets'])
+```
+
+### Additional Resources
+
+In order to make the most out of Jupyter Notebooks, you can check the following resources:
+*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
+*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
+*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)

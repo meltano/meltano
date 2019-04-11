@@ -30,7 +30,7 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#advanced-coming-soon">Advanced - Coming Soon</a></div>
+      <div class='tutorial-header'><a href="#advanced-adding-custom-transformations-and-models">Advanced - Adding Custom Transformations and Models</a></div>
       <div>
         <p>Experience building custom transforms and models.</p>
         <ul>

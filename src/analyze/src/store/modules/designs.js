@@ -7,7 +7,6 @@ import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
 const state = {
-  slug: '',
   activeReport: {},
   design: {
     related_table: {},
@@ -223,14 +222,13 @@ const actions = {
   getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentModel = model;
     state.currentDesign = design;
-    commit('setSlug', slug);
     // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(state.slug, model, design)
+    const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
       });
 
-    sqlApi.getDialect(state.slug, model)
+    sqlApi.getDialect(model)
       .then((response) => {
         commit('setConnectionDialect', response.data);
       })
@@ -238,7 +236,7 @@ const actions = {
         commit('setSqlErrorMessage', e);
       });
 
-    reportsApi.loadReports(state.slug)
+    reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -320,7 +318,7 @@ const actions = {
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
-      .getSql(state.currentModel, state.currentDesign, postData, state.slug)
+      .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
           commit('setQueryResults', response.data);
@@ -441,10 +439,6 @@ const actions = {
 };
 
 const mutations = {
-  setSlug(_, slug) {
-    state.slug = slug;
-  },
-
   setRemoveSort() {
     state.sortColumn = null;
   },

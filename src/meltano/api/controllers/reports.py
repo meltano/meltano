@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request
 from .reports_helper import ReportsHelper
-from .project_helper import project_from_slug
+from .project_helper import project_api_route, project_from_slug
 
 from meltano.api.security import api_auth_required
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 
-reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
+reportsBP = Blueprint("reports", __name__, url_prefix=project_api_route("reports"))
 
 
 @reportsBP.before_request
@@ -26,7 +26,7 @@ class ReportFilter(NameFilterMixin, ResourceFilter):
             return Need("view:design", report["design"])
 
 
-@reportsBP.route("/projects/<project_slug>", methods=["GET"])
+@reportsBP.route("/", methods=["GET"])
 @project_from_slug
 def index(project):
     reports_helper = ReportsHelper(project)
@@ -35,10 +35,11 @@ def index(project):
 
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])
-def load_report(report_name):
+@project_from_slug
+def load_report(report_name, project):
     permit("view:reports", report_name)
 
-    reports_helper = ReportsHelper()
+    reports_helper = ReportsHelper(project)
     response_data = reports_helper.load_report(report_name)
 
     permit("view:design", response_data["design"])
@@ -47,16 +48,18 @@ def load_report(report_name):
 
 
 @reportsBP.route("/save", methods=["POST"])
-def save_report():
-    reports_helper = ReportsHelper()
+@project_from_slug
+def save_report(project):
+    reports_helper = ReportsHelper(project)
     post_data = request.get_json()
     response_data = reports_helper.save_report(post_data)
     return jsonify(response_data)
 
 
 @reportsBP.route("/update", methods=["POST"])
-def update_report():
-    reports_helper = ReportsHelper()
+@project_from_slug
+def update_report(project):
+    reports_helper = ReportsHelper(project)
     post_data = request.get_json()
     response_data = reports_helper.update_report(post_data)
     return jsonify(response_data)

@@ -66,7 +66,7 @@ export default {
       this.$store.dispatch('projects/createProject')
         .then((data) => {
           if (data.data.result) {
-            this.$router.push({ name: 'projectFiles', params: { slug: data.data.project } });
+            this.$router.push({ name: 'projectFiles', params: { projectSlug: data.data.project } });
           }
         })
         .catch(() => {});

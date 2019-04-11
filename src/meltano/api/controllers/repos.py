@@ -7,7 +7,7 @@ from functools import wraps
 import markdown
 from flask import Blueprint, jsonify, request
 
-from .project_helper import project_from_slug
+from .project_helper import project_api_route, project_from_slug
 
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.utils import decode_file_path_from_id
@@ -27,7 +27,7 @@ from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 from meltano.api.security.auth import permit
 
 
-reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
+reposBP = Blueprint("repos", __name__, url_prefix=project_api_route("repos"))
 
 
 class ReportIndexFilter(NameFilterMixin, ResourceFilter):
@@ -66,7 +66,7 @@ def before_request():
     pass
 
 
-@reposBP.route("/projects/<project_slug>", methods=["GET"])
+@reposBP.route("/", methods=["GET"])
 @project_from_slug
 def index(project):
     onlyfiles = [f for f in project.model_dir().iterdir() if f.is_file()]
@@ -123,7 +123,7 @@ def index(project):
     return jsonify(sortedM5oFiles)
 
 
-@reposBP.route("/projects/<project_slug>/file/<unique_id>", methods=["GET"])
+@reposBP.route("/file/<unique_id>", methods=["GET"])
 @project_from_slug
 def file(unique_id, project):
     file_path = decode_file_path_from_id(unique_id)
@@ -173,13 +173,13 @@ def handle_file_not_found(e):
     return jsonify({"result": False, "error": str(e)})
 
 
-@reposBP.route("/projects/<project_slug>/lint", methods=["GET"])
+@reposBP.route("/lint", methods=["GET"])
 @project_from_slug
 def lint(project):
     return lint_all(False, project_slug)
 
 
-@reposBP.route("/projects/<project_slug>/sync", methods=["GET"])
+@reposBP.route("/sync", methods=["GET"])
 @project_from_slug
 def sync(project):
     return lint_all(True, project)
@@ -191,7 +191,7 @@ def db_test():
     return jsonify({"design": {"name": design.name, "settings": design.settings}})
 
 
-@reposBP.route("projects/<project_slug>/models", methods=["GET"])
+@reposBP.route("/models", methods=["GET"])
 @project_from_slug
 def models(project):
     topics = project.root_dir("model", "topics.index.m5oc")
@@ -218,9 +218,7 @@ def table_read(table_name):
     return jsonify(table)
 
 
-@reposBP.route(
-    "projects/<project_slug>/designs/<topic_name>/<design_name>", methods=["GET"]
-)
+@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
 @project_from_slug
 def design_read(topic_name, design_name, project):
     permit("view:design", design_name)
