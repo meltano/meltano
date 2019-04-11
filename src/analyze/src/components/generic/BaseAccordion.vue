@@ -1,9 +1,20 @@
 <script>
 export default {
+  name: 'BaseAccordion',
   props: {
     isOpen: {
       type: Boolean,
       default: false,
+    },
+  },
+  data() {
+    return {
+      isToggleOpen: this.isOpen,
+    };
+  },
+  methods: {
+    toggleIsOpen() {
+      this.isToggleOpen = !this.isToggleOpen;
     },
   },
 };
@@ -11,10 +22,10 @@ export default {
 
 <template>
   <section class="accordion">
-    <div class="accordion-header" @click="isOpen = !isOpen">
+    <div class="accordion-header" @click="toggleIsOpen">
       <slot name="header"></slot>
     </div>
-    <div class="accordion-body" :class="{ 'is-open': isOpen }">
+    <div class="accordion-body" :class="{ 'is-open': isToggleOpen }">
       <div class="accordion-content">
         <slot name="body"></slot>
       </div>

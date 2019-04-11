@@ -61,7 +61,6 @@ export default {
       'isResultsTab',
     ]),
   },
-
   methods: {
     ...mapActions('designs', [
       'sortBy',
