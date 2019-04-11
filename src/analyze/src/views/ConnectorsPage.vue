@@ -37,14 +37,16 @@ export default {
     ]),
     filteredExtractors() {
       if (this.filterExtractorsText) {
-        return this.remainingExtractors.filter(item => item.indexOf(this.filterExtractorsText) > -1);
+        return this.remainingExtractors
+          .filter(item => item.indexOf(this.filterExtractorsText) > -1);
       }
       return this.remainingExtractors;
     },
     filteredInstalledExtractors() {
       if (this.installedPlugins) {
         if (this.filterExtractorsText) {
-          return this.installedPlugins.extractors.filter(item => item.name.indexOf(this.filterExtractorsText) > -1);
+          return this.installedPlugins.extractors
+            .filter(item => item.name.indexOf(this.filterExtractorsText) > -1);
         }
         return this.installedPlugins.extractors;
       }
@@ -53,7 +55,8 @@ export default {
     filteredInstalledLoaders() {
       if (this.installedPlugins && this.installedPlugins.loaders) {
         if (this.filterLoadersText) {
-          return this.installedPlugins.loaders.filter(item => item.name.indexOf(this.filterLoadersText) > -1);
+          return this.installedPlugins.loaders
+            .filter(item => item.name.indexOf(this.filterLoadersText) > -1);
         }
         return this.installedPlugins.loaders;
       }
@@ -124,7 +127,9 @@ export default {
             </div>
             <div class="column">
               <div class="buttons is-pulled-right">
-                <button class="button is-outlined" @click="updateExtractorInFocus(null)">Back</button>
+                <button
+                  class="button is-outlined"
+                  @click="updateExtractorInFocus(null)">Back</button>
               </div>
             </div>
           </div>
@@ -134,24 +139,34 @@ export default {
         </div>
 
         <div v-else>
-          <input type="text" v-model="filterExtractorsText" placeholder="Filter extractors..." class="input connector-input">
+          <input
+            type="text"
+            v-model="filterExtractorsText"
+            placeholder="Filter extractors..."
+            class="input connector-input">
           <h2 class="title is-3">Installed</h2>
-          <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">No extractors currently installed</p>
+          <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
+            No extractors currently installed
+          </p>
           <div class="installed-connectors">
             <ConnectorCard v-for="extractor in filteredInstalledExtractors"
               :connector="extractor.name"
               :key="`${extractor.name}`"
             >
               <template v-slot:callToAction>
-                <button @click="updateExtractorInFocus(extractor)" class="card-button">Settings</button>
+                <button
+                  @click="updateExtractorInFocus(extractor)"
+                  class="card-button">Settings</button>
               </template>
             </ConnectorCard>
           </div>
 
           <h2 class="title is-3">Available</h2>
           <p v-if="installingExtractor">Installing...</p>
-          <progress v-if="installingExtractor" class="progress is-small is-info" max="100">15%</progress>
-          <p v-if="filteredExtractors.length === 0">All available extractors have been installed.</p>
+          <progress v-if="installingExtractor" class="progress is-small is-info"></progress>
+          <p v-if="filteredExtractors.length === 0">
+            All available extractors have been installed.
+          </p>
           <div v-else class="card-grid">
             <ConnectorCard v-for="(extractor, index) in filteredExtractors"
               :connector="extractor"
@@ -172,7 +187,11 @@ export default {
         <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
       </template>
       <template slot="body">
-        <input type="text" v-model="filterLoadersText" placeholder="Filter loaders..." class="input connector-input">
+        <input
+          type="text"
+          v-model="filterLoadersText"
+          placeholder="Filter loaders..."
+          class="input connector-input">
         <h2 class="title is-3">Installed</h2>
         <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
         <div v-else class="installed-connectors">
@@ -184,7 +203,7 @@ export default {
         </div>
         <h2 class="title is-3">Available</h2>
         <p v-if="installingLoader">Installing...</p>
-        <progress v-if="installingLoader" class="progress is-small is-info" max="100">15%</progress>
+        <progress v-if="installingLoader" class="progress is-small is-info"></progress>
         <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(loader, index) in filteredLoaders"
