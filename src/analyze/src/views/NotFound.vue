@@ -1,11 +1,11 @@
 <script>
 export default {
   name: 'NotFound',
-}
+};
 </script>
 
 <template>
-	<main :class="$style.wrapper">
+  <main :class="$style.wrapper">
     <div :class="$style.content">
       <h1 :class="$style.h1">404</h1>
       <p :class="$style.text">Oops... Seems this page is missing...</p>
