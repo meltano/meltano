@@ -1,4 +1,4 @@
-import store from '@/store/';
+import projects from '@/store/modules/projects';
 
 export default {
 
@@ -8,7 +8,7 @@ export default {
   },
 
   apiUrl(blueprint, location = '') {
-    const currentProjectSlug = store.getters['projects/getCurrentProjectSlug'];
+    const currentProjectSlug = projects.getters.getCurrentProjectSlug();
     const projectPrefix = currentProjectSlug ? `projects/${currentProjectSlug}` : '';
     let url = '';
     if (projectPrefix) {
