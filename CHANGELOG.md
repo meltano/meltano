@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 
 ### Changes
 
