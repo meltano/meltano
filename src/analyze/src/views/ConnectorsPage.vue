@@ -1,7 +1,7 @@
 <script>
 import BaseAccordion from '@/components/generic/BaseAccordion';
 import BaseCard from '@/components/generic/BaseCard';
-import ConnectorCard from '@/components/ConnectorCard';
+import ConnectorCard from '@/components/orchestration/ConnectorCard';
 import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
 
 import { mapState, mapGetters } from 'vuex';
