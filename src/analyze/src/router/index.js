@@ -7,7 +7,7 @@ import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
 import Settings from '@/views/Settings';
-import ConnectorsPage from '@/views/ConnectorsPage';
+import Connectors from '@/views/Connectors';
 import SettingsDatabase from '@/components/settings/Database';
 import SettingsRoles from '@/components/settings/Roles';
 
@@ -74,7 +74,7 @@ const router = new Router({
         {
           path: 'connectors',
           name: 'connectors',
-          component: ConnectorsPage,
+          component: Connectors,
         },
       ],
     },

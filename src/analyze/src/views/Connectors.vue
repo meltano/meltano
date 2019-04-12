@@ -2,6 +2,7 @@
 import BaseAccordion from '@/components/generic/BaseAccordion';
 import BaseCard from '@/components/generic/BaseCard';
 import ConnectorCard from '@/components/orchestration/ConnectorCard';
+import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
 import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
 
 import { mapState, mapGetters } from 'vuex';
@@ -9,10 +10,12 @@ import { mapState, mapGetters } from 'vuex';
 import orchestrationsApi from '../api/orchestrations';
 
 export default {
+  name: 'Connectors',
   components: {
     BaseAccordion,
     BaseCard,
     ConnectorCard,
+    ConnectorSettings,
     ExtractorEntities,
   },
   data() {
@@ -133,9 +136,13 @@ export default {
               </div>
             </div>
           </div>
+
+          <ConnectorSettings></ConnectorSettings>
+
           <ExtractorEntities
             :extractor='extractorInFocus'
             :extractor-entities='extractorEntities'></ExtractorEntities>
+
         </div>
 
         <div v-else>
