@@ -44,7 +44,7 @@ class PluginConfigService:
                 var = next(var for var in match.groups() if var)
                 val = str(env_override[var])
 
-                if not val == "":
+                if not val:
                     logging.warning(f"Variable {var} is empty.")
 
                 return val
