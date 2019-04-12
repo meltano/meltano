@@ -177,18 +177,6 @@ def entities(extractor_name: str, project) -> Response:
     return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 
 
-@orchestrationsBP.route("/settings/<extractor_name>", methods=["POST"])
-@project_from_slug
-def settings(extractor_name: str, project) -> Response:
-    """
-    endpoint that returns the settings associated with a particular extractor
-    """
-
-    # TODO
-
-    return jsonify({"test": False})
-
-
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])
 @project_from_slug
 def load(loader_name: str, project) -> Response:

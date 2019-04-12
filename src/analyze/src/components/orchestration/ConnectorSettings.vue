@@ -3,10 +3,10 @@
 
     <div class="columns">
       <div class="column">
-        <h3>Connector Settings</h3>
+        <h3>Extractor Connection Settings</h3>
       </div>
     </div>
-    <pre>{{extractorSettings}}</pre>
+    <pre>{{extractor.config}}</pre>
   </div>
 </template>
 
@@ -20,18 +20,6 @@ export default {
         return {};
       },
     },
-    extractorSettings: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-  },
-  created() {
-    this.$store.dispatch('orchestrations/getExtractorSettings', this.extractor.name);
-  },
-  destroyed() {
-    this.$store.dispatch('orchestrations/clearExtractorSettings');
   },
 };
 </script>

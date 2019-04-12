@@ -30,10 +30,6 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`));
   },
 
-  getExtractorSettings(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', `settings/${extractor}`));
-  },
-
   load(extractor, loader) {
     return axios.post(utils.apiUrl('orchestrations', `load/${loader}`), {
       extractor,

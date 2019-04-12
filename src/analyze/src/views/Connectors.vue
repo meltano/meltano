@@ -140,7 +140,6 @@ export default {
 
           <ConnectorSettings
             :extractor='extractorInFocus'
-            :extractor-settings='extractorSettings'
           ></ConnectorSettings>
 
           <ExtractorEntities
