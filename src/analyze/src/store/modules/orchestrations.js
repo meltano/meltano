@@ -5,6 +5,7 @@ const state = {
   extractors: [],
   loaders: [],
   extractorEntities: {},
+  extractorSettings: {},
   currentView: 'intro',
   currentExtractor: '',
   currentConnectionName: '',
@@ -89,6 +90,10 @@ const actions = {
     commit('setAllExtractorEntities', null);
   },
 
+  clearExtractorSettings({ commit }) {
+    commit('setAllExtractorSettings', null);
+  },
+
   getAll({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
@@ -100,6 +105,13 @@ const actions = {
     orchestrationsApi.getExtractorEntities(extractorName)
       .then((response) => {
         commit('setAllExtractorEntities', response.data);
+      });
+  },
+
+  getExtractorSettings({ commit }, extractorName) {
+    orchestrationsApi.getExtractorSettings(extractorName)
+      .then((response) => {
+        commit('setAllExtractorSettings', response.data);
       });
   },
 
@@ -213,6 +225,10 @@ const mutations = {
         entityGroups: entitiesData.entity_groups,
       }
       : {};
+  },
+
+  setAllExtractorSettings(_, settingsData) {
+    state.extractorSettings = settingsData;
   },
 
   setConnectionNames(_, connectionNames) {

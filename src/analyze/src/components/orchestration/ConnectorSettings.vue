@@ -6,15 +6,33 @@
         <h3>Connector Settings</h3>
       </div>
     </div>
-
+    <pre>{{extractorSettings}}</pre>
   </div>
 </template>
 
 <script>
-import _ from 'lodash';
-
 export default {
   name: 'ConnectorSettings',
+  props: {
+    extractor: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+    extractorSettings: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+  },
+  created() {
+    this.$store.dispatch('orchestrations/getExtractorSettings', this.extractor.name);
+  },
+  destroyed() {
+    this.$store.dispatch('orchestrations/clearExtractorSettings');
+  },
 };
 </script>
 

@@ -32,6 +32,7 @@ export default {
       'installedPlugins',
       'extractors',
       'extractorEntities',
+      'extractorSettings',
       'installedPlugins',
     ]),
     ...mapGetters('orchestrations', [
@@ -137,7 +138,10 @@ export default {
             </div>
           </div>
 
-          <ConnectorSettings></ConnectorSettings>
+          <ConnectorSettings
+            :extractor='extractorInFocus'
+            :extractor-settings='extractorSettings'
+          ></ConnectorSettings>
 
           <ExtractorEntities
             :extractor='extractorInFocus'
