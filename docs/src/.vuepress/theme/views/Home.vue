@@ -212,7 +212,7 @@
 </template>
 
 <script>
-import NavLink from './NavLink.vue'
+import NavLink from '../components/NavLink.vue'
 
 export default {
   components: { NavLink },
@@ -233,7 +233,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import './styles/config.styl'
+@import '../styles/config.styl'
 
 .button {
     display: inline-block;
