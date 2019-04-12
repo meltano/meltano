@@ -103,6 +103,10 @@ const actions = {
       });
   },
 
+  saveExtractorConfiguration(_, configPayload) {
+    orchestrationsApi.saveExtractorConfiguration(configPayload);
+  },
+
   getInstalledPlugins({ commit }) {
     orchestrationsApi.installedPlugins()
       .then((response) => {

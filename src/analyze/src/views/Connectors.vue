@@ -142,6 +142,8 @@ export default {
             :extractor='extractorInFocus'
           ></ConnectorSettings>
 
+          <hr>
+
           <ExtractorEntities
             :extractor='extractorInFocus'
             :extractor-entities='extractorEntities'></ExtractorEntities>

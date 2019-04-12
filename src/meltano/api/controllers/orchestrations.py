@@ -120,6 +120,22 @@ def extract(extractor_name: str, project) -> Response:
     )
 
 
+@orchestrationsBP.route("/save/configuration", methods=["POST"])
+@project_from_slug
+def save_plugin_configuration(project) -> Response:
+    """
+    endpoint for persisting a plugin configuration
+    """
+
+    incoming = request.get_json()
+    extractor_name = incoming["extractorName"]
+    config = incoming["config"]
+
+    # TODO persist strategy
+
+    return jsonify({"test": True})
+
+
 @orchestrationsBP.route("/select-entities", methods=["POST"])
 @project_from_slug
 def selectEntities(project) -> Response:
