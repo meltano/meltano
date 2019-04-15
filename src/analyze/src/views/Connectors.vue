@@ -114,7 +114,7 @@ export default {
 </script>
 
 <template>
-  <div class="content vh-scrollable">
+  <div class="vh-scrollable">
     <base-accordion :isOpen="true">
 
       <template slot="header">
@@ -233,10 +233,6 @@ export default {
 </template>
 
 <style lang="scss">
-.content {
-  padding: 20px;
-}
-
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

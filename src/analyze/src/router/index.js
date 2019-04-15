@@ -8,6 +8,8 @@ import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
 import Settings from '@/views/Settings';
 import Connectors from '@/views/Connectors';
+import Transformations from '@/views/Transformations';
+import Orchestration from '@/views/Orchestration';
 import SettingsDatabase from '@/components/settings/Database';
 import SettingsRoles from '@/components/settings/Roles';
 
@@ -35,6 +37,16 @@ const router = new Router({
       path: '/projects/:projectSlug/connectors/',
       name: 'connectors',
       component: Connectors,
+    },
+    {
+      path: '/projects/:projectSlug/transformations/',
+      name: 'transformations',
+      component: Transformations,
+    },
+    {
+      path: '/projects/:projectSlug/orchestration/',
+      name: 'orchestration',
+      component: Orchestration,
     },
     {
       path: '/projects/:projectSlug/files/',
