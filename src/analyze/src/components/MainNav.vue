@@ -35,36 +35,26 @@
           Connectors
         </router-link>
 
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" v-if="currentProjectSlug">
-            Analyze
-          </a>
-          <div class="navbar-dropdown
-                is-boxed"
-                :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v, model) in models">
-            <div class="navbar-item navbar-title has-text-grey-light" :key="model">
-              {{model | capitalize | underscoreToSpace}}
-            </div>
-            <!-- TODO move to getter -->
-            <router-link
-              :to="{name:'analyze',
-                    params:
-                      {
-                        projectSlug: currentProjectSlug,
-                        model: model,
-                        design: design
-                      }
-                    }"
-            class="navbar-item navbar-child"
-            v-for="design in v['designs']"
-            @click.native="menuSelected"
-            :key="design">
-              {{design | capitalize | underscoreToSpace}}
-            </router-link>
-            </template>
-          </div>
-        </div>
+        <router-link
+          v-if="currentProjectSlug"
+          :to="{name: 'transformations', params: { projectSlug: currentProjectSlug }}"
+          class="navbar-item navbar-child">
+          Transformations
+        </router-link>
+
+        <router-link
+          v-if="currentProjectSlug"
+          :to="{name: 'orchestration', params: { projectSlug: currentProjectSlug }}"
+          class="navbar-item navbar-child">
+          Orchestration
+        </router-link>
+
+        <router-link
+          v-if="currentProjectSlug"
+          :to="{name: 'analyze', params: { projectSlug: currentProjectSlug }}"
+          class="navbar-item navbar-child">
+          Analyze
+        </router-link>
 
         <router-link
           v-if="currentProjectSlug"
