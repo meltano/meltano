@@ -1,9 +1,11 @@
 <template>
   <nav class="navbar is-info">
     <div class="navbar-brand">
-      <a class="navbar-item" href="#">
+      <router-link
+          :to="{name: 'projects'}"
+          class="navbar-item navbar-child">
         <logo></logo>
-      </a>
+      </router-link>
       <div class="navbar-burger burger"
            :class="{'is-active': isMobileMenuOpen}"
            data-target="meltnavbar-transparent"
@@ -18,9 +20,14 @@
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
-        <router-link
-          :to="{name: 'projects'}"
-          class="navbar-item navbar-child">Projects</router-link>
+
+        <div class="navbar-item navbar-child">
+          <span v-if="currentProjectSlug">
+            <em>{{currentProjectSlug}}</em>
+          </span>
+          <span v-else>Projects</span>
+        </div>
+
         <router-link
           v-if="currentProjectSlug"
           :to="{name: 'projectFiles', params: { projectSlug: currentProjectSlug }}"
