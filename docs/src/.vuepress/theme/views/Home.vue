@@ -197,6 +197,12 @@
       <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
     </section>
 
+    <section class="section">
+      <h2 class="section__title">Sign up for our newsletter!</h2>
+      <p class="section__text">Get the latest updates on Meltano delivered right to your inbox! We will only use your email to provide you with updates and will never sell your information!</p>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
+    </section>
+
     <div
       class="footer"
     >
@@ -206,7 +212,7 @@
 </template>
 
 <script>
-import NavLink from './NavLink.vue'
+import NavLink from '../components/NavLink.vue'
 
 export default {
   components: { NavLink },
@@ -227,7 +233,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import './styles/config.styl'
+@import '../styles/config.styl'
 
 .button {
     display: inline-block;
