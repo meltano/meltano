@@ -22,8 +22,8 @@
       <div class="navbar-start">
 
         <div class="navbar-item navbar-child">
-          <span v-if="currentProjectSlug">
-            <em>{{currentProjectSlug}}</em>
+          <span v-if="currentProjectSlug" class='is-italic'>
+            {{currentProjectSlug}}
           </span>
           <span v-else>Projects</span>
         </div>
@@ -67,7 +67,10 @@
 
       <div class="navbar-end">
         <div class="navbar-item navbar-child">
-          <font-awesome-icon :icon="'user'" title="Login currently disabled"></font-awesome-icon>
+          <font-awesome-icon
+            :icon="'user'"
+            :style="{ color: '#0F3B66' }"
+            title="Login currently disabled"></font-awesome-icon>
         </div>
       </div>
 
@@ -137,17 +140,19 @@ export default {
 @import '@/scss/bulma-preset-overrides.scss';
 
 .navbar.is-info {
-  background: $primary;
+  background-color: transparent;
+
+  .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken($primary, 20%);
+    background: darken($light, 10%);
+    color: $primary;
   }
+}
+.navbar.is-info .navbar-start > .navbar-item {
+  color: $primary;
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
-}
-.navbar-dropdown.is-boxed.has-been-clicked {
-  // trick to unhover the menu dropdown
-  display: none !important;
 }
 </style>
