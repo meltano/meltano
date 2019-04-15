@@ -126,7 +126,6 @@ def save_plugin_configuration(project) -> Response:
     """
     endpoint for persisting a plugin configuration
     """
-
     incoming = request.get_json()
     extractor_name = incoming["extractorName"]
     config = incoming["config"]

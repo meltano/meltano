@@ -157,14 +157,6 @@ export default {
             placeholder="Filter extractors..."
             class="input connector-input">
           <h2 class="title is-3">Installed</h2>
-          <article class="message is-warning">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>Extractor authentication settings are not currently supported in the UI. This work is in progress however.</p>
-            </div>
-          </article>
           <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
             No extractors currently installed
           </p>

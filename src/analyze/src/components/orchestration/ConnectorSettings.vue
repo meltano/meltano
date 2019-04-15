@@ -15,6 +15,15 @@
         </div>
     </div>
 
+    <article class="message is-warning">
+      <div class="message-header">
+        <p>Warning</p>
+      </div>
+      <div class="message-body">
+        <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+      </div>
+    </article>
+
     <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
       <div class="field-label is-normal">
         <label class="label">{{key}}</label>

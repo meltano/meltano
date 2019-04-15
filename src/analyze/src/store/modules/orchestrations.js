@@ -105,6 +105,8 @@ const actions = {
 
   saveExtractorConfiguration(_, configPayload) {
     orchestrationsApi.saveExtractorConfiguration(configPayload);
+    // TODO commit if values are properly saved, they are initially copied from
+    // the extractor's config and we'd have to update this
   },
 
   getInstalledPlugins({ commit }) {
