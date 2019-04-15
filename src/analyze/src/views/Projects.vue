@@ -1,21 +1,42 @@
 <template>
   <div class="section">
-    <h1 class="title is-4 has-text-centered">Projects</h1>
     <div class="tile projects is-ancestor">
-      <div class="tile is-parent is-3" v-for="project in projects" :key="project.name">
-        <router-link
-          :to="{name: 'projectFiles', params: {projectSlug: project.name}}"
-          class="tile project is-child box">
-          <h2 class="is-5">{{project.name}}</h2>
-        </router-link>
-      </div>
-      <div class="tile is-parent is-3">
+
+      <div class="tile is-parent">
         <router-link
           :to="{name: 'start'}"
-          class="tile project is-child box">
-          <h2 class="is-5">Create project</h2>
+          class="tile is-child box">
+          <h2 class="is-5 is-size-5 has-text-weight-bold">Create Project</h2>
+          <p class='is-size-7'>A project is useful for grouping extractors, loaders, transformers, database connections, and orchestration in addition to reports and dashboards.</p>
         </router-link>
       </div>
+
+      <div class="tile is-parent" v-for="project in projects" :key="project.name">
+        <div class="tile is-child box">
+          <h2 class="is-5 is-size-5 has-text-weight-bold">{{project.name}}</h2>
+          <hr>
+          <div class="buttons">
+
+            <router-link
+              :to="{name: 'connectors', params: {projectSlug: project.name}}"
+              class="button is-success">
+              Setup
+            </router-link>
+            <router-link
+              :to="{name: 'analyze', params: {projectSlug: project.name}}"
+              class="button">
+              Analyze
+            </router-link>
+            <router-link
+              :to="{name: 'dashboards', params: {projectSlug: project.name}}"
+              class="button">
+              Dashboards
+            </router-link>
+
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>

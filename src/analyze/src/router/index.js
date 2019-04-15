@@ -32,6 +32,11 @@ const router = new Router({
       component: Start,
     },
     {
+      path: '/projects/:projectSlug/connectors/',
+      name: 'connectors',
+      component: Connectors,
+    },
+    {
       path: '/projects/:projectSlug/files/',
       name: 'projectFiles',
       component: Repo,

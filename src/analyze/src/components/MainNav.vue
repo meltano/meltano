@@ -30,9 +30,9 @@
 
         <router-link
           v-if="currentProjectSlug"
-          :to="{name: 'projectFiles', params: { projectSlug: currentProjectSlug }}"
+          :to="{name: 'connectors', params: { projectSlug: currentProjectSlug }}"
           class="navbar-item navbar-child">
-          Files
+          Connectors
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
