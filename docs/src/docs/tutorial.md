@@ -387,7 +387,7 @@ In order to access the newly transformed data in the UI, 2 additional types of f
 - A table.m5o file, which defines the available columns and aggregates for each table
 - A topic.m5o file, which represents the connections between tables, i.e. what they can be joined on.
 
-These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/transform/model/ directory.
+These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/model/ directory.
 
 ```bash
 # opportunity_won.table.m5o
@@ -516,7 +516,7 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 ```
 
 ```bash
-# custom_sfdc.model.m5o
+# custom_sfdc.topic.m5o
 {
   version = 1
   name = custom_sfdc
