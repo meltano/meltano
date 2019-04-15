@@ -73,28 +73,6 @@ const router = new Router({
       name: 'dashboard',
       component: Dashboards,
     },
-    {
-      path: '/projects/:projectSlug/settings',
-      name: 'settings',
-      component: Settings,
-      children: [
-        {
-          path: 'roles',
-          name: 'roles',
-          component: SettingsRoles,
-        },
-        {
-          path: 'database',
-          name: 'database',
-          component: SettingsDatabase,
-        },
-        {
-          path: 'connectors',
-          name: 'connectors',
-          component: Connectors,
-        },
-      ],
-    },
   ],
 });
 

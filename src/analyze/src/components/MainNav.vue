@@ -64,37 +64,13 @@
         </router-link>
 
       </div>
+
       <div class="navbar-end">
-        <div v-if="$auth.user"
-             class="navbar-item has-dropdown is-hoverable">
-          <div class="navbar-link">
-            @{{ $auth.user.username }}
-          </div>
-          <div class="navbar-dropdown is-boxed">
-            <a class="navbar-item navbar-child"
-               @click.capture="$auth.logout()">
-              Logout
-            </a>
-          </div>
-        </div>
-        <div
-          v-if="currentProjectSlug"
-          class="navbar-item has-dropdown is-hoverable">
-          <div class="navbar-link">
-            Settings
-          </div>
-          <div class="navbar-dropdown is-boxed">
-            <router-link :to="{name:'database', params: { projectSlug: currentProjectSlug }}"
-                         class="navbar-item navbar-child">
-              Database
-            </router-link>
-            <router-link :to="{name:'connectors', params: { projectSlug: currentProjectSlug }}"
-                         class="navbar-item navbar-child">
-              Connectors
-            </router-link>
-          </div>
+        <div class="navbar-item navbar-child">
+          <font-awesome-icon :icon="'user'" title="Login currently disabled"></font-awesome-icon>
         </div>
       </div>
+
     </div>
   </nav>
 </template>
