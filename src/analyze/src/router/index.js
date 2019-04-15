@@ -1,17 +1,17 @@
-import Vue from 'vue';
 import Router from 'vue-router';
-import Repo from '@/views/Repo';
-import Projects from '@/views/Projects';
+import Vue from 'vue';
+
 import store from '@/store/';
-import Start from '@/views/Start';
-import Design from '@/views/Design';
-import Dashboards from '@/views/Dashboards';
-import Settings from '@/views/Settings';
+
 import Connectors from '@/views/Connectors';
-import Transformations from '@/views/Transformations';
+import Design from '@/views/Design';
+import Designs from '@/views/Designs';
+import Dashboards from '@/views/Dashboards';
 import Orchestration from '@/views/Orchestration';
-import SettingsDatabase from '@/components/settings/Database';
-import SettingsRoles from '@/components/settings/Roles';
+import Projects from '@/views/Projects';
+import Repo from '@/views/Repo';
+import Start from '@/views/Start';
+import Transformations from '@/views/Transformations';
 
 Vue.use(Router);
 
@@ -54,8 +54,13 @@ const router = new Router({
       component: Repo,
     },
     {
-      path: '/projects/:projectSlug/analyze/:model/:design',
+      path: '/projects/:projectSlug/analyze/',
       name: 'analyze',
+      component: Designs,
+    },
+    {
+      path: '/projects/:projectSlug/analyze/:model/:design',
+      name: 'analyze_design',
       component: Design,
     },
     {
