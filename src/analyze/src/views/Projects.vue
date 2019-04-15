@@ -15,24 +15,28 @@
         <div class="tile is-child box">
           <h2 class="is-5 is-size-5 has-text-weight-bold">{{project.name}}</h2>
           <hr>
-          <div class="buttons">
-
-            <router-link
-              :to="{name: 'connectors', params: {projectSlug: project.name}}"
-              class="button is-success">
-              Setup
-            </router-link>
-            <router-link
-              :to="{name: 'analyze', params: {projectSlug: project.name}}"
-              class="button">
-              Analyze
-            </router-link>
-            <router-link
-              :to="{name: 'dashboards', params: {projectSlug: project.name}}"
-              class="button">
-              Dashboards
-            </router-link>
-
+          <div class="columns is-mobile">
+            <div class="column is-one-fifth">
+              <router-link
+                :to="{name: 'connectors', params: {projectSlug: project.name}}"
+                class="button is-success">
+                Setup
+              </router-link>
+            </div>
+            <div class="column">
+              <div class="buttons is-right">
+                <router-link
+                  :to="{name: 'analyze', params: {projectSlug: project.name}}"
+                  class="button">
+                  Analyze
+                </router-link>
+                <router-link
+                  :to="{name: 'dashboards', params: {projectSlug: project.name}}"
+                  class="button">
+                  Dashboards
+                </router-link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
