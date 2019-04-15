@@ -22,11 +22,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
-.vh-scrollable {
-  height: calc(100vh - 3.25rem); // TODO properly import variable $navbar-height when on Vue CLI3
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
-
 </style>

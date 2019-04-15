@@ -114,8 +114,7 @@ export default {
 </script>
 
 <template>
-  <div class="content">
-    <h1 class="title is-2">Connectors</h1>
+  <div class="content vh-scrollable">
     <base-accordion :isOpen="true">
 
       <template slot="header">
