@@ -5,10 +5,10 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -77,7 +77,7 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -106,10 +106,10 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -178,7 +178,7 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -203,10 +203,10 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -275,7 +275,7 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div>
@@ -304,10 +304,10 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -418,7 +418,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -447,10 +447,10 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -550,7 +550,7 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -579,10 +579,10 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -693,7 +693,7 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -722,10 +722,10 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -825,7 +825,7 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->
@@ -854,10 +854,10 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -951,7 +951,7 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <!---->

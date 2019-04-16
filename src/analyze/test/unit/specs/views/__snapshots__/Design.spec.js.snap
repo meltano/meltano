@@ -5,14 +5,14 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <nav
-          class="panel "
+          class="panel has-background-white"
         >
           <div
             class="panel-block"
@@ -81,7 +81,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -500,14 +500,14 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <nav
-          class="panel "
+          class="panel has-background-white"
         >
           <div
             class="panel-block"
@@ -576,7 +576,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -991,14 +991,14 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <nav
-          class="panel "
+          class="panel has-background-white"
         >
           <div
             class="panel-block"
@@ -1067,7 +1067,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
@@ -1478,10 +1478,10 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
 `;
 
 exports[`Design.vue a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled 1`] = `
-<router-view-layout-stub>
+<router-view-layout-sidebar-stub>
   <div>
     <nav
-      class="panel "
+      class="panel has-background-white"
     >
       <div
         class="panel-block"
@@ -1851,7 +1851,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
      
     <!---->
   </div>
-</router-view-layout-stub>
+</router-view-layout-sidebar-stub>
 `;
 
 exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default 1`] = `
@@ -1859,14 +1859,14 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
   class="columns is-gapless"
 >
   <aside
-    class="column is-one-quarter vh-scrollable has-background-white-bis"
+    class="column is-one-quarter vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <nav
-          class="panel "
+          class="panel has-background-white"
         >
           <div
             class="panel-block"
@@ -1935,7 +1935,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
     class="column is-three-quarters vh-scrollable"
   >
     <div
-      class="box is-radiusless is-shadowless"
+      class="box-transparent box is-radiusless is-shadowless"
     >
       <div>
         <div
