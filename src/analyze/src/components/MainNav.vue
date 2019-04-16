@@ -49,12 +49,38 @@
           Orchestration
         </router-link>
 
-        <router-link
+        <div
           v-if="currentProjectSlug"
-          :to="{name: 'analyze', params: { projectSlug: currentProjectSlug }}"
-          class="navbar-item navbar-child">
-          Analyze
-        </router-link>
+          class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">
+            Analyze
+          </a>
+          <div
+            class="navbar-dropdown"
+            :class="{'has-been-clicked': navbarClicked}">
+            <template v-for="(v, model) in models">
+              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
+                {{model | capitalize | underscoreToSpace}}
+              </div>
+              <!-- TODO move to getter -->
+              <router-link
+                :to="{name:'analyze_design',
+                      params:
+                        {
+                          slug: currentProjectSlug,
+                          model: model,
+                          design: design
+                        }
+                      }"
+                class="navbar-item navbar-child"
+                v-for="design in v['designs']"
+                @click.native="menuSelected"
+                :key="design">
+                {{design | capitalize | underscoreToSpace}}
+              </router-link>
+            </template>
+          </div>
+        </div>
 
         <router-link
           v-if="currentProjectSlug"
@@ -154,15 +180,22 @@ export default {
 .navbar.is-info {
   background-color: transparent;
 
+  .navbar-start .navbar-link,
+  .navbar-start > .navbar-item {
+    color: $primary;
+  }
+
+  .navbar-start .navbar-link::after {
+    border-color: $primary;
+  }
+
+  .navbar-item.has-dropdown:hover .navbar-link,
   .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
     background: darken($light, 10%);
     color: $primary;
   }
-}
-.navbar.is-info .navbar-start > .navbar-item {
-  color: $primary;
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
