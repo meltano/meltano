@@ -501,13 +501,6 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-
-  beforeRouteUpdate(to, from, next) {
-    const { slug, model, design } = to.params;
-    Store.dispatch('designs/getDesign', { model, design, slug });
-    next();
-  },
-
   mounted() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
