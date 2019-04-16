@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 
 ### Changes
+* [#588](https://gitlab.com/meltano/meltano/issues/588) Updated core navigation and depth hierarchy styling to facilitate main user flow and improved information architecture
 
 ### Fixes
 
