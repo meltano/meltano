@@ -226,7 +226,8 @@ const actions = {
     const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      });
+      })
+      .catch(() => { });
 
     sqlApi.getDialect(model)
       .then((response) => {
@@ -264,20 +265,21 @@ const actions = {
     if (join.related_table.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name).then((response) => {
-      commit('setJoinColumns', {
-        columns: response.data.columns,
-        join,
+    designApi.getTable(join.related_table.name)
+      .then((response) => {
+        commit('setJoinColumns', {
+          columns: response.data.columns,
+          join,
+        });
+        commit('setJoinTimeframes', {
+          timeframes: response.data.timeframes,
+          join,
+        });
+        commit('setJoinAggregates', {
+          aggregates: response.data.aggregates,
+          join,
+        });
       });
-      commit('setJoinTimeframes', {
-        timeframes: response.data.timeframes,
-        join,
-      });
-      commit('setJoinAggregates', {
-        aggregates: response.data.aggregates,
-        join,
-      });
-    });
   },
 
   removeSort({ commit }, column) {
@@ -399,7 +401,8 @@ const actions = {
           data: response.data,
           field,
         });
-      });
+      })
+      .catch(() => { });
   },
 
   addDistinctSelection({ commit }, data) {
