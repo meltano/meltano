@@ -12,7 +12,7 @@ export default {
 <template>
   <router-view-layout>
     <div>
-      Orchestration...
+      Orchestration view is in development. <a target="_blank" href="https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=feature_proposal">Get in touch if you have opinions about what should live here</a>.
     </div>
   </router-view-layout>
 </template>
