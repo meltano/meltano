@@ -229,20 +229,20 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
-## Advanced - Create a Custom Tap
+## Advanced - Create a Custom Extractor
 
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
 We aim to make Meltano as thin as possible on top of the components it abstracts, so adding a new plugin should be straightforward.
 
-### How to create a tap
+### How to Create a Extractor
 
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
 If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
 :::
 
-### Create the plugin's package
+### Create the Plugin's Package
 
 Meltano uses [Singer](https://singer.io) taps and targets to extract and load data. For more details about the Singer specification, please visit [https://github.com/singer-io/getting-started](https://github.com/singer-io/getting-started)
 
@@ -256,7 +256,7 @@ $ cookiecutter gh:singer-io/singer-tap-template
 > project_name: tap-gitlab-custom
 ```
 
-### Add the plugin to your Meltano project (--custom)
+### Add the Plugin to Your Meltano Project (--custom)
 
 Now that your plugin is part of your Meltano project, you need to add your plugin configuration in the `meltano.yml`'s plugin definition.
 

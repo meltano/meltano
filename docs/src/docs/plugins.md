@@ -20,12 +20,12 @@ Meltano should provide a wrapper script to manage the execution of the selected 
 
 `meltano extract tap-zendesk --to target-postgres`
 
-## Taps
+## Extractors
 
-[Meltano Taps](/docs/concepts.html#taps) are the extractor part of the data workflow. 
+Meltano Extractors are commonly prefixed with [tap](/docs/concepts.html#taps). 
 
 ::: tip 
-If you can't find the tap you need below, we have a [tutorial for creating your tap](/docs/tutorial.html#advanced-create-a-custom-tap).
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor).
 :::
 
 ### Carbon Intensity
@@ -293,7 +293,7 @@ export STRIPE_API_KEY="yourStripeApiKey"
 export STRIPE_START_DATE="YYYY-MM-DD"
 ```
 
-### ZenDesk
+### Zendesk
 
 `tap-zendesk` is an extractor that pulls data from a Zendesk REST API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
 
