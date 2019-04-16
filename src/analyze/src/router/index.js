@@ -7,6 +7,7 @@ import Connectors from '@/views/Connectors';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
+import NotFound from '@/views/NotFound';
 import Orchestration from '@/views/Orchestration';
 import Projects from '@/views/Projects';
 import Repo from '@/views/Repo';
@@ -18,6 +19,11 @@ Vue.use(Router);
 const router = new Router({
   mode: 'history',
   routes: [
+    {
+      path: '*',
+      name: '404',
+      component: NotFound,
+    },
     {
       path: '/',
       name: 'home',
