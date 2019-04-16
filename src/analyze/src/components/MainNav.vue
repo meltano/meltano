@@ -139,6 +139,12 @@ export default {
 <style lang="scss">
 @import '@/scss/bulma-preset-overrides.scss';
 
+.navbar-menu {
+  background-color: transparent;
+}
+.navbar-burger span {
+  color: $primary;
+}
 .navbar.is-info {
   background-color: transparent;
 

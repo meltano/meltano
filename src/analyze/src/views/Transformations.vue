@@ -1,13 +1,20 @@
 <script>
+import RouterViewLayout from '@/views/RouterViewLayout';
+
 export default {
   name: 'Transformations',
+  components: {
+    RouterViewLayout,
+  },
 };
 </script>
 
 <template>
-  <div class="vh-scrollable">
-    Transformations...
-  </div>
+  <router-view-layout>
+    <div>
+      Transformations...
+    </div>
+  </router-view-layout>
 </template>
 
 <style lang="scss">

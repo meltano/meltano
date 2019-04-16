@@ -1,5 +1,5 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
       <ul class="menu-list">
@@ -20,17 +20,17 @@
       <router-view />
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 <script>
 import { mapState } from 'vuex';
 
-import RouterViewLayout from '@/views/RouterViewLayout';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
   },
   computed: {
     ...mapState('projects', [

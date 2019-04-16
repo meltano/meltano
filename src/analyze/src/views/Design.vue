@@ -1,5 +1,5 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
       <nav class="panel ">
@@ -481,14 +481,14 @@
 
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
-import RouterViewLayout from '@/views/RouterViewLayout';
 import Dropdown from '../components/generic/Dropdown';
 import ResultTable from '../components/designs/ResultTable';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 import SelectDropdown from '../components/generic/SelectDropdown';
 import YesNoFilter from '../components/filters/YesNoFilter';
 import Chart from '../components/designs/Chart';
@@ -514,7 +514,7 @@ export default {
     NewDashboardModal,
     Dropdown,
     ResultTable,
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
     SelectDropdown,
     YesNoFilter,
   },

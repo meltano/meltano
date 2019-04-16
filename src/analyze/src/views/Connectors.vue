@@ -4,6 +4,7 @@ import BaseCard from '@/components/generic/BaseCard';
 import ConnectorCard from '@/components/orchestration/ConnectorCard';
 import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
 import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 import { mapState, mapGetters } from 'vuex';
 
@@ -17,6 +18,7 @@ export default {
     ConnectorCard,
     ConnectorSettings,
     ExtractorEntities,
+    RouterViewLayout,
   },
   data() {
     return {
@@ -114,122 +116,126 @@ export default {
 </script>
 
 <template>
-  <div class="vh-scrollable">
-    <base-accordion :isOpen="true">
+  <router-view-layout>
 
-      <template slot="header">
-        <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
-      </template>
+    <div>
+      <base-accordion :isOpen="true">
 
-      <template slot="body">
+        <template slot="header">
+          <h2 class="title is-3 has-text-white is-marginless">Extractors</h2>
+        </template>
 
-        <div v-if='extractorInFocus'>
-          <div class="columns">
-            <div class="column">
-              <h2>Extractor Settings</h2>
-            </div>
-            <div class="column">
-              <div class="buttons is-pulled-right">
-                <button
-                  class="button is-outlined"
-                  @click="updateExtractorInFocus(null)">Back</button>
+        <template slot="body">
+
+          <div v-if='extractorInFocus'>
+            <div class="columns">
+              <div class="column">
+                <h2>Extractor Settings</h2>
+              </div>
+              <div class="column">
+                <div class="buttons is-pulled-right">
+                  <button
+                    class="button is-outlined"
+                    @click="updateExtractorInFocus(null)">Back</button>
+                </div>
               </div>
             </div>
+
+            <ConnectorSettings
+              :extractor='extractorInFocus'
+            ></ConnectorSettings>
+
+            <hr>
+
+            <ExtractorEntities
+              :extractor='extractorInFocus'
+              :extractor-entities='extractorEntities'></ExtractorEntities>
+
           </div>
 
-          <ConnectorSettings
-            :extractor='extractorInFocus'
-          ></ConnectorSettings>
+          <div v-else>
+            <input
+              type="text"
+              v-model="filterExtractorsText"
+              placeholder="Filter extractors..."
+              class="input connector-input">
+            <h2 class="title is-3">Installed</h2>
+            <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
+              No extractors currently installed
+            </p>
+            <div class="installed-connectors">
+              <ConnectorCard v-for="extractor in filteredInstalledExtractors"
+                :connector="extractor.name"
+                :key="`${extractor.name}`"
+              >
+                <template v-slot:callToAction>
+                  <button
+                    @click="updateExtractorInFocus(extractor)"
+                    class="card-button">Settings</button>
+                </template>
+              </ConnectorCard>
+            </div>
 
-          <hr>
+            <h2 class="title is-3">Available</h2>
+            <p v-if="installingExtractor">Installing...</p>
+            <progress v-if="installingExtractor" class="progress is-small is-info"></progress>
+            <p v-if="filteredExtractors.length === 0">
+              All available extractors have been installed.
+            </p>
+            <div v-else class="card-grid">
+              <ConnectorCard v-for="(extractor, index) in filteredExtractors"
+                :connector="extractor"
+                :key="`${extractor}-${index}`"
+              >
+                <template v-slot:callToAction>
+                  <button @click="installExtractor(extractor)" class="card-button">Install</button>
+                </template>
+              </ConnectorCard>
+            </div>
+          </div>
+        </template>
 
-          <ExtractorEntities
-            :extractor='extractorInFocus'
-            :extractor-entities='extractorEntities'></ExtractorEntities>
+      </base-accordion>
+      <base-accordion :isOpen="true">
 
-        </div>
-
-        <div v-else>
+        <template slot="header">
+          <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
+        </template>
+        <template slot="body">
           <input
             type="text"
-            v-model="filterExtractorsText"
-            placeholder="Filter extractors..."
+            v-model="filterLoadersText"
+            placeholder="Filter loaders..."
             class="input connector-input">
           <h2 class="title is-3">Installed</h2>
-          <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
-            No extractors currently installed
-          </p>
-          <div class="installed-connectors">
-            <ConnectorCard v-for="extractor in filteredInstalledExtractors"
-              :connector="extractor.name"
-              :key="`${extractor.name}`"
+          <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
+          <div v-else class="installed-connectors">
+            <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
+              :connector="loader.name"
+              :key="`${loader.name}-${index}`"
             >
-              <template v-slot:callToAction>
-                <button
-                  @click="updateExtractorInFocus(extractor)"
-                  class="card-button">Settings</button>
-              </template>
             </ConnectorCard>
           </div>
-
           <h2 class="title is-3">Available</h2>
-          <p v-if="installingExtractor">Installing...</p>
-          <progress v-if="installingExtractor" class="progress is-small is-info"></progress>
-          <p v-if="filteredExtractors.length === 0">
-            All available extractors have been installed.
-          </p>
+          <p v-if="installingLoader">Installing...</p>
+          <progress v-if="installingLoader" class="progress is-small is-info"></progress>
+          <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
           <div v-else class="card-grid">
-            <ConnectorCard v-for="(extractor, index) in filteredExtractors"
-              :connector="extractor"
-              :key="`${extractor}-${index}`"
+            <ConnectorCard v-for="(loader, index) in filteredLoaders"
+              :connector="loader"
+              :key="`${loader}-${index}`"
             >
               <template v-slot:callToAction>
-                <button @click="installExtractor(extractor)" class="card-button">Install</button>
+                <button @click="installLoader(loader)" class="card-button">Install</button>
               </template>
             </ConnectorCard>
           </div>
-        </div>
-      </template>
+        </template>
 
-    </base-accordion>
-    <base-accordion :isOpen="true">
+      </base-accordion>
+    </div>
 
-      <template slot="header">
-        <h2 class="title is-3 has-text-white is-marginless">Loaders</h2>
-      </template>
-      <template slot="body">
-        <input
-          type="text"
-          v-model="filterLoadersText"
-          placeholder="Filter loaders..."
-          class="input connector-input">
-        <h2 class="title is-3">Installed</h2>
-        <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
-        <div v-else class="installed-connectors">
-          <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
-            :connector="loader.name"
-            :key="`${loader.name}-${index}`"
-          >
-          </ConnectorCard>
-        </div>
-        <h2 class="title is-3">Available</h2>
-        <p v-if="installingLoader">Installing...</p>
-        <progress v-if="installingLoader" class="progress is-small is-info"></progress>
-        <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
-        <div v-else class="card-grid">
-          <ConnectorCard v-for="(loader, index) in filteredLoaders"
-            :connector="loader"
-            :key="`${loader}-${index}`"
-          >
-            <template v-slot:callToAction>
-              <button @click="installLoader(loader)" class="card-button">Install</button>
-            </template>
-          </ConnectorCard>
-        </div>
-      </template>
-
-    </base-accordion>
-  </div>
+  </router-view-layout>
 </template>
 
 <style lang="scss">
