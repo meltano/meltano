@@ -57,7 +57,9 @@ A `Table` can be identified by the file naming schema: `table-name.table.m5o` an
 
 ## Taps
 
-A `Tap` is an application that takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline.
+A `Tap` is an application that pulls data out of a data source by using the best integration for extracting bulk data. 
+
+For example, it takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline. 
 
 Meltano's `taps` are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
