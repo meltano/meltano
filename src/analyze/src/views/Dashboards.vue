@@ -51,8 +51,8 @@
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import Chart from '../components/designs/Chart';
-import NewDashboardModal from '../components/dashboards/NewDashboardModal';
+import Chart from '@/components/designs/Chart';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {
