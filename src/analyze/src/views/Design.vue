@@ -2,7 +2,7 @@
   <router-view-layout-sidebar>
 
     <div slot='left'>
-      <nav class="panel ">
+      <nav class="panel has-background-white">
         <div class="panel-block">
           <div class="field has-addons">
             <div class="control is-expanded">

@@ -3,7 +3,7 @@
 
     <div slot='left'>
 
-      <nav class="panel">
+      <nav class="panel has-background-white">
         <p class="panel-heading">
           Dashboards
         </p>
