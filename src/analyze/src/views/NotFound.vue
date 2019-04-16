@@ -17,10 +17,10 @@ export default {
 </template>
 
 <style lang="scss" module>
-$headerHeight: 52px;
+@import "../scss/bulma-preset-overrides.scss";
 
 .wrapper {
-  height: calc(100vh - #{$headerHeight});
+  height: calc(100vh - #{$navbar-height});
   display: flex;
   justify-content: center;
 }
