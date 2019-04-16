@@ -57,12 +57,14 @@ A `Table` can be identified by the file naming schema: `table-name.table.m5o` an
 
 ## Taps
 
-A `Tap` is an application that pulls data out of a data source by using the best integration for extracting bulk data. 
+A `Tap` is an application that pulls data out of a data source by using the best integration for extracting bulk data.
 
 For example, it takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline. 
 
-Meltano's `taps` are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+Meltano's `taps` is part of the Extractor portion of the data workflow and are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
 
 ## Targets
 
-A `Target` is an application that has the responsibility of consuming data from `taps` and perform a task with it. Examples include loading it into a file (i.e., CSV), API, or database.
+A `Target` is an application that has the responsibility of consuming data from `taps` and perform a task with it. Examples include loading it into a file (i.e., CSV), API, or database. 
+
+Meltano `targets` is part of the Loader portion of the data workflow.
