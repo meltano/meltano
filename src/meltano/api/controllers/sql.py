@@ -7,13 +7,13 @@ from decimal import Decimal
 from flask import Blueprint, jsonify, request
 from flask_security import auth_required
 
-from .project_helper import project_from_slug
+from .project_helper import project_api_route, project_from_slug
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
-sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
+sqlBP = Blueprint("sql", __name__, url_prefix=project_api_route("sql"))
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -101,7 +101,7 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/projects/<project_slug>/get/<topic_name>/dialect", methods=["GET"])
+@sqlBP.route("/get/<topic_name>/dialect", methods=["GET"])
 @project_from_slug
 def get_dialect(topic_name, project):
     sqlHelper = SqlHelper(project)
@@ -111,9 +111,7 @@ def get_dialect(topic_name, project):
     return jsonify({"connection_dialect": engine.dialect.name})
 
 
-@sqlBP.route(
-    "/projects/<project_slug>/get/<topic_name>/<design_name>", methods=["POST"]
-)
+@sqlBP.route("/get/<topic_name>/<design_name>", methods=["POST"])
 @project_from_slug
 def get_sql(topic_name, design_name, project):
     sqlHelper = SqlHelper(project)

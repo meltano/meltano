@@ -58,7 +58,6 @@ import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 export default {
   name: 'Dashboards',
   created() {
-    this.$store.dispatch('start/getProject', this.$router);
     this.initialize(this.$route.params.slug);
   },
   data() {

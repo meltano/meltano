@@ -39,6 +39,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#576](https://gitlab.com/meltano/meltano/issues/576) Fix switching between designs now works
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
 * [#530](https://gitlab.com/meltano/meltano/issues/530) Fix query generation for star schemas
+* [#571](https://gitlab.com/meltano/meltano/issues/571) Fix various routing and API endpoint issues related to recent `projects` addition
 
 
 ## 0.19.0 - (2019-04-08)

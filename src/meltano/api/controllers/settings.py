@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 from meltano.api.security import api_auth_required, users
 from meltano.api.models.security import db, User, Role, RolesUsers, RolePermissions
 from .settings_helper import SettingsHelper
-from .project_helper import project_from_slug, project_api_route
+from .project_helper import project_api_route, project_from_slug
 
 settingsBP = Blueprint("settings", __name__, url_prefix=project_api_route("settings"))
 settingsApi = Api(settingsBP)
