@@ -21,7 +21,7 @@
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
 
-        <div class="navbar-item navbar-child">
+        <div class="navbar-project-label navbar-item navbar-child">
           <span v-if="currentProjectSlug" class='is-italic'>
             {{currentProjectSlug}}
           </span>
@@ -144,6 +144,12 @@ export default {
 }
 .navbar-burger span {
   color: $primary;
+}
+.navbar-brand .navbar-item {
+  padding: 0 1rem;
+}
+.navbar-project-label {
+  padding-right: 1.2rem;
 }
 .navbar.is-info {
   background-color: transparent;
