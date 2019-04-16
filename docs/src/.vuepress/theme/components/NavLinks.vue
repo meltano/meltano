@@ -47,9 +47,9 @@
 
 <script>
 import DropdownLink from './DropdownLink.vue'
-import { resolveNavLinkItem } from './util'
+import { resolveNavLinkItem } from '../util'
 import NavLink from './NavLink.vue'
-import TwitterIcon from '../components/TwitterIcon'
+import TwitterIcon from '../../components/TwitterIcon'
 
 export default {
   components: { NavLink, DropdownLink, TwitterIcon },
@@ -129,7 +129,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import './styles/config.styl'
+@import '../styles/config.styl'
 
 .nav-links
   display flex

@@ -487,11 +487,13 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import Store from '@/store';
 import Dropdown from '../components/generic/Dropdown';
 import ResultTable from '../components/designs/ResultTable';
 import SelectDropdown from '../components/generic/SelectDropdown';
 import YesNoFilter from '../components/filters/YesNoFilter';
 import Chart from '../components/designs/Chart';
+
 import NewDashboardModal from '../components/dashboards/NewDashboardModal';
 
 export default {
@@ -500,6 +502,12 @@ export default {
     return {
       isNewDashboardModalOpen: false,
     };
+  },
+
+  beforeRouteUpdate(to, from, next) {
+    const { slug, model, design } = to.params;
+    Store.dispatch('designs/getDesign', { model, design, slug });
+    next();
   },
 
   mounted() {

@@ -220,6 +220,7 @@ const getters = {
 
 const actions = {
   getDesign({ dispatch, commit }, { model, design, slug }) {
+    state.currentSQL = '';
     state.currentModel = model;
     state.currentDesign = design;
     // TODO: chain callbacks to keep a single Promise
