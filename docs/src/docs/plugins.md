@@ -351,28 +351,103 @@ export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
 
 A loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
 
-### target-snowflake
+### CSV
+
+`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files. 
+
+#### Info
+
+- **Data Warehouse**: CSV Files
+- **Repository**: [https://gitlab.com/meltano/target-csv](https://gitlab.com/meltano/target-csv)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add loader target-csv
+```
+
+If you are successful, you should see `Added and installed loaders 'target-csv'` on your window.
+
+#### Configuration
+
+If you want to customize your delimited or quote character, open `meltano.yml` for your desired project and update the configuration there.
+
+```yaml{1-3}
+  - config:
+      delimiter": "\t"
+      quotechar": ''''
+    name: target-csv
+    pip_url: git+https://gitlab.com/meltano/target-csv.git
+```
+
+### Snowflake
+
+`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database. 
 
 ::: warning
-This plugin will enable data to be loaded in a [Snowflake](https://www.snowflake.com) database. Please note that querying in the Meltano UI is not supported, yet.
+Please note that querying in the Meltano UI is not supported, yet.
 You can follow the progress on this feature in this issue: [meltano/meltano#428](https://gitlab.com/meltano/meltano/issues/428)
 :::
 
-<table>
-  <tr>
-    <th>Database</th>
-    <td><a target="_blank" href="https://www.snowflake.com/">https://www.snowflake.com</a></td>
-  </tr>
-</table>
+#### Info
 
-#### Default configuration
+- **Data Warehouse**: [Snowflake](https://www.snowflake.com/)
+- **Repository**: [https://gitlab.com/meltano/target-snowflake](https://gitlab.com/meltano/target-snowflake)
 
-**.env**
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
 ```bash
-SF_ACCOUNT
-SF_USER
-SF_PASSWORD
-SF_ROLE       # in UPPERCASE
-SF_DATABASE   # in UPPERCASE
-SF_WAREHOUSE  # in UPPERCASE
+export SF_ACCOUNT=""
+export SF_USER=""
+export SF_PASSWORD=""
+export SF_ROLE=""       # in UPPERCASE
+export SF_DATABASE=""   # in UPPERCASE
+export SF_WAREHOUSE=""  # in UPPERCASE
+```
+
+### Postgres
+
+`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database. 
+
+#### Info
+
+- **Data Warehouse**: [Postgres](https://www.postgresql.org/)
+- **Repository**: [https://github.com/meltano/target-postgres](https://github.com/meltano/target-postgres)
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export PG_ADDRESS=""
+export PG_USERNAME=""
+export PG_PORT=""
+export PG_PASSWORD=""
+export PG_DATABASE=""
+export PG_SCHEMA=""
+```
+
+### Sqlite
+
+`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database. 
+
+#### Info
+
+- **Data Warehouse**: [SQLite](https://sqlite.org/)
+- **Repository**: [https://gitlab.com/meltano/target-sqlite](https://gitlab.com/meltano/target-sqlite)
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export SQLITE_DATABASE=""
 ```
