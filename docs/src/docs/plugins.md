@@ -4,6 +4,22 @@ sidebarDepth: 2
 
 # Plugins
 
+## Installation
+
+### Locally with the CLI
+
+The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command. Examples can be found in each plugin.
+
+### On a CI Pipeline
+
+A docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+
+This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
+
+Meltano should provide a wrapper script to manage the execution of the selected components:
+
+`meltano extract tap-zendesk --to target-postgres`
+
 ## Taps
 
 [Meltano Taps](/docs/concepts.html#taps) are the extractor part of the data workflow. 
