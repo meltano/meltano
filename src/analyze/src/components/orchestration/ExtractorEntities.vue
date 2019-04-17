@@ -2,10 +2,15 @@
   <div>
 
     <!-- Loading -->
-    <progress v-if="isLoading" class="progress is-small is-info"></progress>
+    <progress v-if="isLoading && !hasExtractorLoadingError" class="progress is-small is-info"></progress>
+
+    <!-- Loading error -->
+    <p v-if="hasExtractorLoadingError">
+      Extractor settings are not set properly in your <code>.env</code>.
+    </p>
 
     <!-- Loaded -->
-    <div v-else>
+    <div v-if='!isLoading && !hasExtractorLoadingError'>
       <div class="columns">
         <div class="column is-10">
           <h3>Entities for {{extractorEntities.extractorName}}</h3>
@@ -50,6 +55,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
   name: 'ExtractorEntities',
   props: {
@@ -73,6 +80,9 @@ export default {
     this.$store.dispatch('orchestrations/clearExtractorEntities');
   },
   computed: {
+    ...mapState('orchestrations', [
+      'hasExtractorLoadingError',
+    ]),
     hasEntities() {
       return this.extractorEntities.entityGroups.length > 0;
     },

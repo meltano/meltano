@@ -4,6 +4,7 @@ import orchestrationsApi from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
+  hasExtractorLoadingError: false,
   extractorEntities: {},
   currentView: 'intro',
   currentExtractor: '',
@@ -97,9 +98,14 @@ const actions = {
   },
 
   getExtractorEntities({ commit }, extractorName) {
+    commit('setHasExtractorLoadingError', false);
+
     orchestrationsApi.getExtractorEntities(extractorName)
       .then((response) => {
         commit('setAllExtractorEntities', response.data);
+      })
+      .catch(() => {
+        commit('setHasExtractorLoadingError', true);
       });
   },
 
@@ -233,6 +239,10 @@ const mutations = {
 
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
+  },
+
+  setHasExtractorLoadingError(_, value) {
+    state.hasExtractorLoadingError = value;
   },
 
   setInstalledPlugins(_, projectConfig) {
