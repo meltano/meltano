@@ -23,7 +23,7 @@
       <template v-if='hasEntities'>
         <div
           class='is-unselectable'
-          v-for='entityGroup in orderedEntityGroups'
+          v-for='entityGroup in extractorEntities.entityGroups'
           :key='`${entityGroup.name}`'>
           <a
             class='chip button is-rounded is-outlined entity'
@@ -31,7 +31,7 @@
             @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
           <div class='entity-group'>
             <a
-              v-for='attribute in orderedAttributes(entityGroup.attributes)'
+              v-for='attribute in entityGroup.attributes'
               :key='`${attribute.name}`'
               :class="{'is-success is-outlined': attribute.selected}"
               class="chip button is-rounded is-outlined is-small attribute"
@@ -50,8 +50,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
-
 export default {
   name: 'ExtractorEntities',
   props: {
@@ -76,16 +74,10 @@ export default {
   },
   computed: {
     hasEntities() {
-      return this.orderedEntityGroups.length > 0;
+      return this.extractorEntities.entityGroups.length > 0;
     },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
-    },
-    orderedEntityGroups() {
-      return _.orderBy(this.extractorEntities.entityGroups, 'name');
-    },
-    orderedAttributes() {
-      return attributes => _.orderBy(attributes, 'name');
     },
   },
   methods: {
