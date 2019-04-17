@@ -6,7 +6,6 @@ import store from '@/store/';
 import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
-import Orchestrate from '@/views/Orchestrate';
 import NotFound from '@/views/NotFound';
 import Settings from '@/views/Settings';
 import SettingsDatabase from '@/components/settings/Database';
