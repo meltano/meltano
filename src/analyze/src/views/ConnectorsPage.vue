@@ -68,7 +68,7 @@ export default {
       return this.remainingLoaders;
     },
     isInstallingPlugin() {
-      return (plugin) => this.installingPlugins.includes(plugin);
+      return plugin => this.installingPlugins.includes(plugin);
     },
   },
   methods: {
