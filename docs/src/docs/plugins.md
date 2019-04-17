@@ -2,53 +2,73 @@
 sidebarDepth: 2
 ---
 
-# Available Plugins
+# Plugins
+
+## Installation
+
+### Locally with the CLI
+
+The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command. Examples can be found in each plugin.
+
+### On a CI Pipeline
+
+A docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+
+This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
+
+Meltano should provide a wrapper script to manage the execution of the selected components:
+
+`meltano extract tap-zendesk --to target-postgres`
 
 ## Extractors
 
-Extractors are defined as the component that pulls data out of a data source, using the best integration for extracting bulk data.
-Currently, Meltano supports [Singer.io](https://singer.io) taps as extractors.
+Meltano Extractors are commonly prefixed with [tap](/docs/concepts.html#taps). 
 
-### tap-zuora
+::: tip 
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor).
+:::
 
-<table>
-  <tr>
-    <th>Data Source</th>
-    <td><a target="_blank" href="https://www.zuora.com/">https://www.zuora.com</a></td>
-  </tr>
-  <tr>
-    <th>Repository</th>
-    <td><a target="_blank" href="https://github.com/singer-io/tap-zuora">https://github.com/singerio/tap-zuora</a></td>
-  </tr>
-</table>
+### Carbon Intensity
 
-#### Default configuration
+`tap-carbon-intensity` pulls data from the Official Carbon Intensity API for Great Britain, which was developed by the [National Grid](https://www.nationalgrid.com/uk). For more information, check out [http://carbonintensity.org.uk/](http://carbonintensity.org.uk/).
 
-**.env**
+#### Info
+
+- Data Source: [Carbon Intensity API](https://api.carbonintensity.org.uk/)
+- Repository: [https://gitlab.com/meltano/tap-carbon-intensity](https://gitlab.com/meltano/tap-carbon-intensity)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
 ```bash
-ZUORA_USERNAME
-ZUORA_PASSWORD
-ZUORA_API_TOKEN   # preferred to ZUORA_PASSWORD
-ZUORA_API_TYPE    # specifically 'REST' or 'AQuA'
-ZUORA_PARTNER_ID  # optional, only for the 'AQuA` API type
-ZUORA_START_DATE
-ZUORA_SANDBOX     # specifically 'true' or 'false'
+meltano add extractor tap-carbon-intensity
 ```
 
-### tap-csv
+If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` on your window. It
 
-<table>
-  <tr>
-    <th>Data Source</th>
-    <td>Traditionally-delimited CSV files (commas separated columns, newlines indicate new rows, double quoted values) as defined by the defaults of the python csv library.</td>
-  </tr>
-  <tr>
-    <th>Repository</th>
-    <td><a target="_blank" href="https://gitlab.com/meltano/tap-csv">https://gitlab.com/meltano/tap-csv</a></td>
-  </tr>
-</table>
+### CSV
 
-#### Default configuration
+`tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable. 
+
+#### Info
+
+- **Data Source**: Traditionally-delimited CSV files (commas separated columns, newlines indicate new rows, double quoted values) as defined by the defaults of the python csv library.
+- **Repository**: [https://gitlab.com/meltano/tap-csv](https://gitlab.com/meltano/tap-csv)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-csv
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-csv'` on your window. It
+
+#### Configuration
 
 **.env**
 ```bash
@@ -76,137 +96,374 @@ Description of available options:
   - file: Local path to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed.
   - keys: The names of the columns that constitute the unique keys for that entity.
 
+### Fastly
+
+`tap-fastly` pulls raw data from Fastly and produces JSON-formatted data per the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+#### Info
+
+- **Data Source**: [Fastly](https://www.fastly.com/)
+- **Repository**: [https://gitlab.com/meltano/tap-fastly](https://gitlab.com/meltano/tap-fastly)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-fastly
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-fastly'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export FASTLY_API_TOKEN="yourFastlyApiToken"
+# The date uses ISO-8601 and supports time if desired
+export FASTLY_START_DATE="YYYY-MM-DD"
+```
+
+### GitLab
+
+`tap-gitlab` pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html) and extracts [the following resources](https://gitlab.com/meltano/tap-gitlab#tap-gitlab) from GitLab. It then outputs the schema for each resource
+and incrementally pulls data based on the input state
+#### Info
+
+- **Data Source**: [GitLab's REST API](https://docs.gitlab.com/ee/api/README.html)
+- **Repository**: [https://gitlab.com/meltano/tap-gitlab](https://gitlab.com/meltano/tap-gitlab)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+1. Run the following command:
+
+```bash
+meltano add extractor tap-gitlab
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-gitlab'` on your window.
+
+3. Get your GitLab access token
+    - Login to your GitLab account
+    - Navigate to your profile page
+    - Create an access token
+1. Create a JSON file called `config.json` containing:
+    - Access token you just created
+    - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v3`
+    - Groups to track (space separated)    
+    - Projects to track (space separated)
+    
+    Notes:
+    - either groups or projects need to be provided
+    - filling in 'groups' but leaving 'projects' empty will sync all group projects.
+    - filling in 'projects' but leaving 'groups' empty will sync selected projects.
+    - filling in 'groups' and 'projects' will sync selected projects of those groups.
+
+    ```json
+    {
+      "api_url": "https://gitlab.com/api/v4",
+      "private_token": "your-access-token",
+      "groups": "myorg mygroup", 
+      "projects": "myorg/repo-a myorg/repo-b",
+      "start_date": "2018-01-01T00:00:00Z"
+    }
+    ```
+
+4. [Optional] Create the initial state file
+
+    You can provide JSON file that contains a date for the API endpoints
+    to force the application to only fetch data newer than those dates.
+    If you omit the file it will fetch all GitLab data
+
+    ```json
+    {
+      "branches": "2017-01-17T00:00:00Z",
+      "commits": "2017-01-17T00:00:00Z",
+      "issues": "2017-01-17T00:00:00Z",
+      "projects": "2017-01-17T00:00:00Z",
+      "project_milestones": "2017-01-17T00:00:00Z", 
+      "users": "2017-01-17T00:00:00Z",
+      "group_milestones": "2017-01-17T00:00:00Z"
+    }
+    ```
+    
+    Note:
+    - currently, groups don't have a date field which can be tracked
+
+#### Configuration
+
+### Marketo
+
+`tap-marketo` pulls raw data from Marketo's REST API and extracts activity types, activites, and leads from Marketo.
+
+#### Info
+
+- **Data Source**: [Marketo's REST API](http://developers.marketo.com/rest-api/)
+- **Repository**: [https://gitlab.com/meltano/tap-marketo](https://gitlab.com/meltano/tap-marketo)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-marketo
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-marketo'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export MARKETO_CLIENT_ID="yourClientId"
+export MARKETO_CLIENT_SECRET="yourClientSecret"
+export MARKETO_ENDPOINT="yourEndpointUrl"
+export MARKETO_IDENTITY="yourIdentity"
+export MARKETO_START_TIME="yourStartTime"
+```
+
+### Salesforce
+
+`tap-salesforce` is an extractor that pulls data from a Salesforce database and produced JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+#### Info
+
+- **Data Source**: [Salesforce](https://www.salesforce.com/)
+- **Repository**: [https://gitlab.com/meltano/tap-salesforce](https://gitlab.com/meltano/tap-salesforce)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-salesforce
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-salesforce'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export SFDC_CLIENT_ID="yourSalesforceClientId"
+export SFDC_PASSWORD="yourSalesforcePassword"
+export SFDC_SECURITY_TOKEN="yourSalesforceSecurityToken"
+export SFDC_START_DATE="yourSalesforceStartDate"
+export SFDC_USERNAME="yourSalesforceUsername"
+```
+
+### Stripe
+
+`tap-stripe` is an extractor that pulls data from Stripe's API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+#### Info
+
+- **Data Source**: [Stripe's API](https://stripe.com/docs/api)
+- **Repository**: [https://github.com/meltano/tap-stripe](https://github.com/meltano/tap-stripe)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-carbon-intensity
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export STRIPE_API_KEY="yourStripeApiKey"
+# The date uses ISO-8601 and supports time if desired
+export STRIPE_START_DATE="YYYY-MM-DD"
+```
+
+### Zendesk
+
+`tap-zendesk` is an extractor that pulls data from a Zendesk REST API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+#### Info
+
+- **Data Source**: [Zendesk REST API](https://developer.zendesk.com/rest_api)
+- **Repository**: [https://github.com/meltano/tap-zendesk](https://github.com/meltano/tap-zendesk)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-zendesk
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-zendesk'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export ZENDESK_EMAIL="yourZendeskEmail"
+export ZENDESK_API_TOKEN="yourZendeskApiToken"
+export ZENDESK_SUBDOMAIN="yourZendeskSubdomain"
+# The date uses ISO-8601 and supports time if desired
+export ZENDESK_START_DATE="yourZendeskStartDate"
+```
+
+
+
+### Zuora
+
+`tap-zuora` is an extractor that pulls data from a Zuora REST API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
+
+#### Info
+
+- **Data Source**: [Zuora REST API](https://www.zuora.com/developer/API-Reference/)
+- **Repository**: [https://github.com/singer-io/tap-zuora](https://github.com/singer-io/tap-zuora)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-zendesk
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-zendesk'` on your window. It
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export ZUORA_USERNAME=""
+export ZUORA_PASSWORD=""
+export ZUORA_API_TOKEN=""   # preferred to ZUORA_PASSWORD
+export ZUORA_API_TYPE=""    # specifically 'REST' or 'AQuA'
+export ZUORA_PARTNER_ID=""  # optional, only for the 'AQuA` API type
+export ZUORA_START_DATE=""
+export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
+```
+
 ## Loaders
 
 A loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
 
-### target-snowflake
+### CSV
+
+`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files. 
+
+#### Info
+
+- **Data Warehouse**: CSV Files
+- **Repository**: [https://gitlab.com/meltano/target-csv](https://gitlab.com/meltano/target-csv)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add loader target-csv
+```
+
+If you are successful, you should see `Added and installed loaders 'target-csv'` on your window.
+
+#### Configuration
+
+If you want to customize your delimited or quote character, open `meltano.yml` for your desired project and update the configuration there.
+
+```yaml{1-3}
+  - config:
+      delimiter": "\t"
+      quotechar": ''''
+    name: target-csv
+    pip_url: git+https://gitlab.com/meltano/target-csv.git
+```
+
+### Snowflake
+
+`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database. 
 
 ::: warning
-This plugin will enable data to be loaded in a [Snowflake](https://www.snowflake.com) database. Please note that querying in the Meltano UI is not supported, yet.
+Please note that querying in the Meltano UI is not supported, yet.
 You can follow the progress on this feature in this issue: [meltano/meltano#428](https://gitlab.com/meltano/meltano/issues/428)
 :::
 
-<table>
-  <tr>
-    <th>Database</th>
-    <td><a target="_blank" href="https://www.snowflake.com/">https://www.snowflake.com</a></td>
-  </tr>
-</table>
+#### Info
 
-#### Default configuration
+- **Data Warehouse**: [Snowflake](https://www.snowflake.com/)
+- **Repository**: [https://gitlab.com/meltano/target-snowflake](https://gitlab.com/meltano/target-snowflake)
 
-**.env**
-```bash
-SF_ACCOUNT
-SF_USER
-SF_PASSWORD
-SF_ROLE       # in UPPERCASE
-SF_DATABASE   # in UPPERCASE
-SF_WAREHOUSE  # in UPPERCASE
-```
+#### Configuration
 
-## Create your own
-
-As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
-
-We aim to make Meltano as thin as possible on top of the components it abstracts, so adding a new plugin should be straightforward.
-
-### How to create a tap
-
-First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
-
-If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
-:::
-
-### Create the plugin's package
-
-Meltano uses [Singer](https://singer.io) taps and targets to extract and load data. For more details about the Singer specification, please visit [https://github.com/singer-io/getting-started](https://github.com/singer-io/getting-started)
-
-::: tip
-[cookiecutter](https://cookiecutter.readthedocs.io/en/latest/) is a python tool to scaffold projects quickly from an existing template.
-:::
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
 
 ```bash
-$ pip install cookiecutter
-$ cookiecutter gh:singer-io/singer-tap-template
-> project_name: tap-gitlab-custom
+export SF_ACCOUNT=""
+export SF_USER=""
+export SF_PASSWORD=""
+export SF_ROLE=""       # in UPPERCASE
+export SF_DATABASE=""   # in UPPERCASE
+export SF_WAREHOUSE=""  # in UPPERCASE
 ```
 
-### Add the plugin to your Meltano project (--custom)
+### Postgres
 
-Now that your plugin is part of your Meltano project, you need to add your plugin configuration in the `meltano.yml`'s plugin definition.
+`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database. 
 
-::: tip
-Using `-e` will install the plugin as editable so any change you make is readily available.
-:::
+#### Info
+
+- **Data Warehouse**: [Postgres](https://www.postgresql.org/)
+- **Repository**: [https://github.com/meltano/target-postgres](https://github.com/meltano/target-postgres)
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
 
 ```bash
-# test
-$ meltano add --custom extractor tap-gitlab-custom
-...
-> pip_url: -e tap-gitlab-custom
-> executable: tap-gitlab-custom
+export PG_ADDRESS=""
+export PG_USERNAME=""
+export PG_PORT=""
+export PG_PASSWORD=""
+export PG_DATABASE=""
+export PG_SCHEMA=""
 ```
 
-Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
+### Sqlite
 
-::: tip
-Meltano manages converting the `config` section to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
-:::
+`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database. 
 
-Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `config` section is `null`):
+#### Info
 
-**meltano.yml**
-```yaml
-plugins:
-  extractors:
-  - config: null
-    executable: tap-gitlab-custom
-    name: tap-gitlab-custom
-    pip_url: -e tap-gitlab-custom
-...
+- **Data Warehouse**: [SQLite](https://sqlite.org/)
+- **Repository**: [https://gitlab.com/meltano/target-sqlite](https://gitlab.com/meltano/target-sqlite)
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export SQLITE_DATABASE=""
 ```
-
-Let's include the default configuration for a sample tap:
-
-**meltano.yml**
-```yaml
-plugins:
-  extractors:
-  - config:
-	  username: $GITLAB_USERNAME # supports env expansion
-	  password: my_password
-	  start_date: "2015-09-21T04:00:00Z"
-    executable: tap-gitlab-custom
-    name: tap-gitlab-custom
-    pip_url: -e tap-gitlab-custom
-...
-```
-
-::: warning
-Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `config` section of a plugin.
-:::
-
-### Interacting with your new plugin
-
-Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
-
-```
-;; use `meltano invoke` to run your plugin in isolation
-$ meltano invoke tap-gitlab-custom --discover
-
-;; use `meltano select` to parse your `catalog`
-$ meltano select --list tap-gitlab-custom '*' '*'
-
-;; run an ELT using your new tap
-$ meltano elt tap-gitlab-custom target-sqlite
-```
-
-### References
-
-  - [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
-  - [tap-gitlab](https://gitlab.com/meltano/tap-gitlab)
-  - [target-sqlite](https://gitlab.com/meltano/target-sqlite)
-  - [cookiecutter](https://github.com/audreyr/cookiecutter)
-  - [singer-tap-template](https://github.com/singer-io/singer-tap-template)
