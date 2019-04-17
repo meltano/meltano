@@ -8,7 +8,7 @@ from meltano.core.m5o.m5o_collection_parser import (
     M5oCollectionParserTypes,
 )
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import Project
 from meltano.core.utils import slugify
 from .sql_helper import SqlHelper
 

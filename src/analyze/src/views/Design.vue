@@ -485,6 +485,7 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import store from '@/store';
 import capitalize from '@/filters/capitalize';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Store from '@/store';
@@ -503,16 +504,19 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-
-  beforeRouteUpdate(to, from, next) {
-    const { slug, model, design } = to.params;
-    Store.dispatch('designs/getDesign', { model, design, slug });
-    next();
+  beforeRouteEnter(to, from, next) {
+    const { model, design, slug } = to.params;
+    store.dispatch('designs/getDesign', { model, design, slug })
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
   },
-
-  mounted() {
-    const { slug, model, design } = this.$route.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug });
+  beforeRouteUpdate(to, from, next) {
+    this.$store.dispatch('designs/getDesign', {
+      model: to.params.model,
+      design: to.params.design,
+    }).then(next);
   },
   filters: {
     capitalize,

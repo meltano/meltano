@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 
 ### Changes
+* [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 ### Fixes
 

@@ -19,21 +19,16 @@ def assertIsSQL(value: str) -> bool:
 @pytest.mark.usefixtures("project", "add_model")
 class TestSqlController:
     @pytest.fixture
-    def post(self, app, api, project):
+    def post(self, app, api):
         def _post(payload):
-            return api.post(self.url(app, "carbon", "region", project), json=payload)
+            return api.post(self.url(app, "carbon", "region"), json=payload)
 
         return _post
 
     @classmethod
-    def url(cls, app, topic, design, project):
+    def url(cls, app, topic, design):
         with app.test_request_context():
-            return url_for(
-                "sql.get_sql",
-                project_slug=project.slug,
-                topic_name=topic,
-                design_name=design,
-            )
+            return url_for("sql.get_sql", topic_name=topic, design_name=design)
 
     def test_get_sql(self, post):
         self.assert_empty_query(post)

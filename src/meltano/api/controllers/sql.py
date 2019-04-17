@@ -7,7 +7,6 @@ from decimal import Decimal
 from flask import Blueprint, jsonify, request
 from flask_security import auth_required
 
-from .project_helper import project_api_route, project_from_slug
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.security import api_auth_required
@@ -102,9 +101,8 @@ def index():
 
 
 @sqlBP.route("/get/<topic_name>/dialect", methods=["GET"])
-@project_from_slug
-def get_dialect(topic_name, project):
-    sqlHelper = SqlHelper(project)
+def get_dialect(topic_name):
+    sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(topic_name)
     connection_name = m5oc.connection("connection")
     engine = sqlHelper.get_db_engine(connection_name)
@@ -112,9 +110,8 @@ def get_dialect(topic_name, project):
 
 
 @sqlBP.route("/get/<topic_name>/<design_name>", methods=["POST"])
-@project_from_slug
-def get_sql(topic_name, design_name, project):
-    sqlHelper = SqlHelper(project)
+def get_sql(topic_name, design_name):
+    sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(topic_name)
     design = m5oc.design(design_name)
     incoming_json = request.get_json()

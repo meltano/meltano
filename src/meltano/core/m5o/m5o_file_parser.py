@@ -91,6 +91,7 @@ class MeltanoAnalysisFileParser:
             "many_to_one",
             "many_to_many",
         ]
+        self.project = Project()
 
     def uses_accepted_choice(self, choices, choice):
         return choice in choices
