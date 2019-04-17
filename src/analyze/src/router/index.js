@@ -9,6 +9,7 @@ import NotFound from '@/views/NotFound';
 import Orchestration from '@/views/Orchestration';
 import Repo from '@/views/Repo';
 import Transformations from '@/views/Transformations';
+import Airflow from '@/components/Airflow';
 
 Vue.use(Router);
 
@@ -79,6 +80,11 @@ const router = new Router({
       name: 'Dashboard',
       component: Dashboards,
     },
+    {
+      path: '/airflow',
+      name: 'airflow_proxy',
+      component: Airflow,
+    }
   ],
 });
 
