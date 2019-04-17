@@ -3,7 +3,7 @@ import sys
 from . import cli
 from .params import project
 
-from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -17,7 +17,7 @@ def invoke(project, plugin_name, plugin_args):
         config_service = ConfigService(project)
         plugin = config_service.get_plugin(plugin_name)
 
-        service = PluginInvoker(project, plugin)
+        service = invoker_factory(project, plugin)
         handle = service.invoke(*plugin_args)
 
         exit_code = handle.wait()

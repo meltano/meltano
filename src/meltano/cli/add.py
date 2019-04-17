@@ -18,6 +18,7 @@ from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
 from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.transform_add_service import TransformAddService
+from meltano.core.dbt_service import DbtService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
 
@@ -178,6 +179,10 @@ def add_transform(project: Project, plugin_name: str):
             f"Added transform '{plugin_name}' to your dbt_project.yml", fg="green"
         )
         click.secho(f"Installed '{plugin_name}'.", fg="green")
+
+        # download the transform
+        dbt_service = DbtService(project)
+        dbt_service.deps()
     except (PluginNotSupportedException, PluginNotFoundError):
         click.secho(f"Error: transform '{plugin_name}' is not supported", fg="red")
         raise click.Abort()

@@ -11,6 +11,9 @@ from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
 from .error import SubprocessError
 
+def invoker_factory(project, plugin, *args, **kwargs):
+    return plugin.invoker(project, *args, **kwargs) or PluginInvoker(project, plugin, *args, **kwargs)
+
 
 class PluginInvoker:
     """This class handles the invocation of a `Plugin` instance."""
@@ -30,7 +33,6 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
-
         self._prepared = False
 
     @property
@@ -58,8 +60,13 @@ class PluginInvoker:
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args)]
 
+    def Popen_options(self):
+        return {}
+
     def invoke(self, *args, prepare=True, **Popen):
-        self.env = os.environ.copy()
+        Popen_options = self.Popen_options()
+        Popen_options.update(Popen)
+
         process = None
         try:
             if prepare:
@@ -68,7 +75,8 @@ class PluginInvoker:
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = [*self.exec_args(), *args]
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(popen_args, env=self.env, **Popen)
+                process = subprocess.Popen(popen_args,
+                                           **Popen_options)
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
             raise
@@ -78,13 +86,18 @@ class PluginInvoker:
 
         return process
 
-    async def invoke_async(self, *args, **Popen):
+    async def invoke_async(self, *args, prepare=True, **Popen):
+        Popen_options = self.Popen_options()
+        Popen_options.update(Popen)
+
         process = None
         try:
-            self.prepare()
+            if prepare:
+                self.prepare()
+
             with self.plugin.trigger_hooks("invoke", self, args):
                 process = await asyncio.create_subprocess_exec(
-                    *self.exec_args(), *args, **Popen
+                    *self.exec_args(), *args, **Popen_options
                 )
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
