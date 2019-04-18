@@ -1,0 +1,30 @@
+@import "../../node_modules/bulma/bulma";
+
+$steps-maker-default-color:	$light;
+$steps-marker-default-border:	none;
+$steps-default-color:	$grey-lighter;
+$steps-completed-color:	$light;
+$steps-active-color:	$primary;
+$steps-divider-height:	.1em;
+
+.steps .step-item {
+  color: $grey-lighter;
+}
+
+.steps .step-item.is-active,
+.steps .step-item.is-completed {
+  color: $primary;
+
+  .step-marker {
+    color: $primary !important;
+  }
+}
+
+.steps .step-item .step-marker {
+  color: $grey-lighter !important;
+}
+
+.steps .step-item.is-active .step-marker {
+  background-color: $light !important;
+  border: .1em solid $primary;
+}
