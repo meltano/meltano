@@ -29,7 +29,6 @@ export default {
     ...mapState('orchestrations', [
       'installedPlugins',
       'extractors',
-      'extractorSettings',
     ]),
     ...mapGetters('orchestrations', [
       'remainingExtractors',
@@ -97,11 +96,38 @@ export default {
     </div>
 
     <div v-else>
-      <input
+
+      <div class="content">
+        <input
         type="text"
         v-model="filterExtractorsText"
         placeholder="Filter extractors..."
         class="input connector-input">
+      </div>
+
+      <div class="tile is-ancestor flex-and-wrap">
+        <div
+          class="tile is-parent is-3"
+          v-for="(extractor, index) in extractors"
+          :key="`${extractor}-${index}`">
+          <div class="tile is-child box">
+            <div class="image is-64x64 container">
+              <img
+                :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`"
+                :alt="`gitlab logo`">
+            </div>
+            <div class="content is-small">
+              <p class='has-text-centered'>{{extractor}}</p>
+              <a
+                class="button is-success is-block is-small"
+                @click="installExtractor(extractor)">Install</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
       <h2 class="title is-3">Installed</h2>
       <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
         No extractors currently installed
@@ -140,34 +166,8 @@ export default {
 </template>
 
 <style lang="scss">
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-column-gap: 15px;
-  grid-row-gap: 15px;
-}
-
-.installed-connectors {
-  display: grid;
-  grid-row-gap: 15px;
-}
-
-.card-button {
-  width: 100%;
-  background-color: hsl(210, 100%, 42%);
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 1rem;
-  transition: background 0.2s ease-in;
-  cursor: pointer;
-
-  &:hover {
-    background-color: hsl(210, 74%, 22%);
-  }
-}
-
-.connector-input {
-  margin-top: 15px;
+.image-tap {
+  height: 64px;
+  max-height: 64px;
 }
 </style>

@@ -6,6 +6,11 @@
   overflow-x: hidden;
 }
 
+.flex-and-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
 .box-transparent {
   background-color: transparent;
 }
