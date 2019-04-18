@@ -7,7 +7,6 @@ import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
 const state = {
-  slug: '',
   activeReport: {},
   design: {
     related_table: {},
@@ -224,14 +223,14 @@ const actions = {
     state.currentSQL = '';
     state.currentModel = model;
     state.currentDesign = design;
-    commit('setSlug', slug);
     // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(state.slug, model, design)
+    const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      });
+      })
+      .catch(() => { });
 
-    sqlApi.getDialect(state.slug, model)
+    sqlApi.getDialect(model)
       .then((response) => {
         commit('setConnectionDialect', response.data);
       })
@@ -239,7 +238,7 @@ const actions = {
         commit('setSqlErrorMessage', e);
       });
 
-    reportsApi.loadReports(state.slug)
+    reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -267,20 +266,21 @@ const actions = {
     if (join.related_table.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name).then((response) => {
-      commit('setJoinColumns', {
-        columns: response.data.columns,
-        join,
+    designApi.getTable(join.related_table.name)
+      .then((response) => {
+        commit('setJoinColumns', {
+          columns: response.data.columns,
+          join,
+        });
+        commit('setJoinTimeframes', {
+          timeframes: response.data.timeframes,
+          join,
+        });
+        commit('setJoinAggregates', {
+          aggregates: response.data.aggregates,
+          join,
+        });
       });
-      commit('setJoinTimeframes', {
-        timeframes: response.data.timeframes,
-        join,
-      });
-      commit('setJoinAggregates', {
-        aggregates: response.data.aggregates,
-        join,
-      });
-    });
   },
 
   removeSort({ commit }, column) {
@@ -321,7 +321,7 @@ const actions = {
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
-      .getSql(state.currentModel, state.currentDesign, postData, state.slug)
+      .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
           commit('setQueryResults', response.data);
@@ -402,7 +402,8 @@ const actions = {
           data: response.data,
           field,
         });
-      });
+      })
+      .catch(() => { });
   },
 
   addDistinctSelection({ commit }, data) {
@@ -442,10 +443,6 @@ const actions = {
 };
 
 const mutations = {
-  setSlug(_, slug) {
-    state.slug = slug;
-  },
-
   setRemoveSort() {
     state.sortColumn = null;
   },

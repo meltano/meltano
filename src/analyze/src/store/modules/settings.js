@@ -2,7 +2,6 @@ import _ from 'lodash';
 import settingsApi from '../../api/settings';
 
 const state = {
-  slug: '',
   settings: {
     connections: [],
   },
@@ -20,7 +19,6 @@ const getters = {
   isConnectionDialectSqlite() {
     return connectionDialect => connectionDialect === 'sqlite';
   },
-
   rolesName() {
     return _.map(state.acl.roles, _.property('name'));
   },
@@ -37,60 +35,63 @@ const getters = {
 };
 
 const actions = {
-  saveSlug({ commit }, { slug }) {
-    commit('setSlug', slug);
-  },
-
   getSettings({ commit }) {
-    settingsApi.index(state.slug)
+    settingsApi.index()
       .then((response) => {
         commit('setSettings', response.data.settings);
-      });
+      })
+      .catch(() => { });
   },
   saveConnection({ commit }, connection) {
-    settingsApi.saveConnection(connection, state.slug)
+    settingsApi.saveConnection(connection)
       .then((response) => {
         commit('setSettings', response.data.settings);
-      });
+      })
+      .catch(() => { });
   },
   deleteConnection({ commit }, connection) {
     const connectionToRemove = state.settings.connections
       .find(item => item === connection);
-    settingsApi.deleteConnection(connectionToRemove, state.slug)
+    settingsApi.deleteConnection(connectionToRemove)
       .then((response) => {
         commit('setSettings', response.data.settings);
-      });
+      })
+      .catch(() => { });
   },
   fetchACL({ commit }) {
-    return settingsApi.fetchACL(state.slug)
+    settingsApi.fetchACL()
       .then((response) => {
         commit('setACL', response.data);
-      });
+      })
+      .catch(() => { });
   },
   createRole({ commit }, { role }) {
-    settingsApi.createRole({ name: role }, state.slug)
+    settingsApi.createRole({ name: role })
       .then((response) => {
         commit('addRole', response.data);
-      });
+      })
+      .catch(() => { });
   },
   assignRoleUser({ commit }, { role, user }) {
     const roleDef = { name: role };
 
     // create automatically assign the user if set
-    settingsApi.createRole(roleDef, user, state.slug)
+    settingsApi.createRole(roleDef, user)
       .then(() => {
         commit('assignUserRoles', { user, role });
-      });
+      })
+      .catch(() => { });
   },
   deleteRole({ commit }, { role }) {
-    settingsApi.deleteRole({ name: role }, state.slug)
+    settingsApi.deleteRole({ name: role })
       .then(() => {
         commit('removeRole', role);
 
         state.acl.users.forEach((user) => {
           commit('unassignUserRole', { user: user.username, role });
         });
-      });
+      })
+      .catch(() => { });
   },
   unassignRoleUser({ commit }, { role, user }) {
     if (user === undefined) {
@@ -98,33 +99,33 @@ const actions = {
     }
 
     const roleDef = { name: role };
-    settingsApi.deleteRole(roleDef, user, state.slug)
+    settingsApi.deleteRole(roleDef, user)
       .then(() => {
         commit('unassignUserRole', { user, role });
-      });
+      })
+      .catch(() => { });
   },
   addRolePermission({ commit }, { permissionType, role, context }) {
     const roleDef = { name: role };
 
-    settingsApi.addRolePermission(roleDef, permissionType, context, state.slug)
+    settingsApi.addRolePermission(roleDef, permissionType, context)
       .then((response) => {
         commit('updateRole', response.data);
-      });
+      })
+      .catch(() => { });
   },
   removeRolePermission({ commit }, { permissionType, role, context }) {
     const roleDef = { name: role };
 
-    settingsApi.removeRolePermission(roleDef, permissionType, context, state.slug)
+    settingsApi.removeRolePermission(roleDef, permissionType, context)
       .then((response) => {
         commit('updateRole', response.data);
-      });
+      })
+      .catch(() => { });
   },
 };
 
 const mutations = {
-  setSlug(_store, slug) {
-    state.slug = slug;
-  },
   setSettings(_store, settings) {
     state.settings = settings;
   },

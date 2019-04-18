@@ -1,4 +1,23 @@
+import projects from '@/store/modules/projects';
+
 export default {
+
+  // Path Utils
+  root(path = '') {
+    return `http://localhost:5000${path}`;
+  },
+
+  apiUrl(blueprint, location = '') {
+    const currentProjectSlug = projects.getters.getCurrentProjectSlug();
+    const projectPrefix = currentProjectSlug ? `projects/${currentProjectSlug}` : '';
+    let url = '';
+    if (projectPrefix) {
+      url = [this.root(), 'api/v1', projectPrefix, blueprint, location].join('/');
+    } else {
+      url = [this.root(), 'api/v1', blueprint, location].join('/');
+    }
+    return url;
+  },
 
   // Color Utils
   colors: {
@@ -18,14 +37,6 @@ export default {
       'rgba(153, 102, 255, 1)',
       'rgba(255, 159, 64, 1)',
     ],
-  },
-
-  root(path = '') {
-    return `http://localhost:5000${path}`;
-  },
-
-  apiUrl(blueprint, location = '') {
-    return [this.root(), 'api/v1', blueprint, location].join('/');
   },
 
   getColor(i) {

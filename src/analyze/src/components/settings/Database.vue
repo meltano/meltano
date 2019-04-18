@@ -166,9 +166,6 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch('settings/saveSlug', {
-      slug: this.$route.params.slug,
-    });
     this.$store.dispatch('settings/getSettings');
   },
 

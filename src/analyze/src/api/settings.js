@@ -2,41 +2,41 @@ import axios from 'axios';
 import utils from '@/utils/utils';
 
 export default {
-  index(slug) {
-    return axios.get(utils.apiUrl(`projects/${slug}/settings`));
+  index() {
+    return axios.get(utils.apiUrl('settings'));
   },
 
-  saveConnection(connection, slug) {
-    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'save'), connection);
+  saveConnection(connection) {
+    return axios.post(utils.apiUrl('settings', 'save'), connection);
   },
 
-  deleteConnection(connection, slug) {
-    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'delete'), connection);
+  deleteConnection(connection) {
+    return axios.post(utils.apiUrl('settings', 'delete'), connection);
   },
 
-  fetchACL(slug) {
-    return axios.get(utils.apiUrl(`projects/${slug}/settings`, 'acl'));
+  fetchACL() {
+    return axios.get(utils.apiUrl('settings', 'acl'));
   },
 
-  createRole(role, user, slug) {
+  createRole(role, user) {
     const payload = { role, user };
-    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles'), payload);
+    return axios.post(utils.apiUrl('settings', 'acl/roles'), payload);
   },
 
-  deleteRole(role, user, slug) {
+  deleteRole(role, user) {
     const payload = { role, user };
 
-    return axios.delete(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles'), { data: payload });
+    return axios.delete(utils.apiUrl('settings', 'acl/roles'), { data: payload });
   },
 
-  addRolePermission(role, permissionType, context, slug) {
+  addRolePermission(role, permissionType, context) {
     const payload = { permissionType, role, context };
-    return axios.post(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles/permissions'), payload);
+    return axios.post(utils.apiUrl('settings', 'acl/roles/permissions'), payload);
   },
 
-  removeRolePermission(role, permissionType, context, slug) {
+  removeRolePermission(role, permissionType, context) {
     const payload = { permissionType, role, context };
 
-    return axios.delete(utils.apiUrl(`projects/${slug}/settings`, 'acl/roles/permissions'), { data: payload });
+    return axios.delete(utils.apiUrl('settings', 'acl/roles/permissions'), { data: payload });
   },
 };
