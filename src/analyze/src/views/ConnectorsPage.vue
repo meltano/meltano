@@ -215,7 +215,7 @@ export default {
           </ConnectorCard>
         </div>
         <h2 class="title is-3">Available</h2>
-        <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
+        <p v-if="filteredLoaders.length === 0">All available loaders have been installed.</p>
         <div v-else class="card-grid">
           <ConnectorCard v-for="(loader, index) in filteredLoaders"
             :connector="loader"
