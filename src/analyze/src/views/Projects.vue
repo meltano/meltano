@@ -20,7 +20,7 @@
               <div class="columns is-mobile">
                 <div class="column is-one-fifth">
                   <router-link
-                    :to="{name: 'connectors', params: {projectSlug: project.name}}"
+                    :to="{name: 'dataSetup', params: {projectSlug: project.name}}"
                     class="button is-success">
                     Setup
                   </router-link>

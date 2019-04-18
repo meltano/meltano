@@ -21,12 +21,6 @@
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
 
-        <router-link
-          :to="{name: 'dataSetup'}"
-          class="navbar-item navbar-child">
-          Setup
-        </router-link>
-
         <div class="navbar-project-label navbar-item navbar-child">
           <span v-if="currentProjectSlug" class='is-italic'>
             {{currentProjectSlug}}
@@ -36,9 +30,9 @@
 
         <router-link
           v-if="currentProjectSlug"
-          :to="{name: 'connectors', params: { projectSlug: currentProjectSlug }}"
+          :to="{name: 'dataSetup', params: { projectSlug: currentProjectSlug }}"
           class="navbar-item navbar-child">
-          Connectors
+          Setup
         </router-link>
 
         <router-link

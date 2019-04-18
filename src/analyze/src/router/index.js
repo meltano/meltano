@@ -3,7 +3,6 @@ import Vue from 'vue';
 
 import store from '@/store/';
 
-import Connectors from '@/views/Connectors';
 import DataSetup from '@/views/DataSetup';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
@@ -36,19 +35,14 @@ const router = new Router({
       component: Projects,
     },
     {
-      path: '/setup/',
-      name: 'dataSetup',
-      component: DataSetup,
-    },
-    {
       path: '/start/',
       name: 'start',
       component: Start,
     },
     {
-      path: '/projects/:projectSlug/connectors/',
-      name: 'connectors',
-      component: Connectors,
+      path: '/projects/:projectSlug/setup/',
+      name: 'dataSetup',
+      component: DataSetup,
     },
     {
       path: '/projects/:projectSlug/transformations/',
