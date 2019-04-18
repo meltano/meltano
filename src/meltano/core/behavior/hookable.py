@@ -2,6 +2,8 @@ import contextlib
 import io
 from collections import OrderedDict
 
+from typing import Iterator, Tuple
+
 
 class TriggerError(Exception):
     def __init__(self, before_hooks={}, after_hooks={}):
@@ -11,13 +13,18 @@ class TriggerError(Exception):
     def __str__(self):
         buf = io.StringIO()
 
-        for hook, err in self.before_hooks.items():
-            buf.write(f"[{hook}] raised: {str(err)}")
-
-        for hook, err in self.after_hooks.items():
-            buf.write(f"[{hook}] raised: {str(err)}")
+        for hook, err in self.errors:
+            buf.write(f"[{hook}] raised: {str(err)}\n")
 
         return buf.getvalue()
+
+    @property
+    def errors(self) -> Iterator[Tuple[str, Exception]]:
+        for hook, err in self.before_hooks.items():
+            yield hook, err
+
+        for hook, err in self.after_hooks.items():
+            yield hook, err
 
 
 class hook:
