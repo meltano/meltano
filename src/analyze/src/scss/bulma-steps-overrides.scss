@@ -9,36 +9,33 @@ $steps-divider-height:	.1em;
 
 .steps .step-item {
   color: $grey-lighter;
-}
 
-.steps .step-item.is-active,
-.steps .step-item.is-completed {
-  color: $primary;
+  &.is-active {
+    color: $grey-dark;
+
+    .step-marker {
+      color: $primary !important;
+      background-color: $light !important;
+      border: .1em solid $primary;
+    }
+  }
+
+  &.is-completed {
+    cursor: pointer;
+    color: $primary;
+
+    &:hover {
+      .step-marker {
+        border: .1em solid $primary;
+      }
+    }
+
+    .step-marker {
+      color: $primary !important;
+    }
+  }
 
   .step-marker {
-    color: $primary !important;
+    color: $grey-lighter !important;
   }
-}
-
-.steps .step-item.is-completed {
-  cursor: pointer;
-
-  .step-marker {
-    border: .1em solid $grey-lighter;
-  }
-}
-
-.steps .step-item.is-completed:hover {
-  .step-marker {
-    border: .1em solid $primary;
-  }
-}
-
-.steps .step-item .step-marker {
-  color: $grey-lighter !important;
-}
-
-.steps .step-item.is-active .step-marker {
-  background-color: $light !important;
-  border: .1em solid $primary;
 }
