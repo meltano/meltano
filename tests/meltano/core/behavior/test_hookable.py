@@ -1,7 +1,7 @@
 import pytest
 from unittest import mock
 
-from meltano.core.behavior.hookable import HookObject, hook
+from meltano.core.behavior.hookable import HookObject, hook, TriggerError
 
 
 class Hooked(HookObject):
@@ -44,6 +44,24 @@ class Hooked2(HookObject):
         raise Exception()
 
 
+class HookedException(Hooked):
+    def __init__(self):
+        self.before_ex = Exception("before")
+        self.after_ex = Exception("after")
+
+        super().__init__()
+
+    @hook("before_test")
+    def hook_raises_before(self):
+        self.call("hook_raises_before")
+        raise self.before_ex
+
+    @hook("after_test")
+    def hook_raises_after(self):
+        self.call("hook_raises_after")
+        raise self.after_ex
+
+
 class TestHookable:
     def test_trigger_hook(self):
         subject = Hooked()
@@ -59,7 +77,7 @@ class TestHookable:
         ]
         assert process.called_once
 
-    def test_trigget_hook_raise(self):
+    def test_trigger_hook_raise(self):
         subject = Hooked()
         process = mock.MagicMock()
 
@@ -84,3 +102,23 @@ class TestHookable:
             "after_test_2",
         ]
         assert process.called_once
+
+    def test_trigger_hook_raises(self):
+        subject = HookedException()
+        process = mock.MagicMock()
+
+        with pytest.raises(TriggerError) as ex, subject.trigger_hooks("test"):
+            process()
+
+        assert subject.before_ex is ex.value.before_hooks["before_test"]
+        assert subject.after_ex is ex.value.after_hooks["after_test"]
+
+        # assert not process.called
+        assert subject.calls == [
+            "before_test",
+            "before_test_2",
+            "hook_raises_before",
+            "after_test",
+            "after_test_2",
+            "hook_raises_after",
+        ]
