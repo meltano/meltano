@@ -5,7 +5,6 @@ from .venv_service import VenvService
 from .utils import noop
 from .plugin import Plugin
 from .project import Project
-from .behavior.hookable import TriggerError
 from .error import PluginInstallError, PluginInstallWarning, SubprocessError
 
 
@@ -59,9 +58,3 @@ class PluginInstallService:
                 )
         except SubprocessError as err:
             raise PluginInstallError(str(err), err.process)
-        except TriggerError as trig:
-            for err in trig.before_hooks.values():
-                raise err from trig
-
-            for err in trig.after_hooks.values():
-                raise err from trig

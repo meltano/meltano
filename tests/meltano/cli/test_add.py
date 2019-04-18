@@ -22,7 +22,7 @@ class TestCliAdd:
     def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.get_plugin(plugin_type, plugin_name)
+            config_service.get_plugin(plugin_name, plugin_type=plugin_type)
 
         res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
 
@@ -38,6 +38,7 @@ class TestCliAdd:
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
+        project.reload()
 
         assert res.exit_code == 1
         assert "'tap-unknown' is not supported" in res.stdout
@@ -45,12 +46,12 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            project.reload()
             config_service.get_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
+        project.reload()
 
         assert res.exit_code == 1, res.stdout
         assert "Failed to install plugin 'tap-mock'" in res.stdout
@@ -58,7 +59,6 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            project.reload()
             config_service.get_plugin("tap-mock", PluginType.EXTRACTORS)
 
     @mock.patch("meltano.cli.add.PluginInstallService", autospec=True)

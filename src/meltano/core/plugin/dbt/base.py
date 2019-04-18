@@ -10,9 +10,9 @@ class DbtPlugin(Plugin, HookObject):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
     def invoker(self, project, *args, **kwargs):
-        return DbtInvoker(project, self, *args,
-                          run_dir=project.root_dir("transform"),
-                          **kwargs)
+        return DbtInvoker(
+            project, self, *args, run_dir=project.root_dir("transform"), **kwargs
+        )
 
 
 class DbtTransformPlugin(Plugin, HookObject):

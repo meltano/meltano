@@ -11,8 +11,11 @@ from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
 from .error import SubprocessError
 
+
 def invoker_factory(project, plugin, *args, **kwargs):
-    return plugin.invoker(project, *args, **kwargs) or PluginInvoker(project, plugin, *args, **kwargs)
+    return plugin.invoker(project, *args, **kwargs) or PluginInvoker(
+        project, plugin, *args, **kwargs
+    )
 
 
 class PluginInvoker:
@@ -75,8 +78,7 @@ class PluginInvoker:
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = [*self.exec_args(), *args]
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(popen_args,
-                                           **Popen_options)
+                process = subprocess.Popen(popen_args, **Popen_options)
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
             raise

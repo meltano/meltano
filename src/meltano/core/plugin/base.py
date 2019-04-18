@@ -59,7 +59,7 @@ class Plugin(HookObject):
         pip_url=None,
         config=None,
         select=None,
-        **extras
+        **extras,
     ):
         self.name = name
         self.type = plugin_type

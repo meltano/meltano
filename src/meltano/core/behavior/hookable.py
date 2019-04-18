@@ -57,7 +57,9 @@ class Hookable(type):
         cls.__hooks__ = {}
 
         for hook_name, hook in (
-            (func.__hook__.name, func) for func in dct.values() if hasattr(func, "__hook__")
+            (func.__hook__.name, func)
+            for func in dct.values()
+            if hasattr(func, "__hook__")
         ):
             cls.__hooks__[hook_name] = cls.__hooks__.get(hook_name, [])
             cls.__hooks__[hook_name].append(hook)
@@ -77,15 +79,11 @@ class HookObject(metaclass=Hookable):
 
     @contextlib.contextmanager
     def trigger_hooks(self, hook_name, *args, **kwargs):
-        self.__class__.trigger(
-            self, f"before_{hook_name}", *args, **kwargs
-        )
+        self.__class__.trigger(self, f"before_{hook_name}", *args, **kwargs)
 
         yield
 
-        self.__class__.trigger(
-            self, f"after_{hook_name}", *args, **kwargs
-        )
+        self.__class__.trigger(self, f"after_{hook_name}", *args, **kwargs)
 
     @classmethod
     def trigger(cls, target, hook_name, *args, **kwargs):
@@ -103,4 +101,4 @@ class HookObject(metaclass=Hookable):
                 if hook.__hook__.can_fail:
                     logging.warn(f"{hook_name} has failed: {err}")
                 else:
-                    raise TriggerError(hook_name, err)
+                    raise TriggerError(hook_name, err) from err

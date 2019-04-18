@@ -121,7 +121,7 @@ class Project:
         return self.meltano_dir("models", *joinpaths)
 
     @makedirs
-    def plugin_dir(self, plugin: 'Plugin', *joinpaths):
+    def plugin_dir(self, plugin: "Plugin", *joinpaths):
         return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
 
     def __eq__(self, other):
