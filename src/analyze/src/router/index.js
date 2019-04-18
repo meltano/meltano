@@ -4,6 +4,7 @@ import Vue from 'vue';
 import store from '@/store/';
 
 import Connectors from '@/views/Connectors';
+import DataSetup from '@/views/DataSetup';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
@@ -33,6 +34,11 @@ const router = new Router({
       path: '/projects/',
       name: 'projects',
       component: Projects,
+    },
+    {
+      path: '/setup/',
+      name: 'dataSetup',
+      component: DataSetup,
     },
     {
       path: '/start/',
