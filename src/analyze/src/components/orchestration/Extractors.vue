@@ -127,7 +127,6 @@ export default {
       </div>
 
 
-
       <h2 class="title is-3">Installed</h2>
       <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
         No extractors currently installed
