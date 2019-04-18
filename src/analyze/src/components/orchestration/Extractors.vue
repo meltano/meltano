@@ -71,7 +71,7 @@ export default {
       this.extractorInFocus = extractor;
     },
   },
-}
+};
 </script>
 
 <template>
