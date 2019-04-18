@@ -53,7 +53,7 @@
 import _ from 'lodash';
 
 export default {
-  name: 'ExtractorEntities',
+  name: 'Entities',
   props: {
     extractor: {
       type: Object,

@@ -3,7 +3,6 @@ import BaseAccordion from '@/components/generic/BaseAccordion';
 import BaseCard from '@/components/generic/BaseCard';
 import ConnectorCard from '@/components/orchestration/ConnectorCard';
 import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
-import ExtractorEntities from '@/components/orchestration/ExtractorEntities';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 import { mapState, mapGetters } from 'vuex';
@@ -17,7 +16,6 @@ export default {
     BaseCard,
     ConnectorCard,
     ConnectorSettings,
-    ExtractorEntities,
     RouterViewLayout,
   },
   data() {
@@ -33,7 +31,6 @@ export default {
     ...mapState('orchestrations', [
       'installedPlugins',
       'extractors',
-      'extractorEntities',
       'extractorSettings',
       'installedPlugins',
     ]),
@@ -146,10 +143,6 @@ export default {
             ></ConnectorSettings>
 
             <hr>
-
-            <ExtractorEntities
-              :extractor='extractorInFocus'
-              :extractor-entities='extractorEntities'></ExtractorEntities>
 
           </div>
 
