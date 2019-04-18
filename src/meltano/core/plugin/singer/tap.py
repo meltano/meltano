@@ -68,7 +68,6 @@ class SingerTap(SingerPlugin):
             logging.warn("Invalid catalog output by --discovery.")
             properties_file.unlink()
 
-
     @hook("before_invoke", can_fail=True)
     def apply_select(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:

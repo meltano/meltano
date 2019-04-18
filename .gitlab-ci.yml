@@ -94,6 +94,9 @@ docs:
     - pip install '.[dev]'
   script:
     - pytest -v
+  artifacts:
+    paths:
+      - pytest.log
 
 test_postgres:
   <<: *test
