@@ -20,6 +20,20 @@ $steps-divider-height:	.1em;
   }
 }
 
+.steps .step-item.is-completed {
+  cursor: pointer;
+
+  .step-marker {
+    border: .1em solid $grey-lighter;
+  }
+}
+
+.steps .step-item.is-completed:hover {
+  .step-marker {
+    border: .1em solid $primary;
+  }
+}
+
 .steps .step-item .step-marker {
   color: $grey-lighter !important;
 }
