@@ -93,10 +93,11 @@ docs:
     - make bundle
     - pip install '.[dev]'
   script:
-    - pytest -v
+    - pytest -v --cov --cov-report html
   artifacts:
     paths:
-      - pytest.log
+      - htmlcov/
+    when: on_success
 
 test_postgres:
   <<: *test
