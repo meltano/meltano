@@ -62,12 +62,4 @@ const router = new Router({
   ],
 });
 
-// Update project at global level vs in each page/view component where subsequent API calls can
-// leverage the project store's `currentProjectSlug` for prefixing API calls with a project context
-router.beforeEach((to, from, next) => {
-  const projectSlug = to.params.projectSlug || '';
-  store.dispatch('projects/setProjectSlug', projectSlug);
-  next();
-});
-
 export default router;
