@@ -488,7 +488,6 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import store from '@/store';
 import capitalize from '@/filters/capitalize';
 import RouterViewLayout from '@/views/RouterViewLayout';
-import Store from '@/store';
 import Dropdown from '../components/generic/Dropdown';
 import ResultTable from '../components/designs/ResultTable';
 import SelectDropdown from '../components/generic/SelectDropdown';
