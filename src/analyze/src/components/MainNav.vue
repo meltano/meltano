@@ -18,18 +18,12 @@
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
-        <router-link
-          :to="{name: 'projects'}"
-          class="navbar-item navbar-child">Projects</router-link>
-        <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'projectFiles', params: { projectSlug: currentProjectSlug }}"
-          class="navbar-item navbar-child">
+        <router-link to="/" class="navbar-item navbar-child">
           Files
         </router-link>
 
         <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link" v-if="currentProjectSlug">
+          <a class="navbar-link">
             Analyze
           </a>
           <div class="navbar-dropdown
@@ -39,30 +33,20 @@
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
-            <!-- TODO move to getter -->
             <router-link
-              :to="{name:'analyze',
-                    params:
-                      {
-                        projectSlug: currentProjectSlug,
-                        model: model,
-                        design: design
-                      }
-                    }"
-            class="navbar-item navbar-child"
-            v-for="design in v['designs']"
-            @click.native="menuSelected"
-            :key="design">
+              :to="urlForModelDesign(model, design)"
+              class="navbar-item navbar-child"
+              v-for="design in v['designs']"
+              @click.native="menuSelected"
+              :key="design">
               {{design | capitalize | underscoreToSpace}}
             </router-link>
             </template>
           </div>
         </div>
 
-        <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'dashboards', params: { projectSlug: currentProjectSlug }}"
-          class="navbar-item navbar-child">
+        <router-link to="/dashboards"
+        class="navbar-item navbar-child">
           Dashboards
         </router-link>
 
@@ -80,18 +64,17 @@
             </a>
           </div>
         </div>
-        <div
-          v-if="currentProjectSlug"
-          class="navbar-item has-dropdown is-hoverable">
+
+        <div class="navbar-item has-dropdown is-hoverable">
           <div class="navbar-link">
             Settings
           </div>
           <div class="navbar-dropdown is-boxed">
-            <router-link :to="{name:'database', params: { projectSlug: currentProjectSlug }}"
+            <router-link to="/settings/database"
                          class="navbar-item navbar-child">
               Database
             </router-link>
-            <router-link :to="{name:'connectors', params: { projectSlug: currentProjectSlug }}"
+            <router-link :to="{name:'connectors'}"
                          class="navbar-item navbar-child">
               Connectors
             </router-link>
@@ -102,7 +85,7 @@
   </nav>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
@@ -127,8 +110,6 @@ export default {
   data() {
     return {
       isMobileMenuOpen: false,
-      design: '',
-      model: '',
     };
   },
   filters: {
@@ -140,8 +121,8 @@ export default {
       'models',
       'navbarClicked',
     ]),
-    ...mapState('projects', [
-      'currentProjectSlug',
+    ...mapGetters('repos', [
+      'urlForModelDesign',
     ]),
   },
   methods: {

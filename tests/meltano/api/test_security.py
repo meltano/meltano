@@ -81,7 +81,7 @@ class TestSecurity:
             assert identity.user == user
 
     @pytest.mark.usefixtures("app_context")
-    def test_bootstrap(self, app, api, impersonate, project):
+    def test_bootstrap(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
                 res = api.get(url_for("security.bootstrap_app"))
@@ -93,7 +93,7 @@ class TestSecurity:
                 assert query["auth_token"]
 
     @pytest.mark.usefixtures("app_context")
-    def test_bootstrap_unauthenticated(self, app, api, project):
+    def test_bootstrap_unauthenticated(self, app, api):
         with app.test_request_context():
             res = api.get(url_for("security.bootstrap_app"))
             url = urllib.parse.urlparse(res.location)
@@ -120,9 +120,9 @@ class TestSingleUser:
             assert isinstance(current_user._get_current_object(), FreeUser)
 
     @pytest.mark.usefixtures("app_context")
-    def test_bootstrap(self, app, api, project):
+    def test_bootstrap(self, app, api):
         with app.test_request_context():
-            res = api.get(url_for("security.bootstrap_app", project_slug=project.slug))
+            res = api.get(url_for("security.bootstrap_app"))
 
             assert res.status_code == 302
             assert res.location == url_for("root.default", _external=True)

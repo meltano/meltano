@@ -1,5 +1,3 @@
-from .project_helper import project_api_route, project_from_slug
-
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
@@ -13,13 +11,12 @@ from meltano.cli.add import extractor
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 orchestrationsBP = Blueprint(
-    "orchestrations", __name__, url_prefix=project_api_route("orchestrations")
+    "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
 )
 
 
 @orchestrationsBP.route("/", methods=["GET"])
-@project_from_slug
-def index(project):
+def index():
     new_project = Project()
     new_plugin_discovery_service = PluginDiscoveryService(new_project)
     result = new_plugin_discovery_service.discover(PluginType.ALL)
@@ -27,14 +24,14 @@ def index(project):
 
 
 @orchestrationsBP.route("/installed-plugins", methods=["GET"])
-@project_from_slug
-def installed_plugins(project):
+def installed_plugins():
+    project = Project.find()
     return jsonify(project.meltano)
 
 
 @orchestrationsBP.route("/add-extractor", methods=["POST"])
-@project_from_slug
-def add_extractor(project):
+def add_extractor():
+    project = Project.find()
     add_service = ProjectAddService(project)
     plugin_name = request.get_json()["name"]
     plugin = add_service.add("extractors", plugin_name)
@@ -47,8 +44,8 @@ def add_extractor(project):
 
 
 @orchestrationsBP.route("/add-loader", methods=["POST"])
-@project_from_slug
-def add_loader(project):
+def add_loader():
+    project = Project.find()
     add_service = ProjectAddService(project)
     plugin_name = request.get_json()["name"]
     plugin = add_service.add("loaders", plugin_name)
@@ -61,8 +58,7 @@ def add_loader(project):
 
 
 @orchestrationsBP.route("/connection_names", methods=["GET"])
-@project_from_slug
-def connection_names(project):
+def connection_names():
     settings = Settings.query.first()
     if not settings:
         settings = Settings()
@@ -73,8 +69,7 @@ def connection_names(project):
 
 
 @orchestrationsBP.route("/run", methods=["POST"])
-@project_from_slug
-def run(project):
+def run():
     out_nl = "\n"
     run_output = StringIO(newline=out_nl)
     incoming = request.get_json()
@@ -104,8 +99,7 @@ def run(project):
 
 
 @orchestrationsBP.route("/extract/<extractor_name>", methods=["POST"])
-@project_from_slug
-def extract(extractor_name: str, project) -> Response:
+def extract(extractor_name: str) -> Response:
     """
     endpoint that performs extraction of the selected datasource to the .csv file(s)
     stored on disk in the /static/tmp/ directory)
@@ -121,8 +115,7 @@ def extract(extractor_name: str, project) -> Response:
 
 
 @orchestrationsBP.route("/save/configuration", methods=["POST"])
-@project_from_slug
-def save_plugin_configuration(project) -> Response:
+def save_plugin_configuration() -> Response:
     """
     endpoint for persisting a plugin configuration
     """
@@ -136,11 +129,11 @@ def save_plugin_configuration(project) -> Response:
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])
-@project_from_slug
-def selectEntities(project) -> Response:
+def selectEntities() -> Response:
     """
     endpoint that performs selection of the user selected entities and attributes
     """
+    project = Project.find()
     incoming = request.get_json()
     extractor_name = incoming["extractorName"]
     entity_groups = incoming["entityGroups"]
@@ -160,11 +153,11 @@ def selectEntities(project) -> Response:
 
 
 @orchestrationsBP.route("/entities/<extractor_name>", methods=["POST"])
-@project_from_slug
-def entities(extractor_name: str, project) -> Response:
+def entities(extractor_name: str) -> Response:
     """
     endpoint that returns the entities associated with a particular extractor
     """
+    project = Project.find()
     select_service = SelectService(project, extractor_name)
     list_all = select_service.get_extractor_entities()
 
@@ -193,8 +186,7 @@ def entities(extractor_name: str, project) -> Response:
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])
-@project_from_slug
-def load(loader_name: str, project) -> Response:
+def load(loader_name: str) -> Response:
     """
     endpoint that performs load of the .csv file(s)(stored on disk in the /static/tmp/ directory)
     of the selected extractor  into the selected loader
@@ -252,8 +244,7 @@ def load(loader_name: str, project) -> Response:
 
 
 @orchestrationsBP.route("/transform/<topic_name>", methods=["POST"])
-@project_from_slug
-def transform(model_name, project):
+def transform(model_name):
     """
     {
         'connection_name': 'prod_dw',

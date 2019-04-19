@@ -5,12 +5,12 @@
       <ul class="menu-list">
         <router-link
           tag="li"
-          :to="{name:'database', params: {projectSlug: currentProjectSlug}}">
+          :to="{name:'database'}">
           <a>Database</a>
         </router-link>
         <router-link
           tag="li"
-          :to="{name:'connectors', params: {projectSlug: currentProjectSlug}}">
+          :to="{name:'connectors'}">
           <a>Connectors</a>
         </router-link>
       </ul>
@@ -32,11 +32,6 @@ export default {
   components: {
     RouterViewLayout,
   },
-  computed: {
-    ...mapState('projects', [
-      'currentProjectSlug',
-    ]),
-  },
   data() {
     return {
       categories: [
@@ -45,13 +40,6 @@ export default {
           pages: [{
             title: 'Database',
             href: '/settings/database',
-          }],
-        },
-        {
-          name: 'Access control',
-          pages: [{
-            title: 'Roles',
-            href: '/settings/roles',
           }],
         },
         {

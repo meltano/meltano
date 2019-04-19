@@ -1,11 +1,9 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Repo from '@/views/Repo';
-import Projects from '@/views/Projects';
-import store from '@/store/';
-import Start from '@/views/Start';
 import Design from '@/views/Design';
 import Dashboards from '@/views/Dashboards';
+import NotFound from '@/views/NotFound';
 import Settings from '@/views/Settings';
 import Connectors from '@/views/Connectors';
 import SettingsDatabase from '@/components/settings/Database';
@@ -17,48 +15,42 @@ const router = new Router({
   mode: 'history',
   routes: [
     {
+      path: '*',
+      name: '404',
+      component: NotFound,
+    },
+    {
       path: '/',
-      name: 'home',
-      redirect: '/projects',
+      redirect: '/files',
     },
     {
-      path: '/projects/',
-      name: 'projects',
-      component: Projects,
-    },
-    {
-      path: '/start/',
-      name: 'start',
-      component: Start,
-    },
-    {
-      path: '/projects/:projectSlug/files/',
-      name: 'projectFiles',
+      path: '/files/',
+      name: 'Repo',
       component: Repo,
     },
     {
-      path: '/projects/:projectSlug/analyze/:model/:design',
-      name: 'analyze',
+      path: '/analyze/:model/:design',
+      name: '',
       component: Design,
     },
     {
-      path: '/projects/:projectSlug/analyze/:model/:design/reports/report/:slug',
-      name: 'design_report',
+      path: '/analyze/:model/:design/reports/report/:slug',
+      name: 'Report',
       component: Design,
     },
     {
-      path: '/projects/:projectSlug/dashboards/',
-      name: 'dashboards',
+      path: '/dashboards/',
+      name: 'Dashboards',
       component: Dashboards,
     },
     {
-      path: '/projects/:projectSlug/dashboards/dashboard/:slug',
-      name: 'dashboard',
+      path: '/dashboards/dashboard/:slug',
+      name: 'Dashboard',
       component: Dashboards,
     },
     {
-      path: '/projects/:projectSlug/settings',
-      name: 'settings',
+      path: '/settings',
+      name: 'Settings',
       component: Settings,
       children: [
         {
@@ -79,14 +71,6 @@ const router = new Router({
       ],
     },
   ],
-});
-
-// Update project at global level vs in each page/view component where subsequent API calls can
-// leverage the project store's `currentProjectSlug` for prefixing API calls with a project context
-router.beforeEach((to, from, next) => {
-  const projectSlug = to.params.projectSlug || '';
-  store.dispatch('projects/setProjectSlug', projectSlug);
-  next();
 });
 
 export default router;

@@ -93,7 +93,8 @@ const actions = {
     orchestrationsApi.index()
       .then((response) => {
         commit('setAll', response.data);
-      });
+      })
+      .catch(() => {});
   },
 
   getExtractorEntities({ commit }, extractorName) {
@@ -120,7 +121,8 @@ const actions = {
     orchestrationsApi.connectionNames()
       .then((response) => {
         commit('setConnectionNames', response.data);
-      });
+      })
+      .catch(() => {});
   },
 
   currentViewClicked({ commit }, selectedCurrentView) {
@@ -154,7 +156,8 @@ const actions = {
     orchestrationsApi.extract(state.currentExtractor)
       .then((response) => {
         state.log = `Output saved to \n${response.data.output_file_paths.join(',\n')}`;
-      });
+      })
+      .catch(() => {});
   },
 
   runLoader() {
@@ -162,7 +165,8 @@ const actions = {
     orchestrationsApi.load(state.currentExtractor, state.currentLoader)
       .then((response) => {
         state.log = `CSV's Loaded \n${response.data.inserted_files.join(',\n')}`;
-      });
+      })
+      .catch(() => {});
   },
 
   runTransform() {
@@ -170,7 +174,8 @@ const actions = {
     orchestrationsApi.transform(state.currentExtractor, state.currentConnectionName)
       .then((response) => {
         state.log = `${response.data.command}\n${response.data.output}`;
-      });
+      })
+      .catch(() => {});
   },
 
   runJobs() {
@@ -183,7 +188,8 @@ const actions = {
     orchestrationsApi.run(payload)
       .then((response) => {
         state.log = response.data.append;
-      });
+      })
+      .catch(() => { });
   },
 
   toggleEntityGroup({ commit }, entityGroup) {

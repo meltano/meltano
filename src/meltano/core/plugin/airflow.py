@@ -22,15 +22,21 @@ class Airflow(Plugin):
     def config_files(self):
         return {"config": "airflow.cfg"}
 
-    @classmethod
-    def home(cls, project):
-        return project.root_dir("orchestrate")
+    def home(self, project):
+        return project.run_dir(self.name)
 
     @hook("before_prepare")
     def set_run_dir(self, invoker, *args):
         home = self.home(invoker.project)
-        os.environ["AIRFLOW_HOME"] = str(home)
-        invoker.config_service.run_dir = home
+        invoker.env["AIRFLOW_HOME"] = str(invoker.config_service.run_dir)
+        logging.debug(f"Set AIRFLOW_HOME={invoker.env['AIRFLOW_HOME']}")
+
+        # inject current PATH so the plugin can run `meltano`
+        venv_dir = invoker.project.venvs_dir(self.type, self.name)
+        invoker.env["PATH"] = os.pathsep.join(
+            [str(venv_dir.joinpath("bin")), os.environ["PATH"]]
+        )
+        invoker.env["VIRTUAL_ENV"] = str(venv_dir)
 
     @hook("before_install")
     def setup_env(self, project, *args):
@@ -40,12 +46,7 @@ class Airflow(Plugin):
 
     @hook("after_install")
     def after_install(self, project, *args):
-        plugin_config_service = PluginConfigService(
-            project, self, run_dir=project.root_dir("orchestrate")
-        )
-
-        # create the database directory
-        project.run_dir(self.name)
+        plugin_config_service = PluginConfigService(project, self)
 
         invoker = PluginInvoker(project, self, config_service=plugin_config_service)
 

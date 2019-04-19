@@ -37,6 +37,32 @@
       </div>
     </div>
 
+    <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
+
+    <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
+
+    <div class="el-logos">
+      <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
+      <img src="../assets/stripe-logo.png" alt="Stripe Logo">
+      <img src="../assets/csv-logo.png" alt="CSV Logo">
+      <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
+      <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
+      <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
+      <img src="../assets/zuora-logo.png" alt="Zuora Logo">
+      <img src="../assets/marketo-logo.png" alt="Marketo Logo">
+      <div class="carbon-intensity-logo">
+        <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
+        Carbon Intensity API
+      </div>
+      <img src="../assets/fastly-logo.png" alt="Fastly Logo">
+      <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
+      <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
+    </div>
+
+    <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
+
+    <p class="description"></p>
+
     <h2 class="quote">Meltano does for data what Docker did for containers</h2>
 
     <p class="description">Meltano is a single workflow for the entire data life cycle. From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
@@ -197,6 +223,12 @@
       <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
     </section>
 
+    <section class="section">
+      <h2 class="section__title">Sign up for our newsletter!</h2>
+      <p class="section__text">Get the latest updates on Meltano delivered right to your inbox! We will only use your email to provide you with updates and will never sell your information!</p>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
+    </section>
+
     <div
       class="footer"
     >
@@ -206,7 +238,7 @@
 </template>
 
 <script>
-import NavLink from './NavLink.vue'
+import NavLink from '../components/NavLink.vue'
 
 export default {
   components: { NavLink },
@@ -227,7 +259,7 @@ export default {
 </script>
 
 <style lang="stylus">
-@import './styles/config.styl'
+@import '../styles/config.styl'
 
 .button {
     display: inline-block;
@@ -431,5 +463,63 @@ export default {
 
 .mb0 {
   margin-bottom: 0;
+}
+
+.el-logos {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-column-gap: 30px;
+  grid-template-rows: repeat(4, 150px);
+  align-items: center;
+  justify-content: center;
+  grid-row-gap: 30px;
+  text-align: center;
+  padding: 30px;
+
+  img {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+}
+
+.el-logos {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(120px, 1fr);
+  grid-column-gap: 30px;
+  grid-row-gap: 30px;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+
+@media (min-width: 425px) {
+  .el-logos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 768px) {
+  .el-logos {
+    grid-template-columns: 1fr 1fr 1fr;
+
+    img {
+      max-width: 200px;
+      margin: 0 auto;
+    }
+  }
+}
+
+.ta-c {
+  text-align: center;
+}
+
+.carbon-intensity-logo {
+  display: flex;
+  align-items: center;
+  justify-conent: center;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 </style>

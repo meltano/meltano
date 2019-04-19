@@ -45,14 +45,16 @@ const actions = {
         commit('setValidatedState', response.data);
         state.loadingValidation = false;
         commit('setRepoFiles', { files });
-      });
+      })
+      .catch(() => {});
   },
 
   getFile({ commit }, file) {
     repoApi.file(file.id)
       .then((response) => {
         commit('setCurrentFileTable', response.data);
-      });
+      })
+      .catch(() => {});
   },
 
   lint({ commit }) {
@@ -86,7 +88,8 @@ const actions = {
     repoApi.models()
       .then((response) => {
         commit('setModels', response.data);
-      });
+      })
+      .catch(() => { });
   },
 
   navbarHideDropdown({ commit }) {
