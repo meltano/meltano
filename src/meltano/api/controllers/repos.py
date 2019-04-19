@@ -24,7 +24,7 @@ from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 from meltano.api.security.auth import permit
 
 
-reposBP = Blueprint("repos", __name__, url_prefix=project_api_route("repos"))
+reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
 
 
 class ReportIndexFilter(NameFilterMixin, ResourceFilter):

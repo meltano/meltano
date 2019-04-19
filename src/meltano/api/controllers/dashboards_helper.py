@@ -16,16 +16,14 @@ from .sql_helper import SqlHelper
 class DashboardsHelper:
     VERSION = "1.0.0"
 
-    def __init__(self, project):
-        self.project = project
-
     def get_dashboards(self):
-        path = self.project.root_dir("model")
+        project = Project.find()
+        path = project.root_dir("model")
         dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
         return dashboardsParser.contents()
 
     def get_dashboard_reports_with_query_results(self, reports):
-        sqlHelper = SqlHelper(self.project)
+        sqlHelper = SqlHelper()
         for report in reports:
             # TODO: refactor front-end `model` → `topic`
             m5oc = sqlHelper.get_m5oc_topic(report["model"])
@@ -51,9 +49,10 @@ class DashboardsHelper:
         return target_dashboard[0]
 
     def save_dashboard(self, data):
+        project = Project.find()
         slug = slugify(data["name"])
         file_name = f"{slug}.dashboard.m5o"
-        file_path = self.project.root_dir("model", file_name)
+        file_path = project.root_dir("model", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = DashboardsHelper.VERSION
         data["description"] = data["description"] or ""
@@ -63,21 +62,23 @@ class DashboardsHelper:
         return data
 
     def add_report_to_dashboard(self, data):
+        project = Project.find()
         dashboard = self.get_dashboard(data["dashboardId"])
         if data["reportId"] not in dashboard["reportIds"]:
             dashboard["reportIds"].append(data["reportId"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = self.project.root_dir("model", file_name)
+            file_path = project.root_dir("model", file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
         return dashboard
 
     def remove_report_from_dashboard(self, data):
+        project = Project.find()
         dashboard = self.get_dashboard(data["dashboardId"])
         if data["reportId"] in dashboard["reportIds"]:
             dashboard["reportIds"].remove(data["reportId"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = self.project.root_dir("model", file_name)
+            file_path = project.root_dir("model", file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
         return dashboard

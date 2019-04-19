@@ -12,7 +12,7 @@ from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDial
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 
-sqlBP = Blueprint("sql", __name__, url_prefix=project_api_route("sql"))
+sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
 
 
 @sqlBP.errorhandler(ConnectionNotFound)

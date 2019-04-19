@@ -5,7 +5,7 @@ from meltano.api.security import api_auth_required
 from meltano.api.security.auth import permit
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin, Need
 
-reportsBP = Blueprint("reports", __name__, url_prefix=project_api_route("reports"))
+reportsBP = Blueprint("reports", __name__, url_prefix="/api/v1/reports")
 
 
 @reportsBP.before_request
@@ -35,11 +35,10 @@ def index():
 
 
 @reportsBP.route("/load/<report_name>", methods=["GET"])
-@project_from_slug
-def load_report(report_name, project):
+def load_report(report_name):
     permit("view:reports", report_name)
 
-    reports_helper = ReportsHelper(project)
+    reports_helper = ReportsHelper()
     response_data = reports_helper.load_report(report_name)
 
     permit("view:design", response_data["design"])
@@ -48,18 +47,16 @@ def load_report(report_name, project):
 
 
 @reportsBP.route("/save", methods=["POST"])
-@project_from_slug
-def save_report(project):
-    reports_helper = ReportsHelper(project)
+def save_report():
+    reports_helper = ReportsHelper()
     post_data = request.get_json()
     response_data = reports_helper.save_report(post_data)
     return jsonify(response_data)
 
 
 @reportsBP.route("/update", methods=["POST"])
-@project_from_slug
-def update_report(project):
-    reports_helper = ReportsHelper(project)
+def update_report():
+    reports_helper = ReportsHelper()
     post_data = request.get_json()
     response_data = reports_helper.update_report(post_data)
     return jsonify(response_data)
