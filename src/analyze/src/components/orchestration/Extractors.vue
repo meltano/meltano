@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       filterExtractorsText: '',
-      installingExtractor: false,
+      installingExtractors: [],
       extractorInFocus: null,
     };
   },
@@ -33,6 +33,9 @@ export default {
     getIsConnectorInstalled() {
       return extractor => this.installedPlugins.extractors.find(item => item.name === extractor);
     },
+    getIsInstallingPlugin() {
+      return plugin => this.installingExtractors.includes(plugin);
+    },
     filteredExtractors() {
       if (this.filterExtractorsText) {
         return this.extractors
@@ -43,7 +46,7 @@ export default {
   },
   methods: {
     installExtractor(extractor) {
-      this.installingExtractor = true;
+      this.installingExtractors.push(extractor);
 
       orchestrationsApi.addExtractors({
         name: extractor,
@@ -51,7 +54,8 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingExtractor = false;
+              const idx = this.installingExtractors.indexOf(extractor);
+              this.installingExtractors.splice(idx, 1);
             });
         }
       });
@@ -134,7 +138,8 @@ export default {
                 </template>
                 <template v-else>
                   <a
-                    class="button is-success is-outlined is-block is-small"
+                    :class='{ "is-loading": getIsInstallingPlugin(extractor) }'
+                    class='button is-success is-outlined is-block is-small'
                     @click="installExtractor(extractor)">Install</a>
                 </template>
 
