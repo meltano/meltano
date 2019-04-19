@@ -2,10 +2,15 @@
   <div>
 
     <!-- Loading -->
-    <progress v-if="isLoading" class="progress is-small is-info"></progress>
+    <progress v-if="isLoading && !hasExtractorLoadingError" class="progress is-small is-info"></progress>
+
+    <!-- Loading error -->
+    <p v-if="hasExtractorLoadingError">
+      Extractor settings are not set properly in your <code>.env</code>.
+    </p>
 
     <!-- Loaded -->
-    <div v-else>
+    <div v-if='!isLoading && !hasExtractorLoadingError'>
       <div class="columns">
         <div class="column is-10">
           <h3>Entities for {{extractorEntities.extractorName}}</h3>
@@ -23,7 +28,7 @@
       <template v-if='hasEntities'>
         <div
           class='is-unselectable'
-          v-for='entityGroup in orderedEntityGroups'
+          v-for='entityGroup in extractorEntities.entityGroups'
           :key='`${entityGroup.name}`'>
           <a
             class='chip button is-rounded is-outlined entity'
@@ -31,7 +36,7 @@
             @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
           <div class='entity-group'>
             <a
-              v-for='attribute in orderedAttributes(entityGroup.attributes)'
+              v-for='attribute in entityGroup.attributes'
               :key='`${attribute.name}`'
               :class="{'is-success is-outlined': attribute.selected}"
               class="chip button is-rounded is-outlined is-small attribute"
@@ -50,7 +55,7 @@
 </template>
 
 <script>
-import _ from 'lodash';
+import { mapState } from 'vuex';
 
 export default {
   name: 'ExtractorEntities',
@@ -75,17 +80,14 @@ export default {
     this.$store.dispatch('orchestrations/clearExtractorEntities');
   },
   computed: {
+    ...mapState('orchestrations', [
+      'hasExtractorLoadingError',
+    ]),
     hasEntities() {
-      return this.orderedEntityGroups.length > 0;
+      return this.extractorEntities.entityGroups.length > 0;
     },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
-    },
-    orderedEntityGroups() {
-      return _.orderBy(this.extractorEntities.entityGroups, 'name');
-    },
-    orderedAttributes() {
-      return attributes => _.orderBy(attributes, 'name');
     },
   },
   methods: {

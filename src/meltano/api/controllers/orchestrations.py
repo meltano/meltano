@@ -182,6 +182,12 @@ def entities(extractor_name: str) -> Response:
                 {"name": stream.key, "attributes": [{"name": prop.key}]}
             )
 
+    entity_groups = sorted(entity_groups, key=lambda k: k["name"])
+    for entityGroup in entity_groups:
+        entityGroup["attributes"] = sorted(
+            entityGroup["attributes"], key=lambda k: k["name"]
+        )
+
     return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 
 
