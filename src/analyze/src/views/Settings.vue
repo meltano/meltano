@@ -23,8 +23,6 @@
   </router-view-layout>
 </template>
 <script>
-import { mapState } from 'vuex';
-
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
