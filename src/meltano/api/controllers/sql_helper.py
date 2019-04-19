@@ -28,9 +28,6 @@ class UnsupportedConnectionDialect(Exception):
 
 
 class SqlHelper(SqlUtils):
-    def __init__(self, project):
-        self.project = project
-
     def parse_sql(self, input):
         placeholders = self.placeholder_match(input)
 
@@ -42,11 +39,12 @@ class SqlHelper(SqlUtils):
         return (outer_results, inner_results)
 
     def get_m5oc_topic(self, topic_name):
-        m5oc_file = self.project.root_dir("model", f"{topic_name}.topic.m5oc")
+        project = Project.find()
+        m5oc_file = project.root_dir("model", f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
     def get_connection(self, connection_name):
-        settings_helper = SettingsHelper(self.project)
+        settings_helper = SettingsHelper()
         connections = settings_helper.get_connections()["settings"]["connections"]
 
         try:
@@ -61,6 +59,7 @@ class SqlHelper(SqlUtils):
             raise ConnectionNotFound(connection_name)
 
     def get_db_engine(self, connection_name):
+        project = Project.find()
         connection = self.get_connection(connection_name)
 
         if connection["dialect"] == "postgresql":
@@ -68,7 +67,7 @@ class SqlHelper(SqlUtils):
             user, pw, host, port, db = [connection[param] for param in psql_params]
             connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
         elif connection["dialect"] == "sqlite":
-            db_path = self.project.root.joinpath(connection["path"])
+            db_path = project.root.joinpath(connection["path"])
             connection_url = f"sqlite:///{db_path}"
         else:
             raise UnsupportedConnectionDialect(connection["dialect"])

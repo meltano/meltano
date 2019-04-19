@@ -36,18 +36,14 @@ const getters = {
 
 const actions = {
   getSettings({ commit }) {
-    settingsApi.index()
-      .then((response) => {
-        commit('setSettings', response.data.settings);
-      })
-      .catch(() => { });
+    return settingsApi.index().then((response) => {
+      commit('setSettings', response.data.settings);
+    });
   },
   saveConnection({ commit }, connection) {
-    settingsApi.saveConnection(connection)
-      .then((response) => {
-        commit('setSettings', response.data.settings);
-      })
-      .catch(() => { });
+    settingsApi.saveConnection(connection).then((response) => {
+      commit('setSettings', response.data.settings);
+    });
   },
   deleteConnection({ commit }, connection) {
     const connectionToRemove = state.settings.connections
@@ -59,7 +55,7 @@ const actions = {
       .catch(() => { });
   },
   fetchACL({ commit }) {
-    settingsApi.fetchACL()
+    return settingsApi.fetchACL()
       .then((response) => {
         commit('setACL', response.data);
       })

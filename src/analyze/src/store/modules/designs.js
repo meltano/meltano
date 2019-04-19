@@ -223,6 +223,7 @@ const actions = {
     state.currentSQL = '';
     state.currentModel = model;
     state.currentDesign = design;
+
     // TODO: chain callbacks to keep a single Promise
     const index = designApi.index(model, design)
       .then((response) => {

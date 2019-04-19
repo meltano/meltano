@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from meltano.core.schedule_service import ScheduleService
 
-import o
+import os
 
 print("\n==== CWD ====")
 print(os.getcwd())

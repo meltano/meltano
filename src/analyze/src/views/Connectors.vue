@@ -24,8 +24,7 @@ export default {
     return {
       filterExtractorsText: '',
       filterLoadersText: '',
-      installingExtractor: false,
-      installingLoader: false,
+      installingPlugins: [],
       extractorInFocus: null,
     };
   },
@@ -34,8 +33,6 @@ export default {
       'installedPlugins',
       'extractors',
       'extractorEntities',
-      'extractorSettings',
-      'installedPlugins',
     ]),
     ...mapGetters('orchestrations', [
       'remainingExtractors',
@@ -74,10 +71,13 @@ export default {
       }
       return this.remainingLoaders;
     },
+    isInstallingPlugin() {
+      return plugin => this.installingPlugins.includes(plugin);
+    },
   },
   methods: {
     installExtractor(extractor) {
-      this.installingExtractor = true;
+      this.installingPlugins.push(extractor);
 
       orchestrationsApi.addExtractors({
         name: extractor,
@@ -85,13 +85,14 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingExtractor = false;
+              const idx = this.installingPlugins.indexOf(extractor);
+              this.installingPlugins.splice(idx, 1);
             });
         }
       });
     },
     installLoader(loader) {
-      this.installingLoader = true;
+      this.installingPlugins.push(loader);
 
       orchestrationsApi.addLoaders({
         name: loader,
@@ -99,7 +100,8 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingLoader = false;
+              const idx = this.installingPlugins.indexOf(loader);
+              this.installingPlugins.splice(idx, 1);
             });
         }
       });
@@ -171,14 +173,12 @@ export default {
                 <template v-slot:callToAction>
                   <button
                     @click="updateExtractorInFocus(extractor)"
-                    class="card-button">Settings</button>
+                    class="button is-success is-fullwidth">Settings</button>
                 </template>
               </ConnectorCard>
             </div>
 
             <h2 class="title is-3">Available</h2>
-            <p v-if="installingExtractor">Installing...</p>
-            <progress v-if="installingExtractor" class="progress is-small is-info"></progress>
             <p v-if="filteredExtractors.length === 0">
               All available extractors have been installed.
             </p>
@@ -188,7 +188,10 @@ export default {
                 :key="`${extractor}-${index}`"
               >
                 <template v-slot:callToAction>
-                  <button @click="installExtractor(extractor)" class="card-button">Install</button>
+                  <button
+                    class="button is-success is-fullwidth"
+                    :class="{ 'is-loading': isInstallingPlugin(extractor) }"
+                    @click="installExtractor(extractor)">Install</button>
                 </template>
               </ConnectorCard>
             </div>
@@ -214,19 +217,27 @@ export default {
               :connector="loader.name"
               :key="`${loader.name}-${index}`"
             >
+              <template v-slot:callToAction>
+                <button
+                  disabled
+                  class="button is-success is-fullwidth">Settings</button>
+              </template>
             </ConnectorCard>
           </div>
           <h2 class="title is-3">Available</h2>
-          <p v-if="installingLoader">Installing...</p>
-          <progress v-if="installingLoader" class="progress is-small is-info"></progress>
-          <p v-if="filteredExtractors.length === 0">All available loaders have been installed.</p>
+          <p v-if="filteredLoaders.length === 0">
+            All available loaders have been installed.
+          </p>
           <div v-else class="card-grid">
             <ConnectorCard v-for="(loader, index) in filteredLoaders"
               :connector="loader"
               :key="`${loader}-${index}`"
             >
               <template v-slot:callToAction>
-                <button @click="installLoader(loader)" class="card-button">Install</button>
+                <button
+                  class="button is-success is-fullwidth"
+                  :class="{ 'is-loading': isInstallingPlugin(loader) }"
+                  @click="installLoader(loader)">Install</button>
               </template>
             </ConnectorCard>
           </div>
@@ -249,21 +260,6 @@ export default {
 .installed-connectors {
   display: grid;
   grid-row-gap: 15px;
-}
-
-.card-button {
-  width: 100%;
-  background-color: hsl(210, 100%, 42%);
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 1rem;
-  transition: background 0.2s ease-in;
-  cursor: pointer;
-
-  &:hover {
-    background-color: hsl(210, 74%, 22%);
-  }
 }
 
 .connector-input {
