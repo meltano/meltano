@@ -23,8 +23,6 @@
   </router-view-layout-sidebar>
 </template>
 <script>
-import { mapState } from 'vuex';
-
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {

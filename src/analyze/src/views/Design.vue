@@ -485,7 +485,6 @@
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import store from '@/store';
 import capitalize from '@/filters/capitalize';
 import Dropdown from '@/components/generic/Dropdown';
 import ResultTable from '@/components/designs/ResultTable';

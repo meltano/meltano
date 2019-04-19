@@ -7,7 +7,6 @@ import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
 import Orchestration from '@/views/Orchestration';
-import Projects from '@/views/Projects';
 import Repo from '@/views/Repo';
 import Transformations from '@/views/Transformations';
 
