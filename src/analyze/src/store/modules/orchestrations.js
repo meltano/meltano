@@ -39,28 +39,6 @@ const getters = {
     return !!state.currentExtractor && !!state.currentLoader;
   },
 
-  remainingExtractors() {
-    if (state.installedPlugins) {
-      const installedExtractors = state.installedPlugins.extractors || [];
-
-      if (installedExtractors && installedExtractors.length > 0) {
-        return state.extractors.filter((extractor) => {
-          let matchFound = false;
-
-          for (let i = 0; i < installedExtractors.length; i += 1) {
-            if (extractor === installedExtractors[i].name) {
-              matchFound = true;
-            }
-          }
-
-          return !matchFound;
-        });
-      }
-    }
-
-    return state.extractors;
-  },
-
   remainingLoaders() {
     if (state.installedPlugins) {
       const installedLoaders = state.installedPlugins.loaders;

@@ -30,25 +30,17 @@ export default {
       'installedPlugins',
       'extractors',
     ]),
-    ...mapGetters('orchestrations', [
-      'remainingExtractors',
-    ]),
+    getIsConnectorInstalled() {
+      return (extractor) => {
+        return this.installedPlugins.extractors.find((item) => item.name === extractor)
+      };
+    },
     filteredExtractors() {
       if (this.filterExtractorsText) {
-        return this.remainingExtractors
+        return this.extractors
           .filter(item => item.indexOf(this.filterExtractorsText) > -1);
       }
-      return this.remainingExtractors;
-    },
-    filteredInstalledExtractors() {
-      if (this.installedPlugins) {
-        if (this.filterExtractorsText) {
-          return this.installedPlugins.extractors
-            .filter(item => item.name.indexOf(this.filterExtractorsText) > -1);
-        }
-        return this.installedPlugins.extractors;
-      }
-      return [];
+      return this.extractors;
     },
   },
   methods: {
@@ -67,7 +59,8 @@ export default {
       });
     },
     updateExtractorInFocus(extractor) {
-      this.extractorInFocus = extractor;
+      const extractorObj = this.installedPlugins.extractors.find((item) => item.name === extractor);
+      this.extractorInFocus = extractorObj;
     },
   },
 };
@@ -97,76 +90,68 @@ export default {
 
     <div v-else>
 
-      <div class="content">
-        <input
-        type="text"
-        v-model="filterExtractorsText"
-        placeholder="Filter extractors..."
-        class="input connector-input">
+      <div
+        v-if="filteredExtractors.length === 0"
+        class='content'>
+        <p>
+          No extractors are available.
+        </p>
       </div>
 
-      <div class="tile is-ancestor flex-and-wrap">
-        <div
-          class="tile is-parent is-3"
-          v-for="(extractor, index) in extractors"
-          :key="`${extractor}-${index}`">
-          <div class="tile is-child box">
-            <div class="image is-64x64 container">
-              <img
-                :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`"
-                :alt="`gitlab logo`">
-            </div>
-            <div class="content is-small">
-              <p class='has-text-centered'>{{extractor}}</p>
-              <a
-                class="button is-success is-block is-small"
-                @click="installExtractor(extractor)">Install</a>
+      <template v-else>
+        <div class="columns">
+          <div class="column is-4 is-offset-4">
+            <input
+              type="text"
+              v-model="filterExtractorsText"
+              placeholder="Filter extractors..."
+              class="input connector-input">
+          </div>
+        </div>
+
+        <div class="tile is-ancestor flex-and-wrap">
+          <div
+            class="tile is-parent is-3"
+            v-for="(extractor, index) in filteredExtractors"
+            :key="`${extractor}-${index}`">
+            <div class="tile is-child box">
+              <div class="image is-64x64 container">
+                <img
+                  :class='{ "grayscale": !getIsConnectorInstalled(extractor) }'
+                  :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`"
+                  :alt="`gitlab logo`">
+              </div>
+              <div class="content is-small">
+                <p class='has-text-centered'>
+                  {{extractor}}
+                </p>
+
+                <template v-if='getIsConnectorInstalled(extractor)'>
+                  <div class="buttons are-small">
+                    <a
+                      class='button is-success flex-grow-1'
+                      @click="updateExtractorInFocus(extractor)">Account Settings</a>
+                    <a class='button' disabled>Uninstall</a>
+                  </div>
+                </template>
+                <template v-else>
+                  <a
+                    class="button is-success is-outlined is-block is-small"
+                    @click="installExtractor(extractor)">Install</a>
+                </template>
+
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </template>
 
-
-      <h2 class="title is-3">Installed</h2>
-      <p v-if="!filteredInstalledExtractors || filteredInstalledExtractors.length < 1">
-        No extractors currently installed
-      </p>
-      <div class="installed-connectors">
-        <ConnectorCard v-for="extractor in filteredInstalledExtractors"
-          :connector="extractor.name"
-          :key="`${extractor.name}`"
-        >
-          <template v-slot:callToAction>
-            <button
-              @click="updateExtractorInFocus(extractor)"
-              class="card-button">Settings</button>
-          </template>
-        </ConnectorCard>
-      </div>
-
-      <h2 class="title is-3">Available</h2>
-      <p v-if="installingExtractor">Installing...</p>
-      <progress v-if="installingExtractor" class="progress is-small is-info"></progress>
-      <p v-if="filteredExtractors.length === 0">
-        All available extractors have been installed.
-      </p>
-      <div v-else class="card-grid">
-        <ConnectorCard v-for="(extractor, index) in filteredExtractors"
-          :connector="extractor"
-          :key="`${extractor}-${index}`"
-        >
-          <template v-slot:callToAction>
-            <button @click="installExtractor(extractor)" class="card-button">Install</button>
-          </template>
-        </ConnectorCard>
-      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss">
-.image-tap {
-  height: 64px;
-  max-height: 64px;
+.flex-grow-1 {
+  flex-grow: 1;
 }
 </style>

@@ -21,3 +21,11 @@
   text-overflow: ellipsis;
   max-width: 100%;
 }
+
+.grayscale {
+  /*
+    We can turn this into a function or make more classes for specific grayscale values
+    if we end up with the need for values below 100.
+  */
+  filter: grayscale(100%);
+}
