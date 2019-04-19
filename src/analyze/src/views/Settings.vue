@@ -5,7 +5,7 @@
       <ul class="menu-list">
         <router-link
           tag="li"
-          :to="{name:'database', params: {projectSlug: $route.params.projectSlug}}">
+          :to="{name:'database'}">
           <a>Database</a>
         </router-link>
       </ul>
@@ -24,6 +24,23 @@ export default {
   name: 'Settings',
   components: {
     RouterViewLayout,
+  },
+  data() {
+    return {
+      categories: [{
+        name: 'Database',
+        pages: [{
+          title: 'Database',
+          href: '/settings/database',
+        }],
+      }, {
+        name: 'Access control',
+        pages: [{
+          title: 'Roles',
+          href: '/settings/roles',
+        }],
+      }],
+    };
   },
 };
 </script>

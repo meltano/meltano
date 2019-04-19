@@ -2,7 +2,6 @@ import logging
 import threading
 import time
 import requests
-import webbrowser
 from colorama import Fore
 
 from watchdog.observers import Observer
@@ -43,10 +42,9 @@ class MeltanoBackgroundCompiler:
 
     def start(self):
         try:
-            if self.observer:
-                self.observer.start()
-                for source in self.model_dirs:
-                    logging.info(f"Auto-compiling models in '{str(source)}'")
+            self.observer.start()
+            for source in self.model_dirs:
+                logging.info(f"Auto-compiling models in '{str(source)}'")
         except OSError:
             # most probably INotify being full
             logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
@@ -56,22 +54,19 @@ class MeltanoBackgroundCompiler:
 
 
 class UIAvailableWorker(threading.Thread):
-    def __init__(self, url, open_browser=False):
+    def __init__(self, url):
         super().__init__()
 
         self._terminate = False
         self.url = url
-        self.open_browser = open_browser
 
     def run(self):
         while not self._terminate:
             try:
                 response = requests.get(self.url)
                 if response.status_code == 200:
-                    if self.open_browser:
-                        webbrowser.open(self.url)
+                    print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
                     self._terminate = True
-
             except:
                 pass
 

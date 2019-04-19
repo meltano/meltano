@@ -1,5 +1,3 @@
-import projects from '@/store/modules/projects';
-
 export default {
 
   // Path Utils
@@ -8,15 +6,7 @@ export default {
   },
 
   apiUrl(blueprint, location = '') {
-    const currentProjectSlug = projects.getters.getCurrentProjectSlug();
-    const projectPrefix = currentProjectSlug ? `projects/${currentProjectSlug}` : '';
-    let url = '';
-    if (projectPrefix) {
-      url = [this.root(), 'api/v1', projectPrefix, blueprint, location].join('/');
-    } else {
-      url = [this.root(), 'api/v1', blueprint, location].join('/');
-    }
-    return url;
+    return [this.root(), 'api/v1', blueprint, location].join('/');
   },
 
   // Color Utils
