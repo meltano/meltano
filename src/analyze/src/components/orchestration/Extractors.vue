@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 
 import BaseCard from '@/components/generic/BaseCard';
 import ConnectorCard from '@/components/orchestration/ConnectorCard';
@@ -31,9 +31,7 @@ export default {
       'extractors',
     ]),
     getIsConnectorInstalled() {
-      return (extractor) => {
-        return this.installedPlugins.extractors.find((item) => item.name === extractor)
-      };
+      return extractor => this.installedPlugins.extractors.find(item => item.name === extractor);
     },
     filteredExtractors() {
       if (this.filterExtractorsText) {
@@ -59,7 +57,7 @@ export default {
       });
     },
     updateExtractorInFocus(extractor) {
-      const extractorObj = this.installedPlugins.extractors.find((item) => item.name === extractor);
+      const extractorObj = this.installedPlugins.extractors.find(item => item.name === extractor);
       this.extractorInFocus = extractorObj;
     },
   },
