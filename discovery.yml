@@ -2,7 +2,11 @@ extractors:
   - name: tap-gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
-      api_key: "$GITLAB_API_TOKEN"
+      api_url: "https://gitlab.com/api/v4"
+      private_token: "$GITLAB_API_TOKEN"
+      groups: "$GITLAB_API_GROUPS"
+      projects: "$GITLAB_API_PROJECTS"
+      start_date: "$GITLAB_API_START_DATE"
   - name: tap-zendesk
     pip_url: "tap-zendesk"
     config:
@@ -19,6 +23,8 @@ extractors:
       partner_id: $ZUORA_PARTNER_ID
       api_token: $ZUORA_API_TOKEN
       start_date: $ZUORA_START_DATE
+      sandbox: $ZUORA_SANDBOX
+    docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
     config:
@@ -58,6 +64,11 @@ extractors:
       start_date: $FASTLY_START_DATE
   - name: tap-carbon-intensity
     pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
+  - name: tap-csv
+    pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
+    config:
+      csv_files_definition: "$TAP_CSV_FILES_DEFINITION"
+    docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
@@ -97,3 +108,49 @@ transforms:
       entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
       generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
       region_table: "{{ env_var('PG_SCHEMA') }}.region"
+  - name: tap-salesforce
+    pip_url: "https://gitlab.com/meltano/dbt-tap-salesforce.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-gitlab
+    pip_url: "https://gitlab.com/meltano/dbt-tap-gitlab.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-stripe
+    pip_url: "https://gitlab.com/meltano/dbt-tap-stripe.git"
+    vars:
+      livemode: false
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-zuora
+    pip_url: "https://gitlab.com/meltano/dbt-tap-zuora.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
+  - name: tap-zendesk
+    pip_url: "https://gitlab.com/meltano/dbt-tap-zendesk.git"
+    vars:
+      schema: "{{ env_var('PG_SCHEMA') }}"
+models:
+  - name: model-carbon-intensity-sqlite
+    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
+  - name: model-carbon-intensity
+    pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity.git"
+  - name: model-salesforce
+    pip_url: "git+https://gitlab.com/meltano/model-salesforce.git"
+  - name: model-gitflix
+    pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"
+  - name: model-zendesk
+    pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
+  - name: model-gitlab
+    pip_url: "git+https://gitlab.com/meltano/model-gitlab.git"
+  - name: model-stripe
+    pip_url: "git+https://gitlab.com/meltano/model-stripe.git"
+  - name: model-zuora
+    pip_url: "git+https://gitlab.com/meltano/model-zuora.git"
+orchestrators:
+  - name: airflow
+    pip_url: "apache-airflow==1.10.2"
+    config:
+      core:
+        dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
+        plugins_folder: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+        sql_alchemy_conn: sqlite:///.meltano/orchestrators/airflow/airflow.db

@@ -6,7 +6,6 @@ class ExternalConnector:
         self.connections = {}
 
     def add_connections(self, connections):
-        print("adding connections...")
         for connection in connections:
             connection_name = connection["name"]
             if connection_name not in connections:

@@ -2,11 +2,11 @@ import os
 import yaml
 import requests
 from typing import Dict, List, Optional
+from itertools import groupby
 
 import meltano.core.bundle as bundle
 from .plugin import Plugin, PluginType
-from .plugin.singer import plugin_factory
-from .plugin.dbt import DbtPlugin, DbtTransformPlugin
+from .plugin.factory import plugin_factory
 
 
 class PluginNotFoundError(Exception):
@@ -62,18 +62,11 @@ class PluginDiscoveryService:
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (
-            self.plugin_generator(plugin_type, plugin_def)
+            plugin_factory(plugin_type, plugin_def)
             for plugin_type, plugin_defs in self.discovery.items()
             for plugin_def in plugin_defs
+            if PluginType.value_exists(plugin_type)
         )
-
-    def plugin_generator(self, plugin_type: PluginType, plugin_def: Dict):
-        if plugin_type == PluginType.TRANSFORMERS:
-            return DbtPlugin(**plugin_def)
-        elif plugin_type == PluginType.TRANSFORMS:
-            return DbtTransformPlugin(**plugin_def)
-        else:
-            return plugin_factory(plugin_type, plugin_def)
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
         try:
@@ -92,14 +85,17 @@ class PluginDiscoveryService:
                 PluginType.EXTRACTORS,
                 PluginType.LOADERS,
                 PluginType.TRANSFORMERS,
+                PluginType.MODELS,
                 PluginType.TRANSFORMS,
+                PluginType.ORCHESTRATORS,
             )
             if plugin_type == PluginType.ALL
             else (plugin_type,)
         )
         return {
-            plugin_type: self.list_discovery(plugin_type)
-            for plugin_type in enabled_plugin_types
+            plugin_type: [p.name for p in plugins]
+            for plugin_type, plugins in groupby(self.plugins(), lambda p: p.type)
+            if plugin_type in enabled_plugin_types
         }
 
     def list_discovery(self, discovery):

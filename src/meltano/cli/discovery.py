@@ -4,6 +4,7 @@ import click
 from urllib.parse import urlparse
 
 from . import cli
+from .params import project
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.plugin_discovery_service import (
@@ -14,6 +15,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
+@project
 @click.argument(
     "plugin_type",
     type=click.Choice(
@@ -21,19 +23,22 @@ from meltano.core.tracking import GoogleAnalyticsTracker
             PluginType.EXTRACTORS,
             PluginType.LOADERS,
             PluginType.TRANSFORMERS,
+            PluginType.MODELS,
             PluginType.TRANSFORMS,
+            PluginType.ORCHESTRATORS,
             PluginType.ALL,
         ]
     ),
 )
-def discover(plugin_type):
-    project = Project.find()
+def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     try:
         discovery_dict = discover_service.discover(plugin_type)
-        for key, value in discovery_dict.items():
-            click.secho(key, fg="green")
-            click.echo(value)
+
+        for plugin_type, plugins in discovery_dict.items():
+            click.secho(plugin_type, fg="green")
+            for plugin in plugins:
+                click.echo(plugin)
 
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_discover(plugin_type=plugin_type)

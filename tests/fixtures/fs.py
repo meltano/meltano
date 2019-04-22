@@ -27,3 +27,32 @@ def test_dir(tmp_path_factory):
         yield test_dir
     finally:
         shutil.rmtree(test_dir)
+
+
+@pytest.fixture
+def pushd(request):
+    def _pushd(path):
+        popd = partial(os.chdir, os.getcwd())
+        request.addfinalizer(popd)
+        os.chdir(path)
+
+        return popd
+
+    return _pushd
+
+
+def test_pushd(mkdtemp, pushd):
+    temp = mkdtemp()
+    cwd = os.getcwd()
+
+    os.makedirs(temp.joinpath("a"))
+    os.makedirs(temp.joinpath("a/b"))
+
+    pushd(temp / "a")
+    assert os.getcwd() == str(temp.joinpath("a"))
+
+    popd = pushd("b")
+    assert os.getcwd() == str(temp.joinpath("a/b"))
+
+    popd()
+    assert os.getcwd() == str(temp.joinpath("a"))

@@ -2,10 +2,10 @@ import logging
 import click
 import sys
 
-from meltano.core.project import Project, ProjectNotFound
 from meltano.core.permissions import grant_permissions, SpecLoadingError
 from meltano.core.tracking import GoogleAnalyticsTracker
 from . import cli
+from .params import project
 
 
 @cli.group()
@@ -15,6 +15,7 @@ def permissions():
 
 
 @permissions.command()
+@project
 @click.argument("spec")
 @click.option(
     "--db",
@@ -26,7 +27,7 @@ def permissions():
 @click.option(
     "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
 )
-def grant(db, spec, dry, diff):
+def grant(project, db, spec, dry, diff):
     """Grant the permissions provided in the provided specification file."""
     try:
         if not dry:
@@ -34,13 +35,8 @@ def grant(db, spec, dry, diff):
             sys.exit(1)
 
         sql_commands = grant_permissions(db, spec, dry_run=dry)
-
-        try:
-            project = Project.find()
-            tracker = GoogleAnalyticsTracker(project)
-            tracker.track_meltano_permissions_grant(db=db, dry=dry)
-        except ProjectNotFound as e:
-            pass
+        tracker = GoogleAnalyticsTracker(project)
+        tracker.track_meltano_permissions_grant(db=db, dry=dry)
 
         click.secho()
         if diff:

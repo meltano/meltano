@@ -1,8 +1,8 @@
 # Contributing
 
-We welcome contributions and improvements, please see the contribution guidelines below:
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions:
 
-## Getting Setup
+## Installation from source
 
 ```bash
 # Clone the Meltano repo
@@ -17,6 +17,10 @@ pip install --upgrade pip
 # Optional, but it's best to have the latest setuptools
 pip install --upgrade setuptools
 
+# Optional, but it's recommended to create a virtual environment
+# in order to minimize side effects from unknown environment variable
+python -m venv venv
+
 # Activate your virtual environment
 source ./venv/bin/activate
 
@@ -30,22 +34,45 @@ pip install -e '.[dev]'
 make bundle
 ```
 
-Open a new terminal tab in the meltano project directory:
+Meltano is now installed and available at `meltano`.
+
+Head out to the [tutorials](/docs/tutorial.html) to create your first project.
+
+
+### Meltano API Development
+
+For all changes that do not involve working on Meltano UI itself, run the following command:
 
 ```bash
-# Change into the Meltano UI code directory
+# Starts both Meltano API and a production build of Meltano UI
+meltano ui
+```
+
+### Meltano UI Development
+
+In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
+
+```bash
+# Starts the Meltano API and a production build of Meltano UI that you can ignore
+meltano ui
+
+# Open a new terminal tab and go to your meltano directory. Then change directory to analyze
 cd src/analyze
 
-# Install the dependencies for Meltano UI
-npm install
+# Install dependencies
+npm install # or yarn
 
-# Start the web server for Meltano UI 
-npm run dev
+# Start local development environment
+npm run dev # or yarn dev
 ```
 
 ## Code style
 
 Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.org/docs/rules/) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
+
+:::warning Troubleshooting
+When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
+:::
 
 ## Merge Requests
 
@@ -75,15 +102,12 @@ Make sure to add CHANGELOG entries to your merge requests.
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
-### Requirements
-
-::: warning Requirement
+### Prerequisites
 Ensure you have the latest `master` branch locally before continuing.
 ```bash
   # get latest master branch
   $ git fetch origin
 ```
-:::
 
 ### Release process
 
@@ -92,11 +116,15 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     ```bash
     # activate your virtualenv
     $ source ./venv/bin/activate
+
     # pip install all the development dependencies
     $ pip install '.[dev]'
     ```
 1. Execute the commands below:
     ```bash
+    # if you've released before, you may need to delete the last local release branch you created
+    $ git branch -D release-next
+
     # create and checkout release-next branch that's based off master branch
     $ git checkout -b release-next origin/master
 
@@ -116,13 +144,53 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available.
 
+## Taps & Targets Workflow
+
+### For existing taps/targets
+
+We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
+
+1. Fork (using Meltano organization)
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Modify and submits PRs
+1. If there is resistance, fork as our tap (2)
+
+### For taps/targets we create
+
+1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
+1. For target developement please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. Use a separate repo (meltano/target|tap-x) in GitLab
+   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Publish PyPI packages of these package (not for now)
+1. We could mirror this repo on GitHub if we want (not for now)
+
+### Discoverability
+
+We will maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
+
+Meltano should help the end-user find components via a `discover` command:
+
+```
+$ meltano discover extract
+tap-demo==...
+tap-zendesk==1.3.0
+tap-marketo==...
+...
+
+$ meltano discover load
+target-demo==...
+target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
+target-postgres==...
+```
+
 ## Tmuxinator
 
 Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
 
 ### Why Tmuxinator?
 
-In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command. 
+In order to run applications, you need to run multiple sessions and have to do a lot of repetitive tasks (like sourcing your virtual environments). So we have created a way for you to start and track everything in its appropriate panes with a single command.
 
 1. Start up Docker
 1. Start Meltano API
@@ -140,7 +208,7 @@ This config uses `$MELTANO_VENV` to source the virtual environment from. Set it 
 ### Instructions
 
 1. Make sure you know what directory your virtual environment is. It is normally `.venv` by default.
-1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1. 
+1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
 
 ```bash
 $ cd path/to/meltano

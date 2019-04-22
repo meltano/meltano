@@ -1,0 +1,45 @@
+{
+  version = 1
+  sql_table_name = episodes
+  name = episodes
+  columns {
+    id {
+      primary_key = true
+      hidden = true
+      type = int
+      sql = "{{table}}.id"
+    }
+    no {
+      label = Episode no
+      description = The episode number
+      type = string
+      sql = "{{table}}.no"
+    }
+    title {
+      label = title
+      description = The episode title
+      type = string
+      sql = "{{table}}.title"
+    }
+    tv_series {
+      label = TV Series
+      description = TV Series the episode belongs to
+      type = string
+      sql = "{{table}}.tv_series"
+    }
+  }
+  aggregates {
+    count {
+      label = Episode Count
+      description = Episode Count
+      type = count
+      sql = "{{table}}.id"
+    }
+    avg_rating {
+      label = Average Rating
+      description = Average Episode Rating
+      type = avg
+      sql = "{{table}}.rating"
+    }
+  }
+}

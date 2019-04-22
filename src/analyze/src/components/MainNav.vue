@@ -13,6 +13,7 @@
         <span></span>
       </div>
     </div>
+
     <div id="meltnavbar-transparent"
          class="navbar-menu"
          :class="{'is-active': isMobileMenuOpen}">
@@ -28,15 +29,16 @@
           <div class="navbar-dropdown
                 is-boxed"
                 :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v,model) in models">
+            <template v-for="(v, model) in models">
             <div class="navbar-item navbar-title has-text-grey-light" :key="model">
               {{model | capitalize | underscoreToSpace}}
             </div>
-            <router-link :to="urlForModelDesign(model, design)"
-            class="navbar-item navbar-child"
-            v-for="design in v['designs']"
-            @click.native="menuSelected"
-            :key="design">
+            <router-link
+              :to="urlForModelDesign(model, design)"
+              class="navbar-item navbar-child"
+              v-for="design in v['designs']"
+              @click.native="menuSelected"
+              :key="design">
               {{design | capitalize | underscoreToSpace}}
             </router-link>
             </template>
@@ -50,24 +52,50 @@
 
       </div>
       <div class="navbar-end">
+        <div v-if="$auth.user"
+             class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">
+            @{{ $auth.user.username }}
+          </div>
+          <div class="navbar-dropdown is-boxed">
+            <a class="navbar-item navbar-child"
+               @click.capture="$auth.logout()">
+              Logout
+            </a>
+          </div>
+        </div>
 
-        <router-link to="/settings"
-        class="navbar-item navbar-child">
-          Settings
-        </router-link>
-
+        <div class="navbar-item has-dropdown is-hoverable">
+          <div class="navbar-link">
+            Settings
+          </div>
+          <div class="navbar-dropdown is-boxed">
+            <router-link to="/settings/database"
+                         class="navbar-item navbar-child">
+              Database
+            </router-link>
+            <router-link to="/settings/roles"
+                         class="navbar-item navbar-child">
+              Roles
+            </router-link>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
+import capitalize from '@/filters/capitalize';
+import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
+import Profile from './Profile';
 
 export default {
   name: 'MainNav',
   components: {
     Logo,
+    Profile,
   },
   watch: {
     $route() {
@@ -85,12 +113,8 @@ export default {
     };
   },
   filters: {
-    printable(value) {
-      return value.label ? value.label : value.name;
-    },
-    underscoreToSpace(value) {
-      return value.replace(/_/g, ' ');
-    },
+    capitalize,
+    underscoreToSpace,
   },
   computed: {
     ...mapState('repos', [
@@ -118,17 +142,18 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '@/scss/bulma-preset-overrides.scss';
+
 .navbar.is-info {
-  background: #464ACB;
+  background: $primary;
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken(#464ACB, 20%);
+    background: darken($primary, 20%);
   }
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
 }
-
 .navbar-dropdown.is-boxed.has-been-clicked {
   // trick to unhover the menu dropdown
   display: none !important;

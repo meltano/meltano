@@ -1,0 +1,31 @@
+{
+  "name": "meltano.com",
+  "author": "Meltano Team & Contributors <meltano@gitlab.com>",
+  "license": "MIT",
+  "version": "0.1.0",
+  "description": "https://meltano.com",
+  "main": "index.js",
+  "scripts": {
+    "discovery.yml": "cp ../discovery.yml ./src/.vuepress/public",
+    "dev": "vuepress dev src",
+    "build": "vuepress build src",
+    "dev:docs": "npm run discovery.yml && npm run dev",
+    "build:docs": "npm run discovery.yml && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/meltano/meltano.git"
+  },
+  "keywords": [
+    "meltano"
+  ],
+  "bugs": {
+    "url": "https://gitlab.com/meltano/meltano/issues"
+  },
+  "homepage": "https://gitlab.com/meltano/meltano#readme",
+  "devDependencies": {
+    "@vuepress/plugin-google-analytics": "^1.0.0-alpha.0",
+    "vuepress": "^1.0.0-alpha.30"
+  }
+}

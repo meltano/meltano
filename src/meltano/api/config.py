@@ -1,19 +1,22 @@
 import os
-from dotenv import load_dotenv
+import datetime
 
-load_dotenv()
+TRUTHY = ("True", "true", "1", "yes", "on")
 
 # Flask
 # -----------------
-THREADS_PER_PAGE = 2
+THREADS_PER_PAGE = 1
+PROFILE = os.getenv("FLASK_PROFILE") in TRUTHY
+ENV = os.getenv("FLASK_ENV", "development")
 
-# Change this value in production
+## Change this value in production
 SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
 
 # Meltano
 # -----------------
 LOG_PATH = os.getenv("MELTANO_LOG_PATH", "meltano.log")
-ENV = os.getenv("FLASK_ENV")
+MELTANO_AUTHENTICATION = os.getenv("MELTANO_AUTHENTICATION") in TRUTHY
+MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "")
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")
@@ -21,27 +24,37 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 
 # Flask-SQLAlchemy
 # -----------------
-SQLALCHEMY_ECHO = True
-SQLALCHEMY_DATABASE_URI = "sqlite:///meltano_api.db"
+SQLALCHEMY_ECHO = False
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_API_DATABASE_URI")
 
 # Flask-security
 # -----------------
 
 # Change this value in production
+# A better approach would be to have individual salts hashed resource
 SECURITY_PASSWORD_SALT = "b4c124932584ad6e69f2774a0ae5c138"
 SECURITY_PASSWORD_HASH = "bcrypt"
 SECURITY_REGISTERABLE = True
-SECURITY_CHANGEABLE = True
-SECURITY_RECOVERABLE = True
-SECURITY_CONFIRMABLE = True
+SECURITY_CHANGEABLE = False
+SECURITY_RECOVERABLE = False
+SECURITY_CONFIRMABLE = False
 SECURITY_URL_PREFIX = "/auth"
+SECURITY_USER_IDENTITY_ATTRIBUTES = ("username", "email")
 
-LOGIN_URL = SECURITY_URL_PREFIX + "/login"
-LOGOUT_URL = SECURITY_URL_PREFIX + "/logout"
-REGISTER_URL = SECURITY_URL_PREFIX + "/register"
-RESET_URL = SECURITY_URL_PREFIX + "/reset"
-CHANGE_URL = SECURITY_URL_PREFIX + "/change"
-CONFIRM_URL = SECURITY_URL_PREFIX + "/confirm"
+SECURITY_SEND_REGISTER_EMAIL = False
+
+SECURITY_MSG_USERNAME_NOT_PROVIDED = ("You must provide a username.", "error")
+SECURITY_MSG_USERNAME_INVALID = (
+    "Username must be at least 6 characters long.",
+    "error",
+)
+SECURITY_MSG_USERNAME_ALREADY_TAKEN = ("This username is already taken.", "error")
+
+# Flask-JWT-Extended
+# ------------------
+JWT_SECRET_KEY = SECRET_KEY
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)
 
 # Flask-Mail
 # -----------------

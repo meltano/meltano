@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from .dashboards_helper import DashboardsHelper
 
-dashboardsBP = Blueprint("dashboards", __name__, url_prefix="/dashboards")
+dashboardsBP = Blueprint("dashboards", __name__, url_prefix="/api/v1/dashboards")
 
 
 @dashboardsBP.route("/all", methods=["GET"])

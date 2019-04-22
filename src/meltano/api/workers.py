@@ -1,41 +1,76 @@
 import logging
+import threading
+import time
+import requests
+from colorama import Fore
+
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 
 from meltano.core.project import Project
-from meltano.api.controllers.m5o_file_parser import MeltanoAnalysisFileParser
+from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 class CompileEventHandler(PatternMatchingEventHandler):
-    def __init__(self, root_path):
+    def __init__(self, compiler):
+        self.compiler = compiler
+
         super().__init__(ignore_patterns=["*.m5oc"])
-        self.root_path = root_path
 
     def on_any_event(self, event):
-        try:
-            m5o_parse = MeltanoAnalysisFileParser(self.root_path)
-            models = m5o_parse.parse()
-            m5o_parse.compile(models)
-            logging.info(f"Models have been compiled (via {event})")
-        except Exception:
-            logging.warn(f"Failed to compile models (via {event})")
+        self.compiler.compile()
 
 
 class MeltanoBackgroundCompiler:
-    def __init__(self, project: Project):
+    def __init__(self, project: Project, compiler: ProjectCompiler = None):
         self.project = project
-        self.observer = self.setup_observer(project.root.joinpath("model"))
+        self.compiler = compiler or ProjectCompiler(project)
+        self.observer = self.setup_observer()
 
-    def setup_observer(self, path):
-        event_handler = CompileEventHandler(path)
+    @property
+    def model_dirs(self):
+        return (self.project.root_dir("model"), self.project.model_dir())
+
+    def setup_observer(self):
+        event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
-        observer.schedule(event_handler, str(event_handler.root_path), recursive=True)
+
+        for source in self.model_dirs:
+            observer.schedule(event_handler, str(source), recursive=True)
 
         return observer
 
     def start(self):
-        self.observer.start()
-        logging.info(f"Auto-compiling models in {self.observer}.")
+        try:
+            self.observer.start()
+            for source in self.model_dirs:
+                logging.info(f"Auto-compiling models in '{str(source)}'")
+        except OSError:
+            # most probably INotify being full
+            logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
 
     def stop(self):
         self.observer.stop()
+
+
+class UIAvailableWorker(threading.Thread):
+    def __init__(self, url):
+        super().__init__()
+
+        self._terminate = False
+        self.url = url
+
+    def run(self):
+        while not self._terminate:
+            try:
+                response = requests.get(self.url)
+                if response.status_code == 200:
+                    print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
+                    self._terminate = True
+            except:
+                pass
+
+            time.sleep(2)
+
+    def stop(self):
+        self._terminate = True

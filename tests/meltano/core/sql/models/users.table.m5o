@@ -1,0 +1,45 @@
+{
+  version = 1
+  sql_table_name = users
+  name = users
+  columns {
+    id {
+      primary_key = true
+      hidden = true
+      type = int
+      sql = "{{table}}.id"
+    }
+    name {
+      label = Name
+      description = The user name
+      type = string
+      sql = "{{table}}.name"
+    }
+    gender {
+      label = Gender
+      description = The user gender
+      type = string
+      sql = "{{table}}.gender"
+    }
+  }
+  aggregates {
+    count {
+      label = User Count
+      description = User Count
+      type = count
+      sql = "{{table}}.id"
+    }
+    avg_age {
+      label = Average Age
+      description = Average User Age
+      type = avg
+      sql = "{{table}}.age"
+    }
+    sum_clv {
+      label = Total CLV
+      description = Total CLV
+      type = sum
+      sql = "{{table}}.clv"
+    }
+  }
+}

@@ -9,9 +9,10 @@ from . import (
     invoke,
     ui,
     permissions,
+    schedule,
     select,
 )
 
 
 def main():
-    cli()
+    cli(obj={"project": None})

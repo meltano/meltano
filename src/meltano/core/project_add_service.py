@@ -6,6 +6,7 @@ import logging
 from .project import Project
 from .plugin import PluginType, Plugin
 from .plugin_discovery_service import PluginDiscoveryService
+from .plugin.factory import plugin_factory
 from .config_service import ConfigService
 
 
@@ -13,14 +14,17 @@ class PluginNotSupportedException(Exception):
     pass
 
 
+class PluginAlreadyAddedException(Exception):
+    def __init__(self, plugin: Plugin):
+        self.plugin = plugin
+        super().__init__()
+
+
 class MissingPluginException(Exception):
     pass
 
 
 class ProjectAddService:
-    EXTRACTOR = "extractor"
-    LOADER = "loader"
-
     def __init__(
         self,
         project: Project,
@@ -33,28 +37,12 @@ class ProjectAddService:
         )
         self.config_service = config_service or ConfigService(project)
 
-    def add(self, plugin_type: PluginType, plugin_name: str):
+    def add(self, plugin_type: PluginType, plugin_name: str, **kwargs):
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
-        with self.project.meltano_update() as meltano_yml:
-            meltano_yml["plugins"] = meltano_yml.get("plugins", {})
-            meltano_yml["plugins"][plugin_type] = meltano_yml["plugins"].get(
-                plugin_type, []
-            )
-
         if plugin.pip_url:
-            self.add_to_file(plugin)
+            self.config_service.add_to_file(plugin)
         else:
             raise PluginNotSupportedException()
 
-        return plugin
-
-    def add_to_file(self, plugin: Plugin):
-        if plugin in self.config_service.plugins():
-            logging.warning(
-                f"{plugin.name} is already present, use `meltano install` to install it."
-            )
-            return
-
-        with self.project.meltano_update() as meltano_yml:
-            meltano_yml["plugins"][plugin.type].append(plugin.canonical())
+        return plugin_factory(plugin.type, plugin.canonical())

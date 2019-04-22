@@ -25,6 +25,9 @@ meltano discover all
 # let's add that as a dependency. See https://api.carbonintensity.org.uk/
 meltano add extractor tap-carbon-intensity
 
+# Add a m5o model to the list of plugins we install
+meltano add model model-carbon-intensity-sqlite
+
 # Now we add a loader for the sqlite database
 meltano add loader target-sqlite
 

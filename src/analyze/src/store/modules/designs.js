@@ -1,8 +1,10 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
+import utils from '@/utils/utils';
 import designApi from '../../api/design';
-import utils from '../../api/utils';
+import reportsApi from '../../api/reports';
+import sqlApi from '../../api/sql';
 
 const state = {
   activeReport: {},
@@ -16,11 +18,10 @@ const state = {
   results: [],
   keys: [],
   columnHeaders: [],
-  names: [],
+  columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
   currentDataTab: 'sql',
-  selectedColumns: {},
   currentSQL: '',
   filtersOpen: false,
   dataOpen: true,
@@ -48,14 +49,19 @@ const helpers = {
 
     const baseTable = state.design.related_table;
     const columns = namesOfSelected(baseTable.columns);
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
     let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn);
-
     if (!sortColumn) {
       sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn);
     }
-
-    const aggregates = namesOfSelected(baseTable.aggregates) || [];
+    let order = null;
+    if (sortColumn && sortColumn.selected) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
 
     const filters = JSON.parse(JSON.stringify(state.distincts));
     const filtersKeys = Object.keys(filters);
@@ -64,6 +70,9 @@ const helpers = {
       delete filters[prop].sql;
     });
 
+    if (!state.design.joins) {
+      state.design.joins = [];
+    }
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
@@ -86,8 +95,6 @@ const helpers = {
       })
       .filter(j => !!(j.columns || j.aggregates));
 
-    let order = null;
-
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
@@ -97,13 +104,6 @@ const helpers = {
         periods: tf.periods.filter(selected),
       }))
       .filter(tf => tf.periods.length);
-
-    if (sortColumn) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
 
     return {
       table: baseTable.name,
@@ -124,6 +124,10 @@ const getters = {
       return false;
     }
     return !!state.results.length;
+  },
+
+  hasChartableResults() {
+    return getters.hasResults() && state.resultAggregates.length;
   },
 
   numResults() {
@@ -215,25 +219,42 @@ const getters = {
 };
 
 const actions = {
-  getDesign({ commit }, { model, design }) {
+  getDesign({ dispatch, commit }, { model, design, slug }) {
+    state.currentSQL = '';
     state.currentModel = model;
     state.currentDesign = design;
-    designApi.index(model, design).then((response) => {
-      commit('setDesign', response.data);
-      commit('selectedColumns', response.data.related_table.columns);
-    });
-    designApi.getDialect(model).then((response) => {
-      commit('setConnectionDialect', response.data);
-    });
-    designApi
-      .loadReports()
+
+    // TODO: chain callbacks to keep a single Promise
+    const index = designApi.index(model, design)
+      .then((response) => {
+        commit('setDesign', response.data);
+      })
+      .catch(() => { });
+
+    sqlApi.getDialect(model)
+      .then((response) => {
+        commit('setConnectionDialect', response.data);
+      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+      });
+
+    reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
+        if (slug) {
+          const reportMatch = state.reports.find(report => report.slug === slug);
+          if (reportMatch) {
+            dispatch('loadReport', reportMatch);
+          }
+        }
       })
       .catch((e) => {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
+
+    return index;
   },
 
   expandRow({ commit }, row) {
@@ -246,20 +267,21 @@ const actions = {
     if (join.related_table.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name).then((response) => {
-      commit('setJoinColumns', {
-        columns: response.data.columns,
-        join,
+    designApi.getTable(join.related_table.name)
+      .then((response) => {
+        commit('setJoinColumns', {
+          columns: response.data.columns,
+          join,
+        });
+        commit('setJoinTimeframes', {
+          timeframes: response.data.timeframes,
+          join,
+        });
+        commit('setJoinAggregates', {
+          aggregates: response.data.aggregates,
+          join,
+        });
       });
-      commit('setJoinTimeframes', {
-        timeframes: response.data.timeframes,
-        join,
-      });
-      commit('setJoinAggregates', {
-        aggregates: response.data.aggregates,
-        join,
-      });
-    });
   },
 
   removeSort({ commit }, column) {
@@ -299,7 +321,7 @@ const actions = {
 
     const queryPayload = load || helpers.getQueryPayloadFromDesign();
     const postData = Object.assign({ run }, queryPayload);
-    designApi
+    sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
       .then((response) => {
         if (run) {
@@ -319,7 +341,7 @@ const actions = {
   },
 
   loadReport({ commit }, { name }) {
-    designApi.loadReport(name)
+    reportsApi.loadReport(name)
       .then((response) => {
         const report = response.data;
         this.dispatch('designs/getSQL', {
@@ -343,7 +365,7 @@ const actions = {
       chartType: state.chartType,
       queryPayload: helpers.getQueryPayloadFromDesign(),
     };
-    designApi.saveReport(postData)
+    reportsApi.saveReport(postData)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -358,7 +380,7 @@ const actions = {
   updateReport({ commit }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
     state.activeReport.chartType = state.chartType;
-    designApi.updateReport(state.activeReport)
+    reportsApi.updateReport(state.activeReport)
       .then((response) => {
         commit('resetSaveReportSettings');
         commit('setCurrentReport', response.data);
@@ -374,14 +396,15 @@ const actions = {
   },
 
   getDistinct({ commit }, field) {
-    designApi
+    sqlApi
       .getDistinct(state.currentModel, state.currentDesign, field)
       .then((response) => {
         commit('setDistincts', {
           data: response.data,
           field,
         });
-      });
+      })
+      .catch(() => { });
   },
 
   addDistinctSelection({ commit }, data) {
@@ -447,6 +470,7 @@ const mutations = {
       acc.push({
         name: curr.name,
         columns: curr.related_table.columns,
+        aggregates: curr.related_table.aggregates,
         timeframes: curr.related_table.timeframes,
       });
       return acc;
@@ -467,16 +491,22 @@ const mutations = {
     // TODO
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
+      // joins - columns
       const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
-      // joins
       setSelected(joinGroup.columns, targetJoin.columns);
+      // joins - aggregates
+      if (joinGroup.aggregates) {
+        setSelected(joinGroup.aggregates, targetJoin.aggregates);
+      }
       // timeframes
-      if (joinGroup.timeframes) {
+      if (targetJoin && targetJoin.timeframes) {
         setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
         // periods
         joinGroup.timeframes.forEach((timeframe) => {
           const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
-          setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
+          if (targetTimeframe && targetTimeframe.periods) {
+            setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
+          }
         });
       }
     });
@@ -554,7 +584,7 @@ const mutations = {
     state.results = results.results;
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
-    state.names = results.names;
+    state.columnNames = results.column_names;
     state.resultAggregates = results.aggregates;
   },
 
@@ -583,12 +613,6 @@ const mutations = {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
-  selectedColumns(_, columns) {
-    Object.keys(columns).forEach((column) => {
-      state.selectedColumns[column.unique_name] = false;
-    });
-  },
-
   setDesign(_, designData) {
     state.design = designData;
   },
@@ -604,6 +628,7 @@ const mutations = {
 
 export default {
   namespaced: true,
+  helpers,
   state,
   getters,
   actions,

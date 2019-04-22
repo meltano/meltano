@@ -1,4 +1,4 @@
-aenum==2.0.8
+aenum==2.1.2
 agate==1.6.1
 aiohttp==3.4.4
 asn1crypto==0.24.0
@@ -60,7 +60,7 @@ pycryptodomex==3.6.6
 PyJWT==1.6.4
 pyOpenSSL==18.0.0
 pyparsing==2.2.2
-PyPika==0.15.7
+PyPika==0.25.1
 python-dateutil==2.7.3
 python-dotenv==0.9.1
 python-slugify==1.2.6
@@ -70,6 +70,7 @@ PyYAML==3.13
 requests==2.19.1
 rsa==4.0
 s3transfer==0.1.13
+simplejson==3.16.0
 six==1.11.0
 smmap2==2.0.4
 snowflake-connector-python==1.6.10

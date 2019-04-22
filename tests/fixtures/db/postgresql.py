@@ -2,10 +2,10 @@ import pytest
 import os
 import sqlalchemy
 import contextlib
+import logging
 
 from meltano.core.db import DB, project_engine
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker
 
 
 @pytest.fixture(scope="session")
@@ -25,36 +25,48 @@ def test_engine_uri():
 
 
 @pytest.fixture()
-def engine(project, test_engine_uri):
+def engine_sessionmaker(project, test_engine_uri):
     # create the engine
-    engine, _ = project_engine(project, test_engine_uri)
-    truncate_tables(engine, schema="meltano")
+    engine, sessionmaker = project_engine(project, test_engine_uri, default=True)
 
-    return engine
+    return (engine, sessionmaker)
 
 
 @pytest.fixture()
-def session(request, engine, create_session):
+def session(request, engine_sessionmaker):
     """Creates a new database session for a test."""
+    engine, sessionmaker = engine_sessionmaker
+    truncate_tables(engine, schema="meltano")
 
-    session = create_session()
+    session = sessionmaker()
 
-    def _cleanup():
-        session.close()
-        truncate_tables(engine, schema="meltano")
+    yield session
 
-    request.addfinalizer(_cleanup)
-    return session
+    # teardown
+    session.close()
+    logging.debug("Session closed.")
+    truncate_tables(engine, schema="meltano")
 
 
 def truncate_tables(engine, schema=None):
-    con = engine.connect()
-    con.execute("SET session_replication_role TO 'replica';")
+    with engine.connect() as con:
+        con.execute("SET session_replication_role TO 'replica';")
 
-    with con.begin():
-        meta = MetaData(bind=engine, schema=schema)
-        meta.reflect()
-        for table in meta.sorted_tables:
-            con.execute(table.delete())
+        with con.begin():
+            meta = MetaData(bind=engine, schema=schema)
+            meta.reflect()
+            for table in meta.sorted_tables:
+                logging.debug(f"table {table} truncated.")
+                con.execute(table.delete())
 
-    con.execute("SET session_replication_role TO 'origin';")
+        con.execute("SET session_replication_role TO 'origin';")
+
+
+@pytest.fixture()
+def pg_stats(request, session):
+    yield
+
+    from meltano.core.job import Job
+
+    jobs = session.query(Job).all()
+    print(f"{request.node.name} created {len(jobs)} Job.")

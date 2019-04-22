@@ -1,6 +1,7 @@
 import os
 import yaml
 import logging
+import sys
 from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
@@ -13,7 +14,9 @@ from .error import Error
 
 class ProjectNotFound(Error):
     def __init__(self):
-        super().__init__("Cannot find `meltano.yml`. Are you in a meltano project?")
+        super().__init__(
+            f"Cannot find `{os.getcwd()}/meltano.yml`. Are you in a meltano project?"
+        )
 
 
 class Project:
@@ -28,31 +31,22 @@ class Project:
         self.root = Path(root or os.getcwd()).resolve()
 
     def activate(self):
+        # helpful to refer to the current absolute project path
+        os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
+
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
-        os.chdir(self.root)
         logging.debug(f"Activated project at {self.root}")
+
+    def reload(self):
+        """Force a reload from `meltano.yml`"""
+        self._meltano = yaml.load(self.meltanofile.open()) or {}
 
     @classmethod
     def find(self, from_dir: Union[Path, str] = None, activate=True):
-        """
-        Recursively search for a `meltano.yml` file.
-        """
-        # pushd
-        cwd = os.getcwd()
+        project = Project(from_dir)
 
-        try:
-            if from_dir:
-                os.chdir(from_dir)
-
-            project = Project()
-            while not project.meltanofile.exists():
-                if os.getcwd() == "/":
-                    raise ProjectNotFound()
-
-                os.chdir("..")
-                project = Project()
-        finally:
-            os.chdir(cwd)  # popd
+        if not project.meltanofile.exists():
+            raise ProjectNotFound()
 
         if activate:
             project.activate()
@@ -63,7 +57,8 @@ class Project:
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         if not self._meltano:
-            self._meltano = yaml.load(self.meltanofile.open()) or {}
+            self.reload()
+
         return self._meltano.copy()
 
     @contextmanager
@@ -103,6 +98,9 @@ class Project:
 
         return decorate
 
+    def root_dir(self, *joinpaths):
+        return self.root.joinpath(*joinpaths)
+
     @property
     def meltanofile(self):
         return self.root.joinpath("meltano.yml")
@@ -118,6 +116,10 @@ class Project:
     @makedirs
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
+
+    @makedirs
+    def model_dir(self, *joinpaths):
+        return self.meltano_dir("models", *joinpaths)
 
     @makedirs
     def plugin_dir(self, plugin: Plugin, *joinpaths):

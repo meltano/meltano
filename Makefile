@@ -127,15 +127,13 @@ ${MELTANO_CORE_BUNDLE}/model/%:
 	mkdir -p $(@D)
 	cp model/$* $@
 
-bundle_models: clean_bundle_models $(MODELS_TARGETS)
-
 bundle_ui: ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
 
 .PHONY: bundle
-bundle: bundle_ui bundle_models
+bundle: bundle_ui
 
 sdist: bundle
 	python setup.py sdist

@@ -1,6 +1,7 @@
 import logging
 import subprocess
 import asyncio
+import os
 
 from meltano.core.behavior.hookable import TriggerError
 from .project import Project
@@ -8,6 +9,7 @@ from .plugin import Plugin
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
+from .error import SubprocessError
 
 
 class PluginInvoker:
@@ -42,31 +44,37 @@ class PluginInvoker:
 
     def prepare(self):
         if not self._prepared:
-            self.config_service.configure()
-            self._prepared = True
+            with self.plugin.trigger_hooks("prepare", self):
+                self.config_service.configure()
+                self._prepared = True
 
     def exec_path(self):
-        return self.venv_service.exec_path(self.plugin.name, namespace=self.plugin.type)
+        return self.venv_service.exec_path(
+            self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
+        )
 
     def exec_args(self):
         plugin_args = self.plugin.exec_args(self.files)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args)]
 
-    def invoke(self, *args, **Popen):
+    def invoke(self, *args, prepare=True, **Popen):
+        self.env = os.environ.copy()
         process = None
         try:
-            self.prepare()
+            if prepare:
+                self.prepare()
+
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = [*self.exec_args(), *args]
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(popen_args, **Popen)
-        except TriggerError as terr:
-            for error in terr.before_hooks.values():
-                logging.error(error)
+                process = subprocess.Popen(popen_args, env=self.env, **Popen)
+        except SubprocessError as perr:
+            logging.error(f"{self.plugin.name} has failed: {str(perr)}")
+            raise
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
-            raise PluginMissingError(self.plugin)
+            raise
 
         return process
 
@@ -78,9 +86,6 @@ class PluginInvoker:
                 process = await asyncio.create_subprocess_exec(
                     *self.exec_args(), *args, **Popen
                 )
-        except TriggerError as terr:
-            for error in terr.before_hooks.values():
-                logging.error(error)
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
             raise PluginMissingError(self.plugin)

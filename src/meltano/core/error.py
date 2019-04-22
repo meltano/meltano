@@ -24,7 +24,15 @@ class ExtractError(Error):
         return ExitCode.NO_RETRY
 
 
-class PluginInstallError(Exception):
+class SubprocessError(Exception):
+    """Happens when subprocess exits with a resultcode != 0"""
+
+    def __init__(self, message: str, process):
+        self.process = process
+        super().__init__(message)
+
+
+class PluginInstallError(SubprocessError):
     """Happens when a plugin fails to install."""
 
     pass

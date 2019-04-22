@@ -8,14 +8,7 @@ const state = {
   validated: false,
   navbarClicked: false,
   errors: [],
-  files: {
-    dashboards:
-    [{
-      abs: 'loading',
-      path: 'loading',
-      visual: 'loading',
-    }],
-  },
+  files: {},
 };
 
 const getters = {
@@ -24,18 +17,22 @@ const getters = {
     return state.activeView.populated && state.activeView.is_markdown;
   },
 
-  urlForModelDesign: () => (model, design) => `/design/${model}/${design}`,
+  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`,
 
   hasCode() {
     return state.activeView.populated && !state.activeView.is_markdown;
   },
 
   hasError() {
-    return state.errors.length;
+    return state.errors && state.errors.length;
+  },
+
+  hasFiles() {
+    return Object.hasOwnProperty.call(state.files, 'topics') && state.files.topics.items;
   },
 
   passedValidation() {
-    return state.validated && !state.errors.length;
+    return state.validated && state.errors && !state.errors.length;
   },
 
 };
@@ -45,15 +42,19 @@ const actions = {
     repoApi.index()
       .then((response) => {
         const files = response.data;
+        commit('setValidatedState', response.data);
+        state.loadingValidation = false;
         commit('setRepoFiles', { files });
-      });
+      })
+      .catch(() => {});
   },
 
   getFile({ commit }, file) {
-    repoApi.file(file.unique)
+    repoApi.file(file.id)
       .then((response) => {
         commit('setCurrentFileTable', response.data);
-      });
+      })
+      .catch(() => {});
   },
 
   lint({ commit }) {
@@ -87,7 +88,8 @@ const actions = {
     repoApi.models()
       .then((response) => {
         commit('setModels', response.data);
-      });
+      })
+      .catch(() => { });
   },
 
   navbarHideDropdown({ commit }) {

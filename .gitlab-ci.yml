@@ -6,22 +6,18 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - lint
   - test
-  - pages
-  - build_base
-  - build
+  - docs
+  - build-base
+  - build-meltano
+  - build-runner
+  - test-docker
   - publish
   - review
   # - production
 
-cache:
-  paths:
-    - .cache/pip
-    - venv/
-
 lint:
-  stage: lint
+  stage: test
   image:
     name: registry.gitlab.com/meltano/meltano/base
     entrypoint: [""]
@@ -29,6 +25,64 @@ lint:
     - pip install black
   script:
     - make show_lint
+
+install_e2e:
+  stage: test
+  script:
+    - python -m venv venv
+    - python --version
+    - source ./venv/bin/activate
+    - pip install -e .
+    - apt-get update
+    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
+    - apt-get -y install nodejs
+    - apt-get -y install gcc g++ make
+    - node -v
+    - npm -v
+    - npm install -g yarn
+    - make bundle
+    - meltano --version
+    - pip list
+    - mkdir -p /home/projects
+    - cd /home/projects
+    - meltano init test_project
+    - cd test_project
+    - meltano discover all
+    - meltano add extractor tap-carbon-intensity
+    - meltano add loader target-sqlite
+    - meltano elt tap-carbon-intensity target-sqlite
+
+test_meltano_ui:
+  stage: test
+  image: node:9.11.1
+  script:
+    - cd src/analyze
+    - yarn
+    - yarn unit # change `unit` to `test` once e2e is wired up
+
+docs:
+  variables:
+    REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
+  stage: docs
+  image: node:9.11.1
+  cache:
+    paths:
+      - node_modules/
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+  script:
+    - cd docs
+    - yarn
+    - yarn build:docs
+    - $REMOTE_EXEC "mkdir -p $SSH_BACKUP_DIRECTORY; tar zcvf $SSH_BACKUP_DIRECTORY-$(date +%Y-%m-%dT%H:%M).tar.gz $SSH_DIRECTORY/$SSH_WWW_DIRECTORY"
+    - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
+    - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
+  only:
+    - master
 
 .test: &test
   stage: test
@@ -59,10 +113,11 @@ test_postgres:
   services:
     - postgres:latest
 
-.test_sqlite:
+test_sqlite:
   <<: *test
   variables:
     PYTEST_BACKEND: sqlite
+    SQLITE_DATABASE: pytest
 
 package:
   stage: test
@@ -74,22 +129,6 @@ package:
   artifacts:
     paths:
       - dist
-
-pages:
-  stage: pages
-  image: node:9.11.1
-  cache:
-    paths:
-      - node_modules/
-  script:
-    - yarn
-    - yarn build:docs
-    - mv docs/public public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
 
 publish:
   image:
@@ -145,15 +184,6 @@ hub_meltano: &docker_hub_publish
   only:
     variables:
       - $CI_COMMIT_TAG
-
-# registry.gitlab.com/meltano/meltano/cli:<tag> → docker.io/meltano/cli:<tag>
-# registry.gitlab.com/meltano/meltano/cli:latest → docker.io/meltano/cli:latest
-hub_meltano_cli:
-  <<: *docker_hub_publish
-  variables:
-    IMAGE_NAME: meltano/cli
-    IMAGE_TAG: $CI_COMMIT_TAG
-    SOURCE_IMAGE: $CI_REGISTRY_IMAGE/cli
 
 .production:
   image: silvs/kubectl:latest

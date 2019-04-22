@@ -7,7 +7,13 @@ logging.basicConfig(level=logging.INFO)
 
 PYTEST_BACKEND = os.getenv("PYTEST_BACKEND", "sqlite")
 
-pytest_plugins = ["fixtures.db", "fixtures.fs", "fixtures.core", "fixtures.api"]
+pytest_plugins = [
+    "fixtures.db",
+    "fixtures.fs",
+    "fixtures.core",
+    "fixtures.api",
+    "fixtures.cli",
+]
 
 if PYTEST_BACKEND == "sqlite":
     pytest_plugins.append("fixtures.db.sqlite")

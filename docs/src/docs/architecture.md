@@ -228,17 +228,11 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 - Run the following command(s) for additional usage info `python3 elt/util/spreadsheet_loader.py <csv|sheet> -- --help`
 
-### Docker images
+### Access Control
 
-Meltano provides the following docker images:
+Meltano manages authorization using a role based access control scheme.
 
-> Notes: All images are available in the GitLab's registry: `registry.gitlab.com`
+  * Users have multiple roles;
+  * Roles have multiple permissions;
 
-- `meltano/meltano`: Contains the API, CLI, and Meltano UI. This image should be deployed as Meltano UI.
-- `meltano/meltano/runner`: Contains the CLI and extra runner specific binaries. This image should be used on the CI runner.
-- `meltano/meltano/singer_runner`: **DEPRECATED: Use `meltano/meltano/runner` instead** Contains the CLI, and all curated taps/targets pre-installed.
-
-> Notes: These images are base images used as the basis of other images.
-
-- `meltano/meltano/cli`: Contains the meltano cli
-- `meltano/meltano/base`: Contains the requirements for `meltano/meltano`
+A Permission has a context for with it is valid: anything that matches the context is permitted.

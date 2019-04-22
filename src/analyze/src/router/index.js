@@ -1,57 +1,40 @@
 import Vue from 'vue';
 import Router from 'vue-router';
-import NewProjectForm from '@/components/projects/NewProjectForm';
-import Repo from '@/components/repos/Repo';
-import Design from '@/components/designs/Design';
-import Dashboards from '@/components/dashboards/Dashboards';
-import Settings from '@/components/settings/Settings';
-import Extract from '@/components/extract/Extract';
-import Load from '@/components/load/Load';
-import Transform from '@/components/transform/Transform';
-import Orchestrate from '@/components/orchestrations/Orchestrate';
+import Repo from '@/views/Repo';
+import Design from '@/views/Design';
+import Dashboards from '@/views/Dashboards';
+import NotFound from '@/views/NotFound';
+import Settings from '@/views/Settings';
+import SettingsDatabase from '@/components/settings/Database';
+import SettingsRoles from '@/components/settings/Roles';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   routes: [
     {
+      path: '*',
+      name: '404',
+      component: NotFound,
+    },
+    {
       path: '/',
-      redirect: '/model',
+      redirect: '/files',
     },
     {
-      path: '/extract',
-      name: 'Extract',
-      component: Extract,
-    },
-    {
-      path: '/load',
-      name: 'Load',
-      component: Load,
-    },
-    {
-      path: '/transform',
-      name: 'Transform',
-      component: Transform,
-    },
-    {
-      path: '/project/new',
-      name: 'NewProjectForm',
-      component: NewProjectForm,
-    },
-    {
-      path: '/repo/',
+      path: '/files/',
       name: 'Repo',
       component: Repo,
     },
     {
-      path: '/model/',
-      name: 'Repo',
-      component: Repo,
-    },
-    {
-      path: '/design/:model/:design',
+      path: '/analyze/:model/:design',
       name: '',
+      component: Design,
+    },
+    {
+      path: '/analyze/:model/:design/reports/report/:slug',
+      name: 'Report',
       component: Design,
     },
     {
@@ -60,19 +43,23 @@ export default new Router({
       component: Dashboards,
     },
     {
-      path: '/dashboards/:id',
-      name: 'Dashboards',
+      path: '/dashboards/dashboard/:slug',
+      name: 'Dashboard',
       component: Dashboards,
     },
     {
       path: '/settings',
-      name: '',
+      name: 'Settings',
       component: Settings,
-    },
-    {
-      path: '/orchestrations',
-      name: 'Orchestrate',
-      component: Orchestrate,
+      children: [{
+        path: 'roles',
+        component: SettingsRoles,
+      }, {
+        path: 'database',
+        component: SettingsDatabase,
+      }],
     },
   ],
 });
+
+export default router;
