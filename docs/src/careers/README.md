@@ -6,7 +6,7 @@ Want to help create a new product and make an impact in the world of data? You a
 
 Here are the open positions that we currently have:
 
-- [General Manager](https://boards.greenhouse.io/gitlab/jobs/4059274002)
+- [Senior Product Manager](https://boards.greenhouse.io/gitlab/jobs/4059265002)
 
 ## Benefits
 
