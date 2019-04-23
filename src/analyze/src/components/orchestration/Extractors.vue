@@ -30,11 +30,17 @@ export default {
       'installedPlugins',
       'extractors',
     ]),
+    getImageUrl() {
+      return extractor => `/static/logos/${this.getNameWithoutPrefixedTapDash(extractor)}-logo.png`;
+    },
     getIsConnectorInstalled() {
       return extractor => this.installedPlugins.extractors.find(item => item.name === extractor);
     },
     getIsInstallingPlugin() {
       return plugin => this.installingExtractors.includes(plugin);
+    },
+    getNameWithoutPrefixedTapDash() {
+      return extractor => extractor.replace('tap-', '');
     },
     filteredExtractors() {
       if (this.filterExtractorsText) {
@@ -71,27 +77,16 @@ export default {
 <template>
   <div>
     <div v-if='extractorInFocus'>
-      <div class="columns">
-        <div class="column">
-          <h2>Extractor Settings</h2>
-        </div>
-        <div class="column">
-          <div class="buttons is-pulled-right">
-            <button
-              class="button is-outlined"
-              @click="updateExtractorInFocus(null)">Back</button>
-          </div>
-        </div>
-      </div>
 
       <ConnectorSettings
         :extractor='extractorInFocus'
-      ></ConnectorSettings>
+        :imageUrl='getImageUrl(extractorInFocus.name)'
+        @clearExtractorInFocus='updateExtractorInFocus(null)'>
+      </ConnectorSettings>
 
     </div>
 
     <div v-else>
-
       <div
         v-if="filteredExtractors.length === 0"
         class='content'>
@@ -120,8 +115,8 @@ export default {
               <div class="image is-64x64 container">
                 <img
                   :class='{ "grayscale": !getIsConnectorInstalled(extractor) }'
-                  :src="`/static/logos/${extractor.replace('tap-', '')}-logo.png`"
-                  :alt="`gitlab logo`">
+                  :src='getImageUrl(extractor)'
+                  :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
               </div>
               <div class="content is-small">
                 <p class='has-text-centered'>
