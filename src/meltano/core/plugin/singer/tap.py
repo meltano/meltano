@@ -1,7 +1,8 @@
 import json
 import logging
 from typing import Dict
-from meltano.core.plugin_invoker import PluginInvoker
+from jsonschema import Draft4Validator
+
 from meltano.core.utils import file_has_data
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError
@@ -59,6 +60,14 @@ class SingerTap(SingerPlugin):
                 f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
             )
 
+        # test for the schema to be a valid catalog
+        try:
+            with properties_file.open("r") as catalog:
+                schema_valid = Draft4Validator.check_schema(json.load(catalog))
+        except:
+            logging.warn("Invalid catalog output by --discovery.")
+            properties_file.unlink()
+
     @hook("before_invoke")
     def apply_select(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
@@ -78,9 +87,7 @@ class SingerTap(SingerPlugin):
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
         except FileNotFoundError:
-            raise PluginExecutionError(
-                f"Could not select stream, catalog file is missing."
-            )
+            logging.warn(f"Could not select stream, catalog file is missing.")
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(

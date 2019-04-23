@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 ### Fixes
+* [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
 
 ### Breaks
 
