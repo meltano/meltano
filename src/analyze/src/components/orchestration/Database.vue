@@ -1,6 +1,6 @@
 <template>
   <div class="columns">
-    <div class="column section">
+    <div class="column is-8 is-offset-2 box">
       <section class="section">
         <p v-if="!hasConnections">No Database Connections</p>
         <div class="columns is-multiline is-mobile">
@@ -58,7 +58,7 @@
         </div>
       </section>
       <section class="section">
-        <h2 class="title">New Database Connection</h2>
+        <h3 class="title">New Database Connection</h3>
         <div class="field is-grouped">
           <div class="control is-expanded">
             <input class="input" type="text" placeholder="Name" v-model="connectionName">
@@ -134,8 +134,8 @@
         </div>
 
         <div class="field">
-          <div class="control">
-            <button class="button is-link"
+          <div class="control is-pulled-right">
+            <button class="button is-success"
                       @click.prevent="saveConnection">
               Save Connection
             </button>

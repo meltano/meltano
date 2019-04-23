@@ -3,6 +3,7 @@ import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
 import Loaders from '@/components/orchestration/Loaders';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import RunSummary from '@/components/orchestration/RunSummary';
 
 import bulmaSteps from '@/../node_modules/bulma-steps/dist/js/bulma-steps';
 
@@ -13,6 +14,7 @@ export default {
     Extractors,
     Loaders,
     RouterViewLayout,
+    RunSummary,
   },
   mounted() {
     bulmaSteps.attach();
@@ -52,6 +54,16 @@ export default {
           <p>Get Data</p>
         </div>
       </div>
+
+      <div class="steps-actions">
+        <div class="steps-action">
+          <a href="#" data-nav="previous" class="button is-light">Previous</a>
+        </div>
+        <div class="steps-action">
+          <a href="#" data-nav="next" class="button is-light">Next</a>
+        </div>
+      </div>
+
       <div class="steps-content">
         <div class="step-content is-active">
           <Extractors></Extractors>
@@ -63,15 +75,7 @@ export default {
           <Loaders></Loaders>
         </div>
         <div class="step-content">
-          Get data...
-        </div>
-      </div>
-      <div class="steps-actions">
-        <div class="steps-action">
-          <a href="#" data-nav="previous" class="button is-light">Previous</a>
-        </div>
-        <div class="steps-action">
-          <a href="#" data-nav="next" class="button is-light">Next</a>
+          <RunSummary></RunSummary>
         </div>
       </div>
     </div>

@@ -1,57 +1,53 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 
-import BaseCard from '@/components/generic/BaseCard';
-import ConnectorCard from '@/components/orchestration/ConnectorCard';
-import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
+import Database from '@/components/orchestration/Database';
 
 import orchestrationsApi from '@/api/orchestrations';
 
 export default {
   name: 'Loaders',
   components: {
-    BaseCard,
-    ConnectorCard,
-    ConnectorSettings,
+    Database,
   },
   data() {
     return {
       filterLoadersText: '',
-      installingLoader: false,
+      installingLoaders: [],
+      loaderInFocus: null,
     };
   },
   created() {
     this.$store.dispatch('orchestrations/getAll');
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
     ...mapState('orchestrations', [
       'installedPlugins',
       'loaders',
     ]),
-    ...mapGetters('orchestrations', [
-      'remainingLoaders',
-    ]),
-    filteredInstalledLoaders() {
-      if (this.installedPlugins && this.installedPlugins.loaders) {
-        if (this.filterLoadersText) {
-          return this.installedPlugins.loaders
-            .filter(item => item.name.indexOf(this.filterLoadersText) > -1);
-        }
-        return this.installedPlugins.loaders;
-      }
-      return [];
+    getImageUrl() {
+      return loader => `/static/logos/${this.getNameWithoutPrefixedTapDash(loader)}-logo.png`;
+    },
+    getIsConnectorInstalled() {
+      return loader => this.installedPlugins.loaders.find(item => item.name === loader);
+    },
+    getIsInstallingPlugin() {
+      return plugin => this.installingLoaders.includes(plugin);
+    },
+    getNameWithoutPrefixedTapDash() {
+      return loader => loader.replace('target-', '');
     },
     filteredLoaders() {
       if (this.filterLoadersText) {
-        return this.remainingLoaders.filter(item => item.indexOf(this.filterLoadersText) > -1);
+        return this.loaders
+          .filter(item => item.indexOf(this.filterLoadersText) > -1);
       }
-      return this.remainingLoaders;
+      return this.loaders;
     },
   },
   methods: {
     installLoader(loader) {
-      this.installingLoader = true;
+      this.installingLoaders.push(loader);
 
       orchestrationsApi.addLoaders({
         name: loader,
@@ -59,10 +55,15 @@ export default {
         if (response.status === 200) {
           this.$store.dispatch('orchestrations/getInstalledPlugins')
             .then(() => {
-              this.installingLoader = false;
+              const idx = this.installingLoaders.indexOf(loader);
+              this.installingLoaders.splice(idx, 1);
             });
         }
       });
+    },
+    updateLoaderInFocus(loader) {
+      const loaderObj = this.installedPlugins.loaders.find(item => item.name === loader);
+      this.loaderInFocus = loaderObj;
     },
   },
 };
@@ -70,68 +71,78 @@ export default {
 
 <template>
   <div>
+    <div v-if='loaderInFocus'>
 
-    <input
-      type="text"
-      v-model="filterLoadersText"
-      placeholder="Filter loaders..."
-      class="input connector-input">
-    <h2 class="title is-3">Installed</h2>
-    <p v-if="filteredInstalledLoaders.length === 0">No loaders currently installed</p>
-    <div v-else class="installed-connectors">
-      <ConnectorCard v-for="(loader, index) in filteredInstalledLoaders"
-        :connector="loader.name"
-        :key="`${loader.name}-${index}`"
-      >
-      </ConnectorCard>
-    </div>
-    <h2 class="title is-3">Available</h2>
-    <p v-if="installingLoader">Installing...</p>
-    <progress v-if="installingLoader" class="progress is-small is-info"></progress>
-    <p v-if="filteredLoaders.length === 0">All available loaders have been installed.</p>
-    <div v-else class="card-grid">
-      <ConnectorCard v-for="(loader, index) in filteredLoaders"
-        :connector="loader"
-        :key="`${loader}-${index}`"
-      >
-        <template v-slot:callToAction>
-          <button @click="installLoader(loader)" class="card-button">Install</button>
-        </template>
-      </ConnectorCard>
+      <Database
+        @clearLoaderInFocus='updateLoaderInFocus(null)'>
+      </Database>
+
     </div>
 
+    <div v-else>
+      <div
+        v-if="filteredLoaders.length === 0"
+        class='content'>
+        <p>
+          No loaders are available.
+        </p>
+      </div>
+
+      <template v-else>
+        <div class="columns">
+          <div class="column is-4 is-offset-4">
+            <input
+              type="text"
+              v-model="filterLoadersText"
+              placeholder="Filter loaders..."
+              class="input connector-input">
+          </div>
+        </div>
+
+        <div class="tile is-ancestor flex-and-wrap">
+          <div
+            class="tile is-parent is-3"
+            v-for="(loader, index) in filteredLoaders"
+            :key="`${loader}-${index}`">
+            <div class="tile is-child box">
+              <div class="image is-64x64 container">
+                <img
+                  :class='{ "grayscale": !getIsConnectorInstalled(loader) }'
+                  :src='getImageUrl(loader)'
+                  :alt="`${getNameWithoutPrefixedTapDash(loader)} logo`">
+              </div>
+              <div class="content is-small">
+                <p class='has-text-centered'>
+                  {{loader}}
+                </p>
+
+                <template v-if='getIsConnectorInstalled(loader)'>
+                  <div class="buttons are-small">
+                    <a
+                      class='button is-success flex-grow-1'
+                      @click="updateLoaderInFocus(loader)">Account Settings</a>
+                    <a class='button' disabled>Uninstall</a>
+                  </div>
+                </template>
+                <template v-else>
+                  <a
+                    :class='{ "is-loading": getIsInstallingPlugin(loader) }'
+                    class='button is-success is-outlined is-block is-small'
+                    @click="installLoader(loader)">Install</a>
+                </template>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+
+    </div>
   </div>
 </template>
 
 <style lang="scss">
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-column-gap: 15px;
-  grid-row-gap: 15px;
-}
-
-.installed-connectors {
-  display: grid;
-  grid-row-gap: 15px;
-}
-
-.card-button {
-  width: 100%;
-  background-color: hsl(210, 100%, 42%);
-  color: #fff;
-  text-align: center;
-  padding: 10px 0;
-  font-size: 1rem;
-  transition: background 0.2s ease-in;
-  cursor: pointer;
-
-  &:hover {
-    background-color: hsl(210, 74%, 22%);
-  }
-}
-
-.connector-input {
-  margin-top: 15px;
+.flex-grow-1 {
+  flex-grow: 1;
 }
 </style>
