@@ -1,8 +1,6 @@
 <script>
 import { mapState } from 'vuex';
 
-import BaseCard from '@/components/generic/BaseCard';
-import ConnectorCard from '@/components/orchestration/ConnectorCard';
 import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
 
 import orchestrationsApi from '@/api/orchestrations';
@@ -10,8 +8,6 @@ import orchestrationsApi from '@/api/orchestrations';
 export default {
   name: 'Extractors',
   components: {
-    BaseCard,
-    ConnectorCard,
     ConnectorSettings,
   },
   data() {
@@ -23,7 +19,6 @@ export default {
   },
   created() {
     this.$store.dispatch('orchestrations/getAll');
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
     ...mapState('orchestrations', [

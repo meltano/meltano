@@ -1,4 +1,5 @@
 <script>
+import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
 import Loaders from '@/components/orchestration/Loaders';
 import RouterViewLayout from '@/views/RouterViewLayout';
@@ -8,6 +9,7 @@ import bulmaSteps from '@/../node_modules/bulma-steps/dist/js/bulma-steps';
 export default {
   name: 'DataSetup',
   components: {
+    Entities,
     Extractors,
     Loaders,
     RouterViewLayout,
@@ -55,7 +57,7 @@ export default {
           <Extractors></Extractors>
         </div>
         <div class="step-content">
-          Entity setup...
+          <Entities></Entities>
         </div>
         <div class="step-content">
           <Loaders></Loaders>

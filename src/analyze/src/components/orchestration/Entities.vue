@@ -1,117 +1,108 @@
-<template>
-  <div>
-
-    <!-- Loading -->
-    <progress v-if="isLoading" class="progress is-small is-info"></progress>
-
-    <!-- Loaded -->
-    <div v-else>
-      <div class="columns">
-        <div class="column is-10">
-          <h3>Entities for {{extractorEntities.extractorName}}</h3>
-        </div>
-        <div class="column is-2">
-          <div class="buttons is-pulled-right">
-            <button
-              class='button is-success'
-              :disabled="!hasEntities"
-              @click='selectEntities'>Collect</button>
-          </div>
-        </div>
-      </div>
-
-      <template v-if='hasEntities'>
-        <div
-          class='is-unselectable'
-          v-for='entityGroup in orderedEntityGroups'
-          :key='`${entityGroup.name}`'>
-          <a
-            class='chip button is-rounded is-outlined entity'
-            :class="{'is-success is-outlined': entityGroup.selected}"
-            @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
-          <div class='entity-group'>
-            <a
-              v-for='attribute in orderedAttributes(entityGroup.attributes)'
-              :key='`${attribute.name}`'
-              :class="{'is-success is-outlined': attribute.selected}"
-              class="chip button is-rounded is-outlined is-small attribute"
-              @click.stop="entityAttributeSelected({entityGroup, attribute})">
-              {{attribute.name}}
-            </a>
-          </div>
-        </div>
-      </template>
-      <template v-else>
-        <p>No entities for this extractor.</p>
-      </template>
-    </div>
-
-  </div>
-</template>
-
 <script>
-import _ from 'lodash';
+import { mapState } from 'vuex';
+
+import EntitiesSelector from '@/components/orchestration/EntitiesSelector';
 
 export default {
   name: 'Entities',
-  props: {
-    extractor: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
-    extractorEntities: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
+  components: {
+    EntitiesSelector,
+  },
+  data() {
+    return {
+      filterExtractorsText: '',
+      installingExtractors: [],
+      extractorInFocus: null,
+    };
   },
   created() {
-    this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
-  },
-  destroyed() {
-    this.$store.dispatch('orchestrations/clearExtractorEntities');
+    this.$store.dispatch('orchestrations/getAll');
+    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
-    hasEntities() {
-      return this.orderedEntityGroups.length > 0;
+    ...mapState('orchestrations', [
+      'installedPlugins',
+      'extractors',
+    ]),
+    getImageUrl() {
+      return extractor => `/static/logos/${this.getNameWithoutPrefixedTapDash(extractor)}-logo.png`;
     },
-    isLoading() {
-      return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
+    getNameWithoutPrefixedTapDash() {
+      return extractor => extractor.replace('tap-', '');
     },
-    orderedEntityGroups() {
-      return _.orderBy(this.extractorEntities.entityGroups, 'name');
-    },
-    orderedAttributes() {
-      return attributes => _.orderBy(attributes, 'name');
+    filteredExtractors() {
+      // Alphabetize filter (TODO: temp until getInstalledPlugins is alphabetical like getAll)
+      const alphabetized = this.extractors.filter(
+        extractor => this.installedPlugins.extractors.find(item => item.name === extractor));
+
+      // Input filter
+      if (this.filterExtractorsText) {
+        return alphabetized.filter(item => item.indexOf(this.filterExtractorsText) > -1);
+      }
+      return alphabetized;
     },
   },
   methods: {
-    entityAttributeSelected(payload) {
-      this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
-    },
-    entityGroupSelected(entityGroup) {
-      this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
-    },
-    selectEntities() {
-      this.$store.dispatch('orchestrations/selectEntities');
+    updateExtractorInFocus(extractor) {
+      const extractorObj = this.installedPlugins.extractors.find(item => item.name === extractor);
+      this.extractorInFocus = extractorObj;
     },
   },
 };
 </script>
 
+<template>
+  <div>
+    <div v-if='extractorInFocus'>
+
+      <EntitiesSelector
+        :extractor='extractorInFocus'
+        :imageUrl='getImageUrl(extractorInFocus.name)'
+        @clearExtractorInFocus='updateExtractorInFocus(null)'>
+      </EntitiesSelector>
+
+    </div>
+
+    <div v-else>
+
+      <div class="columns">
+        <div class="column is-4 is-offset-4">
+          <input
+            type="text"
+            v-model="filterExtractorsText"
+            placeholder="Filter installed extractors..."
+            class="input connector-input">
+        </div>
+      </div>
+
+      <div class="tile is-ancestor flex-and-wrap">
+        <div
+          class="tile is-parent is-3"
+          v-for="(extractor, index) in filteredExtractors"
+          :key="`${extractor}-${index}`">
+          <div class="tile is-child box">
+            <div class="image is-64x64 container">
+              <img
+                :src='getImageUrl(extractor)'
+                :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
+            </div>
+            <div class="content is-small">
+              <p class='has-text-centered'>
+                {{extractor}}
+              </p>
+
+              <a
+                class='button is-success is-outlined is-block is-small'
+                @click="updateExtractorInFocus(extractor)">Edit Selections</a>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</template>
+
 <style lang="scss">
-.chip {
-  background-color: transparent;
-}
-
-.entity-group {
-  margin: .25rem .75rem 1.25rem;
-}
-
-.attribute {
-  margin: .15rem;
-}
 </style>
