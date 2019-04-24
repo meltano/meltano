@@ -1,8 +1,8 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
-      <nav class="panel ">
+      <nav class="panel has-background-white">
         <div class="panel-block">
           <div class="field has-addons">
             <div class="control is-expanded">
@@ -481,20 +481,18 @@
 
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
-import store from '@/store';
 import capitalize from '@/filters/capitalize';
-import RouterViewLayout from '@/views/RouterViewLayout';
-import Dropdown from '../components/generic/Dropdown';
-import ResultTable from '../components/designs/ResultTable';
-import SelectDropdown from '../components/generic/SelectDropdown';
-import YesNoFilter from '../components/filters/YesNoFilter';
-import Chart from '../components/designs/Chart';
-
-import NewDashboardModal from '../components/dashboards/NewDashboardModal';
+import Dropdown from '@/components/generic/Dropdown';
+import ResultTable from '@/components/designs/ResultTable';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import SelectDropdown from '@/components/generic/SelectDropdown';
+import YesNoFilter from '@/components/filters/YesNoFilter';
+import Chart from '@/components/designs/Chart';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Design',
@@ -503,19 +501,9 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-  beforeRouteEnter(to, from, next) {
-    const { model, design, slug } = to.params;
-    store.dispatch('designs/getDesign', { model, design, slug })
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/getDesign', {
-      model: to.params.model,
-      design: to.params.design,
-    }).then(next);
+  mounted() {
+    const { slug, model, design } = this.$route.params;
+    this.$store.dispatch('designs/getDesign', { model, design, slug });
   },
   filters: {
     capitalize,
@@ -525,7 +513,7 @@ export default {
     NewDashboardModal,
     Dropdown,
     ResultTable,
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
     SelectDropdown,
     YesNoFilter,
   },

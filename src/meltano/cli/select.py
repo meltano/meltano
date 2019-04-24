@@ -1,20 +1,15 @@
 import os
 import click
-import logging
 import fnmatch
 import json
 
 from . import cli
 from .params import project
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin_invoker import PluginInvoker
-from meltano.core.plugin.singer.catalog import (
-    visit,
-    parse_select_pattern,
-    ListSelectedExecutor,
-)
+from meltano.core.plugin.singer.catalog import parse_select_pattern
+from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
@@ -29,13 +24,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:
-            show(
-                project,
-                extractor,
-                entities_filter,
-                attributes_filter,
-                show_all=flags["all"],
-            )
+            show(project, extractor, show_all=flags["all"])
         else:
             add(
                 project,
@@ -65,40 +54,14 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
 
 
 def add(project, extractor, entities_filter, attributes_filter, exclude=False):
-    exclude = "!" if exclude else ""
-    config = ConfigService(project)
-    pattern = f"{exclude}{entities_filter}.{attributes_filter}"
-
-    with project.meltano_update() as meltano:
-        extractor = config.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
-        extractor.add_select_filter(pattern)
-
-        idx = next(i for i, it in enumerate(config.get_extractors()) if it == extractor)
-        meltano["plugins"]["extractors"][idx] = extractor.canonical()
+    select_service = SelectService(project, extractor)
+    select_service.select(entities_filter, attributes_filter, exclude)
 
 
-def show(project, extractor, entities_filter, attributes_filter, show_all=False):
-    config = ConfigService(project)
-    extractor = config.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
-    invoker = PluginInvoker(project, extractor)
-    pattern = f"{entities_filter}.{attributes_filter}"
-
-    list_all = ListSelectedExecutor()
-    try:
-        if not invoker.files["catalog"].exists():
-            logging.info("Catalog not found, trying to run the tap with --discover.")
-            extractor.run_discovery(invoker)
-        else:
-            extractor.apply_select(invoker)
-
-        with invoker.files["catalog"].open() as catalog:
-            schema = json.load(catalog)
-            visit(schema, list_all)
-    except FileNotFoundError as e:
-        logging.error(
-            "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
-        )
-        raise e
+def show(project, extractor, show_all=False):
+    select_service = SelectService(project, extractor)
+    extractor = select_service.get_extractor()
+    list_all = select_service.get_extractor_entities()
 
     # report
     click.secho("Enabled patterns:")

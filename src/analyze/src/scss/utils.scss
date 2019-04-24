@@ -1,5 +1,15 @@
 /* Utilities - General */
 
+.vh-scrollable {
+  height: calc(100vh - 3.25rem); // TODO properly import variable $navbar-height
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.box-transparent {
+  background-color: transparent;
+}
+
 .ellipsis {
   white-space: nowrap;
   overflow: hidden;

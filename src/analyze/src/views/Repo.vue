@@ -1,5 +1,5 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
       <div class="level">
@@ -109,14 +109,14 @@
       </div>
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import pretty from '@/filters/pretty';
-import RouterViewLayout from '@/views/RouterViewLayout';
 import fileTypeEnums from '@/utils/fileTypeEnums';
+import pretty from '@/filters/pretty';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 import utils from '@/utils/utils';
 
 export default {
@@ -126,7 +126,7 @@ export default {
     this.sync();
   },
   components: {
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
   },
   filters: {
     pretty,

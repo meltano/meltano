@@ -1,30 +1,60 @@
-import os
-import subprocess
-import logging
-from io import StringIO
-import pandas as pd
-from sqlalchemy import TIMESTAMP, DATE, DATETIME
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin import PluginType
+from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.select_service import SelectService
+from meltano.core.tracking import GoogleAnalyticsTracker
+
+from meltano.cli.add import extractor
+
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
-from meltano.core.runner.meltano import (
-    MeltanoRunner,
-    EXTRACTOR_REGISTRY,
-    LOADER_REGISTRY,
+
+orchestrationsBP = Blueprint(
+    "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
 )
-from ..config import TEMP_FOLDER, PROJECT_ROOT_DIR
-from ..models.settings import Settings
-
-
-orchestrationsBP = Blueprint("orchestrations", __name__, url_prefix="/orchestrations")
-DATETIME_TYPES_TO_PARSE = (TIMESTAMP, DATE, DATETIME)
-TRANSFORM_DIR = "transform"
-PROFILES_DIR = "profile"
 
 
 @orchestrationsBP.route("/", methods=["GET"])
 def index():
-    result = {}
-    # eh
+    new_project = Project()
+    new_plugin_discovery_service = PluginDiscoveryService(new_project)
+    result = new_plugin_discovery_service.discover(PluginType.ALL)
     return jsonify(result)
+
+
+@orchestrationsBP.route("/installed-plugins", methods=["GET"])
+def installed_plugins():
+    project = Project.find()
+    return jsonify(project.meltano)
+
+
+@orchestrationsBP.route("/add-extractor", methods=["POST"])
+def add_extractor():
+    project = Project.find()
+    add_service = ProjectAddService(project)
+    plugin_name = request.get_json()["name"]
+    plugin = add_service.add("extractors", plugin_name)
+    install_service = PluginInstallService(project)
+    run_venv = install_service.create_venv(plugin)
+    run_install_plugin = install_service.install_plugin(plugin)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
+    return jsonify({"test": 123})
+
+
+@orchestrationsBP.route("/add-loader", methods=["POST"])
+def add_loader():
+    project = Project.find()
+    add_service = ProjectAddService(project)
+    plugin_name = request.get_json()["name"]
+    plugin = add_service.add("loaders", plugin_name)
+    install_service = PluginInstallService(project)
+    run_venv = install_service.create_venv(plugin)
+    run_install_plugin = install_service.install_plugin(plugin)
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
+    return jsonify({"test": 123})
 
 
 @orchestrationsBP.route("/connection_names", methods=["GET"])
@@ -82,6 +112,83 @@ def extract(extractor_name: str) -> Response:
     return jsonify(
         {"extractor_name": extractor_name, "output_file_paths": csv_files_url}
     )
+
+
+@orchestrationsBP.route("/save/configuration", methods=["POST"])
+def save_plugin_configuration() -> Response:
+    """
+    endpoint for persisting a plugin configuration
+    """
+    incoming = request.get_json()
+    extractor_name = incoming["extractorName"]
+    config = incoming["config"]
+
+    # TODO persist strategy
+
+    return jsonify({"test": True})
+
+
+@orchestrationsBP.route("/select-entities", methods=["POST"])
+def selectEntities() -> Response:
+    """
+    endpoint that performs selection of the user selected entities and attributes
+    """
+    project = Project.find()
+    incoming = request.get_json()
+    extractor_name = incoming["extractorName"]
+    entity_groups = incoming["entityGroups"]
+
+    select_service = SelectService(project, extractor_name)
+
+    for entity_group in entity_groups:
+        group_is_selected = "selected" in entity_group
+
+        for attribute in entity_group["attributes"]:
+            if group_is_selected or "selected" in attribute:
+                entities_filter = entity_group["name"]
+                attributes_filter = attribute["name"]
+                select_service.select(entities_filter, attributes_filter)
+
+    return jsonify("winning")
+
+
+@orchestrationsBP.route("/entities/<extractor_name>", methods=["POST"])
+def entities(extractor_name: str) -> Response:
+    """
+    endpoint that returns the entities associated with a particular extractor
+    """
+    project = Project.find()
+    select_service = SelectService(project, extractor_name)
+    list_all = select_service.get_extractor_entities()
+
+    entity_groups = []
+    for stream, prop in (
+        (stream, prop)
+        for stream in list_all.streams
+        for prop in list_all.properties[stream.key]
+    ):
+        match = next(
+            (
+                entityGroup
+                for entityGroup in entity_groups
+                if entityGroup["name"] == stream.key
+            ),
+            None,
+        )
+        if match:
+            match["attributes"].append({"name": prop.key})
+        else:
+            entity_groups.append(
+                {"name": stream.key, "attributes": [{"name": prop.key}]}
+            )
+
+    entity_groups = sorted(entity_groups, key=lambda k: k["name"])
+    for entityGroup in entity_groups:
+        entityGroup["attributes"] = sorted(
+            entityGroup["attributes"], key=lambda k: k["name"]
+        )
+
+    return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 
 
 @orchestrationsBP.route("/load/<loader_name>", methods=["POST"])

@@ -1,13 +1,17 @@
+import Vue from 'vue';
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
   extractors: [],
   loaders: [],
+  hasExtractorLoadingError: false,
+  extractorEntities: {},
   currentView: 'intro',
   currentExtractor: '',
   currentConnectionName: '',
   connectionNames: [],
   currentLoader: '',
+  installedPlugins: {},
   log: 'Job log will appear when run.',
 };
 
@@ -35,15 +39,88 @@ const getters = {
   canRun() {
     return !!state.currentExtractor && !!state.currentLoader;
   },
+
+  remainingExtractors() {
+    if (state.installedPlugins) {
+      const installedExtractors = state.installedPlugins.extractors || [];
+
+      if (installedExtractors && installedExtractors.length > 0) {
+        return state.extractors.filter((extractor) => {
+          let matchFound = false;
+
+          for (let i = 0; i < installedExtractors.length; i += 1) {
+            if (extractor === installedExtractors[i].name) {
+              matchFound = true;
+            }
+          }
+
+          return !matchFound;
+        });
+      }
+    }
+
+    return state.extractors;
+  },
+
+  remainingLoaders() {
+    if (state.installedPlugins) {
+      const installedLoaders = state.installedPlugins.loaders;
+
+      if (installedLoaders && installedLoaders.length > 0) {
+        return state.loaders.filter((loader) => {
+          let matchFound = false;
+
+          for (let i = 0; i < installedLoaders.length; i += 1) {
+            if (loader === installedLoaders[i].name) {
+              matchFound = true;
+            }
+          }
+
+          return !matchFound;
+        });
+      }
+    }
+
+    return state.loaders;
+  },
 };
 
 const actions = {
+  clearExtractorEntities({ commit }) {
+    commit('setAllExtractorEntities', null);
+  },
+
   getAll({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
         commit('setAll', response.data);
       })
       .catch(() => {});
+  },
+
+  getExtractorEntities({ commit }, extractorName) {
+    commit('setHasExtractorLoadingError', false);
+
+    orchestrationsApi.getExtractorEntities(extractorName)
+      .then((response) => {
+        commit('setAllExtractorEntities', response.data);
+      })
+      .catch(() => {
+        commit('setHasExtractorLoadingError', true);
+      });
+  },
+
+  saveExtractorConfiguration(_, configPayload) {
+    orchestrationsApi.saveExtractorConfiguration(configPayload);
+    // TODO commit if values are properly saved, they are initially copied from
+    // the extractor's config and we'd have to update this
+  },
+
+  getInstalledPlugins({ commit }) {
+    orchestrationsApi.installedPlugins()
+      .then((response) => {
+        commit('setInstalledPlugins', response.data);
+      });
   },
 
   getConnectionNames({ commit }) {
@@ -71,6 +148,13 @@ const actions = {
   currentConnectionNameClicked({ commit }, e) {
     const selectedConnectionName = e.target.value;
     commit('setCurrentConnectionName', selectedConnectionName);
+  },
+
+  selectEntities() {
+    orchestrationsApi.selectEntities(state.extractorEntities)
+      .then(() => {
+        // TODO confirm success or handle error in UI
+      });
   },
 
   runExtractor() {
@@ -113,12 +197,40 @@ const actions = {
       })
       .catch(() => { });
   },
+
+  toggleEntityGroup({ commit }, entityGroup) {
+    commit('toggleSelected', entityGroup);
+    const selected = entityGroup.selected;
+    entityGroup.attributes.forEach((attribute) => {
+      if (attribute.selected !== selected) {
+        commit('toggleSelected', attribute);
+      }
+    });
+  },
+
+  toggleEntityAttribute({ commit }, { entityGroup, attribute }) {
+    commit('toggleSelected', attribute);
+    const hasDeselectedAttribute = attribute.selected === false && entityGroup.selected;
+    const hasAllSelectedAttributes = !entityGroup.attributes.find(attr => !attr.selected);
+    if (hasDeselectedAttribute || hasAllSelectedAttributes) {
+      commit('toggleSelected', entityGroup);
+    }
+  },
 };
 
 const mutations = {
   setAll(_, orchestrationData) {
     state.extractors = orchestrationData.extractors;
     state.loaders = orchestrationData.loaders;
+  },
+
+  setAllExtractorEntities(_, entitiesData) {
+    state.extractorEntities = entitiesData
+      ? {
+        extractorName: entitiesData.extractor_name,
+        entityGroups: entitiesData.entity_groups,
+      }
+      : {};
   },
 
   setConnectionNames(_, connectionNames) {
@@ -139,6 +251,18 @@ const mutations = {
 
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
+  },
+
+  setHasExtractorLoadingError(_, value) {
+    state.hasExtractorLoadingError = value;
+  },
+
+  setInstalledPlugins(_, projectConfig) {
+    state.installedPlugins = projectConfig.plugins;
+  },
+
+  toggleSelected(_, selectable) {
+    Vue.set(selectable, 'selected', !selectable.selected);
   },
 };
 

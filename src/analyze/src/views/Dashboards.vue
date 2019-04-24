@@ -1,9 +1,9 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
 
-      <nav class="panel">
+      <nav class="panel has-background-white">
         <p class="panel-heading">
           Dashboards
         </p>
@@ -46,14 +46,14 @@
 
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 
 <script>
 import { mapState, mapActions } from 'vuex';
-import RouterViewLayout from '@/views/RouterViewLayout';
-import Chart from '../components/designs/Chart';
-import NewDashboardModal from '../components/dashboards/NewDashboardModal';
+import Chart from '@/components/designs/Chart';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {
   name: 'Dashboards',
@@ -68,7 +68,7 @@ export default {
   components: {
     Chart,
     NewDashboardModal,
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
   },
   computed: {
     ...mapState('dashboards', [
