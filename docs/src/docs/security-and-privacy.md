@@ -30,13 +30,38 @@ We take user security and privacy seriously at GitLab. We internally use Meltano
 1. We will never release the pseudonymized dataset publicly, in the event it is possible to reverse engineer unintended content.
 1. Select GitLab employees have administrative access to GitLab.com, and the credentials used for our extractors. As noted above, developers on the Meltano project could maliciously emit credentials into a job log, however, the logs are not publicly available.
 
-## Role Based Access Control (RBAC) <sup>BETA</sup>
+## Role Based Access Control (RBAC) <sup>ALPHA</sup>
+
+::: danger
+This feature is experimental and subject to change.
+:::
 
 In the current architecture of Meltano, authorization is technically always enabled because every installation of Meltano comes with a single user that has administrative rights to everything. In other words, there are no restrictions as far as what the user can do and there is no difference between users who are logged in to Meltano.
 
-While this functionality is still in beta, you can enable RBAC by setting the environment variable `MELTANO_AUTHENTICATION` to `true`.
+While this functionality is still in alpha, you can enable RBAC by setting the environment variable `MELTANO_AUTHENTICATION` to `true`.
 
 ```bash
 # Set in your .env file
 $ export MELTANO_AUTHENTICATION=true
 ```
+
+Now you can start your Meltano installation with:
+
+```bash
+$ meltano ui
+```
+
+### User Authentication
+
+You should see the following login page whenever you open Meltano.
+
+![](/screenshots/meltano-login.png)
+
+There are two primary ways to authenticate:
+
+1. Local user registration through the Register link
+1. Authentication through a GitLab account
+
+## Managing Roles
+
+More information to come...
