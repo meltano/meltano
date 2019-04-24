@@ -13,11 +13,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [!580](https://gitlab.com/meltano/meltano/merge_requests/580) Add sorting to plugins for improved UX, both UI via extractors/loaders/etc. and `meltano discover all` benefit from sorted results
 
 ### Changes
-* [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 ### Fixes
+* [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
 
 ### Breaks
+
+
+## 0.21.0 - (2019-04-23)
+---
+
+### New
+* [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
+
+### Changes
+* [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 
 ## 0.20.0 - (2019-04-15)

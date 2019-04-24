@@ -15,6 +15,7 @@ requires = [
     'Cerberus==1.2',
     'sqlparse==0.3.0',
     'gitpython==2.1.11',
+    'jsonschema==2.6.0',
     'markdown==3.0.1',
     'networkx==2.2',
     'pandas==0.24.1',
@@ -55,7 +56,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.20.0",
+    version="0.21.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",
