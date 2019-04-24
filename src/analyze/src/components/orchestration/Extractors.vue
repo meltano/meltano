@@ -106,8 +106,8 @@ export default {
             class="tile is-parent is-3"
             v-for="(extractor, index) in filteredExtractors"
             :key="`${extractor}-${index}`">
-            <div class="tile is-child box">
-              <div class="image is-64x64 container">
+            <div class="tile level is-child box">
+              <div class="image level-item is-64x64 container">
                 <img
                   :class='{ "grayscale": !getIsConnectorInstalled(extractor) }'
                   :src='getImageUrl(extractor)'

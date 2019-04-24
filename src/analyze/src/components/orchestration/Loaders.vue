@@ -104,8 +104,8 @@ export default {
             class="tile is-parent is-3"
             v-for="(loader, index) in filteredLoaders"
             :key="`${loader}-${index}`">
-            <div class="tile is-child box">
-              <div class="image is-64x64 container">
+            <div class="tile level is-child box">
+              <div class="image level-item is-64x64 container">
                 <img
                   :class='{ "grayscale": !getIsConnectorInstalled(loader) }'
                   :src='getImageUrl(loader)'
