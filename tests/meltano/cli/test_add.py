@@ -30,7 +30,11 @@ class TestCliAdd:
         assert f"Installed '{plugin_name}'." in res.stdout
 
         project.reload()
-        config_service.get_plugin(plugin_name, plugin_type)
+        plugin = config_service.get_plugin(plugin_name, plugin_type)
+
+        if plugin.name == "airflow":
+            assert project.plugin_dir(plugin, "airflow.cfg").exists()
+            assert project.plugin_dir(plugin, "airflow.db").exists()
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])

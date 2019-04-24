@@ -32,7 +32,6 @@ def impersonate(app):
 
 @pytest.fixture()
 def app(create_app):
-
     return create_app()
 
 

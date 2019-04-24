@@ -61,6 +61,7 @@ def api_auth_required(f):
     def decorated():
         if request.method == "OPTIONS":
             return f()
+
         session_user = current_user._get_current_object()
         if isinstance(session_user, FreeUser):
             logging.debug(f"Authentication bypassed`")

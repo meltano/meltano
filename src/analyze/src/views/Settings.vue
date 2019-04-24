@@ -5,12 +5,12 @@
       <ul class="menu-list">
         <router-link
           tag="li"
-          :to="{name:'database', params: {projectSlug: currentProjectSlug}}">
+          :to="{name:'database'}">
           <a>Database</a>
         </router-link>
         <router-link
           tag="li"
-          :to="{name:'connectors', params: {projectSlug: currentProjectSlug}}">
+          :to="{name:'connectors'}">
           <a>Connectors</a>
         </router-link>
       </ul>
@@ -23,19 +23,12 @@
   </router-view-layout-sidebar>
 </template>
 <script>
-import { mapState } from 'vuex';
-
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {
   name: 'Settings',
   components: {
     RouterViewLayoutSidebar,
-  },
-  computed: {
-    ...mapState('projects', [
-      'currentProjectSlug',
-    ]),
   },
   data() {
     return {

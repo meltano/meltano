@@ -329,7 +329,7 @@ class TestSingerTap:
 
         with mock.patch.object(
             PluginInvoker, "invoke", side_effect=corrupt_catalog
-        ) as invoke, pytest.raises(PluginExecutionError):
+        ) as invoke:
             subject.apply_select(invoker, [])
 
             assert not invoker.files[

@@ -9,14 +9,25 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 
 ### Changes
 * [#588](https://gitlab.com/meltano/meltano/issues/588) Updated core navigation and depth hierarchy styling to facilitate main user flow and improved information architecture
+* [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 ### Fixes
+* [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
 
 ### Breaks
+
+
+## 0.21.0 - (2019-04-23)
+---
+
+### New
+* [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
+
+### Changes
+* [#591](https://gitlab.com/meltano/meltano/issues/591) Revert #484: remove `meltano ui` being run outside a Meltano project.
 
 
 ## 0.20.0 - (2019-04-15)
@@ -42,6 +53,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#576](https://gitlab.com/meltano/meltano/issues/576) Fix switching between designs now works
 * [#555](https://gitlab.com/meltano/meltano/issues/555) Fix `meltano discover` improperly displaying plugins
 * [#530](https://gitlab.com/meltano/meltano/issues/530) Fix query generation for star schemas
+* [#575](https://gitlab.com/meltano/meltano/issues/575) Move Airflow configuration to .meltano/run/airflow
 * [#571](https://gitlab.com/meltano/meltano/issues/571) Fix various routing and API endpoint issues related to recent `projects` addition
 
 

@@ -152,4 +152,5 @@ orchestrators:
     config:
       core:
         dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
-        sql_alchemy_conn: sqlite:///.meltano/run/airflow/airflow.db
+        plugins_folder: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+        sql_alchemy_conn: sqlite:///.meltano/orchestrators/airflow/airflow.db

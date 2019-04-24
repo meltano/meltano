@@ -1,11 +1,9 @@
 <template>
   <nav class="navbar is-info">
     <div class="navbar-brand">
-      <router-link
-          :to="{name: 'projects'}"
-          class="navbar-item navbar-child">
+      <div class="navbar-item navbar-child">
         <logo></logo>
-      </router-link>
+      </div>
       <div class="navbar-burger burger"
            :class="{'is-active': isMobileMenuOpen}"
            data-target="meltnavbar-transparent"
@@ -21,36 +19,25 @@
          :class="{'is-active': isMobileMenuOpen}">
       <div class="navbar-start">
 
-        <div class="navbar-project-label navbar-item navbar-child">
-          <span v-if="currentProjectSlug" class='is-italic'>
-            {{currentProjectSlug}}
-          </span>
-          <span v-else>Projects</span>
-        </div>
-
         <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'dataSetup', params: { projectSlug: currentProjectSlug }}"
+          :to="{name: 'dataSetup'}"
           class="navbar-item navbar-child">
-          Setup
+          Configuration
         </router-link>
 
         <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'transformations', params: { projectSlug: currentProjectSlug }}"
+          :to="{name: 'transformations'}"
           class="navbar-item navbar-child">
           Transformations
         </router-link>
 
         <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'orchestration', params: { projectSlug: currentProjectSlug }}"
+          :to="{name: 'orchestration'}"
           class="navbar-item navbar-child">
           Orchestration
         </router-link>
 
         <div
-          v-if="currentProjectSlug"
           class="navbar-item has-dropdown is-hoverable">
           <a class="navbar-link">
             Analyze
@@ -62,16 +49,8 @@
               <div class="navbar-item navbar-title has-text-grey-light" :key="model">
                 {{model | capitalize | underscoreToSpace}}
               </div>
-              <!-- TODO move to getter -->
               <router-link
-                :to="{name:'analyze_design',
-                      params:
-                        {
-                          slug: currentProjectSlug,
-                          model: model,
-                          design: design
-                        }
-                      }"
+                :to="urlForModelDesign(model, design)"
                 class="navbar-item navbar-child"
                 v-for="design in v['designs']"
                 @click.native="menuSelected"
@@ -82,10 +61,8 @@
           </div>
         </div>
 
-        <router-link
-          v-if="currentProjectSlug"
-          :to="{name: 'dashboards', params: { projectSlug: currentProjectSlug }}"
-          class="navbar-item navbar-child">
+        <router-link to="/dashboards"
+        class="navbar-item navbar-child">
           Dashboards
         </router-link>
 
@@ -104,7 +81,7 @@
   </nav>
 </template>
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
@@ -129,8 +106,6 @@ export default {
   data() {
     return {
       isMobileMenuOpen: false,
-      design: '',
-      model: '',
     };
   },
   filters: {
@@ -142,8 +117,8 @@ export default {
       'models',
       'navbarClicked',
     ]),
-    ...mapState('projects', [
-      'currentProjectSlug',
+    ...mapGetters('repos', [
+      'urlForModelDesign',
     ]),
   },
   methods: {

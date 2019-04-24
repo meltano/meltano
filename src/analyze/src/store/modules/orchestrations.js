@@ -4,6 +4,7 @@ import orchestrationsApi from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
+  hasExtractorLoadingError: false,
   extractorEntities: {},
   currentView: 'intro',
   currentExtractor: '',
@@ -38,28 +39,6 @@ const getters = {
   canRun() {
     return !!state.currentExtractor && !!state.currentLoader;
   },
-
-  remainingLoaders() {
-    if (state.installedPlugins) {
-      const installedLoaders = state.installedPlugins.loaders;
-
-      if (installedLoaders && installedLoaders.length > 0) {
-        return state.loaders.filter((loader) => {
-          let matchFound = false;
-
-          for (let i = 0; i < installedLoaders.length; i += 1) {
-            if (loader === installedLoaders[i].name) {
-              matchFound = true;
-            }
-          }
-
-          return !matchFound;
-        });
-      }
-    }
-
-    return state.loaders;
-  },
 };
 
 const actions = {
@@ -76,9 +55,14 @@ const actions = {
   },
 
   getExtractorEntities({ commit }, extractorName) {
+    commit('setHasExtractorLoadingError', false);
+
     orchestrationsApi.getExtractorEntities(extractorName)
       .then((response) => {
         commit('setAllExtractorEntities', response.data);
+      })
+      .catch(() => {
+        commit('setHasExtractorLoadingError', true);
       });
   },
 
@@ -223,6 +207,10 @@ const mutations = {
 
   setCurrentConnectionName(_, selectedConnectionName) {
     state.currentConnectionName = selectedConnectionName;
+  },
+
+  setHasExtractorLoadingError(_, value) {
+    state.hasExtractorLoadingError = value;
   },
 
   setInstalledPlugins(_, projectConfig) {
