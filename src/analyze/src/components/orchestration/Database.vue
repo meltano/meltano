@@ -133,13 +133,13 @@
           </div>
         </div>
 
-        <div class="field">
-          <div class="control is-pulled-right">
-            <button class="button is-success"
-                      @click.prevent="saveConnection">
-              Save Connection
-            </button>
-          </div>
+        <div class="buttons is-pulled-right">
+          <button class="button" @click="clearLoaderInFocus">
+            Cancel
+          </button>
+          <button class="button is-success" @click.prevent="saveConnection">
+            Save Connection
+          </button>
         </div>
       </section>
     </div>
@@ -180,6 +180,9 @@ export default {
   },
 
   methods: {
+    clearLoaderInFocus() {
+      this.$emit('clearLoaderInFocus');
+    },
     saveConnection() {
       this.$store.dispatch('settings/saveConnection', {
         name: this.connectionName,
