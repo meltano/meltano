@@ -9,7 +9,7 @@ class TestUIAvailableWorker:
     def subject(self):
         return UIAvailableWorker("localhost:5000", open_browser=True)
 
-    @mock.patch("time.sleep") # don't wait for real
+    @mock.patch("time.sleep")  # don't wait for real
     @mock.patch("webbrowser.open")
     @mock.patch("requests.get")
     def test_open_browser(self, requests_get, webbrowser_open, sleep, subjec):
