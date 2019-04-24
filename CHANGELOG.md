@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
+* [#597](https://gitlab.com/meltano/meltano/issues/597) Automatically open the browser when `meltano ui` is run
 
 ### Breaks
 
