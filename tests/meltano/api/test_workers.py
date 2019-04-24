@@ -12,7 +12,7 @@ class TestUIAvailableWorker:
     @mock.patch("time.sleep")  # don't wait for real
     @mock.patch("webbrowser.open")
     @mock.patch("requests.get")
-    def test_open_browser(self, requests_get, webbrowser_open, sleep, subjec):
+    def test_open_browser(self, requests_get, webbrowser_open, sleep, subject):
         ERROR = mock.Mock(status_code=400)
         OK = mock.Mock(status_code=200)
         requests_get.side_effect = [ERROR, ERROR, OK]
