@@ -1,3 +1,9 @@
+@import "../../node_modules/bulma/bulma";
+
+html {
+  background-color: $light;
+}
+
 @include tablet() {
    // Favor RouterViewLayout's control of scrollable columns unless on mobile
   html {

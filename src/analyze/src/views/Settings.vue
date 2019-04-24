@@ -1,5 +1,5 @@
 <template>
-  <router-view-layout>
+  <router-view-layout-sidebar>
 
     <div slot='left'>
       <ul class="menu-list">
@@ -8,6 +8,11 @@
           :to="{name:'database'}">
           <a>Database</a>
         </router-link>
+        <router-link
+          tag="li"
+          :to="{name:'connectors'}">
+          <a>Connectors</a>
+        </router-link>
       </ul>
     </div>
 
@@ -15,31 +20,40 @@
       <router-view />
     </div>
 
-  </router-view-layout>
+  </router-view-layout-sidebar>
 </template>
 <script>
-import RouterViewLayout from '@/views/RouterViewLayout';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayout,
+    RouterViewLayoutSidebar,
   },
   data() {
     return {
-      categories: [{
-        name: 'Database',
-        pages: [{
-          title: 'Database',
-          href: '/settings/database',
-        }],
-      }, {
-        name: 'Access control',
-        pages: [{
-          title: 'Roles',
-          href: '/settings/roles',
-        }],
-      }],
+      categories: [
+        {
+          name: 'Database',
+          pages: [{
+            title: 'Database',
+            href: '/settings/database',
+          }],
+        },
+        {
+          name: 'Connectors',
+          pages: [
+            {
+              title: 'Extractors',
+              href: '/settings/connectors#extractors',
+            },
+            {
+              title: 'Loaders',
+              href: '/settings/connectors#loaders',
+            },
+          ],
+        },
+      ],
     };
   },
 };

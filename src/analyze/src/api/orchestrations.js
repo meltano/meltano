@@ -6,8 +6,32 @@ export default {
     return axios.get(utils.apiUrl('orchestrations'));
   },
 
+  addExtractors(extractor) {
+    return axios.post(utils.apiUrl('orchestrations', 'add-extractor'), extractor);
+  },
+
+  addLoaders(loader) {
+    return axios.post(utils.apiUrl('orchestrations', 'add-loader'), loader);
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
+  },
+
+  saveExtractorConfiguration(configPayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'save/configuration'), configPayload);
+  },
+
+  selectEntities(extractorEntities) {
+    return axios.post(utils.apiUrl('orchestrations', 'select-entities'), extractorEntities);
+  },
+
+  installedPlugins() {
+    return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
+  },
+
+  getExtractorEntities(extractor) {
+    return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`));
   },
 
   load(extractor, loader) {

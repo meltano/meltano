@@ -1,12 +1,14 @@
-import Vue from 'vue';
 import Router from 'vue-router';
-import Repo from '@/views/Repo';
+import Vue from 'vue';
+
+import Connectors from '@/views/Connectors';
 import Design from '@/views/Design';
+import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
-import Settings from '@/views/Settings';
-import SettingsDatabase from '@/components/settings/Database';
-import SettingsRoles from '@/components/settings/Roles';
+import Orchestration from '@/views/Orchestration';
+import Repo from '@/views/Repo';
+import Transformations from '@/views/Transformations';
 
 Vue.use(Router);
 
@@ -20,16 +22,36 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/files',
+      redirect: '/connectors',
+    },
+    {
+      path: '/connectors/',
+      name: 'connectors',
+      component: Connectors,
+    },
+    {
+      path: '/transformations/',
+      name: 'transformations',
+      component: Transformations,
+    },
+    {
+      path: '/orchestration/',
+      name: 'orchestration',
+      component: Orchestration,
     },
     {
       path: '/files/',
-      name: 'Repo',
+      name: 'projectFiles',
       component: Repo,
     },
     {
+      path: '/analyze/',
+      name: 'analyze',
+      component: Designs,
+    },
+    {
       path: '/analyze/:model/:design',
-      name: '',
+      name: 'analyze_design',
       component: Design,
     },
     {
@@ -46,18 +68,6 @@ const router = new Router({
       path: '/dashboards/dashboard/:slug',
       name: 'Dashboard',
       component: Dashboards,
-    },
-    {
-      path: '/settings',
-      name: 'Settings',
-      component: Settings,
-      children: [{
-        path: 'roles',
-        component: SettingsRoles,
-      }, {
-        path: 'database',
-        component: SettingsDatabase,
-      }],
     },
   ],
 });
