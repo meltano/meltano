@@ -1,7 +1,7 @@
 import Router from 'vue-router';
 import Vue from 'vue';
 
-import Connectors from '@/views/Connectors';
+import DataSetup from '@/views/DataSetup';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
@@ -22,12 +22,22 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/connectors',
+      redirect: '/setup',
     },
     {
-      path: '/connectors/',
-      name: 'connectors',
-      component: Connectors,
+      path: '/transformations/',
+      name: 'transformations',
+      component: Transformations,
+    },
+    {
+      path: '/orchestration/',
+      name: 'orchestration',
+      component: Orchestration,
+    },
+    {
+      path: '/setup/',
+      name: 'dataSetup',
+      component: DataSetup,
     },
     {
       path: '/transformations/',

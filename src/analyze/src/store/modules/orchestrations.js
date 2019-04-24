@@ -39,50 +39,6 @@ const getters = {
   canRun() {
     return !!state.currentExtractor && !!state.currentLoader;
   },
-
-  remainingExtractors() {
-    if (state.installedPlugins) {
-      const installedExtractors = state.installedPlugins.extractors || [];
-
-      if (installedExtractors && installedExtractors.length > 0) {
-        return state.extractors.filter((extractor) => {
-          let matchFound = false;
-
-          for (let i = 0; i < installedExtractors.length; i += 1) {
-            if (extractor === installedExtractors[i].name) {
-              matchFound = true;
-            }
-          }
-
-          return !matchFound;
-        });
-      }
-    }
-
-    return state.extractors;
-  },
-
-  remainingLoaders() {
-    if (state.installedPlugins) {
-      const installedLoaders = state.installedPlugins.loaders;
-
-      if (installedLoaders && installedLoaders.length > 0) {
-        return state.loaders.filter((loader) => {
-          let matchFound = false;
-
-          for (let i = 0; i < installedLoaders.length; i += 1) {
-            if (loader === installedLoaders[i].name) {
-              matchFound = true;
-            }
-          }
-
-          return !matchFound;
-        });
-      }
-    }
-
-    return state.loaders;
-  },
 };
 
 const actions = {
