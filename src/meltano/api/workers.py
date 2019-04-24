@@ -2,6 +2,7 @@ import logging
 import threading
 import time
 import requests
+import webbrowser
 from colorama import Fore
 
 from watchdog.observers import Observer
@@ -54,11 +55,12 @@ class MeltanoBackgroundCompiler:
 
 
 class UIAvailableWorker(threading.Thread):
-    def __init__(self, url):
+    def __init__(self, url, open_browser=False):
         super().__init__()
 
         self._terminate = False
         self.url = url
+        self.open_browser = open_browser
 
     def run(self):
         while not self._terminate:
@@ -66,7 +68,10 @@ class UIAvailableWorker(threading.Thread):
                 response = requests.get(self.url)
                 if response.status_code == 200:
                     print(f"{Fore.GREEN}Meltano is available at {self.url}{Fore.RESET}")
+                    if self.open_browser:
+                        webbrowser.open(self.url)
                     self._terminate = True
+
             except:
                 pass
 
