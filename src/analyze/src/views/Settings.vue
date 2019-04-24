@@ -41,6 +41,13 @@ export default {
           }],
         },
         {
+          name: 'Access control',
+          pages: [{
+            title: 'Roles',
+            href: '/settings/roles',
+          }],
+        },
+        {
           name: 'Connectors',
           pages: [
             {

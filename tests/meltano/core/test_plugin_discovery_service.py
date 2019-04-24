@@ -52,7 +52,10 @@ class TestPluginDiscoveryService:
         # raw yaml load
         for plugin_type, plugin_defs in subject._discovery.items():
             plugin_type = PluginType(plugin_type)
-            plugin_names = [plugin["name"] for plugin in plugin_defs]
+            plugin_names = [
+                plugin["name"]
+                for plugin in sorted(plugin_defs, key=lambda k: k["name"])
+            ]
 
             assert plugin_type in discovery
             assert discovery[plugin_type] == plugin_names

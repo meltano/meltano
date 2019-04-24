@@ -20,9 +20,9 @@
       <div class="navbar-start">
 
         <router-link
-          :to="{name: 'connectors'}"
+          :to="{name: 'dataSetup'}"
           class="navbar-item navbar-child">
-          Connectors
+          Configuration
         </router-link>
 
         <router-link

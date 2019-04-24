@@ -2,42 +2,51 @@
   <div>
 
     <div class="columns">
-      <div class="column">
-        <h3>Extractor Connection Settings</h3>
-      </div>
-      <div class="column is-2">
-          <div class="buttons is-pulled-right">
-            <button
-              class='button is-success'
-              :disabled="!hasConfig"
-              @click='saveConfig'>Save</button>
+
+      <div class="column box is-4 is-offset-4">
+        <article class="message is-warning is-small">
+          <div class="message-header">
+            <p>Warning</p>
+          </div>
+          <div class="message-body">
+            <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+          </div>
+        </article>
+
+        <div class="content has-text-centered">
+          <h3>Connector Settings</h3>
+          <div class="image is-64x64 container">
+            <img :src='imageUrl' alt="fastly logo" class="">
           </div>
         </div>
-    </div>
 
-    <article class="message is-warning">
-      <div class="message-header">
-        <p>Warning</p>
-      </div>
-      <div class="message-body">
-        <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-      </div>
-    </article>
-
-    <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
-      <div class="field-label is-normal">
-        <label class="label">{{key}}</label>
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <p class="control">
-            <input
-              class="input"
-              type="text"
-              :placeholder="val"
-              v-model="configSettings[key]">
-          </p>
+        <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+          <div class="field-label is-normal">
+            <label class="label">{{key}}</label>
+          </div>
+          <div class="field-body">
+            <div class="field">
+              <p class="control">
+                <input
+                  class="input"
+                  type="text"
+                  :placeholder="val"
+                  v-model="configSettings[key]">
+              </p>
+            </div>
+          </div>
         </div>
+
+        <div class="buttons is-pulled-right">
+          <button
+            class="button"
+            @click="clearExtractorInFocus()">Cancel</button>
+          <button
+            class='button is-success'
+            :disabled="!hasConfig"
+            @click='saveConfig'>Save</button>
+        </div>
+
       </div>
     </div>
 
@@ -61,6 +70,9 @@ export default {
         return {};
       },
     },
+    imageUrl: {
+      type: String,
+    },
   },
   created() {
     this.configSettings = Object.assign({}, this.extractor.config);
@@ -73,6 +85,9 @@ export default {
     },
   },
   methods: {
+    clearExtractorInFocus() {
+      this.$emit('clearExtractorInFocus');
+    },
     saveConfig() {
       this.$store.dispatch('orchestrations/saveExtractorConfiguration', {
         extractorName: this.extractor.name,
