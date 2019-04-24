@@ -4,7 +4,9 @@ Want to help create a new product and make an impact in the world of data? You a
 
 ## Open Positions
 
-We are currently not hiring at this time, but we will be sure to update this page when we are!
+Here are the open positions that we currently have:
+
+- [Senior Product Manager](https://boards.greenhouse.io/gitlab/jobs/4059265002)
 
 ## Benefits
 
