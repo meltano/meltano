@@ -21,7 +21,7 @@ from meltano.core.compiler.project_compiler import ProjectCompiler
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
-available_worker = UIAvailableWorker("http://localhost:5000")
+available_worker = UIAvailableWorker("http://localhost:5000", open_browser=True)
 
 
 def create_app(config={}):
