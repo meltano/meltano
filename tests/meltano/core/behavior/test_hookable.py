@@ -111,8 +111,4 @@ class TestHookable:
             process()
 
         # assert not process.called
-        assert subject.calls == [
-            "before_test",
-            "before_test_2",
-            "hook_raises_before",
-        ]
+        assert subject.calls == ["before_test", "before_test_2", "hook_raises_before"]
