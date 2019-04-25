@@ -162,11 +162,15 @@ const actions = {
     });
   },
 
-  toggleAllEntityGroupsOff({ dispatch }) {
-    state.extractorEntities.entityGroups.forEach((group) => {
-      const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
-      if (group.selected || hasSelectedAttribute) {
-        dispatch('toggleEntityGroup', group);
+  toggleAllEntityGroupsOff({ commit, dispatch }) {
+    state.extractorEntities.entityGroups.forEach((entityGroup) => {
+      if (entityGroup.selected) {
+        dispatch('toggleEntityGroup', entityGroup);
+      } else {
+        const selectedAttributes = entityGroup.attributes.filter(attribute => attribute.selected);
+        if (selectedAttributes.length > 0) {
+          selectedAttributes.forEach(attribute => commit('toggleSelected', attribute));
+        }
       }
     });
   },

@@ -36,13 +36,19 @@
                 <div class="buttons are-small has-addons">
                   <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
                   <button
-                    class="button"
+                    class='button'
                     v-for='mode in selectionModes'
                     :disabled='mode === selectionModes[1]'
                     :key='mode.label'
                     :class="{ 'is-selected is-success': getIsSelectedMode(mode) }"
                     @click='updateSelectionsBasedOnTargetSelectionMode(mode);'>
                     {{mode.label}}
+                  </button>
+                  <button
+                    class='button is-text'
+                    v-if='hasSelectedAttributes'
+                    @click='clearSelections'>
+                    Clear Selection
                   </button>
                 </div>
               </div>
@@ -57,7 +63,7 @@
 
             <div
               class="columns"
-              v-if='this.selectedMode === this.selectionModes[0]'>
+              v-if='this.selectedMode === this.selectionModeAll'>
               <div class="column">
                 <article class="message is-warning is-small">
                   <div class="message-header">
@@ -127,6 +133,11 @@ export default {
     },
   },
   created() {
+    this.selectionModes = [
+      this.selectionModeAll,
+      this.selectionModeRecommended,
+      this.selectionModeCustom,
+    ];
     this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
   },
   destroyed() {
@@ -135,11 +146,10 @@ export default {
   data() {
     return {
       isExpanded: false,
-      selectionModes: [
-        { label: 'All' },
-        { label: 'Default' },
-        { label: 'Custom' },
-      ],
+      selectionModeAll: { label: 'All' },
+      selectionModeRecommended: { label: 'Recommended' },
+      selectionModeCustom: { label: 'Custom' },
+      selectionModes: [],
     };
   },
   computed: {
@@ -148,7 +158,7 @@ export default {
     ]),
     expandableToggleLabel() {
       const prefix = this.isExpanded
-        ? 'Hide majority of'
+        ? 'Hide'
         : `Show all ${this.extractorEntities.entityGroups.length}`;
       return `${prefix} entities`;
     },
@@ -172,33 +182,39 @@ export default {
       });
       return count;
     },
+    getTotalAttributeCount() {
+      return this.extractorEntities.entityGroups
+        .reduce((acc, curr) => { return acc + curr.attributes.length }, 0);
+    },
+    getTotalEntityCount() {
+      return this.extractorEntities.entityGroups.length;
+    },
     getAreAllSelected() {
-      let totalAttributeCount = 0;
-      this.extractorEntities.entityGroups.forEach((group) => {
-        totalAttributeCount += group.attributes.length;
-      });
-      return totalAttributeCount === this.getSelectedAttributeCount;
+      return this.getTotalAttributeCount === this.getSelectedAttributeCount;
     },
     hasEntities() {
-      return this.extractorEntities.entityGroups.length > 0;
+      return this.getTotalEntityCount > 0;
+    },
+    hasSelectedAttributes() {
+      return this.getSelectedAttributeCount > 0;
     },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
     },
     isSavable() {
-      return this.hasEntities && this.getSelectedAttributeCount > 0;
+      return this.hasEntities && this.hasSelectedAttributes;
     },
     selectedMode() {
       // Custom by default until/if we implement Default selections
-      let mode = this.selectionModes[2];
+      let mode = this.selectionModeCustom;
       if (this.getAreAllSelected) {
-        mode = this.selectionModes[0];
+        mode = this.selectionModeAll;
       }
       return mode;
     },
     selectionSummary() {
       let summary = 'Make at least one selection below to save.';
-      if (this.getSelectedAttributeCount > 0) {
+      if (this.hasSelectedAttributes) {
         summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`;
       }
       return summary;
@@ -207,6 +223,9 @@ export default {
   methods: {
     clearExtractorInFocus() {
       this.$emit('clearExtractorInFocus');
+    },
+    clearSelections() {
+      this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
     },
     entityAttributeSelected(payload) {
       this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
@@ -221,9 +240,9 @@ export default {
       this.$store.dispatch('orchestrations/selectEntities');
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
-      if (targetMode === this.selectionModes[0]) {
+      if (targetMode === this.selectionModeAll) {
         this.$store.dispatch('orchestrations/toggleAllEntityGroupsOn');
-      } else if (targetMode === this.selectionModes[2]) {
+      } else if (targetMode === this.selectionModeCustom && this.getAreAllSelected) {
         this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
       }
     },
