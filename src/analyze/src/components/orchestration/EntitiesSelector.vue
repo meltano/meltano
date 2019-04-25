@@ -290,7 +290,7 @@ export default {
 }
 
 .expandable-toggle {
-  margin: .75rem;
+  margin: .75rem .75rem 0 .75rem;
   justify-content: center;
 }
 
