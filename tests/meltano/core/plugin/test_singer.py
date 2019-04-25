@@ -201,7 +201,7 @@ CATALOG = """
           "metadata": {
             "inclusion": "available"
           }
- uto       },
+        },
         {
           "breadcrumb": [
             "properties",
@@ -472,7 +472,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert stream_metadata == 1, "Extraneous stream metadata"
 
     @pytest.mark.parametrize("catalog,attrs", [
-                                                ("CATALOG", {"id", "code", "name", "code"}),
+                                                ("CATALOG", {"id", "code", "name", "code", "created_at"}),
                                                 ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
                                               ], indirect=["catalog"])
     def test_select(self, catalog, attrs):
@@ -485,7 +485,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         assert lister.selected_properties["entities"] == attrs
 
     @pytest.mark.parametrize("catalog,attrs", [
-                                                ("CATALOG", {"id", "balance", "created_at"}),
+                                                ("CATALOG", {"id", "balance", "created_at", "active"}),
                                                 ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
                                               ], indirect=["catalog"])
     def test_select_negated(self, catalog, attrs):

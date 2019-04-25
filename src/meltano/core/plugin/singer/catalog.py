@@ -26,6 +26,12 @@ def parse_select_pattern(pattern: str):
     )
 
 
+def path_property(path: str):
+    prop_regex = r"properties\.(\w+)+"
+    components = re.findall(prop_regex, path)
+    return ".".join(components)
+
+
 class CatalogNode(Enum):
     STREAM = auto()
     STREAM_METADATA = auto()
@@ -141,9 +147,8 @@ class SelectExecutor(CatalogExecutor):
         self.update_node_selection(metadata, path, selected)
 
     def property_node(self, node, path):
-        prop_regex = r"properties\.(\w+)+"
-        components = re.findall(prop_regex, path)
-        breadcrumb = [self.current_stream, *components]
+        breadcrumb_idx = path.index("properties")
+        breadcrumb = path[breadcrumb_idx:].split(".")
 
         try:
             next(
@@ -161,7 +166,8 @@ class SelectExecutor(CatalogExecutor):
             )
 
     def property_metadata_node(self, node, path):
-        prop = ".".join(node["breadcrumb"])
+        property_path = ".".join(node["breadcrumb"])
+        prop = f"{self.current_stream}.{path_property(property_path)}"
         selected = self.property_match_patterns(prop)
         self.update_node_selection(node["metadata"], path, selected)
 
@@ -179,10 +185,10 @@ class ListExecutor(CatalogExecutor):
             self.properties[stream] = set()
 
     def property_node(self, node, path):
-        *_, name = path.split(".")
+        prop = path_property(path)
         # current stream
         stream = next(reversed(self.properties))
-        self.properties[stream].add(name)
+        self.properties[stream].add(prop)
 
 
 class ListSelectedExecutor(CatalogExecutor):
@@ -226,8 +232,9 @@ class ListSelectedExecutor(CatalogExecutor):
         self.streams.add(selection)
 
     def property_metadata_node(self, node, path):
-        name = ".".join(node["breadcrumb"][1:])
-        selection = self.SelectedNode(name, self.is_node_selected(node))
+        property_path = ".".join(node["breadcrumb"])
+        prop = path_property(property_path)
+        selection = self.SelectedNode(prop, self.is_node_selected(node))
 
         self.properties[self._stream].add(selection)
 
