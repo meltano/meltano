@@ -26,30 +26,43 @@
                   <button
                     class='button is-success'
                     :disabled="!hasEntities"
-                    @click='selectEntities'>Collect</button>
+                    @click='selectEntities'>Save</button>
                 </div>
               </div>
             </div>
 
             <div
-              class='is-unselectable'
-              v-for='entityGroup in orderedEntityGroups'
-              :key='`${entityGroup.name}`'>
-              <a
-                class='chip button is-rounded is-outlined entity'
-                :class="{'is-success is-outlined': entityGroup.selected}"
-                @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
-              <div class='entity-group'>
+              class="expandable"
+              :class="{ 'is-expanded': isExpanded }">
+              <div
+                class='is-unselectable'
+                v-for='entityGroup in orderedEntityGroups'
+                :key='`${entityGroup.name}`'>
                 <a
-                  v-for='attribute in orderedAttributes(entityGroup.attributes)'
-                  :key='`${attribute.name}`'
-                  :class="{'is-success is-outlined': attribute.selected}"
-                  class="chip button is-rounded is-outlined is-small attribute"
-                  @click.stop="entityAttributeSelected({entityGroup, attribute})">
-                  {{attribute.name}}
-                </a>
+                  class='chip button is-rounded is-outlined entity'
+                  :class="{'is-success is-outlined': entityGroup.selected}"
+                  @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
+                <div class='entity-group'>
+                  <a
+                    v-for='attribute in orderedAttributes(entityGroup.attributes)'
+                    :key='`${attribute.name}`'
+                    :class="{'is-success is-outlined': attribute.selected}"
+                    class="chip button is-rounded is-outlined is-small attribute"
+                    @click.stop="entityAttributeSelected({entityGroup, attribute})">
+                    {{attribute.name}}
+                  </a>
+                </div>
               </div>
+
+              <div class='expandable-footer is-flex'></div>
             </div>
+
+            <div class='expandable-toggle is-flex'>
+              <a
+                class="button is-small"
+                @click="toggleExpandable">{{expandableToggleLabel}}</a>
+            </div>
+
           </template>
           <template v-else>
             <p>No entities for this extractor.</p>
@@ -82,10 +95,19 @@ export default {
   destroyed() {
     this.$store.dispatch('orchestrations/clearExtractorEntities');
   },
+  data() {
+    return {
+      isExpanded: false,
+    };
+  },
   computed: {
     ...mapState('orchestrations', [
       'extractorEntities',
     ]),
+    expandableToggleLabel() {
+      const prefix = this.isExpanded ? 'Hide' : 'Show';
+      return `${prefix} all ${this.extractorEntities.entityGroups.length} entity groups`;
+    },
     hasEntities() {
       return this.orderedEntityGroups.length > 0;
     },
@@ -109,6 +131,9 @@ export default {
     entityGroupSelected(entityGroup) {
       this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
     },
+    toggleExpandable() {
+      this.isExpanded = !this.isExpanded;
+    },
     selectEntities() {
       this.$store.dispatch('orchestrations/selectEntities');
     },
@@ -117,6 +142,8 @@ export default {
 </script>
 
 <style lang="scss">
+@import '@/scss/utils.scss';
+
 .chip {
   background-color: transparent;
 }
@@ -128,4 +155,34 @@ export default {
 .attribute {
   margin: .15rem;
 }
+
+.expandable {
+  max-height: 210px;
+  overflow: hidden;
+  position: relative;
+
+  &.is-expanded {
+    max-height: none;
+    overflow: initial;
+
+    .expandable-footer {
+      box-shadow: none;
+    }
+  }
+
+  .expandable-footer {
+    position: absolute;
+    bottom: 0;
+    height: 8px;
+    width: 100%;
+
+    @extend .inset-overflow-shadow;
+  }
+}
+
+.expandable-toggle {
+  margin: .75rem;
+  justify-content: center;
+}
+
 </style>

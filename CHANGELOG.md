@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#607](https://gitlab.com/meltano/meltano/issues/607) Add expand/contract UI for improved entities selection UX
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 * [!580](https://gitlab.com/meltano/meltano/merge_requests/580) Add sorting to plugins for improved UX, both UI via extractors/loaders/etc. and `meltano discover all` benefit from sorted results
 
