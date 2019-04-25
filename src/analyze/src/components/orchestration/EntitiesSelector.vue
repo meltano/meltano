@@ -184,7 +184,7 @@ export default {
     },
     getTotalAttributeCount() {
       return this.extractorEntities.entityGroups
-        .reduce((acc, curr) => { return acc + curr.attributes.length }, 0);
+        .reduce((acc, curr) => acc + curr.attributes.length, 0);
     },
     getTotalEntityCount() {
       return this.extractorEntities.entityGroups.length;
