@@ -154,6 +154,23 @@ const actions = {
       .catch(() => { });
   },
 
+  toggleAllEntityGroupsOn({ dispatch }) {
+    state.extractorEntities.entityGroups.forEach((group) => {
+      if (!group.selected) {
+        dispatch('toggleEntityGroup', group);
+      }
+    });
+  },
+
+  toggleAllEntityGroupsOff({ dispatch }) {
+    state.extractorEntities.entityGroups.forEach((group) => {
+      const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
+      if (group.selected || hasSelectedAttribute) {
+        dispatch('toggleEntityGroup', group);
+      }
+    });
+  },
+
   toggleEntityGroup({ commit }, entityGroup) {
     commit('toggleSelected', entityGroup);
     const selected = entityGroup.selected;

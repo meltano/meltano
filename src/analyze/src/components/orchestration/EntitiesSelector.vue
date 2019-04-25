@@ -41,7 +41,7 @@
                     :disabled='mode === selectionModes[1]'
                     :key='mode.label'
                     :class="{ 'is-selected is-success': getIsSelectedMode(mode) }"
-                    @click='setSelectedMode(mode); updateSelectionsBasedOnSelectionMode();'>
+                    @click='updateSelectionsBasedOnTargetSelectionMode(mode);'>
                     {{mode.label}}
                   </button>
                 </div>
@@ -127,8 +127,6 @@ export default {
     },
   },
   created() {
-    //  Set to default mode. Later update based on persisted state and preselect matching entities
-    this.setSelectedMode(this.selectionModes[2]);
     this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
   },
   destroyed() {
@@ -137,7 +135,6 @@ export default {
   data() {
     return {
       isExpanded: false,
-      selectedMode: null,
       selectionModes: [
         { label: 'All' },
         { label: 'Default' },
@@ -175,6 +172,13 @@ export default {
       });
       return count;
     },
+    getAreAllSelected() {
+      let totalAttributeCount = 0;
+      this.extractorEntities.entityGroups.forEach((group) => {
+        totalAttributeCount += group.attributes.length;
+      });
+      return totalAttributeCount === this.getSelectedAttributeCount;
+    },
     hasEntities() {
       return this.extractorEntities.entityGroups.length > 0;
     },
@@ -183,6 +187,14 @@ export default {
     },
     isSavable() {
       return this.hasEntities && this.getSelectedAttributeCount > 0;
+    },
+    selectedMode() {
+      // Custom by default until/if we implement Default selections
+      let mode = this.selectionModes[2];
+      if (this.getAreAllSelected) {
+        mode = this.selectionModes[0];
+      }
+      return mode;
     },
     selectionSummary() {
       let summary = 'Make at least one selection below to save.';
@@ -196,17 +208,11 @@ export default {
     clearExtractorInFocus() {
       this.$emit('clearExtractorInFocus');
     },
-    entityAttributeSelected(payload, shouldUpdateSelectedMode = false) {
+    entityAttributeSelected(payload) {
       this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
-      if (shouldUpdateSelectedMode) {
-        this.setSelectedMode(this.selectionModes[2]);
-      }
     },
-    entityGroupSelected(entityGroup, shouldUpdateSelectedMode = false) {
+    entityGroupSelected(entityGroup) {
       this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
-      if (shouldUpdateSelectedMode) {
-        this.setSelectedMode(this.selectionModes[2]);
-      }
     },
     toggleExpandable() {
       this.isExpanded = !this.isExpanded;
@@ -214,23 +220,11 @@ export default {
     selectEntities() {
       this.$store.dispatch('orchestrations/selectEntities');
     },
-    setSelectedMode(mode) {
-      this.selectedMode = mode;
-    },
-    updateSelectionsBasedOnSelectionMode() {
-      if (this.selectedMode === this.selectionModes[0]) {
-        this.extractorEntities.entityGroups.forEach((group) => {
-          if (!group.selected) {
-            this.entityGroupSelected(group, true);
-          }
-        });
-      } else if (this.selectedMode === this.selectionModes[2]) {
-        this.extractorEntities.entityGroups.forEach((group) => {
-          const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
-          if (group.selected || hasSelectedAttribute) {
-            this.entityGroupSelected(group, true);
-          }
-        });
+    updateSelectionsBasedOnTargetSelectionMode(targetMode) {
+      if (targetMode === this.selectionModes[0]) {
+        this.$store.dispatch('orchestrations/toggleAllEntityGroupsOn');
+      } else if (targetMode === this.selectionModes[2]) {
+        this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
       }
     },
   },
