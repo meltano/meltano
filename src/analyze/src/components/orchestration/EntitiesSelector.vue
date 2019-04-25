@@ -170,7 +170,11 @@ export default {
       return this.hasEntities && this.getSelectedAttributeCount > 0;
     },
     selectionSummary() {
-      return `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`;
+      let summary = 'Make at least one selection below to save.';
+      if (this.getSelectedAttributeCount > 0) {
+        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
+      }
+      return summary;
     },
   },
   methods: {
