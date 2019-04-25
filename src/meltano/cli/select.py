@@ -10,7 +10,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import parse_select_pattern
+from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -76,15 +76,22 @@ def show(project, extractor, show_all=False):
         click.echo()
 
     click.secho("Selected properties:")
-    color = lambda selected: "white" if selected else "red"
+    def color(selection):
+        if selection is SelectionType.SELECTED:
+            return "white"
+        elif selection is SelectionType.AUTOMATIC:
+            return "yellow"
+        elif selection is SelectionType.EXCLUDED:
+            return "red"
+
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
         if show_all:
-            click.secho(f"\t{stream.key}", fg=color(stream.selected), nl=False)
+            click.secho(f"\t{stream.key}", fg=color(stream.selection), nl=False)
             click.echo(".", nl=False)
-            click.secho(prop.key, fg=color(stream.selected and prop.selected))
-        elif stream.selected and prop.selected:
+            click.secho(prop.key, fg=color(stream.selection and prop.selection))
+        elif stream.selection and prop.selection:
             click.echo(f"\t{stream.key}.{prop.key}")

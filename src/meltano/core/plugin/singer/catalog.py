@@ -39,6 +39,15 @@ class CatalogNode(Enum):
     STREAM_PROPERTY_METADATA = auto()
 
 
+class SelectionType(Enum):
+    SELECTED = 1
+    EXCLUDED = 2
+    AUTOMATIC = 3
+
+    def __bool__(self):
+        return self in (self.__class__.SELECTED, self.__class__.AUTOMATIC)
+
+
 class CatalogExecutor:
     def execute(self, node_type: CatalogNode, node, path):
         dispatch = {
@@ -192,7 +201,7 @@ class ListExecutor(CatalogExecutor):
 
 
 class ListSelectedExecutor(CatalogExecutor):
-    SelectedNode = namedtuple("SelectedNode", ("key", "selected"))
+    SelectedNode = namedtuple("SelectedNode", ("key", "selection"))
 
     def __init__(self):
         self.streams = set()
@@ -214,12 +223,16 @@ class ListSelectedExecutor(CatalogExecutor):
 
         return selected
 
-    def is_node_selected(self, node):
+    def node_selection(self, node):
         try:
             metadata = node["metadata"]
-            return metadata.get("inclusion") == "automatic" or metadata.get(
-                "selected", False
-            )
+            if metadata.get("inclusion") == "automatic":
+                return SelectionType.AUTOMATIC
+
+            if metadata.get("selected", False):
+               return SelectionType.SELECTED
+
+            return SelectionType.EXCLUDED
         except KeyError:
             return False
 
@@ -228,13 +241,13 @@ class ListSelectedExecutor(CatalogExecutor):
         self.properties[self._stream] = set()
 
     def stream_metadata_node(self, node, path):
-        selection = self.SelectedNode(self._stream, self.is_node_selected(node))
+        selection = self.SelectedNode(self._stream, self.node_selection(node))
         self.streams.add(selection)
 
     def property_metadata_node(self, node, path):
         property_path = ".".join(node["breadcrumb"])
         prop = path_property(property_path)
-        selection = self.SelectedNode(prop, self.is_node_selected(node))
+        selection = self.SelectedNode(prop, self.node_selection(node))
 
         self.properties[self._stream].add(selection)
 
