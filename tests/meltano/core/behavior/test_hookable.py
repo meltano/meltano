@@ -110,9 +110,6 @@ class TestHookable:
         with pytest.raises(TriggerError) as ex, subject.trigger_hooks("test"):
             process()
 
-        assert subject.before_ex is ex.value.before_hooks["before_test"]
-        assert subject.after_ex is ex.value.after_hooks["after_test"]
-
         # assert not process.called
         assert subject.calls == [
             "before_test",
