@@ -25,16 +25,6 @@ const router = new Router({
       redirect: '/setup',
     },
     {
-      path: '/transformations/',
-      name: 'transformations',
-      component: Transformations,
-    },
-    {
-      path: '/orchestration/',
-      name: 'orchestration',
-      component: Orchestration,
-    },
-    {
       path: '/setup/',
       name: 'dataSetup',
       component: DataSetup,

@@ -25,8 +25,32 @@
                     @click="clearExtractorInFocus()">Cancel</button>
                   <button
                     class='button is-success'
-                    :disabled="!hasEntities"
+                    :disabled="!isSavable"
                     @click='selectEntities'>Save</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="columns is-vcentered">
+              <div class="column">
+                <div class="buttons are-small has-addons">
+                  <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
+                  <button
+                    class="button"
+                    v-for='mode in selectionModes'
+                    :disabled='mode === selectionModes[1]'
+                    :key='mode.label'
+                    :class="{ 'is-selected is-success': getIsSelectedMode(mode) }"
+                    @click='setSelectedMode(mode); updateSelectionsBasedOnSelectionMode();'>
+                    {{mode.label}}
+                  </button>
+                </div>
+              </div>
+              <div class="column">
+                <div class="content is-small">
+                  <p class='has-text-right is-italic'>
+                    {{selectionSummary}}
+                  </p>
                 </div>
               </div>
             </div>
@@ -36,7 +60,7 @@
               :class="{ 'is-expanded': isExpanded }">
               <div
                 class='is-unselectable'
-                v-for='entityGroup in orderedEntityGroups'
+                v-for='entityGroup in extractorEntities.entityGroups'
                 :key='`${entityGroup.name}`'>
                 <a
                   class='chip button is-rounded is-outlined entity'
@@ -44,7 +68,7 @@
                   @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
                 <div class='entity-group'>
                   <a
-                    v-for='attribute in orderedAttributes(entityGroup.attributes)'
+                    v-for='attribute in entityGroup.attributes'
                     :key='`${attribute.name}`'
                     :class="{'is-success is-outlined': attribute.selected}"
                     class="chip button is-rounded is-outlined is-small attribute"
@@ -75,8 +99,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
-
 import { mapState } from 'vuex';
 
 export default {
@@ -90,6 +112,8 @@ export default {
     },
   },
   created() {
+    //  Set to default mode. Later update based on persisted state and preselect matching entities
+    this.setSelectedMode(this.selectionModes[2]);
     this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
   },
   destroyed() {
@@ -98,6 +122,12 @@ export default {
   data() {
     return {
       isExpanded: false,
+      selectionModes: [
+        { label: 'All' },
+        { label: 'Default' },
+        { label: 'Custom' },
+      ],
+      selectedMode: null,
     };
   },
   computed: {
@@ -105,37 +135,84 @@ export default {
       'extractorEntities',
     ]),
     expandableToggleLabel() {
-      const prefix = this.isExpanded ? 'Hide' : 'Show';
-      return `${prefix} all ${this.extractorEntities.entityGroups.length} entity groups`;
+      const prefix = this.isExpanded
+        ? 'Hide majority of'
+        : `Show all ${this.extractorEntities.entityGroups.length}`;
+      return `${prefix} entities`;
+    },
+    getIsSelectedMode() {
+      return mode => mode === this.selectedMode;
+    },
+    getSelectedAttributeCount() {
+      let count = 0;
+      this.extractorEntities.entityGroups.forEach((group) => {
+        count += group.attributes.filter(attibute => attibute.selected).length;
+      });
+      return count;
+    },
+    getSelectedEntityCount() {
+      let count = 0;
+      this.extractorEntities.entityGroups.forEach((group) => {
+        const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
+        if (group.selected || hasSelectedAttribute) {
+          count += 1;
+        }
+      });
+      return count;
     },
     hasEntities() {
-      return this.orderedEntityGroups.length > 0;
+      return this.extractorEntities.entityGroups.length > 0;
     },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
     },
-    orderedEntityGroups() {
-      return _.orderBy(this.extractorEntities.entityGroups, 'name');
+    isSavable() {
+      return this.hasEntities && this.getSelectedAttributeCount > 0;
     },
-    orderedAttributes() {
-      return attributes => _.orderBy(attributes, 'name');
+    selectionSummary() {
+      return `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`;
     },
   },
   methods: {
     clearExtractorInFocus() {
       this.$emit('clearExtractorInFocus');
     },
-    entityAttributeSelected(payload) {
+    entityAttributeSelected(payload, shouldUpdateSelectedMode = false) {
       this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
+      if (shouldUpdateSelectedMode) {
+        this.setSelectedMode(this.selectionModes[2]);
+      }
     },
-    entityGroupSelected(entityGroup) {
+    entityGroupSelected(entityGroup, shouldUpdateSelectedMode = false) {
       this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
+      if (shouldUpdateSelectedMode) {
+        this.setSelectedMode(this.selectionModes[2]);
+      }
     },
     toggleExpandable() {
       this.isExpanded = !this.isExpanded;
     },
     selectEntities() {
       this.$store.dispatch('orchestrations/selectEntities');
+    },
+    setSelectedMode(mode) {
+      this.selectedMode = mode;
+    },
+    updateSelectionsBasedOnSelectionMode() {
+      if (this.selectedMode === this.selectionModes[0]) {
+        this.extractorEntities.entityGroups.forEach((group) => {
+          if (!group.selected) {
+            this.entityGroupSelected(group, true);
+          }
+        });
+      } else if (this.selectedMode === this.selectionModes[2]) {
+        this.extractorEntities.entityGroups.forEach((group) => {
+          const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
+          if (group.selected || hasSelectedAttribute) {
+            this.entityGroupSelected(group, true);
+          }
+        });
+      }
     },
   },
 };
