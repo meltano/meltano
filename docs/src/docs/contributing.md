@@ -133,6 +133,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
     # after changelog validation, build the release
     $ make release
+    
+    # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+    # occasionally the version bump can go to a version you don't expect.
+    $ changelog view
 
     # validate that the tag auto increments based on semver
     $ git push --tags
