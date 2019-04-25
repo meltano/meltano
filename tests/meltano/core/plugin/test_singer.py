@@ -201,7 +201,7 @@ CATALOG = """
           "metadata": {
             "inclusion": "available"
           }
-        },
+ uto       },
         {
           "breadcrumb": [
             "properties",
@@ -457,7 +457,6 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
     def test_select_all(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
-
         self.assert_catalog_is_selected(catalog)
 
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
@@ -472,34 +471,31 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         assert stream_metadata == 1, "Extraneous stream metadata"
 
-    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
-    def test_select(self, catalog):
+    @pytest.mark.parametrize("catalog,attrs", [
+                                                ("CATALOG", {"id", "code", "name", "code"}),
+                                                ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+                                              ], indirect=["catalog"])
+    def test_select(self, catalog, attrs):
         selector = SelectExecutor(["entities.name", "entities.code"])
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties == {
-            "entities": {
-                "id",  # automatic
-                "created_at",  # automatic
-                "name",  # selected
-                "code",  # selected
-            }
-        }
+        assert lister.selected_properties["entities"] == attrs
 
-    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
-    def test_select_negated(self, catalog):
+    @pytest.mark.parametrize("catalog,attrs", [
+                                                ("CATALOG", {"id", "balance", "created_at"}),
+                                                ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+                                              ], indirect=["catalog"])
+    def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties == {
-            "entities": {"balance", "created_at", "id", "active"}
-        }
+        assert lister.selected_properties["entities"] == attrs
 
 
 class TestListExecutor:

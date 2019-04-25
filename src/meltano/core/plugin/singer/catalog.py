@@ -114,23 +114,25 @@ class SelectExecutor(CatalogExecutor):
     def stream_node(self, node, path):
         self._stream = node
         selected = self.stream_match_patterns(self.current_stream)
+        stream_metadata = {
+            "breadcrumb": [],
+            "metadata": {"inclusion": "automatic"},
+        }
 
-        found = any(
-            metadata
-            for metadata in node["metadata"]
-            if len(metadata["breadcrumb"]) == 0
-        )
-
-        # This is to support legacy catalogs
-        if not found:
-            node["metadata"].insert(
-                0,
-                {
-                    "breadcrumb": [],
-                    "metadata": {"inclusion": "available", "selected": selected},
-                },
+        try:
+            metadata = next(
+                metadata
+                for metadata in node["metadata"]
+                if len(metadata["breadcrumb"]) == 0
             )
+            self.update_node_selection(metadata["metadata"], path, selected)
+        except KeyError:
+            node["metadata"] = [stream_metadata]
+        except StopIteration:
+            # This is to support legacy catalogs
+            node["metadata"].insert(0, stream_metadata)
 
+        # the node itself has a `selected` key
         self.update_node_selection(node, path, selected)
 
     def stream_metadata_node(self, node, path):
@@ -143,21 +145,20 @@ class SelectExecutor(CatalogExecutor):
         components = re.findall(prop_regex, path)
         breadcrumb = [self.current_stream, *components]
 
-        found = any(
-            metadata
-            for metadata in self._stream["metadata"]
-            if metadata["breadcrumb"] == breadcrumb
-        )
-
-        # This is to support legacy catalogs
-        if not found:
+        try:
+            next(
+                metadata
+                for metadata in self._stream["metadata"]
+                if metadata["breadcrumb"] == breadcrumb
+            )
+        except StopIteration:
+            # This is to support legacy catalogs
             self._stream["metadata"].append(
                 {
                     "breadcrumb": breadcrumb,
-                    "metadata": {"inclusion": "available", "selected": False},
+                    "metadata": {"inclusion": "automatic"},
                 },
             )
-            logging.debug(f"{path} has been selected.")
 
     def property_metadata_node(self, node, path):
         prop = ".".join(node["breadcrumb"])
