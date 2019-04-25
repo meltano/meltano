@@ -56,6 +56,21 @@
             </div>
 
             <div
+              class="columns"
+              v-if='this.selectedMode === this.selectionModes[0]'>
+              <div class="column">
+                <article class="message is-warning is-small">
+                  <div class="message-header">
+                    <p>Performance Warning</p>
+                  </div>
+                  <div class="message-body">
+                    <p>Selecting <span class='is-italic'>all</span> may negatively impact extraction performance. Consider a custom selection before saving.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div
               class="expandable"
               :class="{ 'is-expanded': isExpanded }">
               <div
@@ -122,12 +137,12 @@ export default {
   data() {
     return {
       isExpanded: false,
+      selectedMode: null,
       selectionModes: [
         { label: 'All' },
         { label: 'Default' },
         { label: 'Custom' },
       ],
-      selectedMode: null,
     };
   },
   computed: {
