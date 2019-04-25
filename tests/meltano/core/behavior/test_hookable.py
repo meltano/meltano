@@ -115,7 +115,4 @@ class TestHookable:
             "before_test",
             "before_test_2",
             "hook_raises_before",
-            "after_test",
-            "after_test_2",
-            "hook_raises_after",
         ]
