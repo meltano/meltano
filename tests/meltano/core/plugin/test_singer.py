@@ -243,6 +243,57 @@ CATALOG = """
 }
 """
 
+JSON_SCHEMA = """
+{
+  "streams": [
+    {
+      "tap_stream_id": "Entity",
+      "stream": "entities",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "balance": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+"""
+
 
 @pytest.fixture
 def select_all_executor():
@@ -383,8 +434,8 @@ class TestLegacyCatalogSelectVisitor:
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture
-    def catalog(self):
-        return json.loads(CATALOG)
+    def catalog(self, request):
+        return json.loads(globals()[request.param])
 
     @classmethod
     def stream_is_selected(cls, stream):
@@ -399,6 +450,11 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         except (KeyError, IndexError):
             return False
 
+    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
+    def test_visit(self, catalog, select_all_executor):
+        super().test_visit(catalog, select_all_executor)
+
+    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
     def test_select_all(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
 
@@ -416,6 +472,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         assert stream_metadata == 1, "Extraneous stream metadata"
 
+    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
     def test_select(self, catalog):
         selector = SelectExecutor(["entities.name", "entities.code"])
         visit(catalog, selector)
@@ -432,6 +489,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
             }
         }
 
+    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
     def test_select_negated(self, catalog):
         selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
         visit(catalog, selector)

@@ -68,12 +68,23 @@ class SelectExecutor(CatalogExecutor):
         self._stream = None
         self._patterns = list(map(parse_select_pattern, patterns))
 
+    @property
+    def current_stream(self):
+        return self._stream["stream"]
+
     @classmethod
     def _match_patterns(cls, value, include=[], exclude=[]):
         included = any(fnmatch(value, pattern) for pattern in include)
         excluded = any(fnmatch(value, pattern) for pattern in exclude)
 
         return included and not excluded
+
+    def update_node_selection(self, node, path: str, selected: bool):
+        node["selected"] = selected
+        if selected:
+            logging.debug(f"{path} has been selected.")
+        else:
+            logging.debug(f"{path} has not been selected.")
 
     def stream_match_patterns(self, stream):
         return self._match_patterns(
@@ -101,11 +112,8 @@ class SelectExecutor(CatalogExecutor):
         )
 
     def stream_node(self, node, path):
-        self._stream = node["stream"]
-
-        if not self.stream_match_patterns(self._stream):
-            logging.debug(f"{self._stream} is not selected.")
-            return
+        self._stream = node
+        selected = self.stream_match_patterns(self.current_stream)
 
         found = any(
             metadata
@@ -119,40 +127,47 @@ class SelectExecutor(CatalogExecutor):
                 0,
                 {
                     "breadcrumb": [],
-                    "metadata": {"inclusion": "available", "selected": True},
+                    "metadata": {"inclusion": "available", "selected": selected},
+                },
+            )
+
+        self.update_node_selection(node, path, selected)
+
+    def stream_metadata_node(self, node, path):
+        metadata = node["metadata"]
+        selected = self.stream_match_patterns(self.current_stream)
+        self.update_node_selection(metadata, path, selected)
+
+    def property_node(self, node, path):
+        prop_regex = r"properties\.(\w+)+"
+        components = re.findall(prop_regex, path)
+        breadcrumb = [self.current_stream, *components]
+
+        found = any(
+            metadata
+            for metadata in self._stream["metadata"]
+            if metadata["breadcrumb"] == breadcrumb
+        )
+
+        # This is to support legacy catalogs
+        if not found:
+            self._stream["metadata"].append(
+                {
+                    "breadcrumb": breadcrumb,
+                    "metadata": {"inclusion": "available", "selected": False},
                 },
             )
             logging.debug(f"{path} has been selected.")
 
-        node.update({"selected": True})
-
-    def stream_metadata_node(self, node, path):
-        if not self.stream_match_patterns(self._stream):
-            logging.debug(f"{self._stream} is not selected.")
-            return
-
-        metadata = node["metadata"]
-        metadata.update({"selected": True})
-        logging.debug(f"{path} has been selected.")
-
     def property_metadata_node(self, node, path):
-        _, name = node["breadcrumb"]
-        prop = f"{self._stream}.{name}"
-
-        if not self.property_match_patterns(prop):
-            logging.debug(f"{prop} is not selected.")
-            return
-
-        metadata = node["metadata"]
-        if metadata.get("inclusion") == "available":
-            metadata.update({"selected": True})
-            logging.debug(f"{path} has been selected.")
+        prop = ".".join(node["breadcrumb"])
+        selected = self.property_match_patterns(prop)
+        self.update_node_selection(node["metadata"], path, selected)
 
 
 class ListExecutor(CatalogExecutor):
     def __init__(self, selected_only=False):
         # properties per stream
-        self._selected_only = selected_only
         self.properties = OrderedDict()
 
         super().__init__()
@@ -210,7 +225,7 @@ class ListSelectedExecutor(CatalogExecutor):
         self.streams.add(selection)
 
     def property_metadata_node(self, node, path):
-        *_, name = node["breadcrumb"]
+        name = ".".join(node["breadcrumb"][1:])
         selection = self.SelectedNode(name, self.is_node_selected(node))
 
         self.properties[self._stream].add(selection)

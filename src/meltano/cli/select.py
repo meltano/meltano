@@ -2,6 +2,7 @@ import os
 import click
 import fnmatch
 import json
+import logging
 
 from . import cli
 from .params import project
@@ -43,6 +44,7 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             flags=flags,
         )
     except PluginExecutionError as e:
+        logging.exception(e)
         raise click.ClickException(
             f"Cannot list the selected properties: "
             "there was a problem running the tap with `--discover`. "
