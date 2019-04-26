@@ -3,7 +3,7 @@ OVERRIDES ----------------------------------------------------------------------
 Derived variable overrides
 */
 
-// Colors ----------
+/* Colors ------------------- */
 
 // Brand colors
 $primary: #0F3B66;
@@ -15,7 +15,11 @@ $green: #1aaa55;
 $orange: #fc9403;
 $red: #db3b21;
 
-// Sizes ----------
+// Other semantic vars (success, info, danger, etc) remain where $warning yellow is overridden
+// to match above Gitlab Pajamas color semantics.
+$warning: $orange;
+
+/* Sizes -------------------- */
 $navbar-height: 3.25rem;
 
 /*
@@ -23,7 +27,7 @@ ADDITIONS ----------------------------------------------------------------------
 General variables and semantically focused ones for improved contextual use within the app
 */
 
-// Colors ----------
+/* Colors ------------------- */
 
 // Adding grey-lightest to sit between grey-lighter and white-ter
 // https://bulma.io/documentation/modifiers/color-helpers/#background-color
