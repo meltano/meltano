@@ -30,7 +30,7 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
   },
 
-  getExtractorEntities(extractor) {
+  getExtractorInFocusEntities(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`));
   },
 

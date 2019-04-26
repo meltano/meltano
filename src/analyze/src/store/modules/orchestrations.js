@@ -5,17 +5,17 @@ const state = {
   extractors: [],
   loaders: [],
   hasExtractorLoadingError: false,
-  extractorEntities: {},
-  currentExtractor: '',
-  currentLoader: '',
+  extractorInFocusEntities: {},
+  extractorInFocus: null,
+  loaderInFocus: null,
   installedPlugins: {},
 };
 
 const getters = {};
 
 const actions = {
-  clearExtractorEntities({ commit }) {
-    commit('setAllExtractorEntities', null);
+  clearExtractorInFocusEntities({ commit }) {
+    commit('setAllExtractorInFocusEntities', null);
   },
 
   getAll({ commit }) {
@@ -26,12 +26,12 @@ const actions = {
       .catch(() => {});
   },
 
-  getExtractorEntities({ commit }, extractorName) {
+  getExtractorInFocusEntities({ commit }, extractorName) {
     commit('setHasExtractorLoadingError', false);
 
-    orchestrationsApi.getExtractorEntities(extractorName)
+    orchestrationsApi.getExtractorInFocusEntities(extractorName)
       .then((response) => {
-        commit('setAllExtractorEntities', response.data);
+        commit('setAllExtractorInFocusEntities', response.data);
       })
       .catch(() => {
         commit('setHasExtractorLoadingError', true);
@@ -52,14 +52,22 @@ const actions = {
   },
 
   selectEntities() {
-    orchestrationsApi.selectEntities(state.extractorEntities)
+    orchestrationsApi.selectEntities(state.extractorInFocusEntities)
       .then(() => {
         // TODO confirm success or handle error in UI
       });
   },
 
+  setExtractorInFocus({ commit }, extractor) {
+    commit('setExtractorInFocus', extractor);
+  },
+
+  setLoaderInFocus({ commit }, loader) {
+    commit('setLoaderInFocus', loader);
+  },
+
   toggleAllEntityGroupsOn({ dispatch }) {
-    state.extractorEntities.entityGroups.forEach((group) => {
+    state.extractorInFocusEntities.entityGroups.forEach((group) => {
       if (!group.selected) {
         dispatch('toggleEntityGroup', group);
       }
@@ -67,7 +75,7 @@ const actions = {
   },
 
   toggleAllEntityGroupsOff({ commit, dispatch }) {
-    state.extractorEntities.entityGroups.forEach((entityGroup) => {
+    state.extractorInFocusEntities.entityGroups.forEach((entityGroup) => {
       if (entityGroup.selected) {
         dispatch('toggleEntityGroup', entityGroup);
       } else {
@@ -105,8 +113,8 @@ const mutations = {
     state.loaders = orchestrationData.loaders;
   },
 
-  setAllExtractorEntities(_, entitiesData) {
-    state.extractorEntities = entitiesData
+  setAllExtractorInFocusEntities(_, entitiesData) {
+    state.extractorInFocusEntities = entitiesData
       ? {
         extractorName: entitiesData.extractor_name,
         entityGroups: entitiesData.entity_groups,
@@ -114,12 +122,12 @@ const mutations = {
       : {};
   },
 
-  setCurrentExtractor(_, selectedExtractor) {
-    state.currentExtractor = selectedExtractor;
+  setExtractorInFocus(_, selectedExtractor) {
+    state.extractorInFocus = selectedExtractor;
   },
 
-  setCurrentLoader(_, selectedLoader) {
-    state.currentLoader = selectedLoader;
+  setLoaderInFocus(_, selectedLoader) {
+    state.loaderInFocus = selectedLoader;
   },
 
   setHasExtractorLoadingError(_, value) {

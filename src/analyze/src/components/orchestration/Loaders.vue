@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import Database from '@/components/orchestration/Database';
 
@@ -14,7 +14,6 @@ export default {
     return {
       filterLoadersText: '',
       installingLoaders: [],
-      loaderInFocus: null,
     };
   },
   created() {
@@ -23,6 +22,7 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'installedPlugins',
+      'loaderInFocus',
       'loaders',
     ]),
     getImageUrl() {
@@ -46,6 +46,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions('orchestrations', [
+      'setLoaderInFocus',
+    ]),
     installLoader(loader) {
       this.installingLoaders.push(loader);
 
@@ -63,7 +66,7 @@ export default {
     },
     updateLoaderInFocus(loader) {
       const loaderObj = this.installedPlugins.loaders.find(item => item.name === loader);
-      this.loaderInFocus = loaderObj;
+      this.setLoaderInFocus(loaderObj);
     },
   },
 };

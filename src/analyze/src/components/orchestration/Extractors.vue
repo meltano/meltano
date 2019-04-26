@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 import ConnectorSettings from '@/components/orchestration/ConnectorSettings';
 
@@ -14,7 +14,6 @@ export default {
     return {
       filterExtractorsText: '',
       installingExtractors: [],
-      extractorInFocus: null,
     };
   },
   created() {
@@ -22,6 +21,7 @@ export default {
   },
   computed: {
     ...mapState('orchestrations', [
+      'extractorInFocus',
       'installedPlugins',
       'extractors',
     ]),
@@ -46,6 +46,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions('orchestrations', [
+      'setExtractorInFocus',
+    ]),
     installExtractor(extractor) {
       this.installingExtractors.push(extractor);
 
@@ -63,7 +66,7 @@ export default {
     },
     updateExtractorInFocus(extractor) {
       const extractorObj = this.installedPlugins.extractors.find(item => item.name === extractor);
-      this.extractorInFocus = extractorObj;
+      this.setExtractorInFocus(extractorObj);
     },
   },
 };

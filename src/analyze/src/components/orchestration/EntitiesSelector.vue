@@ -97,7 +97,7 @@
             :class="{ 'is-expanded': isExpanded }">
             <div
               class='is-unselectable'
-              v-for='entityGroup in extractorEntities.entityGroups'
+              v-for='entityGroup in extractorInFocusEntities.entityGroups'
               :key='`${entityGroup.name}`'>
               <a
                 class='chip button is-rounded is-outlined entity'
@@ -159,10 +159,10 @@ export default {
       this.selectionModeRecommended,
       this.selectionModeCustom,
     ];
-    this.$store.dispatch('orchestrations/getExtractorEntities', this.extractor.name);
+    this.$store.dispatch('orchestrations/getExtractorInFocusEntities', this.extractor.name);
   },
   destroyed() {
-    this.$store.dispatch('orchestrations/clearExtractorEntities');
+    this.$store.dispatch('orchestrations/clearExtractorInFocusEntities');
   },
   data() {
     return {
@@ -175,12 +175,12 @@ export default {
   },
   computed: {
     ...mapState('orchestrations', [
-      'extractorEntities',
+      'extractorInFocusEntities',
     ]),
     expandableToggleLabel() {
       const prefix = this.isExpanded
         ? 'Hide'
-        : `Show all ${this.extractorEntities.entityGroups.length}`;
+        : `Show all ${this.extractorInFocusEntities.entityGroups.length}`;
       return `${prefix} entities`;
     },
     getIsSelectedMode() {
@@ -188,14 +188,14 @@ export default {
     },
     getSelectedAttributeCount() {
       let count = 0;
-      this.extractorEntities.entityGroups.forEach((group) => {
+      this.extractorInFocusEntities.entityGroups.forEach((group) => {
         count += group.attributes.filter(attibute => attibute.selected).length;
       });
       return count;
     },
     getSelectedEntityCount() {
       let count = 0;
-      this.extractorEntities.entityGroups.forEach((group) => {
+      this.extractorInFocusEntities.entityGroups.forEach((group) => {
         const hasSelectedAttribute = group.attributes.find(attribute => attribute.selected);
         if (group.selected || hasSelectedAttribute) {
           count += 1;
@@ -204,11 +204,11 @@ export default {
       return count;
     },
     getTotalAttributeCount() {
-      return this.extractorEntities.entityGroups
+      return this.extractorInFocusEntities.entityGroups
         .reduce((acc, curr) => acc + curr.attributes.length, 0);
     },
     getTotalEntityCount() {
-      return this.extractorEntities.entityGroups.length;
+      return this.extractorInFocusEntities.entityGroups.length;
     },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount;
@@ -220,7 +220,7 @@ export default {
       return this.getSelectedAttributeCount > 0;
     },
     isLoading() {
-      return !Object.prototype.hasOwnProperty.call(this.extractorEntities, 'entityGroups');
+      return !Object.prototype.hasOwnProperty.call(this.extractorInFocusEntities, 'entityGroups');
     },
     isSavable() {
       return this.hasEntities && this.hasSelectedAttributes;
