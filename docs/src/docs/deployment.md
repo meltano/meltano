@@ -2,46 +2,88 @@
 
 ## Amazon Web Services (AWS)
 
+::: warning Prerequisites
+This guide assumes that you have a functioning Docker image where your Meltano project is already bundled with the Meltano installation. More information on how to do this coming in the near future!
+:::
+
 In this section, we will be going over how you can deploy a Meltano Docker image to AWS.
 
+### Setting Up Elastic Container Service (ECS)
+
 1. Login to [AWS Console](https://console.aws.amazon.com)
-1. Search for [Elastic Container Service (ECS)](https://console.aws.amazon.com/ecs) and click on the link
+1. Search for [ECS](https://console.aws.amazon.com/ecs) and click on the link
 
-### Define container and task
+#### Define container and task
 
-1. We will create a new "Container definition" by clicking on the `Configure` button in the "custom" card
+3. We will create a new "Container definition" by clicking on the `Configure` button in the "custom" card
 1. Fill out the form with the following data:
   - **Container name**: Meltano
-  - **Image**: 292927715491.dkr.ecr.us-east-2.amazonaws.com/meltano
-  - **Memory Limits (MiB)**: Soft limit 128
-  - **Port mappings**: 80 tcp
-1. Click `Update` button to finish setting up your container defintion
+  - **Image**: YOUR_DOCKER_IMAGE_URL
+  - **Memory Limits (MiB)**: Soft limit 1024
+  - **Port mappings**: 5000 tcp
+5. Click `Update` button to finish setting up your container defintion
+1. Click `Edit` next to the "Task defintion" heading
+1. Update the form with the following:
+  - **Task definition name**: meltano-task
+  - **Network mode**: awsvpc
+  - **Task execution role**: ecsTaskExecutionRole
+  - **Compatibilities**: FARGATE
+  - **Task memory**: 1GB (1024)
+  - **Task CPU**: 0.25 vCPU (256)
 1. Click `Next` to move to the next step
 
-### Review service properties 
+#### Review service properties 
 
-1. Verify that the properties are as follows:
+7. Verify that the properties are as follows:
   - **Service name**: meltano-service
   - **Number of desired tasks**: 1
   - **Security group**: Automatically create new
   - **Load balancer type**: None
-1. Click `Next` to move on to the next step
+8. Click `Next` to move on to the next step
 
-### Configure your cluster
+#### Configure your cluster
 
 The main configuration here is the `Cluster name`. We provide a suggestion below, but feel free to name it as you wish.
 
-  - **Cluster name**: meltano
+  - **Cluster name**: meltano-cluster
   - **VPC ID**: Automatically create new
   - **Subnets**: Automatically create new
 
-### Finish creating your cluster
+#### Review cluster configuration
 
-After you click `Next`, you will have the opportunity to review all of the properties that you set. Once you confirm that the setttings are correct, click `Create` to setup your ECS.
+After you click `Next`, you will have the opportunity to review all of the properties that you set. Once you confirm that the settings are correct, click `Create` to setup your ECS.
 
-You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished.
+You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, you're cluster has been successfully deployed!
 
-Once you see everything has setup properly, congratulations on deploying a Meltano Docker image with ECS!
+#### Final steps
+
+1. Open the page with your cluster
+1. Click on the "Tasks" tab
+1. You should see a task that has a status of `RUNNING` for "Last Status"
+1. Click on the Task ID link (e.g., 0b35dea-3ca..)
+1. Under "Network", you can find the URL for your instance under "Public IP" (e.g., 18.18.134.18)
+1. Open a new tab in your browser and visit this new URL with port 5000 (e.g., 18.18.134.18:5000)
+
+#### Configure network access
+
+::: tip
+This section is only necessary if you do not have a Security Group that allows for port 5000 inbound.
+:::
+
+Once you complete the cluster setup, you should be brought to the detail page for the service. You should be default on a tab called "Details" with a "Network Access" section.
+
+1. Locate the "Details" tab
+1. Under "Network Access", click on the link next to "Security Groups" (e.g., sg-f0dj093dkjf10)
+1. This should open a new tab with your security group
+1. Click on the "Inbound Rules" tab on the bottom of the page
+1. Click "Edit Rules"
+1. Delete any existing rules
+1. Click "Add Rule" with the following properties:
+  - **Type**: Custom TCP Rule
+  - **Protocol**: TCP
+  - **Port Range**: 5000
+  - **Source**: Custom 0.0.0.0/0
+1. Click `Save rules`
 
 ## Meltano UI
 
