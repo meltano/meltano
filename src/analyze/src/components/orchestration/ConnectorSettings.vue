@@ -16,7 +16,7 @@
         <div class="content has-text-centered">
           <h3>Connector Settings</h3>
           <div class="image is-64x64 container">
-            <img :src='imageUrl' alt="fastly logo" class="">
+            <img :src='imageUrl' :alt="`${extractor.name} logo`">
           </div>
         </div>
 
