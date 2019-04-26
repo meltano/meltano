@@ -1,9 +1,10 @@
+@import '@/scss/bulma-preset-overrides.scss';
 @import "../../node_modules/bulma/bulma";
 
-$steps-maker-default-color:	$light;
+$steps-maker-default-color:	$app-background-color;
 $steps-marker-default-border:	none;
 $steps-default-color:	$grey-lighter;
-$steps-completed-color:	$light;
+$steps-completed-color:	$app-background-color;
 $steps-active-color:	$primary;
 $steps-divider-height:	.1em;
 
@@ -15,7 +16,7 @@ $steps-divider-height:	.1em;
 
     .step-marker {
       color: $primary !important;
-      background-color: $light !important;
+      background-color: $app-background-color !important;
       border: .1em solid $primary;
     }
   }

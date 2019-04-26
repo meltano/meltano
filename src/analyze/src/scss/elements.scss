@@ -1,7 +1,7 @@
-@import "../../node_modules/bulma/bulma";
+@import "@/scss/bulma-preset-overrides.scss";
 
 html {
-  background-color: $light;
+  background-color: $app-background-color;
 }
 
 @include tablet() {
