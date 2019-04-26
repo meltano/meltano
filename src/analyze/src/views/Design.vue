@@ -204,7 +204,7 @@
             <div class="control field" :class="{'has-addons': hasActiveReport()}">
               <p class="control">
                 <button
-                  class="button is-success is-outlined"
+                  class="button is-interactive-primary is-outlined"
                   v-if="hasActiveReport()"
                   @click="updateReport();">
                   <span>Save</span>
@@ -214,7 +214,7 @@
                 <Dropdown
                   :disabled="!hasChartableResults"
                   :label="hasActiveReport() ? '' : 'Save'"
-                  button-classes='is-success is-outlined'
+                  button-classes='is-interactive-primary is-outlined'
                   is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <div class="dropdown-item">
@@ -229,7 +229,7 @@
                       </div>
                       <div class="field is-grouped">
                         <div class="control">
-                          <button class="button is-link"
+                          <button class="button is-interactive-primary"
                                   :disabled="!saveReportSettings.name"
                                   @click="saveReport(); dropdownForceClose();">Save</button>
                         </div>
@@ -249,7 +249,7 @@
               <Dropdown
                 :disabled="!reports.length"
                 label="Load"
-                button-classes='is-success is-outlined'
+                button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                   <a class="dropdown-item"
@@ -721,7 +721,7 @@ code {
     padding-left: 1.75rem;
   }
   &.is-active {
-    border-left-color: $interactive-navigation;
+    border-left-color: $interactive-secondary;
     border-left-width: 4px;
     @extend .has-background-white-ter;
   }

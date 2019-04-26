@@ -137,7 +137,7 @@
           <button class="button" @click="clearLoaderInFocus">
             Cancel
           </button>
-          <button class="button is-success" @click.prevent="saveConnection">
+          <button class="button is-interactive-primary" @click.prevent="saveConnection">
             Save Connection
           </button>
         </div>

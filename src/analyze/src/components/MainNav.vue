@@ -168,7 +168,7 @@ export default {
   .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken($app-background-color, 10%);
+    background: darken($app-background-color, 5%);
     color: $interactive-navigation;
   }
 }

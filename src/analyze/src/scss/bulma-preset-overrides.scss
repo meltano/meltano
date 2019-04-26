@@ -24,7 +24,7 @@ $navbar-height: 3.25rem;
 
 /*
 ADDITIONS ------------------------------------------------------------------------------------------
-General variables and semantically focused ones for improved contextual use within the app
+General and semantically named variables for improved contextual use within the app
 */
 
 /* Colors ------------------- */
@@ -34,4 +34,13 @@ General variables and semantically focused ones for improved contextual use with
 $grey-lightest: hsl(0, 0%, 93%);
 $app-background-color: $grey-lightest;
 
+// Useful for main and secondary navigation based interactive elements
 $interactive-navigation: $primary;
+
+// Useful for primary interactive buttons and components within the UI in focus (page, modal, etc)
+// Ex. Save, New, Create, Install, etc.
+$interactive-primary: $green;
+
+// Useful for secondary and supporting $interactive-primary buttons and components
+// Ex. Toggles, Checkboxes, Radios, Pickers, etc.
+$interactive-secondary: $blue;

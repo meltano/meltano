@@ -26,7 +26,7 @@
         <div class="buttons is-pulled-right">
           <button
             disabled
-            class='button is-success'>Run ELT</button>
+            class='button is-interactive-primary'>Run ELT</button>
         </div>
 
       </div>

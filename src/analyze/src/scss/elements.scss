@@ -1,6 +1,12 @@
 @import "@/scss/bulma-preset-overrides.scss";
 
+/*
+ELEMENTS -------------------------------------------------------------------------------------------
+Styles related to first-class elements
+*/
+
 html {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: $app-background-color;
 }
 

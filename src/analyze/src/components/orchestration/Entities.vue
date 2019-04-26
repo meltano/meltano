@@ -92,7 +92,7 @@ export default {
               </p>
 
               <a
-                class='button is-success is-outlined is-block is-small'
+                class='button is-interactive-primary is-outlined is-block is-small'
                 @click="updateExtractorInFocus(extractor)">Edit Selections</a>
 
             </div>

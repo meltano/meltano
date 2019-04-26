@@ -52,7 +52,7 @@
             class="button"
             @click="clearExtractorInFocus()">Cancel</button>
           <button
-            class='button is-success'
+            class='button is-interactive-primary'
             :disabled="!hasConfig"
             @click='saveConfig'>Save</button>
         </div>

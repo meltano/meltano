@@ -1,16 +1,20 @@
-/* Main */
+/*
+INTERACTIVE ----------------------------------------------------------------------------------------
+Interactive helpers often with improved semantic names built on top of Bulma
+*/
 
-.log-output {
-  background: black;
-  color: white;
-  margin: 20px 0;
-  padding: 1rem;
-  white-space: pre-wrap;
-  @include courier;
+.is-interactive-primary {
+  @extend .is-success;
 }
 
-a.disabled {
- pointer-events: none;
- cursor: default;
- color: #CCC;
+.is-interactive-secondary {
+  @extend .is-link;
+}
+
+.has-text-interactive-primary {
+  @extend .has-text-success;
+}
+
+.has-text-interactive-secondary {
+  @extend .has-text-link;
 }

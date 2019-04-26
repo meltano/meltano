@@ -122,7 +122,7 @@ export default {
                 <template v-if='getIsConnectorInstalled(loader)'>
                   <div class="buttons are-small">
                     <a
-                      class='button is-success flex-grow-1'
+                      class='button is-interactive-primary flex-grow-1'
                       @click="updateLoaderInFocus(loader)">Account Settings</a>
                     <a class='button' disabled>Uninstall</a>
                   </div>
@@ -130,7 +130,7 @@ export default {
                 <template v-else>
                   <a
                     :class='{ "is-loading": getIsInstallingPlugin(loader) }'
-                    class='button is-success is-outlined is-block is-small'
+                    class='button is-interactive-primary is-outlined is-block is-small'
                     @click="installLoader(loader)">Install</a>
                 </template>
 

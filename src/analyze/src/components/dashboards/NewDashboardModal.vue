@@ -31,7 +31,7 @@
       <footer class="modal-card-foot">
         <button class="button" @click="close">Cancel</button>
         <button
-          class="button is-success"
+          class="button is-interactive-primary"
           :disabled="!saveDashboardSettings.name"
           @click="saveDashboard">Create</button>
       </footer>

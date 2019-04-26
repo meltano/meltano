@@ -39,7 +39,7 @@
                 @click="clearExtractorInFocus()">Cancel</button>
               <button
                 v-if='!isLoading'
-                class='button is-success'
+                class='button is-interactive-primary'
                 :disabled="!isSavable"
                 @click='selectEntities'>Save</button>
             </div>
@@ -56,7 +56,7 @@
                   v-for='mode in selectionModes'
                   :disabled='mode === selectionModes[1]'
                   :key='mode.label'
-                  :class="{ 'is-selected is-success': getIsSelectedMode(mode) }"
+                  :class="{ 'is-selected is-interactive-secondary': getIsSelectedMode(mode) }"
                   @click='updateSelectionsBasedOnTargetSelectionMode(mode);'>
                   {{mode.label}}
                 </button>
@@ -70,7 +70,9 @@
             </div>
             <div class="column">
               <div class="content is-small">
-                <p class='has-text-right is-italic'>
+                <p
+                  class='has-text-right is-italic'
+                  :class="{ 'has-text-interactive-secondary': hasSelectedAttributes }">
                   {{selectionSummary}}
                 </p>
               </div>
@@ -101,13 +103,13 @@
               :key='`${entityGroup.name}`'>
               <a
                 class='chip button is-rounded is-outlined entity'
-                :class="{'is-success is-outlined': entityGroup.selected}"
+                :class="{'is-interactive-secondary is-outlined': entityGroup.selected}"
                 @click.stop="entityGroupSelected(entityGroup)">{{entityGroup.name}}</a>
               <div class='entity-group'>
                 <a
                   v-for='attribute in entityGroup.attributes'
                   :key='`${attribute.name}`'
-                  :class="{'is-success is-outlined': attribute.selected}"
+                  :class="{'is-interactive-secondary is-outlined': attribute.selected}"
                   class="chip button is-rounded is-outlined is-small attribute"
                   @click.stop="entityAttributeSelected({entityGroup, attribute})">
                   {{attribute.name}}
