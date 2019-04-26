@@ -11,6 +11,18 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add All/Default/Custom UI for improved entities selection UX
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add expand/contract UI for improved entities selection UX
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.22.0 - (2019-04-24)
+---
+
+### New
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 * [!580](https://gitlab.com/meltano/meltano/merge_requests/580) Add sorting to plugins for improved UX, both UI via extractors/loaders/etc. and `meltano discover all` benefit from sorted results
 
@@ -22,8 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
 * [#597](https://gitlab.com/meltano/meltano/issues/597) Automatically open the browser when `meltano ui` is run
-
-### Breaks
 
 
 ## 0.21.0 - (2019-04-23)
