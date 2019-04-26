@@ -721,7 +721,7 @@ code {
     padding-left: 1.75rem;
   }
   &.is-active {
-    border-left-color: $primary;
+    border-left-color: $interactive-navigation;
     border-left-width: 4px;
     @extend .has-background-white-ter;
   }

@@ -144,7 +144,7 @@ export default {
   background-color: transparent;
 }
 .navbar-burger span {
-  color: $primary;
+  color: $interactive-navigation;
 }
 .navbar-brand .navbar-item {
   padding: 0 1rem;
@@ -157,11 +157,11 @@ export default {
 
   .navbar-start .navbar-link,
   .navbar-start > .navbar-item {
-    color: $primary;
+    color: $interactive-navigation;
   }
 
   .navbar-start .navbar-link::after {
-    border-color: $primary;
+    border-color: $interactive-navigation;
   }
 
   .navbar-item.has-dropdown:hover .navbar-link,
@@ -169,7 +169,7 @@ export default {
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
     background: darken($app-background-color, 10%);
-    color: $primary;
+    color: $interactive-navigation;
   }
 }
 .navbar-item .navbar-child {

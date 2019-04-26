@@ -5,7 +5,7 @@ $steps-maker-default-color:	$app-background-color;
 $steps-marker-default-border:	none;
 $steps-default-color:	$grey-lighter;
 $steps-completed-color:	$app-background-color;
-$steps-active-color:	$primary;
+$steps-active-color:	$interactive-navigation;
 $steps-divider-height:	.1em;
 
 .steps .step-item {
@@ -15,24 +15,24 @@ $steps-divider-height:	.1em;
     color: $grey-dark;
 
     .step-marker {
-      color: $primary !important;
+      color: $interactive-navigation !important;
       background-color: $app-background-color !important;
-      border: .1em solid $primary;
+      border: .1em solid $interactive-navigation;
     }
   }
 
   &.is-completed {
     cursor: pointer;
-    color: $primary;
+    color: $interactive-navigation;
 
     &:hover {
       .step-marker {
-        border: .1em solid $primary;
+        border: .1em solid $interactive-navigation;
       }
     }
 
     .step-marker {
-      color: $primary !important;
+      color: $interactive-navigation !important;
     }
   }
 
