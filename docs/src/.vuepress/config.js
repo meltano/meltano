@@ -64,7 +64,11 @@ module.exports = {
     docsDir: 'src',
     docsRepo: 'https://gitlab.com/meltano/meltano',
     editLinks: true,
-    editLinkText: 'Help us improve this page!'
+    editLinkText: 'Help us improve this page!',
+    algolia: {
+      apiKey: '6da0449ca46dc108fd88ca828f613ea9',
+      indexName: 'meltano'
+    }
   },
   plugins: [
     [
