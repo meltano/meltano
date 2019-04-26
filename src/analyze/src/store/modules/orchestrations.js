@@ -6,7 +6,6 @@ const state = {
   loaders: [],
   hasExtractorLoadingError: false,
   extractorEntities: {},
-  currentView: 'intro',
   currentExtractor: '',
   currentConnectionName: '',
   connectionNames: [],
@@ -15,31 +14,7 @@ const state = {
   log: 'Job log will appear when run.',
 };
 
-const getters = {
-  isIntroView() {
-    return state.currentView === 'intro';
-  },
-
-  isExtractorView() {
-    return state.currentView === 'extractor';
-  },
-
-  isLoaderView() {
-    return state.currentView === 'loader';
-  },
-
-  isTransformView() {
-    return state.currentView === 'transform';
-  },
-
-  isRunView() {
-    return state.currentView === 'run';
-  },
-
-  canRun() {
-    return !!state.currentExtractor && !!state.currentLoader;
-  },
-};
+const getters = {};
 
 const actions = {
   clearExtractorEntities({ commit }) {
@@ -85,10 +60,6 @@ const actions = {
         commit('setConnectionNames', response.data);
       })
       .catch(() => {});
-  },
-
-  currentViewClicked({ commit }, selectedCurrentView) {
-    commit('setCurrentView', selectedCurrentView);
   },
 
   currentExtractorClicked({ commit }, e) {
@@ -212,10 +183,6 @@ const mutations = {
 
   setConnectionNames(_, connectionNames) {
     state.connectionNames = connectionNames;
-  },
-
-  setCurrentView(_, selectedCurrentView) {
-    state.currentView = selectedCurrentView;
   },
 
   setCurrentExtractor(_, selectedExtractor) {
