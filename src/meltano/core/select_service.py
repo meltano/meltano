@@ -20,9 +20,7 @@ class SelectService:
     def load_schema(self):
         invoker = PluginInvoker(self.project, self.extractor)
         if not invoker.files["catalog"].exists():
-            logging.info(
-                "Catalog not found, trying to run the tap with --discover."
-            )
+            logging.info("Catalog not found, trying to run the tap with --discover.")
             self.extractor.run_discovery(invoker)
 
         self.extractor.apply_select(invoker)

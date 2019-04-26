@@ -15,6 +15,20 @@ from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
 
+def selection_color(selection):
+    if selection is SelectionType.SELECTED:
+        return "white"
+    elif selection is SelectionType.AUTOMATIC:
+        return "yellow"
+    elif selection is SelectionType.EXCLUDED:
+        return "red"
+
+
+def selection_mark(selection):
+    colwidth = max(map(len, SelectionType))  # size of the longest mark
+    return f"[{selection:<{colwidth}}]"
+
+
 @cli.command()
 @project
 @click.argument("extractor")
@@ -66,6 +80,13 @@ def show(project, extractor, show_all=False):
     extractor = select_service.get_extractor()
     list_all = select_service.get_extractor_entities()
 
+    # legend
+    click.secho("Legend:")
+    for sel_type in SelectionType:
+        click.secho(f"\t{sel_type}", fg=selection_color(sel_type))
+    else:
+        click.echo()
+
     # report
     click.secho("Enabled patterns:")
     for select in map(parse_select_pattern, extractor.select):
@@ -76,22 +97,25 @@ def show(project, extractor, show_all=False):
         click.echo()
 
     click.secho("Selected properties:")
-    def color(selection):
-        if selection is SelectionType.SELECTED:
-            return "white"
-        elif selection is SelectionType.AUTOMATIC:
-            return "yellow"
-        elif selection is SelectionType.EXCLUDED:
-            return "red"
 
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
+        sel_mark = selection_mark(stream.selection)
         if show_all:
-            click.secho(f"\t{stream.key}", fg=color(stream.selection), nl=False)
+            click.secho(
+                f"\t{sel_mark} {stream.key}",
+                fg=selection_color(stream.selection),
+                nl=False,
+            )
             click.echo(".", nl=False)
-            click.secho(prop.key, fg=color(stream.selection and prop.selection))
+            click.secho(
+                prop.key, fg=selection_color(stream.selection and prop.selection)
+            )
         elif stream.selection and prop.selection:
-            click.echo(f"\t{stream.key}.{prop.key}")
+            click.secho(
+                f"\t{sel_mark} {stream.key}.{prop.key}",
+                fg=selection_color(stream.selection),
+            )

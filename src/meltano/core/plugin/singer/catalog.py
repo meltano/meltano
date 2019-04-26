@@ -39,10 +39,10 @@ class CatalogNode(Enum):
     STREAM_PROPERTY_METADATA = auto()
 
 
-class SelectionType(Enum):
-    SELECTED = 1
-    EXCLUDED = 2
-    AUTOMATIC = 3
+class SelectionType(str, Enum):
+    SELECTED = "selected"
+    EXCLUDED = "excluded"
+    AUTOMATIC = "automatic"
 
     def __bool__(self):
         return self in (self.__class__.SELECTED, self.__class__.AUTOMATIC)
@@ -129,10 +129,7 @@ class SelectExecutor(CatalogExecutor):
     def stream_node(self, node, path):
         self._stream = node
         selected = self.stream_match_patterns(self.current_stream)
-        stream_metadata = {
-            "breadcrumb": [],
-            "metadata": {"inclusion": "automatic"},
-        }
+        stream_metadata = {"breadcrumb": [], "metadata": {"inclusion": "automatic"}}
 
         try:
             metadata = next(
@@ -168,10 +165,7 @@ class SelectExecutor(CatalogExecutor):
         except StopIteration:
             # This is to support legacy catalogs
             self._stream["metadata"].append(
-                {
-                    "breadcrumb": breadcrumb,
-                    "metadata": {"inclusion": "automatic"},
-                },
+                {"breadcrumb": breadcrumb, "metadata": {"inclusion": "automatic"}}
             )
 
     def property_metadata_node(self, node, path):
@@ -230,7 +224,7 @@ class ListSelectedExecutor(CatalogExecutor):
                 return SelectionType.AUTOMATIC
 
             if metadata.get("selected", False):
-               return SelectionType.SELECTED
+                return SelectionType.SELECTED
 
             return SelectionType.EXCLUDED
         except KeyError:

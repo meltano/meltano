@@ -450,11 +450,15 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         except (KeyError, IndexError):
             return False
 
-    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
     def test_visit(self, catalog, select_all_executor):
         super().test_visit(catalog, select_all_executor)
 
-    @pytest.mark.parametrize("catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"])
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
     def test_select_all(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
         self.assert_catalog_is_selected(catalog)
@@ -471,10 +475,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         assert stream_metadata == 1, "Extraneous stream metadata"
 
-    @pytest.mark.parametrize("catalog,attrs", [
-                                                ("CATALOG", {"id", "code", "name", "code", "created_at"}),
-                                                ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
-                                              ], indirect=["catalog"])
+    @pytest.mark.parametrize(
+        "catalog,attrs",
+        [
+            ("CATALOG", {"id", "code", "name", "code", "created_at"}),
+            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+        ],
+        indirect=["catalog"],
+    )
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(["entities.name", "entities.code"])
         visit(catalog, selector)
@@ -484,10 +492,14 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         assert lister.selected_properties["entities"] == attrs
 
-    @pytest.mark.parametrize("catalog,attrs", [
-                                                ("CATALOG", {"id", "balance", "created_at", "active"}),
-                                                ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
-                                              ], indirect=["catalog"])
+    @pytest.mark.parametrize(
+        "catalog,attrs",
+        [
+            ("CATALOG", {"id", "balance", "created_at", "active"}),
+            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+        ],
+        indirect=["catalog"],
+    )
     def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
         visit(catalog, selector)
