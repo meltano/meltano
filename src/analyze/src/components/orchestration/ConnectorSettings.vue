@@ -4,21 +4,22 @@
     <div class="columns">
 
       <div class="column box is-4 is-offset-4">
-        <article class="message is-warning is-small">
-          <div class="message-header">
-            <p>Warning</p>
-          </div>
-          <div class="message-body">
-            <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img :src='imageUrl' :alt="`${extractor.name} logo`">
+            </p>
+          </figure>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <span class='has-text-weight-bold'>Connector Settings</span>
+                <br>
+                {{extractor.name}}
+              </p>
+            </div>
           </div>
         </article>
-
-        <div class="content has-text-centered">
-          <h3>Connector Settings</h3>
-          <div class="image is-64x64 container">
-            <img :src='imageUrl' :alt="`${extractor.name} logo`">
-          </div>
-        </div>
 
         <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
           <div class="field-label is-normal">
@@ -36,6 +37,15 @@
             </div>
           </div>
         </div>
+
+        <article class="message is-warning is-small">
+          <div class="message-header">
+            <p>Warning</p>
+          </div>
+          <div class="message-body">
+            <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+          </div>
+        </article>
 
         <div class="buttons is-pulled-right">
           <button
