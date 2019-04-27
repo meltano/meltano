@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
 - [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
 
 ### Changes
