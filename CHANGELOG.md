@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [marketing#18](https://gitlab.com/meltano/meltano-marketing/issues/18) Introduce project creation command earlier in tutorial
 
 ### Fixes
 
