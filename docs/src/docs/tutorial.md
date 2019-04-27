@@ -160,7 +160,7 @@ A Salesforce account may have more than 100 different entities. In order to see 
 meltano select tap-salesforce --list --all
 ```
 
-In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](docs/meltano-cli.html#meltano-select ) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](docs/meltano-cli.html#meltano-select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
 
 ```bash
 meltano select tap-salesforce "User" "*"
@@ -649,7 +649,29 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 
 [Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
+
 ## Using Docker
+
+### Using pre-built Docker images
+
+We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
+
+> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
+
+This image contains everything you need to get started with Meltano.
+
+```bash
+# to download or update to the latest version
+$ docker pull meltano/meltano
+
+# to look the currently installed version
+$ docker run meltano/meltano --version
+meltano, version …
+```
+
+Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
+
+### Creating your own Docker image
 
 It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
 
@@ -657,7 +679,7 @@ It is possible to run Meltano as a Docker container to simplify usage, deploymen
 
 We will use `docker run` to execute Meltano using the pre-built docker images.
 
-### Initialize Your Project
+#### Initialize Your Project
 
 First things first, let's create a new Meltano project named **carbon**.
 
@@ -681,7 +703,7 @@ $ docker run -v $(pwd):/project \
              meltano/meltano elt tap-carbon-intensity target-sqlite
 ```
 
-### Analyze with Meltano UI
+#### Analyze with Meltano UI
 
 Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
 

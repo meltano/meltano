@@ -1,102 +1,51 @@
 # Installation
 
-Meltano is a powerful combination of command line tool and web app. It leverages the file system, coordinates across databases, and automates data extraction, loading, and transforming in addition to providing reporting and dashboarding. As such, installing and getting up and running takes a bit longer than double-clicking an installer. At least for now...
+In this section, we will be installing Meltano as an application that you will be able to access on the command line (i.e., the terminal). We currently do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we have one!
 
 ## Requirements
 
-Minimum:
-- [Python 3.6.1](https://realpython.com/installing-python/)
+### Python 3+
 
-Optional:
-- [Git](https://git-scm.com/): to version control your Meltano project
-- [Docker Desktop](https://www.docker.com/get-started): to create a sample/default database
+- [Python 3.6.1+](https://realpython.com/installing-python/)
 
-## Instructions
-
-Meltano provides a command line interface (CLI) to kick start and help you manage the configuration and orchestration of all the components in the data life cycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
-
-Let's make sure our requirements are up to date:
-
-#### Python
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
+
+To check if you have the correct Python version, open your terminal and use the following commands to check the version:
 
 ```bash
 $ python --version
 Python 3.6.1
 ```
 
-#### pip
-Run `pip install --upgrade pip` to update `pip` to the latest version.
+### pip
+
+`pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
+# Check version of pip
 $ pip --version
-pip 10.0.1 from … (python 3.6)
 ```
 
 ::: tip
 If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
 :::
 
-### Installation
 
-Open your terminal in the directory where you want Meltano installed. For example `/Users/YOUR_USER_NAME/Documents/Meltano`.
+## Instructions
 
-::: tip Note
-We currently require installing Meltano using Python 3's virtual environment (`venv` snippet below) to isolate it from the rest of your python packages.
-
-See [this issue](https://gitlab.com/meltano/meltano/issues/141) for more information.
-:::
-
-Then run the following commands:
+1. Open your command line tool (i.e., Terminal for macOS)
+2. Then run the following command:
 ```bash
-# create a virtual environment to run Meltano isolated from OS-level packages
-$ python -m venv venv
-
-# install Meltano in the aforementioned virtual environment
 $ pip install meltano
 ```
-
+3. Once the installation, you can check if it was successful by running:
 ```bash
-$ meltano --help
-Usage: meltano [OPTIONS] COMMAND [ARGS]
-    …
+$ meltano --version
+meltano, version X.XX.X
 ```
 
-That's it! Meltano is now be available in the virtual environment we setup. Now, we can [create a Meltano project](/docs/tutorial.html).
-
-## Docker Images
-
-We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
-
-> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
-
-This image contains everything you need to get started with Meltano.
-
-```
-# to download or update to the latest version
-$ docker pull meltano/meltano
-
-# to look the currently installed version
-$ docker run meltano/meltano --version
-meltano, version …
-```
-
-Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
+That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/tutorial.html).
 
 ## Troubleshooting
 
-### Getting the Latest Version
-
-To update Meltano to the latest version, run the following command in your terminal:
-
-::: tip Remember
-Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
-:::
-
-```
-pip install --upgrade meltano
-```
-
-:::warning Troubleshooting
-Still having installation problems? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
-:::
+Are you having installation problems? We are here to help you. Please feel out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
