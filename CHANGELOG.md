@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
 
 ### Changes
+* [#567](https://gitlab.com/meltano/meltano/issues/567) Simplify installation page with some content migration for a straightforward zero to one path
 
 ### Fixes
 
