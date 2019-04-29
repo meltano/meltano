@@ -13,7 +13,7 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {},
-    apiUrl: process.env.MELTANO_ANALYZE_API_URL || "http://localhost:5000/",
+    apiUrl: process.env.MELTANO_ANALYZE_API_URL || "http://localhost:5000",
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

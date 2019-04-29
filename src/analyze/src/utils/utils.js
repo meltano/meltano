@@ -1,14 +1,19 @@
 export default {
 
   // Path Utils
-  apiRoot(path = '') {
+  root(path = '/') {
+    return `${API_URL}${path}`;
+  },
+
+  apiRoot(path = '/') {
     // window.API_URL should be injected in the template
     // either by Webpack (dev) or Flask (prod)
-    return `${API_URL}api/v1`;
+    return self.root(`/api/v1${path}`);
   },
 
   apiUrl(blueprint, location = '') {
-    return [this.apiRoot(), blueprint, location].join('/');
+    const path = [blueprint, location].join('/');
+    return this.apiRoot().concat(path);
   },
 
   // Color Utils

@@ -41,6 +41,10 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'curly': ['warn', 'all'],
     'brace-style': ['error', '1tbs'],
-    'max-len': ['error', { 'code': 200, 'ignoreUrls': true}]
+    'max-len': ['error', { 'code': 200, 'ignoreUrls': true}],
+  },
+  globals: {
+    'process': false,
+    'API_URL': false,
   }
 }
