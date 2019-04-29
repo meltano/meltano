@@ -2,13 +2,13 @@ export default {
 
   // Path Utils
   root(path = '/') {
+    // window.API_URL should be injected in the template
+    // either by Webpack (dev) or Flask (prod)
     return `${API_URL}${path}`;
   },
 
   apiRoot(path = '/') {
-    // window.API_URL should be injected in the template
-    // either by Webpack (dev) or Flask (prod)
-    return self.root(`/api/v1${path}`);
+    return this.root(`/api/v1${path}`);
   },
 
   apiUrl(blueprint, location = '') {
