@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add All/Default/Custom UI for improved entities selection UX
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add expand/contract UI for improved entities selection UX
+* [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
 
 ### Changes
 
