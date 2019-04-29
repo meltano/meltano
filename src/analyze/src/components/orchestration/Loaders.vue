@@ -18,6 +18,7 @@ export default {
   },
   created() {
     this.$store.dispatch('orchestrations/getAll');
+    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
     ...mapState('orchestrations', [

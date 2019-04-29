@@ -1,6 +1,11 @@
 import Router from 'vue-router';
 import Vue from 'vue';
 
+import Entities from '@/components/orchestration/Entities';
+import Extractors from '@/components/orchestration/Extractors';
+import Loaders from '@/components/orchestration/Loaders';
+import RunSummary from '@/components/orchestration/RunSummary';
+
 import DataSetup from '@/views/DataSetup';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
@@ -26,8 +31,31 @@ const router = new Router({
     },
     {
       path: '/configuration/',
+      redirect: '/configuration/extractors/',
       name: 'dataSetup',
       component: DataSetup,
+      children: [
+        {
+          path: 'extractors',
+          name: 'extractors',
+          component: Extractors,
+        },
+        {
+          path: 'entities',
+          name: 'entities',
+          component: Entities,
+        },
+        {
+          path: 'loaders',
+          name: 'loaders',
+          component: Loaders,
+        },
+        {
+          path: 'run',
+          name: 'run',
+          component: RunSummary,
+        },
+      ],
     },
     {
       path: '/transformations/',
