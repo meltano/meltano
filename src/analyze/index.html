@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Meltano</title>
     <% if (htmlWebpackPlugin.options.injectApiURL) { %>
-      <%= "<script>window.API_URL = '{{ request.host_url }}';</script>" %>
+      <%= "<script>window.API_URL = '{{ request.host_url[:-1] }}';</script>" %>
     <% } %>
   </head>
   <body>
