@@ -52,7 +52,7 @@
               <div class="buttons are-small has-addons">
                 <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
                 <button
-                  class='button'
+                  class='button is-outlined'
                   v-for='mode in selectionModes'
                   :disabled='mode === selectionModes[1]'
                   :key='mode.label'
