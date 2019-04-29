@@ -9,10 +9,10 @@ $steps-active-color:	$interactive-navigation;
 $steps-divider-height:	.1em;
 
 .steps .step-item {
-  color: $grey-lighter;
+  color: $interactive-navigation-inactive;
 
   &.is-active {
-    color: $grey-dark;
+    color: $interactive-navigation;
 
     .step-marker {
       color: $interactive-navigation !important;
@@ -37,6 +37,6 @@ $steps-divider-height:	.1em;
   }
 
   .step-marker {
-    color: $grey-lighter !important;
+    color: $interactive-navigation-inactive !important;
   }
 }

@@ -25,7 +25,7 @@ export default {
 <template>
   <router-view-layout>
 
-    <div class="steps" id="steps-data-setup">
+    <div class="steps is-small" id="steps-data-setup">
       <div class="step-item is-active">
         <div class="step-marker">1</div>
         <div class="step-details">

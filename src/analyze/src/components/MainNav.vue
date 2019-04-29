@@ -21,25 +21,25 @@
 
         <router-link
           :to="{name: 'dataSetup'}"
-          class="navbar-item navbar-child">
+          class="navbar-item navbar-child has-text-weight-semibold">
           Configuration
         </router-link>
 
         <router-link
           :to="{name: 'transformations'}"
-          class="navbar-item navbar-child">
+          class="navbar-item navbar-child has-text-weight-semibold">
           Transformations
         </router-link>
 
         <router-link
           :to="{name: 'orchestration'}"
-          class="navbar-item navbar-child">
+          class="navbar-item navbar-child has-text-weight-semibold">
           Orchestration
         </router-link>
 
         <div
           class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
+          <a class="navbar-link navbar-child has-text-weight-semibold">
             Analyze
           </a>
           <div
@@ -62,7 +62,7 @@
         </div>
 
         <router-link to="/dashboards"
-        class="navbar-item navbar-child">
+          class="navbar-item navbar-child has-text-weight-semibold">
           Dashboards
         </router-link>
 
@@ -157,10 +157,18 @@ export default {
 
   .navbar-start .navbar-link,
   .navbar-start > .navbar-item {
-    color: $interactive-navigation;
+    color: $interactive-navigation-inactive;
+    border-bottom: 1px solid transparent;
+
+    &.router-link-active {
+      color: $interactive-navigation;
+    }
   }
 
   .navbar-start .navbar-link::after {
+    border-color: $interactive-navigation-inactive;
+  }
+  .navbar-start .navbar-link:hover::after {
     border-color: $interactive-navigation;
   }
 
@@ -168,8 +176,14 @@ export default {
   .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
-    background: darken($app-background-color, 5%);
+    background: transparent;
     color: $interactive-navigation;
+    border-bottom: 1px solid $interactive-navigation-inactive;
+  }
+
+  .navbar-item.has-dropdown .navbar-link,
+  .navbar-item.has-dropdown:hover .navbar-link {
+    border: none;
   }
 }
 .navbar-item .navbar-child {

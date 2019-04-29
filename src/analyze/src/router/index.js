@@ -22,10 +22,10 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/setup',
+      redirect: '/configuration',
     },
     {
-      path: '/setup/',
+      path: '/configuration/',
       name: 'dataSetup',
       component: DataSetup,
     },
