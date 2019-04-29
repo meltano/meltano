@@ -13,8 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
 
 ### Changes
-* [#375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
-* [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
+* [375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
 
 ### Fixes
 * [#595](https://gitlab.com/meltano/meltano/issues/595) Fix `meltano invoke` not working properly with `dbt`
