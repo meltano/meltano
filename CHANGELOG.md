@@ -9,13 +9,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-<<<<<<< HEAD
 * [#598](https://gitlab.com/meltano/meltano/issues/598) Updated color and greyscale use in the context of navigation and interactive elements to better communicate UI hierarchy
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add All/Default/Custom UI for improved entities selection UX
 * [#607](https://gitlab.com/meltano/meltano/issues/607) Add All/Default/Custom UI for improved entities selection UX
-=======
 * [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
->>>>>>> fee195719b8c852d333e3635eba678599b6210ce
 
 ### Changes
 * [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
