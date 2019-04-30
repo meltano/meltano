@@ -12,10 +12,11 @@ from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 
 from .external_connector import ExternalConnector
-from .workers import MeltanoBackgroundCompiler, UIAvailableWorker
+from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 from . import config as default_config
 
 from meltano.core.project import Project
+from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
@@ -107,9 +108,21 @@ def create_app(config={}):
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
-    compiler_worker = MeltanoBackgroundCompiler(project)
-    compiler_worker.start()
-    available_worker.start()
+    workers = []
+    config_service = ConfigService(project)
+
+    try:
+        airflow = config_service.get_plugin("airflow")
+        workers.append(AirflowWorker(project, airflow))
+    except:
+        logging.info("Airflow is not installed.")
+
+    workers.append(MeltanoBackgroundCompiler(project))
+    workers.append(available_worker)
+
+    # start all workers
+    for worker in workers:
+        worker.start()
 
     try:
         app_config = kwargs.pop("app_config", {})
@@ -122,5 +135,5 @@ def start(project, **kwargs):
 
         app.run(**kwargs)
     finally:
-        compiler_worker.stop()
-        available_worker.stop()
+        for worker in workers:
+            worker.stop()
