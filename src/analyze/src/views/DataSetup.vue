@@ -10,10 +10,10 @@ export default {
     return {
       currentStep: {},
       steps: [
-        { name: 'extractors', matches: ['extractors', 'extractorSettings'] },
-        { name: 'entities', matches: ['entities', 'extractorEntities'] },
-        { name: 'loaders', matches: ['loaders'] },
-        { name: 'run', matches: ['run'] },
+        { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
+        { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
+        { name: 'loaders', routeMatches: ['loaders'] },
+        { name: 'run', routeMatches: ['run'] },
       ],
       isModal: this.$route.meta.isModal,
     };
@@ -21,7 +21,7 @@ export default {
   created() {
     const stepNameFromRoute = this.$route.name;
     this.currentStep = this.steps
-      .find(step => step.matches.find(match => stepNameFromRoute === match));
+      .find(step => step.routeMatches.find(routeMatch => stepNameFromRoute === routeMatch));
   },
   beforeRouteUpdate(to, from, next) {
     this.updateModal(to.meta.isModal);
