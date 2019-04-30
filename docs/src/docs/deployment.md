@@ -91,3 +91,9 @@ Once you complete the cluster setup, you should be brought to the detail page fo
   - **Port Range**: 5000
   - **Source**: Custom 0.0.0.0/0
 1. Click `Save rules`
+
+## Coming Next
+
+- Creating a data warehouse for Meltano
+- Running ELT in the Cloud
+- Growing and Scaling Meltano
