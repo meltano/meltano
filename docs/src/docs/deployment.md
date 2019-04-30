@@ -105,3 +105,5 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 - Creating a data warehouse for Meltano
 - Running ELT in the Cloud
 - Growing and Scaling Meltano
+- Running Meltano with AWS EC2
+- Using AWS Lambda with Meltano
