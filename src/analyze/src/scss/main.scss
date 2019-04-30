@@ -47,6 +47,11 @@ Interactive helpers often with improved semantic names built on top of Bulma
   @extend .has-text-link;
 }
 
+/*
+LAYOUT ---------------------------------------------------------------------------------------------
+Layout helpers with names based on Bulma naming conventions
+*/
+
 .modal-card.is-wide {
   width: calc(100vw - 160px);
 }
