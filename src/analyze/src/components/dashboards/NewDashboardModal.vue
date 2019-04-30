@@ -28,7 +28,7 @@
           </div>
         </div>
       </section>
-      <footer class="modal-card-foot">
+      <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Cancel</button>
         <button
           class="button is-interactive-primary"
@@ -70,10 +70,5 @@ export default {
 };
 </script>
 
-<style scoped>
-
-.modal-card-foot {
-  justify-content: flex-end;
-}
-
+<style>
 </style>

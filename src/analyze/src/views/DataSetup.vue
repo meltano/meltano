@@ -15,11 +15,16 @@ export default {
         { name: 'loaders' },
         { name: 'run' },
       ],
+      isModal: this.$route.meta.isModal,
     };
   },
   mounted() {
     // TODO parse route and set currentStep properly, maybe in different life cycle method
     this.currentStep = this.steps[0];
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.updateModal(to.meta.isModal);
+    next();
   },
   computed: {
     getIsActiveStep() {
@@ -39,6 +44,9 @@ export default {
     setStep(stepName) {
       this.currentStep = this.steps.find(step => step.name === stepName);
       this.$router.push(this.currentStep);
+    },
+    updateModal(isModal) {
+      this.isModal = isModal;
     },
   },
 };
@@ -114,6 +122,10 @@ export default {
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('extractors') }">
           <router-view></router-view>
+          <div v-if='isModal'>
+            Modal time
+            <router-view name='extractorSettings'></router-view>
+          </div>
         </div>
         <div
           class="step-content"

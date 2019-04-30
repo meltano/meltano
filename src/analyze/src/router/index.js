@@ -1,6 +1,7 @@
 import Router from 'vue-router';
 import Vue from 'vue';
 
+import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
 import Loaders from '@/components/orchestration/Loaders';
@@ -38,7 +39,23 @@ const router = new Router({
         {
           path: 'extractors',
           name: 'extractors',
-          component: Extractors,
+          components: {
+            default: Extractors,
+          },
+          meta: {
+            isModal: false,
+          },
+        },
+        {
+          path: 'extractors/:extractor',
+          name: 'extractorSettings',
+          components: {
+            default: Extractors,
+            extractorSettings: ExtractorSettingsModal,
+          },
+          meta: {
+            isModal: true,
+          },
         },
         {
           path: 'entities',

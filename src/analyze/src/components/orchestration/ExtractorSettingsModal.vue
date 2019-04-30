@@ -1,25 +1,13 @@
 <template>
-  <div>
 
-    <div class="columns">
-
-      <div class="column box is-4 is-offset-4">
-        <article class="media">
-          <figure class="media-left">
-            <p class="image is-64x64">
-              <img :src='imageUrl' :alt="`${extractor.name} logo`">
-            </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <span class='has-text-weight-bold'>Connector Settings</span>
-                <br>
-                {{extractor.name}}
-              </p>
-            </div>
-          </div>
-        </article>
+  <div class="modal is-active">
+    <div class="modal-background" @click="close"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Extractor Settings</p>
+        <button class="delete" aria-label="close" @click="close"></button>
+      </header>
+      <section class="modal-card-body">
 
         <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
           <div class="field-label is-normal">
@@ -47,47 +35,50 @@
           </div>
         </article>
 
-        <div class="buttons is-pulled-right">
-          <button
-            class="button"
-            @click="clearExtractorInFocus()">Cancel</button>
-          <button
-            class='button is-interactive-primary'
-            :disabled="!hasConfig"
-            @click='saveConfig'>Save</button>
-        </div>
-
-      </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <button
+          class="button"
+          @click="close">Cancel</button>
+        <button
+          class='button is-interactive-primary'
+          :disabled="!hasConfig"
+          @click='saveConfig'>Save</button>
+      </footer>
     </div>
-
   </div>
+
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 import _ from 'lodash';
 
 export default {
-  name: 'ConnectorSettings',
-  data() {
-    return {
-      configSettings: {},
-    };
-  },
+  name: 'ExtractorSettingsModal',
   props: {
-    extractor: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
     imageUrl: {
       type: String,
     },
   },
   created() {
-    this.configSettings = Object.assign({}, this.extractor.config);
+    this.extractorNameFromRoute = this.$route.params.extractor;
+    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
+    ...mapState('orchestrations', [
+      'extractorInFocus',
+      'installedPlugins',
+    ]),
+    configSettings() {
+      return this.extractor ? Object.assign({}, this.extractor.config) : {};
+    },
+    extractor() {
+      return this.installedPlugins.extractors.length > 0
+        ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
+        : {};
+    },
     hasConfig() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
@@ -95,8 +86,12 @@ export default {
     },
   },
   methods: {
-    clearExtractorInFocus() {
-      this.$emit('clearExtractorInFocus');
+    close() {
+      if (this.prevRoute) {
+        this.$router.go(-1);
+      } else {
+        this.$router.push({ name: 'extractors' });
+      }
     },
     saveConfig() {
       this.$store.dispatch('orchestrations/saveExtractorConfiguration', {
