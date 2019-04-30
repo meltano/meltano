@@ -26,13 +26,13 @@ export default {
       return stepName => this.currentStep.name === stepName;
     },
     getIsStepEntitiesMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return false; // TODO proper minimally validated validation
     },
     getIsStepLoadersMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return false; // TODO proper minimally validated validation
     },
     getIsStepRunMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return false; // TODO proper minimally validated validation
     },
   },
   methods: {
@@ -50,13 +50,13 @@ export default {
     <div class="steps is-small" id="steps-data-setup">
       <div
         class="step-item is-completed"
-        :class="{
-          'is-active': getIsActiveStep('extractors'),
-        }"
-        @click='setStep("extractors")'>
+        :class="{ 'is-active': getIsActiveStep('extractors') }">
         <div class="step-marker">1</div>
         <div class="step-details">
-          <p class="step-title">Extractors</p>
+          <button
+            class="step-title button is-interactive-navigation is-outlined"
+            :class="{ 'is-active': getIsActiveStep('extractors') }"
+            @click='setStep("extractors")'>Extractors</button>
           <p>Data Sources</p>
         </div>
       </div>
@@ -65,11 +65,14 @@ export default {
         :class="{
           'is-active': getIsActiveStep('entities'),
           'is-completed': getIsStepEntitiesMinimallyValidated
-        }"
-        @click='setStep("entities")'>
+        }">
         <div class="step-marker">2</div>
         <div class="step-details">
-          <p class="step-title">Entities</p>
+          <button
+            class="step-title button is-interactive-navigation is-outlined"
+            :class="{ 'is-active': getIsActiveStep('entities') }"
+            :disabled='!getIsStepEntitiesMinimallyValidated'
+            @click='setStep("entities")'>Entities</button>
           <p>Source Selections</p>
         </div>
       </div>
@@ -78,11 +81,14 @@ export default {
         :class="{
           'is-active': getIsActiveStep('loaders'),
           'is-completed': getIsStepLoadersMinimallyValidated
-        }"
-        @click='setStep("loaders")'>
+        }">
         <div class="step-marker">3</div>
         <div class="step-details">
-          <p class="step-title">Loaders</p>
+          <button
+            class="step-title button is-interactive-navigation is-outlined"
+            :class="{ 'is-active': getIsActiveStep('loaders') }"
+            :disabled='!getIsStepLoadersMinimallyValidated'
+            @click='setStep("loaders")'>Loaders</button>
           <p>Selection Targets</p>
         </div>
       </div>
@@ -91,11 +97,14 @@ export default {
         :class="{
           'is-active': getIsActiveStep('run'),
           'is-completed': getIsStepRunMinimallyValidated
-        }"
-        @click='setStep("run")'>
+        }">
         <div class="step-marker">4</div>
         <div class="step-details">
-          <p class="step-title">Run</p>
+          <button
+            class="step-title button is-interactive-navigation is-outlined"
+            :class="{ 'is-active': getIsActiveStep('run') }"
+            :disabled='!getIsStepRunMinimallyValidated'
+            @click='setStep("run")'>Run</button>
           <p>Get Data</p>
         </div>
       </div>

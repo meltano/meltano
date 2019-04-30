@@ -17,26 +17,22 @@ $steps-divider-height:	.1em;
     .step-marker {
       color: $interactive-navigation !important;
       background-color: $app-background-color !important;
-      border: .1em solid $interactive-navigation;
     }
   }
 
   &.is-completed {
-    cursor: pointer;
     color: $interactive-navigation;
 
-    &:hover {
-      .step-marker {
-        border: .1em solid $interactive-navigation;
-      }
-    }
-
-    .step-marker {
+    &.is-active {
       color: $interactive-navigation !important;
     }
   }
 
   .step-marker {
     color: $interactive-navigation-inactive !important;
+  }
+
+  .step-title {
+    margin-bottom: .4rem;
   }
 }
