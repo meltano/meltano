@@ -1,9 +1,10 @@
 import Router from 'vue-router';
 import Vue from 'vue';
 
-import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
+import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
+import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
 import Loaders from '@/components/orchestration/Loaders';
 import RunSummary from '@/components/orchestration/RunSummary';
 
@@ -60,7 +61,23 @@ const router = new Router({
         {
           path: 'entities',
           name: 'entities',
-          component: Entities,
+          components: {
+            default: Entities,
+          },
+          meta: {
+            isModal: false,
+          },
+        },
+        {
+          path: 'entities/:extractor',
+          name: 'extractorEntities',
+          components: {
+            default: Entities,
+            extractorEntities: EntitiesSelectorModal,
+          },
+          meta: {
+            isModal: true,
+          },
         },
         {
           path: 'loaders',

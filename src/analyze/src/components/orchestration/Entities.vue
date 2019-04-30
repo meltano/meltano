@@ -1,13 +1,8 @@
 <script>
 import { mapState } from 'vuex';
 
-import EntitiesSelector from '@/components/orchestration/EntitiesSelector';
-
 export default {
   name: 'Entities',
-  components: {
-    EntitiesSelector,
-  },
   data() {
     return {
       filterExtractorsText: '',
@@ -43,65 +38,54 @@ export default {
     },
   },
   methods: {
-    updateExtractorInFocus(extractor) {
-      const extractorObj = this.installedPlugins.extractors.find(item => item.name === extractor);
-      this.extractorInFocus = extractorObj;
+    udpateExtractorEntities(extractor) {
+      this.$router.push({ name: 'extractorEntities', params: { extractor } });
     },
   },
 };
 </script>
 
 <template>
+
   <div>
-    <div v-if='extractorInFocus'>
 
-      <EntitiesSelector
-        :extractor='extractorInFocus'
-        :imageUrl='getImageUrl(extractorInFocus.name)'
-        @clearExtractorInFocus='updateExtractorInFocus(null)'>
-      </EntitiesSelector>
-
+    <div class="columns">
+      <div class="column is-4 is-offset-4">
+        <input
+          type="text"
+          v-model="filterExtractorsText"
+          placeholder="Filter installed extractors..."
+          class="input connector-input">
+      </div>
     </div>
 
-    <div v-else>
+    <div class="tile is-ancestor flex-and-wrap">
+      <div
+        class="tile is-parent is-3"
+        v-for="(extractor, index) in filteredExtractors"
+        :key="`${extractor}-${index}`">
+        <div class="tile level is-child box">
+          <div class="image level-item is-64x64 container">
+            <img
+              :src='getImageUrl(extractor)'
+              :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
+          </div>
+          <div class="content is-small">
+            <p class='has-text-centered'>
+              {{extractor}}
+            </p>
 
-      <div class="columns">
-        <div class="column is-4 is-offset-4">
-          <input
-            type="text"
-            v-model="filterExtractorsText"
-            placeholder="Filter installed extractors..."
-            class="input connector-input">
-        </div>
-      </div>
+            <a
+              class='button is-interactive-primary is-outlined is-block is-small'
+              @click="udpateExtractorEntities(extractor)">Edit Selections</a>
 
-      <div class="tile is-ancestor flex-and-wrap">
-        <div
-          class="tile is-parent is-3"
-          v-for="(extractor, index) in filteredExtractors"
-          :key="`${extractor}-${index}`">
-          <div class="tile level is-child box">
-            <div class="image level-item is-64x64 container">
-              <img
-                :src='getImageUrl(extractor)'
-                :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
-            </div>
-            <div class="content is-small">
-              <p class='has-text-centered'>
-                {{extractor}}
-              </p>
-
-              <a
-                class='button is-interactive-primary is-outlined is-block is-small'
-                @click="updateExtractorInFocus(extractor)">Edit Selections</a>
-
-            </div>
           </div>
         </div>
       </div>
-
     </div>
+
   </div>
+
 </template>
 
 <style lang="scss">

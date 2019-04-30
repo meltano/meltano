@@ -1,5 +1,32 @@
 <template>
 
+  <div class="modal is-active">
+    <div class="modal-background" @click="close"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Entities Selection</p>
+        <button class="delete" aria-label="close" @click="close"></button>
+      </header>
+      <section class="modal-card-body">
+
+        ... {{extractor.name}}
+
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <button
+          class="button"
+          @click="close">Cancel</button>
+        <button
+          v-if='!isLoading'
+          class='button is-interactive-primary'
+          :disabled="!isSavable"
+          @click='selectEntities'>Save</button>
+      </footer>
+    </div>
+  </div>
+
+
+<!--
   <div class="columns">
     <div class="column is-8 is-offset-2">
 
@@ -51,7 +78,7 @@
             <div class="column">
               <div class="buttons are-small has-addons">
                 <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
-                <button
+                <!-- <button
                   class='button is-outlined'
                   v-for='mode in selectionModes'
                   :disabled='mode === selectionModes[1]'
@@ -135,7 +162,7 @@
 
       </div>
     </div>
-  </div>
+  </div> -->
 
 </template>
 
@@ -143,14 +170,8 @@
 import { mapState } from 'vuex';
 
 export default {
-  name: 'EntitiesSelector',
+  name: 'EntitiesSelectorModal',
   props: {
-    extractor: {
-      type: Object,
-      default() {
-        return {};
-      },
-    },
     imageUrl: {
       type: String,
     },
@@ -161,7 +182,10 @@ export default {
       this.selectionModeRecommended,
       this.selectionModeCustom,
     ];
-    this.$store.dispatch('orchestrations/getExtractorInFocusEntities', this.extractor.name);
+    this.extractorNameFromRoute = this.$route.params.extractor;
+    console.log('entities extractor', this.extractorNameFromRoute);
+    this.$store.dispatch('orchestrations/getExtractorInFocusEntities', this.extractorNameFromRoute);
+    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   destroyed() {
     this.$store.dispatch('orchestrations/clearExtractorInFocusEntities');
@@ -178,12 +202,18 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'extractorInFocusEntities',
+      'installedPlugins',
     ]),
     expandableToggleLabel() {
       const prefix = this.isExpanded
         ? 'Hide'
         : `Show all ${this.extractorInFocusEntities.entityGroups.length}`;
       return `${prefix} entities`;
+    },
+    extractor() {
+      return this.installedPlugins.extractors
+        ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
+        : {};
     },
     getIsSelectedMode() {
       return mode => mode === this.selectedMode;
@@ -244,11 +274,15 @@ export default {
     },
   },
   methods: {
-    clearExtractorInFocus() {
-      this.$emit('clearExtractorInFocus');
-    },
     clearSelections() {
       this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
+    },
+    close() {
+      if (this.prevRoute) {
+        this.$router.go(-1);
+      } else {
+        this.$router.push({ name: 'entities' });
+      }
     },
     entityAttributeSelected(payload) {
       this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);

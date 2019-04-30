@@ -68,7 +68,6 @@ export default {
   },
   computed: {
     ...mapState('orchestrations', [
-      'extractorInFocus',
       'installedPlugins',
     ]),
     configSettings() {

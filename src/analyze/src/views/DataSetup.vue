@@ -10,17 +10,18 @@ export default {
     return {
       currentStep: {},
       steps: [
-        { name: 'extractors' },
-        { name: 'entities' },
-        { name: 'loaders' },
-        { name: 'run' },
+        { name: 'extractors', matches: ['extractors', 'extractorSettings'] },
+        { name: 'entities', matches: ['entities', 'extractorEntities'] },
+        { name: 'loaders', matches: ['loaders'] },
+        { name: 'run', matches: ['run'] },
       ],
       isModal: this.$route.meta.isModal,
     };
   },
-  mounted() {
-    // TODO parse route and set currentStep properly, maybe in different life cycle method
-    this.currentStep = this.steps[0];
+  created() {
+    const stepNameFromRoute = this.$route.name;
+    this.currentStep = this.steps
+      .find(step => step.matches.find(match => stepNameFromRoute === match));
   },
   beforeRouteUpdate(to, from, next) {
     this.updateModal(to.meta.isModal);
@@ -123,7 +124,6 @@ export default {
           :class="{ 'is-active': getIsActiveStep('extractors') }">
           <router-view></router-view>
           <div v-if='isModal'>
-            Modal time
             <router-view name='extractorSettings'></router-view>
           </div>
         </div>
@@ -131,6 +131,9 @@ export default {
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('entities') }">
           <router-view></router-view>
+          <div v-if='isModal'>
+            <router-view name='extractorEntities'></router-view>
+          </div>
         </div>
         <div
           class="step-content"
