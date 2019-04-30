@@ -126,11 +126,6 @@ import { mapState } from 'vuex';
 
 export default {
   name: 'EntitiesSelectorModal',
-  props: {
-    imageUrl: {
-      type: String,
-    },
-  },
   created() {
     this.selectionModes = [
       this.selectionModeAll,

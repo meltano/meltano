@@ -57,11 +57,6 @@ import _ from 'lodash';
 
 export default {
   name: 'ExtractorSettingsModal',
-  props: {
-    imageUrl: {
-      type: String,
-    },
-  },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
     this.$store.dispatch('orchestrations/getInstalledPlugins');
