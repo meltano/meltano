@@ -13,9 +13,13 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 1. Login to [AWS Console](https://console.aws.amazon.com)
 1. Search for [ECS](https://console.aws.amazon.com/ecs) and click on the link
 
+![](/screenshots/aws-ecs.png)
+
 #### Define container and task
 
-3. We will create a new "Container definition" by clicking on the `Configure` button in the "custom" card
+![](/screenshots/aws-ecs-getting-started.png)
+
+1. We will create a new "Container definition" by clicking on the `Configure` button in the "custom" card
 1. Fill out the form with the following data:
   - **Container name**: Meltano
   - **Image**: YOUR_DOCKER_IMAGE_URL
@@ -24,7 +28,7 @@ In this section, we will be going over how you can deploy a Meltano Docker image
       - registry.gitlab.com/namespace/project/image-name:tag
   - **Memory Limits (MiB)**: Soft limit 1024
   - **Port mappings**: 5000 tcp
-5. Click `Update` button to finish setting up your container defintion
+1. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the "Task defintion" heading
 1. Update the form with the following:
   - **Task definition name**: meltano-run
@@ -37,12 +41,14 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 
 #### Review service properties 
 
-7. Verify that the properties are as follows:
+![](/screenshots/aws-ecs-review-service.png)
+
+1. Verify that the properties are as follows:
   - **Service name**: meltano-service
   - **Number of desired tasks**: 1
   - **Security group**: Automatically create new
   - **Load balancer type**: None
-8. Click `Next` to move on to the next step
+1. Click `Next` to move on to the next step
 
 #### Configure your cluster
 
@@ -59,6 +65,8 @@ After you click `Next`, you will have the opportunity to review all of the prope
 You should now see a page where Amazon prepares the services we configured. There will be spinning icons on the right of each service that will live update as it finished. Once you see everything has setup properly, you're cluster has been successfully deployed!
 
 #### Final steps
+
+![](/screenshots/aws-ecs-final-steps.png)
 
 1. Open the page with your cluster
 1. Click on the "Tasks" tab
