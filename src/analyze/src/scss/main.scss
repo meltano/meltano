@@ -46,3 +46,7 @@ Interactive helpers often with improved semantic names built on top of Bulma
 .has-text-interactive-secondary {
   @extend .has-text-link;
 }
+
+.modal-card.is-wide {
+  width: calc(100vw - 160px);
+}

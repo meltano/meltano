@@ -2,74 +2,19 @@
 
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
+    <div class="modal-card is-wide">
       <header class="modal-card-head">
-        <p class="modal-card-title">Entities Selection</p>
+        <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
 
-        ... {{extractor.name}}
-
-      </section>
-      <footer class="modal-card-foot buttons is-right">
-        <button
-          class="button"
-          @click="close">Cancel</button>
-        <button
-          v-if='!isLoading'
-          class='button is-interactive-primary'
-          :disabled="!isSavable"
-          @click='selectEntities'>Save</button>
-      </footer>
-    </div>
-  </div>
-
-
-<!--
-  <div class="columns">
-    <div class="column is-8 is-offset-2">
-
-      <div class="box">
         <div
           class="columns"
           :class="{ 'is-vcentered': isLoading }">
-          <div class="column">
-
-            <article class="media">
-              <figure class="media-left">
-                <p class="image is-64x64">
-                  <img :src='imageUrl' :alt="`${extractor.name} logo`">
-                </p>
-              </figure>
-              <div class="media-content">
-                <div class="content">
-                  <p>
-                    <span class='has-text-weight-bold'>Entity Selection</span>
-                    <br>
-                    {{extractor.name}}
-                  </p>
-                </div>
-              </div>
-            </article>
-
-          </div>
 
           <div v-if='isLoading' class="column">
             <progress class="progress is-small is-info"></progress>
-          </div>
-
-          <div v-else class="column">
-            <div class="buttons is-pulled-right">
-              <button
-                class="button"
-                @click="clearExtractorInFocus()">Cancel</button>
-              <button
-                v-if='!isLoading'
-                class='button is-interactive-primary'
-                :disabled="!isSavable"
-                @click='selectEntities'>Save</button>
-            </div>
           </div>
         </div>
 
@@ -78,7 +23,7 @@
             <div class="column">
               <div class="buttons are-small has-addons">
                 <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
-                <!-- <button
+                <button
                   class='button is-outlined'
                   v-for='mode in selectionModes'
                   :disabled='mode === selectionModes[1]'
@@ -160,9 +105,19 @@
           </div>
         </template>
 
-      </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <button
+          class="button"
+          @click="close">Cancel</button>
+        <button
+          v-if='!isLoading'
+          class='button is-interactive-primary'
+          :disabled="!isSavable"
+          @click='selectEntities'>Save</button>
+      </footer>
     </div>
-  </div> -->
+  </div>
 
 </template>
 
@@ -183,9 +138,7 @@ export default {
       this.selectionModeCustom,
     ];
     this.extractorNameFromRoute = this.$route.params.extractor;
-    console.log('entities extractor', this.extractorNameFromRoute);
     this.$store.dispatch('orchestrations/getExtractorInFocusEntities', this.extractorNameFromRoute);
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   destroyed() {
     this.$store.dispatch('orchestrations/clearExtractorInFocusEntities');
@@ -202,18 +155,12 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'extractorInFocusEntities',
-      'installedPlugins',
     ]),
     expandableToggleLabel() {
       const prefix = this.isExpanded
         ? 'Hide'
         : `Show all ${this.extractorInFocusEntities.entityGroups.length}`;
       return `${prefix} entities`;
-    },
-    extractor() {
-      return this.installedPlugins.extractors
-        ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
-        : {};
     },
     getIsSelectedMode() {
       return mode => mode === this.selectedMode;

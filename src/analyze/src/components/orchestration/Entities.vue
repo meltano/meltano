@@ -7,7 +7,6 @@ export default {
     return {
       filterExtractorsText: '',
       installingExtractors: [],
-      extractorInFocus: null,
     };
   },
   created() {
