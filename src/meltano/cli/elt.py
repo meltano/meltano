@@ -56,8 +56,6 @@ def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
         tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
     )
 
-    dbt_runner = DbtRunner(project)
-
     try:
         if transform != "only":
             click.echo("Running extract & load...")
@@ -67,6 +65,7 @@ def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
             click.secho("Extract & load skipped.", fg="yellow")
 
         if transform != "skip":
+            dbt_runner = DbtRunner(project)
             click.echo("Running transformation...")
             dbt_runner.run(dry_run=dry, models=extractor)
             click.secho("Transformation complete!", fg="green")
