@@ -3,7 +3,7 @@
 ## Amazon Web Services (AWS)
 
 ::: warning Prerequisites
-This guide assumes that you have a functioning Docker image where your Meltano project is already bundled with the Meltano installation. More information on how to do this coming in the near future!
+This guide assumes that you have a functioning Docker image where your Meltano project is already bundled with the Meltano installation. To track this issue, follow [meltano#624](https://gitlab.com/meltano/meltano/issues/624).
 :::
 
 In this section, we will be going over how you can deploy a Meltano Docker image to AWS.
