@@ -67,6 +67,10 @@ You should now see a page where Amazon prepares the services we configured. Ther
 1. Under "Network", you can find the URL for your instance under "Public IP" (e.g., 18.18.134.18)
 1. Open a new tab in your browser and visit this new URL with port 5000 (e.g., 18.18.134.18:5000)
 
+::: tip
+The IP address can be mapped to a domain using Route53. We will be writing up a guide on how to do this. You can follow along at [meltano#625](https://gitlab.com/meltano/meltano/issues/625).
+:::
+
 #### Configure network access
 
 ::: tip
