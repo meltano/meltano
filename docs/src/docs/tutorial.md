@@ -66,7 +66,7 @@ This will start a local web server at [http://localhost:5000](http://localhost:5
 
 When you visit the URL, you should see:
 
-![](/screenshots/meltano-ui-carbon-tutorial-output.png)
+![Meltano UI with Carbon API initial loading screen](/screenshots/meltano-ui-carbon-tutorial-output.png)
 
 :::warning Troubleshooting
 Having issues with Meltano? Help us help you. Here is a [pre-baked form to streamline us doing so](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs).
@@ -77,12 +77,14 @@ Having issues with Meltano? Help us help you. Here is a [pre-baked form to strea
 
 With Meltano UI up and running, we can automatically generate queries with as little as a single click and then explore the query results:
 
-- Navigate to Model > Region (Model dropdown)
-- Open Region accordion
+- In the top navigation, hover over `Analyze` and click on **Region**
+- Under the `Region` section on the left navigation:
   - Toggle *at least one* aggregate button to generate SQL
   - Toggle any number of column buttons to generate SQL
-  - Click the Run button to query using the generated SQL
+  - Click the **Run Query** button in the upper right to query using the generated SQL
 - Open the Charts accordion to visualize the data!
+
+![Screenshot of Meltano UI with Carbon API charts](/screenshots/carbon-ui-charts.png)
 
 ## Intermediate - Salesforce
 
