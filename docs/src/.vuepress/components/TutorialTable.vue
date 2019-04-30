@@ -6,7 +6,9 @@ export default {
 
 <template>
   <div class='tutorial-container'>
-
+    <div class="tutorial-item">
+      <h2 class="tutorial-header">Table of Content</h2>
+    </div>
     <div class="tutorial-item">
       <div class='tutorial-header'><a href="#starter-carbon-emissions">Starter - Carbon Emissions</a></div>
       <div>
