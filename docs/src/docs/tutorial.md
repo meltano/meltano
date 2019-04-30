@@ -4,7 +4,17 @@ sidebarDepth: 2
 
 # Tutorials
 
-First time using Meltano? No worries. We have you covered with tutorials that will guide you through how Meltano works. Let's get started!
+Now that you have successfully installed Meltano, creating a new Meltano project is very simple. The Meltano CLI offers you a simple command to initialize a new project:
+
+```bash
+meltano init PROJECT_NAME
+```
+
+:::tip
+For those new to the command line, your PROJECT_NAME should not have spaces in the name and should use dashes instead. For example, "my project" will not work; but "my-project" will.
+:::
+
+Now that you know how to create a new project, we recommend checking out our [Carbon Emissions tutorial](/docs/tutorial.html#starter-carbon-emissions) to explore what Meltano is capable of. If you are feeling more adventurous, feel free to skip it and move on!
 
 <TutorialTable />
 
