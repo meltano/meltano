@@ -75,7 +75,7 @@ export default {
       return this.extractor ? Object.assign({}, this.extractor.config) : {};
     },
     extractor() {
-      return this.installedPlugins.extractors.length > 0
+      return this.installedPlugins.extractors
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
         : {};
     },

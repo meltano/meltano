@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 import orchestrationsApi from '@/api/orchestrations';
 
@@ -17,7 +17,6 @@ export default {
   },
   computed: {
     ...mapState('orchestrations', [
-      'extractorInFocus',
       'installedPlugins',
       'extractors',
     ]),
@@ -42,9 +41,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions('orchestrations', [
-      'setExtractorInFocus',
-    ]),
     installExtractor(extractor) {
       this.installingExtractors.push(extractor);
 
@@ -60,7 +56,7 @@ export default {
         }
       });
     },
-    updateExtractorInFocus(extractor) {
+    updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } });
     },
   },
@@ -110,7 +106,7 @@ export default {
                 <div class="buttons are-small">
                   <a
                     class='button is-interactive-primary flex-grow-1'
-                    @click="updateExtractorInFocus(extractor)">Account Settings</a>
+                    @click="updateExtractorSettings(extractor)">Account Settings</a>
                   <a class='button' disabled>Uninstall</a>
                 </div>
               </template>
