@@ -35,10 +35,7 @@ const webpackConfig = merge(baseWebpackConfig, {
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
     new webpack.DefinePlugin({
-      'process.env': env
-    }),
-    new webpack.DefinePlugin({
-      API_URL: JSON.stringify(process.env.MELTANO_ANALYZE_API_URL)
+      'process.env': env,
     }),
     new UglifyJsPlugin({
       uglifyOptions: {
@@ -72,6 +69,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       filename:
         process.env.NODE_ENV === 'testing' ? 'index.html' : config.build.index,
       template: 'index.html',
+      injectApiURL: true,
       inject: true,
       minify: {
         removeComments: true,
