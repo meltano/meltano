@@ -19,6 +19,9 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 1. Fill out the form with the following data:
   - **Container name**: Meltano
   - **Image**: YOUR_DOCKER_IMAGE_URL
+    - Examples:
+      - docker.io/namespace/image-name:tag
+      - registry.gitlab.com/namespace/project/image-name:tag
   - **Memory Limits (MiB)**: Soft limit 1024
   - **Port mappings**: 5000 tcp
 5. Click `Update` button to finish setting up your container defintion
