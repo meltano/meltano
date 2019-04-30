@@ -26,13 +26,13 @@ export default {
       return stepName => this.currentStep.name === stepName;
     },
     getIsStepEntitiesMinimallyValidated() {
-      return false; // TODO proper minimally validated validation
+      return true; // TODO proper minimally validated validation
     },
     getIsStepLoadersMinimallyValidated() {
-      return false; // TODO proper minimally validated validation
+      return true; // TODO proper minimally validated validation
     },
     getIsStepRunMinimallyValidated() {
-      return false; // TODO proper minimally validated validation
+      return true; // TODO proper minimally validated validation
     },
   },
   methods: {
