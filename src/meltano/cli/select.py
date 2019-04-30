@@ -24,7 +24,16 @@ def selection_color(selection):
         return "red"
 
 
-def selection_mark(selection):
+def selection_marker(selection):
+    """
+    Returns the marker to indicate the selection type of an attribute.
+
+    Examples:
+      [automatic]
+      [selected ]
+      [excluded ]
+    """
+
     colwidth = max(map(len, SelectionType))  # size of the longest mark
     return f"[{selection:<{colwidth}}]"
 
@@ -84,26 +93,21 @@ def show(project, extractor, show_all=False):
     click.secho("Legend:")
     for sel_type in SelectionType:
         click.secho(f"\t{sel_type}", fg=selection_color(sel_type))
-    else:
-        click.echo()
 
     # report
-    click.secho("Enabled patterns:")
+    click.secho("\nEnabled patterns:")
     for select in map(parse_select_pattern, extractor.select):
         click.secho(
             f"\t{select.property_pattern}", fg="red" if select.negated else "white"
         )
-    else:
-        click.echo()
 
-    click.secho("Selected properties:")
-
+    click.secho("\nSelected properties:")
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
-        sel_mark = selection_mark(stream.selection)
+        sel_mark = selection_marker(stream.selection)
         if show_all:
             click.secho(
                 f"\t{sel_mark} {stream.key}",

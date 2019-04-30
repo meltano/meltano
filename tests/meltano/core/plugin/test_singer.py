@@ -13,6 +13,7 @@ from meltano.core.plugin.singer.catalog import (
     SelectExecutor,
     ListExecutor,
     ListSelectedExecutor,
+    path_property,
 )
 
 
@@ -298,6 +299,18 @@ JSON_SCHEMA = """
 @pytest.fixture
 def select_all_executor():
     return SelectExecutor(["*.*"])
+
+
+@pytest.mark.parametrize(
+    "path,prop",
+    [
+        ("stream[0].properties.master.properties.details", "master.details"),
+        ("stream[2].properties.name", "name"),
+        ("stream[10].properties.list[2].properties.name", "list[2].name"),
+    ],
+)
+def test_path_property(path, prop):
+    assert path_property(path) == prop
 
 
 class TestSingerTap:

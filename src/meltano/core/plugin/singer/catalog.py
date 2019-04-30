@@ -27,7 +27,18 @@ def parse_select_pattern(pattern: str):
 
 
 def path_property(path: str):
-    prop_regex = r"properties\.(\w+)+"
+    """
+    Extract the property name from a materialized path.
+
+    As we traverse the catalog tree, we build a materialized path
+    to keep track of the parent nodes.
+
+    Examples:
+
+      stream[0].properties.list_items.properties.account → list_items.account
+      stream[0].properties.name                          → name
+    """
+    prop_regex = r"properties\.([\w\[\]\d]+)+"
     components = re.findall(prop_regex, path)
     return ".".join(components)
 
@@ -45,7 +56,7 @@ class SelectionType(str, Enum):
     AUTOMATIC = "automatic"
 
     def __bool__(self):
-        return self in (self.__class__.SELECTED, self.__class__.AUTOMATIC)
+        return self is not self.__class__.EXCLUDED
 
 
 class CatalogExecutor:
@@ -99,7 +110,7 @@ class SelectExecutor(CatalogExecutor):
         if selected:
             logging.debug(f"{path} has been selected.")
         else:
-            logging.debug(f"{path} has not been selected.")
+            logging.debug(f"{path} has been deselected.")
 
     def stream_match_patterns(self, stream):
         return self._match_patterns(
