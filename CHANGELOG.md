@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [#375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
+* [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
 
 ### Fixes
 
