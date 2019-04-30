@@ -27,7 +27,7 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 5. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the "Task defintion" heading
 1. Update the form with the following:
-  - **Task definition name**: meltano-task
+  - **Task definition name**: meltano-run
   - **Network mode**: awsvpc
   - **Task execution role**: ecsTaskExecutionRole
   - **Compatibilities**: FARGATE
