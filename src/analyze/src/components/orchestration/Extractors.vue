@@ -45,7 +45,7 @@ export default {
             </a>
             <span class='step-spacer'>then</span>
             <a class="button is-small is-static is-marginless is-borderless">
-              <span>Configure their settings</span>
+              <span>Configure and save their settings</span>
             </a>
           </p>
         </div>
@@ -95,8 +95,5 @@ export default {
 <style lang="scss">
 .flex-grow-1 {
   flex-grow: 1;
-}
-.step-spacer {
-  margin: 0 .5rem;
 }
 </style>

@@ -36,6 +36,22 @@ export default {
 <template>
   <div>
 
+    <div class="columns">
+      <div class="column is-three-fifths is-offset-one-fifth">
+        <div class='content has-text-centered'>
+          <p class='level-item buttons'>
+            <a class="button is-small is-static is-marginless is-borderless">
+              <span>Tell us which loader(s) to install</span>
+            </a>
+            <span class='step-spacer'>then</span>
+            <a class="button is-small is-static is-marginless is-borderless">
+              <span>Configure and save their settings</span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <div class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
