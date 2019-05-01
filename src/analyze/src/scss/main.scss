@@ -61,3 +61,12 @@ Layout helpers with names based on Bulma naming conventions
     margin-right: 1.25rem;
   }
 }
+
+/*
+MODIFIERS ------------------------------------------------------------------------------------------
+Modifer helpers with names based on Bulma naming conventions
+*/
+
+.is-borderless {
+  border: none;
+}
