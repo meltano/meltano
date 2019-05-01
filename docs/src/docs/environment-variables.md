@@ -15,7 +15,7 @@ export FLASK_ENV = ""
 
 ### AuthLib
 
-These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#).
+These variables are specific to [Flask-OAuthlib](https://flask-oauthlib.readthedocs.io/en/latest/#) and work with [OAuth authentication with GitLab](https://docs.gitlab.com/ee/integration/oauth_provider.html).
 
 Update your `.env` file in your project directory with the desired customizations.
 
@@ -25,6 +25,8 @@ export OAUTH_GITLAB_APPLICATION_ID = ""
 # GitLab Client Secret
 export OAUTH_GITLAB_SECRET = ""
 ```
+
+For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
 
 ## Meltano
 
