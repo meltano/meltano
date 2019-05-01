@@ -7,6 +7,7 @@ const state = {
   hasExtractorLoadingError: false,
   extractorInFocusEntities: {},
   installedPlugins: {},
+  installingExtractors: [],
 };
 
 const getters = {
@@ -15,6 +16,12 @@ const getters = {
   },
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
+  },
+  getIsExtractorPluginInstalled(stateRef) {
+    return extractor => stateRef.installedPlugins.extractors.find(item => item.name === extractor);
+  },
+  getIsInstallingExtractorPlugin(stateRef) {
+    return extractor => stateRef.installingExtractors.includes(extractor);
   },
   getLoaderImageUrl(_, gettersRef) {
     return loader => `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`;
@@ -46,6 +53,20 @@ const actions = {
       })
       .catch(() => {
         commit('setHasExtractorLoadingError', true);
+      });
+  },
+
+  installExtractor({ commit, dispatch }, extractor) {
+    commit('installExtractorStart', extractor);
+
+    orchestrationsApi.addExtractors({ name: extractor })
+      .then((response) => {
+        if (response.status === 200) {
+          dispatch('getInstalledPlugins')
+            .then(() => {
+              commit('installExtractorComplete', extractor);
+            });
+        }
       });
   },
 
@@ -111,6 +132,15 @@ const actions = {
 };
 
 const mutations = {
+  installExtractorStart(_, extractor) {
+    state.installingExtractors.push(extractor);
+  },
+
+  installExtractorComplete(_, extractor) {
+    const idx = state.installingExtractors.indexOf(extractor);
+    state.installingExtractors.splice(idx, 1);
+  },
+
   setAll(_, orchestrationData) {
     state.extractors = orchestrationData.extractors;
     state.loaders = orchestrationData.loaders;

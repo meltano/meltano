@@ -1,14 +1,11 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
-
-import orchestrationsApi from '@/api/orchestrations';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'Extractors',
   data() {
     return {
       filterExtractorsText: '',
-      installingExtractors: [],
     };
   },
   created() {
@@ -19,17 +16,13 @@ export default {
     ...mapGetters('orchestrations', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
+      'getIsExtractorPluginInstalled',
+      'getIsInstallingExtractorPlugin',
     ]),
     ...mapState('orchestrations', [
       'installedPlugins',
       'extractors',
     ]),
-    getIsConnectorInstalled() {
-      return extractor => this.installedPlugins.extractors.find(item => item.name === extractor);
-    },
-    getIsInstallingPlugin() {
-      return plugin => this.installingExtractors.includes(plugin);
-    },
     filteredExtractors() {
       if (this.filterExtractorsText) {
         return this.extractors
@@ -39,21 +32,9 @@ export default {
     },
   },
   methods: {
-    installExtractor(extractor) {
-      this.installingExtractors.push(extractor);
-
-      orchestrationsApi.addExtractors({
-        name: extractor,
-      }).then((response) => {
-        if (response.status === 200) {
-          this.$store.dispatch('orchestrations/getInstalledPlugins')
-            .then(() => {
-              const idx = this.installingExtractors.indexOf(extractor);
-              this.installingExtractors.splice(idx, 1);
-            });
-        }
-      });
-    },
+    ...mapActions('orchestrations', [
+      'installExtractor',
+    ]),
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } });
     },
@@ -91,7 +72,7 @@ export default {
           <div class="tile level is-child box">
             <div class="image level-item is-64x64 container">
               <img
-                :class='{ "grayscale": !getIsConnectorInstalled(extractor) }'
+                :class='{ "grayscale": !getIsExtractorPluginInstalled(extractor) }'
                 :src='getExtractorImageUrl(extractor)'
                 :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
             </div>
@@ -100,7 +81,7 @@ export default {
                 {{extractor}}
               </p>
 
-              <template v-if='getIsConnectorInstalled(extractor)'>
+              <template v-if='getIsExtractorPluginInstalled(extractor)'>
                 <div class="buttons are-small">
                   <a
                     class='button is-interactive-primary flex-grow-1'
@@ -110,7 +91,7 @@ export default {
               </template>
               <template v-else>
                 <a
-                  :class='{ "is-loading": getIsInstallingPlugin(extractor) }'
+                  :class='{ "is-loading": getIsInstallingExtractorPlugin(extractor) }'
                   class='button is-interactive-primary is-outlined is-block is-small'
                   @click="installExtractor(extractor)">Install</a>
               </template>
