@@ -50,6 +50,8 @@ The following are the environment variables currently available for customizatio
 Update your `.env` file in your project directory with the desired customizations.
 
 ```bash
-# Your database URI
+# This is the system database URI that stores
+# 1. Job logs
+# 2. RBAC users
 export MELTANO_API_DATABASE_URI = "YOUR_DATABASE_URI"
 ```
