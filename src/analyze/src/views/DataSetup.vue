@@ -12,7 +12,7 @@ export default {
       steps: [
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
-        { name: 'loaders', routeMatches: ['loaders'] },
+        { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
         { name: 'run', routeMatches: ['run'] },
       ],
       isModal: this.$route.meta.isModal,
@@ -139,6 +139,9 @@ export default {
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('loaders') }">
           <router-view></router-view>
+          <div v-if='isModal'>
+            <router-view name='loaderSettings'></router-view>
+          </div>
         </div>
         <div
           class="step-content"

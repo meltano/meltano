@@ -1,11 +1,13 @@
 import Router from 'vue-router';
 import Vue from 'vue';
 
+
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
 import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
 import Loaders from '@/components/orchestration/Loaders';
+import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
 import RunSummary from '@/components/orchestration/RunSummary';
 
 import DataSetup from '@/views/DataSetup';
@@ -82,7 +84,23 @@ const router = new Router({
         {
           path: 'loaders',
           name: 'loaders',
-          component: Loaders,
+          components: {
+            default: Loaders,
+          },
+          meta: {
+            isModal: false,
+          },
+        },
+        {
+          path: 'loaders/:loader',
+          name: 'loaderSettings',
+          components: {
+            default: Loaders,
+            loaderSettings: LoaderSettingsModal,
+          },
+          meta: {
+            isModal: true,
+          },
         },
         {
           path: 'run',

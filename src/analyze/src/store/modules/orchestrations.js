@@ -6,7 +6,6 @@ const state = {
   loaders: [],
   hasExtractorLoadingError: false,
   extractorInFocusEntities: {},
-  loaderInFocus: null,
   installedPlugins: {},
 };
 
@@ -55,10 +54,6 @@ const actions = {
       .then(() => {
         // TODO confirm success or handle error in UI
       });
-  },
-
-  setLoaderInFocus({ commit }, loader) {
-    commit('setLoaderInFocus', loader);
   },
 
   toggleAllEntityGroupsOn({ dispatch }) {
@@ -115,10 +110,6 @@ const mutations = {
         entityGroups: entitiesData.entity_groups,
       }
       : {};
-  },
-
-  setLoaderInFocus(_, selectedLoader) {
-    state.loaderInFocus = selectedLoader;
   },
 
   setHasExtractorLoadingError(_, value) {
