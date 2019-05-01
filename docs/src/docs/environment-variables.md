@@ -37,7 +37,9 @@ Update your `.env` file in your project directory with the desired customization
 ```bash
 # The directory where the Meltano logs will be generated
 export MELTANO_LOG_PATH = ""
-# The URL where the web app will be located
+# The URL where the web app will be located when working locally in development
+# since it provides the redirect after authentication.
+# Not require for production
 export MELTANO_UI_URL = ""
 ```
 
