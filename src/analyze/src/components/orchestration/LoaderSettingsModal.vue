@@ -4,6 +4,11 @@
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
       <header class="modal-card-head">
+        <div class="modal-card-head-image image is-64x64 level-item">
+          <img
+            :src='getLoaderImageUrl(loaderNameFromRoute)'
+            :alt="`${getLoaderNameWithoutPrefixedTargetDash(loaderNameFromRoute)} logo`">
+        </div>
         <p class="modal-card-title">Loader Settings</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
@@ -193,6 +198,10 @@ export default {
   computed: {
     ...mapState('orchestrations', [
       'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
+    ]),
+    ...mapGetters('orchestrations', [
+      'getLoaderImageUrl',
+      'getLoaderNameWithoutPrefixedTargetDash',
     ]),
     ...mapState('settings', [
       'settings',

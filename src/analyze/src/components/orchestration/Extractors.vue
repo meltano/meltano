@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import orchestrationsApi from '@/api/orchestrations';
 
@@ -16,21 +16,19 @@ export default {
     this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
+    ...mapGetters('orchestrations', [
+      'getExtractorImageUrl',
+      'getExtractorNameWithoutPrefixedTapDash',
+    ]),
     ...mapState('orchestrations', [
       'installedPlugins',
       'extractors',
     ]),
-    getImageUrl() {
-      return extractor => `/static/logos/${this.getNameWithoutPrefixedTapDash(extractor)}-logo.png`;
-    },
     getIsConnectorInstalled() {
       return extractor => this.installedPlugins.extractors.find(item => item.name === extractor);
     },
     getIsInstallingPlugin() {
       return plugin => this.installingExtractors.includes(plugin);
-    },
-    getNameWithoutPrefixedTapDash() {
-      return extractor => extractor.replace('tap-', '');
     },
     filteredExtractors() {
       if (this.filterExtractorsText) {
@@ -94,8 +92,8 @@ export default {
             <div class="image level-item is-64x64 container">
               <img
                 :class='{ "grayscale": !getIsConnectorInstalled(extractor) }'
-                :src='getImageUrl(extractor)'
-                :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
+                :src='getExtractorImageUrl(extractor)'
+                :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
             </div>
             <div class="content is-small">
               <p class='has-text-centered'>

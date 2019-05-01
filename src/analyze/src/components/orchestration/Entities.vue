@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'Entities',
@@ -14,16 +14,14 @@ export default {
     this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
+    ...mapGetters('orchestrations', [
+      'getExtractorImageUrl',
+      'getExtractorNameWithoutPrefixedTapDash',
+    ]),
     ...mapState('orchestrations', [
       'installedPlugins',
       'extractors',
     ]),
-    getImageUrl() {
-      return extractor => `/static/logos/${this.getNameWithoutPrefixedTapDash(extractor)}-logo.png`;
-    },
-    getNameWithoutPrefixedTapDash() {
-      return extractor => extractor.replace('tap-', '');
-    },
     filteredExtractors() {
       // Alphabetize filter (TODO: temp until getInstalledPlugins is alphabetical like getAll)
       const alphabetized = this.extractors.filter(
@@ -66,8 +64,8 @@ export default {
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
-              :src='getImageUrl(extractor)'
-              :alt="`${getNameWithoutPrefixedTapDash(extractor)} logo`">
+              :src='getExtractorImageUrl(extractor)'
+              :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
           </div>
           <div class="content is-small">
             <p class='has-text-centered'>

@@ -52,6 +52,12 @@ LAYOUT -------------------------------------------------------------------------
 Layout helpers with names based on Bulma naming conventions
 */
 
-.modal-card.is-wide {
-  width: calc(100vw - 160px);
+.modal-card {
+  &.is-wide {
+    width: calc(100vw - 160px);
+  }
+
+  .modal-card-head-image {
+    margin-right: 1.25rem;
+  }
 }

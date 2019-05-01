@@ -4,6 +4,11 @@
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-wide">
       <header class="modal-card-head">
+        <div class="modal-card-head-image image is-64x64 level-item">
+          <img
+            :src='getExtractorImageUrl(extractorNameFromRoute)'
+            :alt="`${getExtractorNameWithoutPrefixedTapDash(extractorNameFromRoute)} logo`">
+        </div>
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
@@ -122,7 +127,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'EntitiesSelectorModal',
@@ -148,6 +153,10 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('orchestrations', [
+      'getExtractorImageUrl',
+      'getExtractorNameWithoutPrefixedTapDash',
+    ]),
     ...mapState('orchestrations', [
       'extractorInFocusEntities',
     ]),

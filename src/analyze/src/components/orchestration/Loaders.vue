@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import orchestrationsApi from '@/api/orchestrations';
 
@@ -16,22 +16,20 @@ export default {
     this.$store.dispatch('orchestrations/getInstalledPlugins');
   },
   computed: {
+    ...mapGetters('orchestrations', [
+      'getLoaderImageUrl',
+      'getLoaderNameWithoutPrefixedTargetDash',
+    ]),
     ...mapState('orchestrations', [
       'installedPlugins',
       'loaderInFocus',
       'loaders',
     ]),
-    getImageUrl() {
-      return loader => `/static/logos/${this.getNameWithoutPrefixedTapDash(loader)}-logo.png`;
-    },
     getIsConnectorInstalled() {
       return loader => this.installedPlugins.loaders.find(item => item.name === loader);
     },
     getIsInstallingPlugin() {
       return plugin => this.installingLoaders.includes(plugin);
-    },
-    getNameWithoutPrefixedTapDash() {
-      return loader => loader.replace('target-', '');
     },
     filteredLoaders() {
       if (this.filterLoadersText) {
@@ -100,8 +98,8 @@ export default {
             <div class="image level-item is-64x64 container">
               <img
                 :class='{ "grayscale": !getIsConnectorInstalled(loader) }'
-                :src='getImageUrl(loader)'
-                :alt="`${getNameWithoutPrefixedTapDash(loader)} logo`">
+                :src='getLoaderImageUrl(loader)'
+                :alt="`${getLoaderNameWithoutPrefixedTargetDash(loader)} logo`">
             </div>
             <div class="content is-small">
               <p class='has-text-centered'>

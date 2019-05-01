@@ -9,7 +9,20 @@ const state = {
   installedPlugins: {},
 };
 
-const getters = {};
+const getters = {
+  getExtractorImageUrl(_, gettersRef) {
+    return extractor => `/static/logos/${gettersRef.getExtractorNameWithoutPrefixedTapDash(extractor)}-logo.png`;
+  },
+  getExtractorNameWithoutPrefixedTapDash() {
+    return extractor => extractor.replace('tap-', '');
+  },
+  getLoaderImageUrl(_, gettersRef) {
+    return loader => `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`;
+  },
+  getLoaderNameWithoutPrefixedTargetDash() {
+    return loader => loader.replace('target-', '');
+  },
+};
 
 const actions = {
   clearExtractorInFocusEntities({ commit }) {
