@@ -35,6 +35,10 @@ export default {
     ...mapActions('orchestrations', [
       'installExtractor',
     ]),
+    installExtractorAndBeginSettings(extractor) {
+      this.installExtractor(extractor);
+      this.updateExtractorSettings(extractor);
+    },
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } });
     },
@@ -93,7 +97,7 @@ export default {
                 <a
                   :class='{ "is-loading": getIsInstallingExtractorPlugin(extractor) }'
                   class='button is-interactive-primary is-outlined is-block is-small'
-                  @click="installExtractor(extractor)">Install</a>
+                  @click="installExtractorAndBeginSettings(extractor)">Install</a>
               </template>
 
             </div>

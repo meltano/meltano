@@ -14,31 +14,46 @@
       </header>
       <section class="modal-card-body">
 
-        <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
-          <div class="field-label is-normal">
-            <label class="label">{{key}}</label>
+        <template v-if='getIsInstallingExtractorPlugin(extractorNameFromRoute)'>
+          <div class="content">
+            <div class="level">
+              <div class="level-item">
+                <p>Installing {{extractorNameFromRoute}} can take up to a minute.</p>
+              </div>
+            </div>
+            <progress class="progress is-small is-info"></progress>
           </div>
-          <div class="field-body">
-            <div class="field">
-              <p class="control">
-                <input
-                  class="input"
-                  type="text"
-                  :placeholder="val"
-                  v-model="configSettings[key]">
-              </p>
+        </template>
+
+        <template v-if='getIsExtractorPluginInstalled(extractorNameFromRoute)'>
+
+          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+            <div class="field-label is-normal">
+              <label class="label">{{key}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    :placeholder="val"
+                    v-model="configSettings[key]">
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <article class="message is-warning is-small">
-          <div class="message-header">
-            <p>Warning</p>
-          </div>
-          <div class="message-body">
-            <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-          </div>
-        </article>
+          <article class="message is-warning is-small">
+            <div class="message-header">
+              <p>Warning</p>
+            </div>
+            <div class="message-body">
+              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+            </div>
+          </article>
+
+        </template>
 
       </section>
       <footer class="modal-card-foot buttons is-right">
@@ -70,6 +85,8 @@ export default {
     ...mapGetters('orchestrations', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
+      'getIsExtractorPluginInstalled',
+      'getIsInstallingExtractorPlugin',
     ]),
     ...mapState('orchestrations', [
       'installedPlugins',
