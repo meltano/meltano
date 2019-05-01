@@ -9,6 +9,32 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
+- [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
+
+### Changes
+* [#375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
+* [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
+
+### Fixes
+
+### Breaks
+
+
+## 0.23.0 - (2019-04-29)
+---
+
+### New
+* [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
+
+### Changes
+* [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
+
+
+## 0.22.0 - (2019-04-24)
+---
+
+### New
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 * [!580](https://gitlab.com/meltano/meltano/merge_requests/580) Add sorting to plugins for improved UX, both UI via extractors/loaders/etc. and `meltano discover all` benefit from sorted results
 * [!528](https://gitlab.com/meltano/meltano/issues/528) Add documentation for RBAC alpha feature and environment variables 
@@ -21,8 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 * [#600](https://gitlab.com/meltano/meltano/issues/600) Fix a bug with meltano select when the extractor would output an invalid schema
 * [#597](https://gitlab.com/meltano/meltano/issues/597) Automatically open the browser when `meltano ui` is run
-
-### Breaks
 
 
 ## 0.21.0 - (2019-04-23)

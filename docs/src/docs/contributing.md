@@ -1,5 +1,7 @@
 # Contributing
 
+**Note: Meltano uses >= python3.6**
+
 We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions:
 
 ## Installation from source
@@ -133,6 +135,10 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
     # after changelog validation, build the release
     $ make release
+    
+    # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+    # occasionally the version bump can go to a version you don't expect.
+    $ changelog view
 
     # validate that the tag auto increments based on semver
     $ git push --tags
