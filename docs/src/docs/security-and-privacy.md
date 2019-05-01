@@ -64,4 +64,19 @@ There are two primary ways to authenticate:
 
 ## Managing Roles
 
-More information to come...
+Meltano uses a RBAC (role-based access control) to expose resources to the current authenticated user.
+
+- User: associated to an email, serves as the primary identity
+- Role: associated to users, serves as the authorization source
+- Permission: associated to roles, express the authorization scope
+- Resource: Any `Design`, `Report`, `Dashboard`
+
+In this system, any permission is assigned a "Context" which represent a pattern upon which resources will be tested for. Currently, the context tests for the `name` attribute of resources.
+
+Here's an example, let's say we have a `Design` named `finance.month_over_month` and a `Permission` with a context `finance.*`, then this `Design` would be available to all users that have any role having this `Permission`.
+
+This system allows you to create any kind of hierarchical system:
+
+- *department.resource-name*
+- *topic.resource-name*
+- *access-level.resource-name*
