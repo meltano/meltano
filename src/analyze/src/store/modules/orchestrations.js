@@ -8,6 +8,7 @@ const state = {
   extractorInFocusEntities: {},
   installedPlugins: {},
   installingExtractors: [],
+  installingLoaders: [],
 };
 
 const getters = {
@@ -28,6 +29,12 @@ const getters = {
   },
   getLoaderNameWithoutPrefixedTargetDash() {
     return loader => loader.replace('target-', '');
+  },
+  getIsLoaderPluginInstalled(stateRef) {
+    return loader => stateRef.installedPlugins.loaders.find(item => item.name === loader);
+  },
+  getIsInstallingLoaderPlugin(stateRef) {
+    return loader => stateRef.installingLoaders.includes(loader);
   },
 };
 
@@ -65,6 +72,20 @@ const actions = {
           dispatch('getInstalledPlugins')
             .then(() => {
               commit('installExtractorComplete', extractor);
+            });
+        }
+      });
+  },
+
+  installLoader({ commit, dispatch }, loader) {
+    commit('installLoaderStart', loader);
+
+    orchestrationsApi.addLoaders({ name: loader })
+      .then((response) => {
+        if (response.status === 200) {
+          dispatch('getInstalledPlugins')
+            .then(() => {
+              commit('installLoaderComplete', loader);
             });
         }
       });
@@ -139,6 +160,15 @@ const mutations = {
   installExtractorComplete(_, extractor) {
     const idx = state.installingExtractors.indexOf(extractor);
     state.installingExtractors.splice(idx, 1);
+  },
+
+  installLoaderStart(_, loader) {
+    state.installingLoaders.push(loader);
+  },
+
+  installLoaderComplete(_, loader) {
+    const idx = state.installingLoaders.indexOf(loader);
+    state.installingLoaders.splice(idx, 1);
   },
 
   setAll(_, orchestrationData) {
