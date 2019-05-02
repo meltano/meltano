@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 - [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
+- [#586](https://gitlab.com/meltano/meltano/issues/586) `meltano ui` now automatically start Airflow if installed; Airflow UI available at `Orchestration`.
 
 ### Changes
 * [375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
