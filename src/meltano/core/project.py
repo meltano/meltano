@@ -8,7 +8,6 @@ from contextlib import contextmanager
 from functools import wraps
 from dotenv import load_dotenv
 
-from .plugin import Plugin
 from .error import Error
 
 
@@ -122,7 +121,7 @@ class Project:
         return self.meltano_dir("models", *joinpaths)
 
     @makedirs
-    def plugin_dir(self, plugin: Plugin, *joinpaths):
+    def plugin_dir(self, plugin: "Plugin", *joinpaths):
         return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
 
     def __eq__(self, other):

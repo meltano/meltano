@@ -40,7 +40,7 @@ class SingerTap(SingerPlugin):
     def output_files(self):
         return {"output": "tap.out"}
 
-    @hook("before_invoke")
+    @hook("before_invoke", can_fail=True)
     def run_discovery(self, plugin_invoker, exec_args=[]):
         if not self._extras.get("autodiscover", True):
             return
@@ -68,7 +68,7 @@ class SingerTap(SingerPlugin):
             logging.warn("Invalid catalog output by --discovery.")
             properties_file.unlink()
 
-    @hook("before_invoke")
+    @hook("before_invoke", can_fail=True)
     def apply_select(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
             return

@@ -59,7 +59,7 @@ class Plugin(HookObject):
         pip_url=None,
         config=None,
         select=None,
-        **extras
+        **extras,
     ):
         self.name = name
         self.type = plugin_type
@@ -83,6 +83,10 @@ class Plugin(HookObject):
             canonical.update(**self._extras)
 
         return canonical
+
+    def invoker(self, project, *args, **kwargs):
+        "Override to have a specialize PluginInvoker class"
+        pass
 
     def exec_args(self, files: Dict):
         return []
@@ -108,8 +112,14 @@ class Plugin(HookObject):
     def executable(self):
         return self._extras.get("executable", self.name)
 
+    def cwd(self, project):
+        return project.root
+
     def add_select_filter(self, filter: str):
         self._select.add(filter)
 
     def __eq__(self, other):
         return self.name == other.name and self.type == other.type
+
+    def __repr__(self):
+        return f"<Plugin name={self.name} type={self.type}>"

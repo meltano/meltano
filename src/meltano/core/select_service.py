@@ -4,7 +4,7 @@ import logging
 from .project import Project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
 
 
@@ -18,7 +18,7 @@ class SelectService:
         return self.extractor
 
     def get_extractor_entities(self):
-        invoker = PluginInvoker(self.project, self.extractor)
+        invoker = invoker_factory(self.project, self.extractor)
 
         list_all = ListSelectedExecutor()
         try:

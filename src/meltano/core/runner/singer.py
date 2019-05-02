@@ -11,7 +11,7 @@ from . import Runner
 from meltano.core.db import project_engine
 from meltano.core.job import Job, JobFinder
 from meltano.core.project import Project
-from meltano.core.plugin_invoker import PluginInvoker
+from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
@@ -144,8 +144,9 @@ class SingerRunner(Runner):
         )
         target = self.config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
 
-        extractor = PluginInvoker(self.project, tap)
-        loader = PluginInvoker(self.project, target)
+        extractor = invoker_factory(self.project, tap)
+        loader = invoker_factory(self.project, target)
+
         self.prepare(extractor, loader)
 
         if dry_run:

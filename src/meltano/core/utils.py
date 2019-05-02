@@ -3,6 +3,7 @@ import re
 import sys
 import logging
 
+from copy import deepcopy
 from typing import Union
 from requests.auth import HTTPBasicAuth
 from functools import reduce
@@ -107,14 +108,15 @@ def nest(d: dict, path: str, value={}):
     >>> alist.append("works")
     >>> d
     {'foo': {'bar': {'test': {'a': 1}}, 'list': ["works"]}}
-
     """
     cursor = d
 
     # create the list of dicts
     for key in path.split("."):
         if key not in cursor:
-            cursor[key] = value
+            # We need to copy the value to make sure
+            # the `value` parameter is not mutated.
+            cursor[key] = deepcopy(value)
         cursor = cursor[key]
 
     return cursor

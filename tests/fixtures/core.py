@@ -2,7 +2,7 @@ import pytest
 import os
 import shutil
 import yaml
-
+import logging
 from pathlib import Path
 
 from meltano.core.project_init_service import ProjectInitService
@@ -95,6 +95,7 @@ def schedule_service(project):
 @pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
     project = project_init_service.init()
+    logging.debug(f"Created new project at {project.root}")
 
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root_dir(".env"))
@@ -137,3 +138,4 @@ def project(test_dir, project_init_service):
     # clean-up
     os.chdir(test_dir)
     shutil.rmtree(project.root)
+    logging.debug(f"Cleaned project at {project.root}")
