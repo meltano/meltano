@@ -251,7 +251,7 @@ This tap is currently a proof of concept and may have limited utility, but feedb
 meltano add extractor tap-mongodb
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-mongodb'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-mongodb'` on your window.
 
 #### Configuration
 
