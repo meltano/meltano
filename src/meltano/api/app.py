@@ -96,14 +96,14 @@ def create_app(config={}):
     @app.before_request
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
-        g.jsContext = {
-            'appUrl': appUrl.geturl()[:-1]
-        }
+        g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
         try:
             airflow = ConfigService(project).get_plugin("airflow")
             airflow_port = airflow.config["webserver"]["web_server_port"]
-            g.jsContext['airflowUrl'] = appUrl._replace(netloc=f"{appUrl.hostname}:{airflow_port}").geturl()[:-1]
+            g.jsContext["airflowUrl"] = appUrl._replace(
+                netloc=f"{appUrl.hostname}:{airflow_port}"
+            ).geturl()[:-1]
         except PluginMissingError:
             pass
 
@@ -133,7 +133,10 @@ def start(project, **kwargs):
             # TODO: alembic migration
             create_dev_user()
 
-        if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+        # ensure we only start the workers on the via the main thread
+        # this will make sure we don't start everything twice
+        # when code reload is enabled
+        if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
             cleanup = start_workers(app, project)
 
         app.run(**kwargs)
@@ -150,7 +153,9 @@ def start_workers(app, project):
         logging.info("Airflow is not installed.")
 
     workers.append(MeltanoBackgroundCompiler(project))
-    workers.append(UIAvailableWorker("http://localhost:5000", open_browser=not app.debug))
+    workers.append(
+        UIAvailableWorker("http://localhost:5000", open_browser=not app.debug)
+    )
 
     def stop_all():
         for worker in workers:

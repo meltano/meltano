@@ -10,7 +10,11 @@
 }
 
 a.disabled {
- pointer-events: none;
- cursor: default;
- color: #CCC;
+  pointer-events: none;
+}
+
+.disabled {
+  cursor: not-allowed;
+  color: #CCC;
+  opacity: 0.7;
 }

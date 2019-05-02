@@ -33,9 +33,14 @@
 
         <router-link
           :to="{name: 'orchestration'}"
+          v-if="orchestrationEnabled"
           class="navbar-item navbar-child">
           Orchestration
         </router-link>
+        <span v-else class="navbar-item navbar-child disabled">
+          <span data-tooltip="Airflow is required."
+                class="tooltip is-tooltip-right is-tooltip-bottom-desktop">Orchestration</span>
+        </span>
 
         <div
           class="navbar-item has-dropdown is-hoverable">
@@ -65,7 +70,6 @@
         class="navbar-item navbar-child">
           Dashboards
         </router-link>
-
       </div>
 
       <div class="navbar-end">
@@ -76,7 +80,6 @@
             title="Login currently disabled"></font-awesome-icon>
         </div>
       </div>
-
     </div>
   </nav>
 </template>
@@ -120,6 +123,9 @@ export default {
     ...mapGetters('repos', [
       'urlForModelDesign',
     ]),
+    orchestrationEnabled() {
+      return Boolean(FLASK.airflowUrl);
+    },
   },
   methods: {
     menuSelected() {

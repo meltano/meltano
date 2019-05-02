@@ -18,7 +18,7 @@ export default {
     if (FLASK.airflowUrl) {
       next();
     } else {
-      Vue.toasted.show("Airflow is not installed.");
+      Vue.toasted.show('Airflow is not installed.');
       next(from.path);
     }
   },

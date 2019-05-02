@@ -6,7 +6,6 @@ import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
-import Orchestration from '@/views/Orchestration';
 import Repo from '@/views/Repo';
 import Transformations from '@/views/Transformations';
 import Airflow from '@/components/Airflow';

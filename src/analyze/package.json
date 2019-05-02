@@ -24,6 +24,7 @@
     "axios-middleware": "^0.3.1",
     "bulma": "^0.7.1",
     "bulma-steps": "^2.2.1",
+    "bulma-tooltip": "^2.0.2",
     "chart.js": "^2.7.2",
     "dotenv": "^6.0.0",
     "jwt-decode": "^2.2.0",
