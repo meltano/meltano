@@ -159,6 +159,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
+          :disabled='!isSavable'
           @click.prevent="saveConnectionAndBeginRun">Save</button>
       </footer>
     </div>
@@ -210,6 +211,22 @@ export default {
       'hasConnections',
       'isConnectionDialectSqlite',
     ]),
+    isSavable() {
+      // TODO proper validation
+      const dialectCondition = this.isConnectionDialectSqlite(this.connectionDialect)
+        ? this.connectionSqlitePath.length > 0
+        : true;
+      const val = dialectCondition &&
+        this.connectionName.length > 0 &&
+        this.connectionDatabase.length > 0 &&
+        this.connectionSchema.length > 0 &&
+        this.connectionDialect.length > 0 &&
+        this.connectionHost.length > 0 &&
+        this.connectionPort.length > 0 &&
+        this.connectionUsername.length > 0 &&
+        this.connectionPassword.length > 0;
+      return val;
+    },
     loader() {
       return this.installedPlugins.loaders
         ? this.installedPlugins.loaders.find(item => item.name === this.loaderNameFromRoute)
