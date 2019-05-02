@@ -231,7 +231,11 @@ export MARKETO_START_TIME="yourStartTime"
 
 ### MongoDB
 
-`tap-mongodb` pulls raw data from a MongoDB source. It is currently a proof of concept and may have limited utility, but feedback is 
+::: warning
+This tap is currently a proof of concept and may have limited utility, but feedback is always welcome on [issue #631](https://gitlab.com/meltano/meltano/issues/631)
+:::
+
+`tap-mongodb` pulls raw data from a MongoDB source.  
 
 #### Info
 
