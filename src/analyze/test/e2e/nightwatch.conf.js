@@ -1,6 +1,6 @@
 require('babel-register');
 
-const config = require('../../config');
+const config = require('../../build/config');
 
 // http://nightwatchjs.org/gettingstarted#settings-file
 module.exports = {

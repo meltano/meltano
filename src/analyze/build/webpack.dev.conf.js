@@ -1,14 +1,16 @@
 'use strict'
-const utils = require('./utils')
 const webpack = require('webpack')
-const config = require('../config')
 const merge = require('webpack-merge')
 const path = require('path')
-const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+
+const utils = require('./utils')
+const config = require('./config')
+const baseWebpackConfig = require('./webpack.base.conf')
+
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
@@ -44,10 +46,18 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     }
   },
+  externals: {
+    FLASK: 'FLASK',
+  },
   plugins: [
-    new webpack.DefinePlugin({
-      'process.env': require('../config/dev.env'),
-      'API_URL': JSON.stringify(config.dev.apiUrl),
+    // expose only these ENV variables
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: "development",
+      AIRFLOW_URL: "http://localhost:5010",
+      MELTANO_ANALYZE_API_URL: "http://localhost:5000",
+    }),
+    new webpack.ProvidePlugin({
+      FLASK: '@/globals',
     }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NamedModulesPlugin(), // HMR shows correct file names in console on update.
@@ -56,7 +66,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'index.html',
-      injectApiURL: false,
+      injectFlaskContext: false,
     }),
     // copy custom static assets
     new CopyWebpackPlugin([
