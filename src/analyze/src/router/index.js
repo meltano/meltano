@@ -33,7 +33,7 @@ const router = new Router({
     {
       path: '/orchestration/',
       name: 'orchestration',
-      component: Orchestration,
+      component: Airflow,
     },
     {
       path: '/setup/',
@@ -69,11 +69,6 @@ const router = new Router({
       path: '/dashboards/dashboard/:slug',
       name: 'Dashboard',
       component: Dashboards,
-    },
-    {
-      path: '/-/airflow/',
-      name: 'airflow_proxy',
-      component: Airflow,
     },
   ],
 });

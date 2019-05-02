@@ -1,6 +1,6 @@
 <template>
   <div class="proxy-container">
-    <p class="disclaimer">You are now looking at the Airflow UI.</p>
+    <p class="disclaimer">You are now looking at the Airflow UI. See the <a target="_blank" href="https://airflow.apache.org/ui.html">documentation</a> for more details.</p>
     <iframe class="proxy" :src="airflowUrl" />
   </div>
 </template>
@@ -37,6 +37,12 @@ export default {
    color: white;
    text-align: center;
    background: #5555aa;
+
+ }
+
+ .disclaimer a {
+   color: white;
+   text-decoration: underline;
  }
 
  .proxy {
