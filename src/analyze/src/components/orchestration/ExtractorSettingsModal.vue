@@ -63,7 +63,7 @@
         <button
           class='button is-interactive-primary'
           :disabled="!hasConfig"
-          @click='saveConfig'>Save</button>
+          @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
   </div>
@@ -113,11 +113,12 @@ export default {
         this.$router.push({ name: 'extractors' });
       }
     },
-    saveConfig() {
+    saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('orchestrations/saveExtractorConfiguration', {
         extractorName: this.extractor.name,
         config: this.configSettings,
       });
+      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
     },
   },
 };

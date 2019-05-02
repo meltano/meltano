@@ -19,11 +19,10 @@ export default {
     };
   },
   created() {
-    const stepNameFromRoute = this.$route.name;
-    this.currentStep = this.steps
-      .find(step => step.routeMatches.find(routeMatch => stepNameFromRoute === routeMatch));
+    this.updateStepFromRoute(this.$route.name);
   },
   beforeRouteUpdate(to, from, next) {
+    this.updateStepFromRoute(to.name);
     this.updateModal(to.meta.isModal);
     next();
   },
@@ -49,6 +48,11 @@ export default {
     updateModal(isModal) {
       this.isModal = isModal;
     },
+    updateStepFromRoute(routeName) {
+      const stepNameFromRoute = routeName;
+      this.currentStep = this.steps
+        .find(step => step.routeMatches.find(routeMatch => stepNameFromRoute === routeMatch));
+    },
   },
 };
 </script>
@@ -59,7 +63,7 @@ export default {
     <div class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
         <div class='content has-text-centered'>
-          <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and organization of data.</p>
+          <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection and analysis of data.</p>
           <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to do so.</p>
         </div>
       </div>
