@@ -159,7 +159,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          @click.prevent="saveConnection">Save</button>
+          @click.prevent="saveConnectionAndBeginRun">Save</button>
       </footer>
     </div>
   </div>
@@ -224,7 +224,7 @@ export default {
         this.$router.push({ name: 'loaders' });
       }
     },
-    saveConnection() {
+    saveConnectionAndBeginRun() {
       this.$store.dispatch('settings/saveConnection', {
         name: this.connectionName,
         database: this.connectionDatabase,
@@ -245,6 +245,8 @@ export default {
       this.connectionUsername = '';
       this.connectionPassword = '';
       this.connectionSqlitePath = '';
+
+      this.$router.push({ name: 'run' });
     },
     deleteConnection(connection) {
       this.$store.dispatch('settings/deleteConnection', connection);

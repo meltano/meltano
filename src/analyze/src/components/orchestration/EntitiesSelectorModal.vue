@@ -119,7 +119,7 @@
           v-if='!isLoading'
           class='button is-interactive-primary'
           :disabled="!isSavable"
-          @click='selectEntities'>Save</button>
+          @click='selectEntitiesAndBeginLoaderInstall'>Save</button>
       </footer>
     </div>
   </div>
@@ -244,8 +244,9 @@ export default {
     toggleExpandable() {
       this.isExpanded = !this.isExpanded;
     },
-    selectEntities() {
+    selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('orchestrations/selectEntities');
+      this.$router.push({ name: 'loaders' });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
