@@ -38,7 +38,7 @@ class Project:
 
     def reload(self):
         """Force a reload from `meltano.yml`"""
-        self._meltano = yaml.load(self.meltanofile.open()) or {}
+        self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
 
     def has_plugin(self, plugin: str):
         config_service = ConfigService

@@ -41,16 +41,6 @@ const router = new Router({
       component: DataSetup,
     },
     {
-      path: '/transformations/',
-      name: 'transformations',
-      component: Transformations,
-    },
-    {
-      path: '/orchestration/',
-      name: 'orchestration',
-      component: Orchestration,
-    },
-    {
       path: '/files/',
       name: 'projectFiles',
       component: Repo,
@@ -81,10 +71,10 @@ const router = new Router({
       component: Dashboards,
     },
     {
-      path: '/airflow',
+      path: '/-/airflow/',
       name: 'airflow_proxy',
       component: Airflow,
-    }
+    },
   ],
 });
 

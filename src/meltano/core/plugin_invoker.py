@@ -3,7 +3,6 @@ import subprocess
 import asyncio
 import os
 
-from meltano.core.behavior.hookable import TriggerError
 from .project import Project
 from .plugin import Plugin
 from .plugin.error import PluginMissingError, PluginExecutionError
@@ -101,8 +100,11 @@ class PluginInvoker:
                 process = await asyncio.create_subprocess_exec(
                     *self.exec_args(), *args, **Popen_options
                 )
+        except SubprocessError as perr:
+            logging.error(f"{self.plugin.name} has failed: {str(perr)}")
+            raise
         except Exception as err:
             logging.error(f"Failed to start plugin {self.plugin}.")
-            raise PluginMissingError(self.plugin)
+            raise
 
         return process

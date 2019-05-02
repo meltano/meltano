@@ -2,7 +2,7 @@ import datetime
 import logging
 import logging.handlers
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, g
 from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
@@ -10,19 +10,20 @@ from flask_login import current_user
 from flask_cors import CORS
 from jinja2.exceptions import TemplateNotFound
 from importlib import reload
+from urllib.parse import urlsplit
 
 from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 from . import config as default_config
 
 from meltano.core.project import Project
+from meltano.core.plugin.error import PluginMissingError
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 connector = ExternalConnector()
 logger = logging.getLogger(__name__)
-available_worker = UIAvailableWorker("http://localhost:5000", open_browser=True)
 
 
 def create_app(config={}):
@@ -92,6 +93,20 @@ def create_app(config={}):
 
         init(app)
 
+    @app.before_request
+    def setup_js_context():
+        appUrl = urlsplit(request.host_url)
+        g.jsContext = {
+            'appUrl': appUrl.geturl()[:-1]
+        }
+
+        try:
+            airflow = ConfigService(project).get_plugin("airflow")
+            airflow_port = airflow.config["webserver"]["web_server_port"]
+            g.jsContext['airflowUrl'] = appUrl._replace(netloc=f"{appUrl.hostname}:{airflow_port}").geturl()[:-1]
+        except PluginMissingError:
+            pass
+
     @app.after_request
     def after_request(res):
         request_message = f"[{request.url}]"
@@ -99,7 +114,7 @@ def create_app(config={}):
         if request.method != "OPTIONS":
             request_message += f" as {current_user}"
 
-        logger.info(request_message)
+        logging.info(request_message)
         return res
 
     return app
@@ -108,22 +123,7 @@ def create_app(config={}):
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
-    workers = []
-    config_service = ConfigService(project)
-
-    try:
-        airflow = config_service.get_plugin("airflow")
-        workers.append(AirflowWorker(project, airflow))
-    except:
-        logging.info("Airflow is not installed.")
-
-    workers.append(MeltanoBackgroundCompiler(project))
-    workers.append(available_worker)
-
-    # start all workers
-    for worker in workers:
-        worker.start()
-
+    cleanup = None
     try:
         app_config = kwargs.pop("app_config", {})
         app = create_app(app_config)
@@ -133,7 +133,31 @@ def start(project, **kwargs):
             # TODO: alembic migration
             create_dev_user()
 
+        if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+            cleanup = start_workers(app, project)
+
         app.run(**kwargs)
     finally:
+        if cleanup:
+            cleanup()
+
+
+def start_workers(app, project):
+    workers = []
+    try:
+        workers.append(AirflowWorker(project))
+    except:
+        logging.info("Airflow is not installed.")
+
+    workers.append(MeltanoBackgroundCompiler(project))
+    workers.append(UIAvailableWorker("http://localhost:5000", open_browser=not app.debug))
+
+    def stop_all():
         for worker in workers:
             worker.stop()
+
+    # start all workers
+    for worker in workers:
+        worker.start()
+
+    return stop_all

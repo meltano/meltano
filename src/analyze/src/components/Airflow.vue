@@ -1,10 +1,28 @@
 <template>
   <div class="proxy-container">
     <p class="disclaimer">You are now looking at the Airflow UI.</p>
-    <iframe class="proxy" src="http://localhost:9000/" />
+    <iframe class="proxy" :src="airflowUrl" />
   </div>
 </template>
 <script>
+import Vue from 'vue';
+
+export default {
+  computed: {
+    airflowUrl() {
+      return FLASK.airflowUrl;
+    },
+  },
+
+  beforeRouteEnter(to, from, next) {
+    if (FLASK.airflowUrl) {
+      next();
+    } else {
+      Vue.toasted.show("Airflow is not installed.");
+      next(from.path);
+    }
+  },
+};
 </script>
 <style>
  .proxy-container {

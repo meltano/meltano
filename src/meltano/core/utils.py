@@ -4,7 +4,7 @@ import sys
 import logging
 
 from copy import deepcopy
-from typing import Union
+from typing import Union, Dict, Callable
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
@@ -137,3 +137,8 @@ def encode_id_from_file_path(file_path):
 
 def noop(*_args, **_kwargs):
     pass
+
+
+def map_dict(f: Callable, d: Dict):
+    for k, v in d.items():
+        yield k, f(v)
