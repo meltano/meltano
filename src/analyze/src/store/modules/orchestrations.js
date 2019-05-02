@@ -19,7 +19,9 @@ const getters = {
     return extractor => extractor.replace('tap-', '');
   },
   getIsExtractorPluginInstalled(stateRef) {
-    return extractor => stateRef.installedPlugins.extractors.find(item => item.name === extractor);
+    return extractor => (stateRef.installedPlugins.extractors
+      ? stateRef.installedPlugins.extractors.find(item => item.name === extractor)
+      : false);
   },
   getIsInstallingExtractorPlugin(stateRef) {
     return extractor => stateRef.installingExtractors.includes(extractor);
