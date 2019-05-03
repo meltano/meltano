@@ -138,10 +138,10 @@ export default {
       this.selectionModeCustom,
     ];
     this.extractorNameFromRoute = this.$route.params.extractor;
-    this.$store.dispatch('orchestrations/getExtractorInFocusEntities', this.extractorNameFromRoute);
+    this.$store.dispatch('configuration/getExtractorInFocusEntities', this.extractorNameFromRoute);
   },
   destroyed() {
-    this.$store.dispatch('orchestrations/clearExtractorInFocusEntities');
+    this.$store.dispatch('configuration/clearExtractorInFocusEntities');
   },
   data() {
     return {
@@ -153,11 +153,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('orchestrations', [
+    ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
     ]),
-    ...mapState('orchestrations', [
+    ...mapState('configuration', [
       'extractorInFocusEntities',
     ]),
     expandableToggleLabel() {
@@ -226,7 +226,7 @@ export default {
   },
   methods: {
     clearSelections() {
-      this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
+      this.$store.dispatch('configuration/toggleAllEntityGroupsOff');
     },
     close() {
       if (this.prevRoute) {
@@ -236,23 +236,23 @@ export default {
       }
     },
     entityAttributeSelected(payload) {
-      this.$store.dispatch('orchestrations/toggleEntityAttribute', payload);
+      this.$store.dispatch('configuration/toggleEntityAttribute', payload);
     },
     entityGroupSelected(entityGroup) {
-      this.$store.dispatch('orchestrations/toggleEntityGroup', entityGroup);
+      this.$store.dispatch('configuration/toggleEntityGroup', entityGroup);
     },
     toggleExpandable() {
       this.isExpanded = !this.isExpanded;
     },
     selectEntitiesAndBeginLoaderInstall() {
-      this.$store.dispatch('orchestrations/selectEntities');
+      this.$store.dispatch('configuration/selectEntities');
       this.$router.push({ name: 'loaders' });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
-        this.$store.dispatch('orchestrations/toggleAllEntityGroupsOn');
+        this.$store.dispatch('configuration/toggleAllEntityGroupsOn');
       } else if (targetMode === this.selectionModeCustom && this.getAreAllSelected) {
-        this.$store.dispatch('orchestrations/toggleAllEntityGroupsOff');
+        this.$store.dispatch('configuration/toggleAllEntityGroupsOff');
       }
     },
   },

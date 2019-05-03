@@ -194,13 +194,13 @@ export default {
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
+    this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {
-    ...mapState('orchestrations', [
+    ...mapState('configuration', [
       'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
     ]),
-    ...mapGetters('orchestrations', [
+    ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
     ]),

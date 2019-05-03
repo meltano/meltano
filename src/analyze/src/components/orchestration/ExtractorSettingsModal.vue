@@ -79,16 +79,16 @@ export default {
   name: 'ExtractorSettingsModal',
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
+    this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('orchestrations', [
+    ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
       'getIsExtractorPluginInstalled',
       'getIsInstallingExtractorPlugin',
     ]),
-    ...mapState('orchestrations', [
+    ...mapState('configuration', [
       'installedPlugins',
     ]),
     configSettings() {
@@ -114,7 +114,7 @@ export default {
       }
     },
     saveConfigAndBeginEntitySelection() {
-      this.$store.dispatch('orchestrations/saveExtractorConfiguration', {
+      this.$store.dispatch('configuration/saveExtractorConfiguration', {
         extractorName: this.extractor.name,
         config: this.configSettings,
       });

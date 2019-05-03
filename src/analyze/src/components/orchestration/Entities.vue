@@ -4,15 +4,15 @@ import { mapGetters, mapState } from 'vuex';
 export default {
   name: 'Entities',
   created() {
-    this.$store.dispatch('orchestrations/getAll');
-    this.$store.dispatch('orchestrations/getInstalledPlugins');
+    this.$store.dispatch('configuration/getAll');
+    this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('orchestrations', [
+    ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
     ]),
-    ...mapState('orchestrations', [
+    ...mapState('configuration', [
       'installedPlugins',
       'extractors',
     ]),
