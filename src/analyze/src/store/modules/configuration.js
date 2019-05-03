@@ -16,13 +16,15 @@ const state = {
 
 const getters = {
   getExtractorImageUrl(_, gettersRef) {
-    return extractor => `/static/logos/${gettersRef.getExtractorNameWithoutPrefixedTapDash(extractor)}-logo.png`;
+    return extractor => (
+      `/static/logos/${gettersRef.getExtractorNameWithoutPrefixedTapDash(extractor)}-logo.png`
+    );
   },
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
   },
   getIsExtractorPluginInstalled(stateRef) {
-    return extractor => (stateRef.installedPlugins.extractors
+    return extractor => (stateRef.extractors && stateRef.installedPlugins.extractors
       ? stateRef.installedPlugins.extractors.find(item => item.name === extractor)
       : false);
   },
@@ -30,13 +32,17 @@ const getters = {
     return extractor => stateRef.installingExtractors.includes(extractor);
   },
   getLoaderImageUrl(_, gettersRef) {
-    return loader => `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`;
+    return loader => (
+      `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`
+    );
   },
   getLoaderNameWithoutPrefixedTargetDash() {
     return loader => loader.replace('target-', '');
   },
   getIsLoaderPluginInstalled(stateRef) {
-    return loader => stateRef.installedPlugins.loaders.find(item => item.name === loader);
+    return loader => (stateRef.loaders && stateRef.installedPlugins.loaders
+      ? stateRef.installedPlugins.loaders.find(item => item.name === loader)
+      : false);
   },
   getIsInstallingLoaderPlugin(stateRef) {
     return loader => stateRef.installingLoaders.includes(loader);
