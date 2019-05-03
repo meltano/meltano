@@ -69,13 +69,11 @@ const actions = {
     commit('installExtractorStart', extractor);
 
     orchestrationsApi.addExtractors({ name: extractor })
-      .then((response) => {
-        if (response.status === 200) {
-          dispatch('getInstalledPlugins')
-            .then(() => {
-              commit('installExtractorComplete', extractor);
-            });
-        }
+      .then(() => {
+        dispatch('getInstalledPlugins')
+          .then(() => {
+            commit('installExtractorComplete', extractor);
+          });
       });
   },
 
@@ -83,13 +81,11 @@ const actions = {
     commit('installLoaderStart', loader);
 
     orchestrationsApi.addLoaders({ name: loader })
-      .then((response) => {
-        if (response.status === 200) {
-          dispatch('getInstalledPlugins')
-            .then(() => {
-              commit('installLoaderComplete', loader);
-            });
-        }
+      .then(() => {
+        dispatch('getInstalledPlugins')
+          .then(() => {
+            commit('installLoaderComplete', loader);
+          });
       });
   },
 
