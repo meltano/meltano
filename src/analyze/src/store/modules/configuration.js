@@ -24,8 +24,8 @@ const getters = {
     return extractor => extractor.replace('tap-', '');
   },
   getIsExtractorPluginInstalled(stateRef) {
-    return extractor => (stateRef.extractors && stateRef.installedPlugins.extractors
-      ? stateRef.installedPlugins.extractors.find(item => item.name === extractor)
+    return extractor => (stateRef.installedPlugins.extractors
+      ? Boolean(stateRef.installedPlugins.extractors.find(item => item.name === extractor))
       : false);
   },
   getIsInstallingExtractorPlugin(stateRef) {
@@ -40,8 +40,8 @@ const getters = {
     return loader => loader.replace('target-', '');
   },
   getIsLoaderPluginInstalled(stateRef) {
-    return loader => (stateRef.loaders && stateRef.installedPlugins.loaders
-      ? stateRef.installedPlugins.loaders.find(item => item.name === loader)
+    return loader => (stateRef.installedPlugins.loaders
+      ? Boolean(stateRef.installedPlugins.loaders.find(item => item.name === loader))
       : false);
   },
   getIsInstallingLoaderPlugin(stateRef) {
@@ -195,7 +195,9 @@ const mutations = {
   },
 
   setInstalledPlugins(_, projectConfig) {
-    state.installedPlugins = projectConfig.plugins;
+    if (projectConfig.plugins) {
+      state.installedPlugins = projectConfig.plugins;
+    }
   },
 
   toggleSelected(_, selectable) {
