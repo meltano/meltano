@@ -89,7 +89,7 @@ def init_sqlite_hook(engine):
 # TODO: alembic hook?
 def seed(engine):
     # import all the models
-    import meltano.core.job
+    import meltano.models
 
     # seed the database
     SystemMetadata.create_all(engine)
