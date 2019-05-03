@@ -112,7 +112,7 @@ class SingerRunner(Runner):
         try:
             new_state = json.loads(new_state)
 
-            self.job.payload["singer_state"] = new_state.get("value", {})
+            self.job.payload["singer_state"] = new_state
             self.job.payload_flags |= SingerPayload.STATE
             self.job.ended_at = datetime.utcnow()
             logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
