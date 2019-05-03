@@ -8,25 +8,18 @@ export default {
   },
   data() {
     return {
-      currentStep: {},
       steps: [
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
         { name: 'run', routeMatches: ['run'] },
       ],
-      isModal: this.$route.meta.isModal,
     };
   },
-  created() {
-    this.updateStepFromRoute(this.$route.name);
-  },
-  beforeRouteUpdate(to, from, next) {
-    this.updateStepFromRoute(to.name);
-    this.updateModal(to.meta.isModal);
-    next();
-  },
   computed: {
+    currentStep() {
+      return this.steps.find(step => step.routeMatches.find(match => this.$route.name === match));
+    },
     getIsActiveStep() {
       return stepName => this.currentStep.name === stepName;
     },
@@ -39,19 +32,14 @@ export default {
     getIsStepRunMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
+    isModal() {
+      return this.$route.meta.isModal;
+    },
   },
   methods: {
     setStep(stepName) {
-      this.currentStep = this.steps.find(step => step.name === stepName);
-      this.$router.push(this.currentStep);
-    },
-    updateModal(isModal) {
-      this.isModal = isModal;
-    },
-    updateStepFromRoute(routeName) {
-      const stepNameFromRoute = routeName;
-      this.currentStep = this.steps
-        .find(step => step.routeMatches.find(routeMatch => stepNameFromRoute === routeMatch));
+      const targetStep = this.steps.find(step => step.name === stepName);
+      this.$router.push(targetStep);
     },
   },
 };
