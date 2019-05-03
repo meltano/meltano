@@ -1,4 +1,7 @@
 import Vue from 'vue';
+
+import lodash from 'lodash';
+
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
@@ -156,8 +159,7 @@ const mutations = {
   },
 
   installExtractorComplete(_, extractor) {
-    const idx = state.installingExtractors.indexOf(extractor);
-    state.installingExtractors.splice(idx, 1);
+    lodash.pull(state.installingExtractors, extractor);
   },
 
   installLoaderStart(_, loader) {
@@ -165,8 +167,7 @@ const mutations = {
   },
 
   installLoaderComplete(_, loader) {
-    const idx = state.installingLoaders.indexOf(loader);
-    state.installingLoaders.splice(idx, 1);
+    lodash.pull(state.installingExtractors, loader);
   },
 
   setAll(_, orchestrationData) {
