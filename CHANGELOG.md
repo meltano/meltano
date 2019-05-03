@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * [#622](https://gitlab.com/meltano/meltano/issues/622) Added ELT flow UI Routes & Deep Linking to advance user through next steps after each step's save condition vs. requiring them to manually click the next step to advance
 * [#598](https://gitlab.com/meltano/meltano/issues/598) Updated color and greyscale use in the context of navigation and interactive elements to better communicate UI hierarchy
-* [#607](https://gitlab.com/meltano/meltano/issues/607) Add All/Default/Custom UI for improved entities selection UX
+* [#607](https://gitlab.com/meltano/meltano/issues/607) Add "All/Default/Custom" button bar UI for improved entities selection UX
 * [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
 - [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
 
