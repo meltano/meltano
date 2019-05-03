@@ -5,7 +5,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 
 - `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
-- `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** and installs it inside the `.meltano` directory. Installed models are available to use in the Meltano UI.
+- `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** so that you can interactively generate SQL. They are installed inside the `.meltano` directory and are available to use in the Meltano UI.
 - `meltano add orchestrator [name]`: Adds an orchestrator plugin to your **meltano.yml** and installs it.
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
 - `meltano discover all`: list available extractors and loaders:
