@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#32](https://gitlab.com/meltano/meltano-marketing/issues/32) Integrate Algolia Search for docs
 * [#590](https://gitlab.com/meltano/meltano/issues/590) Add documentation for deploying Meltano in ECS
 * [#628](https://gitlab.com/meltano/meltano/issues/628) Add documentation for tap-mongodb
+* [!605](https://gitlab.com/meltano/meltano/merge_requests/605) Added tooltips for areas of UI that are WIP for better communication of a feature's status
 
 ### Changes
 * [#375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
@@ -40,7 +41,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 * [#477](https://gitlab.com/meltano/meltano/issues/477) Add ability for users to sign up for email newsletters
 * [!580](https://gitlab.com/meltano/meltano/merge_requests/580) Add sorting to plugins for improved UX, both UI via extractors/loaders/etc. and `meltano discover all` benefit from sorted results
-* [!528](https://gitlab.com/meltano/meltano/issues/528) Add documentation for RBAC alpha feature and environment variables 
+* [!528](https://gitlab.com/meltano/meltano/issues/528) Add documentation for RBAC alpha feature and environment variables
 
 ### Changes
 * [#588](https://gitlab.com/meltano/meltano/issues/588) Updated core navigation and depth hierarchy styling to facilitate main user flow and improved information architecture
