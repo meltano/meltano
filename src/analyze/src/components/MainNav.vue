@@ -70,10 +70,14 @@
 
       <div class="navbar-end">
         <div class="navbar-item navbar-child">
+          <a
+            class='button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
+            data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>
           <font-awesome-icon
             :icon="'user'"
             :style="{ color: '#0F3B66' }"
             title="Login currently disabled"></font-awesome-icon>
+          </a>
         </div>
       </div>
 

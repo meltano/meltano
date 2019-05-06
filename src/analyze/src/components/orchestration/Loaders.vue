@@ -121,7 +121,9 @@ export default {
                     <a
                       class='button is-success flex-grow-1'
                       @click="updateLoaderInFocus(loader)">Account Settings</a>
-                    <a class='button' disabled>Uninstall</a>
+                    <a
+                      class='button tooltip is-tooltip-warning is-tooltip-multiline'
+                      data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Uninstall</a>
                   </div>
                 </template>
                 <template v-else>
