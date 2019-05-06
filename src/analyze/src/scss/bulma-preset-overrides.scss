@@ -1,7 +1,49 @@
-// Derived variables
+/*
+OVERRIDES ------------------------------------------------------------------------------------------
+Derived variable overrides
+*/
 
+/* Colors ------------------- */
+
+// Brand colors
 $primary: #0F3B66;
 
-$light: #EEEEEE;
+// Color semantics match GitLab Pajamas 500-level | Blue, Green, Orange, Red
+// https://design.gitlab.com/foundations/colors/
+$blue: #1f78d1;
+$green: #1aaa55;
+$orange: #fc9403;
+$red: #db3b21;
 
+// Other semantic vars (success, info, danger, etc) remain where $warning yellow is overridden
+// to match above Gitlab Pajamas color semantics.
+$warning: $orange;
+
+$modal-background-background-color: rgba(#000000, 0.65);
+
+/* Sizes -------------------- */
 $navbar-height: 3.25rem;
+
+/*
+ADDITIONS ------------------------------------------------------------------------------------------
+General and semantically named variables for improved contextual use within the app
+*/
+
+/* Colors ------------------- */
+
+// Adding grey-lightest to sit between grey-lighter and white-ter
+// https://bulma.io/documentation/modifiers/color-helpers/#background-color
+$grey-lightest: hsl(0, 0%, 93%);
+$app-background-color: $grey-lightest;
+
+// Useful for main and secondary navigation based interactive elements
+$interactive-navigation: $primary;
+$interactive-navigation-inactive: rgb(181, 181, 181);
+
+// Useful for primary interactive buttons and components within the UI in focus (page, modal, etc)
+// Ex. Save, New, Create, Install, etc.
+$interactive-primary: $green;
+
+// Useful for secondary and supporting $interactive-primary buttons and components
+// Ex. Toggles, Checkboxes, Radios, Pickers, etc.
+$interactive-secondary: $blue;

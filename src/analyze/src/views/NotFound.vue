@@ -20,7 +20,7 @@ export default {
 @import "../scss/bulma-preset-overrides.scss";
 
 .wrapper {
-  height: calc(100vh - #{$navbar-height});
+  height: calc(100vh - $navbar-height);
   display: flex;
   justify-content: center;
 }

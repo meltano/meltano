@@ -1,41 +1,38 @@
+@import '@/scss/bulma-preset-overrides.scss';
 @import "../../node_modules/bulma/bulma";
 
-$steps-maker-default-color:	$light;
+$steps-maker-default-color:	$app-background-color;
 $steps-marker-default-border:	none;
 $steps-default-color:	$grey-lighter;
-$steps-completed-color:	$light;
-$steps-active-color:	$primary;
+$steps-completed-color:	$app-background-color;
+$steps-active-color:	$interactive-navigation;
 $steps-divider-height:	.1em;
 
 .steps .step-item {
-  color: $grey-lighter;
+  color: $interactive-navigation-inactive;
 
   &.is-active {
-    color: $grey-dark;
+    color: $interactive-navigation;
 
     .step-marker {
-      color: $primary !important;
-      background-color: $light !important;
-      border: .1em solid $primary;
+      color: $interactive-navigation !important;
+      background-color: $app-background-color !important;
     }
   }
 
   &.is-completed {
-    cursor: pointer;
-    color: $primary;
+    color: $interactive-navigation;
 
-    &:hover {
-      .step-marker {
-        border: .1em solid $primary;
-      }
-    }
-
-    .step-marker {
-      color: $primary !important;
+    &.is-active {
+      color: $interactive-navigation !important;
     }
   }
 
   .step-marker {
-    color: $grey-lighter !important;
+    color: $interactive-navigation-inactive !important;
+  }
+
+  .step-title {
+    margin-bottom: .4rem;
   }
 }
