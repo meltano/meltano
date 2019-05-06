@@ -2,6 +2,24 @@
   <div>
 
     <div class="columns">
+      <div class="column is-three-fifths is-offset-one-fifth">
+        <div class='content has-text-centered'>
+          <p class='level-item buttons'>
+            <a class="button is-small is-static is-marginless is-borderless">
+              <span>Select the extractor, entities, and loader combo</span>
+            </a>
+            <span class='step-spacer'>then</span>
+            <a class="button is-small is-static is-marginless is-borderless">
+              <span>Click <span class='is-italic'>Run ELT</span> to get the data</span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <div class="columns">
 
       <div class="column box is-4 is-offset-4">
         <article class="message is-warning is-small">
@@ -26,7 +44,7 @@
         <div class="buttons is-pulled-right">
           <button
             disabled
-            class='button is-success'>Run ELT</button>
+            class='button is-interactive-primary'>Run ELT</button>
         </div>
 
       </div>
