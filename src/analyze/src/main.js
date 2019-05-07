@@ -57,7 +57,8 @@ Vue.use(Toasted, {
   position: 'bottom-right',
   iconPack: 'fontawesome',
   className: 'notification',
-  duration: 6000,
+  theme: 'outline',
+  duration: 600000,
 });
 
 Vue.use(Auth, {

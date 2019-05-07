@@ -18,6 +18,7 @@ $red: #db3b21;
 // Other semantic vars (success, info, danger, etc) remain where $warning yellow is overridden
 // to match above Gitlab Pajamas color semantics.
 $warning: $orange;
+$error: $red;
 
 $modal-background-background-color: rgba(#000000, 0.65);
 
