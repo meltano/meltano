@@ -62,7 +62,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          :disabled="!hasConfig"
+          :disabled="!isSavable"
           @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
@@ -103,10 +103,10 @@ export default {
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
         : {};
     },
-    hasConfig() {
+    isSavable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0;
+      return hasOwns.length > 0 && this.getIsExtractorPluginInstalled(this.extractorNameFromRoute);
     },
   },
   methods: {
