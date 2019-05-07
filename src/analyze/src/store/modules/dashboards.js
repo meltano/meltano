@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import dashboardsApi from '../../api/dashboards';
 import reportsApi from '../../api/reports';
 
@@ -16,7 +18,7 @@ const actions = {
       .then(() => {
         dispatch('preloadDashboard', slug);
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
   preloadDashboard({ dispatch }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
@@ -37,7 +39,7 @@ const actions = {
           commit('setDashboards', dashboards);
           resolve();
         })
-        .catch(() => { });
+        .catch(Vue.toasted.global.oops);
     });
   },
   setDashboard({ dispatch }, dashboard) {
@@ -50,7 +52,7 @@ const actions = {
           commit('setReports', response.data);
           resolve();
         })
-        .catch(() => { });
+        .catch(Vue.toasted.global.oops);
     });
   },
   getActiveDashboardReportsWithQueryResults({ commit }) {
@@ -60,7 +62,7 @@ const actions = {
       .then((response) => {
         commit('setActiveDashboardReports', response.data);
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
   saveDashboard({ dispatch, commit }, data) {
     dashboardsApi.saveDashboard(data)
@@ -68,7 +70,7 @@ const actions = {
         dispatch('updateCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
     dashboardsApi.saveDashboard(data)
@@ -81,21 +83,21 @@ const actions = {
           dashboardId: dashboard.id,
         });
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
   addReportToDashboard({ dispatch }, data) {
     dashboardsApi.addReportToDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
       })
-      .catch(() => {});
+      .catch(Vue.toasted.global.oops);
   },
   removeReportFromDashboard({ dispatch }, data) {
     dashboardsApi.removeReportFromDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
       })
-      .catch(() => {});
+      .catch(Vue.toasted.global.oops);
   },
   updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard);

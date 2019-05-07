@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 import repoApi from '../../api/repo';
 
 const state = {
@@ -46,7 +48,7 @@ const actions = {
         state.loadingValidation = false;
         commit('setRepoFiles', { files });
       })
-      .catch(() => {});
+      .catch(Vue.toasted.global.oops);
   },
 
   getFile({ commit }, file) {
@@ -54,7 +56,7 @@ const actions = {
       .then((response) => {
         commit('setCurrentFileTable', response.data);
       })
-      .catch(() => {});
+      .catch(Vue.toasted.global.oops);
   },
 
   lint({ commit }) {
@@ -89,7 +91,7 @@ const actions = {
       .then((response) => {
         commit('setModels', response.data);
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
 
   navbarHideDropdown({ commit }) {

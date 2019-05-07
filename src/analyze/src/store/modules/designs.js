@@ -229,7 +229,7 @@ const actions = {
       .then((response) => {
         commit('setDesign', response.data);
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
 
     sqlApi.getDialect(model)
       .then((response) => {
@@ -281,7 +281,8 @@ const actions = {
           aggregates: response.data.aggregates,
           join,
         });
-      });
+      })
+      .catch(Vue.toasted.global.oops);
   },
 
   removeSort({ commit }, column) {
@@ -404,7 +405,7 @@ const actions = {
           field,
         });
       })
-      .catch(() => { });
+      .catch(Vue.toasted.global.oops);
   },
 
   addDistinctSelection({ commit }, data) {

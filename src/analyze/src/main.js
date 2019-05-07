@@ -56,7 +56,8 @@ Vue.use(Toasted, {
   router,
   position: 'bottom-right',
   iconPack: 'fontawesome',
-  duration: 6000,
+  className: 'notification',
+  duration: 60000,
 });
 
 Vue.use(Auth, {
@@ -64,9 +65,27 @@ Vue.use(Auth, {
   toasted: Vue.toasted,
 });
 
-// Lets Register a Global Error Notification Toast.
+// Register a Global Forbidden Error Notification Toast.
 Vue.toasted.register('forbidden', "You can't access this resource at this moment.", {
   type: 'error',
+});
+// Register a Global General Error Notification Toast.
+Vue.toasted.register('oops', 'Oops. Something went wrong.', {
+  type: 'error',
+  action: [
+    {
+      text: 'Submit Bug',
+      onClick: () => {
+        window.open('https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=feature_proposal');
+      },
+    },
+    {
+      text: 'Close',
+      onClick: (e, toastObject) => {
+        toastObject.goAway(0);
+      },
+    },
+  ],
 });
 
 /* eslint-disable no-new */
