@@ -95,7 +95,7 @@ export default {
     ]),
     configSettings() {
       return this.extractor
-        ? Object.assign(this.extractorInFocusConfiguration, this.extractor.config)
+        ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
         : this.extractorInFocusConfiguration;
     },
     extractor() {
