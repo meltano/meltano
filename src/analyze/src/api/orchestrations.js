@@ -18,6 +18,10 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
   },
 
+  getPluginConfiguration(pluginPayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'get/configuration'), pluginPayload);
+  },
+
   saveExtractorConfiguration(configPayload) {
     return axios.post(utils.apiUrl('orchestrations', 'save/configuration'), configPayload);
   },

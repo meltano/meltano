@@ -25,7 +25,7 @@
           </div>
         </template>
 
-        <template v-if='getIsExtractorPluginInstalled(extractorNameFromRoute)'>
+        <template v-if='configSettings'>
 
           <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
             <div class="field-label is-normal">
@@ -79,6 +79,7 @@ export default {
   name: 'ExtractorSettingsModal',
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
+    this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {
@@ -89,10 +90,13 @@ export default {
       'getIsInstallingExtractorPlugin',
     ]),
     ...mapState('configuration', [
+      'extractorInFocusConfiguration',
       'installedPlugins',
     ]),
     configSettings() {
-      return this.extractor ? Object.assign({}, this.extractor.config) : {};
+      return this.extractor
+        ? Object.assign(this.extractorInFocusConfiguration, this.extractor.config)
+        : this.extractorInFocusConfiguration;
     },
     extractor() {
       return this.installedPlugins.extractors

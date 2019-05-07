@@ -114,6 +114,21 @@ def extract(extractor_name: str) -> Response:
     )
 
 
+@orchestrationsBP.route("/get/configuration", methods=["POST"])
+def get_plugin_configuration() -> Response:
+    """
+    endpoint for getting a plugin's configuration
+    """
+    project = Project.find()
+    incoming = request.get_json()
+    plugin_name = incoming["name"]
+    plugin_type = incoming["type"]
+    discovery_service = PluginDiscoveryService(project)
+    # TODO update when save_plugin_configuration is implemented and default to the discovery otherwise
+    plugin = discovery_service.find_plugin(plugin_type, plugin_name)
+    return jsonify(plugin.config)
+
+
 @orchestrationsBP.route("/save/configuration", methods=["POST"])
 def save_plugin_configuration() -> Response:
     """

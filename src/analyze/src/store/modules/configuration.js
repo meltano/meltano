@@ -8,6 +8,7 @@ const state = {
   extractors: [],
   loaders: [],
   hasExtractorLoadingError: false,
+  extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
   installedPlugins: {},
   installingExtractors: [],
@@ -72,6 +73,21 @@ const actions = {
       .catch(() => {
         commit('setHasExtractorLoadingError', true);
       });
+  },
+
+  getExtractorConfiguration({ commit, dispatch }, extractor) {
+    dispatch('getPluginConfiguration', { name: extractor, type: 'extractors' })
+      .then((response) => {
+        commit('setExtractorInFocusConfiguration', response.data);
+      });
+  },
+
+  getLoaderConfiguration({ dispatch }, loader) {
+    dispatch('getPluginConfiguration', { name: loader, type: 'loaders' });
+  },
+
+  getPluginConfiguration(_, pluginPayload) {
+    return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
   installExtractor({ commit, dispatch }, extractor) {
@@ -188,6 +204,10 @@ const mutations = {
         entityGroups: entitiesData.entity_groups,
       }
       : {};
+  },
+
+  setExtractorInFocusConfiguration(_, configuration) {
+    state.extractorInFocusConfiguration = configuration;
   },
 
   setHasExtractorLoadingError(_, value) {
