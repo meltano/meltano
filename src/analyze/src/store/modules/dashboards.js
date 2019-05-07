@@ -12,8 +12,6 @@ const state = {
 
 const actions = {
   initialize({ dispatch }, slug) {
-    Vue.toasted.global.oops(); // TODO temp testing
-
     const promiseGetReports = dispatch('getReports');
     const promiseGetDashboards = dispatch('getDashboards');
     Promise.all([promiseGetReports, promiseGetDashboards])
