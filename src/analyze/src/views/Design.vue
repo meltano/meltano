@@ -486,13 +486,11 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
+import Chart from '@/components/designs/Chart';
 import Dropdown from '@/components/generic/Dropdown';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import ResultTable from '@/components/designs/ResultTable';
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
-import SelectDropdown from '@/components/generic/SelectDropdown';
-import YesNoFilter from '@/components/filters/YesNoFilter';
-import Chart from '@/components/designs/Chart';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Design',
@@ -514,8 +512,6 @@ export default {
     Dropdown,
     ResultTable,
     RouterViewLayoutSidebar,
-    SelectDropdown,
-    YesNoFilter,
   },
   computed: {
     ...mapState('designs', [
