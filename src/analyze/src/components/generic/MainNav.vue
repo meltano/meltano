@@ -2,7 +2,7 @@
   <nav class="navbar is-info">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
-        <logo></logo>
+        <Logo></Logo>
       </div>
       <div class="navbar-burger burger"
            :class="{'is-active': isMobileMenuOpen}"
@@ -84,14 +84,13 @@
 import { mapState, mapGetters } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
+
 import Logo from './Logo';
-import Profile from './Profile';
 
 export default {
   name: 'MainNav',
   components: {
     Logo,
-    Profile,
   },
   watch: {
     $route() {
