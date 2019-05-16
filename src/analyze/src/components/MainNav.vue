@@ -149,9 +149,6 @@ export default {
 .navbar-brand .navbar-item {
   padding: 0 1rem;
 }
-.navbar-project-label {
-  padding-right: 1.2rem;
-}
 .navbar.is-info {
   background-color: transparent;
 
