@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar is-info">
+  <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
         <logo></logo>
@@ -39,11 +39,13 @@
 
         <div
           class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link navbar-child has-text-weight-semibold">
+          <a
+            class="navbar-link navbar-child has-text-weight-semibold"
+            :class="{ 'is-active': hasAnalyzeParentPath }">
             Analyze
           </a>
           <div
-            class="navbar-dropdown"
+            class="navbar-dropdown is-boxed"
             :class="{'has-been-clicked': navbarClicked}">
             <template v-for="(v, model) in models">
               <div class="navbar-item navbar-title has-text-grey-light" :key="model">
@@ -120,6 +122,9 @@ export default {
     ...mapGetters('repos', [
       'urlForModelDesign',
     ]),
+    hasAnalyzeParentPath() {
+      return this.$route.path.includes('/analyze/');
+    },
   },
   methods: {
     menuSelected() {
@@ -152,7 +157,7 @@ export default {
 .navbar-project-label {
   padding-right: 1.2rem;
 }
-.navbar.is-info {
+.navbar.is-transparent {
   background-color: transparent;
 
   .navbar-start .navbar-link,
@@ -160,6 +165,7 @@ export default {
     color: $interactive-navigation-inactive;
     border-bottom: 1px solid transparent;
 
+    &.is-active,
     &.router-link-active {
       color: $interactive-navigation;
     }
