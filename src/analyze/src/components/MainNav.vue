@@ -22,19 +22,7 @@
         <router-link
           :to="{name: 'dataSetup'}"
           class="navbar-item navbar-child has-text-weight-semibold">
-          Configuration
-        </router-link>
-
-        <router-link
-          :to="{name: 'transformations'}"
-          class="navbar-item navbar-child has-text-weight-semibold">
-          Transformations
-        </router-link>
-
-        <router-link
-          :to="{name: 'orchestration'}"
-          class="navbar-item navbar-child has-text-weight-semibold">
-          Orchestration
+          Pipelines
         </router-link>
 
         <router-link

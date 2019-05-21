@@ -1,7 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import store from '@/store';
-
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import RouterViewLayout from '@/views/RouterViewLayout';
@@ -105,153 +104,162 @@ export default {
   <router-view-layout>
     <div class='columns'>
       <div class="column">
-        <section class="section">
-          <p v-if="!hasConnections">No Database Connections</p>
-          <div class="columns is-multiline is-mobile">
-            <div class="column is-half"
-                  v-for="connection in settings.connections"
-                  :key="connection.host">
-              <div class="card">
-                <header class="card-header">
-                  <p class="card-header-title">
-                    {{connection.name}}
-                  </p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <p>
-                      <strong>Dialect</strong>
-                      <span class="is-pulled-right">{{connection.dialect}}</span>
+        <section>
+          <div class="content">
+            <h3>Analytics Connection Settings</h3>
+            <p v-if="!hasConnections">No Database Connections</p>
+            <div class="columns is-multiline is-mobile">
+              <div class="column is-half"
+                    v-for="connection in settings.connections"
+                    :key="connection.host">
+                <div class="card">
+                  <header class="card-header">
+                    <p class="card-header-title">
+                      {{connection.name}}
                     </p>
-                    <div v-if="!isConnectionDialectSqlite(connection.dialect)">
+                  </header>
+                  <div class="card-content">
+                    <div class="content">
                       <p>
-                        <strong>Port</strong>
-                        <span class="is-pulled-right">{{connection.port}}</span>
+                        <strong>Dialect</strong>
+                        <span class="is-pulled-right">{{connection.dialect}}</span>
                       </p>
-                      <p>
-                        <strong>Username</strong>
-                        <span class="is-pulled-right">{{connection.username}}</span>
-                      </p>
-                      <p>
-                        <strong>Host</strong>
-                        <span class="ellipsis is-pulled-right"
-                                :title="connection.host">
-                          {{connection.host}}
-                        </span>
-                      </p>
-                    </div>
-                    <div v-if="isConnectionDialectSqlite(connection.dialect)">
-                      <p>
-                        <strong>Path</strong>
-                        <span class="ellipsis is-pulled-right"
-                                :title="connection.path">
-                          {{connection.path}}
-                        </span>
-                      </p>
+                      <div v-if="!isConnectionDialectSqlite(connection.dialect)">
+                        <p>
+                          <strong>Port</strong>
+                          <span class="is-pulled-right">{{connection.port}}</span>
+                        </p>
+                        <p>
+                          <strong>Username</strong>
+                          <span class="is-pulled-right">{{connection.username}}</span>
+                        </p>
+                        <p>
+                          <strong>Host</strong>
+                          <span class="ellipsis is-pulled-right"
+                                  :title="connection.host">
+                            {{connection.host}}
+                          </span>
+                        </p>
+                      </div>
+                      <div v-if="isConnectionDialectSqlite(connection.dialect)">
+                        <p>
+                          <strong>Path</strong>
+                          <span class="ellipsis is-pulled-right"
+                                  :title="connection.path">
+                            {{connection.path}}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
+                  <footer class="card-footer">
+                    <a href="#" class="card-footer-item is-danger"
+                        @click.prevent="deleteConnection(connection)">
+                      Delete Connection
+                    </a>
+                  </footer>
                 </div>
-                <footer class="card-footer">
-                  <a href="#" class="card-footer-item is-danger"
-                      @click.prevent="deleteConnection(connection)">
-                    Delete Connection
-                  </a>
-                </footer>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section class="section">
-          <h3 class="title">New Database Connection</h3>
-          <div class="field is-grouped">
-            <div class="control is-expanded">
-              <input class="input" type="text" placeholder="Name" v-model="connectionName">
-            </div>
-            <div class="control">
-              <div class="select">
-                <select v-model="connectionDialect">
-                  <option value="" disabled selected>Dialect</option>
-                  <option value="postgresql">PostgreSQL</option>
-                  <option value="mysql">MySQL</option>
-                  <option value="sqlite">SQLite</option>
-                </select>
               </div>
             </div>
           </div>
 
-          <div class="field" v-if="!isConnectionDialectSqlite(connectionDialect)">
+          <div class="content">
+            <h3 class="title">Add Analytics Connection</h3>
             <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input class="input"
-                        type="text"
-                        placeholder="Host"
-                        v-model="connectionHost">
-              </p>
-              <p class="control">
-                <input class="input"
-                        type="text"
-                        placeholder="Port"
-                        v-model="connectionPort">
-              </p>
+              <div class="control is-expanded">
+                <input class="input" type="text" placeholder="Name" v-model="connectionName">
+              </div>
+              <div class="control">
+                <div class="select">
+                  <select v-model="connectionDialect">
+                    <option value="" disabled selected>Dialect</option>
+                    <option value="postgresql">PostgreSQL</option>
+                    <option value="mysql">MySQL</option>
+                    <option value="sqlite">SQLite</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
-            <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input class="input"
-                        type="text"
-                        placeholder="Database"
-                        v-model="connectionDatabase">
-              </p>
-              <p class="control">
-                <input class="input"
-                        type="text"
-                        placeholder="Schema"
-                        v-model="connectionSchema">
-              </p>
+            <div class="field" v-if="!isConnectionDialectSqlite(connectionDialect)">
+              <div class="field is-grouped">
+                <p class="control is-expanded">
+                  <input class="input"
+                          type="text"
+                          placeholder="Host"
+                          v-model="connectionHost">
+                </p>
+                <p class="control">
+                  <input class="input"
+                          type="text"
+                          placeholder="Port"
+                          v-model="connectionPort">
+                </p>
+              </div>
+
+              <div class="field is-grouped">
+                <p class="control is-expanded">
+                  <input class="input"
+                          type="text"
+                          placeholder="Database"
+                          v-model="connectionDatabase">
+                </p>
+                <p class="control">
+                  <input class="input"
+                          type="text"
+                          placeholder="Schema"
+                          v-model="connectionSchema">
+                </p>
+              </div>
+
+              <div class="field is-grouped">
+                <p class="control is-expanded">
+                  <input class="input"
+                          type="text"
+                          placeholder="Username"
+                          v-model="connectionUsername">
+                </p>
+                <p class="control is-expanded">
+                  <input class="input"
+                          type="password"
+                          placeholder="Password"
+                          v-model="connectionPassword">
+                </p>
+              </div>
             </div>
 
-            <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input class="input"
-                        type="text"
-                        placeholder="Username"
-                        v-model="connectionUsername">
-              </p>
-              <p class="control is-expanded">
-                <input class="input"
-                        type="password"
-                        placeholder="Password"
-                        v-model="connectionPassword">
-              </p>
-            </div>
-          </div>
-
-          <div class="field" v-if="isConnectionDialectSqlite(connectionDialect)">
-            <div class="field is-grouped">
-              <p class="control is-expanded">
-                <input class="input"
-                        type="text"
-                        placeholder="Path to SQLite file"
-                        v-model="connectionSqlitePath">
-              </p>
+            <div class="field" v-if="isConnectionDialectSqlite(connectionDialect)">
+              <div class="field is-grouped">
+                <p class="control is-expanded">
+                  <input class="input"
+                          type="text"
+                          placeholder="Path to SQLite file"
+                          v-model="connectionSqlitePath">
+                </p>
+              </div>
             </div>
           </div>
 
         </section>
       </div>
       <div class="column">
-        <template v-for="(v, model) in models">
-          <div class="navbar-item navbar-title has-text-grey-light" :key="model">
-            {{model | capitalize | underscoreToSpace}}
+        <section>
+          <div class="content">
+            <h3>Analyses</h3>
+            <template v-for="(v, model) in models">
+              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
+                {{model | capitalize | underscoreToSpace}}
+              </div>
+              <router-link
+                :to="urlForModelDesign(model, design)"
+                class="navbar-item navbar-child"
+                v-for="design in v['designs']"
+                :key="design">
+                {{design | capitalize | underscoreToSpace}}
+              </router-link>
+            </template>
           </div>
-          <router-link
-            :to="urlForModelDesign(model, design)"
-            class="navbar-item navbar-child"
-            v-for="design in v['designs']"
-            :key="design">
-            {{design | capitalize | underscoreToSpace}}
-          </router-link>
-        </template>
+        </section>
       </div>
     </div>
   </router-view-layout>

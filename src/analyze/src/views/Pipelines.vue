@@ -2,7 +2,7 @@
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
-  name: 'DataSetup',
+  name: 'Pipelines',
   components: {
     RouterViewLayout,
   },
@@ -52,7 +52,7 @@ export default {
       <div class="column is-three-fifths is-offset-one-fifth">
         <div class='content has-text-centered'>
           <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection and analysis of data.</p>
-          <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to do so.</p>
+          <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to set up your data pipeline(s).</p>
         </div>
       </div>
     </div>
@@ -114,7 +114,7 @@ export default {
             class="step-title button is-interactive-navigation is-outlined"
             :class="{ 'is-active': getIsActiveStep('run') }"
             :disabled='!getIsStepRunMinimallyValidated'
-            @click='setStep("run")'>Run</button>
+            @click='setStep("run")'>Orchestration</button>
           <p>Get Data</p>
         </div>
       </div>
