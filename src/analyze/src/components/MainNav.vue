@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar is-info">
+  <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
         <logo></logo>
@@ -37,29 +37,11 @@
           Orchestration
         </router-link>
 
-        <div
-          class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link navbar-child has-text-weight-semibold">
-            Analyze
-          </a>
-          <div
-            class="navbar-dropdown"
-            :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v, model) in models">
-              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
-                {{model | capitalize | underscoreToSpace}}
-              </div>
-              <router-link
-                :to="urlForModelDesign(model, design)"
-                class="navbar-item navbar-child"
-                v-for="design in v['designs']"
-                @click.native="menuSelected"
-                :key="design">
-                {{design | capitalize | underscoreToSpace}}
-              </router-link>
-            </template>
-          </div>
-        </div>
+        <router-link
+          :to="{name: 'analyze'}"
+          class="navbar-item navbar-child has-text-weight-semibold">
+          Analyze
+        </router-link>
 
         <router-link to="/dashboards"
           class="navbar-item navbar-child has-text-weight-semibold">
@@ -81,9 +63,6 @@
   </nav>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex';
-import capitalize from '@/filters/capitalize';
-import underscoreToSpace from '@/filters/underscoreToSpace';
 import Logo from './Logo';
 import Profile from './Profile';
 
@@ -100,34 +79,12 @@ export default {
       }
     },
   },
-  created() {
-    this.$store.dispatch('repos/getModels');
-  },
   data() {
     return {
       isMobileMenuOpen: false,
     };
   },
-  filters: {
-    capitalize,
-    underscoreToSpace,
-  },
-  computed: {
-    ...mapState('repos', [
-      'models',
-      'navbarClicked',
-    ]),
-    ...mapGetters('repos', [
-      'urlForModelDesign',
-    ]),
-  },
   methods: {
-    menuSelected() {
-      this.$store.dispatch('repos/navbarHideDropdown');
-      if (this.isMobileMenuOpen) {
-        this.closeMobileMenu();
-      }
-    },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
@@ -152,7 +109,7 @@ export default {
 .navbar-project-label {
   padding-right: 1.2rem;
 }
-.navbar.is-info {
+.navbar.is-transparent {
   background-color: transparent;
 
   .navbar-start .navbar-link,
@@ -172,18 +129,12 @@ export default {
     border-color: $interactive-navigation;
   }
 
-  .navbar-item.has-dropdown:hover .navbar-link,
   .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
     background: transparent;
     color: $interactive-navigation;
     border-bottom: 1px solid $interactive-navigation-inactive;
-  }
-
-  .navbar-item.has-dropdown .navbar-link,
-  .navbar-item.has-dropdown:hover .navbar-link {
-    border: none;
   }
 }
 .navbar-item .navbar-child {
