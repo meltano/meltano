@@ -2,12 +2,14 @@
 import { mapGetters, mapState } from 'vuex';
 import store from '@/store';
 import capitalize from '@/filters/capitalize';
+import ClosableMessage from '@/components/generic/ClosableMessage';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Designs',
   components: {
+    ClosableMessage,
     RouterViewLayout,
   },
   filters: {
@@ -102,6 +104,12 @@ export default {
 
 <template>
   <router-view-layout>
+
+    <ClosableMessage title='Meltano Analyze'>
+      <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
+      <p><span class="is-italic">You need to connect to pipelined data first</span>. Manage your analytics connections to enable analyses.</p>
+    </ClosableMessage>
+
     <div class='columns'>
       <div class="column">
         <section>
