@@ -8,6 +8,7 @@ export default {
   },
   data() {
     return {
+      isShowNote: true,
       steps: [
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
@@ -41,6 +42,9 @@ export default {
       const targetStep = this.steps.find(step => step.name === stepName);
       this.$router.push(targetStep);
     },
+    closeNote() {
+      this.isShowNote = false;
+    },
   },
 };
 </script>
@@ -48,11 +52,24 @@ export default {
 <template>
   <router-view-layout>
 
-    <div class="columns">
+    <div
+      v-if='isShowNote'
+      class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
-        <div class='content has-text-centered'>
-          <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection and analysis of data.</p>
-          <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to set up your data pipeline(s).</p>
+        <div class='content'>
+          <article class="message is-small">
+            <div class="message-header">
+              Meltano Pipelines
+              <button
+                class="delete is-small"
+                aria-label="delete"
+                @click='closeNote'></button>
+            </div>
+            <div class="message-body has-text-centered">
+              <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection and analysis of data.</p>
+              <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to set up your data pipeline(s).</p>
+            </div>
+          </article>
         </div>
       </div>
     </div>
