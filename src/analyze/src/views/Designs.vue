@@ -107,7 +107,7 @@ export default {
 
     <ClosableMessage title='Meltano Analyze'>
       <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
-      <p><span class="is-italic">You need to connect to pipelined data first</span>. Manage your analytics connections to enable analyses.</p>
+      <p><span class="is-italic">You need to connect to pipelined data first</span>. Manage your analytics connections below to enable analyses.</p>
     </ClosableMessage>
 
     <div class='columns'>
