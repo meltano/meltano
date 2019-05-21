@@ -10,7 +10,6 @@ describe('repos Vuex store', () => {
       loadingUpdate: false,
       models: [],
       validated: false,
-      navbarClicked: false,
       errors: [],
       files: {},
     };
