@@ -71,7 +71,7 @@ export default {
     },
   },
   methods: {
-    saveConnectionAndBeginRun() {
+    saveConnection() {
       this.$store.dispatch('settings/saveConnection', {
         name: this.connectionName,
         database: this.connectionDatabase,
@@ -246,6 +246,13 @@ export default {
                 </p>
               </div>
             </div>
+          </div>
+
+          <div class="buttons is-right">
+            <button
+              class='button is-interactive-primary'
+              :disabled='!isSavable'
+              @click.prevent="saveConnection">Save</button>
           </div>
 
         </section>
