@@ -14,11 +14,46 @@
       </header>
       <section class="modal-card-body">
 
-        <div class="columns">
-          <div class="column">
-            Todo
+        <template v-if='getIsInstallingLoaderPlugin(loaderNameFromRoute)'>
+          <div class="content">
+            <div class="level">
+              <div class="level-item">
+                <p>Installing {{loaderNameFromRoute}} can take up to a minute.</p>
+              </div>
+            </div>
+            <progress class="progress is-small is-info"></progress>
           </div>
-        </div>
+        </template>
+
+        <template v-if='configSettings'>
+
+          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+            <div class="field-label is-normal">
+              <label class="label">{{key}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    :placeholder="val"
+                    v-model="configSettings[key]">
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <article class="message is-warning is-small">
+            <div class="message-header">
+              <p>Warning</p>
+            </div>
+            <div class="message-body">
+              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+            </div>
+          </article>
+
+        </template>
 
       </section>
       <footer class="modal-card-foot buttons is-right">
@@ -41,18 +76,27 @@ export default {
   name: 'LoaderSettingsModal',
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
+    this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {
-    ...mapState('configuration', [
-      'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
-    ]),
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
+      'getIsLoaderPluginInstalled',
+      'getIsInstallingLoaderPlugin',
     ]),
+    ...mapState('configuration', [
+      'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
+      'loaderInFocusConfiguration',
+    ]),
+    configSettings() {
+      return this.loader
+        ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
+        : this.loaderInFocusConfiguration;
+    },
     isSavable() {
-      return true; // TODO mirror ExtractorSettingsModal approach
+      return true; // TODO mirror extractorSettingsModal approach
     },
     loader() {
       return this.installedPlugins.loaders

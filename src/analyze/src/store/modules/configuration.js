@@ -8,6 +8,7 @@ const state = {
   extractors: [],
   loaders: [],
   hasExtractorLoadingError: false,
+  loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
   installedPlugins: {},
@@ -82,8 +83,11 @@ const actions = {
       });
   },
 
-  getLoaderConfiguration({ dispatch }, loader) {
-    dispatch('getPluginConfiguration', { name: loader, type: 'loaders' });
+  getLoaderConfiguration({ commit, dispatch }, loader) {
+    dispatch('getPluginConfiguration', { name: loader, type: 'loaders' })
+      .then((response) => {
+        commit('setLoaderInFocusConfiguration', response.data);
+      });
   },
 
   getPluginConfiguration(_, pluginPayload) {
@@ -218,6 +222,10 @@ const mutations = {
     if (projectConfig.plugins) {
       state.installedPlugins = projectConfig.plugins;
     }
+  },
+
+  setLoaderInFocusConfiguration(_, configuration) {
+    state.loaderInFocusConfiguration = configuration;
   },
 
   toggleSelected(_, selectable) {
