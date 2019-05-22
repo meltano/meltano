@@ -92,8 +92,6 @@ export default {
       this.connectionUsername = '';
       this.connectionPassword = '';
       this.connectionSqlitePath = '';
-
-      this.$router.push({ name: 'run' });
     },
     deleteConnection(connection) {
       this.$store.dispatch('settings/deleteConnection', connection);
