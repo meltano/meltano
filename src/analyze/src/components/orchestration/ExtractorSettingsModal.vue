@@ -82,6 +82,9 @@ export default {
     this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
+  },
   computed: {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',

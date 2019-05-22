@@ -79,6 +79,9 @@ export default {
     this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
+  },
   computed: {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',

@@ -56,6 +56,14 @@ const actions = {
     commit('setAllExtractorInFocusEntities', null);
   },
 
+  clearExtractorInFocusConfiguration({ commit }) {
+    commit('setExtractorInFocusConfiguration', {});
+  },
+
+  clearLoaderInFocusConfiguration({ commit }) {
+    commit('setLoaderInFocusConfiguration', {});
+  },
+
   getAll({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
