@@ -201,7 +201,7 @@ const mutations = {
   },
 
   installLoaderComplete(_, loader) {
-    lodash.pull(state.installingExtractors, loader);
+    lodash.pull(state.installingLoaders, loader);
   },
 
   setAll(_, orchestrationData) {

@@ -72,6 +72,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
+import _ from 'lodash';
+
 export default {
   name: 'LoaderSettingsModal',
   created() {
@@ -90,16 +92,18 @@ export default {
       'getIsInstallingLoaderPlugin',
     ]),
     ...mapState('configuration', [
-      'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
+      'installedPlugins',
       'loaderInFocusConfiguration',
     ]),
     configSettings() {
-      return this.loader
+      return this.loader.config
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
         : this.loaderInFocusConfiguration;
     },
     isSavable() {
-      return true; // TODO mirror extractorSettingsModal approach
+      const hasOwns = [];
+      _.forOwn(this.configSettings, val => hasOwns.push(val));
+      return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);
     },
     loader() {
       return this.installedPlugins.loaders

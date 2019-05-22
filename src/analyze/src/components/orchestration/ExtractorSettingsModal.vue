@@ -97,7 +97,7 @@ export default {
       'installedPlugins',
     ]),
     configSettings() {
-      return this.extractor
+      return this.extractor.config
         ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
         : this.extractorInFocusConfiguration;
     },
