@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * [!613](https://gitlab.com/meltano/meltano/merge_requests/613) Updated home page docs with recommended install snippet so our "Learn More" CTA remains primary, but we make it easier for experienced devs to get up and running even quicker
+* [!647](https://gitlab.com/meltano/meltano/merge_requests/647) Added preloader for occasional lengthy extractor loading and added feedback for lengthy entities loading
 
 ### Changes
 
