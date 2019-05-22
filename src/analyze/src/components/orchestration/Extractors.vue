@@ -17,6 +17,9 @@ export default {
     ...mapState('configuration', [
       'extractors',
     ]),
+    isLoadingExtractors() {
+      return this.extractors.length === 0;
+    },
   },
   methods: {
     ...mapActions('configuration', [
@@ -52,7 +55,13 @@ export default {
       </div>
     </div>
 
-    <div class="tile is-ancestor flex-and-wrap">
+    <progress
+      v-if='isLoadingExtractors'
+      class="progress is-small is-info"></progress>
+
+    <div
+      v-else
+      class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
         v-for="(extractor, index) in extractors"

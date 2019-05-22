@@ -19,6 +19,9 @@
           :class="{ 'is-vcentered': isLoading }">
 
           <div v-if='isLoading' class="column">
+            <div class="content has-text-centered">
+              <p>It may take up to a minute or more if this is the first time accessing this extractor's entities.</p>
+            </div>
             <progress class="progress is-small is-info"></progress>
           </div>
         </div>
