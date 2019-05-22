@@ -63,7 +63,7 @@
         <button
           class='button is-interactive-primary'
           :disabled='!isSavable'
-          @click.prevent="saveConnectionAndBeginRun">Save</button>
+          @click.prevent="saveConfigAndGoToOrchestration">Save</button>
       </footer>
     </div>
   </div>
@@ -118,6 +118,14 @@ export default {
       } else {
         this.$router.push({ name: 'loaders' });
       }
+    },
+    saveConfigAndGoToOrchestration() {
+      this.$store.dispatch('configuration/saveLoaderConfiguration', {
+        name: this.loader.name,
+        type: 'loader',
+        config: this.configSettings,
+      });
+      this.$router.push({ name: 'run' });
     },
   },
 };
