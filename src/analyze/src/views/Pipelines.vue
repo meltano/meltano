@@ -14,7 +14,7 @@ export default {
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'run', routeMatches: ['run'] },
+        { name: 'orchestration', routeMatches: ['orchestration'] },
       ],
     };
   },
@@ -31,7 +31,7 @@ export default {
     getIsStepLoadersMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
-    getIsStepRunMinimallyValidated() {
+    getIsStepOrchestrationMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
     isModal() {
@@ -103,16 +103,16 @@ export default {
       <div
         class="step-item"
         :class="{
-          'is-active': getIsActiveStep('run'),
-          'is-completed': getIsStepRunMinimallyValidated
+          'is-active': getIsActiveStep('orchestration'),
+          'is-completed': getIsStepOrchestrationMinimallyValidated
         }">
         <div class="step-marker">4</div>
         <div class="step-details">
           <button
             class="step-title button is-interactive-navigation is-outlined"
-            :class="{ 'is-active': getIsActiveStep('run') }"
-            :disabled='!getIsStepRunMinimallyValidated'
-            @click='setStep("run")'>Orchestration</button>
+            :class="{ 'is-active': getIsActiveStep('orchestration') }"
+            :disabled='!getIsStepOrchestrationMinimallyValidated'
+            @click='setStep("orchestration")'>Orchestration</button>
           <p>Get Data</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default {
         </div>
         <div
           class="step-content"
-          :class="{ 'is-active': getIsActiveStep('run') }">
+          :class="{ 'is-active': getIsActiveStep('orchestration') }">
           <router-view></router-view>
         </div>
       </div>

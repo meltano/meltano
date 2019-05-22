@@ -125,7 +125,7 @@ export default {
         type: 'loader',
         config: this.configSettings,
       });
-      this.$router.push({ name: 'run' });
+      this.$router.push({ name: 'orchestration' });
     },
   },
 };

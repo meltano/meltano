@@ -101,8 +101,8 @@ const router = new Router({
           },
         },
         {
-          path: 'run',
-          name: 'run',
+          path: 'orchestration',
+          name: 'orchestration',
           component: RunSummary,
         },
       ],
