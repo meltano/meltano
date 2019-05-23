@@ -62,7 +62,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          :disabled="!isSavable"
+          :disabled="!isSaveable"
           @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
