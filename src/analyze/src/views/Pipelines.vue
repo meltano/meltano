@@ -1,9 +1,11 @@
 <script>
+import ClosableMessage from '@/components/generic/ClosableMessage';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
-  name: 'DataSetup',
+  name: 'Pipelines',
   components: {
+    ClosableMessage,
     RouterViewLayout,
   },
   data() {
@@ -12,7 +14,7 @@ export default {
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'run', routeMatches: ['run'] },
+        { name: 'orchestration', routeMatches: ['orchestration'] },
       ],
     };
   },
@@ -29,7 +31,7 @@ export default {
     getIsStepLoadersMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
-    getIsStepRunMinimallyValidated() {
+    getIsStepOrchestrationMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
     isModal() {
@@ -48,14 +50,10 @@ export default {
 <template>
   <router-view-layout>
 
-    <div class="columns">
-      <div class="column is-three-fifths is-offset-one-fifth">
-        <div class='content has-text-centered'>
-          <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection and analysis of data.</p>
-          <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to do so.</p>
-        </div>
-      </div>
-    </div>
+    <ClosableMessage title='Meltano Pipelines'>
+      <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
+      <p><span class="is-italic">You need to collect the data first</span>. Use the steps below to set up your data pipeline(s).</p>
+    </ClosableMessage>
 
     <div class="steps is-small" id="steps-data-setup">
       <div
@@ -105,16 +103,16 @@ export default {
       <div
         class="step-item"
         :class="{
-          'is-active': getIsActiveStep('run'),
-          'is-completed': getIsStepRunMinimallyValidated
+          'is-active': getIsActiveStep('orchestration'),
+          'is-completed': getIsStepOrchestrationMinimallyValidated
         }">
         <div class="step-marker">4</div>
         <div class="step-details">
           <button
-            class="step-title button is-interactive-navigation"
-            :class="{ 'is-active': getIsActiveStep('run') }"
-            :disabled='!getIsStepRunMinimallyValidated'
-            @click='setStep("run")'>Run</button>
+            class="step-title button is-interactive-navigation is-outlined"
+            :class="{ 'is-active': getIsActiveStep('orchestration') }"
+            :disabled='!getIsStepOrchestrationMinimallyValidated'
+            @click='setStep("orchestration")'>Orchestration</button>
           <p>Get Data</p>
         </div>
       </div>
@@ -146,7 +144,7 @@ export default {
         </div>
         <div
           class="step-content"
-          :class="{ 'is-active': getIsActiveStep('run') }">
+          :class="{ 'is-active': getIsActiveStep('orchestration') }">
           <router-view></router-view>
         </div>
       </div>

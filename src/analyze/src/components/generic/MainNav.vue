@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar is-info">
+  <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
         <Logo></Logo>
@@ -22,44 +22,14 @@
         <router-link
           :to="{name: 'dataSetup'}"
           class="navbar-item navbar-child has-text-weight-semibold">
-          Configuration
+          Pipelines
         </router-link>
 
         <router-link
-          :to="{name: 'transformations'}"
+          :to="{name: 'analyze'}"
           class="navbar-item navbar-child has-text-weight-semibold">
-          Transformations
+          Analyze
         </router-link>
-
-        <router-link
-          :to="{name: 'orchestration'}"
-          class="navbar-item navbar-child has-text-weight-semibold">
-          Orchestration
-        </router-link>
-
-        <div
-          class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link navbar-child has-text-weight-semibold">
-            Analyze
-          </a>
-          <div
-            class="navbar-dropdown"
-            :class="{'has-been-clicked': navbarClicked}">
-            <template v-for="(v, model) in models">
-              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
-                {{model | capitalize | underscoreToSpace}}
-              </div>
-              <router-link
-                :to="urlForModelDesign(model, design)"
-                class="navbar-item navbar-child"
-                v-for="design in v['designs']"
-                @click.native="menuSelected"
-                :key="design">
-                {{design | capitalize | underscoreToSpace}}
-              </router-link>
-            </template>
-          </div>
-        </div>
 
         <router-link to="/dashboards"
           class="navbar-item navbar-child has-text-weight-semibold">
@@ -70,10 +40,14 @@
 
       <div class="navbar-end">
         <div class="navbar-item navbar-child">
+          <a
+            class='button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
+            data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>
           <font-awesome-icon
             :icon="'user'"
             :style="{ color: '#0F3B66' }"
             title="Login currently disabled"></font-awesome-icon>
+          </a>
         </div>
       </div>
 
@@ -81,10 +55,6 @@
   </nav>
 </template>
 <script>
-import { mapState, mapGetters } from 'vuex';
-import capitalize from '@/filters/capitalize';
-import underscoreToSpace from '@/filters/underscoreToSpace';
-
 import Logo from './Logo';
 
 export default {
@@ -99,34 +69,12 @@ export default {
       }
     },
   },
-  created() {
-    this.$store.dispatch('repos/getModels');
-  },
   data() {
     return {
       isMobileMenuOpen: false,
     };
   },
-  filters: {
-    capitalize,
-    underscoreToSpace,
-  },
-  computed: {
-    ...mapState('repos', [
-      'models',
-      'navbarClicked',
-    ]),
-    ...mapGetters('repos', [
-      'urlForModelDesign',
-    ]),
-  },
   methods: {
-    menuSelected() {
-      this.$store.dispatch('repos/navbarHideDropdown');
-      if (this.isMobileMenuOpen) {
-        this.closeMobileMenu();
-      }
-    },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen;
     },
@@ -148,7 +96,10 @@ export default {
 .navbar-brand .navbar-item {
   padding: 0 1rem;
 }
-.navbar.is-info {
+.navbar-project-label {
+  padding-right: 1.2rem;
+}
+.navbar.is-transparent {
   background-color: transparent;
 
   .navbar-start .navbar-link,
@@ -168,18 +119,12 @@ export default {
     border-color: $interactive-navigation;
   }
 
-  .navbar-item.has-dropdown:hover .navbar-link,
   .navbar-brand > a.navbar-item:hover,
   .navbar-start > a.navbar-item.is-active,
   .navbar-start > a.navbar-item:hover {
     background: transparent;
     color: $interactive-navigation;
     border-bottom: 1px solid $interactive-navigation-inactive;
-  }
-
-  .navbar-item.has-dropdown .navbar-link,
-  .navbar-item.has-dropdown:hover .navbar-link {
-    border: none;
   }
 }
 .navbar-item .navbar-child {

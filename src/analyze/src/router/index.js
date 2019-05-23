@@ -10,14 +10,12 @@ import Loaders from '@/components/orchestration/Loaders';
 import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
 import RunSummary from '@/components/orchestration/RunSummary';
 
-import DataSetup from '@/views/DataSetup';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
-import Orchestration from '@/views/Orchestration';
+import Pipelines from '@/views/Pipelines';
 import Repo from '@/views/Repo';
-import Transformations from '@/views/Transformations';
 
 Vue.use(Router);
 
@@ -31,13 +29,13 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/configuration',
+      redirect: '/pipelines',
     },
     {
-      path: '/configuration/',
-      redirect: '/configuration/extractors/',
+      path: '/pipelines/',
+      redirect: '/pipelines/extractors/',
       name: 'dataSetup',
-      component: DataSetup,
+      component: Pipelines,
       children: [
         {
           path: 'extractors',
@@ -103,21 +101,11 @@ const router = new Router({
           },
         },
         {
-          path: 'run',
-          name: 'run',
+          path: 'orchestration',
+          name: 'orchestration',
           component: RunSummary,
         },
       ],
-    },
-    {
-      path: '/transformations/',
-      name: 'transformations',
-      component: Transformations,
-    },
-    {
-      path: '/orchestration/',
-      name: 'orchestration',
-      component: Orchestration,
     },
     {
       path: '/files/',

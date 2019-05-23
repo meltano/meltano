@@ -82,6 +82,9 @@ export default {
     this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
+  },
   computed: {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
@@ -94,7 +97,7 @@ export default {
       'installedPlugins',
     ]),
     configSettings() {
-      return this.extractor
+      return this.extractor.config
         ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
         : this.extractorInFocusConfiguration;
     },
@@ -119,7 +122,8 @@ export default {
     },
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
-        extractorName: this.extractor.name,
+        name: this.loader.name,
+        type: 'extractor',
         config: this.configSettings,
       });
       this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });

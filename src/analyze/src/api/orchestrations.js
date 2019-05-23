@@ -22,7 +22,7 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', 'get/configuration'), pluginPayload);
   },
 
-  saveExtractorConfiguration(configPayload) {
+  savePluginConfiguration(configPayload) {
     return axios.post(utils.apiUrl('orchestrations', 'save/configuration'), configPayload);
   },
 

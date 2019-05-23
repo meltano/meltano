@@ -135,7 +135,8 @@ def save_plugin_configuration() -> Response:
     endpoint for persisting a plugin configuration
     """
     incoming = request.get_json()
-    extractor_name = incoming["extractorName"]
+    plugin_name = incoming["name"]
+    plugin_type = incoming["type"]
     config = incoming["config"]
 
     # TODO persist strategy
