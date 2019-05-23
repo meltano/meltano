@@ -14,143 +14,46 @@
       </header>
       <section class="modal-card-body">
 
-        <div class="columns">
-          <div class="column">
-            <section class="section">
-              <p v-if="!hasConnections">No Database Connections</p>
-              <div class="columns is-multiline is-mobile">
-                <div class="column is-half"
-                      v-for="connection in settings.connections"
-                      :key="connection.host">
-                  <div class="card">
-                    <header class="card-header">
-                      <p class="card-header-title">
-                        {{connection.name}}
-                      </p>
-                    </header>
-                    <div class="card-content">
-                      <div class="content">
-                        <p>
-                          <strong>Dialect</strong>
-                          <span class="is-pulled-right">{{connection.dialect}}</span>
-                        </p>
-                        <div v-if="!isConnectionDialectSqlite(connection.dialect)">
-                          <p>
-                            <strong>Port</strong>
-                            <span class="is-pulled-right">{{connection.port}}</span>
-                          </p>
-                          <p>
-                            <strong>Username</strong>
-                            <span class="is-pulled-right">{{connection.username}}</span>
-                          </p>
-                          <p>
-                            <strong>Host</strong>
-                            <span class="ellipsis is-pulled-right"
-                                    :title="connection.host">
-                              {{connection.host}}
-                            </span>
-                          </p>
-                        </div>
-                        <div v-if="isConnectionDialectSqlite(connection.dialect)">
-                          <p>
-                            <strong>Path</strong>
-                            <span class="ellipsis is-pulled-right"
-                                    :title="connection.path">
-                              {{connection.path}}
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    <footer class="card-footer">
-                      <a href="#" class="card-footer-item is-danger"
-                          @click.prevent="deleteConnection(connection)">
-                        Delete Connection
-                      </a>
-                    </footer>
-                  </div>
-                </div>
+        <template v-if='getIsInstallingLoaderPlugin(loaderNameFromRoute)'>
+          <div class="content">
+            <div class="level">
+              <div class="level-item">
+                <p>Installing {{loaderNameFromRoute}} can take up to a minute.</p>
               </div>
-            </section>
-            <section class="section">
-              <h3 class="title">New Database Connection</h3>
-              <div class="field is-grouped">
-                <div class="control is-expanded">
-                  <input class="input" type="text" placeholder="Name" v-model="connectionName">
-                </div>
-                <div class="control">
-                  <div class="select">
-                    <select v-model="connectionDialect">
-                      <option value="" disabled selected>Dialect</option>
-                      <option value="postgresql">PostgreSQL</option>
-                      <option value="mysql">MySQL</option>
-                      <option value="sqlite">SQLite</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              <div class="field" v-if="!isConnectionDialectSqlite(connectionDialect)">
-                <div class="field is-grouped">
-                  <p class="control is-expanded">
-                    <input class="input"
-                            type="text"
-                            placeholder="Host"
-                            v-model="connectionHost">
-                  </p>
-                  <p class="control">
-                    <input class="input"
-                            type="text"
-                            placeholder="Port"
-                            v-model="connectionPort">
-                  </p>
-                </div>
-
-                <div class="field is-grouped">
-                  <p class="control is-expanded">
-                    <input class="input"
-                            type="text"
-                            placeholder="Database"
-                            v-model="connectionDatabase">
-                  </p>
-                  <p class="control">
-                    <input class="input"
-                            type="text"
-                            placeholder="Schema"
-                            v-model="connectionSchema">
-                  </p>
-                </div>
-
-                <div class="field is-grouped">
-                  <p class="control is-expanded">
-                    <input class="input"
-                            type="text"
-                            placeholder="Username"
-                            v-model="connectionUsername">
-                  </p>
-                  <p class="control is-expanded">
-                    <input class="input"
-                            type="password"
-                            placeholder="Password"
-                            v-model="connectionPassword">
-                  </p>
-                </div>
-              </div>
-
-              <div class="field" v-if="isConnectionDialectSqlite(connectionDialect)">
-                <div class="field is-grouped">
-                  <p class="control is-expanded">
-                    <input class="input"
-                            type="text"
-                            placeholder="Path to SQLite file"
-                            v-model="connectionSqlitePath">
-                  </p>
-                </div>
-              </div>
-
-            </section>
+            </div>
+            <progress class="progress is-small is-info"></progress>
           </div>
-        </div>
+        </template>
+
+        <template v-if='configSettings'>
+
+          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+            <div class="field-label is-normal">
+              <label class="label">{{key}}</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <p class="control">
+                  <input
+                    class="input"
+                    type="text"
+                    :placeholder="val"
+                    v-model="configSettings[key]">
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <article class="message is-warning is-small">
+            <div class="message-header">
+              <p>Warning</p>
+            </div>
+            <div class="message-body">
+              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
+            </div>
+          </article>
+
+        </template>
 
       </section>
       <footer class="modal-card-foot buttons is-right">
@@ -160,72 +63,47 @@
         <button
           class='button is-interactive-primary'
           :disabled='!isSavable'
-          @click.prevent="saveConnectionAndBeginRun">Save</button>
+          @click.prevent="saveConfigAndGoToOrchestration">Save</button>
       </footer>
     </div>
   </div>
 
 </template>
 <script>
-import store from '@/store';
 import { mapState, mapGetters } from 'vuex';
+
+import _ from 'lodash';
 
 export default {
   name: 'LoaderSettingsModal',
-  data() {
-    return {
-      connectionName: '',
-      connectionDatabase: '',
-      connectionSchema: '',
-      connectionDialect: '',
-      connectionHost: '',
-      connectionPort: '',
-      connectionUsername: '',
-      connectionPassword: '',
-      connectionSqlitePath: '',
-    };
-  },
-  beforeRouteEnter(to, from, next) {
-    store.dispatch('settings/getSettings')
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
-  },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
+    this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
+  },
   computed: {
-    ...mapState('configuration', [
-      'installedPlugins', // Leverage installed plugins approach vs getSettings old way?
-    ]),
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
+      'getIsLoaderPluginInstalled',
+      'getIsInstallingLoaderPlugin',
     ]),
-    ...mapState('settings', [
-      'settings',
+    ...mapState('configuration', [
+      'installedPlugins',
+      'loaderInFocusConfiguration',
     ]),
-    ...mapGetters('settings', [
-      'hasConnections',
-      'isConnectionDialectSqlite',
-    ]),
+    configSettings() {
+      return this.loader.config
+        ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
+        : this.loaderInFocusConfiguration;
+    },
     isSavable() {
-      // TODO proper validation
-      const dialectCondition = this.isConnectionDialectSqlite(this.connectionDialect)
-        ? this.connectionSqlitePath.length > 0
-        : true;
-      const val = dialectCondition &&
-        this.connectionName.length > 0 &&
-        this.connectionDatabase.length > 0 &&
-        this.connectionSchema.length > 0 &&
-        this.connectionDialect.length > 0 &&
-        this.connectionHost.length > 0 &&
-        this.connectionPort.length > 0 &&
-        this.connectionUsername.length > 0 &&
-        this.connectionPassword.length > 0;
-      return val;
+      const hasOwns = [];
+      _.forOwn(this.configSettings, val => hasOwns.push(val));
+      return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);
     },
     loader() {
       return this.installedPlugins.loaders
@@ -241,32 +119,13 @@ export default {
         this.$router.push({ name: 'loaders' });
       }
     },
-    saveConnectionAndBeginRun() {
-      this.$store.dispatch('settings/saveConnection', {
-        name: this.connectionName,
-        database: this.connectionDatabase,
-        schema: this.connectionSchema,
-        dialect: this.connectionDialect,
-        host: this.connectionHost,
-        port: this.connectionPort,
-        username: this.connectionUsername,
-        password: this.connectionPassword,
-        path: this.connectionSqlitePath,
+    saveConfigAndGoToOrchestration() {
+      this.$store.dispatch('configuration/saveLoaderConfiguration', {
+        name: this.loader.name,
+        type: 'loader',
+        config: this.configSettings,
       });
-      this.connectionName = '';
-      this.connectionDatabase = '';
-      this.connectionSchema = '';
-      this.connectionDialect = '';
-      this.connectionHost = '';
-      this.connectionPort = '';
-      this.connectionUsername = '';
-      this.connectionPassword = '';
-      this.connectionSqlitePath = '';
-
-      this.$router.push({ name: 'run' });
-    },
-    deleteConnection(connection) {
-      this.$store.dispatch('settings/deleteConnection', connection);
+      this.$router.push({ name: 'orchestration' });
     },
   },
 };
