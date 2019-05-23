@@ -20,7 +20,6 @@ export class AuthMiddleware {
   onResponseError(err) { // eslint-disable-line class-methods-use-this
     if (err.response && err.response.status === 403) {
       this.toasted.global.forbidden();
-      throw err;
     }
 
     // 401 should be sent to login
