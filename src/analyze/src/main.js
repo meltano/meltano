@@ -28,6 +28,7 @@ import App from './App';
 import router from './router';
 import store from './store';
 import Auth from './auth';
+import ErrorMiddleware from './error-middleware';
 
 Vue.config.productionTip = false;
 
@@ -58,10 +59,15 @@ Vue.use(Toasted, {
   iconPack: 'fontawesome',
   className: 'notification',
   theme: 'outline',
-  duration: 6000,
+  duration: 9000,
 });
 
 Vue.use(Auth, {
+  router,
+  toasted: Vue.toasted,
+});
+
+Vue.use(ErrorMiddleware, {
   router,
   toasted: Vue.toasted,
 });

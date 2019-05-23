@@ -228,8 +228,7 @@ const actions = {
     const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      })
-      .catch(Vue.toasted.global.oops);
+      });
 
     sqlApi.getDialect(model)
       .then((response) => {
@@ -281,8 +280,7 @@ const actions = {
           aggregates: response.data.aggregates,
           join,
         });
-      })
-      .catch(Vue.toasted.global.oops);
+      });
   },
 
   removeSort({ commit }, column) {
@@ -404,8 +402,7 @@ const actions = {
           data: response.data,
           field,
         });
-      })
-      .catch(Vue.toasted.global.oops);
+      });
   },
 
   addDistinctSelection({ commit }, data) {

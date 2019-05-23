@@ -68,8 +68,7 @@ const actions = {
     orchestrationsApi.index()
       .then((response) => {
         commit('setAll', response.data);
-      })
-      .catch(Vue.toasted.global.oops);
+      });
   },
 
   getExtractorInFocusEntities({ commit }, extractorName) {
@@ -110,10 +109,8 @@ const actions = {
         dispatch('getInstalledPlugins')
           .then(() => {
             commit('installExtractorComplete', extractor);
-          })
-          .catch(Vue.toasted.global.oops);
-      })
-      .catch(Vue.toasted.global.oops);
+          });
+      });
   },
 
   installLoader({ commit, dispatch }, loader) {
@@ -124,10 +121,8 @@ const actions = {
         dispatch('getInstalledPlugins')
           .then(() => {
             commit('installLoaderComplete', loader);
-          })
-          .catch(Vue.toasted.global.oops);
-      })
-      .catch(Vue.toasted.global.oops);
+          });
+      });
   },
 
   saveExtractorConfiguration(_, configPayload) {
@@ -146,16 +141,14 @@ const actions = {
     orchestrationsApi.installedPlugins()
       .then((response) => {
         commit('setInstalledPlugins', response.data);
-      })
-      .catch(Vue.toasted.global.oops);
+      });
   },
 
   selectEntities() {
     orchestrationsApi.selectEntities(state.extractorInFocusEntities)
       .then(() => {
         // TODO confirm success or handle error in UI
-      })
-      .catch(Vue.toasted.global.oops);
+      });
   },
 
   toggleAllEntityGroupsOn({ dispatch }) {
