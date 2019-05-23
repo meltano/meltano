@@ -25,7 +25,7 @@
           </div>
         </template>
 
-        <template v-if='getIsExtractorPluginInstalled(extractorNameFromRoute)'>
+        <template v-if='configSettings'>
 
           <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
             <div class="field-label is-normal">
@@ -62,7 +62,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          :disabled="!hasConfig"
+          :disabled="!isSavable"
           @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
@@ -79,7 +79,11 @@ export default {
   name: 'ExtractorSettingsModal',
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
+    this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
     this.$store.dispatch('configuration/getInstalledPlugins');
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
   },
   computed: {
     ...mapGetters('configuration', [
@@ -89,20 +93,23 @@ export default {
       'getIsInstallingExtractorPlugin',
     ]),
     ...mapState('configuration', [
+      'extractorInFocusConfiguration',
       'installedPlugins',
     ]),
     configSettings() {
-      return this.extractor ? Object.assign({}, this.extractor.config) : {};
+      return this.extractor.config
+        ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
+        : this.extractorInFocusConfiguration;
     },
     extractor() {
       return this.installedPlugins.extractors
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
         : {};
     },
-    hasConfig() {
+    isSavable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0;
+      return hasOwns.length > 0 && this.getIsExtractorPluginInstalled(this.extractorNameFromRoute);
     },
   },
   methods: {
@@ -115,7 +122,8 @@ export default {
     },
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
-        extractorName: this.extractor.name,
+        name: this.loader.name,
+        type: 'extractor',
         config: this.configSettings,
       });
       this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });

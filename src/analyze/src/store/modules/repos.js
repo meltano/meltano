@@ -8,7 +8,6 @@ const state = {
   loadingUpdate: false,
   models: [],
   validated: false,
-  navbarClicked: false,
   errors: [],
   files: {},
 };
@@ -93,20 +92,9 @@ const actions = {
       })
       .catch(Vue.toasted.global.oops);
   },
-
-  navbarHideDropdown({ commit }) {
-    commit('setHiddenDropdown');
-  },
 };
 
 const mutations = {
-  setHiddenDropdown() {
-    state.navbarClicked = true;
-    setTimeout(() => {
-      state.navbarClicked = false;
-    }, 500);
-  },
-
   setModels(_, models) {
     state.models = models;
   },
