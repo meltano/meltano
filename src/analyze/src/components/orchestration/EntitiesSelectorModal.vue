@@ -118,7 +118,7 @@
         <button
           v-if='!isLoading'
           class='button is-interactive-primary'
-          :disabled="!isSavable"
+          :disabled="!isSaveable"
           @click='selectEntitiesAndBeginLoaderInstall'>Save</button>
       </footer>
     </div>
@@ -205,7 +205,7 @@ export default {
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.extractorInFocusEntities, 'entityGroups');
     },
-    isSavable() {
+    isSaveable() {
       return this.hasEntities && this.hasSelectedAttributes;
     },
     selectedMode() {

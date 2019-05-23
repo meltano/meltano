@@ -53,7 +53,7 @@ export default {
       'hasConnections',
       'isConnectionDialectSqlite',
     ]),
-    isSavable() {
+    isSaveable() {
       // TODO proper validation
       const dialectCondition = this.isConnectionDialectSqlite(this.connectionDialect)
         ? this.connectionSqlitePath.length > 0
@@ -249,7 +249,7 @@ export default {
           <div class="buttons is-right">
             <button
               class='button is-interactive-primary'
-              :disabled='!isSavable'
+              :disabled='!isSaveable'
               @click.prevent="saveConnection">Save</button>
           </div>
 
