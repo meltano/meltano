@@ -2,7 +2,7 @@
   <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
-        <Logo></Logo>
+        <Logo/>
       </div>
       <div class="navbar-burger burger"
            :class="{'is-active': isMobileMenuOpen}"
