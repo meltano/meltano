@@ -71,7 +71,7 @@ Vue.toasted.register('forbidden', "You can't access this resource at this moment
   type: 'error',
 });
 // Register a Global General Error Notification Toast.
-Vue.toasted.register('oops', 'Oops. Something went wrong.', {
+Vue.toasted.register('oops', 'Oops! Something went wrong.', {
   type: 'error',
   action: [
     {
