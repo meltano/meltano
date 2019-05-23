@@ -11,6 +11,7 @@ Interactive helpers often with improved semantic names built on top of Bulma
     background-color: $primary;
     border-color: transparent;
     color: $white;
+    @extend .is-outlined;
 
     &.is-active,
     &:hover:not([disabled]) {

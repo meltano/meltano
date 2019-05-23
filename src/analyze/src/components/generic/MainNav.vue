@@ -2,7 +2,7 @@
   <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
-        <logo></logo>
+        <Logo/>
       </div>
       <div class="navbar-burger burger"
            :class="{'is-active': isMobileMenuOpen}"
@@ -56,13 +56,11 @@
 </template>
 <script>
 import Logo from './Logo';
-import Profile from './Profile';
 
 export default {
   name: 'MainNav',
   components: {
     Logo,
-    Profile,
   },
   watch: {
     $route() {

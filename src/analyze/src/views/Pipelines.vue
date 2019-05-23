@@ -62,7 +62,7 @@ export default {
         <div class="step-marker">1</div>
         <div class="step-details">
           <button
-            class="step-title button is-interactive-navigation is-outlined"
+            class="step-title button is-interactive-navigation"
             :class="{ 'is-active': getIsActiveStep('extractors') }"
             @click='setStep("extractors")'>Extractors</button>
           <p>Data Sources</p>
@@ -77,7 +77,7 @@ export default {
         <div class="step-marker">2</div>
         <div class="step-details">
           <button
-            class="step-title button is-interactive-navigation is-outlined"
+            class="step-title button is-interactive-navigation"
             :class="{ 'is-active': getIsActiveStep('entities') }"
             :disabled='!getIsStepEntitiesMinimallyValidated'
             @click='setStep("entities")'>Entities</button>
@@ -93,7 +93,7 @@ export default {
         <div class="step-marker">3</div>
         <div class="step-details">
           <button
-            class="step-title button is-interactive-navigation is-outlined"
+            class="step-title button is-interactive-navigation"
             :class="{ 'is-active': getIsActiveStep('loaders') }"
             :disabled='!getIsStepLoadersMinimallyValidated'
             @click='setStep("loaders")'>Loaders</button>
