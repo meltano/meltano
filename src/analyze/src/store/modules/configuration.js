@@ -8,6 +8,8 @@ const state = {
   extractors: [],
   loaders: [],
   hasExtractorLoadingError: false,
+  loaderInFocusConfiguration: {},
+  extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
   installedPlugins: {},
   installingExtractors: [],
@@ -54,6 +56,14 @@ const actions = {
     commit('setAllExtractorInFocusEntities', null);
   },
 
+  clearExtractorInFocusConfiguration({ commit }) {
+    commit('setExtractorInFocusConfiguration', {});
+  },
+
+  clearLoaderInFocusConfiguration({ commit }) {
+    commit('setLoaderInFocusConfiguration', {});
+  },
+
   getAll({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
@@ -72,6 +82,24 @@ const actions = {
       .catch(() => {
         commit('setHasExtractorLoadingError', true);
       });
+  },
+
+  getExtractorConfiguration({ commit, dispatch }, extractor) {
+    dispatch('getPluginConfiguration', { name: extractor, type: 'extractors' })
+      .then((response) => {
+        commit('setExtractorInFocusConfiguration', response.data);
+      });
+  },
+
+  getLoaderConfiguration({ commit, dispatch }, loader) {
+    dispatch('getPluginConfiguration', { name: loader, type: 'loaders' })
+      .then((response) => {
+        commit('setLoaderInFocusConfiguration', response.data);
+      });
+  },
+
+  getPluginConfiguration(_, pluginPayload) {
+    return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
   installExtractor({ commit, dispatch }, extractor) {
@@ -99,9 +127,15 @@ const actions = {
   },
 
   saveExtractorConfiguration(_, configPayload) {
-    orchestrationsApi.saveExtractorConfiguration(configPayload);
+    orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
     // the extractor's config and we'd have to update this
+  },
+
+  saveLoaderConfiguration(_, configPayload) {
+    orchestrationsApi.savePluginConfiguration(configPayload);
+    // TODO commit if values are properly saved, they are initially copied from
+    // the loader's config and we'd have to update this
   },
 
   getInstalledPlugins({ commit }) {
@@ -173,7 +207,7 @@ const mutations = {
   },
 
   installLoaderComplete(_, loader) {
-    lodash.pull(state.installingExtractors, loader);
+    lodash.pull(state.installingLoaders, loader);
   },
 
   setAll(_, orchestrationData) {
@@ -190,6 +224,10 @@ const mutations = {
       : {};
   },
 
+  setExtractorInFocusConfiguration(_, configuration) {
+    state.extractorInFocusConfiguration = configuration;
+  },
+
   setHasExtractorLoadingError(_, value) {
     state.hasExtractorLoadingError = value;
   },
@@ -198,6 +236,10 @@ const mutations = {
     if (projectConfig.plugins) {
       state.installedPlugins = projectConfig.plugins;
     }
+  },
+
+  setLoaderInFocusConfiguration(_, configuration) {
+    state.loaderInFocusConfiguration = configuration;
   },
 
   toggleSelected(_, selectable) {

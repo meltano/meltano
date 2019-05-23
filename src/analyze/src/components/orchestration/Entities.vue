@@ -11,6 +11,7 @@ export default {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
+      'getIsExtractorPluginInstalled',
     ]),
     ...mapState('configuration', [
       'installedPlugins',
@@ -52,6 +53,7 @@ export default {
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
+              :class='{ "grayscale": !getIsExtractorPluginInstalled(extractor) }'
               :src='getExtractorImageUrl(extractor)'
               :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
           </div>

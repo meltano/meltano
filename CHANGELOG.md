@@ -9,11 +9,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#642](https://gitlab.com/meltano/meltano/issues/642) Improved UX during extractor plugin installation so settings can be configured *during* installation as opposed to waiting for the (typically lengthy) install to complete
 * [!613](https://gitlab.com/meltano/meltano/merge_requests/613) Updated home page docs with recommended install snippet so our "Learn More" CTA remains primary, but we make it easier for experienced devs to get up and running even quicker
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Added an Analyze landing page to facilitate future sub-UIs including the Analytics DB Connector Settings. Added proper Loader Settings UI.
 
 ### Changes
 
 ### Fixes
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analytics DB Connector Settings
 
 ### Breaks
 
