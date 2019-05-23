@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Service } from 'axios-middleware';
 
-export class ErrorMiddleware {
+export class FatalError {
   constructor({ router, toasted }) {
     this.router = router;
     this.toasted = toasted;
@@ -21,7 +21,7 @@ export default {
   install(Vue, options) {
     const service = new Service(axios);
 
-    service.register(new ErrorMiddleware({
+    service.register(new FatalError({
       router: options.router,
       toasted: options.toasted,
     }));
