@@ -18,18 +18,22 @@ export class AuthMiddleware {
   }
 
   onResponseError(err) { // eslint-disable-line class-methods-use-this
-    if (err.response && err.response.status === 403) {
-      this.toasted.global.forbidden();
+    if (!err.response) {
+      throw err;
     }
 
-    // 401 should be sent to login
-    if (err.response && err.response.status === 401) {
-      window.location.href = utils.root('/auth/login');
-    }
-
-    // 422 should be sent when the JWT is invalid
-    if (err.response && err.response.status === 422) {
-      window.location.href = utils.root('/auth/bootstrap');
+    switch (err.response.status) {
+      case 401:
+        window.location.href = utils.root('/auth/login');
+        break;
+      case 403:
+        this.toasted.global.forbidden();
+        break;
+      case 422:
+        window.location.href = utils.root('/auth/bootstrap');
+        break;
+      default:
+        break;
     }
 
     throw err;
