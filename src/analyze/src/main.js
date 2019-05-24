@@ -24,7 +24,7 @@ import {
   FontAwesomeLayersText,
 } from '@fortawesome/vue-fontawesome';
 import Auth from '@/middleware/auth';
-import FatalErr from '@/middleware/fatal-error';
+import FatalError from '@/middleware/fatalError';
 import Toasted from 'vue-toasted';
 import App from './App';
 import router from './router';
@@ -67,7 +67,7 @@ Vue.use(Auth, {
   toasted: Vue.toasted,
 });
 
-Vue.use(FatalErr, {
+Vue.use(FatalError, {
   router,
   toasted: Vue.toasted,
 });
