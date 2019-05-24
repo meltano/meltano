@@ -122,7 +122,7 @@ export default {
     },
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
-        name: this.loader.name,
+        name: this.extractor.name,
         type: 'extractor',
         config: this.configSettings,
       });
