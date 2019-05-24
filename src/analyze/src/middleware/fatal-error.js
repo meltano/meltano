@@ -2,8 +2,7 @@ import axios from 'axios';
 import { Service } from 'axios-middleware';
 
 export class FatalError {
-  constructor({ router, toasted }) {
-    this.router = router;
+  constructor({ toasted }) {
     this.toasted = toasted;
   }
 
@@ -21,7 +20,6 @@ export default {
     const service = new Service(axios);
 
     service.register(new FatalError({
-      router: options.router,
       toasted: options.toasted,
     }));
   },
