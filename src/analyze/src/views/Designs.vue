@@ -259,6 +259,13 @@ export default {
         <section>
           <div class="content">
             <h3>Analyses</h3>
+
+            <div class="notification is-small">
+              <p>This UI temporarily requires <code>meltano add model ...</code> to be executed from the CLI to properly display the analysis options below.</p>
+              <p>Learn how to do this <a href="https://meltano.com/docs/tutorial.html#run-elt-extract-load-transform">in the Meltano documentation</a>.</p>
+              <p class='is-italic'>The work for replacing this temporary UI is in this <a href="https://gitlab.com/meltano/meltano/issues/651">issue</a>.</p>
+            </div>
+
             <template v-for="(v, model) in models">
               <div class="navbar-item navbar-title has-text-grey-light" :key="model">
                 {{model | capitalize | underscoreToSpace}}
