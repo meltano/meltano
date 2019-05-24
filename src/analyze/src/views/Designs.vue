@@ -259,6 +259,17 @@ export default {
         <section>
           <div class="content">
             <h3>Analyses</h3>
+
+            <div class="notification is-small">
+              <p>This UI temporarily requires <br/> <code>meltano add model [name_of_model]</code>
+              to be executed from the CLI to properly display the analysis options below.</p>
+              <p>You can check for available models by running <br/>
+              <code>meltano discover models</code> in your project and then use <br/>
+              <code>meltano add model [name_of_model]</code> to add the models.</p>
+              <p class='is-italic'>The work for replacing this temporary UI is in this
+                <a href="https://gitlab.com/meltano/meltano/issues/651">issue</a>.</p>
+            </div>
+
             <template v-for="(v, model) in models">
               <div class="navbar-item navbar-title has-text-grey-light" :key="model">
                 {{model | capitalize | underscoreToSpace}}
