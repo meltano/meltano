@@ -173,7 +173,7 @@ meltano --help</code></pre><span class="code-block-copy-button code-block-copy-b
           <td>
             <ul>
               <li>
-                <a href="https://www.tableau.com/)">Tableau</a>
+                <a href="https://www.tableau.com/">Tableau</a>
               </li>
               <li>
                 <a href="https://www.metabase.com/">Metabase</a>
