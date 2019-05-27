@@ -68,8 +68,7 @@ const actions = {
     orchestrationsApi.index()
       .then((response) => {
         commit('setAll', response.data);
-      })
-      .catch(() => {});
+      });
   },
 
   getExtractorInFocusEntities({ commit }, extractorName) {
