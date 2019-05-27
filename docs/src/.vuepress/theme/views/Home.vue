@@ -173,7 +173,7 @@ meltano --help</code></pre><span class="code-block-copy-button code-block-copy-b
           <td>
             <ul>
               <li>
-                <a href="https://www.tableau.com/)">Tableau</a>
+                <a href="https://www.tableau.com/">Tableau</a>
               </li>
               <li>
                 <a href="https://www.metabase.com/">Metabase</a>
@@ -238,7 +238,7 @@ meltano --help</code></pre><span class="code-block-copy-button code-block-copy-b
     <div
       class="footer"
     >
-      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/Home.vue" target="_blank">Edit this page</a>
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">Edit this page</a>
     </div>
   </div>
 </template>
