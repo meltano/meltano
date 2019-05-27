@@ -28,6 +28,12 @@
     </div>
 
     <div slot='right'>
+
+      <ClosableMessage title='Meltano Dashboards'>
+        <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
+        <p><span class="is-italic">You need to save an analysis to a dashboard first</span>. Manage your dashboards below.</p>
+      </ClosableMessage>
+
       <h1>{{activeDashboard.name}}</h1>
       <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
       <hr v-if="activeDashboardReports.length">
@@ -52,6 +58,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import Chart from '@/components/designs/Chart';
+import ClosableMessage from '@/components/generic/ClosableMessage';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
@@ -67,6 +74,7 @@ export default {
   },
   components: {
     Chart,
+    ClosableMessage,
     NewDashboardModal,
     RouterViewLayoutSidebar,
   },

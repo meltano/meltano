@@ -1,7 +1,13 @@
-@import "../../node_modules/bulma/bulma";
+@import "@/scss/bulma-preset-overrides.scss";
+
+/*
+ELEMENTS -------------------------------------------------------------------------------------------
+Styles related to first-class elements
+*/
 
 html {
-  background-color: $light;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: $app-background-color;
 }
 
 @include tablet() {

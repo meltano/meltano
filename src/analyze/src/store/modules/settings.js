@@ -1,4 +1,5 @@
 import _ from 'lodash';
+
 import settingsApi from '../../api/settings';
 
 const state = {
@@ -36,14 +37,16 @@ const getters = {
 
 const actions = {
   getSettings({ commit }) {
-    return settingsApi.index().then((response) => {
-      commit('setSettings', response.data.settings);
-    });
+    return settingsApi.index()
+      .then((response) => {
+        commit('setSettings', response.data.settings);
+      });
   },
   saveConnection({ commit }, connection) {
-    settingsApi.saveConnection(connection).then((response) => {
-      commit('setSettings', response.data.settings);
-    });
+    settingsApi.saveConnection(connection)
+      .then((response) => {
+        commit('setSettings', response.data.settings);
+      });
   },
   deleteConnection({ commit }, connection) {
     const connectionToRemove = state.settings.connections
@@ -51,22 +54,19 @@ const actions = {
     settingsApi.deleteConnection(connectionToRemove)
       .then((response) => {
         commit('setSettings', response.data.settings);
-      })
-      .catch(() => { });
+      });
   },
   fetchACL({ commit }) {
     return settingsApi.fetchACL()
       .then((response) => {
         commit('setACL', response.data);
-      })
-      .catch(() => { });
+      });
   },
   createRole({ commit }, { role }) {
     settingsApi.createRole({ name: role })
       .then((response) => {
         commit('addRole', response.data);
-      })
-      .catch(() => { });
+      });
   },
   assignRoleUser({ commit }, { role, user }) {
     const roleDef = { name: role };
@@ -75,8 +75,7 @@ const actions = {
     settingsApi.createRole(roleDef, user)
       .then(() => {
         commit('assignUserRoles', { user, role });
-      })
-      .catch(() => { });
+      });
   },
   deleteRole({ commit }, { role }) {
     settingsApi.deleteRole({ name: role })
@@ -86,8 +85,7 @@ const actions = {
         state.acl.users.forEach((user) => {
           commit('unassignUserRole', { user: user.username, role });
         });
-      })
-      .catch(() => { });
+      });
   },
   unassignRoleUser({ commit }, { role, user }) {
     if (user === undefined) {
@@ -98,8 +96,7 @@ const actions = {
     settingsApi.deleteRole(roleDef, user)
       .then(() => {
         commit('unassignUserRole', { user, role });
-      })
-      .catch(() => { });
+      });
   },
   addRolePermission({ commit }, { permissionType, role, context }) {
     const roleDef = { name: role };
@@ -107,8 +104,7 @@ const actions = {
     settingsApi.addRolePermission(roleDef, permissionType, context)
       .then((response) => {
         commit('updateRole', response.data);
-      })
-      .catch(() => { });
+      });
   },
   removeRolePermission({ commit }, { permissionType, role, context }) {
     const roleDef = { name: role };
@@ -116,8 +112,7 @@ const actions = {
     settingsApi.removeRolePermission(roleDef, permissionType, context)
       .then((response) => {
         commit('updateRole', response.data);
-      })
-      .catch(() => { });
+      });
   },
 };
 

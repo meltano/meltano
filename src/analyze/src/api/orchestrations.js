@@ -18,7 +18,11 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
   },
 
-  saveExtractorConfiguration(configPayload) {
+  getPluginConfiguration(pluginPayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'get/configuration'), pluginPayload);
+  },
+
+  savePluginConfiguration(configPayload) {
     return axios.post(utils.apiUrl('orchestrations', 'save/configuration'), configPayload);
   },
 
@@ -30,7 +34,7 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
   },
 
-  getExtractorEntities(extractor) {
+  getExtractorInFocusEntities(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`));
   },
 

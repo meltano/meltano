@@ -4,7 +4,7 @@ export default {
   root(path = '/') {
     // window.FLASK should be injected in the template
     // either by Webpack (dev) or Flask (prod)
-    return `${FLASK.apiUrl}${path}`;
+    return `${FLASK.appUrl}${path}`;
   },
 
   apiRoot(path = '/') {

@@ -13,7 +13,7 @@
                    placeholder="Role name" />
           </div>
           <div class="control">
-            <button class="button is-success"
+            <button class="button is-interactive-primary"
                     :disabled="!has(model.role)"
                     @click.prevent="createRole(model)">
               Create

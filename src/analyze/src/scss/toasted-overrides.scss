@@ -1,0 +1,29 @@
+/*
+OVERRIDES ------------------------------------------------------------------------------------------
+Toasted library (may eventually switch to Bulma-Toast which likely removes need to override style)
+*/
+
+.toasted-container {
+
+  &.bottom-right {
+    bottom: 5%;
+  }
+
+  .toasted {
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    padding: 10px 20px;
+
+    .action {
+      text-transform: none;
+    }
+
+    &.outline {
+      border-radius: 4px;
+
+      &.error {
+        color: $error;
+        border-color: $error;
+      }
+    }
+  }
+}

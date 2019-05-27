@@ -1,10 +1,10 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-import repos from './modules/repos';
+import configuration from './modules/configuration';
 import designs from './modules/designs';
 import dashboards from './modules/dashboards';
+import repos from './modules/repos';
 import settings from './modules/settings';
-import orchestrations from './modules/orchestrations';
 
 Vue.use(Vuex);
 
@@ -16,7 +16,7 @@ export default new Vuex.Store({
     designs,
     dashboards,
     settings,
-    orchestrations,
+    configuration,
   },
   string: debug,
 });

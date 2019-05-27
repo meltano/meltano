@@ -8,6 +8,6 @@
 */
 
 module.exports = {
-  apiUrl: process.env.MELTANO_ANALYZE_API_URL,
+  appUrl: process.env.MELTANO_ANALYZE_APP_URL,
   airflowUrl: process.env.AIRFLOW_URL,
 };

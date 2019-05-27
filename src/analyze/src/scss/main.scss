@@ -1,12 +1,51 @@
-/* Main */
+/*
+INTERACTIVE ----------------------------------------------------------------------------------------
+Interactive helpers often with improved semantic names built on top of Bulma
+*/
 
-.log-output {
-  background: black;
-  color: white;
-  margin: 20px 0;
-  padding: 1rem;
-  white-space: pre-wrap;
-  @include courier;
+.is-interactive-navigation {
+  color: $primary;
+}
+
+.button.is-interactive-navigation {
+    background-color: $primary;
+    border-color: transparent;
+    color: $white;
+    @extend .is-outlined;
+
+    &.is-active,
+    &:hover:not([disabled]) {
+      background-color: darken($primary, 2.5%);
+    }
+
+    &.is-outlined {
+      background-color: transparent;
+      border-color: $primary;
+      color: $primary;
+
+      &.is-active,
+      &:hover:not([disabled]) {
+        background-color: $primary;
+        border-color: transparent;
+        color: $white;
+      }
+    }
+}
+
+.is-interactive-primary {
+  @extend .is-success;
+}
+
+.is-interactive-secondary {
+  @extend .is-link;
+}
+
+.has-text-interactive-primary {
+  @extend .has-text-success;
+}
+
+.has-text-interactive-secondary {
+  @extend .has-text-link;
 }
 
 a.disabled {
@@ -17,4 +56,32 @@ a.disabled {
   cursor: not-allowed;
   color: #CCC;
   opacity: 0.7;
+}
+
+/*
+LAYOUT ---------------------------------------------------------------------------------------------
+Layout helpers with names based on Bulma naming conventions
+*/
+
+.modal-card {
+  &.is-wide {
+    width: calc(100vw - 160px);
+  }
+
+  .modal-card-head-image {
+    margin-right: 1.25rem;
+  }
+}
+
+.step-spacer {
+  margin: 0 .5rem;
+}
+
+/*
+MODIFIERS ------------------------------------------------------------------------------------------
+Modifer helpers with names based on Bulma naming conventions
+*/
+
+.is-borderless {
+  border: none;
 }

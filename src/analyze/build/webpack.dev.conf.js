@@ -54,7 +54,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new webpack.EnvironmentPlugin({
       NODE_ENV: "development",
       AIRFLOW_URL: "http://localhost:5010",
-      MELTANO_ANALYZE_API_URL: "http://localhost:5000",
+      MELTANO_ANALYZE_APP_URL: "http://localhost:5000",
     }),
     new webpack.ProvidePlugin({
       FLASK: '@/globals',

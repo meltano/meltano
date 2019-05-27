@@ -153,7 +153,7 @@ If you are successful, you should see `Added and installed extractors 'tap-gitla
     - Create an access token
 1. Create a JSON file called `config.json` containing:
     - Access token you just created
-    - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v3`
+    - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v4`
     - Groups to track (space separated)    
     - Projects to track (space separated)
     
@@ -228,6 +228,49 @@ export MARKETO_ENDPOINT="yourEndpointUrl"
 export MARKETO_IDENTITY="yourIdentity"
 export MARKETO_START_TIME="yourStartTime"
 ```
+
+### MongoDB
+
+::: warning
+This tap is currently a proof of concept and may have limited utility, but feedback is always welcome on [issue #631](https://gitlab.com/meltano/meltano/issues/631)
+:::
+
+`tap-mongodb` pulls raw data from a MongoDB source.  
+
+#### Info
+
+- **Data Source**: [MongoDB](https://www.mongodb.com/) source
+- **Repository**: [https://github.com/singer-io/tap-mongodb](https://github.com/singer-io/tap-mongodb)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-mongodb
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-mongodb'` on your window.
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+# MongoDB databse host URI
+export MONGODB_HOST=""
+# MongoDB database port
+export MONGODB_PORT=""
+# MongoDB database username
+export MONGODB_USERNAME=""
+# MongoDB database password
+export MONGODB_PASSWORD=""
+# MongoDB database name
+export MONGODB_DBNAME=""
+```
+
 
 ### Salesforce
 

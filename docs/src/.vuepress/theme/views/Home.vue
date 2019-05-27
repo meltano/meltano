@@ -21,6 +21,12 @@
           :item="actionLink"
         />
       </p>
+
+      <div class='jump-in'>
+        <div class='jump-in-message'>or jump right in</div>
+        <div class="language-bash extra-class"><pre class="language-bash"><code>pip <span class="token function">install</span> meltano
+meltano --help</code></pre><span class="code-block-copy-button code-block-copy-button-offset" title="Copy to clipboard"></span></div>
+      </div>
     </div>
 
     <div
@@ -521,5 +527,18 @@ export default {
   justify-conent: center;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.jump-in {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-conent: center;
+  .jump-in-message {
+    margin-bottom: 1.8rem;
+  }
+  .language-bash {
+    padding-right: 1.5rem;
+  }
 }
 </style>

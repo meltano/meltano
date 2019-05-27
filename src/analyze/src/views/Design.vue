@@ -204,7 +204,7 @@
             <div class="control field" :class="{'has-addons': hasActiveReport()}">
               <p class="control">
                 <button
-                  class="button is-success is-outlined"
+                  class="button is-interactive-primary is-outlined"
                   v-if="hasActiveReport()"
                   @click="updateReport();">
                   <span>Save</span>
@@ -214,7 +214,7 @@
                 <Dropdown
                   :disabled="!hasChartableResults"
                   :label="hasActiveReport() ? '' : 'Save'"
-                  button-classes='is-success is-outlined'
+                  button-classes='is-interactive-primary is-outlined'
                   is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <div class="dropdown-item">
@@ -229,7 +229,7 @@
                       </div>
                       <div class="field is-grouped">
                         <div class="control">
-                          <button class="button is-link"
+                          <button class="button is-interactive-primary"
                                   :disabled="!saveReportSettings.name"
                                   @click="saveReport(); dropdownForceClose();">Save</button>
                         </div>
@@ -249,7 +249,7 @@
               <Dropdown
                 :disabled="!reports.length"
                 label="Load"
-                button-classes='is-success is-outlined'
+                button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
                 <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                   <a class="dropdown-item"
@@ -486,13 +486,11 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
+import Chart from '@/components/designs/Chart';
 import Dropdown from '@/components/generic/Dropdown';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import ResultTable from '@/components/designs/ResultTable';
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
-import SelectDropdown from '@/components/generic/SelectDropdown';
-import YesNoFilter from '@/components/filters/YesNoFilter';
-import Chart from '@/components/designs/Chart';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 
 export default {
   name: 'Design',
@@ -514,8 +512,6 @@ export default {
     Dropdown,
     ResultTable,
     RouterViewLayoutSidebar,
-    SelectDropdown,
-    YesNoFilter,
   },
   computed: {
     ...mapState('designs', [
@@ -721,7 +717,7 @@ code {
     padding-left: 1.75rem;
   }
   &.is-active {
-    border-left-color: $primary;
+    border-left-color: $interactive-secondary;
     border-left-width: 4px;
     @extend .has-background-white-ter;
   }

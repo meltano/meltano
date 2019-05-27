@@ -15,8 +15,7 @@ const actions = {
     Promise.all([promiseGetReports, promiseGetDashboards])
       .then(() => {
         dispatch('preloadDashboard', slug);
-      })
-      .catch(() => { });
+      });
   },
   preloadDashboard({ dispatch }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
@@ -36,8 +35,7 @@ const actions = {
           const dashboards = response.data;
           commit('setDashboards', dashboards);
           resolve();
-        })
-        .catch(() => { });
+        });
     });
   },
   setDashboard({ dispatch }, dashboard) {
@@ -49,8 +47,7 @@ const actions = {
         .then((response) => {
           commit('setReports', response.data);
           resolve();
-        })
-        .catch(() => { });
+        });
     });
   },
   getActiveDashboardReportsWithQueryResults({ commit }) {
@@ -59,16 +56,14 @@ const actions = {
     dashboardsApi.getActiveDashboardReportsWithQueryResults(activeReports)
       .then((response) => {
         commit('setActiveDashboardReports', response.data);
-      })
-      .catch(() => { });
+      });
   },
   saveDashboard({ dispatch, commit }, data) {
     dashboardsApi.saveDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
         commit('addSavedDashboardToDashboards', response.data);
-      })
-      .catch(() => { });
+      });
   },
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
     dashboardsApi.saveDashboard(data)
@@ -80,22 +75,19 @@ const actions = {
           reportId: report.id,
           dashboardId: dashboard.id,
         });
-      })
-      .catch(() => { });
+      });
   },
   addReportToDashboard({ dispatch }, data) {
     dashboardsApi.addReportToDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
-      })
-      .catch(() => {});
+      });
   },
   removeReportFromDashboard({ dispatch }, data) {
     dashboardsApi.removeReportFromDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
-      })
-      .catch(() => {});
+      });
   },
   updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard);

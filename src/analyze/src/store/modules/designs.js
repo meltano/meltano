@@ -228,8 +228,7 @@ const actions = {
     const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      })
-      .catch(() => { });
+      });
 
     sqlApi.getDialect(model)
       .then((response) => {
@@ -403,8 +402,7 @@ const actions = {
           data: response.data,
           field,
         });
-      })
-      .catch(() => { });
+      });
   },
 
   addDistinctSelection({ commit }, data) {
