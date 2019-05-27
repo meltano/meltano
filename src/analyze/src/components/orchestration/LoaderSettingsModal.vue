@@ -62,7 +62,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          :disabled='!isSavable'
+          :disabled='!isSaveable'
           @click.prevent="saveConfigAndGoToOrchestration">Save</button>
       </footer>
     </div>
@@ -100,7 +100,7 @@ export default {
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
         : this.loaderInFocusConfiguration;
     },
-    isSavable() {
+    isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
       return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);

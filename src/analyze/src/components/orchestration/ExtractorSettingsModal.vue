@@ -62,7 +62,7 @@
           @click="close">Cancel</button>
         <button
           class='button is-interactive-primary'
-          :disabled="!isSavable"
+          :disabled="!isSaveable"
           @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
@@ -106,7 +106,7 @@ export default {
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
         : {};
     },
-    isSavable() {
+    isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
       return hasOwns.length > 0 && this.getIsExtractorPluginInstalled(this.extractorNameFromRoute);
