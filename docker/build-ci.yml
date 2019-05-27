@@ -171,11 +171,11 @@ runner:
 .test_docker: &test_docker
   stage: test-docker
   image:
-    name: registry.gitlab.com/meltano/meltano:$IMAGE_TAG
+    name: $CI_REGISTRY_IMAGE:$IMAGE_TAG
     entrypoint: [""]
   script:
     - mkdir -p /meltano_projects && cd /meltano_projects
-    - meltano init carbon && cd carbon
+    - meltano init --no_usage_stats carbon && cd carbon
     - meltano elt tap-carbon-intensity target-sqlite
 
 test_e2e_dev:

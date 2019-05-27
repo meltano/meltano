@@ -45,7 +45,7 @@ install_e2e:
     - pip list
     - mkdir -p /home/projects
     - cd /home/projects
-    - meltano init test_project
+    - meltano init --no_usage_stats test_project
     - cd test_project
     - meltano discover all
     - meltano add extractor tap-carbon-intensity
