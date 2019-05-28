@@ -1,4 +1,4 @@
-# Meltano CLI
+# Command Line Interface (CLI) Guide
 
 Meltano provides a command line interface (CLI) to kick start and help you manage the configuration and orchestration of all the components in the data life cycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
