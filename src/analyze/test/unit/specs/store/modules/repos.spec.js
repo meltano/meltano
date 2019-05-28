@@ -8,7 +8,7 @@ describe('repos Vuex store', () => {
       activeView: { is_markdown: false, file: '', populated: false },
       loadingValidation: false,
       loadingUpdate: false,
-      models: [],
+      models: {},
       validated: false,
       errors: [],
       files: {},

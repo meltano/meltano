@@ -161,9 +161,15 @@ def lint_all(compile):
 
 @reposBP.errorhandler(MeltanoAnalysisFileParserError)
 def handle_meltano_analysis_file_parser_error(e):
-    return jsonify(
-        {"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]}
-    ), 500
+    return (
+        jsonify(
+            {
+                "result": False,
+                "errors": [{"message": e.message, "file_name": e.file_name}],
+            }
+        ),
+        500,
+    )
 
 
 @reposBP.errorhandler(FileNotFoundError)
