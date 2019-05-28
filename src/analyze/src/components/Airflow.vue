@@ -24,7 +24,9 @@ export default {
   },
 };
 </script>
-<style>
+<style lang="scss">
+ @import 'bulma';
+
  .proxy-container {
    display: flex;
    flex-grow: 1;
@@ -32,16 +34,16 @@ export default {
  }
 
  .disclaimer {
-   font-size: 0.8rem;
-   padding: 0.3rem;
-   color: white;
-   text-align: center;
-   background: #5555aa;
+   @extend .has-text-white;
+   @extend .has-text-centered;
+   @extend .is-size-7;
 
+   padding: 0.3rem;
+   background: #5555aa;
  }
 
  .disclaimer a {
-   color: white;
+   @extend .has-text-white;
    text-decoration: underline;
  }
 
