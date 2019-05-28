@@ -12,14 +12,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#586](https://gitlab.com/meltano/meltano/issues/586) `meltano ui` now automatically start Airflow if installed; Airflow UI available at `Orchestration`.
 * [#592](https://gitlab.com/meltano/meltano/issues/592) Added baseline UX feedback via toast for uncaught API response errors with a link to "Submit Bug"
 * [#642](https://gitlab.com/meltano/meltano/issues/642) Improved UX during extractor plugin installation so settings can be configured *during* installation as opposed to waiting for the (typically lengthy) install to complete
-* [!613](https://gitlab.com/meltano/meltano/merge_requests/613) Updated home page docs with recommended install snippet so our "Learn More" CTA remains primary, but we make it easier for experienced devs to get up and running even quicker
 * [!647](https://gitlab.com/meltano/meltano/merge_requests/647) Added preloader for occasional lengthy extractor loading and added feedback for lengthy entities loading
-* [#645](https://gitlab.com/meltano/meltano/issues/645) Added an Analyze landing page to facilitate future sub-UIs including the Analytics DB Connector Settings. Added proper Loader Settings UI.
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Added an Analyze landing page to facilitate future sub-UIs including the Analyze database settings; Added proper Loader Settings UI.
 
 ### Changes
 
 ### Fixes
-* [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analytics DB Connector Settings
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analyze database settings
 
 ### Breaks
 
