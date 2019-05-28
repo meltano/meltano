@@ -7,6 +7,8 @@ sidebarDepth: 2
 Meltano provides a command line interface (CLI) to kick start and help you manage the configuration and orchestration of all the components in the data life cycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
 
+## Commands
+
 - `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
 - `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** so that you can interactively generate SQL. They are installed inside the `.meltano` directory and are available to use in the Meltano UI.
@@ -23,22 +25,22 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
 
-## `init`
+### `init`
 
 The `init` command is used to create a new meltano project with a basic infrastructure in place. 
 
-### Example
+#### Example
 
 ```bash
 # Format
 meltano init [project_name] [--no_usage_stats]
 ```
 
-### Parameters
+#### Parameters
 
 * **project_name** - This determines the folder name for the project
 
-### Options
+#### Options
 
 * **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project. 
 
@@ -49,7 +51,7 @@ send_anonymous_usage_stats: false
 ```
 :::
 
-## Version
+### Version
 
 To check which version of Meltano you are using, run the following command:
 
@@ -63,14 +65,14 @@ To update Meltano to the latest version, run the following command in your termi
 pip install --upgrade meltano
 ```
 
-## meltano select
+### meltano select
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
 > You can use `meltano invoke tap-... --discover` to see if the tap supports it.
 
 Use this command to add select patterns to a specific extractor in your Meltano project.
 
-### Select Pattern
+#### Select Pattern
 
 Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) syntax you might find in your operating system.
 
@@ -79,7 +81,7 @@ Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki
   - `[abc]`: matches either `a`, `b`, or `c`
   - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-#### Examples
+##### Examples
 
 > Note: Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.
 
@@ -95,14 +97,14 @@ $ meltano select tap-carbon-intensity 'region'
 
 This will select all attributes of the `region` entity.
 
-### --exclude
+#### --exclude
 
 Use `--exclude` to exclude all attributes that match the filter.
 
 > Note: exclusion has precedence over inclusion. If an attribute is excluded, there
 > is no way to include it back without removing the exclusion pattern first.
 
-#### Examples
+##### Examples
 
 ```bash
 $ meltano select --exclude tap-carbon-intensity '*' 'longitude'
@@ -111,13 +113,13 @@ $ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
-### --list
+#### --list
 
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
-## Transforms
+### Transforms
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 
@@ -180,7 +182,7 @@ When Meltano runs a new transformation, `transform/dbt_project.yml` is always ke
 
 Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
 
-## meltano schedule
+### meltano schedule
 
 ::: tip
 An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
@@ -199,7 +201,7 @@ schedules:
     MELTANO_JOB_ID: ''
 ```
 
-## meltano permissions 
+### meltano permissions 
 
 Use this command to check and manage the permissions of a Snowflake account.
 
@@ -211,7 +213,7 @@ Given the parameters to connect to a Snowflake account and a YAML file (a "spec"
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
-### spec_file
+#### spec_file
 
 The YAML specification file is used to define in a declarative way the databases, roles, users and warehouses in a Snowflake account, together with the permissions for databases, schemas and tables for the same account.
 
@@ -310,15 +312,15 @@ warehouses:
 
 For a working example, you can check [the Snowflake specification file](https://gitlab.com/meltano/meltano/blob/master/tests/meltano/core/permissions/specs/snowflake_spec.yml) that we are using for testing `meltano permissions`.
 
-### --db
+#### --db
 
 The database to be used, either `postgres` or `snowflake`. Postgres is still experimental and may be fully supported in the future.
 
-### --diff
+#### --diff
 
 When this flag is set, a full diff with both new and already granted commands is returned. Otherwise, only required commands for matching the definitions on the spec are returned.
 
-### --dry
+#### --dry
 
 When this flag is set, the permission queries generated are not actually sent to the server and run; They are just returned to the user for examining them and running them manually.
 
@@ -337,7 +339,7 @@ $PERMISSION_BOT_ROLE
 $PERMISSION_BOT_WAREHOUSE
 ```
 
-## How ELT Commands Fetch Dependencies
+### How ELT Commands Fetch Dependencies
 
 When you run ELT commands on a tap or target, this is the general process for fetching dependencies:
 
@@ -349,13 +351,13 @@ When you run ELT commands on a tap or target, this is the general process for fe
   - in the project itself for the user to edit
   - in a global repo for meltano employees to edit
 
-# Tutorials
+## Tutorials
 
 Now that you know how to create a new project, we recommend checking out our [Carbon Emissions tutorial](/docs/tutorial.html#starter-carbon-emissions) to explore what Meltano is capable of. If you are feeling more adventurous, feel free to skip it and move on!
 
 <TutorialTable />
 
-## Starter - Carbon Emissions
+### Starter - Carbon Emissions
 
 This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-definitions/) (carbon emissions/footprint) and SQLite tutorial. This datasource was chosen as it is public, free, and does not require credentials to access. It guides you through data extraction from the Carbon Intensity API, loading extracted entities to a SQLite database, and analyzing the results.
 
@@ -363,11 +365,11 @@ This is the [Carbon Intensity API](https://carbon-intensity.github.io/api-defini
 This tutorial is perfect if your goal is to get Meltano up and running as quickly as possible.
 :::
 
-### Prerequisites
+#### Prerequisites
 
 - Meltano's [minimum requirements](./installation.html#requirements) installed
 
-### Initialize Your Project
+#### Initialize Your Project
 
 Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
 
@@ -400,7 +402,7 @@ Meltano extracts data from various sources like Salesforce, Zendesk, and Google 
 Meltano's ELT pipeline empowers you to aggregate data from various sources and then gather insights from them using Meltano UI with its automatic SQL generation.
 :::
 
-### Analyze with Meltano UI
+#### Analyze with Meltano UI
 
 Now that your data is extracted and loaded, it is ready to be analyzed. Time to start up the web app! Go back into your terminal and run the following command:
 
@@ -420,7 +422,7 @@ Having issues with Meltano? Help us help you. Here is a [pre-baked form to strea
 :::
 
 ---
-#### Analyze
+##### Analyze
 
 With Meltano UI up and running, we can automatically generate queries with as little as a single click and then explore the query results:
 
@@ -433,16 +435,16 @@ With Meltano UI up and running, we can automatically generate queries with as li
 
 ![Screenshot of Meltano UI with Carbon API charts](/screenshots/carbon-ui-charts.png)
 
-## Intermediate - Salesforce
+### Intermediate - Salesforce
 
 This is the Salesforce API and Postgres database tutorial. It guides you through data extraction from your Salesforce account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results.
 
-### Prerequisites
+#### Prerequisites
 
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 
-### Initialize Your Project
+#### Initialize Your Project
 
 To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
 
@@ -470,7 +472,7 @@ meltano add extractor tap-salesforce
 meltano add loader target-postgres
 ```
 
-### Set Your Credentials
+#### Set Your Credentials
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
@@ -501,7 +503,7 @@ Finally, make the credentials available to Meltano by executing the following co
 source .env
 ```
 
-### Select The Entities to Export from Salesforce
+#### Select The Entities to Export from Salesforce
 
 A Salesforce account may have more than 100 different entities. In order to see the list of available entities, please run
 
@@ -520,7 +522,7 @@ meltano select tap-salesforce "OpportunityHistory" "*"
 meltano select tap-salesforce "Contact" "*"
 ```
 
-### Run ELT (extract, load, transform)
+#### Run ELT (extract, load, transform)
 
 Run the full Extract > Load > Transform pipeline:
 
@@ -550,7 +552,7 @@ In order to visualize the data with existing transformations in the UI, the fina
 meltano add model model-salesforce
 ```
 
-### Interact with Your Data in The Web App
+#### Interact with Your Data in The Web App
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
 
@@ -578,20 +580,20 @@ You can now query and explore the extracted data:
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
 
-## Advanced - Create a Custom Extractor
+### Advanced - Create a Custom Extractor
 
 As much as we'd like to support all the data sources out there, we'll need your help to get there. If you find a data source that Meltano doesn't support right now, it might be time to get your hands dirty.
 
 We aim to make Meltano as thin as possible on top of the components it abstracts, so adding a new plugin should be straightforward.
 
-### How to Create a Extractor
+#### How to Create a Extractor
 
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
 If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
 :::
 
-### Create the Plugin's Package
+#### Create the Plugin's Package
 
 Meltano uses [Singer](https://singer.io) taps and targets to extract and load data. For more details about the Singer specification, please visit [https://github.com/singer-io/getting-started](https://github.com/singer-io/getting-started)
 
@@ -605,7 +607,7 @@ $ cookiecutter gh:singer-io/singer-tap-template
 > project_name: tap-gitlab-custom
 ```
 
-### Add the Plugin to Your Meltano Project (--custom)
+#### Add the Plugin to Your Meltano Project (--custom)
 
 Now that your plugin is part of your Meltano project, you need to add your plugin configuration in the `meltano.yml`'s plugin definition.
 
@@ -660,7 +662,7 @@ plugins:
 Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `config` section of a plugin.
 :::
 
-### Interacting with your new plugin
+#### Interacting with your new plugin
 
 Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
 
@@ -675,7 +677,7 @@ $ meltano select --list tap-gitlab-custom '*' '*'
 $ meltano elt tap-gitlab-custom target-sqlite
 ```
 
-### References
+#### References
 
   - [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
   - [tap-gitlab](https://gitlab.com/meltano/tap-gitlab)
@@ -684,9 +686,9 @@ $ meltano elt tap-gitlab-custom target-sqlite
   - [singer-tap-template](https://github.com/singer-io/singer-tap-template)
 
 
-## Advanced - Adding Custom Transformations and Models
+### Advanced - Adding Custom Transformations and Models
 
-### Prerequisites
+#### Prerequisites
 
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
@@ -696,7 +698,7 @@ $ meltano elt tap-gitlab-custom target-sqlite
 We assume that you have also run the [ELT steps](./tutorial.html#run-elt-extract-load-transform) in the SalesForce tutorial.
 Nothwithstanding, you can follow this tutorial in order to create entirely new transformations and run the whole ELT process in the end.
 
-### Context
+#### Context
 
 As an example, let's create transformations, which will allow us to look at closed opportunities (i.e. actual sales) by year, quarter and the following categorical dimensions:
 
@@ -706,7 +708,7 @@ As an example, let's create transformations, which will allow us to look at clos
 - Client's industry
 - Client's size, i.e. Small (<100 employees), Medium (100 - 999 employees), Large (1k - 20k employees), Strategic (>20k employees)
 
-### Adding Custom Transforms
+#### Adding Custom Transforms
 
 Let's create two additional tables:
 
@@ -834,7 +836,7 @@ We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract
 meltano elt tap-salesforce target-postgres --transform only
 
 ```
-### Adding Custom Models
+#### Adding Custom Models
 
 In order to access the newly transformed data in the UI, 2 additional types of files must be created:
 
@@ -994,14 +996,14 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 
 ```
 
-### Interact with Your Data in The Web App
+#### Interact with Your Data in The Web App
 
 [Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 
-## Using Docker
+### Using Docker
 
-### Using pre-built Docker images
+#### Using pre-built Docker images
 
 We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
 
@@ -1020,7 +1022,7 @@ meltano, version …
 
 Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
 
-### Creating your own Docker image
+#### Creating your own Docker image
 
 It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
 
@@ -1028,7 +1030,7 @@ It is possible to run Meltano as a Docker container to simplify usage, deploymen
 
 We will use `docker run` to execute Meltano using the pre-built docker images.
 
-#### Initialize Your Project
+##### Initialize Your Project
 
 First things first, let's create a new Meltano project named **carbon**.
 
@@ -1052,7 +1054,7 @@ $ docker run -v $(pwd):/project \
              meltano/meltano elt tap-carbon-intensity target-sqlite
 ```
 
-#### Analyze with Meltano UI
+##### Analyze with Meltano UI
 
 Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
 
@@ -1077,21 +1079,21 @@ You can now visit [http://localhost:5000](http://localhost:5000) to access the M
 For furter analysis, please head to the [Analyze](#analyze) section.
 
 
-## Using Jupyter Notebooks
+### Using Jupyter Notebooks
 
 Once the `meltano elt` pipeline has successfully completed and data extracted from an API or a Data Source have been transformed and loaded to the `analytics` schema of your Data Warehouse, you can use Meltano UI or any data exploration tool to analyze and generate reports.
 
 In this tutorial, we are going to present how to connect [Jupyter Notebook](https://jupyter.org/) to a Meltano Project that uses Postgres to store the transformed data.
 
 
-### Prerequisites
+#### Prerequisites
 
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 - You have successfully extracted and loaded data from an API by following the steps described in the previous Tutorials.
 
 
-### Jupyter Notebook Installation
+#### Jupyter Notebook Installation
 
 If you have Jupyter already installed in your system, you can skip this step.
 
@@ -1114,7 +1116,7 @@ pip install matplotlib
 
 Once the installation is completed, you are set to use Jupyter Notebooks with Meltano.
 
-### Running Jupyter Notebook 
+#### Running Jupyter Notebook 
 
 (**Optional**) Navigate to your Meltano Project and make the credentials you used with Meltano available to the environment the Jupyter Notebook will run:
 
@@ -1148,7 +1150,7 @@ When the notebook opens in your browser, you will see the Notebook Dashboard, wh
 
 If this is the first time you start `jupyter notebook` from the `notebook` directory of your Meltano project, the list will be empty. Let's start a new Python notebook!
 
-### Notebook Basics
+#### Notebook Basics
 
 While on the Notebook Dashboard, you can start a new Notebook by selecting `Python 3` from the `New` drop down menu.
 
@@ -1236,7 +1238,7 @@ plt.rcParams['figure.figsize'] = [15, 8]
 result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets','one_touch_tickets','reopened_tickets'])
 ```
 
-### Additional Resources
+#### Additional Resources
 
 In order to make the most out of Jupyter Notebooks, you can check the following resources:
 *  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
