@@ -26,7 +26,7 @@
         </router-link>
 
         <router-link
-          :to="{name: 'analyze'}"
+          :to="{name: 'AnalyzeModels'}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Analyze
         </router-link>

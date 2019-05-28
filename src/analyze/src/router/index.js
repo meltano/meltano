@@ -10,6 +10,8 @@ import Loaders from '@/components/orchestration/Loaders';
 import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
 import RunSummary from '@/components/orchestration/RunSummary';
 
+import AnalyzeModels from '@/views/AnalyzeModels';
+import AnalyzeSettings from '@/views/AnalyzeSettings';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
 import Dashboards from '@/views/Dashboards';
@@ -116,6 +118,18 @@ const router = new Router({
       path: '/analyze/',
       name: 'analyze',
       component: Designs,
+      children: [
+        {
+          path: 'models',
+          name: 'AnalyzeModels',
+          component: AnalyzeModels,
+        },
+        {
+          path: 'settings',
+          name: 'AnalyzeSettings',
+          component: AnalyzeSettings,
+        },
+      ],
     },
     {
       path: '/analyze/:model/:design',
