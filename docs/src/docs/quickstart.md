@@ -1,7 +1,3 @@
----
-sidebarDepth: 2
----
-
 # Quick Start
 
 Now that you have successfully installed Meltano, creating a new Meltano project is very simple. The Meltano CLI offers you a simple command to initialize a new project:
