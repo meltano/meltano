@@ -1,7 +1,3 @@
----
-sidebarDepth: 2
----
-
 # Tutorials
 
 Now that you know how to create a new project, we recommend checking out our [Carbon Emissions tutorial](/docs/tutorial.html#starter-carbon-emissions) to explore what Meltano is capable of. If you are feeling more adventurous, feel free to skip it and move on!
