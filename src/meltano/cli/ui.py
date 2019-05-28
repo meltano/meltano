@@ -34,4 +34,4 @@ def ui(project, debug, port, reload, hostname):
     tracker.track_meltano_ui()
 
     # todo: run gunicorn if not in debug mode
-    start(project, debug=debug, use_reloader=True, port=port, host=hostname)
+    start(project, debug=debug, use_reloader=reload, port=port, host=hostname)
