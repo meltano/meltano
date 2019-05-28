@@ -45,6 +45,6 @@ module.exports = {
   },
   globals: {
     'process': false,
-    'API_URL': false,
+    'FLASK': false,
   }
 }

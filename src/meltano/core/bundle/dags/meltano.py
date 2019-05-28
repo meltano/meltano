@@ -1,22 +1,9 @@
+import os
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from datetime import datetime, timedelta
 
 from meltano.core.schedule_service import ScheduleService
-
-import os
-
-print("\n==== CWD ====")
-print(os.getcwd())
-
-import sys
-
-print("\n==== sys.path ====")
-print(sys.path)
-
-print("\n==== PATH ====")
-print(os.environ["PATH"])
-
 from meltano.core.project import Project
 
 project = Project.find()

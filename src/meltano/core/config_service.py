@@ -31,6 +31,13 @@ class ConfigService:
         with self.project.meltano_update() as meltano_yml:
             meltano_yml["plugins"][plugin.type].append(plugin.canonical())
 
+    def has_plugin(self, plugin_name: str):
+        try:
+            self.get_plugin(plugin_name)
+            return True
+        except PluginMissingError:
+            return False
+
     def get_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
         try:
             return next(

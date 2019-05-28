@@ -16,6 +16,7 @@ import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
 import Pipelines from '@/views/Pipelines';
 import Repo from '@/views/Repo';
+import Airflow from '@/components/Airflow';
 
 Vue.use(Router);
 
@@ -101,11 +102,16 @@ const router = new Router({
           },
         },
         {
-          path: 'orchestration',
-          name: 'orchestration',
+          path: 'schedule',
+          name: 'schedule',
           component: RunSummary,
         },
       ],
+    },
+    {
+      path: '/orchestration/',
+      name: 'orchestration',
+      component: Airflow,
     },
     {
       path: '/files/',
