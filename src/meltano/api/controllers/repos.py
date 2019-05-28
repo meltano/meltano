@@ -163,12 +163,12 @@ def lint_all(compile):
 def handle_meltano_analysis_file_parser_error(e):
     return jsonify(
         {"result": False, "errors": [{"message": e.message, "file_name": e.file_name}]}
-    )
+    ), 500
 
 
 @reposBP.errorhandler(FileNotFoundError)
 def handle_file_not_found(e):
-    return jsonify({"result": False, "error": str(e)})
+    return jsonify({"result": False, "error": str(e)}), 404
 
 
 @reposBP.route("/lint", methods=["GET"])
