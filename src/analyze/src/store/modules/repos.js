@@ -1,10 +1,11 @@
 import repoApi from '../../api/repo';
+import _ from 'lodash';
 
 const state = {
   activeView: { is_markdown: false, file: '', populated: false },
   loadingValidation: false,
   loadingUpdate: false,
-  models: [],
+  models: {},
   validated: false,
   errors: [],
   files: {},
@@ -28,6 +29,10 @@ const getters = {
 
   hasFiles() {
     return Object.hasOwnProperty.call(state.files, 'topics') && state.files.topics.items;
+  },
+
+  hasModels() {
+    return !_.isEmpty(state.models);
   },
 
   passedValidation() {

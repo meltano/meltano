@@ -5,12 +5,14 @@ import capitalize from '@/filters/capitalize';
 import ClosableMessage from '@/components/generic/ClosableMessage';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import DocsLink from '@/components/generic/DocsLink';
 
 export default {
   name: 'Designs',
   components: {
     ClosableMessage,
     RouterViewLayout,
+    DocsLink,
   },
   filters: {
     capitalize,
@@ -48,6 +50,7 @@ export default {
     ]),
     ...mapGetters('repos', [
       'urlForModelDesign',
+      'hasModels',
     ]),
     ...mapGetters('settings', [
       'hasConnections',
@@ -287,6 +290,38 @@ export default {
               @click.prevent="saveConnection">Save</button>
           </div>
 
+        </section>
+      </div>
+      <div class="column">
+        <section>
+          <div class="content">
+            <h3>Analyses</h3>
+
+            <article v-if="!hasModels" class="message is-info is-small">
+              <div class="message-header">
+                <p>No model found in this project</p>
+              </div>
+              <div class="message-body">
+                <p class="content">
+                  Use <code>meltano add model</code> to add models to your current project.
+
+                  See the <docs-link page="tutorial" fragment="initialize-your-project">documentation</docs-link> for more details.
+                </p>
+              </div>
+            </article>
+            <template v-for="(v, model) in models">
+              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
+                {{model | capitalize | underscoreToSpace}}
+              </div>
+              <router-link
+                :to="urlForModelDesign(model, design)"
+                class="navbar-item navbar-child"
+                v-for="design in v['designs']"
+                :key="design">
+                {{design | capitalize | underscoreToSpace}}
+              </router-link>
+            </template>
+          </div>
         </section>
       </div>
     </div>

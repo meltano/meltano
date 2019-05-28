@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analytics DB Connector Settings
+* [#658](https://gitlab.com/meltano/meltano/issues/658) Fixed the Analyze page when no models are present
 
 ### Breaks
 
