@@ -263,7 +263,7 @@ export default {
           <div class="content">
             <h3>Analyses</h3>
 
-            <article v-if="true || !hasModels" class="message is-info is-small">
+            <article v-if="!hasModels" class="message is-info is-small">
               <div class="message-header">
                 <p>No model found in this project</p>
               </div>
