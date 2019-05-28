@@ -102,17 +102,51 @@ export default {
 
 <template>
   <router-view-layout>
+    <div class="container">
+      <div class="content">
+        <div class="level">
+          <div class="level-left">
+            <h1>Analyze</h1>
+          </div>
+          <div class="level-right">
+            <a href="#">Settings</a>
+          </div>
+        </div>
+        <div class="message is-warning">
+          <div class="message-body">
+            <p>This UI temporarily requires a model in order to display analysis options. For more information on how to add models, check out our <a href="https://www.meltano.com/docs/architecture.html#meltano-model">documentation for models</a>.
+            <p class='is-italic'>The work for replacing this temporary UI is in this
+              <a href="https://gitlab.com/meltano/meltano/issues/651">issue</a>.</p>
+          </div>
+        </div>
 
-    <ClosableMessage title='Meltano Analyze'>
-      <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
-      <p><span class="is-italic">You need to connect to pipelined data first</span>. Manage your connections below to enable analyses.</p>
-    </ClosableMessage>
+         <template v-for="(v, model) in models">
+            <h2 :key="model">
+              {{model | capitalize | underscoreToSpace}}
+            </h2>
+            <ul :key="`${model}-list`">
+              <li v-for="design in v['designs']" :key="design">
+                <router-link
+                  :to="urlForModelDesign(model, design)"
+                  class="navbar-item navbar-child"
+                  >
+                  {{design | capitalize | underscoreToSpace}}
+                </router-link>
+              </li>
+            </ul>
+          </template>
+      </div>
+    </div>
 
     <div class='columns'>
       <div class="column">
-        <section>
+        <section v-show="false">
           <div class="content">
             <h3>Analytics Connection Settings</h3>
+              <ClosableMessage title='Meltano Analyze'>
+                <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
+                <p><span class="is-italic">You need to connect to pipelined data first</span>. Manage your connections below to enable analyses.</p>
+              </ClosableMessage>
             <p v-if="!hasConnections">No Database Connections</p>
             <div class="columns is-multiline is-mobile">
               <div class="column is-half"
@@ -253,36 +287,6 @@ export default {
               @click.prevent="saveConnection">Save</button>
           </div>
 
-        </section>
-      </div>
-      <div class="column">
-        <section>
-          <div class="content">
-            <h3>Analyses</h3>
-
-            <div class="notification is-small">
-              <p>This UI temporarily requires <br/> <code>meltano add model [name_of_model]</code>
-              to be executed from the CLI to properly display the analysis options below.</p>
-              <p>You can check for available models by running <br/>
-              <code>meltano discover models</code> in your project and then use <br/>
-              <code>meltano add model [name_of_model]</code> to add the models.</p>
-              <p class='is-italic'>The work for replacing this temporary UI is in this
-                <a href="https://gitlab.com/meltano/meltano/issues/651">issue</a>.</p>
-            </div>
-
-            <template v-for="(v, model) in models">
-              <div class="navbar-item navbar-title has-text-grey-light" :key="model">
-                {{model | capitalize | underscoreToSpace}}
-              </div>
-              <router-link
-                :to="urlForModelDesign(model, design)"
-                class="navbar-item navbar-child"
-                v-for="design in v['designs']"
-                :key="design">
-                {{design | capitalize | underscoreToSpace}}
-              </router-link>
-            </template>
-          </div>
         </section>
       </div>
     </div>
