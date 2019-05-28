@@ -1,5 +1,5 @@
-import repoApi from '../../api/repo';
 import _ from 'lodash';
+import repoApi from '../../api/repo';
 
 const state = {
   activeView: { is_markdown: false, file: '', populated: false },
@@ -95,19 +95,19 @@ const actions = {
 };
 
 const mutations = {
-  setModels(_, models) {
+  setModels(currentState, models) {
     state.models = models;
   },
 
-  setRepoFiles(_, { files }) {
+  setRepoFiles(currentState, { files }) {
     state.files = files;
   },
 
-  setCurrentFileTable(_, file) {
+  setCurrentFileTable(currentState, file) {
     state.activeView = file;
   },
 
-  setValidatedState(_, validated) {
+  setValidatedState(currentState, validated) {
     state.errors = [];
     state.validated = true;
     // validation failed, so there will be errors
