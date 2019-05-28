@@ -15,6 +15,7 @@ import {
   faExclamationTriangle,
   faGlobeAmericas,
   faHashtag,
+  faPencilRuler,
   faSearch,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -46,6 +47,7 @@ library.add(faDotCircle);
 library.add(faExclamationTriangle);
 library.add(faGlobeAmericas);
 library.add(faHashtag);
+library.add(faPencilRuler);
 library.add(faSearch);
 library.add(faUser);
 
