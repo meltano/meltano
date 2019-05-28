@@ -12,17 +12,35 @@ Create and grant usage for a database schema.
 
 Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano UI.
 
-### Model Setup
+### Add a Model
+
+To add an existing model to your Meltano project, run the following command:
+
+```
+meltano add model [name_of_model]
+```
+
+### Discover Available Models
+
+To see what models are currently available in the Meltano ecosystem, run the following command:
+
+```
+meltano discover models
+```
+
+### Create a New Model
+
+#### Model Setup
 There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano UI:
 1. Author `my-database-setup.model.m5o` file(s)
     - Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
 1. Author `my-table.table.m5o` file(s)
     - Define a database table for connecting to using Meltano's CLI and/or UI
 
-### Model Authoring (`.m5o` files)
+#### Model Authoring (`.m5o` files)
 The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are examples with comments to aid the authoring of your `...model.m5o` and `...table.m5o` files mentioned above.
 
-#### Example `carbon.model.m5o` file
+##### Example `carbon.model.m5o` file
 
 ```
 # Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
@@ -64,7 +82,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 }
 ```
 
-#### Example `entry.table.m5o` file
+##### Example `entry.table.m5o` file
 
 ```
 # Define a database table for connecting to using Meltano's CLI and/or UI
