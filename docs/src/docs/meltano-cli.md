@@ -51,9 +51,9 @@ send_anonymous_usage_stats: false
 ```
 :::
 
-### Version
+### `version`
 
-To check which version of Meltano you are using, run the following command:
+The `version` command is used to check which version of Meltano you are using:
 
 ```bash
 meltano --version
@@ -65,12 +65,12 @@ To update Meltano to the latest version, run the following command in your termi
 pip install --upgrade meltano
 ```
 
-### meltano select
+### `select`
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
 > You can use `meltano invoke tap-... --discover` to see if the tap supports it.
 
-Use this command to add select patterns to a specific extractor in your Meltano project.
+Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
 #### Select Pattern
 
@@ -97,7 +97,7 @@ $ meltano select tap-carbon-intensity 'region'
 
 This will select all attributes of the `region` entity.
 
-#### --exclude
+#### `exclude`
 
 Use `--exclude` to exclude all attributes that match the filter.
 
@@ -113,13 +113,13 @@ $ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
-#### --list
+#### `list`
 
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
-### Transforms
+### `transform`
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 
@@ -182,7 +182,7 @@ When Meltano runs a new transformation, `transform/dbt_project.yml` is always ke
 
 Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
 
-### meltano schedule
+### `schedule`
 
 ::: tip
 An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
@@ -201,7 +201,7 @@ schedules:
     MELTANO_JOB_ID: ''
 ```
 
-### meltano permissions 
+### `permissions`
 
 Use this command to check and manage the permissions of a Snowflake account.
 
