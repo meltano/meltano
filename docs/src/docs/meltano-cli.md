@@ -1,5 +1,5 @@
 ---
-sidebarDepth: 2
+sidebarDepth: 1
 ---
 
 # Command Line Tools
@@ -201,9 +201,9 @@ schedules:
     MELTANO_JOB_ID: ''
 ```
 
-## Managing Snowflake Permissions
+## Managing Permissions
 
-### `permissions`
+#### `permissions`
 
 Use this command to check and manage the permissions of a Snowflake account.
 
