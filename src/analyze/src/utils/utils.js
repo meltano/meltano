@@ -16,6 +16,12 @@ export default {
     return this.apiRoot().concat(path);
   },
 
+  docsUrl(path = '/', fragment) {
+    fragment = fragment ? `#${fragment}` : '';
+
+    return `https://meltano.com/docs${path}.html${fragment}`;
+  },
+
   // Color Utils
   colors: {
     backgroundColor: [

@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* [#658](https://gitlab.com/meltano/meltano/issues/658) Fixed the Analyze page when no models are present
 
 ### Breaks
 
