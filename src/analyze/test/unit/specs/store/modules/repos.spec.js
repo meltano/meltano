@@ -24,11 +24,11 @@ describe('repos Vuex store', () => {
 
     activeView.is_markdown = true;
     activeView.populated = true;
-    expect(repos.getters.hasMarkdown()).toBe(true);
+    expect(repos.getters.hasMarkdown(repos.state)).toBe(true);
 
     activeView.is_markdown = false;
     activeView.populated = true;
-    expect(repos.getters.hasMarkdown()).toBe(false);
+    expect(repos.getters.hasMarkdown(repos.state)).toBe(false);
   });
 
   it('validates that the hasCode functions properly', () => {
@@ -36,10 +36,10 @@ describe('repos Vuex store', () => {
 
     activeView.is_markdown = false;
     activeView.populated = true;
-    expect(repos.getters.hasCode()).toBe(true);
+    expect(repos.getters.hasCode(repos.state)).toBe(true);
 
     activeView.is_markdown = true;
     activeView.populated = true;
-    expect(repos.getters.hasCode()).toBe(false);
+    expect(repos.getters.hasCode(repos.state)).toBe(false);
   });
 });

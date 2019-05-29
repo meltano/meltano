@@ -13,6 +13,8 @@ Vue.config.productionTip = false;
 Vue.use(Router);
 Vue.use(FontAwesome);
 
+Vue.use(Router);
+
 Vue.use(Toasted, {
   router,
   position: 'bottom-right',
