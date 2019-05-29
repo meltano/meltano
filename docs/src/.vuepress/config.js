@@ -52,7 +52,6 @@ module.exports = {
         '/docs/security-and-privacy',
         '/docs/deployment',
         '/docs/upgrading',
-        '/docs/personas',
         '/docs/roadmap',
         '/docs/architecture',
         '/docs/contributing'
