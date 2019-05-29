@@ -28,7 +28,7 @@
         <router-link
           :to="{name: 'orchestration'}"
           v-if="orchestrationEnabled"
-          class="navbar-item navbar-child">
+          class="navbar-item navbar-child has-text-weight-semibold">
           Orchestration
         </router-link>
         <span v-else class="navbar-item navbar-child disabled">
