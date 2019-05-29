@@ -154,3 +154,6 @@ orchestrators:
         dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
         plugins_folder: $MELTANO_PROJECT_ROOT/orchestrate/plugins
         sql_alchemy_conn: sqlite:///.meltano/orchestrators/airflow/airflow.db
+        load_examples: False
+      webserver:
+        web_server_port: 5010

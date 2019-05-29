@@ -14,7 +14,7 @@ export default {
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'orchestration', routeMatches: ['orchestration'] },
+        { name: 'schedule', routeMatches: ['schedule'] },
       ],
     };
   },
@@ -31,7 +31,7 @@ export default {
     getIsStepLoadersMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
-    getIsStepOrchestrationMinimallyValidated() {
+    getIsStepScheduleMinimallyValidated() {
       return true; // TODO proper minimally validated validation
     },
     isModal() {
@@ -103,17 +103,16 @@ export default {
       <div
         class="step-item"
         :class="{
-          'is-active': getIsActiveStep('orchestration'),
-          'is-completed': getIsStepOrchestrationMinimallyValidated
+          'is-active': getIsActiveStep('schedule'),
+          'is-completed': getIsStepScheduleMinimallyValidated
         }">
         <div class="step-marker">4</div>
         <div class="step-details">
           <button
             class="step-title button is-interactive-navigation is-outlined"
-            :class="{ 'is-active': getIsActiveStep('orchestration') }"
-            :disabled='!getIsStepOrchestrationMinimallyValidated'
-            @click='setStep("orchestration")'>Orchestration</button>
-          <p>Get Data</p>
+            :class="{ 'is-active': getIsActiveStep('schedule') }"
+            :disabled='!getIsStepScheduleMinimallyValidated'
+            @click='setStep("schedule")'>Schedule</button>
         </div>
       </div>
 
@@ -144,7 +143,7 @@ export default {
         </div>
         <div
           class="step-content"
-          :class="{ 'is-active': getIsActiveStep('orchestration') }">
+          :class="{ 'is-active': getIsActiveStep('schedule') }">
           <router-view></router-view>
         </div>
       </div>

@@ -1,3 +1,9 @@
+<template>
+  <a :href="url" :target="linkTarget">
+    <slot/>
+  </a>
+</template>
+
 <script>
 import utils from '@/utils/utils';
 
@@ -14,16 +20,8 @@ export default {
 
   computed: {
     url() {
-      const url = utils.docsUrl(this.linkPage, this.fragment);
-
-      return url;
+      return utils.docsUrl(this.linkPage, this.fragment);
     },
   },
 };
 </script>
-
-<template>
-  <a :href="url" :target="linkTarget">
-    <slot/>
-  </a>
-</template>

@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, jsonify, redirect
+from urllib.parse import urlsplit
+from flask import Blueprint, render_template, jsonify, redirect, g
 from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
@@ -22,7 +23,7 @@ def internal_error(exception):
 @login_required
 def default(path):
     try:
-        return render_template("analyze.html")
+        return render_template("analyze.html", jsContext=g.jsContext)
     except TemplateNotFound:
         return "Please run `make bundle` from src/analyze of the Meltano project."
 

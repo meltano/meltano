@@ -1,7 +1,4 @@
 import Router from 'vue-router';
-import Vue from 'vue';
-
-
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
@@ -18,8 +15,7 @@ import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
 import Pipelines from '@/views/Pipelines';
 import Repo from '@/views/Repo';
-
-Vue.use(Router);
+import Airflow from '@/components/Airflow';
 
 const router = new Router({
   mode: 'history',
@@ -103,11 +99,16 @@ const router = new Router({
           },
         },
         {
-          path: 'orchestration',
-          name: 'orchestration',
+          path: 'schedule',
+          name: 'schedule',
           component: RunSummary,
         },
       ],
+    },
+    {
+      path: '/orchestration/',
+      name: 'orchestration',
+      component: Airflow,
     },
     {
       path: '/files/',

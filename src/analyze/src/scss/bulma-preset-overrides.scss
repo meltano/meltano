@@ -1,3 +1,5 @@
+@import '~bulma/sass/utilities/initial-variables';
+
 /*
 OVERRIDES ------------------------------------------------------------------------------------------
 Derived variable overrides
@@ -19,11 +21,11 @@ $red: #db3b21;
 // to match above Gitlab Pajamas color semantics.
 $warning: $orange;
 $error: $red;
-
 $modal-background-background-color: rgba(#000000, 0.65);
 
 /* Sizes -------------------- */
 $navbar-height: 3.25rem;
+$navbar-breakpoint: $tablet;
 
 /*
 ADDITIONS ------------------------------------------------------------------------------------------
@@ -34,7 +36,8 @@ General and semantically named variables for improved contextual use within the 
 
 // Adding grey-lightest to sit between grey-lighter and white-ter
 // https://bulma.io/documentation/modifiers/color-helpers/#background-color
-$app-background-color: hsl(0, 0%, 100%);
+$grey-lightest: hsl(0, 0%, 93%);
+$app-background-color: white;
 
 // Useful for main and secondary navigation based interactive elements
 $interactive-navigation: $primary;

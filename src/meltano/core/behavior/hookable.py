@@ -5,31 +5,6 @@ from collections import OrderedDict
 from typing import Iterator, Tuple
 
 
-class TriggerError(Exception):
-    def __init__(self, hook, err):
-        self.hook = hook
-        self.error = err
-
-    def __str__(self):
-        return f"[{self.hook}]: {self.error}"
-
-    def __str__(self):
-        buf = io.StringIO()
-
-        for hook, err in self.errors:
-            buf.write(f"[{hook}] raised: {str(err)}\n")
-
-        return buf.getvalue()
-
-    @property
-    def errors(self) -> Iterator[Tuple[str, Exception]]:
-        for hook, err in self.before_hooks.items():
-            yield hook, err
-
-        for hook, err in self.after_hooks.items():
-            yield hook, err
-
-
 class hook:
     """
     This decorator marks a function as a __hook__.
@@ -98,7 +73,6 @@ class HookObject(metaclass=Hookable):
             try:
                 hook(target, *args, **kwargs)
             except Exception as err:
-                if hook.__hook__.can_fail:
-                    logging.warn(f"{hook_name} has failed: {err}")
-                else:
-                    raise TriggerError(hook_name, err) from err
+                logging.warn(f"{hook_name} has failed: {err}")
+                if not hook.__hook__.can_fail:
+                    raise err

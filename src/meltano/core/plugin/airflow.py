@@ -10,7 +10,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.venv_service import VenvService
-from meltano.core.utils import nest
+from meltano.core.utils import nest, map_dict
 
 
 class Airflow(Plugin):
@@ -59,7 +59,7 @@ class Airflow(Plugin):
         logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
         for section, cfg in self.config.items():
-            airflow_cfg[section].update(cfg)
+            airflow_cfg[section].update(map_dict(str, cfg))
             logging.debug(f"\tUpdated section [{section}]")
 
         with airflow_cfg_path.open("w") as cfg:

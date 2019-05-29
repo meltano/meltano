@@ -3,8 +3,6 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-const envPath = path.join(process.env.PWD, '../.env')
-require('dotenv').config({ path: envPath })
 
 
 module.exports = {
@@ -13,7 +11,6 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {},
-    apiUrl: process.env.MELTANO_ANALYZE_API_URL || "http://localhost:5000",
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

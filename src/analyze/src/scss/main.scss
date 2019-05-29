@@ -48,6 +48,16 @@ Interactive helpers often with improved semantic names built on top of Bulma
   @extend .has-text-link;
 }
 
+a.disabled {
+  pointer-events: none;
+}
+
+.disabled {
+  cursor: not-allowed;
+  color: #CCC;
+  opacity: 0.7;
+}
+
 /*
 LAYOUT ---------------------------------------------------------------------------------------------
 Layout helpers with names based on Bulma naming conventions

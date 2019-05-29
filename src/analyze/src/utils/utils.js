@@ -2,9 +2,9 @@ export default {
 
   // Path Utils
   root(path = '/') {
-    // window.API_URL should be injected in the template
+    // window.FLASK should be injected in the template
     // either by Webpack (dev) or Flask (prod)
-    return `${API_URL}${path}`;
+    return `${FLASK.appUrl}${path}`;
   },
 
   apiRoot(path = '/') {

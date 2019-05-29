@@ -14,8 +14,9 @@ The live site can be found at: [https://www.meltano.com](https://www.meltano.com
 ```bash
 npm install
 ```
-4. Run a local instance of VuePress that dynamically uploads as you make changes to the files in the `/docs` directory
+4. Navigate to the `/docs` directory and tun a local instance of VuePress that dynamically uploads as you make changes to the files in this directory
 ```bash
+cd docs/
 npm run dev:docs
 ```
 

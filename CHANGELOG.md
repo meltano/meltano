@@ -9,10 +9,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* [#592](https://gitlab.com/meltano/meltano/issues/592) Added baseline UX feedback via toast for uncaught API response errors with a link to "Submit Bug"
-* [#642](https://gitlab.com/meltano/meltano/issues/642) Improved UX during extractor plugin installation so settings can be configured *during* installation as opposed to waiting for the (typically lengthy) install to complete
-* [!613](https://gitlab.com/meltano/meltano/merge_requests/613) Updated home page docs with recommended install snippet so our "Learn More" CTA remains primary, but we make it easier for experienced devs to get up and running even quicker
-* [#645](https://gitlab.com/meltano/meltano/issues/645) Added an Analyze landing page to facilitate future sub-UIs including the Analytics DB Connector Settings. Added proper Loader Settings UI.
 
 ### Changes
 
@@ -21,6 +17,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#658](https://gitlab.com/meltano/meltano/issues/658) Fixed the Analyze page when no models are present
 
 ### Breaks
+
+
+## 0.25.0 - (2019-05-28)
+---
+
+### New
+* [#586](https://gitlab.com/meltano/meltano/issues/586) `meltano ui` now automatically start Airflow if installed; Airflow UI available at `Orchestration`.
+* [#592](https://gitlab.com/meltano/meltano/issues/592) Added baseline UX feedback via toast for uncaught API response errors with a link to "Submit Bug"
+* [#642](https://gitlab.com/meltano/meltano/issues/642) Improved UX during extractor plugin installation so settings can be configured *during* installation as opposed to waiting for the (typically lengthy) install to complete
+* [!647](https://gitlab.com/meltano/meltano/merge_requests/647) Added preloader for occasional lengthy extractor loading and added feedback for lengthy entities loading
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Added an Analyze landing page to facilitate future sub-UIs including the Analyze database settings; Added proper Loader Settings UI.
+
+
+### Fixes
+* [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analyze database settings
 
 
 ## 0.24.0 - (2019-05-06)
@@ -36,8 +47,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [!605](https://gitlab.com/meltano/meltano/merge_requests/605) Added tooltips for areas of UI that are WIP for better communication of a feature's status
 
 ### Changes
-* [#375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
-* [#522](https://gitlab.com/meltano/meltano/issues/522) Update Carbon tutorial with new instructions and screenshots
+* [375](https://gitlab.com/meltano/meltano/issues/375) Meltano can now run on any host/port
 
 ### Fixes
 * [#595](https://gitlab.com/meltano/meltano/issues/595) Fix `meltano invoke` not working properly with `dbt`
