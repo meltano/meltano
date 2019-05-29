@@ -1,6 +1,8 @@
 # Installation
 
-In this section, we will be installing Meltano as an application that you will be able to access on the command line (i.e., the terminal). We currently do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we have one!
+In this section, we will install Meltano as an application you can access from your browser and command line. 
+
+We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
 
 ## Requirements
 
@@ -49,3 +51,13 @@ That's it! Meltano is now be available for you to use. Now we can [create a Melt
 ## Troubleshooting
 
 Are you having installation problems? We are here to help you. Please feel out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
+
+## Upgrading Version
+
+### Update to the Latest
+
+To update Meltano to the latest version, run the following command in your terminal:
+
+```
+pip install --upgrade meltano
+```
