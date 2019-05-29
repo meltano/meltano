@@ -201,7 +201,11 @@ schedules:
     MELTANO_JOB_ID: ''
 ```
 
-## Managing Permissions
+## Snowflake Permissions
+
+:::tip
+This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. As we improve Meltano, this may become a first level concept within user roles but that is not the case today.
+:::
 
 #### `permissions`
 
