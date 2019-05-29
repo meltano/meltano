@@ -48,7 +48,6 @@ module.exports = {
         '/docs/tutorial',
         '/docs/plugins',
         '/docs/meltano-cli',
-        '/docs/orchestration',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/deployment',
