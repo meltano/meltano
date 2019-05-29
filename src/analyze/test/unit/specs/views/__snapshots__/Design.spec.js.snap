@@ -41,7 +41,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span
                     class="icon"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="search"
                     />
                   </span>
@@ -140,7 +140,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         <span
                           class="icon is-small"
                         >
-                          <font-awesome-icon
+                          <font-awesome-icon-stub
                             icon="caret-down"
                           />
                         </span>
@@ -227,7 +227,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       <span
                         class="icon is-small"
                       >
-                        <font-awesome-icon
+                        <font-awesome-icon-stub
                           icon="caret-down"
                         />
                       </span>
@@ -296,7 +296,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-bar"
                     />
                   </span>
@@ -313,7 +313,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-line"
                     />
                   </span>
@@ -330,7 +330,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-area"
                     />
                   </span>
@@ -347,7 +347,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="dot-circle"
                     />
                   </span>
@@ -365,7 +365,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-down"
                 />
               </span>
@@ -398,7 +398,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-up"
                 />
               </span>
@@ -536,7 +536,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span
                     class="icon"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="search"
                     />
                   </span>
@@ -635,7 +635,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         <span
                           class="icon is-small"
                         >
-                          <font-awesome-icon
+                          <font-awesome-icon-stub
                             icon="caret-down"
                           />
                         </span>
@@ -723,7 +723,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       <span
                         class="icon is-small"
                       >
-                        <font-awesome-icon
+                        <font-awesome-icon-stub
                           icon="caret-down"
                         />
                       </span>
@@ -783,7 +783,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-bar"
                     />
                   </span>
@@ -800,7 +800,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-line"
                     />
                   </span>
@@ -817,7 +817,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-area"
                     />
                   </span>
@@ -834,7 +834,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="dot-circle"
                     />
                   </span>
@@ -852,7 +852,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-down"
                 />
               </span>
@@ -885,7 +885,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-up"
                 />
               </span>
@@ -1027,7 +1027,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   <span
                     class="icon"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="search"
                     />
                   </span>
@@ -1126,7 +1126,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                         <span
                           class="icon is-small"
                         >
-                          <font-awesome-icon
+                          <font-awesome-icon-stub
                             icon="caret-down"
                           />
                         </span>
@@ -1214,7 +1214,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                       <span
                         class="icon is-small"
                       >
-                        <font-awesome-icon
+                        <font-awesome-icon-stub
                           icon="caret-down"
                         />
                       </span>
@@ -1274,7 +1274,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-bar"
                     />
                   </span>
@@ -1291,7 +1291,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-line"
                     />
                   </span>
@@ -1308,7 +1308,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-area"
                     />
                   </span>
@@ -1325,7 +1325,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="dot-circle"
                     />
                   </span>
@@ -1343,7 +1343,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-down"
                 />
               </span>
@@ -1376,7 +1376,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-up"
                 />
               </span>
@@ -1510,7 +1510,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span
                 class="icon"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="search"
                 />
               </span>
@@ -1653,7 +1653,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="chart-bar"
                 />
               </span>
@@ -1670,7 +1670,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="chart-line"
                 />
               </span>
@@ -1687,7 +1687,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="chart-area"
                 />
               </span>
@@ -1704,7 +1704,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="dot-circle"
                 />
               </span>
@@ -1722,7 +1722,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           <span
             class="icon is-small"
           >
-            <font-awesome-icon
+            <font-awesome-icon-stub
               icon="angle-down"
             />
           </span>
@@ -1755,7 +1755,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           <span
             class="icon is-small"
           >
-            <font-awesome-icon
+            <font-awesome-icon-stub
               icon="angle-up"
             />
           </span>
@@ -1895,7 +1895,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span
                     class="icon"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="search"
                     />
                   </span>
@@ -1994,7 +1994,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         <span
                           class="icon is-small"
                         >
-                          <font-awesome-icon
+                          <font-awesome-icon-stub
                             icon="caret-down"
                           />
                         </span>
@@ -2082,7 +2082,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       <span
                         class="icon is-small"
                       >
-                        <font-awesome-icon
+                        <font-awesome-icon-stub
                           icon="caret-down"
                         />
                       </span>
@@ -2143,7 +2143,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-bar"
                     />
                   </span>
@@ -2160,7 +2160,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-line"
                     />
                   </span>
@@ -2177,7 +2177,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="chart-area"
                     />
                   </span>
@@ -2194,7 +2194,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span
                     class="icon is-small"
                   >
-                    <font-awesome-icon
+                    <font-awesome-icon-stub
                       icon="dot-circle"
                     />
                   </span>
@@ -2212,7 +2212,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-down"
                 />
               </span>
@@ -2245,7 +2245,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <span
                 class="icon is-small"
               >
-                <font-awesome-icon
+                <font-awesome-icon-stub
                   icon="angle-up"
                 />
               </span>
