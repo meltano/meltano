@@ -1,6 +1,8 @@
 # Installation
 
-In this section, we will be installing Meltano as an application that you will be able to access on the command line (i.e., the terminal). We currently do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we have one!
+In this section, we will install Meltano as an application you can access from your browser and command line. 
+
+We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
 
 ## Requirements
 

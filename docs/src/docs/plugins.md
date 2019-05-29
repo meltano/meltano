@@ -6,13 +6,17 @@ sidebarDepth: 2
 
 ## Installation
 
+### From Meltano UI
+
+To manage your plugins, [launch Meltano's UI in your browser](/docs/tutorial.html) and visit [localhost:5000/pipelines/extractors/](http://localhost:5000/pipelines/extractors/). From here, you can install and configure connections with the plugins described below.
+
 ### Locally with the CLI
 
-The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command. Examples can be found in each plugin.
+The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command followed by an argument for the plugin name.
 
 ### On a CI Pipeline
 
-A docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+A Docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
 
 This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
 
@@ -25,7 +29,7 @@ Meltano should provide a wrapper script to manage the execution of the selected 
 Meltano Extractors are commonly prefixed with [tap](/docs/concepts.html#taps). 
 
 ::: tip 
-If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor).
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Analytics, Google Ads, and Facebook Ads as next up on the list.
 :::
 
 ### Carbon Intensity
