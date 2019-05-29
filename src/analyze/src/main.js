@@ -1,4 +1,6 @@
 import Vue from 'vue';
+import Router from 'vue-router';
+import Toasted from 'vue-toasted';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAngleDown,
@@ -25,7 +27,6 @@ import {
 } from '@fortawesome/vue-fontawesome';
 import Auth from '@/middleware/auth';
 import FatalError from '@/middleware/fatalError';
-import Toasted from 'vue-toasted';
 import App from './App';
 import router from './router';
 import store from './store';
@@ -52,6 +53,8 @@ library.add(faUser);
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 Vue.component('font-awesome-layers', FontAwesomeLayers);
 Vue.component('font-awesome-layers-text', FontAwesomeLayersText);
+
+Vue.use(Router);
 
 Vue.use(Toasted, {
   router,

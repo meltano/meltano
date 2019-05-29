@@ -1,15 +1,34 @@
-import { mount, createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
+import Router from 'vue-router';
+import { mount, createLocalVue, shallowMount } from '@vue/test-utils';
 import Repo from '@/views/Repo';
 import repos from '@/store/modules/repos';
+import router from '@/router';
 
 const localVue = createLocalVue();
 localVue.use(Vuex);
+localVue.use(Router);
+
 
 describe('Repo.vue', () => {
   let actions;
   let state;
   let store;
+
+  const createShallowWrapper = () =>
+    shallowMount(Repo, {
+      store,
+      localVue,
+      router,
+    });
+
+  const createWrapper = () =>
+    mount(Repo, {
+      store,
+      localVue,
+      router,
+      stubs: ['font-awesome-icon'],
+    });
 
   beforeEach(() => {
     state = repos.state;
@@ -31,7 +50,7 @@ describe('Repo.vue', () => {
   });
 
   it('calls getRepo() and sync() via created() lifecycle hook', () => {
-    const wrapper = shallowMount(Repo, { store, localVue });
+    const wrapper = createShallowWrapper();
 
     expect(wrapper.html()).toBeTruthy();
     expect(actions.getRepo).toHaveBeenCalled();
@@ -39,21 +58,21 @@ describe('Repo.vue', () => {
   });
 
   it('renders no code or markdown by default', () => {
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders markdown in the preview pane for markdown files', () => {
     state.activeView = { is_markdown: true, file: '<h1>Title</h1>', populated: true };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('renders code in the preview pane for code files', () => {
     state.activeView = { is_markdown: false, file: '{ "title": "Title" }', populated: true };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
   });
@@ -74,12 +93,10 @@ describe('Repo.vue', () => {
         }],
       },
     };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
-
     wrapper.find('.js-dashboards-some').trigger('click');
-
     expect(actions.getFile).toHaveBeenCalled();
   });
 
@@ -96,12 +113,10 @@ describe('Repo.vue', () => {
         }],
       },
     };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
-
     wrapper.find('.js-documents-readme').trigger('click');
-
     expect(actions.getFile).toHaveBeenCalled();
   });
 
@@ -123,12 +138,10 @@ describe('Repo.vue', () => {
         }],
       },
     };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
-
     wrapper.find('.js-reports-some').trigger('click');
-
     expect(actions.getFile).toHaveBeenCalled();
   });
 
@@ -145,12 +158,10 @@ describe('Repo.vue', () => {
         }],
       },
     };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
-
     wrapper.find('.js-tables-episodes').trigger('click');
-
     expect(actions.getFile).toHaveBeenCalled();
   });
 
@@ -167,12 +178,10 @@ describe('Repo.vue', () => {
         }],
       },
     };
-    const wrapper = mount(Repo, { store, localVue });
+    const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
-
     wrapper.find('.js-topics-carbon').trigger('click');
-
     expect(actions.getFile).toHaveBeenCalled();
   });
 });

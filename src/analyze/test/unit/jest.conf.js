@@ -28,4 +28,10 @@ module.exports = {
     '!src/router/index.js',
     '!**/node_modules/**',
   ],
+  globals: {
+    FLASK: {
+      appUrl: 'http://localhost:5000',
+      airflowUrl: 'http://localhost:5010',
+    },
+  },
 };
