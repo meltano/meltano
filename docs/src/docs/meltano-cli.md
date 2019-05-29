@@ -1246,3 +1246,39 @@ In order to make the most out of Jupyter Notebooks, you can check the following 
 *  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
 *  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
 *  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
+
+## Orchestration
+
+### Airflow
+
+Meltano uses [Airflow](https://apache.airflow.org) in order to schedule jobs. Please find below documentation on how it can be used.
+
+#### Getting started
+
+
+```bash
+# Install airflow in your Meltano project and make it available to use via `meltano invoke` 
+$ meltano add orchestrator airflow
+```
+
+Meltano ships out-of-the-box with a sample DAG for your current project, which is located at `orchestrate/dags/meltano.py`.
+Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
+
+Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
+
+```bash
+# View 'meltano' dags
+$ meltano invoke airflow list_dags
+
+# Manually trigger a task to run
+$ meltano invoke airflow run --raw meltano extract_load $(date -I)
+
+# Start the airflow ui - currently starts in a separate browser
+$ meltano invoke airflow webserver -D
+
+# start the airflow scheduler, enabling background job processing
+$ meltano invoke airflow scheduler -D
+
+# trigger a dag run
+$ meltano invoke airflow trigger_dag meltano
+```
