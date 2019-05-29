@@ -48,8 +48,6 @@ module.exports = {
         '/docs/tutorial',
         '/docs/plugins',
         '/docs/meltano-cli',
-        '/docs/concepts',
-        '/docs/architecture',
         '/docs/orchestration',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
@@ -57,6 +55,7 @@ module.exports = {
         '/docs/upgrading',
         '/docs/personas',
         '/docs/roadmap',
+        '/docs/architecture',
         '/docs/contributing'
       ]
     },

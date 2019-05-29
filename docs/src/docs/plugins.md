@@ -2,7 +2,7 @@
 sidebarDepth: 1
 ---
 
-# Plugins
+# Data Connectors
 
 ## Installation
 
