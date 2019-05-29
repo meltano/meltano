@@ -17,9 +17,9 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 def selection_color(selection):
     if selection is SelectionType.SELECTED:
-        return "white"
+        return "bright_green"
     elif selection is SelectionType.AUTOMATIC:
-        return "yellow"
+        return "bright_white"
     elif selection is SelectionType.EXCLUDED:
         return "red"
 
@@ -88,6 +88,7 @@ def show(project, extractor, show_all=False):
     select_service = SelectService(project, extractor)
     extractor = select_service.get_extractor()
     list_all = select_service.get_extractor_entities()
+    import pdb; pdb.set_trace()
 
     # legend
     click.secho("Legend:")
