@@ -51,7 +51,6 @@ module.exports = {
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/deployment',
-        '/docs/upgrading',
         '/docs/roadmap',
         '/docs/architecture',
         '/docs/contributing'

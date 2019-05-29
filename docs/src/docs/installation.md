@@ -51,3 +51,13 @@ That's it! Meltano is now be available for you to use. Now we can [create a Melt
 ## Troubleshooting
 
 Are you having installation problems? We are here to help you. Please feel out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
+
+## Upgrading Version
+
+### Update to the Latest
+
+To update Meltano to the latest version, run the following command in your terminal:
+
+```
+pip install --upgrade meltano
+```
