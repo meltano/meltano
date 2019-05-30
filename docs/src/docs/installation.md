@@ -32,6 +32,16 @@ $ pip --version
 If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
 :::
 
+### virtualenv
+
+Allows you to set up a virtual environment by running `virtualenv venv` from within your Meltano project. 
+
+```bash
+pip install virtualenv
+```
+
+To activate your virtual enviroment you will need to run `source venv/bin/activate`
+
 
 ## Instructions
 

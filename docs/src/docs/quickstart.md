@@ -1,6 +1,14 @@
 # Quick Start
 
-Now that you have successfully installed Meltano, creating a new Meltano project is very simple. Once we initialize a new project on the command line, the rest of your work will take place in our web-based user interface.
+Now that you have successfully [installed Meltano]('/docs/installation.html) and its requirements, you can create your first project. Once we initialize a new project on the command line, the rest of your work will take place in our web-based user interface.
+
+## Launch Your Virtual Environment
+
+Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
+
+```bash
+source venv/bin/activate
+```
 
 ## Create Your First Project
 
