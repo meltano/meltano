@@ -365,15 +365,13 @@ In order to make the most out of Jupyter Notebooks, you can check the following 
 
 ## Orchestration
 
-### Airflow
+Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs. Please find below documentation on how it can be used.
 
-Meltano uses [Airflow](https://apache.airflow.org) in order to schedule jobs. Please find below documentation on how it can be used.
+### Installing Airflow
 
-#### Getting started
+Change directories so that you are inside your Meltano project, and then run the following commadn to make Airflow available to use via `meltano invoke`
 
-
-```bash
-# Install airflow in your Meltano project and make it available to use via `meltano invoke` 
+```bash 
 $ meltano add orchestrator airflow
 ```
 
