@@ -13,6 +13,7 @@ from meltano.core.plugin.singer.catalog import (
     SelectExecutor,
     ListExecutor,
     ListSelectedExecutor,
+    path_property,
 )
 
 
@@ -243,10 +244,73 @@ CATALOG = """
 }
 """
 
+JSON_SCHEMA = """
+{
+  "streams": [
+    {
+      "tap_stream_id": "Entity",
+      "stream": "entities",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "active": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "balance": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+"""
+
 
 @pytest.fixture
 def select_all_executor():
     return SelectExecutor(["*.*"])
+
+
+@pytest.mark.parametrize(
+    "path,prop",
+    [
+        ("stream[0].properties.master.properties.details", "master.details"),
+        ("stream[2].properties.name", "name"),
+        ("stream[10].properties.list[2].properties.name", "list[2].name"),
+    ],
+)
+def test_path_property(path, prop):
+    assert path_property(path) == prop
 
 
 class TestSingerTap:
@@ -383,8 +447,8 @@ class TestLegacyCatalogSelectVisitor:
 
 class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.fixture
-    def catalog(self):
-        return json.loads(CATALOG)
+    def catalog(self, request):
+        return json.loads(globals()[request.param])
 
     @classmethod
     def stream_is_selected(cls, stream):
@@ -399,9 +463,17 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         except (KeyError, IndexError):
             return False
 
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
+    def test_visit(self, catalog, select_all_executor):
+        super().test_visit(catalog, select_all_executor)
+
+    @pytest.mark.parametrize(
+        "catalog", ["CATALOG", "JSON_SCHEMA"], indirect=["catalog"]
+    )
     def test_select_all(self, catalog, select_all_executor):
         visit(catalog, select_all_executor)
-
         self.assert_catalog_is_selected(catalog)
 
         streams = {stream["stream"]: stream for stream in catalog["streams"]}
@@ -416,32 +488,39 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
 
         assert stream_metadata == 1, "Extraneous stream metadata"
 
-    def test_select(self, catalog):
+    @pytest.mark.parametrize(
+        "catalog,attrs",
+        [
+            ("CATALOG", {"id", "code", "name", "code", "created_at"}),
+            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+        ],
+        indirect=["catalog"],
+    )
+    def test_select(self, catalog, attrs):
         selector = SelectExecutor(["entities.name", "entities.code"])
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties == {
-            "entities": {
-                "id",  # automatic
-                "created_at",  # automatic
-                "name",  # selected
-                "code",  # selected
-            }
-        }
+        assert lister.selected_properties["entities"] == attrs
 
-    def test_select_negated(self, catalog):
+    @pytest.mark.parametrize(
+        "catalog,attrs",
+        [
+            ("CATALOG", {"id", "balance", "created_at", "active"}),
+            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+        ],
+        indirect=["catalog"],
+    )
+    def test_select_negated(self, catalog, attrs):
         selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties == {
-            "entities": {"balance", "created_at", "id", "active"}
-        }
+        assert lister.selected_properties["entities"] == attrs
 
 
 class TestListExecutor:

@@ -17,22 +17,25 @@ class SelectService:
     def get_extractor(self):
         return self.extractor
 
+    def load_schema(self):
+        invoker = invoker_factory(self.project, self.extractor)
+        if not invoker.files["catalog"].exists():
+            logging.info("Catalog not found, trying to run the tap with --discover.")
+            self.extractor.run_discovery(invoker)
+
+        self.extractor.apply_select(invoker)
+        with invoker.files["catalog"].open() as catalog:
+            return json.load(catalog)
+
     def get_extractor_entities(self):
         invoker = invoker_factory(self.project, self.extractor)
 
+    def get_extractor_entities(self):
         list_all = ListSelectedExecutor()
-        try:
-            if not invoker.files["catalog"].exists():
-                logging.info(
-                    "Catalog not found, trying to run the tap with --discover."
-                )
-                self.extractor.run_discovery(invoker)
-            else:
-                self.extractor.apply_select(invoker)
 
-            with invoker.files["catalog"].open() as catalog:
-                schema = json.load(catalog)
-                visit(schema, list_all)
+        try:
+            schema = self.load_schema()
+            visit(schema, list_all)
         except FileNotFoundError as e:
             logging.error(
                 "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
