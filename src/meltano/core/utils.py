@@ -115,15 +115,20 @@ def nest(d: dict, path: str, value={}):
     """
     cursor = d
 
+    *initial, tail = path.split(".")
+
     # create the list of dicts
-    for key in path.split("."):
+    for key in initial:
         if key not in cursor:
-            # We need to copy the value to make sure
-            # the `value` parameter is not mutated.
-            cursor[key] = deepcopy(value)
+            cursor[key] = {}
+
         cursor = cursor[key]
 
-    return cursor
+    # We need to copy the value to make sure
+    # the `value` parameter is not mutated.
+    cursor[tail] = deepcopy(value)
+
+    return cursor[tail]
 
 
 def file_has_data(file: Union[Path, str]):
