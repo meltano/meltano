@@ -54,6 +54,7 @@ dev_requires = [
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',
+    'ipython==7.5.0',
 ]
 
 setup(
