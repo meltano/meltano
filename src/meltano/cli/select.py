@@ -88,7 +88,6 @@ def show(project, extractor, show_all=False):
     select_service = SelectService(project, extractor)
     extractor = select_service.get_extractor()
     list_all = select_service.get_extractor_entities()
-    import pdb; pdb.set_trace()
 
     # legend
     click.secho("Legend:")
