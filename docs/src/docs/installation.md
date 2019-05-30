@@ -6,6 +6,8 @@ We do not have a double click installer at this time, but it is in our roadmap a
 
 ## Requirements
 
+Before you install meltano with `pip install meltano` make sure you have the following requirements installed and up to date.
+
 ### Python 3+
 
 - [Python 3.6.1+](https://realpython.com/installing-python/)
@@ -24,8 +26,11 @@ Python 3.6.1
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check version of pip
+# Check for current version of pip
 $ pip --version
+
+# Update pip
+$ pip install --upgrade pip
 ```
 
 ::: tip
@@ -43,7 +48,7 @@ pip install virtualenv
 To activate your virtual enviroment you will need to run `source venv/bin/activate`
 
 
-## Instructions
+## Installing Meltano
 
 1. Open your command line tool (i.e., Terminal for macOS)
 2. Then run the following command:

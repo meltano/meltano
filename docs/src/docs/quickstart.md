@@ -7,6 +7,10 @@ Now that you have successfully [installed Meltano]('/docs/installation.html) and
 Navigate to the directory in your terminal where you want your Meltano project to be installed. Then run the following commands:
 
 ```bash
+# Create virtual environment
+virtualenv venv
+
+# Activate virtual environment
 source venv/bin/activate
 ```
 
