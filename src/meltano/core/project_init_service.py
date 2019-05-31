@@ -83,30 +83,29 @@ class ProjectInitService:
             raise ProjectInitServiceError
 
         new_project = Project(self.project_name)
-        self.project_echo("", True)
-
         for path in visit(default_project_yaml, Path(self.project_name)):
-            self.project_echo(filename=path, star=path.is_file(), check=path.is_dir())
+            self.project_echo(filename=path)
 
         return new_project
 
-    def project_echo(self, filename="", star=False, check=False):
-        star = "⭐" if star else ""
-        check = "✅" if check else ""
-        click.secho(f"{star}{check}\tCreated", fg="blue", nl=False)
+    def project_echo(self, filename=""):
+        click.secho(f"\tCreated", fg="blue", nl=False)
         click.echo(f" ./{filename}")
 
     def echo_instructions(self):
-        click.secho(f"🚀\t{self.project_name}", fg="green", nl=False)
-        click.echo(" has been created. Next steps:")
-        click.echo(f"🚪\tcd ", nl=False)
+        click.secho("Project", nl=False)
+        click.secho(f" {self.project_name}", fg="green", nl=False)
+        click.echo(" has been created.")
+
+        click.echo("\nNext steps:")
+        click.secho("\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
-        click.secho(
-            "📈\tMeltano sends anonymous usage data that helps us improve the product. For more information, see https://meltano.com/docs/meltano-cli.html#init"
+        click.echo(
+            "\tVisit https://meltano.com/docs/tutorial.html in order to try us out"
         )
-        click.secho(
-            "🚀\tPlease visit https://meltano.com/docs/tutorial.html in order to try us out",
-            fg="green",
+
+        click.echo(
+            "\nMeltano sends anonymous usage data that helps us improve the product.\nFor more information, see https://meltano.com/docs/meltano-cli.html#init"
         )
 
     def join_with_project_base(self, filename):

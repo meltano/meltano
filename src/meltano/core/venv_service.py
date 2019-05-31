@@ -2,32 +2,32 @@ import subprocess
 import platform
 import sys
 import os
-from abc import ABC
+from pathlib import Path
+from collections import namedtuple
 from .project import Project
 from .error import SubprocessError
 
 
-VenvSpecs = namedtuple("VenvSpecs", (
-    "python_executable",
-    "lib_dir",
-    "bin_dir",
-    "site_packages_dir")
+VenvSpecs = namedtuple(
+    "VenvSpecs", ("python_executable", "lib_dir", "bin_dir", "site_packages_dir")
 )
 
 
-class VenvProvider(ABC):
+class VirtualEnv:
     PLATFORM_SPECS = {
         "Linux": VenvSpecs(
             lib_dir="lib",
             bin_dir="bin",
-            site_packages_dir=os.path.join("python", sys.version[:3], "site-packages"),
+            site_packages_dir=os.path.join(
+                "lib", "python" + sys.version[:3], "site-packages"
+            ),
             python_executable="python3",
         ),
         "Windows": VenvSpecs(
             lib_dir="Lib",
             bin_dir="Scripts",
-            site_packages_dir="site-packages",
-            python_executable="python"
+            site_packages_dir=os.path.join("Lib", "site-packages"),
+            python_executable="python",
         ),
     }
 
@@ -39,12 +39,20 @@ class VenvProvider(ABC):
     def platform_specs(cls):
         try:
             system = platform.system()
-            return self.__class__.PLATFORM_SPECS[system]
+            return cls.PLATFORM_SPECS[system]
         except KeyError:
             raise Exception(f"Platform {system} not supported.")
 
-    def __getattribute__(self, attr):
-        return self._specs[attr]
+    def __getattr__(self, attr):
+        spec = getattr(self._specs, attr)
+
+        if attr.endswith("_dir"):
+            return self.root.joinpath(spec)
+        else:
+            return spec
+
+    def __str__(self):
+        return str(self.root)
 
 
 class VenvService:
@@ -52,11 +60,10 @@ class VenvService:
         self.project = project
 
     def create(self, namespace="", name=""):
-        venv_path = self.project.venvs_dir(namespace, name)
-        provider = VenvProvider(venv_path)
+        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
 
         run = subprocess.run(
-            [provider.python_executable, "-m", "venv", str(venv_path)],
+            [venv.python_executable, "-m", "venv", str(venv)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -70,19 +77,19 @@ class VenvService:
         # we want the plugin to inherit our current venv
         sys_paths = []
         for path in sys.path:
+            # the current venv if any
             if path.endswith("site-packages"):
                 sys_paths.append(path)
 
-            if path.endswith(os.path.join("meltano", "src")):  # meltano is installed as editable
+            # when meltano is installed as editable
+            if path.endswith(os.path.join("meltano", "src")):
                 sys_paths.append(path)
 
-        # inject a .pth to include the current virtualenv if possible
-        meltano_pth_path = venv_path.joinpath(
-            provider.site_packages_dir, "meltano_venv.pth"
-        )
+        # inject a .pth to add these PYTHONPATHs
+        meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
         with meltano_pth_path.open("w") as pth:
             for path in sys_paths:
-                pth.write(path + os.linesep)
+                pth.write(path + "\n")
 
         return run
 
@@ -112,4 +119,4 @@ class VenvService:
     def exec_path(self, bin, name=None, namespace=""):
         name = name or bin
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
-        return venv.bin_dir(bin)
+        return venv.bin_dir.joinpath(bin)
