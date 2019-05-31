@@ -37,11 +37,11 @@ $ pip install --upgrade pip
 If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
 :::
 
-### virtualenv
+### Virtual Environment
 
-We highly recommend using a virtual environment on your local development environment to run Meltano, rather than installing globally. 
+We highly recommend using a virtual environment to install and run Meltano, rather than installing globally. 
 
-If you haven't already, create a directory where you want your virtual environments to be saved. Then change to that directory and create a new virtual environment
+If you haven't already, create a directory where you want your virtual environments to be saved (e.g. /Users/YOUR_USERNAME/Virtual). Then change to that directory and create a new virtual environment
 
 ```bash
 mkdir Virtual
