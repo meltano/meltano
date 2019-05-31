@@ -41,18 +41,18 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 We highly recommend using a virtual environment to install and run Meltano, rather than installing globally. 
 
-If you haven't already, create a directory where you want your virtual environments to be saved (e.g. /Users/YOUR_USERNAME/Virtual). Then change to that directory and create a new virtual environment
+Create a directory where you want your virtual environments to be saved (e.g. /Users/YOUR_USERNAME/Virtual). Then change to that directory and create a new virtual environment:
 
 ```bash
-mkdir Virtual
-cd Virtual
-python -m venv [YOUR_VENV_NAME]
+$ mkdir Virtual
+$ cd Virtual
+$ python -m venv [YOUR_VENV_NAME]
 ```
 
-To activate your virtual enviroment, you will need to be inside your Virtual directory. Then run 
+To activate your virtual enviroment, you will need to be inside your /Virtual directory. Then run: 
 
 ```bash
-source [YOUR_VENV_NAME]/bin/activate
+$ source [YOUR_VENV_NAME]/bin/activate
 ```
 
 Note: We will add Microsoft Windows virtual environment instructions in the future (contributions welcome).
@@ -83,7 +83,7 @@ Are you having installation problems? We are here to help you. Please feel out t
 We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
 ```
-pip install --upgrade meltano
+$ pip install --upgrade meltano
 ```
 
 Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
