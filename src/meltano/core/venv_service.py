@@ -2,8 +2,49 @@ import subprocess
 import platform
 import sys
 import os
+from abc import ABC
 from .project import Project
 from .error import SubprocessError
+
+
+VenvSpecs = namedtuple("VenvSpecs", (
+    "python_executable",
+    "lib_dir",
+    "bin_dir",
+    "site_packages_dir")
+)
+
+
+class VenvProvider(ABC):
+    PLATFORM_SPECS = {
+        "Linux": VenvSpecs(
+            lib_dir="lib",
+            bin_dir="bin",
+            site_packages_dir=os.path.join("python", sys.version[:3], "site-packages"),
+            python_executable="python3",
+        ),
+        "Windows": VenvSpecs(
+            lib_dir="Lib",
+            bin_dir="Scripts",
+            site_packages_dir="site-packages",
+            python_executable="python"
+        ),
+    }
+
+    def __init__(self, root: Path):
+        self.root = root
+        self._specs = self.__class__.platform_specs()
+
+    @classmethod
+    def platform_specs(cls):
+        try:
+            system = platform.system()
+            return self.__class__.PLATFORM_SPECS[system]
+        except KeyError:
+            raise Exception(f"Platform {system} not supported.")
+
+    def __getattribute__(self, attr):
+        return self._specs[attr]
 
 
 class VenvService:
@@ -12,13 +53,10 @@ class VenvService:
 
     def create(self, namespace="", name=""):
         venv_path = self.project.venvs_dir(namespace, name)
-        if platform.system() == "Windows":
-            python_executable = "python"
-        else:
-            python_executable = "python3"
+        provider = VenvProvider(venv_path)
 
         run = subprocess.run(
-            [python_executable, "-m", "venv", str(venv_path)],
+            [provider.python_executable, "-m", "venv", str(venv_path)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
@@ -34,16 +72,17 @@ class VenvService:
         for path in sys.path:
             if path.endswith("site-packages"):
                 sys_paths.append(path)
-            if path.endswith("meltano/src"):  # meltano is installed as editable
+
+            if path.endswith(os.path.join("meltano", "src")):  # meltano is installed as editable
                 sys_paths.append(path)
 
         # inject a .pth to include the current virtualenv if possible
         meltano_pth_path = venv_path.joinpath(
-            "lib", "python" + sys.version[:3], "site-packages", "meltano_venv.pth"
+            provider.site_packages_dir, "meltano_venv.pth"
         )
         with meltano_pth_path.open("w") as pth:
             for path in sys_paths:
-                pth.write(path + "\n")
+                pth.write(path + os.linesep)
 
         return run
 
@@ -72,8 +111,5 @@ class VenvService:
 
     def exec_path(self, bin, name=None, namespace=""):
         name = name or bin
-        if platform.system() == "Windows":
-            exec_folder = "Scripts"
-        else:
-            exec_folder = "bin"
-        return self.project.venvs_dir(namespace, name).joinpath(exec_folder, bin)
+        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+        return venv.bin_dir(bin)
