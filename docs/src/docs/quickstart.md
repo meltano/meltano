@@ -1,4 +1,4 @@
-# Quick Start
+# Quick Start Guide
 
 Now that you have successfully [installed Meltano]('/docs/installation.html) and its requirements, you can create your first project. 
 
@@ -12,7 +12,7 @@ Remember, to activate your virtual enviroment, you will need to be inside your /
 $ source [YOUR_VENV_NAME]/bin/activate
 ```
 
-## Create Your First Project
+## Creating Your First Project
 
 Run this command in your terminal to initialize a new project:
 
