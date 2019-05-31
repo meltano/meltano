@@ -39,20 +39,34 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### virtualenv
 
-We highly recommend using a virtual environment by running `python -m venv [VENV_NAME]` from wherever you want your virtual environment to be (you might want to create a folder for these). 
+We highly recommend using a virtual environment on your local development environment to run Meltano, rather than installing globally. 
 
-To activate your virtual enviroment you will need to run `source [VENV_NAME]/bin/activate`
+If you haven't already, create a directory where you want your virtual environments to be saved. Then change to that directory and create a new virtual environment
 
-Note: We will add Microsoft Windows instructions in the future (contributions welcome).
+```bash
+mkdir Virtual
+cd Virtual
+python -m venv [YOUR_VENV_NAME]
+```
+
+To activate your virtual enviroment, you will need to be inside your Virtual directory. Then run 
+
+```bash
+source [YOUR_VENV_NAME]/bin/activate
+```
+
+Note: We will add Microsoft Windows virtual environment instructions in the future (contributions welcome).
 
 ## Installing Meltano
 
-1. Open your command line tool (i.e., Terminal for macOS)
-2. Then run the following command:
+Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
+
 ```bash
 $ pip install meltano
 ```
-3. Once the installation, you can check if it was successful by running:
+
+Once the installation completes, you can check if it was successful by running:
+
 ```bash
 $ meltano --version
 meltano, version X.XX.X
@@ -66,10 +80,10 @@ Are you having installation problems? We are here to help you. Please feel out t
 
 ## Upgrading Version
 
-### Update to the Latest
-
-To update Meltano to the latest version, run the following command in your terminal:
+We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
 ```
 pip install --upgrade meltano
 ```
+
+Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
