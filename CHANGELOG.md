@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [#657](https://gitlab.com/meltano/meltano/issues/657) Update Analyze page to have single purpose views
 
 ### Fixes
 * [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analytics DB Connector Settings
