@@ -124,7 +124,7 @@ Congratulations! Now that you've ingested data into Meltano, created a reporting
 Start exploring and analyzing your data and build dashboards with [Meltano Analyze](http://localhost:5000/analyze).
 
 :::tip
-Right now, models can not be added from inside Meltano's UI so you will need to return to your command line interface.
+Right now, models can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
 :::
 
 To find a list of available models, run this command:
@@ -141,7 +141,18 @@ model-salesforce
 model-stripe
 model-zendesk
 model-zuora
+```
 
+Choose the relevant model to the data source you've connected, and run the command:
+
+```bash
+$ meltano add model [MODEL_NAME]
+
+#Example
+$ meltano add model model-carbon-intensity
+```
+
+Now that you've added your model, you're Analyze page will contain a link to view that model as an interactive dashboard.
 
 
 ## Doing More With Meltano
