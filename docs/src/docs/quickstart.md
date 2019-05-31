@@ -49,13 +49,13 @@ Data sources can contain a LOT of different entities, and you might not want Mel
 
 Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
 
-## Selecting the Reporting Database
+## Selecting a Reporting Database
 
 Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored. 
 
 Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
 
-## Run the ELT
+## Running the ELT
 
 ::: tip
 Right now, this can't be done from the Meltano UI so you will have to return to your command line interface. 
@@ -78,7 +78,7 @@ To get a full list of all the availble taps and targets, run this command:
 $ meltano discover all
 ```
 
-## Schedule ELT Jobs
+## Scheduling the ELT with Orchestration
 
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
 
