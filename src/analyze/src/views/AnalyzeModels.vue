@@ -56,60 +56,6 @@ export default {
           </span> {{design | capitalize | underscoreToSpace}}
         </router-link>
       </div>
-      <div class="column is-one-quarter panel" v-for="(v, model) in models" :key="`${model}-panel`">
-        <h3 class="panel-heading is-marginless">{{model | capitalize | underscoreToSpace}}</h3>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="pencil-ruler" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
-      </div>
-      <div class="column is-one-quarter panel" v-for="(v, model) in models" :key="`${model}-panel`">
-        <h3 class="panel-heading is-marginless">{{model | capitalize | underscoreToSpace}}</h3>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="pencil-ruler" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
-      </div>
-      <div class="column is-one-quarter panel" v-for="(v, model) in models" :key="`${model}-panel`">
-        <h3 class="panel-heading is-marginless">{{model | capitalize | underscoreToSpace}}</h3>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="pencil-ruler" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="pencil-ruler" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="pencil-ruler" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
-      </div>
     </div>
   </section>
 </template>
