@@ -123,6 +123,7 @@ export default {
 
     &.router-link-active {
       color: $interactive-navigation;
+      border-color: $interactive-navigation;
     }
   }
 
