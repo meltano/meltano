@@ -72,7 +72,7 @@ $ meltano --version
 meltano, version X.XX.X
 ```
 
-That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/tutorial.html).
+That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
 
 ## Troubleshooting
 
