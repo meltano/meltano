@@ -1,6 +1,6 @@
 # Installation
 
-In this section, we will install Meltano as an application you can access from your browser and command line. 
+In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/meltano-cli.html#using-docker).
 
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
 
@@ -39,14 +39,11 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### virtualenv
 
-Allows you to set up a virtual environment by running `virtualenv venv` from within your Meltano project. 
+We highly recommend using a virtual environment by running `python -m venv [VENV_NAME]` from wherever you want your virtual environment to be (you might want to create a folder for these). 
 
-```bash
-pip install virtualenv
-```
+To activate your virtual enviroment you will need to run `source [VENV_NAME]/bin/activate`
 
-To activate your virtual enviroment you will need to run `source venv/bin/activate`
-
+Note: We will add Microsoft Windows instructions in the future (contributions welcome).
 
 ## Installing Meltano
 

@@ -375,8 +375,34 @@ Change directories so that you are inside your Meltano project, and then run the
 $ meltano add orchestrator airflow
 ```
 
-Meltano ships out-of-the-box with a sample DAG for your current project, which is located at `orchestrate/dags/meltano.py`.
-Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
+If you are already in the Meltano UI, you will need to kill it, and re-start it with `meltano ui` to activate the Orchestration tab.
+
+Now you have Airflow installed, let's create a simple example schedule to confirm everything is working correctly.
+
+Meltano ships out-of-the-box with a dynamic DAG, which is a DAG generator for your current project located at `orchestrate/dags/meltano.py` .
+
+### Create a Schedule
+
+To regularly schedule your ELT to run, do the following
+
+```bash 
+$ meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
+
+#Example
+$ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
+```
+
+Now that you've scheduled your first DAG, you can refresh the "Orchestration" page and you will see your DAG.
+
+::: tip
+IMPORTANT: Your schedule is now created, but it will not be enabled until you toggle the "ON" button. Refresh the page and click the "Refresh" icon under "Links" to see that your DAG is fully running.
+:::
+
+To learn more about orchestration functionality, check out the [Apache Airflow documentation](https://apache.airflow.org).
+
+
+
+#### Other Things You Can Do With Airflow
 
 Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
 
@@ -396,3 +422,5 @@ $ meltano invoke airflow scheduler -D
 # trigger a dag run
 $ meltano invoke airflow trigger_dag meltano
 ```
+
+Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.
