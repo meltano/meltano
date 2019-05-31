@@ -81,7 +81,7 @@ export default {
 <template>
   <section>
     <div class="content">
-      <h3>Analytics Connection Settings</h3>
+      <h2>Connection Settings</h2>
       <p v-if="!hasConnections">No Database Connections</p>
       <div class="columns is-multiline is-mobile">
         <div
