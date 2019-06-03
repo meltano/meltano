@@ -43,15 +43,17 @@ Open your Internet browser and visit  [http://localhost:5000](http://localhost:5
 
 When you visit the [http://localhost:5000](http://localhost:5000), you should see:
 
-![Meltano UI with all extractors not installed initial loading screen](/screenshots/meltano-extractors-newinstall.png)
-
 Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
+
+![Meltano UI with all extractors not installed initial loading screen](/screenshots/meltano-extractors-newinstall.png)
 
 ## Selecting Entities
 
 Data sources can contain a LOT of different entities, and you might not want Meltano to pull every data source into your dashboard. In this step, you can choose which to include.
 
 Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
+
+![Meltano UI pipeline entities screen new install](/screenshots/meltano-pipeline-entities-quickstart.png)
 
 ## Selecting a Reporting Database
 
