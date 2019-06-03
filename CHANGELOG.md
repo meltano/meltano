@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#603](https://gitlab.com/meltano/meltano/issues/603) `meltano select` now supports raw JSON Schema as a valid Catalog
 
 ### Changes
+* [#621](https://gitlab.com/meltano/meltano/issues/621) Added new tutorial for tap-gitlab
 
 ### Fixes
 * [#658](https://gitlab.com/meltano/meltano/issues/658) Fixed the Analyze page when no models are present
