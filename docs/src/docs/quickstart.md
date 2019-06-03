@@ -61,6 +61,8 @@ Now that Meltano is pulling data in from your data source(s), you need to choose
 
 Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
 
+![Meltano UI pipeline targets new install](/screenshots/meltano-extractors-newinstall.png)
+
 ## Running the ELT
 
 ::: tip
