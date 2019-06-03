@@ -139,13 +139,11 @@ Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/
 
 ![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
 
-For a deeper explanation of how to use Meltano Orchestration with Airflow visit our [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
+For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
 
 ## Analyzing Your Data
 
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to go! 
-
-Start exploring and analyzing your data and build dashboards with [Meltano Analyze](http://localhost:5000/analyze).
 
 :::tip
 Right now, models can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
@@ -174,9 +172,25 @@ $ meltano add model [MODEL_NAME]
 
 #Example
 $ meltano add model model-carbon-intensity
+
+#Added 'model-carbon-intensity' to your Meltano project.
+#Activated 'model-carbon-intensity' virtual environment.
+#Installed 'model-carbon-intensity'.
+#Added and installed models 'model-carbon-intensity'.
 ```
 
-Now that you've added your model, you're Analyze page will contain a link to view that model as an interactive dashboard.
+To see your newly added model in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
+
+```bash
+$ control+c
+$ meltano ui
+```
+
+Now that you've added your model, you're Analyze page will contain a link to view that model as an interactive dashboard. Start exploring and analyzing your data and build dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
+
+This is where you will see a list of available models:
+
+![Meltano UI available models](/screenshots/meltano-ui-models.png)
 
 
 ## Doing More With Meltano
