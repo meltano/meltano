@@ -1,4 +1,12 @@
 extractors:
+  - name: tap-google-analytics
+    pip_url: "git+https://gitlab.com/meltano/tap-google-analytics.git"
+    config:
+      key_file_location: "$GOOGLE_ANALYTICS_API_CLIENT_SECRETS"
+      view_id: "$GOOGLE_ANALYTICS_API_VIEW_ID"
+      reports: "$GOOGLE_ANALYTICS_API_REPORTS"
+      start_date: "$GOOGLE_ANALYTICS_API_START_DATE"
+      end_date: "$GOOGLE_ANALYTICS_API_END_DATE"
   - name: tap-gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
