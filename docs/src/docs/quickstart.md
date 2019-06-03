@@ -3,13 +3,17 @@
 Now that you have successfully [installed Meltano]('/docs/installation.html) and its requirements, you can create your first project. 
 
 :::tip
-**IMPORTANT: * you must have created your virtual environment and have it running in the command line where you want to create your Meltano project.
+**IMPORTANT:** you must have created your virtual environment and activate it in the command line in which want to create your Meltano project.
 :::
 
-Remember, to activate your virtual enviroment, you will need to be inside your /Virtual directory. Then run: 
+Remember, to activate your virtual enviroment, you will need to run: 
 
 ```bash
-$ source [YOUR_VENV_NAME]/bin/activate
+# Linux, OSX
+$ source ~/virtualenvs/meltano/bin/activate
+
+# Windows
+$ %ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
 ## Creating Your First Project
