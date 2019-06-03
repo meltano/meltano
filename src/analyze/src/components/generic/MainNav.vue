@@ -37,7 +37,7 @@
         </span>
 
         <router-link
-          :to="{name: 'analyze'}"
+          :to="{name: 'analyzeModels'}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Analyze
         </router-link>
@@ -123,6 +123,7 @@ export default {
 
     &.router-link-active {
       color: $interactive-navigation;
+      border-color: $interactive-navigation;
     }
   }
 

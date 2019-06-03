@@ -11,6 +11,7 @@ import {
   faChartLine,
   faChartPie,
   faDotCircle,
+  faDraftingCompass,
   faExclamationTriangle,
   faGlobeAmericas,
   faHashtag,
@@ -37,6 +38,7 @@ export default {
     library.add(faChartLine);
     library.add(faChartPie);
     library.add(faDotCircle);
+    library.add(faDraftingCompass);
     library.add(faExclamationTriangle);
     library.add(faGlobeAmericas);
     library.add(faHashtag);

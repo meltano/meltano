@@ -39,23 +39,33 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### Virtual Environment
 
-We highly recommend using a virtual environment to install and run Meltano, rather than installing globally. 
+Meltano must be installed inside a virtual environment, unless you are building a Docker image.
 
-Create a directory where you want your virtual environments to be saved (e.g. /Users/YOUR_USERNAME/Virtual). Then change to that directory and create a new virtual environment:
+We suggest you create a directory where you want your virtual environments to be saved, e.g.:
+  - **Linux, OSX**:  `~/virtualenvs`
+  - **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
 
-```bash
-$ mkdir Virtual
-$ cd Virtual
-$ python -m venv [YOUR_VENV_NAME]
-```
-
-To activate your virtual enviroment, you will need to be inside your /Virtual directory. Then run: 
+Then create a new virtual environment inside that directory:
 
 ```bash
-$ source [YOUR_VENV_NAME]/bin/activate
+# Linux, OSX
+$ mkdir ~/virtualenvs
+$ python -m venv ~/virtualenvs/meltano
+
+# Windows
+$ mkdir %ALLUSERSPROFILE%\\virtualenvs
+$ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 ```
 
-Note: We will add Microsoft Windows virtual environment instructions in the future (contributions welcome).
+Then, you will need to activate the virtual environment using:
+
+```bash
+# Linux, OSX
+$ source ~/virtualenvs/meltano/bin/activate
+
+# Windows
+$ %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
+```
 
 ## Installing Meltano
 
@@ -73,6 +83,21 @@ meltano, version X.XX.X
 ```
 
 That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
+
+::: tip
+Once a virtual environment is activated, it stays active until the current shell is closed.
+
+You must re-activate the virtual environment before interacting with Meltano. 
+To streamline this process, you can add the `meltano` executable directly in your `PATH`.
+
+```bash
+# Linux, OSX
+export PATH=$PATH:$HOME/virtualenvs/meltano/bin/meltano
+
+# Windows
+setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
+```
+:::
 
 ## Troubleshooting
 
