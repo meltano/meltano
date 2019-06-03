@@ -37,7 +37,7 @@
         </span>
 
         <router-link
-          :to="{name: 'AnalyzeModels'}"
+          :to="{name: 'analyzeModels'}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Analyze
         </router-link>
