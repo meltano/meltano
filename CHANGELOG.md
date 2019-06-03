@@ -25,6 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#537](https://gitlab.com/meltano/meltano/issues/537) Add Extractor for Google Analytics (`tap-google-analytics`) to Meltano. It uses the tap defined in https://gitlab.com/meltano/tap-google-analytics/
 
 ### Changes
+* [#621](https://gitlab.com/meltano/meltano/issues/621) Added new tutorial for tap-gitlab
 * [#657](https://gitlab.com/meltano/meltano/issues/657) Update Analyze page to have single purpose views
 
 ### Fixes

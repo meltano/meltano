@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Now that you have successfully [installed Meltano]('/docs/installation.html) and its requirements, you can create your first project. 
+Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project. 
 
 :::tip
 **IMPORTANT:** you must have created your virtual environment and activate it in the command line in which want to create your Meltano project.

@@ -26,7 +26,7 @@ The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <lo
 
 ## Extractors
 
-Meltano Extractors are commonly prefixed with [tap](/docs/concepts.html#taps). 
+Meltano Extractors are commonly prefixed with [tap](/docs/architecture.html#taps). 
 
 ::: tip 
 If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Analytics, Google Ads, and Facebook Ads as next up on the list.
