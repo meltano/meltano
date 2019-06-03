@@ -654,6 +654,12 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 
 ## Using Docker
 
+A Docker image should be built containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+
+This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
+
+The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
+
 ### Using pre-built Docker images
 
 We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
