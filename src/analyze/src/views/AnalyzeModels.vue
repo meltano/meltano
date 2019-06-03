@@ -52,7 +52,7 @@ export default {
           class="panel-block"
         >
           <span class="panel-icon">
-            <font-awesome-icon icon="chart-line" />
+            <font-awesome-icon icon="drafting-compass" />
           </span> {{design | capitalize | underscoreToSpace}}
         </router-link>
       </div>
