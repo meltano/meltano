@@ -73,6 +73,7 @@ Run the following command
 
 ```bash
 $ meltano elt [YOUR_TAP_NAME] [YOUR_TARGET_NAME]
+#Extract & load complete!
 
 #Example
 $ meltano elt tap-carbon-intensity target-sqlite
@@ -91,20 +92,24 @@ $ meltano discover all
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
 
 ::: tip
-Right now, Airflow can not be installed from inside Meltano's UI so you will ahve to return to your command line interface.
+Right now, Airflow can not be installed from inside Meltano's UI so you need to return to your command line interface.
 :::
 
 Run the following command:
 
 ```bash
 $ meltano add orchestrator airflow
+#Added 'airflow' to your Meltano project.
+#Activated 'airflow' virtual environment.
+#Installed 'airflow'.
+#Added and installed orchestrators 'airflow'.
 ```
 
 One Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
 
 ```bash
 
-$ meltano schedule [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
+$ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
 
 #Example
 $ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
@@ -124,6 +129,15 @@ meltano_carbon__sqlite
 :::tip
 To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
 :::
+
+```bash
+$ control+c
+$ meltano ui
+```
+
+Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
+
+![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
 
 ## Analyzing Your Data
 
