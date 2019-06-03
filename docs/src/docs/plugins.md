@@ -2,27 +2,7 @@
 sidebarDepth: 1
 ---
 
-# Connect Data Sources
-
-## Installation
-
-### From Meltano UI
-
-To manage your plugins, [launch Meltano's UI in your browser](/docs/tutorial.html) and visit [localhost:5000/pipelines/extractors/](http://localhost:5000/pipelines/extractors/). From here, you can install and configure connections with the plugins described below.
-
-### Locally with the CLI
-
-The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command followed by an argument for the plugin name.
-
-See the [meltano cli documentation](/docs/meltano-cli.html) 
-
-### On a CI Pipeline
-
-A Docker image should be built containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
-
-This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
-
-The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
+# Extractors & Loaders
 
 ## Extractors
 
