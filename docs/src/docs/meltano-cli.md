@@ -185,7 +185,7 @@ Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By 
 ### `schedule`
 
 ::: tip
-An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
+An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/meltano-cli.html#orchestration) documentation to get started with Meltano orchestration.
 :::
 
 Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:

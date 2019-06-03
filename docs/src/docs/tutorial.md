@@ -162,7 +162,7 @@ A Salesforce account may have more than 100 different entities. In order to see 
 meltano select tap-salesforce --list --all
 ```
 
-In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](docs/meltano-cli.html#meltano-select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](/docs/meltano-cli.html#select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
 
 ```bash
 meltano select tap-salesforce "User" "*"
