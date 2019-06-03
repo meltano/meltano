@@ -192,6 +192,12 @@ This is where you will see a list of available models:
 
 ![Meltano UI available models](/screenshots/meltano-ui-models.png)
 
+Click on your model (in the case of our example it is "Region") to begin exploring and querying your data.
+
+![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
+
+When after you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
+
 
 ## Doing More With Meltano
 
