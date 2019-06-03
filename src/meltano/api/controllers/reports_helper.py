@@ -4,7 +4,6 @@ import os
 from os.path import join
 from pathlib import Path
 
-from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.m5o.m5o_file_parser import MeltanoAnalysisFileParser
 from meltano.core.m5o.m5o_collection_parser import (
