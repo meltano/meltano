@@ -14,7 +14,7 @@ If you can't find the extractor you need below, we have a [tutorial for creating
 
 ### Carbon Intensity
 
-`tap-carbon-intensity` pulls data from the Official Carbon Intensity API for Great Britain, which was developed by the [National Grid](https://www.nationalgrid.com/uk). For more information, check out [http://carbonintensity.org.uk/](http://carbonintensity.org.uk/).
+`tap-carbon-intensity` pulls data from the Official Carbon Emissions Intensity API for Great Britain, which was developed by the [National Grid](https://www.nationalgrid.com/uk). For more information, check out [http://carbonintensity.org.uk/](http://carbonintensity.org.uk/).
 
 #### Info
 
