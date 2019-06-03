@@ -139,6 +139,8 @@ Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/
 
 ![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
 
+For a deeper explanation of how to use Meltano Orchestration with Airflow visit our [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
+
 ## Analyzing Your Data
 
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to go! 
