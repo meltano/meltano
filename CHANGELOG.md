@@ -9,15 +9,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#603](https://gitlab.com/meltano/meltano/issues/603) `meltano select` now supports raw JSON Schema as a valid Catalog
 
 ### Changes
 * [#657](https://gitlab.com/meltano/meltano/issues/657) Update Analyze page to have single purpose views
 
 ### Fixes
 * [#645](https://gitlab.com/meltano/meltano/issues/645) Fixed confusion around Loader Settings and Analytics DB Connector Settings
+* [#580](https://gitlab.com/meltano/meltano/issues/580) Fixed `project_compiler` so the Analyze page can properly display custom topics
 * [#658](https://gitlab.com/meltano/meltano/issues/658) Fixed the Analyze page when no models are present
+* [#603](https://gitlab.com/meltano/meltano/issues/603) Fix an issue where `meltano select` would incorrectly report properties as excluded
+* [#603](https://gitlab.com/meltano/meltano/issues/603) Fix an issue where `meltano select` incorrectly flatten nested properties
+* [#553](https://gitlab.com/meltano/meltano/issues/553) Fix an issue where running `meltano select --list` for the first time would incorrectly report properties
 
-### Breaks
+### Break
 
 
 ## 0.25.0 - (2019-05-28)

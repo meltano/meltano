@@ -1,7 +1,13 @@
-# Meltano CLI
+---
+sidebarDepth: 1
+---
+
+# Command Line Tools
 
 Meltano provides a command line interface (CLI) to kick start and help you manage the configuration and orchestration of all the components in the data life cycle. It provides a single source of truth for the entire data pipeline. The CLI makes it easy to develop, run, and debug every step of the data life cycle.
 Meltano provides a CLI to kick start and help you manage the configuration and orchestration of all the components in the data life cycle.
+
+## Commands
 
 - `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
 - `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
@@ -19,22 +25,22 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
 
-## `init`
+### `init`
 
 The `init` command is used to create a new meltano project with a basic infrastructure in place. 
 
-### Example
+#### Example
 
 ```bash
 # Format
 meltano init [project_name] [--no_usage_stats]
 ```
 
-### Parameters
+#### Parameters
 
 * **project_name** - This determines the folder name for the project
 
-### Options
+#### Options
 
 * **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project. 
 
@@ -45,9 +51,9 @@ send_anonymous_usage_stats: false
 ```
 :::
 
-## Version
+### `version`
 
-To check which version of Meltano you are using, run the following command:
+The `version` command is used to check which version of Meltano you are using:
 
 ```bash
 meltano --version
@@ -59,14 +65,14 @@ To update Meltano to the latest version, run the following command in your termi
 pip install --upgrade meltano
 ```
 
-## meltano select
+### `select`
 
 > Note: not all tap support this feature; tap needs to support the --discover switch.
 > You can use `meltano invoke tap-... --discover` to see if the tap supports it.
 
-Use this command to add select patterns to a specific extractor in your Meltano project.
+Use the `select` command to add select patterns to a specific extractor in your Meltano project.
 
-### Select Pattern
+#### Select Pattern
 
 Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) syntax you might find in your operating system.
 
@@ -75,7 +81,7 @@ Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki
   - `[abc]`: matches either `a`, `b`, or `c`
   - `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
-#### Examples
+##### Examples
 
 > Note: Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.
 
@@ -91,14 +97,14 @@ $ meltano select tap-carbon-intensity 'region'
 
 This will select all attributes of the `region` entity.
 
-### --exclude
+#### `exclude`
 
 Use `--exclude` to exclude all attributes that match the filter.
 
 > Note: exclusion has precedence over inclusion. If an attribute is excluded, there
 > is no way to include it back without removing the exclusion pattern first.
 
-#### Examples
+##### Examples
 
 ```bash
 $ meltano select --exclude tap-carbon-intensity '*' 'longitude'
@@ -107,13 +113,13 @@ $ meltano select --exclude tap-carbon-intensity '*' 'latitude'
 
 This will exclude all `longitude` and `latitude` attributes.
 
-### --list
+#### `list`
 
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
 
-## Transforms
+### `transform`
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
 
@@ -176,7 +182,7 @@ When Meltano runs a new transformation, `transform/dbt_project.yml` is always ke
 
 Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
 
-## meltano schedule
+### `schedule`
 
 ::: tip
 An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
@@ -195,7 +201,11 @@ schedules:
     MELTANO_JOB_ID: ''
 ```
 
-## meltano permissions 
+## Snowflake Permissions
+
+This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. As we improve Meltano, this may become a first level concept within user roles but that is not the case today.
+
+#### `permissions`
 
 Use this command to check and manage the permissions of a Snowflake account.
 
@@ -207,7 +217,7 @@ Given the parameters to connect to a Snowflake account and a YAML file (a "spec"
 
 We currently support only Snowflake, as [pgbedrock](https://github.com/Squarespace/pgbedrock) can be used for managing the permissions in a Postgres database.
 
-### spec_file
+#### spec_file
 
 The YAML specification file is used to define in a declarative way the databases, roles, users and warehouses in a Snowflake account, together with the permissions for databases, schemas and tables for the same account.
 
@@ -306,21 +316,21 @@ warehouses:
 
 For a working example, you can check [the Snowflake specification file](https://gitlab.com/meltano/meltano/blob/master/tests/meltano/core/permissions/specs/snowflake_spec.yml) that we are using for testing `meltano permissions`.
 
-### --db
+#### --db
 
 The database to be used, either `postgres` or `snowflake`. Postgres is still experimental and may be fully supported in the future.
 
-### --diff
+#### --diff
 
 When this flag is set, a full diff with both new and already granted commands is returned. Otherwise, only required commands for matching the definitions on the spec are returned.
 
-### --dry
+#### --dry
 
 When this flag is set, the permission queries generated are not actually sent to the server and run; They are just returned to the user for examining them and running them manually.
 
 Currently we are still evaluating the results generated by the `meltano permissions grant` command, so the `--dry` flag is required.
 
-### Connection Parameters
+#### Connection Parameters
 
 The following environmental variables must be available to connect to Snowflake:
 
@@ -344,3 +354,73 @@ When you run ELT commands on a tap or target, this is the general process for fe
 - By doing this, you ensure that packages are version controlled via `discovery.yml` and that it will live in two places:
   - in the project itself for the user to edit
   - in a global repo for meltano employees to edit
+
+
+#### Additional Resources
+
+In order to make the most out of Jupyter Notebooks, you can check the following resources:
+*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
+*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
+*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
+
+## Orchestration
+
+Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs. Please find below documentation on how it can be used.
+
+### Installing Airflow
+
+Change directories so that you are inside your Meltano project, and then run the following commadn to make Airflow available to use via `meltano invoke`
+
+```bash 
+$ meltano add orchestrator airflow
+```
+
+If you are already in the Meltano UI, you will need to kill it, and re-start it with `meltano ui` to activate the Orchestration tab.
+
+Now you have Airflow installed, let's create a simple example schedule to confirm everything is working correctly.
+
+Meltano ships out-of-the-box with a dynamic DAG, which is a DAG generator for your current project located at `orchestrate/dags/meltano.py` .
+
+### Create a Schedule
+
+To regularly schedule your ELT to run, do the following
+
+```bash 
+$ meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
+
+#Example
+$ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
+```
+
+Now that you've scheduled your first DAG, you can refresh the "Orchestration" page and you will see your DAG.
+
+::: tip
+IMPORTANT: Your schedule is now created, but it will not be enabled until you toggle the "ON" button. Refresh the page and click the "Refresh" icon under "Links" to see that your DAG is fully running.
+:::
+
+To learn more about orchestration functionality, check out the [Apache Airflow documentation](https://apache.airflow.org).
+
+
+
+#### Other Things You Can Do With Airflow
+
+Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
+
+```bash
+# View 'meltano' dags
+$ meltano invoke airflow list_dags
+
+# Manually trigger a task to run
+$ meltano invoke airflow run --raw meltano extract_load $(date -I)
+
+# Start the airflow ui - currently starts in a separate browser
+$ meltano invoke airflow webserver -D
+
+# start the airflow scheduler, enabling background job processing
+$ meltano invoke airflow scheduler -D
+
+# trigger a dag run
+$ meltano invoke airflow trigger_dag meltano
+```
+
+Airflow is a full-featured orchestrator that has a lot of features that are currently outside of Meltano's scope. As we are improving this integration, Meltano will facade more of these feature to create a seamless experience using this orchestrator. Please refer to the [Airflow documentation](https://airflow.apache.org/) for more in-depth knowledge about Airflow.

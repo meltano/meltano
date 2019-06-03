@@ -64,6 +64,7 @@ class GoogleAnalyticsTracker:
             "t": "event",
             "ec": category,
             "ea": action,
+            "el": self.client_id,
         }
         return event
 

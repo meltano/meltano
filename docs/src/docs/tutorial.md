@@ -1,18 +1,8 @@
 ---
-sidebarDepth: 2
+sidebarDepth: 1
 ---
 
-# Tutorials
-
-Now that you have successfully installed Meltano, creating a new Meltano project is very simple. The Meltano CLI offers you a simple command to initialize a new project:
-
-```bash
-meltano init PROJECT_NAME
-```
-
-:::tip
-For those new to the command line, your PROJECT_NAME should not have spaces in the name and should use dashes instead. For example, "my project" will not work; but "my-project" will.
-:::
+# Advanced Tutorials
 
 Now that you know how to create a new project, we recommend checking out our [Carbon Emissions tutorial](/docs/tutorial.html#starter-carbon-emissions) to explore what Meltano is capable of. If you are feeling more adventurous, feel free to skip it and move on!
 
@@ -898,10 +888,3 @@ Or generate a bar plot:
 plt.rcParams['figure.figsize'] = [15, 8]
 result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets','one_touch_tickets','reopened_tickets'])
 ```
-
-### Additional Resources
-
-In order to make the most out of Jupyter Notebooks, you can check the following resources:
-*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
-*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
-*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)

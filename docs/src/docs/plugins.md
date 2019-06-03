@@ -1,31 +1,35 @@
 ---
-sidebarDepth: 2
+sidebarDepth: 1
 ---
 
-# Plugins
+# Connect Data Sources
 
 ## Installation
 
+### From Meltano UI
+
+To manage your plugins, [launch Meltano's UI in your browser](/docs/tutorial.html) and visit [localhost:5000/pipelines/extractors/](http://localhost:5000/pipelines/extractors/). From here, you can install and configure connections with the plugins described below.
+
 ### Locally with the CLI
 
-The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command. Examples can be found in each plugin.
+The general pattern for installing a plugin on a Meltano instance is to use the `meltano add` command followed by an argument for the plugin name.
+
+See the [meltano cli documentation](/docs/meltano-cli.html) 
 
 ### On a CI Pipeline
 
-A docker image should be build containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+A Docker image should be built containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
 
 This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
 
-Meltano should provide a wrapper script to manage the execution of the selected components:
-
-`meltano extract tap-zendesk --to target-postgres`
+The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
 
 ## Extractors
 
 Meltano Extractors are commonly prefixed with [tap](/docs/concepts.html#taps). 
 
 ::: tip 
-If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor).
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Analytics, Google Ads, and Facebook Ads as next up on the list.
 :::
 
 ### Carbon Intensity
@@ -46,7 +50,7 @@ If you can't find the extractor you need below, we have a [tutorial for creating
 meltano add extractor tap-carbon-intensity
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` in your terminal.
 
 ### CSV
 
@@ -66,7 +70,7 @@ If you are successful, you should see `Added and installed extractors 'tap-carbo
 meltano add extractor tap-csv
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-csv'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-csv'` in your terminal.
 
 #### Configuration
 
@@ -92,9 +96,10 @@ Where `files_def.json` is a json file with all the CSV files to be loaded:
 ```
 
 Description of available options:
-  - entity: The entity name to be passed to singer (i.e. the table name).
-  - file: Local path to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed.
-  - keys: The names of the columns that constitute the unique keys for that entity.
+
+  - **entity**: The entity name to be passed to singer (i.e. the table name).
+  - **file**: Local path to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed.
+  - **keys**: The names of the columns that constitute the unique keys for that entity.
 
 ### Fastly
 
@@ -114,7 +119,7 @@ Description of available options:
 meltano add extractor tap-fastly
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-fastly'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-fastly'` in your terminal.
 
 #### Configuration
 
@@ -145,56 +150,36 @@ and incrementally pulls data based on the input state
 meltano add extractor tap-gitlab
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-gitlab'` on your window.
+If you are successful, you should see `Added and installed extractors 'tap-gitlab'` in your terminal.
 
 3. Get your GitLab access token
     - Login to your GitLab account
     - Navigate to your profile page
     - Create an access token
-1. Create a JSON file called `config.json` containing:
-    - Access token you just created
-    - API URL for your GitLab account. If you are using the public gitlab.com this will be `https://gitlab.com/api/v4`
-    - Groups to track (space separated)    
-    - Projects to track (space separated)
+
+# Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+```bash
+export GITLAB_API_TOKEN="access token from step 3"
+export GITLAB_API_GROUPS="myorg mygroup"
+export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
+# The date uses ISO-8601 and supports time if desired
+export GITLAB_API_START_DATE="YYYY-MM-DD"
+```
+
+::: info
+  - Either groups or projects need to be provided
+  - Filling in 'groups' but leaving 'projects' empty will sync all group projects.
+  - Filling in 'projects' but leaving 'groups' empty will sync selected projects.
+  - Filling in 'groups' and 'projects' will sync selected projects of those groups.
+:::
     
-    Notes:
-    - either groups or projects need to be provided
-    - filling in 'groups' but leaving 'projects' empty will sync all group projects.
-    - filling in 'projects' but leaving 'groups' empty will sync selected projects.
-    - filling in 'groups' and 'projects' will sync selected projects of those groups.
-
-    ```json
-    {
-      "api_url": "https://gitlab.com/api/v4",
-      "private_token": "your-access-token",
-      "groups": "myorg mygroup", 
-      "projects": "myorg/repo-a myorg/repo-b",
-      "start_date": "2018-01-01T00:00:00Z"
-    }
-    ```
-
-4. [Optional] Create the initial state file
-
-    You can provide JSON file that contains a date for the API endpoints
-    to force the application to only fetch data newer than those dates.
-    If you omit the file it will fetch all GitLab data
-
-    ```json
-    {
-      "branches": "2017-01-17T00:00:00Z",
-      "commits": "2017-01-17T00:00:00Z",
-      "issues": "2017-01-17T00:00:00Z",
-      "projects": "2017-01-17T00:00:00Z",
-      "project_milestones": "2017-01-17T00:00:00Z", 
-      "users": "2017-01-17T00:00:00Z",
-      "group_milestones": "2017-01-17T00:00:00Z"
-    }
-    ```
-    
-    Note:
-    - currently, groups don't have a date field which can be tracked
-
-#### Configuration
+::: warning
+Currently, groups don't have a date field which can be tracked
+:::
 
 ### Marketo
 
@@ -214,7 +199,7 @@ If you are successful, you should see `Added and installed extractors 'tap-gitla
 meltano add extractor tap-marketo
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-marketo'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-marketo'` in your terminal.
 
 #### Configuration
 
@@ -251,7 +236,7 @@ This tap is currently a proof of concept and may have limited utility, but feedb
 meltano add extractor tap-mongodb
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-mongodb'` on your window.
+If you are successful, you should see `Added and installed extractors 'tap-mongodb'` in your terminal.
 
 #### Configuration
 
@@ -271,7 +256,6 @@ export MONGODB_PASSWORD=""
 export MONGODB_DBNAME=""
 ```
 
-
 ### Salesforce
 
 `tap-salesforce` is an extractor that pulls data from a Salesforce database and produced JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
@@ -290,7 +274,7 @@ export MONGODB_DBNAME=""
 meltano add extractor tap-salesforce
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-salesforce'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-salesforce'` in your terminal.
 
 #### Configuration
 
@@ -320,10 +304,10 @@ export SFDC_USERNAME="yourSalesforceUsername"
 2. Run the following command:
 
 ```bash
-meltano add extractor tap-carbon-intensity
+meltano add extractor tap-stripe
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-stripe'` in your terminal.
 
 #### Configuration
 
@@ -354,7 +338,7 @@ export STRIPE_START_DATE="YYYY-MM-DD"
 meltano add extractor tap-zendesk
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-zendesk'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-zendesk'` in your terminal.
 
 #### Configuration
 
@@ -368,8 +352,6 @@ export ZENDESK_SUBDOMAIN="yourZendeskSubdomain"
 # The date uses ISO-8601 and supports time if desired
 export ZENDESK_START_DATE="yourZendeskStartDate"
 ```
-
-
 
 ### Zuora
 
@@ -386,10 +368,10 @@ export ZENDESK_START_DATE="yourZendeskStartDate"
 2. Run the following command:
 
 ```bash
-meltano add extractor tap-zendesk
+meltano add extractor tap-zuora
 ```
 
-If you are successful, you should see `Added and installed extractors 'tap-zendesk'` on your window. It
+If you are successful, you should see `Added and installed extractors 'tap-zuora'` in your terminal.
 
 #### Configuration
 
@@ -428,7 +410,7 @@ A loader is a component for the bulk import of data. Currently, Meltano supports
 meltano add loader target-csv
 ```
 
-If you are successful, you should see `Added and installed loaders 'target-csv'` on your window.
+If you are successful, you should see `Added and installed loaders 'target-csv'` in your terminal.
 
 #### Configuration
 

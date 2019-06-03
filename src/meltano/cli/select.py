@@ -2,6 +2,7 @@ import os
 import click
 import fnmatch
 import json
+import logging
 
 from . import cli
 from .params import project
@@ -9,9 +10,32 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.singer.catalog import parse_select_pattern
+from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
+
+
+def selection_color(selection):
+    if selection is SelectionType.SELECTED:
+        return "bright_green"
+    elif selection is SelectionType.AUTOMATIC:
+        return "bright_white"
+    elif selection is SelectionType.EXCLUDED:
+        return "red"
+
+
+def selection_marker(selection):
+    """
+    Returns the marker to indicate the selection type of an attribute.
+
+    Examples:
+      [automatic]
+      [selected ]
+      [excluded ]
+    """
+
+    colwidth = max(map(len, SelectionType))  # size of the longest mark
+    return f"[{selection:<{colwidth}}]"
 
 
 @cli.command()
@@ -43,6 +67,7 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             flags=flags,
         )
     except PluginExecutionError as e:
+        logging.exception(e)
         raise click.ClickException(
             f"Cannot list the selected properties: "
             "there was a problem running the tap with `--discover`. "
@@ -64,25 +89,37 @@ def show(project, extractor, show_all=False):
     extractor = select_service.get_extractor()
     list_all = select_service.get_extractor_entities()
 
+    # legend
+    click.secho("Legend:")
+    for sel_type in SelectionType:
+        click.secho(f"\t{sel_type}", fg=selection_color(sel_type))
+
     # report
-    click.secho("Enabled patterns:")
+    click.secho("\nEnabled patterns:")
     for select in map(parse_select_pattern, extractor.select):
         click.secho(
             f"\t{select.property_pattern}", fg="red" if select.negated else "white"
         )
-    else:
-        click.echo()
 
-    click.secho("Selected properties:")
-    color = lambda selected: "white" if selected else "red"
+    click.secho("\nSelected properties:")
     for stream, prop in (
         (stream, prop)
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
+        sel_mark = selection_marker(stream.selection)
         if show_all:
-            click.secho(f"\t{stream.key}", fg=color(stream.selected), nl=False)
+            click.secho(
+                f"\t{sel_mark} {stream.key}",
+                fg=selection_color(stream.selection),
+                nl=False,
+            )
             click.echo(".", nl=False)
-            click.secho(prop.key, fg=color(stream.selected and prop.selected))
-        elif stream.selected and prop.selected:
-            click.echo(f"\t{stream.key}.{prop.key}")
+            click.secho(
+                prop.key, fg=selection_color(stream.selection and prop.selection)
+            )
+        elif stream.selection and prop.selection:
+            click.secho(
+                f"\t{sel_mark} {stream.key}.{prop.key}",
+                fg=selection_color(stream.selection),
+            )
