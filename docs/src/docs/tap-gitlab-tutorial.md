@@ -147,7 +147,11 @@ export GITLAB_API_START_DATE=2019-05-01T00:00:00Z
 Now that everything is setup, we can run our extractor with the following command:
 
 ```bash
-meltano elt tap-gitlab target-postgres
+PG_SCHEMA='tap_gitlab' meltano elt tap-gitlab target-postgres
 ```
+
+::: tip
+You might notice that we are declaring a specific Postgres schema at the beginning of the command. This is to ensure that the data tables do not collide with other data sources and is considered a best practice.
+:::
 
 You should now see the data being fetched and your Postgres database properly populated once it is complete. Congratulations!
