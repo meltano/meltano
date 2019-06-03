@@ -3,7 +3,7 @@
 Now that you have successfully [installed Meltano]('/docs/installation.html) and its requirements, you can create your first project. 
 
 :::tip
-**IMPORTANT:** you must have created your virtual environment and activate it in the command line in which want to create your Meltano project.
+Before you begin, you must activate the virtual environment you created in the installation process on the command line. All the commands below should be run inside this virtual environment.
 :::
 
 Remember, to activate your virtual enviroment, you will need to run: 
@@ -43,7 +43,7 @@ Open your Internet browser and visit  [http://localhost:5000](http://localhost:5
 
 When you visit the [http://localhost:5000](http://localhost:5000), you should see:
 
-![Meltano UI with Carbon API initial loading screen](/screenshots/meltano-ui-carbon-tutorial-output.png)
+![Meltano UI with all extractors not installed initial loading screen](/screenshots/meltano-extractors-newinstall.png)
 
 Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
 
