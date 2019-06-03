@@ -122,12 +122,12 @@ const router = new Router({
       children: [
         {
           path: 'models',
-          name: 'AnalyzeModels',
+          name: 'analyzeModels',
           component: AnalyzeModels,
         },
         {
           path: 'settings',
-          name: 'AnalyzeSettings',
+          name: 'analyzeSettings',
           component: AnalyzeSettings,
         },
       ],
