@@ -12,20 +12,20 @@ Create and grant usage for a database schema.
 
 Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano UI.
 
-### Add a Model
-
-To add an existing model to your Meltano project, run the following command:
-
-```
-meltano add model [name_of_model]
-```
-
 ### Discover Available Models
 
 To see what models are currently available in the Meltano ecosystem, run the following command:
 
 ```
 meltano discover models
+```
+
+### Add a Model
+
+To add an existing model to your Meltano project, run the following command:
+
+```
+meltano add model [name_of_model]
 ```
 
 ### Create a New Model
