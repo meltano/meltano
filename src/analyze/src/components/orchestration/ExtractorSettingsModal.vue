@@ -102,9 +102,10 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractor() {
-      return this.installedPlugins.extractors
+      const targetExtractor = this.installedPlugins.extractors
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
-        : {};
+        : null;
+      return targetExtractor || {};
     },
     isSaveable() {
       const hasOwns = [];
