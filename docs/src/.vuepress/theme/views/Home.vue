@@ -3,7 +3,7 @@
     <div class="hero" style="min-height:450px;">
     
       <div style="float:left; text-align:left; width:60%;">
-        <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
+        <h1 style="font-size: 36px; text-align: left; padding-top: 80px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
         <p style="padding-left:35px; padding-right: 20px;">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
         <p style="text-align: left; padding-left: 35px;"
@@ -19,7 +19,7 @@
       </div>
 
       <div style="float:right; text-align:left; width:40%;">
-        <img style="float:right; max-height:360px;" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        <img style="float:right; max-height:380px;" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
       </div>
       
     </div>
