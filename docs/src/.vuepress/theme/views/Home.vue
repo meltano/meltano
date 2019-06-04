@@ -8,7 +8,7 @@
       </div>
 
       <div style="float:right; text-align:left; width:40%;">
-         <img style="float:right; max-height:400px;" src="https://media.istockphoto.com/vectors/young-freelancer-working-at-home-flat-editable-vector-illustration-vector-id827691618?" />
+         <img style="float:right; max-height:400px;" src="../assets/happy-meltano-user.jpg" />
       </div>
       
 
