@@ -37,7 +37,7 @@ General and semantically named variables for improved contextual use within the 
 // Adding grey-lightest to sit between grey-lighter and white-ter
 // https://bulma.io/documentation/modifiers/color-helpers/#background-color
 $grey-lightest: hsl(0, 0%, 93%);
-$app-background-color: white;
+$app-background-color: $grey-lightest;
 
 // Useful for main and secondary navigation based interactive elements
 $interactive-navigation: $primary;
