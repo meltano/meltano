@@ -6,12 +6,8 @@
         :src="$withBase(data.heroImage)"
         alt="hero"
       >
-      <h1>{{ data.heroText || $title || 'Hello' }}</h1>
-      <h1>Test</h1>
-
-      <p class="description">
-        {{ data.tagline || $description || 'Welcome to your VuePress site' }}
-      </p>
+    
+      <h2>Open source data dashboarding software</h2>
 
       <p
         class="action"
