@@ -2,7 +2,7 @@
   <div class="home">
     <div class="hero homepage-cta">
     
-      <div style="float:left; text-align:left; width:60%;">
+      <div class="hero-left" style="float:left; text-align:left; width:60%;">
         <h1 style="font-size: 36px; text-align: left; padding-top: 120px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
         <p style="padding-left:35px; padding-right: 20px;">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
@@ -317,7 +317,6 @@ export default {
 .meltano-stages-table {
   display: block;
   margin: 2.5rem auto 7rem;
-  width:97%; 
   float:left; 
   font-size:14px;
 
@@ -398,6 +397,12 @@ export default {
 
 .homepage-cta {
   min-height:500px;
+}
+
+.hero-left {
+  float:left;
+  text-align:left;
+  width:60%;
 }
 
 .home
