@@ -40,11 +40,11 @@
 
     <div>
 
-      <h2 class="quote" style="font-weight:400; font-size:36px;">A single workflow for the entire data life cycle.</h2>
+      <h2 class="quote">A single workflow for the entire data life cycle.</h2>
 
       <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
-      <table class="meltano-stages-table" style="width:97%; float:left; font-size:14px;">
+      <table class="meltano-stages-table">
         <thead>
           <tr class="meltano-header-row">
             <th>Stage:</th>
@@ -292,13 +292,14 @@ export default {
 
 .quote {
   border-top: 1px solid #ddd;
-  border-bottom: 0;
-  font-size: 2.4rem;
+  border-bottom: 0;  
   text-align: center;
   margin-top: 5rem;
   padding-top: 5rem;
   display: block;
   margin-bottom: 1rem;
+  font-weight:400;
+  font-size:36px;
 }
 
 .description {
@@ -313,6 +314,9 @@ export default {
 .meltano-stages-table {
   display: block;
   margin: 2.5rem auto 7rem;
+  width:97%; 
+  float:left; 
+  font-size:14px;
 
   tr:nth-child(2n) {
     background-color: white;
