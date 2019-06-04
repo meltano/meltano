@@ -2,12 +2,15 @@
   <div class="home">
     <div class="hero">
     
-      <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
-
-      <div>
-        <p style="float:left; text-align:left; padding-left:35px; width:50%;">Meltano is a free alternative to expensive SaaS tools for building automated business dashboards. Our platform powers end-to-end workflows with tools for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
-        <p style="float:right;"><img src="https://media.istockphoto.com/vectors/young-freelancer-working-at-home-flat-editable-vector-illustration-vector-id827691618?" /></p>
+      <div style="float:left; text-align:left; width:50%;">
+        <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
+        <p style="padding-left:35px;">Meltano is a free alternative to expensive SaaS tools for building automated business dashboards. Our platform powers end-to-end workflows with tools for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
       </div>
+
+      <div style="float:right; text-align:left; width:50%;">
+         <img src="https://media.istockphoto.com/vectors/young-freelancer-working-at-home-flat-editable-vector-illustration-vector-id827691618?" />
+      </div>
+      
 
       <p style="text-align: left; padding-left: 35px; padding-top:20px;"
         class="action"
