@@ -1,13 +1,8 @@
 <template>
   <div class="home">
     <div class="hero">
-      <img
-        v-if="data.heroImage"
-        :src="$withBase(data.heroImage)"
-        alt="hero"
-      >
     
-      <h1 style="font-size: 18px;">Open source data dashboarding software</h1>
+      <h1 style="    font-size: 36px; text-align: left; padding-top: 60px; padding-bottom: 60px; padding-left: 35px;">Open source data dashboarding software</h1>
 
       <p
         class="action"
