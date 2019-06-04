@@ -39,6 +39,16 @@
     </div>
 
     <div>
+
+      <h2 class="quote">A single workflow for the entire data life cycle.</h2>
+
+      <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+
+
+
+
+
+
       <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
 
       <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
@@ -66,10 +76,6 @@
     <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
 
     <p class="description"></p>
-
-    <h2 class="quote">A single workflow for the entire data life cycle.</h2>
-
-    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
     <table class="meltano-stages-table">
       <thead>
