@@ -6,8 +6,7 @@
         <p class="hero-header">Open source data dashboarding</p>
         <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
-        <p style="text-align: left; padding-left: 35px;"
-          class="action"
+        <p class="action"
           v-if="data.actionText && data.actionLink"
         >
           <NavLink
@@ -435,10 +434,13 @@ export default {
       max-height 380px
       display block
       margin-right:-33px;
+      padding-top:60px;
     h1
       font-size 3rem
     h1, .description, .action
       margin 1.8rem auto
+      text-align: left; 
+      padding-left: 35px;
     .description
       max-width 35rem
       font-size 1.6rem
