@@ -59,7 +59,7 @@
         </thead>
         <tbody>
           <tr class="meltano-use-row">
-            <td style="background-color:#3e3c8e;">Meltano uses:</td>
+            <td style="background-color:#3e3c8e; width:10%;">Meltano uses:</td>
             <td style="background-color:#5959a7;">
               <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
             </td>
@@ -82,7 +82,7 @@
               <a href="https://airflow.apache.org/">Apache Airflow</a>
             </td>
           </tr>
-          <tr class="meltano-replace-row">
+          <tr class="meltano-replace-row" style="font-size:11px;">
             <td>Meltano can be an alternative to:</td>
             <td>
               <ul>
