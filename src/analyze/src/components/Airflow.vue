@@ -37,6 +37,6 @@ export default {
  }
 
  .proxy {
-   flex: 1;
+    height: 100vh;
  }
 </style>
