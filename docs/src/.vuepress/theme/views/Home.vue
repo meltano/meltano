@@ -19,7 +19,7 @@
       </div>
 
       <div style="float:right; text-align:left; width:50%;">
-         <p style="background-image:url("http://localhost:8080/assets/img/happy-meltano-user.daee6e89.jpg"); background-position:right; background-size:contain; background-repeat: no-repeat; height:400px;">test</p>
+         <p style="background-image:url("../assets/img/happy-meltano-user.daee6e89.jpg"); background-position:right; background-size:contain; background-repeat: no-repeat; height:400px;">test</p>
       </div>
       
     </div>
