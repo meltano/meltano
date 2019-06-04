@@ -190,9 +190,10 @@
         </tbody>
       </table>
     </div>
-
-    <div class="home">
-      
+  </div>
+  
+  <div class="home">
+    <div class="hero homepage-plugins">
       <h2 class="quote">Plugins to Extract & Load Data</h2>
 
       <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
@@ -239,7 +240,8 @@
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
       </section>
     </div>
-
+  </div>
+  
     <div
       class="footer"
     >
