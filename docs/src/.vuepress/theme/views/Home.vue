@@ -290,7 +290,7 @@ export default {
 .meltano-user-img {
   float:right;
   max-height:380px; 
-  margin-right:-33px
+  margin-right:-33px;
 }
 
 .quote {
@@ -408,7 +408,7 @@ export default {
   .hero
     text-align center
     img
-      max-height 280px
+      max-height 380px
       display block
       margin 3rem auto 1.5rem
     h1
