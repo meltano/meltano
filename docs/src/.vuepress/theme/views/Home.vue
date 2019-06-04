@@ -18,8 +18,8 @@
 
       </div>
 
-      <div style="float:right; text-align:left; min-height:300px; width:40%; background-image: url("../assets/happy-meltano-user.jpg");">
-         <img style="float:right; max-height:400px;" src="../assets/happy-meltano-user.jpg" />
+      <div style="float:right; text-align:left; width:40%; background-image:url("../assets/happy-meltano-user.jpg");">
+         <p>test text</p>
       </div>
       
     </div>
