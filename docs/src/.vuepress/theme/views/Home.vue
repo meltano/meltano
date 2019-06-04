@@ -1,6 +1,6 @@
 <template>
   <div class="home" style="background:#e5e4e2; max-width:none; padding-right:0px;">
-    <div class="hero">
+    <div class="hero" style="min-height:450px;">
     
       <div style="float:left; text-align:left; width:50%;">
         <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
