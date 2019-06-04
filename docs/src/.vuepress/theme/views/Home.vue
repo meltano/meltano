@@ -3,7 +3,7 @@
     <div class="hero">
     
       <div style="float:left; text-align:left; width:60%;">
-        <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
+        <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
         <p style="padding-left:35px;">Meltano is a free alternative to expensive SaaS tools for building automated business dashboards. Our platform powers end-to-end workflows with tools for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
       </div>
 
