@@ -22,9 +22,6 @@
          <img style="float:right; max-height:400px;" src="../assets/happy-meltano-user.jpg" />
       </div>
       
-
-
-
     </div>
 
     <div
@@ -41,26 +38,29 @@
       </div>
     </div>
 
-    <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
+    <div>
+      <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
 
-    <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
+      <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
 
-    <div class="el-logos">
-      <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
-      <img src="../assets/stripe-logo.png" alt="Stripe Logo">
-      <img src="../assets/csv-logo.png" alt="CSV Logo">
-      <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
-      <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
-      <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
-      <img src="../assets/zuora-logo.png" alt="Zuora Logo">
-      <img src="../assets/marketo-logo.png" alt="Marketo Logo">
-      <div class="carbon-intensity-logo">
-        <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
-        Carbon Intensity API
+      <div class="el-logos">
+        <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
+        <img src="../assets/stripe-logo.png" alt="Stripe Logo">
+        <img src="../assets/csv-logo.png" alt="CSV Logo">
+        <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
+        <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
+        <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
+        <img src="../assets/zuora-logo.png" alt="Zuora Logo">
+        <img src="../assets/marketo-logo.png" alt="Marketo Logo">
+        <div class="carbon-intensity-logo">
+          <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
+          Carbon Intensity API
+        </div>
+        <img src="../assets/fastly-logo.png" alt="Fastly Logo">
+        <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
+        <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
       </div>
-      <img src="../assets/fastly-logo.png" alt="Fastly Logo">
-      <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
-      <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
+
     </div>
 
     <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
