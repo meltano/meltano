@@ -1,6 +1,6 @@
 <template>
-  <div class="home" style="background:#e5e4e2; max-width:none; padding-right:0px;">
-    <div class="hero" style="min-height:500px;">
+  <div class="home">
+    <div class="hero homepage-cta">
     
       <div style="float:left; text-align:left; width:60%;">
         <h1 style="font-size: 36px; text-align: left; padding-top: 120px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
@@ -19,7 +19,7 @@
       </div>
 
       <div style="float:right; text-align:left; width:40%;">
-        <img style="float:right; max-height:380px;" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        <img class="meltano-user-img" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
       </div>
       
     </div>
@@ -287,6 +287,12 @@ export default {
     }
 }
 
+.meltano-user-img {
+  float:right;
+  max-height:380px; 
+  margin-right:-33px
+}
+
 .quote {
   border-top: 1px solid #ddd;
   border-bottom: 0;  
@@ -390,7 +396,12 @@ export default {
   }
 }
 
+.homepage-cta {
+  min-height:500px;
+}
+
 .home
+  background:#e5e4e2;
   padding $navbarHeight 2rem 0
   max-width 1080px
   margin 0px auto
