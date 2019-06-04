@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div class="hero" style="background-image:url("https://media.istockphoto.com/vectors/young-freelancer-working-at-home-flat-editable-vector-illustration-vector-id827691618?");">
+    <div class="hero">
     
       <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
 
