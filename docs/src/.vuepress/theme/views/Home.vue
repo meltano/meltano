@@ -189,11 +189,7 @@
           </tr>
         </tbody>
       </table>
-    </div>
-  </div>
-  
-  <div class="home">
-    <div class="hero homepage-plugins">
+
       <h2 class="quote">Plugins to Extract & Load Data</h2>
 
       <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
@@ -216,32 +212,37 @@
         <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
       </div>
 
+   
+
       <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
+
+      <p class="description"></p>
+
+      
+
+      <section class="section">
+        <h2 class="section__title">Communicate with the team!</h2>
+        <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel, watch our videos on YouTube, or use another preferred channel.</p>
+        <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
+        <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
+        <a href="https://twitter.com/meltanodata" class="button" target="_blank">Twitter</a>
+        <a href="https://meltano.com/blog/" class="button" target="_blank">Blog</a>
+        <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
+      </section>
+
+      <section class="section">
+        <h2 class="section__title">Sign up for our newsletter!</h2>
+        <p class="section__text">Get the latest updates on Meltano delivered right to your inbox! We will only use your email to provide you with updates and will never sell your information!</p>
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
+      </section>
+    </div>
+
+    <div
+      class="footer"
+    >
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">Edit this page</a>
     </div>
   </div>
-
-  <div>
-    <section class="section">
-      <h2 class="section__title">Communicate with the team!</h2>
-      <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel, watch our videos on YouTube, or use another preferred channel.</p>
-      <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
-      <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
-      <a href="https://twitter.com/meltanodata" class="button" target="_blank">Twitter</a>
-      <a href="https://meltano.com/blog/" class="button" target="_blank">Blog</a>
-      <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
-    </section>
-
-    <section class="section">
-      <h2 class="section__title">Sign up for our newsletter!</h2>
-      <p class="section__text">Get the latest updates on Meltano delivered right to your inbox! We will only use your email to provide you with updates and will never sell your information!</p>
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
-    </section>
-  </div> 
-
-  <div class="footer">
-    <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">Edit this page</a>
-  </div>
-  
 </template>
 
 <script>
