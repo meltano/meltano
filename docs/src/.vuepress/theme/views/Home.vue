@@ -189,7 +189,10 @@
           </tr>
         </tbody>
       </table>
+    </div>
 
+    <div class="home">
+      
       <h2 class="quote">Plugins to Extract & Load Data</h2>
 
       <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
