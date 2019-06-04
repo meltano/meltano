@@ -366,10 +366,11 @@ export default {
 }
 
 .meltano-replace-row {
+  font-size:11px;
   td:first-child {
     background: #eee;
     font-weight: bold;
-    font-size:11px;
+    
   }
 }
 
