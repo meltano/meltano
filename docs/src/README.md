@@ -1,6 +1,6 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Get Started →
-actionLink: /docs/installation.html
+actionText: Learn More →
+actionLink: /docs/
 ---

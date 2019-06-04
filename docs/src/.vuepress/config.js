@@ -37,7 +37,7 @@ module.exports = {
     nav: [
       { text: 'Documentation', link: '/docs/' },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
-      { text: 'Subscribe', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link' },
+      { text: 'Newsletter', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link' },
       { text: 'Press', link: '/press/' }
     ],
     sidebar: {

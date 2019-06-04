@@ -17,11 +17,6 @@
         />
       </p>
 
-      <div class='jump-in'>
-        <div class='jump-in-message'>or jump right in</div>
-        <div class="language-bash extra-class"><pre class="language-bash"><code>pip <span class="token function">install</span> meltano
-meltano --help</code></pre><span class="code-block-copy-button code-block-copy-button-offset" title="Copy to clipboard"></span></div>
-      </div>
     </div>
 
     <div
