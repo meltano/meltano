@@ -1,5 +1,5 @@
 <template>
-  <div class="home" style="background:#e5e4e2; max-width:none;">
+  <div class="home" style="background:#e5e4e2; max-width:none; padding-right:0px;">
     <div class="hero">
     
       <div style="float:left; text-align:left; width:60%;">
