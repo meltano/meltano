@@ -44,7 +44,7 @@
 
       <p class="description" style="font-size:16px; padding-left:10%; padding-right:10%; text-align:center; padding-top:10px;">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
-      <table class="meltano-stages-table">
+      <table class="meltano-stages-table" style="width:97%; float:left; font-size:14px;">
         <thead>
           <tr class="meltano-header-row">
             <th>Stage:</th>
@@ -59,27 +59,27 @@
         </thead>
         <tbody>
           <tr class="meltano-use-row">
-            <td>Meltano uses:</td>
-            <td>
+            <td style="background-color:#3e3c8e;">Meltano uses:</td>
+            <td style="background-color:#5959a7;">
               <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
             </td>
-            <td>
+            <td style="background-color:#5959a7;">
               <a href="https://www.singer.io/#taps">Singer Taps</a>
             </td>
-            <td>
+            <td style="background-color:#5959a7;">
               <a href="https://www.singer.io/#targets">Singer Targets</a>
             </td>
-            <td>
+            <td style="background-color:#5959a7;">
               <a href="https://www.getdbt.com/">dbt</a>
             </td>
-            <td>
+            <td style="background-color:#5959a7;">
               <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
             </td>
-            <td>
-              <a href="https://github.com/jupyterhub/jupyterhub">JupyterHub</a>
+            <td style="background-color:#5959a7;">
+              <a href="https://github.com/jupyterhub/jupyterhub">Jupyter Notebooks</a>
             </td>
-            <td>
-              <a href="https://airflow.apache.org/">Airflow</a>
+            <td style="background-color:#5959a7;">
+              <a href="https://airflow.apache.org/">Apache Airflow</a>
             </td>
           </tr>
           <tr class="meltano-replace-row">
