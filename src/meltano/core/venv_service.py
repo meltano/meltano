@@ -13,22 +13,27 @@ VenvSpecs = namedtuple(
 )
 
 
+POSIX = VenvSpecs(
+    lib_dir="lib",
+    bin_dir="bin",
+    site_packages_dir=os.path.join(
+        "lib", "python" + sys.version[:3], "site-packages"
+        ),
+    python_executable="python3",
+)
+
+NT = VenvSpecs(
+    lib_dir="Lib",
+    bin_dir="Scripts",
+    site_packages_dir=os.path.join("Lib", "site-packages"),
+    python_executable="python",
+)
+
 class VirtualEnv:
     PLATFORM_SPECS = {
-        "Linux": VenvSpecs(
-            lib_dir="lib",
-            bin_dir="bin",
-            site_packages_dir=os.path.join(
-                "lib", "python" + sys.version[:3], "site-packages"
-            ),
-            python_executable="python3",
-        ),
-        "Windows": VenvSpecs(
-            lib_dir="Lib",
-            bin_dir="Scripts",
-            site_packages_dir=os.path.join("Lib", "site-packages"),
-            python_executable="python",
-        ),
+        "Linux": POSIX,
+        "Darwin": POSIX,
+        "Windows": NT
     }
 
     def __init__(self, root: Path):
