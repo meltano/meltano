@@ -4,9 +4,10 @@
     
       <h1 style="font-size: 36px; text-align: left; padding-top: 100px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
 
-      <p style="text-align:left; padding-left:35px; width:50%;">Meltano is a free alternative to expensive SaaS tools for building automated business dashboards. We provide tools for ELT, modeling, dashboarding, and orchestration</p>
+      <p style="text-align:left; padding-left:35px; width:50%;">Meltano is a free alternative to expensive SaaS tools for building automated business dashboards. We provide tools for ELT, modeling, dashboarding, and orchestration.</p>
 
-      <p
+
+      <p style="text-align: left; padding-left: 35px; padding-top:20px;"
         class="action"
         v-if="data.actionText && data.actionLink"
       >
