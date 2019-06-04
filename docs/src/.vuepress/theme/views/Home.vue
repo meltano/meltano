@@ -193,9 +193,9 @@
 
 
 
-      <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
+      <h2 style="font-size:36px; font-weight:400; border-bottom: none; ">Plugins to Extract & Load Data</h2>
 
-      <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
+      <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
 
       <div class="el-logos">
         <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
