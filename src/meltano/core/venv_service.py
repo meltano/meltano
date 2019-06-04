@@ -56,7 +56,7 @@ class VenvService:
         venv = VirtualEnv(self.project.venvs_dir(namespace, name))
 
         run = subprocess.run(
-            [venv.python_executable, "-m", "venv", str(venv)],
+            [sys.executable, "-m", "venv", str(venv)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
