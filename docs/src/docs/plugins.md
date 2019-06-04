@@ -6,10 +6,21 @@ sidebarDepth: 1
 
 ## Extractors
 
-Meltano Extractors are commonly prefixed with [tap](/docs/architecture.html#taps). 
+Meltano Extractors are commonly prefixed with [tap](/docs/architecture.html#taps) and currently include:
+- [tap-carbon-intensity](#carbon-intensity)
+- [tap-csv](#csv)
+- [tap-fastly](#fastly)
+- [tap-gitlab](#gitlab)
+- [tap-google-analytics](#google-analytics)
+- [tap-marketo](#marketo)
+- [tap-mongodb](#mongodb)
+- [tap-salesforce](#salesforce)
+- [tap-stripe](#stripe)
+- [tap-zendesk](#zendesk)
+- [tap-zuora](#zuora)
 
-::: tip 
-If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Analytics, Google Ads, and Facebook Ads as next up on the list.
+::: tip
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
 :::
 
 ### Carbon Intensity
@@ -34,7 +45,7 @@ If you are successful, you should see `Added and installed extractors 'tap-carbo
 
 ### CSV
 
-`tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable. 
+`tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable.
 
 #### Info
 
@@ -137,7 +148,7 @@ If you are successful, you should see `Added and installed extractors 'tap-gitla
     - Navigate to your profile page
     - Create an access token
 
-# Configuration
+#### Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
@@ -150,16 +161,23 @@ export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
 export GITLAB_API_START_DATE="YYYY-MM-DD"
 ```
 
-::: info
-  - Either groups or projects need to be provided
-  - Filling in 'groups' but leaving 'projects' empty will sync all group projects.
-  - Filling in 'projects' but leaving 'groups' empty will sync selected projects.
-  - Filling in 'groups' and 'projects' will sync selected projects of those groups.
-:::
-    
 ::: warning
+- Either groups or projects need to be provided
+- Filling in 'groups' but leaving 'projects' empty will sync all group projects.
+- Filling in 'projects' but leaving 'groups' empty will sync selected projects.
+- Filling in 'groups' and 'projects' will sync selected projects of those groups.
+
 Currently, groups don't have a date field which can be tracked
 :::
+
+### Google Analytics
+
+#### Info
+
+#### Install
+
+#### Configuration
+
 
 ### Marketo
 
@@ -200,7 +218,7 @@ export MARKETO_START_TIME="yourStartTime"
 This tap is currently a proof of concept and may have limited utility, but feedback is always welcome on [issue #631](https://gitlab.com/meltano/meltano/issues/631)
 :::
 
-`tap-mongodb` pulls raw data from a MongoDB source.  
+`tap-mongodb` pulls raw data from a MongoDB source.
 
 #### Info
 
@@ -374,7 +392,7 @@ A loader is a component for the bulk import of data. Currently, Meltano supports
 
 ### CSV
 
-`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files. 
+`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files.
 
 #### Info
 
@@ -406,7 +424,7 @@ If you want to customize your delimited or quote character, open `meltano.yml` f
 
 ### Snowflake
 
-`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database. 
+`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database.
 
 ::: warning
 Please note that querying in the Meltano UI is not supported, yet.
@@ -434,7 +452,7 @@ export SF_WAREHOUSE=""  # in UPPERCASE
 
 ### Postgres
 
-`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database. 
+`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database.
 
 #### Info
 
@@ -457,7 +475,7 @@ export PG_SCHEMA=""
 
 ### Sqlite
 
-`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database. 
+`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database.
 
 #### Info
 
