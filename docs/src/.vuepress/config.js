@@ -1,6 +1,6 @@
 module.exports = {
-  title: '',
-  description: 'Open source data dashboarding software for everyone',
+  title: 'Open source data dashboarding software',
+  description: '',
   head: [
     [
       'link',
