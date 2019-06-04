@@ -58,7 +58,7 @@
         </thead>
         <tbody>
           <tr class="meltano-use-row">
-            <td style="background-color:#3e3c8e; width:10%;">Meltano uses:</td>
+            <td class="meltano-uses">Meltano uses:</td>
             <td style="background-color:#5959a7;">
               <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
             </td>
@@ -296,7 +296,6 @@ export default {
   border-top: 1px solid #ddd;
   border-bottom: 0;  
   text-align: center;
-  margin-top: 5rem;
   padding-top: 5rem;
   display: block;
   margin-bottom: 1rem;
@@ -332,6 +331,11 @@ export default {
     //width: 80px;
     text-align: left;
   }
+}
+
+.meltano-uses {
+  background-color:#3e3c8e;
+  width:10%;
 }
 
 .meltano-use-row {
@@ -410,6 +414,7 @@ export default {
     padding-top: 120px; 
     padding-left: 35px; 
     font-weight:400;
+    line-height: 1.2em;
 }
 
 .hero-tagline {
@@ -426,7 +431,6 @@ export default {
 .home
   background:#e5e4e2;
   padding $navbarHeight 2rem 0
-  max-width 1080px
   margin 0px auto
   .hero
     text-align center
