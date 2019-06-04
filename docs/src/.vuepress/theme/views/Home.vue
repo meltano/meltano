@@ -3,7 +3,7 @@
     <div class="hero homepage-cta">
     
       <div class="hero-left">
-        <h1>Open source data dashboarding</h1>
+        <h1 class="hero-left"s>Open source data dashboarding</h1>
         <p style="padding-left:35px; padding-right: 20px;">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
         <p style="text-align: left; padding-left: 35px;"
