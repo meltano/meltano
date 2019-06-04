@@ -59,29 +59,29 @@
         <tbody>
           <tr class="meltano-use-row">
             <td class="meltano-uses">Meltano uses:</td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://www.singer.io/#taps">Singer Taps</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://www.singer.io/#targets">Singer Targets</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://www.getdbt.com/">dbt</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://github.com/jupyterhub/jupyterhub">Jupyter Notebooks</a>
             </td>
-            <td style="background-color:#5959a7;">
+            <td class="meltano-uses-secondary">
               <a href="https://airflow.apache.org/">Apache Airflow</a>
             </td>
           </tr>
-          <tr class="meltano-replace-row" style="font-size:11px;">
+          <tr class="meltano-replace-row">
             <td>Meltano can be an alternative to:</td>
             <td>
               <ul>
@@ -338,6 +338,10 @@ export default {
   width:10%;
 }
 
+.meltano-uses-secondary {
+  background-color:#5959a7;
+}
+
 .meltano-use-row {
   background-color: #3915c0;
   color: white;
@@ -365,6 +369,7 @@ export default {
   td:first-child {
     background: #eee;
     font-weight: bold;
+    font-size:11px;
   }
 }
 
