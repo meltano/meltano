@@ -20,6 +20,7 @@
 
       <div style="float:right; text-align:left; width:50%;">
          <p style="background-image:url('../assets/happy-meltano-user.jpg'); background-position:right; background-size:contain; background-repeat: no-repeat; height:400px;">test</p>
+         <img src="../assets/happy-meltano-user.jpg" />
       </div>
       
     </div>
