@@ -11,7 +11,7 @@
           v-if="data.actionText && data.actionLink"
         >
           <NavLink
-            class="action-button" style="background-color:#42706d; border-bottom: 1px solid #42706d;"
+            class="action-button"
             :item="actionLink"
           />
         </p>
@@ -434,7 +434,7 @@ export default {
     img
       max-height 380px
       display block
-      margin 3rem auto 1.5rem
+      margin-right:-33px;
     h1
       font-size 3rem
     h1, .description, .action
@@ -448,12 +448,12 @@ export default {
       display inline-block
       font-size 1.2rem
       color #fff
-      background-color $accentColor
+      background-color:#42706d; 
+      border-bottom: 1px solid #42706d;
       padding 0.8rem 1.6rem
       border-radius 4px
       transition background-color .1s ease
       box-sizing border-box
-      border-bottom 1px solid darken($accentColor, 10%)
       &:hover
         background-color lighten($accentColor, 10%)
   .features
