@@ -3,8 +3,8 @@
     <div class="hero homepage-cta">
     
       <div class="hero-left">
-        <h1 class="hero-left-h1">Open source data dashboarding</h1>
-        <p style="padding-left:35px; padding-right: 20px;">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
+        <p class="hero-header">Open source data dashboarding</p>
+        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
         <p style="text-align: left; padding-left: 35px;"
           class="action"
@@ -405,13 +405,18 @@ export default {
   width:60%;
 }
 
-.hero-left-h1 {
+.hero-header {
     font-size: 36px; 
     text-align: left; 
     padding-top: 120px; 
     padding-left: 35px; 
     font-weight:400;
-  }
+}
+
+.hero-tagline {
+  padding-left:35px; 
+  padding-right: 20px;
+}
 
 .hero-right {
   float:right;
