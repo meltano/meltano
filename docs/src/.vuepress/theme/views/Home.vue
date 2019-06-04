@@ -38,38 +38,15 @@
       </div>
     </div>
 
-    <div>
-      <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
-
-      <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
-
-      <div class="el-logos">
-        <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
-        <img src="../assets/stripe-logo.png" alt="Stripe Logo">
-        <img src="../assets/csv-logo.png" alt="CSV Logo">
-        <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
-        <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
-        <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
-        <img src="../assets/zuora-logo.png" alt="Zuora Logo">
-        <img src="../assets/marketo-logo.png" alt="Marketo Logo">
-        <div class="carbon-intensity-logo">
-          <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
-          Carbon Intensity API
-        </div>
-        <img src="../assets/fastly-logo.png" alt="Fastly Logo">
-        <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
-        <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
-      </div>
-
-    </div>
+    
 
     <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
 
     <p class="description"></p>
 
-    <h2 class="quote">Test Meltano does for data what Docker did for containers</h2>
+    <h2 class="quote">A single workflow for the entire data life cycle.</h2>
 
-    <p class="description">Meltano is a single workflow for the entire data life cycle. From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+    <p class="description">From loading your data to generating beautiful reports for analysis, Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
     <table class="meltano-stages-table">
       <thead>
@@ -239,6 +216,32 @@
       <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">Edit this page</a>
     </div>
   </div>
+
+  <div>
+      <h2 class="quote">Meltano is built so you can use the extractors and loaders that work for your data and your team.</h2>
+
+      <p class="description">One of the hardest steps of getting insight from your data is standardizing it so you can actually analyze it. Check out all the extractors and/or loaders we currently support (and there is more to come):</p>
+
+      <div class="el-logos">
+        <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
+        <img src="../assets/stripe-logo.png" alt="Stripe Logo">
+        <img src="../assets/csv-logo.png" alt="CSV Logo">
+        <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
+        <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
+        <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
+        <img src="../assets/zuora-logo.png" alt="Zuora Logo">
+        <img src="../assets/marketo-logo.png" alt="Marketo Logo">
+        <div class="carbon-intensity-logo">
+          <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
+          Carbon Intensity API
+        </div>
+        <img src="../assets/fastly-logo.png" alt="Fastly Logo">
+        <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
+        <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
+      </div>
+
+    </div>
+    
 </template>
 
 <script>
