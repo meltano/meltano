@@ -2,7 +2,9 @@
   <div class="home">
     <div class="hero">
     
-      <h1 style="    font-size: 36px; text-align: left; padding-top: 60px; padding-bottom: 60px; padding-left: 35px;">Open source data dashboarding software</h1>
+      <h1 style="    font-size: 36px; text-align: left; padding-top: 120px; padding-bottom: 60px; padding-left: 35px; font-weight:400;">Open source data dashboarding software</h1>
+
+      <p>Meltano is a free alternative to expensive SaaS tools for data ELT, dashboarding, and orchestration</p>
 
       <p
         class="action"
