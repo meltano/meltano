@@ -1,9 +1,9 @@
 <template>
   <div class="home" style="background:#e5e4e2; max-width:none; padding-right:0px;">
-    <div class="hero" style="min-height:450px;">
+    <div class="hero" style="min-height:500px;">
     
       <div style="float:left; text-align:left; width:60%;">
-        <h1 style="font-size: 36px; text-align: left; padding-top: 80px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
+        <h1 style="font-size: 36px; text-align: left; padding-top: 120px; padding-left: 35px; font-weight:400;">Open source data dashboarding</h1>
         <p style="padding-left:35px; padding-right: 20px;">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
      
         <p style="text-align: left; padding-left: 35px;"
@@ -40,7 +40,7 @@
 
     <div>
 
-      <h2 class="quote">A single workflow for the entire data life cycle.</h2>
+      <h2 class="quote" style="font-weight:400; font-size:36px;">A single workflow for the entire data life cycle.</h2>
 
       <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
