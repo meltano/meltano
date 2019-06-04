@@ -6,7 +6,7 @@ sidebarDepth: 1
 
 ## Extractors
 
-Meltano Extractors are commonly prefixed with [tap](/docs/architecture.html#taps) and currently include:
+Meltano Extractors *extract data* and are commonly prefixed with [tap](/docs/architecture.html#taps) and currently include:
 - [tap-carbon-intensity](#carbon-intensity)
 - [tap-csv](#csv)
 - [tap-fastly](#fastly)
@@ -388,7 +388,11 @@ export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
 
 ## Loaders
 
-A loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
+Meltano Loaders *load data in bulk* and are commonly prefixed with [target](/docs/architecture.html#targets). Meltano currently supports:
+- [target-csv](#csv)
+- [target-postgres](#postgres)
+- [target-snowflake](#snowflake)
+- [target-sqlite](#sqlite)
 
 ### CSV
 
