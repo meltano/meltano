@@ -27,14 +27,9 @@
 
         <router-link
           :to="{name: 'orchestration'}"
-          v-if="orchestrationEnabled"
           class="navbar-item navbar-child has-text-weight-semibold">
           Orchestration
         </router-link>
-        <span v-else class="navbar-item navbar-child disabled">
-          <span data-tooltip="Airflow is required."
-                class="tooltip is-tooltip-right is-tooltip-bottom-desktop">Orchestration</span>
-        </span>
 
         <router-link
           :to="{name: 'analyzeModels'}"
@@ -82,11 +77,6 @@ export default {
     return {
       isMobileMenuOpen: false,
     };
-  },
-  computed: {
-    orchestrationEnabled() {
-      return Boolean(FLASK.airflowUrl);
-    },
   },
   methods: {
     mobileMenuClicked() {

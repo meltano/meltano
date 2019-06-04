@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* [#663](https://gitlab.com/meltano/meltano/issues/645) Fixed Airflow error when advancing to Orchestration step after installing and saving a Loader configuration
 
 ### Breaks
 

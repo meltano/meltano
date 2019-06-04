@@ -106,9 +106,10 @@ export default {
       return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);
     },
     loader() {
-      return this.installedPlugins.loaders
+      const targetLoader = this.installedPlugins.loaders
         ? this.installedPlugins.loaders.find(item => item.name === this.loaderNameFromRoute)
-        : {};
+        : null;
+      return targetLoader || {};
     },
   },
   methods: {

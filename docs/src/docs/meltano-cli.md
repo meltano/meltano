@@ -10,7 +10,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 ## Commands
 
 - `meltano add [extractor | loader] [name_of_plugin]`: Adds extractor or loader to your **meltano.yml** file and installs in `.meltano` directory with `venvs` and `pip`.
-- `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data. 
+- `meltano add [transform | transformer]`: Adds transform to your **meltano.yml** and updates the dbt packages and project configuration, so that the transform can run. Also used to install the `dbt` transformer for enabling transformations to run after extracting and loading data.
 - `meltano add model [name_of_model]`: Adds a model bundle to your **meltano.yml** so that you can interactively generate SQL. They are installed inside the `.meltano` directory and are available to use in the Meltano UI.
 - `meltano add orchestrator [name]`: Adds an orchestrator plugin to your **meltano.yml** and installs it.
 - `meltano install`: Installs all the dependencies of your project based on the **meltano.yml** file.
@@ -27,7 +27,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 
 ### `init`
 
-The `init` command is used to create a new meltano project with a basic infrastructure in place. 
+The `init` command is used to create a new meltano project with a basic infrastructure in place.
 
 #### Example
 
@@ -42,7 +42,7 @@ meltano init [project_name] [--no_usage_stats]
 
 #### Options
 
-* **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project. 
+* **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project.
 
 ::: tip
 To disable tracking manually, you can add the following to the `meltano.yml` file:
@@ -131,7 +131,7 @@ As an example, assume that the following command runs:
 meltano elt tap-carbon-intensity target-postgres --transform run
 ```
 
-After the Extract and Load steps are successfuly completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs. 
+After the Extract and Load steps are successfuly completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs.
 
 Meltano uses the convention that the transform has the same name as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
 
@@ -164,7 +164,7 @@ transforms:
     region_table: "{{ env_var('PG_SCHEMA') }}.region"
 ```
 
-Those entries may follow dbt's syntax in order to fetch values from environment variables. In this case, $PG_SCHEMA must be available in order for the transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses $PG_SCHEMA by default as it is the same default schema also used by the Postgres Loader. 
+Those entries may follow dbt's syntax in order to fetch values from environment variables. In this case, $PG_SCHEMA must be available in order for the transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses $PG_SCHEMA by default as it is the same default schema also used by the Postgres Loader.
 
 You can keep those parameters as they are and provide the schema as an environment variable or set the schema manually in `meltano.yml`:
 
@@ -369,9 +369,9 @@ Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs. Please find
 
 ### Installing Airflow
 
-Change directories so that you are inside your Meltano project, and then run the following commadn to make Airflow available to use via `meltano invoke`
+Change directories so that you are inside your Meltano project, and then run the following command to make Airflow available to use via `meltano invoke`
 
-```bash 
+```bash
 $ meltano add orchestrator airflow
 ```
 
@@ -385,7 +385,7 @@ Meltano ships out-of-the-box with a dynamic DAG, which is a DAG generator for yo
 
 To regularly schedule your ELT to run, do the following
 
-```bash 
+```bash
 $ meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
 
 #Example
