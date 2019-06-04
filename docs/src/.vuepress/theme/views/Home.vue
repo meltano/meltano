@@ -1,5 +1,5 @@
 <template>
-  <div class="home home-gray">
+  <div class="home">
     <div class="hero homepage-cta">
     
       <div style="float:left; text-align:left; width:60%;">
@@ -400,11 +400,8 @@ export default {
   min-height:500px;
 }
 
-.home-gray {
-  background:#e5e4e2;
-}
-
 .home
+  background:#e5e4e2;
   padding $navbarHeight 2rem 0
   max-width 1080px
   margin 0px auto
