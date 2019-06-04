@@ -16,14 +16,6 @@ class ProjectInitServiceError(Exception):
     pass
 
 
-class Executor:
-    def write_file(self, path: Path, content: str):
-        pass
-
-    def make_dir(self):
-        pass
-
-
 @singledispatch
 def visit(node, executor):
     pass
@@ -84,13 +76,10 @@ class ProjectInitService:
 
         new_project = Project(self.project_name)
         for path in visit(default_project_yaml, Path(self.project_name)):
-            self.project_echo(filename=path)
+            click.secho(f"\tCreated", fg="blue", nl=False)
+            click.echo(f" {path}")
 
         return new_project
-
-    def project_echo(self, filename=""):
-        click.secho(f"\tCreated", fg="blue", nl=False)
-        click.echo(f" ./{filename}")
 
     def echo_instructions(self):
         click.secho("Project", nl=False)

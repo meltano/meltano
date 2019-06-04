@@ -4,37 +4,29 @@ import sys
 import os
 from pathlib import Path
 from collections import namedtuple
+
 from .project import Project
 from .error import SubprocessError
 
 
-VenvSpecs = namedtuple(
-    "VenvSpecs", ("python_executable", "lib_dir", "bin_dir", "site_packages_dir")
-)
+VenvSpecs = namedtuple("VenvSpecs", ("lib_dir", "bin_dir", "site_packages_dir"))
 
 
 POSIX = VenvSpecs(
     lib_dir="lib",
     bin_dir="bin",
-    site_packages_dir=os.path.join(
-        "lib", "python" + sys.version[:3], "site-packages"
-        ),
-    python_executable="python3",
+    site_packages_dir=os.path.join("lib", f"python{sys.version[:3]}", "site-packages"),
 )
 
 NT = VenvSpecs(
     lib_dir="Lib",
     bin_dir="Scripts",
     site_packages_dir=os.path.join("Lib", "site-packages"),
-    python_executable="python",
 )
 
+
 class VirtualEnv:
-    PLATFORM_SPECS = {
-        "Linux": POSIX,
-        "Darwin": POSIX,
-        "Windows": NT
-    }
+    PLATFORM_SPECS = {"Linux": POSIX, "Darwin": POSIX, "Windows": NT}
 
     def __init__(self, root: Path):
         self.root = root
@@ -50,11 +42,7 @@ class VirtualEnv:
 
     def __getattr__(self, attr):
         spec = getattr(self._specs, attr)
-
-        if attr.endswith("_dir"):
-            return self.root.joinpath(spec)
-        else:
-            return spec
+        return self.root.joinpath(spec)
 
     def __str__(self):
         return str(self.root)
