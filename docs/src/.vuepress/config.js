@@ -1,6 +1,6 @@
 module.exports = {
-  title: 'Meltano',
-  description: 'From data source to dashboard',
+  title: '',
+  description: 'Open source data dashboarding software for everyone',
   head: [
     [
       'link',
