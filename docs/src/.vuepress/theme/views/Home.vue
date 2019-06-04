@@ -42,7 +42,7 @@
 
       <h2 class="quote" style="font-weight:400; font-size:36px;">A single workflow for the entire data life cycle.</h2>
 
-      <p class="description" style="font-size:16px; padding-left:10%; padding-right:10%; text-align:center; padding-top:10px;">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+      <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
       <table class="meltano-stages-table" style="width:97%; float:left; font-size:14px;">
         <thead>
@@ -302,8 +302,12 @@ export default {
 }
 
 .description {
-  font-size: 1.4rem;
   margin-bottom: 0;
+  font-size:16px;
+  padding-left:10%; 
+  padding-right:10%;
+  text-align:center;
+  padding-top:10px;
 }
 
 .meltano-stages-table {
