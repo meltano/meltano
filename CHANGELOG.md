@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#663](https://gitlab.com/meltano/meltano/issues/645) Fixed Airflow error when advancing to Orchestration step after installing and saving a Loader configuration
+* [#254](https://gitlab.com/meltano/meltano/issues/254) Fixed `meltano init` not working on terminal with cp1252 encoding
+* [#254](https://gitlab.com/meltano/meltano/issues/254) Fixed `meltano add/install` crashing on Windows
 
 ### Breaks
 
