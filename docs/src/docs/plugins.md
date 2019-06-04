@@ -6,7 +6,7 @@ sidebarDepth: 1
 
 ## Extractors
 
-Meltano Extractors *extract data* and are commonly prefixed with [tap](/docs/architecture.html#taps) and currently include:
+Meltano Extractors *extract data in bulk* and are commonly prefixed with [tap](/docs/architecture.html#taps) and currently include:
 - [tap-carbon-intensity](#carbon-intensity)
 - [tap-csv](#csv)
 - [tap-fastly](#fastly)
