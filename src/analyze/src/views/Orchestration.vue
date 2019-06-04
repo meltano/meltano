@@ -4,7 +4,7 @@
     <airflow v-if='isAirflowInstalled'></airflow>
     <div v-else>
       <div class="content">
-        <p>Airflow installation is required.</p>
+        <p class='is-italic'>Airflow installation is required.</p>
         <p>Until this installation is automatic please follow the <a target='_blank' href="https://www.meltano.com/docs/meltano-cli.html#installing-airflow">Installing Airflow</a> documentation.</p>
       </div>
     </div>
