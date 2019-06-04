@@ -9,13 +9,13 @@ import RunSummary from '@/components/orchestration/RunSummary';
 
 import AnalyzeModels from '@/views/AnalyzeModels';
 import AnalyzeSettings from '@/views/AnalyzeSettings';
+import Dashboards from '@/views/Dashboards';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
-import Dashboards from '@/views/Dashboards';
 import NotFound from '@/views/NotFound';
+import Orchestration from '@/views/Orchestration';
 import Pipelines from '@/views/Pipelines';
 import Repo from '@/views/Repo';
-import Airflow from '@/components/Airflow';
 
 const router = new Router({
   mode: 'history',
@@ -108,7 +108,7 @@ const router = new Router({
     {
       path: '/orchestration/',
       name: 'orchestration',
-      component: Airflow,
+      component: Orchestration,
     },
     {
       path: '/files/',

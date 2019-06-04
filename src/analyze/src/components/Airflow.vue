@@ -5,22 +5,11 @@
   </div>
 </template>
 <script>
-import Vue from 'vue';
-
 export default {
   computed: {
     airflowUrl() {
       return FLASK.airflowUrl;
     },
-  },
-
-  beforeRouteEnter(to, from, next) {
-    if (FLASK.airflowUrl) {
-      next();
-    } else {
-      Vue.toasted.show('Airflow is not installed.');
-      next(from.path);
-    }
   },
 };
 </script>
