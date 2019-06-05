@@ -70,7 +70,8 @@
         <button
           class="button"
           @click="close">Cancel</button>
-        <button v-if='extractorLacksConfigSettingsAndIsInstalled'
+        <button
+          v-if='extractorLacksConfigSettingsAndIsInstalled'
           class='button is-interactive-primary'
           @click='saveConfigAndBeginEntitySelection'>Next</button>
         <button
