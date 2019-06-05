@@ -44,21 +44,38 @@ export default {
     </aside>
 
     <div class="columns" v-if="!!hasModels">
-      <div class="column is-one-quarter panel" v-for="(v, model) in models" :key="`${model}-panel`">
-        <h3 class="panel-heading is-marginless">{{model | capitalize | underscoreToSpace}}</h3>
-        <router-link
-          v-for="design in v['designs']" :key="design"
-          :to="urlForModelDesign(model, design)"
-          class="panel-block"
-        >
-          <span class="panel-icon">
-            <font-awesome-icon icon="drafting-compass" />
-          </span> {{design | capitalize | underscoreToSpace}}
-        </router-link>
+      <div class="column is-one-quarter">
+        <h2 class='title is-5'>Available</h2>
+        <div class="content">
+          <p>List here...</p>
+        </div>
+      </div>
+      <div class="column is-three-quarter">
+        <h2 class='title is-5'>Analyzable</h2>
+        <div
+          class="box"
+          v-for="(v, model) in models" :key="`${model}-panel`">
+          <div class="content">
+            <h3 class='is-size-6'>{{model | capitalize | underscoreToSpace}}</h3>
+            <hr class='hr-tight'>
+            <div class="level level-tight" v-for="design in v['designs']" :key="design">
+              <div class='level-left'>{{design | capitalize | underscoreToSpace}}</div>
+              <div class="level-right">
+                <router-link
+                  class="button is-small is-interactive-primary"
+                  :to='urlForModelDesign(model, design)'>Analyze</router-link>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <style>
+.level:not(:last-child),
+.level-tight:not(:last-child) {
+  margin-bottom: .5rem;
+}
 </style>
