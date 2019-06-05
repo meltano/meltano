@@ -55,12 +55,26 @@
 
         </template>
 
+        <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
+          <div class="content">
+            <p>{{extractorNameFromRoute}} lacks configuration settings so:</p>
+            <ul>
+              <li>Click "Next" to advance</li>
+              <li>or "Cancel" to manage other extractors</li>
+            </ul>
+          </div>
+        </template>
+
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button
           class="button"
           @click="close">Cancel</button>
+        <button v-if='extractorLacksConfigSettingsAndIsInstalled'
+          class='button is-interactive-primary'
+          @click='saveConfigAndBeginEntitySelection'>Next</button>
         <button
+          v-else
           class='button is-interactive-primary'
           :disabled="!isSaveable"
           @click='saveConfigAndBeginEntitySelection'>Save</button>
@@ -101,6 +115,10 @@ export default {
         ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
         : this.extractorInFocusConfiguration;
     },
+    extractorLacksConfigSettingsAndIsInstalled() {
+      return this.configSettings === null &&
+        !this.getIsInstallingExtractorPlugin(this.extractorNameFromRoute);
+    },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
         ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
@@ -121,13 +139,16 @@ export default {
         this.$router.push({ name: 'extractors' });
       }
     },
+    beginEntitySelection() {
+      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
+    },
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
         name: this.extractor.name,
         type: 'extractor',
         config: this.configSettings,
       });
-      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
+      this.beginEntitySelection();
     },
   },
 };
