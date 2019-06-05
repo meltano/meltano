@@ -133,7 +133,16 @@ def project(test_dir, project_init_service):
     project.activate()
     os.chdir(project.root)
 
+    # Fetch the current ENV[MELTANO_DISABLE_TRACKING] value and then
+    #  disable tracking for tests
+    disable_tracking_default = os.getenv("MELTANO_DISABLE_TRACKING")
+    os.environ["MELTANO_DISABLE_TRACKING"] = "True"
+
     yield project
+
+    # Restore ENV[MELTANO_DISABLE_TRACKING] to its default value
+    if disable_tracking_default:
+        os.environ["MELTANO_DISABLE_TRACKING"] = disable_tracking_default
 
     # clean-up
     os.chdir(test_dir)

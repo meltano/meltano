@@ -2,8 +2,11 @@ import logging
 import requests
 import uuid
 import yaml
+import os
 
 from typing import Dict
+
+from meltano.core.utils import truthy
 
 REQUEST_TIMEOUT = 2.0
 MELTANO_TRACKING_ID = "UA-132758957-3"
@@ -22,8 +25,10 @@ class GoogleAnalyticsTracker:
         self.project = project
         self.tracking_id = tracking_id or MELTANO_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
+
         self.send_anonymous_usage_stats = (
-            self.project.meltano.get("send_anonymous_usage_stats", False) == True
+            not truthy(os.getenv("MELTANO_DISABLE_TRACKING"))
+            and self.project.meltano.get("send_anonymous_usage_stats", False) == True
         )
         self.client_id = client_id or self.project_id()
 
