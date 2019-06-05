@@ -1,4 +1,5 @@
 import Router from 'vue-router';
+
 import AnalyzeModels from '@/components/designs/AnalyzeModels';
 import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
