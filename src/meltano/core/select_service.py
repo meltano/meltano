@@ -28,9 +28,6 @@ class SelectService:
             return json.load(catalog)
 
     def get_extractor_entities(self):
-        invoker = invoker_factory(self.project, self.extractor)
-
-    def get_extractor_entities(self):
         list_all = ListSelectedExecutor()
 
         try:

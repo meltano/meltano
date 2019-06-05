@@ -24,9 +24,9 @@ def selection_color(selection):
         return "red"
 
 
-def selection_marker(selection):
+def selection_mark(selection):
     """
-    Returns the marker to indicate the selection type of an attribute.
+    Returns the mark to indicate the selection type of an attribute.
 
     Examples:
       [automatic]
@@ -107,19 +107,9 @@ def show(project, extractor, show_all=False):
         for stream in list_all.streams
         for prop in list_all.properties[stream.key]
     ):
-        sel_mark = selection_marker(stream.selection)
-        if show_all:
-            click.secho(
-                f"\t{sel_mark} {stream.key}",
-                fg=selection_color(stream.selection),
-                nl=False,
-            )
-            click.echo(".", nl=False)
-            click.secho(
-                prop.key, fg=selection_color(stream.selection and prop.selection)
-            )
-        elif stream.selection and prop.selection:
-            click.secho(
-                f"\t{sel_mark} {stream.key}.{prop.key}",
-                fg=selection_color(stream.selection),
-            )
+        entry_selection = stream.selection + prop.selection
+        mark = selection_mark(entry_selection)
+        if show_all or entry_selection:
+            click.secho(f"\t{mark} ", fg=selection_color(entry_selection), nl=False)
+            click.secho(stream.key, fg=selection_color(stream.selection), nl=False)
+            click.secho(f".{prop.key}", fg=selection_color(entry_selection))
