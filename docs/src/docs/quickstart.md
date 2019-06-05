@@ -114,7 +114,7 @@ $ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
 $ meltano schedule meltano_carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
-To check that your scheduling was successful and that a DAG was created in Airflow, run the following command:
+To check that your scheduling was successful, run the following command:
 
 ```bash
 $ meltano invoke airflow list_dags
@@ -124,6 +124,8 @@ DAGS
 -------------------------------------------------------------------
 meltano_carbon__sqlite
 ```
+
+A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 :::tip
 To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
@@ -145,10 +147,10 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to analyze!
 
 :::tip
-Right now, models can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
+Right now, [analysis models](/docs/architecture.html#meltano-model) can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
 :::
 
-To find a list of available models, run this command:
+To find a list of available analysis models, run this command:
 
 ```bash
 $ meltano discover models
@@ -164,7 +166,7 @@ model-zendesk
 model-zuora
 ```
 
-Choose the relevant model to the data source you've connected, and run the command:
+Choose the relevant analysis model to the data source you've connected, and run the command:
 
 ```bash
 $ meltano add model [MODEL_NAME]
@@ -178,20 +180,20 @@ $ meltano add model model-carbon-intensity
 #Added and installed models 'model-carbon-intensity'.
 ```
 
-To see your newly added model in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
+To see your newly added analysis in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
 
 ```bash
 $ control+c
 $ meltano ui
 ```
 
-Now that you've added your model, you're Analyze page will contain a link to view that model as an interactive dashboard. Start exploring and analyzing your data and build dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
+Now that you've added your analysis model, you're Analyze page will contain a link to view its corresponding analysis which manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data from which to build savable and shareable dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
 
-This is where you will see a list of available models:
+This is where you will see a list of available analysis models:
 
 ![Meltano UI available models](/screenshots/meltano-ui-models.png)
 
-Click on your model (in the case of our example it is "Region") to begin exploring and querying your data.
+Click on your analysis model (in the case of our example it is "Region") to begin exploring, querying, and visualizing your data.
 
 ![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
 
