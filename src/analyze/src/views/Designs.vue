@@ -57,15 +57,17 @@ export default {
                 <li :class="isCurrentLink('/analyze/models')">
                   <router-link to="/analyze/models">Models</router-link>
                 </li>
-                <li :class="isCurrentLink('/analyze/settings')" class="is-marginless">
-                  <router-link to="/analyze/settings">Settings</router-link>
+                <li :class="isCurrentLink('/analyze/connection-settings')" class="is-marginless">
+                  <router-link to="/analyze/connection-settings">Connections</router-link>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-        <router-view />
+
+      <router-view />
+
     </div>
   </router-view-layout>
 </template>

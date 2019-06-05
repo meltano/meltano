@@ -127,7 +127,7 @@ const router = new Router({
           component: AnalyzeModels,
         },
         {
-          path: 'settings',
+          path: 'connection-settings',
           name: 'analyzeSettings',
           component: AnalyzeSettings,
         },
