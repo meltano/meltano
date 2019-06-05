@@ -130,7 +130,9 @@ class SelectExecutor(CatalogExecutor):
                 if not pattern.negated
             ),
             exclude=(
-                pattern.stream_pattern for pattern in self._patterns if pattern.negated
+                pattern.stream_pattern
+                for pattern in self._patterns
+                if pattern.negated and pattern.property_pattern == "*"
             ),
         )
 

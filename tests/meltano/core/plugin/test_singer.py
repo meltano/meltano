@@ -159,7 +159,7 @@ LEGACY_CATALOG = """
           "metadata": {
             "inclusion": "available"
           }
-        },
+        }
       ],
       "replication_key": "created_at",
       "replication_method": "INCREMENTAL"
@@ -597,9 +597,6 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     def test_select(self, catalog, attrs):
         selector = SelectExecutor(["entities.name", "entities.code"])
         visit(catalog, selector)
-        import pdb
-
-        pdb.set_trace()
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
