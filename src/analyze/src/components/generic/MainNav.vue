@@ -32,7 +32,7 @@
         </router-link>
 
         <router-link
-          :to="{name: 'designs'}"
+          :to="{name: 'analyze'}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Analyze
         </router-link>
