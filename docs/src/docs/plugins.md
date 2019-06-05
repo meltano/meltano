@@ -6,10 +6,21 @@ sidebarDepth: 1
 
 ## Extractors
 
-Meltano Extractors are commonly prefixed with [tap](/docs/architecture.html#taps). 
+Meltano Extractors *extract data in bulk* and are commonly prefixed with [tap](/docs/architecture.html#taps). Meltano currently supports:
+- [tap-carbon-intensity](#carbon-intensity)
+- [tap-csv](#csv)
+- [tap-fastly](#fastly)
+- [tap-gitlab](#gitlab)
+- [tap-google-analytics](#google-analytics)
+- [tap-marketo](#marketo)
+- [tap-mongodb](#mongodb)
+- [tap-salesforce](#salesforce)
+- [tap-stripe](#stripe)
+- [tap-zendesk](#zendesk)
+- [tap-zuora](#zuora)
 
-::: tip 
-If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Analytics, Google Ads, and Facebook Ads as next up on the list.
+::: tip
+If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
 :::
 
 ### Carbon Intensity
@@ -34,7 +45,7 @@ If you are successful, you should see `Added and installed extractors 'tap-carbo
 
 ### CSV
 
-`tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable. 
+`tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable.
 
 #### Info
 
@@ -137,7 +148,7 @@ If you are successful, you should see `Added and installed extractors 'tap-gitla
     - Navigate to your profile page
     - Create an access token
 
-# Configuration
+#### Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
@@ -150,16 +161,53 @@ export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
 export GITLAB_API_START_DATE="YYYY-MM-DD"
 ```
 
-::: info
-  - Either groups or projects need to be provided
-  - Filling in 'groups' but leaving 'projects' empty will sync all group projects.
-  - Filling in 'projects' but leaving 'groups' empty will sync selected projects.
-  - Filling in 'groups' and 'projects' will sync selected projects of those groups.
-:::
-    
 ::: warning
+- Either groups or projects need to be provided
+- Filling in 'groups' but leaving 'projects' empty will sync all group projects.
+- Filling in 'projects' but leaving 'groups' empty will sync selected projects.
+- Filling in 'groups' and 'projects' will sync selected projects of those groups.
+
 Currently, groups don't have a date field which can be tracked
 :::
+
+### Google Analytics
+
+`tap-google-analytics` pulls raw data from the Google Analytics Reporting APIv4.
+
+#### Info
+- **Data Source**: [Google Analytics Reporting APIv4](https://developers.google.com/analytics/devguides/reporting/core/v4/)
+- **Repository**: [https://gitlab.com/meltano/tap-google-analytics](https://gitlab.com/meltano/tap-google-analytics)
+
+#### Install
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add extractor tap-google-analytics
+```
+
+If you are successful, you should see `Added and installed extractors 'tap-google-analytics'` in your terminal.
+
+#### Configuration
+
+1. Open your project's `.env` file in a text editor
+1. Add the following variables to your file:
+
+Required:
+```bash
+export GOOGLE_ANALYTICS_API_CLIENT_SECRETS="client_secrets.json"
+export GOOGLE_ANALYTICS_API_VIEW_ID="YOUR VIEW ID"
+export GOOGLE_ANALYTICS_API_START_DATE="2019-02-01T00:00:00Z"
+```
+
+Optional:
+```bash
+export GOOGLE_ANALYTICS_API_REPORTS="cli_reports.json"
+export GOOGLE_ANALYTICS_API_END_DATE="2019-06-01T00:00:00Z"
+```
+
+Check the [README](https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics) for details.
 
 ### Marketo
 
@@ -200,7 +248,7 @@ export MARKETO_START_TIME="yourStartTime"
 This tap is currently a proof of concept and may have limited utility, but feedback is always welcome on [issue #631](https://gitlab.com/meltano/meltano/issues/631)
 :::
 
-`tap-mongodb` pulls raw data from a MongoDB source.  
+`tap-mongodb` pulls raw data from a MongoDB source.
 
 #### Info
 
@@ -370,11 +418,15 @@ export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
 
 ## Loaders
 
-A loader is a component for the bulk import of data. Currently, Meltano supports [Singer.io](https://singer.io) targets as loaders.
+Meltano Loaders *load data in bulk* and are commonly prefixed with [target](/docs/architecture.html#targets). Meltano currently supports:
+- [target-csv](#csv)
+- [target-postgres](#postgres)
+- [target-snowflake](#snowflake)
+- [target-sqlite](#sqlite)
 
 ### CSV
 
-`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files. 
+`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files.
 
 #### Info
 
@@ -406,7 +458,7 @@ If you want to customize your delimited or quote character, open `meltano.yml` f
 
 ### Snowflake
 
-`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database. 
+`target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database.
 
 ::: warning
 Please note that querying in the Meltano UI is not supported, yet.
@@ -434,7 +486,7 @@ export SF_WAREHOUSE=""  # in UPPERCASE
 
 ### Postgres
 
-`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database. 
+`target-postgres` is a loader that works with other extractors in order to move data into a Postgres database.
 
 #### Info
 
@@ -457,7 +509,7 @@ export PG_SCHEMA=""
 
 ### Sqlite
 
-`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database. 
+`target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database.
 
 #### Info
 
