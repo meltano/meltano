@@ -1,12 +1,12 @@
 # Getting Started Guide
 
-Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project. 
+Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
 :::tip
 Before you begin, you must activate the virtual environment you created in the installation process on the command line. All the commands below should be run inside this virtual environment.
 :::
 
-Remember, to activate your virtual enviroment, you will need to run: 
+Remember, to activate your virtual enviroment, you will need to run:
 
 ```bash
 # Linux, OSX
@@ -35,13 +35,13 @@ $ cd PROJECT_NAME
 $ meltano ui
 ```
 
-Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards. 
+Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
 
-Open your Internet browser and visit  [http://localhost:5000](http://localhost:5000) get started.
+Open your Internet browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
 
 ## Connecting Data Sources
 
-When you visit the [http://localhost:5000](http://localhost:5000), you should see:
+When you visit [http://localhost:5000](http://localhost:5000), you should see:
 
 Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
 
@@ -49,7 +49,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://loc
 
 ## Selecting Entities
 
-Data sources can contain a LOT of different entities, and you might not want Meltano to pull every data source into your dashboard. In this step, you can choose which to include.
+Data sources can contain a LOT of different entities, and you might not want Meltano to pull every data source into your dashboard. In this step, you can choose which to include by clicking the "Edit Selections" button of an installed extractor.
 
 Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
 
@@ -57,7 +57,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://local
 
 ## Selecting a Reporting Database
 
-Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored. 
+Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored.
 
 Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
 
@@ -66,7 +66,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localh
 ## Running the ELT
 
 ::: tip
-Right now, this can't be done from the Meltano UI so you will have to return to your command line interface. 
+Right now, this can't be done from the Meltano UI so you will have to return to your command line interface.
 :::
 
 Run the following command
@@ -105,17 +105,16 @@ $ meltano add orchestrator airflow
 #Added and installed orchestrators 'airflow'.
 ```
 
-One Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
+Once Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
 
 ```bash
-
 $ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
 
 #Example
-$ meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
+$ meltano schedule meltano_carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
-To check that your scheduling was successful, and created a DAG in Airflow run the following command:
+To check that your scheduling was successful and that a DAG was created in Airflow, run the following command:
 
 ```bash
 $ meltano invoke airflow list_dags
@@ -143,7 +142,7 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 
 ## Analyzing Your Data
 
-Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to go! 
+Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to analyze!
 
 :::tip
 Right now, models can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
@@ -196,7 +195,7 @@ Click on your model (in the case of our example it is "Region") to begin explori
 
 ![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
 
-When after you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
+After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
 
 
 ## Doing More With Meltano
