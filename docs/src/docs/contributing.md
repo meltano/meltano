@@ -82,8 +82,16 @@ Meltano uses an approval workflow for all merge requests.
 
 1. Create your merge request
 1. Assign the merge request to any Meltano maintainer for a review cycle
-1. Once the review is done the reviewer should approve the merge request
+1. Once the review is done the reviewer may approve the merge request or send it back for further iteration
 1. Once approved, the merge request can be merged by any Meltano maintainer
+
+### Reviews
+
+A contributor can ask for a review on any merge request, without this merge request being done and/or ready to merge.
+
+Asking for a review is asking for feedback on the implementation, not approval of the merge request. It is also the perfect time to familiarize yourself with the code base. If you don’t understand why a certain code path would solve a particular problem, that should be sent as feedback: it most probably means the code is cryptic/complex or that the problem is bigger than anticipated.
+
+Merge conflicts, failing tests and/or missing checkboxes should not be used as ground for sending back a merge request without feedback, unless specified by the reviewer.
 
 ## Changelog
 
