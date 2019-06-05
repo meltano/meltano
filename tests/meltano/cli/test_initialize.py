@@ -17,7 +17,7 @@ def test_init(request, cli_runner, test_dir, pushd):
         Project.find()
 
     # create one with the CLI
-    cli_runner.invoke(cli, ["init", "test_project"])
+    cli_runner.invoke(cli, ["init", "test_project", "--no_usage_stats"])
     pushd("test_project")
 
     project = Project.find()

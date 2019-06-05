@@ -49,6 +49,11 @@ To disable tracking manually, you can add the following to the `meltano.yml` fil
 ```yaml
 send_anonymous_usage_stats: false
 ```
+
+Or you can set the following Environment variable to True and disable tracking for all your projects:
+```bash
+export MELTANO_DISABLE_TRACKING=True
+```
 :::
 
 ### `version`

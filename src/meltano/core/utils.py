@@ -11,6 +11,9 @@ from pathlib import Path
 from .db import DB
 
 
+TRUTHY = ("true", "1", "yes", "on")
+
+
 # from https://github.com/jonathanj/compose/blob/master/compose.py
 def compose(*fs):
     """
@@ -142,3 +145,7 @@ def noop(*_args, **_kwargs):
 def map_dict(f: Callable, d: Dict):
     for k, v in d.items():
         yield k, f(v)
+
+
+def truthy(val: str) -> bool:
+    return str(val).lower() in TRUTHY

@@ -1,7 +1,7 @@
 import pytest
 import os
 import logging
-
+from _pytest.monkeypatch import MonkeyPatch
 
 logging.basicConfig(level=logging.INFO)
 
@@ -34,3 +34,13 @@ def pytest_runtest_setup(item):
     # both as SYSTEM and WAREHOUSE.
     if backend_marker and backend_marker.args[0] != PYTEST_BACKEND:
         pytest.skip()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_env():
+    monkeypatch = MonkeyPatch()
+    monkeypatch.setenv("MELTANO_DISABLE_TRACKING", "True")
+
+    yield
+
+    monkeypatch.undo()
