@@ -8,22 +8,6 @@ export default {
     RouterViewLayout,
     DocsLink,
   },
-  data() {
-    return {
-      connectionName: '',
-      connectionDatabase: '',
-      connectionSchema: '',
-      connectionDialect: '',
-      connectionHost: '',
-      connectionPort: '',
-      connectionUsername: '',
-      connectionPassword: '',
-      connectionSqlitePath: '',
-    };
-  },
-  created() {
-    this.$store.dispatch('repos/getModels');
-  },
   methods: {
     isCurrentLink(path) {
       return this.$route.path === path ? 'is-active' : '';
