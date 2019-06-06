@@ -12,7 +12,7 @@ export default {
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
       'getIsPluginInstalled',
-      'getIsInstallingExtractorPlugin',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'plugins',
@@ -23,10 +23,10 @@ export default {
   },
   methods: {
     ...mapActions('configuration', [
-      'installExtractor',
+      'installPlugin',
     ]),
     installExtractorAndBeginSettings(extractor) {
-      this.installExtractor(extractor);
+      this.installPlugin({ collectionType: 'extractors', name: extractor });
       this.updateExtractorSettings(extractor);
     },
     updateExtractorSettings(extractor) {
@@ -90,7 +90,7 @@ export default {
             </template>
             <template v-else>
               <a
-                :class='{ "is-loading": getIsInstallingExtractorPlugin(extractor) }'
+                :class='{ "is-loading": getIsInstallingPlugin("extractors", extractor) }'
                 class='button is-interactive-primary is-outlined is-block is-small'
                 @click="installExtractorAndBeginSettings(extractor)">Install</a>
             </template>

@@ -29,31 +29,33 @@ def installed_plugins():
     return jsonify(project.meltano)
 
 
-@orchestrationsBP.route("/add-extractor", methods=["POST"])
-def add_extractor():
+@orchestrationsBP.route("/install-plugin", methods=["POST"])
+def install_plugin():
     project = Project.find()
     add_service = ProjectAddService(project)
+    plugin_collection_type = request.get_json()["collectionType"]
     plugin_name = request.get_json()["name"]
-    plugin = add_service.add("extractors", plugin_name)
+    plugin = add_service.add(plugin_collection_type, plugin_name)
     install_service = PluginInstallService(project)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-    return jsonify({"test": 123})
 
+    plugin_type = None
+    if plugin_collection_type == PluginType.EXTRACTORS:
+        plugin_type = "extractor"
+    elif plugin_collection_type == PluginType.LOADERS:
+        plugin_type = "loader"
+    elif plugin_collection_type == PluginType.MODELS:
+        plugin_type = "model"
+    elif plugin_collection_type == PluginType.TRANSFORMERS:
+        plugin_type = "transformer"
+    elif plugin_collection_type == PluginType.TRANSFORMS:
+        plugin_type = "transform"
+    elif plugin_collection_type == PluginType.ORCHESTRATORS:
+        plugin_type = "orchestrator"
+    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
-@orchestrationsBP.route("/add-loader", methods=["POST"])
-def add_loader():
-    project = Project.find()
-    add_service = ProjectAddService(project)
-    plugin_name = request.get_json()["name"]
-    plugin = add_service.add("loaders", plugin_name)
-    install_service = PluginInstallService(project)
-    run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
     return jsonify({"test": 123})
 
 

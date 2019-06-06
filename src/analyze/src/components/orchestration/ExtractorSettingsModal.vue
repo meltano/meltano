@@ -14,7 +14,7 @@
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingExtractorPlugin(extractorNameFromRoute)'>
+        <template v-if='getIsInstallingPlugin("extractors", extractorNameFromRoute)'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -89,8 +89,8 @@ export default {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
-      'getIsExtractorPluginInstalled',
-      'getIsInstallingExtractorPlugin',
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
@@ -110,7 +110,7 @@ export default {
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsExtractorPluginInstalled(this.extractorNameFromRoute);
+      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
     },
   },
   methods: {

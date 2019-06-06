@@ -12,7 +12,7 @@ export default {
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
       'getIsPluginInstalled',
-      'getIsInstallingLoaderPlugin',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'plugins',
@@ -20,10 +20,10 @@ export default {
   },
   methods: {
     ...mapActions('configuration', [
-      'installLoader',
+      'installPlugin',
     ]),
     installLoaderAndBeginSettings(loader) {
-      this.installLoader(loader);
+      this.installPlugin({ collectionType: 'loaders', name: loader });
       this.updateLoaderSettings(loader);
     },
     updateLoaderSettings(loader) {
@@ -81,7 +81,7 @@ export default {
             </template>
             <template v-else>
               <a
-                :class='{ "is-loading": getIsInstallingLoaderPlugin(loader) }'
+                :class='{ "is-loading": getIsInstallingPlugin("loaders", loader) }'
                 class='button is-interactive-primary is-outlined is-block is-small'
                 @click="installLoaderAndBeginSettings(loader)">Install</a>
             </template>

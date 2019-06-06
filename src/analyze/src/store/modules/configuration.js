@@ -11,6 +11,10 @@ const state = {
   extractorInFocusEntities: {},
   plugins: {},
   installedPlugins: {},
+  installingPlugins: {
+    extractors: [],
+    loaders: [],
+  },
   installingExtractors: [],
   installingLoaders: [],
 };
@@ -29,8 +33,8 @@ const getters = {
       ? Boolean(stateRef.installedPlugins[collectionType].find(item => item.name === extractor))
       : false);
   },
-  getIsInstallingExtractorPlugin(stateRef) {
-    return extractor => stateRef.installingExtractors.includes(extractor);
+  getIsInstallingPlugin(stateRef) {
+    return (collectionType, extractor) => stateRef.installingPlugins[collectionType].includes(extractor);
   },
   getLoaderImageUrl(_, gettersRef) {
     return loader => (
@@ -39,14 +43,6 @@ const getters = {
   },
   getLoaderNameWithoutPrefixedTargetDash() {
     return loader => loader.replace('target-', '');
-  },
-  getIsLoaderPluginInstalled(stateRef) {
-    return loader => (stateRef.installedPlugins.loaders
-      ? Boolean(stateRef.installedPlugins.loaders.find(item => item.name === loader))
-      : false);
-  },
-  getIsInstallingLoaderPlugin(stateRef) {
-    return loader => stateRef.installingLoaders.includes(loader);
   },
 };
 
@@ -100,26 +96,14 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  installExtractor({ commit, dispatch }, extractor) {
-    commit('installExtractorStart', extractor);
+  installPlugin({ commit, dispatch }, installConfig) {
+    commit('installPluginStart', installConfig);
 
-    orchestrationsApi.addExtractors({ name: extractor })
+    orchestrationsApi.installPlugin(installConfig)
       .then(() => {
         dispatch('getInstalledPlugins')
           .then(() => {
-            commit('installExtractorComplete', extractor);
-          });
-      });
-  },
-
-  installLoader({ commit, dispatch }, loader) {
-    commit('installLoaderStart', loader);
-
-    orchestrationsApi.addLoaders({ name: loader })
-      .then(() => {
-        dispatch('getInstalledPlugins')
-          .then(() => {
-            commit('installLoaderComplete', loader);
+            commit('installPluginComplete', installConfig);
           });
       });
   },
@@ -192,20 +176,12 @@ const actions = {
 };
 
 const mutations = {
-  installExtractorStart(_, extractor) {
-    state.installingExtractors.push(extractor);
+  installPluginStart(_, installConfig) {
+    state.installingPlugins[installConfig.collectionType].push(installConfig.name);
   },
 
-  installExtractorComplete(_, extractor) {
-    lodash.pull(state.installingExtractors, extractor);
-  },
-
-  installLoaderStart(_, loader) {
-    state.installingLoaders.push(loader);
-  },
-
-  installLoaderComplete(_, loader) {
-    lodash.pull(state.installingLoaders, loader);
+  installPluginComplete(_, installConfig) {
+    lodash.pull(state.installingPlugins[installConfig.collectionType], installConfig.name);
   },
 
   setAllPlugins(_, plugins) {

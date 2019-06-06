@@ -6,12 +6,8 @@ export default {
     return axios.get(utils.apiUrl('orchestrations'));
   },
 
-  addExtractors(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', 'add-extractor'), extractor);
-  },
-
-  addLoaders(loader) {
-    return axios.post(utils.apiUrl('orchestrations', 'add-loader'), loader);
+  installPlugin(installConfig) {
+    return axios.post(utils.apiUrl('orchestrations', 'install-plugin'), installConfig);
   },
 
   extract(extractor) {

@@ -14,7 +14,7 @@
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingLoaderPlugin(loaderNameFromRoute)'>
+        <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -89,7 +89,7 @@ export default {
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
       'getIsPluginInstalled',
-      'getIsInstallingLoaderPlugin',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'installedPlugins',
