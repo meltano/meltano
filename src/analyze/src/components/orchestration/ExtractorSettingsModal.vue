@@ -57,10 +57,10 @@
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">
-            <p>{{extractorNameFromRoute}} lacks configuration settings so:</p>
+            <p>{{extractorNameFromRoute}} doesn't require configuration.</p>
             <ul>
               <li>Click "Next" to advance</li>
-              <li>or "Cancel" to manage other extractors</li>
+              <li>Click "Cancel" to install other extractors</li>
             </ul>
           </div>
         </template>
