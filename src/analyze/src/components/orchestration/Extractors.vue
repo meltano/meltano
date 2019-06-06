@@ -11,7 +11,7 @@ export default {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
-      'getIsExtractorPluginInstalled',
+      'getIsPluginInstalled',
       'getIsInstallingExtractorPlugin',
     ]),
     ...mapState('configuration', [
@@ -69,7 +69,7 @@ export default {
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
-              :class='{ "grayscale": !getIsExtractorPluginInstalled(extractor) }'
+              :class='{ "grayscale": !getIsPluginInstalled("extractors", extractor) }'
               :src='getExtractorImageUrl(extractor)'
               :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
           </div>
@@ -78,7 +78,7 @@ export default {
               {{extractor}}
             </p>
 
-            <template v-if='getIsExtractorPluginInstalled(extractor)'>
+            <template v-if='getIsPluginInstalled("extractors", extractor)'>
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'

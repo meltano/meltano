@@ -24,9 +24,9 @@ const getters = {
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
   },
-  getIsExtractorPluginInstalled(stateRef) {
-    return extractor => (stateRef.installedPlugins.extractors
-      ? Boolean(stateRef.installedPlugins.extractors.find(item => item.name === extractor))
+  getIsPluginInstalled(stateRef) {
+    return (collectionType, extractor) => (stateRef.installedPlugins[collectionType]
+      ? Boolean(stateRef.installedPlugins[collectionType].find(item => item.name === extractor))
       : false);
   },
   getIsInstallingExtractorPlugin(stateRef) {

@@ -88,7 +88,7 @@ export default {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
-      'getIsLoaderPluginInstalled',
+      'getIsPluginInstalled',
       'getIsInstallingLoaderPlugin',
     ]),
     ...mapState('configuration', [
@@ -103,7 +103,7 @@ export default {
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);
+      return hasOwns.length > 0 && this.getIsPluginInstalled(this.loaderNameFromRoute);
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders

@@ -14,7 +14,7 @@ export default {
     this.$store.dispatch('repos/getModels');
   },
   computed: {
-    ...mapState('configuration', ['plugins']),
+    ...mapState('configuration', ['installedPlugins', 'plugins']),
     ...mapState('repos', ['models']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
   },

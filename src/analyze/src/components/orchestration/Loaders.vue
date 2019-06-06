@@ -11,7 +11,7 @@ export default {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
-      'getIsLoaderPluginInstalled',
+      'getIsPluginInstalled',
       'getIsInstallingLoaderPlugin',
     ]),
     ...mapState('configuration', [
@@ -60,7 +60,7 @@ export default {
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
-              :class='{ "grayscale": !getIsLoaderPluginInstalled(loader) }'
+              :class='{ "grayscale": !getIsPluginInstalled("loaders", loader) }'
               :src='getLoaderImageUrl(loader)'
               :alt="`${getLoaderNameWithoutPrefixedTargetDash(loader)} logo`">
           </div>
@@ -69,7 +69,7 @@ export default {
               {{loader}}
             </p>
 
-            <template v-if='getIsLoaderPluginInstalled(loader)'>
+            <template v-if='getIsPluginInstalled("loaders", loader)'>
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'
