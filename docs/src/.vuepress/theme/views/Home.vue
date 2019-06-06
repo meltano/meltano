@@ -3,7 +3,7 @@
     <div class="hero homepage-cta">
 
       <div class="hero-left">
-        <p class="hero-header">Open source data dashboarding</p>
+        <h2 class="hero-header">Open source data dashboarding</h2>
         <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
 
         <p class="action"
@@ -18,9 +18,8 @@
       </div>
 
       <div class="hero-right">
-        <img class="meltano-user-img" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        <img src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
       </div>
-
     </div>
 
     <div
@@ -211,8 +210,6 @@
         <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
       </div>
 
-
-
       <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
 
       <p class="description"></p>
@@ -284,12 +281,6 @@ export default {
       color: #fff;
       background-color: $accentColor;
     }
-}
-
-.meltano-user-img {
-  float:right;
-  max-height:380px;
-  margin-right:-33px;
 }
 
 .quote {
@@ -405,52 +396,58 @@ export default {
 }
 
 .homepage-cta {
-  min-height:500px;
+  min-height: 500px;
+  max-width: $contentWidthWide;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column-reverse;
+}
+
+@media (min-width: $MQNarrow) {
+  .homepage-cta {
+    flex-direction: row;
+  }
 }
 
 .hero-left {
-  float:left;
-  text-align:left;
-  width:60%;
+  max-width: 80%;
+  text-align: left;
 }
 
 .hero-header {
+  padding: 0;
+  font-weight:400;
+  font-size: 36px;
+}
+
+@media (min-width: $MQNarrow) {
+  .hero-header {
     font-size: 36px;
     text-align: left;
-    padding-top: 120px;
-    padding-left: 35px;
-    font-weight:400;
+    padding-top: 40px;
     line-height: 1.2em;
+  }
 }
 
 .hero-tagline {
-  padding-left:35px;
   padding-right: 20px;
 }
 
-.hero-right {
-  float:right;
-  text-align:left;
-  width:40%;
-}
-
 .home
-  background:#e5e4e2;
+  background #e5e4e2
   padding $navbarHeight 2rem 0
   margin 0px auto
   .hero
     text-align center
+    margin 0 auto
     img
-      max-height 380px
-      display block
-      margin-right:-33px;
-      padding-top:60px;
+
     h1
       font-size 3rem
     h1, .description, .action
       margin 1.8rem auto
       text-align: left;
-      padding-left: 35px;
     .description
       max-width 35rem
       font-size 1.6rem
@@ -503,14 +500,15 @@ export default {
       max-width 100%
       padding 0 2.5rem
 
-@media (max-width: $MQMobileNarrow)
+@media (min-width: $MQMobileNarrow)
   .home
     padding-left 1.5rem
     padding-right 1.5rem
     .hero
       img
-        max-height 210px
-        margin 2rem auto 1.2rem
+        max-height 480px
+        display block
+        margin-right: -33px;
       h1
         font-size 2rem
       h1, .description, .action
