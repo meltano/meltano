@@ -103,7 +103,7 @@ export default {
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled(this.loaderNameFromRoute);
+      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders
