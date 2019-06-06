@@ -15,8 +15,6 @@ const state = {
     extractors: [],
     loaders: [],
   },
-  installingExtractors: [],
-  installingLoaders: [],
 };
 
 const getters = {
