@@ -7,7 +7,7 @@ import orchestrationsApi from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
-  modelPlugins: [],
+  plugins: {},
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
@@ -210,11 +210,10 @@ const mutations = {
     lodash.pull(state.installingLoaders, loader);
   },
 
-  setAllPlugins(_, orchestrationData) {
-    state.extractors = orchestrationData.extractors;
-    state.loaders = orchestrationData.loaders;
-    state.modelPlugins = orchestrationData.models;
-    console.log('all plugins', orchestrationData);
+  setAllPlugins(_, plugins) {
+    state.plugins = plugins;
+    state.extractors = plugins.extractors;
+    state.loaders = plugins.loaders;
   },
 
   setAllExtractorInFocusEntities(_, entitiesData) {
@@ -237,7 +236,6 @@ const mutations = {
   setInstalledPlugins(_, projectConfig) {
     if (projectConfig.plugins) {
       state.installedPlugins = projectConfig.plugins;
-      console.log('installedPlugins', state.installedPlugins);
     }
   },
 

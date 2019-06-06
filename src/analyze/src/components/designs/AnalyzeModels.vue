@@ -14,7 +14,7 @@ export default {
     this.$store.dispatch('repos/getModels');
   },
   computed: {
-    ...mapState('configuration', ['modelPlugins']),
+    ...mapState('configuration', ['plugins']),
     ...mapState('repos', ['models']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
   },
@@ -52,8 +52,8 @@ export default {
         <div class="content">
           <ul>
             <li
-              v-for='model in modelPlugins'
-              :key='model'>{{model}}</li>
+              v-for='modelPlugin in plugins.models'
+              :key='modelPlugin'>{{modelPlugin}}</li>
           </ul>
         </div>
       </div>
