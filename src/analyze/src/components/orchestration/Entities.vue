@@ -4,7 +4,7 @@ import { mapGetters, mapState } from 'vuex';
 export default {
   name: 'Entities',
   created() {
-    this.$store.dispatch('configuration/getAll');
+    this.$store.dispatch('configuration/getAllPlugins');
     this.$store.dispatch('configuration/getInstalledPlugins');
   },
   computed: {

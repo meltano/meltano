@@ -9,12 +9,12 @@ export default {
     DocsLink,
   },
   created() {
-    this.$store.dispatch('configuration/getAll');
+    this.$store.dispatch('configuration/getAllPlugins');
     this.$store.dispatch('configuration/getInstalledPlugins');
     this.$store.dispatch('repos/getModels');
   },
   computed: {
-    ...mapState('configuration', ['allModels']),
+    ...mapState('configuration', ['modelPlugins']),
     ...mapState('repos', ['models']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
   },
@@ -52,7 +52,7 @@ export default {
         <div class="content">
           <ul>
             <li
-              v-for='model in allModels'
+              v-for='model in modelPlugins'
               :key='model'>{{model}}</li>
           </ul>
         </div>

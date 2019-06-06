@@ -7,7 +7,7 @@ import orchestrationsApi from '../../api/orchestrations';
 const state = {
   extractors: [],
   loaders: [],
-  allModels: [],
+  modelPlugins: [],
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
@@ -65,10 +65,10 @@ const actions = {
     commit('setLoaderInFocusConfiguration', {});
   },
 
-  getAll({ commit }) {
+  getAllPlugins({ commit }) {
     orchestrationsApi.index()
       .then((response) => {
-        commit('setAll', response.data);
+        commit('setAllPlugins', response.data);
       });
   },
 
@@ -210,10 +210,11 @@ const mutations = {
     lodash.pull(state.installingLoaders, loader);
   },
 
-  setAll(_, orchestrationData) {
+  setAllPlugins(_, orchestrationData) {
     state.extractors = orchestrationData.extractors;
     state.loaders = orchestrationData.loaders;
-    state.allModels = orchestrationData.models;
+    state.modelPlugins = orchestrationData.models;
+    console.log('all plugins', orchestrationData);
   },
 
   setAllExtractorInFocusEntities(_, entitiesData) {
@@ -236,6 +237,7 @@ const mutations = {
   setInstalledPlugins(_, projectConfig) {
     if (projectConfig.plugins) {
       state.installedPlugins = projectConfig.plugins;
+      console.log('installedPlugins', state.installedPlugins);
     }
   },
 
