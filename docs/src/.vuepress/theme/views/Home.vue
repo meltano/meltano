@@ -1,11 +1,11 @@
 <template>
   <div class="home">
     <div class="hero homepage-cta">
-    
+
       <div class="hero-left">
         <p class="hero-header">Open source data dashboarding</p>
-        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
-     
+        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
+
         <p class="action"
           v-if="data.actionText && data.actionLink"
         >
@@ -20,7 +20,7 @@
       <div class="hero-right">
         <img class="meltano-user-img" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
       </div>
-      
+
     </div>
 
     <div
@@ -37,7 +37,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="content-width-wide">
 
       <h2 class="quote">A single workflow for the entire data life cycle.</h2>
 
@@ -211,13 +211,13 @@
         <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
       </div>
 
-   
+
 
       <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
 
       <p class="description"></p>
 
-      
+
 
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
@@ -288,13 +288,13 @@ export default {
 
 .meltano-user-img {
   float:right;
-  max-height:380px; 
+  max-height:380px;
   margin-right:-33px;
 }
 
 .quote {
   border-top: 1px solid #ddd;
-  border-bottom: 0;  
+  border-bottom: 0;
   text-align: center;
   padding-top: 5rem;
   display: block;
@@ -306,7 +306,7 @@ export default {
 .description {
   margin-bottom: 0;
   font-size:16px;
-  padding-left:10%; 
+  padding-left:10%;
   padding-right:10%;
   text-align:center;
   padding-top:10px;
@@ -315,7 +315,7 @@ export default {
 .meltano-stages-table {
   display: block;
   margin: 2.5rem auto 7rem;
-  float:left; 
+  float:left;
   font-size:14px;
 
   tr:nth-child(2n) {
@@ -370,7 +370,7 @@ export default {
   td:first-child {
     background: #eee;
     font-weight: bold;
-    
+
   }
 }
 
@@ -415,22 +415,22 @@ export default {
 }
 
 .hero-header {
-    font-size: 36px; 
-    text-align: left; 
-    padding-top: 120px; 
-    padding-left: 35px; 
+    font-size: 36px;
+    text-align: left;
+    padding-top: 120px;
+    padding-left: 35px;
     font-weight:400;
     line-height: 1.2em;
 }
 
 .hero-tagline {
-  padding-left:35px; 
+  padding-left:35px;
   padding-right: 20px;
 }
 
 .hero-right {
   float:right;
-  text-align:left; 
+  text-align:left;
   width:40%;
 }
 
@@ -449,7 +449,7 @@ export default {
       font-size 3rem
     h1, .description, .action
       margin 1.8rem auto
-      text-align: left; 
+      text-align: left;
       padding-left: 35px;
     .description
       max-width 35rem
@@ -460,7 +460,7 @@ export default {
       display inline-block
       font-size 1.2rem
       color #fff
-      background-color:#42706d; 
+      background-color:#42706d;
       border-bottom: 1px solid #42706d;
       padding 0.8rem 1.6rem
       border-radius 4px
