@@ -15,8 +15,12 @@ export default {
   },
   computed: {
     ...mapState('configuration', ['installedPlugins', 'plugins']),
-    ...mapState('repos', ['models']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
+    ...mapGetters('configuration', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
+    ]),
+    ...mapState('repos', ['models']),
   },
   filters: {
     capitalize,
@@ -50,11 +54,19 @@ export default {
       <div class="column is-one-quarter">
         <h2 class='title is-5'>Available</h2>
         <div class="content">
-          <ul>
-            <li
-              v-for='modelPlugin in plugins.models'
-              :key='modelPlugin'>{{modelPlugin}}</li>
-          </ul>
+            <div
+              v-for='(modelPlugin, index) in plugins.models'
+              :key="`${modelPlugin}-${index}`">
+              <span>
+                {{modelPlugin}}
+              </span>
+              <button
+                v-if='!getIsPluginInstalled("models", modelPlugin)'
+                class='button is-interactive-primary is-outlined is-block is-small'>Install</button>
+              <span
+                v-else
+                class='is-italic'>Installed</span>
+            </div>
         </div>
       </div>
       <div class="column is-three-quarter">

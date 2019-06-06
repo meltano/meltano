@@ -14,6 +14,7 @@ const state = {
   installingPlugins: {
     extractors: [],
     loaders: [],
+    models: [],
   },
 };
 
