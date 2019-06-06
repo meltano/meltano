@@ -9,9 +9,12 @@ export default {
     DocsLink,
   },
   created() {
+    this.$store.dispatch('configuration/getAll');
+    this.$store.dispatch('configuration/getInstalledPlugins');
     this.$store.dispatch('repos/getModels');
   },
   computed: {
+    ...mapState('configuration', ['allModels']),
     ...mapState('repos', ['models']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
   },
@@ -47,7 +50,11 @@ export default {
       <div class="column is-one-quarter">
         <h2 class='title is-5'>Available</h2>
         <div class="content">
-          <p>List here...</p>
+          <ul>
+            <li
+              v-for='model in allModels'
+              :key='model'>{{model}}</li>
+          </ul>
         </div>
       </div>
       <div class="column is-three-quarter">

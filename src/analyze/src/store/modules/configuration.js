@@ -3,13 +3,11 @@ import Vue from 'vue';
 import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
-import pluginsApi from '../../api/plugins';
 
 const state = {
   extractors: [],
   loaders: [],
   allModels: [],
-  plugins: {},
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
@@ -102,13 +100,6 @@ const actions = {
 
   getPluginConfiguration(_, pluginPayload) {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
-  },
-
-  getPlugins({ commit }) {
-    pluginsApi.getPlugins()
-      .then((response) => {
-        commit('setPlugins', response.data);
-      });
   },
 
   installExtractor({ commit, dispatch }, extractor) {
@@ -250,10 +241,6 @@ const mutations = {
 
   setLoaderInFocusConfiguration(_, configuration) {
     state.loaderInFocusConfiguration = configuration;
-  },
-
-  setPlugins(_, plugins) {
-    state.plugins = plugins;
   },
 
   toggleSelected(_, selectable) {
