@@ -5,13 +5,11 @@ import lodash from 'lodash';
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
-  extractors: [],
-  loaders: [],
-  plugins: {},
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
+  plugins: {},
   installedPlugins: {},
   installingExtractors: [],
   installingLoaders: [],
@@ -212,8 +210,6 @@ const mutations = {
 
   setAllPlugins(_, plugins) {
     state.plugins = plugins;
-    state.extractors = plugins.extractors;
-    state.loaders = plugins.loaders;
   },
 
   setAllExtractorInFocusEntities(_, entitiesData) {

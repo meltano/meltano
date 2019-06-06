@@ -15,7 +15,7 @@ export default {
       'getIsInstallingLoaderPlugin',
     ]),
     ...mapState('configuration', [
-      'loaders',
+      'plugins',
     ]),
   },
   methods: {
@@ -55,7 +55,7 @@ export default {
     <div class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(loader, index) in loaders"
+        v-for="(loader, index) in plugins.loaders"
         :key="`${loader}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">

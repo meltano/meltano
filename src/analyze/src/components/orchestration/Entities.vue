@@ -15,7 +15,7 @@ export default {
     ]),
     ...mapState('configuration', [
       'installedPlugins',
-      'extractors',
+      'plugins',
     ]),
   },
   methods: {
@@ -48,7 +48,7 @@ export default {
     <div class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(extractor, index) in extractors"
+        v-for="(extractor, index) in plugins.extractors"
         :key="`${extractor}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
