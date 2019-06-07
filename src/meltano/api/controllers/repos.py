@@ -190,8 +190,9 @@ def sync():
 @reposBP.route("/models", methods=["GET"])
 def models():
     project = Project.find()
-    topics = project.root_dir("model", "topics.index.m5oc")
-    topics = json.load(open(topics, "r"))
+    topicsFile = project.root_dir("model", "topics.index.m5oc")
+    path = Path(topicsFile)
+    topics = json.load(open(path, "r")) if path.is_file() else {}
     topics = next(M5ocFilter().filter("view:topic", [topics]))
 
     return jsonify(topics)

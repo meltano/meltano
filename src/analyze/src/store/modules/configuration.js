@@ -103,6 +103,7 @@ const actions = {
         dispatch('getInstalledPlugins')
           .then(() => {
             commit('installPluginComplete', installConfig);
+            dispatch('getAllPlugins');
           });
       });
   },

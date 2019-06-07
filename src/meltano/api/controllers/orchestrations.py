@@ -1,3 +1,4 @@
+from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
@@ -39,7 +40,12 @@ def install_plugin():
     install_service = PluginInstallService(project)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
-    tracker = GoogleAnalyticsTracker(project)
+
+    compiler = ProjectCompiler(project)
+    try:
+        compiler.compile()
+    except Exception as e:
+        pass
 
     plugin_type = None
     if plugin_collection_type == PluginType.EXTRACTORS:
@@ -54,6 +60,7 @@ def install_plugin():
         plugin_type = "transform"
     elif plugin_collection_type == PluginType.ORCHESTRATORS:
         plugin_type = "orchestrator"
+    tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
     return jsonify({"test": 123})
