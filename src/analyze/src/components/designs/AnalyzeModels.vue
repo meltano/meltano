@@ -27,7 +27,10 @@ export default {
       'installPlugin',
     ]),
     installModel(model) {
-      this.installPlugin({ collectionType: 'models', name: model });
+      this.installPlugin({ collectionType: 'models', name: model })
+        .then(() => {
+          this.$store.dispatch('repos/getModels');
+        });
     },
   },
 };

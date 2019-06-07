@@ -98,7 +98,7 @@ const actions = {
   installPlugin({ commit, dispatch }, installConfig) {
     commit('installPluginStart', installConfig);
 
-    orchestrationsApi.installPlugin(installConfig)
+    return orchestrationsApi.installPlugin(installConfig)
       .then(() => {
         dispatch('getInstalledPlugins')
           .then(() => {
