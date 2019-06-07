@@ -1,6 +1,6 @@
 import lodash from 'lodash';
 
-import orchestrationsApi from '../../api/orchestrations';
+import pluginsApi from '../../api/plugins';
 
 const state = {
   plugins: {},
@@ -25,7 +25,7 @@ const getters = {
 
 const actions = {
   getAllPlugins({ commit }) {
-    orchestrationsApi.index()
+    pluginsApi.getAllPlugins()
       .then((response) => {
         commit('setAllPlugins', response.data);
       });
@@ -34,7 +34,7 @@ const actions = {
   installPlugin({ commit, dispatch }, installConfig) {
     commit('installPluginStart', installConfig);
 
-    return orchestrationsApi.installPlugin(installConfig)
+    return pluginsApi.installPlugin(installConfig)
       .then(() => {
         dispatch('getInstalledPlugins')
           .then(() => {
@@ -45,7 +45,7 @@ const actions = {
   },
 
   getInstalledPlugins({ commit }) {
-    orchestrationsApi.installedPlugins()
+    pluginsApi.getInstalledPlugins()
       .then((response) => {
         commit('setInstalledPlugins', response.data);
       });

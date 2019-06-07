@@ -2,14 +2,6 @@ import axios from 'axios';
 import utils from '@/utils/utils';
 
 export default {
-  index() {
-    return axios.get(utils.apiUrl('orchestrations'));
-  },
-
-  installPlugin(installConfig) {
-    return axios.post(utils.apiUrl('orchestrations', 'install-plugin'), installConfig);
-  },
-
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`));
   },
@@ -24,10 +16,6 @@ export default {
 
   selectEntities(extractorEntities) {
     return axios.post(utils.apiUrl('orchestrations', 'select-entities'), extractorEntities);
-  },
-
-  installedPlugins() {
-    return axios.get(utils.apiUrl('orchestrations', 'installed-plugins'));
   },
 
   getExtractorInFocusEntities(extractor) {
