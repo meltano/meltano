@@ -48,7 +48,9 @@ def install_plugin():
         pass
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_collection_type, plugin_name=plugin_name)
+    tracker.track_meltano_add(
+        plugin_type=plugin_collection_type, plugin_name=plugin_name
+    )
 
     return jsonify({"test": 123})
 
