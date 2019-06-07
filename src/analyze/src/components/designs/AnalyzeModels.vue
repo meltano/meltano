@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import capitalize from '@/filters/capitalize';
 import underscoreToSpace from '@/filters/underscoreToSpace';
 import DocsLink from '@/components/generic/DocsLink';
@@ -25,6 +25,14 @@ export default {
   filters: {
     capitalize,
     underscoreToSpace,
+  },
+  methods: {
+    ...mapActions('configuration', [
+      'installPlugin',
+    ]),
+    installModel(model) {
+      this.installPlugin({ collectionType: 'models', name: model });
+    },
   },
 };
 </script>
@@ -62,7 +70,9 @@ export default {
               </span>
               <button
                 v-if='!getIsPluginInstalled("models", modelPlugin)'
-                class='button is-interactive-primary is-outlined is-block is-small'>Install</button>
+                :class='{ "is-loading": getIsInstallingPlugin("models", modelPlugin) }'
+                class='button is-interactive-primary is-outlined is-block is-small'
+                @click="installModel(modelPlugin)">Install</button>
               <span
                 v-else
                 class='is-italic'>Installed</span>
