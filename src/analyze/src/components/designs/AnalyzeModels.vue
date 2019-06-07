@@ -5,25 +5,33 @@ import underscoreToSpace from '@/filters/underscoreToSpace';
 
 export default {
   created() {
-    this.$store.dispatch('configuration/getAllPlugins');
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getAllPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
     this.$store.dispatch('repos/getModels');
   },
   computed: {
-    ...mapState('configuration', ['installedPlugins', 'plugins']),
-    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapGetters('configuration', [
+    ...mapState('plugins', [
+      'installedPlugins',
+      'plugins',
+    ]),
+    ...mapGetters('repos', [
+      'hasModels',
+      'urlForModelDesign',
+    ]),
+    ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
-    ...mapState('repos', ['models']),
+    ...mapState('repos', [
+      'models',
+    ]),
   },
   filters: {
     capitalize,
     underscoreToSpace,
   },
   methods: {
-    ...mapActions('configuration', [
+    ...mapActions('plugins', [
       'installPlugin',
     ]),
     installModel(model) {

@@ -4,17 +4,19 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
   name: 'Extractors',
   created() {
-    this.$store.dispatch('configuration/getAllPlugins');
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getAllPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
+    ]),
+    ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
-    ...mapState('configuration', [
+    ...mapState('plugins', [
       'plugins',
     ]),
     isLoadingExtractors() {
@@ -22,7 +24,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions('configuration', [
+    ...mapActions('plugins', [
       'installPlugin',
     ]),
     installExtractorAndBeginSettings(extractor) {

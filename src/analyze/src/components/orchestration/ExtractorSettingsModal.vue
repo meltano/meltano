@@ -80,7 +80,7 @@ export default {
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
     this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
@@ -89,11 +89,15 @@ export default {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
+    ]),
+    ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
       'installedPlugins',
     ]),
     configSettings() {

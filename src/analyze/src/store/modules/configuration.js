@@ -1,7 +1,5 @@
 import Vue from 'vue';
 
-import lodash from 'lodash';
-
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
@@ -9,13 +7,6 @@ const state = {
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
-  plugins: {},
-  installedPlugins: {},
-  installingPlugins: {
-    extractors: [],
-    loaders: [],
-    models: [],
-  },
 };
 
 const getters = {
@@ -26,14 +17,6 @@ const getters = {
   },
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
-  },
-  getIsPluginInstalled(stateRef) {
-    return (collectionType, extractor) => (stateRef.installedPlugins[collectionType]
-      ? Boolean(stateRef.installedPlugins[collectionType].find(item => item.name === extractor))
-      : false);
-  },
-  getIsInstallingPlugin(stateRef) {
-    return (collectionType, extractor) => stateRef.installingPlugins[collectionType].includes(extractor);
   },
   getLoaderImageUrl(_, gettersRef) {
     return loader => (
@@ -56,13 +39,6 @@ const actions = {
 
   clearLoaderInFocusConfiguration({ commit }) {
     commit('setLoaderInFocusConfiguration', {});
-  },
-
-  getAllPlugins({ commit }) {
-    orchestrationsApi.index()
-      .then((response) => {
-        commit('setAllPlugins', response.data);
-      });
   },
 
   getExtractorInFocusEntities({ commit }, extractorName) {
@@ -95,19 +71,6 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  installPlugin({ commit, dispatch }, installConfig) {
-    commit('installPluginStart', installConfig);
-
-    return orchestrationsApi.installPlugin(installConfig)
-      .then(() => {
-        dispatch('getInstalledPlugins')
-          .then(() => {
-            commit('installPluginComplete', installConfig);
-            dispatch('getAllPlugins');
-          });
-      });
-  },
-
   saveExtractorConfiguration(_, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
@@ -118,13 +81,6 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
     // the loader's config and we'd have to update this
-  },
-
-  getInstalledPlugins({ commit }) {
-    orchestrationsApi.installedPlugins()
-      .then((response) => {
-        commit('setInstalledPlugins', response.data);
-      });
   },
 
   selectEntities() {
@@ -176,18 +132,6 @@ const actions = {
 };
 
 const mutations = {
-  installPluginStart(_, installConfig) {
-    state.installingPlugins[installConfig.collectionType].push(installConfig.name);
-  },
-
-  installPluginComplete(_, installConfig) {
-    lodash.pull(state.installingPlugins[installConfig.collectionType], installConfig.name);
-  },
-
-  setAllPlugins(_, plugins) {
-    state.plugins = plugins;
-  },
-
   setAllExtractorInFocusEntities(_, entitiesData) {
     state.extractorInFocusEntities = entitiesData
       ? {
@@ -203,12 +147,6 @@ const mutations = {
 
   setHasExtractorLoadingError(_, value) {
     state.hasExtractorLoadingError = value;
-  },
-
-  setInstalledPlugins(_, projectConfig) {
-    if (projectConfig.plugins) {
-      state.installedPlugins = projectConfig.plugins;
-    }
   },
 
   setLoaderInFocusConfiguration(_, configuration) {

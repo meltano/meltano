@@ -4,22 +4,24 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
   name: 'Loaders',
   created() {
-    this.$store.dispatch('configuration/getAllPlugins');
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getAllPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
+    ]),
+    ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
-    ...mapState('configuration', [
+    ...mapState('plugins', [
       'plugins',
     ]),
   },
   methods: {
-    ...mapActions('configuration', [
+    ...mapActions('plugins', [
       'installPlugin',
     ]),
     installLoaderAndBeginSettings(loader) {

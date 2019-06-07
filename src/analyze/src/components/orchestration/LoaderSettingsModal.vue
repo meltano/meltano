@@ -79,7 +79,7 @@ export default {
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
     this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
@@ -88,12 +88,16 @@ export default {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
+    ]),
+    ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
-      'installedPlugins',
       'loaderInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
+      'installedPlugins',
     ]),
     configSettings() {
       return this.loader.config
