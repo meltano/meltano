@@ -54,6 +54,7 @@ module.exports = {
         '/docs/roadmap',
         '/docs/architecture',
         '/docs/contributing'
+        '/docs/vision',
       ]
     },
     logo: '/meltano-logo.svg',
