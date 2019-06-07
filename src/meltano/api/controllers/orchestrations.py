@@ -47,21 +47,8 @@ def install_plugin():
     except Exception as e:
         pass
 
-    plugin_type = None
-    if plugin_collection_type == PluginType.EXTRACTORS:
-        plugin_type = "extractor"
-    elif plugin_collection_type == PluginType.LOADERS:
-        plugin_type = "loader"
-    elif plugin_collection_type == PluginType.MODELS:
-        plugin_type = "model"
-    elif plugin_collection_type == PluginType.TRANSFORMERS:
-        plugin_type = "transformer"
-    elif plugin_collection_type == PluginType.TRANSFORMS:
-        plugin_type = "transform"
-    elif plugin_collection_type == PluginType.ORCHESTRATORS:
-        plugin_type = "orchestrator"
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
+    tracker.track_meltano_add(plugin_type=plugin_collection_type, plugin_name=plugin_name)
 
     return jsonify({"test": 123})
 
