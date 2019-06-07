@@ -308,6 +308,8 @@ export default {
   margin: 2.5rem auto 7rem;
   float:left;
   font-size:14px;
+  overflow: scroll;
+  width: 100%;
 
   tr:nth-child(2n) {
     background-color: white;
@@ -316,10 +318,10 @@ export default {
 
 .meltano-header-row {
   height: 75px;
+  background: #f6f6f6;
 
   th:first-child {
     background: #eee;
-    //width: 80px;
     text-align: left;
   }
 }
@@ -415,9 +417,13 @@ export default {
   text-align: left;
 }
 
+.hero-tagline {
+  padding-right: 20px;
+}
+
 .hero-header {
-  padding: 0;
-  font-weight:400;
+  padding-right: 40px;
+  font-weight: bold;
   font-size: 36px;
 }
 
@@ -428,10 +434,12 @@ export default {
     padding-top: 40px;
     line-height: 1.2em;
   }
-}
-
-.hero-tagline {
-  padding-right: 20px;
+  .hero-left {
+    max-width: 50%;
+  }
+  .hero-tagline {
+    padding-right: 80px;
+  }
 }
 
 .home
@@ -442,7 +450,7 @@ export default {
     text-align center
     margin 0 auto
     img
-
+      max-width 100%
     h1
       font-size 3rem
     h1, .description, .action
@@ -508,7 +516,7 @@ export default {
       img
         max-height 480px
         display block
-        margin-right: -33px;
+        margin-right: -33px
       h1
         font-size 2rem
       h1, .description, .action
