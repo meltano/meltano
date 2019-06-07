@@ -32,7 +32,7 @@ def cli(ctx, log_level, verbose):
     ctx.obj["verbosity"] = verbose
 
     try:
-        ctx.obj["project"] = Project.find()
+        ctx.obj["project"] = Project.find(set_as_current=True)
     except ProjectNotFound as err:
         ctx.obj["project"] = None
     except IncompatibleVersionError as err:

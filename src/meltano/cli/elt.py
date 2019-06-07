@@ -128,7 +128,8 @@ def install_missing_plugins(
             try:
                 # Check if there is a default transform for this extractor
                 PluginDiscoveryService(project).find_plugin(
-                    PluginType.TRANSFORMS, extractor
+                    extractor,
+                    plugin_type=PluginType.TRANSFORMS
                 )
 
                 click.secho(

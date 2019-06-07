@@ -1,15 +1,20 @@
-from . import Plugin
-from typing import Iterable, Dict
+import os
+import sqlalchemy
+import logging
+from typing import Iterable, Dict, Tuple
 
-from meltano.core.plugin.setting import PluginSetting
 from meltano.core.db import project_engine
 from meltano.core.utils import nest
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from . import Plugin, PluginType
+from .setting import PluginSetting
 
 
 class PluginSettingsService:
-    def __init__(self, project, plugin: Plugin):
+    def __init__(self, project, plugin: Plugin, plugin_discovery=None):
         self.project = project
         self.plugin = plugin
+        self.plugin_discovery = plugin_discovery or PluginDiscoveryService(project)
         _, self._session_cls = project_engine(project)
 
     def settings(self, enabled_only=True):
@@ -26,39 +31,67 @@ class PluginSettingsService:
             session.close()
 
     @classmethod
-    def as_config(self, settings: Iterable[PluginSetting]) -> Dict:
+    def plugin_namespace(cls, plugin: Plugin) -> str:
+        return f"{plugin.type}.{plugin.name}"
+
+    @property
+    def namespace(self):
+        return self.plugin_namespace(self.plugin)
+
+    def as_config(self) -> Dict:
+        plugin_def = self.get_definition()
         config = {}
 
-        for setting in settings:
-            nest(config, setting.name, setting.value)
+        for config_def in plugin_def.config:
+            print(config_def)
+            nest(config,
+                 config_def['name'],
+                 self.get_value(config_def['name']))
 
         return config
 
-    def set(self, key: str, attr: str, value, default=False, enabled=True):
+    def set(self, name: str, value, enabled=True):
         try:
-            value_key = 'default_value' if default else 'defined_value'
-
             session = self._session_cls()
-            setting = PluginSetting(name=attr,
-                                    plugin=self.plugin.name,
-                                    enabled=enabled,
-                                    key=key)
+            setting = PluginSetting(namespace=self.namespace,
+                                    name=name,
+                                    enabled=enabled)
 
-            # set either the default/defined value
-            setattr(setting, value_key, value)
-
+            setting.defined_value = value
             session.merge(setting)
             session.commit()
         finally:
             session.close()
 
-    def get_value(self, attr):
+    def get_definition(self):
+        return self.plugin_discovery.find_plugin(self.plugin.type,
+                                                 self.plugin.name)
+
+    # TODO: ensure `kind` is handled
+    def get_value(self, name: str):
+        session = self._session_cls()
+
         try:
-            session = self._session_cls()
+            plugin_def = self.get_definition()
+            config_def = next(
+                config for config in plugin_def.config
+                if config['name'] == name
+            )
+
+            if config_def['env'] in os.environ:
+                logging.debug(f"Found ENV variable {key} for {self.plugin.name}:{config_def['name']}")
+                return os.environ[config_def['key']]
+
             setting = session.query(PluginSetting) \
-              .filter_by(plugin=self.plugin.name,
-                         name=attr) \
+              .filter_by(namespace=self.namespace,
+                         name=name,
+                         enabled=True) \
               .one() \
-              .value
+              .defined_value
+        except StopIteration:
+            logging.error(f"Cannot find {key} for {self.plugin.name}.")
+        except sqlalchemy.orm.exc.NoResultFound:
+            # that means it was not overriden
+            return config_def.get("value")
         finally:
             session.close()

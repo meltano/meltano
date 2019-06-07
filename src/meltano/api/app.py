@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_app(config={}):
-    project = Project.find()
+    project = Project.find(set_as_current=True)
 
     app = Flask(__name__)
     app.config.from_object(reload(default_config))

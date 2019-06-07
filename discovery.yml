@@ -1,3 +1,4 @@
+version: 2.0
 extractors:
   - name: tap-google-analytics
     pip_url: "git+https://gitlab.com/meltano/tap-google-analytics.git"
@@ -10,104 +11,177 @@ extractors:
   - name: tap-gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
     config:
-      api_url: "https://gitlab.com/api/v4"
-      private_token: "$GITLAB_API_TOKEN"
-      groups: "$GITLAB_API_GROUPS"
-      projects: "$GITLAB_API_PROJECTS"
-      start_date: "$GITLAB_API_START_DATE"
-      ultimate_license: "$GITLAB_API_ULTIMATE_LICENSE"
+      - key: GITLAB_API_URL
+        label: GitLab API URL
+        name: api_url
+        value: "https://gitlab.com/api/v4"
+      - key: GITLAB_API_TOKEN
+        name: private_token
+        value: ~
+      - key: GITLAB_API_GROUPS
+        name: groups
+        value: ~
+      - key: GITLAB_API_PROJECTS
+        name: projects
+        value: ~
+      - key: GITLAB_API_START_DATE
+        name: start_date
+        value: ~
+        kind: date_iso8601
+      - name: ultimate_license
+        value: false
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     pip_url: "tap-zendesk"
     config:
-      email: "$ZENDESK_EMAIL"
-      api_token: "$ZENDESK_API_TOKEN"
-      subdomain: "$ZENDESK_SUBDOMAIN"
-      start_date: "$ZENDESK_START_DATE"
+      - key: ZENDESK_EMAIL
+        name: email
+        value: ''
+      - key: ZENDESK_API_TOKEN
+        name: api_token
+        value: ''
+      - key: ZENDESK_SUBDOMAIN
+        name: subdomain
+        value: ''
+      - key: ZENDESK_START_DATE
+        name: start_date
+        kind: date_iso8601
   - name: tap-zuora
     pip_url: "tap-zuora"
     config:
-      username: $ZUORA_USERNAME
-      password: $ZUORA_PASSWORD
-      api_type: $ZUORA_API_TYPE
-      partner_id: $ZUORA_PARTNER_ID
-      api_token: $ZUORA_API_TOKEN
-      start_date: $ZUORA_START_DATE
-      sandbox: $ZUORA_SANDBOX
+      - key: ZUORA_USERNAME
+        name: username
+      - key: ZUORA_PASSWOR
+        name: password
+      - key: ZUORA_API_TYPE
+        name: api_type
+      - key: ZUORA_PARTNER_ID
+        name: partner_id
+      - key: ZUORA_API_TOKEN
+        name: api_token
+      - key: ZUORA_START_DATE
+        name: start_date
+      - key: ZUORA_SANDBOX
+        name: sandbox
     docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
     config:
-      endpoint: $MARKETO_ENDPOINT
-      identity: $MARKETO_IDENTITY
-      client_id: $MARKETO_CLIENT_ID
-      client_secret: $MARKETO_CLIENT_SECRET
-      start_time: $MARKETO_START_TIME
+      - key: MARKETO_ENDPOINT
+        name: endpoint
+      - key: MARKETO_IDENTITY
+        name: identity
+      - key: MARKETO_CLIENT_ID
+        name: client_id
+      - key: MARKETO_CLIENT_SECRET
+        name: client_secret
+      - key: MARKETO_START_TIME
+        name: start_time
   - name: tap-salesforce
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     config:
-      api_type: REST
-      client_id: $SFDC_CLIENT_ID
-      username: $SFDC_USERNAME
-      password: $SFDC_PASSWORD
-      security_token: $SFDC_SECURITY_TOKEN
-      select_fields_by_default: true
-      start_date: $SFDC_START_DATE
+      # TODO: remove, should be injected from Meltano
+      - key: SFDC_API_TYPE
+        name: api_type
+        value: REST
+      - key: SFDC_CLIENT_ID
+        name: client_id
+      - key: SFDC_USERNAME
+        name: username
+      - key: SFDC_PASSWORD
+        name: password
+      - key: SFDC_SECURITY_TOKEN
+        name: security_token
+      - key: SFDC_SELECT_ALL_FIELDS
+        name: select_fields_by_default
+        value: true
+      - key: SFDC_START_DATE
+        name: start_date
   - name: tap-mongodb
     pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
     config:
-      host: $MONGODB_HOST
-      port: $MONGODB_PORT
-      user: $MONGODB_USERNAME
-      password: $MONGODB_PASSWORD
-      dbname: $MONGODB_DBNAME
+      - key: MONGODB_HOST
+        name: host
+      - key: MONGODB_PORT
+        name: port
+      - key: MONGODB_USERNAME
+        name: user
+      - key: MONGODB_PASSWORD
+        name: password
+      - key: MONGODB_DBNAME
+        name: dbname
   - name: tap-stripe
     pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
     config:
-      client_secret: $STRIPE_API_KEY
-      start_date: $STRIPE_START_DATE
-      account_id:
+      - key: STRIPE_API_KEY
+        name: client_secret
+      - key: STRIPE_START_DATE
+        name: start_date
+      - key: STRIPE_ACCOUNT_ID
+        name: account_id
   - name: tap-fastly
     pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
     config:
-      api_token: $FASTLY_API_TOKEN
-      start_date: $FASTLY_START_DATE
+      - key: FASTLY_API_TOKEN
+        name: api_token
+      - key: FASTLY_START_DATE
+        name: start_date
   - name: tap-carbon-intensity
     pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
   - name: tap-csv
     pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
     config:
-      csv_files_definition: "$TAP_CSV_FILES_DEFINITION"
+      - key: TAP_CSV_FILES_DEFINITION
+        name: csv_files_definition
+        kind: files
     docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
     config:
-      delimiter": "\t"
-      quotechar": "'"
+      - key: CSV_DELIMITER
+        name: delimiter"
+        value: "\t"
+      - key: CSV_QUOTECHAR
+        name: quotechar
+        value: "'"
   - name: target-snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
     config:
-      account: "$SF_ACCOUNT"
-      username: "$SF_USER"
-      password: "$SF_PASSWORD"
-      role: "$SF_ROLE"
-      database: "$SF_DATABASE"
-      schema: "$SF_SCHEMA"
-      warehouse: "$SF_WAREHOUSE"
+      - key: SF_ACCOUNT
+        name: account
+      - key: SF_USER
+        name: username
+      - key: SF_PASSWORD
+        name: password
+      - key: SF_ROLE
+        name: role
+      - key: SF_DATABASE
+        name: database
+      - key: SF_SCHEMA
+        name: schema
+      - key: SF_WAREHOUSE
+        name: warehouse
   - name: target-postgres
     pip_url: "git+https://github.com/meltano/target-postgres.git"
     config:
-      host: "$PG_ADDRESS"
-      user: "$PG_USERNAME"
-      port: "$PG_PORT"
-      password: "$PG_PASSWORD"
-      dbname: "$PG_DATABASE"
-      schema: "$PG_SCHEMA"
+      - key: PG_ADDRESS
+        name: host
+      - key: PG_USERNAME
+        name: user
+      - key: PG_PORT
+        name: port
+      - key: PG_PASSWORD
+        name: password
+      - key: PG_DATABASE
+        name: dbname
+      - key: PG_SCHEMA
+        name: schema
   - name: target-sqlite
     pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
     config:
-      database: "$SQLITE_DATABASE"
+      - key: SQLITE_DATABASE
+        name: database
 transformers:
   - name: dbt
     pip_url: dbt
@@ -169,10 +243,18 @@ orchestrators:
   - name: airflow
     pip_url: "apache-airflow==1.10.2"
     config:
-      core:
-        dags_folder: $MELTANO_PROJECT_ROOT/orchestrate/dags
-        plugins_folder: $MELTANO_PROJECT_ROOT/orchestrate/plugins
-        sql_alchemy_conn: sqlite:///.meltano/orchestrators/airflow/airflow.db
-        load_examples: False
-      webserver:
-        web_server_port: 5010
+      - name: core.dags_folder
+        value: $MELTANO_PROJECT_ROOT/orchestrate/dags
+        key: AIRFLOW__CORE__DAGS_FOLDER
+      - name: core.plugins_folder
+        value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
+        key: AIRFLOW__CORE__DAGS_FOLDER
+      - name: core.sql_alchemy_conn
+        value: sqlite:///.meltano/orchestrators/airflow/airflow.db
+        key: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+      - name: core.load_examples
+        value: False
+        key: AIRFLOW__CORE__LOAD_EXAMPLES
+      - name: webserver.web_server_port
+        value: 5010
+        key: AIRFLOW__WEBSERVER__WEB_SERVER_PORT

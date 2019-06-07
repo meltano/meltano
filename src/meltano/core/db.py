@@ -57,8 +57,9 @@ def init_hook(engine):
         function_map[engine.dialect.name](engine)
     except KeyError:
         raise Exception("Meltano only supports SQLite and PostgreSQL")
-    except:
-        logging.fatal("Can't initialize database.")
+    except Exception as e:
+        logging.exception(e)
+        logging.fatal(f"Can't initialize database.")
 
 
 def init_postgresql_hook(engine):
