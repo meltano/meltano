@@ -8,9 +8,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 from flask import Blueprint, request, jsonify
 
-pluginsBP = Blueprint(
-    "plugins", __name__, url_prefix="/api/v1/plugins"
-)
+pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
 
 
 @pluginsBP.route("/all", methods=["GET"])
