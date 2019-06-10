@@ -1,3 +1,4 @@
+import sys
 import click
 import logging
 import warnings
@@ -8,6 +9,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 
 import meltano
 from meltano.core.project import Project, ProjectNotFound
+from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.utils import setup_logging
 
 LEVELS = {
@@ -33,3 +35,12 @@ def cli(ctx, log_level, verbose):
         ctx.obj["project"] = Project.find()
     except ProjectNotFound as err:
         ctx.obj["project"] = None
+    except IncompatibleVersionError as err:
+        click.secho(
+            "This meltano project is incompatible with this version of `meltano`.",
+            fg="yellow",
+        )
+        click.echo(
+            "Visit http://meltano.com/docs/installation.html#upgrading-version for more details."
+        )
+        sys.exit(3)
