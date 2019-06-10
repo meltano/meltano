@@ -59,15 +59,15 @@ export default {
               {{modelPlugin}}
             </div>
             <div class="level-right">
-              <button
+              <a
                 v-if='!getIsPluginInstalled("models", modelPlugin)'
                 :class='{ "is-loading": getIsInstallingPlugin("models", modelPlugin) }'
                 class='button is-interactive-primary is-outlined is-block is-small'
-                @click="installModel(modelPlugin)">Install</button>
-              <button
+                @click="installModel(modelPlugin)">Install</a>
+              <a
                 v-else
                 disabled
-                class='button is-outlined is-block is-small'>Uninstall</button>
+                class='button is-outlined is-block is-small'>Uninstall</a>
             </div>
           </div>
 
