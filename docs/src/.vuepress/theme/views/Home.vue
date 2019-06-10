@@ -37,8 +37,8 @@
       </div>
     </div>
 
-    <div style="background-color: #e5e4e2; padding-bottom: 6rem;">
-      <div class="hero homepage-cta" >
+    <div class="feature-section-wrapper">
+      <div class="feature-section">
         <div class="feature-left">
           <img 
             style="max-width: 100%; margin: 0 auto; display: block;"
@@ -437,15 +437,46 @@ export default {
   text-align: left;
 }
 
+.feature-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6rem;
+}
+
+.feature-section-wrapper {
+  background-color: #e5e4e2; 
+  padding-bottom: 6rem;
+}
+
 .feature-left {
-  padding-left: 30px;
   max-width: 80%;
+  padding-bottom: 2rem;
 }
 
 .feature-right {
-  margin-left: 30px;
-  text-align: left;
-  max-width: 40%;
+  max-width: 80%;
+}
+
+@media (min-width: $MQNarrow) {
+  .feature-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    max-width: $contentWidthWide;
+    margin: 0 auto;
+  }
+  
+  .feature-left {
+    padding-left: 30px;
+  }
+
+  .feature-right {
+    margin-left: 30px;
+    text-align: left;
+    max-width: 40%;
+  }
 }
 
 .hero-tagline {
