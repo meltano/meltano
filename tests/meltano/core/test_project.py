@@ -3,7 +3,8 @@ import yaml
 import os
 import shutil
 
-from meltano.core.project import Project, ProjectNotFound, IncompatibleVersionError
+from meltano.core.project import Project, ProjectNotFound
+from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
 class TestProject:

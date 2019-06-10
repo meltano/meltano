@@ -40,4 +40,7 @@ def cli(ctx, log_level, verbose):
             "This meltano project is incompatible with this version of `meltano`.",
             fg="yellow",
         )
+        click.echo(
+            "Visit http://meltano.com/docs/installation.html#upgrading-version for more details."
+        )
         sys.exit(3)

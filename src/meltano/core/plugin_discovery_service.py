@@ -43,6 +43,13 @@ class PluginDiscoveryService(Versioned):
 
     @property
     def discovery(self):
+        """
+        Return first compatible discovery manifest from these locations:
+
+        - project local `discovery.yml`
+        - http://meltano.com/discovery.yml
+        - .meltano/cache/discovery.yml
+        """
         if self._discovery:
             return self._discovery
 
