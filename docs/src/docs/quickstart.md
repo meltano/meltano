@@ -146,54 +146,20 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to analyze!
 
-:::tip
-Right now, [analysis models](/docs/architecture.html#meltano-model) can not be added from inside Meltano's UI so you will need to return to your command line interface. This command line step is temporary, and the work to integrate it directly into Meltano's UI is being tracked in [Issue #651](https://gitlab.com/meltano/meltano/issues/651).
-:::
+There are just three steps to take:
+1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
 
-To find a list of available analysis models, run this command:
+  ![Meltano UI - Models Viewer](/screenshots/meltano-ui-analyze-models-step-1.png)
+2. Click the Install button of your desired analysis model
 
-```bash
-$ meltano discover models
+  ![Meltano UI - Models Installation](/screenshots/meltano-ui-analyze-models-step-2.png)
+3. Once installed, click the corresponding analysis model's Analyze button
 
-models
-model-carbon-intensity
-model-carbon-intensity-sqlite
-model-gitflix
-model-gitlab
-model-salesforce
-model-stripe
-model-zendesk
-model-zuora
-```
+  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models-step-3.png)
 
-Choose the relevant analysis model to the data source you've connected, and run the command:
+You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
 
-```bash
-$ meltano add model [MODEL_NAME]
-
-#Example
-$ meltano add model model-carbon-intensity
-
-#Added 'model-carbon-intensity' to your Meltano project.
-#Activated 'model-carbon-intensity' virtual environment.
-#Installed 'model-carbon-intensity'.
-#Added and installed models 'model-carbon-intensity'.
-```
-
-To see your newly added analysis in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
-
-```bash
-$ control+c
-$ meltano ui
-```
-
-Now that you've added your analysis model, you're Analyze page will contain a link to view its corresponding analysis which manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data from which to build savable and shareable dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
-
-This is where you will see a list of available analysis models:
-
-![Meltano UI available models](/screenshots/meltano-ui-models.png)
-
-Click on your analysis model (in the case of our example it is "Region") to begin exploring, querying, and visualizing your data.
+Begin exploring, querying, and visualizing your data using Meltano Analyze.
 
 ![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
 
