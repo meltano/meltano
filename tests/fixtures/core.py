@@ -21,6 +21,7 @@ PROJECT_NAME = "a_meltano_project"
 @pytest.fixture()
 def discovery():
     return {
+        "version": 0,
         str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
         str(PluginType.LOADERS): [{"name": "target-mock", "pip_url": "target-mock"}],
         str(PluginType.TRANSFORMERS): [

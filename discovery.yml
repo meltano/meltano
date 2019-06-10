@@ -1,3 +1,4 @@
+version: 1
 extractors:
   - name: tap-google-analytics
     pip_url: "git+https://gitlab.com/meltano/tap-google-analytics.git"

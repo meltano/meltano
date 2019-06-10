@@ -12,6 +12,7 @@ def make_meltano_yml(project):
         f.write(
             yaml.dump(
                 {
+                    "version": 1,
                     "plugins": {
                         "extractors": [
                             {
@@ -25,7 +26,7 @@ def make_meltano_yml(project):
                                 "pip_url": "git+https://gitlab.com/meltano/target-csv.git",
                             }
                         ],
-                    }
+                    },
                 }
             )
         )
@@ -53,6 +54,8 @@ class TestConfigService:
     def subject(self, project):
         make_meltano_yml(project)
         make_database_yml(project)
+        project.reload()
+
         return ConfigService(project)
 
     def test_default_init_should_not_fail(self, subject):
