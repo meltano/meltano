@@ -122,7 +122,7 @@ export default {
     },
     extractorLacksConfigSettingsAndIsInstalled() {
       return this.configSettings === null &&
-        !this.getIsInstallingExtractorPlugin(this.extractorNameFromRoute);
+        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
