@@ -31,6 +31,7 @@ class TestPluginInstallService:
                     }
                 )
             )
+        project.reload()
 
         return PluginInstallService(project)
 

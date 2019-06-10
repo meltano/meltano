@@ -46,12 +46,13 @@ conflicts = [
 ]
 
 dev_requires = [
-    'pytest==4.3.1',
-    'pytest-asyncio==0.10.0',
     'asynctest==0.12.2',
     'black==18.9b0',
     'bumpversion==0.5.3',
-    'changelog-cli==0.6.2'
+    'changelog-cli==0.6.2',
+    'pytest==4.3.1',
+    'pytest-asyncio==0.10.0',
+    'requests-mock==1.6.0',
 ]
 
 setup(
