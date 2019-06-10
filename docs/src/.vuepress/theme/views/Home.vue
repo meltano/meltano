@@ -36,6 +36,28 @@
       </div>
     </div>
 
+    <div class="hero homepage-cta">
+
+      <div class="feature-left">
+        
+        <img 
+        style="max-width: 100%; margin: 0 auto; display: block;"
+        src="/screenshots/analyze-page.png" 
+        alt="Screenshot of Meltano Analyze page" 
+      />
+      </div>
+
+      <div class="feature-right">
+        <h2 class="hero-header">Analyze your data with dynamically generated SQL queries</h2>
+      <p class="hero-tagline">Meltano makes it easy for you to analyze your data with a user interface that allows you to generate SQL with a few clicks so you can get the insights you need.</p>
+      
+        </p>
+      </div>
+    </div>
+    <section class="hero-left">
+      
+    </section>
+
     <div class="content-width-wide">
 
       <h2 class="quote">A single workflow for the entire data life cycle.</h2>
@@ -187,6 +209,9 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="content-width-wide">
 
       <h2 class="quote">Plugins to Extract & Load Data</h2>
 
@@ -296,11 +321,12 @@ export default {
 
 .description {
   margin-bottom: 0;
-  font-size:16px;
-  padding-left:10%;
-  padding-right:10%;
-  text-align:center;
-  padding-top:10px;
+  font-size: 17px;
+  padding-left: 10%;
+  padding-right: 10%;
+  text-align: center;
+  padding-top: 10px;
+  margin-bottom: 30px;
 }
 
 .meltano-stages-table {
@@ -415,6 +441,17 @@ export default {
 .hero-left {
   max-width: 80%;
   text-align: left;
+}
+
+.feature-left {
+  padding-left: 30px;
+  max-width: 80%;
+}
+
+.feature-right {
+  margin-left: 30px;
+  text-align: left;
+  max-width: 40%;
 }
 
 .hero-tagline {
