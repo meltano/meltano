@@ -1,19 +1,12 @@
 import Vue from 'vue';
 
-import lodash from 'lodash';
-
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
-  extractors: [],
-  loaders: [],
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
-  installedPlugins: {},
-  installingExtractors: [],
-  installingLoaders: [],
 };
 
 const getters = {
@@ -25,14 +18,6 @@ const getters = {
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
   },
-  getIsExtractorPluginInstalled(stateRef) {
-    return extractor => (stateRef.installedPlugins.extractors
-      ? Boolean(stateRef.installedPlugins.extractors.find(item => item.name === extractor))
-      : false);
-  },
-  getIsInstallingExtractorPlugin(stateRef) {
-    return extractor => stateRef.installingExtractors.includes(extractor);
-  },
   getLoaderImageUrl(_, gettersRef) {
     return loader => (
       `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`
@@ -40,14 +25,6 @@ const getters = {
   },
   getLoaderNameWithoutPrefixedTargetDash() {
     return loader => loader.replace('target-', '');
-  },
-  getIsLoaderPluginInstalled(stateRef) {
-    return loader => (stateRef.installedPlugins.loaders
-      ? Boolean(stateRef.installedPlugins.loaders.find(item => item.name === loader))
-      : false);
-  },
-  getIsInstallingLoaderPlugin(stateRef) {
-    return loader => stateRef.installingLoaders.includes(loader);
   },
 };
 
@@ -62,13 +39,6 @@ const actions = {
 
   clearLoaderInFocusConfiguration({ commit }) {
     commit('setLoaderInFocusConfiguration', {});
-  },
-
-  getAll({ commit }) {
-    orchestrationsApi.index()
-      .then((response) => {
-        commit('setAll', response.data);
-      });
   },
 
   getExtractorInFocusEntities({ commit }, extractorName) {
@@ -101,30 +71,6 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  installExtractor({ commit, dispatch }, extractor) {
-    commit('installExtractorStart', extractor);
-
-    orchestrationsApi.addExtractors({ name: extractor })
-      .then(() => {
-        dispatch('getInstalledPlugins')
-          .then(() => {
-            commit('installExtractorComplete', extractor);
-          });
-      });
-  },
-
-  installLoader({ commit, dispatch }, loader) {
-    commit('installLoaderStart', loader);
-
-    orchestrationsApi.addLoaders({ name: loader })
-      .then(() => {
-        dispatch('getInstalledPlugins')
-          .then(() => {
-            commit('installLoaderComplete', loader);
-          });
-      });
-  },
-
   saveExtractorConfiguration(_, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
@@ -135,13 +81,6 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
     // the loader's config and we'd have to update this
-  },
-
-  getInstalledPlugins({ commit }) {
-    orchestrationsApi.installedPlugins()
-      .then((response) => {
-        commit('setInstalledPlugins', response.data);
-      });
   },
 
   selectEntities() {
@@ -193,27 +132,6 @@ const actions = {
 };
 
 const mutations = {
-  installExtractorStart(_, extractor) {
-    state.installingExtractors.push(extractor);
-  },
-
-  installExtractorComplete(_, extractor) {
-    lodash.pull(state.installingExtractors, extractor);
-  },
-
-  installLoaderStart(_, loader) {
-    state.installingLoaders.push(loader);
-  },
-
-  installLoaderComplete(_, loader) {
-    lodash.pull(state.installingLoaders, loader);
-  },
-
-  setAll(_, orchestrationData) {
-    state.extractors = orchestrationData.extractors;
-    state.loaders = orchestrationData.loaders;
-  },
-
   setAllExtractorInFocusEntities(_, entitiesData) {
     state.extractorInFocusEntities = entitiesData
       ? {
@@ -229,12 +147,6 @@ const mutations = {
 
   setHasExtractorLoadingError(_, value) {
     state.hasExtractorLoadingError = value;
-  },
-
-  setInstalledPlugins(_, projectConfig) {
-    if (projectConfig.plugins) {
-      state.installedPlugins = projectConfig.plugins;
-    }
   },
 
   setLoaderInFocusConfiguration(_, configuration) {

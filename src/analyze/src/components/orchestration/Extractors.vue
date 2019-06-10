@@ -4,29 +4,31 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
   name: 'Extractors',
   created() {
-    this.$store.dispatch('configuration/getAll');
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getAllPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
-      'getIsExtractorPluginInstalled',
-      'getIsInstallingExtractorPlugin',
     ]),
-    ...mapState('configuration', [
-      'extractors',
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
+    ]),
+    ...mapState('plugins', [
+      'plugins',
     ]),
     isLoadingExtractors() {
-      return this.extractors.length === 0;
+      return this.plugins.extractors && this.plugins.extractors.length === 0;
     },
   },
   methods: {
-    ...mapActions('configuration', [
-      'installExtractor',
+    ...mapActions('plugins', [
+      'installPlugin',
     ]),
     installExtractorAndBeginSettings(extractor) {
-      this.installExtractor(extractor);
+      this.installPlugin({ collectionType: 'extractors', name: extractor });
       this.updateExtractorSettings(extractor);
     },
     updateExtractorSettings(extractor) {
@@ -64,12 +66,12 @@ export default {
       class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(extractor, index) in extractors"
+        v-for="(extractor, index) in plugins.extractors"
         :key="`${extractor}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
-              :class='{ "grayscale": !getIsExtractorPluginInstalled(extractor) }'
+              :class='{ "grayscale": !getIsPluginInstalled("extractors", extractor) }'
               :src='getExtractorImageUrl(extractor)'
               :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
           </div>
@@ -78,7 +80,7 @@ export default {
               {{extractor}}
             </p>
 
-            <template v-if='getIsExtractorPluginInstalled(extractor)'>
+            <template v-if='getIsPluginInstalled("extractors", extractor)'>
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'
@@ -90,7 +92,7 @@ export default {
             </template>
             <template v-else>
               <a
-                :class='{ "is-loading": getIsInstallingExtractorPlugin(extractor) }'
+                :class='{ "is-loading": getIsInstallingPlugin("extractors", extractor) }'
                 class='button is-interactive-primary is-outlined is-block is-small'
                 @click="installExtractorAndBeginSettings(extractor)">Install</a>
             </template>

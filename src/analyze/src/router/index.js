@@ -1,4 +1,7 @@
 import Router from 'vue-router';
+
+import AnalyzeModels from '@/components/designs/AnalyzeModels';
+import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
@@ -7,8 +10,6 @@ import Loaders from '@/components/orchestration/Loaders';
 import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
 import RunSummary from '@/components/orchestration/RunSummary';
 
-import AnalyzeModels from '@/views/AnalyzeModels';
-import AnalyzeSettings from '@/views/AnalyzeSettings';
 import Dashboards from '@/views/Dashboards';
 import Design from '@/views/Design';
 import Designs from '@/views/Designs';
@@ -117,6 +118,7 @@ const router = new Router({
     },
     {
       path: '/analyze/',
+      redirect: '/analyze/models/',
       name: 'analyze',
       component: Designs,
       children: [
@@ -126,7 +128,7 @@ const router = new Router({
           component: AnalyzeModels,
         },
         {
-          path: 'settings',
+          path: 'connection-settings',
           name: 'analyzeSettings',
           component: AnalyzeSettings,
         },
