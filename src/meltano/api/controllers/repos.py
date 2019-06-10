@@ -194,7 +194,6 @@ def models():
     path = Path(topicsFile)
     topics = json.load(open(path, "r")) if path.is_file() else {}
     topics = next(M5ocFilter().filter("view:topic", [topics]))
-
     return jsonify(topics)
 
 
