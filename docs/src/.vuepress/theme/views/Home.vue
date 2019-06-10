@@ -219,8 +219,8 @@
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel, watch our videos on YouTube, or use another preferred channel.</p>
-        <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
-        <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
+        <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Slack</a>
+        <a href="https://www.youtube.com/meltano" class="button" target="_blank">YouTube</a>
         <a href="https://twitter.com/meltanodata" class="button" target="_blank">Twitter</a>
         <a href="https://meltano.com/blog/" class="button" target="_blank">Blog</a>
         <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
