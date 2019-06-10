@@ -144,18 +144,14 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 
 ## Analyzing Your Data
 
-Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your data set you're ready to analyze!
+Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!
 
 There are just three steps to take:
 1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
-
-  ![Meltano UI - Models Viewer](/screenshots/meltano-ui-analyze-models-step-1.png)
 2. Click the Install button of your desired analysis model
-
-  ![Meltano UI - Models Installation](/screenshots/meltano-ui-analyze-models-step-2.png)
 3. Once installed, click the corresponding analysis model's Analyze button
 
-  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models-step-3.png)
+  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
 
 You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
 
