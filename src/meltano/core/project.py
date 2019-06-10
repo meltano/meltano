@@ -9,6 +9,7 @@ from functools import wraps
 from dotenv import load_dotenv
 
 from .error import Error
+from .behavior.versioned import Versioned
 
 
 class ProjectNotFound(Error):
@@ -18,13 +19,14 @@ class ProjectNotFound(Error):
         )
 
 
-class Project:
+class Project(Versioned):
     """
     Represent the current Meltano project from a file-system
     perspective.
     """
 
     _meltano = {}
+    __version__ = 1
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
@@ -35,6 +37,12 @@ class Project:
 
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")
+
+        self.ensure_compatible()
+
+    @property
+    def backend_version(self):
+        return int(self.meltano.get("version", 1))
 
     def reload(self):
         """Force a reload from `meltano.yml`"""

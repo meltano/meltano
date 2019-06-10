@@ -3,7 +3,7 @@ import yaml
 import os
 import shutil
 
-from meltano.core.project import Project, ProjectNotFound
+from meltano.core.project import Project, ProjectNotFound, IncompatibleVersionError
 
 
 class TestProject:
@@ -37,3 +37,16 @@ class TestProject:
 
         project.activate()
         assert os.getenv("MELTANO_PROJECT") == str(project.root)
+
+
+class TestIncompatibleProject:
+    @pytest.fixture
+    def project(self, project):
+        with project.meltano_update() as meltano:
+            meltano["version"] = 10
+
+        return project
+
+    def test_incompatible(self, project):
+        with pytest.raises(IncompatibleVersionError):
+            project.activate()
