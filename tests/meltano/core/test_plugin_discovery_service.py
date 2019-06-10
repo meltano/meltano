@@ -4,7 +4,10 @@ import json
 from unittest import mock
 
 from meltano.core.plugin import PluginType
-from meltano.core.plugin_discovery_service import PluginDiscoveryService, MELTANO_DISCOVERY_URL
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    MELTANO_DISCOVERY_URL,
+)
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
@@ -81,12 +84,12 @@ class TestPluginDiscoveryService:
             assert "turboencabulator" not in discovery
 
     def test_cached_discovery(self, subject):
-        # fmt: off
-        with mock.patch.object(PluginDiscoveryService, "cached_discovery",
-                               new_callable=mock.PropertyMock,
-                               return_value=subject._discovery) as cached_discovery, \
-            requests_mock.Mocker() as r:
-        # fmt: on
+        with mock.patch.object(
+            PluginDiscoveryService,
+            "cached_discovery",
+            new_callable=mock.PropertyMock,
+            return_value=subject._discovery,
+        ) as cached_discovery, requests_mock.Mocker() as r:
             r.get(MELTANO_DISCOVERY_URL, status_code=500)
             discovery = subject.fetch_discovery()
 
@@ -102,7 +105,7 @@ class TestIncompatiblePluginDiscoveryService:
 
     @pytest.fixture
     def discovery_yaml(self, subject):
-        subject._discovery['version'] = 1000
+        subject._discovery["version"] = 1000
 
     @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery(self, subject):
@@ -114,12 +117,13 @@ class TestIncompatiblePluginDiscoveryService:
         compatible_discovery = subject._discovery.copy()
         compatible_discovery["version"] = PluginDiscoveryService.__version__
 
-        # fmt: off
-        with mock.patch.object(PluginDiscoveryService, "cached_discovery",
+        # fmt:off
+        with mock.patch.object(PluginDiscoveryService,
+                               "cached_discovery",
                                new_callable=mock.PropertyMock,
                                return_value=compatible_discovery) as cached_discovery, \
             requests_mock.Mocker() as r:
-        # fmt: on
+        # fmt:on
             r.get(MELTANO_DISCOVERY_URL, text=json.dumps(subject._discovery))
             subject.fetch_discovery()
 
