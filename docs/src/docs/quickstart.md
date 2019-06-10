@@ -73,9 +73,10 @@ Run the following command
 
 ```bash
 $ meltano elt [YOUR_TAP_NAME] [YOUR_TARGET_NAME]
-#Extract & load complete!
+…
+Extract & load complete!
 
-#Example
+# Example
 $ meltano elt tap-carbon-intensity target-sqlite
 ```
 
@@ -99,10 +100,11 @@ Run the following command:
 
 ```bash
 $ meltano add orchestrator airflow
-#Added 'airflow' to your Meltano project.
-#Activated 'airflow' virtual environment.
-#Installed 'airflow'.
-#Added and installed orchestrators 'airflow'.
+Added 'airflow' to your Meltano project.
+Activated 'airflow' virtual environment.
+…
+Installed 'airflow'.
+Added and installed orchestrators 'airflow'.
 ```
 
 Once Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
@@ -110,7 +112,7 @@ Once Airflow is installed, create your first test schedule using the ELT you ran
 ```bash
 $ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
 
-#Example
+# Example
 $ meltano schedule meltano_carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
@@ -171,23 +173,24 @@ Choose the relevant analysis model to the data source you've connected, and run 
 ```bash
 $ meltano add model [MODEL_NAME]
 
-#Example
-$ meltano add model model-carbon-intensity
+# Example
+$ meltano add model model-carbon-intensity-sqlite
 
-#Added 'model-carbon-intensity' to your Meltano project.
-#Activated 'model-carbon-intensity' virtual environment.
-#Installed 'model-carbon-intensity'.
-#Added and installed models 'model-carbon-intensity'.
+Added 'model-carbon-intensity-sqlite' to your Meltano project.
+Activated 'model-carbon-intensity' virtual environment.
+…
+Installed 'model-carbon-intensity-sqlite'.
+Added and installed models 'model-carbon-intensity-sqlite'.
 ```
 
-To see your newly added analysis in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
+To see your newly added analysis models in the Meltano UI, you will need to kill the existing `meltano ui` process using control+c and then restart it again.
 
 ```bash
 $ control+c
 $ meltano ui
 ```
 
-Now that you've added your analysis model, you're Analyze page will contain a link to view its corresponding analysis which manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data from which to build savable and shareable dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
+Now that you've added your analysis model, your Analyze page will contain a link to view its corresponding analysis which manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data from which to build savable and shareable dashboards with [Meltano Analyze at http://localhost:5000/analyze](http://localhost:5000/analyze)
 
 This is where you will see a list of available analysis models:
 
