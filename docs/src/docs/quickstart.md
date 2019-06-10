@@ -73,9 +73,10 @@ Run the following command
 
 ```bash
 $ meltano elt [YOUR_TAP_NAME] [YOUR_TARGET_NAME]
-#Extract & load complete!
+…
+Extract & load complete!
 
-#Example
+# Example
 $ meltano elt tap-carbon-intensity target-sqlite
 ```
 
@@ -99,10 +100,11 @@ Run the following command:
 
 ```bash
 $ meltano add orchestrator airflow
-#Added 'airflow' to your Meltano project.
-#Activated 'airflow' virtual environment.
-#Installed 'airflow'.
-#Added and installed orchestrators 'airflow'.
+Added 'airflow' to your Meltano project.
+Activated 'airflow' virtual environment.
+…
+Installed 'airflow'.
+Added and installed orchestrators 'airflow'.
 ```
 
 Once Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
@@ -110,7 +112,7 @@ Once Airflow is installed, create your first test schedule using the ELT you ran
 ```bash
 $ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
 
-#Example
+# Example
 $ meltano schedule meltano_carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 

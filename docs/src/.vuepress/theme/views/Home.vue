@@ -1,11 +1,11 @@
 <template>
   <div class="home">
     <div class="hero homepage-cta">
-    
+
       <div class="hero-left">
-        <p class="hero-header">Open source data dashboarding</p>
-        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p> 
-     
+        <h2 class="hero-header">Open source data dashboarding</h2>
+        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
+
         <p class="action"
           v-if="data.actionText && data.actionLink"
         >
@@ -18,9 +18,8 @@
       </div>
 
       <div class="hero-right">
-        <img class="meltano-user-img" src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        <img src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
       </div>
-      
     </div>
 
     <div
@@ -37,7 +36,7 @@
       </div>
     </div>
 
-    <div>
+    <div class="content-width-wide">
 
       <h2 class="quote">A single workflow for the entire data life cycle.</h2>
 
@@ -211,19 +210,17 @@
         <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
       </div>
 
-   
-
       <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
 
       <p class="description"></p>
 
-      
+
 
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel, watch our videos on YouTube, or use another preferred channel.</p>
-        <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Meltano Slack</a>
-        <a href="https://www.youtube.com/meltano" class="button" target="_blank">Meltano YouTube</a>
+        <a href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc" class="button" target="_blank">Slack</a>
+        <a href="https://www.youtube.com/meltano" class="button" target="_blank">YouTube</a>
         <a href="https://twitter.com/meltanodata" class="button" target="_blank">Twitter</a>
         <a href="https://meltano.com/blog/" class="button" target="_blank">Blog</a>
         <a href="https://gitlab.com/meltano/meltano" class="button" target="_blank">Repo</a>
@@ -286,15 +283,9 @@ export default {
     }
 }
 
-.meltano-user-img {
-  float:right;
-  max-height:380px; 
-  margin-right:-33px;
-}
-
 .quote {
   border-top: 1px solid #ddd;
-  border-bottom: 0;  
+  border-bottom: 0;
   text-align: center;
   padding-top: 5rem;
   display: block;
@@ -306,7 +297,7 @@ export default {
 .description {
   margin-bottom: 0;
   font-size:16px;
-  padding-left:10%; 
+  padding-left:10%;
   padding-right:10%;
   text-align:center;
   padding-top:10px;
@@ -315,8 +306,10 @@ export default {
 .meltano-stages-table {
   display: block;
   margin: 2.5rem auto 7rem;
-  float:left; 
+  float:left;
   font-size:14px;
+  overflow: scroll;
+  width: 100%;
 
   tr:nth-child(2n) {
     background-color: white;
@@ -325,10 +318,10 @@ export default {
 
 .meltano-header-row {
   height: 75px;
+  background: #f6f6f6;
 
   th:first-child {
     background: #eee;
-    //width: 80px;
     text-align: left;
   }
 }
@@ -370,7 +363,7 @@ export default {
   td:first-child {
     background: #eee;
     font-weight: bold;
-    
+
   }
 }
 
@@ -405,52 +398,64 @@ export default {
 }
 
 .homepage-cta {
-  min-height:500px;
+  min-height: 500px;
+  max-width: $contentWidthWide;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column-reverse;
+}
+
+@media (min-width: $MQNarrow) {
+  .homepage-cta {
+    flex-direction: row;
+  }
 }
 
 .hero-left {
-  float:left;
-  text-align:left;
-  width:60%;
-}
-
-.hero-header {
-    font-size: 36px; 
-    text-align: left; 
-    padding-top: 120px; 
-    padding-left: 35px; 
-    font-weight:400;
-    line-height: 1.2em;
+  max-width: 80%;
+  text-align: left;
 }
 
 .hero-tagline {
-  padding-left:35px; 
   padding-right: 20px;
 }
 
-.hero-right {
-  float:right;
-  text-align:left; 
-  width:40%;
+.hero-header {
+  padding-right: 40px;
+  font-weight: bold;
+  font-size: 36px;
+}
+
+@media (min-width: $MQNarrow) {
+  .hero-header {
+    font-size: 36px;
+    text-align: left;
+    padding-top: 40px;
+    line-height: 1.2em;
+  }
+  .hero-left {
+    max-width: 50%;
+  }
+  .hero-tagline {
+    padding-right: 80px;
+  }
 }
 
 .home
-  background:#e5e4e2;
+  background #e5e4e2
   padding $navbarHeight 2rem 0
   margin 0px auto
   .hero
     text-align center
+    margin 0 auto
     img
-      max-height 380px
-      display block
-      margin-right:-33px;
-      padding-top:60px;
+      max-width 100%
     h1
       font-size 3rem
     h1, .description, .action
       margin 1.8rem auto
-      text-align: left; 
-      padding-left: 35px;
+      text-align: left;
     .description
       max-width 35rem
       font-size 1.6rem
@@ -460,7 +465,7 @@ export default {
       display inline-block
       font-size 1.2rem
       color #fff
-      background-color:#42706d; 
+      background-color:#42706d;
       border-bottom: 1px solid #42706d;
       padding 0.8rem 1.6rem
       border-radius 4px
@@ -503,14 +508,15 @@ export default {
       max-width 100%
       padding 0 2.5rem
 
-@media (max-width: $MQMobileNarrow)
+@media (min-width: $MQMobileNarrow)
   .home
     padding-left 1.5rem
     padding-right 1.5rem
     .hero
       img
-        max-height 210px
-        margin 2rem auto 1.2rem
+        max-height 480px
+        display block
+        margin-right: -33px
       h1
         font-size 2rem
       h1, .description, .action

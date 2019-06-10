@@ -58,6 +58,15 @@ class SelectionType(str, Enum):
     def __bool__(self):
         return self is not self.__class__.EXCLUDED
 
+    def __add__(self, other):
+        if self is SelectionType.EXCLUDED or other is SelectionType.EXCLUDED:
+            return SelectionType.EXCLUDED
+
+        if self is SelectionType.AUTOMATIC or other is SelectionType.AUTOMATIC:
+            return SelectionType.AUTOMATIC
+
+        return SelectionType.SELECTED
+
 
 class CatalogExecutor:
     def execute(self, node_type: CatalogNode, node, path):
@@ -119,6 +128,11 @@ class SelectExecutor(CatalogExecutor):
                 pattern.stream_pattern
                 for pattern in self._patterns
                 if not pattern.negated
+            ),
+            exclude=(
+                pattern.stream_pattern
+                for pattern in self._patterns
+                if pattern.negated and pattern.property_pattern == "*"
             ),
         )
 
@@ -264,20 +278,29 @@ def visit(node, executor, path: str = ""):
 
 @visit.register(dict)
 def _(node: dict, executor, path=""):
-    logging.debug(f"Visiting node at '{path}'.")
-    if re.search(r"streams\[\d+\]$", path):
-        executor(CatalogNode.STREAM, node, path)
+    node_type = None
 
-    if re.search(r"schema\.properties\..*$", path):
-        executor(CatalogNode.STREAM_PROPERTY, node, path)
+    if re.search(r"streams\[\d+\]$", path):
+        node_type = CatalogNode.STREAM
+
+    if re.search(r"schema(\.properties\.\w*)+$", path):
+        node_type = CatalogNode.STREAM_PROPERTY
 
     if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
         if len(node["breadcrumb"]) == 0:
-            executor(CatalogNode.STREAM_METADATA, node, path)
+            node_type = CatalogNode.STREAM_METADATA
         else:
-            executor(CatalogNode.STREAM_PROPERTY_METADATA, node, path)
+            node_type = CatalogNode.STREAM_PROPERTY_METADATA
+
+    if node_type:
+        logging.debug(f"Visiting {node_type} at '{path}'.")
+        executor(node_type, node, path)
 
     for child_path, child_node in node.items():
+        if node_type is CatalogNode.STREAM_PROPERTY and child_path in ["anyOf", "type"]:
+            continue
+
+        # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
         visit(child_node, executor, path=f"{path}.{child_path}")
 
 

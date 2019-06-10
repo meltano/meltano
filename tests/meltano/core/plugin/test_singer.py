@@ -63,6 +63,14 @@ LEGACY_CATALOG = """
               "number",
               "null"
             ]
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "content": {"type": ["string", "null"]},
+              "hash": {"type": "string"}
+            },
+            "required": ["hash"]
           }
         }
       },
@@ -120,6 +128,37 @@ LEGACY_CATALOG = """
           "metadata": {
             "inclusion": "available"
           }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "content"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "hash"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
         }
       ],
       "replication_key": "created_at",
@@ -172,6 +211,14 @@ CATALOG = """
               "number",
               "null"
             ]
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "content": {"type": ["string", "null"]},
+              "hash": {"type": "string"}
+            },
+            "required": ["hash"]
           }
         }
       },
@@ -231,6 +278,37 @@ CATALOG = """
           }
         },
         {
+          "breadcrumb": [
+            "properties",
+            "payload"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "content"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
+          "breadcrumb": [
+            "properties",
+            "payload",
+            "properties",
+            "hash"
+          ],
+          "metadata": {
+            "inclusion": "available"
+          }
+        },
+        {
           "breadcrumb": [],
           "metadata": {
             "table-key-properties": ["id"],
@@ -270,11 +348,10 @@ JSON_SCHEMA = """
             ]
           },
           "created_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
+            "anyOf": [
+              {"type": "string", "format": "date-time"},
+              {"type": ["string", "null"]}
+            ]
           },
           "active": {
             "type": [
@@ -287,6 +364,14 @@ JSON_SCHEMA = """
               "number",
               "null"
             ]
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "content": {"type": ["string", "null"]},
+              "hash": {"type": "string"}
+            },
+            "required": ["hash"]
           }
         }
       }
@@ -492,7 +577,20 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         "catalog,attrs",
         [
             ("CATALOG", {"id", "code", "name", "code", "created_at"}),
-            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+            (
+                "JSON_SCHEMA",
+                {
+                    "id",
+                    "code",
+                    "name",
+                    "balance",
+                    "created_at",
+                    "active",
+                    "payload",
+                    "payload.content",
+                    "payload.hash",
+                },
+            ),
         ],
         indirect=["catalog"],
     )
@@ -508,8 +606,32 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
     @pytest.mark.parametrize(
         "catalog,attrs",
         [
-            ("CATALOG", {"id", "balance", "created_at", "active"}),
-            ("JSON_SCHEMA", {"id", "code", "name", "balance", "created_at", "active"}),
+            (
+                "CATALOG",
+                {
+                    "id",
+                    "balance",
+                    "created_at",
+                    "active",
+                    "payload",
+                    "payload.content",
+                    "payload.hash",
+                },
+            ),
+            (
+                "JSON_SCHEMA",
+                {
+                    "id",
+                    "code",
+                    "name",
+                    "balance",
+                    "created_at",
+                    "active",
+                    "payload",
+                    "payload.content",
+                    "payload.hash",
+                },
+            ),
         ],
         indirect=["catalog"],
     )
@@ -533,7 +655,17 @@ class TestListExecutor:
         visit(catalog, executor)
 
         assert dict(executor.properties) == {
-            "entities": {"code", "name", "balance", "created_at", "id", "active"}
+            "entities": {
+                "code",
+                "name",
+                "balance",
+                "created_at",
+                "id",
+                "active",
+                "payload",
+                "payload.content",
+                "payload.hash",
+            }
         }
 
 
