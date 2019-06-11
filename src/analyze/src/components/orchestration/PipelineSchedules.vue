@@ -97,8 +97,8 @@ import Dropdown from '@/components/generic/Dropdown';
 export default {
   name: 'PipelineSchedules',
   components: {
-    Dropdown
-  }
+    Dropdown,
+  },
 };
 </script>
 
