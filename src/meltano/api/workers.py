@@ -22,7 +22,10 @@ class CompileEventHandler(PatternMatchingEventHandler):
         super().__init__(ignore_patterns=["*.m5oc"])
 
     def on_any_event(self, event):
-        self.compiler.compile()
+        try:
+            self.compiler.compile()
+        except Exception as e:
+            logging.error(f"Compilation failed: {str(e)}")
 
 
 class MeltanoBackgroundCompiler:
@@ -32,23 +35,20 @@ class MeltanoBackgroundCompiler:
         self.observer = self.setup_observer()
 
     @property
-    def model_dirs(self):
-        return (self.project.root_dir("model"), self.project.model_dir())
+    def model_dir(self):
+        return self.project.root_dir("model")
 
     def setup_observer(self):
         event_handler = CompileEventHandler(self.compiler)
         observer = Observer()
-
-        for source in self.model_dirs:
-            observer.schedule(event_handler, str(source), recursive=True)
+        observer.schedule(event_handler, str(self.model_dir), recursive=True)
 
         return observer
 
     def start(self):
         try:
             self.observer.start()
-            for source in self.model_dirs:
-                logging.info(f"Auto-compiling models in '{str(source)}'")
+            logging.info(f"Auto-compiling models in '{self.model_dir}'")
         except OSError:
             # most probably INotify being full
             logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
