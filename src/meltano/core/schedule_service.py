@@ -1,4 +1,6 @@
 from collections import namedtuple
+from typing import Optional
+from datetime import datetime
 
 from .config_service import ConfigService
 from .project import Project
@@ -12,7 +14,8 @@ class ScheduleAlreadyExistsError(Exception):
 
 
 Schedule = namedtuple(
-    "Schedule", ("name", "extractor", "loader", "transform", "interval", "env")
+    "Schedule",
+    ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
 )
 
 
@@ -21,9 +24,18 @@ class ScheduleService:
         self.project = project
 
     def add(
-        self, name, extractor: str, loader: str, transform: str, interval: str, **env
+        self,
+        name,
+        extractor: str,
+        loader: str,
+        transform: str,
+        interval: str,
+        start_date: Optional[datetime] = None,
+        **env
     ):
-        schedule = Schedule(name, extractor, loader, transform, interval, env=env)
+        schedule = Schedule(
+            name, extractor, loader, transform, interval, start_date, env=env
+        )
 
         return self.add_schedule(schedule)
 
