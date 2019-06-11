@@ -1,24 +1,25 @@
 <template>
   <div class="home">
-    <div class="hero homepage-cta">
+    <div style="background-color: #e5e4e2">
+      <div class="hero homepage-cta">
+        <div class="hero-left">
+          <h2 class="hero-header">Open source data dashboarding</h2>
+          <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
 
-      <div class="hero-left">
-        <h2 class="hero-header">Open source data dashboarding</h2>
-        <p class="hero-tagline">Meltano is a free alternative to expensive SaaS tools. We provide an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.</p>
+          <p class="action"
+            v-if="data.actionText && data.actionLink"
+          >
+            <NavLink
+              class="action-button"
+              :item="actionLink"
+            />
+          </p>
 
-        <p class="action"
-          v-if="data.actionText && data.actionLink"
-        >
-          <NavLink
-            class="action-button"
-            :item="actionLink"
-          />
-        </p>
+        </div>
 
-      </div>
-
-      <div class="hero-right">
-        <img src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        <div class="hero-right">
+          <img src="../assets/happy-meltano-user.jpg" alt="Happy Meltano User Says Hi" />
+        </div>
       </div>
     </div>
 
@@ -36,186 +37,206 @@
       </div>
     </div>
 
-    <div class="content-width-wide">
-
-      <h2 class="quote">A single workflow for the entire data life cycle.</h2>
-
-      <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
-
-      <table class="meltano-stages-table">
-        <thead>
-          <tr class="meltano-header-row">
-            <th>Stage:</th>
-            <th>Model</th>
-            <th>Extract</th>
-            <th>Load</th>
-            <th>Transform</th>
-            <th>Analyze</th>
-            <th>Notebook</th>
-            <th>Orchestrate</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr class="meltano-use-row">
-            <td class="meltano-uses">Meltano uses:</td>
-            <td class="meltano-uses-secondary">
-              <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://www.singer.io/#taps">Singer Taps</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://www.singer.io/#targets">Singer Targets</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://www.getdbt.com/">dbt</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://github.com/jupyterhub/jupyterhub">Jupyter Notebooks</a>
-            </td>
-            <td class="meltano-uses-secondary">
-              <a href="https://airflow.apache.org/">Apache Airflow</a>
-            </td>
-          </tr>
-          <tr class="meltano-replace-row">
-            <td>Meltano can be an alternative to:</td>
-            <td>
-              <ul>
-                <li>
-                  <a href="http://www.modelsphere.com/org/">Open ModelSphere</a>
-                </li>
-                <li>
-                  <a href="https://looker.com/platform/data-modeling">LookML</a>
-                </li>
-                <li>
-                  <a href="http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/">Matillion</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
-                </li>
-                <li>
-                  <a href="https://www.talend.com/">Talend</a>
-                </li>
-                <li>
-                  <a href="https://www.alooma.com/">Alooma</a></li>
-                <li>
-                  <a href="https://fivetran.com/">Fivetran</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
-                </li>
-                <li>
-                  <a href="https://www.talend.com/">Talend</a>
-                </li>
-                <li>
-                  <a href="https://www.alooma.com/">Alooma</a>
-                </li>
-                <li>
-                  <a href="https://fivetran.com/">Fivetran</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="https://meltano.com/docs/best-practices.html#stored-procedures">Stored procedures</a>
-                </li>
-                <li>
-                  <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
-                </li>
-                <li>
-                  <a href="https://www.alooma.com/">Alooma</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="https://www.tableau.com/">Tableau</a>
-                </li>
-                <li>
-                  <a href="https://www.metabase.com/">Metabase</a>
-                </li>
-                <li>
-                  <a href="https://looker.com/">Looker</a>
-                </li>
-                <li>
-                  <a href="https://www.periscopedata.com/">Periscope</a>
-                </li>
-                <li>
-                  <a href="https://redash.io/">Redash</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="https://www.gnu.org/software/octave/">GNU Octave</a>
-                </li>
-                <li>
-                  <a href="https://www.nurtch.com/">Nurtch</a>
-                </li>
-                <li>
-                  <a href="https://www.datadoghq.com/blog/data-driven-notebooks/">Datadog Notebooks</a>
-                </li>
-              </ul>
-            </td>
-            <td>
-              <ul>
-                <li>
-                  <a href="https://github.com/spotify/luigi">Luigi</a>
-                </li>
-                <li>
-                  <a href="https://nifi.apache.org/">Nifi</a>
-                </li>
-                <li>
-                  <a href="https://fivetran.com/">Fivetran</a>
-                </li>
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h2 class="quote">Plugins to Extract & Load Data</h2>
-
-      <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
-
-      <div class="el-logos">
-        <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
-        <img src="../assets/stripe-logo.png" alt="Stripe Logo">
-        <img src="../assets/csv-logo.png" alt="CSV Logo">
-        <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
-        <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
-        <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
-        <img src="../assets/zuora-logo.png" alt="Zuora Logo">
-        <img src="../assets/marketo-logo.png" alt="Marketo Logo">
-        <div class="carbon-intensity-logo">
-          <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
-          Carbon Intensity API
+    <div class="feature-section-wrapper">
+      <div class="feature-section">
+        <div class="feature-left">
+          <img 
+            style="max-width: 100%; margin: 0 auto; display: block;"
+            src="/screenshots/analyze-page.png" 
+            alt="Screenshot of Meltano Analyze page" 
+          />
         </div>
-        <img src="../assets/fastly-logo.png" alt="Fastly Logo">
-        <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
-        <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
+        <div class="feature-right">
+          <h2 class="section-title">Analyze your data with dynamically generated SQL queries</h2>
+          <p class="hero-tagline">Meltano makes it easy for you to analyze your data with a user interface that allows you to generate SQL with a few clicks so you can get the insights you need.</p>
+        </div>
       </div>
-
-      <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
-
-      <p class="description"></p>
+    </div>
 
 
+    <div style="background-color: #e5e4e2; padding-bottom: 6rem;">
+      <div class="content-width-wide">
+        <h2 class="section-title" style="text-align: center; margin-top: 0;">A single workflow for the entire data life cycle.</h2>
 
+        <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
+
+        <table class="meltano-stages-table">
+          <thead>
+            <tr class="meltano-header-row">
+              <th>Stage:</th>
+              <th>Model</th>
+              <th>Extract</th>
+              <th>Load</th>
+              <th>Transform</th>
+              <th>Analyze</th>
+              <th>Notebook</th>
+              <th>Orchestrate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="meltano-use-row">
+              <td class="meltano-uses">Meltano uses:</td>
+              <td class="meltano-uses-secondary">
+                <a href="https://meltano.com/docs/architecture.html#meltano-model" target="_blank">Meltano Model</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://www.singer.io/#taps">Singer Taps</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://www.singer.io/#targets">Singer Targets</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://www.getdbt.com/">dbt</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://meltano.com/docs/architecture.html#meltano-ui">Meltano UI</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://github.com/jupyterhub/jupyterhub">Jupyter Notebooks</a>
+              </td>
+              <td class="meltano-uses-secondary">
+                <a href="https://airflow.apache.org/">Apache Airflow</a>
+              </td>
+            </tr>
+            <tr class="meltano-replace-row">
+              <td>Meltano can be an alternative to:</td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="http://www.modelsphere.com/org/">Open ModelSphere</a>
+                  </li>
+                  <li>
+                    <a href="https://looker.com/platform/data-modeling">LookML</a>
+                  </li>
+                  <li>
+                    <a href="http://www.stephenlevin.co/data-modeling-layer-startup-analytics-dbt-vs-matillion-vs-lookml/">Matillion</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+                  </li>
+                  <li>
+                    <a href="https://www.talend.com/">Talend</a>
+                  </li>
+                  <li>
+                    <a href="https://www.alooma.com/">Alooma</a></li>
+                  <li>
+                    <a href="https://fivetran.com/">Fivetran</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+                  </li>
+                  <li>
+                    <a href="https://www.talend.com/">Talend</a>
+                  </li>
+                  <li>
+                    <a href="https://www.alooma.com/">Alooma</a>
+                  </li>
+                  <li>
+                    <a href="https://fivetran.com/">Fivetran</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="https://meltano.com/docs/best-practices.html#stored-procedures">Stored procedures</a>
+                  </li>
+                  <li>
+                    <a href="http://www.pentaho.com/product/data-integration">Pentaho DI</a>
+                  </li>
+                  <li>
+                    <a href="https://www.alooma.com/">Alooma</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="https://www.tableau.com/">Tableau</a>
+                  </li>
+                  <li>
+                    <a href="https://www.metabase.com/">Metabase</a>
+                  </li>
+                  <li>
+                    <a href="https://looker.com/">Looker</a>
+                  </li>
+                  <li>
+                    <a href="https://www.periscopedata.com/">Periscope</a>
+                  </li>
+                  <li>
+                    <a href="https://redash.io/">Redash</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="https://www.gnu.org/software/octave/">GNU Octave</a>
+                  </li>
+                  <li>
+                    <a href="https://www.nurtch.com/">Nurtch</a>
+                  </li>
+                  <li>
+                    <a href="https://www.datadoghq.com/blog/data-driven-notebooks/">Datadog Notebooks</a>
+                  </li>
+                </ul>
+              </td>
+              <td>
+                <ul>
+                  <li>
+                    <a href="https://github.com/spotify/luigi">Luigi</a>
+                  </li>
+                  <li>
+                    <a href="https://nifi.apache.org/">Nifi</a>
+                  </li>
+                  <li>
+                    <a href="https://fivetran.com/">Fivetran</a>
+                  </li>
+                </ul>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div style="padding-top: 5rem;">
+      <div class="content-width-wide">
+        <h2 class="section-title ta-c">Plugins to Extract & Load Data</h2>
+
+        <p class="description">Meltano works with a growing number of data sources and reporting database formats.</p>
+
+        <div class="el-logos">
+          <img src="../assets/gitlab-logo.png" alt="GitLab Logo">
+          <img src="../assets/stripe-logo.png" alt="Stripe Logo">
+          <img src="../assets/csv-logo.png" alt="CSV Logo">
+          <img src="../assets/salesforce-logo.png" alt="Salesforce Logo">
+          <img src="../assets/sqlite-logo.png" alt="SQLite Logo">
+          <img src="../assets/zendesk-logo.png" alt="Zendesk Logo">
+          <img src="../assets/zuora-logo.png" alt="Zuora Logo">
+          <img src="../assets/marketo-logo.png" alt="Marketo Logo">
+          <div class="carbon-intensity-logo">
+            <img src="../assets/carbon-intensity-logo.png" alt="Carbon Intensity Favicon">
+            Carbon Intensity API
+          </div>
+          <img src="../assets/fastly-logo.png" alt="Fastly Logo">
+          <img src="../assets/mongodb-logo.png" alt="MongoDB Logo">
+          <img src="../assets/snowflake-logo.png" alt="Snowflake Logo">
+        </div>
+
+        <p class="description ta-c">For more information, check out our <a href="/docs/plugins.html">plugins documentation</a></p>
+      </div>
+    </div>
+
+    <div class="content-width-wide">
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">Got questions or want to chat with the team? You can find us in the Meltano Slack channel, watch our videos on YouTube, or use another preferred channel.</p>
@@ -232,7 +253,6 @@
         <a href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link" class="button" target="_blank">Subscribe</a>
       </section>
     </div>
-
     <div
       class="footer"
     >
@@ -296,17 +316,17 @@ export default {
 
 .description {
   margin-bottom: 0;
-  font-size:16px;
-  padding-left:10%;
-  padding-right:10%;
-  text-align:center;
-  padding-top:10px;
+  font-size: 17px;
+  padding-left: 10%;
+  padding-right: 10%;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 30px;
 }
 
 .meltano-stages-table {
   display: block;
-  margin: 2.5rem auto 7rem;
-  float:left;
+  margin: 1rem auto 0rem;
   font-size:14px;
   overflow: scroll;
   width: 100%;
@@ -369,7 +389,7 @@ export default {
 
 .section {
   border-top: 1px solid #eaecef;
-  padding: 2.5rem 0;
+  padding: 6rem 0;
   text-align: center;
 
   &__text {
@@ -417,6 +437,48 @@ export default {
   text-align: left;
 }
 
+.feature-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 6rem;
+}
+
+.feature-section-wrapper {
+  background-color: #e5e4e2; 
+  padding-bottom: 6rem;
+}
+
+.feature-left {
+  max-width: 80%;
+  padding-bottom: 2rem;
+}
+
+.feature-right {
+  max-width: 80%;
+}
+
+@media (min-width: $MQNarrow) {
+  .feature-section {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    max-width: $contentWidthWide;
+    margin: 0 auto;
+  }
+  
+  .feature-left {
+    padding-left: 30px;
+  }
+
+  .feature-right {
+    margin-left: 30px;
+    text-align: left;
+    max-width: 40%;
+  }
+}
+
 .hero-tagline {
   padding-right: 20px;
 }
@@ -442,9 +504,14 @@ export default {
   }
 }
 
+.section-title {
+  font-weight: bold;
+  font-size: 32px;
+  margin-top: 0;
+}
+
 .home
-  background #e5e4e2
-  padding $navbarHeight 2rem 0
+  padding $navbarHeight 0 0
   margin 0px auto
   .hero
     text-align center
@@ -454,7 +521,7 @@ export default {
     h1
       font-size 3rem
     h1, .description, .action
-      margin 1.8rem auto
+      margin 1.8rem auto 0
       text-align: left;
     .description
       max-width 35rem
@@ -510,8 +577,6 @@ export default {
 
 @media (min-width: $MQMobileNarrow)
   .home
-    padding-left 1.5rem
-    padding-right 1.5rem
     .hero
       img
         max-height 480px
@@ -520,7 +585,7 @@ export default {
       h1
         font-size 2rem
       h1, .description, .action
-        margin 1.2rem auto
+        margin 1.2rem auto 0
       .description
         font-size 1.2rem
       .action-button
