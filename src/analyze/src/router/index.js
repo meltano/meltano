@@ -5,7 +5,7 @@ import Extractors from '@/components/orchestration/Extractors';
 import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
 import Loaders from '@/components/orchestration/Loaders';
 import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
-import RunSummary from '@/components/orchestration/RunSummary';
+import PipelineSchedules from '@/components/orchestration/PipelineSchedules';
 
 import AnalyzeModels from '@/views/AnalyzeModels';
 import AnalyzeSettings from '@/views/AnalyzeSettings';
@@ -101,7 +101,7 @@ const router = new Router({
         {
           path: 'schedule',
           name: 'schedule',
-          component: RunSummary,
+          component: PipelineSchedules,
         },
       ],
     },

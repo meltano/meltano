@@ -113,6 +113,7 @@ export default {
             :class="{ 'is-active': getIsActiveStep('schedule') }"
             :disabled='!getIsStepScheduleMinimallyValidated'
             @click='setStep("schedule")'>Schedule</button>
+          <p>Data Pipelines</p>
         </div>
       </div>
 
