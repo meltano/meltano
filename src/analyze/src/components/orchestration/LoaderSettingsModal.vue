@@ -14,7 +14,7 @@
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingLoaderPlugin(loaderNameFromRoute)'>
+        <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -79,7 +79,7 @@ export default {
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
     this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
@@ -88,12 +88,16 @@ export default {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
-      'getIsLoaderPluginInstalled',
-      'getIsInstallingLoaderPlugin',
+    ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
-      'installedPlugins',
       'loaderInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
+      'installedPlugins',
     ]),
     configSettings() {
       return this.loader.config
@@ -103,7 +107,7 @@ export default {
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsLoaderPluginInstalled(this.loaderNameFromRoute);
+      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders

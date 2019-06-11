@@ -14,7 +14,7 @@
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingExtractorPlugin(extractorNameFromRoute)'>
+        <template v-if='getIsInstallingPlugin("extractors", extractorNameFromRoute)'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -95,7 +95,7 @@ export default {
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
     this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
@@ -104,11 +104,15 @@ export default {
     ...mapGetters('configuration', [
       'getExtractorImageUrl',
       'getExtractorNameWithoutPrefixedTapDash',
-      'getIsExtractorPluginInstalled',
-      'getIsInstallingExtractorPlugin',
+    ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
     ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
       'installedPlugins',
     ]),
     configSettings() {
@@ -118,7 +122,7 @@ export default {
     },
     extractorLacksConfigSettingsAndIsInstalled() {
       return this.configSettings === null &&
-        !this.getIsInstallingExtractorPlugin(this.extractorNameFromRoute);
+        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -129,7 +133,7 @@ export default {
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsExtractorPluginInstalled(this.extractorNameFromRoute);
+      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
     },
   },
   methods: {
