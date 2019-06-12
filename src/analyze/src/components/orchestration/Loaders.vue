@@ -4,26 +4,28 @@ import { mapActions, mapGetters, mapState } from 'vuex';
 export default {
   name: 'Loaders',
   created() {
-    this.$store.dispatch('configuration/getAll');
-    this.$store.dispatch('configuration/getInstalledPlugins');
+    this.$store.dispatch('plugins/getAllPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
     ...mapGetters('configuration', [
       'getLoaderImageUrl',
       'getLoaderNameWithoutPrefixedTargetDash',
-      'getIsLoaderPluginInstalled',
-      'getIsInstallingLoaderPlugin',
     ]),
-    ...mapState('configuration', [
-      'loaders',
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
+    ]),
+    ...mapState('plugins', [
+      'plugins',
     ]),
   },
   methods: {
-    ...mapActions('configuration', [
-      'installLoader',
+    ...mapActions('plugins', [
+      'installPlugin',
     ]),
     installLoaderAndBeginSettings(loader) {
-      this.installLoader(loader);
+      this.installPlugin({ pluginType: 'loaders', name: loader });
       this.updateLoaderSettings(loader);
     },
     updateLoaderSettings(loader) {
@@ -55,12 +57,12 @@ export default {
     <div class="tile is-ancestor flex-and-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(loader, index) in loaders"
+        v-for="(loader, index) in plugins.loaders"
         :key="`${loader}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <img
-              :class='{ "grayscale": !getIsLoaderPluginInstalled(loader) }'
+              :class='{ "grayscale": !getIsPluginInstalled("loaders", loader) }'
               :src='getLoaderImageUrl(loader)'
               :alt="`${getLoaderNameWithoutPrefixedTargetDash(loader)} logo`">
           </div>
@@ -69,7 +71,7 @@ export default {
               {{loader}}
             </p>
 
-            <template v-if='getIsLoaderPluginInstalled(loader)'>
+            <template v-if='getIsPluginInstalled("loaders", loader)'>
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'
@@ -81,7 +83,7 @@ export default {
             </template>
             <template v-else>
               <a
-                :class='{ "is-loading": getIsInstallingLoaderPlugin(loader) }'
+                :class='{ "is-loading": getIsInstallingPlugin("loaders", loader) }'
                 class='button is-interactive-primary is-outlined is-block is-small'
                 @click="installLoaderAndBeginSettings(loader)">Install</a>
             </template>
