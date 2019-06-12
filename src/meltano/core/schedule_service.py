@@ -18,6 +18,8 @@ Schedule = namedtuple(
     ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
 )
 
+Schedule._defaults = {"start_date": None}
+
 
 class ScheduleService:
     def __init__(self, project: Project):
@@ -53,6 +55,12 @@ class ScheduleService:
 
     def schedules(self):
         return (
-            Schedule(**schedule_def)
+            self.yaml_schedule(schedule_def)
             for schedule_def in self.project.meltano.get("schedules", [])
         )
+
+    @classmethod
+    def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
+        schedule_definition = {**Schedule._defaults, **schedule_definition}
+
+        return Schedule(**schedule_definition)
