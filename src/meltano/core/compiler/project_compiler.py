@@ -1,5 +1,8 @@
 import logging
 
+import fasteners
+import threading
+
 from meltano.core.project import Project
 from meltano.core.m5o.m5o_file_parser import (
     MeltanoAnalysisFileParser,
@@ -19,6 +22,7 @@ class ProjectCompiler:
     def __init__(self, project):
         self.project = project
         self._parsed = False
+        self._lock = threading.Lock()
 
     @property
     def source_dir(self):
@@ -34,13 +38,15 @@ class ProjectCompiler:
             logging.warn(f"Failed to compile topics: {e}")
             raise e
 
+    @fasteners.locked
     def compile(self):
         try:
-            if not self._parsed:
-                self.parse()
+            self.parse()
+
             all_topics = self.topics + self.package_topics
             if all_topics:
                 self.parser.compile(all_topics)
+
             logging.debug(f"Successfully compiled topics")
         except MeltanoAnalysisFileParserError as e:
             logging.warn(f"Failed to compile topics: {e}")

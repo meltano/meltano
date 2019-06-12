@@ -14,12 +14,12 @@ const state = {
 
 const getters = {
   getIsPluginInstalled(stateRef) {
-    return (collectionType, extractor) => (stateRef.installedPlugins[collectionType]
-      ? Boolean(stateRef.installedPlugins[collectionType].find(item => item.name === extractor))
+    return (pluginType, extractor) => (stateRef.installedPlugins[pluginType]
+      ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === extractor))
       : false);
   },
   getIsInstallingPlugin(stateRef) {
-    return (collectionType, extractor) => stateRef.installingPlugins[collectionType].includes(extractor);
+    return (pluginType, extractor) => stateRef.installingPlugins[pluginType].includes(extractor);
   },
 };
 
@@ -54,11 +54,11 @@ const actions = {
 
 const mutations = {
   installPluginStart(_, installConfig) {
-    state.installingPlugins[installConfig.collectionType].push(installConfig.name);
+    state.installingPlugins[installConfig.pluginType].push(installConfig.name);
   },
 
   installPluginComplete(_, installConfig) {
-    lodash.pull(state.installingPlugins[installConfig.collectionType], installConfig.name);
+    lodash.pull(state.installingPlugins[installConfig.pluginType], installConfig.name);
   },
 
   setAllPlugins(_, plugins) {

@@ -35,7 +35,7 @@ export default {
       'installPlugin',
     ]),
     installModel(model) {
-      this.installPlugin({ collectionType: 'models', name: model })
+      this.installPlugin({ pluginType: 'models', name: model })
         .then(() => {
           this.$store.dispatch('repos/getModels');
         });
@@ -67,14 +67,15 @@ export default {
               <a
                 v-else
                 disabled
-                class='button is-outlined is-block is-small'>Uninstall</a>
+                class='button is-outlined is-block is-small tooltip is-tooltip-left'
+                data-tooltip="Not implemented">Uninstall</a>
             </div>
           </div>
 
         </div>
       </div>
       <div class="column is-two-thirds">
-        <h2 class='title is-5'>Analyzable</h2>
+        <h2 class='title is-5'>Installed</h2>
         <template v-if='hasModels'>
           <div
             class="box"
@@ -95,7 +96,7 @@ export default {
         </template>
         <template v-else>
           <div class="content">
-            <p>There are no analyzable models yet. Install them to your left.</p>
+            <p>There are no models installed yet: you may install them using the panel on the left.</p>
           </div>
         </template>
       </div>

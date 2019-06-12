@@ -27,24 +27,26 @@ def installed():
 
 @pluginsBP.route("/install", methods=["POST"])
 def install():
+    payload = request.get_json()
+    plugin_type = PluginType(payload["pluginType"])
+    plugin_name = payload["name"]
+
     project = Project.find()
     add_service = ProjectAddService(project)
-    plugin_collection_type = request.get_json()["collectionType"]
-    plugin_name = request.get_json()["name"]
-    plugin = add_service.add(plugin_collection_type, plugin_name)
     install_service = PluginInstallService(project)
+    compiler = ProjectCompiler(project)
+
+    plugin = add_service.add(plugin_type, plugin_name)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
 
-    compiler = ProjectCompiler(project)
-    try:
-        compiler.compile()
-    except Exception as e:
-        pass
+    if plugin_type is PluginType.MODELS:
+        try:
+            compiler.compile()
+        except Exception as e:
+            pass
 
     tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(
-        plugin_type=plugin_collection_type, plugin_name=plugin_name
-    )
+    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
     return jsonify({"test": 123})

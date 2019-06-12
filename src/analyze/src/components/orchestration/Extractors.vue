@@ -28,7 +28,7 @@ export default {
       'installPlugin',
     ]),
     installExtractorAndBeginSettings(extractor) {
-      this.installPlugin({ collectionType: 'extractors', name: extractor });
+      this.installPlugin({ pluginType: 'extractors', name: extractor });
       this.updateExtractorSettings(extractor);
     },
     updateExtractorSettings(extractor) {

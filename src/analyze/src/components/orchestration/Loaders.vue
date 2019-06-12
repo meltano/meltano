@@ -25,7 +25,7 @@ export default {
       'installPlugin',
     ]),
     installLoaderAndBeginSettings(loader) {
-      this.installPlugin({ collectionType: 'loaders', name: loader });
+      this.installPlugin({ pluginType: 'loaders', name: loader });
       this.updateLoaderSettings(loader);
     },
     updateLoaderSettings(loader) {
