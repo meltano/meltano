@@ -19,6 +19,9 @@ const getters = {
   getExtractorNameWithoutPrefixedTapDash() {
     return extractor => extractor.replace('tap-', '');
   },
+  getHasPipelines() {
+    return state.pipelines.length > 0;
+  },
   getLoaderImageUrl(_, gettersRef) {
     return loader => (
       `/static/logos/${gettersRef.getLoaderNameWithoutPrefixedTargetDash(loader)}-logo.png`

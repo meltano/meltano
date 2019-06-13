@@ -130,7 +130,7 @@ export default {
         type: 'loader',
         config: this.configSettings,
       });
-      this.$router.push({ name: 'orchestration' });
+      this.$router.push({ name: 'schedule' });
     },
   },
 };

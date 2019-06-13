@@ -41,8 +41,7 @@
 
     </div>
 
-    <div class="box">
-
+    <div v-if='getHasPipelines' class="box">
       <table class="table pipelines-table is-fullwidth">
         <thead>
           <tr>
@@ -57,7 +56,7 @@
         </thead>
         <tbody>
 
-          <template v-for="pipeline in [{id: 1}, {id: 2}]">
+          <template v-for="pipeline in pipelines">
             <div :key='pipeline.id'>Pipeline {{pipeline.id}}</div>
           </template>
 
@@ -65,17 +64,29 @@
       </table>
     </div>
 
+    <div v-else class='content'>
+      <p>There are no pipelines scheduled yet. <router-link to='schedule/create'>Schedule your first Pipeline</router-link> now.</p>
+    </div>
+
   </div>
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'PipelineSchedules',
+  created() {
+    if (!this.getHasPipelines) {
+      this.createPipeline();
+    }
+  },
   computed: {
     ...mapState('configuration', [
       'pipelines',
+    ]),
+    ...mapGetters('configuration', [
+      'getHasPipelines',
     ]),
   },
   methods: {
