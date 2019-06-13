@@ -30,7 +30,8 @@ source ./venv/bin/activate
 pip install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-pip install -e '.[dev]'
+# Note: you may have to escape the `.[dev]` argument on some shells, like zsh
+pip install -e .[dev]
 
 # Run scripts to create remaining required files
 make bundle
@@ -128,7 +129,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     $ source ./venv/bin/activate
 
     # pip install all the development dependencies
-    $ pip install '.[dev]'
+    $ pip install .[dev]
     ```
 1. Execute the commands below:
     ```bash

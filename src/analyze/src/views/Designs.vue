@@ -8,28 +8,9 @@ export default {
     RouterViewLayout,
     DocsLink,
   },
-  data() {
-    return {
-      connectionName: '',
-      connectionDatabase: '',
-      connectionSchema: '',
-      connectionDialect: '',
-      connectionHost: '',
-      connectionPort: '',
-      connectionUsername: '',
-      connectionPassword: '',
-      connectionSqlitePath: '',
-    };
-  },
-  created() {
-    this.$store.dispatch('repos/getModels');
-  },
   methods: {
     isCurrentLink(path) {
-      if (this.$route.path === path) {
-        return 'is-active';
-      }
-      return '';
+      return this.$route.path === path ? 'is-active' : '';
     },
   },
 };
@@ -54,18 +35,20 @@ export default {
           <div class="level-right">
             <div class="tabs is-right">
               <ul>
-                <li :class="isCurrentLink('/analyze/models')">
-                  <router-link to="/analyze/models">Models</router-link>
+                <li :class="isCurrentLink('/analyze/models/')">
+                  <router-link to="/analyze/models/">Models</router-link>
                 </li>
-                <li :class="isCurrentLink('/analyze/settings')" class="is-marginless">
-                  <router-link to="/analyze/settings">Settings</router-link>
+                <li :class="isCurrentLink('/analyze/connection-settings/')" class="is-marginless">
+                  <router-link to="/analyze/connection-settings/">Connections</router-link>
                 </li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-        <router-view />
+
+      <router-view />
+
     </div>
   </router-view-layout>
 </template>

@@ -1,10 +1,6 @@
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin import PluginType
 from meltano.core.project import Project
-from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.select_service import SelectService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from meltano.cli.add import extractor
 
@@ -13,48 +9,6 @@ from flask import Blueprint, request, url_for, jsonify, make_response, Response
 orchestrationsBP = Blueprint(
     "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
 )
-
-
-@orchestrationsBP.route("/", methods=["GET"])
-def index():
-    new_project = Project()
-    new_plugin_discovery_service = PluginDiscoveryService(new_project)
-    result = new_plugin_discovery_service.discover(PluginType.ALL)
-    return jsonify(result)
-
-
-@orchestrationsBP.route("/installed-plugins", methods=["GET"])
-def installed_plugins():
-    project = Project.find()
-    return jsonify(project.meltano)
-
-
-@orchestrationsBP.route("/add-extractor", methods=["POST"])
-def add_extractor():
-    project = Project.find()
-    add_service = ProjectAddService(project)
-    plugin_name = request.get_json()["name"]
-    plugin = add_service.add("extractors", plugin_name)
-    install_service = PluginInstallService(project)
-    run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="extractor", plugin_name=plugin_name)
-    return jsonify({"test": 123})
-
-
-@orchestrationsBP.route("/add-loader", methods=["POST"])
-def add_loader():
-    project = Project.find()
-    add_service = ProjectAddService(project)
-    plugin_name = request.get_json()["name"]
-    plugin = add_service.add("loaders", plugin_name)
-    install_service = PluginInstallService(project)
-    run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="loader", plugin_name=plugin_name)
-    return jsonify({"test": 123})
 
 
 @orchestrationsBP.route("/connection_names", methods=["GET"])
