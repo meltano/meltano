@@ -82,7 +82,7 @@ docs:
     - $REMOTE_EXEC "cd $SSH_DIRECTORY && find ./$SSH_WWW_DIRECTORY -mindepth 1 -maxdepth 1 -not -name blog -not -name '.' -exec rm -rf  '{}' \;"
     - scp -o stricthostkeychecking=no -P$SSH_PORT -r public/* $SSH_USER_DOMAIN:$SSH_DIRECTORY/$SSH_WWW_DIRECTORY
   only:
-    - master
+    - master@meltano/meltano
 
 .test: &test
   stage: test
