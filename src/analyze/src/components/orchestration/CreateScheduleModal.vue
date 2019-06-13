@@ -63,9 +63,9 @@
                 <p class="control">
                   <span class="select is-fullwidth">
                     <select v-model="pipeline.transform">
-                      <option>skip</option>
-                      <option>only</option>
-                      <option>run</option>
+                      <option
+                        v-for="transform in transformOptions"
+                        :key='transform'>{{transform}}</option>
                     </select>
                   </span>
                 </p>
@@ -74,12 +74,9 @@
                 <p class="control is-expanded">
                   <span class="select is-fullwidth">
                     <select v-model="pipeline.interval">
-                      <option>@once</option>
-                      <option>@hourly</option>
-                      <option>@daily</option>
-                      <option>@weekly</option>
-                      <option>@monthly</option>
-                      <option>@yearly</option>
+                      <option
+                        v-for="interval in intervalOptions"
+                        :key='interval'>{{interval}}</option>
                     </select>
                   </span>
                 </p>
@@ -132,6 +129,7 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import _ from 'lodash';
 
 import Dropdown from '@/components/generic/Dropdown';
 
@@ -154,7 +152,9 @@ export default {
       'installedPlugins',
     ]),
     isSaveable() {
-      return true;
+      const hasOwns = [];
+      _.forOwn(this.pipeline, val => hasOwns.push(val));
+      return hasOwns.find(val => val === '') === undefined;
     },
     todaysDate() {
       return utils.getTodayYYYYMMDD();
@@ -170,6 +170,19 @@ export default {
         interval: '',
         startDate: 'None',
       },
+      transformOptions: [
+        'skip',
+        'run',
+        'only',
+      ],
+      intervalOptions: [
+        '@once',
+        '@hourly',
+        '@daily',
+        '@weekly',
+        '@monthly',
+        '@yearly',
+      ],
     };
   },
   methods: {
@@ -185,6 +198,8 @@ export default {
       this.pipeline.name = `Default-${this.todaysDate}`;
       this.pipeline.extractor = this.installedPlugins.extractors[0].name;
       this.pipeline.loader = this.installedPlugins.loaders[0].name;
+      this.pipeline.transform = this.transformOptions[0];
+      this.pipeline.interval = this.intervalOptions[0];
     },
     save() {
       console.log('save:', this.pipeline);
