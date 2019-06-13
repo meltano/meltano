@@ -59,7 +59,7 @@ meltano_base:
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
 
 #############
 # Build     #
@@ -93,8 +93,7 @@ meltano_edge:
   only:
     - master
   except:
-    variables:
-      - $CI_COMMIT_TAG
+    - tags
 
 # Manages:
 #  - meltano/meltano:<tag>
@@ -112,7 +111,7 @@ meltano:
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
 
 # Manages:
 #   - meltano/meltano/runner:<sha>
@@ -142,8 +141,7 @@ runner_edge:
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:edge
     - docker push $DOCKER_IMAGE_NAME:edge
   only:
-    refs:
-      - master
+    - master
 
 # Manages:
 #   - meltano/meltano/runner:<tag>
@@ -162,7 +160,7 @@ runner:
     - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
 
 ##########
 # Tests  #
@@ -192,9 +190,8 @@ test_e2e_edge:
     IMAGE_TAG: edge
   only:
     - master
-  except:
-    variables:
-      - $CI_COMMIT_TAG
+  except::
+    - tags
 
 test_e2e:
   <<: *test_docker
@@ -202,4 +199,4 @@ test_e2e:
     IMAGE_TAG: latest
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
