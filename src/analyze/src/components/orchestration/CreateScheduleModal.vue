@@ -83,25 +83,32 @@
               </td>
               <td>
                 <p class="control is-expanded">
-                  <Dropdown label="None" is-right-aligned is-full-width>
+                  <Dropdown
+                    :label='pipeline.startDate'
+                    is-right-aligned
+                    is-full-width>
                     <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                       <a
                         class="dropdown-item"
-                        @click="dropdownForceClose();">
+                        @click="setCatchUpDateToNone(); dropdownForceClose();">
                         None
                       </a>
                       <hr class="dropdown-divider">
                       <div>
                         <div class="dropdown-item">
-                          <span class='is-size-7'>mm/dd/yyyy</span>
                           <input
                             type="date"
                             id="catchup-start"
                             name="catchup-start"
-                            :value="todaysDate"
+                            v-model='pipeline.startDate'
                             required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
                             min="2000-01-01"
                             :max="todaysDate">
+                            <a
+                              class="button is-interactive-primary is-outlined is-small"
+                              @click="dropdownForceClose();">
+                              Set
+                            </a>
                         </div>
                       </div>
                     </div>
@@ -202,7 +209,15 @@ export default {
       this.pipeline.interval = this.intervalOptions[0];
     },
     save() {
+      /**
+       * TODO
+       * 1. add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
+       * 2. validate Set button for startDate + UI
+       *  */
       console.log('save:', this.pipeline);
+    },
+    setCatchUpDateToNone() {
+      this.pipeline.startDate = 'None';
     },
   },
 };
