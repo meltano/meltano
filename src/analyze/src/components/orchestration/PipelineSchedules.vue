@@ -88,7 +88,7 @@
             </td>
             <td>
               <p class="control is-expanded">
-                <Dropdown label="Start Date" is-right-aligned>
+                <Dropdown label="Start Date" is-right-aligned is-full-width>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <a
                       class="dropdown-item"
@@ -142,9 +142,4 @@ export default {
 </script>
 
 <style lang="scss">
-.pipelines-table {
-  th {
-    margin: 0 auto;
-  }
-}
 </style>
