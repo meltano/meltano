@@ -190,7 +190,7 @@ test_e2e_edge:
     IMAGE_TAG: edge
   only:
     - master
-  except::
+  except:
     - tags
 
 test_e2e:
