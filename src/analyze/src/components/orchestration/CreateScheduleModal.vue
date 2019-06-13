@@ -25,13 +25,20 @@
             <tr>
               <th>
                 <p class="control is-expanded">
-                  <input class="input" type="text" placeholder="Name">
+                  <input
+                    class="input"
+                    type="text"
+                    @focus="$event.target.select()"
+                    v-model='pipeline.name'
+                    placeholder="Name">
                 </p>
               </th>
               <td>
                 <p class="control is-expanded">
                   <span class="select is-fullwidth">
-                    <select>
+                    <select
+                      v-model="pipeline.extractor"
+                      :disabled='!getHasInstalledPluginsOfType("extractors")'>
                       <option
                         v-for="extractor in installedPlugins.extractors"
                         :key='extractor.name'>{{extractor.name}}</option>
@@ -42,7 +49,9 @@
               <td>
                 <p class="control is-expanded">
                   <span class="select is-fullwidth">
-                    <select>
+                    <select
+                      v-model="pipeline.loader"
+                      :disabled='!getHasInstalledPluginsOfType("loaders")'>
                       <option
                         v-for="loader in installedPlugins.loaders"
                         :key='loader.name'>{{loader.name}}</option>
@@ -53,10 +62,10 @@
               <td>
                 <p class="control">
                   <span class="select is-fullwidth">
-                    <select>
-                      <option>Skip</option>
-                      <option>Only</option>
-                      <option>Run</option>
+                    <select v-model="pipeline.transform">
+                      <option>skip</option>
+                      <option>only</option>
+                      <option>run</option>
                     </select>
                   </span>
                 </p>
@@ -64,8 +73,7 @@
               <td>
                 <p class="control is-expanded">
                   <span class="select is-fullwidth">
-                    <select>
-                      <option>None</option>
+                    <select v-model="pipeline.interval">
                       <option>@once</option>
                       <option>@hourly</option>
                       <option>@daily</option>
@@ -113,7 +121,9 @@
           class="button"
           @click="close">Cancel</button>
         <button
-          class='button is-interactive-primary'>Save</button>
+          class='button is-interactive-primary'
+          :disabled="!isSaveable"
+          @click='save'>Save</button>
       </footer>
     </div>
   </div>
@@ -121,7 +131,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import Dropdown from '@/components/generic/Dropdown';
 
@@ -133,15 +143,34 @@ export default {
     Dropdown,
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins');
+    this.$store.dispatch('plugins/getInstalledPlugins')
+      .then(this.prefillForm);
   },
   computed: {
+    ...mapGetters('plugins', [
+      'getHasInstalledPluginsOfType',
+    ]),
     ...mapState('plugins', [
       'installedPlugins',
     ]),
+    isSaveable() {
+      return true;
+    },
     todaysDate() {
       return utils.getTodayYYYYMMDD();
     },
+  },
+  data() {
+    return {
+      pipeline: {
+        name: '',
+        extractor: '',
+        loader: '',
+        transform: '',
+        interval: '',
+        startDate: 'None',
+      },
+    };
   },
   methods: {
     close() {
@@ -150,6 +179,15 @@ export default {
       } else {
         this.$router.push({ name: 'schedule' });
       }
+    },
+    prefillForm() {
+      // TODO implement an intelligent prefill approach
+      this.pipeline.name = `Default-${this.todaysDate}`;
+      this.pipeline.extractor = this.installedPlugins.extractors[0].name;
+      this.pipeline.loader = this.installedPlugins.loaders[0].name;
+    },
+    save() {
+      console.log('save:', this.pipeline);
     },
   },
 };
