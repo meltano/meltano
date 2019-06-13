@@ -145,7 +145,7 @@ publish:
     - twine upload dist/*
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
 
 
 .review:
@@ -186,7 +186,7 @@ hub_meltano: &docker_hub_publish
     - docker push $IMAGE_NAME:latest
   only:
     variables:
-      - $CI_COMMIT_TAG
+      - $CI_COMMIT_TAG =~ /^v*/
 
 .production:
   image: silvs/kubectl:latest
