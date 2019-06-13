@@ -14,7 +14,7 @@ export default {
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'schedule', routeMatches: ['schedule'] },
+        { name: 'schedule', routeMatches: ['schedule', 'createSchedule'] },
       ],
     };
   },
@@ -146,6 +146,9 @@ export default {
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('schedule') }">
           <router-view></router-view>
+          <div v-if='isModal'>
+            <router-view name='createSchedule'></router-view>
+          </div>
         </div>
       </div>
 

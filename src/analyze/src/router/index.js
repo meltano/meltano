@@ -2,6 +2,7 @@ import Router from 'vue-router';
 
 import AnalyzeModels from '@/components/designs/AnalyzeModels';
 import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
+import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
@@ -102,7 +103,23 @@ const router = new Router({
         {
           path: 'schedule',
           name: 'schedule',
-          component: PipelineSchedules,
+          components: {
+            default: PipelineSchedules,
+          },
+          meta: {
+            isModal: false,
+          },
+        },
+        {
+          path: 'schedule/create',
+          name: 'createSchedule',
+          components: {
+            default: PipelineSchedules,
+            createSchedule: CreateScheduleModal,
+          },
+          meta: {
+            isModal: true,
+          },
         },
       ],
     },

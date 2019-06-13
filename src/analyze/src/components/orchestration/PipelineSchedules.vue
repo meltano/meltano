@@ -19,7 +19,30 @@
 
     <br>
 
+    <div class="columns is-vcentered">
+
+      <div class="column">
+        <h2 class='title is-5'>Existing</h2>
+      </div>
+
+      <div class="column">
+        <div class="field is-pulled-right">
+
+          <p class="control">
+            <button
+              class="button is-interactive-primary"
+              @click="createPipeline();">
+              <span>Create</span>
+            </button>
+          </p>
+
+        </div>
+      </div>
+
+    </div>
+
     <div class="box">
+
       <table class="table pipelines-table is-fullwidth">
         <thead>
           <tr>
@@ -149,11 +172,19 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
+    ...mapState('configuration', [
+      'pipelines',
+    ]),
     ...mapState('plugins', [
       'installedPlugins',
     ]),
     todaysDate() {
       return utils.getTodayYYYYMMDD();
+    },
+  },
+  methods: {
+    createPipeline() {
+      this.$router.push({ name: 'createSchedule' });
     },
   },
 };

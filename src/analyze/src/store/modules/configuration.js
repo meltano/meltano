@@ -7,6 +7,7 @@ const state = {
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
+  pipelines: [],
 };
 
 const getters = {
