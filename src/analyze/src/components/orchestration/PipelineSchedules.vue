@@ -74,7 +74,7 @@
                 <p class='has-text-centered'>{{pipeline.interval}}</p>
               </td>
               <td>
-                <p class='has-text-centered'>{{pipeline.startDate}}</p>
+                <p class='has-text-centered'>{{pipeline.startDate || 'None'}}</p>
               </td>
               <td>
                 <div class="buttons is-right">

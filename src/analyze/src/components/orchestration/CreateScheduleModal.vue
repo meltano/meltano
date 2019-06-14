@@ -250,11 +250,10 @@ export default {
         ? this.intervalOptions[0] : '';
     },
     save() {
-      /**
-       * TODO
-       * 1. ensure date is in proper format or handle on backend?
-       *  */
-      this.$store.dispatch('configuration/savePipelineSchedule', this.pipeline);
+      const pipeline = Object.assign({}, this.pipeline);
+      pipeline.startDate = this.pipeline.startDate === 'None'
+        ? '' : new Date(this.pipeline.startDate).toISOString();
+      this.$store.dispatch('configuration/savePipelineSchedule', pipeline);
       this.close();
     },
     setCatchUpDateToNone() {

@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
+from meltano.core.schedule_service import ScheduleService
 from meltano.core.select_service import SelectService
-
 from meltano.cli.add import extractor
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
@@ -292,10 +294,22 @@ def get_pipeline_schedules():
     """
     endpoint for getting a the pipeline schedules
     """
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedules = schedule_service.schedules()
 
-    # TODO get persisted pipeline schedules
+    cleaned_schedules = []
+    for schedule in list(schedules):
+        cleaned_schedules.append({
+            "name": schedule.name,
+            "extractor": schedule.extractor,
+            "loader": schedule.loader,
+            "transform": schedule.transform,
+            "interval": schedule.interval,
+            "startDate": schedule.start_date
+        })
 
-    return jsonify([])
+    return jsonify(cleaned_schedules)
 
 
 @orchestrationsBP.route("/save/pipeline_schedule", methods=["POST"])
@@ -303,15 +317,27 @@ def save_pipeline_schedule() -> Response:
     """
     endpoint for persisting a pipeline schedule
     """
-
     incoming = request.get_json()
-    schedule_name = incoming["name"]
-    schedule_extractor = incoming["extractor"]
-    schedule_loader = incoming["loader"]
-    schedule_transform = incoming["transform"]
-    schedule_interval = incoming["interval"]
-    schedule_startDate = incoming["startDate"]
+    name = incoming["name"]
+    extractor = incoming["extractor"]
+    loader = incoming["loader"]
+    transform = incoming["transform"]
+    interval = incoming["interval"]
+    start_date = incoming["startDate"]
 
-    # TODO persist strategy
+    start_date_arg = None
+    if start_date:
+        start_date_arg = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.000Z')
+
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedule = schedule_service.add(
+        name,
+        extractor,
+        loader,
+        transform,
+        interval,
+        start_date_arg
+    )
 
     return jsonify(incoming)
