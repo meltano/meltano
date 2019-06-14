@@ -39,7 +39,9 @@
                 <p class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{ 'is-interactive-secondary': pipeline.extractor }">
+                    :class="{
+                      'is-interactive-secondary': pipeline.extractor,
+                      'is-loading': !pipeline.extractor }">
                     <select
                       :class="{ 'has-text-interactive-secondary': pipeline.extractor }"
                       v-model="pipeline.extractor"
@@ -55,7 +57,9 @@
                 <p class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{ 'is-interactive-secondary': pipeline.loader }">
+                    :class="{
+                      'is-interactive-secondary': pipeline.loader,
+                      'is-loading': !pipeline.loader }">
                     <select
                       :class="{ 'has-text-interactive-secondary': pipeline.loader }"
                       v-model="pipeline.loader"
@@ -71,7 +75,9 @@
                 <p class="control">
                   <span
                     class="select is-fullwidth"
-                    :class="{ 'is-interactive-secondary': pipeline.transform }">
+                    :class="{
+                      'is-interactive-secondary': pipeline.transform,
+                      'is-loading': !pipeline.transform }">
                     <select
                       :class="{ 'has-text-interactive-secondary': pipeline.transform }"
                       v-model="pipeline.transform">
@@ -86,7 +92,9 @@
                 <p class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{ 'is-interactive-secondary': pipeline.interval }">
+                    :class="{
+                      'is-interactive-secondary': pipeline.interval,
+                      'is-loading': !pipeline.interval }">
                     <select
                       :class="{ 'has-text-interactive-secondary': pipeline.interval }"
                       v-model="pipeline.interval">
@@ -232,10 +240,14 @@ export default {
     prefillForm() {
       // TODO implement an intelligent prefill approach
       this.pipeline.name = `Default-${this.todaysDate}`;
-      this.pipeline.extractor = this.installedPlugins.extractors[0].name;
-      this.pipeline.loader = this.installedPlugins.loaders[0].name;
-      this.pipeline.transform = this.transformOptions[0];
-      this.pipeline.interval = this.intervalOptions[0];
+      this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
+        ? this.installedPlugins.extractors[0].name : '';
+      this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
+        ? this.installedPlugins.loaders[0].name : '';
+      this.pipeline.transform = !_.isEmpty(this.transformOptions)
+        ? this.transformOptions[0] : '';
+      this.pipeline.interval = !_.isEmpty(this.intervalOptions)
+        ? this.intervalOptions[0] : '';
     },
     save() {
       /**
