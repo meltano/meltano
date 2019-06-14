@@ -101,14 +101,15 @@
                             id="catchup-start"
                             name="catchup-start"
                             v-model='pipeline.startDate'
-                            required pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-                            min="2000-01-01"
-                            :max="todaysDate">
-                            <a
-                              class="button is-interactive-primary is-outlined is-small"
-                              @click="dropdownForceClose();">
-                              Set
-                            </a>
+                            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
+                            :min='`${minYear}-01-01`'
+                            :max='todaysDate'>
+                          <button
+                            class="button is-interactive-primary is-outlined is-small"
+                            :disabled='!isStartDateSettable'
+                            @click="dropdownForceClose();">
+                            Set
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -163,12 +164,30 @@ export default {
       _.forOwn(this.pipeline, val => hasOwns.push(val));
       return hasOwns.find(val => val === '') === undefined;
     },
+    isStartDateSettable() {
+      return this.isStartDateValid && this.isStartDateMinYearValid;
+    },
+    isStartDateValid() {
+      return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
+    },
+    isStartDateMinYearValid() {
+      return parseInt(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
+    },
     todaysDate() {
       return utils.getTodayYYYYMMDD();
     },
   },
   data() {
     return {
+      intervalOptions: [
+        '@once',
+        '@hourly',
+        '@daily',
+        '@weekly',
+        '@monthly',
+        '@yearly',
+      ],
+      minYear: '2000',
       pipeline: {
         name: '',
         extractor: '',
@@ -181,14 +200,6 @@ export default {
         'skip',
         'run',
         'only',
-      ],
-      intervalOptions: [
-        '@once',
-        '@hourly',
-        '@daily',
-        '@weekly',
-        '@monthly',
-        '@yearly',
       ],
     };
   },
@@ -212,7 +223,6 @@ export default {
       /**
        * TODO
        * 1. add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
-       * 2. validate Set button for startDate + UI
        *  */
       console.log('save:', this.pipeline);
     },

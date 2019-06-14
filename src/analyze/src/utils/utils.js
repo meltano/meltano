@@ -121,6 +121,11 @@ export default {
     return this.formatDateYYYYMMDD(new Date());
   },
 
+  getIsDateStringInFormatYYYYMMDD(dateString) {
+    const result = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(dateString);
+    return result;
+  },
+
   formatDateYYYYMMDD(date) {
     const d = new Date(date);
     let month = `${d.getMonth() + 1}`;
