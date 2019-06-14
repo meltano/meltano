@@ -240,9 +240,8 @@ export default {
     save() {
       /**
        * TODO
-       * 1. make issue, don't do now = add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
-       * 2. ensure date is in proper format or handle on backend?
-       * 3. backend endpoint round trip
+       * 1. ensure date is in proper format or handle on backend?
+       * 2. backend endpoint round trip
        *  */
     },
     setCatchUpDateToNone() {

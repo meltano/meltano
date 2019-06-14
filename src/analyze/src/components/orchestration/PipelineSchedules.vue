@@ -42,7 +42,7 @@
     </div>
 
     <div v-if='getHasPipelines' class="box">
-      <table class="table pipelines-table is-fullwidth">
+      <table class="table pipelines-table is-fullwidth is-narrow is-hoverable">
         <thead>
           <tr>
             <th>Name</th>
@@ -57,7 +57,36 @@
         <tbody>
 
           <template v-for="pipeline in pipelines">
-            <div :key='pipeline.id'>Pipeline {{pipeline.id}}</div>
+            <tr :key='pipeline.name'>
+              <td>
+                <p>{{pipeline.name}}</p>
+              </td>
+              <td>
+                <p class='has-text-centered'>{{pipeline.extractor}}</p>
+              </td>
+              <td>
+                <p class='has-text-centered'>{{pipeline.loader}}</p>
+              </td>
+              <td>
+                <p class='has-text-centered'>{{pipeline.transform}}</p>
+              </td>
+              <td>
+                <p class='has-text-centered'>{{pipeline.interval}}</p>
+              </td>
+              <td>
+                <p class='has-text-centered'>{{pipeline.startDate}}</p>
+              </td>
+              <td>
+                <div class="buttons is-right">
+                  <button
+                    class="button is-small tooltip is-tooltip-left"
+                    disabled
+                    data-tooltip="Not implemented">Edit</button>
+                </div>
+              </td>
+
+            </tr>
+
           </template>
 
         </tbody>
@@ -98,4 +127,9 @@ export default {
 </script>
 
 <style lang="scss">
+.pipelines-table {
+  td {
+    vertical-align: middle;
+  }
+}
 </style>
