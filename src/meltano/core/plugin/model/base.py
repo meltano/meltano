@@ -1,8 +1,8 @@
 from meltano.core.behavior.hookable import HookObject, hook
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginInstall, PluginType
 
 
-class ModelPlugin(Plugin, HookObject):
+class ModelPlugin(PluginInstall):
     __plugin_type__ = PluginType.MODELS
 
     def __init__(self, *args, **kwargs):

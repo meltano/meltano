@@ -45,4 +45,5 @@ class ProjectAddService:
         else:
             raise PluginNotSupportedException()
 
-        return plugin_factory(plugin.type, plugin.canonical())
+        # TODO: this returns the installed version
+        return plugin_factory(plugin.type, plugin.as_installed().canonical())

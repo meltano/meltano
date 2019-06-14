@@ -9,10 +9,11 @@ from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin.setting_service import PluginSettingsService
 from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginRef, PluginType
 
 
 PROJECT_NAME = "a_meltano_project"
@@ -21,18 +22,23 @@ PROJECT_NAME = "a_meltano_project"
 @pytest.fixture()
 def discovery():
     return {
-        "version": 0,
-        str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
-        str(PluginType.LOADERS): [{"name": "target-mock", "pip_url": "target-mock"}],
+        "version": 2,
+        str(PluginType.EXTRACTORS): [{
+            "name": "tap-mock",
+            "namespace": "pytest",
+            "pip_url": "tap-mock",
+            "settings": [{"name": "test", "value": "mock"}]
+        }],
+        str(PluginType.LOADERS): [{"name": "target-mock", "namespace": "pytest", "pip_url": "target-mock"}],
         str(PluginType.TRANSFORMERS): [
-            {"name": "transformer-mock", "pip_url": "transformer-mock"}
+            {"name": "transformer-mock", "namespace": "pytest", "pip_url": "transformer-mock"}
         ],
         str(PluginType.TRANSFORMS): [
-            {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+            {"name": "tap-mock-transform", "namespace": "pytest", "pip_url": "tap-mock-transform"}
         ],
-        str(PluginType.MODELS): [{"name": "model-mock", "pip_url": "model-mock"}],
+        str(PluginType.MODELS): [{"name": "model-mock", "namespace": "pytest", "pip_url": "model-mock"}],
         str(PluginType.ORCHESTRATORS): [
-            {"name": "orchestrator-mock", "pip_url": "orchestrator-mock"}
+            {"name": "orchestrator-mock", "namespace": "pytest", "pip_url": "orchestrator-mock"}
         ],
     }
 
@@ -57,6 +63,11 @@ def project_init_service():
 @pytest.fixture(scope="class")
 def plugin_install_service(project):
     return PluginInstallService(project)
+
+
+@pytest.fixture(scope="class")
+def plugin_settings_service(project):
+    return PluginSettingsService(project, PluginRef(PluginType.EXTRACTORS, 'tap-mock'))
 
 
 @pytest.fixture(scope="class")
@@ -107,22 +118,33 @@ def project(test_dir, project_init_service):
         .open("r")
         .read()
     )
+
     discovery_dict = yaml.load(discovery_yaml)
-    discovery_dict[PluginType.EXTRACTORS].append(
-        {"name": "tap-mock", "pip_url": "tap-mock"}
-    )
+    discovery_dict[PluginType.EXTRACTORS].append({
+        "name": "tap-mock",
+        "namespace": "pytest",
+        "pip_url": "tap-mock",
+        "settings": [{"name": "test", "value": "mock"}]
+    })
     discovery_dict[PluginType.LOADERS].append(
-        {"name": "target-mock", "pip_url": "target-mock"}
+        {"name": "target-mock",
+         "namespace": "pytest",
+         "pip_url": "target-mock"}
     )
     discovery_dict[PluginType.TRANSFORMERS].append(
-        {"name": "transformer-mock", "pip_url": "transformer-mock"}
+        {"name": "transformer-mock",
+         "namespace": "pytest",
+         "pip_url": "transformer-mock"}
     )
     discovery_dict[PluginType.TRANSFORMS].append(
-        {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
+        {"name": "tap-mock-transform",
+         "namespace": "pytest",
+         "pip_url": "tap-mock-transform"}
     )
     discovery_dict[PluginType.MODELS].append(
         {
             "name": "model-gitlab",
+            "namespace": "pytest",
             "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
         }
     )

@@ -4,7 +4,7 @@ import asyncio
 import os
 
 from .project import Project
-from .plugin import Plugin
+from .plugin import PluginInstall
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .venv_service import VenvService
@@ -23,7 +23,7 @@ class PluginInvoker:
     def __init__(
         self,
         project: Project,
-        plugin: Plugin,
+        plugin: PluginInstall,
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,

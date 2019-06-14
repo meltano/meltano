@@ -9,7 +9,7 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 
 from meltano.core.project import Project
-from meltano.core.plugin import Plugin
+from meltano.core.plugin import PluginInstall
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
@@ -85,7 +85,7 @@ class UIAvailableWorker(threading.Thread):
 
 
 class AirflowWorker(threading.Thread):
-    def __init__(self, project: Project, airflow: Plugin = None):
+    def __init__(self, project: Project, airflow: PluginInstall = None):
         super().__init__()
 
         self.project = project

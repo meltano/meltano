@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 from meltano.core.utils import nest
 from .project import Project
-from .plugin import Plugin, PluginType
+from .plugin import Plugin, PluginInstall, PluginType
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
@@ -22,6 +22,7 @@ class ConfigService:
             plugins = nest(meltano_yml, "plugins")
             plugins[plugin.type] = plugins.get(plugin.type, [])
 
+        # TODO: ensure __eq__ between Plugin and PluginInstall (via PluginRef)
         if plugin in self.plugins():
             logging.warning(
                 f"{plugin.name} is already present, use `meltano install` to install it."
@@ -29,7 +30,7 @@ class ConfigService:
             return
 
         with self.project.meltano_update() as meltano_yml:
-            meltano_yml["plugins"][plugin.type].append(plugin.canonical())
+            meltano_yml["plugins"][plugin.type].append(plugin.as_installed().canonical())
 
     def has_plugin(self, plugin_name: str):
         try:
@@ -71,7 +72,7 @@ class ConfigService:
             open(self.project.meltano_dir(f".database_{database_name}.yml"))
         )
 
-    def plugins(self) -> List[Plugin]:
+    def plugins(self) -> List[PluginInstall]:
         """Parse the meltano.yml file and return it as `Plugin` instances."""
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.

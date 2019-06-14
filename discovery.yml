@@ -1,251 +1,249 @@
 version: 2.0
 extractors:
   - name: tap-google-analytics
+    namespace: google-analytics
     pip_url: "git+https://gitlab.com/meltano/tap-google-analytics.git"
-    config:
-      key_file_location: "$GOOGLE_ANALYTICS_API_CLIENT_SECRETS"
-      view_id: "$GOOGLE_ANALYTICS_API_VIEW_ID"
-      reports: "$GOOGLE_ANALYTICS_API_REPORTS"
-      start_date: "$GOOGLE_ANALYTICS_API_START_DATE"
-      end_date: "$GOOGLE_ANALYTICS_API_END_DATE"
+    settings:
+      - name: key_file_location
+        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
+        kind: file
+      - name: view_id
+      - name: reports
+      - name: start_date
+        kind: date_iso8601
+      - name: end_date
+        kind: date_iso8601
   - name: tap-gitlab
+    namespace: gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
-    config:
-      - key: GITLAB_API_URL
+    settings:
+      - name: api_url
         label: GitLab API URL
-        name: api_url
         value: "https://gitlab.com/api/v4"
-      - key: GITLAB_API_TOKEN
-        name: private_token
-        value: ~
-      - key: GITLAB_API_GROUPS
-        name: groups
-        value: ~
-      - key: GITLAB_API_PROJECTS
-        name: projects
-        value: ~
-      - key: GITLAB_API_START_DATE
-        name: start_date
-        value: ~
+      - name: private_token
+      - name: groups
+      - name: projects
+      - name: start_date
         kind: date_iso8601
       - name: ultimate_license
         value: false
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
+    namespace: zendesk
     pip_url: "tap-zendesk"
-    config:
-      - key: ZENDESK_EMAIL
-        name: email
-        value: ''
-      - key: ZENDESK_API_TOKEN
-        name: api_token
-        value: ''
-      - key: ZENDESK_SUBDOMAIN
-        name: subdomain
-        value: ''
-      - key: ZENDESK_START_DATE
-        name: start_date
+    settings:
+      - name: email
+        kind: email
+      - name: api_token
+        label: Zendesk API Token
+      - name: subdomain
+        label: Zendesk Domain (<subdomain>.zendesk.com)
+      - name: start_date
         kind: date_iso8601
   - name: tap-zuora
+    namespace: zuora
     pip_url: "tap-zuora"
-    config:
-      - key: ZUORA_USERNAME
-        name: username
-      - key: ZUORA_PASSWOR
-        name: password
-      - key: ZUORA_API_TYPE
-        name: api_type
-      - key: ZUORA_PARTNER_ID
-        name: partner_id
-      - key: ZUORA_API_TOKEN
-        name: api_token
-      - key: ZUORA_START_DATE
-        name: start_date
-      - key: ZUORA_SANDBOX
-        name: sandbox
+    settings:
+      - name: username
+      - name: password
+        kind: password
+      - name: api_type
+      - name: partner_id
+      - name: api_token
+      - name: start_date
+        kind: date_iso8601
+      - name: sandbox
+        kind: boolean
     docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
+    namespace: marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
-    config:
-      - key: MARKETO_ENDPOINT
-        name: endpoint
-      - key: MARKETO_IDENTITY
-        name: identity
-      - key: MARKETO_CLIENT_ID
-        name: client_id
-      - key: MARKETO_CLIENT_SECRET
-        name: client_secret
-      - key: MARKETO_START_TIME
-        name: start_time
+    settings:
+      - name: endpoint
+      - name: identity
+      - name: client_id
+      - name: client_secret
+      - { name: start_time, kind: date_iso8601 }
   - name: tap-salesforce
+    namespace: salesforce
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
-    config:
+    settings:
       # TODO: remove, should be injected from Meltano
-      - key: SFDC_API_TYPE
-        name: api_type
+      - name: api_type
         value: REST
-      - key: SFDC_CLIENT_ID
-        name: client_id
-      - key: SFDC_USERNAME
-        name: username
-      - key: SFDC_PASSWORD
-        name: password
-      - key: SFDC_SECURITY_TOKEN
-        name: security_token
-      - key: SFDC_SELECT_ALL_FIELDS
-        name: select_fields_by_default
+        hidden: true
+      - name: client_id
+      - name: username
+      - name: password
+      - name: security_token
+      - name: select_fields_by_default
         value: true
-      - key: SFDC_START_DATE
-        name: start_date
+        kind: boolean
+        hidden: true
+      - name: start_date
+        kind: date_iso8601
   - name: tap-mongodb
+    namespace: mongodb
     pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
-    config:
-      - key: MONGODB_HOST
-        name: host
-      - key: MONGODB_PORT
-        name: port
-      - key: MONGODB_USERNAME
-        name: user
-      - key: MONGODB_PASSWORD
-        name: password
-      - key: MONGODB_DBNAME
-        name: dbname
+    settings:
+      - name: host
+      - name: port
+        value: 27017
+      - name: user
+      - name: password
+        kind: password
+      - name: dbname
   - name: tap-stripe
+    namespace: stripe
     pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
-    config:
-      - key: STRIPE_API_KEY
-        name: client_secret
-      - key: STRIPE_START_DATE
-        name: start_date
-      - key: STRIPE_ACCOUNT_ID
-        name: account_id
+    settings:
+      - name: client_secret
+      - name: start_date
+        kind: date_iso8601
+      - name: account_id
   - name: tap-fastly
+    namespace: fastly
     pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
-    config:
-      - key: FASTLY_API_TOKEN
-        name: api_token
-      - key: FASTLY_START_DATE
-        name: start_date
+    settings:
+      - name: api_token
+      - name: start_date
+        kind: date_iso8601
   - name: tap-carbon-intensity
+    namespace: carbon
     pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
   - name: tap-csv
+    namespace: tap-csv
     pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
-    config:
+    settings:
       - key: TAP_CSV_FILES_DEFINITION
         name: csv_files_definition
         kind: files
     docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
+    namespace: csv
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
-    config:
-      - key: CSV_DELIMITER
-        name: delimiter"
+    settings:
+      - name: delimiter
         value: "\t"
-      - key: CSV_QUOTECHAR
-        name: quotechar
+      - name: quotechar
         value: "'"
   - name: target-snowflake
+    namespace: snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
-    config:
-      - key: SF_ACCOUNT
-        name: account
-      - key: SF_USER
-        name: username
-      - key: SF_PASSWORD
-        name: password
-      - key: SF_ROLE
-        name: role
-      - key: SF_DATABASE
-        name: database
-      - key: SF_SCHEMA
-        name: schema
-      - key: SF_WAREHOUSE
-        name: warehouse
+    # TODO: in reality this should be a Meltano database concept
+    # instead of a granular connection. We could use an existing
+    # connection from analyze.
+    settings:
+      - name: account
+      - name: username
+      - name: password
+        kind: password
+      - name: role
+      - name: database
+      - name: schema
+      - name: warehouse
   - name: target-postgres
+    namespace: pg
     pip_url: "git+https://github.com/meltano/target-postgres.git"
-    config:
-      - key: PG_ADDRESS
-        name: host
-      - key: PG_USERNAME
-        name: user
-      - key: PG_PORT
-        name: port
-      - key: PG_PASSWORD
-        name: password
-      - key: PG_DATABASE
-        name: dbname
-      - key: PG_SCHEMA
-        name: schema
+    settings:
+      - name: host
+        env: PG_ADDRESS
+      - name: user
+        env: PG_USERNAME
+      - name: port
+      - name: password
+        kind: password
+      - name: dbname
+        env: PG_DATABASE
+      - name: schema
   - name: target-sqlite
+    namespace: sqlite
     pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
-    config:
-      - key: SQLITE_DATABASE
-        name: database
+    settings:
+      - name: database
 transformers:
   - name: dbt
+    namespace: dbt
     pip_url: dbt
 transforms:
   - name: tap-carbon-intensity
+    namespace: carbon
     pip_url: "https://gitlab.com/meltano/dbt-tap-carbon-intensity.git"
     vars:
       entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
       generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
       region_table: "{{ env_var('PG_SCHEMA') }}.region"
   - name: tap-salesforce
+    namespace: salesforce
     pip_url: "https://gitlab.com/meltano/dbt-tap-salesforce.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
   - name: tap-gitlab
+    namespace: gitlab
     pip_url: "https://gitlab.com/meltano/dbt-tap-gitlab.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
       ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE') }}"
   - name: tap-stripe
+    namespace: stripe
     pip_url: "https://gitlab.com/meltano/dbt-tap-stripe.git"
     vars:
       livemode: false
       schema: "{{ env_var('PG_SCHEMA') }}"
   - name: tap-zuora
+    namespace: zuora
     pip_url: "https://gitlab.com/meltano/dbt-tap-zuora.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
   - name: tap-zendesk
+    namespace: zendesk
     pip_url: "https://gitlab.com/meltano/dbt-tap-zendesk.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
   - name: tap-google-analytics
+    namespace: google-analytics
     pip_url: "https://gitlab.com/meltano/dbt-tap-google-analytics.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
 models:
   - name: model-carbon-intensity-sqlite
+    namespace: carbon
     pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity-sqlite.git"
   - name: model-carbon-intensity
+    namespace: carbon
     pip_url: "git+https://gitlab.com/meltano/model-carbon-intensity.git"
   - name: model-salesforce
+    namespace: salesforce
     pip_url: "git+https://gitlab.com/meltano/model-salesforce.git"
   - name: model-gitflix
+    namespace: gitflix
     pip_url: "git+https://gitlab.com/jschatz1/model-gitflix.git"
   - name: model-zendesk
+    namespace: zendesk
     pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
   - name: model-gitlab
+    namespace: gitlab
     pip_url: "git+https://gitlab.com/meltano/model-gitlab.git"
   - name: model-gitlab-ultimate
     pip_url: "git+https://gitlab.com/meltano/model-gitlab-ultimate.git"
   - name: model-stripe
+    namespace: stripe
     pip_url: "git+https://gitlab.com/meltano/model-stripe.git"
   - name: model-zuora
+    namespace: zuora
     pip_url: "git+https://gitlab.com/meltano/model-zuora.git"
   - name: model-google-analytics
+    namespace: google-analytics
     pip_url: "git+https://gitlab.com/meltano/model-google-analytics.git"
 orchestrators:
   - name: airflow
+    namespace: airflow
     pip_url: "apache-airflow==1.10.2"
-    config:
+    settings:
       - name: core.dags_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/dags
-        key: AIRFLOW__CORE__DAGS_FOLDER
+        env: AIRFLOW__CORE__DAGS_FOLDER
       - name: core.plugins_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
         key: AIRFLOW__CORE__DAGS_FOLDER

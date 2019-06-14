@@ -18,7 +18,9 @@ def repl():
     c.InteractiveShellApp.exec_lines = [
         'print("\\nBooting import Meltano REPL\\n")',
         'from meltano.core.project import Project',
-        'from meltano.core.plugin import Plugin',
+        'from meltano.core.plugin import PluginRef, PluginInstall, Plugin',
+        'from meltano.core.plugin.setting import PluginSetting',
+        'from meltano.core.plugin.setting_service import PluginSettingsService',
         'from meltano.core.config_service import ConfigService',
         'from meltano.core.db import project_engine',
         '%autoreload 2',

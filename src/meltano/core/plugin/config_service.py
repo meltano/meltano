@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from meltano.core.project import Project
-from meltano.core.plugin import Plugin
+from meltano.core.plugin import PluginInstall
 
 
 class PluginConfigService:
@@ -14,7 +14,7 @@ class PluginConfigService:
     set of files that should be stubbed using environment variables.
     """
 
-    def __init__(self, project: Project, plugin: Plugin, config_dir=None, run_dir=None):
+    def __init__(self, project: Project, plugin: PluginInstall, config_dir=None, run_dir=None):
         self.project = project
         self.plugin = plugin
 

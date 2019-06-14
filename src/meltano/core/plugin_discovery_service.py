@@ -2,13 +2,15 @@ import os
 import yaml
 import requests
 import logging
-from typing import Dict, List, Optional
-from itertools import groupby
+from copy import deepcopy
+from typing import Dict, Iterator, Optional
+from itertools import groupby, chain
 
 import meltano.core.bundle as bundle
-from .plugin import Plugin, PluginType
+from .plugin import Plugin, PluginInstall, PluginType
 from .plugin.factory import plugin_factory
 from .behavior.versioned import Versioned, IncompatibleVersionError
+from .config_service import ConfigService
 
 
 class PluginNotFoundError(Exception):
@@ -31,10 +33,13 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService(Versioned):
-    __version__ = 1
+    __version__ = 2
 
-    def __init__(self, project, discovery: Optional[Dict] = None):
+    def __init__(self, project,
+                 config_service: ConfigService = None,
+                 discovery: Optional[Dict] = None):
         self.project = project
+        self.config_service = config_service or ConfigService(project)
         self._discovery = discovery
 
     @property
@@ -71,6 +76,7 @@ class PluginDiscoveryService(Versioned):
             logging.fatal(
                 "This version of Meltano cannot parse the plugins manifest, please update Meltano."
             )
+            self._discovery = None
             raise
 
     def fetch_discovery(self):
@@ -112,18 +118,41 @@ class PluginDiscoveryService(Versioned):
     def cached_discovery_file(self):
         return self.project.meltano_dir("cache", "discovery.yml")
 
-    def plugins(self) -> List[Plugin]:
+    def plugins(self) -> Iterator[Plugin]:
+        return chain(self.custom_plugins(), self.discovery_plugins())
+
+    def discovery_plugins(self) -> Iterator[Plugin]:
         """Parse the discovery file and returns it as `Plugin` instances."""
+
         # this will parse the discovery file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
-        plugins = self.discovery.copy()
+        plugins = deepcopy(self.discovery)
         plugins.pop("version", 1)
 
         return (
-            plugin_factory(plugin_type, plugin_def)
+            Plugin(plugin_type,
+                   plugin_def.pop('name'),
+                   plugin_def.pop('namespace'),
+                   plugin_def.pop('pip_url'),
+                   **plugin_def)
             for plugin_type, plugin_defs in plugins.items()
-            for plugin_def in sorted(plugin_defs, key=lambda k: k["name"])
-            if PluginType.value_exists(plugin_type)
+            for plugin_def in plugin_defs
+        )
+
+    def custom_plugins(self) -> Iterator[Plugin]:
+        """Parse the meltano.yml and return all defined `Plugin`."""
+
+        plugins = deepcopy(self.project.meltano.get('plugins', {}))
+
+        return (
+            Plugin(plugin_type,
+                   plugin_def.pop('name'),
+                   plugin_def.pop('namespace'),
+                   plugin_def.pop('pip_url'),
+                   **plugin_def)
+            for plugin_type, plugin_defs in plugins.items()
+            for plugin_def in plugin_defs
+            if 'namespace' in plugin_def
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):

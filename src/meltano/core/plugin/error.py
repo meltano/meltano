@@ -1,4 +1,4 @@
-from . import Plugin
+from . import PluginRef
 
 
 class PluginMissingError(Exception):
@@ -7,7 +7,7 @@ class PluginMissingError(Exception):
     """
 
     def __init__(self, plugin_or_name):
-        if isinstance(plugin_or_name, Plugin):
+        if isinstance(plugin_or_name, PluginRef):
             self.plugin_name = plugin_or_name.name
         else:
             self.plugin_name = plugin_or_name

@@ -8,19 +8,6 @@ from meltano.core.utils import nest
 from meltano.core.db import SystemModel
 
 
-def infer_env(ctx):
-    process = lambda s: s.replace(".", "__").upper()
-
-    name = process(ctx.current_parameters.get("name"))
-    ns = ctx.current_parameters.get("namespace")
-
-    if ns:
-        ns = process(ns)
-        return "_".join((ns, name))
-
-    return name
-
-
 class PluginSetting(SystemModel):
     __tablename__ = "plugin_settings"
 
@@ -33,7 +20,6 @@ class PluginSetting(SystemModel):
     name = Column(types.String, primary_key=True)
     namespace = Column(types.String, primary_key=True, nullable=True)
     value = Column(types.PickleType)
-    env = Column(types.String, default=infer_env)
     enabled = Column(types.Boolean, default=False)
 
     def __repr__(self):

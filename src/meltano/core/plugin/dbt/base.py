@@ -1,9 +1,9 @@
 from meltano.core.behavior.hookable import HookObject, hook
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 
 
-class DbtPlugin(Plugin, HookObject):
+class DbtPlugin(PluginInstall):
     __plugin_type__ = PluginType.TRANSFORMERS
 
     def __init__(self, *args, **kwargs):
@@ -15,7 +15,7 @@ class DbtPlugin(Plugin, HookObject):
         )
 
 
-class DbtTransformPlugin(Plugin, HookObject):
+class DbtTransformPlugin(PluginInstall):
     __plugin_type__ = PluginType.TRANSFORMS
 
     def __init__(self, *args, **kwargs):
