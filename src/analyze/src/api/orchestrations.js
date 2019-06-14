@@ -14,6 +14,14 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', 'save/configuration'), configPayload);
   },
 
+  getAllPipelineSchedules() {
+    return axios.get(utils.apiUrl('orchestrations', 'get/pipeline_schedules'));
+  },
+
+  savePipelineSchedule(schedulePayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'save/pipeline_schedule'), schedulePayload);
+  },
+
   selectEntities(extractorEntities) {
     return axios.post(utils.apiUrl('orchestrations', 'select-entities'), extractorEntities);
   },

@@ -285,3 +285,33 @@ def run_transform(topic_name, connection_name):
         "output": transform_log.decode("utf-8"),
         "status": "ok",
     }
+
+
+@orchestrationsBP.route("/get/pipeline_schedules", methods=["GET"])
+def get_pipeline_schedules():
+    """
+    endpoint for getting a the pipeline schedules
+    """
+
+    # TODO get persisted pipeline schedules
+
+    return jsonify([])
+
+
+@orchestrationsBP.route("/save/pipeline_schedule", methods=["POST"])
+def save_pipeline_schedule() -> Response:
+    """
+    endpoint for persisting a pipeline schedule
+    """
+
+    incoming = request.get_json()
+    schedule_name = incoming["name"]
+    schedule_extractor = incoming["extractor"]
+    schedule_loader = incoming["loader"]
+    schedule_transform = incoming["transform"]
+    schedule_interval = incoming["interval"]
+    schedule_startDate = incoming["startDate"]
+
+    # TODO persist strategy
+
+    return jsonify(incoming)

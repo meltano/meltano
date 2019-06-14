@@ -45,6 +45,13 @@ const actions = {
     commit('setLoaderInFocusConfiguration', {});
   },
 
+  getAllPipelineSchedules({ commit }) {
+    orchestrationsApi.getAllPipelineSchedules()
+      .then((response) => {
+        commit('setPipelines', response.data);
+      });
+  },
+
   getExtractorInFocusEntities({ commit }, extractorName) {
     commit('setHasExtractorLoadingError', false);
 
@@ -85,6 +92,13 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
     // the loader's config and we'd have to update this
+  },
+
+  savePipelineSchedule({ commit }, pipelineSchedulePayload) {
+    orchestrationsApi.savePipelineSchedule(pipelineSchedulePayload)
+      .then((response) => {
+        commit('updatePipelines', response.data);
+      });
   },
 
   selectEntities() {
@@ -157,8 +171,16 @@ const mutations = {
     state.loaderInFocusConfiguration = configuration;
   },
 
+  setPipelines(_, pipelines) {
+    state.pipelines = pipelines;
+  },
+
   toggleSelected(_, selectable) {
     Vue.set(selectable, 'selected', !selectable.selected);
+  },
+
+  updatePipelines(_, pipeline) {
+    state.pipelines.push(pipeline);
   },
 };
 

@@ -241,8 +241,9 @@ export default {
       /**
        * TODO
        * 1. ensure date is in proper format or handle on backend?
-       * 2. backend endpoint round trip
        *  */
+      this.$store.dispatch('configuration/savePipelineSchedule', this.pipeline);
+      this.close();
     },
     setCatchUpDateToNone() {
       this.pipeline.startDate = 'None';

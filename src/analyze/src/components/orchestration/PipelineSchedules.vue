@@ -106,6 +106,7 @@ import { mapGetters, mapState } from 'vuex';
 export default {
   name: 'PipelineSchedules',
   created() {
+    this.$store.dispatch('configuration/getAllPipelineSchedules');
     if (!this.getHasPipelines) {
       this.createPipeline();
     }
