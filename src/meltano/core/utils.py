@@ -2,6 +2,7 @@ import base64
 import re
 import sys
 import logging
+from datetime import datetime, date, time
 
 from copy import deepcopy
 from typing import Union, Dict, Callable
@@ -149,3 +150,12 @@ def map_dict(f: Callable, d: Dict):
 
 def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
+
+
+def coerce_datetime(d: Union[date, datetime]) -> datetime:
+    """Adds a `time` component to `d` if such a component is missing."""
+
+    if isinstance(d, datetime):
+        return d
+
+    return datetime.combine(d, time())

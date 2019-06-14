@@ -20,8 +20,9 @@ from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExists
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
+@click.option("--start-date", type=click.DateTime(), default=None)
 @project
-def schedule(project, name, extractor, loader, interval, transform, job_id):
+def schedule(project, name, extractor, loader, interval, transform, job_id, start_date):
     """
     meltano schedule SCHEDULE_NAME EXTRACTOR_NAME LOADER_NAME INTERVAL
 
@@ -36,7 +37,13 @@ def schedule(project, name, extractor, loader, interval, transform, job_id):
 
     try:
         schedule = schedule_service.add(
-            name, extractor, loader, transform, interval, MELTANO_JOB_ID=job_id or ""
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date,
+            MELTANO_JOB_ID=job_id or "",
         )
 
         tracker.track_meltano_schedule(schedule)
