@@ -80,7 +80,7 @@ When testing your contributions you may need to ensure that your various `__pyca
 ## Merge Requests
 
 :::tip Searching for something to work on?
-Start off by looking at our [Accepting Merge Request](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
+Start off by looking at our [~"Accepting Merge Request"](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
 
 Keep in mind that this is only a suggestion: all improvements are welcome.
 :::
