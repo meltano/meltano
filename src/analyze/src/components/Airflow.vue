@@ -1,15 +1,15 @@
 <template>
-<div>
+  <div>
 
-  <ClosableMessage title='Notice'>
-    <p>You are now looking at the Airflow UI. See the <a target="_blank" href="https://airflow.apache.org/ui.html">documentation</a> for more details.</p>
-  </ClosableMessage>
+    <ClosableMessage title='Notice'>
+      <p>You are now looking at the Airflow UI. See the <a target="_blank" href="https://airflow.apache.org/ui.html">documentation</a> for more details.</p>
+    </ClosableMessage>
 
-  <div class="proxy-container">
-    <iframe class="proxy" :src="airflowUrl" />
+    <div class="proxy-container">
+      <iframe class="proxy" :src="airflowUrl" />
+    </div>
+
   </div>
-
-</div>
 </template>
 <script>
 import ClosableMessage from '@/components/generic/ClosableMessage';
