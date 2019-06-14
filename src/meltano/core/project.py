@@ -2,6 +2,7 @@ import os
 import yaml
 import logging
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
@@ -76,7 +77,7 @@ class Project(Versioned):
         if not self._meltano:
             self.reload()
 
-        return self._meltano.copy()
+        return deepcopy(self._meltano)
 
     @contextmanager
     def meltano_update(self):

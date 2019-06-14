@@ -126,7 +126,7 @@ def nest(d: dict, path: str, value={}):
 
     # We need to copy the value to make sure
     # the `value` parameter is not mutated.
-    cursor[tail] = deepcopy(value)
+    cursor[tail] = cursor.get(tail, deepcopy(value))
 
     return cursor[tail]
 

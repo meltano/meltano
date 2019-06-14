@@ -18,11 +18,6 @@ class ConfigService:
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
     def add_to_file(self, plugin: Plugin):
-        with self.project.meltano_update() as meltano_yml:
-            plugins = nest(meltano_yml, "plugins")
-            plugins[plugin.type] = plugins.get(plugin.type, [])
-
-        # TODO: ensure __eq__ between Plugin and PluginInstall (via PluginRef)
         if plugin in self.plugins():
             logging.warning(
                 f"{plugin.name} is already present, use `meltano install` to install it."
@@ -30,7 +25,8 @@ class ConfigService:
             return
 
         with self.project.meltano_update() as meltano_yml:
-            meltano_yml["plugins"][plugin.type].append(plugin.as_installed().canonical())
+            plugins = nest(meltano_yml, f"plugins.{plugin.type}", value=[])
+            plugins.append(plugin.as_installed().canonical())
 
     def has_plugin(self, plugin_name: str):
         try:
@@ -73,7 +69,8 @@ class ConfigService:
         )
 
     def plugins(self) -> List[PluginInstall]:
-        """Parse the meltano.yml file and return it as `Plugin` instances."""
+        """Parse the meltano.yml file and return it as `PluginInstall` instances."""
+
         # this will parse the meltano.yml file and create an instance of the
         # corresponding `plugin_class` for all the plugins.
         return (

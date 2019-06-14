@@ -51,7 +51,12 @@ class PluginRef:
         self.type = plugin_type if isinstance(plugin_type, PluginType) else PluginType(plugin_type)
         self.name = name
 
-    # TODO: __eq__, __hash__
+    def __eq__(self, other):
+        return (self.name == other.name
+                and self.type == other.type)
+
+    def __hash__(self):
+        return hash((self.namespace, self.name))
 
 
 class PluginInstall(HookObject, PluginRef):
