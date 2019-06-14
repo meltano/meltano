@@ -27,6 +27,8 @@
                 <p class="control is-expanded">
                   <input
                     class="input"
+                    :class="{
+                      'is-interactive-secondary has-text-interactive-secondary': pipeline.name }"
                     type="text"
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
@@ -35,8 +37,11 @@
               </th>
               <td>
                 <p class="control is-expanded">
-                  <span class="select is-fullwidth">
+                  <span
+                    class="select is-fullwidth"
+                    :class="{ 'is-interactive-secondary': pipeline.extractor }">
                     <select
+                      :class="{ 'has-text-interactive-secondary': pipeline.extractor }"
                       v-model="pipeline.extractor"
                       :disabled='!getHasInstalledPluginsOfType("extractors")'>
                       <option
@@ -48,8 +53,11 @@
               </td>
               <td>
                 <p class="control is-expanded">
-                  <span class="select is-fullwidth">
+                  <span
+                    class="select is-fullwidth"
+                    :class="{ 'is-interactive-secondary': pipeline.loader }">
                     <select
+                      :class="{ 'has-text-interactive-secondary': pipeline.loader }"
                       v-model="pipeline.loader"
                       :disabled='!getHasInstalledPluginsOfType("loaders")'>
                       <option
@@ -61,8 +69,12 @@
               </td>
               <td>
                 <p class="control">
-                  <span class="select is-fullwidth">
-                    <select v-model="pipeline.transform">
+                  <span
+                    class="select is-fullwidth"
+                    :class="{ 'is-interactive-secondary': pipeline.transform }">
+                    <select
+                      :class="{ 'has-text-interactive-secondary': pipeline.transform }"
+                      v-model="pipeline.transform">
                       <option
                         v-for="transform in transformOptions"
                         :key='transform'>{{transform}}</option>
@@ -72,8 +84,12 @@
               </td>
               <td>
                 <p class="control is-expanded">
-                  <span class="select is-fullwidth">
-                    <select v-model="pipeline.interval">
+                  <span
+                    class="select is-fullwidth"
+                    :class="{ 'is-interactive-secondary': pipeline.interval }">
+                    <select
+                      :class="{ 'has-text-interactive-secondary': pipeline.interval }"
+                      v-model="pipeline.interval">
                       <option
                         v-for="interval in intervalOptions"
                         :key='interval'>{{interval}}</option>
@@ -85,6 +101,8 @@
                 <p class="control is-expanded">
                   <Dropdown
                     :label='pipeline.startDate'
+                    :button-classes='pipeline.startDate
+                      ? "is-interactive-secondary is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
                     <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
@@ -222,7 +240,9 @@ export default {
     save() {
       /**
        * TODO
-       * 1. add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
+       * 1. make issue, don't do now = add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
+       * 2. ensure date is in proper format or handle on backend?
+       * 3. backend endpoint round trip
        *  */
     },
     setCatchUpDateToNone() {
