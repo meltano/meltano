@@ -1,34 +1,38 @@
 import os
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta, MINYEAR
 
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.project import Project
+from meltano.core.utils import coerce_datetime
+
 
 project = Project.find()
-
-
+schedule_service = ScheduleService(project)
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2015, 6, 1),
-    "email": ["airflow@example.com"],
+    "start_date": datetime(MINYEAR, 1, 1),
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
-    # 'queue': 'bash_queue',
-    # 'pool': 'backfill',
-    # 'priority_weight': 10,
-    # 'end_date': datetime(2016, 1, 1),
+    "concurrency": 1,
 }
 
-schedule_service = ScheduleService(project)
-
 for schedule in schedule_service.schedules():
+    catchup = False
+    args = default_args.copy()
+
+    if schedule.start_date:
+        args["start_date"] = coerce_datetime(schedule.start_date)
+        catchup = True
+
     dag_id = f"meltano_{schedule.name}"
-    dag = DAG(dag_id, default_args=default_args, schedule_interval=schedule.interval)
+    dag = DAG(
+        dag_id, default_args=args, schedule_interval=schedule.interval, catchup=catchup
+    )
 
     elt = BashOperator(
         task_id="extract_load",

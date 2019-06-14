@@ -20,6 +20,7 @@ def create_schedule():
             loader="target-mock",
             transform="run",
             interval="@daily",
+            start_date=None,
             env={},
         )
 

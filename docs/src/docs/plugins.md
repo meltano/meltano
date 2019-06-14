@@ -127,6 +127,7 @@ export FASTLY_START_DATE="YYYY-MM-DD"
 
 `tap-gitlab` pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html) and extracts [the following resources](https://gitlab.com/meltano/tap-gitlab#tap-gitlab) from GitLab. It then outputs the schema for each resource
 and incrementally pulls data based on the input state
+
 #### Info
 
 - **Data Source**: [GitLab's REST API](https://docs.gitlab.com/ee/api/README.html)
@@ -159,7 +160,10 @@ export GITLAB_API_GROUPS="myorg mygroup"
 export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
 # The date uses ISO-8601 and supports time if desired
 export GITLAB_API_START_DATE="YYYY-MM-DD"
+export GITLAB_API_ULTIMATE_LICENSE="true"
 ```
+
+If `ultimate_license` is true (defaults to false), then the GitLab account used has access to the Gitlab Ultimate or Gitlab.com Gold features. It will enable fetching Epics, Epic Issues and other entities available for Gitlab Ultimate and Gitlab.com Gold accounts.
 
 ::: warning
 - Either groups or projects need to be provided

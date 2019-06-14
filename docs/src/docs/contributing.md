@@ -30,7 +30,8 @@ source ./venv/bin/activate
 pip install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-pip install -e '.[dev]'
+# Note: you may have to escape the `.[dev]` argument on some shells, like zsh
+pip install -e .[dev]
 
 # Run scripts to create remaining required files
 make bundle
@@ -77,6 +78,12 @@ When testing your contributions you may need to ensure that your various `__pyca
 :::
 
 ## Merge Requests
+
+:::tip Searching for something to work on?
+Start off by looking at our [~"Accepting Merge Request"](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
+
+Keep in mind that this is only a suggestion: all improvements are welcome.
+:::
 
 Meltano uses an approval workflow for all merge requests.
 
@@ -128,7 +135,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     $ source ./venv/bin/activate
 
     # pip install all the development dependencies
-    $ pip install '.[dev]'
+    $ pip install .[dev]
     ```
 1. Execute the commands below:
     ```bash

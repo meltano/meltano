@@ -1,4 +1,6 @@
 from collections import namedtuple
+from typing import Optional
+from datetime import datetime
 
 from .config_service import ConfigService
 from .project import Project
@@ -12,8 +14,11 @@ class ScheduleAlreadyExistsError(Exception):
 
 
 Schedule = namedtuple(
-    "Schedule", ("name", "extractor", "loader", "transform", "interval", "env")
+    "Schedule",
+    ("name", "extractor", "loader", "transform", "interval", "start_date", "env"),
 )
+
+Schedule._defaults = {"start_date": None}
 
 
 class ScheduleService:
@@ -21,9 +26,18 @@ class ScheduleService:
         self.project = project
 
     def add(
-        self, name, extractor: str, loader: str, transform: str, interval: str, **env
+        self,
+        name,
+        extractor: str,
+        loader: str,
+        transform: str,
+        interval: str,
+        start_date: Optional[datetime] = None,
+        **env
     ):
-        schedule = Schedule(name, extractor, loader, transform, interval, env=env)
+        schedule = Schedule(
+            name, extractor, loader, transform, interval, start_date, env=env
+        )
 
         return self.add_schedule(schedule)
 
@@ -41,6 +55,12 @@ class ScheduleService:
 
     def schedules(self):
         return (
-            Schedule(**schedule_def)
+            self.yaml_schedule(schedule_def)
             for schedule_def in self.project.meltano.get("schedules", [])
         )
+
+    @classmethod
+    def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
+        schedule_definition = {**Schedule._defaults, **schedule_definition}
+
+        return Schedule(**schedule_definition)
