@@ -171,7 +171,7 @@ export default {
       return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
     },
     isStartDateMinYearValid() {
-      return parseInt(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
+      return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
     },
     todaysDate() {
       return utils.getTodayYYYYMMDD();
@@ -224,7 +224,6 @@ export default {
        * TODO
        * 1. add blur hooks -> to check that no existing schedule matches all the same values -> exising name doesn't already exist
        *  */
-      console.log('save:', this.pipeline);
     },
     setCatchUpDateToNone() {
       this.pipeline.startDate = 'None';
