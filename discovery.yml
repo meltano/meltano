@@ -15,6 +15,8 @@ extractors:
       groups: "$GITLAB_API_GROUPS"
       projects: "$GITLAB_API_PROJECTS"
       start_date: "$GITLAB_API_START_DATE"
+      ultimate_license: "$GITLAB_API_ULTIMATE_LICENSE"
+    docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     pip_url: "tap-zendesk"
     config:
