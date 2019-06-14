@@ -300,14 +300,16 @@ def get_pipeline_schedules():
 
     cleaned_schedules = []
     for schedule in list(schedules):
-        cleaned_schedules.append({
-            "name": schedule.name,
-            "extractor": schedule.extractor,
-            "loader": schedule.loader,
-            "transform": schedule.transform,
-            "interval": schedule.interval,
-            "startDate": schedule.start_date
-        })
+        cleaned_schedules.append(
+            {
+                "name": schedule.name,
+                "extractor": schedule.extractor,
+                "loader": schedule.loader,
+                "transform": schedule.transform,
+                "interval": schedule.interval,
+                "startDate": schedule.start_date,
+            }
+        )
 
     return jsonify(cleaned_schedules)
 
@@ -327,17 +329,12 @@ def save_pipeline_schedule() -> Response:
 
     start_date_arg = None
     if start_date:
-        start_date_arg = datetime.strptime(start_date, '%Y-%m-%dT%H:%M:%S.000Z')
+        start_date_arg = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.000Z")
 
     project = Project.find()
     schedule_service = ScheduleService(project)
     schedule = schedule_service.add(
-        name,
-        extractor,
-        loader,
-        transform,
-        interval,
-        start_date_arg
+        name, extractor, loader, transform, interval, start_date_arg
     )
 
     return jsonify(incoming)
