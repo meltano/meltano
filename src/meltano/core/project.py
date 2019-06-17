@@ -53,9 +53,7 @@ class Project(Versioned):
         config_service = ConfigService
 
     @classmethod
-    def find(
-        cls, from_dir: Union[Path, str] = None, activate=True, set_as_current=False
-    ):
+    def find(cls, from_dir: Union[Path, str] = None, activate=True):
         project = Project(from_dir)
 
         if not project.meltanofile.exists():
@@ -64,14 +62,7 @@ class Project(Versioned):
         if activate:
             project.activate()
 
-        if set_as_current:
-            cls.register_current(project)
-
         return project
-
-    @classmethod
-    def register_current(cls, project: "Project"):
-        cls.current = project
 
     @property
     def meltano(self) -> Dict:

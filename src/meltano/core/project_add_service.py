@@ -43,6 +43,5 @@ class ProjectAddService:
         if not plugin.pip_url:
             raise PluginNotSupportedException()
 
-        self.config_service.add_to_file(plugin)
-
-        return plugin_factory(plugin.type, plugin.as_installed().canonical())
+        installed = plugin.as_installed()
+        return self.config_service.add_to_file(installed)

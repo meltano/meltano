@@ -2,15 +2,16 @@ import os
 import yaml
 import requests
 import logging
+import shutil
 from copy import deepcopy
 from typing import Dict, Iterator, Optional
 from itertools import groupby, chain
 
 import meltano.core.bundle as bundle
-from .plugin import Plugin, PluginInstall, PluginType
-from .plugin.factory import plugin_factory
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .config_service import ConfigService
+from .plugin import Plugin, PluginInstall, PluginType
+from .plugin.factory import plugin_factory
 
 
 class PluginNotFoundError(Exception):
@@ -57,6 +58,7 @@ class PluginDiscoveryService(Versioned):
         - project local `discovery.yml`
         - http://meltano.com/discovery.yml
         - .meltano/cache/discovery.yml
+        - meltano.core.bundle
         """
         if self._discovery:
             return self._discovery
@@ -110,12 +112,15 @@ class PluginDiscoveryService(Versioned):
         try:
             with self.cached_discovery_file.open() as discovery_cache:
                 return yaml.load(discovery_cache)
-        except yaml.YAMLError:
+        except (yaml.YAMLError, FileNotFoundError):
             logging.debug(
-                f"Discovery cache corrupted, deleting {self.cached_discovery_file}"
+                f"Discovery cache corrupted or missing, falling back on the bundled discovery."
             )
-            self.cached_discovery_file.unlink()
-            return {}
+            shutil.copy(bundle.find("discovery.yml"), self.cached_discovery_file)
+
+            # load it back
+            with self.cached_discovery_file.open() as discovery_cache:
+                return yaml.load(discovery_cache)
 
     @property
     def cached_discovery_file(self):
@@ -142,6 +147,7 @@ class PluginDiscoveryService(Versioned):
             )
             for plugin_type, plugin_defs in plugins.items()
             for plugin_def in plugin_defs
+            if PluginType.value_exists(plugin_type)
         )
 
     def custom_plugins(self) -> Iterator[Plugin]:
@@ -159,7 +165,7 @@ class PluginDiscoveryService(Versioned):
             )
             for plugin_type, plugin_defs in plugins.items()
             for plugin_def in plugin_defs
-            if "namespace" in plugin_def
+            if (PluginType.value_exists(plugin_type) and "namespace" in plugin_def)
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):

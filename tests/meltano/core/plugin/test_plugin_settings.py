@@ -17,14 +17,12 @@ def test_create(session):
 
 class TestPluginSettingsService:
     @pytest.fixture
-    def subject(self, project, project_add_service, plugin_settings_service):
-        project_add_service.add("extractors", "tap-mock")
+    def subject(self, session, project_add_service, plugin_settings_service_factory):
+        plugin = project_add_service.add("extractors", "tap-mock")
 
-        return plugin_settings_service
+        return plugin_settings_service_factory(session, plugin)
 
-    def test_get_value(self, subject, project, monkeypatch):
-        session = subject._session_cls()
-
+    def test_get_value(self, session, subject, project, monkeypatch):
         # returns the default value when unset
         assert subject.get_value("test") == "mock"
 
@@ -39,10 +37,9 @@ class TestPluginSettingsService:
         assert subject.get_value("test") == "mock"
 
         # overriden via the `meltano.yml` configuration
-        with project.meltano_update() as meltano:
-            meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
-
+        project._meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
         assert subject.get_value("test") == 42
+        project.reload()
 
         # overriden via ENV
         monkeypatch.setenv("PYTEST_TEST", "N33DC0F33")
@@ -51,10 +48,10 @@ class TestPluginSettingsService:
     def test_as_config(self, subject):
         assert subject.as_config() == {"test": "mock"}
 
-    def test_unset(self, subject, session):
+    def test_unset(self, session, subject):
         # overriden by an PluginSetting db value when set
         setting = subject.set("test", "THIS_IS_FROM_DB")
-        assert subject._session_cls().query(PluginSetting).count() == 1
+        assert session.query(PluginSetting).count() == 1
 
         subject.unset("test")
-        assert subject._session_cls().query(PluginSetting).count() == 0
+        assert session.query(PluginSetting).count() == 0

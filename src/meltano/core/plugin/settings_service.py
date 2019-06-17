@@ -17,13 +17,13 @@ class PluginSettingsService:
         session,
         project,
         plugin: PluginRef,
-        config_service=None,
-        plugin_discovery=None,
+        config_service: ConfigService = None,
+        discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.plugin = plugin
         self.config_service = config_service or ConfigService(project)
-        self.plugin_discovery = plugin_discovery or PluginDiscoveryService(project)
+        self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
         self._session = session
 
     def settings(self, enabled_only=True):
@@ -66,6 +66,8 @@ class PluginSettingsService:
 
         self._session.merge(setting)
         self._session.commit()
+
+        return setting
 
     def unset(self, name: str):
         self._session.query(PluginSetting).filter_by(

@@ -15,9 +15,9 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
         PluginType.EXTRACTORS: lazy_import(".singer", "SingerTap"),
         PluginType.LOADERS: lazy_import(".singer", "SingerTarget"),
         PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
-        PluginType.TRANSFORMS: lazy_import(".dbt.", "DbtTransformPlugin"),
+        PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
         PluginType.MODELS: lazy_import(".model", "ModelPlugin"),
-        PluginType.ORCHESTRATORS: lazy_import(".airflow", "AirflowPlugin"),
+        PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
     }
 
     # this will parse the discovery file and create an instance of the

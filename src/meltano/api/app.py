@@ -12,14 +12,13 @@ from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 from urllib.parse import urlsplit
 
-from .external_connector import ExternalConnector
-from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
-from . import config as default_config
-
 from meltano.core.project import Project
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
+from .external_connector import ExternalConnector
+from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
+from . import config as default_config
 
 
 connector = ExternalConnector()
@@ -27,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_app(config={}):
-    project = Project.find(set_as_current=True)
+    project = Project.find()
 
     app = Flask(__name__)
     app.config.from_object(reload(default_config))

@@ -16,13 +16,13 @@ from meltano.core.db import project_engine
 @db_options
 @project
 def invoke(project, plugin_name, plugin_args, engine_uri):
-    project_engine(project, engine_uri, default=True)
+    _, Session = project_engine(project, engine_uri, default=True)
+    session = Session()
 
     try:
         config_service = ConfigService(project)
         plugin = config_service.get_plugin(plugin_name)
-
-        service = invoker_factory(project, plugin)
+        service = invoker_factory(session, project, plugin)
         handle = service.invoke(*plugin_args)
 
         exit_code = handle.wait()
@@ -37,3 +37,5 @@ def invoke(project, plugin_name, plugin_args, engine_uri):
         logging.exception(err)
         click.secho(f"An error occured: {err}.", fg="red")
         raise click.Abort() from err
+    finally:
+        session.close()

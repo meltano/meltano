@@ -8,8 +8,12 @@ from sqlalchemy import create_engine, MetaData
 
 
 @pytest.fixture()
-def engine_sessionmaker(project):
-    engine_uri = "sqlite://"
+def engine_uri():
+    return "sqlite://"
+
+
+@pytest.fixture()
+def engine_sessionmaker(project, engine_uri):
     return project_engine(project, engine_uri, default=True)
 
 

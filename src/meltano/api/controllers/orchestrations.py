@@ -1,16 +1,16 @@
 from datetime import datetime
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
-from flatten_dict import flatten
 
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.plugin.setting_service import PluginSettingsService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import flatten
 from meltano.api.models import db
 from meltano.cli.add import extractor
 
@@ -85,18 +85,11 @@ def get_plugin_configuration() -> Response:
     project = Project.find()
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
-
     settings = PluginSettingsService(db.session, project, plugin)
-
-    def dot_reducer(*xs):
-        if xs[0] is None:
-            return xs[1]
-        else:
-            return ".".join(xs)
 
     return jsonify(
         {
-            "config": flatten(settings.as_config(), reducer=dot_reducer),
+            "config": flatten(settings.as_config(), reducer="dot"),
             "settings": settings.get_definition().settings,
         }
     )
@@ -109,13 +102,9 @@ def save_plugin_configuration() -> Response:
     """
     project = Project.find()
     incoming = request.get_json()
-    plugin_name = incoming["name"]
-    plugin_type = incoming["type"]
-
     plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
-    # TODO persist strategy
     settings = PluginSettingsService(db.session, project, plugin)
     for name, value in config.items():
         settings.set(name, value)
@@ -132,7 +121,6 @@ def selectEntities() -> Response:
     incoming = request.get_json()
     extractor_name = incoming["extractorName"]
     entity_groups = incoming["entityGroups"]
-
     select_service = SelectService(project, extractor_name)
 
     for entity_group in entity_groups:

@@ -17,16 +17,19 @@ class ConfigService:
     def make_meltano_secret_dir(self):
         os.makedirs(self.project.meltano_dir(), exist_ok=True)
 
-    def add_to_file(self, plugin: Plugin):
-        if plugin in self.plugins():
+    def add_to_file(self, plugin: PluginInstall):
+        installed_def = plugin.canonical()
+
+        if not plugin in self.plugins():
+            with self.project.meltano_update() as meltano_yml:
+                plugins = nest(meltano_yml, f"plugins.{plugin.type}", value=[])
+                plugins.append(installed_def)
+        else:
             logging.warning(
                 f"{plugin.name} is already present, use `meltano install` to install it."
             )
-            return
 
-        with self.project.meltano_update() as meltano_yml:
-            plugins = nest(meltano_yml, f"plugins.{plugin.type}", value=[])
-            plugins.append(plugin.as_installed().canonical())
+        return plugin_factory(plugin.type, installed_def)
 
     def has_plugin(self, plugin_name: str):
         try:

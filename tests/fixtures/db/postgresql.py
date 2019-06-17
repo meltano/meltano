@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, MetaData
 
 
 @pytest.fixture(scope="session")
-def test_engine_uri():
+def engine_uri():
     host = os.getenv("PG_ADDRESS")
     port = os.getenv("PG_PORT", 5432)
     user = os.getenv("PG_USERNAME")
@@ -25,9 +25,9 @@ def test_engine_uri():
 
 
 @pytest.fixture()
-def engine_sessionmaker(project, test_engine_uri):
+def engine_sessionmaker(project, engine_uri):
     # create the engine
-    engine, sessionmaker = project_engine(project, test_engine_uri, default=True)
+    engine, sessionmaker = project_engine(project, engine_uri, default=True)
 
     return (engine, sessionmaker)
 

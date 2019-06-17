@@ -7,13 +7,14 @@ from .project import Project
 from .plugin import PluginInstall
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
+from .plugin.settings_service import PluginSettingsService
 from .venv_service import VenvService
 from .error import SubprocessError
 
 
-def invoker_factory(project, plugin, *args, **kwargs):
-    return plugin.invoker(project, *args, **kwargs) or PluginInvoker(
-        project, plugin, *args, **kwargs
+def invoker_factory(session, project, plugin, *args, **kwargs):
+    return plugin.invoker(session, project, *args, **kwargs) or PluginInvoker(
+        session, project, plugin, *args, **kwargs
     )
 
 
@@ -22,18 +23,23 @@ class PluginInvoker:
 
     def __init__(
         self,
+        session,
         project: Project,
         plugin: PluginInstall,
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
         config_service: PluginConfigService = None,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin = plugin
         self.venv_service = venv_service or VenvService(project)
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
+        )
+        self.plugin_settings = plugin_settings_service or PluginSettingsService(
+            session, project, plugin
         )
         self._prepared = False
 

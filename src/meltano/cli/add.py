@@ -4,6 +4,7 @@ import json
 import click
 import sys
 from urllib.parse import urlparse
+
 from . import cli
 from .params import project, db_options
 from meltano.core.project_add_service import (

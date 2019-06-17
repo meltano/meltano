@@ -430,8 +430,8 @@ class TestSingerTap:
             base_files["state"],
         ]
 
-    def test_run_discovery(self, project, subject):
-        invoker = PluginInvoker(project, subject)
+    def test_run_discovery(self, session, plugin_invoker_factory, subject):
+        invoker = plugin_invoker_factory(session, subject)
         invoker.prepare()
 
         def mock_discovery():
@@ -448,11 +448,11 @@ class TestSingerTap:
 
             assert invoke.called_with(["--discover"])
 
-    def test_run_discovery_fails(self, project, subject):
+    def test_run_discovery_fails(self, session, plugin_invoker_factory, subject):
         process_mock = mock.Mock()
         process_mock.wait.return_value = 1  # something went wrong
 
-        invoker = PluginInvoker(project, subject)
+        invoker = plugin_invoker_factory(session, subject)
         invoker.prepare()
 
         with mock.patch.object(
@@ -464,11 +464,13 @@ class TestSingerTap:
                 "catalog"
             ].exists(), "Catalog should not be present."
 
-    def test_apply_select_catalog_invalid(self, project, subject):
+    def test_apply_select_catalog_invalid(
+        self, session, plugin_invoker_factory, subject
+    ):
         process_mock = mock.Mock()
         process_mock.wait.return_value = 0
 
-        invoker = PluginInvoker(project, subject)
+        invoker = plugin_invoker_factory(session, subject)
         invoker.prepare()
 
         def corrupt_catalog(*_, **__):

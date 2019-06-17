@@ -2,13 +2,14 @@ import base64
 import re
 import sys
 import logging
+import flatten_dict
 from datetime import datetime, date, time
-
 from copy import deepcopy
 from typing import Union, Dict, Callable
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
+
 from .db import DB
 
 
@@ -129,6 +130,21 @@ def nest(d: dict, path: str, value={}):
     cursor[tail] = cursor.get(tail, deepcopy(value))
 
     return cursor[tail]
+
+
+def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
+    """Wrapper arround `flatten_dict.flatten` that adds `dot` reducer."""
+
+    def dot_reducer(*xs):
+        if xs[0] is None:
+            return xs[1]
+        else:
+            return ".".join(xs)
+
+    if reducer == "dot":
+        reducer = dot_reducer
+
+    return flatten_dict.flatten(d, reducer, **kwargs)
 
 
 def file_has_data(file: Union[Path, str]):

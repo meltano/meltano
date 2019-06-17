@@ -1,4 +1,3 @@
-from meltano.core.behavior.hookable import HookObject, hook
 from meltano.core.plugin import PluginInstall, PluginType
 
 

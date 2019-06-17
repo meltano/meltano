@@ -5,8 +5,8 @@ import click
 from . import cli
 from .params import project, db_options
 from meltano.api.app import start
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.db import project_engine
+from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()

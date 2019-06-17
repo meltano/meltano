@@ -144,16 +144,16 @@ class SingerRunner(Runner):
         )
         target = self.config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
 
-        extractor = invoker_factory(self.project, tap)
-        loader = invoker_factory(self.project, target)
-
-        self.prepare(extractor, loader)
-
-        if dry_run:
-            return self.dry_run(tap, target)
-
         try:
             session = self._session_cls()
+            extractor = invoker_factory(session, self.project, tap)
+            loader = invoker_factory(session, self.project, target)
+
+            self.prepare(extractor, loader)
+
+            if dry_run:
+                return self.dry_run(tap, target)
+
             with self.job.run(session):
                 self.restore_bookmark(session, extractor)
                 loop = asyncio.get_event_loop()

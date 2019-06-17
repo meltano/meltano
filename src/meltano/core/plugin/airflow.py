@@ -4,7 +4,7 @@ import logging
 import subprocess
 import time
 import os
-from . import Plugin, PluginType
+from . import PluginInstall, PluginType
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
@@ -13,7 +13,7 @@ from meltano.core.venv_service import VenvService
 from meltano.core.utils import nest, map_dict
 
 
-class Airflow(Plugin):
+class Airflow(PluginInstall):
     __plugin_type__ = PluginType.ORCHESTRATORS
 
     def __init__(self, *args, **kwargs):
@@ -34,44 +34,52 @@ class Airflow(Plugin):
 
     @hook("after_install")
     def after_install(self, project, args=[]):
+        _, Session = project_engine(project)
+        session = Session()
+
         plugin_config_service = PluginConfigService(project, self)
-        invoker = invoker_factory(project, self, config_service=plugin_config_service)
-
-        airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
-        stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
-        handle = invoker.invoke(
-            "--help", prepare=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        invoker = invoker_factory(
+            session, project, self, config_service=plugin_config_service
         )
-        handle.wait()
-        logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
-        # move it to the config dir
-        shutil.move(airflow_cfg_path, stub_path)
-        airflow_cfg_path = stub_path
-        logging.debug(f"Moved to '{str(stub_path)}'")
+        try:
+            airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
+            stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
+            handle = invoker.invoke(
+                "--help", prepare=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            handle.wait()
+            logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
 
-        # open the configuration and update it
-        # now we let's update the config to use our stubs
-        airflow_cfg = configparser.ConfigParser()
+            # move it to the config dir
+            shutil.move(airflow_cfg_path, stub_path)
+            airflow_cfg_path = stub_path
+            logging.debug(f"Moved to '{str(stub_path)}'")
 
-        with airflow_cfg_path.open() as cfg:
-            airflow_cfg.read_file(cfg)
-        logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
+            # open the configuration and update it
+            # now we let's update the config to use our stubs
+            airflow_cfg = configparser.ConfigParser()
 
-        for section, cfg in self.config.items():
-            airflow_cfg[section].update(map_dict(str, cfg))
-            logging.debug(f"\tUpdated section [{section}]")
+            with airflow_cfg_path.open() as cfg:
+                airflow_cfg.read_file(cfg)
+            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-        with airflow_cfg_path.open("w") as cfg:
-            airflow_cfg.write(cfg)
-        logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+            for section, cfg in self.config.items():
+                airflow_cfg[section].update(map_dict(str, cfg))
+                logging.debug(f"\tUpdated section [{section}]")
 
-        # initdb
-        handle = invoker.invoke(
-            "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        handle.wait()
-        logging.debug(f"Completed `airflow initdb`")
+            with airflow_cfg_path.open("w") as cfg:
+                airflow_cfg.write(cfg)
+            logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+
+            # initdb
+            handle = invoker.invoke(
+                "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            )
+            handle.wait()
+            logging.debug(f"Completed `airflow initdb`")
+        finally:
+            session.close()
 
 
 class AirflowInvoker(PluginInvoker):
