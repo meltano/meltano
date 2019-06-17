@@ -94,7 +94,7 @@
     </div>
 
     <div v-else class='content'>
-      <p>There are no pipelines scheduled yet. <router-link to='schedule/create'>Schedule your first Pipeline</router-link> now.</p>
+      <p>There are no pipelines scheduled yet. <router-link to='schedules/create'>Schedule your first Pipeline</router-link> now.</p>
     </div>
 
   </div>
