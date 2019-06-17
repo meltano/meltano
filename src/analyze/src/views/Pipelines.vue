@@ -14,7 +14,7 @@ export default {
         { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
         { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
         { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'schedule', routeMatches: ['schedule'] },
+        { name: 'schedules', routeMatches: ['schedules', 'createSchedule'] },
       ],
     };
   },
@@ -65,7 +65,7 @@ export default {
             class="step-title button is-interactive-navigation"
             :class="{ 'is-active': getIsActiveStep('extractors') }"
             @click='setStep("extractors")'>Extractors</button>
-          <p>Data Sources</p>
+          <p>Source Connectors</p>
         </div>
       </div>
       <div
@@ -97,7 +97,7 @@ export default {
             :class="{ 'is-active': getIsActiveStep('loaders') }"
             :disabled='!getIsStepLoadersMinimallyValidated'
             @click='setStep("loaders")'>Loaders</button>
-          <p>Selection Targets</p>
+          <p>Target Connectors</p>
         </div>
       </div>
       <div
@@ -110,9 +110,10 @@ export default {
         <div class="step-details">
           <button
             class="step-title button is-interactive-navigation is-outlined"
-            :class="{ 'is-active': getIsActiveStep('schedule') }"
+            :class="{ 'is-active': getIsActiveStep('schedules') }"
             :disabled='!getIsStepScheduleMinimallyValidated'
-            @click='setStep("schedule")'>Schedule</button>
+            @click='setStep("schedules")'>Schedules</button>
+          <p>Data Pipelines</p>
         </div>
       </div>
 
@@ -143,8 +144,11 @@ export default {
         </div>
         <div
           class="step-content"
-          :class="{ 'is-active': getIsActiveStep('schedule') }">
+          :class="{ 'is-active': getIsActiveStep('schedules') }">
           <router-view></router-view>
+          <div v-if='isModal'>
+            <router-view name='createSchedule'></router-view>
+          </div>
         </div>
       </div>
 

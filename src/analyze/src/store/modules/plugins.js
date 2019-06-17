@@ -13,6 +13,13 @@ const state = {
 };
 
 const getters = {
+  getHasInstalledPluginsOfType() {
+    return (pluginType) => {
+      const hasOwns = [];
+      lodash.forOwn(state.installedPlugins[pluginType], val => hasOwns.push(val));
+      return hasOwns.length > 0;
+    };
+  },
   getIsPluginInstalled(stateRef) {
     return (pluginType, extractor) => (stateRef.installedPlugins[pluginType]
       ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === extractor))
@@ -45,7 +52,7 @@ const actions = {
   },
 
   getInstalledPlugins({ commit }) {
-    pluginsApi.getInstalledPlugins()
+    return pluginsApi.getInstalledPlugins()
       .then((response) => {
         commit('setInstalledPlugins', response.data);
       });

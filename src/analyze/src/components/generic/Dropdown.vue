@@ -1,6 +1,10 @@
 <template>
   <div class="dropdown"
-        :class="{'is-active': isOpen, 'is-right': isRightAligned}">
+        :class="{
+          'is-active': isOpen,
+          'is-right': isRightAligned,
+          'is-fullwidth': isFullWidth,
+        }">
     <div class="dropdown-trigger">
       <button class="button"
               :class="buttonClasses"
@@ -59,6 +63,9 @@ export default {
     isRightAligned: {
       type: Boolean,
     },
+    isFullWidth: {
+      type: Boolean,
+    },
   },
   methods: {
     forceClose() {
@@ -79,5 +86,11 @@ export default {
 </script>
 
 <style lang="scss">
-
+.dropdown.is-fullwidth {
+  display: flex;
+}
+.dropdown.is-fullwidth * {
+  width: 100%;
+  text-align: left;
+}
 </style>

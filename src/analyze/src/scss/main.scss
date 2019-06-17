@@ -64,12 +64,18 @@ Layout helpers with names based on Bulma naming conventions
 */
 
 .modal-card {
+  overflow: visible; // Prevents clipping of dropdown and similar components in Modal
+
   &.is-wide {
     width: calc(100vw - 160px);
   }
 
   .modal-card-head-image {
     margin-right: 1.25rem;
+  }
+
+  .modal-card-body {
+    overflow: visible; // Prevents clipping of dropdown and similar components in Modal
   }
 }
 

@@ -2,13 +2,14 @@ import Router from 'vue-router';
 
 import AnalyzeModels from '@/components/designs/AnalyzeModels';
 import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
+import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
 import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
 import Loaders from '@/components/orchestration/Loaders';
 import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
-import RunSummary from '@/components/orchestration/RunSummary';
+import PipelineSchedules from '@/components/orchestration/PipelineSchedules';
 
 import Dashboards from '@/views/Dashboards';
 import Design from '@/views/Design';
@@ -100,9 +101,25 @@ const router = new Router({
           },
         },
         {
-          path: 'schedule',
-          name: 'schedule',
-          component: RunSummary,
+          path: 'schedules',
+          name: 'schedules',
+          components: {
+            default: PipelineSchedules,
+          },
+          meta: {
+            isModal: false,
+          },
+        },
+        {
+          path: 'schedules/create',
+          name: 'createSchedule',
+          components: {
+            default: PipelineSchedules,
+            createSchedule: CreateScheduleModal,
+          },
+          meta: {
+            isModal: true,
+          },
         },
       ],
     },

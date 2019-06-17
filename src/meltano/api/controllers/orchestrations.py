@@ -1,7 +1,9 @@
+from datetime import datetime
+
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.project import Project
+from meltano.core.schedule_service import ScheduleService
 from meltano.core.select_service import SelectService
-
 from meltano.cli.add import extractor
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
@@ -285,3 +287,54 @@ def run_transform(topic_name, connection_name):
         "output": transform_log.decode("utf-8"),
         "status": "ok",
     }
+
+
+@orchestrationsBP.route("/get/pipeline_schedules", methods=["GET"])
+def get_pipeline_schedules():
+    """
+    endpoint for getting a the pipeline schedules
+    """
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedules = schedule_service.schedules()
+
+    cleaned_schedules = []
+    for schedule in list(schedules):
+        cleaned_schedules.append(
+            {
+                "name": schedule.name,
+                "extractor": schedule.extractor,
+                "loader": schedule.loader,
+                "transform": schedule.transform,
+                "interval": schedule.interval,
+                "startDate": schedule.start_date,
+            }
+        )
+
+    return jsonify(cleaned_schedules)
+
+
+@orchestrationsBP.route("/save/pipeline_schedule", methods=["POST"])
+def save_pipeline_schedule() -> Response:
+    """
+    endpoint for persisting a pipeline schedule
+    """
+    incoming = request.get_json()
+    name = incoming["name"]
+    extractor = incoming["extractor"]
+    loader = incoming["loader"]
+    transform = incoming["transform"]
+    interval = incoming["interval"]
+    start_date = incoming["startDate"]
+
+    start_date_arg = None
+    if start_date:
+        start_date_arg = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.000Z")
+
+    project = Project.find()
+    schedule_service = ScheduleService(project)
+    schedule = schedule_service.add(
+        name, extractor, loader, transform, interval, start_date_arg
+    )
+
+    return jsonify(incoming)
