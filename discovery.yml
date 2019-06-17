@@ -126,6 +126,7 @@ transforms:
     pip_url: "https://gitlab.com/meltano/dbt-tap-gitlab.git"
     vars:
       schema: "{{ env_var('PG_SCHEMA') }}"
+      ultimate_license: "{{ env_var('GITLAB_API_ULTIMATE_LICENSE') }}"
   - name: tap-stripe
     pip_url: "https://gitlab.com/meltano/dbt-tap-stripe.git"
     vars:
