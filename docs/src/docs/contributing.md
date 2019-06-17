@@ -69,6 +69,19 @@ npm install # or yarn
 npm run dev # or yarn dev
 ```
 
+## Documentation
+
+### Text
+
+Follow the merge request and changelog portions of this contribution section for text-based documentation contributions.
+
+### Images
+
+When adding supporting visuals to documentation, adhere to:
+- Use Chrome in "incognito mode" (we do this to have the same browser bar for consistency across screenshots)
+- Screenshot the image at 16:9 aspect ratio with minimum 1280x720px
+- Place `.png` screenshot in `src/docs/.vuepress/public/screenshots/` with a descriptive name
+
 ## Code style
 
 Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.org/docs/rules/) to enforce a consistent code style. You may use `make lint` to automatically lint all your code, or `make show_lint` if you only want to see what needs to change.
@@ -104,7 +117,7 @@ Merge conflicts, failing tests and/or missing checkboxes should not be used as g
 
 Meltano uses [changelog-cli](https://github.com/mc706/changelog-cli) to populate the CHANGELOG.md
 
-## Script
+### Script
 
 Use `changelog (new|change|fix|breaks) MESSAGE` to describe your current work in progress.
 
@@ -150,7 +163,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
     # after changelog validation, build the release
     $ make release
-    
+
     # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
     # occasionally the version bump can go to a version you don't expect.
     $ changelog view
