@@ -65,28 +65,11 @@ Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localh
 
 ## Running the ELT
 
-::: tip
-Right now, this can't be done from the Meltano UI so you will have to return to your command line interface.
-:::
+Now that you've selected your reporting database, you can schedule and run your ELT pipeline.
 
-Run the following command
+Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://localhost:5000/pipelines/schedules](http://localhost:5000/pipelines/schedules)
 
-```bash
-$ meltano elt [YOUR_TAP_NAME] [YOUR_TARGET_NAME]
-…
-Extract & load complete!
-
-# Example
-$ meltano elt tap-carbon-intensity target-sqlite
-```
-
-### Using the Correct Syntax
-
-To get a full list of all the availble taps and targets, run this command:
-
-```bash
-$ meltano discover all
-```
+![Meltano UI pipeline schedules screen create schedule](/screenshots/meltano-ui-create-schedule.png)
 
 ## Scheduling the ELT with Orchestration
 
@@ -107,25 +90,7 @@ Installed 'airflow'.
 Added and installed orchestrators 'airflow'.
 ```
 
-Once Airflow is installed, create your first test schedule using the ELT you ran in the previous step:
-
-```bash
-$ meltano schedule [NEW_SCHEDULE_NAME] [YOUR_TAP] [YOUR_TARGET] [INTERVAL]
-
-# Example
-$ meltano schedule meltano_carbon__sqlite tap-carbon-intensity target-sqlite @daily
-```
-
-To check that your scheduling was successful, run the following command:
-
-```bash
-$ meltano invoke airflow list_dags
-
--------------------------------------------------------------------
-DAGS
--------------------------------------------------------------------
-meltano_carbon__sqlite
-```
+Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
 
 A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 

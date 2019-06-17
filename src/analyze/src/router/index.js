@@ -101,8 +101,8 @@ const router = new Router({
           },
         },
         {
-          path: 'schedule',
-          name: 'schedule',
+          path: 'schedules',
+          name: 'schedules',
           components: {
             default: PipelineSchedules,
           },
@@ -111,7 +111,7 @@ const router = new Router({
           },
         },
         {
-          path: 'schedule/create',
+          path: 'schedules/create',
           name: 'createSchedule',
           components: {
             default: PipelineSchedules,

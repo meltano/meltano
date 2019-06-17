@@ -130,7 +130,7 @@ export default {
         type: 'loader',
         config: this.configSettings,
       });
-      this.$router.push({ name: 'schedule' });
+      this.$router.push({ name: 'schedules' });
     },
   },
 };

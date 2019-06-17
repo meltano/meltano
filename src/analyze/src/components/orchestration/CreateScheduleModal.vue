@@ -234,7 +234,7 @@ export default {
       if (this.prevRoute) {
         this.$router.go(-1);
       } else {
-        this.$router.push({ name: 'schedule' });
+        this.$router.push({ name: 'schedules' });
       }
     },
     prefillForm() {
