@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'Entities',
@@ -21,6 +21,13 @@ export default {
     ]),
   },
   methods: {
+    ...mapActions('plugins', [
+      'installPlugin',
+    ]),
+    installRequired(extractor) {
+      this.installPlugin({ pluginType: 'extractors', name: extractor });
+      this.$router.push({ name: 'extractorSettings', params: { extractor } });
+    },
     udpateExtractorEntities(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } });
     },
@@ -65,8 +72,14 @@ export default {
             </p>
 
             <a
-              class='button is-interactive-primary is-outlined is-block is-small'
+              v-if='getIsPluginInstalled("extractors", extractor)'
+              class='button is-interactive-primary is-block is-small'
               @click="udpateExtractorEntities(extractor)">Edit Selections</a>
+            <a
+              v-else
+              class='button is-interactive-primary is-outlined is-block is-small'
+              @click="installRequired(extractor)">Install</a>
+
           </div>
         </div>
       </div>
