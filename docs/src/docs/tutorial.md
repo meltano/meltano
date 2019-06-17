@@ -466,7 +466,6 @@ In order to have the results of the transformations materialized in the analytic
 ```bash
 # Update `my_meltano_project: null` to `my_meltano_project: materialized: table`
 models:
-  enabled: true
   my_meltano_project:
     materialized: table
   tap_salesforce:
