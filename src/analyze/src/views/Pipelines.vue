@@ -65,7 +65,7 @@ export default {
             class="step-title button is-interactive-navigation"
             :class="{ 'is-active': getIsActiveStep('extractors') }"
             @click='setStep("extractors")'>Extractors</button>
-          <p>Data Sources</p>
+          <p>Source Connectors</p>
         </div>
       </div>
       <div
@@ -97,7 +97,7 @@ export default {
             :class="{ 'is-active': getIsActiveStep('loaders') }"
             :disabled='!getIsStepLoadersMinimallyValidated'
             @click='setStep("loaders")'>Loaders</button>
-          <p>Selection Targets</p>
+          <p>Target Connectors</p>
         </div>
       </div>
       <div
