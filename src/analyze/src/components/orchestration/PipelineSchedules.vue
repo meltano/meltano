@@ -78,6 +78,9 @@
               </td>
               <td>
                 <div class="buttons is-right">
+                  <router-link
+                    class="button is-interactive-primary is-outlined is-small"
+                    :to="{name: 'orchestration'}">Orchestration</router-link>
                   <button
                     class="button is-small tooltip is-tooltip-left"
                     disabled
