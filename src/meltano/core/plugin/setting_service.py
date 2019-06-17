@@ -12,27 +12,27 @@ from .setting import PluginSetting
 
 
 class PluginSettingsService:
-    def __init__(self, project, plugin: PluginRef,
-                 config_service=None,
-                 plugin_discovery=None):
+    def __init__(
+        self,
+        session,
+        project,
+        plugin: PluginRef,
+        config_service=None,
+        plugin_discovery=None,
+    ):
         self.project = project
         self.plugin = plugin
         self.config_service = config_service or ConfigService(project)
         self.plugin_discovery = plugin_discovery or PluginDiscoveryService(project)
-        _, self._session_cls = project_engine(project)
+        self._session = session
 
     def settings(self, enabled_only=True):
-        try:
-            session = self._session_cls()
-            q = session.query(PluginSetting) \
-              .filter_by(plugin=self.plugin.name)
+        q = self._session.query(PluginSetting).filter_by(plugin=self.plugin.name)
 
-            if enabled_only:
-                q.filter_by(enabled=True)
+        if enabled_only:
+            q.filter_by(enabled=True)
 
-            return q.all()
-        finally:
-            session.close()
+        return q.all()
 
     @classmethod
     def plugin_namespace(cls, plugin: PluginRef) -> str:
@@ -44,47 +44,47 @@ class PluginSettingsService:
 
     def as_config(self) -> Dict:
         plugin = self.get_definition()
-        config = {}
+        config = plugin._extras.get("config", {})
 
         for setting in plugin.settings:
-            nest(config,
-                 setting['name'],
-                 self.get_value(setting['name']))
+            nest(config, setting["name"], self.get_value(setting["name"]))
 
         return config
 
     def set(self, name: str, value, enabled=True):
-        try:
-            session = self._session_cls()
-            setting = PluginSetting(namespace=self.namespace,
-                                    name=name,
-                                    value=value,
-                                    enabled=enabled)
-            session.merge(setting)
-            session.commit()
+        plugin_def = self.get_definition()
+        setting = self.find_setting(plugin_def, name)
+        env = setting.get("env", self.setting_env(plugin_def.namespace, name))
 
-            return setting
-        finally:
-            session.close()
+        if env in os.environ:
+            logging.warning(f"Setting {name} is currently set via ${env}.")
+            return
+
+        setting = PluginSetting(
+            namespace=self.namespace, name=name, value=value, enabled=enabled
+        )
+
+        self._session.merge(setting)
+        self._session.commit()
 
     def unset(self, name: str):
-        try:
-            session = self._session_cls()
-            session.query(PluginSetting) \
-              .filter_by(namespace=self.namespace,
-                         name=name) \
-              .delete()
-            session.commit()
-        finally:
-            session.close()
+        self._session.query(PluginSetting).filter_by(
+            namespace=self.namespace, name=name
+        ).delete()
+        self._session.commit()
 
     def get_definition(self) -> Plugin:
-        return self.plugin_discovery.find_plugin(self.plugin.type,
-                                                 self.plugin.name)
+        return self.plugin_discovery.find_plugin(self.plugin.type, self.plugin.name)
+
+    def find_setting(self, plugin_def: Dict, name: str) -> Dict:
+        return next(
+            setting for setting in plugin_def.settings if setting["name"] == name
+        )
 
     def get_install(self) -> PluginInstall:
-        return self.config_service.get_plugin(self.plugin.name,
-                                              plugin_type=self.plugin.type)
+        return self.config_service.get_plugin(
+            self.plugin.name, plugin_type=self.plugin.type
+        )
 
     def setting_env(self, *parts: Iterable[str]):
         process = lambda s: s.replace(".", "__").upper()
@@ -93,40 +93,33 @@ class PluginSettingsService:
 
     # TODO: ensure `kind` is handled
     def get_value(self, name: str):
-        session = self._session_cls()
-
         try:
             plugin_def = self.get_definition()
             plugin_install = self.get_install()
-
-            setting = next(
-                setting for setting in plugin_def.settings
-                if setting['name'] == name
-            )
-            env = setting.get('env', self.setting_env(plugin_def.namespace,
-                                                      name))
+            setting = self.find_setting(plugin_def, name)
+            env = setting.get("env", self.setting_env(plugin_def.namespace, name))
 
             # priority 1: environment variable
             if env in os.environ:
-                logging.debug(f"Found ENV variable {env} for {plugin_def.namespace}:{name}")
+                logging.debug(
+                    f"Found ENV variable {env} for {plugin_def.namespace}:{name}"
+                )
                 return os.environ[env]
 
             # priority 2: installed configuration
-            if setting['name'] in plugin_install.config:
-                return plugin_install.config[setting['name']]
+            if setting["name"] in plugin_install.config:
+                return plugin_install.config[setting["name"]]
 
             # priority 3: settings database
-            return session.query(PluginSetting) \
-              .filter_by(namespace=self.namespace,
-                         name=name,
-                         enabled=True) \
-              .one() \
-              .value
+            return (
+                self._session.query(PluginSetting)
+                .filter_by(namespace=self.namespace, name=name, enabled=True)
+                .one()
+                .value
+            )
         except StopIteration:
             logging.error(f"Cannot find {name} for {self.plugin.name}.")
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden
             return setting.get("value")
-        finally:
-            session.close()

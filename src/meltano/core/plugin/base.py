@@ -45,28 +45,31 @@ class PluginType(YAMLEnum):
 
 
 class PluginRef:
-    def __init__(self,
-                 plugin_type: Union[str, PluginType],
-                 name: str):
-        self.type = plugin_type if isinstance(plugin_type, PluginType) else PluginType(plugin_type)
+    def __init__(self, plugin_type: Union[str, PluginType], name: str):
+        self.type = (
+            plugin_type
+            if isinstance(plugin_type, PluginType)
+            else PluginType(plugin_type)
+        )
         self.name = name
 
     def __eq__(self, other):
-        return (self.name == other.name
-                and self.type == other.type)
+        return self.name == other.name and self.type == other.type
 
     def __hash__(self):
         return hash((self.namespace, self.name))
 
 
 class PluginInstall(HookObject, PluginRef):
-    def __init__(self,
-                 plugin_type: PluginType,
-                 name: str,
-                 pip_url: str,
-                 select=set(),
-                 config={},
-                 **extras):
+    def __init__(
+        self,
+        plugin_type: PluginType,
+        name: str,
+        pip_url: str,
+        select=set(),
+        config={},
+        **extras
+    ):
         super().__init__(plugin_type, name)
 
         self.config = config
@@ -75,11 +78,7 @@ class PluginInstall(HookObject, PluginRef):
         self._extras = extras or {}
 
     def canonical(self):
-        canonical = {
-            "name": self.name,
-            "pip_url": self.pip_url,
-            **self._extras,
-        }
+        canonical = {"name": self.name, "pip_url": self.pip_url, **self._extras}
 
         if self._select:
             canonical.update({"select": list(self._select)})
@@ -88,6 +87,10 @@ class PluginInstall(HookObject, PluginRef):
             canonical.update({"config": self.config})
 
         return canonical
+
+    @property
+    def executable(self):
+        return self._extras.get("executable", self.name)
 
     @property
     def select(self):
@@ -134,7 +137,6 @@ class Plugin(PluginRef):
         name: str,
         namespace: str,
         pip_url: str,
-        executable: str = None,
         settings: list = [],
         docs=None,
         **extras
@@ -143,13 +145,9 @@ class Plugin(PluginRef):
 
         self.namespace = namespace
         self.pip_url = pip_url
-        self.executable = executable or self.name
         self.settings = settings
         self.docs = docs
         self._extras = extras or {}
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type,
-                             self.name,
-                             self.pip_url,
-                             **self._extras)
+        return PluginInstall(self.type, self.name, self.pip_url, **self._extras)

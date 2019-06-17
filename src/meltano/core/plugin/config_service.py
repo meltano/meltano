@@ -14,7 +14,9 @@ class PluginConfigService:
     set of files that should be stubbed using environment variables.
     """
 
-    def __init__(self, project: Project, plugin: PluginInstall, config_dir=None, run_dir=None):
+    def __init__(
+        self, project: Project, plugin: PluginInstall, config_dir=None, run_dir=None
+    ):
         self.project = project
         self.plugin = plugin
 
@@ -75,7 +77,7 @@ class PluginConfigService:
                 self.envsubst(src, dst)
                 stubbed.append(dst)
             except FileNotFoundError:
-                logging.warning(
+                logging.debug(
                     f"Could not find {src.name} in {src.resolve()}, skipping."
                 )
 

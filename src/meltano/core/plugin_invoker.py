@@ -48,7 +48,7 @@ class PluginInvoker:
 
     def prepare(self):
         if not self._prepared:
-            with self.plugin.trigger_hooks("prepare", self):
+            with self.plugin.trigger_hooks("configure", self):
                 self.config_service.configure()
                 self._prepared = True
 

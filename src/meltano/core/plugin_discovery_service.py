@@ -35,9 +35,12 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 class PluginDiscoveryService(Versioned):
     __version__ = 2
 
-    def __init__(self, project,
-                 config_service: ConfigService = None,
-                 discovery: Optional[Dict] = None):
+    def __init__(
+        self,
+        project,
+        config_service: ConfigService = None,
+        discovery: Optional[Dict] = None,
+    ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
         self._discovery = discovery
@@ -130,11 +133,13 @@ class PluginDiscoveryService(Versioned):
         plugins.pop("version", 1)
 
         return (
-            Plugin(plugin_type,
-                   plugin_def.pop('name'),
-                   plugin_def.pop('namespace'),
-                   plugin_def.pop('pip_url'),
-                   **plugin_def)
+            Plugin(
+                plugin_type,
+                plugin_def.pop("name"),
+                plugin_def.pop("namespace"),
+                plugin_def.pop("pip_url"),
+                **plugin_def,
+            )
             for plugin_type, plugin_defs in plugins.items()
             for plugin_def in plugin_defs
         )
@@ -142,17 +147,19 @@ class PluginDiscoveryService(Versioned):
     def custom_plugins(self) -> Iterator[Plugin]:
         """Parse the meltano.yml and return all defined `Plugin`."""
 
-        plugins = deepcopy(self.project.meltano.get('plugins', {}))
+        plugins = deepcopy(self.project.meltano.get("plugins", {}))
 
         return (
-            Plugin(plugin_type,
-                   plugin_def.pop('name'),
-                   plugin_def.pop('namespace'),
-                   plugin_def.pop('pip_url'),
-                   **plugin_def)
+            Plugin(
+                plugin_type,
+                plugin_def.pop("name"),
+                plugin_def.pop("namespace"),
+                plugin_def.pop("pip_url"),
+                **plugin_def,
+            )
             for plugin_type, plugin_defs in plugins.items()
             for plugin_def in plugin_defs
-            if 'namespace' in plugin_def
+            if "namespace" in plugin_def
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):

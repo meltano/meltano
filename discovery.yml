@@ -22,7 +22,9 @@ extractors:
         value: "https://gitlab.com/api/v4"
       - name: private_token
       - name: groups
+        value: ""
       - name: projects
+        value: ""
       - name: start_date
         kind: date_iso8601
       - name: ultimate_license
@@ -63,7 +65,8 @@ extractors:
       - name: identity
       - name: client_id
       - name: client_secret
-      - { name: start_time, kind: date_iso8601 }
+      - name: start_time
+        kind: date_iso8601
   - name: tap-salesforce
     namespace: salesforce
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
@@ -71,7 +74,6 @@ extractors:
       # TODO: remove, should be injected from Meltano
       - name: api_type
         value: REST
-        hidden: true
       - name: client_id
       - name: username
       - name: password
@@ -79,7 +81,6 @@ extractors:
       - name: select_fields_by_default
         value: true
         kind: boolean
-        hidden: true
       - name: start_date
         kind: date_iso8601
   - name: tap-mongodb
@@ -107,6 +108,7 @@ extractors:
     settings:
       - name: api_token
       - name: start_date
+        label: Start Date
         kind: date_iso8601
   - name: tap-carbon-intensity
     namespace: carbon
@@ -115,9 +117,8 @@ extractors:
     namespace: tap-csv
     pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
     settings:
-      - key: TAP_CSV_FILES_DEFINITION
-        name: csv_files_definition
-        kind: files
+      - name: csv_files_definition
+        kind: file
     docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
@@ -162,6 +163,7 @@ loaders:
     pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
     settings:
       - name: database
+        description: E.g. `meltano` will create `meltano.db`
 transformers:
   - name: dbt
     namespace: dbt
@@ -246,13 +248,13 @@ orchestrators:
         env: AIRFLOW__CORE__DAGS_FOLDER
       - name: core.plugins_folder
         value: $MELTANO_PROJECT_ROOT/orchestrate/plugins
-        key: AIRFLOW__CORE__DAGS_FOLDER
+        env: AIRFLOW__CORE__DAGS_FOLDER
       - name: core.sql_alchemy_conn
         value: sqlite:///.meltano/orchestrators/airflow/airflow.db
-        key: AIRFLOW__CORE__SQL_ALCHEMY_CONN
+        env: AIRFLOW__CORE__SQL_ALCHEMY_CONN
       - name: core.load_examples
         value: False
-        key: AIRFLOW__CORE__LOAD_EXAMPLES
+        env: AIRFLOW__CORE__LOAD_EXAMPLES
       - name: webserver.web_server_port
         value: 5010
-        key: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+        env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT

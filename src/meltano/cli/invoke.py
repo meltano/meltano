@@ -1,18 +1,23 @@
 import click
 import sys
+import logging
 from . import cli
-from .params import project
+from .params import project, db_options
 
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))
-@project
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
-def invoke(project, plugin_name, plugin_args):
+@db_options
+@project
+def invoke(project, plugin_name, plugin_args, engine_uri):
+    project_engine(project, engine_uri, default=True)
+
     try:
         config_service = ConfigService(project)
         plugin = config_service.get_plugin(plugin_name)
@@ -29,5 +34,6 @@ def invoke(project, plugin_name, plugin_args):
 
         sys.exit(exit_code)
     except Exception as err:
+        logging.exception(err)
         click.secho(f"An error occured: {err}.", fg="red")
         raise click.Abort() from err

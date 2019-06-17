@@ -1,8 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
-
 import _ from 'lodash';
 
 export default {
@@ -64,8 +62,8 @@ export default {
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
         name: this.extractor.name,
-        type: 'extractor',
-        config: this.configSettings,
+        type: 'extractors',
+        config: this.configSettings.config,
       });
       this.beginEntitySelection();
     },
@@ -74,7 +72,6 @@ export default {
 </script>
 
 <template>
-
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
@@ -100,9 +97,10 @@ export default {
 
         <template v-if='configSettings'>
 
-          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+          <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
             <div class="field-label is-normal">
-              <label class="label">{{key}}</label>
+              <label class="label">{{ setting.label || setting.name }}</label>
+              <p v-if="setting.description">{{ setting.description }}</p>
             </div>
             <div class="field-body">
               <div class="field">
@@ -111,7 +109,7 @@ export default {
                     class="input"
                     type="text"
                     :placeholder="val"
-                    v-model="configSettings[key]">
+                    v-model="configSettings.config[setting.name]">
                 </p>
               </div>
             </div>
@@ -155,7 +153,6 @@ export default {
       </footer>
     </div>
   </div>
-
 </template>
 
 <style lang="scss">

@@ -55,9 +55,7 @@ class PluginInstallService:
         try:
             with plugin.trigger_hooks("install", self.project):
                 return self.venv_service.install(
-                    namespace=plugin.type,
-                    name=plugin.name,
-                    pip_url=plugin.pip_url
+                    namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
                 )
         except SubprocessError as err:
             raise PluginInstallError(str(err), err.process)

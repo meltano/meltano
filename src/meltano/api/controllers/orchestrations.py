@@ -1,12 +1,19 @@
 from datetime import datetime
+from flask import Blueprint, request, url_for, jsonify, make_response, Response
+from flatten_dict import flatten
 
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin import PluginType, PluginRef
 from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin.setting_service import PluginSettingsService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.select_service import SelectService
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.api.models import db
 from meltano.cli.add import extractor
 
-from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 orchestrationsBP = Blueprint(
     "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
@@ -76,13 +83,23 @@ def get_plugin_configuration() -> Response:
     endpoint for getting a plugin's configuration
     """
     project = Project.find()
-    incoming = request.get_json()
-    plugin_name = incoming["name"]
-    plugin_type = incoming["type"]
-    discovery_service = PluginDiscoveryService(project)
-    # TODO update when save_plugin_configuration is implemented and default to the discovery otherwise
-    plugin = discovery_service.find_plugin(plugin_type, plugin_name)
-    return jsonify(plugin.config)
+    payload = request.get_json()
+    plugin = PluginRef(payload["type"], payload["name"])
+
+    settings = PluginSettingsService(db.session, project, plugin)
+
+    def dot_reducer(*xs):
+        if xs[0] is None:
+            return xs[1]
+        else:
+            return ".".join(xs)
+
+    return jsonify(
+        {
+            "config": flatten(settings.as_config(), reducer=dot_reducer),
+            "settings": settings.get_definition().settings,
+        }
+    )
 
 
 @orchestrationsBP.route("/save/configuration", methods=["POST"])
@@ -90,14 +107,20 @@ def save_plugin_configuration() -> Response:
     """
     endpoint for persisting a plugin configuration
     """
+    project = Project.find()
     incoming = request.get_json()
     plugin_name = incoming["name"]
     plugin_type = incoming["type"]
+
+    plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
     # TODO persist strategy
+    settings = PluginSettingsService(db.session, project, plugin)
+    for name, value in config.items():
+        settings.set(name, value)
 
-    return jsonify({"test": True})
+    return jsonify(settings.as_config())
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])

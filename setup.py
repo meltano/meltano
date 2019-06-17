@@ -32,6 +32,7 @@ requires = [
     'flask-sqlalchemy==2.3.2',
     'flask-restful==0.3.7',
     'flask-jwt-extended==3.17.0',
+    'flatten-dict==0.1.0',
     'meltano-flask-security==0.1.0',
     'pyhocon==0.3.51',
     'python-dotenv==0.10.1',
