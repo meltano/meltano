@@ -215,5 +215,5 @@ export default {
   </section>
 </template>
 
-<style>
+<style lang="scss">
 </style>

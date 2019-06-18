@@ -1,3 +1,10 @@
+<script>
+export default {
+  name: 'Pill',
+  props: ['user', 'name'],
+};
+</script>
+
 <template>
   <div class="control">
     <div class="tags has-addons">
@@ -6,9 +13,6 @@
     </div>
   </div>
 </template>
-<script>
-export default {
-  name: 'Pill',
-  props: ['user', 'name'],
-};
-</script>
+
+<style lang="scss">
+</style>

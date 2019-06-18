@@ -1,11 +1,3 @@
-<template>
-  <div v-show="results.length">
-    <component :is="chartType"
-                :chart-type='chartType'
-                :results='results'
-                :result-aggregates='resultAggregates'></component>
-  </div>
-</template>
 <script>
 import { BarChart, LineChart, AreaChart, ScatterChart } from './charts';
 
@@ -24,3 +16,15 @@ export default {
   ],
 };
 </script>
+
+<template>
+  <div v-show="results.length">
+    <component :is="chartType"
+                :chart-type='chartType'
+                :results='results'
+                :result-aggregates='resultAggregates'></component>
+  </div>
+</template>
+
+<style lang="scss">
+</style>

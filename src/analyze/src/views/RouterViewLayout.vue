@@ -1,3 +1,11 @@
+<script>
+
+export default {
+  name: 'RouterViewLayout',
+};
+
+</script>
+
 <template>
   <div class="columns is-gapless">
     <section class="column is-full vh-scrollable">
@@ -7,14 +15,6 @@
     </section>
   </div>
 </template>
-
-<script>
-
-export default {
-  name: 'RouterViewLayout',
-};
-
-</script>
 
 <style lang="scss" scoped>
 </style>

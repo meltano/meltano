@@ -1,3 +1,33 @@
+<script>
+import { mapState, mapGetters, mapActions } from 'vuex';
+
+export default {
+  name: 'ResultTable',
+  computed: {
+    ...mapState('designs', [
+      'resultAggregates',
+      'columnHeaders',
+      'columnNames',
+      'results',
+      'keys',
+      'sortDesc',
+    ]),
+    ...mapGetters('designs', [
+      'hasResults',
+      'isColumnSorted',
+      'getFormattedValue',
+      'isColumnSelectedAggregate',
+      'isResultsTab',
+    ]),
+  },
+  methods: {
+    ...mapActions('designs', [
+      'sortBy',
+    ]),
+  },
+};
+</script>
+
 <template>
     <div class="result-data" v-if="isResultsTab">
       <div class="notification is-info" v-if="!hasResults">
@@ -39,35 +69,7 @@
       </table>
     </div>
 </template>
-<script>
-import { mapState, mapGetters, mapActions } from 'vuex';
 
-export default {
-  name: 'ResultTable',
-  computed: {
-    ...mapState('designs', [
-      'resultAggregates',
-      'columnHeaders',
-      'columnNames',
-      'results',
-      'keys',
-      'sortDesc',
-    ]),
-    ...mapGetters('designs', [
-      'hasResults',
-      'isColumnSorted',
-      'getFormattedValue',
-      'isColumnSelectedAggregate',
-      'isResultsTab',
-    ]),
-  },
-  methods: {
-    ...mapActions('designs', [
-      'sortBy',
-    ]),
-  },
-};
-</script>
 <style lang="scss">
 .sortable-header {
   cursor: pointer;

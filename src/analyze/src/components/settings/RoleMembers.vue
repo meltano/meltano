@@ -1,3 +1,32 @@
+<script>
+import _ from 'lodash';
+import Pill from './Pill';
+
+export default {
+  name: 'RoleMember',
+  props: ['users', 'roles'],
+  data() {
+    return {
+      model: {
+        user: null,
+        role: null,
+      },
+    };
+  },
+
+  computed: {
+    enabled() {
+      return !(_.isEmpty(this.model.role) ||
+               _.isEmpty(this.model.user));
+    },
+  },
+
+  components: {
+    'role-pill': Pill,
+  },
+};
+</script>
+
 <template>
   <div>
     <table class="table is-fullwidth">
@@ -56,34 +85,7 @@
     </div>
   </div>
 </template>
-<script>
-import _ from 'lodash';
-import Pill from './Pill';
 
-export default {
-  name: 'RoleMember',
-  props: ['users', 'roles'],
-  data() {
-    return {
-      model: {
-        user: null,
-        role: null,
-      },
-    };
-  },
-
-  computed: {
-    enabled() {
-      return !(_.isEmpty(this.model.role) ||
-               _.isEmpty(this.model.user));
-    },
-  },
-
-  components: {
-    'role-pill': Pill,
-  },
-};
-</script>
 <style scoped>
  .action {
    font-weight: bold;

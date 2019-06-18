@@ -1,3 +1,224 @@
+<script>
+import { mapState, mapGetters, mapActions } from 'vuex';
+import capitalize from '@/filters/capitalize';
+import Chart from '@/components/designs/Chart';
+import Dropdown from '@/components/generic/Dropdown';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
+import ResultTable from '@/components/designs/ResultTable';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+
+export default {
+  name: 'Design',
+  data() {
+    return {
+      isNewDashboardModalOpen: false,
+    };
+  },
+  mounted() {
+    const { slug, model, design } = this.$route.params;
+    this.$store.dispatch('designs/getDesign', { model, design, slug });
+  },
+  filters: {
+    capitalize,
+  },
+  components: {
+    Chart,
+    NewDashboardModal,
+    Dropdown,
+    ResultTable,
+    RouterViewLayoutSidebar,
+  },
+  computed: {
+    ...mapState('designs', [
+      'activeReport',
+      'design',
+      'currentModel',
+      'currentDesign',
+      'currentSQL',
+      'loadingQuery',
+      'filtersOpen',
+      'dataOpen',
+      'saveReportSettings',
+      'reports',
+      'chartsOpen',
+      'hasSQLError',
+      'sqlErrorMessage',
+      'results',
+      'resultAggregates',
+      'chartType',
+      'dialect',
+    ]),
+    ...mapGetters('designs', [
+      'currentModelLabel',
+      'currentDesignLabel',
+      'isDataTab',
+      'isResultsTab',
+      'hasChartableResults',
+      'numResults',
+      'isSQLTab',
+      'getDistinctsForField',
+      'getResultsFromDistinct',
+      'getKeyFromDistinct',
+      'getSelectionsFromDistinct',
+      'getChartYAxis',
+      'hasJoins',
+      'showJoinColumnAggregateHeader',
+      'formattedSql',
+    ]),
+    ...mapState('dashboards', [
+      'dashboards',
+    ]),
+    ...mapGetters('settings', [
+      'isConnectionDialectSqlite',
+    ]),
+    canToggleTimeframe() {
+      return !this.isConnectionDialectSqlite(this.dialect);
+    },
+    limit: {
+      get() {
+        return this.$store.getters['designs/currentLimit'];
+      },
+      set(value) {
+        this.$store.dispatch('designs/limitSet', value);
+        this.$store.dispatch('designs/getSQL', { run: false });
+      },
+    },
+  },
+  methods: {
+    ...mapActions('dashboards', [
+      'getDashboards',
+    ]),
+
+    isActiveReportInDashboard(dashboard) {
+      return dashboard.reportIds.includes(this.activeReport.id);
+    },
+
+    hasActiveReport() {
+      return Object.keys(this.activeReport).length > 0;
+    },
+
+    toggleActiveReportInDashboard(dashboard) {
+      const methodName = this.isActiveReportInDashboard(dashboard)
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard';
+      this.$store.dispatch(`dashboards/${methodName}`, {
+        reportId: this.activeReport.id,
+        dashboardId: dashboard.id,
+      });
+    },
+
+    inputFocused(field) {
+      if (!this.getDistinctsForField(field)) {
+        this.$store.dispatch('designs/getDistinct', field);
+      }
+    },
+
+    setAndOpenChart(chartType) {
+      this.$store.dispatch('designs/setChartType', chartType);
+      if (!this.chartsOpen) {
+        this.$store.dispatch('designs/toggleChartsOpen');
+      }
+    },
+
+    tableRowClicked(relatedTable) {
+      this.$store.dispatch('designs/expandRow', relatedTable);
+    },
+
+    joinRowClicked(join) {
+      this.$store.dispatch('designs/expandJoinRow', join);
+    },
+
+    columnSelected(column) {
+      this.$store.dispatch('designs/removeSort', column);
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    timeframeSelected(timeframe) {
+      if (!this.canToggleTimeframe) {
+        return;
+      }
+      this.$store.dispatch('designs/toggleTimeframe', timeframe);
+    },
+
+    timeframePeriodSelected(period) {
+      this.$store.dispatch('designs/toggleTimeframePeriod', period);
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    aggregateSelected(aggregate) {
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    joinColumnSelected(join, column) {
+      this.$store.dispatch('designs/toggleColumn', column);
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    joinAggregateSelected(join, aggregate) {
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    runQuery() {
+      this.$store.dispatch('designs/getSQL', { run: true });
+    },
+
+    loadReport(report) {
+      this.$store.dispatch('designs/loadReport', { name: report.name });
+    },
+
+    saveReport() {
+      this.$store.dispatch('designs/saveReport', this.saveReportSettings);
+    },
+
+    updateReport() {
+      this.$store.dispatch('designs/updateReport');
+    },
+
+    setCurrentTab(tab) {
+      this.$store.dispatch('designs/switchCurrentTab', tab);
+    },
+
+    toggleFilterOpen() {
+      this.$store.dispatch('designs/toggleFilterOpen');
+    },
+
+    toggleDataOpen() {
+      this.$store.dispatch('designs/toggleDataOpen');
+    },
+
+    toggleChartsOpen() {
+      this.$store.dispatch('designs/toggleChartsOpen');
+    },
+
+    toggleNewDashboardModal() {
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
+    },
+
+    dropdownSelected(item, field) {
+      this.$store.dispatch('designs/addDistinctSelection', {
+        item,
+        field,
+      });
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+
+    modifierChanged(item, field) {
+      this.$store.dispatch('designs/addDistinctModifier', {
+        item,
+        field,
+      });
+      this.$store.dispatch('designs/getSQL', { run: false });
+    },
+    ...mapActions('designs', [
+      'resetErrorMessage',
+    ]),
+  },
+};
+</script>
+
 <template>
   <router-view-layout-sidebar>
 
@@ -483,226 +704,7 @@
 
   </router-view-layout-sidebar>
 </template>
-<script>
-import { mapState, mapGetters, mapActions } from 'vuex';
-import capitalize from '@/filters/capitalize';
-import Chart from '@/components/designs/Chart';
-import Dropdown from '@/components/generic/Dropdown';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import ResultTable from '@/components/designs/ResultTable';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
-export default {
-  name: 'Design',
-  data() {
-    return {
-      isNewDashboardModalOpen: false,
-    };
-  },
-  mounted() {
-    const { slug, model, design } = this.$route.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug });
-  },
-  filters: {
-    capitalize,
-  },
-  components: {
-    Chart,
-    NewDashboardModal,
-    Dropdown,
-    ResultTable,
-    RouterViewLayoutSidebar,
-  },
-  computed: {
-    ...mapState('designs', [
-      'activeReport',
-      'design',
-      'currentModel',
-      'currentDesign',
-      'currentSQL',
-      'loadingQuery',
-      'filtersOpen',
-      'dataOpen',
-      'saveReportSettings',
-      'reports',
-      'chartsOpen',
-      'hasSQLError',
-      'sqlErrorMessage',
-      'results',
-      'resultAggregates',
-      'chartType',
-      'dialect',
-    ]),
-    ...mapGetters('designs', [
-      'currentModelLabel',
-      'currentDesignLabel',
-      'isDataTab',
-      'isResultsTab',
-      'hasChartableResults',
-      'numResults',
-      'isSQLTab',
-      'getDistinctsForField',
-      'getResultsFromDistinct',
-      'getKeyFromDistinct',
-      'getSelectionsFromDistinct',
-      'getChartYAxis',
-      'hasJoins',
-      'showJoinColumnAggregateHeader',
-      'formattedSql',
-    ]),
-    ...mapState('dashboards', [
-      'dashboards',
-    ]),
-    ...mapGetters('settings', [
-      'isConnectionDialectSqlite',
-    ]),
-    canToggleTimeframe() {
-      return !this.isConnectionDialectSqlite(this.dialect);
-    },
-    limit: {
-      get() {
-        return this.$store.getters['designs/currentLimit'];
-      },
-      set(value) {
-        this.$store.dispatch('designs/limitSet', value);
-        this.$store.dispatch('designs/getSQL', { run: false });
-      },
-    },
-  },
-  methods: {
-    ...mapActions('dashboards', [
-      'getDashboards',
-    ]),
-
-    isActiveReportInDashboard(dashboard) {
-      return dashboard.reportIds.includes(this.activeReport.id);
-    },
-
-    hasActiveReport() {
-      return Object.keys(this.activeReport).length > 0;
-    },
-
-    toggleActiveReportInDashboard(dashboard) {
-      const methodName = this.isActiveReportInDashboard(dashboard)
-        ? 'removeReportFromDashboard'
-        : 'addReportToDashboard';
-      this.$store.dispatch(`dashboards/${methodName}`, {
-        reportId: this.activeReport.id,
-        dashboardId: dashboard.id,
-      });
-    },
-
-    inputFocused(field) {
-      if (!this.getDistinctsForField(field)) {
-        this.$store.dispatch('designs/getDistinct', field);
-      }
-    },
-
-    setAndOpenChart(chartType) {
-      this.$store.dispatch('designs/setChartType', chartType);
-      if (!this.chartsOpen) {
-        this.$store.dispatch('designs/toggleChartsOpen');
-      }
-    },
-
-    tableRowClicked(relatedTable) {
-      this.$store.dispatch('designs/expandRow', relatedTable);
-    },
-
-    joinRowClicked(join) {
-      this.$store.dispatch('designs/expandJoinRow', join);
-    },
-
-    columnSelected(column) {
-      this.$store.dispatch('designs/removeSort', column);
-      this.$store.dispatch('designs/toggleColumn', column);
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    timeframeSelected(timeframe) {
-      if (!this.canToggleTimeframe) {
-        return;
-      }
-      this.$store.dispatch('designs/toggleTimeframe', timeframe);
-    },
-
-    timeframePeriodSelected(period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', period);
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    aggregateSelected(aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    joinColumnSelected(join, column) {
-      this.$store.dispatch('designs/toggleColumn', column);
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    runQuery() {
-      this.$store.dispatch('designs/getSQL', { run: true });
-    },
-
-    loadReport(report) {
-      this.$store.dispatch('designs/loadReport', { name: report.name });
-    },
-
-    saveReport() {
-      this.$store.dispatch('designs/saveReport', this.saveReportSettings);
-    },
-
-    updateReport() {
-      this.$store.dispatch('designs/updateReport');
-    },
-
-    setCurrentTab(tab) {
-      this.$store.dispatch('designs/switchCurrentTab', tab);
-    },
-
-    toggleFilterOpen() {
-      this.$store.dispatch('designs/toggleFilterOpen');
-    },
-
-    toggleDataOpen() {
-      this.$store.dispatch('designs/toggleDataOpen');
-    },
-
-    toggleChartsOpen() {
-      this.$store.dispatch('designs/toggleChartsOpen');
-    },
-
-    toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
-    },
-
-    dropdownSelected(item, field) {
-      this.$store.dispatch('designs/addDistinctSelection', {
-        item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    modifierChanged(item, field) {
-      this.$store.dispatch('designs/addDistinctModifier', {
-        item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-    ...mapActions('designs', [
-      'resetErrorMessage',
-    ]),
-  },
-};
-</script>
 <style lang="scss" scoped>
 @import '@/scss/bulma-preset-overrides.scss';
 @import "../../node_modules/bulma/bulma";

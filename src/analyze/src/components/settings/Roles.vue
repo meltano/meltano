@@ -1,3 +1,64 @@
+<script>
+import _ from 'lodash';
+import store from '@/store';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import RoleMembers from './RoleMembers';
+import RolePermissions from './RolePermissions';
+
+export default {
+  name: 'Roles',
+
+  data() {
+    return {
+      permissions: [
+        { name: 'View designs', type: 'view:design' },
+        { name: 'View reports', type: 'view:reports' },
+      ],
+      model: {
+        role: null,
+      },
+    };
+  },
+
+  components: {
+    RoleMembers,
+    RolePermissions,
+  },
+
+  beforeRouteEnter(to, from, next) {
+    store.dispatch('settings/fetchACL')
+      .then(next)
+      .catch(() => {
+        next(from.path);
+      });
+  },
+
+  computed: {
+    has() {
+      return _.negate(_.isEmpty);
+    },
+    ...mapState('settings', [
+      'acl',
+    ]),
+    ...mapGetters('settings', [
+      'rolesName',
+      'rolesContexts',
+    ]),
+  },
+
+  methods: {
+    ...mapActions('settings', [
+      'createRole',
+      'deleteRole',
+      'unassignRoleUser',
+      'assignRoleUser',
+      'addRolePermission',
+      'removeRolePermission',
+    ]),
+  },
+};
+</script>
+
 <template>
   <section class="section">
     <h1 class="title is-2">Roles</h1>
@@ -53,67 +114,7 @@
     </div>
   </section>
 </template>
-<script>
-import _ from 'lodash';
-import store from '@/store';
-import { mapState, mapGetters, mapActions } from 'vuex';
-import RoleMembers from './RoleMembers';
-import RolePermissions from './RolePermissions';
 
-
-export default {
-  name: 'Roles',
-
-  data() {
-    return {
-      permissions: [
-        { name: 'View designs', type: 'view:design' },
-        { name: 'View reports', type: 'view:reports' },
-      ],
-      model: {
-        role: null,
-      },
-    };
-  },
-
-  components: {
-    RoleMembers,
-    RolePermissions,
-  },
-
-  beforeRouteEnter(to, from, next) {
-    store.dispatch('settings/fetchACL')
-      .then(next)
-      .catch(() => {
-        next(from.path);
-      });
-  },
-
-  computed: {
-    has() {
-      return _.negate(_.isEmpty);
-    },
-    ...mapState('settings', [
-      'acl',
-    ]),
-    ...mapGetters('settings', [
-      'rolesName',
-      'rolesContexts',
-    ]),
-  },
-
-  methods: {
-    ...mapActions('settings', [
-      'createRole',
-      'deleteRole',
-      'unassignRoleUser',
-      'assignRoleUser',
-      'addRolePermission',
-      'removeRolePermission',
-    ]),
-  },
-};
-</script>
 <style scoped>
  .segment {
    margin-bottom: 2rem;

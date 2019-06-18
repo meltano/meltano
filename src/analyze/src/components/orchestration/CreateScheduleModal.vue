@@ -1,3 +1,105 @@
+<script>
+import { mapGetters, mapState } from 'vuex';
+import _ from 'lodash';
+
+import Dropdown from '@/components/generic/Dropdown';
+
+import utils from '@/utils/utils';
+
+export default {
+  name: 'CreateScheduleModal',
+  components: {
+    Dropdown,
+  },
+  created() {
+    this.$store.dispatch('plugins/getInstalledPlugins')
+      .then(this.prefillForm);
+  },
+  computed: {
+    ...mapGetters('plugins', [
+      'getHasInstalledPluginsOfType',
+    ]),
+    ...mapState('plugins', [
+      'installedPlugins',
+    ]),
+    isSaveable() {
+      const hasOwns = [];
+      _.forOwn(this.pipeline, val => hasOwns.push(val));
+      return hasOwns.find(val => val === '') === undefined;
+    },
+    isStartDateSettable() {
+      return this.isStartDateValid && this.isStartDateMinYearValid;
+    },
+    isStartDateValid() {
+      return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
+    },
+    isStartDateMinYearValid() {
+      return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
+    },
+    todaysDate() {
+      return utils.getTodayYYYYMMDD();
+    },
+  },
+  data() {
+    return {
+      intervalOptions: [
+        '@once',
+        '@hourly',
+        '@daily',
+        '@weekly',
+        '@monthly',
+        '@yearly',
+      ],
+      minYear: '2000',
+      pipeline: {
+        name: '',
+        extractor: '',
+        loader: '',
+        transform: '',
+        interval: '',
+        startDate: 'None',
+      },
+      transformOptions: [
+        'skip',
+        'run',
+        'only',
+      ],
+    };
+  },
+  methods: {
+    close() {
+      if (this.prevRoute) {
+        this.$router.go(-1);
+      } else {
+        this.$router.push({ name: 'schedules' });
+      }
+    },
+    prefillForm() {
+      // TODO implement an intelligent prefill approach
+      this.pipeline.name = `Default-${this.todaysDate}`;
+      this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
+        ? this.installedPlugins.extractors[0].name : '';
+      this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
+        ? this.installedPlugins.loaders[0].name : '';
+      this.pipeline.transform = !_.isEmpty(this.transformOptions)
+        ? this.transformOptions[0] : '';
+      this.pipeline.interval = !_.isEmpty(this.intervalOptions)
+        ? this.intervalOptions[0] : '';
+    },
+    save() {
+      const pipeline = Object.assign({}, this.pipeline);
+      pipeline.startDate = this.pipeline.startDate === 'None'
+        ? '' : new Date(this.pipeline.startDate).toISOString();
+      this.$store.dispatch('configuration/savePipelineSchedule', pipeline);
+      this.close();
+    },
+    setCatchUpDateToNone() {
+      this.pipeline.startDate = 'None';
+    },
+  },
+};
+</script>
+
 <template>
 
   <div class="modal is-active">
@@ -160,108 +262,6 @@
   </div>
 
 </template>
-
-<script>
-import { mapGetters, mapState } from 'vuex';
-import _ from 'lodash';
-
-import Dropdown from '@/components/generic/Dropdown';
-
-import utils from '@/utils/utils';
-
-export default {
-  name: 'CreateScheduleModal',
-  components: {
-    Dropdown,
-  },
-  created() {
-    this.$store.dispatch('plugins/getInstalledPlugins')
-      .then(this.prefillForm);
-  },
-  computed: {
-    ...mapGetters('plugins', [
-      'getHasInstalledPluginsOfType',
-    ]),
-    ...mapState('plugins', [
-      'installedPlugins',
-    ]),
-    isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.pipeline, val => hasOwns.push(val));
-      return hasOwns.find(val => val === '') === undefined;
-    },
-    isStartDateSettable() {
-      return this.isStartDateValid && this.isStartDateMinYearValid;
-    },
-    isStartDateValid() {
-      return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
-    },
-    isStartDateMinYearValid() {
-      return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
-    },
-    todaysDate() {
-      return utils.getTodayYYYYMMDD();
-    },
-  },
-  data() {
-    return {
-      intervalOptions: [
-        '@once',
-        '@hourly',
-        '@daily',
-        '@weekly',
-        '@monthly',
-        '@yearly',
-      ],
-      minYear: '2000',
-      pipeline: {
-        name: '',
-        extractor: '',
-        loader: '',
-        transform: '',
-        interval: '',
-        startDate: 'None',
-      },
-      transformOptions: [
-        'skip',
-        'run',
-        'only',
-      ],
-    };
-  },
-  methods: {
-    close() {
-      if (this.prevRoute) {
-        this.$router.go(-1);
-      } else {
-        this.$router.push({ name: 'schedules' });
-      }
-    },
-    prefillForm() {
-      // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default-${this.todaysDate}`;
-      this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
-        ? this.installedPlugins.extractors[0].name : '';
-      this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
-        ? this.installedPlugins.loaders[0].name : '';
-      this.pipeline.transform = !_.isEmpty(this.transformOptions)
-        ? this.transformOptions[0] : '';
-      this.pipeline.interval = !_.isEmpty(this.intervalOptions)
-        ? this.intervalOptions[0] : '';
-    },
-    save() {
-      const pipeline = Object.assign({}, this.pipeline);
-      pipeline.startDate = this.pipeline.startDate === 'None'
-        ? '' : new Date(this.pipeline.startDate).toISOString();
-      this.$store.dispatch('configuration/savePipelineSchedule', pipeline);
-      this.close();
-    },
-    setCatchUpDateToNone() {
-      this.pipeline.startDate = 'None';
-    },
-  },
-};
-</script>
 
 <style lang="scss">
 </style>

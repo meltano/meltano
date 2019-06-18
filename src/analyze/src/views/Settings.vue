@@ -1,27 +1,3 @@
-<template>
-  <router-view-layout-sidebar>
-
-    <div slot='left'>
-      <ul class="menu-list">
-        <router-link
-          tag="li"
-          :to="{name:'database'}">
-          <a>Database</a>
-        </router-link>
-        <router-link
-          tag="li"
-          :to="{name:'connectors'}">
-          <a>Connectors</a>
-        </router-link>
-      </ul>
-    </div>
-
-    <div slot="right">
-      <router-view />
-    </div>
-
-  </router-view-layout-sidebar>
-</template>
 <script>
 import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
 
@@ -65,3 +41,31 @@ export default {
   },
 };
 </script>
+
+<template>
+  <router-view-layout-sidebar>
+
+    <div slot='left'>
+      <ul class="menu-list">
+        <router-link
+          tag="li"
+          :to="{name:'database'}">
+          <a>Database</a>
+        </router-link>
+        <router-link
+          tag="li"
+          :to="{name:'connectors'}">
+          <a>Connectors</a>
+        </router-link>
+      </ul>
+    </div>
+
+    <div slot="right">
+      <router-view />
+    </div>
+
+  </router-view-layout-sidebar>
+</template>
+
+<style lang="scss">
+</style>

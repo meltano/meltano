@@ -1,3 +1,56 @@
+<script>
+import { mapState, mapActions } from 'vuex';
+import Chart from '@/components/designs/Chart';
+import ClosableMessage from '@/components/generic/ClosableMessage';
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+
+export default {
+  name: 'Dashboards',
+  created() {
+    this.initialize(this.$route.params.slug);
+  },
+  data() {
+    return {
+      isNewDashboardModalOpen: false,
+    };
+  },
+  components: {
+    Chart,
+    ClosableMessage,
+    NewDashboardModal,
+    RouterViewLayoutSidebar,
+  },
+  computed: {
+    ...mapState('dashboards', [
+      'activeDashboard',
+      'activeDashboardReports',
+      'dashboards',
+      'reports',
+    ]),
+  },
+  methods: {
+    ...mapActions('dashboards', [
+      'initialize',
+      'setDashboard',
+      'getActiveDashboardReportsWithQueryResults',
+    ]),
+    isActive(dashboard) {
+      return dashboard.id === this.activeDashboard.id;
+    },
+    toggleNewDashboardModal() {
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
+    },
+  },
+  watch: {
+    activeDashboard() {
+      this.getActiveDashboardReportsWithQueryResults();
+    },
+  },
+};
+
+</script>
+
 <template>
   <router-view-layout-sidebar>
 
@@ -54,59 +107,6 @@
 
   </router-view-layout-sidebar>
 </template>
-
-<script>
-import { mapState, mapActions } from 'vuex';
-import Chart from '@/components/designs/Chart';
-import ClosableMessage from '@/components/generic/ClosableMessage';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
-
-export default {
-  name: 'Dashboards',
-  created() {
-    this.initialize(this.$route.params.slug);
-  },
-  data() {
-    return {
-      isNewDashboardModalOpen: false,
-    };
-  },
-  components: {
-    Chart,
-    ClosableMessage,
-    NewDashboardModal,
-    RouterViewLayoutSidebar,
-  },
-  computed: {
-    ...mapState('dashboards', [
-      'activeDashboard',
-      'activeDashboardReports',
-      'dashboards',
-      'reports',
-    ]),
-  },
-  methods: {
-    ...mapActions('dashboards', [
-      'initialize',
-      'setDashboard',
-      'getActiveDashboardReportsWithQueryResults',
-    ]),
-    isActive(dashboard) {
-      return dashboard.id === this.activeDashboard.id;
-    },
-    toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
-    },
-  },
-  watch: {
-    activeDashboard() {
-      this.getActiveDashboardReportsWithQueryResults();
-    },
-  },
-};
-
-</script>
 
 <style lang="scss" scoped>
 </style>

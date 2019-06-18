@@ -104,7 +104,7 @@ export default {
   </section>
 </template>
 
-<style>
+<style lang="scss">
 .level:not(:last-child),
 .level-tight:not(:last-child) {
   margin-bottom: .5rem;

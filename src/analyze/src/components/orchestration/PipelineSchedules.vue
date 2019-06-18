@@ -1,3 +1,30 @@
+<script>
+import { mapGetters, mapState } from 'vuex';
+
+export default {
+  name: 'PipelineSchedules',
+  created() {
+    this.$store.dispatch('configuration/getAllPipelineSchedules');
+    if (!this.getHasPipelines) {
+      this.createPipeline();
+    }
+  },
+  computed: {
+    ...mapState('configuration', [
+      'pipelines',
+    ]),
+    ...mapGetters('configuration', [
+      'getHasPipelines',
+    ]),
+  },
+  methods: {
+    createPipeline() {
+      this.$router.push({ name: 'createSchedule' });
+    },
+  },
+};
+</script>
+
 <template>
   <div>
 
@@ -102,33 +129,6 @@
 
   </div>
 </template>
-
-<script>
-import { mapGetters, mapState } from 'vuex';
-
-export default {
-  name: 'PipelineSchedules',
-  created() {
-    this.$store.dispatch('configuration/getAllPipelineSchedules');
-    if (!this.getHasPipelines) {
-      this.createPipeline();
-    }
-  },
-  computed: {
-    ...mapState('configuration', [
-      'pipelines',
-    ]),
-    ...mapGetters('configuration', [
-      'getHasPipelines',
-    ]),
-  },
-  methods: {
-    createPipeline() {
-      this.$router.push({ name: 'createSchedule' });
-    },
-  },
-};
-</script>
 
 <style lang="scss">
 .pipelines-table {
