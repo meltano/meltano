@@ -1,5 +1,5 @@
 <script>
-import Airflow from '@/components/Airflow';
+import Airflow from '@/components/orchestration/Airflow';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {

@@ -2,15 +2,15 @@ import Router from 'vue-router';
 
 import AnalyzeModels from '@/components/analyze/AnalyzeModels';
 import AnalyzeSettings from '@/components/analyze/AnalyzeSettings';
-import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
+import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal';
 import Design from '@/components/analyze/Design';
-import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
-import Entities from '@/components/orchestration/Entities';
-import Extractors from '@/components/orchestration/Extractors';
-import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
-import Loaders from '@/components/orchestration/Loaders';
-import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
-import PipelineSchedules from '@/components/orchestration/PipelineSchedules';
+import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal';
+import Entities from '@/components/pipelines/Entities';
+import Extractors from '@/components/pipelines/Extractors';
+import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal';
+import Loaders from '@/components/pipelines/Loaders';
+import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal';
+import PipelineSchedules from '@/components/pipelines/PipelineSchedules';
 
 import Dashboards from '@/views/Dashboards';
 import Analyze from '@/views/Analyze';
