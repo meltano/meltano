@@ -157,6 +157,8 @@ models:
     pip_url: "git+https://gitlab.com/meltano/model-zendesk.git"
   - name: model-gitlab
     pip_url: "git+https://gitlab.com/meltano/model-gitlab.git"
+  - name: model-gitlab-ultimate
+    pip_url: "git+https://gitlab.com/meltano/model-gitlab-ultimate.git"
   - name: model-stripe
     pip_url: "git+https://gitlab.com/meltano/model-stripe.git"
   - name: model-zuora
