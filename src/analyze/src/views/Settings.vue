@@ -1,10 +1,10 @@
 <script>
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayoutSidebar,
+    RouterViewLayout,
   },
   data() {
     return {
@@ -43,7 +43,7 @@ export default {
 </script>
 
 <template>
-  <router-view-layout-sidebar>
+  <router-view-layout>
 
     <div slot='left'>
       <ul class="menu-list">
@@ -64,7 +64,7 @@ export default {
       <router-view />
     </div>
 
-  </router-view-layout-sidebar>
+  </router-view-layout>
 </template>
 
 <style lang="scss">

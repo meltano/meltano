@@ -5,7 +5,7 @@ import Chart from '@/components/designs/Chart';
 import Dropdown from '@/components/generic/Dropdown';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import ResultTable from '@/components/designs/ResultTable';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Design',
@@ -26,7 +26,7 @@ export default {
     NewDashboardModal,
     Dropdown,
     ResultTable,
-    RouterViewLayoutSidebar,
+    RouterViewLayout,
   },
   computed: {
     ...mapState('designs', [
@@ -220,9 +220,9 @@ export default {
 </script>
 
 <template>
-  <router-view-layout-sidebar>
+  <router-view-layout>
 
-    <div slot='left'>
+    <div>
       <nav class="panel has-background-white">
         <div class="panel-block">
           <div class="field has-addons">
@@ -381,7 +381,7 @@ export default {
       </nav>
     </div>
 
-    <div slot="right">
+    <div>
 
       <div class="columns is-vcentered">
 
@@ -702,7 +702,7 @@ export default {
 
     </div>
 
-  </router-view-layout-sidebar>
+  </router-view-layout>
 </template>
 
 <style lang="scss" scoped>

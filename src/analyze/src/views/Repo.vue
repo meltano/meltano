@@ -2,7 +2,7 @@
 import { mapState, mapGetters } from 'vuex';
 import fileTypeEnums from '@/utils/fileTypeEnums';
 import pretty from '@/filters/pretty';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import RouterViewLayout from '@/views/RouterViewLayout';
 import utils from '@/utils/utils';
 
 export default {
@@ -12,7 +12,7 @@ export default {
     this.sync();
   },
   components: {
-    RouterViewLayoutSidebar,
+    RouterViewLayout,
   },
   filters: {
     pretty,
@@ -70,7 +70,7 @@ export default {
 </script>
 
 <template>
-  <router-view-layout-sidebar>
+  <router-view-layout>
 
     <div slot='left'>
       <div class="level">
@@ -180,7 +180,7 @@ export default {
       </div>
     </div>
 
-  </router-view-layout-sidebar>
+  </router-view-layout>
 </template>
 
 <style lang="scss" scoped>
