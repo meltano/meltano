@@ -23,7 +23,7 @@ export default {
   <div
     v-if='isShowNote'
     class="columns">
-    <div class="column is-three-fifths is-offset-one-fifth">
+    <div class="column">
       <div class='content'>
         <article class="message is-small">
           <div class="message-header">
