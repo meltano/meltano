@@ -24,8 +24,16 @@ $error: $red;
 $modal-background-background-color: rgba(#000000, 0.65);
 
 /* Sizes -------------------- */
+
 $navbar-height: 3.25rem;
 $navbar-breakpoint: $tablet;
+
+/* Tabs __------------------- */
+
+$tabs-link-active-border-bottom-color: $primary;
+$tabs-link-active-color: $primary;
+$tabs-toggle-link-active-background-color: $primary;
+$tabs-toggle-link-active-border-color: $primary;
 
 /*
 ADDITIONS ------------------------------------------------------------------------------------------
