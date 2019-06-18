@@ -74,9 +74,9 @@ Layout helpers, often with names based on Bulma naming conventions
 }
 
 .view-body {
-  border: 1px solid #DDD;
-  border-radius: 6px;
-  background-color: #f1f1f1;
+  border: 1px solid $grey-lighter;
+  border-radius: $radius-large;
+  background-color: $white-ter;
   padding: 1em;
 }
 
