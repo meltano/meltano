@@ -79,6 +79,11 @@ Layout helpers, often with names based on Bulma naming conventions
   border-radius: $radius-large;
   background-color: $white-ter;
   padding: 1em;
+
+  &.is-fluid {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 .modal-card {
