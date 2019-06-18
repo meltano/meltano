@@ -3,14 +3,18 @@ import RouterViewLayout from '@/views/RouterViewLayout';
 import DocsLink from '@/components/generic/DocsLink';
 
 export default {
-  name: 'Designs',
+  name: 'Analyze',
   components: {
     RouterViewLayout,
     DocsLink,
   },
-  methods: {
-    isCurrentLink(path) {
-      return this.$route.path === path ? 'is-active' : '';
+  computed: {
+    isAnalyzing() {
+      return !this.isCurrentLink('/analyze/models/') &&
+        !this.isCurrentLink('/analyze/connection-settings/');
+    },
+    isCurrentLink() {
+      return path => this.$route.path === path;
     },
   },
 };
@@ -28,10 +32,12 @@ export default {
           <div class="level-right">
             <div class="tabs is-right">
               <ul>
-                <li :class="isCurrentLink('/analyze/models/')">
+                <li :class="{ 'is-active': isCurrentLink('/analyze/models/') }">
                   <router-link to="/analyze/models/">Models</router-link>
                 </li>
-                <li :class="isCurrentLink('/analyze/connection-settings/')" class="is-marginless">
+                <li
+                  class="is-marginless"
+                  :class="{ 'is-active': isCurrentLink('/analyze/connection-settings/') }">
                   <router-link to="/analyze/connection-settings/">Connections</router-link>
                 </li>
               </ul>
@@ -41,7 +47,9 @@ export default {
       </div>
     </div>
 
-    <div class="container view-body">
+    <div
+      class="container view-body"
+      :class="{ 'is-fluid': isAnalyzing }">
       <router-view />
     </div>
 

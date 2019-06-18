@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import AnalyzeModels from '@/components/designs/AnalyzeModels';
 import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
 import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
+import Design from '@/components/designs/Design';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';
@@ -12,8 +13,7 @@ import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal'
 import PipelineSchedules from '@/components/orchestration/PipelineSchedules';
 
 import Dashboards from '@/views/Dashboards';
-import Design from '@/views/Design';
-import Designs from '@/views/Designs';
+import Analyze from '@/views/Analyze';
 import NotFound from '@/views/NotFound';
 import Orchestration from '@/views/Orchestration';
 import Pipelines from '@/views/Pipelines';
@@ -137,7 +137,7 @@ const router = new Router({
       path: '/analyze/',
       redirect: '/analyze/models/',
       name: 'analyze',
-      component: Designs,
+      component: Analyze,
       children: [
         {
           path: 'models',
@@ -149,18 +149,23 @@ const router = new Router({
           name: 'analyzeSettings',
           component: AnalyzeSettings,
         },
+        {
+          path: '/analyze/:model/:design',
+          name: 'analyze_design',
+          component: Design,
+        },
       ],
     },
-    {
-      path: '/analyze/:model/:design',
-      name: 'analyze_design',
-      component: Design,
-    },
-    {
-      path: '/analyze/:model/:design/reports/report/:slug',
-      name: 'Report',
-      component: Design,
-    },
+    // {
+    //   path: '/analyze/:model/:design',
+    //   name: 'analyze_design',
+    //   component: Design,
+    // },
+    // {
+    //   path: '/analyze/:model/:design/reports/report/:slug',
+    //   name: 'Report',
+    //   component: Design,
+    // },
     {
       path: '/dashboards/',
       name: 'Dashboards',
