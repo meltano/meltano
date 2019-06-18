@@ -1,7 +1,7 @@
 import { mount, createLocalVue, shallowMount } from '@vue/test-utils';
 import Vuex from 'vuex';
 import VueRouter from 'vue-router';
-import Design from '@/views/Design';
+import Design from '@/components/designs/Design';
 import designs from '@/store/modules/designs';
 import router from '@/router';
 
