@@ -1,3 +1,33 @@
+<script>
+export default {
+  name: 'NewDashboardModal',
+  data() {
+    return {
+      saveDashboardSettings: { name: null, description: null },
+    };
+  },
+  methods: {
+    close() {
+      this.$emit('close');
+    },
+    saveDashboard() {
+      if (this.report) {
+        this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
+          data: this.saveDashboardSettings,
+          report: this.report,
+        });
+      } else {
+        this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
+      }
+      this.close();
+    },
+  },
+  props: {
+    report: Object,
+  },
+};
+</script>
+
 <template>
 
   <div class="modal is-active">
@@ -39,36 +69,6 @@
   </div>
 
 </template>
-
-<script>
-export default {
-  name: 'NewDashboardModal',
-  data() {
-    return {
-      saveDashboardSettings: { name: null, description: null },
-    };
-  },
-  methods: {
-    close() {
-      this.$emit('close');
-    },
-    saveDashboard() {
-      if (this.report) {
-        this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
-          data: this.saveDashboardSettings,
-          report: this.report,
-        });
-      } else {
-        this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
-      }
-      this.close();
-    },
-  },
-  props: {
-    report: Object,
-  },
-};
-</script>
 
 <style>
 </style>

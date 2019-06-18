@@ -1,3 +1,46 @@
+<script>
+import _ from 'lodash';
+import Pill from './Pill';
+
+export default {
+  name: 'RolePermissions',
+  props: ['permission', 'roles'],
+  data() {
+    return {
+      model: {
+        permissionType: this.permission.type,
+        role: null,
+        context: null,
+      },
+    };
+  },
+
+  components: {
+    'context-pill': Pill,
+  },
+
+  computed: {
+    enabled() {
+      return !(_.isEmpty(this.model.role) ||
+               _.isEmpty(this.model.context));
+    },
+  },
+
+  methods: {
+    add() {
+      this.$emit('add', this.model);
+      this.model.context = null;
+    },
+    remove(role, context) {
+      this.$emit('remove', {
+        permissionType: this.permission.type,
+        role: role.name,
+        context,
+      });
+    },
+  },
+};
+</script>
 
 <template>
   <div class="box" style="margin-bottom: 2em;">
@@ -57,49 +100,6 @@
   </div>
 </template>
 
-<script>
-import _ from 'lodash';
-import Pill from './Pill';
-
-export default {
-  name: 'RolePermissions',
-  props: ['permission', 'roles'],
-  data() {
-    return {
-      model: {
-        permissionType: this.permission.type,
-        role: null,
-        context: null,
-      },
-    };
-  },
-
-  components: {
-    'context-pill': Pill,
-  },
-
-  computed: {
-    enabled() {
-      return !(_.isEmpty(this.model.role) ||
-               _.isEmpty(this.model.context));
-    },
-  },
-
-  methods: {
-    add() {
-      this.$emit('add', this.model);
-      this.model.context = null;
-    },
-    remove(role, context) {
-      this.$emit('remove', {
-        permissionType: this.permission.type,
-        role: role.name,
-        context,
-      });
-    },
-  },
-};
-</script>
 <style scoped>
  .action {
    font-weight: bold;

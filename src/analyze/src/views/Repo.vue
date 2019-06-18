@@ -1,3 +1,74 @@
+<script>
+import { mapState, mapGetters } from 'vuex';
+import fileTypeEnums from '@/utils/fileTypeEnums';
+import pretty from '@/filters/pretty';
+import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import utils from '@/utils/utils';
+
+export default {
+  name: 'Repo',
+  created() {
+    this.getRepo();
+    this.sync();
+  },
+  components: {
+    RouterViewLayoutSidebar,
+  },
+  filters: {
+    pretty,
+  },
+  computed: {
+    ...mapGetters('repos', [
+      'hasFiles',
+      'hasError',
+      'passedValidation',
+      'hasMarkdown',
+      'hasCode',
+    ]),
+    ...mapState('repos', [
+      'files',
+      'activeView',
+      'validated',
+      'loadingValidation',
+      'loadingUpdate',
+      'errors',
+    ]),
+  },
+  methods: {
+    getRepo() {
+      this.$store.dispatch('repos/getRepo');
+    },
+    jsDashify(type, name) {
+      return utils.jsDashify(type, name);
+    },
+    isActive(f) {
+      return f.id === this.activeView.id;
+    },
+    isDeepRoutable(type) {
+      return type === fileTypeEnums.dashboards || type === fileTypeEnums.reports;
+    },
+    getDeepRoute(key, file) {
+      const name = utils.capitalize(utils.singularize(key));
+      const params = { slug: file.slug };
+      if (file.model && file.design) {
+        params.model = file.model;
+        params.design = file.design;
+      }
+      return { name, params };
+    },
+    getFile(file) {
+      this.$store.dispatch('repos/getFile', file);
+    },
+    lint() {
+      this.$store.dispatch('repos/lint');
+    },
+    sync() {
+      this.$store.dispatch('repos/sync');
+    },
+  },
+};
+</script>
+
 <template>
   <router-view-layout-sidebar>
 
@@ -112,76 +183,6 @@
   </router-view-layout-sidebar>
 </template>
 
-<script>
-import { mapState, mapGetters } from 'vuex';
-import fileTypeEnums from '@/utils/fileTypeEnums';
-import pretty from '@/filters/pretty';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
-import utils from '@/utils/utils';
-
-export default {
-  name: 'Repo',
-  created() {
-    this.getRepo();
-    this.sync();
-  },
-  components: {
-    RouterViewLayoutSidebar,
-  },
-  filters: {
-    pretty,
-  },
-  computed: {
-    ...mapGetters('repos', [
-      'hasFiles',
-      'hasError',
-      'passedValidation',
-      'hasMarkdown',
-      'hasCode',
-    ]),
-    ...mapState('repos', [
-      'files',
-      'activeView',
-      'validated',
-      'loadingValidation',
-      'loadingUpdate',
-      'errors',
-    ]),
-  },
-  methods: {
-    getRepo() {
-      this.$store.dispatch('repos/getRepo');
-    },
-    jsDashify(type, name) {
-      return utils.jsDashify(type, name);
-    },
-    isActive(f) {
-      return f.id === this.activeView.id;
-    },
-    isDeepRoutable(type) {
-      return type === fileTypeEnums.dashboards || type === fileTypeEnums.reports;
-    },
-    getDeepRoute(key, file) {
-      const name = utils.capitalize(utils.singularize(key));
-      const params = { slug: file.slug };
-      if (file.model && file.design) {
-        params.model = file.model;
-        params.design = file.design;
-      }
-      return { name, params };
-    },
-    getFile(file) {
-      this.$store.dispatch('repos/getFile', file);
-    },
-    lint() {
-      this.$store.dispatch('repos/lint');
-    },
-    sync() {
-      this.$store.dispatch('repos/sync');
-    },
-  },
-};
-</script>
 <style lang="scss" scoped>
 .content {
   padding: 10px;

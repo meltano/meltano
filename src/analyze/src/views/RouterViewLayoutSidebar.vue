@@ -1,3 +1,11 @@
+<script>
+
+export default {
+  name: 'RouterViewLayoutSidebar',
+};
+
+</script>
+
 <template>
   <div class="columns is-gapless">
     <aside class="column is-one-quarter vh-scrollable">
@@ -12,14 +20,6 @@
     </section>
   </div>
 </template>
-
-<script>
-
-export default {
-  name: 'RouterViewLayoutSidebar',
-};
-
-</script>
 
 <style lang="scss" scoped>
 </style>

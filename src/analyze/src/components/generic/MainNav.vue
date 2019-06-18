@@ -1,3 +1,34 @@
+<script>
+import Logo from './Logo';
+
+export default {
+  name: 'MainNav',
+  components: {
+    Logo,
+  },
+  watch: {
+    $route() {
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu();
+      }
+    },
+  },
+  data() {
+    return {
+      isMobileMenuOpen: false,
+    };
+  },
+  methods: {
+    mobileMenuClicked() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    },
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false;
+    },
+  },
+};
+</script>
+
 <template>
   <nav class="navbar is-transparent">
     <div class="navbar-brand">
@@ -58,36 +89,7 @@
     </div>
   </nav>
 </template>
-<script>
-import Logo from './Logo';
 
-export default {
-  name: 'MainNav',
-  components: {
-    Logo,
-  },
-  watch: {
-    $route() {
-      if (this.isMobileMenuOpen) {
-        this.closeMobileMenu();
-      }
-    },
-  },
-  data() {
-    return {
-      isMobileMenuOpen: false,
-    };
-  },
-  methods: {
-    mobileMenuClicked() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    },
-    closeMobileMenu() {
-      this.isMobileMenuOpen = false;
-    },
-  },
-};
-</script>
 <style lang="scss">
 @import '@/scss/bulma-preset-overrides.scss';
 

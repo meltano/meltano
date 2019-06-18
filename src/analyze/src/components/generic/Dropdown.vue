@@ -1,29 +1,3 @@
-<template>
-  <div class="dropdown"
-        :class="{
-          'is-active': isOpen,
-          'is-right': isRightAligned,
-          'is-fullwidth': isFullWidth,
-        }">
-    <div class="dropdown-trigger">
-      <button class="button"
-              :class="buttonClasses"
-              :disabled="disabled"
-              :aria-controls="getHyphenatedLabel"
-              aria-haspopup="true"
-              @click="toggleDropdown">
-        <span v-if="label">{{label}}</span>
-        <span class="icon is-small">
-          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
-        </span>
-      </button>
-    </div>
-    <div class="dropdown-menu" :id="getHyphenatedLabel" role="menu">
-      <slot :dropdown-force-close="forceClose"></slot>
-    </div>
-  </div>
-</template>
-
 <script>
 import hyphenate from '@/filters/hyphenate';
 
@@ -84,6 +58,32 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="dropdown"
+        :class="{
+          'is-active': isOpen,
+          'is-right': isRightAligned,
+          'is-fullwidth': isFullWidth,
+        }">
+    <div class="dropdown-trigger">
+      <button class="button"
+              :class="buttonClasses"
+              :disabled="disabled"
+              :aria-controls="getHyphenatedLabel"
+              aria-haspopup="true"
+              @click="toggleDropdown">
+        <span v-if="label">{{label}}</span>
+        <span class="icon is-small">
+          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
+        </span>
+      </button>
+    </div>
+    <div class="dropdown-menu" :id="getHyphenatedLabel" role="menu">
+      <slot :dropdown-force-close="forceClose"></slot>
+    </div>
+  </div>
+</template>
 
 <style lang="scss">
 .dropdown.is-fullwidth {

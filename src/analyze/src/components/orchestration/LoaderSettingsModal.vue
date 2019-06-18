@@ -1,3 +1,70 @@
+<script>
+import { mapState, mapGetters } from 'vuex';
+
+import _ from 'lodash';
+
+export default {
+  name: 'LoaderSettingsModal',
+  created() {
+    this.loaderNameFromRoute = this.$route.params.loader;
+    this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
+    this.$store.dispatch('plugins/getInstalledPlugins');
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
+  },
+  computed: {
+    ...mapGetters('configuration', [
+      'getLoaderImageUrl',
+      'getLoaderNameWithoutPrefixedTargetDash',
+    ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
+    ]),
+    ...mapState('configuration', [
+      'loaderInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
+      'installedPlugins',
+    ]),
+    configSettings() {
+      return this.loader.config
+        ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
+        : this.loaderInFocusConfiguration;
+    },
+    isSaveable() {
+      const hasOwns = [];
+      _.forOwn(this.configSettings, val => hasOwns.push(val));
+      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+    },
+    loader() {
+      const targetLoader = this.installedPlugins.loaders
+        ? this.installedPlugins.loaders.find(item => item.name === this.loaderNameFromRoute)
+        : null;
+      return targetLoader || {};
+    },
+  },
+  methods: {
+    close() {
+      if (this.prevRoute) {
+        this.$router.go(-1);
+      } else {
+        this.$router.push({ name: 'loaders' });
+      }
+    },
+    saveConfigAndGoToOrchestration() {
+      this.$store.dispatch('configuration/saveLoaderConfiguration', {
+        name: this.loader.name,
+        type: 'loader',
+        config: this.configSettings,
+      });
+      this.$router.push({ name: 'schedules' });
+    },
+  },
+};
+</script>
+
 <template>
 
   <div class="modal is-active">
@@ -69,69 +136,6 @@
   </div>
 
 </template>
-<script>
-import { mapState, mapGetters } from 'vuex';
 
-import _ from 'lodash';
-
-export default {
-  name: 'LoaderSettingsModal',
-  created() {
-    this.loaderNameFromRoute = this.$route.params.loader;
-    this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
-    this.$store.dispatch('plugins/getInstalledPlugins');
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
-  },
-  computed: {
-    ...mapGetters('configuration', [
-      'getLoaderImageUrl',
-      'getLoaderNameWithoutPrefixedTargetDash',
-    ]),
-    ...mapGetters('plugins', [
-      'getIsPluginInstalled',
-      'getIsInstallingPlugin',
-    ]),
-    ...mapState('configuration', [
-      'loaderInFocusConfiguration',
-    ]),
-    ...mapState('plugins', [
-      'installedPlugins',
-    ]),
-    configSettings() {
-      return this.loader.config
-        ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
-        : this.loaderInFocusConfiguration;
-    },
-    isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
-    },
-    loader() {
-      const targetLoader = this.installedPlugins.loaders
-        ? this.installedPlugins.loaders.find(item => item.name === this.loaderNameFromRoute)
-        : null;
-      return targetLoader || {};
-    },
-  },
-  methods: {
-    close() {
-      if (this.prevRoute) {
-        this.$router.go(-1);
-      } else {
-        this.$router.push({ name: 'loaders' });
-      }
-    },
-    saveConfigAndGoToOrchestration() {
-      this.$store.dispatch('configuration/saveLoaderConfiguration', {
-        name: this.loader.name,
-        type: 'loader',
-        config: this.configSettings,
-      });
-      this.$router.push({ name: 'schedules' });
-    },
-  },
-};
-</script>
+<style lang="scss">
+</style>

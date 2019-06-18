@@ -1,9 +1,3 @@
-<template>
-  <a :href="url" :target="linkTarget">
-    <slot/>
-  </a>
-</template>
-
 <script>
 import utils from '@/utils/utils';
 
@@ -25,3 +19,12 @@ export default {
   },
 };
 </script>
+
+<template>
+  <a :href="url" :target="linkTarget">
+    <slot/>
+  </a>
+</template>
+
+<style lang="scss">
+</style>

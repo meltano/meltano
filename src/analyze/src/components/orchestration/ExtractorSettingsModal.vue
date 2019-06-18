@@ -1,3 +1,77 @@
+<script>
+import { mapGetters, mapState } from 'vuex';
+
+import _ from 'lodash';
+
+export default {
+  name: 'ExtractorSettingsModal',
+  created() {
+    this.extractorNameFromRoute = this.$route.params.extractor;
+    this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
+    this.$store.dispatch('plugins/getInstalledPlugins');
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
+  },
+  computed: {
+    ...mapGetters('configuration', [
+      'getExtractorImageUrl',
+      'getExtractorNameWithoutPrefixedTapDash',
+    ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin',
+    ]),
+    ...mapState('configuration', [
+      'extractorInFocusConfiguration',
+    ]),
+    ...mapState('plugins', [
+      'installedPlugins',
+    ]),
+    configSettings() {
+      return this.extractor.config
+        ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
+        : this.extractorInFocusConfiguration;
+    },
+    extractorLacksConfigSettingsAndIsInstalled() {
+      return this.configSettings === null &&
+        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+    },
+    extractor() {
+      const targetExtractor = this.installedPlugins.extractors
+        ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
+        : null;
+      return targetExtractor || {};
+    },
+    isSaveable() {
+      const hasOwns = [];
+      _.forOwn(this.configSettings, val => hasOwns.push(val));
+      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+    },
+  },
+  methods: {
+    close() {
+      if (this.prevRoute) {
+        this.$router.go(-1);
+      } else {
+        this.$router.push({ name: 'extractors' });
+      }
+    },
+    beginEntitySelection() {
+      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
+    },
+    saveConfigAndBeginEntitySelection() {
+      this.$store.dispatch('configuration/saveExtractorConfiguration', {
+        name: this.extractor.name,
+        type: 'extractor',
+        config: this.configSettings,
+      });
+      this.beginEntitySelection();
+    },
+  },
+};
+</script>
+
 <template>
 
   <div class="modal is-active">
@@ -84,80 +158,6 @@
   </div>
 
 </template>
-
-<script>
-import { mapGetters, mapState } from 'vuex';
-
-import _ from 'lodash';
-
-export default {
-  name: 'ExtractorSettingsModal',
-  created() {
-    this.extractorNameFromRoute = this.$route.params.extractor;
-    this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
-    this.$store.dispatch('plugins/getInstalledPlugins');
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
-  },
-  computed: {
-    ...mapGetters('configuration', [
-      'getExtractorImageUrl',
-      'getExtractorNameWithoutPrefixedTapDash',
-    ]),
-    ...mapGetters('plugins', [
-      'getIsPluginInstalled',
-      'getIsInstallingPlugin',
-    ]),
-    ...mapState('configuration', [
-      'extractorInFocusConfiguration',
-    ]),
-    ...mapState('plugins', [
-      'installedPlugins',
-    ]),
-    configSettings() {
-      return this.extractor.config
-        ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
-        : this.extractorInFocusConfiguration;
-    },
-    extractorLacksConfigSettingsAndIsInstalled() {
-      return this.configSettings === null &&
-        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
-    },
-    extractor() {
-      const targetExtractor = this.installedPlugins.extractors
-        ? this.installedPlugins.extractors.find(item => item.name === this.extractorNameFromRoute)
-        : null;
-      return targetExtractor || {};
-    },
-    isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
-    },
-  },
-  methods: {
-    close() {
-      if (this.prevRoute) {
-        this.$router.go(-1);
-      } else {
-        this.$router.push({ name: 'extractors' });
-      }
-    },
-    beginEntitySelection() {
-      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
-    },
-    saveConfigAndBeginEntitySelection() {
-      this.$store.dispatch('configuration/saveExtractorConfiguration', {
-        name: this.extractor.name,
-        type: 'extractor',
-        config: this.configSettings,
-      });
-      this.beginEntitySelection();
-    },
-  },
-};
-</script>
 
 <style lang="scss">
 </style>
