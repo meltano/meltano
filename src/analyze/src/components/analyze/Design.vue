@@ -1,10 +1,10 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 import capitalize from '@/filters/capitalize';
-import Chart from '@/components/designs/Chart';
+import Chart from '@/components/analyze/Chart';
 import Dropdown from '@/components/generic/Dropdown';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import ResultTable from '@/components/designs/ResultTable';
+import ResultTable from '@/components/analyze/ResultTable';
 
 export default {
   name: 'Design',

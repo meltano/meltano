@@ -1,9 +1,9 @@
 import Router from 'vue-router';
 
-import AnalyzeModels from '@/components/designs/AnalyzeModels';
-import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
+import AnalyzeModels from '@/components/analyze/AnalyzeModels';
+import AnalyzeSettings from '@/components/analyze/AnalyzeSettings';
 import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
-import Design from '@/components/designs/Design';
+import Design from '@/components/analyze/Design';
 import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
 import Entities from '@/components/orchestration/Entities';
 import Extractors from '@/components/orchestration/Extractors';

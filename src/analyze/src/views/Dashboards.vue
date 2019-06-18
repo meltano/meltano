@@ -1,6 +1,6 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import Chart from '@/components/designs/Chart';
+import Chart from '@/components/analyze/Chart';
 import ClosableMessage from '@/components/generic/ClosableMessage';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import RouterViewLayout from '@/views/RouterViewLayout';
