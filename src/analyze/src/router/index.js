@@ -154,18 +154,13 @@ const router = new Router({
           name: 'analyze_design',
           component: Design,
         },
+        {
+          path: '/analyze/:model/:design/reports/report/:slug',
+          name: 'Report',
+          component: Design,
+        },
       ],
     },
-    // {
-    //   path: '/analyze/:model/:design',
-    //   name: 'analyze_design',
-    //   component: Design,
-    // },
-    // {
-    //   path: '/analyze/:model/:design/reports/report/:slug',
-    //   name: 'Report',
-    //   component: Design,
-    // },
     {
       path: '/dashboards/',
       name: 'Dashboards',
