@@ -45,7 +45,7 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
     {
       text: 'Submit Bug',
       onClick: () => {
-        window.open('https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=feature_proposal');
+        window.open('https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs');
       },
     },
     {
