@@ -256,7 +256,7 @@
     <div
       class="footer"
     >
-      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">Edit this page</a>
+      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">{{ $site.themeConfig.editLinkText }} <OutboundLink /></a>
     </div>
   </div>
 </template>
@@ -566,6 +566,9 @@ export default {
     border-top 1px solid $borderColor
     text-align center
     color lighten($textColor, 25%)
+    a
+      color $textColor
+      font-weight 500
 
 @media (max-width: $MQMobile)
   .home
