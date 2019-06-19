@@ -5,10 +5,11 @@ import sqlalchemy.pool as pool
 import logging
 import weakref
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import create_engine, MetaData, event
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 
 
@@ -75,6 +76,13 @@ def init_postgresql_hook(engine):
 
 
 def init_sqlite_hook(engine):
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """Enable WAL to handle concurrent processes gracefully."""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA journal_mode=WAL")
+        cursor.close()
+
+    event.listen(engine, "connect", set_sqlite_pragma, once=True)
     seed(engine)
 
 
