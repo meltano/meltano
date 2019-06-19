@@ -1,4 +1,5 @@
 import pytest
+import requests
 import requests_mock
 import json
 import yaml
@@ -12,10 +13,24 @@ from meltano.core.plugin_discovery_service import (
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
+@pytest.fixture
+def subject(plugin_discovery_service):
+    return plugin_discovery_service
+
+
+@pytest.fixture
+def discovery_url_mock():
+    with requests_mock.Mocker() as m:
+        m.get(MELTANO_DISCOVERY_URL, status_code=418)
+
+        yield
+
+
+@pytest.mark.usefixtures("discovery_url_mock")
 class TestPluginDiscoveryService:
-    @pytest.fixture
-    def subject(self, plugin_discovery_service):
-        return plugin_discovery_service
+    @pytest.mark.meta
+    def test_discovery_url_mock(self):
+        assert requests.get(MELTANO_DISCOVERY_URL).status_code == 418
 
     @pytest.fixture
     def extraneous_plugin(self, subject):
@@ -90,6 +105,8 @@ class TestPluginDiscoveryService:
             assert isinstance(discovery[t], list)
             assert "turboencabulator" not in discovery
 
+
+class TestPluginDiscoveryServiceRemote:
     def test_cached_discovery(self, subject):
         with mock.patch.object(
             PluginDiscoveryService,
@@ -110,16 +127,14 @@ class TestIncompatiblePluginDiscoveryService:
     def subject(self, plugin_discovery_service):
         return plugin_discovery_service
 
-    @pytest.fixture
+    @pytest.fixture(autouse=True)
     def discovery_yaml(self, subject):
         subject._discovery["version"] = 1000
 
-    @pytest.mark.usefixtures("discovery_yaml")
     def test_discovery(self, subject):
         with pytest.raises(IncompatibleVersionError):
             subject.ensure_compatible()
 
-    @pytest.mark.usefixtures("discovery_yaml")
     def test_remote_incompatible(self, subject):
         compatible_discovery = subject._discovery.copy()
         compatible_discovery["version"] = PluginDiscoveryService.__version__

@@ -9,6 +9,7 @@ from . import PluginInstall, PluginType
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
+from meltano.core.db import project_engine
 from meltano.core.venv_service import VenvService
 from meltano.core.utils import nest, map_dict
 

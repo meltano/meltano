@@ -127,33 +127,14 @@ class PluginDiscoveryService(Versioned):
         return self.project.meltano_dir("cache", "discovery.yml")
 
     def plugins(self) -> Iterator[Plugin]:
-        return chain(self.custom_plugins(), self.discovery_plugins())
+        custom_plugins = self.make_plugins(self.project.meltano.get("plugins", {}))
+        discovery_plugins = self.make_plugins(self.discovery)
 
-    def discovery_plugins(self) -> Iterator[Plugin]:
-        """Parse the discovery file and returns it as `Plugin` instances."""
+        return chain(custom_plugins, discovery_plugins)
 
-        # this will parse the discovery file and create an instance of the
-        # corresponding `plugin_class` for all the plugins.
-        plugins = deepcopy(self.discovery)
+    def make_plugins(self, plugin_defs: Dict) -> Iterator[Plugin]:
+        plugins = deepcopy(plugin_defs)
         plugins.pop("version", 1)
-
-        return (
-            Plugin(
-                plugin_type,
-                plugin_def.pop("name"),
-                plugin_def.pop("namespace"),
-                plugin_def.pop("pip_url"),
-                **plugin_def,
-            )
-            for plugin_type, plugin_defs in plugins.items()
-            for plugin_def in plugin_defs
-            if PluginType.value_exists(plugin_type)
-        )
-
-    def custom_plugins(self) -> Iterator[Plugin]:
-        """Parse the meltano.yml and return all defined `Plugin`."""
-
-        plugins = deepcopy(self.project.meltano.get("plugins", {}))
 
         return (
             Plugin(

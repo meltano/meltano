@@ -1,10 +1,11 @@
 import subprocess
 import logging
 
-from .venv_service import VenvService
-from .plugin import PluginType
 from .config_service import ConfigService
+from .db import project_engine
+from .plugin import PluginType
 from .plugin_invoker import invoker_factory
+from .venv_service import VenvService
 
 
 class DbtService:
@@ -20,7 +21,7 @@ class DbtService:
 
     def compile(self, models=None):
         session = self._Session()
-        invoker = invoker_factory(session, project, self._plugin)
+        invoker = invoker_factory(session, self.project, self._plugin)
 
         try:
             params = ["--profiles-dir", self.profile_dir, "--profile", "meltano"]
@@ -29,7 +30,7 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = self.invoker.invoke("compile", *params)
+            handle = invoker.invoke("compile", *params)
             handle.wait()
 
             return handle
@@ -38,9 +39,9 @@ class DbtService:
 
     def deps(self):
         session = self._Session()
-        invoker = invoker_factory(session, project, self._plugin)
+        invoker = invoker_factory(session, self.project, self._plugin)
         try:
-            handle = self.invoker.invoke("deps")
+            handle = invoker.invoke("deps")
             handle.wait()
 
             return handle
@@ -49,7 +50,7 @@ class DbtService:
 
     def run(self, models=None):
         session = self._Session()
-        invoker = invoker_factory(session, project, self._plugin)
+        invoker = invoker_factory(session, self.project, self._plugin)
 
         try:
             params = ["--profiles-dir", self.profile_dir, "--profile", "meltano"]
@@ -58,7 +59,7 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = self.invoker.invoke("run", *params)
+            handle = invoker.invoke("run", *params)
             handle.wait()
 
             return handle

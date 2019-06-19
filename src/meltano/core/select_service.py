@@ -1,11 +1,12 @@
 import json
 import logging
 
-from .project import Project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
+from .project import Project
+from .db import project_engine
 
 
 class SelectService:

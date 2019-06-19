@@ -228,6 +228,7 @@ models:
     namespace: gitlab
     pip_url: "git+https://gitlab.com/meltano/model-gitlab.git"
   - name: model-gitlab-ultimate
+    namespace: gitlab
     pip_url: "git+https://gitlab.com/meltano/model-gitlab-ultimate.git"
   - name: model-stripe
     namespace: stripe
