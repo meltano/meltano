@@ -1,10 +1,15 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 import _ from 'lodash';
 
 export default {
   name: 'LoaderSettingsModal',
+  components: {
+    ConnectorLogo,
+  },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
     this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
@@ -15,8 +20,7 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', [
-      'getLoaderImageUrl',
-      'getLoaderNameWithoutPrefixedTargetDash',
+      'getConnectorLogoUrl',
     ]),
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
@@ -72,9 +76,7 @@ export default {
     <div class="modal-card">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <img
-            :src='getLoaderImageUrl(loaderNameFromRoute)'
-            :alt="`${getLoaderNameWithoutPrefixedTargetDash(loaderNameFromRoute)} logo`">
+          <ConnectorLogo :connector='loaderNameFromRoute' />
         </div>
         <p class="modal-card-title">Loader Settings</p>
         <button class="delete" aria-label="close" @click="close"></button>

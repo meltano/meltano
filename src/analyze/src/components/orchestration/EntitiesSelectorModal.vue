@@ -1,8 +1,13 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
+
+import ConnectorLogo from '@/components/generic/ConnectorLogo';
 
 export default {
   name: 'EntitiesSelectorModal',
+  components: {
+    ConnectorLogo,
+  },
   created() {
     this.selectionModes = [
       this.selectionModeAll,
@@ -25,10 +30,6 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getExtractorImageUrl',
-      'getExtractorNameWithoutPrefixedTapDash',
-    ]),
     ...mapState('configuration', [
       'extractorInFocusEntities',
     ]),
@@ -138,9 +139,7 @@ export default {
     <div class="modal-card is-wide">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <img
-            :src='getExtractorImageUrl(extractorNameFromRoute)'
-            :alt="`${getExtractorNameWithoutPrefixedTapDash(extractorNameFromRoute)} logo`">
+          <ConnectorLogo :connector='extractorNameFromRoute' />
         </div>
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
