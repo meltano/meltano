@@ -20,8 +20,8 @@ class Airflow(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-    def invoker(self, project, *args, **kwargs):
-        return AirflowInvoker(project, self, *args, **kwargs)
+    def invoker(self, session, project, *args, **kwargs):
+        return AirflowInvoker(session, project, self, *args, **kwargs)
 
     @property
     def config_files(self):
@@ -65,9 +65,9 @@ class Airflow(PluginInstall):
                 airflow_cfg.read_file(cfg)
             logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-            for section, cfg in self.config.items():
+            for section, cfg in invoker.plugin_settings.as_config().items():
                 airflow_cfg[section].update(map_dict(str, cfg))
-                logging.debug(f"\tUpdated section [{section}]")
+                logging.debug(f"\tUpdated section [{section}] with {cfg}")
 
             with airflow_cfg_path.open("w") as cfg:
                 airflow_cfg.write(cfg)

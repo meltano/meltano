@@ -2,6 +2,7 @@ import os
 import sqlalchemy
 import logging
 from typing import Iterable, Dict, Tuple
+from copy import deepcopy
 
 from meltano.core.db import project_engine
 from meltano.core.utils import nest
@@ -43,8 +44,9 @@ class PluginSettingsService:
         return self.plugin_namespace(self.plugin)
 
     def as_config(self) -> Dict:
+        # defaults to the meltano.yml for extraneous settings
+        config = deepcopy(self.get_install().config)
         plugin = self.get_definition()
-        config = plugin._extras.get("config", {})
 
         for setting in plugin.settings:
             nest(config, setting["name"], self.get_value(setting["name"]))
