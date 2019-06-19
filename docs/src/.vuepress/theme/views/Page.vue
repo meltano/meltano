@@ -53,8 +53,16 @@
           class="last-updated"
           v-if="lastUpdated"
         >
-          <span class="prefix">{{ lastUpdatedText }}: </span>
-          <span class="time">{{ lastUpdated }}</span>
+          {{ lastUpdatedText }}: {{ lastUpdated }}</span>
+        </div>
+
+        <div class="edit-link">
+          <a
+            href="https://gitlab.com/meltano/meltano/issues/new"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Submit an issue</a>
+          <OutboundLink/>
         </div>
       </div>
     </div>
@@ -215,6 +223,8 @@ function find (page, items, offset) {
   .last-updated
     float right
     font-size 0.9em
+    color #888
+    font-style italic
     .prefix
       font-weight 500
       color lighten($textColor, 25%)
@@ -225,6 +235,8 @@ function find (page, items, offset) {
 .page-edit__inner {
   border-top: 1px solid $borderColor;
   padding-top: 1.5rem;
+  display: flex;
+  justify-content: space-between;
 }
 
 .page-nav
@@ -245,13 +257,16 @@ function find (page, items, offset) {
 
 @media (max-width: $MQMobile)
   .page-edit
-    margin 0 2rem
-    border 1px solid blue
+    padding 0 2rem
     .edit-link
-      margin-bottom .5rem
+      margin-bottom .8rem
     .last-updated
-      font-size .8em
+      font-size 1rem
       float none
       text-align left
-
+  .page-edit__inner
+    display flex
+    flex-direction column
+  .last-updated
+    order 1
 </style>
