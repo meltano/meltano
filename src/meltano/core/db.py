@@ -82,7 +82,7 @@ def init_sqlite_hook(engine):
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.close()
 
-    event.listen(engine, 'connect', set_sqlite_pragma, once=True)
+    event.listen(engine, "connect", set_sqlite_pragma, once=True)
     seed(engine)
 
 
