@@ -1,10 +1,15 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 import _ from 'lodash';
 
 export default {
   name: 'ExtractorSettingsModal',
+  components: {
+    ConnectorLogo,
+  },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
     this.$store.dispatch('configuration/getExtractorConfiguration', this.extractorNameFromRoute);
@@ -14,10 +19,6 @@ export default {
     this.$store.dispatch('configuration/clearExtractorInFocusConfiguration');
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getExtractorImageUrl',
-      'getExtractorNameWithoutPrefixedTapDash',
-    ]),
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
@@ -79,9 +80,7 @@ export default {
     <div class="modal-card">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <img
-            :src='getExtractorImageUrl(extractorNameFromRoute)'
-            :alt="`${getExtractorNameWithoutPrefixedTapDash(extractorNameFromRoute)} logo`">
+          <ConnectorLogo :connector='extractorNameFromRoute' />
         </div>
         <p class="modal-card-title">Extractor Settings</p>
         <button class="delete" aria-label="close" @click="close"></button>

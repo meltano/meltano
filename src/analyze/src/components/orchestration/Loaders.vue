@@ -1,17 +1,18 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 export default {
   name: 'Loaders',
+  components: {
+    ConnectorLogo,
+  },
   created() {
     this.$store.dispatch('plugins/getAllPlugins');
     this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getLoaderImageUrl',
-      'getLoaderNameWithoutPrefixedTargetDash',
-    ]),
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
@@ -61,10 +62,9 @@ export default {
         :key="`${loader}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
-            <img
-              :class='{ "grayscale": !getIsPluginInstalled("loaders", loader) }'
-              :src='getLoaderImageUrl(loader)'
-              :alt="`${getLoaderNameWithoutPrefixedTargetDash(loader)} logo`">
+            <ConnectorLogo
+              :connector='loader'
+              :is-grayscale='!getIsPluginInstalled("loaders", loader)' />
           </div>
           <div class="content is-small">
             <p class='has-text-centered'>

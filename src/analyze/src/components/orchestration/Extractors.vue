@@ -1,17 +1,18 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 
+import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 export default {
   name: 'Extractors',
+  components: {
+    ConnectorLogo,
+  },
   created() {
     this.$store.dispatch('plugins/getAllPlugins');
     this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getExtractorImageUrl',
-      'getExtractorNameWithoutPrefixedTapDash',
-    ]),
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
@@ -70,10 +71,9 @@ export default {
         :key="`${extractor}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
-            <img
-              :class='{ "grayscale": !getIsPluginInstalled("extractors", extractor) }'
-              :src='getExtractorImageUrl(extractor)'
-              :alt="`${getExtractorNameWithoutPrefixedTapDash(extractor)} logo`">
+            <ConnectorLogo
+              :connector='extractor'
+              :is-grayscale='!getIsPluginInstalled("extractors", extractor)' />
           </div>
           <div class="content is-small">
             <p class='has-text-centered'>

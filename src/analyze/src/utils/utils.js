@@ -1,3 +1,5 @@
+const connectorLogoRegExp = /(?:tap-|target-)?(.*)/;
+
 export default {
 
   // Path Utils
@@ -20,6 +22,11 @@ export default {
     fragment = fragment ? `#${fragment}` : '';
 
     return `https://meltano.com/docs${path}.html${fragment}`;
+  },
+
+  getConnectorLogoUrl(connectorName) {
+    const name = connectorLogoRegExp.exec(connectorName)[1];
+    return `/static/logos/${name}-logo.png`;
   },
 
   // Color Utils
