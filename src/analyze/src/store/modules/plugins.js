@@ -65,7 +65,8 @@ const mutations = {
   },
 
   installPluginComplete(_, installConfig) {
-    lodash.pull(state.installingPlugins[installConfig.pluginType], installConfig.name);
+    const idx = state.installingPlugins[installConfig.pluginType].indexOf(installConfig.name);
+    state.installingPlugins[installConfig.pluginType].splice(idx, 1);
   },
 
   setAllPlugins(_, plugins) {
