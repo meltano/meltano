@@ -26,10 +26,12 @@ export default {
       'addPlugin',
       'installPlugin',
     ]),
-    async installLoaderAndBeginSettings(loader) {
-      await this.addPlugin({ pluginType: 'loaders', name: loader });
-      this.installPlugin({ pluginType: 'loaders', name: loader });
-      this.updateLoaderSettings(loader);
+    installLoaderAndBeginSettings(loader) {
+      this.addPlugin({ pluginType: 'loaders', name: loader })
+        .then(() => {
+          this.installPlugin({ pluginType: 'loaders', name: loader });
+          this.updateLoaderSettings(loader);
+        });
     },
     updateLoaderSettings(loader) {
       this.$router.push({ name: 'loaderSettings', params: { loader } });

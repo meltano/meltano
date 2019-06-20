@@ -29,10 +29,12 @@ export default {
       'addPlugin',
       'installPlugin',
     ]),
-    async installExtractorAndBeginSettings(extractor) {
-      await this.addPlugin({ pluginType: 'extractors', name: extractor });
-      this.installPlugin({ pluginType: 'extractors', name: extractor });
-      this.updateExtractorSettings(extractor);
+    installExtractorAndBeginSettings(extractor) {
+      this.addPlugin({ pluginType: 'extractors', name: extractor })
+        .then(() => {
+          this.installPlugin({ pluginType: 'extractors', name: extractor });
+          this.updateExtractorSettings(extractor);
+        });
     },
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } });
