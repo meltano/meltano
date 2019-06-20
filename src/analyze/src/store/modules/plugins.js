@@ -21,12 +21,12 @@ const getters = {
     };
   },
   getIsPluginInstalled(stateRef) {
-    return (pluginType, extractor) => (stateRef.installedPlugins[pluginType]
-      ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === extractor))
+    return (pluginType, pluginName) => (stateRef.installedPlugins[pluginType]
+      ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === pluginName))
       : false);
   },
   getIsInstallingPlugin(stateRef) {
-    return (pluginType, extractor) => stateRef.installingPlugins[pluginType].includes(extractor);
+    return (pluginType, pluginName) => stateRef.installingPlugins[pluginType].includes(pluginName);
   },
 };
 
