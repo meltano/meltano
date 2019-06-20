@@ -19,9 +19,6 @@ export default {
     this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getConnectorLogoUrl',
-    ]),
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
