@@ -32,13 +32,13 @@ export default {
   },
   methods: {
     ...mapActions('plugins', [
+      'addPlugin',
       'installPlugin',
     ]),
     installModel(model) {
-      this.installPlugin({ pluginType: 'models', name: model })
-        .then(() => {
-          this.$store.dispatch('repos/getModels');
-        });
+      this.addPlugin({ pluginType: 'models', name: model })
+        .then(() => this.installPlugin({ pluginType: 'models', name: model }))
+        .then(() => this.$store.dispatch('repos/getModels'));
     },
   },
 };
@@ -50,7 +50,6 @@ export default {
       <div class="column is-one-third">
         <h2 class='title is-5'>Available</h2>
         <div class="content is-small">
-
           <div
             class="level level-tight"
             v-for='(modelPlugin, index) in plugins.models'
