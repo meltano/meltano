@@ -23,9 +23,11 @@ export default {
   },
   methods: {
     ...mapActions('plugins', [
+      'addPlugin',
       'installPlugin',
     ]),
-    installLoaderAndBeginSettings(loader) {
+    async installLoaderAndBeginSettings(loader) {
+      await this.addPlugin({ pluginType: 'loaders', name: loader });
       this.installPlugin({ pluginType: 'loaders', name: loader });
       this.updateLoaderSettings(loader);
     },

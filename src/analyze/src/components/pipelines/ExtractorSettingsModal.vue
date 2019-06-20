@@ -108,7 +108,7 @@ export default {
                   <input
                     class="input"
                     type="text"
-                    :placeholder="val"
+                    :placeholder="setting.value"
                     v-model="configSettings.config[setting.name]">
                 </p>
               </div>

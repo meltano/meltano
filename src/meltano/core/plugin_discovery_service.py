@@ -145,7 +145,7 @@ class PluginDiscoveryService(Versioned):
                 **plugin_def,
             )
             for plugin_type, plugin_defs in plugins.items()
-            for plugin_def in plugin_defs
+            for plugin_def in sorted(plugin_defs, key=lambda d: d["name"])
             if (PluginType.value_exists(plugin_type) and "namespace" in plugin_def)
         )
 

@@ -26,9 +26,11 @@ export default {
   },
   methods: {
     ...mapActions('plugins', [
+      'addPlugin',
       'installPlugin',
     ]),
-    installExtractorAndBeginSettings(extractor) {
+    async installExtractorAndBeginSettings(extractor) {
+      await this.addPlugin({ pluginType: 'extractors', name: extractor });
       this.installPlugin({ pluginType: 'extractors', name: extractor });
       this.updateExtractorSettings(extractor);
     },
