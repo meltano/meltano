@@ -119,6 +119,7 @@ export default {
 
       <div class="steps-content">
         <div
+          v-if='getIsActiveStep("extractors")'
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('extractors') }">
           <router-view></router-view>
@@ -127,6 +128,7 @@ export default {
           </div>
         </div>
         <div
+          v-if='getIsActiveStep("entities")'
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('entities') }">
           <router-view></router-view>
@@ -135,6 +137,7 @@ export default {
           </div>
         </div>
         <div
+          v-if='getIsActiveStep("loaders")'
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('loaders') }">
           <router-view></router-view>
@@ -143,6 +146,7 @@ export default {
           </div>
         </div>
         <div
+          v-if='getIsActiveStep("schedules")'
           class="step-content"
           :class="{ 'is-active': getIsActiveStep('schedules') }">
           <router-view></router-view>
