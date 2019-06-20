@@ -13,6 +13,7 @@ from meltano.core.plugin import PluginInstall
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.api.models import db
 
 
 class CompileEventHandler(PatternMatchingEventHandler):
@@ -92,7 +93,7 @@ class AirflowWorker(threading.Thread):
         self._plugin = airflow or ConfigService(project).get_plugin("airflow")
 
     def start_all(self):
-        invoker = invoker_factory(self.project, self._plugin)
+        invoker = invoker_factory(db.session, self.project, self._plugin)
         self._webserver = invoker.invoke("webserver")
         self._scheduler = invoker.invoke("scheduler")
 
