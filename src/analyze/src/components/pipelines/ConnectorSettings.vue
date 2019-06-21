@@ -1,13 +1,16 @@
 <script>
 export default {
   name: 'ConnectorSettings',
+  props: {
+    settings: { type: Object, required: true, default: () => {} },
+  },
 };
 </script>
 
 <template>
   <div>
-    ConnectorSettings
-    <!-- <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+
+    <div class="field is-horizontal" v-for='(val, key) in settings' :key='key'>
       <div class="field-label is-normal">
         <label class="label">{{key}}</label>
       </div>
@@ -18,11 +21,11 @@ export default {
               class="input"
               type="text"
               :placeholder="val"
-              v-model="configSettings[key]">
+              v-model="settings[key]">
           </p>
         </div>
       </div>
-    </div> -->
+    </div>
 
   </div>
 </template>

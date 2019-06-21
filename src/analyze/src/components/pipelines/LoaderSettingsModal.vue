@@ -2,6 +2,7 @@
 import { mapState, mapGetters } from 'vuex';
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
+import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
 import _ from 'lodash';
 
@@ -9,6 +10,7 @@ export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
+    ConnectorSettings,
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
@@ -91,26 +93,9 @@ export default {
           </div>
         </template>
 
-        <template v-if='configSettings'>
-
-          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
-            <div class="field-label is-normal">
-              <label class="label">{{key}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    :placeholder="val"
-                    v-model="configSettings[key]">
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </template>
+        <ConnectorSettings
+          v-if='configSettings'
+          :settings='configSettings'/>
 
       </section>
       <footer class="modal-card-foot buttons is-right">
