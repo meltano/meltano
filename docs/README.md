@@ -1,36 +1,33 @@
 # Meltano Documentation
 
-The live site can be found at: [https://www.meltano.com](https://www.meltano.com).
+Read more at [meltano.com](https://www.meltano.com).
 
-## Requirements
+## Prerequisites
 
-- [NodeJS 8+](https://nodejs.org/)
+Before you move on, make sure you have [Node 8.x]((https://nodejs.org/)) or newer installed.
 
 ## Instructions
 
-1. Clone this repo `git@gitlab.com:meltano/meltano.git`
-1. Navigate to root directory in terminal
-1. Install all dependencies
-```bash
+1. Clone the project
+```sh
+git clone git@gitlab.com:meltano/meltano.git
+```
+2. Navigate to the `docs/` folder and install all dependencies 
+
+```sh
+cd meltano/docs/
 npm install
 ```
-4. Navigate to the `/docs` directory and tun a local instance of VuePress that dynamically uploads as you make changes to the files in this directory
+3. Build and run
 ```bash
-cd docs/
 npm run dev:docs
 ```
-
-5. To view changes, go to http://localhost:8080/ (Troubleshooting: if 8080 doesn't work, check the success message for the correct port)
+4. View changes at http://localhost:8080/ 
 
 ## Build Artifacts
 
-To build the artifacts for the docs site, run the following commands:
-
-1. Install all dependencies
-```bash
-npm install
-```
-2. Run a local instance of VuePress that dynamically uploads as you make changes to the files in the `/docs` directory
+To generate static assets for the `docs/` directory, run:
 ```bash
 npm run build:docs
 ```
+This will add the generated files in the `docs/public` directory.
