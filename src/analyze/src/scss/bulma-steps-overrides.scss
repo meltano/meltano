@@ -4,7 +4,7 @@
 $steps-maker-default-color:	$app-background-color;
 $steps-marker-default-border:	none;
 $steps-default-color:	$grey-lighter;
-$steps-completed-color:	$app-background-color;
+$steps-completed-color:	$white-ter;
 $steps-active-color:	$interactive-navigation;
 $steps-divider-height:	.1em;
 
@@ -16,7 +16,7 @@ $steps-divider-height:	.1em;
 
     .step-marker {
       color: $interactive-navigation !important;
-      background-color: $app-background-color !important;
+      background-color: $white-ter !important;
     }
   }
 

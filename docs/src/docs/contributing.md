@@ -90,6 +90,41 @@ Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.
 When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
 :::
 
+### UI - Visual Hierarchy
+
+The below visual hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
+- Level 1 - Primary navigation, signage, and sub-navigation - *Grey*
+- Level 2 - Task container (traditionally the page metaphor) - *White-ish Grey*
+- Level 3 - Primary task container(s) - *White w/Shadow*
+- Level 4 - Primary CTAs - *Primary-Interactive Color*
+- Level 5 - Dropdowns, dialogs, pop-overs, etc. - *White w/Shadow*
+- Level 6 - Modals - *White w/Lightbox*
+- Level 7 - Toasts - *White w/Shadow + Message Color*
+
+### UI - Markup Hierarchy
+
+There are three fundamental markup groups in the codebase. All three are technically VueJS single-file components but each have an intended use:
+1. Views (top-level "pages" and "page containers" that map to parent routes)
+2. Sub-views (nested "pages" of "page containers" that map to child routes)
+3. Components (widgets that are potentially reusable across parent and child routes)
+
+Here is a technical breakdown:
+1. Views - navigation, signage, and sub-navigation
+    - Use `<router-view-layout>` as root with only two children:
+      1. `<div class="container view-header">`
+          - Signage
+          - Sub-navigation
+      2. `<div class="container view-body">`
+          - Can expand based on task real-estate requirements via `is-fluid` class addition
+    - Reside in the `src/views` directory
+2. Sub-views - tasks
+    - Use `<section>` as root (naturally assumes a parent of `<div class="container view-body">`) with one type of child:
+        - One or more `<div class="columns">` each with their needed `<div class="column">` variations
+    - Reside in feature directory (ex. `src/components/analyze/AnalyzeModels`)
+3. Components - task helpers
+    - Use Vue component best practices
+    - Reside in feature or generic directory (ex. `src/components/analyze/ResultTable` and `src/components/generic/Dropdown`)
+
 ## Merge Requests
 
 :::tip Searching for something to work on?

@@ -60,8 +60,31 @@ a.disabled {
 
 /*
 LAYOUT ---------------------------------------------------------------------------------------------
-Layout helpers with names based on Bulma naming conventions
+Layout helpers, often with names based on Bulma naming conventions
 */
+
+.view-header {
+  margin-bottom: 1rem;
+  height: 45px;
+
+  .tabs {
+    ul {
+      margin: 0;
+    }
+  }
+}
+
+.view-body {
+  border: 1px solid $grey-lighter;
+  border-radius: $radius-large;
+  background-color: $white-ter;
+  padding: 1em;
+
+  &.is-fluid {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
 
 .modal-card {
   overflow: visible; // Prevents clipping of dropdown and similar components in Modal
