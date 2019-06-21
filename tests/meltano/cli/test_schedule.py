@@ -1,14 +1,22 @@
 import pytest
 import os
-from unittest.mock import patch
+from unittest import mock
 from functools import partial
 
 from meltano.cli import cli
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import iso8601_datetime
+from asserts import assert_cli_runner
 
 
 class TestCliSchedule:
-    def test_schedule(self, project, cli_runner, schedule_service):
+    @pytest.mark.usefixtures("tap", "target")
+    @mock.patch(
+        "meltano.core.schedule_service.PluginSettingsService.get_value", autospec=True
+    )
+    def test_schedule(self, get_value, project, cli_runner, schedule_service):
+        get_value.return_value = "2010-01-01"
+
         res = cli_runner.invoke(
             cli,
             [
@@ -22,6 +30,7 @@ class TestCliSchedule:
             ],
         )
 
+        assert_cli_runner(res)
         project.reload()
 
         schedule = next(schedule_service.schedules())
@@ -30,4 +39,5 @@ class TestCliSchedule:
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
         assert schedule.interval == "@eon"  # not anytime soon ;)
+        assert schedule.start_date == iso8601_datetime(get_value.return_value)
         assert res.exit_code == 0, res.stdout
