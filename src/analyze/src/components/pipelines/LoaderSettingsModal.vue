@@ -110,15 +110,6 @@ export default {
             </div>
           </div>
 
-          <article class="message is-warning is-small">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-            </div>
-          </article>
-
         </template>
 
       </section>

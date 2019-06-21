@@ -2,6 +2,7 @@
 import { mapGetters, mapState } from 'vuex';
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
+import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
 import _ from 'lodash';
 
@@ -9,6 +10,7 @@ export default {
   name: 'ExtractorSettingsModal',
   components: {
     ConnectorLogo,
+    ConnectorSettings,
   },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
@@ -98,35 +100,9 @@ export default {
           </div>
         </template>
 
-        <template v-if='configSettings'>
-
-          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
-            <div class="field-label is-normal">
-              <label class="label">{{key}}</label>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    :placeholder="val"
-                    v-model="configSettings[key]">
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <article class="message is-warning is-small">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-            </div>
-          </article>
-
-        </template>
+        <ConnectorSettings
+          v-if='configSettings'
+          :settings='configSettings'/>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">
