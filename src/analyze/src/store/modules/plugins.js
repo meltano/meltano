@@ -21,12 +21,12 @@ const getters = {
     };
   },
   getIsPluginInstalled(stateRef) {
-    return (pluginType, extractor) => (stateRef.installedPlugins[pluginType]
-      ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === extractor))
+    return (pluginType, pluginName) => (stateRef.installedPlugins[pluginType]
+      ? Boolean(stateRef.installedPlugins[pluginType].find(item => item.name === pluginName))
       : false);
   },
   getIsInstallingPlugin(stateRef) {
-    return (pluginType, extractor) => stateRef.installingPlugins[pluginType].includes(extractor);
+    return (pluginType, pluginName) => stateRef.installingPlugins[pluginType].includes(pluginName);
   },
 };
 
@@ -65,7 +65,8 @@ const mutations = {
   },
 
   installPluginComplete(_, installConfig) {
-    lodash.pull(state.installingPlugins[installConfig.pluginType], installConfig.name);
+    const idx = state.installingPlugins[installConfig.pluginType].indexOf(installConfig.name);
+    state.installingPlugins[installConfig.pluginType].splice(idx, 1);
   },
 
   setAllPlugins(_, plugins) {

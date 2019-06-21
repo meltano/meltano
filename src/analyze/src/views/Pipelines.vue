@@ -1,20 +1,34 @@
 <script>
 import ClosableMessage from '@/components/generic/ClosableMessage';
 import RouterViewLayout from '@/views/RouterViewLayout';
+import Step from '@/components/generic/bulma/Step';
 
 export default {
   name: 'Pipelines',
   components: {
     ClosableMessage,
     RouterViewLayout,
+    Step,
   },
   data() {
     return {
       steps: [
-        { name: 'extractors', routeMatches: ['extractors', 'extractorSettings'] },
-        { name: 'entities', routeMatches: ['entities', 'extractorEntities'] },
-        { name: 'loaders', routeMatches: ['loaders', 'loaderSettings'] },
-        { name: 'schedules', routeMatches: ['schedules', 'createSchedule'] },
+        { name: 'extractors',
+          subView: 'extractorSettings',
+          routeMatches: ['extractors', 'extractorSettings'],
+        },
+        { name: 'entities',
+          subView: 'extractorEntities',
+          routeMatches: ['entities', 'extractorEntities'],
+        },
+        { name: 'loaders',
+          subView: 'loaderSettings',
+          routeMatches: ['loaders', 'loaderSettings'],
+        },
+        { name: 'schedules',
+          subView: 'createSchedule',
+          routeMatches: ['schedules', 'createSchedule'],
+        },
       ],
     };
   },
@@ -33,6 +47,9 @@ export default {
     },
     getIsStepScheduleMinimallyValidated() {
       return true; // TODO proper minimally validated validation
+    },
+    getModalName() {
+      return this.currentStep.subView;
     },
     isModal() {
       return this.$route.meta.isModal;
@@ -127,39 +144,14 @@ export default {
         </div>
 
         <div class="steps-content">
-          <div
-            class="step-content"
-            :class="{ 'is-active': getIsActiveStep('extractors') }">
+          <Step>
             <router-view></router-view>
             <div v-if='isModal'>
-              <router-view name='extractorSettings'></router-view>
+              <router-view :name='getModalName'></router-view>
             </div>
-          </div>
-          <div
-            class="step-content"
-            :class="{ 'is-active': getIsActiveStep('entities') }">
-            <router-view></router-view>
-            <div v-if='isModal'>
-              <router-view name='extractorEntities'></router-view>
-            </div>
-          </div>
-          <div
-            class="step-content"
-            :class="{ 'is-active': getIsActiveStep('loaders') }">
-            <router-view></router-view>
-            <div v-if='isModal'>
-              <router-view name='loaderSettings'></router-view>
-            </div>
-          </div>
-          <div
-            class="step-content"
-            :class="{ 'is-active': getIsActiveStep('schedules') }">
-            <router-view></router-view>
-            <div v-if='isModal'>
-              <router-view name='createSchedule'></router-view>
-            </div>
-          </div>
+          </Step>
         </div>
+
       </div>
     </div>
 
