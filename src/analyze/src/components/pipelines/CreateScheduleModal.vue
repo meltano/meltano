@@ -89,9 +89,10 @@ export default {
     save() {
       const pipeline = Object.assign({}, this.pipeline);
       pipeline.startDate = this.pipeline.startDate === 'None'
-        ? '' : new Date(this.pipeline.startDate).toISOString();
-      this.$store.dispatch('configuration/savePipelineSchedule', pipeline);
-      this.close();
+        ? null : new Date(this.pipeline.startDate).toISOString();
+
+      this.$store.dispatch('configuration/savePipelineSchedule', pipeline)
+        .then(() => this.close());
     },
     setCatchUpDateToNone() {
       this.pipeline.startDate = 'None';

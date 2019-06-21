@@ -5,7 +5,7 @@ import logging
 import flatten_dict
 from datetime import datetime, date, time
 from copy import deepcopy
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, Optional
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
@@ -180,3 +180,15 @@ def coerce_datetime(d: Union[date, datetime]) -> datetime:
         return d
 
     return datetime.combine(d, time())
+
+
+def iso8601_datetime(d: str) -> Optional[datetime]:
+    if d is None:
+        return None
+
+    try:
+        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S.000Z")
+    except:
+        pass
+
+    return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))

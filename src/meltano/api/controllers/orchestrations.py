@@ -7,10 +7,11 @@ from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
-from meltano.core.schedule_service import ScheduleService
+from meltano.core.config_service import ConfigService
+from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import flatten
+from meltano.core.utils import flatten, iso8601_datetime
 from meltano.api.models import db
 from meltano.cli.add import extractor
 
@@ -338,14 +339,18 @@ def save_pipeline_schedule() -> Response:
     interval = incoming["interval"]
     start_date = incoming["startDate"]
 
-    start_date_arg = None
-    if start_date:
-        start_date_arg = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.000Z")
-
     project = Project.find()
     schedule_service = ScheduleService(project)
-    schedule = schedule_service.add(
-        name, extractor, loader, transform, interval, start_date_arg
-    )
 
-    return jsonify(incoming)
+    try:
+        schedule = schedule_service.add(
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date=iso8601_datetime(start_date),
+        )
+        return jsonify(schedule), 201
+    except ScheduleAlreadyExistsError as e:
+        return jsonify(e.schedule), 200

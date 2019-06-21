@@ -151,7 +151,8 @@ def start(project, **kwargs):
 def start_workers(app, project):
     workers = []
     try:
-        workers.append(AirflowWorker(project))
+        if not app.config["AIRFLOW_DISABLED"]:
+            workers.append(AirflowWorker(project))
     except:
         logging.info("Airflow is not installed.")
 
