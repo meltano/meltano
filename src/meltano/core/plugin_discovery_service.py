@@ -97,9 +97,10 @@ class PluginDiscoveryService(Versioned):
         except (requests.exceptions.HTTPError, yaml.YAMLError) as e:
             # let's try loading the cache instead
             self._discovery = self.cached_discovery
-        except IncompatibleVersionError:
+        except IncompatibleVersionError as e:
             # let's default to the local cache
-            logging.warning("You must update Meltano to get new plugins updates.")
+            if e.backend_version > e.version:
+                logging.warning("You must update Meltano to get new plugins updates.")
             self._discovery = self.cached_discovery
 
         if not self._discovery:
