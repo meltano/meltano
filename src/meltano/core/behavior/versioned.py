@@ -23,7 +23,7 @@ class Versioned(ABC):
     def ensure_compatible(self, version: int = None):
         version = self.__class__.__version__ if version is None else version
 
-        if self.backend_version != version:
+        if self.backend_version > version:
             raise IncompatibleVersionError(
                 f"Version {version} required, currently at {self.backend_version}"
             )

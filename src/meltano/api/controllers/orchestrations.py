@@ -1,7 +1,9 @@
+import logging
 from datetime import datetime
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_install_service import PluginInstallService
@@ -143,34 +145,38 @@ def entities(extractor_name: str) -> Response:
     """
     project = Project.find()
     select_service = SelectService(project, extractor_name)
-    list_all = select_service.get_extractor_entities()
 
     entity_groups = []
-    for stream, prop in (
-        (stream, prop)
-        for stream in list_all.streams
-        for prop in list_all.properties[stream.key]
-    ):
-        match = next(
-            (
-                entityGroup
-                for entityGroup in entity_groups
-                if entityGroup["name"] == stream.key
-            ),
-            None,
-        )
-        if match:
-            match["attributes"].append({"name": prop.key})
-        else:
-            entity_groups.append(
-                {"name": stream.key, "attributes": [{"name": prop.key}]}
-            )
+    try:
+        list_all = select_service.get_extractor_entities()
 
-    entity_groups = sorted(entity_groups, key=lambda k: k["name"])
-    for entityGroup in entity_groups:
-        entityGroup["attributes"] = sorted(
-            entityGroup["attributes"], key=lambda k: k["name"]
-        )
+        for stream, prop in (
+            (stream, prop)
+            for stream in list_all.streams
+            for prop in list_all.properties[stream.key]
+        ):
+            match = next(
+                (
+                    entityGroup
+                    for entityGroup in entity_groups
+                    if entityGroup["name"] == stream.key
+                ),
+                None,
+            )
+            if match:
+                match["attributes"].append({"name": prop.key})
+            else:
+                entity_groups.append(
+                    {"name": stream.key, "attributes": [{"name": prop.key}]}
+                )
+
+        entity_groups = sorted(entity_groups, key=lambda k: k["name"])
+        for entityGroup in entity_groups:
+            entityGroup["attributes"] = sorted(
+                entityGroup["attributes"], key=lambda k: k["name"]
+            )
+    except PluginExecutionError as e:
+        logging.warning(str(e))
 
     return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 

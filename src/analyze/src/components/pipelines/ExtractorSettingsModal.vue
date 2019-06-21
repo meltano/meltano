@@ -33,8 +33,8 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractorLacksConfigSettingsAndIsInstalled() {
-      return this.configSettings === null &&
-        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+      return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
+             this.configSettings && this.configSettings.settings.length === 0;
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -114,15 +114,6 @@ export default {
               </div>
             </div>
           </div>
-
-          <article class="message is-warning is-small">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-            </div>
-          </article>
 
         </template>
 

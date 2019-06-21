@@ -75,8 +75,8 @@ export default {
         <p class="modal-card-title">Loader Settings</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
 
+      <section class="modal-card-body">
         <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
           <div class="content">
             <div class="level">
@@ -89,7 +89,6 @@ export default {
         </template>
 
         <template v-if='configSettings'>
-
           <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
             <div class="field-label is-normal">
               <label class="label">{{ setting.label || setting.name }}</label>
@@ -107,19 +106,9 @@ export default {
               </div>
             </div>
           </div>
-
-          <article class="message is-warning is-small">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-            </div>
-          </article>
-
         </template>
-
       </section>
+
       <footer class="modal-card-foot buttons is-right">
         <button
           class="button"

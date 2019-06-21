@@ -1,6 +1,5 @@
 <script>
 import { mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 
 export default {
