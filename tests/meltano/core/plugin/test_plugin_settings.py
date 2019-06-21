@@ -48,6 +48,9 @@ class TestPluginSettingsService:
     def test_as_config(self, subject):
         assert subject.as_config() == {"test": "mock"}
 
+    def test_as_env(self, subject):
+        assert subject.as_env() == {"PYTEST_TEST": "mock"}
+
     def test_unset(self, session, subject):
         # overriden by an PluginSetting db value when set
         setting = subject.set("test", "THIS_IS_FROM_DB")

@@ -19,7 +19,7 @@ class DbtService:
     def exec_path(self):
         return self.venv_service.exec_path("dbt", namespace=PluginType.TRANSFORMERS)
 
-    def compile(self, models=None):
+    def compile(self, models=None, **kwargs):
         session = self._Session()
         invoker = invoker_factory(session, self.project, self._plugin)
 
@@ -30,7 +30,7 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = invoker.invoke("compile", *params)
+            handle = invoker.invoke("compile", *params, **kwargs)
             handle.wait()
 
             return handle
@@ -48,7 +48,7 @@ class DbtService:
         finally:
             session.close()
 
-    def run(self, models=None):
+    def run(self, models=None, **kwargs):
         session = self._Session()
         invoker = invoker_factory(session, self.project, self._plugin)
 
@@ -59,7 +59,7 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = invoker.invoke("run", *params)
+            handle = invoker.invoke("run", *params, **kwargs)
             handle.wait()
 
             return handle

@@ -21,14 +21,19 @@ extractors:
         label: GitLab API URL
         value: "https://gitlab.com/api/v4"
       - name: private_token
+        env: GITLAB_API_PRIVATE_TOKEN
       - name: groups
         value: ""
+        env: GITLAB_API_GROUPS
       - name: projects
         value: ""
+        env: GITLAB_API_PROJECTS
       - name: start_date
         kind: date_iso8601
+        env: GITLAB_API_START_DATE
       - name: ultimate_license
         value: false
+        env: GITLAB_API_ULTIMATE_LICENSE
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     namespace: zendesk
