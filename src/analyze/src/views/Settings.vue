@@ -1,10 +1,10 @@
 <script>
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayoutSidebar,
+    RouterViewLayout,
   },
   data() {
     return {
@@ -43,28 +43,42 @@ export default {
 </script>
 
 <template>
-  <router-view-layout-sidebar>
+  <router-view-layout>
 
-    <div slot='left'>
-      <ul class="menu-list">
-        <router-link
-          tag="li"
-          :to="{name:'database'}">
-          <a>Database</a>
-        </router-link>
-        <router-link
-          tag="li"
-          :to="{name:'connectors'}">
-          <a>Connectors</a>
-        </router-link>
-      </ul>
+    <div class="container view-header">
+      <div class="content">
+        <div class="level">
+          <h1 class='is-marginless'>Settings</h1>
+        </div>
+      </div>
     </div>
 
-    <div slot="right">
-      <router-view />
+    <div class="container view-body is-fluid">
+      <section>
+        <div class="columns is-gapless">
+          <div class="column is-one-quarter vh-scrollable">
+            <ul class="menu-list">
+              <router-link
+                tag="li"
+                :to="{name:'database'}">
+                <a>Database</a>
+              </router-link>
+              <router-link
+                tag="li"
+                :to="{name:'connectors'}">
+                <a>Connectors</a>
+              </router-link>
+            </ul>
+          </div>
+
+          <div class="column is-three-quarters vh-scrollable">
+            <router-view />
+          </div>
+        </div>
+      </section>
     </div>
 
-  </router-view-layout-sidebar>
+  </router-view-layout>
 </template>
 
 <style lang="scss">

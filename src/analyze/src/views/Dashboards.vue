@@ -1,9 +1,9 @@
 <script>
 import { mapState, mapActions } from 'vuex';
-import Chart from '@/components/designs/Chart';
+import Chart from '@/components/analyze/Chart';
 import ClosableMessage from '@/components/generic/ClosableMessage';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import RouterViewLayoutSidebar from '@/views/RouterViewLayoutSidebar';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Dashboards',
@@ -19,7 +19,7 @@ export default {
     Chart,
     ClosableMessage,
     NewDashboardModal,
-    RouterViewLayoutSidebar,
+    RouterViewLayout,
   },
   computed: {
     ...mapState('dashboards', [
@@ -52,60 +52,68 @@ export default {
 </script>
 
 <template>
-  <router-view-layout-sidebar>
+  <router-view-layout>
 
-    <div slot='left'>
-
-      <nav class="panel has-background-white">
-        <p class="panel-heading">
-          Dashboards
-        </p>
-
-        <div class='panel-block'>
-          <a class='button is-secondary is-fullwidth'
-              @click="toggleNewDashboardModal">New Dashboard</a>
+    <div class="container view-header">
+      <div class="content">
+        <div class="level">
+          <h1 class='is-marginless'>Dashboards</h1>
         </div>
+      </div>
+    </div>
 
-        <div v-for="dashboard in dashboards"
-            class='panel-block'
-            :class="{'is-active': isActive(dashboard)}"
-            :key="dashboard.id"
-            @click="setDashboard(dashboard)">
-          <div>
-            <div>{{dashboard.name}}</div>
+    <div class="container view-body is-fluid">
+      <section>
+        <div class="columns is-gapless">
+          <aside class="column is-one-quarter vh-scrollable">
+            <nav class="panel has-background-white">
+              <p class="panel-heading">
+                Dashboards
+              </p>
+
+              <div class='panel-block'>
+                <a class='button is-secondary is-fullwidth'
+                    @click="toggleNewDashboardModal">New Dashboard</a>
+              </div>
+
+              <div v-for="dashboard in dashboards"
+                  class='panel-block'
+                  :class="{'is-active': isActive(dashboard)}"
+                  :key="dashboard.id"
+                  @click="setDashboard(dashboard)">
+                <div>
+                  <div>{{dashboard.name}}</div>
+                </div>
+              </div>
+
+            </nav>
+          </aside>
+          <div class="column is-three-quarters vh-scrollable">
+            <ClosableMessage title='Meltano Dashboards'>
+              <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
+              <p><span class="is-italic">You need to save an analysis to a dashboard first</span>. Manage your dashboards below.</p>
+            </ClosableMessage>
+
+            <h1>{{activeDashboard.name}}</h1>
+            <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
+            <hr v-if="activeDashboardReports.length">
+            <div
+              class='box'
+              v-for="report in activeDashboardReports"
+              :key="report.id">
+              <p>{{report.name}}</p>
+              <chart :chart-type='report.chartType'
+                      :results='report.queryResults'
+                      :result-aggregates='report.queryResultAggregates'></chart>
+            </div>
+
+            <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
           </div>
         </div>
-
-      </nav>
-
+      </section>
     </div>
+  </router-view-layout>
 
-    <div slot='right'>
-
-      <ClosableMessage title='Meltano Dashboards'>
-        <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
-        <p><span class="is-italic">You need to save an analysis to a dashboard first</span>. Manage your dashboards below.</p>
-      </ClosableMessage>
-
-      <h1>{{activeDashboard.name}}</h1>
-      <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
-      <hr v-if="activeDashboardReports.length">
-      <div
-        class='box'
-        v-for="report in activeDashboardReports"
-        :key="report.id">
-        <p>{{report.name}}</p>
-        <chart :chart-type='report.chartType'
-                :results='report.queryResults'
-                :result-aggregates='report.queryResultAggregates'></chart>
-      </div>
-
-      <!-- New Dashboard Modal -->
-      <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
-
-    </div>
-
-  </router-view-layout-sidebar>
 </template>
 
 <style lang="scss" scoped>

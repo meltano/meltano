@@ -1,19 +1,19 @@
 import Router from 'vue-router';
 
-import AnalyzeModels from '@/components/designs/AnalyzeModels';
-import AnalyzeSettings from '@/components/designs/AnalyzeSettings';
-import CreateScheduleModal from '@/components/orchestration/CreateScheduleModal';
-import EntitiesSelectorModal from '@/components/orchestration/EntitiesSelectorModal';
-import Entities from '@/components/orchestration/Entities';
-import Extractors from '@/components/orchestration/Extractors';
-import ExtractorSettingsModal from '@/components/orchestration/ExtractorSettingsModal';
-import Loaders from '@/components/orchestration/Loaders';
-import LoaderSettingsModal from '@/components/orchestration/LoaderSettingsModal';
-import PipelineSchedules from '@/components/orchestration/PipelineSchedules';
+import AnalyzeModels from '@/components/analyze/AnalyzeModels';
+import AnalyzeSettings from '@/components/analyze/AnalyzeSettings';
+import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal';
+import Design from '@/components/analyze/Design';
+import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal';
+import Entities from '@/components/pipelines/Entities';
+import Extractors from '@/components/pipelines/Extractors';
+import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal';
+import Loaders from '@/components/pipelines/Loaders';
+import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal';
+import PipelineSchedules from '@/components/pipelines/PipelineSchedules';
 
 import Dashboards from '@/views/Dashboards';
-import Design from '@/views/Design';
-import Designs from '@/views/Designs';
+import Analyze from '@/views/Analyze';
 import NotFound from '@/views/NotFound';
 import Orchestration from '@/views/Orchestration';
 import Pipelines from '@/views/Pipelines';
@@ -137,7 +137,7 @@ const router = new Router({
       path: '/analyze/',
       redirect: '/analyze/models/',
       name: 'analyze',
-      component: Designs,
+      component: Analyze,
       children: [
         {
           path: 'models',
@@ -149,17 +149,17 @@ const router = new Router({
           name: 'analyzeSettings',
           component: AnalyzeSettings,
         },
+        {
+          path: '/analyze/:model/:design',
+          name: 'analyze_design',
+          component: Design,
+        },
+        {
+          path: '/analyze/:model/:design/reports/report/:slug',
+          name: 'Report',
+          component: Design,
+        },
       ],
-    },
-    {
-      path: '/analyze/:model/:design',
-      name: 'analyze_design',
-      component: Design,
-    },
-    {
-      path: '/analyze/:model/:design/reports/report/:slug',
-      name: 'Report',
-      component: Design,
     },
     {
       path: '/dashboards/',
