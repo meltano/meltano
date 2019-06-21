@@ -34,7 +34,8 @@ export default {
     },
     extractorLacksConfigSettingsAndIsInstalled() {
       return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
-             this.configSettings && this.configSettings.settings.length === 0;
+             this.configSettings.settings &&
+             this.configSettings.settings.length === 0;
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
