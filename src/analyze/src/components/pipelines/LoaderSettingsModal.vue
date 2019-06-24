@@ -71,7 +71,7 @@ export default {
 <template>
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
+    <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='loaderNameFromRoute' />
