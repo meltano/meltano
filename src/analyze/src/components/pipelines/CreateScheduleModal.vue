@@ -22,6 +22,9 @@ export default {
     ...mapState('plugins', [
       'installedPlugins',
     ]),
+    getInputDateMeta() {
+      return utils.getInputDateMeta();
+    },
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.pipeline, val => hasOwns.push(val));
@@ -35,9 +38,6 @@ export default {
     },
     isStartDateMinYearValid() {
       return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
-    },
-    todaysDate() {
-      return utils.getTodayYYYYMMDD();
     },
   },
   data() {
@@ -76,7 +76,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default-${this.todaysDate}`;
+      this.pipeline.name = `Default-${this.getInputDateMeta.today}`;
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
@@ -230,9 +230,9 @@ export default {
                             id="catchup-start"
                             name="catchup-start"
                             v-model='pipeline.startDate'
-                            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-                            :min='`${minYear}-01-01`'
-                            :max='todaysDate'>
+                            :pattern='getInputDateMeta.pattern'
+                            :min='getInputDateMeta.min'
+                            :max='getInputDateMeta.today'>
                           <button
                             class="button is-interactive-primary is-outlined is-small"
                             :disabled='!isStartDateSettable'

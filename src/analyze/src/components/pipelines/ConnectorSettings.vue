@@ -7,6 +7,15 @@ export default {
     configSettings: { type: Object, required: true, default: () => {} },
   },
   computed: {
+    getCleanedLabel() {
+      return value => utils.titleCase(utils.underscoreToSpace(value));
+    },
+    getInputDateMeta() {
+      return utils.getInputDateMeta();
+    },
+    getIsConfigSettingValid() {
+      return value => value !== null && value !== undefined && value !== '';
+    },
     getIsOfKindBoolean() {
       return kind => kind === 'boolean';
     },
@@ -33,9 +42,6 @@ export default {
         return type;
       };
     },
-    todaysDate() {
-      return utils.getTodayYYYYMMDD();
-    },
   },
 };
 </script>
@@ -45,11 +51,11 @@ export default {
 
     <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
       <div class="field-label is-normal">
-        <label class="label">{{ setting.label || setting.name }}</label>
+        <label class="label is-small">{{ getCleanedLabel(setting.label || setting.name) }}</label>
       </div>
       <div class="field-body">
         <div class="field">
-          <p class="control">
+          <p class="control is-expanded">
 
             <!-- Boolean -->
             <label
@@ -67,23 +73,31 @@ export default {
               :id="`date-${setting.name}`"
               :name="`date-${setting.name}`"
               v-model="configSettings.config[setting.name]"
-              pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-              min='`2000-01-01`'
-              :max='todaysDate'>
+              :pattern="getInputDateMeta.pattern"
+              :min='getInputDateMeta.min'
+              :max='getInputDateMeta.today'>
 
             <!-- Text / Password / Email -->
             <input
               v-else-if='getIsOfKindTextBased(setting.kind)'
-              class="input"
+              class="input is-small"
+              @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
-              :placeholder="setting.value"
+              :placeholder="setting.value || setting.name"
               v-model="configSettings.config[setting.name]">
 
           </p>
           <p
+            v-if='!getIsConfigSettingValid(configSettings.config[setting.name])'
+            class="help has-text-grey-light is-italic">
+            This field is required
+          </p>
+          <p
             v-if="setting.description"
             class='help'
-            >{{ setting.description }}</p>
+            >
+            {{ setting.description }}
+          </p>
         </div>
       </div>
     </div>

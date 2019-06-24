@@ -132,8 +132,12 @@ export default {
   },
 
   // Date Utils
-  getTodayYYYYMMDD() {
-    return this.formatDateYYYYMMDD(new Date());
+  getInputDateMeta() {
+    return {
+      min: '2000-01-01',
+      pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
+      today: this.formatDateYYYYMMDD(new Date()),
+    };
   },
 
   getIsDateStringInFormatYYYYMMDD(dateString) {
