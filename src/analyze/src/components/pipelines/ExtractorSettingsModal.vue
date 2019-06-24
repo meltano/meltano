@@ -101,7 +101,7 @@ export default {
 
         <ConnectorSettings
           v-if='configSettings'
-          :settings='configSettings'/>
+          :config-settings='configSettings'/>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">

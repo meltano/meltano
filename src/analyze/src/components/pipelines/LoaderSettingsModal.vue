@@ -93,7 +93,7 @@ export default {
 
         <ConnectorSettings
           v-if='configSettings'
-          :settings='configSettings'/>
+          :config-settings='configSettings'/>
 
       </section>
 
