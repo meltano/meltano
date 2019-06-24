@@ -7,7 +7,6 @@ import logging
 from . import cli
 from .params import project
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType

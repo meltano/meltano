@@ -3,7 +3,7 @@ import logging
 from .config_service import ConfigService
 from .venv_service import VenvService
 from .utils import noop
-from .plugin import Plugin
+from .plugin import PluginInstall, Plugin, PluginRef
 from .project import Project
 from .error import PluginInstallError, PluginInstallWarning, SubprocessError
 
@@ -19,13 +19,14 @@ class PluginInstallService:
         self.venv_service = venv_service or VenvService(project)
         self.config_service = config_service or ConfigService(project)
 
-    def create_venv(self, plugin: Plugin):
+    def create_venv(self, plugin: PluginRef):
         return self.venv_service.create(namespace=plugin.type, name=plugin.name)
 
     def install_all_plugins(self, status_cb=noop):
         errors = []
         installed = []
 
+        # TODO: config service returns PluginInstall, not Plugin
         for plugin in self.config_service.plugins():
             status = {"plugin": plugin, "status": "running"}
             status_cb(status)
@@ -50,7 +51,7 @@ class PluginInstallService:
 
         return {"errors": errors, "installed": installed}
 
-    def install_plugin(self, plugin: Plugin):
+    def install_plugin(self, plugin: PluginInstall):
         try:
             with plugin.trigger_hooks("install", self.project):
                 return self.venv_service.install(

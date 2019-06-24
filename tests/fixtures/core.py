@@ -5,46 +5,78 @@ import yaml
 import logging
 from pathlib import Path
 
+import meltano.core.bundle
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin import PluginType
+from meltano.core.plugin import PluginRef, PluginType, PluginInstall
 
 
 PROJECT_NAME = "a_meltano_project"
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def discovery():
-    return {
-        "version": 0,
-        str(PluginType.EXTRACTORS): [{"name": "tap-mock", "pip_url": "tap-mock"}],
-        str(PluginType.LOADERS): [{"name": "target-mock", "pip_url": "target-mock"}],
-        str(PluginType.TRANSFORMERS): [
-            {"name": "transformer-mock", "pip_url": "transformer-mock"}
-        ],
-        str(PluginType.TRANSFORMS): [
-            {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
-        ],
-        str(PluginType.MODELS): [{"name": "model-mock", "pip_url": "model-mock"}],
-        str(PluginType.ORCHESTRATORS): [
-            {"name": "orchestrator-mock", "pip_url": "orchestrator-mock"}
-        ],
-    }
+    with meltano.core.bundle.find("discovery.yml").open() as base:
+        discovery = yaml.load(base)
+
+    discovery[PluginType.EXTRACTORS].append(
+        {
+            "name": "tap-mock",
+            "namespace": "pytest",
+            "pip_url": "tap-mock",
+            "settings": [{"name": "test", "value": "mock"}],
+        }
+    )
+    discovery[PluginType.LOADERS].append(
+        {"name": "target-mock", "namespace": "pytest", "pip_url": "target-mock"}
+    )
+    discovery[PluginType.TRANSFORMERS].append(
+        {
+            "name": "transformer-mock",
+            "namespace": "pytest",
+            "pip_url": "transformer-mock",
+        }
+    )
+    discovery[PluginType.TRANSFORMS].append(
+        {
+            "name": "tap-mock-transform",
+            "namespace": "pytest",
+            "pip_url": "tap-mock-transform",
+        }
+    )
+
+    discovery[PluginType.MODELS].append(
+        {
+            "name": "model-gitlab",
+            "namespace": "pytest",
+            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
+        }
+    )
+
+    discovery[PluginType.ORCHESTRATORS].append(
+        {
+            "name": "orchestrator-mock",
+            "namespace": "pytest",
+            "pip_url": "orchestrator-mock",
+        }
+    )
+
+    return discovery
+
+
+@pytest.fixture(scope="class")
+def plugin_discovery_service(project, discovery):
+    return PluginDiscoveryService(project, discovery=discovery)
 
 
 @pytest.fixture()
-def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(
-        project, discovery=discovery
-    )  # TODO: discovery factory
-
-
-@pytest.fixture
 def project_compiler(project):
     return ProjectCompiler(project)
 
@@ -60,8 +92,36 @@ def plugin_install_service(project):
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project):
-    return ProjectAddService(project)
+def project_add_service(project, plugin_discovery_service):
+    return ProjectAddService(project, plugin_discovery_service=plugin_discovery_service)
+
+
+@pytest.fixture(scope="class")
+def plugin_settings_service_factory(project, plugin_discovery_service):
+    def _factory(session, plugin, **kwargs):
+        return PluginSettingsService(
+            session,
+            project,
+            plugin,
+            discovery_service=plugin_discovery_service,
+            **kwargs,
+        )
+
+    return _factory
+
+
+@pytest.fixture(scope="class")
+def plugin_invoker_factory(project, plugin_settings_service_factory):
+    def _factory(session, plugin, **kwargs):
+        return invoker_factory(
+            session,
+            project,
+            plugin,
+            plugin_settings_service=plugin_settings_service_factory(session, plugin),
+            **kwargs,
+        )
+
+    return _factory
 
 
 @pytest.fixture(scope="class")
@@ -89,6 +149,18 @@ def config_service(project):
 
 
 @pytest.fixture(scope="class")
+def tap(config_service):
+    tap = PluginInstall(PluginType.EXTRACTORS, "tap-mock", "tap-mock")
+    return config_service.add_to_file(tap)
+
+
+@pytest.fixture(scope="class")
+def target(config_service):
+    target = PluginInstall(PluginType.LOADERS, "target-mock", "target-mock")
+    return config_service.add_to_file(target)
+
+
+@pytest.fixture(scope="class")
 def schedule_service(project):
     return ScheduleService(project)
 
@@ -100,35 +172,6 @@ def project(test_dir, project_init_service):
 
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root_dir(".env"))
-
-    discovery_yaml = (
-        Path(os.path.dirname(os.path.dirname(__file__)))
-        .parent.joinpath("discovery.yml")
-        .open("r")
-        .read()
-    )
-    discovery_dict = yaml.load(discovery_yaml)
-    discovery_dict[PluginType.EXTRACTORS].append(
-        {"name": "tap-mock", "pip_url": "tap-mock"}
-    )
-    discovery_dict[PluginType.LOADERS].append(
-        {"name": "target-mock", "pip_url": "target-mock"}
-    )
-    discovery_dict[PluginType.TRANSFORMERS].append(
-        {"name": "transformer-mock", "pip_url": "transformer-mock"}
-    )
-    discovery_dict[PluginType.TRANSFORMS].append(
-        {"name": "tap-mock-transform", "pip_url": "tap-mock-transform"}
-    )
-    discovery_dict[PluginType.MODELS].append(
-        {
-            "name": "model-gitlab",
-            "pip_url": "git+https://gitlab.com/meltano/model-gitlab.git",
-        }
-    )
-    # copy discovery.yml into this project
-    with open(project.root.joinpath("discovery.yml"), "w") as f:
-        yaml.dump(discovery_dict, f, default_flow_style=False)
 
     # cd into the new project root
     project.activate()

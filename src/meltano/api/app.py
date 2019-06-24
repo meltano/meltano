@@ -12,14 +12,14 @@ from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 from urllib.parse import urlsplit
 
+from meltano.core.project import Project
+from meltano.core.plugin.error import PluginMissingError
+from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.config_service import ConfigService
+from meltano.core.compiler.project_compiler import ProjectCompiler
 from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 from . import config as default_config
-
-from meltano.core.project import Project
-from meltano.core.plugin.error import PluginMissingError
-from meltano.core.config_service import ConfigService
-from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 connector = ExternalConnector()
@@ -102,7 +102,8 @@ def create_app(config={}):
 
         try:
             airflow = ConfigService(project).get_plugin("airflow")
-            airflow_port = airflow.config["webserver"]["web_server_port"]
+            airflow_settings = PluginSettingsService(db.session, project, airflow)
+            airflow_port = airflow_settings.get_value("webserver.web_server_port")
             g.jsContext["airflowUrl"] = appUrl._replace(
                 netloc=f"{appUrl.hostname}:{airflow_port}"
             ).geturl()[:-1]
@@ -150,7 +151,8 @@ def start(project, **kwargs):
 def start_workers(app, project):
     workers = []
     try:
-        workers.append(AirflowWorker(project))
+        if not app.config["AIRFLOW_DISABLED"]:
+            workers.append(AirflowWorker(project))
     except:
         logging.info("Airflow is not installed.")
 

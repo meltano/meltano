@@ -3,6 +3,7 @@ from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
+from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
@@ -25,6 +26,20 @@ def installed():
     return jsonify(project.meltano)
 
 
+@pluginsBP.route("/add", methods=["POST"])
+def add():
+    payload = request.get_json()
+    plugin_type = PluginType(payload["pluginType"])
+    plugin_name = payload["name"]
+
+    project = Project.find()
+    add_service = ProjectAddService(project)
+
+    plugin = add_service.add(plugin_type, plugin_name)
+
+    return jsonify({"name": plugin.name, "pluginType": plugin.type})
+
+
 @pluginsBP.route("/install", methods=["POST"])
 def install():
     payload = request.get_json()
@@ -32,11 +47,11 @@ def install():
     plugin_name = payload["name"]
 
     project = Project.find()
-    add_service = ProjectAddService(project)
-    install_service = PluginInstallService(project)
     compiler = ProjectCompiler(project)
+    install_service = PluginInstallService(project)
+    config_service = ConfigService(project)
 
-    plugin = add_service.add(plugin_type, plugin_name)
+    plugin = config_service.get_plugin(plugin_name, plugin_type=plugin_type)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
 
@@ -49,4 +64,4 @@ def install():
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
-    return jsonify({"test": 123})
+    return jsonify({"name": plugin.name, "pluginType": plugin.type})

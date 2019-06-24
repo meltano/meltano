@@ -1,8 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
-
 import _ from 'lodash';
 
 export default {
@@ -35,8 +33,9 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractorLacksConfigSettingsAndIsInstalled() {
-      return this.configSettings === null &&
-        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+      return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
+             this.configSettings.settings &&
+             this.configSettings.settings.length === 0;
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -64,8 +63,8 @@ export default {
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
         name: this.extractor.name,
-        type: 'extractor',
-        config: this.configSettings,
+        type: 'extractors',
+        config: this.configSettings.config,
       });
       this.beginEntitySelection();
     },
@@ -74,7 +73,6 @@ export default {
 </script>
 
 <template>
-
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
@@ -100,9 +98,10 @@ export default {
 
         <template v-if='configSettings'>
 
-          <div class="field is-horizontal" v-for='(val, key) in configSettings' :key='key'>
+          <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
             <div class="field-label is-normal">
-              <label class="label">{{key}}</label>
+              <label class="label">{{ setting.label || setting.name }}</label>
+              <p v-if="setting.description">{{ setting.description }}</p>
             </div>
             <div class="field-body">
               <div class="field">
@@ -110,21 +109,12 @@ export default {
                   <input
                     class="input"
                     type="text"
-                    :placeholder="val"
-                    v-model="configSettings[key]">
+                    :placeholder="setting.value"
+                    v-model="configSettings.config[setting.name]">
                 </p>
               </div>
             </div>
           </div>
-
-          <article class="message is-warning is-small">
-            <div class="message-header">
-              <p>Warning</p>
-            </div>
-            <div class="message-body">
-              <p>These connector settings are not currently persisted on the backend. Additionally, this UI still needs further iteration from a UX lens.</p>
-            </div>
-          </article>
 
         </template>
 
@@ -155,7 +145,6 @@ export default {
       </footer>
     </div>
   </div>
-
 </template>
 
 <style lang="scss">

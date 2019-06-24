@@ -26,11 +26,15 @@ export default {
   },
   methods: {
     ...mapActions('plugins', [
+      'addPlugin',
       'installPlugin',
     ]),
     installExtractorAndBeginSettings(extractor) {
-      this.installPlugin({ pluginType: 'extractors', name: extractor });
-      this.updateExtractorSettings(extractor);
+      this.addPlugin({ pluginType: 'extractors', name: extractor })
+        .then(() => {
+          this.installPlugin({ pluginType: 'extractors', name: extractor });
+          this.updateExtractorSettings(extractor);
+        });
     },
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } });

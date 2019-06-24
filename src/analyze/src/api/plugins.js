@@ -13,4 +13,8 @@ export default {
   installPlugin(installConfig) {
     return axios.post(utils.apiUrl('plugins', 'install'), installConfig);
   },
+
+  addPlugin(addConfig) {
+    return axios.post(utils.apiUrl('plugins', 'add'), addConfig);
+  },
 };

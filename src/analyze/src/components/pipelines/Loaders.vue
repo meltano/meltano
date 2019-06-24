@@ -23,11 +23,15 @@ export default {
   },
   methods: {
     ...mapActions('plugins', [
+      'addPlugin',
       'installPlugin',
     ]),
     installLoaderAndBeginSettings(loader) {
-      this.installPlugin({ pluginType: 'loaders', name: loader });
-      this.updateLoaderSettings(loader);
+      this.addPlugin({ pluginType: 'loaders', name: loader })
+        .then(() => {
+          this.installPlugin({ pluginType: 'loaders', name: loader });
+          this.updateLoaderSettings(loader);
+        });
     },
     updateLoaderSettings(loader) {
       this.$router.push({ name: 'loaderSettings', params: { loader } });

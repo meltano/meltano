@@ -9,6 +9,7 @@ from .params import db_options, project
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
+from meltano.core.db import project_engine
 
 
 @cli.command()
@@ -21,8 +22,19 @@ from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExists
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @click.option("--start-date", type=click.DateTime(), default=None)
+@db_options
 @project
-def schedule(project, name, extractor, loader, interval, transform, job_id, start_date):
+def schedule(
+    project,
+    name,
+    extractor,
+    loader,
+    interval,
+    transform,
+    job_id,
+    start_date,
+    engine_uri,
+):
     """
     meltano schedule SCHEDULE_NAME EXTRACTOR_NAME LOADER_NAME INTERVAL
 
@@ -30,6 +42,7 @@ def schedule(project, name, extractor, loader, interval, transform, job_id, star
     loader_name: Which loader should be used in this extraction
     interval: Cron-like syntax to specify the interval or scheduling
     """
+    project_engine(project, engine_uri, default=True)
 
     # install_missing_plugins(project, extractor, loader, transform)
     schedule_service = ScheduleService(project)
@@ -51,5 +64,5 @@ def schedule(project, name, extractor, loader, interval, transform, job_id, star
     except ScheduleAlreadyExistsError as serr:
         click.secho(f"Schedule '{name}' already exists.", fg="yellow")
     except Exception as err:
-        click.secho(str(err), err=True)
+        click.secho(f"Scheduling failed: {err}", fg="red", err=True)
         raise click.Abort()

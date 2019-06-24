@@ -2,13 +2,14 @@ import base64
 import re
 import sys
 import logging
+import flatten_dict
 from datetime import datetime, date, time
-
 from copy import deepcopy
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, Optional
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
+
 from .db import DB
 
 
@@ -115,15 +116,35 @@ def nest(d: dict, path: str, value={}):
     """
     cursor = d
 
+    *initial, tail = path.split(".")
+
     # create the list of dicts
-    for key in path.split("."):
+    for key in initial:
         if key not in cursor:
-            # We need to copy the value to make sure
-            # the `value` parameter is not mutated.
-            cursor[key] = deepcopy(value)
+            cursor[key] = {}
+
         cursor = cursor[key]
 
-    return cursor
+    # We need to copy the value to make sure
+    # the `value` parameter is not mutated.
+    cursor[tail] = cursor.get(tail, deepcopy(value))
+
+    return cursor[tail]
+
+
+def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
+    """Wrapper arround `flatten_dict.flatten` that adds `dot` reducer."""
+
+    def dot_reducer(*xs):
+        if xs[0] is None:
+            return xs[1]
+        else:
+            return ".".join(xs)
+
+    if reducer == "dot":
+        reducer = dot_reducer
+
+    return flatten_dict.flatten(d, reducer, **kwargs)
 
 
 def file_has_data(file: Union[Path, str]):
@@ -159,3 +180,15 @@ def coerce_datetime(d: Union[date, datetime]) -> datetime:
         return d
 
     return datetime.combine(d, time())
+
+
+def iso8601_datetime(d: str) -> Optional[datetime]:
+    if d is None:
+        return None
+
+    try:
+        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S.000Z")
+    except:
+        pass
+
+    return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))

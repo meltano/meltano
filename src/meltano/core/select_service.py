@@ -1,11 +1,12 @@
 import json
 import logging
 
-from .project import Project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
+from .project import Project
+from .db import project_engine
 
 
 class SelectService:
@@ -18,14 +19,22 @@ class SelectService:
         return self.extractor
 
     def load_schema(self):
-        invoker = invoker_factory(self.project, self.extractor)
-        if not invoker.files["catalog"].exists():
-            logging.info("Catalog not found, trying to run the tap with --discover.")
-            self.extractor.run_discovery(invoker)
+        _, Session = project_engine(self.project)
+        session = Session()
+        invoker = invoker_factory(session, self.project, self.extractor)
 
-        self.extractor.apply_select(invoker)
-        with invoker.files["catalog"].open() as catalog:
-            return json.load(catalog)
+        try:
+            if not invoker.files["catalog"].exists():
+                logging.info(
+                    "Catalog not found, trying to run the tap with --discover."
+                )
+                self.extractor.run_discovery(invoker)
+
+            self.extractor.apply_select(invoker)
+            with invoker.files["catalog"].open() as catalog:
+                return json.load(catalog)
+        finally:
+            session.close()
 
     def get_extractor_entities(self):
         list_all = ListSelectedExecutor()

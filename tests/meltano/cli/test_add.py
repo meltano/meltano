@@ -1,5 +1,6 @@
 import os
 import pytest
+import functools
 from unittest import mock
 
 from meltano.cli import cli
@@ -72,7 +73,8 @@ class TestCliAdd:
         service.test = 100
 
         stdin = os.linesep.join(
-            ["-e path/to/tap-custom", "tap-custom-bin"]  # pip_url  # executable
+            # namespace, executable, pip_url
+            ["custom", "-e path/to/tap-custom", "tap-custom-bin"]
         )
 
         res = cli_runner.invoke(

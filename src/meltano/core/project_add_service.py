@@ -4,7 +4,7 @@ import yaml
 import logging
 
 from .project import Project
-from .plugin import PluginType, Plugin
+from .plugin import PluginType, PluginInstall, PluginRef
 from .plugin_discovery_service import PluginDiscoveryService
 from .plugin.factory import plugin_factory
 from .config_service import ConfigService
@@ -15,7 +15,7 @@ class PluginNotSupportedException(Exception):
 
 
 class PluginAlreadyAddedException(Exception):
-    def __init__(self, plugin: Plugin):
+    def __init__(self, plugin: PluginRef):
         self.plugin = plugin
         super().__init__()
 
@@ -37,12 +37,11 @@ class ProjectAddService:
         )
         self.config_service = config_service or ConfigService(project)
 
-    def add(self, plugin_type: PluginType, plugin_name: str, **kwargs):
+    def add(self, plugin_type: PluginType, plugin_name: str, **kwargs) -> PluginInstall:
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
 
-        if plugin.pip_url:
-            self.config_service.add_to_file(plugin)
-        else:
+        if not plugin.pip_url:
             raise PluginNotSupportedException()
 
-        return plugin_factory(plugin.type, plugin.canonical())
+        installed = plugin.as_installed()
+        return self.config_service.add_to_file(installed)

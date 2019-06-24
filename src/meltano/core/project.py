@@ -2,6 +2,7 @@ import os
 import yaml
 import logging
 import sys
+from copy import deepcopy
 from pathlib import Path
 from typing import Union, Dict
 from contextlib import contextmanager
@@ -52,7 +53,7 @@ class Project(Versioned):
         config_service = ConfigService
 
     @classmethod
-    def find(self, from_dir: Union[Path, str] = None, activate=True):
+    def find(cls, from_dir: Union[Path, str] = None, activate=True):
         project = Project(from_dir)
 
         if not project.meltanofile.exists():
@@ -69,7 +70,7 @@ class Project(Versioned):
         if not self._meltano:
             self.reload()
 
-        return self._meltano.copy()
+        return deepcopy(self._meltano)
 
     @contextmanager
     def meltano_update(self):
@@ -132,7 +133,7 @@ class Project(Versioned):
         return self.meltano_dir("models", *joinpaths)
 
     @makedirs
-    def plugin_dir(self, plugin: "Plugin", *joinpaths):
+    def plugin_dir(self, plugin: "PluginRef", *joinpaths):
         return self.meltano_dir(plugin.type, plugin.name, *joinpaths)
 
     def __eq__(self, other):

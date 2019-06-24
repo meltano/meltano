@@ -1,21 +1,25 @@
-from meltano.core.behavior.hookable import HookObject, hook
-from meltano.core.plugin import Plugin, PluginType
+from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 
 
-class DbtPlugin(Plugin, HookObject):
+class DbtPlugin(PluginInstall):
     __plugin_type__ = PluginType.TRANSFORMERS
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-    def invoker(self, project, *args, **kwargs):
+    def invoker(self, session, project, *args, **kwargs):
         return DbtInvoker(
-            project, self, *args, run_dir=project.root_dir("transform"), **kwargs
+            session,
+            project,
+            self,
+            *args,
+            run_dir=project.root_dir("transform"),
+            **kwargs
         )
 
 
-class DbtTransformPlugin(Plugin, HookObject):
+class DbtTransformPlugin(PluginInstall):
     __plugin_type__ = PluginType.TRANSFORMS
 
     def __init__(self, *args, **kwargs):

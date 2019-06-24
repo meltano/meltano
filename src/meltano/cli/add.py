@@ -4,8 +4,9 @@ import json
 import click
 import sys
 from urllib.parse import urlparse
+
 from . import cli
-from .params import project
+from .params import project, db_options
 from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
@@ -20,13 +21,17 @@ from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
+from meltano.core.db import project_engine
 
 
 @cli.group()
+@click.option("--custom", is_flag=True)
+@db_options
 @project
 @click.pass_context
-@click.option("--custom", is_flag=True)
-def add(ctx, project, custom):
+def add(ctx, project, custom, engine_uri):
+    project_engine(project, engine_uri, default=True)
+
     if custom:
         if ctx.invoked_subcommand in ("transformer", "transform", "orchestrator"):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
