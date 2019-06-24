@@ -1,4 +1,4 @@
-# Getting Started Guide
+# Getting Started
 
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
