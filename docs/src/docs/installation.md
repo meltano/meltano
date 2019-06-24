@@ -101,7 +101,7 @@ setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
 
 ## Troubleshooting
 
-Are you having installation problems? We are here to help you. Please feel out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
+Are you having installation problems? We are here to help you. Please fill out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
 
 ## Upgrading Version
 
