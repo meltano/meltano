@@ -14,6 +14,13 @@ const getters = {
   getHasPipelines() {
     return state.pipelines.length > 0;
   },
+  getHasValidConfigSettings(stateRef, getterRef) {
+    return configSettings => configSettings.settings && configSettings.settings.find(setting =>
+      !getterRef.getIsConfigSettingValid(configSettings.config[setting.name])) === undefined;
+  },
+  getIsConfigSettingValid() {
+    return value => value !== null && value !== undefined && value !== '';
+  },
 };
 
 const actions = {

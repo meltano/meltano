@@ -1,4 +1,6 @@
 <script>
+import { mapGetters } from 'vuex';
+
 import utils from '@/utils/utils';
 
 export default {
@@ -7,14 +9,14 @@ export default {
     configSettings: { type: Object, required: true, default: () => {} },
   },
   computed: {
+    ...mapGetters('configuration', [
+      'getIsConfigSettingValid',
+    ]),
     getCleanedLabel() {
       return value => utils.titleCase(utils.underscoreToSpace(value));
     },
     getInputDateMeta() {
       return utils.getInputDateMeta();
-    },
-    getIsConfigSettingValid() {
-      return value => value !== null && value !== undefined && value !== '';
     },
     getIsOfKindBoolean() {
       return kind => kind === 'boolean';

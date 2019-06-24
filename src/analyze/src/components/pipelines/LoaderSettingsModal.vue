@@ -3,8 +3,6 @@ import { mapState, mapGetters } from 'vuex';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
-import _ from 'lodash';
-
 export default {
   name: 'LoaderSettingsModal',
   components: {
@@ -24,6 +22,9 @@ export default {
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
+    ...mapGetters('configuration', [
+      'getHasValidConfigSettings',
+    ]),
     ...mapState('configuration', [
       'loaderInFocusConfiguration',
     ]),
@@ -36,9 +37,9 @@ export default {
         : this.loaderInFocusConfiguration;
     },
     isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+      const isInstalled = this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return isInstalled && isValid;
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders

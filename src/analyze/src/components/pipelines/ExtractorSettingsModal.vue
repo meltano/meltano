@@ -3,8 +3,6 @@ import { mapGetters, mapState } from 'vuex';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
-import _ from 'lodash';
-
 export default {
   name: 'ExtractorSettingsModal',
   components: {
@@ -23,6 +21,9 @@ export default {
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
+    ]),
+    ...mapGetters('configuration', [
+      'getHasValidConfigSettings',
     ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
@@ -47,9 +48,9 @@ export default {
       return targetExtractor || {};
     },
     isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+      const isInstalled = this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return isInstalled && isValid;
     },
   },
   methods: {
