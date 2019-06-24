@@ -1,6 +1,5 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -59,8 +58,8 @@ export default {
     saveConfigAndGoToOrchestration() {
       this.$store.dispatch('configuration/saveLoaderConfiguration', {
         name: this.loader.name,
-        type: 'loader',
-        config: this.configSettings,
+        type: 'loaders',
+        config: this.configSettings.config,
       });
       this.$router.push({ name: 'schedules' });
     },
@@ -69,7 +68,6 @@ export default {
 </script>
 
 <template>
-
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
@@ -80,8 +78,8 @@ export default {
         <p class="modal-card-title">Loader Settings</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
 
+      <section class="modal-card-body">
         <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
           <div class="content">
             <div class="level">
@@ -98,6 +96,7 @@ export default {
           :settings='configSettings'/>
 
       </section>
+
       <footer class="modal-card-foot buttons is-right">
         <button
           class="button"
@@ -109,7 +108,6 @@ export default {
       </footer>
     </div>
   </div>
-
 </template>
 
 <style lang="scss">

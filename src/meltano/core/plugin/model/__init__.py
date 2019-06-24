@@ -1,2 +1,2 @@
-from .base import ModelPlugin
+from .base import *
 from .package import Package

@@ -10,10 +10,10 @@ from meltano.core.utils import coerce_datetime
 
 project = Project.find()
 schedule_service = ScheduleService(project)
+
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(MINYEAR, 1, 1),
     "email_on_failure": False,
     "email_on_retry": False,
     "retries": 1,

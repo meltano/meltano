@@ -4,7 +4,7 @@ import yaml
 import logging
 
 from .project import Project
-from .plugin import Plugin
+from .plugin import Plugin, PluginInstall
 
 
 class TransformAddService:
@@ -31,7 +31,7 @@ class TransformAddService:
         with open(self.packages_file, "w") as f:
             f.write(yaml.dump(package_yaml, default_flow_style=False))
 
-    def update_dbt_project(self, plugin: Plugin):
+    def update_dbt_project(self, plugin: PluginInstall):
         transform_name = plugin.name.replace("-", "_")
         dbt_project_yaml = yaml.load(self.dbt_project_file.open())
 

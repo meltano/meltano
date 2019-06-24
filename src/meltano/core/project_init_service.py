@@ -10,7 +10,6 @@ from pathlib import Path
 import meltano.core.bundle as bundle
 from .project import Project
 from .venv_service import VenvService
-from .plugin_discovery_service import PluginDiscoveryService
 
 
 class ProjectInitServiceError(Exception):
@@ -79,10 +78,6 @@ class ProjectInitService:
         for path in visit(default_project_yaml, Path(self.project_name)):
             click.secho(f"\tCreated", fg="blue", nl=False)
             click.echo(f" {path}")
-
-        # let's cache the discovery.yml at this point so we at least have
-        # a valid version going forward.
-        PluginDiscoveryService(new_project).fetch_discovery()
 
         return new_project
 

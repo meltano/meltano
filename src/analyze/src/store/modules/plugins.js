@@ -38,6 +38,10 @@ const actions = {
       });
   },
 
+  addPlugin(_, addConfig) {
+    return pluginsApi.addPlugin(addConfig);
+  },
+
   installPlugin({ commit, dispatch }, installConfig) {
     commit('installPluginStart', installConfig);
 

@@ -32,6 +32,7 @@ requires = [
     'flask-sqlalchemy==2.3.2',
     'flask-restful==0.3.7',
     'flask-jwt-extended==3.17.0',
+    'flatten-dict==0.1.0',
     'meltano-flask-security==0.1.0',
     'pyhocon==0.3.51',
     'python-dotenv==0.10.1',
@@ -54,6 +55,7 @@ dev_requires = [
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',
+    'ipython==7.5.0',
 ]
 
 setup(

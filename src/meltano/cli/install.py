@@ -1,11 +1,12 @@
 import click
 from . import cli
-from .params import project
+from .params import project, db_options
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 def install_status_update(data):
@@ -21,8 +22,11 @@ def install_status_update(data):
 
 
 @cli.command()
+@db_options
 @project
-def install(project):
+def install(project, engine_uri):
+    project_engine(project, engine_uri, default=True)
+
     install_service = PluginInstallService(project)
     install_status = install_service.install_all_plugins(install_status_update)
     num_installed = len(install_status["installed"])

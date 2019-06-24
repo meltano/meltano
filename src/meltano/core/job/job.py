@@ -1,11 +1,11 @@
 import logging
 import sqlalchemy.types as types
-
 from datetime import datetime
 from contextlib import contextmanager
 from enum import Enum
 from sqlalchemy import Column
 from sqlalchemy.ext.mutable import MutableDict
+
 from meltano.core.db import SystemModel
 from meltano.core.error import Error
 from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag

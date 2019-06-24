@@ -1,6 +1,5 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -37,8 +36,9 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractorLacksConfigSettingsAndIsInstalled() {
-      return this.configSettings === null &&
-        !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+      return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
+             this.configSettings.settings &&
+             this.configSettings.settings.length === 0;
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -66,8 +66,8 @@ export default {
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
         name: this.extractor.name,
-        type: 'extractor',
-        config: this.configSettings,
+        type: 'extractors',
+        config: this.configSettings.config,
       });
       this.beginEntitySelection();
     },
@@ -76,7 +76,6 @@ export default {
 </script>
 
 <template>
-
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
@@ -131,7 +130,6 @@ export default {
       </footer>
     </div>
   </div>
-
 </template>
 
 <style lang="scss">

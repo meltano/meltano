@@ -6,7 +6,7 @@
   "description": "https://meltano.com",
   "main": "index.js",
   "scripts": {
-    "discovery.yml": "cp ../discovery.yml ./src/.vuepress/public",
+    "discovery.yml": "cp ../src/meltano/core/bundle/discovery.yml ./src/.vuepress/public",
     "dev": "vuepress dev src",
     "build": "vuepress build src",
     "dev:docs": "npm run discovery.yml && npm run dev",

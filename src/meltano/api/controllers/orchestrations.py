@@ -1,12 +1,22 @@
+import logging
 from datetime import datetime
+from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
+from meltano.core.plugin import PluginType, PluginRef
+from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
-from meltano.core.schedule_service import ScheduleService
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.config_service import ConfigService
+from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.select_service import SelectService
+from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.utils import flatten, iso8601_datetime
+from meltano.api.models import db
 from meltano.cli.add import extractor
 
-from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 orchestrationsBP = Blueprint(
     "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
@@ -76,13 +86,16 @@ def get_plugin_configuration() -> Response:
     endpoint for getting a plugin's configuration
     """
     project = Project.find()
-    incoming = request.get_json()
-    plugin_name = incoming["name"]
-    plugin_type = incoming["type"]
-    discovery_service = PluginDiscoveryService(project)
-    # TODO update when save_plugin_configuration is implemented and default to the discovery otherwise
-    plugin = discovery_service.find_plugin(plugin_type, plugin_name)
-    return jsonify(plugin.config)
+    payload = request.get_json()
+    plugin = PluginRef(payload["type"], payload["name"])
+    settings = PluginSettingsService(db.session, project, plugin)
+
+    return jsonify(
+        {
+            "config": flatten(settings.as_config(), reducer="dot"),
+            "settings": settings.get_definition().settings,
+        }
+    )
 
 
 @orchestrationsBP.route("/save/configuration", methods=["POST"])
@@ -90,14 +103,16 @@ def save_plugin_configuration() -> Response:
     """
     endpoint for persisting a plugin configuration
     """
+    project = Project.find()
     incoming = request.get_json()
-    plugin_name = incoming["name"]
-    plugin_type = incoming["type"]
+    plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
-    # TODO persist strategy
+    settings = PluginSettingsService(db.session, project, plugin)
+    for name, value in config.items():
+        settings.set(name, value)
 
-    return jsonify({"test": True})
+    return jsonify(settings.as_config())
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])
@@ -109,7 +124,6 @@ def selectEntities() -> Response:
     incoming = request.get_json()
     extractor_name = incoming["extractorName"]
     entity_groups = incoming["entityGroups"]
-
     select_service = SelectService(project, extractor_name)
 
     for entity_group in entity_groups:
@@ -131,34 +145,38 @@ def entities(extractor_name: str) -> Response:
     """
     project = Project.find()
     select_service = SelectService(project, extractor_name)
-    list_all = select_service.get_extractor_entities()
 
     entity_groups = []
-    for stream, prop in (
-        (stream, prop)
-        for stream in list_all.streams
-        for prop in list_all.properties[stream.key]
-    ):
-        match = next(
-            (
-                entityGroup
-                for entityGroup in entity_groups
-                if entityGroup["name"] == stream.key
-            ),
-            None,
-        )
-        if match:
-            match["attributes"].append({"name": prop.key})
-        else:
-            entity_groups.append(
-                {"name": stream.key, "attributes": [{"name": prop.key}]}
-            )
+    try:
+        list_all = select_service.get_extractor_entities()
 
-    entity_groups = sorted(entity_groups, key=lambda k: k["name"])
-    for entityGroup in entity_groups:
-        entityGroup["attributes"] = sorted(
-            entityGroup["attributes"], key=lambda k: k["name"]
-        )
+        for stream, prop in (
+            (stream, prop)
+            for stream in list_all.streams
+            for prop in list_all.properties[stream.key]
+        ):
+            match = next(
+                (
+                    entityGroup
+                    for entityGroup in entity_groups
+                    if entityGroup["name"] == stream.key
+                ),
+                None,
+            )
+            if match:
+                match["attributes"].append({"name": prop.key})
+            else:
+                entity_groups.append(
+                    {"name": stream.key, "attributes": [{"name": prop.key}]}
+                )
+
+        entity_groups = sorted(entity_groups, key=lambda k: k["name"])
+        for entityGroup in entity_groups:
+            entityGroup["attributes"] = sorted(
+                entityGroup["attributes"], key=lambda k: k["name"]
+            )
+    except PluginExecutionError as e:
+        logging.warning(str(e))
 
     return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
 
@@ -327,14 +345,18 @@ def save_pipeline_schedule() -> Response:
     interval = incoming["interval"]
     start_date = incoming["startDate"]
 
-    start_date_arg = None
-    if start_date:
-        start_date_arg = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%S.000Z")
-
     project = Project.find()
     schedule_service = ScheduleService(project)
-    schedule = schedule_service.add(
-        name, extractor, loader, transform, interval, start_date_arg
-    )
 
-    return jsonify(incoming)
+    try:
+        schedule = schedule_service.add(
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+            start_date=iso8601_datetime(start_date),
+        )
+        return jsonify(schedule), 201
+    except ScheduleAlreadyExistsError as e:
+        return jsonify(e.schedule), 200
