@@ -146,7 +146,6 @@ export default {
   },
 
   formatDateStringYYYYMMDD(date) {
-    console.log('format?', date);
     return new Date(date).toISOString().split('T')[0];
   },
 };

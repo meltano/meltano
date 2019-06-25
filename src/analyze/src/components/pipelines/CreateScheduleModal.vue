@@ -1,11 +1,12 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
-import _ from 'lodash';
 
 import Dropdown from '@/components/generic/Dropdown';
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
 
 import utils from '@/utils/utils';
+
+import _ from 'lodash';
 
 export default {
   name: 'CreateScheduleModal',
@@ -24,6 +25,9 @@ export default {
     ...mapState('plugins', [
       'installedPlugins',
     ]),
+    getFormattedDateStringYYYYMMDD() {
+      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate);
+    },
     getInputDateMeta() {
       return utils.getInputDateMeta();
     },
@@ -31,15 +35,6 @@ export default {
       const hasOwns = [];
       _.forOwn(this.pipeline, val => hasOwns.push(val));
       return hasOwns.find(val => val === '') === undefined;
-    },
-    isStartDateSettable() {
-      return this.isStartDateValid && this.isStartDateMinYearValid;
-    },
-    isStartDateValid() {
-      return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
-    },
-    isStartDateMinYearValid() {
-      return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
     },
   },
   data() {
@@ -52,14 +47,14 @@ export default {
         '@monthly',
         '@yearly',
       ],
-      minYear: '2000',
+      hasCatchupDate: false,
       pipeline: {
         name: '',
         extractor: '',
         loader: '',
         transform: '',
         interval: '',
-        startDate: 'None',
+        startDate: null,
       },
       transformOptions: [
         'skip',
@@ -89,15 +84,14 @@ export default {
         ? this.intervalOptions[0] : '';
     },
     save() {
-      const pipeline = Object.assign({}, this.pipeline);
-      pipeline.startDate = this.pipeline.startDate === 'None'
-        ? null : new Date(this.pipeline.startDate).toISOString();
-
-      this.$store.dispatch('configuration/savePipelineSchedule', pipeline)
+      this.$store.dispatch('configuration/savePipelineSchedule', this.pipeline)
         .then(() => this.close());
     },
-    setCatchUpDateToNone() {
-      this.pipeline.startDate = 'None';
+    setHasCatchupDate(val) {
+      this.hasCatchupDate = val;
+      if (!this.hasCatchupDate) {
+        this.pipeline.startDate = null;
+      }
     },
   },
 };
@@ -213,15 +207,15 @@ export default {
               <td>
                 <p class="control is-expanded">
                   <Dropdown
-                    :label='pipeline.startDate'
-                    :button-classes='pipeline.startDate
+                    :label='hasCatchupDate ? getFormattedDateStringYYYYMMDD : "None"'
+                    :button-classes='(pipeline.startDate || !hasCatchupDate)
                       ? "is-interactive-secondary is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
                     <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                       <a
                         class="dropdown-item"
-                        @click="setCatchUpDateToNone(); dropdownForceClose();">
+                        @click="setHasCatchupDate(false); dropdownForceClose();">
                         None
                       </a>
                       <hr class="dropdown-divider">
@@ -232,8 +226,7 @@ export default {
                             name='catchup-start' />
                           <button
                             class="button is-interactive-primary is-outlined is-small"
-                            :disabled='!isStartDateSettable'
-                            @click="dropdownForceClose();">
+                            @click="setHasCatchupDate(true); dropdownForceClose();">
                             Set
                           </button>
                         </div>
