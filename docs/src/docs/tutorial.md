@@ -334,7 +334,7 @@ We are currently working on defining the complete list of setting's kind. See [i
 
   - **env** (optional): Define the environment variable name used to set this value at runtime. *Defaults to `NAMESPACE_NAME`*.
   - **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
-```
+
 
 Once the settings are exposed, you can use any of the following to set the proper values (in order of precedence):
 
