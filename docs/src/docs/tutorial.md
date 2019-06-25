@@ -289,6 +289,7 @@ plugins:
   extractors:
   - executable: tap-gitlab-custom
     name: tap-gitlab-custom
+    namespace: gitlab
     pip_url: -e tap-gitlab-custom
 ...
 ```
