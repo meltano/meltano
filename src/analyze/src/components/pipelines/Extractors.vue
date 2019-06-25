@@ -88,7 +88,7 @@ export default {
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'
-                  @click="updateExtractorSettings(extractor)">Account Settings</a>
+                  @click="updateExtractorSettings(extractor)">Configure</a>
                 <a
                   class='button tooltip is-tooltip-warning is-tooltip-multiline'
                   data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Uninstall</a>
