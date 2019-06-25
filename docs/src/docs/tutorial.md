@@ -241,6 +241,7 @@ We aim to make Meltano as thin as possible on top of the components it abstracts
 
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
+::: warning Heads-up!
 If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
 :::
 
@@ -267,9 +268,9 @@ Using `-e` will install the plugin as editable so any change you make is readily
 :::
 
 ```bash
-# test
 $ meltano add --custom extractor tap-gitlab-custom
 ...
+> namespace: gitlab 
 > pip_url: -e tap-gitlab-custom
 > executable: tap-gitlab-custom
 ```
@@ -277,18 +278,18 @@ $ meltano add --custom extractor tap-gitlab-custom
 Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
 
 ::: tip
-Meltano manages converting the `config` section to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
+Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
 :::
 
-Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `config` section is `null`):
+Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `settings` section is missing):
 
 **meltano.yml**
 ```yaml
 plugins:
   extractors:
-  - config: null
-    executable: tap-gitlab-custom
+  - executable: tap-gitlab-custom
     name: tap-gitlab-custom
+    namespace: gitlab
     pip_url: -e tap-gitlab-custom
 ...
 ```
@@ -299,18 +300,51 @@ Let's include the default configuration for a sample tap:
 ```yaml
 plugins:
   extractors:
-  - config:
-	  username: $GITLAB_USERNAME # supports env expansion
-	  password: my_password
-	  start_date: "2015-09-21T04:00:00Z"
-    executable: tap-gitlab-custom
+  - executable: tap-gitlab-custom
     name: tap-gitlab-custom
+    namespace: gitlab
     pip_url: -e tap-gitlab-custom
+    settings:
+    - name: username
+    - name: password
+      kind: password
+    - name: start_date
+      value: "2015-09-21T04:00:00Z"
 ...
 ```
 
+#### Plugin Setting
+
+When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
+
+To expose such a setting, you'll need to define it as such
+
+ - **name**: Identifier of this setting in the configuration.  
+ The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.  
+ Nesting can be represented using the `.` separator.  
+
+    - `foo` represents the `{ foo: VALUE }` in the output configuration.  
+    - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.  
+
+  - **kind**: Represent the type of value this should be, (e.g. `password` or `date_iso8601`). 
+  
+::: warning WIP
+We are currently working on defining the complete list of setting's kind. See [issue (#739)](https://gitlab.com/meltano/meltano/issues/739) for more details.
+:::
+
+  - **env** (optional): Define the environment variable name used to set this value at runtime. *Defaults to `NAMESPACE_NAME`*.
+  - **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
+
+
+Once the settings are exposed, you can use any of the following to set the proper values (in order of precedence):
+
+  - Environment variables
+  - `config` section in the plugin
+  - Meltano UI 
+  - `value` of the setting's definition
+
 ::: warning
-Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `config` section of a plugin.
+Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `settings` section of a plugin.
 :::
 
 ### Interacting with your new plugin
