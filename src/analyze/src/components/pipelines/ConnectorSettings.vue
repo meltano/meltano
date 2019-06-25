@@ -1,10 +1,15 @@
 <script>
 import { mapGetters } from 'vuex';
 
+import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+
 import utils from '@/utils/utils';
 
 export default {
   name: 'ConnectorSettings',
+  components: {
+    InputDateIso8601,
+  },
   props: {
     configSettings: { type: Object, required: true, default: () => {} },
   },
@@ -14,9 +19,6 @@ export default {
     ]),
     getCleanedLabel() {
       return value => utils.titleCase(utils.underscoreToSpace(value));
-    },
-    getInputDateMeta() {
-      return utils.getInputDateMeta();
     },
     getIsOfKindBoolean() {
       return kind => kind === 'boolean';
@@ -64,29 +66,24 @@ export default {
               v-if='getIsOfKindBoolean(setting.kind)'
               class="checkbox">
               <input
-                type="checkbox"
-                v-model="configSettings.config[setting.name]">
+                v-model="configSettings.config[setting.name]"
+                type="checkbox">
             </label>
 
             <!-- Date -->
-            <input
+            <InputDateIso8601
               v-else-if='getIsOfKindDate(setting.kind)'
-              type="date"
-              :id="`date-${setting.name}`"
-              :name="`date-${setting.name}`"
               v-model="configSettings.config[setting.name]"
-              :pattern="getInputDateMeta.pattern"
-              :min='getInputDateMeta.min'
-              :max='getInputDateMeta.today'>
+              :name='setting.name' />
 
             <!-- Text / Password / Email -->
             <input
               v-else-if='getIsOfKindTextBased(setting.kind)'
+              v-model="configSettings.config[setting.name]"
               class="input is-small"
               @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
-              :placeholder="setting.value || setting.name"
-              v-model="configSettings.config[setting.name]">
+              :placeholder="setting.value || setting.name">
 
           </p>
           <p

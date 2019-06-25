@@ -3,6 +3,7 @@ import { mapGetters, mapState } from 'vuex';
 import _ from 'lodash';
 
 import Dropdown from '@/components/generic/Dropdown';
+import InputDateIso8601 from '@/components/generic/InputDateIso8601';
 
 import utils from '@/utils/utils';
 
@@ -10,6 +11,7 @@ export default {
   name: 'CreateScheduleModal',
   components: {
     Dropdown,
+    InputDateIso8601,
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins')
@@ -225,14 +227,9 @@ export default {
                       <hr class="dropdown-divider">
                       <div>
                         <div class="dropdown-item">
-                          <input
-                            type="date"
-                            id="catchup-start"
-                            name="catchup-start"
-                            v-model='pipeline.startDate'
-                            :pattern='getInputDateMeta.pattern'
-                            :min='getInputDateMeta.min'
-                            :max='getInputDateMeta.today'>
+                          <InputDateIso8601
+                            v-model="pipeline.startDate"
+                            name='catchup-start' />
                           <button
                             class="button is-interactive-primary is-outlined is-small"
                             :disabled='!isStartDateSettable'
