@@ -72,7 +72,7 @@ export default {
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='loaderNameFromRoute' />
         </div>
-        <p class="modal-card-title">Loader Settings</p>
+        <p class="modal-card-title">Loader Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
