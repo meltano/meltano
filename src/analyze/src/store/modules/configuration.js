@@ -171,6 +171,7 @@ const mutations = {
   },
 
   updatePipelines(_, pipeline) {
+    pipeline.startDate = pipeline.start_date;
     state.pipelines.push(pipeline);
   },
 };
