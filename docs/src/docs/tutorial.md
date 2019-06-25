@@ -214,7 +214,7 @@ meltano ui
 
 When you visit the URL, you will be using the default connection to Meltano's SQLite database. In order to allow the UI to access your postgres DB instance, please follow the steps below:
 
-1. Navigate to the Postgres Loader Settings (Configuration > Loaders > target-postgres > Account Settings)
+1. Navigate to the Postgres Loader Configuration (Configuration > Loaders > target-postgres > Configure)
 2. Enter connection settings
   - Name = `postgres_db` (important to use that name if you are following the tutorial)
   - Dialect = `PostgresSQl`
