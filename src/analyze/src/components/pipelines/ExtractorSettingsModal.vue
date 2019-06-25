@@ -80,7 +80,7 @@ export default {
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='extractorNameFromRoute' />
         </div>
-        <p class="modal-card-title">Extractor Settings</p>
+        <p class="modal-card-title">Extractor Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
