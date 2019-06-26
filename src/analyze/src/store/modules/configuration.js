@@ -1,5 +1,7 @@
 import Vue from 'vue';
 
+import lodash from 'lodash';
+
 import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
@@ -15,8 +17,10 @@ const getters = {
     return state.pipelines.length > 0;
   },
   getHasValidConfigSettings(stateRef, getterRef) {
-    return configSettings => configSettings.settings && configSettings.settings.find(setting =>
-      !getterRef.getIsConfigSettingValid(configSettings.config[setting.name])) === undefined;
+    return (configSettings) => {
+      const isValid = setting => getterRef.getIsConfigSettingValid(configSettings.config[setting.name]);
+      return configSettings.settings && lodash.every(configSettings.settings, isValid);
+    };
   },
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== '';
