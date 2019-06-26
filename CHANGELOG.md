@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * [#710](https://gitlab.com/meltano/meltano/issues/710) Updated connector (extractor and loader) settings with specific control type (text, password, email, boolean, and date) per setting, added form validation, and added an inference by default for password and token fields as a protective measure
-* [#643](https://gitlab.com/meltano/meltano/issues/643) Updated `minimallyValidated` computeds so tha new users are more intentionally funneled through the pipelines ELT setup UI vs. previously being able to skip past required steps
+* [#643](https://gitlab.com/meltano/meltano/issues/643) Updated `minimallyValidated` computeds so that new users are intentionally funneled through the pipelines ELT setup UI (previously they could skip past required steps)
 
 ### Changes
 
