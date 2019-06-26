@@ -73,7 +73,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default-${this.getInputDateMeta.today}`;
+      this.pipeline.name = `Default ${Date.now()}`;
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
