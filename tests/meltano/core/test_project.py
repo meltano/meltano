@@ -2,19 +2,25 @@ import pytest
 import yaml
 import os
 import shutil
+import threading
 
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
+@pytest.fixture(autouse=True)
+def unset_default_project():
+    Project._default = None
+
+
 class TestProject:
     def test_find(self, project, mkdtemp):
         # defaults to the cwd
-        found = Project.find()
+        found = Project.find(activate=False)
         assert found == project
 
         # or you can specify a path
-        found = Project.find(project.root)
+        found = Project.find(project.root, activate=False)
         assert found == project
 
         # but it doens't recurse up, you have to be
@@ -39,15 +45,32 @@ class TestProject:
         project.activate()
         assert os.getenv("MELTANO_PROJECT") == str(project.root)
 
+        # then `Project.find()` always return the same instance
+        assert Project.find() is project
+
+    def test_threadsafe(self, project):
+        class ProjectFinderThread(threading.Thread):
+            def __init__(self):
+                super().__init__()
+                self._project = None
+
+            def run(self):
+                self._project = Project.find()
+
+        concurrent = ProjectFinderThread()
+        concurrent.start()
+
+        project = Project.find()
+
+        concurrent.join()
+
+        assert project is concurrent._project
+
 
 class TestIncompatibleProject:
-    @pytest.fixture
-    def project(self, project):
-        with project.meltano_update() as meltano:
-            meltano["version"] = 10
-
-        return project
-
     def test_incompatible(self, project):
+        with project.meltano_update() as meltano:
+            meltano["version"] += 1
+
         with pytest.raises(IncompatibleVersionError):
             project.activate()
