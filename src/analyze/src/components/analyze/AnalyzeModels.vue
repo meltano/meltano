@@ -50,7 +50,7 @@ export default {
       <div class="column is-one-third">
         <h2 class='title is-5'>Available</h2>
 
-        <table class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent ">
+        <table class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent">
           <thead>
             <tr>
               <th>Action</th>
