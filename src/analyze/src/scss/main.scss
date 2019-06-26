@@ -111,10 +111,18 @@ Layout helpers, often with names based on Bulma naming conventions
   font-style: italic;
 }
 
+.table td {
+  vertical-align: middle;
+}
+
 /*
 MODIFIERS ------------------------------------------------------------------------------------------
 Modifer helpers with names based on Bulma naming conventions
 */
+
+.has-background-transparent {
+  background-color: transparent;
+}
 
 .is-borderless {
   border: none;

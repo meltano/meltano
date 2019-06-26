@@ -108,10 +108,9 @@ export default {
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{name: 'orchestration'}">Orchestration</router-link>
-                  <button
-                    class="button is-small tooltip is-tooltip-left"
-                    disabled
-                    data-tooltip="Not implemented">Edit</button>
+                  <a
+                    class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
+                    data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Edit</a>
                 </div>
               </td>
 
@@ -131,9 +130,4 @@ export default {
 </template>
 
 <style lang="scss">
-.pipelines-table {
-  td {
-    vertical-align: middle;
-  }
-}
 </style>
