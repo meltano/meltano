@@ -70,9 +70,8 @@ export default {
                       @click="installModel(modelPlugin)">Install</a>
                     <a
                       v-else
-                      disabled
-                      class='button is-outlined is-block is-small tooltip is-tooltip-right'
-                      data-tooltip="Not implemented">Uninstall</a>
+                      class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-right'
+                      data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Uninstall</a>
                   </div>
                 </td>
                 <td>
