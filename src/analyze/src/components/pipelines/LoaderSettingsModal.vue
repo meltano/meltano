@@ -37,9 +37,10 @@ export default {
         : this.loaderInFocusConfiguration;
     },
     isSaveable() {
+      const isInstalling = this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
       const isInstalled = this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
       const isValid = this.getHasValidConfigSettings(this.configSettings);
-      return isInstalled && isValid;
+      return !isInstalling && isInstalled && isValid;
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders
