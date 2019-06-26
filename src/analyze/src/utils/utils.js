@@ -132,6 +132,10 @@ export default {
   },
 
   // Date Utils
+  getDateStringAsIso8601OrNull(dateString) {
+    return dateString ? new Date(dateString).toISOString() : null;
+  },
+
   getInputDateMeta() {
     return {
       min: '2000-01-01',
