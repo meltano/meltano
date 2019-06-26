@@ -131,9 +131,4 @@ export default {
 </template>
 
 <style lang="scss">
-.pipelines-table {
-  td {
-    vertical-align: middle;
-  }
-}
 </style>
