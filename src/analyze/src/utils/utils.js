@@ -1,4 +1,5 @@
-const connectorLogoRegExp = /(?:tap-|target-)?(.*)/;
+const regExpConnectorLogo = /(?:tap-|target-)?(.*)/;
+const regExpPrivateInput = /(password|private|token)/;
 
 export default {
 
@@ -25,7 +26,7 @@ export default {
   },
 
   getConnectorLogoUrl(connectorName) {
-    const name = connectorLogoRegExp.exec(connectorName)[1];
+    const name = regExpConnectorLogo.exec(connectorName)[1];
     return `/static/logos/${name}-logo.png`;
   },
 
@@ -80,6 +81,13 @@ export default {
     hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-');
     return hyphenateMe;
   },
+  inferInputType(value, defaultType = 'text') {
+    let type = defaultType;
+    if (regExpPrivateInput.test(value)) {
+      type = 'password';
+    }
+    return type;
+  },
   jsDashify(type, name) {
     if (!type || !name) {
       return '';
@@ -124,8 +132,12 @@ export default {
   },
 
   // Date Utils
-  getTodayYYYYMMDD() {
-    return this.formatDateYYYYMMDD(new Date());
+  getInputDateMeta() {
+    return {
+      min: '2000-01-01',
+      pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
+      today: this.formatDateYYYYMMDD(new Date()),
+    };
   },
 
   getIsDateStringInFormatYYYYMMDD(dateString) {

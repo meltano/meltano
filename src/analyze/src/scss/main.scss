@@ -89,6 +89,10 @@ Layout helpers, often with names based on Bulma naming conventions
 .modal-card {
   overflow: visible; // Prevents clipping of dropdown and similar components in Modal
 
+  &.is-narrow {
+    max-width: 440px;
+  }
+
   &.is-wide {
     width: calc(100vw - 160px);
   }
@@ -103,7 +107,8 @@ Layout helpers, often with names based on Bulma naming conventions
 }
 
 .step-spacer {
-  margin: 0 .5rem;
+  margin: 0 .2rem;
+  font-style: italic;
 }
 
 .table td {
