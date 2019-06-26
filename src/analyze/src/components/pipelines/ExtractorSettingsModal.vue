@@ -1,12 +1,13 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
-import _ from 'lodash';
+import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
 export default {
   name: 'ExtractorSettingsModal',
   components: {
     ConnectorLogo,
+    ConnectorSettings,
   },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
@@ -20,6 +21,9 @@ export default {
     ...mapGetters('plugins', [
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
+    ]),
+    ...mapGetters('configuration', [
+      'getHasValidConfigSettings',
     ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
@@ -44,9 +48,9 @@ export default {
       return targetExtractor || {};
     },
     isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+      const isInstalled = this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return isInstalled && isValid;
     },
   },
   methods: {
@@ -75,7 +79,7 @@ export default {
 <template>
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
+    <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='extractorNameFromRoute' />
@@ -96,27 +100,9 @@ export default {
           </div>
         </template>
 
-        <template v-if='configSettings'>
-
-          <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
-            <div class="field-label is-normal">
-              <label class="label">{{ setting.label || setting.name }}</label>
-              <p v-if="setting.description">{{ setting.description }}</p>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    :placeholder="setting.value"
-                    v-model="configSettings.config[setting.name]">
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </template>
+        <ConnectorSettings
+          v-if='configSettings'
+          :config-settings='configSettings'/>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">
