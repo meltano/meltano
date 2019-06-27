@@ -49,9 +49,6 @@ class Project(Versioned):
         """Force a reload from `meltano.yml`"""
         self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
 
-    def has_plugin(self, plugin: str):
-        config_service = ConfigService
-
     @classmethod
     def find(cls, from_dir: Union[Path, str] = None, activate=True):
         project = Project(from_dir)

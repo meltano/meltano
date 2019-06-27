@@ -90,7 +90,7 @@ class ProjectInitService:
         click.secho("\tcd ", nl=False)
         click.secho(self.project_name, fg="green")
         click.echo(
-            "\tVisit https://meltano.com/docs/tutorial.html in order to try us out"
+            "\tVisit https://meltano.com/docs/quickstart.html in order to try us out"
         )
 
         click.echo(

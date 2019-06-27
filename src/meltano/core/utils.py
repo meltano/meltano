@@ -187,7 +187,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         return None
 
     try:
-        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S.000Z")
+        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%SZ")
     except:
         pass
 
