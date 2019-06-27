@@ -8,11 +8,6 @@ from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
 
 
-@pytest.fixture(autouse=True)
-def unset_default_project():
-    Project._default = None
-
-
 class TestProject:
     def test_find(self, project, mkdtemp):
         # defaults to the cwd
@@ -42,10 +37,13 @@ class TestProject:
         with open(".env", "w") as env:
             env.write(f"MELTANO_PROJECT={project.root}")
 
-        project.activate()
+        # doesn't set the default automatically
+        project.activate(default=False)
+        assert Project._default is None
         assert os.getenv("MELTANO_PROJECT") == str(project.root)
 
-        # then `Project.find()` always return the same instance
+        # `Project.find()` always return the default instance
+        project.activate()
         assert Project.find() is project
 
     def test_threadsafe(self, project):

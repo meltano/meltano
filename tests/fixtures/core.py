@@ -173,8 +173,11 @@ def project(test_dir, project_init_service):
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root_dir(".env"))
 
+    # not setting the project as default to limit
+    # the side effect in tests
+    project.activate(default=False)
+
     # cd into the new project root
-    project.activate()
     os.chdir(project.root)
 
     yield project

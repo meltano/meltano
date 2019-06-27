@@ -38,7 +38,7 @@ class Project(Versioned):
         self._activate_lock = threading.Lock()
 
     @fasteners.locked(lock="_activate_lock")
-    def activate(self):
+    def activate(self, default=True):
         self.ensure_compatible()
 
         if self.__class__._default is self:
@@ -50,8 +50,9 @@ class Project(Versioned):
         load_dotenv(dotenv_path=self.root.joinpath(".env"))
         logging.debug(f"Activated project at {self.root}")
 
-        # set the current
-        self.__class__._default = self
+        # set the default project
+        if default:
+            self.__class__._default = self
 
     @property
     def backend_version(self):
@@ -72,6 +73,8 @@ class Project(Versioned):
         if not project.meltanofile.exists():
             raise ProjectNotFound()
 
+        # if we activate a project using `find()`, it should
+        # be set as the default project for future `find()`
         if activate:
             project.activate()
 
