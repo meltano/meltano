@@ -1,4 +1,6 @@
 <script>
+import { mapState } from 'vuex';
+
 import ClosableMessage from '@/components/generic/ClosableMessage';
 import RouterViewLayout from '@/views/RouterViewLayout';
 import Step from '@/components/generic/bulma/Step';
@@ -33,6 +35,9 @@ export default {
     };
   },
   computed: {
+    ...mapState('plugins', [
+      'installedPlugins',
+    ]),
     currentStep() {
       return this.steps.find(step => step.routeMatches.find(match => this.$route.name === match));
     },
@@ -40,13 +45,15 @@ export default {
       return stepName => this.currentStep.name === stepName;
     },
     getIsStepEntitiesMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return this.installedPlugins.extractors && this.installedPlugins.extractors.length > 0;
     },
     getIsStepLoadersMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return this.getIsStepEntitiesMinimallyValidated;
     },
     getIsStepScheduleMinimallyValidated() {
-      return true; // TODO proper minimally validated validation
+      return this.getIsStepLoadersMinimallyValidated &&
+        this.installedPlugins.loaders &&
+        this.installedPlugins.loaders.length > 0;
     },
     getModalName() {
       return this.currentStep.subView;
