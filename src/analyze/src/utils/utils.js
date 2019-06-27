@@ -132,11 +132,15 @@ export default {
   },
 
   // Date Utils
+  getDateStringAsIso8601OrNull(dateString) {
+    return dateString ? new Date(dateString).toISOString() : null;
+  },
+
   getInputDateMeta() {
     return {
       min: '2000-01-01',
       pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
-      today: this.formatDateYYYYMMDD(new Date()),
+      today: this.formatDateStringYYYYMMDD(new Date()),
     };
   },
 
@@ -145,19 +149,7 @@ export default {
     return result;
   },
 
-  formatDateYYYYMMDD(date) {
-    const d = new Date(date);
-    let month = `${d.getMonth() + 1}`;
-    let day = `${d.getDate()}`;
-    const year = d.getFullYear();
-
-    if (month.length < 2) {
-      month = `0${month}`;
-    }
-    if (day.length < 2) {
-      day = `0${day}`;
-    }
-
-    return [year, month, day].join('-');
+  formatDateStringYYYYMMDD(date) {
+    return new Date(date).toISOString().split('T')[0];
   },
 };

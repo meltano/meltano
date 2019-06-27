@@ -48,9 +48,10 @@ export default {
       return targetExtractor || {};
     },
     isSaveable() {
+      const isInstalling = this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
       const isInstalled = this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
       const isValid = this.getHasValidConfigSettings(this.configSettings);
-      return isInstalled && isValid;
+      return !isInstalling && isInstalled && isValid;
     },
   },
   methods: {

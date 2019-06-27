@@ -1,5 +1,6 @@
 import Vue from 'vue';
 
+import utils from '@/utils/utils';
 import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
@@ -167,6 +168,9 @@ const mutations = {
   },
 
   setPipelines(_, pipelines) {
+    pipelines.forEach((pipeline) => {
+      pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate);
+    });
     state.pipelines = pipelines;
   },
 
@@ -175,6 +179,7 @@ const mutations = {
   },
 
   updatePipelines(_, pipeline) {
+    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.start_date);
     state.pipelines.push(pipeline);
   },
 };
