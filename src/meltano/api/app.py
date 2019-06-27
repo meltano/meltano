@@ -102,8 +102,8 @@ def create_app(config={}):
 
         try:
             airflow = ConfigService(project).get_plugin("airflow")
-            airflow_settings = PluginSettingsService(db.session, project, airflow)
-            airflow_port = airflow_settings.get_value("webserver.web_server_port")
+            settings = PluginSettingsService(db.session, project)
+            airflow_port = settings.get_value(airflow, "webserver.web_server_port")
             g.jsContext["airflowUrl"] = appUrl._replace(
                 netloc=f"{appUrl.hostname}:{airflow_port}"
             ).geturl()[:-1]

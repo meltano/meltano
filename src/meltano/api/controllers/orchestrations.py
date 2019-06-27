@@ -88,12 +88,12 @@ def get_plugin_configuration() -> Response:
     project = Project.find()
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
-    settings = PluginSettingsService(db.session, project, plugin)
+    settings = PluginSettingsService(db.session, project)
 
     return jsonify(
         {
-            "config": flatten(settings.as_config(), reducer="dot"),
-            "settings": settings.get_definition().settings,
+            "config": flatten(settings.as_config(plugin), reducer="dot"),
+            "settings": settings.get_definition(plugin).settings,
         }
     )
 
@@ -108,11 +108,11 @@ def save_plugin_configuration() -> Response:
     plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
-    settings = PluginSettingsService(db.session, project, plugin)
+    settings = PluginSettingsService(db.session, project)
     for name, value in config.items():
-        settings.set(name, value)
+        settings.set(plugin, name, value)
 
-    return jsonify(settings.as_config())
+    return jsonify(settings.as_config(plugin))
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])

@@ -17,18 +17,16 @@ class PluginSettingsService:
         self,
         session,
         project,
-        plugin: PluginRef,
         config_service: ConfigService = None,
         discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
-        self.plugin = plugin
         self.config_service = config_service or ConfigService(project)
         self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
         self._session = session
 
-    def settings(self, enabled_only=True):
-        q = self._session.query(PluginSetting).filter_by(plugin=self.plugin.name)
+    def settings(self, plugin: PluginRef, enabled_only=True):
+        q = self._session.query(PluginSetting).filter_by(plugin=plugin.name)
 
         if enabled_only:
             q.filter_by(enabled=True)
@@ -39,35 +37,31 @@ class PluginSettingsService:
     def plugin_namespace(cls, plugin: PluginRef) -> str:
         return f"{plugin.type}.{plugin.name}"
 
-    @property
-    def namespace(self):
-        return self.plugin_namespace(self.plugin)
-
-    def as_config(self) -> Dict:
+    def as_config(self, plugin: PluginRef) -> Dict:
         # defaults to the meltano.yml for extraneous settings
-        config = deepcopy(self.get_install().config)
-        plugin = self.get_definition()
+        config = deepcopy(self.get_install(plugin).config)
+        plugin = self.get_definition(plugin)
 
         for setting in plugin.settings:
-            nest(config, setting["name"], self.get_value(setting["name"]))
+            nest(config, setting["name"], self.get_value(plugin, setting["name"]))
 
         return config
 
-    def as_env(self) -> Dict[str, str]:
+    def as_env(self, plugin: PluginRef) -> Dict[str, str]:
         # defaults to the meltano.yml for extraneous settings
-        plugin = self.get_definition()
+        plugin = self.get_definition(plugin)
         env = {}
 
         for setting in plugin.settings:
             env_key = setting.get(
                 "env", self.setting_env(plugin.namespace, setting["name"])
             )
-            env[env_key] = str(self.get_value(setting["name"]))
+            env[env_key] = str(self.get_value(plugin, setting["name"]))
 
         return env
 
-    def set(self, name: str, value, enabled=True):
-        plugin_def = self.get_definition()
+    def set(self, plugin: PluginRef, name: str, value, enabled=True):
+        plugin_def = self.get_definition(plugin)
         setting = self.find_setting(plugin_def, name)
         env = setting.get("env", self.setting_env(plugin_def.namespace, name))
 
@@ -76,7 +70,10 @@ class PluginSettingsService:
             return
 
         setting = PluginSetting(
-            namespace=self.namespace, name=name, value=value, enabled=enabled
+            namespace=self.plugin_namespace(plugin),
+            name=name,
+            value=value,
+            enabled=enabled,
         )
 
         self._session.merge(setting)
@@ -84,24 +81,22 @@ class PluginSettingsService:
 
         return setting
 
-    def unset(self, name: str):
+    def unset(self, plugin: PluginRef, name: str):
         self._session.query(PluginSetting).filter_by(
-            namespace=self.namespace, name=name
+            namespace=self.plugin_namespace(plugin), name=name
         ).delete()
         self._session.commit()
 
-    def get_definition(self) -> Plugin:
-        return self.plugin_discovery.find_plugin(self.plugin.type, self.plugin.name)
+    def get_definition(self, plugin: PluginRef) -> Plugin:
+        return self.plugin_discovery.find_plugin(plugin.type, plugin.name)
 
     def find_setting(self, plugin_def: Dict, name: str) -> Dict:
         return next(
             setting for setting in plugin_def.settings if setting["name"] == name
         )
 
-    def get_install(self) -> PluginInstall:
-        return self.config_service.get_plugin(
-            self.plugin.name, plugin_type=self.plugin.type
-        )
+    def get_install(self, plugin: PluginRef) -> PluginInstall:
+        return self.config_service.get_plugin(plugin.name, plugin_type=plugin.type)
 
     def setting_env(self, *parts: Iterable[str]):
         process = lambda s: s.replace(".", "__").upper()
@@ -109,10 +104,10 @@ class PluginSettingsService:
         return "_".join(map(process, parts))
 
     # TODO: ensure `kind` is handled
-    def get_value(self, name: str):
+    def get_value(self, plugin: PluginRef, name: str):
         try:
-            plugin_def = self.get_definition()
-            plugin_install = self.get_install()
+            plugin_def = self.get_definition(plugin)
+            plugin_install = self.get_install(plugin)
             setting = self.find_setting(plugin_def, name)
             env = setting.get("env", self.setting_env(plugin_def.namespace, name))
 
@@ -130,12 +125,14 @@ class PluginSettingsService:
             # priority 3: settings database
             return (
                 self._session.query(PluginSetting)
-                .filter_by(namespace=self.namespace, name=name, enabled=True)
+                .filter_by(
+                    namespace=self.plugin_namespace(plugin), name=name, enabled=True
+                )
                 .one()
                 .value
             )
         except StopIteration:
-            logging.error(f"Cannot find {name} for {self.plugin.name}.")
+            logging.warning(f"Cannot find {name} for {plugin.name}.")
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden

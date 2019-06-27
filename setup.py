@@ -52,6 +52,7 @@ dev_requires = [
     'black==18.9b0',
     'bumpversion==0.5.3',
     'changelog-cli==0.6.2',
+    'freezegun==0.3.12',
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',

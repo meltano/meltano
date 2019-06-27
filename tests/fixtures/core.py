@@ -31,7 +31,7 @@ def discovery():
             "name": "tap-mock",
             "namespace": "pytest",
             "pip_url": "tap-mock",
-            "settings": [{"name": "test", "value": "mock"}],
+            "settings": [{"name": "test", "value": "mock"}, {"name": "start_date"}],
         }
     )
     discovery[PluginType.LOADERS].append(
@@ -98,13 +98,9 @@ def project_add_service(project, plugin_discovery_service):
 
 @pytest.fixture(scope="class")
 def plugin_settings_service_factory(project, plugin_discovery_service):
-    def _factory(session, plugin, **kwargs):
+    def _factory(session, **kwargs):
         return PluginSettingsService(
-            session,
-            project,
-            plugin,
-            discovery_service=plugin_discovery_service,
-            **kwargs,
+            session, project, discovery_service=plugin_discovery_service, **kwargs
         )
 
     return _factory
@@ -117,7 +113,7 @@ def plugin_invoker_factory(project, plugin_settings_service_factory):
             session,
             project,
             plugin,
-            plugin_settings_service=plugin_settings_service_factory(session, plugin),
+            plugin_settings_service=plugin_settings_service_factory(session),
             **kwargs,
         )
 
@@ -161,8 +157,16 @@ def target(config_service):
 
 
 @pytest.fixture(scope="class")
-def schedule_service(project):
-    return ScheduleService(project)
+def schedule_service_factory(project, plugin_settings_service_factory):
+    def _factory(session, **kwargs):
+        return ScheduleService(
+            session,
+            project,
+            plugin_settings_service=plugin_settings_service_factory(session),
+            **kwargs,
+        )
+
+    return _factory
 
 
 @pytest.fixture(scope="class")

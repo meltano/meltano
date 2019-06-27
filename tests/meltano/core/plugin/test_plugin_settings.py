@@ -17,44 +17,49 @@ def test_create(session):
 
 class TestPluginSettingsService:
     @pytest.fixture
-    def subject(self, session, project_add_service, plugin_settings_service_factory):
-        plugin = project_add_service.add("extractors", "tap-mock")
+    def subject(
+        self, session, project_add_service, tap, plugin_settings_service_factory
+    ):
+        plugin = project_add_service.add("extractors", tap.name)
 
-        return plugin_settings_service_factory(session, plugin)
+        return plugin_settings_service_factory(session)
 
-    def test_get_value(self, session, subject, project, monkeypatch):
+    def test_get_value(self, session, subject, project, tap, monkeypatch):
         # returns the default value when unset
-        assert subject.get_value("test") == "mock"
+        assert subject.get_value(tap, "test") == "mock"
 
         # overriden by an PluginSetting db value when set
-        setting = subject.set("test", "THIS_IS_FROM_DB")
-        assert subject.get_value("test") == "THIS_IS_FROM_DB"
+        setting = subject.set(tap, "test", "THIS_IS_FROM_DB")
+        assert subject.get_value(tap, "test") == "THIS_IS_FROM_DB"
 
         # but only if enabled
         setting.enabled = False
         session.merge(setting)
         session.commit()
-        assert subject.get_value("test") == "mock"
+        assert subject.get_value(tap, "test") == "mock"
 
         # overriden via the `meltano.yml` configuration
         project._meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
-        assert subject.get_value("test") == 42
+        assert subject.get_value(tap, "test") == 42
         project.reload()
 
         # overriden via ENV
         monkeypatch.setenv("PYTEST_TEST", "N33DC0F33")
-        assert subject.get_value("test") == "N33DC0F33"
+        assert subject.get_value(tap, "test") == "N33DC0F33"
 
-    def test_as_config(self, subject):
-        assert subject.as_config() == {"test": "mock"}
+    def test_as_config(self, subject, tap):
+        assert subject.as_config(tap) == {"test": "mock", "start_date": None}
 
-    def test_as_env(self, subject):
-        assert subject.as_env() == {"PYTEST_TEST": "mock"}
+    def test_as_env(self, subject, tap):
+        assert subject.as_env(tap) == {
+            "PYTEST_TEST": "mock",
+            "PYTEST_START_DATE": "None",
+        }
 
-    def test_unset(self, session, subject):
+    def test_unset(self, session, subject, tap):
         # overriden by an PluginSetting db value when set
-        setting = subject.set("test", "THIS_IS_FROM_DB")
+        setting = subject.set(tap, "test", "THIS_IS_FROM_DB")
         assert session.query(PluginSetting).count() == 1
 
-        subject.unset("test")
+        subject.unset(tap, "test")
         assert session.query(PluginSetting).count() == 0
