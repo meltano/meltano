@@ -203,6 +203,44 @@ In order to visualize the data with existing transformations in the UI, the fina
 meltano add model model-salesforce
 ```
 
+#### Setup incremental ELT
+
+Per default, Meltano will pull all data in the ELT process. This behavior is perfect to get started because of its simplicity. However, some datasets are too big to query as a whole: the solution is incremental ELT.
+
+Incremental ELT will persist the extraction cursor (named `state`) to make sure any subsequent ELT only pull the data that changed **after** this cursor. This feature is currently implemented by the extractors and is pretty simple to setup in your Meltano project.
+
+:::warning
+Support for incremental ELT varies from extractor to extractor.
+:::
+
+To enable it, Meltano must know which cursor to use for the ELT, which is set using the `--job_id` parameter on the `meltano elt` command.
+Alternatively, one can use the `MELTANO_JOB_ID` environmental variable. For each subsequent `ELT`, Meltano will look for a previous cursor to start from.
+
+```bash
+# the first run will create a cursor state
+$ meltano elt --job_id=gitlab tap-gitlab target-postgres
+No state was found, complete import.
+…
+ELT Completed …
+
+# subsequent runs will start from this cursor
+$ meltano elt --job_id=gitlab tap-gitlab target-postgres
+Found state from …
+…
+ELT Completed …
+```
+
+:::warning
+Schedules currently only support the `MELTANO_JOB_ID` environment variable, which need to be set manually in the **meltano.yml**.
+```yaml
+schedules:
+  - name: gitlab_postgres
+    …
+    env:
+      MELTANO_JOB_ID=gitlab
+```
+:::
+
 ### Interact with Your Data in The Web App
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
