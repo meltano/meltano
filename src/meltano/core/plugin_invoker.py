@@ -39,7 +39,7 @@ class PluginInvoker:
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
         self.plugin_settings = plugin_settings_service or PluginSettingsService(
-            session, project, plugin
+            session, project
         )
         self._prepared = False
 

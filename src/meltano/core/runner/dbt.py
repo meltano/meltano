@@ -17,6 +17,7 @@ class DbtRunner(Runner):
         project: Project,
         config_service: ConfigService = None,
         dbt_service: DbtService = None,
+        plugin_settings_service=None,
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
@@ -35,11 +36,10 @@ class DbtRunner(Runner):
 
         session = Session()
         try:
-            extractor_settings = PluginSettingsService(session, self.project, extractor)
-            loader_settings = PluginSettingsService(session, self.project, loader)
+            settings = PluginSettingsService(session, self.project)
 
             # send the elt_context as ENV variables
-            env = {**extractor_settings.as_env(), **loader_settings.as_env()}
+            env = {**settings.as_env(extractor), **settings.as_env(loader)}
         except Exception as e:
             logging.warning("Could not inject environment to dbt.")
             logging.debug("Could not hydrate ENV from the EltContext: {str(e)}")

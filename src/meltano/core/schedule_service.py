@@ -1,11 +1,10 @@
 from collections import namedtuple
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, date
 
-from .config_service import ConfigService
 from .plugin.settings_service import PluginSettingsService
 from .project import Project
-from .plugin import PluginType
+from .plugin import PluginType, PluginRef
 from .db import project_engine
 from .utils import nest, iso8601_datetime
 
@@ -24,8 +23,17 @@ Schedule = namedtuple(
 
 
 class ScheduleService:
-    def __init__(self, project: Project):
+    def __init__(
+        self,
+        session,
+        project: Project,
+        plugin_settings_service: PluginSettingsService = None,
+    ):
         self.project = project
+        self.settings_service = plugin_settings_service or PluginSettingsService(
+            session, project
+        )
+        self._session = session
 
     def add(
         self,
@@ -37,30 +45,29 @@ class ScheduleService:
         start_date: Optional[datetime] = None,
         **env
     ):
-        # default to the extractor start date
-        if not start_date:
-            config_service = ConfigService(self.project)
-            extractor_plugin = config_service.get_plugin(
-                extractor, plugin_type=PluginType.EXTRACTORS
-            )
-
-            _, Session = project_engine(self.project)
-            session = Session()
-            try:
-                extractor_settings = PluginSettingsService(
-                    session, self.project, extractor_plugin
-                )
-                start_date = iso8601_datetime(
-                    extractor_settings.get_value("start_date")
-                )
-            finally:
-                session.close()
-
+        start_date = start_date or self.default_start_date(extractor)
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )
 
         return self.add_schedule(schedule)
+
+    def default_start_date(self, extractor: str) -> datetime:
+        """
+        Returns the `start_date` of the extractor, or now.
+        """
+        extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
+        start_date = self.settings_service.get_value(extractor_ref, "start_date")
+
+        # TODO: this coercion should be handled by the `kind` attribute
+        # on the actual setting
+        if isinstance(start_date, datetime):
+            return start_date
+
+        if isinstance(start_date, date):
+            return coerce_datetime(start_date)
+
+        return iso8601_datetime(start_date) or datetime.utcnow()
 
     def add_schedule(self, schedule: Schedule):
         # guard if it already exists
