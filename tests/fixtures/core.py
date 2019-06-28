@@ -127,21 +127,30 @@ def plugin_invoker_factory(project, plugin_settings_service_factory):
 
 @pytest.fixture(scope="class")
 def add_model(project, plugin_install_service, project_add_service):
-    plugin = project_add_service.add(PluginType.MODELS, "model-carbon-intensity-sqlite")
-    plugin_install_service.create_venv(plugin)
-    plugin_install_service.install_plugin(plugin)
+    MODELS = [
+        "model-carbon-intensity-sqlite",
+        "model-gitflix",
+        "model-salesforce",
+        "model-gitlab",
+    ]
 
-    plugin = project_add_service.add(PluginType.MODELS, "model-gitflix")
-    plugin_install_service.create_venv(plugin)
-    plugin_install_service.install_plugin(plugin)
+    for model in MODELS:
+        plugin = project_add_service.add(PluginType.MODELS, model)
+        plugin_install_service.create_venv(plugin)
+        plugin_install_service.install_plugin(plugin)
 
-    plugin = project_add_service.add(PluginType.MODELS, "model-salesforce")
-    plugin_install_service.create_venv(plugin)
-    plugin_install_service.install_plugin(plugin)
+    yield
 
-    plugin = project_add_service.add(PluginType.MODELS, "model-gitlab")
-    plugin_install_service.create_venv(plugin)
-    plugin_install_service.install_plugin(plugin)
+    # clean-up
+    with project.meltano_update() as meltano:
+        meltano["plugins"]["models"] = [
+            model_def
+            for model_def in meltano["plugins"]["models"]
+            if model_def["name"] not in MODELS
+        ]
+
+    for model in MODELS:
+        shutil.rmtree(project.model_dir(model))
 
 
 @pytest.fixture(scope="class")
@@ -176,7 +185,7 @@ def project(test_dir, project_init_service):
 
     # not setting the project as default to limit
     # the side effect in tests
-    Project.activate(project, default=False)
+    Project.activate(project)
 
     # cd into the new project root
     os.chdir(project.root)
@@ -184,6 +193,7 @@ def project(test_dir, project_init_service):
     yield project
 
     # clean-up
+    Project._default = None
     os.chdir(test_dir)
     shutil.rmtree(project.root)
     logging.debug(f"Cleaned project at {project.root}")

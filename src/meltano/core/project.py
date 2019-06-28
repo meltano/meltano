@@ -39,11 +39,8 @@ class Project(Versioned):
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
-    def activate(cls, project: 'Project', default=True):
+    def activate(cls, project: "Project"):
         project.ensure_compatible()
-
-        if cls._default is project:
-            return
 
         # helpful to refer to the current absolute project path
         os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
@@ -52,8 +49,7 @@ class Project(Versioned):
         logging.debug(f"Activated project at {project.root}")
 
         # set the default project
-        if default:
-            cls._default = project
+        cls._default = project
 
     @property
     def backend_version(self):
