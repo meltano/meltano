@@ -42,10 +42,11 @@ def schedule(
     loader_name: Which loader should be used in this extraction
     interval: Cron-like syntax to specify the interval or scheduling
     """
-    project_engine(project, engine_uri, default=True)
+    _, Session = project_engine(project, engine_uri, default=True)
+    session = Session()
 
     # install_missing_plugins(project, extractor, loader, transform)
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(session, project)
     tracker = GoogleAnalyticsTracker(project)
 
     try:
@@ -66,3 +67,5 @@ def schedule(
     except Exception as err:
         click.secho(f"Scheduling failed: {err}", fg="red", err=True)
         raise click.Abort()
+    finally:
+        session.close()

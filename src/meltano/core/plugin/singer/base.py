@@ -18,7 +18,7 @@ class SingerPlugin(PluginInstall):
         plugin_dir = project.plugin_dir(self)
         os.makedirs(plugin_dir, exist_ok=True)
 
-        config = invoker.plugin_settings.as_config()
+        config = invoker.plugin_settings.as_config(self)
 
         with open(plugin_dir.joinpath(self.config_files["config"]), "w") as config_stub:
             json.dump(config, config_stub)
