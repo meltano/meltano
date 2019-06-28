@@ -149,3 +149,4 @@ src/meltano/core/bundle/model/
 
 # sqlite
 *.db
+/gitlab
