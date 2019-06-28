@@ -38,12 +38,12 @@ class TestProject:
             env.write(f"MELTANO_PROJECT={project.root}")
 
         # doesn't set the default automatically
-        project.activate(default=False)
+        Project.activate(project, default=False)
         assert Project._default is None
         assert os.getenv("MELTANO_PROJECT") == str(project.root)
 
         # `Project.find()` always return the default instance
-        project.activate()
+        Project.activate(project)
         assert Project.find() is project
 
     def test_threadsafe(self, project):
@@ -71,4 +71,4 @@ class TestIncompatibleProject:
             meltano["version"] += 1
 
         with pytest.raises(IncompatibleVersionError):
-            project.activate()
+            Project.activate(project)

@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 
 import meltano.core.bundle
+from meltano.core.project import Project
 from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
@@ -175,7 +176,7 @@ def project(test_dir, project_init_service):
 
     # not setting the project as default to limit
     # the side effect in tests
-    Project.activate(default=False)
+    Project.activate(project, default=False)
 
     # cd into the new project root
     os.chdir(project.root)
