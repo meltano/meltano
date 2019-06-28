@@ -175,7 +175,7 @@ def project(test_dir, project_init_service):
 
     # not setting the project as default to limit
     # the side effect in tests
-    project.activate(default=False)
+    Project.activate(default=False)
 
     # cd into the new project root
     os.chdir(project.root)

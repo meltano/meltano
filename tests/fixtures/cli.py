@@ -2,6 +2,7 @@ import pytest
 import os
 
 from click.testing import CliRunner
+from meltano.core.project import Project
 
 
 @pytest.mark.usefixtures("session")
@@ -11,4 +12,8 @@ def cli_runner(session, pushd):
     # after this test is finished
     pushd(os.getcwd())
 
-    return CliRunner(mix_stderr=False)
+    yield CliRunner(mix_stderr=False)
+
+    # the CLI activates the meltano project
+    # let's make sure we deactivate it after
+    Project._default = None

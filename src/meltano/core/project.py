@@ -30,29 +30,30 @@ class Project(Versioned):
 
     _meltano = {}
     __version__ = 1
-    _lock = threading.Lock()
+    _activate_lock = threading.Lock()
+    _find_lock = threading.Lock()
     _default = None
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
-        self._activate_lock = threading.Lock()
 
+    @classmethod
     @fasteners.locked(lock="_activate_lock")
-    def activate(self, default=True):
-        self.ensure_compatible()
+    def activate(cls, project: 'Project', default=True):
+        project.ensure_compatible()
 
-        if self.__class__._default is self:
+        if cls._default is project:
             return
 
         # helpful to refer to the current absolute project path
-        os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
+        os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
 
-        load_dotenv(dotenv_path=self.root.joinpath(".env"))
-        logging.debug(f"Activated project at {self.root}")
+        load_dotenv(dotenv_path=project.root.joinpath(".env"))
+        logging.debug(f"Activated project at {project.root}")
 
         # set the default project
         if default:
-            self.__class__._default = self
+            cls._default = project
 
     @property
     def backend_version(self):
@@ -63,7 +64,7 @@ class Project(Versioned):
         self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
 
     @classmethod
-    @fasteners.locked
+    @fasteners.locked(lock="_find_lock")
     def find(cls, from_dir: Union[Path, str] = None, activate=True):
         if cls._default:
             return cls._default
@@ -76,7 +77,7 @@ class Project(Versioned):
         # if we activate a project using `find()`, it should
         # be set as the default project for future `find()`
         if activate:
-            project.activate()
+            cls.activate(project)
 
         return project
 
