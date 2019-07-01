@@ -67,7 +67,7 @@ export default {
         class='has-text-centered'>
         <span>Actions</span>
         <span
-          class="icon has-text-grey-light tooltip is-tooltip-multiline is-tooltip-left"
+          class="icon has-text-grey-light tooltip is-tooltip-left"
           data-tooltip="Steps to take with a given ELT pipeline schedule.">
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
