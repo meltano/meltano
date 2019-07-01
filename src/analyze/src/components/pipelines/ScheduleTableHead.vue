@@ -64,7 +64,7 @@ export default {
 
       <th
         v-if='hasActions'
-        class='has-text-centered'>
+        class='has-text-right'>
         <span>Actions</span>
         <span
           class="icon has-text-grey-light tooltip is-tooltip-left"

@@ -23,6 +23,9 @@ export default {
     ...mapGetters('configuration', [
       'getHasPipelines',
     ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+    ]),
     getFormattedDateStringYYYYMMDD() {
       return val => utils.formatDateStringYYYYMMDD(val);
     },
@@ -112,7 +115,11 @@ export default {
                 <div class="buttons is-right">
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
+                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
                     :to="{name: 'orchestration'}">Orchestration</router-link>
+                  <router-link
+                    class="button is-interactive-primary is-outlined is-small"
+                    :to="{name: 'analyze'}">Analyze</router-link>
                   <a
                     class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
                     data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Edit</a>
