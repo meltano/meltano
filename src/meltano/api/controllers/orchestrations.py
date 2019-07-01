@@ -313,7 +313,7 @@ def get_pipeline_schedules():
     endpoint for getting a the pipeline schedules
     """
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(None, project)
     schedules = schedule_service.schedules()
 
     cleaned_schedules = []
@@ -346,7 +346,7 @@ def save_pipeline_schedule() -> Response:
     start_date = incoming["startDate"]
 
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(None, project)
 
     try:
         schedule = schedule_service.add(
