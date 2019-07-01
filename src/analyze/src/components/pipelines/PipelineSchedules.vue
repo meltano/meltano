@@ -81,7 +81,7 @@ export default {
     <div v-if='getHasPipelines' class="box">
       <table class="table is-fullwidth is-narrow is-hoverable">
 
-        <ScheduleTableHead />
+        <ScheduleTableHead has-actions />
 
         <tbody>
 
