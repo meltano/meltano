@@ -310,10 +310,10 @@ def run_transform(topic_name, connection_name):
 @orchestrationsBP.route("/get/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
-    endpoint for getting a the pipeline schedules
+    endpoint for getting the pipeline schedules
     """
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(None, project)
     schedules = schedule_service.schedules()
 
     cleaned_schedules = []
@@ -346,7 +346,7 @@ def save_pipeline_schedule() -> Response:
     start_date = incoming["startDate"]
 
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(None, project)
 
     try:
         schedule = schedule_service.add(
