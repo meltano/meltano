@@ -85,29 +85,6 @@ export default {
           </tbody>
         </table>
 
-        <!-- <div class="content is-small">
-          <div
-            class="columns columns-compact-list"
-            v-for='(modelPlugin, index) in plugins.models'
-            :key="`${modelPlugin}-${index}`">
-            <div class='column is-one-third'>
-              <a
-                v-if='!getIsPluginInstalled("models", modelPlugin)'
-                :class='{ "is-loading": getIsInstallingPlugin("models", modelPlugin) }'
-                class='button is-interactive-primary is-outlined is-block is-small'
-                @click="installModel(modelPlugin)">Install</a>
-              <a
-                v-else
-                disabled
-                class='button is-outlined is-block is-small tooltip is-tooltip-left'
-                data-tooltip="Not implemented">Uninstall</a>
-            </div>
-            <div class="column is-three-thirds">
-              {{modelPlugin}}
-            </div>
-          </div>
-
-        </div> -->
       </div>
       <div class="column is-two-thirds">
         <h2 class='title is-5'>Installed</h2>
