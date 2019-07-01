@@ -1,10 +1,15 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 
+import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead';
+
 import utils from '@/utils/utils';
 
 export default {
   name: 'PipelineSchedules',
+  components: {
+    ScheduleTableHead,
+  },
   created() {
     this.$store.dispatch('configuration/getAllPipelineSchedules');
     if (!this.getHasPipelines) {
@@ -74,18 +79,10 @@ export default {
     </div>
 
     <div v-if='getHasPipelines' class="box">
-      <table class="table pipelines-table is-fullwidth is-narrow is-hoverable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th class='has-text-centered'>Extractor</th>
-            <th class='has-text-centered'>Loader</th>
-            <th class='has-text-centered'>Transform</th>
-            <th class='has-text-centered'>Interval</th>
-            <th class='has-text-centered'>Catch-up Date</th>
-            <th class='has-text-centered'></th>
-          </tr>
-        </thead>
+      <table class="table is-fullwidth is-narrow is-hoverable">
+
+        <ScheduleTableHead />
+
         <tbody>
 
           <template v-for="pipeline in pipelines">
