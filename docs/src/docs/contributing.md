@@ -183,7 +183,7 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
     $ source ./venv/bin/activate
 
     # pip install all the development dependencies
-    $ pip install .[dev]
+    $ pip install '.[dev]'
     ```
 1. Execute the commands below:
     ```bash
