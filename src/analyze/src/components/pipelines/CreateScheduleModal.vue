@@ -18,6 +18,9 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm);
   },
+  mounted() {
+    this.$refs.name.focus();
+  },
   computed: {
     ...mapGetters('plugins', [
       'getHasInstalledPluginsOfType',
@@ -73,7 +76,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default ${Date.now()}`;
+      this.pipeline.name = '';
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
@@ -129,6 +132,7 @@ export default {
                     :class="{
                       'is-interactive-secondary has-text-interactive-secondary': pipeline.name }"
                     type="text"
+                    ref='name'
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">
