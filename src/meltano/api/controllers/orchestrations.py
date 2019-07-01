@@ -310,7 +310,7 @@ def run_transform(topic_name, connection_name):
 @orchestrationsBP.route("/get/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
-    endpoint for getting a the pipeline schedules
+    endpoint for getting the pipeline schedules
     """
     project = Project.find()
     schedule_service = ScheduleService(None, project)
