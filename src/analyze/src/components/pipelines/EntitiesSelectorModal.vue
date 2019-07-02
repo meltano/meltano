@@ -123,9 +123,9 @@ export default {
     },
     selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('configuration/selectEntities')
-          .then(() => {
-            this.$router.push({ name: 'loaders' });
-          });
+        .then(() => {
+          this.$router.push({ name: 'loaders' });
+        });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
