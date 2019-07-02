@@ -11,15 +11,17 @@ export default {
       this.$emit('close');
     },
     saveDashboard() {
+      let action = null;
       if (this.report) {
-        this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
+        action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
           data: this.saveDashboardSettings,
           report: this.report,
         });
       } else {
-        this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
+        action = this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
       }
-      this.close();
+
+      action.then(this.close);
     },
   },
   props: {

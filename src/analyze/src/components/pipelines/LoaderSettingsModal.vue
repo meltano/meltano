@@ -62,8 +62,9 @@ export default {
         name: this.loader.name,
         type: 'loaders',
         config: this.configSettings.config,
+      }).then(() => {
+        this.$router.push({ name: 'schedules' });
       });
-      this.$router.push({ name: 'schedules' });
     },
   },
 };

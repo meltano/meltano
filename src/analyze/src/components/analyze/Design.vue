@@ -13,7 +13,7 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
-  mounted() {
+  created() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
   },
