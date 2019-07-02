@@ -47,6 +47,9 @@ export default {
         : null;
       return targetExtractor || {};
     },
+    isLoading() {
+      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+    },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
       const isInstalled = this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
@@ -101,9 +104,12 @@ export default {
             <progress class="progress is-small is-info"></progress>
           </div>
         </template>
+        <progress
+          v-else-if='isLoading'
+          class="progress is-small is-info"></progress>
 
         <ConnectorSettings
-          v-if='configSettings'
+          v-if='!isLoading && configSettings'
           :config-settings='configSettings'/>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>

@@ -36,6 +36,9 @@ export default {
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
         : this.loaderInFocusConfiguration;
     },
+    isLoading() {
+      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+    },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
       const isInstalled = this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
@@ -83,6 +86,7 @@ export default {
       </header>
 
       <section class="modal-card-body">
+
         <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
           <div class="content">
             <div class="level">
@@ -93,9 +97,12 @@ export default {
             <progress class="progress is-small is-info"></progress>
           </div>
         </template>
+        <progress
+          v-else-if='isLoading'
+          class="progress is-small is-info"></progress>
 
         <ConnectorSettings
-          v-if='configSettings'
+          v-if='!isLoading && configSettings'
           :config-settings='configSettings'/>
 
       </section>
