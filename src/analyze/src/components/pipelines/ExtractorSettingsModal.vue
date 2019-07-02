@@ -128,9 +128,7 @@ export default {
           v-else
           class='button is-interactive-primary'
           :disabled="!isSaveable"
-          @click='saveConfigAndBeginEntitySelection'>
-          <span>Save</span>
-        </button>
+          @click='saveConfigAndBeginEntitySelection'>Save</button>
       </footer>
     </div>
   </div>
