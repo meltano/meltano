@@ -132,8 +132,10 @@ loaders:
     settings:
       - name: delimiter
         value: "\t"
+        description: A one-character string used to separate fields. It defaults to ','
       - name: quotechar
         value: "'"
+        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '"'.
   - name: target-snowflake
     namespace: snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
