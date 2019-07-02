@@ -120,6 +120,10 @@ Within each aforementioned depth level is an interactive color hierarchy that fu
 1. Navigation - *`$interactive-navigation`*
     - Denotes navigation and sub-navigation interactive elements as distinct from primary and secondary task colors
 
+After the primary, secondary, tertiary, or navigation decision is made, the button size decision is informed by:
+1. Use the default button size
+1. Use the `is-small` modifier if it is within a component that can have multiple instances
+
 ### Markup Hierarchy
 
 There are three fundamental markup groups in the codebase. All three are technically VueJS single-file components but each have an intended use:
