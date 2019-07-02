@@ -67,6 +67,7 @@ export default {
               class="checkbox">
               <input
                 v-model="configSettings.config[setting.name]"
+                :class='{ "is-interactive-secondary has-text-interactive-secondary": getIsConfigSettingValid(configSettings.config[setting.name]) }'
                 type="checkbox">
             </label>
 
@@ -81,19 +82,14 @@ export default {
               v-else-if='getIsOfKindTextBased(setting.kind)'
               v-model="configSettings.config[setting.name]"
               class="input is-small"
+              :class='{ "is-interactive-secondary has-text-interactive-secondary": getIsConfigSettingValid(configSettings.config[setting.name]) }'
               @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
               :placeholder="setting.value || setting.name">
-
-          </p>
-          <p
-            v-if='!getIsConfigSettingValid(configSettings.config[setting.name])'
-            class="help has-text-grey-light is-italic">
-            This field is required
           </p>
           <p
             v-if="setting.description"
-            class='help'
+            class='help is-italic'
             >
             {{ setting.description }}
           </p>
