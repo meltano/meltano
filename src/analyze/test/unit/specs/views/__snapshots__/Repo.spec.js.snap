@@ -498,8 +498,8 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
                       class="column is-one-fifth"
                     >
                       <a
-                        class="button is-secondary is-light is-small is-pulled-right"
-                        href="/dashboards/dashboard/some"
+                        class="button is-secondary is-light is-small is-pulled-right router-link-active"
+                        href="/"
                       >
                         <font-awesome-icon-stub
                           icon="arrow-right"
@@ -821,8 +821,8 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
                       class="column is-one-fifth"
                     >
                       <a
-                        class="button is-secondary is-light is-small is-pulled-right"
-                        href="/analyze/carbon/region/reports/report/some"
+                        class="button is-secondary is-light is-small is-pulled-right router-link-active"
+                        href="/"
                       >
                         <font-awesome-icon-stub
                           icon="arrow-right"
