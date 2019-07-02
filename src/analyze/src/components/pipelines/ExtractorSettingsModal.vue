@@ -62,16 +62,17 @@ export default {
         this.$router.push({ name: 'extractors' });
       }
     },
-    beginEntitySelection() {
-      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
-    },
     saveConfigAndBeginEntitySelection() {
       this.$store.dispatch('configuration/saveExtractorConfiguration', {
         name: this.extractor.name,
         type: 'extractors',
         config: this.configSettings.config,
+      }).then(() => {
+        this.$router.push({
+          name: 'extractorEntities',
+          params: { extractor: this.extractor.name },
+        });
       });
-      this.beginEntitySelection();
     },
   },
 };

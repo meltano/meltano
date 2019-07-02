@@ -122,8 +122,10 @@ export default {
       this.isExpanded = !this.isExpanded;
     },
     selectEntitiesAndBeginLoaderInstall() {
-      this.$store.dispatch('configuration/selectEntities');
-      this.$router.push({ name: 'loaders' });
+      this.$store.dispatch('configuration/selectEntities')
+        .then(() => {
+          this.$router.push({ name: 'loaders' });
+        });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
