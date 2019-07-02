@@ -68,7 +68,8 @@ export default {
           Analyze
         </router-link>
 
-        <router-link to="/dashboards"
+        <router-link
+          :to="{name: 'dashboards'}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Dashboards
         </router-link>
