@@ -1,4 +1,6 @@
 <script>
+import utils from '@/utils/utils';
+
 import Logo from './Logo';
 
 export default {
@@ -17,6 +19,11 @@ export default {
     return {
       isMobileMenuOpen: false,
     };
+  },
+  computed: {
+    getIsSubRouteOf() {
+      return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path);
+    },
   },
   methods: {
     mobileMenuClicked() {
@@ -52,24 +59,28 @@ export default {
 
         <router-link
           :to="{name: 'dataSetup'}"
+          :class="{'router-link-active': getIsSubRouteOf('/pipelines')}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Pipelines
         </router-link>
 
         <router-link
           :to="{name: 'orchestration'}"
+          :class="{'router-link-active': getIsSubRouteOf('/orchestration')}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Orchestration
         </router-link>
 
         <router-link
           :to="{name: 'analyze'}"
+          :class="{'router-link-active': getIsSubRouteOf('/analyze')}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Analyze
         </router-link>
 
         <router-link
           :to="{name: 'dashboards'}"
+          :class="{'router-link-active': getIsSubRouteOf('/dashboards')}"
           class="navbar-item navbar-child has-text-weight-semibold">
           Dashboards
         </router-link>
