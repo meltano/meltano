@@ -13,7 +13,7 @@ from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
 )
 from meltano.core.project_add_custom_service import ProjectAddCustomService
-from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.plugin_install_service import PluginInstallService, PluginNotInstallable
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
@@ -129,6 +129,17 @@ def transform(project, plugin_name):
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
 
 
+@add.command()
+@project
+@click.pass_context
+@click.argument("plugin_name")
+def connection(ctx, project, plugin_name):
+    add_plugin(ctx.obj["add_service"], project, PluginType.CONNECTIONS, plugin_name)
+
+    tracker = GoogleAnalyticsTracker(project)
+    tracker.track_meltano_add(plugin_type="connection", plugin_name=plugin_name)
+
+
 def add_plugin(
     add_service, project: Project, plugin_type: PluginType, plugin_name: str
 ):
@@ -148,22 +159,23 @@ def add_plugin(
 
     try:
         install_service = PluginInstallService(project)
-        install_service.create_venv(plugin)
-        click.secho(f"Activated '{plugin_name}' virtual environment.", fg="green")
-
         run = install_service.install_plugin(plugin)
         click.secho(run.stdout)
         click.secho(f"Installed '{plugin_name}'.", fg="green")
 
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
-
-        docs_link = plugin._extras.get("docs")
-        if docs_link:
-            click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
+    except PluginNotInstallable as install_err:
+        pass
+        # logging.debug(f"{plugin_type} is not installable, skipping install.")
     except SubprocessError as proc_err:
         click.secho(str(proc_err), fg="red")
         click.secho(proc_err.process.stderr, err=True)
         raise click.Abort()
+
+    docs_link = plugin._extras.get("docs")
+    if docs_link:
+        click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
+
 
 
 def add_transform(project: Project, plugin_name: str):

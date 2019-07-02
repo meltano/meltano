@@ -1,4 +1,4 @@
-version: 2.0
+version: 3.0
 extractors:
   - name: tap-google-analytics
     namespace: google-analytics
@@ -277,3 +277,35 @@ orchestrators:
       - name: webserver.web_server_port
         value: 5010
         env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+connections:
+  - name: sqlite
+    namespace: sqlite
+    settings:
+      - name: dialect
+        value: sqlite
+      - name: dbname
+        value: /meltano.db
+  - name: postgresql
+    namespace: postgresql
+    settings:
+      - name: dialect
+        value: sqlite
+      - name: user
+        value: warehouse
+      - name: password
+        value: warehouse
+      - name: host
+        value: 'localhost:5432'
+      - name: dbname
+        value: warehouse
+  - name: snowflake
+    namespace: snowflake
+    settings:
+      - name: dialect
+        value: snowflake
+      - name: account
+      - name: user
+      - name: password
+      - name: role
+      - name: warehouse
+      - name: database

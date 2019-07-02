@@ -34,7 +34,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService(Versioned):
-    __version__ = 2
+    __version__ = 3
 
     def __init__(
         self,
@@ -142,7 +142,6 @@ class PluginDiscoveryService(Versioned):
                 plugin_type,
                 plugin_def.pop("name"),
                 plugin_def.pop("namespace"),
-                plugin_def.pop("pip_url"),
                 **plugin_def,
             )
             for plugin_type, plugin_defs in plugins.items()
@@ -169,6 +168,7 @@ class PluginDiscoveryService(Versioned):
                 PluginType.TRANSFORMERS,
                 PluginType.MODELS,
                 PluginType.TRANSFORMS,
+                PluginType.CONNECTIONS,
                 PluginType.ORCHESTRATORS,
             )
             if plugin_type == PluginType.ALL

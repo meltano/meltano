@@ -3,6 +3,7 @@ import fnmatch
 from typing import Dict, Union
 from collections import namedtuple
 from enum import Enum
+from typing import Optional
 
 from meltano.core.behavior.hookable import HookObject
 
@@ -26,6 +27,7 @@ class PluginType(YAMLEnum):
     TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
     ORCHESTRATORS = "orchestrators"
+    CONNECTIONS = "connections"
     ALL = "all"
 
     def __str__(self):
@@ -65,7 +67,7 @@ class PluginInstall(HookObject, PluginRef):
         self,
         plugin_type: PluginType,
         name: str,
-        pip_url: str,
+        pip_url: Optional[str] = None,
         select=set(),
         config={},
         **extras
@@ -78,7 +80,10 @@ class PluginInstall(HookObject, PluginRef):
         self._extras = extras or {}
 
     def canonical(self):
-        canonical = {"name": self.name, "pip_url": self.pip_url, **self._extras}
+        canonical = {"name": self.name, **self._extras}
+
+        if self.pip_url:
+            canonical.update({"pip_url", self.pip_url})
 
         if self._select:
             canonical.update({"select": list(self._select)})
@@ -87,6 +92,9 @@ class PluginInstall(HookObject, PluginRef):
             canonical.update({"config": self.config})
 
         return canonical
+
+    def installable(self):
+        return self.pip_url is not None
 
     @property
     def executable(self):
@@ -136,7 +144,7 @@ class Plugin(PluginRef):
         plugin_type: PluginType,
         name: str,
         namespace: str,
-        pip_url: str,
+        pip_url: Optional[str] = None,
         settings: list = [],
         docs=None,
         **extras
@@ -150,4 +158,4 @@ class Plugin(PluginRef):
         self._extras = extras or {}
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(self.type, self.name, self.pip_url, **self._extras)
+        return PluginInstall(self.type, self.name, **self._extras)
