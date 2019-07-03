@@ -36,14 +36,18 @@ export default {
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
         : this.loaderInFocusConfiguration;
     },
+    isInstalled() {
+      return this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+    },
+    isInstalling() {
+      return this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
+    },
     isLoading() {
       return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
     },
     isSaveable() {
-      const isInstalling = this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
-      const isInstalled = this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
       const isValid = this.getHasValidConfigSettings(this.configSettings);
-      return !isInstalling && isInstalled && isValid;
+      return !this.isInstalling && this.isInstalled && isValid;
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders
@@ -87,7 +91,7 @@ export default {
 
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
+        <template v-if='isInstalling'>
           <div class="content">
             <div class="level">
               <div class="level-item">
