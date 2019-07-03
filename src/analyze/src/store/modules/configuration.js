@@ -7,8 +7,8 @@ import orchestrationsApi from '../../api/orchestrations';
 
 const state = {
   hasExtractorLoadingError: false,
-  loaderInFocusConfiguration: { config: {}, settings: [] },
-  extractorInFocusConfiguration: { config: {}, settings: [] },
+  loaderInFocusConfiguration: {},
+  extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
 };

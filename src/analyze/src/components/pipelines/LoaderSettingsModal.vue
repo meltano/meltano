@@ -42,7 +42,7 @@ export default {
     isInstalling() {
       return this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
     },
-    isLoading() {
+    isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
     },
     isSaveable() {
@@ -101,13 +101,14 @@ export default {
             <progress class="progress is-small is-info"></progress>
           </div>
         </template>
-        <progress
-          v-else-if='isLoading'
-          class="progress is-small is-info"></progress>
 
         <ConnectorSettings
-          v-if='!isLoading && configSettings'
+          v-if='!isLoadingConfigSettings'
           :config-settings='configSettings'/>
+
+        <progress
+          v-if='isLoadingConfigSettings && !isInstalling'
+          class="progress is-small is-info"></progress>
 
       </section>
 
