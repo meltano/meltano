@@ -2,7 +2,7 @@ from collections import namedtuple
 from typing import Optional
 from datetime import datetime, date
 
-from .plugin.settings_service import PluginSettingsService
+from .plugin.settings_service import SettingsService
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -27,10 +27,10 @@ class ScheduleService:
         self,
         session,
         project: Project,
-        plugin_settings_service: PluginSettingsService = None,
+        plugin_settings_service: SettingsService = None,
     ):
         self.project = project
-        self.settings_service = plugin_settings_service or PluginSettingsService(
+        self.settings_service = plugin_settings_service or SettingsService(
             session, project
         )
         self._session = session

@@ -5,7 +5,7 @@ from io import StringIO
 from . import Runner
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import SettingsService
 from meltano.core.dbt_service import DbtService
 from meltano.core.config_service import ConfigService
 from meltano.core.db import project_engine
@@ -24,10 +24,10 @@ class DbtRunner(Runner):
         self.dbt_service = dbt_service or DbtService(project)
 
     def run(self, extractor: str, loader: str, dry_run=False, models=None):
-        extractor = self.config_service.get_plugin(
+        extractor = self.config_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
-        loader = self.config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
+        loader = self.config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
 
         # we should probably refactor this part to have an ELTContext object already
         # filled with the each plugins' configuration so we don't have to query
@@ -36,7 +36,7 @@ class DbtRunner(Runner):
 
         session = Session()
         try:
-            settings = PluginSettingsService(session, self.project)
+            settings = SettingsService(session, self.project)
 
             # send the elt_context as ENV variables
             env = {**settings.as_env(extractor), **settings.as_env(loader)}

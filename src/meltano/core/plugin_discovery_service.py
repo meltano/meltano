@@ -10,7 +10,7 @@ from itertools import groupby, chain
 import meltano.core.bundle as bundle
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .config_service import ConfigService
-from .plugin import Plugin, PluginInstall, PluginType
+from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
 
 
@@ -150,14 +150,15 @@ class PluginDiscoveryService(Versioned):
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
+        name, _ = PluginRef.parse_name(plugin_name)
         try:
             return next(
                 plugin
                 for plugin in self.plugins()
-                if (plugin.type == plugin_type and plugin.name == plugin_name)
+                if (plugin.type == plugin_type and plugin.name == name)
             )
         except StopIteration:
-            raise PluginNotFoundError()
+            raise PluginNotFoundError(name)
 
     def discover(self, plugin_type: PluginType):
         """Return a pretty printed list of available plugins."""

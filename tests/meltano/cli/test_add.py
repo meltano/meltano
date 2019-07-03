@@ -23,7 +23,7 @@ class TestCliAdd:
     def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.get_plugin(plugin_name, plugin_type=plugin_type)
+            config_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
         res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
 
@@ -31,7 +31,7 @@ class TestCliAdd:
         assert f"Installed '{plugin_name}'." in res.stdout
 
         project.reload()
-        plugin = config_service.get_plugin(plugin_name, plugin_type)
+        plugin = config_service.find_plugin(plugin_name, plugin_type)
 
         if plugin.name == "airflow":
             assert project.plugin_dir(plugin, "airflow.cfg").exists()
@@ -47,7 +47,7 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.get_plugin("tap-unknown", PluginType.EXTRACTORS)
+            config_service.find_plugin("tap-unknown", PluginType.EXTRACTORS)
 
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project, cli_runner, config_service):
@@ -60,7 +60,7 @@ class TestCliAdd:
 
         # ensure the plugin is not present
         with pytest.raises(PluginMissingError):
-            config_service.get_plugin("tap-mock", PluginType.EXTRACTORS)
+            config_service.find_plugin("tap-mock", PluginType.EXTRACTORS)
 
     @mock.patch("meltano.cli.add.PluginInstallService", autospec=True)
     def test_add_custom(
@@ -82,7 +82,7 @@ class TestCliAdd:
         )
 
         project.reload()
-        plugin = config_service.get_plugin("tap-custom", PluginType.EXTRACTORS)
+        plugin = config_service.find_plugin("tap-custom", PluginType.EXTRACTORS)
         assert plugin.name == "tap-custom"
         assert plugin.executable == "tap-custom-bin"
 

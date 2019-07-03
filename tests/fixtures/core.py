@@ -11,7 +11,7 @@ from meltano.core.project_init_service import ProjectInitService
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import SettingsService
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService
@@ -100,7 +100,7 @@ def project_add_service(project, plugin_discovery_service):
 @pytest.fixture(scope="class")
 def plugin_settings_service_factory(project, plugin_discovery_service):
     def _factory(session, **kwargs):
-        return PluginSettingsService(
+        return SettingsService(
             session, project, discovery_service=plugin_discovery_service, **kwargs
         )
 

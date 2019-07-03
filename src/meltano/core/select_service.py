@@ -13,7 +13,7 @@ class SelectService:
     def __init__(self, project: Project, extractor: str):
         self.project = project
         self.config = ConfigService(project)
-        self.extractor = self.config.get_plugin(extractor, PluginType.EXTRACTORS)
+        self.extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
 
     def get_extractor(self):
         return self.extractor

@@ -12,7 +12,7 @@ from asserts import assert_cli_runner
 class TestCliSchedule:
     @pytest.mark.usefixtures("tap", "target")
     @mock.patch(
-        "meltano.core.schedule_service.PluginSettingsService.get_value", autospec=True
+        "meltano.core.schedule_service.SettingsService.get_value", autospec=True
     )
     def test_schedule(
         self, get_value, session, project, cli_runner, schedule_service_factory

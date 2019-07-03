@@ -5,7 +5,7 @@ import logging
 import flatten_dict
 from datetime import datetime, date, time
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
@@ -145,6 +145,12 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
         reducer = dot_reducer
 
     return flatten_dict.flatten(d, reducer, **kwargs)
+
+
+def compact(xs: Iterable) -> Iterable:
+    return (x
+            for x in xs
+            if x is not None)
 
 
 def file_has_data(file: Union[Path, str]):

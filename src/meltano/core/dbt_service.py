@@ -11,7 +11,7 @@ from .venv_service import VenvService
 class DbtService:
     def __init__(self, project):
         self.project = project
-        self._plugin = ConfigService(project).get_plugin("dbt", PluginType.TRANSFORMERS)
+        self._plugin = ConfigService(project).find_plugin("dbt", PluginType.TRANSFORMERS)
         self.profile_dir = f"{self.project.root}/transform/profile/"
         _, self._Session = project_engine(project)
 

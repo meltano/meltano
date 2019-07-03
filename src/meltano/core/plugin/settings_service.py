@@ -12,7 +12,7 @@ from . import PluginRef, PluginType, Plugin, PluginInstall
 from .setting import PluginSetting
 
 
-class PluginSettingsService:
+class SettingsService:
     def __init__(
         self,
         session,
@@ -26,35 +26,31 @@ class PluginSettingsService:
         self._session = session
 
     def settings(self, plugin: PluginRef, enabled_only=True):
-        q = self._session.query(PluginSetting).filter_by(plugin=plugin.name)
+        q = self._session.query(PluginSetting).filter_by(namespace=plugin.qualified_name)
 
         if enabled_only:
             q.filter_by(enabled=True)
 
         return q.all()
 
-    @classmethod
-    def plugin_namespace(cls, plugin: PluginRef) -> str:
-        return f"{plugin.type}.{plugin.name}"
-
     def as_config(self, plugin: PluginRef) -> Dict:
         # defaults to the meltano.yml for extraneous settings
         config = deepcopy(self.get_install(plugin).config)
-        plugin = self.get_definition(plugin)
+        plugin_def = self.get_definition(plugin)
 
-        for setting in plugin.settings:
+        for setting in plugin_def.settings:
             nest(config, setting["name"], self.get_value(plugin, setting["name"]))
 
         return config
 
     def as_env(self, plugin: PluginRef) -> Dict[str, str]:
         # defaults to the meltano.yml for extraneous settings
-        plugin = self.get_definition(plugin)
+        plugin_def = self.get_definition(plugin)
         env = {}
 
         for setting in plugin.settings:
             env_key = setting.get(
-                "env", self.setting_env(plugin.namespace, setting["name"])
+                "env", self.setting_env(plugin_def.namespace, setting["name"])
             )
             env[env_key] = str(self.get_value(plugin, setting["name"]))
 
@@ -70,7 +66,7 @@ class PluginSettingsService:
             return
 
         setting = PluginSetting(
-            namespace=self.plugin_namespace(plugin),
+            namespace=plugin.qualified_name,
             name=name,
             value=value,
             enabled=enabled,
@@ -83,7 +79,7 @@ class PluginSettingsService:
 
     def unset(self, plugin: PluginRef, name: str):
         self._session.query(PluginSetting).filter_by(
-            namespace=self.plugin_namespace(plugin), name=name
+            namespace=plugin.qualified_name, name=name
         ).delete()
         self._session.commit()
 
@@ -96,7 +92,7 @@ class PluginSettingsService:
         )
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
-        return self.config_service.get_plugin(plugin.name, plugin_type=plugin.type)
+        return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)
 
     def setting_env(self, *parts: Iterable[str]):
         process = lambda s: s.replace(".", "__").upper()
@@ -126,7 +122,7 @@ class PluginSettingsService:
             return (
                 self._session.query(PluginSetting)
                 .filter_by(
-                    namespace=self.plugin_namespace(plugin), name=name, enabled=True
+                    namespace=plugin.qualified_name, name=name, enabled=True
                 )
                 .one()
                 .value

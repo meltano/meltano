@@ -90,7 +90,7 @@ class AirflowWorker(threading.Thread):
         super().__init__()
 
         self.project = project
-        self._plugin = airflow or ConfigService(project).get_plugin("airflow")
+        self._plugin = airflow or ConfigService(project).find_plugin("airflow")
 
     def start_all(self):
         invoker = invoker_factory(db.session, self.project, self._plugin)
