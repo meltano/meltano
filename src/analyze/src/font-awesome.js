@@ -10,6 +10,7 @@ import {
   faChartBar,
   faChartLine,
   faChartPie,
+  faCheck,
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
@@ -38,6 +39,7 @@ export default {
     library.add(faChartBar);
     library.add(faChartLine);
     library.add(faChartPie);
+    library.add(faCheck);
     library.add(faDotCircle);
     library.add(faDraftingCompass);
     library.add(faExclamationTriangle);
