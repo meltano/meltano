@@ -95,18 +95,41 @@ Meltano uses [Black](https://github.com/ambv/black) and [ESLint](https://eslint.
 When testing your contributions you may need to ensure that your various `__pycache__` directories are removed. This helps ensure that you are running the code you expect to be running.
 :::
 
-### UI - Visual Hierarchy
+## UI/UX
 
-The below visual hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
-- Level 1 - Primary navigation, signage, and sub-navigation - *Grey*
+### Visual Hierarchy
+
+#### Depth
+The below level hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
+- Level 1 - Primary navigation, sub-navigation, and signage - *Grey*
 - Level 2 - Task container (traditionally the page metaphor) - *White-ish Grey*
 - Level 3 - Primary task container(s) - *White w/Shadow*
-- Level 4 - Primary CTAs - *Primary-Interactive Color*
-- Level 5 - Dropdowns, dialogs, pop-overs, etc. - *White w/Shadow*
-- Level 6 - Modals - *White w/Lightbox*
-- Level 7 - Toasts - *White w/Shadow + Message Color*
+- Level 4 - Dropdowns, dialogs, pop-overs, etc. - *White w/Shadow*
+- Level 5 - Modals - *White w/Lightbox*
+- Level 6 - Toasts - *White w/Shadow + Message Color*
 
-### UI - Markup Hierarchy
+#### Interactivity
+Within each aforementioned depth level is an interactive color hierarchy that further organizes content while communicating an order of importance for interactive elements. This interactive color hierarchy subtly influences the user's attention and nudges their focus.
+
+1. Primary - *`$interactive-primary`*
+    - Core interactive elements (typically buttons) for achieving the primary task(s) in the UI
+    - Fill - Most important
+    - Stroke - Important
+1. Secondary - *`$interactive-secondary`*
+    - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
+    - Fill - Hover only
+    - Stroke - Denotes the states of selected, active, and/or valid
+        - Grey represents the opposites: unselected, inactive, and/or invalid
+1. Tertiary - *Greyscale*
+    - Useful controls and actions that aren't core or supporting of the primary task(s) in the UI
+1. Navigation - *`$interactive-navigation`*
+    - Denotes navigation and sub-navigation interactive elements as distinct from primary and secondary task colors
+
+After the primary, secondary, tertiary, or navigation decision is made, the button size decision is informed by:
+1. Use the default button size
+1. Use the `is-small` modifier if it is within a component that can have multiple instances
+
+### Markup Hierarchy
 
 There are three fundamental markup groups in the codebase. All three are technically VueJS single-file components but each have an intended use:
 1. Views (top-level "pages" and "page containers" that map to parent routes)

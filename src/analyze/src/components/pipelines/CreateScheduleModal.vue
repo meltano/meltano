@@ -3,6 +3,7 @@ import { mapGetters, mapState } from 'vuex';
 
 import Dropdown from '@/components/generic/Dropdown';
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead';
 
 import utils from '@/utils/utils';
 
@@ -13,10 +14,14 @@ export default {
   components: {
     Dropdown,
     InputDateIso8601,
+    ScheduleTableHead,
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm);
+  },
+  mounted() {
+    this.$refs.name.focus();
   },
   computed: {
     ...mapGetters('plugins', [
@@ -73,7 +78,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default_${Date.now()}`;
+      this.pipeline.name = '';
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
@@ -109,16 +114,8 @@ export default {
       <section class="modal-card-body">
 
         <table class="table pipelines-table is-fullwidth">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th class='has-text-centered'>Extractor</th>
-              <th class='has-text-centered'>Loader</th>
-              <th class='has-text-centered'>Transform</th>
-              <th class='has-text-centered'>Interval</th>
-              <th class='has-text-centered'>Catch-up Date</th>
-            </tr>
-          </thead>
+
+          <ScheduleTableHead />
 
           <tbody>
             <tr>
@@ -129,6 +126,7 @@ export default {
                     :class="{
                       'is-success has-text-success': pipeline.name }"
                     type="text"
+                    ref='name'
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">

@@ -30,6 +30,10 @@ export default {
     return `/static/logos/${name}-logo.png`;
   },
 
+  getIsSubRouteOf(parentPath, currentPath) {
+    return currentPath.includes(parentPath);
+  },
+
   // Color Utils
   colors: {
     backgroundColor: [
