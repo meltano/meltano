@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 
 export default {
   name: 'Extractors',

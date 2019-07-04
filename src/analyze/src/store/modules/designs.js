@@ -33,7 +33,7 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
-  dialect: null,
+  dialect: 'sqlite', // TODO: dropdown with the Connections list
 };
 
 const helpers = {
@@ -114,6 +114,7 @@ const helpers = {
       order,
       limit: state.limit,
       filters,
+      dialect: state.dialect,
     };
   },
 };
@@ -228,14 +229,6 @@ const actions = {
     const index = designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      });
-
-    sqlApi.getDialect(model)
-      .then((response) => {
-        commit('setConnectionDialect', response.data);
-      })
-      .catch((e) => {
-        commit('setSqlErrorMessage', e);
       });
 
     reportsApi.loadReports()
@@ -572,10 +565,6 @@ const mutations = {
 
   setSQLResults(_, results) {
     state.currentSQL = results.sql;
-  },
-
-  setConnectionDialect(_, results) {
-    state.dialect = results.connection_dialect;
   },
 
   setQueryResults(_, results) {

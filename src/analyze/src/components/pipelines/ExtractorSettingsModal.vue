@@ -70,7 +70,7 @@ export default {
       }
     },
     saveConfigAndBeginEntitySelection() {
-      this.$store.dispatch('configuration/saveExtractorConfiguration', {
+      this.$store.dispatch('configuration/savePluginConfiguration', {
         name: this.extractor.name,
         type: 'extractors',
         config: this.configSettings.config,

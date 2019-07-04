@@ -9,6 +9,7 @@ const state = {
     extractors: [],
     loaders: [],
     models: [],
+    connections: [],
   },
 };
 

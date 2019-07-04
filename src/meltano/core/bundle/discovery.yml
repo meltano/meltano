@@ -281,15 +281,13 @@ connections:
   - name: sqlite
     namespace: sqlite
     settings:
-      - name: dialect
-        value: sqlite
       - name: dbname
-        value: /meltano.db
+        label: Database
+        description: Path to the database, relative to the project root.
+        value: meltano.db
   - name: postgresql
     namespace: postgresql
     settings:
-      - name: dialect
-        value: sqlite
       - name: user
         value: warehouse
       - name: password
@@ -301,8 +299,6 @@ connections:
   - name: snowflake
     namespace: snowflake
     settings:
-      - name: dialect
-        value: snowflake
       - name: account
       - name: user
       - name: password

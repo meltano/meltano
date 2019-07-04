@@ -70,6 +70,9 @@ class ConfigService:
     def get_models(self):
         return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
 
+    def get_connections(self):
+        return filter(lambda p: p.type == PluginType.CONNECTIONS, self.plugins())
+
     def get_database(self, database_name):
         return yaml.load(
             open(self.project.meltano_dir(f".database_{database_name}.yml"))

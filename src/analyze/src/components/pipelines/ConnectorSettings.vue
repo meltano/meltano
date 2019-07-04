@@ -11,7 +11,11 @@ export default {
     InputDateIso8601,
   },
   props: {
-    configSettings: { type: Object, required: true, default: () => {} },
+    configSettings: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
   },
   computed: {
     ...mapGetters('configuration', [
@@ -52,7 +56,7 @@ export default {
 
 <template>
   <div>
-
+    <slot />
     <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
       <div class="field-label is-normal">
         <label class="label is-small">{{ setting.label || getCleanedLabel(setting.name) }}</label>
@@ -102,7 +106,6 @@ export default {
         </div>
       </div>
     </div>
-
   </div>
 </template>
 

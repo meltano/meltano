@@ -57,25 +57,30 @@ class SettingsService:
         return env
 
     def set(self, plugin: PluginRef, name: str, value, enabled=True):
-        plugin_def = self.get_definition(plugin)
-        setting = self.find_setting(plugin_def, name)
-        env = setting.get("env", self.setting_env(plugin_def.namespace, name))
+        try:
+            plugin_def = self.get_definition(plugin)
+            setting = self.find_setting(plugin_def, name)
+            env = setting.get("env", self.setting_env(plugin_def.namespace, name))
 
-        if env in os.environ:
-            logging.warning(f"Setting {name} is currently set via ${env}.")
-            return
+            if env in os.environ:
+                logging.warning(f"Setting `{name}` is currently set via ${env}.")
+                return
 
-        setting = PluginSetting(
-            namespace=plugin.qualified_name,
-            name=name,
-            value=value,
-            enabled=enabled,
-        )
+            setting = PluginSetting(
+                namespace=plugin.qualified_name,
+                name=name,
+                value=value,
+                enabled=enabled,
+                )
 
-        self._session.merge(setting)
-        self._session.commit()
+            self._session.merge(setting)
+            self._session.commit()
 
-        return setting
+            return setting
+        except StopIteration:
+            logging.warning(f"Setting `{name}` not found.")
+            return None
+
 
     def unset(self, plugin: PluginRef, name: str):
         self._session.query(PluginSetting).filter_by(

@@ -1,5 +1,8 @@
 requirements.txt: ""
 meltano.yml: |
+  plugins:
+    connections:
+      - name: sqlite
   version: 1.0
   send_anonymous_usage_stats: True
 README.md: ""
