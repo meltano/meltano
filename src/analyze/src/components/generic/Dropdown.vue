@@ -34,10 +34,14 @@ export default {
       type: Boolean,
       default: false,
     },
-    isRightAligned: {
+    isCaretRemoved: {
       type: Boolean,
+      default: false,
     },
     isFullWidth: {
+      type: Boolean,
+    },
+    isRightAligned: {
       type: Boolean,
     },
   },
@@ -74,7 +78,7 @@ export default {
               aria-haspopup="true"
               @click="toggleDropdown">
         <span v-if="label">{{label}}</span>
-        <span class="icon is-small">
+        <span v-if='!isCaretRemoved' class="icon is-small">
           <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
         </span>
       </button>
