@@ -222,10 +222,17 @@ export default {
 
           <p v-if="hasActiveReport()" class="control" @click="getDashboards">
             <Dropdown label="Add to Dashboard" is-right-aligned>
+<<<<<<< HEAD
               <div class="dropdown-content" slot-scope="{ dropdownClose }">
                 <a
                   class="dropdown-item"
                   @click="toggleNewDashboardModal(); dropdownClose();">
+=======
+              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                <a
+                  class="dropdown-item"
+                  @click="toggleNewDashboardModal(); dropdownForceClose();">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                   New Dashboard
                 </a>
                 <div v-if="dashboards.length">
@@ -235,7 +242,11 @@ export default {
                     <label for="'checkbox-' + dashboard.id"
                             @click="
                               toggleActiveReportInDashboard(dashboard);
+<<<<<<< HEAD
                               dropdownClose();">
+=======
+                              dropdownForceClose();">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                       <input type="checkbox"
                             :id="'checkbox-' + dashboard.id"
                             :checked="isActiveReportInDashboard(dashboard)">
@@ -262,7 +273,11 @@ export default {
                 :label="hasActiveReport() ? '' : 'Save'"
                 button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
+<<<<<<< HEAD
                 <div class="dropdown-content" slot-scope="{ dropdownClose }">
+=======
+                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                   <div class="dropdown-item">
                     <div class="field">
                       <label class="label" v-if="hasActiveReport()">Save as</label>
@@ -277,11 +292,19 @@ export default {
                       <div class="control">
                         <button class="button is-interactive-primary"
                                 :disabled="!saveReportSettings.name"
+<<<<<<< HEAD
                                 @click="saveReport(); dropdownClose();">Save</button>
                       </div>
                       <div class="control">
                         <button class="button is-text"
                                 @click="dropdownClose();">
+=======
+                                @click="saveReport(); dropdownForceClose();">Save</button>
+                      </div>
+                      <div class="control">
+                        <button class="button is-text"
+                                @click="dropdownForceClose();">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                           Cancel</button>
                       </div>
                     </div>
@@ -297,11 +320,19 @@ export default {
               label="Load"
               button-classes='is-interactive-primary is-outlined'
               is-right-aligned>
+<<<<<<< HEAD
               <div class="dropdown-content" slot-scope="{ dropdownClose }">
                 <a class="dropdown-item"
                     v-for="report in reports"
                     :key="report.name"
                     @click="loadReport(report); dropdownClose();">
+=======
+              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                <a class="dropdown-item"
+                    v-for="report in reports"
+                    :key="report.name"
+                    @click="loadReport(report); dropdownForceClose();">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                   {{report.name}}
                 </a>
               </div>
@@ -318,6 +349,7 @@ export default {
 
         <div class="box">
           <div class="columns is-vcentered">
+<<<<<<< HEAD
             <div class="column is-two-fifths">
               <h2 class="title is-5">Query</h2>
             </div>
@@ -336,6 +368,13 @@ export default {
                     </div>
                   </div>
                 </Dropdown>
+=======
+            <div class="column">
+              <h2 class="title is-5">Query</h2>
+            </div>
+            <div class="column">
+              <div class="buttons is-right">
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                 <button class="button is-success"
                   :class="{'is-loading': loadingQuery}"
                   :disabled="!currentSQL"
@@ -344,6 +383,7 @@ export default {
             </div>
           </div>
 
+<<<<<<< HEAD
           <div class="columns is-vcentered">
             <div class="column">
               <div class="field">
@@ -498,32 +538,60 @@ export default {
                     has-background-white"
                     v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                     Columns
+=======
+          <nav class="panel has-background-white">
+
+            <div class="is-unselectable">
+              <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
+              <template v-if="hasJoins">
+                <template v-for="join in design.joins">
+                  <a
+                    class="panel-block
+                      panel-block-heading
+                      has-background-white-bis
+                      has-text-grey
+                      is-expandable"
+                      :class="{'is-collapsed': join.collapsed}"
+                      :key="join.label"
+                      @click="joinRowClicked(join)">
+                      {{join.label}}
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                   </a>
-                  <template v-for="timeframe in join.related_table.timeframes">
-                    <a class="panel-block timeframe"
-                        v-if="!timeframe.hidden"
-                        @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
-                        :key="timeframe.label"
-                        :class="{
-                          'is-active': timeframe.selected,
-                          'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
-                        }">
-                      {{timeframe.label}}
-                      <div class='sqlite-unsupported-container'
-                            v-if='isConnectionDialectSqlite(dialect)'>
-                        <small>Unsupported by SQLite</small>
-                      </div>
+                  <template v-if="!join.collapsed">
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
+                    <a class="panel-block
+                      panel-block-heading
+                      has-background-white"
+                      v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
+                      Columns
                     </a>
-                    <template v-if="timeframe.selected">
-                      <template v-for="period in timeframe.periods">
-                        <a class="panel-block indented"
-                            :key="timeframe.label.concat('-', period.label)"
-                            @click="timeframePeriodSelected(period)"
-                            :class="{'is-active': period.selected}">
-                          {{period.label}}
-                        </a>
+                    <template v-for="timeframe in join.related_table.timeframes">
+                      <a class="panel-block timeframe"
+                          v-if="!timeframe.hidden"
+                          @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
+                          :key="timeframe.label"
+                          :class="{
+                            'is-active': timeframe.selected,
+                            'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
+                          }">
+                        {{timeframe.label}}
+                        <div class='sqlite-unsupported-container'
+                              v-if='isConnectionDialectSqlite(dialect)'>
+                          <small>Unsupported by SQLite</small>
+                        </div>
+                      </a>
+                      <template v-if="timeframe.selected">
+                        <template v-for="period in timeframe.periods">
+                          <a class="panel-block indented"
+                              :key="timeframe.label.concat('-', period.label)"
+                              @click="timeframePeriodSelected(period)"
+                              :class="{'is-active': period.selected}">
+                            {{period.label}}
+                          </a>
+                        </template>
                       </template>
                     </template>
+<<<<<<< HEAD
                   </template>
                   <template v-for="column in join.related_table.columns">
                     <a class="panel-block space-between has-text-weight-medium"
@@ -540,15 +608,64 @@ export default {
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
                       </button>
+=======
+                    <template v-for="column in join.related_table.columns">
+                      <a class="panel-block"
+                        v-if="!column.hidden"
+                        :key="column.label"
+                        :class="{'is-active': column.selected}"
+                        @click="joinColumnSelected(join, column)">
+                      {{column.label}}
+                      </a>
+                    </template>
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
+                    <a class="panel-block
+                      panel-block-heading
+                      has-background-white"
+                      v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
+                      Aggregates
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
                     </a>
+                    <template v-for="aggregate in join.related_table.aggregates">
+                      <a class="panel-block"
+                        v-if="!aggregate.hidden"
+                        :key="aggregate.label"
+                        :class="{'is-active': aggregate.selected}"
+                        @click="joinAggregateSelected(join, aggregate)">
+                      {{aggregate.label}}
+                      </a>
+                    </template>
                   </template>
-                  <!-- eslint-disable-next-line vue/require-v-for-key -->
-                  <a class="panel-block
+                </template>
+              </template>
+              <template>
+                <a
+                  class="panel-block
+                  panel-block-heading
+                  has-background-white-bis
+                  has-text-grey
+                  is-expandable"
+                  :class="{'is-collapsed': design.related_table.collapsed}"
+                  @click="tableRowClicked(design.related_table)">
+                    {{design.label}}
+                  </a>
+              </template>
+              <template v-if="!design.related_table.collapsed">
+                <a class="panel-block
                     panel-block-heading
                     has-background-white"
-                    v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
-                    Aggregates
+                    v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
+                  Columns
+                </a>
+                <template v-for="timeframe in design.related_table.timeframes">
+                  <a class="panel-block dimension-group"
+                      :key="timeframe.label"
+                      v-if="!timeframe.related_view.hidden"
+                      @click="timeframeSelected(timeframe)"
+                      :class="{'is-active': timeframe.selected}">
+                    {{timeframe.label}}
                   </a>
+<<<<<<< HEAD
                   <template v-for="aggregate in join.related_table.aggregates">
                     <a class="panel-block space-between has-text-weight-medium"
                       v-if="!aggregate.hidden"
@@ -669,6 +786,262 @@ export default {
 
             <ResultTable></ResultTable>
 
+=======
+                  <template v-for="period in timeframe.periods">
+                    <a class="panel-block indented"
+                        :key="period.label"
+                        @click="timeframePeriodSelected(period)"
+                        v-if="timeframe.selected"
+                        :class="{'is-active': period.selected}">
+                      {{period.label}}
+                    </a>
+                  </template>
+                </template>
+                <a class="panel-block"
+                    v-for="column in design.related_table.columns"
+                    :key="column.label"
+                    v-if="!column.hidden"
+                    @click="columnSelected(column)"
+                    :class="{'is-active': column.selected}">
+                  {{column.label}}
+                </a>
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
+                <a class="panel-block
+                    panel-block-heading
+                    has-background-white"
+                    v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
+                  Aggregates
+                </a>
+                <a class="panel-block"
+                    v-for="aggregate in design.related_table.aggregates"
+                    :key="aggregate.label"
+                    @click="aggregateSelected(aggregate)"
+                    :class="{'is-active': aggregate.selected}">
+                  {{aggregate.label}}
+                </a>
+              </template>
+            </div>
+
+          </nav>
+        </div>
+      </aside>
+
+      <div class="column is-three-quarters">
+
+        <div class="box">
+          <div class="columns is-vcentered">
+            <div class="column">
+              <h2 class="title is-5">Results</h2>
+            </div>
+            <div class="column">
+              <div class="buttons is-right">
+                <button class="button is-success"
+                  :class="{'is-loading': loadingQuery}"
+                  :disabled="!currentSQL"
+                  @click="runQuery">Run</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- filters tab -->
+          <div v-if="design.has_filters">
+            <div class="has-background-primary
+              accordion-header
+              has-text-white-bis
+              is-expandable"
+              @click="toggleFilterOpen"
+              :class="{'is-collapsed': !filtersOpen}">
+
+              <span>Filters</span>
+              <div class="accordion-toggle">
+                <a class="button is-primary is-small">
+                  <span class="icon is-small">
+                    <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'">
+                    </font-awesome-icon>
+                  </span>
+                </a>
+              </div>
+            </div>
+            <div class="accordion-body">
+              <div v-if="filtersOpen">
+                <div class="columns">
+                  <div class="column is-3">
+                    <strong>{{filter.design_label}}</strong>
+                    <span>{{filter.label}}</span>
+                    <span>({{filter.type}})</span>
+                  </div>
+                  <div class="column is-9">
+                    <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
+                    <div class="field" v-if="filter.type == 'string'">
+                      <select-dropdown
+                        :placeholder="filter.field"
+                        :field="filter.sql"
+                        :dropdownList="getResultsFromDistinct(filter.sql)"
+                        :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
+                        @focused="inputFocused(filter.sql)"
+                        @selected="dropdownSelected"
+                        @modifierChanged="modifierChanged">
+                      </select-dropdown>
+                    </div>
+                    <div class="tags selected-filters">
+                      <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
+                        <span class="tag is-link" :key="key">
+                          {{selected}}
+                          <button class="delete is-small"></button>
+                        </span>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- charts tab -->
+          <div class="has-background-primary
+            accordion-header
+            has-text-white-bis
+            is-expandable"
+            @click="toggleChartsOpen"
+            :class="{'is-collapsed': !chartsOpen}">
+
+            <span class="accordion-title">Charts</span>
+            <div>
+              <div class="field has-addons chart-buttons">
+                <p class="control" @click.stop="setAndOpenChart('BarChart')">
+                  <button
+                    class="button is-small is-text has-text-white"
+                    :class="{'is-active': chartType === 'BarChart'}"
+                    :disabled="!hasChartableResults">
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="chart-bar"></font-awesome-icon>
+                    </span>
+                  </button>
+                </p>
+                <p class="control" @click.stop="setAndOpenChart('LineChart')">
+                  <button
+                    class="button is-small is-text has-text-white"
+                    :class="{'is-active': chartType === 'LineChart'}"
+                    :disabled="!hasChartableResults">
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                    </span>
+                  </button>
+                </p>
+                <p class="control" @click.stop="setAndOpenChart('AreaChart')">
+                  <button
+                    class="button is-small is-text has-text-white"
+                    :class="{'is-active': chartType === 'AreaChart'}"
+                    :disabled="!hasChartableResults">
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="chart-area"></font-awesome-icon>
+                    </span>
+                  </button>
+                </p>
+                <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
+                  <button
+                    class="button is-small is-text has-text-white"
+                    :class="{'is-active': chartType === 'ScatterChart'}"
+                    :disabled="!hasChartableResults">
+                    <span class="icon is-small">
+                      <font-awesome-icon icon="dot-circle"></font-awesome-icon>
+                    </span>
+                  </button>
+                </p>
+              </div>
+            </div>
+
+            <div class="accordion-toggle">
+              <a class="button is-primary is-small">
+                <span class="icon is-small">
+                  <font-awesome-icon :icon="chartsOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+                </span>
+              </a>
+            </div>
+
+          </div>
+
+          <div class="accordion-body">
+            <div v-if="chartsOpen" >
+              <div v-if="hasChartableResults" class="chart-toggles">
+                <chart :chart-type='chartType'
+                        :results='results'
+                        :result-aggregates='resultAggregates'></chart>
+              </div>
+              <div v-if="!hasChartableResults">
+                <div class="box is-radiusless is-shadowless">
+                  <p>
+                    Run a query with at least one aggregate selected or load a report
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- results/SQL tab -->
+          <div class="has-background-primary
+            accordion-header
+            has-text-white-bis
+            is-expandable"
+            @click="toggleDataOpen"
+            :class="{'is-collapsed': !dataOpen}">
+
+            <span>Data</span>
+            <div class="accordion-toggle">
+              <a class="button is-primary is-small">
+                <span class="icon is-small">
+                  <font-awesome-icon :icon="dataOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+                </span>
+              </a>
+            </div>
+          </div>
+          <div class="accordion-body">
+            <div v-if="dataOpen" class="box is-radiusless is-shadowless">
+              <div class="notification is-danger" v-if="hasSQLError">
+                <button class="delete" @click="resetErrorMessage"></button>
+                <ul>
+                  <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+                </ul>
+              </div>
+              <div class="columns is-vcentered">
+
+                <div class="column">
+                  <div class="tabs">
+                    <ul>
+                      <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
+                        <a>Results ({{numResults}})</a>
+                      </li>
+                      <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
+                        <a>SQL</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="column">
+                  <div class="field is-horizontal is-marginless is-pulled-right">
+                    <div class="field-label">
+                      <label class="label">Limit</label>
+                    </div>
+                    <div class="field-body">
+                      <div class="field">
+                        <div class="control">
+                          <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <ResultTable></ResultTable>
+              <div>
+                <div class="" v-if="isSQLTab && currentSQL">
+                  <code>{{formattedSql}}</code>
+                </div>
+              </div>
+            </div>
+>>>>>>> 87b7551f... initial UI cleanup in Analyze to better group editing tasks (Query as data related edits and Results as presentation related edits) as opposed to conflating what a user can do in each container (aimed as a user mental model improvment)
           </div>
 
           <!-- New Dashboard Modal -->
