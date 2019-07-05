@@ -473,6 +473,7 @@ export default {
               <template v-for="join in design.joins">
                 <a
                   class="panel-block
+                    panel-block-heading
                     has-background-white-bis
                     has-text-grey
                     is-expandable"
@@ -509,38 +510,29 @@ export default {
                       @click="joinRowClicked(join)">
                       {{join.label}}
                   </a>
-                  <template v-if="!join.collapsed">
-                    <!-- eslint-disable-next-line vue/require-v-for-key -->
-                    <a class="panel-block
-                      panel-block-heading
-                      has-background-white"
-                      v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
-                      Columns
+                  <template v-for="timeframe in join.related_table.timeframes">
+                    <a class="panel-block timeframe"
+                        v-if="!timeframe.hidden"
+                        @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
+                        :key="timeframe.label"
+                        :class="{
+                          'is-active': timeframe.selected,
+                          'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
+                        }">
+                      {{timeframe.label}}
+                      <div class='sqlite-unsupported-container'
+                            v-if='isConnectionDialectSqlite(dialect)'>
+                        <small>Unsupported by SQLite</small>
+                      </div>
                     </a>
-                    <template v-for="timeframe in join.related_table.timeframes">
-                      <a class="panel-block timeframe"
-                          v-if="!timeframe.hidden"
-                          @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
-                          :key="timeframe.label"
-                          :class="{
-                            'is-active': timeframe.selected,
-                            'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
-                          }">
-                        {{timeframe.label}}
-                        <div class='sqlite-unsupported-container'
-                              v-if='isConnectionDialectSqlite(dialect)'>
-                          <small>Unsupported by SQLite</small>
-                        </div>
-                      </a>
-                      <template v-if="timeframe.selected">
-                        <template v-for="period in timeframe.periods">
-                          <a class="panel-block indented"
-                              :key="timeframe.label.concat('-', period.label)"
-                              @click="timeframePeriodSelected(period)"
-                              :class="{'is-active': period.selected}">
-                            {{period.label}}
-                          </a>
-                        </template>
+                    <template v-if="timeframe.selected">
+                      <template v-for="period in timeframe.periods">
+                        <a class="panel-block indented"
+                            :key="timeframe.label.concat('-', period.label)"
+                            @click="timeframePeriodSelected(period)"
+                            :class="{'is-active': period.selected}">
+                          {{period.label}}
+                        </a>
                       </template>
                     </template>
                   </template>
@@ -560,44 +552,13 @@ export default {
                         </span>
                       </button>
                     </a>
-                    <template v-for="aggregate in join.related_table.aggregates">
-                      <a class="panel-block"
-                        v-if="!aggregate.hidden"
-                        :key="aggregate.label"
-                        :class="{'is-active': aggregate.selected}"
-                        @click="joinAggregateSelected(join, aggregate)">
-                      {{aggregate.label}}
-                      </a>
-                    </template>
                   </template>
-                </template>
-              </template>
-              <template>
-                <a
-                  class="panel-block
-                  panel-block-heading
-                  has-background-white-bis
-                  has-text-grey
-                  is-expandable"
-                  :class="{'is-collapsed': design.related_table.collapsed}"
-                  @click="tableRowClicked(design.related_table)">
-                    {{design.label}}
-                  </a>
-              </template>
-              <template v-if="!design.related_table.collapsed">
-                <a class="panel-block
+                  <!-- eslint-disable-next-line vue/require-v-for-key -->
+                  <a class="panel-block
                     panel-block-heading
                     has-background-white"
-                    v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
-                  Columns
-                </a>
-                <template v-for="timeframe in design.related_table.timeframes">
-                  <a class="panel-block dimension-group"
-                      :key="timeframe.label"
-                      v-if="!timeframe.related_view.hidden"
-                      @click="timeframeSelected(timeframe)"
-                      :class="{'is-active': timeframe.selected}">
-                    {{timeframe.label}}
+                    v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
+                    Aggregates
                   </a>
                   <template v-for="aggregate in join.related_table.aggregates">
                     <a class="panel-block space-between has-text-weight-medium"
