@@ -125,8 +125,25 @@ export FASTLY_START_DATE="YYYY-MM-DD"
 
 ### GitLab
 
-`tap-gitlab` pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html) and extracts [the following resources](https://gitlab.com/meltano/tap-gitlab#tap-gitlab) from GitLab. It then outputs the schema for each resource
-and incrementally pulls data based on the input state
+`tap-gitlab` pulls raw data from GitLab's [REST API](https://docs.gitlab.com/ee/api/README.html) and extracts the following resources from GitLab:
+  - [Branches](https://docs.gitlab.com/ee/api/branches.html)
+  - [Commits](https://docs.gitlab.com/ee/api/commits.html)
+  - [Issues](https://docs.gitlab.com/ee/api/issues.html)
+  - [Projects](https://docs.gitlab.com/ee/api/projects.html)
+  - [Project milestones](https://docs.gitlab.com/ee/api/milestones.html)
+  - [Project Merge Requests](https://docs.gitlab.com/ee/api/merge_requests.html)
+  - [Users](https://docs.gitlab.com/ee/api/users.html)
+  - [Groups](https://docs.gitlab.com/ee/api/group_milestones.html)
+  - [Group Milestones](https://docs.gitlab.com/ee/api/users.html)
+  - [Group and Project members](https://docs.gitlab.com/ee/api/members.html)
+  - [Tags](https://docs.gitlab.com/ee/api/tags.html)
+  - [Releases](https://docs.gitlab.com/ee/api/releases/index.html)
+  - [Group Labels](https://docs.gitlab.com/ee/api/group_labels.html)
+  - [Project Labels](https://docs.gitlab.com/ee/api/labels.html)
+  - [Epics](https://docs.gitlab.com/ee/api/epics.html) (only available for Gitlab Ultimate and Gitlab.com Gold accounts)
+  - [Epic Issues](https://docs.gitlab.com/ee/api/epic_issues.html) (only available for Gitlab Ultimate and Gitlab.com Gold accounts)
+
+It incrementally pulls data based on the input state and then outputs the schema for each resource and the extracted data. For more information you can check [the documentation for tap-gitlab](https://gitlab.com/meltano/tap-gitlab).
 
 #### Info
 
