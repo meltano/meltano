@@ -343,21 +343,42 @@ export default {
             </div>
           </div>
 
-          <div class="columns">
+          <div class="columns is-vcentered">
             <div class="column">
-              <div class="field is-horizontal">
-                <div class="field-label">
-                  <label class="label">Limit</label>
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <div class="control">
-                      <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-                    </div>
-                  </div>
+              <div class="field">
+                <label class="label">Limit</label>
+                <div class="control is-expanded">
+                  <input
+                    class="input is-small"
+                    type="text"
+                    placeholder="Limit"
+                    v-model="limit"
+                    @focus="$event.target.select()">
                 </div>
               </div>
             </div>
+            <div class="column">
+              <div class="field">
+                <label class="label">Filters</label>
+                <div class="control is-expanded">
+                  <Dropdown
+                    label="None"
+                    button-classes='is-small'
+                    is-right-aligned
+                    is-full-width>
+                    <div class="dropdown-content">
+                      <a class="dropdown-item">
+                        TODO
+                      </a>
+                    </div>
+                  </Dropdown>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Attributes</label>
           </div>
 
           <nav class="panel has-background-white">
