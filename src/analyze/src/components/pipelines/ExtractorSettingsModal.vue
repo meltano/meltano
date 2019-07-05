@@ -37,7 +37,7 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractorLacksConfigSettingsAndIsInstalled() {
-      return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
+      return !this.isInstalling &&
              this.configSettings.settings &&
              this.configSettings.settings.length === 0;
     },
@@ -47,11 +47,18 @@ export default {
         : null;
       return targetExtractor || {};
     },
+    isInstalled() {
+      return this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+    },
+    isInstalling() {
+      return this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+    },
+    isLoadingConfigSettings() {
+      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+    },
     isSaveable() {
-      const isInstalling = this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
-      const isInstalled = this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
       const isValid = this.getHasValidConfigSettings(this.configSettings);
-      return !isInstalling && isInstalled && isValid;
+      return !this.isInstalling && this.isInstalled && isValid;
     },
   },
   methods: {
@@ -91,7 +98,7 @@ export default {
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingPlugin("extractors", extractorNameFromRoute)'>
+        <template v-if='isInstalling'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -103,8 +110,12 @@ export default {
         </template>
 
         <ConnectorSettings
-          v-if='configSettings'
+          v-if='!isLoadingConfigSettings'
           :config-settings='configSettings'/>
+
+        <progress
+          v-if='isLoadingConfigSettings && !isInstalling'
+          class="progress is-small is-info"></progress>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">
