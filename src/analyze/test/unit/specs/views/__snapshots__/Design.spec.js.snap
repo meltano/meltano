@@ -3,52 +3,361 @@
 exports[`Design.vue Load report button enabled if reports exist 1`] = `
 <section>
   <div
-    class="columns is-gapless"
+    class="columns is-vcentered"
   >
-    <aside
-      class="column is-one-quarter vh-scrollable"
+    <div
+      class="column is-one-quarter"
     >
-      <nav
-        class="panel has-background-white"
+      <div
+        class="is-grouped is-pulled-left"
       >
+        <div>
+          <em>
+            Untitled Report
+          </em>
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="column"
+    >
+      <div
+        class="field is-grouped is-pulled-right"
+      >
+        <!---->
+         
         <div
-          class="panel-block"
+          class="control field"
         >
-          <div
-            class="field has-addons"
+          <p
+            class="control"
+          >
+            <!---->
+          </p>
+           
+          <p
+            class="control"
           >
             <div
-              class="control is-expanded"
+              class="dropdown is-right"
             >
-              <input
-                class="input"
-                disabled="disabled"
-                placeholder="Filter"
-                type="text"
-              />
+              <div
+                class="dropdown-trigger"
+              >
+                <button
+                  aria-controls="dropdown-save"
+                  aria-haspopup="true"
+                  class="button is-interactive-primary is-outlined"
+                  disabled="disabled"
+                >
+                  <span>
+                    Save
+                  </span>
+                   
+                  <span
+                    class="icon is-small"
+                  >
+                    <font-awesome-icon-stub
+                      icon="caret-down"
+                    />
+                  </span>
+                </button>
+              </div>
+               
+              <div
+                class="dropdown-menu"
+                id="dropdown-save"
+                role="menu"
+              >
+                <div
+                  class="dropdown-content"
+                >
+                  <div
+                    class="dropdown-item"
+                  >
+                    <div
+                      class="field"
+                    >
+                      <!---->
+                       
+                      <div
+                        class="control"
+                      >
+                        <input
+                          class="input"
+                          placeholder="Name your report"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                     
+                    <div
+                      class="field is-grouped"
+                    >
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-interactive-primary"
+                          disabled="disabled"
+                        >
+                          Save
+                        </button>
+                      </div>
+                       
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-text"
+                        >
+                          
+                        Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <div
+            class="dropdown is-right"
+          >
+            <div
+              class="dropdown-trigger"
+            >
+              <button
+                aria-controls="dropdown-load"
+                aria-haspopup="true"
+                class="button is-interactive-primary is-outlined"
+              >
+                <span>
+                  Load
+                </span>
+                 
+                <span
+                  class="icon is-small"
+                >
+                  <font-awesome-icon-stub
+                    icon="caret-down"
+                  />
+                </span>
+              </button>
             </div>
              
             <div
-              class="control"
+              class="dropdown-menu"
+              id="dropdown-load"
+              role="menu"
             >
+              <div
+                class="dropdown-content"
+              >
+                <a
+                  class="dropdown-item"
+                >
+                  
+                Report 1 Test
+              
+                </a>
+              </div>
+            </div>
+          </div>
+        </p>
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="columns"
+  >
+    <aside
+      class="column is-one-quarter"
+    >
+      <div
+        class="box"
+      >
+        <div
+          class="columns is-vcentered"
+        >
+          <div
+            class="column is-two-fifths"
+          >
+            <h2
+              class="title is-5"
+            >
+              Query
+            </h2>
+          </div>
+           
+          <div
+            class="column is-three-fifths"
+          >
+            <div
+              class="buttons is-right"
+            >
+              <div
+                class="dropdown"
+              >
+                <div
+                  class="dropdown-trigger"
+                >
+                  <button
+                    aria-controls="dropdown-sql"
+                    aria-haspopup="true"
+                    class="button is-text is-small"
+                    disabled="disabled"
+                  >
+                    <span>
+                      SQL
+                    </span>
+                     
+                    <!---->
+                  </button>
+                </div>
+                 
+                <div
+                  class="dropdown-menu"
+                  id="dropdown-sql"
+                  role="menu"
+                >
+                  <div
+                    class="dropdown-content"
+                  >
+                    <div
+                      class="level"
+                    >
+                      <div
+                        class="level-item"
+                      >
+                        <code>
+                          
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               
               <button
-                class="button"
+                class="button is-success"
                 disabled="disabled"
               >
-                <span
-                  class="icon"
-                >
-                  <font-awesome-icon-stub
-                    icon="search"
-                  />
-                </span>
+                Run
               </button>
             </div>
           </div>
         </div>
          
         <div
-          class="is-unselectable"
+          class="columns is-vcentered"
+        >
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Limit
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <input
+                  class="input is-small"
+                  placeholder="Limit"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Filters
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <div
+                  class="dropdown is-fullwidth"
+                >
+                  <div
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-none"
+                      aria-haspopup="true"
+                      class="button is-small"
+                    >
+                      <span>
+                        None
+                      </span>
+                       
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-none"
+                    role="menu"
+                  >
+                    <div
+                      class="dropdown-content"
+                    >
+                      <a
+                        class="dropdown-item"
+                      >
+                        
+                      TODO
+                    
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        <div
+          class="field"
+        >
+          <label
+            class="label"
+          >
+            Attributes
+          </label>
+        </div>
+         
+        <nav
+          class="panel is-unselectable"
         >
           <!---->
            
@@ -68,221 +377,37 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
              
           <!---->
            
-        </div>
-      </nav>
+        </nav>
+      </div>
     </aside>
      
     <div
-      class="column is-three-quarters vh-scrollable"
+      class="column is-three-quarters"
     >
       <div
-        class="columns is-vcentered"
+        class="box"
       >
         <div
-          class="column is-one-quarter"
+          class="columns is-vcentered"
         >
           <div
-            class="is-grouped is-pulled-left"
+            class="column"
           >
-            <div>
-              <em>
-                Untitled Report
-              </em>
-            </div>
+            <h2
+              class="title is-5"
+            >
+              Results
+            </h2>
           </div>
-        </div>
-         
-        <div
-          class="column"
-        >
+           
           <div
-            class="field is-grouped is-pulled-right"
+            class="column"
           >
-            <!---->
-             
             <div
-              class="control field"
-            >
-              <p
-                class="control"
-              >
-                <!---->
-              </p>
-               
-              <p
-                class="control"
-              >
-                <div
-                  class="dropdown is-right"
-                >
-                  <div
-                    class="dropdown-trigger"
-                  >
-                    <button
-                      aria-controls="dropdown-save"
-                      aria-haspopup="true"
-                      class="button is-interactive-primary is-outlined"
-                      disabled="disabled"
-                    >
-                      <span>
-                        Save
-                      </span>
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id="dropdown-save"
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <div
-                          class="field"
-                        >
-                          <!---->
-                           
-                          <div
-                            class="control"
-                          >
-                            <input
-                              class="input"
-                              placeholder="Name your report"
-                              type="text"
-                            />
-                          </div>
-                        </div>
-                         
-                        <div
-                          class="field is-grouped"
-                        >
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-interactive-primary"
-                              disabled="disabled"
-                            >
-                              Save
-                            </button>
-                          </div>
-                           
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-text"
-                            >
-                              
-                            Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </p>
-            </div>
-             
-            <p
-              class="control"
-            >
-              <div
-                class="dropdown is-right"
-              >
-                <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-load"
-                    aria-haspopup="true"
-                    class="button is-interactive-primary is-outlined"
-                  >
-                    <span>
-                      Load
-                    </span>
-                     
-                    <span
-                      class="icon is-small"
-                    >
-                      <font-awesome-icon-stub
-                        icon="caret-down"
-                      />
-                    </span>
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-load"
-                  role="menu"
-                >
-                  <div
-                    class="dropdown-content"
-                  >
-                    <a
-                      class="dropdown-item"
-                    >
-                      
-                    Report 1 Test
-                  
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </p>
-             
-            <p
-              class="control"
+              class="buttons has-addons is-right"
             >
               <button
-                class="button is-success"
-                disabled="disabled"
-              >
-                Run Query
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-       
-      <!---->
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
-      >
-        <span
-          class="accordion-title"
-        >
-          Charts
-        </span>
-         
-        <div>
-          <div
-            class="field has-addons chart-buttons"
-          >
-            <p
-              class="control"
-            >
-              <button
-                class="button is-small is-text has-text-white is-active"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -292,14 +417,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -309,14 +429,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -326,14 +441,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -343,143 +453,132 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
+               
+              <button
+                class="button is-selected is-interactive-secondary"
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
          
-        <div
-          class="accordion-toggle"
-        >
-          <a
-            class="button is-primary is-small"
-          >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-down"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
         <!---->
-      </div>
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
-      >
-        <span>
-          Data
-        </span>
          
         <div
-          class="accordion-toggle"
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable is-collapsed"
         >
-          <a
-            class="button is-primary is-small"
+          <span
+            class="accordion-title"
           >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-up"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
-        <div
-          class="box is-radiusless is-shadowless"
-        >
-          <!---->
+            Charts
+          </span>
            
           <div
-            class="columns is-vcentered"
+            class="accordion-toggle"
           >
-            <div
-              class="column"
+            <a
+              class="button is-primary is-small"
             >
-              <div
-                class="tabs"
+              <span
+                class="icon is-small"
               >
-                <ul>
-                  <li
-                    class=""
-                  >
-                    <a>
-                      Results (0)
-                    </a>
-                  </li>
-                   
-                  <li
-                    class="is-active"
-                  >
-                    <a>
-                      SQL
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-             
-            <div
-              class="column"
-            >
-              <div
-                class="field is-horizontal is-marginless is-pulled-right"
-              >
-                <div
-                  class="field-label"
-                >
-                  <label
-                    class="label"
-                  >
-                    Limit
-                  </label>
-                </div>
-                 
-                <div
-                  class="field-body"
-                >
-                  <div
-                    class="field"
-                  >
-                    <div
-                      class="control"
-                    >
-                      <input
-                        class="input is-small"
-                        placeholder="Limit"
-                        type="text"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-           
-          <!---->
-           
-          <div>
-            <!---->
+                <font-awesome-icon-stub
+                  icon="angle-down"
+                />
+              </span>
+            </a>
           </div>
         </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <!---->
+        </div>
+         
+        <div
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+        >
+          <span>
+            Data
+          </span>
+           
+          <div
+            class="accordion-toggle"
+          >
+            <a
+              class="button is-primary is-small"
+            >
+              <span
+                class="icon is-small"
+              >
+                <font-awesome-icon-stub
+                  icon="angle-up"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <div
+            class="box is-radiusless is-shadowless"
+          >
+            <!---->
+             
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <div
+                  class="tabs"
+                >
+                  <ul>
+                    <li
+                      class=""
+                    >
+                      <a>
+                        Results (0)
+                      </a>
+                    </li>
+                     
+                    <li
+                      class="is-active"
+                    >
+                      <a>
+                        SQL
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+               
+              <div
+                class="column"
+              />
+            </div>
+             
+            <!---->
+             
+            <div>
+              <!---->
+            </div>
+          </div>
+        </div>
+         
+        <!---->
       </div>
-       
-      <!---->
     </div>
   </div>
 </section>
@@ -488,52 +587,352 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
 exports[`Design.vue Run Query button enabled and SQL tab focused and displayed if selection(s) are made 1`] = `
 <section>
   <div
-    class="columns is-gapless"
+    class="columns is-vcentered"
   >
-    <aside
-      class="column is-one-quarter vh-scrollable"
+    <div
+      class="column is-one-quarter"
     >
-      <nav
-        class="panel has-background-white"
+      <div
+        class="is-grouped is-pulled-left"
       >
+        <div>
+          <em>
+            Untitled Report
+          </em>
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="column"
+    >
+      <div
+        class="field is-grouped is-pulled-right"
+      >
+        <!---->
+         
         <div
-          class="panel-block"
+          class="control field"
         >
-          <div
-            class="field has-addons"
+          <p
+            class="control"
+          >
+            <!---->
+          </p>
+           
+          <p
+            class="control"
           >
             <div
-              class="control is-expanded"
+              class="dropdown is-right"
             >
-              <input
-                class="input"
+              <div
+                class="dropdown-trigger"
+              >
+                <button
+                  aria-controls="dropdown-save"
+                  aria-haspopup="true"
+                  class="button is-interactive-primary is-outlined"
+                  disabled="disabled"
+                >
+                  <span>
+                    Save
+                  </span>
+                   
+                  <span
+                    class="icon is-small"
+                  >
+                    <font-awesome-icon-stub
+                      icon="caret-down"
+                    />
+                  </span>
+                </button>
+              </div>
+               
+              <div
+                class="dropdown-menu"
+                id="dropdown-save"
+                role="menu"
+              >
+                <div
+                  class="dropdown-content"
+                >
+                  <div
+                    class="dropdown-item"
+                  >
+                    <div
+                      class="field"
+                    >
+                      <!---->
+                       
+                      <div
+                        class="control"
+                      >
+                        <input
+                          class="input"
+                          placeholder="Name your report"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                     
+                    <div
+                      class="field is-grouped"
+                    >
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-interactive-primary"
+                          disabled="disabled"
+                        >
+                          Save
+                        </button>
+                      </div>
+                       
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-text"
+                        >
+                          
+                        Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <div
+            class="dropdown is-right"
+          >
+            <div
+              class="dropdown-trigger"
+            >
+              <button
+                aria-controls="dropdown-load"
+                aria-haspopup="true"
+                class="button is-interactive-primary is-outlined"
                 disabled="disabled"
-                placeholder="Filter"
-                type="text"
-              />
+              >
+                <span>
+                  Load
+                </span>
+                 
+                <span
+                  class="icon is-small"
+                >
+                  <font-awesome-icon-stub
+                    icon="caret-down"
+                  />
+                </span>
+              </button>
             </div>
              
             <div
-              class="control"
+              class="dropdown-menu"
+              id="dropdown-load"
+              role="menu"
             >
-              <button
-                class="button"
-                disabled="disabled"
+              <div
+                class="dropdown-content"
+              />
+            </div>
+          </div>
+        </p>
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="columns"
+  >
+    <aside
+      class="column is-one-quarter"
+    >
+      <div
+        class="box"
+      >
+        <div
+          class="columns is-vcentered"
+        >
+          <div
+            class="column is-two-fifths"
+          >
+            <h2
+              class="title is-5"
+            >
+              Query
+            </h2>
+          </div>
+           
+          <div
+            class="column is-three-fifths"
+          >
+            <div
+              class="buttons is-right"
+            >
+              <div
+                class="dropdown"
               >
-                <span
-                  class="icon"
+                <div
+                  class="dropdown-trigger"
                 >
-                  <font-awesome-icon-stub
-                    icon="search"
-                  />
-                </span>
+                  <button
+                    aria-controls="dropdown-sql"
+                    aria-haspopup="true"
+                    class="button is-text is-small"
+                  >
+                    <span>
+                      SQL
+                    </span>
+                     
+                    <!---->
+                  </button>
+                </div>
+                 
+                <div
+                  class="dropdown-menu"
+                  id="dropdown-sql"
+                  role="menu"
+                >
+                  <div
+                    class="dropdown-content"
+                  >
+                    <div
+                      class="level"
+                    >
+                      <div
+                        class="level-item"
+                      >
+                        <code>
+                          
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               
+              <button
+                class="button is-success"
+              >
+                Run
               </button>
             </div>
           </div>
         </div>
          
         <div
-          class="is-unselectable"
+          class="columns is-vcentered"
+        >
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Limit
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <input
+                  class="input is-small"
+                  placeholder="Limit"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Filters
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <div
+                  class="dropdown is-fullwidth"
+                >
+                  <div
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-none"
+                      aria-haspopup="true"
+                      class="button is-small"
+                    >
+                      <span>
+                        None
+                      </span>
+                       
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-none"
+                    role="menu"
+                  >
+                    <div
+                      class="dropdown-content"
+                    >
+                      <a
+                        class="dropdown-item"
+                      >
+                        
+                      TODO
+                    
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        <div
+          class="field"
+        >
+          <label
+            class="label"
+          >
+            Attributes
+          </label>
+        </div>
+         
+        <nav
+          class="panel is-unselectable"
         >
           <!---->
            
@@ -553,213 +952,37 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
              
           <!---->
            
-        </div>
-      </nav>
+        </nav>
+      </div>
     </aside>
      
     <div
-      class="column is-three-quarters vh-scrollable"
+      class="column is-three-quarters"
     >
       <div
-        class="columns is-vcentered"
+        class="box"
       >
         <div
-          class="column is-one-quarter"
+          class="columns is-vcentered"
         >
           <div
-            class="is-grouped is-pulled-left"
+            class="column"
           >
-            <div>
-              <em>
-                Untitled Report
-              </em>
-            </div>
+            <h2
+              class="title is-5"
+            >
+              Results
+            </h2>
           </div>
-        </div>
-         
-        <div
-          class="column"
-        >
+           
           <div
-            class="field is-grouped is-pulled-right"
+            class="column"
           >
-            <!---->
-             
             <div
-              class="control field"
-            >
-              <p
-                class="control"
-              >
-                <!---->
-              </p>
-               
-              <p
-                class="control"
-              >
-                <div
-                  class="dropdown is-right"
-                >
-                  <div
-                    class="dropdown-trigger"
-                  >
-                    <button
-                      aria-controls="dropdown-save"
-                      aria-haspopup="true"
-                      class="button is-interactive-primary is-outlined"
-                      disabled="disabled"
-                    >
-                      <span>
-                        Save
-                      </span>
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id="dropdown-save"
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <div
-                          class="field"
-                        >
-                          <!---->
-                           
-                          <div
-                            class="control"
-                          >
-                            <input
-                              class="input"
-                              placeholder="Name your report"
-                              type="text"
-                            />
-                          </div>
-                        </div>
-                         
-                        <div
-                          class="field is-grouped"
-                        >
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-interactive-primary"
-                              disabled="disabled"
-                            >
-                              Save
-                            </button>
-                          </div>
-                           
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-text"
-                            >
-                              
-                            Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </p>
-            </div>
-             
-            <p
-              class="control"
-            >
-              <div
-                class="dropdown is-right"
-              >
-                <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-load"
-                    aria-haspopup="true"
-                    class="button is-interactive-primary is-outlined"
-                    disabled="disabled"
-                  >
-                    <span>
-                      Load
-                    </span>
-                     
-                    <span
-                      class="icon is-small"
-                    >
-                      <font-awesome-icon-stub
-                        icon="caret-down"
-                      />
-                    </span>
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-load"
-                  role="menu"
-                >
-                  <div
-                    class="dropdown-content"
-                  />
-                </div>
-              </div>
-            </p>
-             
-            <p
-              class="control"
+              class="buttons has-addons is-right"
             >
               <button
-                class="button is-success"
-              >
-                Run Query
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-       
-      <!---->
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
-      >
-        <span
-          class="accordion-title"
-        >
-          Charts
-        </span>
-         
-        <div>
-          <div
-            class="field has-addons chart-buttons"
-          >
-            <p
-              class="control"
-            >
-              <button
-                class="button is-small is-text has-text-white is-active"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -769,14 +992,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -786,14 +1004,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -803,14 +1016,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -820,147 +1028,136 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
+               
+              <button
+                class="button is-selected is-interactive-secondary"
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
          
-        <div
-          class="accordion-toggle"
-        >
-          <a
-            class="button is-primary is-small"
-          >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-down"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
         <!---->
-      </div>
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
-      >
-        <span>
-          Data
-        </span>
          
         <div
-          class="accordion-toggle"
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable is-collapsed"
         >
-          <a
-            class="button is-primary is-small"
+          <span
+            class="accordion-title"
           >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-up"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
-        <div
-          class="box is-radiusless is-shadowless"
-        >
-          <!---->
+            Charts
+          </span>
            
           <div
-            class="columns is-vcentered"
+            class="accordion-toggle"
           >
-            <div
-              class="column"
+            <a
+              class="button is-primary is-small"
             >
-              <div
-                class="tabs"
+              <span
+                class="icon is-small"
               >
-                <ul>
-                  <li
-                    class=""
-                  >
-                    <a>
-                      Results (0)
-                    </a>
-                  </li>
-                   
-                  <li
-                    class="is-active"
-                  >
-                    <a>
-                      SQL
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <font-awesome-icon-stub
+                  icon="angle-down"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <!---->
+        </div>
+         
+        <div
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+        >
+          <span>
+            Data
+          </span>
+           
+          <div
+            class="accordion-toggle"
+          >
+            <a
+              class="button is-primary is-small"
+            >
+              <span
+                class="icon is-small"
+              >
+                <font-awesome-icon-stub
+                  icon="angle-up"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <div
+            class="box is-radiusless is-shadowless"
+          >
+            <!---->
              
             <div
-              class="column"
+              class="columns is-vcentered"
             >
               <div
-                class="field is-horizontal is-marginless is-pulled-right"
+                class="column"
               >
                 <div
-                  class="field-label"
+                  class="tabs"
                 >
-                  <label
-                    class="label"
-                  >
-                    Limit
-                  </label>
-                </div>
-                 
-                <div
-                  class="field-body"
-                >
-                  <div
-                    class="field"
-                  >
-                    <div
-                      class="control"
+                  <ul>
+                    <li
+                      class=""
                     >
-                      <input
-                        class="input is-small"
-                        placeholder="Limit"
-                        type="text"
-                      />
-                    </div>
-                  </div>
+                      <a>
+                        Results (0)
+                      </a>
+                    </li>
+                     
+                    <li
+                      class="is-active"
+                    >
+                      <a>
+                        SQL
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
+               
+              <div
+                class="column"
+              />
             </div>
-          </div>
-           
-          <!---->
-           
-          <div>
+             
+            <!---->
+             
             <div>
-              <code>
-                
-              </code>
+              <div>
+                <code>
+                  
+                </code>
+              </div>
             </div>
           </div>
         </div>
+         
+        <!---->
       </div>
-       
-      <!---->
     </div>
   </div>
 </section>
@@ -969,52 +1166,352 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
 exports[`Design.vue Save report button enabled if query has ran 1`] = `
 <section>
   <div
-    class="columns is-gapless"
+    class="columns is-vcentered"
   >
-    <aside
-      class="column is-one-quarter vh-scrollable"
+    <div
+      class="column is-one-quarter"
     >
-      <nav
-        class="panel has-background-white"
+      <div
+        class="is-grouped is-pulled-left"
       >
+        <div>
+          <em>
+            Untitled Report
+          </em>
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="column"
+    >
+      <div
+        class="field is-grouped is-pulled-right"
+      >
+        <!---->
+         
         <div
-          class="panel-block"
+          class="control field"
         >
-          <div
-            class="field has-addons"
+          <p
+            class="control"
+          >
+            <!---->
+          </p>
+           
+          <p
+            class="control"
           >
             <div
-              class="control is-expanded"
+              class="dropdown is-right"
             >
-              <input
-                class="input"
+              <div
+                class="dropdown-trigger"
+              >
+                <button
+                  aria-controls="dropdown-save"
+                  aria-haspopup="true"
+                  class="button is-interactive-primary is-outlined"
+                  disabled="disabled"
+                >
+                  <span>
+                    Save
+                  </span>
+                   
+                  <span
+                    class="icon is-small"
+                  >
+                    <font-awesome-icon-stub
+                      icon="caret-down"
+                    />
+                  </span>
+                </button>
+              </div>
+               
+              <div
+                class="dropdown-menu"
+                id="dropdown-save"
+                role="menu"
+              >
+                <div
+                  class="dropdown-content"
+                >
+                  <div
+                    class="dropdown-item"
+                  >
+                    <div
+                      class="field"
+                    >
+                      <!---->
+                       
+                      <div
+                        class="control"
+                      >
+                        <input
+                          class="input"
+                          placeholder="Name your report"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                     
+                    <div
+                      class="field is-grouped"
+                    >
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-interactive-primary"
+                          disabled="disabled"
+                        >
+                          Save
+                        </button>
+                      </div>
+                       
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-text"
+                        >
+                          
+                        Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <div
+            class="dropdown is-right"
+          >
+            <div
+              class="dropdown-trigger"
+            >
+              <button
+                aria-controls="dropdown-load"
+                aria-haspopup="true"
+                class="button is-interactive-primary is-outlined"
                 disabled="disabled"
-                placeholder="Filter"
-                type="text"
-              />
+              >
+                <span>
+                  Load
+                </span>
+                 
+                <span
+                  class="icon is-small"
+                >
+                  <font-awesome-icon-stub
+                    icon="caret-down"
+                  />
+                </span>
+              </button>
             </div>
              
             <div
-              class="control"
+              class="dropdown-menu"
+              id="dropdown-load"
+              role="menu"
             >
-              <button
-                class="button"
-                disabled="disabled"
+              <div
+                class="dropdown-content"
+              />
+            </div>
+          </div>
+        </p>
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="columns"
+  >
+    <aside
+      class="column is-one-quarter"
+    >
+      <div
+        class="box"
+      >
+        <div
+          class="columns is-vcentered"
+        >
+          <div
+            class="column is-two-fifths"
+          >
+            <h2
+              class="title is-5"
+            >
+              Query
+            </h2>
+          </div>
+           
+          <div
+            class="column is-three-fifths"
+          >
+            <div
+              class="buttons is-right"
+            >
+              <div
+                class="dropdown"
               >
-                <span
-                  class="icon"
+                <div
+                  class="dropdown-trigger"
                 >
-                  <font-awesome-icon-stub
-                    icon="search"
-                  />
-                </span>
+                  <button
+                    aria-controls="dropdown-sql"
+                    aria-haspopup="true"
+                    class="button is-text is-small"
+                  >
+                    <span>
+                      SQL
+                    </span>
+                     
+                    <!---->
+                  </button>
+                </div>
+                 
+                <div
+                  class="dropdown-menu"
+                  id="dropdown-sql"
+                  role="menu"
+                >
+                  <div
+                    class="dropdown-content"
+                  >
+                    <div
+                      class="level"
+                    >
+                      <div
+                        class="level-item"
+                      >
+                        <code>
+                          
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               
+              <button
+                class="button is-success"
+              >
+                Run
               </button>
             </div>
           </div>
         </div>
          
         <div
-          class="is-unselectable"
+          class="columns is-vcentered"
+        >
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Limit
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <input
+                  class="input is-small"
+                  placeholder="Limit"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Filters
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <div
+                  class="dropdown is-fullwidth"
+                >
+                  <div
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-none"
+                      aria-haspopup="true"
+                      class="button is-small"
+                    >
+                      <span>
+                        None
+                      </span>
+                       
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-none"
+                    role="menu"
+                  >
+                    <div
+                      class="dropdown-content"
+                    >
+                      <a
+                        class="dropdown-item"
+                      >
+                        
+                      TODO
+                    
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        <div
+          class="field"
+        >
+          <label
+            class="label"
+          >
+            Attributes
+          </label>
+        </div>
+         
+        <nav
+          class="panel is-unselectable"
         >
           <!---->
            
@@ -1034,213 +1531,37 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
              
           <!---->
            
-        </div>
-      </nav>
+        </nav>
+      </div>
     </aside>
      
     <div
-      class="column is-three-quarters vh-scrollable"
+      class="column is-three-quarters"
     >
       <div
-        class="columns is-vcentered"
+        class="box"
       >
         <div
-          class="column is-one-quarter"
+          class="columns is-vcentered"
         >
           <div
-            class="is-grouped is-pulled-left"
+            class="column"
           >
-            <div>
-              <em>
-                Untitled Report
-              </em>
-            </div>
+            <h2
+              class="title is-5"
+            >
+              Results
+            </h2>
           </div>
-        </div>
-         
-        <div
-          class="column"
-        >
+           
           <div
-            class="field is-grouped is-pulled-right"
+            class="column"
           >
-            <!---->
-             
             <div
-              class="control field"
-            >
-              <p
-                class="control"
-              >
-                <!---->
-              </p>
-               
-              <p
-                class="control"
-              >
-                <div
-                  class="dropdown is-right"
-                >
-                  <div
-                    class="dropdown-trigger"
-                  >
-                    <button
-                      aria-controls="dropdown-save"
-                      aria-haspopup="true"
-                      class="button is-interactive-primary is-outlined"
-                      disabled="disabled"
-                    >
-                      <span>
-                        Save
-                      </span>
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id="dropdown-save"
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <div
-                          class="field"
-                        >
-                          <!---->
-                           
-                          <div
-                            class="control"
-                          >
-                            <input
-                              class="input"
-                              placeholder="Name your report"
-                              type="text"
-                            />
-                          </div>
-                        </div>
-                         
-                        <div
-                          class="field is-grouped"
-                        >
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-interactive-primary"
-                              disabled="disabled"
-                            >
-                              Save
-                            </button>
-                          </div>
-                           
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-text"
-                            >
-                              
-                            Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </p>
-            </div>
-             
-            <p
-              class="control"
-            >
-              <div
-                class="dropdown is-right"
-              >
-                <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-load"
-                    aria-haspopup="true"
-                    class="button is-interactive-primary is-outlined"
-                    disabled="disabled"
-                  >
-                    <span>
-                      Load
-                    </span>
-                     
-                    <span
-                      class="icon is-small"
-                    >
-                      <font-awesome-icon-stub
-                        icon="caret-down"
-                      />
-                    </span>
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-load"
-                  role="menu"
-                >
-                  <div
-                    class="dropdown-content"
-                  />
-                </div>
-              </div>
-            </p>
-             
-            <p
-              class="control"
+              class="buttons has-addons is-right"
             >
               <button
-                class="button is-success"
-              >
-                Run Query
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-       
-      <!---->
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
-      >
-        <span
-          class="accordion-title"
-        >
-          Charts
-        </span>
-         
-        <div>
-          <div
-            class="field has-addons chart-buttons"
-          >
-            <p
-              class="control"
-            >
-              <button
-                class="button is-small is-text has-text-white is-active"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1250,14 +1571,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1267,14 +1583,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1284,14 +1595,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1301,147 +1607,136 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
+               
+              <button
+                class="button is-selected is-interactive-secondary"
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
          
-        <div
-          class="accordion-toggle"
-        >
-          <a
-            class="button is-primary is-small"
-          >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-down"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
         <!---->
-      </div>
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
-      >
-        <span>
-          Data
-        </span>
          
         <div
-          class="accordion-toggle"
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable is-collapsed"
         >
-          <a
-            class="button is-primary is-small"
+          <span
+            class="accordion-title"
           >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-up"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
-        <div
-          class="box is-radiusless is-shadowless"
-        >
-          <!---->
+            Charts
+          </span>
            
           <div
-            class="columns is-vcentered"
+            class="accordion-toggle"
           >
-            <div
-              class="column"
+            <a
+              class="button is-primary is-small"
             >
-              <div
-                class="tabs"
+              <span
+                class="icon is-small"
               >
-                <ul>
-                  <li
-                    class=""
-                  >
-                    <a>
-                      Results (0)
-                    </a>
-                  </li>
-                   
-                  <li
-                    class="is-active"
-                  >
-                    <a>
-                      SQL
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <font-awesome-icon-stub
+                  icon="angle-down"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <!---->
+        </div>
+         
+        <div
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+        >
+          <span>
+            Data
+          </span>
+           
+          <div
+            class="accordion-toggle"
+          >
+            <a
+              class="button is-primary is-small"
+            >
+              <span
+                class="icon is-small"
+              >
+                <font-awesome-icon-stub
+                  icon="angle-up"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <div
+            class="box is-radiusless is-shadowless"
+          >
+            <!---->
              
             <div
-              class="column"
+              class="columns is-vcentered"
             >
               <div
-                class="field is-horizontal is-marginless is-pulled-right"
+                class="column"
               >
                 <div
-                  class="field-label"
+                  class="tabs"
                 >
-                  <label
-                    class="label"
-                  >
-                    Limit
-                  </label>
-                </div>
-                 
-                <div
-                  class="field-body"
-                >
-                  <div
-                    class="field"
-                  >
-                    <div
-                      class="control"
+                  <ul>
+                    <li
+                      class=""
                     >
-                      <input
-                        class="input is-small"
-                        placeholder="Limit"
-                        type="text"
-                      />
-                    </div>
-                  </div>
+                      <a>
+                        Results (0)
+                      </a>
+                    </li>
+                     
+                    <li
+                      class="is-active"
+                    >
+                      <a>
+                        SQL
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
+               
+              <div
+                class="column"
+              />
             </div>
-          </div>
-           
-          <!---->
-           
-          <div>
+             
+            <!---->
+             
             <div>
-              <code>
-                
-              </code>
+              <div>
+                <code>
+                  
+                </code>
+              </div>
             </div>
           </div>
         </div>
+         
+        <!---->
       </div>
-       
-      <!---->
     </div>
   </div>
 </section>
@@ -1450,52 +1745,210 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
 exports[`Design.vue a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled 1`] = `
 <section>
   <div
-    class="columns is-gapless"
+    class="columns is-vcentered"
+  >
+    <div
+      class="column is-one-quarter"
+    >
+      <div
+        class="is-grouped is-pulled-left"
+      >
+        <div>
+          Report 1 Test
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="column"
+    >
+      <div
+        class="field is-grouped is-pulled-right"
+      >
+        <p
+          class="control"
+        >
+          <dropdown-stub
+            isrightaligned="true"
+            label="Add to Dashboard"
+          />
+        </p>
+         
+        <div
+          class="control field has-addons"
+        >
+          <p
+            class="control"
+          >
+            <button
+              class="button is-interactive-primary is-outlined"
+            >
+              <span>
+                Save
+              </span>
+            </button>
+          </p>
+           
+          <p
+            class="control"
+          >
+            <dropdown-stub
+              buttonclasses="is-interactive-primary is-outlined"
+              disabled="true"
+              isrightaligned="true"
+              label=""
+            />
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <dropdown-stub
+            buttonclasses="is-interactive-primary is-outlined"
+            isrightaligned="true"
+            label="Load"
+          />
+        </p>
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="columns"
   >
     <aside
-      class="column is-one-quarter vh-scrollable"
+      class="column is-one-quarter"
     >
-      <nav
-        class="panel has-background-white"
+      <div
+        class="box"
       >
         <div
-          class="panel-block"
+          class="columns is-vcentered"
         >
           <div
-            class="field has-addons"
+            class="column is-two-fifths"
+          >
+            <h2
+              class="title is-5"
+            >
+              Query
+            </h2>
+          </div>
+           
+          <div
+            class="column is-three-fifths"
           >
             <div
-              class="control is-expanded"
+              class="buttons is-right"
             >
-              <input
-                class="input"
-                disabled="disabled"
-                placeholder="Filter"
-                type="text"
-              />
-            </div>
-             
-            <div
-              class="control"
-            >
-              <button
-                class="button"
-                disabled="disabled"
+              <dropdown-stub
+                buttonclasses="is-text is-small"
+                iscaretremoved="true"
+                label="SQL"
               >
-                <span
-                  class="icon"
+                <div
+                  class="dropdown-content"
                 >
-                  <font-awesome-icon-stub
-                    icon="search"
-                  />
-                </span>
+                  <div
+                    class="level"
+                  >
+                    <div
+                      class="level-item"
+                    >
+                      <code>
+                        
+                      </code>
+                    </div>
+                  </div>
+                </div>
+              </dropdown-stub>
+               
+              <button
+                class="button is-success"
+              >
+                Run
               </button>
             </div>
           </div>
         </div>
          
         <div
-          class="is-unselectable"
+          class="columns is-vcentered"
+        >
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Limit
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <input
+                  class="input is-small"
+                  placeholder="Limit"
+                  type="text"
+                />
+              </div>
+            </div>
+          </div>
+           
+          <div
+            class="column"
+          >
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Filters
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <dropdown-stub
+                  buttonclasses="is-small"
+                  isfullwidth="true"
+                  label="None"
+                >
+                  <div
+                    class="dropdown-content"
+                  >
+                    <a
+                      class="dropdown-item"
+                    >
+                      
+                      TODO
+                    
+                    </a>
+                  </div>
+                </dropdown-stub>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        <div
+          class="field"
+        >
+          <label
+            class="label"
+          >
+            Attributes
+          </label>
+        </div>
+         
+        <nav
+          class="panel is-unselectable"
         >
           <!---->
            
@@ -1515,117 +1968,37 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
              
           <!---->
            
-        </div>
-      </nav>
+        </nav>
+      </div>
     </aside>
      
     <div
-      class="column is-three-quarters vh-scrollable"
+      class="column is-three-quarters"
     >
       <div
-        class="columns is-vcentered"
+        class="box"
       >
         <div
-          class="column is-one-quarter"
+          class="columns is-vcentered"
         >
           <div
-            class="is-grouped is-pulled-left"
+            class="column"
           >
-            <div>
-              Report 1 Test
-            </div>
-          </div>
-        </div>
-         
-        <div
-          class="column"
-        >
-          <div
-            class="field is-grouped is-pulled-right"
-          >
-            <p
-              class="control"
+            <h2
+              class="title is-5"
             >
-              <dropdown-stub
-                isrightaligned="true"
-                label="Add to Dashboard"
-              />
-            </p>
-             
+              Results
+            </h2>
+          </div>
+           
+          <div
+            class="column"
+          >
             <div
-              class="control field has-addons"
-            >
-              <p
-                class="control"
-              >
-                <button
-                  class="button is-interactive-primary is-outlined"
-                >
-                  <span>
-                    Save
-                  </span>
-                </button>
-              </p>
-               
-              <p
-                class="control"
-              >
-                <dropdown-stub
-                  buttonclasses="is-interactive-primary is-outlined"
-                  disabled="true"
-                  isrightaligned="true"
-                  label=""
-                />
-              </p>
-            </div>
-             
-            <p
-              class="control"
-            >
-              <dropdown-stub
-                buttonclasses="is-interactive-primary is-outlined"
-                isrightaligned="true"
-                label="Load"
-              />
-            </p>
-             
-            <p
-              class="control"
+              class="buttons has-addons is-right"
             >
               <button
-                class="button is-success"
-              >
-                Run Query
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-       
-      <!---->
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
-      >
-        <span
-          class="accordion-title"
-        >
-          Charts
-        </span>
-         
-        <div>
-          <div
-            class="field has-addons chart-buttons"
-          >
-            <p
-              class="control"
-            >
-              <button
-                class="button is-small is-text has-text-white is-active"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1635,14 +2008,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1652,14 +2020,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1669,14 +2032,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -1686,147 +2044,136 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
+               
+              <button
+                class="button is-selected is-interactive-secondary"
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
          
-        <div
-          class="accordion-toggle"
-        >
-          <a
-            class="button is-primary is-small"
-          >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-down"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
         <!---->
-      </div>
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
-      >
-        <span>
-          Data
-        </span>
          
         <div
-          class="accordion-toggle"
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable is-collapsed"
         >
-          <a
-            class="button is-primary is-small"
+          <span
+            class="accordion-title"
           >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-up"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
-        <div
-          class="box is-radiusless is-shadowless"
-        >
-          <!---->
+            Charts
+          </span>
            
           <div
-            class="columns is-vcentered"
+            class="accordion-toggle"
           >
-            <div
-              class="column"
+            <a
+              class="button is-primary is-small"
             >
-              <div
-                class="tabs"
+              <span
+                class="icon is-small"
               >
-                <ul>
-                  <li
-                    class=""
-                  >
-                    <a>
-                      Results (0)
-                    </a>
-                  </li>
-                   
-                  <li
-                    class="is-active"
-                  >
-                    <a>
-                      SQL
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
+                <font-awesome-icon-stub
+                  icon="angle-down"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <!---->
+        </div>
+         
+        <div
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+        >
+          <span>
+            Data
+          </span>
+           
+          <div
+            class="accordion-toggle"
+          >
+            <a
+              class="button is-primary is-small"
+            >
+              <span
+                class="icon is-small"
+              >
+                <font-awesome-icon-stub
+                  icon="angle-up"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <div
+            class="box is-radiusless is-shadowless"
+          >
+            <!---->
              
             <div
-              class="column"
+              class="columns is-vcentered"
             >
               <div
-                class="field is-horizontal is-marginless is-pulled-right"
+                class="column"
               >
                 <div
-                  class="field-label"
+                  class="tabs"
                 >
-                  <label
-                    class="label"
-                  >
-                    Limit
-                  </label>
-                </div>
-                 
-                <div
-                  class="field-body"
-                >
-                  <div
-                    class="field"
-                  >
-                    <div
-                      class="control"
+                  <ul>
+                    <li
+                      class=""
                     >
-                      <input
-                        class="input is-small"
-                        placeholder="Limit"
-                        type="text"
-                      />
-                    </div>
-                  </div>
+                      <a>
+                        Results (0)
+                      </a>
+                    </li>
+                     
+                    <li
+                      class="is-active"
+                    >
+                      <a>
+                        SQL
+                      </a>
+                    </li>
+                  </ul>
                 </div>
               </div>
+               
+              <div
+                class="column"
+              />
             </div>
-          </div>
-           
-          <resulttable-stub />
-           
-          <div>
+             
+            <resulttable-stub />
+             
             <div>
-              <code>
-                
-              </code>
+              <div>
+                <code>
+                  
+                </code>
+              </div>
             </div>
           </div>
         </div>
+         
+        <!---->
       </div>
-       
-      <!---->
     </div>
   </div>
 </section>
@@ -1835,129 +2182,307 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
 exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, and Run Query buttons are disabled by default 1`] = `
 <section>
   <div
-    class="columns is-gapless"
+    class="columns is-vcentered"
   >
-    <aside
-      class="column is-one-quarter vh-scrollable"
+    <div
+      class="column is-one-quarter"
     >
-      <nav
-        class="panel has-background-white"
+      <div
+        class="is-grouped is-pulled-left"
       >
+        <div>
+          <em>
+            Untitled Report
+          </em>
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="column"
+    >
+      <div
+        class="field is-grouped is-pulled-right"
+      >
+        <!---->
+         
         <div
-          class="panel-block"
+          class="control field"
         >
-          <div
-            class="field has-addons"
+          <p
+            class="control"
+          >
+            <!---->
+          </p>
+           
+          <p
+            class="control"
           >
             <div
-              class="control is-expanded"
+              class="dropdown is-right"
             >
-              <input
-                class="input"
+              <div
+                class="dropdown-trigger"
+              >
+                <button
+                  aria-controls="dropdown-save"
+                  aria-haspopup="true"
+                  class="button is-interactive-primary is-outlined"
+                  disabled="disabled"
+                >
+                  <span>
+                    Save
+                  </span>
+                   
+                  <span
+                    class="icon is-small"
+                  >
+                    <font-awesome-icon-stub
+                      icon="caret-down"
+                    />
+                  </span>
+                </button>
+              </div>
+               
+              <div
+                class="dropdown-menu"
+                id="dropdown-save"
+                role="menu"
+              >
+                <div
+                  class="dropdown-content"
+                >
+                  <div
+                    class="dropdown-item"
+                  >
+                    <div
+                      class="field"
+                    >
+                      <!---->
+                       
+                      <div
+                        class="control"
+                      >
+                        <input
+                          class="input"
+                          placeholder="Name your report"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                     
+                    <div
+                      class="field is-grouped"
+                    >
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-interactive-primary"
+                          disabled="disabled"
+                        >
+                          Save
+                        </button>
+                      </div>
+                       
+                      <div
+                        class="control"
+                      >
+                        <button
+                          class="button is-text"
+                        >
+                          
+                        Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <div
+            class="dropdown is-right"
+          >
+            <div
+              class="dropdown-trigger"
+            >
+              <button
+                aria-controls="dropdown-load"
+                aria-haspopup="true"
+                class="button is-interactive-primary is-outlined"
                 disabled="disabled"
-                placeholder="Filter"
-                type="text"
-              />
+              >
+                <span>
+                  Load
+                </span>
+                 
+                <span
+                  class="icon is-small"
+                >
+                  <font-awesome-icon-stub
+                    icon="caret-down"
+                  />
+                </span>
+              </button>
             </div>
              
             <div
-              class="control"
+              class="dropdown-menu"
+              id="dropdown-load"
+              role="menu"
             >
+              <div
+                class="dropdown-content"
+              />
+            </div>
+          </div>
+        </p>
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="columns"
+  >
+    <aside
+      class="column is-one-quarter"
+    >
+      <div
+        class="box"
+      >
+        <div
+          class="columns is-vcentered"
+        >
+          <div
+            class="column is-two-fifths"
+          >
+            <h2
+              class="title is-5"
+            >
+              Query
+            </h2>
+          </div>
+           
+          <div
+            class="column is-three-fifths"
+          >
+            <div
+              class="buttons is-right"
+            >
+              <div
+                class="dropdown"
+              >
+                <div
+                  class="dropdown-trigger"
+                >
+                  <button
+                    aria-controls="dropdown-sql"
+                    aria-haspopup="true"
+                    class="button is-text is-small"
+                    disabled="disabled"
+                  >
+                    <span>
+                      SQL
+                    </span>
+                     
+                    <!---->
+                  </button>
+                </div>
+                 
+                <div
+                  class="dropdown-menu"
+                  id="dropdown-sql"
+                  role="menu"
+                >
+                  <div
+                    class="dropdown-content"
+                  >
+                    <div
+                      class="level"
+                    >
+                      <div
+                        class="level-item"
+                      >
+                        <code>
+                          
+                        </code>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               
               <button
-                class="button"
+                class="button is-success"
                 disabled="disabled"
               >
-                <span
-                  class="icon"
-                >
-                  <font-awesome-icon-stub
-                    icon="search"
-                  />
-                </span>
+                Run
               </button>
             </div>
           </div>
         </div>
          
         <div
-          class="is-unselectable"
-        >
-          <!---->
-           
-          <a
-            class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
-          >
-            
-                
-              
-          </a>
-           
-          <!---->
-             
-          <!---->
-           
-        </div>
-      </nav>
-    </aside>
-     
-    <div
-      class="column is-three-quarters vh-scrollable"
-    >
-      <div
-        class="columns is-vcentered"
-      >
-        <div
-          class="column is-one-quarter"
+          class="columns is-vcentered"
         >
           <div
-            class="is-grouped is-pulled-left"
+            class="column"
           >
-            <div>
-              <em>
-                Untitled Report
-              </em>
+            <div
+              class="field"
+            >
+              <label
+                class="label"
+              >
+                Limit
+              </label>
+               
+              <div
+                class="control is-expanded"
+              >
+                <input
+                  class="input is-small"
+                  placeholder="Limit"
+                  type="text"
+                />
+              </div>
             </div>
           </div>
-        </div>
-         
-        <div
-          class="column"
-        >
+           
           <div
-            class="field is-grouped is-pulled-right"
+            class="column"
           >
-            <!---->
-             
             <div
-              class="control field"
+              class="field"
             >
-              <p
-                class="control"
+              <label
+                class="label"
               >
-                <!---->
-              </p>
+                Filters
+              </label>
                
-              <p
-                class="control"
+              <div
+                class="control is-expanded"
               >
                 <div
-                  class="dropdown is-right"
+                  class="dropdown is-fullwidth"
                 >
                   <div
                     class="dropdown-trigger"
                   >
                     <button
-                      aria-controls="dropdown-save"
+                      aria-controls="dropdown-none"
                       aria-haspopup="true"
-                      class="button is-interactive-primary is-outlined"
-                      disabled="disabled"
+                      class="button is-small"
                     >
                       <span>
-                        Save
+                        None
                       </span>
                        
                       <span
@@ -1972,142 +2497,89 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                    
                   <div
                     class="dropdown-menu"
-                    id="dropdown-save"
+                    id="dropdown-none"
                     role="menu"
                   >
                     <div
                       class="dropdown-content"
                     >
-                      <div
+                      <a
                         class="dropdown-item"
                       >
-                        <div
-                          class="field"
-                        >
-                          <!---->
-                           
-                          <div
-                            class="control"
-                          >
-                            <input
-                              class="input"
-                              placeholder="Name your report"
-                              type="text"
-                            />
-                          </div>
-                        </div>
-                         
-                        <div
-                          class="field is-grouped"
-                        >
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-interactive-primary"
-                              disabled="disabled"
-                            >
-                              Save
-                            </button>
-                          </div>
-                           
-                          <div
-                            class="control"
-                          >
-                            <button
-                              class="button is-text"
-                            >
-                              
-                            Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                        
+                      TODO
+                    
+                      </a>
                     </div>
                   </div>
                 </div>
-              </p>
-            </div>
-             
-            <p
-              class="control"
-            >
-              <div
-                class="dropdown is-right"
-              >
-                <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-load"
-                    aria-haspopup="true"
-                    class="button is-interactive-primary is-outlined"
-                    disabled="disabled"
-                  >
-                    <span>
-                      Load
-                    </span>
-                     
-                    <span
-                      class="icon is-small"
-                    >
-                      <font-awesome-icon-stub
-                        icon="caret-down"
-                      />
-                    </span>
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-load"
-                  role="menu"
-                >
-                  <div
-                    class="dropdown-content"
-                  />
-                </div>
               </div>
-            </p>
-             
-            <p
-              class="control"
-            >
-              <button
-                class="button is-success"
-                disabled="disabled"
-              >
-                Run Query
-              </button>
-            </p>
+            </div>
           </div>
         </div>
-      </div>
-       
-      <!---->
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
-      >
-        <span
-          class="accordion-title"
-        >
-          Charts
-        </span>
          
-        <div>
-          <div
-            class="field has-addons chart-buttons"
+        <div
+          class="field"
+        >
+          <label
+            class="label"
           >
-            <p
-              class="control"
+            Attributes
+          </label>
+        </div>
+         
+        <nav
+          class="panel is-unselectable"
+        >
+          <!---->
+           
+          <a
+            class="panel-block
+              panel-block-heading
+              has-background-white-bis
+              has-text-grey
+              is-expandable"
+          >
+            
+                
+              
+          </a>
+           
+          <!---->
+             
+          <!---->
+           
+        </nav>
+      </div>
+    </aside>
+     
+    <div
+      class="column is-three-quarters"
+    >
+      <div
+        class="box"
+      >
+        <div
+          class="columns is-vcentered"
+        >
+          <div
+            class="column"
+          >
+            <h2
+              class="title is-5"
+            >
+              Results
+            </h2>
+          </div>
+           
+          <div
+            class="column"
+          >
+            <div
+              class="buttons has-addons is-right"
             >
               <button
-                class="button is-small is-text has-text-white is-active"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -2117,14 +2589,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -2134,14 +2601,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -2151,14 +2613,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
-             
-            <p
-              class="control"
-            >
+               
               <button
-                class="button is-small is-text has-text-white"
-                disabled="disabled"
+                class="button"
               >
                 <span
                   class="icon is-small"
@@ -2168,143 +2625,132 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
+               
+              <button
+                class="button is-selected is-interactive-secondary"
+              >
+                Table
+              </button>
+            </div>
           </div>
         </div>
          
-        <div
-          class="accordion-toggle"
-        >
-          <a
-            class="button is-primary is-small"
-          >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-down"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
         <!---->
-      </div>
-       
-      <div
-        class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
-      >
-        <span>
-          Data
-        </span>
          
         <div
-          class="accordion-toggle"
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable is-collapsed"
         >
-          <a
-            class="button is-primary is-small"
+          <span
+            class="accordion-title"
           >
-            <span
-              class="icon is-small"
-            >
-              <font-awesome-icon-stub
-                icon="angle-up"
-              />
-            </span>
-          </a>
-        </div>
-      </div>
-       
-      <div
-        class="accordion-body"
-      >
-        <div
-          class="box is-radiusless is-shadowless"
-        >
-          <!---->
+            Charts
+          </span>
            
           <div
-            class="columns is-vcentered"
+            class="accordion-toggle"
           >
-            <div
-              class="column"
+            <a
+              class="button is-primary is-small"
             >
-              <div
-                class="tabs"
+              <span
+                class="icon is-small"
               >
-                <ul>
-                  <li
-                    class=""
-                  >
-                    <a>
-                      Results (0)
-                    </a>
-                  </li>
-                   
-                  <li
-                    class="is-active"
-                  >
-                    <a>
-                      SQL
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-             
-            <div
-              class="column"
-            >
-              <div
-                class="field is-horizontal is-marginless is-pulled-right"
-              >
-                <div
-                  class="field-label"
-                >
-                  <label
-                    class="label"
-                  >
-                    Limit
-                  </label>
-                </div>
-                 
-                <div
-                  class="field-body"
-                >
-                  <div
-                    class="field"
-                  >
-                    <div
-                      class="control"
-                    >
-                      <input
-                        class="input is-small"
-                        placeholder="Limit"
-                        type="text"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-           
-          <!---->
-           
-          <div>
-            <!---->
+                <font-awesome-icon-stub
+                  icon="angle-down"
+                />
+              </span>
+            </a>
           </div>
         </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <!---->
+        </div>
+         
+        <div
+          class="has-background-primary
+          accordion-header
+          has-text-white-bis
+          is-expandable"
+        >
+          <span>
+            Data
+          </span>
+           
+          <div
+            class="accordion-toggle"
+          >
+            <a
+              class="button is-primary is-small"
+            >
+              <span
+                class="icon is-small"
+              >
+                <font-awesome-icon-stub
+                  icon="angle-up"
+                />
+              </span>
+            </a>
+          </div>
+        </div>
+         
+        <div
+          class="accordion-body"
+        >
+          <div
+            class="box is-radiusless is-shadowless"
+          >
+            <!---->
+             
+            <div
+              class="columns is-vcentered"
+            >
+              <div
+                class="column"
+              >
+                <div
+                  class="tabs"
+                >
+                  <ul>
+                    <li
+                      class=""
+                    >
+                      <a>
+                        Results (0)
+                      </a>
+                    </li>
+                     
+                    <li
+                      class="is-active"
+                    >
+                      <a>
+                        SQL
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+               
+              <div
+                class="column"
+              />
+            </div>
+             
+            <!---->
+             
+            <div>
+              <!---->
+            </div>
+          </div>
+        </div>
+         
+        <!---->
       </div>
-       
-      <!---->
     </div>
   </div>
 </section>
