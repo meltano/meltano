@@ -33,7 +33,7 @@ const state = {
   distincts: {},
   sortColumn: null,
   sortDesc: false,
-  dialect: 'sqlite', // TODO: dropdown with the Connections list
+  dialect: null,
 };
 
 const helpers = {
@@ -137,6 +137,8 @@ const getters = {
     }
     return state.results.length;
   },
+
+  getDialect: () => state.dialect,
 
   getDistinctsForField: () => field => state.distincts[field],
 
@@ -303,6 +305,7 @@ const actions = {
     commit('setLimit', limit);
   },
 
+  // TODO: remove and use `mapMutations`
   setChartType({ commit }, chartType) {
     commit('setChartType', chartType);
   },
@@ -311,7 +314,7 @@ const actions = {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
-    const queryPayload = load || helpers.getQueryPayloadFromDesign();
+    const queryPayload = Object.assign({}, helpers.getQueryPayloadFromDesign(), load);
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
@@ -610,6 +613,10 @@ const mutations = {
 
   setLimit(_, limit) {
     state.limit = limit;
+  },
+
+  setDialect(_, dialect) {
+    state.dialect = dialect;
   },
 };
 
