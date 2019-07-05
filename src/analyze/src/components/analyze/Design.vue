@@ -360,6 +360,23 @@ export default {
             </div>
           </div>
 
+          <div class="columns">
+            <div class="column">
+              <div class="field is-horizontal">
+                <div class="field-label">
+                  <label class="label">Limit</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <nav class="panel has-background-white">
 
             <div class="is-unselectable">
@@ -513,11 +530,72 @@ export default {
               <h2 class="title is-5">Results</h2>
             </div>
             <div class="column">
-              <div class="buttons is-right">
-                <button class="button is-success"
-                  :class="{'is-loading': loadingQuery}"
-                  :disabled="!currentSQL"
-                  @click="runQuery">Run</button>
+              <div class="buttons has-addons is-right">
+                <!-- <div>
+                  <div class="field has-addons chart-buttons">
+                    <p class="control" @click.stop="setAndOpenChart('BarChart')">
+                      <button
+                        class="button is-small is-text has-text-white"
+                        :class="{'is-active': chartType === 'BarChart'}"
+                        :disabled="!hasChartableResults">
+                        <span class="icon is-small">
+                          <font-awesome-icon icon="chart-bar"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </p>
+                    <p class="control" @click.stop="setAndOpenChart('LineChart')">
+                      <button
+                        class="button is-small is-text has-text-white"
+                        :class="{'is-active': chartType === 'LineChart'}"
+                        :disabled="!hasChartableResults">
+                        <span class="icon is-small">
+                          <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </p>
+                    <p class="control" @click.stop="setAndOpenChart('AreaChart')">
+                      <button
+                        class="button is-small is-text has-text-white"
+                        :class="{'is-active': chartType === 'AreaChart'}"
+                        :disabled="!hasChartableResults">
+                        <span class="icon is-small">
+                          <font-awesome-icon icon="chart-area"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </p>
+                    <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
+                      <button
+                        class="button is-small is-text has-text-white"
+                        :class="{'is-active': chartType === 'ScatterChart'}"
+                        :disabled="!hasChartableResults">
+                        <span class="icon is-small">
+                          <font-awesome-icon icon="dot-circle"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </p>
+                  </div>
+                </div> -->
+                <button class="button">
+                  <span class="icon is-small">
+                    <font-awesome-icon icon="chart-bar"></font-awesome-icon>
+                  </span>
+                </button>
+                <button class="button">
+                  <span class="icon is-small">
+                    <font-awesome-icon icon="chart-line"></font-awesome-icon>
+                  </span>
+                </button>
+                <button class="button">
+                  <span class="icon is-small">
+                    <font-awesome-icon icon="chart-area"></font-awesome-icon>
+                  </span>
+                </button>
+                <button class="button">
+                  <span class="icon is-small">
+                    <font-awesome-icon icon="dot-circle"></font-awesome-icon>
+                  </span>
+                </button>
+                <button class="button is-selected is-interactive-secondary">Table</button>
               </div>
             </div>
           </div>
@@ -585,51 +663,6 @@ export default {
             :class="{'is-collapsed': !chartsOpen}">
 
             <span class="accordion-title">Charts</span>
-            <div>
-              <div class="field has-addons chart-buttons">
-                <p class="control" @click.stop="setAndOpenChart('BarChart')">
-                  <button
-                    class="button is-small is-text has-text-white"
-                    :class="{'is-active': chartType === 'BarChart'}"
-                    :disabled="!hasChartableResults">
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-bar"></font-awesome-icon>
-                    </span>
-                  </button>
-                </p>
-                <p class="control" @click.stop="setAndOpenChart('LineChart')">
-                  <button
-                    class="button is-small is-text has-text-white"
-                    :class="{'is-active': chartType === 'LineChart'}"
-                    :disabled="!hasChartableResults">
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-line"></font-awesome-icon>
-                    </span>
-                  </button>
-                </p>
-                <p class="control" @click.stop="setAndOpenChart('AreaChart')">
-                  <button
-                    class="button is-small is-text has-text-white"
-                    :class="{'is-active': chartType === 'AreaChart'}"
-                    :disabled="!hasChartableResults">
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="chart-area"></font-awesome-icon>
-                    </span>
-                  </button>
-                </p>
-                <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
-                  <button
-                    class="button is-small is-text has-text-white"
-                    :class="{'is-active': chartType === 'ScatterChart'}"
-                    :disabled="!hasChartableResults">
-                    <span class="icon is-small">
-                      <font-awesome-icon icon="dot-circle"></font-awesome-icon>
-                    </span>
-                  </button>
-                </p>
-              </div>
-            </div>
-
             <div class="accordion-toggle">
               <a class="button is-primary is-small">
                 <span class="icon is-small">
@@ -698,18 +731,7 @@ export default {
                 </div>
 
                 <div class="column">
-                  <div class="field is-horizontal is-marginless is-pulled-right">
-                    <div class="field-label">
-                      <label class="label">Limit</label>
-                    </div>
-                    <div class="field-body">
-                      <div class="field">
-                        <div class="control">
-                          <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+
                 </div>
 
               </div>
