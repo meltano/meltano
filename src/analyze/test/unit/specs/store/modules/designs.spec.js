@@ -27,7 +27,7 @@ describe('designs Vuex store', () => {
       saveReportSettings: { name: null },
       reports: [],
       chartType: 'BarChart',
-      limit: 3,
+      limit: 50,
       distincts: {},
       sortColumn: null,
       sortDesc: false,
