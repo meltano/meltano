@@ -56,6 +56,12 @@ For all changes that do not involve working on Meltano UI itself, run the follow
 meltano ui
 ```
 
+:::warning Troubleshooting
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed. 
+
+On a OSX, this can be solved by running `brew install yarn`. 
+:::
+
 ### Meltano UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
