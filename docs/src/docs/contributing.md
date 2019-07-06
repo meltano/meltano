@@ -26,10 +26,10 @@ pip install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
-python -m venv venv
+python -m venv ~/virtualenvs/meltano-development
 
 # Activate your virtual environment
-source ./venv/bin/activate
+source ~/virtualenvs/meltano-development/bin/activate
 
 # Install all the dependencies
 pip install -r requirements.txt
