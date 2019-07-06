@@ -25,6 +25,10 @@ def install_status_update(data):
 @db_options
 @project
 def install(project, engine_uri):
+    """
+    Installs all the dependencies of your project based on the meltano.yml file.
+    Read more at https://www.meltano.com/docs/meltano-cli.html#commands.
+    """
     project_engine(project, engine_uri, default=True)
 
     install_service = PluginInstallService(project)
