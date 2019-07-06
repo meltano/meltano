@@ -209,7 +209,7 @@ class MeltanoAggregate(MeltanoBase):
     def alias(self) -> str:
         return f"{self.table.sql_table_name}.{self.name}"
 
-    def qualified_sql(self, base_table: str = None) -> fn.Coalesce:
+    def qualified_sql(self, base_table: str = None, pika_table=None) -> fn.Coalesce:
         """
         Return the aggregate as a fully qualified SQL clause defined
           as a pypika Aggregate
@@ -228,7 +228,9 @@ class MeltanoAggregate(MeltanoBase):
         On top of that, most of the times we define aggregates as: {{TABLE}}.id
           so we have to first replace {{TABLE}} with its own table name
         """
-        if base_table and base_table != self.table.sql_table_name:
+        if pika_table:
+            field = Field(self.column_name(), table=pika_table)
+        elif base_table and base_table != self.table.sql_table_name:
             sql = re.sub(
                 "\{\{TABLE\}\}",
                 self.table.sql_table_name,
@@ -456,6 +458,113 @@ class MeltanoQuery(MeltanoBase):
     def joins_for_table(self, design_graph, source_table: str, target_table: str):
         return nx.shortest_path(design_graph, source=source_table, target=target_table)
 
+    def single_table_query(self) -> Tuple:
+        """
+        Build a simple, no-join SQL query for this Query definition.
+
+        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
+        - sql: A string with the SQL:1999 compatible query
+        - (column_names, column_headers): The column names and headers of
+           the final result in the same order as the one defined by the query
+        - aggregate_columns: The aggregate columns in the query
+        """
+
+        # Lists with the column names and headers of the final result when the
+        #  query is executed
+        column_headers = []
+        column_names = []
+        aggregate_columns = []
+
+        table = next(iter(self.tables), None)
+
+        if not (table.columns() or table.aggregates() or table.timeframes()):
+            # Return an empty query if nothing was requested
+            return ("", column_headers, column_names, aggregate_columns)
+
+        # Create a pypika Table based on the Table's name
+        pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
+
+        # Add all columns in the SELECT clause and as group_by attributes
+        select = []
+        group_by_attributes = []
+
+        for c in table.columns():
+            select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
+            group_by_attributes.append(Field(c.alias()))
+
+            column_headers.append(c.label)
+            column_names.append(c.name)
+
+        # Generate the Aggregate Clauses
+        select_aggregates = []
+        for a in table.aggregates():
+            select_aggregates.append(a.qualified_sql(pika_table=pika_table))
+
+            aggregate_columns.append(a.alias())
+            column_headers.append(a.label)
+            column_names.append(a.name)
+
+        # Generate the query
+        no_join_query = (
+            Query
+            .from_(pika_table)
+            .select(*select)
+            .select(*select_aggregates)
+            .groupby(*group_by_attributes)
+            .limit(self.limit or 50)
+        )
+
+        # Add the Order By clause(s) for the final query
+        if self.order:
+            orderby = self.order.get("column", None)
+            if self.order.get("direction", None) == "desc":
+                order = Order.desc
+            else:
+                order = Order.asc
+
+            try:
+                orderby_field = next(
+                    Field(t.get_column(orderby).alias())
+                    for t in self.tables
+                    if t.get_column(orderby)
+                )
+            except StopIteration:
+                try:
+                    orderby_field = next(
+                        Field(
+                            t.get_aggregate(orderby).alias()
+                        )
+                        for t in self.tables
+                        if t.get_aggregate(orderby)
+                    )
+                except StopIteration:
+                    raise ParseError(
+                        f"Requested Order By Attribute {orderby} is not defined in the design"
+                    )
+
+            no_join_query = no_join_query.orderby(orderby_field, order=order)
+        else:
+            # By default order by all the Group By attributes asc
+            order = Order.asc
+            orderby_fields = [
+                Field(c.alias())
+                for t in self.tables
+                for c in t.columns()
+            ]
+            for field in orderby_fields:
+                no_join_query = no_join_query.orderby(field, order=order)
+
+        final_query = str(no_join_query)
+
+        # Dynamically add at runtime the schema provided by the current connection
+        if self.schema is not None and self.schema != "":
+            final_query = final_query.replace(
+                f'FROM "{table.sql_table_name}"',
+                f'FROM "{self.schema}"."{table.sql_table_name}"'
+            )
+
+        return (final_query + ";", column_headers, column_names, aggregate_columns)
+
     def hda_query(self) -> Tuple:
         """
         Build the HDA SQL query for this Query definition.
@@ -464,10 +573,11 @@ class MeltanoQuery(MeltanoBase):
         https://gitlab.com/meltano/meltano/issues/286
         https://gitlab.com/meltano/meltano/issues/344
 
-        Returns a Tuple (sql, column_headers, column_names)
+        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
         - sql: A string with the hda_query as a SQL:1999 compatible query
         - (column_names, column_headers): The column names and headers of
            the final result in the same order as the one defined by the HDA query
+        - aggregate_columns: The aggregate columns in the query
         """
 
         # Lists with the column names and headers of the final result when the

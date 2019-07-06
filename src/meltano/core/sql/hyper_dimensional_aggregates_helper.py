@@ -1,9 +1,7 @@
 from typing import Dict, Tuple
-from pypika import functions as fn
-from pypika import AliasedQuery, Query, Order, Table, Field
 
 from .design_helper import DesignHelper
-from .base import MeltanoDesign, MeltanoQuery
+from .base import MeltanoQuery
 
 
 class HyperDimensionalAggregatesHelper:
@@ -42,4 +40,7 @@ class HyperDimensionalAggregatesHelper:
         - (column_names, column_headers): The column names and headers of
            the final result in the same order as the one defined by the HDA query
         """
-        return self.query.hda_query()
+        if self.needs_hda():
+            return self.query.hda_query()
+        else:
+            return self.query.single_table_query()
