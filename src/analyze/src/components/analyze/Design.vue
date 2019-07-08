@@ -4,6 +4,7 @@ import capitalize from '@/filters/capitalize';
 import Chart from '@/components/analyze/Chart';
 import Dropdown from '@/components/generic/Dropdown';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
+import QueryFilters from '@/components/analyze/QueryFilters';
 import ResultTable from '@/components/analyze/ResultTable';
 
 export default {
@@ -25,6 +26,7 @@ export default {
     Chart,
     Dropdown,
     NewDashboardModal,
+    QueryFilters,
     ResultTable,
   },
   computed: {
@@ -49,7 +51,7 @@ export default {
       'currentModelLabel',
       'currentDesignLabel',
       'hasChartableResults',
-      'numResults',
+      'resultsCount',
       'getDistinctsForField',
       'getResultsFromDistinct',
       'getKeyFromDistinct',
@@ -58,6 +60,8 @@ export default {
       'hasJoins',
       'showJoinColumnAggregateHeader',
       'formattedSql',
+      'filtersCount',
+      'hasFilters',
     ]),
     ...mapState('dashboards', [
       'dashboards',
@@ -81,6 +85,9 @@ export default {
   methods: {
     ...mapActions('dashboards', [
       'getDashboards',
+    ]),
+    ...mapActions('designs', [
+      'toggleFilter',
     ]),
 
     isActiveReportInDashboard(dashboard) {
@@ -187,9 +194,6 @@ export default {
       });
       this.$store.dispatch('designs/getSQL', { run: false });
     },
-    ...mapActions('designs', [
-      'resetErrorMessage',
-    ]),
   },
 };
 </script>
@@ -352,13 +356,13 @@ export default {
                 <label class="label">Filters</label>
                 <div class="control is-expanded">
                   <Dropdown
-                    label="None"
+                    :label="hasFilters ? `${filtersCount} Total` : 'None'"
                     button-classes='is-small'
                     is-full-width>
                     <div class="dropdown-content">
-                      <a class="dropdown-item">
-                        TODO
-                      </a>
+                      <div class="dropdown-item">
+                        <QueryFilters></QueryFilters>
+                      </div>
                     </div>
                   </Dropdown>
                 </div>
@@ -430,7 +434,9 @@ export default {
                       :class="{'is-active': column.selected}"
                       @click="joinColumnSelected(join, column)">
                       {{column.label}}
-                      <button class="button is-small">
+                      <button
+                        class="button is-small"
+                        @click='toggleFilter({ attribute: column, filterType: "column" })'>
                         <span
                           class="icon"
                           :class="{
@@ -456,7 +462,9 @@ export default {
                       :class="{'is-active': aggregate.selected}"
                       @click="joinAggregateSelected(join, aggregate)">
                       {{aggregate.label}}
-                      <button class="button is-small">
+                      <button
+                        class="button is-small"
+                        @click='toggleFilter({ attribute: aggregate, filterType: "aggregate" })'>
                         <span
                           class="icon"
                           :class="{
@@ -517,7 +525,9 @@ export default {
                   @click="columnSelected(column)"
                   :class="{'is-active': column.selected}">
                 {{column.label}}
-                <button class="button is-small">
+                <button
+                  class="button is-small"
+                  @click='toggleFilter({ attribute: column, filterType: "column" })'>
                   <span
                     class="icon"
                     :class="{
@@ -541,7 +551,9 @@ export default {
                   @click="aggregateSelected(aggregate)"
                   :class="{'is-active': aggregate.selected}">
                 {{aggregate.label}}
-                <button class="button is-small">
+                <button
+                  class="button is-small"
+                  @click='toggleFilter({ attribute: aggregate, filterType: "aggregate" })'>
                   <span
                     class="icon"
                     :class="{
@@ -566,8 +578,8 @@ export default {
               <h2 class="title is-5">
                 <span>Results</span>
                 <span
-                  v-if='numResults > 0'
-                  class='has-text-weight-light has-text-grey-light is-size-7'>({{numResults}})</span>
+                  v-if='resultsCount > 0'
+                  class='has-text-weight-light has-text-grey-light is-size-7'>({{resultsCount}})</span>
               </h2>
             </div>
             <div class="column">
