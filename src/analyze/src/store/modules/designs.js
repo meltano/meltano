@@ -21,11 +21,7 @@ const state = {
   columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
-  currentDataTab: 'sql',
   currentSQL: '',
-  filtersOpen: false,
-  dataOpen: true,
-  chartsOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
@@ -200,18 +196,6 @@ const getters = {
     return utils.titleCase(state.currentModel);
   },
 
-  isDataTab() {
-    return state.currentDataTab === 'data';
-  },
-
-  isResultsTab() {
-    return state.currentDataTab === 'results';
-  },
-
-  isSQLTab() {
-    return state.currentDataTab === 'sql';
-  },
-
   currentLimit() {
     return state.limit;
   },
@@ -322,11 +306,9 @@ const actions = {
         if (run) {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'results');
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'sql');
         }
       })
       .catch((e) => {
@@ -409,24 +391,8 @@ const actions = {
     commit('setModifierDistincts', data);
   },
 
-  switchCurrentTab({ commit }, tab) {
-    commit('setCurrentTab', tab);
-  },
-
-  toggleFilterOpen({ commit }) {
-    commit('setFilterToggle');
-  },
-
-  toggleDataOpen({ commit }) {
-    commit('setDataToggle');
-  },
-
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
-  },
-
-  toggleChartsOpen({ commit }) {
-    commit('setChartToggle');
   },
 
   sortBy({ commit }, name) {
@@ -551,20 +517,8 @@ const mutations = {
     Vue.set(state.distincts[field], 'modifier', item);
   },
 
-  setFilterToggle() {
-    state.filtersOpen = !state.filtersOpen;
-  },
-
-  setDataToggle() {
-    state.dataOpen = !state.dataOpen;
-  },
-
   resetSaveReportSettings() {
     state.saveReportSettings = { name: null };
-  },
-
-  setChartToggle() {
-    state.chartsOpen = !state.chartsOpen;
   },
 
   setSQLResults(_, results) {
@@ -606,10 +560,6 @@ const mutations = {
 
   setDesign(_, designData) {
     state.design = designData;
-  },
-
-  setCurrentTab(_, tab) {
-    state.currentDataTab = tab;
   },
 
   setLimit(_, limit) {
