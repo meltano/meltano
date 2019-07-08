@@ -16,6 +16,7 @@ export default {
   created() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
+    this.$store.dispatch('designs/getFilterOptions');
   },
   filters: {
     capitalize,
@@ -42,6 +43,7 @@ export default {
       'resultAggregates',
       'chartType',
       'dialect',
+      'filterOptions',
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',

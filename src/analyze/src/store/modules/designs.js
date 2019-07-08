@@ -30,6 +30,7 @@ const state = {
   sortColumn: null,
   sortDesc: false,
   dialect: null,
+  filterOptions: null,
 };
 
 const helpers = {
@@ -240,6 +241,13 @@ const actions = {
     return index;
   },
 
+  getFilterOptions({ commit }) {
+    sqlApi.getFilterOptions()
+      .then((response) => {
+        commit('setFilterOptions', response.data);
+      });
+  },
+
   expandRow({ commit }, row) {
     commit('toggleCollapsed', row);
   },
@@ -418,6 +426,10 @@ const mutations = {
 
   setCurrentReport(_, report) {
     state.activeReport = report;
+  },
+
+  setFilterOptions(_, options) {
+    state.filterOptions = options;
   },
 
   setStateFromLoadedReport(_, report) {
