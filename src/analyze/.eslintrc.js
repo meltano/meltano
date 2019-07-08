@@ -42,6 +42,7 @@ module.exports = {
     'curly': ['warn', 'all'],
     'brace-style': ['error', '1tbs'],
     'max-len': ['error', { 'code': 200, 'ignoreUrls': true}],
+    'no-prototype-builtins': false,
   },
   globals: {
     'process': false,
