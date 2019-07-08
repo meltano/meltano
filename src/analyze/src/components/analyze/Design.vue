@@ -34,11 +34,8 @@ export default {
       'currentDesign',
       'currentSQL',
       'loadingQuery',
-      'filtersOpen',
-      'dataOpen',
       'saveReportSettings',
       'reports',
-      'chartsOpen',
       'hasSQLError',
       'sqlErrorMessage',
       'results',
@@ -49,11 +46,8 @@ export default {
     ...mapGetters('designs', [
       'currentModelLabel',
       'currentDesignLabel',
-      'isDataTab',
-      'isResultsTab',
       'hasChartableResults',
       'numResults',
-      'isSQLTab',
       'getDistinctsForField',
       'getResultsFromDistinct',
       'getKeyFromDistinct',
@@ -111,11 +105,8 @@ export default {
       }
     },
 
-    setAndOpenChart(chartType) {
+    setChartType(chartType) {
       this.$store.dispatch('designs/setChartType', chartType);
-      if (!this.chartsOpen) {
-        this.$store.dispatch('designs/toggleChartsOpen');
-      }
     },
 
     tableRowClicked(relatedTable) {
@@ -173,22 +164,6 @@ export default {
 
     updateReport() {
       this.$store.dispatch('designs/updateReport');
-    },
-
-    setCurrentTab(tab) {
-      this.$store.dispatch('designs/switchCurrentTab', tab);
-    },
-
-    toggleFilterOpen() {
-      this.$store.dispatch('designs/toggleFilterOpen');
-    },
-
-    toggleDataOpen() {
-      this.$store.dispatch('designs/toggleDataOpen');
-    },
-
-    toggleChartsOpen() {
-      this.$store.dispatch('designs/toggleChartsOpen');
     },
 
     toggleNewDashboardModal() {
@@ -595,194 +570,118 @@ export default {
             </div>
             <div class="column">
               <div class="buttons has-addons is-right">
-                <!-- <div>
-                  <div class="field has-addons chart-buttons">
-                    <p class="control" @click.stop="setAndOpenChart('BarChart')">
-                      <button
-                        class="button is-small is-text has-text-white"
-                        :class="{'is-active': chartType === 'BarChart'}"
-                        :disabled="!hasChartableResults">
-                        <span class="icon is-small">
-                          <font-awesome-icon icon="chart-bar"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </p>
-                    <p class="control" @click.stop="setAndOpenChart('LineChart')">
-                      <button
-                        class="button is-small is-text has-text-white"
-                        :class="{'is-active': chartType === 'LineChart'}"
-                        :disabled="!hasChartableResults">
-                        <span class="icon is-small">
-                          <font-awesome-icon icon="chart-line"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </p>
-                    <p class="control" @click.stop="setAndOpenChart('AreaChart')">
-                      <button
-                        class="button is-small is-text has-text-white"
-                        :class="{'is-active': chartType === 'AreaChart'}"
-                        :disabled="!hasChartableResults">
-                        <span class="icon is-small">
-                          <font-awesome-icon icon="chart-area"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </p>
-                    <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
-                      <button
-                        class="button is-small is-text has-text-white"
-                        :class="{'is-active': chartType === 'ScatterChart'}"
-                        :disabled="!hasChartableResults">
-                        <span class="icon is-small">
-                          <font-awesome-icon icon="dot-circle"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </p>
-                  </div>
-                </div> -->
-                <button class="button">
+                <button
+                  class="button"
+                  @click.stop="setChartType('BarChart')"
+                  :class="{
+                    'has-text-grey-lighter': chartType !== 'BarChart',
+                    'is-active has-text-interactive-secondary': chartType === 'BarChart',
+                  }"
+                  :disabled="!hasChartableResults">
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                   </span>
                 </button>
-                <button class="button">
+                <button
+                  class="button"
+                  @click.stop="setChartType('LineChart')"
+                  :class="{
+                    'has-text-grey-lighter': chartType !== 'LineChart',
+                    'is-active has-text-interactive-secondary': chartType === 'LineChart',
+                  }"
+                  :disabled="!hasChartableResults">
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-line"></font-awesome-icon>
                   </span>
                 </button>
-                <button class="button">
+                <button
+                  class="button"
+                  @click.stop="setChartType('AreaChart')"
+                  :class="{
+                    'has-text-grey-lighter': chartType !== 'AreaChart',
+                    'is-active has-text-interactive-secondary': chartType === 'AreaChart',
+                  }"
+                  :disabled="!hasChartableResults">
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-area"></font-awesome-icon>
                   </span>
                 </button>
-                <button class="button">
+                <button
+                  class="button"
+                  @click.stop="setChartType('ScatterChart')"
+                  :class="{
+                    'has-text-grey-lighter': chartType !== 'ScatterChart',
+                    'is-active has-text-interactive-secondary': chartType === 'ScatterChart',
+                  }"
+                  :disabled="!hasChartableResults">
                   <span class="icon is-small">
                     <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                   </span>
                 </button>
-                <button class="button is-selected is-interactive-secondary">Table</button>
               </div>
             </div>
           </div>
 
           <!-- filters tab -->
-          <div v-if="design.has_filters">
-            <div class="has-background-primary
-              accordion-header
-              has-text-white-bis
-              is-expandable"
-              @click="toggleFilterOpen"
-              :class="{'is-collapsed': !filtersOpen}">
-
-              <span>Filters</span>
-              <div class="accordion-toggle">
-                <a class="button is-primary is-small">
-                  <span class="icon is-small">
-                    <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'">
-                    </font-awesome-icon>
+          <!-- <div class="columns">
+            <div class="column is-3">
+              <strong>{{filter.design_label}}</strong>
+              <span>{{filter.label}}</span>
+              <span>({{filter.type}})</span>
+            </div>
+            <div class="column is-9">
+              <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
+              <div class="field" v-if="filter.type == 'string'">
+                <select-dropdown
+                  :placeholder="filter.field"
+                  :field="filter.sql"
+                  :dropdownList="getResultsFromDistinct(filter.sql)"
+                  :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
+                  @focused="inputFocused(filter.sql)"
+                  @selected="dropdownSelected"
+                  @modifierChanged="modifierChanged">
+                </select-dropdown>
+              </div>
+              <div class="tags selected-filters">
+                <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
+                  <span class="tag is-link" :key="key">
+                    {{selected}}
+                    <button class="delete is-small"></button>
                   </span>
-                </a>
+                </template>
               </div>
             </div>
-            <div class="accordion-body">
-              <div v-if="filtersOpen">
-                <div class="columns">
-                  <div class="column is-3">
-                    <strong>{{filter.design_label}}</strong>
-                    <span>{{filter.label}}</span>
-                    <span>({{filter.type}})</span>
-                  </div>
-                  <div class="column is-9">
-                    <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
-                    <div class="field" v-if="filter.type == 'string'">
-                      <select-dropdown
-                        :placeholder="filter.field"
-                        :field="filter.sql"
-                        :dropdownList="getResultsFromDistinct(filter.sql)"
-                        :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
-                        @focused="inputFocused(filter.sql)"
-                        @selected="dropdownSelected"
-                        @modifierChanged="modifierChanged">
-                      </select-dropdown>
-                    </div>
-                    <div class="tags selected-filters">
-                      <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
-                        <span class="tag is-link" :key="key">
-                          {{selected}}
-                          <button class="delete is-small"></button>
-                        </span>
-                      </template>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          </div> -->
 
           <!-- charts tab -->
-          <div class="has-background-primary
-            accordion-header
-            has-text-white-bis
-            is-expandable"
-            @click="toggleChartsOpen"
-            :class="{'is-collapsed': !chartsOpen}">
-
-            <span class="accordion-title">Charts</span>
-            <div class="accordion-toggle">
-              <a class="button is-primary is-small">
-                <span class="icon is-small">
-                  <font-awesome-icon :icon="chartsOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
-                </span>
-              </a>
+          <div>
+            <div v-if="hasChartableResults" class="chart-toggles">
+              <chart :chart-type='chartType'
+                      :results='results'
+                      :result-aggregates='resultAggregates'></chart>
             </div>
-
-          </div>
-
-          <div class="accordion-body">
-            <div v-if="chartsOpen" >
-              <div v-if="hasChartableResults" class="chart-toggles">
-                <chart :chart-type='chartType'
-                        :results='results'
-                        :result-aggregates='resultAggregates'></chart>
-              </div>
-              <div v-if="!hasChartableResults">
-                <div class="box is-radiusless is-shadowless">
-                  <p>
-                    Run a query with at least one aggregate selected or load a report
-                  </p>
-                </div>
+            <div v-if="!hasChartableResults">
+              <div class="box is-radiusless is-shadowless">
+                <p>
+                  Run a query with at least one aggregate selected or load a report
+                </p>
               </div>
             </div>
           </div>
+
+          <hr>
 
           <!-- results/SQL tab -->
-          <div class="has-background-primary
-            accordion-header
-            has-text-white-bis
-            is-expandable"
-            @click="toggleDataOpen"
-            :class="{'is-collapsed': !dataOpen}">
-
-            <span>Data</span>
-            <div class="accordion-toggle">
-              <a class="button is-primary is-small">
-                <span class="icon is-small">
-                  <font-awesome-icon :icon="dataOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
-                </span>
-              </a>
+          <div>
+            <div class="notification is-danger" v-if="hasSQLError">
+              <button class="delete" @click="resetErrorMessage"></button>
+              <ul>
+                <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+              </ul>
             </div>
-          </div>
-          <div class="accordion-body">
-            <div v-if="dataOpen" class="box is-radiusless is-shadowless">
-              <div class="notification is-danger" v-if="hasSQLError">
-                <button class="delete" @click="resetErrorMessage"></button>
-                <ul>
-                  <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
-                </ul>
-              </div>
 
-              <ResultTable></ResultTable>
+            <ResultTable></ResultTable>
 
-            </div>
           </div>
 
           <!-- New Dashboard Modal -->
@@ -883,38 +782,6 @@ code {
   padding-top: .5rem;
 }
 
-.accordion-header {
-  padding: .5rem .5rem .5rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  cursor: pointer;
-  @extend .is-unselectable;
-  .accordion-title {
-    padding-right: 1.5rem;
-  }
-  .button:not([disabled]) {
-    &.is-active {
-      @extend .has-text-primary;
-      @extend .has-background-white-ter;
-    }
-    &.is-text:hover,
-    &.is-text:focus {
-      @extend .has-text-primary;
-      @extend .has-background-white;
-    }
-  }
-  .accordion-toggle {
-    margin-left: auto;
-  }
-}
-.accordion-body {
-  margin-bottom: 0.25rem;
-  @extend .has-background-white-bis;
-  .box {
-    @extend .has-background-white-bis;
-  }
-}
 .filter-item {
   padding: 1.5rem;
 }
@@ -922,10 +789,5 @@ code {
 .selected-filters {
   padding: 1.5rem;
   padding-left: 0;
-}
-.chart-buttons {
-  .button {
-    background: transparent;
-  }
 }
 </style>
