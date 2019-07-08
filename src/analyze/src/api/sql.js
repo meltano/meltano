@@ -17,4 +17,8 @@ export default {
   getFilterOptions() {
     return axios.get(utils.apiUrl('sql/get', 'filter-options'));
   },
+
+  getFilterOptions() {
+    return axios.get(utils.apiUrl('sql/get', 'filter-options'));
+  },
 };

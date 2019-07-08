@@ -403,28 +403,6 @@ const actions = {
     commit('setErrorState');
   },
 
-<<<<<<< HEAD
-=======
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then((response) => {
-        commit('setDistincts', {
-          data: response.data,
-          field,
-        });
-      });
-  },
-
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data);
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data);
-  },
-
->>>>>>> d3ffdaf2... removed accordion in favor of showing the chart and table by default (there is no real value of using the accordion and we want to present the visual chart front and center)
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
   },
@@ -570,22 +548,6 @@ const mutations = {
     join.aggregates = aggregates;
   },
 
-<<<<<<< HEAD
-=======
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', []);
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item);
-    }
-  },
-
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item);
-  },
-
->>>>>>> d3ffdaf2... removed accordion in favor of showing the chart and table by default (there is no real value of using the accordion and we want to present the visual chart front and center)
   resetSaveReportSettings() {
     state.saveReportSettings = { name: null };
   },
