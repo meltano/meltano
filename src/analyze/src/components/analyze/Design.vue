@@ -473,7 +473,6 @@ export default {
               <template v-for="join in design.joins">
                 <a
                   class="panel-block
-                    panel-block-heading
                     has-background-white-bis
                     has-text-grey
                     is-expandable"
