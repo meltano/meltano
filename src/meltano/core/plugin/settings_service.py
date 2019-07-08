@@ -48,7 +48,7 @@ class SettingsService:
         plugin_def = self.get_definition(plugin)
         env = {}
 
-        for setting in plugin.settings:
+        for setting in plugin_def.settings:
             env_key = setting.get(
                 "env", self.setting_env(plugin_def.namespace, setting["name"])
             )
