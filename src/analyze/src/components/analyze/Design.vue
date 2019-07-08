@@ -16,10 +16,14 @@ export default {
   created() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
+<<<<<<< HEAD
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(() => {
         this.dialect = this.installedPlugins.connections[0].name;
       });
+=======
+    this.$store.dispatch('designs/getFilterOptions');
+>>>>>>> 594e986c... initial filter options FE->BE round trip
   },
   filters: {
     capitalize,
@@ -45,6 +49,11 @@ export default {
       'results',
       'resultAggregates',
       'chartType',
+<<<<<<< HEAD
+=======
+      'dialect',
+      'filterOptions',
+>>>>>>> 594e986c... initial filter options FE->BE round trip
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
