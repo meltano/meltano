@@ -417,19 +417,22 @@ export default {
               <template v-for="join in design.joins">
                 <a
                   class="panel-block
-                    panel-block-heading
                     has-background-white-bis
                     has-text-grey
                     is-expandable"
                     :class="{'is-collapsed': join.collapsed}"
                     :key="join.label"
                     @click="joinRowClicked(join)">
+                    <span class="icon is-small panel-icon">
+                      <font-awesome-icon icon="table"></font-awesome-icon>
+                    </span>
                     {{join.label}}
                 </a>
                 <template v-if="!join.collapsed">
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a class="panel-block
                     panel-block-heading
+                    has-text-weight-light
                     has-background-white"
                     v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                     Columns
@@ -461,12 +464,22 @@ export default {
                     </template>
                   </template>
                   <template v-for="column in join.related_table.columns">
-                    <a class="panel-block"
+                    <a class="panel-block space-between has-text-weight-medium"
                       v-if="!column.hidden"
                       :key="column.label"
                       :class="{'is-active': column.selected}"
                       @click="joinColumnSelected(join, column)">
-                    {{column.label}}
+                      {{column.label}}
+                      <button class="button is-small">
+                        <span
+                          class="icon"
+                          :class="{
+                            'has-text-grey-lighter': true,
+                            'has-text-interactive-secondary': false,
+                          }">
+                          <font-awesome-icon icon="filter"></font-awesome-icon>
+                        </span>
+                      </button>
                     </a>
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -477,12 +490,22 @@ export default {
                     Aggregates
                   </a>
                   <template v-for="aggregate in join.related_table.aggregates">
-                    <a class="panel-block"
+                    <a class="panel-block space-between has-text-weight-medium"
                       v-if="!aggregate.hidden"
                       :key="aggregate.label"
                       :class="{'is-active': aggregate.selected}"
                       @click="joinAggregateSelected(join, aggregate)">
-                    {{aggregate.label}}
+                      {{aggregate.label}}
+                      <button class="button is-small">
+                        <span
+                          class="icon"
+                          :class="{
+                            'has-text-grey-lighter': true,
+                            'has-text-interactive-secondary': false,
+                          }">
+                          <font-awesome-icon icon="filter"></font-awesome-icon>
+                        </span>
+                      </button>
                     </a>
                   </template>
                 </template>
@@ -491,13 +514,15 @@ export default {
             <template>
               <a
                 class="panel-block
-                panel-block-heading
                 has-background-white-bis
                 has-text-grey
                 is-expandable"
                 :class="{'is-collapsed': design.related_table.collapsed}"
                 @click="tableRowClicked(design.related_table)">
-                  {{design.label}}
+                <span class="icon is-small panel-icon">
+                  <font-awesome-icon icon="table"></font-awesome-icon>
+                </span>
+                {{design.label}}
                 </a>
             </template>
             <template v-if="!design.related_table.collapsed">
@@ -525,13 +550,23 @@ export default {
                   </a>
                 </template>
               </template>
-              <a class="panel-block"
+              <a class="panel-block space-between has-text-weight-medium"
                   v-for="column in design.related_table.columns"
                   :key="column.label"
                   v-if="!column.hidden"
                   @click="columnSelected(column)"
                   :class="{'is-active': column.selected}">
                 {{column.label}}
+                <button class="button is-small">
+                  <span
+                    class="icon"
+                    :class="{
+                      'has-text-grey-lighter': true,
+                      'has-text-interactive-secondary': false,
+                    }">
+                    <font-awesome-icon icon="filter"></font-awesome-icon>
+                  </span>
+                </button>
               </a>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
               <a class="panel-block
@@ -540,12 +575,22 @@ export default {
                   v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
                 Aggregates
               </a>
-              <a class="panel-block"
+              <a class="panel-block space-between has-text-weight-medium"
                   v-for="aggregate in design.related_table.aggregates"
                   :key="aggregate.label"
                   @click="aggregateSelected(aggregate)"
                   :class="{'is-active': aggregate.selected}">
                 {{aggregate.label}}
+                <button class="button is-small">
+                  <span
+                    class="icon"
+                    :class="{
+                      'has-text-grey-lighter': true,
+                      'has-text-interactive-secondary': false,
+                    }">
+                    <font-awesome-icon icon="filter"></font-awesome-icon>
+                  </span>
+                </button>
               </a>
             </template>
 
@@ -558,7 +603,12 @@ export default {
         <div class="box">
           <div class="columns is-vcentered">
             <div class="column">
-              <h2 class="title is-5">Results</h2>
+              <h2 class="title is-5">
+                <span>Results</span>
+                <span
+                  v-if='numResults > 0'
+                  class='has-text-weight-light has-text-grey-light is-size-7'>({{numResults}})</span>
+              </h2>
             </div>
             <div class="column">
               <div class="buttons has-addons is-right">
@@ -746,32 +796,9 @@ export default {
                   <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
                 </ul>
               </div>
-              <div class="columns is-vcentered">
 
-                <div class="column">
-                  <div class="tabs">
-                    <ul>
-                      <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
-                        <a>Results ({{numResults}})</a>
-                      </li>
-                      <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
-                        <a>SQL</a>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div class="column">
-
-                </div>
-
-              </div>
               <ResultTable></ResultTable>
-              <div>
-                <div class="" v-if="isSQLTab && currentSQL">
-                  <code>{{formattedSql}}</code>
-                </div>
-              </div>
+
             </div>
           </div>
 
@@ -798,6 +825,9 @@ code {
 }
 .panel-block {
   position: relative;
+  &.space-between {
+    justify-content: space-between;
+  }
   &.indented {
     padding-left: 1.75rem;
   }
@@ -808,9 +838,8 @@ code {
     @extend .has-background-white-ter;
   }
   &.panel-block-heading {
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
-    font-weight: bold;
     &:hover {
       background: white;
     }
