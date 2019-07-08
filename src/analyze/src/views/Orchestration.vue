@@ -1,4 +1,6 @@
 <script>
+import { mapGetters } from 'vuex';
+
 import Airflow from '@/components/orchestration/Airflow';
 import RouterViewLayout from '@/views/RouterViewLayout';
 
@@ -9,9 +11,9 @@ export default {
     RouterViewLayout,
   },
   computed: {
-    isAirflowInstalled() {
-      return Boolean(FLASK.airflowUrl);
-    },
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+    ]),
   },
 };
 
@@ -29,7 +31,7 @@ export default {
     </div>
 
     <div class="container view-body">
-      <airflow v-if='isAirflowInstalled'></airflow>
+      <airflow v-if='getIsPluginInstalled("orchestrators", "airflow")'></airflow>
       <section v-else>
         <div class="columns">
           <div class="column">
