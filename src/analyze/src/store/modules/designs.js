@@ -31,6 +31,10 @@ const state = {
   sortDesc: false,
   dialect: null,
   filterOptions: null,
+  filters: {
+    columns: [],
+    aggregates: [],
+  },
 };
 
 const helpers = {
@@ -116,6 +120,10 @@ const helpers = {
 };
 
 const getters = {
+  filtersCount() {
+    return state.filters.columns.length + state.filters.aggregates.length;
+  },
+
   hasResults() {
     if (!state.results) {
       return false;
@@ -127,7 +135,11 @@ const getters = {
     return getters.hasResults() && state.resultAggregates.length;
   },
 
-  numResults() {
+  hasFilters() {
+    return getters.filtersCount() > 0;
+  },
+
+  resultsCount() {
     if (!state.results) {
       return 0;
     }
@@ -413,6 +425,21 @@ const actions = {
       run: true,
     });
   },
+
+  toggleFilter({ commit }, { attribute, filterType }) {
+    const filter = {
+      tableName: 'TABLE_NAME',
+      attributeName: attribute.name,
+      operation: '',
+      value: '',
+      nullState: '',
+    };
+    commit('addFilter', { filter, filterType });
+  },
+
+  removeFilter() {
+    return true;
+  },
 };
 
 const mutations = {
@@ -490,6 +517,10 @@ const mutations = {
     // TODO
     // base_table timeframes
     // TODO
+  },
+
+  addFilter(_, { filter, filterType }) {
+    state.filters[`${filterType}s`].push(filter);
   },
 
   addSavedReportToReports(_, report) {
