@@ -648,7 +648,7 @@ export default {
                 </button>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- charts tab -->
           <div>
