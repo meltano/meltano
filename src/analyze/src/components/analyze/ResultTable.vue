@@ -17,7 +17,6 @@ export default {
       'isColumnSorted',
       'getFormattedValue',
       'isColumnSelectedAggregate',
-      'isResultsTab',
     ]),
   },
   methods: {
@@ -29,7 +28,7 @@ export default {
 </script>
 
 <template>
-    <div class="result-data" v-if="isResultsTab">
+    <div class="result-data">
       <div class="notification is-info" v-if="!hasResults">
         No results
       </div>
