@@ -2,7 +2,7 @@ import collections
 
 from enum import Enum
 
-FilterOption = collections.namedtuple('FilterOption', 'label description operation')
+FilterOption = collections.namedtuple("FilterOption", "label description operation")
 
 
 class FilterOptionType(str, Enum):
@@ -17,38 +17,36 @@ class FilterOptionType(str, Enum):
 
 FilterOptions = [
     FilterOption(
-      label = "< Less than",
-      description = "Less than",
-      operation = FilterOptionType.LESS_THAN,
+        label="< Less than",
+        description="Less than",
+        operation=FilterOptionType.LESS_THAN,
     ),
     FilterOption(
-      label = "<= Less than or equal",
-      description = "Less than or equal",
-      operation = FilterOptionType.LESS_THAN_OR_EQUAL_TO,
+        label="<= Less than or equal",
+        description="Less than or equal",
+        operation=FilterOptionType.LESS_THAN_OR_EQUAL_TO,
     ),
     FilterOption(
-      label = "= Equal to",
-      description = "Equal to",
-      operation = FilterOptionType.EQUAL_TO,
+        label="= Equal to", description="Equal to", operation=FilterOptionType.EQUAL_TO
     ),
     FilterOption(
-      label = "!= Not equal to",
-      description = "Not equal to",
-      operation = FilterOptionType.NOT_EQUAL_TO,
+        label="!= Not equal to",
+        description="Not equal to",
+        operation=FilterOptionType.NOT_EQUAL_TO,
     ),
     FilterOption(
-      label = ">= Greater than or equal",
-      description = "Greater than or equal",
-      operation = FilterOptionType.GREATER_THAN_OR_EQUAL_TO,
+        label=">= Greater than or equal",
+        description="Greater than or equal",
+        operation=FilterOptionType.GREATER_THAN_OR_EQUAL_TO,
     ),
     FilterOption(
-      label = "> Greater than",
-      description = "Greater than",
-      operation = FilterOptionType.GREATER_THAN,
+        label="> Greater than",
+        description="Greater than",
+        operation=FilterOptionType.GREATER_THAN,
     ),
     FilterOption(
-      label = "Like",
-      description = "Custom like expression",
-      operation = FilterOptionType.LIKE,
+        label="Like",
+        description="Custom like expression",
+        operation=FilterOptionType.LIKE,
     ),
 ]
