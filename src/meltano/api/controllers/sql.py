@@ -1,11 +1,9 @@
-import collections
 import json
 import os
 import sqlalchemy
 
 from datetime import date, datetime
 from decimal import Decimal
-from enum import Enum
 from flask import Blueprint, jsonify, request
 from flask_security import auth_required
 
@@ -16,16 +14,6 @@ from meltano.core.project import Project
 from meltano.core.sql.filter import FilterOptions
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
-
-
-class FilterOptionType(str, Enum):
-    LESS_THAN = "LESS_THAN"
-    LESS_THAN_OR_EQUAL_TO = "LESS_THAN_OR_EQUAL_TO"
-    EQUAL_TO = "EQUAL_TO"
-    NOT_EQUAL_TO = "NOT_EQUAL_TO"
-    GREATER_THAN_OR_EQUAL_TO = "GREATER_THAN_OR_EQUAL_TO"
-    GREATER_THAN = "GREATER_THAN"
-    LIKE = "LIKE"
 
 
 @sqlBP.errorhandler(ConnectionNotFound)
@@ -131,42 +119,6 @@ def get_sql(topic_name, design_name):
     return jsonify(base_dict)
 
 
-<<<<<<< HEAD
 @sqlBP.route("/get/filter-options", methods=["GET"])
 def get_filter_options():
     return jsonify(FilterOptions)
-=======
-@sqlBP.route("/distinct/<topic_name>/<design_name>", methods=["POST"])
-def get_distinct_field_name(topic_name, design_name):
-    # incoming_json = request.get_json()
-    # field_name = incoming_json["field"].replace("${TABLE}", design_name)
-    # model = Model.query.filter(Model.name == model_name).first()
-    # design = Design.query.filter(Design.name == design_name).first()
-
-    # base_table = design.table.settings["sql_table_name"]
-    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {design_name} ORDER BY {field_name}"
-
-    # engine = get_db_engine(model.settings["connection"])
-    # results = engine.execute(base_sql)
-    # results = [dict(row) for row in results]
-    # return json.dumps(
-    #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
-    #     default=default,
-    # )
-    return jsonify({"tester": "tester"})
-
-
-@sqlBP.route("/get/filter-options", methods=["GET"])
-def get_filter_options():
-    FilterOption = collections.namedtuple('FilterOption', 'label description operation')
-    filter_options = [
-        FilterOption(label = "< Less than", description = "Less than", operation = FilterOptionType.LESS_THAN),
-        FilterOption(label = "<= Less than or equal", description = "Less than or equal", operation = FilterOptionType.LESS_THAN_OR_EQUAL_TO),
-        FilterOption(label = "= Equal to", description = "Equal to", operation = FilterOptionType.EQUAL_TO),
-        FilterOption(label = "!= Not equal to", description = "Not equal to", operation = FilterOptionType.NOT_EQUAL_TO),
-        FilterOption(label = ">= Greater than or equal", description = "Greater than or equal", operation = FilterOptionType.GREATER_THAN_OR_EQUAL_TO),
-        FilterOption(label = "> Greater than", description = "Greater than", operation = FilterOptionType.GREATER_THAN),
-        FilterOption(label = "Like", description = "Custom like expression", operation = FilterOptionType.LIKE),
-    ]
-    return jsonify(filter_options)
->>>>>>> 651fa063... initial filter options FE->BE round trip
