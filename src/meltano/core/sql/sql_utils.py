@@ -10,12 +10,7 @@ class SqlUtils:
 
         hda_helper = HyperDimensionalAggregatesHelper(design, incoming_json, schema)
 
-        (
-            sql,
-            column_headers,
-            column_names,
-            aggregate_columns,
-        ) = hda_helper.get_query()
+        (sql, column_headers, column_names, aggregate_columns) = hda_helper.get_query()
 
         return {
             "db_table": db_table,
