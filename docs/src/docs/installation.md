@@ -2,7 +2,9 @@
 
 In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/meltano-cli.html#using-docker).
 
+::: warning
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
+:::
 
 ## Requirements
 
@@ -12,7 +14,9 @@ Before you install meltano with `pip install meltano` make sure you have the fol
 
 - [Python 3.6.1+](https://realpython.com/installing-python/)
 
+::: tip
 You may refer to [https://realpython.com/installing-python/](https://realpython.com/installing-python/) for platform specific installation instructions.
+:::
 
 To check if you have the correct Python version, open your terminal and use the following commands to check the version:
 
@@ -39,7 +43,9 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### Virtual Environment
 
+::: danger
 Meltano must be installed inside a virtual environment, unless you are building a Docker image.
+:::
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
   - **Linux, OSX**:  `~/virtualenvs`

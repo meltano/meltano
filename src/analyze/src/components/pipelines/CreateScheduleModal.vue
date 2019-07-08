@@ -3,6 +3,7 @@ import { mapGetters, mapState } from 'vuex';
 
 import Dropdown from '@/components/generic/Dropdown';
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead';
 
 import utils from '@/utils/utils';
 
@@ -13,10 +14,14 @@ export default {
   components: {
     Dropdown,
     InputDateIso8601,
+    ScheduleTableHead,
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm);
+  },
+  mounted() {
+    this.$refs.name.focus();
   },
   computed: {
     ...mapGetters('plugins', [
@@ -73,7 +78,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default_${Date.now()}`;
+      this.pipeline.name = '';
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
@@ -109,16 +114,8 @@ export default {
       <section class="modal-card-body">
 
         <table class="table pipelines-table is-fullwidth">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th class='has-text-centered'>Extractor</th>
-              <th class='has-text-centered'>Loader</th>
-              <th class='has-text-centered'>Transform</th>
-              <th class='has-text-centered'>Interval</th>
-              <th class='has-text-centered'>Catch-up Date</th>
-            </tr>
-          </thead>
+
+          <ScheduleTableHead />
 
           <tbody>
             <tr>
@@ -127,8 +124,9 @@ export default {
                   <input
                     class="input"
                     :class="{
-                      'is-interactive-secondary has-text-interactive-secondary': pipeline.name }"
+                      'is-success has-text-success': pipeline.name }"
                     type="text"
+                    ref='name'
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">
@@ -139,10 +137,10 @@ export default {
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.extractor,
+                      'is-success': pipeline.extractor,
                       'is-loading': !pipeline.extractor }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.extractor }"
+                      :class="{ 'has-text-success': pipeline.extractor }"
                       v-model="pipeline.extractor"
                       :disabled='!getHasInstalledPluginsOfType("extractors")'>
                       <option
@@ -157,10 +155,10 @@ export default {
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.loader,
+                      'is-success': pipeline.loader,
                       'is-loading': !pipeline.loader }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.loader }"
+                      :class="{ 'has-text-success': pipeline.loader }"
                       v-model="pipeline.loader"
                       :disabled='!getHasInstalledPluginsOfType("loaders")'>
                       <option
@@ -175,10 +173,10 @@ export default {
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.transform,
+                      'is-success': pipeline.transform,
                       'is-loading': !pipeline.transform }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.transform }"
+                      :class="{ 'has-text-success': pipeline.transform }"
                       v-model="pipeline.transform">
                       <option
                         v-for="transform in transformOptions"
@@ -192,10 +190,10 @@ export default {
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.interval,
+                      'is-success': pipeline.interval,
                       'is-loading': !pipeline.interval }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.interval }"
+                      :class="{ 'has-text-success': pipeline.interval }"
                       v-model="pipeline.interval">
                       <option
                         v-for="interval in intervalOptions"
@@ -209,7 +207,7 @@ export default {
                   <Dropdown
                     :label='hasCatchupDate ? getFormattedDateStringYYYYMMDD : "None"'
                     :button-classes='(pipeline.startDate || !hasCatchupDate)
-                      ? "is-interactive-secondary is-outlined" : ""'
+                      ? "is-success is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
                     <div class="dropdown-content" slot-scope="{ dropdownForceClose }">

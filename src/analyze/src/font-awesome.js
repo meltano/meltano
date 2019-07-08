@@ -10,11 +10,13 @@ import {
   faChartBar,
   faChartLine,
   faChartPie,
+  faCheck,
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
   faGlobeAmericas,
   faHashtag,
+  faInfoCircle,
   faSearch,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -37,11 +39,13 @@ export default {
     library.add(faChartBar);
     library.add(faChartLine);
     library.add(faChartPie);
+    library.add(faCheck);
     library.add(faDotCircle);
     library.add(faDraftingCompass);
     library.add(faExclamationTriangle);
     library.add(faGlobeAmericas);
     library.add(faHashtag);
+    library.add(faInfoCircle);
     library.add(faSearch);
     library.add(faUser);
 

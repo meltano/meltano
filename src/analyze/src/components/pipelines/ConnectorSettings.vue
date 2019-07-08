@@ -55,7 +55,7 @@ export default {
 
     <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
       <div class="field-label is-normal">
-        <label class="label is-small">{{ getCleanedLabel(setting.label || setting.name) }}</label>
+        <label class="label is-small">{{ setting.label || getCleanedLabel(setting.name) }}</label>
       </div>
       <div class="field-body">
         <div class="field">
@@ -67,6 +67,7 @@ export default {
               class="checkbox">
               <input
                 v-model="configSettings.config[setting.name]"
+                :class='{ "is-success has-text-success": getIsConfigSettingValid(configSettings.config[setting.name]) }'
                 type="checkbox">
             </label>
 
@@ -81,21 +82,22 @@ export default {
               v-else-if='getIsOfKindTextBased(setting.kind)'
               v-model="configSettings.config[setting.name]"
               class="input is-small"
+              :class='{ "is-success has-text-success": getIsConfigSettingValid(configSettings.config[setting.name]) }'
               @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
               :placeholder="setting.value || setting.name">
-
-          </p>
-          <p
-            v-if='!getIsConfigSettingValid(configSettings.config[setting.name])'
-            class="help has-text-grey-light is-italic">
-            This field is required
           </p>
           <p
             v-if="setting.description"
-            class='help'
+            class='help is-italic'
             >
             {{ setting.description }}
+          </p>
+          <p
+            v-if="setting.documentation"
+            class='help'
+            >
+            <a :href="setting.documentation">More Info.</a>
           </p>
         </div>
       </div>
