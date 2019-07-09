@@ -35,9 +35,11 @@ def discovery():
             "settings": [{"name": "test", "value": "mock"}, {"name": "start_date"}],
         }
     )
+
     discovery[PluginType.LOADERS].append(
         {"name": "target-mock", "namespace": "pytest", "pip_url": "target-mock"}
     )
+
     discovery[PluginType.TRANSFORMERS].append(
         {
             "name": "transformer-mock",
@@ -45,6 +47,7 @@ def discovery():
             "pip_url": "transformer-mock",
         }
     )
+
     discovery[PluginType.TRANSFORMS].append(
         {
             "name": "tap-mock-transform",
@@ -66,6 +69,13 @@ def discovery():
             "name": "orchestrator-mock",
             "namespace": "pytest",
             "pip_url": "orchestrator-mock",
+        }
+    )
+
+    discovery[PluginType.CONNECTIONS].append(
+        {
+            "name": "pytest",
+            "namespace": "pytest",
         }
     )
 
@@ -147,6 +157,11 @@ def add_model(project, plugin_install_service, project_add_service):
 
     for model in MODELS:
         shutil.rmtree(project.model_dir(model))
+
+
+@pytest.fixture(scope="class")
+def add_connection(project_add_service):
+    return project_add_service.add(PluginType.CONNECTIONS, "pytest")
 
 
 @pytest.fixture(scope="class")

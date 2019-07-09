@@ -1,6 +1,7 @@
 import pytest
 import re
 
+from unittest import mock
 from flask import url_for
 
 
@@ -16,11 +17,14 @@ def assertIsSQL(value: str) -> bool:
     )
 
 
-@pytest.mark.usefixtures("project", "add_model")
+@pytest.mark.usefixtures("project", "add_model", "add_connection")
 class TestSqlController:
     @pytest.fixture
-    def post(self, app, api):
-        def _post(payload):
+    def post(self, app, api, engine_sessionmaker):
+        engine, _ = engine_sessionmaker
+
+        @mock.patch('meltano.api.controllers.sql.SqlHelper.get_db_engine', return_value=engine)
+        def _post(payload, engine_mock):
             return api.post(self.url(app, "carbon", "region"), json=payload)
 
         return _post
@@ -59,6 +63,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -81,6 +86,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -108,6 +114,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -144,6 +151,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -165,6 +173,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -188,6 +197,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -221,6 +231,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -260,6 +271,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
@@ -296,6 +308,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
+            "dialect": "pytest",
         }
 
         res = post(payload)
