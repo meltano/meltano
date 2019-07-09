@@ -107,10 +107,10 @@ export default {
       });
     },
 
-    toggleFilterAttribute(attribute, filterType) {
-      const hasFilter = this.getIsAttributeInFilters(attribute.name, filterType);
+    toggleFilterAttribute(tableName, attribute, filterType) {
+      const hasFilter = this.getIsAttributeInFilters(tableName, attribute.name, filterType);
       const methodName = hasFilter ? 'remove' : 'add';
-      this.$store.dispatch(`designs/${methodName}Filter`, { attribute, filterType });
+      this.$store.dispatch(`designs/${methodName}Filter`, { tableName, attribute, filterType });
     },
 
     inputFocused(field) {
@@ -452,12 +452,12 @@ export default {
                       {{column.label}}
                       <button
                         class="button is-small"
-                        @click.stop='toggleFilterAttribute(column, "column")'>
+                        @click.stop='toggleFilterAttribute(join.name, column, "column")'>
                         <span
                           class="icon"
                           :class="{
-                            'has-text-grey-lighter': !getIsAttributeInFilters(column.name, 'column'),
-                            'has-text-interactive-secondary': getIsAttributeInFilters(column.name, 'column'),
+                            'has-text-grey-lighter': !getIsAttributeInFilters(join.name, column.name, 'column'),
+                            'has-text-interactive-secondary': getIsAttributeInFilters(join.name, column.name, 'column'),
                           }">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
@@ -480,12 +480,12 @@ export default {
                       {{aggregate.label}}
                       <button
                         class="button is-small"
-                        @click.stop='toggleFilterAttribute(aggregate, "aggregate")'>
+                        @click.stop='toggleFilterAttribute(join.name, aggregate, "aggregate")'>
                         <span
                           class="icon"
                           :class="{
-                            'has-text-grey-lighter': !getIsAttributeInFilters(aggregate.name, 'aggregate'),
-                            'has-text-interactive-secondary': getIsAttributeInFilters(aggregate.name, 'aggregate'),
+                            'has-text-grey-lighter': !getIsAttributeInFilters(join.name, aggregate.name, 'aggregate'),
+                            'has-text-interactive-secondary': getIsAttributeInFilters(join.name, aggregate.name, 'aggregate'),
                           }">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
@@ -543,12 +543,12 @@ export default {
                 {{column.label}}
                 <button
                   class="button is-small"
-                  @click.stop='toggleFilterAttribute(column, "column")'>
+                  @click.stop='toggleFilterAttribute(design.from, column, "column")'>
                   <span
                     class="icon"
                     :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(column.name, 'column'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(column.name, 'column'),
+                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, column.name, 'column'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, column.name, 'column'),
                     }">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
@@ -569,12 +569,12 @@ export default {
                 {{aggregate.label}}
                 <button
                   class="button is-small"
-                  @click.stop='toggleFilterAttribute(aggregate, "aggregate")'>
+                  @click.stop='toggleFilterAttribute(design.from, aggregate, "aggregate")'>
                   <span
                     class="icon"
                     :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(aggregate.name, 'aggregate'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(aggregate.name, 'aggregate'),
+                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
                     }">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
