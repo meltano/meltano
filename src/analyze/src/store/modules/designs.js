@@ -30,6 +30,7 @@ const state = {
   sortColumn: null,
   sortDesc: false,
   dialect: null,
+  selectedAttributeCount: 0,
   filterOptions: null,
   filters: {
     columns: [],
@@ -142,6 +143,10 @@ const getters = {
 
   getIsAttributeInFilters() {
     return (attributeName, filterType) => state.filters[`${filterType}s`].find(filter => filter.attributeName === attributeName);
+  },
+
+  attributesCount() {
+    return state.selectedAttributeCount;
   },
 
   resultsCount() {
@@ -606,6 +611,7 @@ const mutations = {
 
   toggleSelected(_, selectable) {
     Vue.set(selectable, 'selected', !selectable.selected);
+    state.selectedAttributeCount += selectable.selected ? 1 : -1;
   },
 
   toggleCollapsed(_, collapsable) {

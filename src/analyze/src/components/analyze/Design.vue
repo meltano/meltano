@@ -52,6 +52,7 @@ export default {
       'filterOptions',
     ]),
     ...mapGetters('designs', [
+      'attributesCount',
       'currentModelLabel',
       'currentDesignLabel',
       'hasChartableResults',
@@ -385,10 +386,15 @@ export default {
             </div>
             <div class="column">
               <div class="field">
-                <label class="label">Filters</label>
+                <label class="label">
+                  <span>Filters</span>
+                  <span
+                    v-if='filtersCount > 0'
+                    class='has-text-weight-light has-text-grey-light is-size-7'>({{filtersCount}})</span>
+                </label>
                 <div class="control is-expanded">
                   <Dropdown
-                    :label="hasFilters ? `${filtersCount} Total` : 'None'"
+                    :label="hasFilters ? 'Edit' : 'None'"
                     button-classes='is-small'
                     is-full-width>
                     <div class="dropdown-content">
@@ -403,7 +409,12 @@ export default {
           </div>
 
           <div class="field">
-            <label class="label">Attributes</label>
+            <label class="label">
+              <span>Attributes</span>
+              <span
+                v-if='attributesCount > 0'
+                class='has-text-weight-light has-text-grey-light is-size-7'>({{attributesCount}})</span>
+            </label>
           </div>
 
           <nav class="panel is-unselectable">
