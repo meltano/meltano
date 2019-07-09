@@ -89,12 +89,12 @@ export default {
 
     dialect: {
       get() {
-	return this.$store.getters['designs/getDialect'];
+        return this.$store.getters['designs/getDialect'];
       },
       set(value) {
-	this.$store.commit('designs/setDialect', value);
-      }
-    }
+        this.$store.commit('designs/setDialect', value);
+      },
+    },
   },
   methods: {
     ...mapActions('dashboards', [
@@ -114,8 +114,8 @@ export default {
 
     toggleActiveReportInDashboard(dashboard) {
       const methodName = this.isActiveReportInDashboard(dashboard)
-        ? 'removeReportFromDashboard'
-        : 'addReportToDashboard';
+                       ? 'removeReportFromDashboard'
+                       : 'addReportToDashboard';
       this.$store.dispatch(`dashboards/${methodName}`, {
         reportId: this.activeReport.id,
         dashboardId: dashboard.id,
@@ -251,17 +251,17 @@ export default {
               </div>
             </div>
           </div>
-	  
+
           <div class="is-unselectable">
             <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
             <template v-if="hasJoins">
               <template v-for="join in design.joins">
                 <a
                   class="panel-block
-			 panel-block-heading
-			 has-background-white-bis
-			 has-text-grey
-			 is-expandable"
+                         panel-block-heading
+                         has-background-white-bis
+                         has-text-grey
+                         is-expandable"
                   :class="{'is-collapsed': join.collapsed}"
                   :key="join.label"
                   @click="joinRowClicked(join)">
@@ -270,8 +270,8 @@ export default {
                 <template v-if="!join.collapsed">
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a class="panel-block
-			    panel-block-heading
-			    has-background-white"
+                            panel-block-heading
+                            has-background-white"
                      v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                     Columns
                   </a>
@@ -281,9 +281,9 @@ export default {
                        @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
                        :key="timeframe.label"
                        :class="{
-                               'is-active': timeframe.selected,
-                               'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
-                               }">
+                              'is-active': timeframe.selected,
+                              'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
+                              }">
                       {{timeframe.label}}
                       <div class='sqlite-unsupported-container'
                            v-if='isConnectionDialectSqlite(dialect)'>
@@ -312,8 +312,8 @@ export default {
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a class="panel-block
-			    panel-block-heading
-			    has-background-white"
+                            panel-block-heading
+                            has-background-white"
                      v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
                     Aggregates
                   </a>
@@ -343,8 +343,8 @@ export default {
             </template>
             <template v-if="!design.related_table.collapsed">
               <a class="panel-block
-			panel-block-heading
-			has-background-white"
+                        panel-block-heading
+                        has-background-white"
                  v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
                 Columns
               </a>
@@ -376,8 +376,8 @@ export default {
               </a>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
               <a class="panel-block
-			panel-block-heading
-			has-background-white"
+                        panel-block-heading
+                        has-background-white"
                  v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
                 Aggregates
               </a>
@@ -390,23 +390,23 @@ export default {
               </a>
             </template>
           </div>
-	  
+
         </nav>
       </aside>
       
       <div class="column is-three-quarters vh-scrollable">
         <div class="columns is-vcentered">
-	  
+
           <div class="column is-one-quarter">
             <div class="is-grouped is-pulled-left">
               <div v-if="hasActiveReport()">{{activeReport.name}}</div>
               <div v-else><em>Untitled Report</em></div>
             </div>
           </div>
-	  
+
           <div class="column">
             <div class="field is-grouped is-pulled-right">
-	      
+
               <p v-if="hasActiveReport()" class="control" @click="getDashboards">
                 <Dropdown label="Add to Dashboard" is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
@@ -421,8 +421,8 @@ export default {
                            :key="dashboard.id">
                         <label for="'checkbox-' + dashboard.id"
                                @click="
-                                       toggleActiveReportInDashboard(dashboard);
-                                       dropdownForceClose();">
+                                    toggleActiveReportInDashboard(dashboard);
+                                    dropdownForceClose();">
                           <input type="checkbox"
                                  :id="'checkbox-' + dashboard.id"
                                  :checked="isActiveReportInDashboard(dashboard)">
@@ -433,7 +433,7 @@ export default {
                   </div>
                 </Dropdown>
               </p>
-	      
+
               <div class="control field" :class="{'has-addons': hasActiveReport()}">
                 <div class="control">
                   <button
@@ -477,7 +477,7 @@ export default {
                   </Dropdown>
                 </div>
               </div>
-	      
+
               <div class="control field">
                 <Dropdown
                   :disabled="!reports.length"
@@ -494,34 +494,34 @@ export default {
                   </div>
                 </Dropdown>
               </div>
-	      
-	      <div class="control field has-addons">
-		<div class="control">
-		  <button class="button is-success"
-			  :class="{'is-loading': loadingQuery}"
-			  :disabled="!currentSQL"
-			  @click="runQuery">Run Query</button>
-		</div>
-		<div class="control">
-		  <div class="select is-fullwidth">
-		    <select name="connection" v-model="dialect">
-		      <option v-for="connection in installedPlugins['connections']">{{connection.name}}</option>
-		    </select>
-		  </div>
-		</div>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	
-	<!-- filters tab -->
+
+              <div class="control field has-addons">
+                <div class="control">
+                  <button class="button is-success"
+                          :class="{'is-loading': loadingQuery}"
+                          :disabled="!currentSQL"
+                          @click="runQuery">Run Query</button>
+                </div>
+                <div class="control">
+                  <div class="select is-fullwidth">
+                    <select name="connection" v-model="dialect">
+                      <option v-for="connection in installedPlugins['connections']">{{connection.name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- filters tab -->
         <div v-if="design.has_filters">
           <div class="has-background-primary
-            accordion-header
-            has-text-white-bis
-            is-expandable"
-            @click="toggleFilterOpen"
-            :class="{'is-collapsed': !filtersOpen}">
+                      accordion-header
+                      has-text-white-bis
+                      is-expandable"
+               @click="toggleFilterOpen"
+               :class="{'is-collapsed': !filtersOpen}">
 
             <span>Filters</span>
             <div class="accordion-toggle">
@@ -570,11 +570,11 @@ export default {
 
         <!-- charts tab -->
         <div class="has-background-primary
-          accordion-header
-          has-text-white-bis
-          is-expandable"
-          @click="toggleChartsOpen"
-          :class="{'is-collapsed': !chartsOpen}">
+                    accordion-header
+                    has-text-white-bis
+                    is-expandable"
+             @click="toggleChartsOpen"
+             :class="{'is-collapsed': !chartsOpen}">
 
           <span class="accordion-title">Charts</span>
           <div>
@@ -636,8 +636,8 @@ export default {
           <div v-if="chartsOpen" >
             <div v-if="hasChartableResults" class="chart-toggles">
               <chart :chart-type='chartType'
-                      :results='results'
-                      :result-aggregates='resultAggregates'></chart>
+                     :results='results'
+                     :result-aggregates='resultAggregates'></chart>
             </div>
             <div v-if="!hasChartableResults">
               <div class="box is-radiusless is-shadowless">
@@ -651,11 +651,11 @@ export default {
 
         <!-- results/SQL tab -->
         <div class="has-background-primary
-          accordion-header
-          has-text-white-bis
-          is-expandable"
-          @click="toggleDataOpen"
-          :class="{'is-collapsed': !dataOpen}">
+                    accordion-header
+                    has-text-white-bis
+                    is-expandable"
+             @click="toggleDataOpen"
+             :class="{'is-collapsed': !dataOpen}">
 
           <span>Data</span>
           <div class="accordion-toggle">
@@ -722,7 +722,6 @@ export default {
         </NewDashboardModal>
 
       </div>
-
     </div>
   </section>
 </template>

@@ -14,8 +14,6 @@ const defaultState = {
   pipelines: [],
 };
 
-const resetState = lodash.cloneDeep(defaultState);
-
 const getters = {
   getHasPipelines(state) {
     return state.pipelines.length > 0;
@@ -144,8 +142,8 @@ const actions = {
 
 const mutations = {
   reset(state, attr) {
-    if (Object.prototype.hasOwnProperty.call(resetState, attr)) {
-      state[attr] = resetState[attr];
+    if (defaultState.hasOwnProperty(attr)) {
+      state[attr] = defaultState[attr];
     }
   },
 
@@ -193,7 +191,7 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state: defaultState,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,
