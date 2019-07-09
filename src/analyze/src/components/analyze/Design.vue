@@ -17,14 +17,11 @@ export default {
   created() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
-<<<<<<< HEAD
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(() => {
         this.dialect = this.installedPlugins.connections[0].name;
       });
-=======
     this.$store.dispatch('designs/getFilterOptions');
->>>>>>> 594e986c... initial filter options FE->BE round trip
   },
   filters: {
     capitalize,
@@ -51,11 +48,8 @@ export default {
       'results',
       'resultAggregates',
       'chartType',
-<<<<<<< HEAD
-=======
       'dialect',
       'filterOptions',
->>>>>>> 594e986c... initial filter options FE->BE round trip
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
@@ -72,6 +66,7 @@ export default {
       'formattedSql',
       'filtersCount',
       'hasFilters',
+      'getIsAttributeInFilters',
     ]),
     ...mapState('dashboards', [
       'dashboards',
@@ -110,6 +105,7 @@ export default {
     ...mapActions('dashboards', [
       'getDashboards',
     ]),
+<<<<<<< HEAD
     ...mapActions('designs', [
 <<<<<<< HEAD
       'resetErrorMessage',
@@ -117,6 +113,8 @@ export default {
       'toggleFilter',
 >>>>>>> 8270e9dc... initial filter add functionality, still need to toggle vs naive add
     ]),
+=======
+>>>>>>> 783d062a... initial toggle/add/remove filter functionality implemented
 
     isActiveReportInDashboard(dashboard) {
       return dashboard.reportIds.includes(this.activeReport.id);
@@ -134,6 +132,12 @@ export default {
         reportId: this.activeReport.id,
         dashboardId: dashboard.id,
       });
+    },
+
+    toggleFilterAttribute(attribute, filterType) {
+      const hasFilter = this.getIsAttributeInFilters(attribute.name, filterType);
+      const methodName = hasFilter ? 'remove' : 'add';
+      this.$store.dispatch(`designs/${methodName}Filter`, { attribute, filterType });
     },
 
     inputFocused(field) {
@@ -464,12 +468,12 @@ export default {
                       {{column.label}}
                       <button
                         class="button is-small"
-                        @click='toggleFilter({ attribute: column, filterType: "column" })'>
+                        @click='toggleFilterAttribute(column, "column")'>
                         <span
                           class="icon"
                           :class="{
-                            'has-text-grey-lighter': true,
-                            'has-text-interactive-secondary': false,
+                            'has-text-grey-lighter': !getIsAttributeInFilters(column.name, 'column'),
+                            'has-text-interactive-secondary': getIsAttributeInFilters(column.name, 'column'),
                           }">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
@@ -492,12 +496,12 @@ export default {
                       {{aggregate.label}}
                       <button
                         class="button is-small"
-                        @click='toggleFilter({ attribute: aggregate, filterType: "aggregate" })'>
+                        @click='toggleFilterAttribute(aggregate, "aggregate")'>
                         <span
                           class="icon"
                           :class="{
-                            'has-text-grey-lighter': true,
-                            'has-text-interactive-secondary': false,
+                            'has-text-grey-lighter': !getIsAttributeInFilters(aggregate.name, 'aggregate'),
+                            'has-text-interactive-secondary': getIsAttributeInFilters(aggregate.name, 'aggregate'),
                           }">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
@@ -555,12 +559,12 @@ export default {
                 {{column.label}}
                 <button
                   class="button is-small"
-                  @click='toggleFilter({ attribute: column, filterType: "column" })'>
+                  @click='toggleFilterAttribute(column, "column")'>
                   <span
                     class="icon"
                     :class="{
-                      'has-text-grey-lighter': true,
-                      'has-text-interactive-secondary': false,
+                      'has-text-grey-lighter': !getIsAttributeInFilters(column.name, 'column'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(column.name, 'column'),
                     }">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
@@ -581,12 +585,12 @@ export default {
                 {{aggregate.label}}
                 <button
                   class="button is-small"
-                  @click='toggleFilter({ attribute: aggregate, filterType: "aggregate" })'>
+                  @click='toggleFilterAttribute(aggregate, "aggregate")'>
                   <span
                     class="icon"
                     :class="{
-                      'has-text-grey-lighter': true,
-                      'has-text-interactive-secondary': false,
+                      'has-text-grey-lighter': !getIsAttributeInFilters(aggregate.name, 'aggregate'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(aggregate.name, 'aggregate'),
                     }">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
