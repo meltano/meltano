@@ -174,10 +174,6 @@ const getters = {
     return state.selectedAttributeCount;
   },
 
-  attributesCount() {
-    return state.selectedAttributeCount;
-  },
-
   resultsCount() {
     if (!state.results) {
       return 0;
@@ -529,11 +525,13 @@ const mutations = {
     }
   },
 
-  removeFilter(_, { attribute, filterType }) {
-    const filtersByType = state.filters[`${filterType}s`];
-    const targetFilter = filtersByType.find(filter => filter.attributeName === attribute.name);
-    const idx = filtersByType.indexOf(targetFilter);
-    filtersByType.splice(idx, 1);
+  removeFilter(_, { tableName, attribute, filterType }) {
+    const targetFilter = getters.getFilter(tableName, attribute.name, filterType);
+    if (targetFilter) {
+      const filtersByType = state.filters[`${filterType}s`];
+      const idx = filtersByType.indexOf(targetFilter);
+      filtersByType.splice(idx, 1);
+    }
   },
 
   addSavedReportToReports(_, report) {
