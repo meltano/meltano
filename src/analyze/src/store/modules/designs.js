@@ -141,8 +141,12 @@ const getters = {
     return getters.filtersCount() > 0;
   },
 
+  getFilter(tableName, attributeName, filterType) {
+    return state.filters[`${filterType}s`].find(filter => filter.attributeName === attributeName && filter.tableName === tableName);
+  },
+
   getIsAttributeInFilters() {
-    return (attributeName, filterType) => state.filters[`${filterType}s`].find(filter => filter.attributeName === attributeName);
+    return (tableName, attributeName, filterType) => !!getters.getFilter(tableName, attributeName, filterType);
   },
 
   attributesCount() {
@@ -431,9 +435,9 @@ const actions = {
     });
   },
 
-  addFilter({ commit }, { attribute, filterType }) {
+  addFilter({ commit }, { tableName, attribute, filterType }) {
     const filter = {
-      tableName: 'TABLE_NAME',
+      tableName,
       attributeName: attribute.name,
       operation: '',
       value: '',
@@ -442,8 +446,8 @@ const actions = {
     commit('addFilter', { filter, filterType });
   },
 
-  removeFilter({ commit }, { attribute, filterType }) {
-    commit('removeFilter', { attribute, filterType });
+  removeFilter({ commit }, { tableName, attribute, filterType }) {
+    commit('removeFilter', { tableName, attribute, filterType });
   },
 };
 
@@ -529,11 +533,13 @@ const mutations = {
     state.filters[`${filterType}s`].push(filter);
   },
 
-  removeFilter(_, { attribute, filterType }) {
-    const filtersByType = state.filters[`${filterType}s`];
-    const targetFilter = filtersByType.find(filter => filter.attributeName === attribute.name);
-    const idx = filtersByType.indexOf(targetFilter);
-    filtersByType.splice(idx, 1);
+  removeFilter(_, { tableName, attribute, filterType }) {
+    const targetFilter = getters.getFilter(tableName, attribute.name, filterType);
+    if (targetFilter) {
+      const filtersByType = state.filters[`${filterType}s`];
+      const idx = filtersByType.indexOf(targetFilter);
+      filtersByType.splice(idx, 1);
+    }
   },
 
   addSavedReportToReports(_, report) {
