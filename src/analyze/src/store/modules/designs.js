@@ -139,6 +139,10 @@ const getters = {
     return getters.filtersCount() > 0;
   },
 
+  getIsAttributeInFilters() {
+    return (attributeName, filterType) => state.filters[`${filterType}s`].find(filter => filter.attributeName === attributeName);
+  },
+
   resultsCount() {
     if (!state.results) {
       return 0;
@@ -426,7 +430,7 @@ const actions = {
     });
   },
 
-  toggleFilter({ commit }, { attribute, filterType }) {
+  addFilter({ commit }, { attribute, filterType }) {
     const filter = {
       tableName: 'TABLE_NAME',
       attributeName: attribute.name,
@@ -437,8 +441,8 @@ const actions = {
     commit('addFilter', { filter, filterType });
   },
 
-  removeFilter() {
-    return true;
+  removeFilter({ commit }, { attribute, filterType }) {
+    commit('removeFilter', { attribute, filterType });
   },
 };
 
@@ -521,6 +525,13 @@ const mutations = {
 
   addFilter(_, { filter, filterType }) {
     state.filters[`${filterType}s`].push(filter);
+  },
+
+  removeFilter(_, { attribute, filterType }) {
+    const filtersByType = state.filters[`${filterType}s`];
+    const targetFilter = filtersByType.find(filter => filter.attributeName === attribute.name);
+    const idx = filtersByType.indexOf(targetFilter);
+    filtersByType.splice(idx, 1);
   },
 
   addSavedReportToReports(_, report) {
