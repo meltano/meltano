@@ -525,6 +525,13 @@ const mutations = {
     }
   },
 
+  removeFilter(_, { attribute, filterType }) {
+    const filtersByType = state.filters[`${filterType}s`];
+    const targetFilter = filtersByType.find(filter => filter.attributeName === attribute.name);
+    const idx = filtersByType.indexOf(targetFilter);
+    filtersByType.splice(idx, 1);
+  },
+
   addSavedReportToReports(_, report) {
     state.reports.push(report);
   },
