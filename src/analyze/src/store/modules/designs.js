@@ -141,7 +141,11 @@ const getters = {
   },
 
   getFilter(tableName, attributeName, filterType) {
-    return state.filters[`${filterType}s`].find(filter => filter.attributeName === attributeName && filter.tableName === tableName);
+    return getters.getFiltersByType(filterType).find(filter => filter.attributeName === attributeName && filter.tableName === tableName);
+  },
+
+  getFiltersByType(filterType) {
+    return state.filters[`${filterType}s`];
   },
 
   getIsAttributeInFilters() {
@@ -533,13 +537,13 @@ const mutations = {
   },
 
   addFilter(_, { filter, filterType }) {
-    state.filters[`${filterType}s`].push(filter);
+    getters.getFiltersByType(filterType).push(filter);
   },
 
   removeFilter(_, { tableName, attribute, filterType }) {
     const targetFilter = getters.getFilter(tableName, attribute.name, filterType);
     if (targetFilter) {
-      const filtersByType = state.filters[`${filterType}s`];
+      const filtersByType = getters.getFiltersByType(filterType);
       const idx = filtersByType.indexOf(targetFilter);
       filtersByType.splice(idx, 1);
     }
