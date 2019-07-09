@@ -318,8 +318,15 @@ const actions = {
     commit('toggleSelected', timeframePeriod);
   },
 
-  toggleAggregate({ commit }, aggregate) {
+  toggleAggregate({ commit }, { aggregate, tableName }) {
     commit('toggleSelected', aggregate);
+
+    if (!aggregate.selected) {
+      const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
+      if (filter) {
+        commit('removeFilter', { filter, filterType: 'aggregate' });
+      }
+    }
   },
 
   limitSet({ commit }, limit) {
@@ -448,10 +455,20 @@ const actions = {
       nullState: '',
     };
     commit('addFilter', { filter, filterType });
+
+    const isValidToggleSelection = !attribute.hasOwnProperty('selected') || !attribute.selected;
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute);
+    }
   },
 
   removeFilter({ commit }, { tableName, attribute, filterType }) {
-    commit('removeFilter', { tableName, attribute, filterType });
+    const filter = getters.getFilter(tableName, attribute.name, filterType);
+    commit('removeFilter', { filter, filterType });
+
+    if (filterType === 'aggregate' && attribute.selected) {
+      commit('toggleSelected', attribute);
+    }
   },
 };
 
@@ -537,11 +554,10 @@ const mutations = {
     getters.getFiltersByType(filterType).push(filter);
   },
 
-  removeFilter(_, { tableName, attribute, filterType }) {
-    const targetFilter = getters.getFilter(tableName, attribute.name, filterType);
-    if (targetFilter) {
+  removeFilter(_, { filter, filterType }) {
+    if (filter) {
       const filtersByType = getters.getFiltersByType(filterType);
-      const idx = filtersByType.indexOf(targetFilter);
+      const idx = filtersByType.indexOf(filter);
       filtersByType.splice(idx, 1);
     }
   },

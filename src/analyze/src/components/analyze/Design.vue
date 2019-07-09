@@ -178,7 +178,7 @@ export default {
     },
 
     aggregateSelected(aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/toggleAggregate',  { aggregate, tableName: design.from });
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 
@@ -188,7 +188,7 @@ export default {
     },
 
     joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
+      this.$store.dispatch('designs/toggleAggregate',  { aggregate, tableName: join.name });
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 

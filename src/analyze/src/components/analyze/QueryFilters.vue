@@ -5,6 +5,7 @@ export default {
   name: 'QueryFilters',
   computed: {
     ...mapState('designs', [
+      'filterOptions',
       'filters',
     ]),
     ...mapGetters('designs', [
@@ -21,7 +22,9 @@ export default {
 </script>
 
 <template>
-  <div>Query Filters...</div>
+  <div>
+    <div>{{filterOptions}}</div>
+  </div>
 </template>
 
 <style lang="scss">
