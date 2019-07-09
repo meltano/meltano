@@ -119,7 +119,7 @@ export default {
 
           <tbody>
             <tr>
-              <th>
+              <td>
                 <div class="control is-expanded">
                   <input
                     class="input"
@@ -131,7 +131,7 @@ export default {
                     v-model='pipeline.name'
                     placeholder="Name">
                 </div>
-              </th>
+              </td>
               <td>
                 <div class="control is-expanded">
                   <span

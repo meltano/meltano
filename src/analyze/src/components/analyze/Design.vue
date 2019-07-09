@@ -395,13 +395,10 @@ export default {
                 <div class="control is-expanded">
                   <Dropdown
                     :label="hasFilters ? 'Edit' : 'None'"
-                    :disabled='!hasFilters'
                     :button-classes="`is-small ${hasFilters ? 'has-text-interactive-secondary' : ''}`"
                     is-full-width>
                     <div class="dropdown-content">
-                      <div class="dropdown-item">
-                        <QueryFilters></QueryFilters>
-                      </div>
+                      <QueryFilters></QueryFilters>
                     </div>
                   </Dropdown>
                 </div>
