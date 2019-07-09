@@ -71,7 +71,7 @@ export default {
     </table>
     <label class="action">Assign filter</label>
     <div class="controls field is-grouped">
-      <p class="control">
+      <div class="control">
         <div class="select">
           <select v-model="model.role">
             <option :value="null">Select a role</option>
@@ -80,22 +80,22 @@ export default {
             >{{role.name}}</option>
           </select>
         </div>
-      </p>
-      <p class="control is-expanded">
+      </div>
+      <div class="control is-expanded">
         <input v-model="model.context"
                type="text"
                class="input"
                placeholder="Design filter"
                @keyup.enter="enabled && add"
         />
-      </p>
-      <p class="control">
+      </div>
+      <div class="control">
         <button @click="add"
                 class="button is-primary"
                 :disabled="!enabled">
           Add
         </button>
-      </p>
+      </div>
     </div>
   </div>
 </template>

@@ -5,6 +5,7 @@ from pathlib import Path
 from collections import OrderedDict
 from flask import jsonify, redirect, url_for
 from pypika import Query, Order
+from sqlalchemy.event import listen
 
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
@@ -63,18 +64,34 @@ class SqlHelper(SqlUtils):
         project = Project.find()
         connection = self.get_connection(dialect)
         config = SettingsService(db.session, project).as_config(connection)
+        engine_hooks = []
 
         if dialect == "postgresql":
             psql_params = ["user", "password", "host", "dbname"]
             user, pw, host, dbname = [config[param] for param in psql_params]
             connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}/{dbname}"
+
+            def set_connection_schema(raw, conn):
+                schema = config["schema"]
+                with raw.cursor() as cursor:
+                    res = cursor.execute(f"SET search_path TO {schema};")
+                    logging.debug(f"Connection schema set to {schema}")
+
+            engine_hooks.append(
+                lambda engine: listen(engine, "first_connect", set_connection_schema)
+            )
         elif dialect == "sqlite":
             db_path = project.root.joinpath(config["dbname"])
             connection_url = f"sqlite:///{db_path}"
         else:
             raise UnsupportedConnectionDialect(dialect)
 
-        return sqlalchemy.create_engine(connection_url)
+        engine = sqlalchemy.create_engine(connection_url)
+
+        for hook in engine_hooks:
+            hook(engine)
+
+        return engine
 
     def get_query_results(self, dialect, sql):
         engine = self.get_db_engine(dialect)

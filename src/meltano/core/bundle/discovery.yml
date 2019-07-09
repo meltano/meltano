@@ -296,6 +296,9 @@ connections:
         value: 'localhost:5432'
       - name: dbname
         value: warehouse
+      - name: schema
+        value: analytics
+        env: PG_SCHEMA
   - name: snowflake
     namespace: snowflake
     settings:

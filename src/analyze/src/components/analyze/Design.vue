@@ -502,13 +502,13 @@ export default {
                           :disabled="!currentSQL"
                           @click="runQuery">Run Query</button>
                 </p>
-                <p class="control">
+                <div class="control">
                   <div class="select is-fullwidth">
                     <select name="connection" v-model="dialect">
                       <option :key="connection.name" v-for="connection in installedPlugins.connections">{{connection.name}}</option>
                     </select>
                   </div>
-                </p>
+                </div>
               </div>
             </div>
           </div>

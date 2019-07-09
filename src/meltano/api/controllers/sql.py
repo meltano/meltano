@@ -92,7 +92,7 @@ def get_sql(topic_name, design_name):
     dialect = incoming_json["dialect"]
     connection = sqlHelper.get_connection(dialect)
 
-    sql_dict = sqlHelper.get_sql(design, incoming_json, None)
+    sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
     column_headers = sql_dict["column_headers"]

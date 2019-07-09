@@ -55,7 +55,7 @@ export default {
     </table>
     <label class="action">Assign Role</label>
     <div class="controls field is-grouped">
-      <p class="control">
+      <div class="control">
         <div class="select">
           <select v-model="model.user">
             <option :value="null">Select a user</option>
@@ -64,8 +64,8 @@ export default {
             >{{user.username}}</option>
           </select>
         </div>
-      </p>
-      <p class="control is-expanded">
+      </div>
+      <div class="control is-expanded">
         <div class="select">
           <select v-model="model.role">
             <option :value="null">Select a role</option>
@@ -74,14 +74,14 @@ export default {
             >{{role}}</option>
           </select>
         </div>
-      </p>
-      <p class="control">
+      </div>
+      <div class="control">
         <button class="button is-primary"
                 @click="$emit('add', model)"
                 :disabled="!enabled">
           Assign
         </button>
-      </p>
+      </div>
     </div>
   </div>
 </template>

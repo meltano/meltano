@@ -456,6 +456,7 @@ const mutations = {
     state.currentDesign = report.design;
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
+    state.dialect = report.queryPayload.dialect;
 
     // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
     const baseTable = state.design.related_table;
