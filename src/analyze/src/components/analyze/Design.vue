@@ -480,7 +480,7 @@ export default {
                       {{column.label}}
                       <button
                         class="button is-small"
-                        @click='toggleFilterAttribute(column, "column")'>
+                        @click.stop='toggleFilterAttribute(column, "column")'>
                         <span
                           class="icon"
                           :class="{
@@ -508,7 +508,7 @@ export default {
                       {{aggregate.label}}
                       <button
                         class="button is-small"
-                        @click='toggleFilterAttribute(aggregate, "aggregate")'>
+                        @click.stop='toggleFilterAttribute(aggregate, "aggregate")'>
                         <span
                           class="icon"
                           :class="{
@@ -571,7 +571,7 @@ export default {
                 {{column.label}}
                 <button
                   class="button is-small"
-                  @click='toggleFilterAttribute(column, "column")'>
+                  @click.stop='toggleFilterAttribute(column, "column")'>
                   <span
                     class="icon"
                     :class="{
@@ -597,7 +597,7 @@ export default {
                 {{aggregate.label}}
                 <button
                   class="button is-small"
-                  @click='toggleFilterAttribute(aggregate, "aggregate")'>
+                  @click.stop='toggleFilterAttribute(aggregate, "aggregate")'>
                   <span
                     class="icon"
                     :class="{
