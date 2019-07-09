@@ -26,10 +26,10 @@ pip install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
-python -m venv venv
+python -m venv ~/virtualenvs/meltano-development
 
 # Activate your virtual environment
-source ./venv/bin/activate
+source ~/virtualenvs/meltano-development/bin/activate
 
 # Install all the dependencies
 pip install -r requirements.txt
@@ -55,6 +55,12 @@ For all changes that do not involve working on Meltano UI itself, run the follow
 # Starts both Meltano API and a production build of Meltano UI
 meltano ui
 ```
+
+:::warning Troubleshooting
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed. 
+
+On a OSX, this can be solved by running `brew install yarn`. 
+:::
 
 ### Meltano UI Development
 

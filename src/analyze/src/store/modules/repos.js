@@ -31,7 +31,7 @@ const getters = {
   },
 
   hasFiles(state) {
-    return Object.hasOwnProperty.call(state.files, 'topics') && state.files.topics.items;
+    return state.files.hasOwnProperty('topics') && state.files.topics.items;
   },
 
   hasModels(state) {

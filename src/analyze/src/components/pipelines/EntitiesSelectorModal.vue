@@ -80,7 +80,7 @@ export default {
       return this.getSelectedAttributeCount > 0;
     },
     isLoading() {
-      return !Object.prototype.hasOwnProperty.call(this.extractorInFocusEntities, 'entityGroups');
+      return !this.extractorInFocusEntities.hasOwnProperty('entityGroups');
     },
     isSaveable() {
       return this.hasEntities && this.hasSelectedAttributes;
