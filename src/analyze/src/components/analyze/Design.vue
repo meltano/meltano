@@ -376,7 +376,7 @@ export default {
                 <label class="label">Limit</label>
                 <div class="control is-expanded">
                   <input
-                    class="input is-small"
+                    class="input is-small has-text-interactive-secondary"
                     type="text"
                     placeholder="Limit"
                     v-model="limit"
@@ -395,7 +395,8 @@ export default {
                 <div class="control is-expanded">
                   <Dropdown
                     :label="hasFilters ? 'Edit' : 'None'"
-                    button-classes='is-small'
+                    :disabled='!hasFilters'
+                    :button-classes="`is-small ${hasFilters ? 'has-text-interactive-secondary' : ''}`"
                     is-full-width>
                     <div class="dropdown-content">
                       <div class="dropdown-item">
