@@ -174,6 +174,10 @@ const getters = {
     return state.selectedAttributeCount;
   },
 
+  attributesCount() {
+    return state.selectedAttributeCount;
+  },
+
   resultsCount() {
     if (!state.results) {
       return 0;
