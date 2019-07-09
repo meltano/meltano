@@ -48,9 +48,7 @@ class PluginType(YAMLEnum):
 
 
 class PluginRef:
-    def __init__(self,
-                 plugin_type: Union[str, PluginType],
-                 name: str):
+    def __init__(self, plugin_type: Union[str, PluginType], name: str):
         self.type = (
             plugin_type
             if isinstance(plugin_type, PluginType)
@@ -78,8 +76,7 @@ class PluginRef:
         return "@".join(compact(parts))
 
     def __eq__(self, other):
-        return (self.name == other.name
-                and self.type == other.type)
+        return self.name == other.name and self.type == other.type
 
     def __hash__(self):
         return hash((self.type, self.canonical_name, self.profile))
@@ -124,7 +121,7 @@ class PluginInstall(HookObject, PluginRef):
         if not self.profile:
             return self._config
 
-        return self._extras['profiles'][self.profile]
+        return self._extras["profiles"][self.profile]
 
     @property
     def executable(self):

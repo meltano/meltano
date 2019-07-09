@@ -1,8 +1,6 @@
 <script>
 import { mapGetters } from 'vuex';
-
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
-
 import utils from '@/utils/utils';
 
 export default {
@@ -52,14 +50,14 @@ export default {
       };
     },
     labelClass() {
-      return this.fieldClass || "is-normal";
+      return this.fieldClass || 'is-normal';
     },
     successClass() {
-      return (setting) =>
-	this.getIsConfigSettingValid(setting)
-	? "is-success has-text-success"
-        : null
-    }
+      return setting =>
+        (this.getIsConfigSettingValid(setting)
+          ? 'is-success has-text-success'
+          : null);
+    },
   },
 };
 </script>
@@ -81,7 +79,7 @@ export default {
               class="checkbox">
               <input
                 v-model="configSettings.config[setting.name]"
-		:class="successClass(setting)"
+                :class="successClass(setting)"
                 type="checkbox">
             </label>
 

@@ -5,7 +5,12 @@ from .venv_service import VenvService
 from .utils import noop
 from .plugin import PluginInstall, Plugin, PluginRef
 from .project import Project
-from .error import PluginInstallError, PluginInstallWarning, SubprocessError, PluginNotInstallable
+from .error import (
+    PluginInstallError,
+    PluginInstallWarning,
+    SubprocessError,
+    PluginNotInstallable,
+)
 
 
 class PluginInstallService:

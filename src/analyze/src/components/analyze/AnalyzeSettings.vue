@@ -9,7 +9,7 @@ export default {
   data() {
     return {
       connectionName: null,
-    }
+    };
   },
   components: {
     ConnectorLogo,
@@ -39,14 +39,14 @@ export default {
     ]),
     connection() {
       const targetConnection = this.installedPlugins.connections
-                             ? this.installedPlugins.connections.find(item => item.name === this.connectionName)
-                             : null;
+        ? this.installedPlugins.connections.find(item => item.name === this.connectionName)
+        : null;
       return targetConnection || {};
     },
     configSettings() {
       return this.connection.config
-           ? Object.assign(this.connection.config, this.connectionInFocusConfiguration)
-           : this.connectionInFocusConfiguration;
+        ? Object.assign(this.connection.config, this.connectionInFocusConfiguration)
+        : this.connectionInFocusConfiguration;
     },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('connections', this.connectionName);
@@ -71,7 +71,7 @@ export default {
         pluginType: 'connections',
         name: connection,
       })
-      .then(this.selectConnection(connection));
+        .then(this.selectConnection(connection));
     },
     selectConnection(connection) {
       this.connectionName = connection;

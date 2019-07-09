@@ -6,12 +6,12 @@ export default {
 </script>
 
 <template>
-  <div class="control">
+  <p class="control">
     <div class="tags has-addons">
         <span class="tag">{{name}}</span>
         <a class="tag is-delete" @click.prevent="$emit('delete')"></a>
     </div>
-  </div>
+  </p>
 </template>
 
 <style lang="scss">

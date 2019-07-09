@@ -23,7 +23,9 @@ class TestSqlController:
     def post(self, app, api, engine_sessionmaker):
         engine, _ = engine_sessionmaker
 
-        @mock.patch('meltano.api.controllers.sql.SqlHelper.get_db_engine', return_value=engine)
+        @mock.patch(
+            "meltano.api.controllers.sql.SqlHelper.get_db_engine", return_value=engine
+        )
         def _post(payload, engine_mock):
             return api.post(self.url(app, "carbon", "region"), json=payload)
 

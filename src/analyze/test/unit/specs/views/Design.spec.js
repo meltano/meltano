@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import Design from '@/components/analyze/Design';
 import designs from '@/store/modules/designs';
+import plugins from '@/store/modules/plugins';
 import router from '@/router';
 
 const localVue = createLocalVue();
@@ -48,6 +49,7 @@ describe('Design.vue', () => {
           actions,
           getters: designs.getters,
         },
+        plugins,
       },
     });
   });

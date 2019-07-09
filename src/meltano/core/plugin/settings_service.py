@@ -26,7 +26,9 @@ class SettingsService:
         self._session = session
 
     def settings(self, plugin: PluginRef, enabled_only=True):
-        q = self._session.query(PluginSetting).filter_by(namespace=plugin.qualified_name)
+        q = self._session.query(PluginSetting).filter_by(
+            namespace=plugin.qualified_name
+        )
 
         if enabled_only:
             q.filter_by(enabled=True)
@@ -67,11 +69,8 @@ class SettingsService:
                 return
 
             setting = PluginSetting(
-                namespace=plugin.qualified_name,
-                name=name,
-                value=value,
-                enabled=enabled,
-                )
+                namespace=plugin.qualified_name, name=name, value=value, enabled=enabled
+            )
 
             self._session.merge(setting)
             self._session.commit()
@@ -80,7 +79,6 @@ class SettingsService:
         except StopIteration:
             logging.warning(f"Setting `{name}` not found.")
             return None
-
 
     def unset(self, plugin: PluginRef, name: str):
         self._session.query(PluginSetting).filter_by(
@@ -126,9 +124,7 @@ class SettingsService:
             # priority 3: settings database
             return (
                 self._session.query(PluginSetting)
-                .filter_by(
-                    namespace=plugin.qualified_name, name=name, enabled=True
-                )
+                .filter_by(namespace=plugin.qualified_name, name=name, enabled=True)
                 .one()
                 .value
             )

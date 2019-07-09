@@ -148,9 +148,7 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
 
 
 def compact(xs: Iterable) -> Iterable:
-    return (x
-            for x in xs
-            if x is not None)
+    return (x for x in xs if x is not None)
 
 
 def file_has_data(file: Union[Path, str]):

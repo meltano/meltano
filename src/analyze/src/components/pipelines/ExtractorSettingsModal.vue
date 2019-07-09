@@ -111,7 +111,7 @@ export default {
 
         <ConnectorSettings
           v-if='!isLoadingConfigSettings'
-	  fieldClass="is-small"
+          fieldClass="is-small"
           :config-settings='configSettings'/>
 
         <progress

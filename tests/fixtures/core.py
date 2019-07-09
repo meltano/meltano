@@ -72,12 +72,7 @@ def discovery():
         }
     )
 
-    discovery[PluginType.CONNECTIONS].append(
-        {
-            "name": "pytest",
-            "namespace": "pytest",
-        }
-    )
+    discovery[PluginType.CONNECTIONS].append({"name": "pytest", "namespace": "pytest"})
 
     return discovery
 

@@ -13,7 +13,10 @@ from meltano.core.project_add_service import (
     PluginAlreadyAddedException,
 )
 from meltano.core.project_add_custom_service import ProjectAddCustomService
-from meltano.core.plugin_install_service import PluginInstallService, PluginNotInstallable
+from meltano.core.plugin_install_service import (
+    PluginInstallService,
+    PluginNotInstallable,
+)
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
@@ -175,7 +178,6 @@ def add_plugin(
     docs_link = plugin._extras.get("docs")
     if docs_link:
         click.secho(f"Visit {docs_link} for more details about '{plugin.name}'.")
-
 
 
 def add_transform(project: Project, plugin_name: str):

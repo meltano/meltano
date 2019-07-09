@@ -54,9 +54,7 @@ class SqlHelper(SqlUtils):
         # match dialect-wise
         try:
             return next(
-                connection
-                for connection in connections
-                if connection.name == dialect
+                connection for connection in connections if connection.name == dialect
             )
         except StopIteration:
             raise ConnectionNotFound(dialect)

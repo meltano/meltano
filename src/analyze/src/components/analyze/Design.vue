@@ -114,8 +114,8 @@ export default {
 
     toggleActiveReportInDashboard(dashboard) {
       const methodName = this.isActiveReportInDashboard(dashboard)
-                       ? 'removeReportFromDashboard'
-                       : 'addReportToDashboard';
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard';
       this.$store.dispatch(`dashboards/${methodName}`, {
         reportId: this.activeReport.id,
         dashboardId: dashboard.id,
@@ -234,21 +234,21 @@ export default {
 <template>
   <section>
     <div class="columns is-gapless">
-      
+
       <aside class="column is-one-quarter vh-scrollable">
         <nav class="panel has-background-white">
           <div class="panel-block">
             <div class="field has-addons">
-              <div class="control is-expanded">
+              <p class="control is-expanded">
                 <input class="input" type="text" placeholder="Filter" disabled>
-              </div>
-              <div class="control">
+              </p>
+              <p class="control">
                 <button class="button" disabled>
                   <span class="icon">
                     <font-awesome-icon icon="search"></font-awesome-icon>
                   </span>
                 </button>
-              </div>
+              </p>
             </div>
           </div>
 
@@ -393,7 +393,7 @@ export default {
 
         </nav>
       </aside>
-      
+
       <div class="column is-three-quarters vh-scrollable">
         <div class="columns is-vcentered">
 
@@ -435,15 +435,15 @@ export default {
               </p>
 
               <div class="control field" :class="{'has-addons': hasActiveReport()}">
-                <div class="control">
+                <p class="control">
                   <button
                     class="button is-interactive-primary is-outlined"
                     v-if="hasActiveReport()"
                     @click="updateReport();">
                     <span>Save</span>
                   </button>
-                </div>
-                <div class="control">
+                </p>
+                <p class="control">
                   <Dropdown
                     :disabled="!hasChartableResults"
                     :label="hasActiveReport() ? '' : 'Save'"
@@ -475,7 +475,7 @@ export default {
                       </div>
                     </div>
                   </Dropdown>
-                </div>
+                </p>
               </div>
 
               <div class="control field">
@@ -496,19 +496,19 @@ export default {
               </div>
 
               <div class="control field has-addons">
-                <div class="control">
+                <p class="control">
                   <button class="button is-success"
                           :class="{'is-loading': loadingQuery}"
                           :disabled="!currentSQL"
                           @click="runQuery">Run Query</button>
-                </div>
-                <div class="control">
+                </p>
+                <p class="control">
                   <div class="select is-fullwidth">
                     <select name="connection" v-model="dialect">
-                      <option v-for="connection in installedPlugins['connections']">{{connection.name}}</option>
+                      <option :key="connection.name" v-for="connection in installedPlugins.connections">{{connection.name}}</option>
                     </select>
                   </div>
-                </div>
+                </p>
               </div>
             </div>
           </div>
@@ -696,9 +696,9 @@ export default {
                   </div>
                   <div class="field-body">
                     <div class="field">
-                      <div class="control">
+                      <p class="control">
                         <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-                      </div>
+                      </p>
                     </div>
                   </div>
                 </div>

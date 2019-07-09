@@ -88,20 +88,20 @@ export default {
             <div class="level">
               <div class="level-left">
                 <div class="field has-addons">
-                  <div class="control">
+                  <p class="control">
                     <a
                       href="#"
                       class="button is-small"
                       :class="{'is-loading': loadingValidation}"
                       @click="lint">Lint</a>
-                  </div>
-                  <div class="control">
+                  </p>
+                  <p class="control">
                     <a
                       href="#"
                       class="button is-small"
                       :class="{'is-loading': loadingUpdate}"
                       @click="sync">Sync</a>
-                  </div>
+                  </p>
                 </div>
               </div>
               <div class="level-right">

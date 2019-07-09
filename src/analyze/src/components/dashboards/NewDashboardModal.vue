@@ -43,20 +43,20 @@ export default {
           <div>
             <div class="field">
             <label class="label">Name</label>
-            <div class="control">
+            <p class="control">
               <input class="input"
                       type="text"
                       placeholder="Name your dashboard"
                       v-model="saveDashboardSettings.name">
-            </div>
+            </p>
           </div>
           <div class="field">
             <label class="label">Description</label>
-            <div class="control">
+            <p class="control">
               <textarea class="textarea"
                         placeholder="Describe your dashboard for easier reference later"
                         v-model="saveDashboardSettings.description"></textarea>
-            </div>
+            </p>
           </div>
         </div>
       </section>
