@@ -13,6 +13,8 @@ class FilterOptionType(str, Enum):
     GREATER_THAN_OR_EQUAL_TO = "GREATER_THAN_OR_EQUAL_TO"
     GREATER_THAN = "GREATER_THAN"
     LIKE = "LIKE"
+    IS_NULL = "IS_NULL"
+    IS_NOT_NULL = "IS_NOT_NULL"
 
 
 FilterOptions = [
@@ -48,5 +50,15 @@ FilterOptions = [
         label="Like",
         description="Custom like expression",
         operation=FilterOptionType.LIKE,
+    ),
+    FilterOption(
+        label="Is Null",
+        description="Is null",
+        operation=FilterOptionType.IS_NULL,
+    ),
+    FilterOption(
+        label="Is Not Null",
+        description="Is not null",
+        operation=FilterOptionType.IS_NOT_NULL,
     ),
 ]
