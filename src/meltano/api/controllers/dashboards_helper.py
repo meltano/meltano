@@ -33,7 +33,6 @@ class DashboardsHelper:
             sql_dict = sqlHelper.get_sql(design, report["queryPayload"])
             outgoing_sql = sql_dict["sql"]
             aggregates = sql_dict["aggregates"]
-            db_table = sql_dict["db_table"]
 
             report["queryResults"] = sqlHelper.get_query_results(
                 connection_name, outgoing_sql

@@ -1,16 +1,39 @@
 import re
 
+from enum import Enum
 from typing import Dict, List, Tuple
 import networkx as nx
 
 from pypika import functions as fn
-from pypika import AliasedQuery, Query, Order, Table, Field
+from pypika import AliasedQuery, Query, Order, Table, Field, Criterion
 
 from networkx.readwrite import json_graph
 
 
 class ParseError(Exception):
     pass
+
+
+class MeltanoFilterExpressionType(Enum):
+    Unknown = "UNKNOWN"
+    LessThan = "less_than"
+    LessOrEqualThan = "less_or_equal_than"
+    EqualTo = "equal_to"
+    GreaterOrEqualThan = "greater_or_equal_than"
+    GreaterThan = "greater_than"
+    Like = "like"
+    IsNull = "is_null"
+    IsNotNull = "is_not_null"
+
+    def __eq__(self, other):
+        return self.value.lower() == other.value.lower()
+
+    @classmethod
+    def parse(cls, value: str):
+        try:
+            return next(e for e in cls if e.value.lower() == value)
+        except StopIteration:
+            return cls.Unknown
 
 
 class MeltanoBase:
@@ -358,6 +381,13 @@ class MeltanoTimeframe(MeltanoBase):
         return fn.Extract(period["part"], field, alias=self.period_alias(period))
 
     def copy_metadata(self, other_timeframe, requested_periods=None) -> None:
+        """
+        Copy the metadata from another timeframe, only keeping the
+         periods defined by requested_periods.
+
+        Allows us to copy everything from the Design, by keeping only the
+         periods requested in a Query.
+        """
         self.name = other_timeframe.name
 
         # Careful cause requested periods could be []
@@ -402,6 +432,127 @@ class MeltanoJoin(MeltanoBase):
         super().__init__(definition)
 
 
+class MeltanoFilter(MeltanoBase):
+    """
+    An internal representation of a Filter (WHERE or HAVING clause)
+    defined in a MeltanoQuery.
+
+    definition: {"table_name":, "name":, "expression":, "value":}
+
+    In the most simple case, the idea is to use it in order to generate a simple clause:
+      table_name.name {expression} value
+    e.g. gitlab_stats_per_user.project_name = 'Meltano'
+     or  COALESCE(SUM("gitlab_stats_per_user"."total_issues_authored"),0) > 5
+
+    Because we are using this dynamically over various intermediary tables,
+     in reality we use match(...) to find the Filters that match a specific attribute
+     and then criterion(...) to generate the proper clause based on a Pypika Field
+     (the Pypika Field knows at run time the table, the clause is evaluated against)
+
+    It provides access to the metada for the Filter:
+      {type, table_name, name, expression, value}
+    """
+
+    def __init__(self, definition: Dict = {}, design: MeltanoDesign = None) -> None:
+        # The design is used for filters in queries against specific designs
+        #  to validate that all the tables and attributes (columns/aggregates)
+        #  are properly defined in the design
+        self.design = design
+
+        self.expression_type = MeltanoFilterExpressionType.parse(
+            definition["expression"]
+        )
+
+        self.validate(definition)
+
+        super().__init__(definition)
+
+    def validate(self, definition: Dict) -> None:
+        """
+        Validate the Filter definition
+        """
+        table_name = definition.get("table_name", None)
+        attribute_name = definition.get("name", None)
+
+        if self.expression_type == MeltanoFilterExpressionType.Unknown:
+            raise NotImplementedError(
+                f"Unknown filter expression: {definition['expression']}."
+            )
+
+        if table_name is None:
+            raise ParseError(
+                f"A table name was not provided for filter '{definition}'."
+            )
+        elif attribute_name is None:
+            raise ParseError(
+                f"An (attribute) name was not provided for filter '{definition}'."
+            )
+
+        if (
+            definition.get("value", None) is None
+            and self.expression_type != MeltanoFilterExpressionType.IsNull
+            and self.expression_type != MeltanoFilterExpressionType.IsNotNull
+        ):
+            raise ParseError(
+                f"Filter expression: {self.expression_type} needs a non-empty value."
+            )
+
+        if self.design:
+            table_def = self.design.get_table(table_name)
+            if not table_def:
+                raise ParseError(
+                    f"Requested table {table_name} in filter '{definition}' is not defined in the design"
+                )
+
+            column_def = table_def.get_column(attribute_name)
+            aggregate_def = table_def.get_aggregate(attribute_name)
+            if not column_def and not aggregate_def:
+                raise ParseError(
+                    f"Requested column {table_name}.{attribute_name} in filter '{definition}' is not defined in the design"
+                )
+
+    def match(self, table_name: str, attribute_name: str) -> bool:
+        """
+        Return True if this filter is defined for the given table and attribute
+        """
+        return (
+            True
+            if (self.table_name == table_name and self.name == attribute_name)
+            else False
+        )
+
+    def criterion(self, field: Field) -> Criterion:
+        """
+        Generate the Pypika Criterion for this filter
+
+        field: Pypika Field as we don't know the base table this filter is
+                evaluated against (is it the base table or an intermediary table?)
+
+        We have to use the following cases as PyPika does not allow an str
+         representation of the clause on its where() and having() functions
+        """
+        if self.expression_type == MeltanoFilterExpressionType.LessThan:
+            return field < self.value
+        elif self.expression_type == MeltanoFilterExpressionType.LessOrEqualThan:
+            return field <= self.value
+        elif self.expression_type == MeltanoFilterExpressionType.EqualTo:
+            return field == self.value
+        elif self.expression_type == MeltanoFilterExpressionType.GreaterOrEqualThan:
+            return field >= self.value
+        elif self.expression_type == MeltanoFilterExpressionType.GreaterThan:
+            return field > self.value
+        elif self.expression_type == MeltanoFilterExpressionType.Like:
+            return field.like(self.value)
+        elif self.expression_type == MeltanoFilterExpressionType.IsNull:
+            return field.isnull()
+        elif self.expression_type == MeltanoFilterExpressionType.IsNotNull:
+            return field.notnull()
+        else:
+            raise NotImplementedError(
+                f"Unknown filter expression_type: {self.expression_type}."
+            )
+
+
 class MeltanoQuery(MeltanoBase):
     """
     An internal representation of a Query Definition sent to meltano for evaluation.
@@ -409,7 +560,7 @@ class MeltanoQuery(MeltanoBase):
     The definition dictionary is parsed and the information is stored in a
     structured way:
      - Tables with only the Columns, Timeframes and Aggregates requested
-     - Filters (WIP: access through the filters attribute at the moment)
+     - Filters
      - The join order
 
     It provides also access to additional metada for the query:
@@ -429,9 +580,15 @@ class MeltanoQuery(MeltanoBase):
         #  if it is not None
         self.schema = schema
 
-        # A collection of all tables that arte defined in the Query
+        # A collection of all tables that are defined in the Query
         #  with the Columns, Timeframes and Aggregates defined in the Query
         self.tables = []
+
+        # A collection of all the column and aggregate filters in the query
+        # column_filters --> WHERE clauses that use columns selected in the query
+        # aggregate_filters --> HAVING clauses that use aggregates computed in the query
+        self.column_filters = []
+        self.aggregate_filters = []
 
         # The proper join order that will be used for the query (list of table names)
         self.join_order = []
@@ -555,7 +712,7 @@ class MeltanoQuery(MeltanoBase):
 
                         self.join_order.append({"table": join, "on": join_on})
 
-                # Take care care for the single table, no join query
+                # Take care care for the single table, no join query case
                 if not self.join_order:
                     self.join_order.append({"table": primary_table["name"], "on": None})
 
@@ -564,8 +721,56 @@ class MeltanoQuery(MeltanoBase):
                     f'Requested table {related_table.get("name", None)} is not defined in the design'
                 )
 
+        # Parse and store the provided filters
+        filters = definition.get("filters", None)
+
+        if filters:
+            for column_filter in filters.get("columns", []):
+                # Generate (and automaticaly validate) the filter and then store it
+                mf = MeltanoFilter(definition=column_filter, design=self.design)
+                self.column_filters.append(mf)
+
+            for aggregate_filter in filters.get("aggregates", []):
+                # Generate (and automaticaly validate) the filter and then store it
+                mf = MeltanoFilter(definition=aggregate_filter, design=self.design)
+                self.aggregate_filters.append(mf)
+
     def joins_for_table(self, design_graph, source_table: str, target_table: str):
         return nx.shortest_path(design_graph, source=source_table, target=target_table)
+
+    def needs_hda(self) -> bool:
+        """
+        Check if this MeltanoQuery needs to generate an HDA query or not
+        """
+        has_join_columns = next(
+            filter(lambda x: len(x.get("columns", [])), self._definition["joins"]), None
+        )
+
+        has_join_aggregates = next(
+            filter(lambda x: len(x.get("aggregates", [])), self._definition["joins"]),
+            None,
+        )
+        has_base_table_aggregate = len(self._definition.get("aggregates", []))
+
+        if not has_join_columns and not has_join_aggregates:
+            return False
+        else:
+            return has_base_table_aggregate or has_join_aggregates
+
+    def get_query(self) -> Tuple:
+        """
+        Return the SQL query for this Query definition.
+
+        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
+        - sql: A string with the SQL:1999 compatible query
+        - (column_names, column_headers): The column names and headers of
+           the final result in the same order as the one defined by the query
+        - aggregate_columns: The aggregate columns in the query (fuly qualified)
+        """
+        if self.needs_hda():
+            return self.hda_query()
+        else:
+            return self.single_table_query()
 
     def single_table_query(self) -> Tuple:
         """
@@ -575,7 +780,7 @@ class MeltanoQuery(MeltanoBase):
         - sql: A string with the SQL:1999 compatible query
         - (column_names, column_headers): The column names and headers of
            the final result in the same order as the one defined by the query
-        - aggregate_columns: The aggregate columns in the query
+        - aggregate_columns: The aggregate columns in the query (fuly qualified)
         """
 
         # Lists with the column names and headers of the final result when the
@@ -587,6 +792,9 @@ class MeltanoQuery(MeltanoBase):
         select = []
         select_aggregates = []
         group_by_attributes = []
+
+        where = []
+        having = []
 
         base_query = Query
 
@@ -605,7 +813,7 @@ class MeltanoQuery(MeltanoBase):
                 base_query = base_query.join(pika_table).on(join["on"])
 
             if not (table.columns() or table.aggregates() or table.timeframes()):
-                # Return an empty query if nothing was requested
+                # After joining the table, skip the rest if nothing was requested
                 continue
 
             # Add all columns in the SELECT clause and as group_by attributes
@@ -616,6 +824,15 @@ class MeltanoQuery(MeltanoBase):
                 column_headers.append(c.label)
                 column_names.append(c.name)
 
+                # Also check if there is a filter for this column and add it
+                #  in the WHERE clase
+                for f in self.column_filters:
+                    if f.match(table.name, c.name):
+                        where.append(
+                            f.criterion(Field(c.column_name(), table=pika_table))
+                        )
+
+            # Add the timeframe columns in the SELECT clause and as group_by attributes
             for t in table.timeframes():
                 for period in t.periods:
                     select.append(t.period_sql(period, pika_table=pika_table))
@@ -632,13 +849,27 @@ class MeltanoQuery(MeltanoBase):
                 column_headers.append(a.label)
                 column_names.append(a.name)
 
+                # Also check if there is a filter for this aggregate and add it
+                #  in the HAVING clase
+                for f in self.aggregate_filters:
+                    if f.match(table.name, a.name):
+                        field = a.qualified_sql(pika_table=pika_table)
+                        # remove the alias before adding it to the having clause
+                        field.alias = None
+                        having.append(f.criterion(field))
+
         # Generate the query
-        no_join_query = (
-            base_query.select(*select)
-            .select(*select_aggregates)
-            .groupby(*group_by_attributes)
-            .limit(self.limit or 50)
-        )
+        no_join_query = base_query.select(*select).select(*select_aggregates)
+
+        if where:
+            # The check is necessary as PyPika does not accept in where()
+            #  the EmptyCriterion that is generated by an empty array
+            no_join_query = no_join_query.where(Criterion.all(where))
+
+        no_join_query = no_join_query.groupby(*group_by_attributes)
+
+        if having:
+            no_join_query = no_join_query.having(Criterion.all(having))
 
         # Add the Order By clause(s) for the final query
         if self.order:
@@ -673,7 +904,10 @@ class MeltanoQuery(MeltanoBase):
             for field in group_by_attributes:
                 no_join_query = no_join_query.orderby(field, order=order)
 
-        final_query = self.add_schema_to_hda_query(str(no_join_query))
+        # Add a Limit (by default 50)
+        no_join_query = no_join_query.limit(self.limit or 50)
+
+        final_query = self.add_schema_to_query(str(no_join_query))
 
         if len(final_query) > 0:
             final_query = final_query + ";"
@@ -700,6 +934,8 @@ class MeltanoQuery(MeltanoBase):
         column_headers = []
         column_names = []
         aggregate_columns = []
+
+        where = []
 
         # Build the base_join table
         base_join_query = Query
@@ -743,6 +979,14 @@ class MeltanoQuery(MeltanoBase):
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
                 groupby_columns_selected.add(c.column_name())
 
+                # Also check if there is a filter for this column and add it
+                #  in the WHERE clase
+                for f in self.column_filters:
+                    if f.match(table.name, c.name):
+                        where.append(
+                            f.criterion(Field(c.column_name(), table=pika_table))
+                        )
+
             for a in table.aggregates():
                 aggregate_columns.append(a.alias())
 
@@ -765,6 +1009,9 @@ class MeltanoQuery(MeltanoBase):
                     column_names.append(t.period_alias(period))
 
         base_join_query = base_join_query.select(*select)
+
+        if where:
+            base_join_query = base_join_query.where(Criterion.all(where))
 
         # Iterativelly build the HDA query by starting with the base_join
         #  and then adding base_XXX and XXX_stats with clauses for each table
@@ -810,6 +1057,22 @@ class MeltanoQuery(MeltanoBase):
                 .select(*select_aggregates)
                 .groupby(*group_by_attributes)
             )
+
+            # Add a Having Clause
+            having = []
+
+            for a in table.aggregates():
+                for f in self.aggregate_filters:
+                    if f.match(table.name, a.name):
+                        field = a.qualified_sql(base_db_table)
+                        # remove the alias before adding it to the having clause
+                        field.alias = None
+                        having.append(f.criterion(field))
+
+            if having:
+                stats_query = stats_query.having(Criterion.all(having))
+
+            # Add the Stats with clause to the hda query
             hda_query = hda_query.with_(stats_query, stats_db_table)
 
             stats_pika_table = Table(stats_db_table, alias=stats_db_table)
@@ -903,14 +1166,14 @@ class MeltanoQuery(MeltanoBase):
             for field in orderby_fields:
                 hda_query = hda_query.orderby(field, order=order)
 
-        final_query = self.add_schema_to_hda_query(str(hda_query))
+        final_query = self.add_schema_to_query(str(hda_query))
 
         if len(final_query) > 0:
             final_query = final_query + ";"
 
         return (final_query, column_headers, column_names, aggregate_columns)
 
-    def add_schema_to_hda_query(self, hda_query: str) -> str:
+    def add_schema_to_query(self, query: str) -> str:
         """
         This is a temporary solution to address an issue in the way pypika
         validates join conditions.
@@ -932,9 +1195,9 @@ class MeltanoQuery(MeltanoBase):
           Pretty ugly but the best we got at the moment.
         """
         if self.schema is None or self.schema == "":
-            return hda_query
+            return query
 
-        schema_query = hda_query
+        schema_query = query
         for join in self.join_order:
             if join["on"] is None:
                 schema_query = schema_query.replace(
