@@ -392,6 +392,95 @@ export default {
 
           <nav class="panel is-unselectable">
 
+            <!-- Base table first followed by join tables -->
+            <template>
+              <a
+                class="panel-block
+                has-background-white-bis
+                has-text-grey
+                is-expandable"
+                :class="{'is-collapsed': design.related_table.collapsed}"
+                @click="tableRowClicked(design.related_table)">
+                <span class="icon is-small panel-icon">
+                  <font-awesome-icon icon="table"></font-awesome-icon>
+                </span>
+                {{design.label}}
+                </a>
+            </template>
+            <template v-if="!design.related_table.collapsed">
+              <a class="panel-block
+                  panel-block-heading
+                  has-background-white"
+                  v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
+                Columns
+              </a>
+              <template v-for="timeframe in design.related_table.timeframes">
+                <a class="panel-block dimension-group"
+                    :key="timeframe.label"
+                    v-if="!timeframe.related_view.hidden"
+                    @click="timeframeSelected(timeframe)"
+                    :class="{'is-active': timeframe.selected}">
+                  {{timeframe.label}}
+                </a>
+                <template v-for="period in timeframe.periods">
+                  <a class="panel-block indented"
+                      :key="period.label"
+                      @click="timeframePeriodSelected(period)"
+                      v-if="timeframe.selected"
+                      :class="{'is-active': period.selected}">
+                    {{period.label}}
+                  </a>
+                </template>
+              </template>
+              <a class="panel-block space-between has-text-weight-medium"
+                  v-for="column in design.related_table.columns"
+                  :key="column.label"
+                  v-if="!column.hidden"
+                  @click="columnSelected(column)"
+                  :class="{'is-active': column.selected}">
+                {{column.label}}
+                <button
+                  class="button is-small"
+                  @click.stop='toggleFilterAttribute(design.from, column, "column")'>
+                  <span
+                    class="icon"
+                    :class="{
+                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, column.name, 'column'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, column.name, 'column'),
+                    }">
+                    <font-awesome-icon icon="filter"></font-awesome-icon>
+                  </span>
+                </button>
+              </a>
+              <!-- eslint-disable-next-line vue/require-v-for-key -->
+              <a class="panel-block
+                  panel-block-heading
+                  has-background-white"
+                  v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
+                Aggregates
+              </a>
+              <a class="panel-block space-between has-text-weight-medium"
+                  v-for="aggregate in design.related_table.aggregates"
+                  :key="aggregate.label"
+                  @click="aggregateSelected(aggregate)"
+                  :class="{'is-active': aggregate.selected}">
+                {{aggregate.label}}
+                <button
+                  class="button is-small"
+                  @click.stop='toggleFilterAttribute(design.from, aggregate, "aggregate")'>
+                  <span
+                    class="icon"
+                    :class="{
+                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
+                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
+                    }">
+                    <font-awesome-icon icon="filter"></font-awesome-icon>
+                  </span>
+                </button>
+              </a>
+            </template>
+
+            <!-- Join table(s) second, preceded by the base table -->
             <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
             <template v-if="hasJoins">
               <template v-for="join in design.joins">
@@ -494,92 +583,6 @@ export default {
                   </template>
                 </template>
               </template>
-            </template>
-            <template>
-              <a
-                class="panel-block
-                has-background-white-bis
-                has-text-grey
-                is-expandable"
-                :class="{'is-collapsed': design.related_table.collapsed}"
-                @click="tableRowClicked(design.related_table)">
-                <span class="icon is-small panel-icon">
-                  <font-awesome-icon icon="table"></font-awesome-icon>
-                </span>
-                {{design.label}}
-                </a>
-            </template>
-            <template v-if="!design.related_table.collapsed">
-              <a class="panel-block
-                  panel-block-heading
-                  has-background-white"
-                  v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
-                Columns
-              </a>
-              <template v-for="timeframe in design.related_table.timeframes">
-                <a class="panel-block dimension-group"
-                    :key="timeframe.label"
-                    v-if="!timeframe.related_view.hidden"
-                    @click="timeframeSelected(timeframe)"
-                    :class="{'is-active': timeframe.selected}">
-                  {{timeframe.label}}
-                </a>
-                <template v-for="period in timeframe.periods">
-                  <a class="panel-block indented"
-                      :key="period.label"
-                      @click="timeframePeriodSelected(period)"
-                      v-if="timeframe.selected"
-                      :class="{'is-active': period.selected}">
-                    {{period.label}}
-                  </a>
-                </template>
-              </template>
-              <a class="panel-block space-between has-text-weight-medium"
-                  v-for="column in design.related_table.columns"
-                  :key="column.label"
-                  v-if="!column.hidden"
-                  @click="columnSelected(column)"
-                  :class="{'is-active': column.selected}">
-                {{column.label}}
-                <button
-                  class="button is-small"
-                  @click.stop='toggleFilterAttribute(design.from, column, "column")'>
-                  <span
-                    class="icon"
-                    :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, column.name, 'column'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, column.name, 'column'),
-                    }">
-                    <font-awesome-icon icon="filter"></font-awesome-icon>
-                  </span>
-                </button>
-              </a>
-              <!-- eslint-disable-next-line vue/require-v-for-key -->
-              <a class="panel-block
-                  panel-block-heading
-                  has-background-white"
-                  v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
-                Aggregates
-              </a>
-              <a class="panel-block space-between has-text-weight-medium"
-                  v-for="aggregate in design.related_table.aggregates"
-                  :key="aggregate.label"
-                  @click="aggregateSelected(aggregate)"
-                  :class="{'is-active': aggregate.selected}">
-                {{aggregate.label}}
-                <button
-                  class="button is-small"
-                  @click.stop='toggleFilterAttribute(design.from, aggregate, "aggregate")'>
-                  <span
-                    class="icon"
-                    :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
-                    }">
-                    <font-awesome-icon icon="filter"></font-awesome-icon>
-                  </span>
-                </button>
-              </a>
             </template>
 
           </nav>
