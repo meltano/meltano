@@ -135,10 +135,8 @@ export default {
       });
     },
 
-    toggleFilterAttribute(tableName, attribute, filterType) {
-      const hasFilter = this.getIsAttributeInFilters(tableName, attribute.name, filterType);
-      const methodName = hasFilter ? 'remove' : 'add';
-      this.$store.dispatch(`designs/${methodName}Filter`, { tableName, attribute, filterType });
+    jumpToFilters() {
+      console.log('jump to filters');
     },
 
     inputFocused(field) {
@@ -467,14 +465,10 @@ export default {
                   :class="{'is-active': column.selected}">
                 {{column.label}}
                 <button
+                  v-if="getIsAttributeInFilters(design.from, column.name, 'column')"
                   class="button is-small"
-                  @click.stop='toggleFilterAttribute(design.from, column, "column")'>
-                  <span
-                    class="icon"
-                    :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, column.name, 'column'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, column.name, 'column'),
-                    }">
+                  @click.stop='jumpToFilters'>
+                  <span class="icon has-text-interactive-secondary">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
                 </button>
@@ -493,14 +487,10 @@ export default {
                   :class="{'is-active': aggregate.selected}">
                 {{aggregate.label}}
                 <button
+                  v-if="getIsAttributeInFilters(design.from, aggregate.name, 'aggregate')"
                   class="button is-small"
-                  @click.stop='toggleFilterAttribute(design.from, aggregate, "aggregate")'>
-                  <span
-                    class="icon"
-                    :class="{
-                      'has-text-grey-lighter': !getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
-                      'has-text-interactive-secondary': getIsAttributeInFilters(design.from, aggregate.name, 'aggregate'),
-                    }">
+                  @click.stop='jumpToFilters'>
+                  <span class="icon has-text-interactive-secondary">
                     <font-awesome-icon icon="filter"></font-awesome-icon>
                   </span>
                 </button>
@@ -567,14 +557,10 @@ export default {
                       @click="joinColumnSelected(join, column)">
                       {{column.label}}
                       <button
+                        v-if="getIsAttributeInFilters(join.name, column.name, 'column')"
                         class="button is-small"
-                        @click.stop='toggleFilterAttribute(join.name, column, "column")'>
-                        <span
-                          class="icon"
-                          :class="{
-                            'has-text-grey-lighter': !getIsAttributeInFilters(join.name, column.name, 'column'),
-                            'has-text-interactive-secondary': getIsAttributeInFilters(join.name, column.name, 'column'),
-                          }">
+                        @click.stop='jumpToFilters'>
+                        <span class="icon has-text-interactive-secondary">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
                       </button>
@@ -595,14 +581,10 @@ export default {
                       @click="joinAggregateSelected(join, aggregate)">
                       {{aggregate.label}}
                       <button
+                        v-if="getIsAttributeInFilters(join.name, aggregate.name, 'aggregate')"
                         class="button is-small"
-                        @click.stop='toggleFilterAttribute(join.name, aggregate, "aggregate")'>
-                        <span
-                          class="icon"
-                          :class="{
-                            'has-text-grey-lighter': !getIsAttributeInFilters(join.name, aggregate.name, 'aggregate'),
-                            'has-text-interactive-secondary': getIsAttributeInFilters(join.name, aggregate.name, 'aggregate'),
-                          }">
+                        @click.stop='jumpToFilters'>
+                        <span class="icon has-text-interactive-secondary">
                           <font-awesome-icon icon="filter"></font-awesome-icon>
                         </span>
                       </button>
