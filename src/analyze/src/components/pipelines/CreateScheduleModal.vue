@@ -113,7 +113,7 @@ export default {
       </header>
       <section class="modal-card-body">
 
-        <table class="table pipelines-table is-fullwidth">
+        <table class="table is-fullwidth">
 
           <ScheduleTableHead />
 

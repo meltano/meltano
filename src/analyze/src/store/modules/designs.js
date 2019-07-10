@@ -141,6 +141,29 @@ const getters = {
     return getters.filtersCount() > 0;
   },
 
+  getAttributesByTable() {
+    const attributeTables = [];
+    const design = state.design;
+    const attributeFilter = attr => !attr.hidden;
+    if (design.label) {
+      attributeTables.push({
+        label: design.label,
+        columns: design.related_table.columns.filter(attributeFilter),
+        aggregates: design.related_table.aggregates.filter(attributeFilter),
+      });
+    }
+    if (design.joins) {
+      design.joins.forEach((join) => {
+        attributeTables.push({
+          label: join.label,
+          columns: join.related_table.columns.filter(attributeFilter),
+          aggregates: join.related_table.aggregates.filter(attributeFilter),
+        });
+      });
+    }
+    return attributeTables;
+  },
+
   getFilter(tableName, attributeName, filterType) {
     return getters.getFiltersByType(filterType).find(filter => filter.attributeName === attributeName && filter.tableName === tableName);
   },
