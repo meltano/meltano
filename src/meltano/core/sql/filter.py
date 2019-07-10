@@ -19,30 +19,30 @@ class FilterOptionType(str, Enum):
 
 FilterOptions = [
     FilterOption(
-        label="< Less than",
+        label="Less than",
         description="Less than",
         operation=FilterOptionType.LESS_THAN,
     ),
     FilterOption(
-        label="<= Less than or equal",
+        label="Less than or equal",
         description="Less than or equal",
         operation=FilterOptionType.LESS_THAN_OR_EQUAL_TO,
     ),
     FilterOption(
-        label="= Equal to", description="Equal to", operation=FilterOptionType.EQUAL_TO
+        label="Equal to", description="Equal to", operation=FilterOptionType.EQUAL_TO
     ),
     FilterOption(
-        label="!= Not equal to",
+        label="Not equal to",
         description="Not equal to",
         operation=FilterOptionType.NOT_EQUAL_TO,
     ),
     FilterOption(
-        label=">= Greater than or equal",
+        label="Greater than or equal",
         description="Greater than or equal",
         operation=FilterOptionType.GREATER_THAN_OR_EQUAL_TO,
     ),
     FilterOption(
-        label="> Greater than",
+        label="Greater than",
         description="Greater than",
         operation=FilterOptionType.GREATER_THAN,
     ),
