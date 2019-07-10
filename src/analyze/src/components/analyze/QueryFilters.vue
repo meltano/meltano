@@ -3,6 +3,19 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'QueryFilters',
+  data() {
+    return {
+      addFilterModel: {
+        attributeHelper: {
+          attribute: null,
+          type: '',
+          tableName: '',
+        },
+        operation: '',
+        value: '',
+      },
+    };
+  },
   computed: {
     ...mapState('designs', [
       'filterOptions',
@@ -12,12 +25,29 @@ export default {
       'getAttributesByTable',
       'hasFilters',
     ]),
+    getFilterInputType() {
+      return this.addFilterModel.attributeHelper.type === 'aggregate' ? 'number' : 'text';
+    },
+    isValidAdd() {
+      const vm = this.addFilterModel;
+      return vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.operation && vm.value;
+    },
   },
   methods: {
     ...mapActions('designs', [
-      'toggleFilter',
+      'addFilter',
       'removeFilter',
     ]),
+    addFilter() {
+      const vm = this.addFilterModel;
+      this.$store.dispatch('designs/addFilter', {
+        tableName: vm.attributeHelper.tableName,
+        attribute: vm.attributeHelper.attribute,
+        filterType: vm.attributeHelper.type,
+        operation: vm.operation,
+        value: vm.value,
+      });
+    },
   },
 };
 </script>
@@ -64,19 +94,31 @@ export default {
             <p class="control is-expanded">
               <span
                 class="select is-fullwidth is-small">
-                <select>
+                <select v-model='addFilterModel.attributeHelper'>
                   <optgroup
-                    v-for="table in getAttributesByTable"
-                    :key='table.label'
-                    :label="table.label">
+                    v-for="attributeTable in getAttributesByTable"
+                    :key='attributeTable.tableLabel'
+                    :label="attributeTable.tableLabel">
                     <option disabled>Columns</option>
                     <option
-                      v-for="column in table.columns"
-                      :key='column.label'>{{column.label}}</option>
+                      v-for="column in attributeTable.columns"
+                      :key='column.label'
+                      :value="{
+                        attribute: column,
+                        tableName: attributeTable.tableName,
+                        type: 'column'}">
+                      {{column.label}}
+                    </option>
                     <option disabled>Aggregates</option>
                     <option
-                      v-for="aggregate in table.aggregates"
-                      :key='aggregate.label'>{{aggregate.label}}</option>
+                      v-for="aggregate in attributeTable.aggregates"
+                      :key='aggregate.label'
+                      :value="{
+                        attribute: aggregate,
+                        tableName: attributeTable.tableName,
+                        type: 'aggregate'}">
+                      {{aggregate.label}}
+                    </option>
                   </optgroup>
                 </select>
               </span>
@@ -86,10 +128,11 @@ export default {
             <p class="control is-expanded">
               <span
                 class="select is-fullwidth is-small">
-                <select>
+                <select v-model='addFilterModel.operation'>
                   <option
                     v-for="filterOption in filterOptions"
-                    :key='filterOption.label'>{{filterOption.label}}</option>
+                    :key='filterOption.label'
+                    :value='filterOption.operation'>{{filterOption.label}}</option>
                 </select>
               </span>
             </p>
@@ -98,20 +141,26 @@ export default {
             <p class="control is-expanded">
               <input
                 class="input is-small"
-                type="text"
-                ref='value'
+                :type="getFilterInputType"
                 @focus="$event.target.select()"
+                v-model='addFilterModel.value'
                 placeholder="Filter value">
             </p>
           </td>
           <td>
             <div class="control">
-              <button class="button is-small is-fullwidth">Delete</button>
+              <button
+                class="button is-small is-fullwidth is-interactive-primary is-outlined"
+                :disabled='!isValidAdd'
+                @click='addFilter'>
+                Add</button>
             </div>
           </td>
         </tr>
+
       </tbody>
     </table>
+
   </div>
 </template>
 
