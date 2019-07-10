@@ -146,7 +146,8 @@ const getters = {
     const attributeFilter = attr => !attr.hidden;
     if (design.label) {
       attributeTables.push({
-        label: design.label,
+        tableLabel: design.label,
+        tableName: design.from,
         columns: design.related_table.columns.filter(attributeFilter),
         aggregates: design.related_table.aggregates.filter(attributeFilter),
       });
@@ -154,7 +155,8 @@ const getters = {
     if (design.joins) {
       design.joins.forEach((join) => {
         attributeTables.push({
-          label: join.label,
+          tableLabel: join.label,
+          tableName: join.name,
           columns: join.related_table.columns.filter(attributeFilter),
           aggregates: join.related_table.aggregates.filter(attributeFilter),
         });
@@ -473,13 +475,12 @@ const actions = {
     });
   },
 
-  addFilter({ commit }, { tableName, attribute, filterType }) {
+  addFilter({ commit }, { tableName, attribute, filterType, operation = '', value = '' }) {
     const filter = {
       tableName,
       attributeName: attribute.name,
-      operation: '',
-      value: '',
-      nullState: '',
+      operation,
+      value,
     };
     commit('addFilter', { filter, filterType });
 

@@ -19,9 +19,7 @@ class FilterOptionType(str, Enum):
 
 FilterOptions = [
     FilterOption(
-        label="Less than",
-        description="Less than",
-        operation=FilterOptionType.LESS_THAN,
+        label="Less than", description="Less than", operation=FilterOptionType.LESS_THAN
     ),
     FilterOption(
         label="Less than or equal",
@@ -52,9 +50,7 @@ FilterOptions = [
         operation=FilterOptionType.LIKE,
     ),
     FilterOption(
-        label="Is Null",
-        description="Is null",
-        operation=FilterOptionType.IS_NULL,
+        label="Is Null", description="Is null", operation=FilterOptionType.IS_NULL
     ),
     FilterOption(
         label="Is Not Null",
