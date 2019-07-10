@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'QueryFilters',
@@ -49,11 +49,11 @@ export default {
       this.selectivelyClearAddFilterModel();
     },
     removeFilter() {
-      console.log('removeFilter');
+      //
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
-    }
+    },
   },
 };
 </script>
