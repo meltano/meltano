@@ -49,6 +49,9 @@ export default {
     forceClose() {
       this.isOpen = false;
     },
+    forceOpen() {
+      this.isOpen = true;
+    },
     toggleDropdown() {
       this.isOpen = !this.isOpen;
     },
