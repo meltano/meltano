@@ -56,7 +56,7 @@ export default {
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
-    }
+    },
   },
 };
 </script>
