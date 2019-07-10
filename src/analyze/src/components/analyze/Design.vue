@@ -396,9 +396,8 @@ export default {
                   <Dropdown
                     :label="hasFilters ? 'Edit' : 'None'"
                     :button-classes="`is-small ${hasFilters ? 'has-text-interactive-secondary' : ''}`"
-                    ref='filter-dropdown'
-                    is-full-width>
-                    <div class="dropdown-content">
+                    ref='filter-dropdown'>
+                    <div class="dropdown-content" style='width: 600px;'>
                       <div class="dropdown-item">
                         <QueryFilters></QueryFilters>
                       </div>

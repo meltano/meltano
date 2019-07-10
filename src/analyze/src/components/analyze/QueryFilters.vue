@@ -25,6 +25,9 @@ export default {
       'getAttributesByTable',
       'hasFilters',
     ]),
+    getFlattenedFilters() {
+      return this.filters ? this.filters.columns.concat(this.filters.aggregates) : [];
+    },
     getFilterInputType() {
       return this.addFilterModel.attributeHelper.type === 'aggregate' ? 'number' : 'text';
     },
@@ -34,10 +37,6 @@ export default {
     },
   },
   methods: {
-    ...mapActions('designs', [
-      'addFilter',
-      'removeFilter',
-    ]),
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
@@ -47,7 +46,14 @@ export default {
         operation: vm.operation,
         value: vm.value,
       });
+      this.selectivelyClearAddFilterModel();
     },
+    removeFilter() {
+      console.log('removeFilter');
+    },
+    selectivelyClearAddFilterModel() {
+      this.addFilterModel.value = '';
+    }
   },
 };
 </script>
@@ -157,6 +163,71 @@ export default {
             </div>
           </td>
         </tr>
+
+        <template v-if='hasFilters'>
+          <br>
+
+          <tr
+            v-for='filter in getFlattenedFilters'
+            :key='`${filter.tableName}-${filter.attributeName}`'>
+            <td>
+              <p class="control is-expanded">
+                <span
+                  class="select is-fullwidth is-small">
+                  <select v-model='filter.attributeName'>
+                    <optgroup
+                      v-for="attributeTable in getAttributesByTable"
+                      :key='attributeTable.tableLabel'
+                      :label="attributeTable.tableLabel">
+                      <option disabled>Columns</option>
+                      <option
+                        v-for="column in attributeTable.columns"
+                        :key='column.label'>
+                        {{column.label}}
+                      </option>
+                      <option disabled>Aggregates</option>
+                      <option
+                        v-for="aggregate in attributeTable.aggregates"
+                        :key='aggregate.label'>
+                        {{aggregate.label}}
+                      </option>
+                    </optgroup>
+                  </select>
+                </span>
+              </p>
+            </td>
+            <td>
+              <p class="control is-expanded">
+                <span
+                  class="select is-fullwidth is-small">
+                  <select v-model='filter.operation'>
+                    <option
+                      v-for="filterOption in filterOptions"
+                      :key='filterOption.label'>{{filterOption.label}}</option>
+                  </select>
+                </span>
+              </p>
+            </td>
+            <td>
+              <p class="control is-expanded">
+                <input
+                  class="input is-small"
+                  type="text"
+                  @focus="$event.target.select()"
+                  v-model='filter.value'
+                  placeholder="Filter value">
+              </p>
+            </td>
+            <td>
+              <div class="control">
+                <button
+                  class="button is-small is-fullwidth"
+                  @click='removeFilter'>
+                  Remove</button>
+              </div>
+            </td>
+          </tr>
+        </template>
 
       </tbody>
     </table>
