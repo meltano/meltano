@@ -104,7 +104,7 @@ export default {
             </div>
             <div class="level-right">
               <div class="level-item content is-small flex-column">
-                <p class="connector-name has-text-weight-bold">{{ connection }}</p>
+                <p class="is-uppercase has-text-weight-bold">{{ connection }}</p>
                 <div class="buttons are-small">
                   <a class="button is-interactive-primary flex-grow-1"
                      @click="configureConnection(connection)">Configure</a>
@@ -116,7 +116,7 @@ export default {
       </div>
     </div>
 
-    <div class="column is-two-third" rel="container" v-if="configSettings">
+    <div class="column" rel="container" v-if="configSettings">
       <h2 class="title is-5">Configuration</h2>
       <ConnectorSettings v-if='connectionName'
                          class="box"
@@ -152,9 +152,5 @@ export default {
 .connector-logo {
   max-height: 48px;
   object-fit: scale-down;
-}
-
-.connector-name {
-  text-transform: uppercase;
 }
 </style>
