@@ -84,7 +84,7 @@ export default {
       <section>
 
         <div class="columns is-gapless">
-          <aside class="column is-one-quarter vh-scrollable">
+          <aside class="column is-one-quarter">
             <div class="level">
               <div class="level-left">
                 <div class="field has-addons">
@@ -169,7 +169,7 @@ export default {
 
             </template>
           </aside>
-          <div class="column is-three-quarters vh-scrollable">
+          <div class="column is-three-quarters">
             <div v-if="!activeView.populated">
               <div
                 class="empty-state
