@@ -56,7 +56,7 @@ export default {
     <div class="container view-body is-fluid">
       <section>
         <div class="columns is-gapless">
-          <div class="column is-one-quarter vh-scrollable">
+          <div class="column is-one-quarter">
             <ul class="menu-list">
               <router-link
                 tag="li"
@@ -71,7 +71,7 @@ export default {
             </ul>
           </div>
 
-          <div class="column is-three-quarters vh-scrollable">
+          <div class="column is-three-quarters">
             <router-view />
           </div>
         </div>

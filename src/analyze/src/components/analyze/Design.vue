@@ -6,6 +6,7 @@ import Dropdown from '@/components/generic/Dropdown';
 import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
 import QueryFilters from '@/components/analyze/QueryFilters';
 import ResultTable from '@/components/analyze/ResultTable';
+import utils from '@/utils/utils';
 
 export default {
   name: 'Design',
@@ -108,7 +109,8 @@ export default {
     },
 
     jumpToFilters() {
-      console.log('jump to filters');
+      utils.scrollToTop();
+      this.$refs['filter-dropdown'].forceOpen();
     },
 
     inputFocused(field) {
@@ -366,6 +368,7 @@ export default {
                   <Dropdown
                     :label="hasFilters ? 'Edit' : 'None'"
                     :button-classes="`is-small ${hasFilters ? 'has-text-interactive-secondary' : ''}`"
+                    ref='filter-dropdown'
                     is-full-width>
                     <div class="dropdown-content">
                       <div class="dropdown-item">
