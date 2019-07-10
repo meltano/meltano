@@ -18,6 +18,7 @@ class TestCliAdd:
             (PluginType.TRANSFORMERS, "dbt"),
             (PluginType.TRANSFORMS, "tap-carbon-intensity"),
             (PluginType.ORCHESTRATORS, "airflow"),
+            (PluginType.CONNECTIONS, "postgresql"),
         ],
     )
     def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
@@ -25,17 +26,19 @@ class TestCliAdd:
         with pytest.raises(PluginMissingError):
             config_service.find_plugin(plugin_name, plugin_type=plugin_type)
 
-        res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
+        with mock.patch(
+            "meltano.cli.add.PluginInstallService.install_plugin"
+        ) as install_plugin_mock:
+            install_plugin_mock.return_value = mock.Mock(
+                stdout=f"Mocked {plugin_name} install."
+            )
+            res = cli_runner.invoke(cli, ["add", plugin_type.cli_command, plugin_name])
 
         assert res.exit_code == 0, res.stdout
         assert f"Installed '{plugin_name}'." in res.stdout
 
         project.reload()
         plugin = config_service.find_plugin(plugin_name, plugin_type)
-
-        if plugin.name == "airflow":
-            assert project.plugin_dir(plugin, "airflow.cfg").exists()
-            assert project.plugin_dir(plugin, "airflow.db").exists()
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
@@ -86,5 +89,4 @@ class TestCliAdd:
         assert plugin.name == "tap-custom"
         assert plugin.executable == "tap-custom-bin"
 
-        service.create_venv.assert_called_once_with(plugin)
         service.install_plugin.assert_called_once_with(plugin)

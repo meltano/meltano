@@ -293,18 +293,9 @@ connections:
       - name: password
         value: warehouse
       - name: host
-        value: 'localhost:5432'
+        value: 'localhost:5502'
       - name: dbname
         value: warehouse
       - name: schema
         value: analytics
         env: PG_SCHEMA
-  - name: snowflake
-    namespace: snowflake
-    settings:
-      - name: account
-      - name: user
-      - name: password
-      - name: role
-      - name: warehouse
-      - name: database

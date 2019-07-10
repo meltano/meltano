@@ -66,16 +66,14 @@ export default {
         this.$router.push({ name: 'connections' });
       }
     },
-    installConnection(connection) {
+    configureConnection(connection) {
       this.$store.dispatch('plugins/addPlugin', {
         pluginType: 'connections',
         name: connection,
-      })
-        .then(this.selectConnection(connection));
-    },
-    selectConnection(connection) {
-      this.connectionName = connection;
-      this.getConnectionConfiguration(connection);
+      }).then(() => {
+        this.connectionName = connection;
+        this.getConnectionConfiguration(connection);
+      });
     },
     saveConfig() {
       this.$store.dispatch('configuration/savePluginConfiguration', {
@@ -98,23 +96,18 @@ export default {
              :key="`${connection}-${index}`">
           <div class="tile level box">
             <div class="level-left">
-              <div class="image level-item is-48x48">
-                <ConnectorLogo
-                  :connector='connection'
-                  :is-grayscale='!getIsPluginInstalled("connections", connection)' />
+              <div class="level-item flex-column has-text-left">
+                <ConnectorLogo class="connector-logo"
+                               :connector='connection'
+                               :is-grayscale='!getIsPluginInstalled("connections", connection)' />
               </div>
             </div>
-            <span class="level-item">{{ connection }}</span>
             <div class="level-right">
-              <div class="level-item content is-small">
+              <div class="level-item content is-small flex-column">
+                <p class="connector-name has-text-weight-bold">{{ connection }}</p>
                 <div class="buttons are-small">
-                  <a v-if="!getIsPluginInstalled('connections', connection)"
-                     class="button is-interactive-primary flex-grow-1"
-                     @click="installConnection(connection)">Install</a>
-
-                  <a v-else
-                     class="button is-interactive-primary flex-grow-1"
-                     @click="selectConnection(connection)">Configure</a>
+                  <a class="button is-interactive-primary flex-grow-1"
+                     @click="configureConnection(connection)">Configure</a>
                 </div>
               </div>
             </div>
@@ -154,5 +147,14 @@ export default {
 
 .flex-column {
   flex-direction: column;
+}
+
+.connector-logo {
+  max-height: 48px;
+  object-fit: scale-down;
+}
+
+.connector-name {
+  text-transform: uppercase;
 }
 </style>

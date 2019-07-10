@@ -3,6 +3,7 @@ import yaml
 import json
 import click
 import sys
+import logging
 from urllib.parse import urlparse
 
 from . import cli
@@ -36,7 +37,12 @@ def add(ctx, project, custom, engine_uri):
     project_engine(project, engine_uri, default=True)
 
     if custom:
-        if ctx.invoked_subcommand in ("transformer", "transform", "orchestrator"):
+        if ctx.invoked_subcommand in (
+            "transformer",
+            "transform",
+            "orchestrator",
+            "connections",
+        ):
             click.secho(f"--custom is not supported for {ctx.invoked_subcommand}")
             raise click.Abort()
 
@@ -168,8 +174,7 @@ def add_plugin(
 
         click.secho(f"Added and installed {plugin_type} '{plugin_name}'.", fg="green")
     except PluginNotInstallable as install_err:
-        pass
-        # logging.debug(f"{plugin_type} is not installable, skipping install.")
+        logging.info(f"{plugin_type} is not installable, skipping install.")
     except SubprocessError as proc_err:
         click.secho(str(proc_err), fg="red")
         click.secho(proc_err.process.stderr, err=True)

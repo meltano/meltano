@@ -3,6 +3,7 @@ meltano.yml: |
   plugins:
     connections:
       - name: sqlite
+      - name: postgresql
   version: 1.0
   send_anonymous_usage_stats: True
 README.md: ""

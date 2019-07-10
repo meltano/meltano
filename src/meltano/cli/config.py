@@ -8,18 +8,75 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import SettingsService
 
 
-@cli.command()
+@cli.group(invoke_without_command=True)
 @project
 @click.argument("plugin_name")
+@click.pass_context
 @db_options
-def config(project, plugin_name, engine_uri):
+def config(ctx, project, plugin_name, engine_uri):
     config = ConfigService(project)
     plugin = config.find_plugin(plugin_name)
 
     _, Session = project_engine(project, engine_uri, default=True)
     session = Session()
-    try:
-        settings = SettingsService(session, project)
+    settings = SettingsService(session, project)
+
+    ctx.obj["settings"] = settings
+    ctx.obj["plugin"] = plugin
+
+    if ctx.invoked_subcommand is None:
         print(settings.as_config(plugin))
-    finally:
-        session.close()
+
+
+@config.command()
+@click.argument("setting_name")
+@click.argument("value")
+@click.pass_context
+def set(ctx, setting_name, value):
+    settings = ctx.obj["settings"]
+    plugin = ctx.obj["plugin"]
+
+    settings.set(plugin, setting_name, value)
+
+
+@config.command()
+@click.argument("setting_name")
+@click.argument("value")
+@click.pass_context
+def unset(ctx, setting_name):
+    settings = ctx.obj["settings"]
+    plugin = ctx.obj["plugin"]
+
+    settings.unset(plugin, setting_name)
+
+
+@config.command()
+@click.pass_context
+def reset(ctx):
+    settings = ctx.obj["settings"]
+    plugin = ctx.obj["plugin"]
+
+    for setting in settings.settings(plugin):
+        settings.unset(plugin, setting.name)
+
+
+@config.command()
+@click.pass_context
+def list(ctx):
+    settings = ctx.obj["settings"]
+    plugin = ctx.obj["plugin"]
+    plugin_def = settings.get_definition(plugin)
+
+    for setting in settings.settings(plugin):
+        setting_def = next(
+            setting_def
+            for setting_def in plugin_def.settings
+            if setting_def["name"] == setting.name
+        )
+
+        label_marker = f" ({setting_def['label']})" if "label" in setting_def else ""
+        description_marker = (
+            f": {setting_def['description']}" if "description" in setting_def else ""
+        )
+
+        click.secho(f"{setting.name}{label_marker}{description_marker}")
