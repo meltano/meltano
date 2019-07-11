@@ -2,59 +2,44 @@ import collections
 
 from enum import Enum
 
-FilterOption = collections.namedtuple("FilterOption", "label description operation")
+from .base import MeltanoFilterExpressionType
 
-
-class FilterOptionType(str, Enum):
-    LESS_THAN = "LESS_THAN"
-    LESS_THAN_OR_EQUAL_TO = "LESS_THAN_OR_EQUAL_TO"
-    EQUAL_TO = "EQUAL_TO"
-    NOT_EQUAL_TO = "NOT_EQUAL_TO"
-    GREATER_THAN_OR_EQUAL_TO = "GREATER_THAN_OR_EQUAL_TO"
-    GREATER_THAN = "GREATER_THAN"
-    LIKE = "LIKE"
-    IS_NULL = "IS_NULL"
-    IS_NOT_NULL = "IS_NOT_NULL"
+FilterOption = collections.namedtuple("FilterOption", "label description expression")
 
 
 FilterOptions = [
     FilterOption(
-        label="Less than", description="Less than", operation=FilterOptionType.LESS_THAN
+        label="Less than", description="Less than", expression=MeltanoFilterExpressionType.LessThan
     ),
     FilterOption(
         label="Less than or equal",
         description="Less than or equal",
-        operation=FilterOptionType.LESS_THAN_OR_EQUAL_TO,
+        expression=MeltanoFilterExpressionType.LessOrEqualThan,
     ),
     FilterOption(
-        label="Equal to", description="Equal to", operation=FilterOptionType.EQUAL_TO
-    ),
-    FilterOption(
-        label="Not equal to",
-        description="Not equal to",
-        operation=FilterOptionType.NOT_EQUAL_TO,
+        label="Equal to", description="Equal to", expression=MeltanoFilterExpressionType.EqualTo
     ),
     FilterOption(
         label="Greater than or equal",
         description="Greater than or equal",
-        operation=FilterOptionType.GREATER_THAN_OR_EQUAL_TO,
+        expression=MeltanoFilterExpressionType.GreaterOrEqualThan,
     ),
     FilterOption(
         label="Greater than",
         description="Greater than",
-        operation=FilterOptionType.GREATER_THAN,
+        expression=MeltanoFilterExpressionType.GreaterThan,
     ),
     FilterOption(
         label="Like",
         description="Custom like expression",
-        operation=FilterOptionType.LIKE,
+        expression=MeltanoFilterExpressionType.Like,
     ),
     FilterOption(
-        label="Is Null", description="Is null", operation=FilterOptionType.IS_NULL
+        label="Is Null", description="Is null", expression=MeltanoFilterExpressionType.IsNull
     ),
     FilterOption(
         label="Is Not Null",
         description="Is not null",
-        operation=FilterOptionType.IS_NOT_NULL,
+        expression=MeltanoFilterExpressionType.IsNotNull,
     ),
 ]
