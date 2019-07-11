@@ -150,26 +150,6 @@ def get_sql(topic_name, design_name):
     return jsonify(base_dict)
 
 
-@sqlBP.route("/distinct/<topic_name>/<design_name>", methods=["POST"])
-def get_distinct_field_name(topic_name, design_name):
-    # incoming_json = request.get_json()
-    # field_name = incoming_json["field"].replace("${TABLE}", design_name)
-    # model = Model.query.filter(Model.name == model_name).first()
-    # design = Design.query.filter(Design.name == design_name).first()
-
-    # base_table = design.table.settings["sql_table_name"]
-    # base_sql = f"SELECT DISTINCT {field_name} FROM {base_table} AS {design_name} ORDER BY {field_name}"
-
-    # engine = get_db_engine(model.settings["connection"])
-    # results = engine.execute(base_sql)
-    # results = [dict(row) for row in results]
-    # return json.dumps(
-    #     {"sql": base_sql, "results": results, "keys": list(results[0].keys())},
-    #     default=default,
-    # )
-    return jsonify({"tester": "tester"})
-
-
 @sqlBP.route("/get/filter-options", methods=["GET"])
 def get_filter_options():
     return jsonify(FilterOptions)
