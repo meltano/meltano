@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'QueryFilters',
@@ -37,6 +37,9 @@ export default {
     },
   },
   methods: {
+    ...mapActions('designs', [
+      'removeFilter',
+    ]),
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
@@ -47,9 +50,6 @@ export default {
         value: vm.value,
       });
       this.selectivelyClearAddFilterModel();
-    },
-    removeFilter() {
-      //
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
@@ -171,58 +171,19 @@ export default {
             v-for='filter in getFlattenedFilters'
             :key='`${filter.tableName}-${filter.attributeName}`'>
             <td>
-              <p class="control is-expanded">
-                <span
-                  class="select is-fullwidth is-small">
-                  <select v-model='filter.attributeName'>
-                    <optgroup
-                      v-for="attributeTable in getAttributesByTable"
-                      :key='attributeTable.tableLabel'
-                      :label="attributeTable.tableLabel">
-                      <option disabled>Columns</option>
-                      <option
-                        v-for="column in attributeTable.columns"
-                        :key='column.label'>
-                        {{column.label}}
-                      </option>
-                      <option disabled>Aggregates</option>
-                      <option
-                        v-for="aggregate in attributeTable.aggregates"
-                        :key='aggregate.label'>
-                        {{aggregate.label}}
-                      </option>
-                    </optgroup>
-                  </select>
-                </span>
-              </p>
+              <p>{{filter.attributeName}}</p>
             </td>
             <td>
-              <p class="control is-expanded">
-                <span
-                  class="select is-fullwidth is-small">
-                  <select v-model='filter.operation'>
-                    <option
-                      v-for="filterOption in filterOptions"
-                      :key='filterOption.label'>{{filterOption.label}}</option>
-                  </select>
-                </span>
-              </p>
+              <p>{{filter.operation}}</p>
             </td>
             <td>
-              <p class="control is-expanded">
-                <input
-                  class="input is-small"
-                  :type="getFilterInputType(filter.filterType)"
-                  @focus="$event.target.select()"
-                  v-model='filter.value'
-                  placeholder="Filter value">
-              </p>
+              <p>{{filter.value}}</p>
             </td>
             <td>
               <div class="control">
                 <button
                   class="button is-small is-fullwidth"
-                  @click='removeFilter'>
+                  @click='removeFilter(filter)'>
                   Remove</button>
               </div>
             </td>
