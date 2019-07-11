@@ -349,7 +349,7 @@ const actions = {
     if (!aggregate.selected) {
       const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
       if (filter) {
-        commit('removeFilter', { filter, filterType: 'aggregate' });
+        commit('removeFilter', filter);
       }
     }
   },
@@ -479,7 +479,7 @@ const actions = {
       operation,
       value,
     };
-    commit('addFilter', { filter, filterType });
+    commit('addFilter', filter);
 
     const isValidToggleSelection = !attribute.hasOwnProperty('selected') || !attribute.selected;
     if (filterType === 'aggregate' && isValidToggleSelection) {
@@ -487,13 +487,8 @@ const actions = {
     }
   },
 
-  removeFilter({ commit }, { tableName, attribute, filterType }) {
-    const filter = getters.getFilter(tableName, attribute.name, filterType);
-    commit('removeFilter', { filter, filterType });
-
-    if (filterType === 'aggregate' && attribute.selected) {
-      commit('toggleSelected', attribute);
-    }
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter);
   },
 };
 
@@ -575,13 +570,13 @@ const mutations = {
     // TODO
   },
 
-  addFilter(_, { filter, filterType }) {
-    getters.getFiltersByType(filterType).push(filter);
+  addFilter(_, filter) {
+    getters.getFiltersByType(filter.filterType).push(filter);
   },
 
-  removeFilter(_, { filter, filterType }) {
+  removeFilter(_, filter) {
     if (filter) {
-      const filtersByType = getters.getFiltersByType(filterType);
+      const filtersByType = getters.getFiltersByType(filter.filterType);
       const idx = filtersByType.indexOf(filter);
       filtersByType.splice(idx, 1);
     }
