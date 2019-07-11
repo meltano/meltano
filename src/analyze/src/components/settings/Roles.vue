@@ -66,27 +66,27 @@ export default {
       <h2 class="title is-4">Manage roles</h2>
       <form>
         <div class="field is-grouped">
-          <p class="control">
+          <div class="control">
             <input v-model="model.role"
                    @keyup.enter="has(model.role) && createRole(model)"
                    type="text"
                    class="input"
                    placeholder="Role name" />
-          </p>
-          <p class="control">
+          </div>
+          <div class="control">
             <button class="button is-interactive-primary"
                     :disabled="!has(model.role)"
                     @click.prevent="createRole(model)">
               Create
             </button>
-          </p>
-          <p class="control">
+          </div>
+          <div class="control">
             <button class="button is-danger"
                     :disabled="!has(model.role)"
                     @click.prevent="deleteRole(model)">
               Delete
             </button>
-          </p>
+          </div>
         </div>
       </form>
     </div>

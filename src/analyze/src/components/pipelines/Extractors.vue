@@ -68,7 +68,7 @@ export default {
 
     <div
       v-else
-      class="tile is-ancestor flex-and-wrap">
+      class="tile is-ancestor is-flex is-flex-wrap">
       <div
         class="tile is-parent is-3"
         v-for="(extractor, index) in plugins.extractors"

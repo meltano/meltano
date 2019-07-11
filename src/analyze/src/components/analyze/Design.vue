@@ -242,16 +242,16 @@ export default {
         <nav class="panel has-background-white">
           <div class="panel-block">
             <div class="field has-addons">
-              <p class="control is-expanded">
+              <div class="control is-expanded">
                 <input class="input" type="text" placeholder="Filter" disabled>
-              </p>
-              <p class="control">
+              </div>
+              <div class="control">
                 <button class="button" disabled>
                   <span class="icon">
                     <font-awesome-icon icon="search"></font-awesome-icon>
                   </span>
                 </button>
-              </p>
+              </div>
             </div>
           </div>
 
@@ -410,7 +410,7 @@ export default {
           <div class="column">
             <div class="field is-grouped is-pulled-right">
 
-              <p v-if="hasActiveReport()" class="control" @click="getDashboards">
+              <div v-if="hasActiveReport()" class="control" @click="getDashboards">
                 <Dropdown label="Add to Dashboard" is-right-aligned>
                   <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
                     <a
@@ -435,18 +435,18 @@ export default {
                     </div>
                   </div>
                 </Dropdown>
-              </p>
+              </div>
 
               <div class="control field" :class="{'has-addons': hasActiveReport()}">
-                <p class="control">
+                <div class="control">
                   <button
                     class="button is-interactive-primary is-outlined"
                     v-if="hasActiveReport()"
                     @click="updateReport();">
                     <span>Save</span>
                   </button>
-                </p>
-                <p class="control">
+                </div>
+                <div class="control">
                   <Dropdown
                     :disabled="!hasChartableResults"
                     :label="hasActiveReport() ? '' : 'Save'"
@@ -456,29 +456,29 @@ export default {
                       <div class="dropdown-item">
                         <div class="field">
                           <label class="label" v-if="hasActiveReport()">Save as</label>
-                          <p class="control">
+                          <div class="control">
                             <input class="input"
                                    type="text"
                                    placeholder="Name your report"
                                    v-model="saveReportSettings.name">
-                          </p>
+                          </div>
                         </div>
                         <div class="field is-grouped">
-                          <p class="control">
+                          <div class="control">
                             <button class="button is-interactive-primary"
                                     :disabled="!saveReportSettings.name"
                                     @click="saveReport(); dropdownForceClose();">Save</button>
-                          </p>
-                          <p class="control">
+                          </div>
+                          <div class="control">
                             <button class="button is-text"
                                     @click="dropdownForceClose();">
                               Cancel</button>
-                          </p>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </Dropdown>
-                </p>
+                </div>
               </div>
 
               <div class="control field">
@@ -499,12 +499,12 @@ export default {
               </div>
 
               <div class="control field has-addons">
-                <p class="control">
+                <div class="control">
                   <button class="button is-success"
                           :class="{'is-loading': loadingQuery}"
                           :disabled="!currentSQL"
                           @click="runQuery">Run Query</button>
-                </p>
+                </div>
                 <div class="control">
                   <div class="select is-fullwidth">
                     <select name="connection" v-model="dialect">
@@ -582,7 +582,7 @@ export default {
           <span class="accordion-title">Charts</span>
           <div>
             <div class="field has-addons chart-buttons">
-              <p class="control" @click.stop="setAndOpenChart('BarChart')">
+              <div class="control" @click.stop="setAndOpenChart('BarChart')">
                 <button
                   class="button is-small is-text has-text-white"
                   :class="{'is-active': chartType === 'BarChart'}"
@@ -591,8 +591,8 @@ export default {
                     <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                   </span>
                 </button>
-              </p>
-              <p class="control" @click.stop="setAndOpenChart('LineChart')">
+              </div>
+              <div class="control" @click.stop="setAndOpenChart('LineChart')">
                 <button
                   class="button is-small is-text has-text-white"
                   :class="{'is-active': chartType === 'LineChart'}"
@@ -601,8 +601,8 @@ export default {
                     <font-awesome-icon icon="chart-line"></font-awesome-icon>
                   </span>
                 </button>
-              </p>
-              <p class="control" @click.stop="setAndOpenChart('AreaChart')">
+              </div>
+              <div class="control" @click.stop="setAndOpenChart('AreaChart')">
                 <button
                   class="button is-small is-text has-text-white"
                   :class="{'is-active': chartType === 'AreaChart'}"
@@ -611,8 +611,8 @@ export default {
                     <font-awesome-icon icon="chart-area"></font-awesome-icon>
                   </span>
                 </button>
-              </p>
-              <p class="control" @click.stop="setAndOpenChart('ScatterChart')">
+              </div>
+              <div class="control" @click.stop="setAndOpenChart('ScatterChart')">
                 <button
                   class="button is-small is-text has-text-white"
                   :class="{'is-active': chartType === 'ScatterChart'}"
@@ -621,7 +621,7 @@ export default {
                     <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                   </span>
                 </button>
-              </p>
+              </div>
             </div>
           </div>
 
@@ -699,9 +699,9 @@ export default {
                   </div>
                   <div class="field-body">
                     <div class="field">
-                      <p class="control">
+                      <div class="control">
                         <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
-                      </p>
+                      </div>
                     </div>
                   </div>
                 </div>

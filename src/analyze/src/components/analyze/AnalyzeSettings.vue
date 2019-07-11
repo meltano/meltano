@@ -90,20 +90,20 @@ export default {
   <section class="columns">
     <div class="column is-one-third">
       <h2 class="title is-5">Available Connections</h2>
-      <div class="tile is-ancestor flex-and-wrap flex-column">
-        <div class="tile is-parent no-grow"
+      <div class="tile is-ancestor is-flex is-flex-column">
+        <div class="tile is-parent is-flex-no-grow"
              v-for="(connection, index) in plugins.connections"
              :key="`${connection}-${index}`">
           <div class="tile level box">
             <div class="level-left">
-              <div class="level-item flex-column has-text-left">
+              <div class="level-item is-flex-column has-text-left">
                 <ConnectorLogo class="connector-logo"
                                :connector='connection'
                                :is-grayscale='!getIsPluginInstalled("connections", connection)' />
               </div>
             </div>
             <div class="level-right">
-              <div class="level-item content is-small flex-column">
+              <div class="level-item content is-small is-flex-column">
                 <p class="is-uppercase has-text-weight-bold">{{ connection }}</p>
                 <div class="buttons are-small">
                   <a class="button is-interactive-primary flex-grow-1"
@@ -141,14 +141,6 @@ export default {
 </template>
 
 <style lang="scss">
-.no-grow {
-  flex-grow: 0;
-}
-
-.flex-column {
-  flex-direction: column;
-}
-
 .connector-logo {
   max-height: 48px;
   object-fit: scale-down;

@@ -1,6 +1,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+
 import utils from '@/utils/utils';
 
 export default {
@@ -71,7 +72,7 @@ export default {
       </div>
       <div class="field-body">
         <div class="field">
-          <p class="control is-expanded">
+          <div class="control is-expanded">
 
             <!-- Boolean -->
             <label
@@ -97,7 +98,7 @@ export default {
               @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
               :placeholder="setting.value || setting.name">
-          </p>
+          </div>
           <p
             v-if="setting.description"
             class="help is-italic"
