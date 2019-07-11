@@ -11,7 +11,7 @@ from meltano.api.models import db
 from meltano.api.security import create_dev_user
 from meltano.core.project import Project
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin.settings_service import SettingsService
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
@@ -63,7 +63,7 @@ class SqlHelper(SqlUtils):
     def get_db_engine(self, dialect):
         project = Project.find()
         connection = self.get_connection(dialect)
-        config = SettingsService(db.session, project).as_config(connection)
+        config = PluginSettingsService(db.session, project).as_config(connection)
         engine_hooks = []
 
         if dialect == "postgresql":

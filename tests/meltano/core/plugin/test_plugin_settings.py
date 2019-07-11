@@ -15,7 +15,7 @@ def test_create(session):
     assert setting == fetched
 
 
-class TestSettingsService:
+class TestPluginSettingsService:
     @pytest.fixture
     def subject(
         self, session, project_add_service, tap, plugin_settings_service_factory

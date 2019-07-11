@@ -5,7 +5,7 @@ from .params import project, db_options
 from meltano.core.db import project_engine
 from meltano.core.project import Project
 from meltano.core.config_service import ConfigService
-from meltano.core.plugin.settings_service import SettingsService
+from meltano.core.plugin.settings_service import PluginSettingsService
 
 
 @cli.group(invoke_without_command=True)
@@ -19,7 +19,7 @@ def config(ctx, project, plugin_name, engine_uri):
 
     _, Session = project_engine(project, engine_uri, default=True)
     session = Session()
-    settings = SettingsService(session, project)
+    settings = PluginSettingsService(session, project)
 
     ctx.obj["settings"] = settings
     ctx.obj["plugin"] = plugin

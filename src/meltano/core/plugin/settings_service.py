@@ -12,7 +12,7 @@ from . import PluginRef, PluginType, Plugin, PluginInstall
 from .setting import PluginSetting
 
 
-class SettingsService:
+class PluginSettingsService:
     def __init__(
         self,
         session,

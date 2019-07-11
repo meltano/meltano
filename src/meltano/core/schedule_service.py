@@ -2,7 +2,7 @@ from collections import namedtuple
 from typing import Optional
 from datetime import datetime, date
 
-from .plugin.settings_service import SettingsService
+from .plugin.settings_service import PluginSettingsService
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -24,10 +24,10 @@ Schedule = namedtuple(
 
 class ScheduleService:
     def __init__(
-        self, session, project: Project, plugin_settings_service: SettingsService = None
+        self, session, project: Project, plugin_settings_service: PluginSettingsService = None
     ):
         self.project = project
-        self.settings_service = plugin_settings_service or SettingsService(
+        self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
             session, project
         )
         self._session = session
@@ -54,7 +54,7 @@ class ScheduleService:
         Returns the `start_date` of the extractor, or now.
         """
         extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
-        start_date = self.settings_service.get_value(extractor_ref, "start_date")
+        start_date = self.plugin_settings_service.get_value(extractor_ref, "start_date")
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

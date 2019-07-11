@@ -5,7 +5,7 @@ from io import StringIO
 from . import Runner
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
-from meltano.core.plugin.settings_service import SettingsService
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.dbt_service import DbtService
 from meltano.core.config_service import ConfigService
 from meltano.core.db import project_engine
@@ -36,7 +36,7 @@ class DbtRunner(Runner):
 
         session = Session()
         try:
-            settings = SettingsService(session, self.project)
+            settings = PluginSettingsService(session, self.project)
 
             # send the elt_context as ENV variables
             env = {**settings.as_env(extractor), **settings.as_env(loader)}

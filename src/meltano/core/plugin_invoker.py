@@ -7,7 +7,7 @@ from .project import Project
 from .plugin import PluginInstall
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
-from .plugin.settings_service import SettingsService
+from .plugin.settings_service import PluginSettingsService
 from .venv_service import VenvService
 from .error import SubprocessError
 
@@ -30,7 +30,7 @@ class PluginInvoker:
         config_dir=None,
         venv_service: VenvService = None,
         config_service: PluginConfigService = None,
-        plugin_settings_service: SettingsService = None,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -38,7 +38,7 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
-        self.plugin_settings = plugin_settings_service or SettingsService(
+        self.plugin_settings = plugin_settings_service or PluginSettingsService(
             session, project
         )
         self._prepared = False
