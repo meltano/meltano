@@ -736,17 +736,4 @@ code {
     }
   }
 }
-
-.data-toggles {
-  padding-top: .5rem;
-}
-
-.filter-item {
-  padding: 1.5rem;
-}
-
-.selected-filters {
-  padding: 1.5rem;
-  padding-left: 0;
-}
 </style>
