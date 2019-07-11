@@ -138,7 +138,7 @@ export default {
 
     jumpToFilters() {
       utils.scrollToTop();
-      this.$refs['filter-dropdown'].forceOpen();
+      this.$refs['filter-dropdown'].open();
     },
 
     inputFocused(field) {
@@ -248,10 +248,10 @@ export default {
 
           <p v-if="hasActiveReport()" class="control" @click="getDashboards">
             <Dropdown label="Add to Dashboard" is-right-aligned>
-              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+              <div class="dropdown-content" slot-scope="{ dropdownClose }">
                 <a
                   class="dropdown-item"
-                  @click="toggleNewDashboardModal(); dropdownForceClose();">
+                  @click="toggleNewDashboardModal(); dropdownClose();">
                   New Dashboard
                 </a>
                 <div v-if="dashboards.length">
@@ -261,7 +261,7 @@ export default {
                     <label for="'checkbox-' + dashboard.id"
                             @click="
                               toggleActiveReportInDashboard(dashboard);
-                              dropdownForceClose();">
+                              dropdownClose();">
                       <input type="checkbox"
                             :id="'checkbox-' + dashboard.id"
                             :checked="isActiveReportInDashboard(dashboard)">
@@ -288,7 +288,7 @@ export default {
                 :label="hasActiveReport() ? '' : 'Save'"
                 button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
-                <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                <div class="dropdown-content" slot-scope="{ dropdownClose }">
                   <div class="dropdown-item">
                     <div class="field">
                       <label class="label" v-if="hasActiveReport()">Save as</label>
@@ -303,11 +303,11 @@ export default {
                       <div class="control">
                         <button class="button is-interactive-primary"
                                 :disabled="!saveReportSettings.name"
-                                @click="saveReport(); dropdownForceClose();">Save</button>
+                                @click="saveReport(); dropdownClose();">Save</button>
                       </div>
                       <div class="control">
                         <button class="button is-text"
-                                @click="dropdownForceClose();">
+                                @click="dropdownClose();">
                           Cancel</button>
                       </div>
                     </div>
@@ -323,11 +323,11 @@ export default {
               label="Load"
               button-classes='is-interactive-primary is-outlined'
               is-right-aligned>
-              <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+              <div class="dropdown-content" slot-scope="{ dropdownClose }">
                 <a class="dropdown-item"
                     v-for="report in reports"
                     :key="report.name"
-                    @click="loadReport(report); dropdownForceClose();">
+                    @click="loadReport(report); dropdownClose();">
                   {{report.name}}
                 </a>
               </div>

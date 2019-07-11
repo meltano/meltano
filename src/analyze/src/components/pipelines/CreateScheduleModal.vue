@@ -210,10 +210,10 @@ export default {
                       ? "is-success is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
-                    <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    <div class="dropdown-content" slot-scope="{ dropdownClose }">
                       <a
                         class="dropdown-item"
-                        @click="setHasCatchupDate(false); dropdownForceClose();">
+                        @click="setHasCatchupDate(false); dropdownClose();">
                         None
                       </a>
                       <hr class="dropdown-divider">
@@ -224,7 +224,7 @@ export default {
                             name='catchup-start' />
                           <button
                             class="button is-interactive-primary is-outlined is-small"
-                            @click="setHasCatchupDate(true); dropdownForceClose();">
+                            @click="setHasCatchupDate(true); dropdownClose();">
                             Set
                           </button>
                         </div>
