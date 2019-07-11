@@ -46,10 +46,10 @@ export default {
     },
   },
   methods: {
-    forceClose() {
+    close() {
       this.isOpen = false;
     },
-    forceOpen() {
+    open() {
       this.isOpen = true;
     },
     toggleDropdown() {
@@ -59,7 +59,7 @@ export default {
       const targetEl = el.target.closest('.dropdown');
       const matchEl = this.$el.closest('.dropdown');
       if (targetEl !== matchEl) {
-        this.forceClose();
+        this.close();
       }
     },
   },
@@ -87,7 +87,7 @@ export default {
       </button>
     </div>
     <div class="dropdown-menu" :id="getHyphenatedLabel" role="menu">
-      <slot :dropdown-force-close="forceClose"></slot>
+      <slot :dropdown-close="close"></slot>
     </div>
   </div>
 </template>
