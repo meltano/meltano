@@ -12,7 +12,7 @@ class AggregateType(Enum):
     Number = "number"
 
     def __eq__(self, other):
-        return self.value.lower() == str(other).lower()
+        return self.value.lower() == other.value.lower()
 
     @classmethod
     def parse(cls, value: str):

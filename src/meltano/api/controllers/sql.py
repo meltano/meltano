@@ -127,7 +127,6 @@ def get_sql(topic_name, design_name):
     aggregates = sql_dict["aggregates"]
     column_headers = sql_dict["column_headers"]
     column_names = sql_dict["column_names"]
-    db_table = sql_dict["db_table"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
     base_dict["column_headers"] = column_headers
