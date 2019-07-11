@@ -67,16 +67,9 @@ def list(ctx):
     plugin = ctx.obj["plugin"]
     plugin_def = settings.get_definition(plugin)
 
-    for setting in settings.settings(plugin):
-        setting_def = next(
-            setting_def
-            for setting_def in plugin_def.settings
-            if setting_def["name"] == setting.name
-        )
-
-        label_marker = f" ({setting_def['label']})" if "label" in setting_def else ""
+    for setting_def in plugin_def.settings:
+        env_key = settings.setting_env(setting_def, plugin_def)
         description_marker = (
             f": {setting_def['description']}" if "description" in setting_def else ""
         )
-
-        click.secho(f"{setting.name}{label_marker}{description_marker}")
+        click.secho(f"{setting_def['name']} [{env_key}]{description_marker}")

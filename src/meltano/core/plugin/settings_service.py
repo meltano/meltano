@@ -51,9 +51,7 @@ class PluginSettingsService:
         env = {}
 
         for setting in plugin_def.settings:
-            env_key = setting.get(
-                "env", self.setting_env(plugin_def.namespace, setting["name"])
-            )
+            env_key = self.setting_env(setting, plugin_def)
             env[env_key] = str(self.get_value(plugin, setting["name"]))
 
         return env
@@ -97,10 +95,13 @@ class PluginSettingsService:
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)
 
-    def setting_env(self, *parts: Iterable[str]):
-        process = lambda s: s.replace(".", "__").upper()
-
-        return "_".join(map(process, parts))
+    def setting_env(self, setting, plugin_def):
+        try:
+            return setting["env"]
+        except KeyError:
+            parts = (plugin_def.namespace, setting["name"])
+            process = lambda s: s.replace(".", "__").upper()
+            return "_".join(map(process, parts))
 
     # TODO: ensure `kind` is handled
     def get_value(self, plugin: PluginRef, name: str):
@@ -108,14 +109,14 @@ class PluginSettingsService:
             plugin_def = self.get_definition(plugin)
             plugin_install = self.get_install(plugin)
             setting = self.find_setting(plugin_def, name)
-            env = setting.get("env", self.setting_env(plugin_def.namespace, name))
+            env_key = setting_env(setting, plugin_def)
 
             # priority 1: environment variable
-            if env in os.environ:
+            if env_key in os.environ:
                 logging.debug(
                     f"Found ENV variable {env} for {plugin_def.namespace}:{name}"
                 )
-                return os.environ[env]
+                return os.environ[env_key]
 
             # priority 2: installed configuration
             if setting["name"] in plugin_install.config:

@@ -24,7 +24,10 @@ Schedule = namedtuple(
 
 class ScheduleService:
     def __init__(
-        self, session, project: Project, plugin_settings_service: PluginSettingsService = None
+        self,
+        session,
+        project: Project,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
