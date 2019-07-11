@@ -479,6 +479,7 @@ const actions = {
     const filter = {
       tableName,
       attributeName: attribute.name,
+      filterType,
       operation,
       value,
     };
