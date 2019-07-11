@@ -65,13 +65,6 @@ const helpers = {
       };
     }
 
-    const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters);
-    filtersKeys.forEach((prop) => {
-      delete filters[prop].results;
-      delete filters[prop].sql;
-    });
-
     if (!state.design.joins) {
       state.design.joins = [];
     }
@@ -115,7 +108,7 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      filters,
+      filters: state.filters,
     };
   },
 };
