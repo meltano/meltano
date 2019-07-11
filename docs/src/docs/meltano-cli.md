@@ -24,6 +24,11 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
+- `meltano config <plugin_name>`: Displays the plugin's configuration.
+  - `meltano config <plugin_name> list`: List the available settings for the plugin.
+  - `meltano config <plugin_name> set <name> <value>`: Sets the configuration's setting <name> to <value>.
+  - `meltano config <plugin_name> unset <name>`: Remove the configuration's setting <name>.
+  - `meltano config <plugin_name> reset`: Clear the configuration (back to defaults).
 
 ### `init`
 
@@ -123,6 +128,31 @@ This will exclude all `longitude` and `latitude` attributes.
 Use `--list` to list the current selected tap attributes.
 
 > Note: `--all` can be used to show all the tap attributes with their selected status.
+
+### `config`
+
+Manipulate a plugin's configuration.
+
+Meltano uses configuration layers to resolve a plugin's configuration:
+
+  1. Environments variables
+  1. Plugin definition's `config:` attribute in **meltano.yml**
+  1. Settings set via `meltano config` or the in the UI (stored in the meltano database)
+  1. Default values set in the setting definition in **discovery.yml**
+
+This way, a Meltano project can stay secure in production, where environment variables shall be used for sensible settings (such as _passwords_ or _keys_) or use the settings database.
+
+:::warning
+Meltano stores the configuration as-is, without encryption. The most secure way to set a plugin's setting to a sensible value is to use the environment variable associated with it.
+
+Use `meltano config <plugin_name> list` to see the proper variable to set for a setting.
+:::
+
+In development, however, one can use the **meltano.yml** to quickly set the configuration, via the `config:` attribute in each plugin, or use a different set of environment variables.
+
+:::tip
+If you want to see what is the current configuration a plugin will use, run `meltano config <plugin_name>` and the configuration will be displayed.
+:::
 
 ### `transform`
 
