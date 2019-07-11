@@ -221,9 +221,10 @@ export default {
                         <div class="dropdown-item">
                           <InputDateIso8601
                             v-model="pipeline.startDate"
-                            name='catchup-start' />
+                            name='catchup-start'
+                            input-classes='is-small' />
                           <button
-                            class="button is-interactive-primary is-outlined is-small"
+                            class="button is-interactive-primary is-outlined is-small is-inline"
                             @click="setHasCatchupDate(true); dropdownClose();">
                             Set
                           </button>
