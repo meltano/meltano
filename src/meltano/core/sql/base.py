@@ -25,6 +25,9 @@ class MeltanoFilterExpressionType(Enum):
     IsNull = "is_null"
     IsNotNull = "is_not_null"
 
+    def __hash__(self):
+        return hash(self.value)
+
     def __eq__(self, other):
         return self.value.lower() == other.value.lower()
 
@@ -437,7 +440,7 @@ class MeltanoFilter(MeltanoBase):
     An internal representation of a Filter (WHERE or HAVING clause)
     defined in a MeltanoQuery.
 
-    definition: {"table_name":, "name":, "expression":, "value":}
+    definition: {"table_name", "name", "expression", "value"}
 
     In the most simple case, the idea is to use it in order to generate a simple clause:
       table_name.name {expression} value
@@ -531,23 +534,20 @@ class MeltanoFilter(MeltanoBase):
         We have to use the following cases as PyPika does not allow an str
          representation of the clause on its where() and having() functions
         """
-        if self.expression_type == MeltanoFilterExpressionType.LessThan:
-            return field < self.value
-        elif self.expression_type == MeltanoFilterExpressionType.LessOrEqualThan:
-            return field <= self.value
-        elif self.expression_type == MeltanoFilterExpressionType.EqualTo:
-            return field == self.value
-        elif self.expression_type == MeltanoFilterExpressionType.GreaterOrEqualThan:
-            return field >= self.value
-        elif self.expression_type == MeltanoFilterExpressionType.GreaterThan:
-            return field > self.value
-        elif self.expression_type == MeltanoFilterExpressionType.Like:
-            return field.like(self.value)
-        elif self.expression_type == MeltanoFilterExpressionType.IsNull:
-            return field.isnull()
-        elif self.expression_type == MeltanoFilterExpressionType.IsNotNull:
-            return field.notnull()
-        else:
+        criterion_strategies = {
+            MeltanoFilterExpressionType.LessThan: lambda f: f < self.value,
+            MeltanoFilterExpressionType.LessOrEqualThan: lambda f: f <= self.value,
+            MeltanoFilterExpressionType.EqualTo: lambda f: f == self.value,
+            MeltanoFilterExpressionType.GreaterOrEqualThan: lambda f: f >= self.value,
+            MeltanoFilterExpressionType.GreaterThan: lambda f: f > self.value,
+            MeltanoFilterExpressionType.Like: lambda f: f.like(self.value),
+            MeltanoFilterExpressionType.IsNull: lambda f: f.isnull(),
+            MeltanoFilterExpressionType.IsNotNull: lambda f: f.notnull(),
+        }
+
+        try:
+            return criterion_strategies[self.expression_type](field)
+        except KeyError:
             raise NotImplementedError(
                 f"Unknown filter expression_type: {self.expression_type}."
             )
