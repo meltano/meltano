@@ -180,7 +180,14 @@ export default {
               <p>{{filter.expression}}</p>
             </td>
             <td>
-              <p>{{filter.value}}</p>
+              <p class="control is-expanded">
+                <input
+                  class="input is-small"
+                  :type="getFilterInputType(filter.filterType)"
+                  @focus="$event.target.select()"
+                  v-model='filter.value'
+                  placeholder="Filter value">
+              </p>
             </td>
             <td>
               <div class="control">
