@@ -58,10 +58,6 @@ export default {
       'currentDesignLabel',
       'hasChartableResults',
       'resultsCount',
-      'getDistinctsForField',
-      'getResultsFromDistinct',
-      'getKeyFromDistinct',
-      'getSelectionsFromDistinct',
       'getChartYAxis',
       'hasJoins',
       'showJoinColumnAggregateHeader',
@@ -141,12 +137,6 @@ export default {
       this.$refs['filter-dropdown'].open();
     },
 
-    inputFocused(field) {
-      if (!this.getDistinctsForField(field)) {
-        this.$store.dispatch('designs/getDistinct', field);
-      }
-    },
-
     setChartType(chartType) {
       this.$store.dispatch('designs/setChartType', chartType);
     },
@@ -210,22 +200,6 @@ export default {
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
-    },
-
-    dropdownSelected(item, field) {
-      this.$store.dispatch('designs/addDistinctSelection', {
-        item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-
-    modifierChanged(item, field) {
-      this.$store.dispatch('designs/addDistinctModifier', {
-        item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
     },
   },
 };
@@ -665,37 +639,6 @@ export default {
               </div>
             </div>
           </div>
-
-          <!-- filters tab -->
-          <!-- <div class="columns">
-            <div class="column is-3">
-              <strong>{{filter.design_label}}</strong>
-              <span>{{filter.label}}</span>
-              <span>({{filter.type}})</span>
-            </div>
-            <div class="column is-9">
-              <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
-              <div class="field" v-if="filter.type == 'string'">
-                <select-dropdown
-                  :placeholder="filter.field"
-                  :field="filter.sql"
-                  :dropdownList="getResultsFromDistinct(filter.sql)"
-                  :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
-                  @focused="inputFocused(filter.sql)"
-                  @selected="dropdownSelected"
-                  @modifierChanged="modifierChanged">
-                </select-dropdown>
-              </div>
-              <div class="tags selected-filters">
-                <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
-                  <span class="tag is-link" :key="key">
-                    {{selected}}
-                    <button class="delete is-small"></button>
-                  </span>
-                </template>
-              </div>
-            </div>
-          </div> -->
 
           <!-- charts tab -->
           <div>
