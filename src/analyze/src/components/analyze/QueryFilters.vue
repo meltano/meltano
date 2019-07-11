@@ -76,7 +76,7 @@ export default {
             <span>Operation</span>
             <span
               class="icon has-text-grey-light tooltip"
-              data-tooltip='The filter expression for the selected column or aggregate.'>
+              data-tooltip='The filter operation for the selected column or aggregate.'>
               <font-awesome-icon icon="info-circle"></font-awesome-icon>
             </span>
           </th>
