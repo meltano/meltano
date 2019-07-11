@@ -30,6 +30,9 @@ export default {
     buttonClasses: {
       type: String,
     },
+    menuClasses: {
+      type: String,
+    },
     disabled: {
       type: Boolean,
       default: false,
@@ -86,7 +89,10 @@ export default {
         </span>
       </button>
     </div>
-    <div class="dropdown-menu" :id="getHyphenatedLabel" role="menu">
+    <div class="dropdown-menu"
+         :class="menuClasses"
+         :id="getHyphenatedLabel"
+         role="menu">
       <slot :dropdown-close="close"></slot>
     </div>
   </div>
@@ -94,10 +100,23 @@ export default {
 
 <style lang="scss">
 .dropdown.is-fullwidth {
-  display: flex;
-}
-.dropdown.is-fullwidth * {
   width: 100%;
-  text-align: left;
+
+  .dropdown-trigger {
+    width: 100%
+  }
+
+  .button {
+    display: flex;
+    width: 100%;
+    justify-content: space-between
+  }
+}
+.dropdown-menu {
+  // TODO refactor into a better approach for target widths while accounting for the app breakpoints
+  // Ideally we can inject the SCSS vars, mixins, etc and leverage them in components to leverage a style SSOT
+  &.dropdown-menu-600 {
+    width: 600px;
+  }
 }
 </style>
