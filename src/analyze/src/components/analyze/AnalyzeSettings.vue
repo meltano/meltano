@@ -51,21 +51,13 @@ export default {
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('connections', this.connectionName);
       const isInstalled = this.getIsPluginInstalled('connections', this.connectionName);
-      const isValid = this.getHasValidConfigSettings(this.configSettings);
-      return !isInstalling && isInstalled && isValid;
+      return !isInstalling && isInstalled;
     },
   },
   methods: {
     ...mapActions('configuration', [
       'getConnectionConfiguration',
     ]),
-    close() {
-      if (this.prevRoute) {
-        this.$router.go(-1);
-      } else {
-        this.$router.push({ name: 'connections' });
-      }
-    },
     configureConnection(connection) {
       this.$store.dispatch('plugins/addPlugin', {
         pluginType: 'connections',
@@ -123,8 +115,6 @@ export default {
                          :config-settings='configSettings'>
         <section class="field buttons is-right"
                  slot="bottom">
-          <button class="button"
-                  @click="close">Cancel</button>
           <button class='button is-interactive-primary'
                   :disabled='!isSaveable'
                   @click.prevent="saveConfig">Save</button>

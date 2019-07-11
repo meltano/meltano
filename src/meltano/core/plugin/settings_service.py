@@ -1,8 +1,9 @@
 import os
 import sqlalchemy
 import logging
-from typing import Iterable, Dict, Tuple
+from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
+from enum import Enum
 
 from meltano.core.db import project_engine
 from meltano.core.utils import nest
@@ -10,6 +11,13 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from . import PluginRef, PluginType, Plugin, PluginInstall
 from .setting import PluginSetting
+
+
+class PluginSettingValueSource(int, Enum):
+    ENV = 0
+    MELTANO_YML = 1
+    DB = 2
+    DEFAULT = 3
 
 
 class PluginSettingsService:
@@ -35,13 +43,19 @@ class PluginSettingsService:
 
         return q.all()
 
-    def as_config(self, plugin: PluginRef) -> Dict:
+    def as_config(
+        self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
+    ) -> Dict:
         # defaults to the meltano.yml for extraneous settings
         config = deepcopy(self.get_install(plugin).config)
         plugin_def = self.get_definition(plugin)
 
         for setting in plugin_def.settings:
-            nest(config, setting["name"], self.get_value(plugin, setting["name"]))
+            value, source = self.get_value(plugin, setting["name"])
+            if sources and source not in sources:
+                continue
+
+            nest(config, setting["name"], value)
 
         return config
 
@@ -116,22 +130,28 @@ class PluginSettingsService:
                 logging.debug(
                     f"Found ENV variable {env_key} for {plugin_def.namespace}:{name}"
                 )
-                return os.environ[env_key]
+                return (os.environ[env_key], PluginSettingValueSource.ENV)
 
             # priority 2: installed configuration
             if setting_def["name"] in plugin_install.config:
-                return plugin_install.config[setting_def["name"]]
+                return (
+                    plugin_install.config[setting_def["name"]],
+                    PluginSettingValueSource.MELTANO_YML,
+                )
 
             # priority 3: settings database
             return (
-                self._session.query(PluginSetting)
-                .filter_by(namespace=plugin.qualified_name, name=name, enabled=True)
-                .one()
-                .value
+                (
+                    self._session.query(PluginSetting)
+                    .filter_by(namespace=plugin.qualified_name, name=name, enabled=True)
+                    .one()
+                    .value
+                ),
+                PluginSettingValueSource.DB,
             )
         except StopIteration:
             logging.warning(f"Cannot find {name} for {plugin.name}.")
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden
-            return setting_def.get("value")
+            return setting_def.get("value"), PluginSettingValueSource.DEFAULT
