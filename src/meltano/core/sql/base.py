@@ -746,15 +746,25 @@ class MeltanoQuery(MeltanoBase):
             filter(lambda x: len(x.get("columns", [])), self._definition["joins"]), None
         )
 
+        has_join_timeframes = next(
+            filter(lambda x: len(x.get("timeframes", [])), self._definition["joins"]),
+            None,
+        )
+
         has_join_aggregates = next(
             filter(lambda x: len(x.get("aggregates", [])), self._definition["joins"]),
             None,
         )
+
         has_base_table_aggregate = len(self._definition.get("aggregates", []))
 
-        if not has_join_columns and not has_join_aggregates:
+        if not has_join_columns and not has_join_timeframes and not has_join_aggregates:
+            # A query that references no columns or aggregates from the joined
+            #  tables does not need an HDA
             return False
         else:
+            # Even if there are joins needed, switch to an HDA only if aggregates
+            #  will be computed.
             return has_base_table_aggregate or has_join_aggregates
 
     def get_query(self) -> Tuple:
