@@ -26,7 +26,6 @@ const state = {
   reports: [],
   chartType: 'BarChart',
   limit: 50,
-  distincts: {},
   sortColumn: null,
   sortDesc: false,
   dialect: null,
@@ -181,16 +180,6 @@ const getters = {
     return state.results.length;
   },
 
-  getDistinctsForField: () => field => state.distincts[field],
-
-  getResultsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.results;
-  },
-
   hasJoins() {
     return !!(state.design.joins && state.design.joins.length);
   },
@@ -200,26 +189,6 @@ const getters = {
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
-
-  getKeyFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.keys[0];
-  },
-
-  getSelectionsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return [];
-    }
-    const thisDistinctSelections = thisDistinct.selections;
-    if (!thisDistinctSelections) {
-      return [];
-    }
-    return thisDistinctSelections;
-  },
 
   getChartYAxis() {
     if (!state.resultAggregates) {
@@ -438,25 +407,6 @@ const actions = {
     commit('setErrorState');
   },
 
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then((response) => {
-        commit('setDistincts', {
-          data: response.data,
-          field,
-        });
-      });
-  },
-
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data);
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data);
-  },
-
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
   },
@@ -589,10 +539,6 @@ const mutations = {
     state.sortColumn = name;
   },
 
-  setDistincts(_, { data, field }) {
-    Vue.set(state.distincts, field, data);
-  },
-
   setJoinColumns(_, { columns, join }) {
     join.columns = columns;
   },
@@ -603,19 +549,6 @@ const mutations = {
 
   setJoinAggregates(_, { aggregates, join }) {
     join.aggregates = aggregates;
-  },
-
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', []);
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item);
-    }
-  },
-
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item);
   },
 
   resetSaveReportSettings() {
