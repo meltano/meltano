@@ -414,12 +414,12 @@ const actions = {
     });
   },
 
-  addFilter({ commit }, { tableName, attribute, filterType, operation = '', value = '' }) {
+  addFilter({ commit }, { tableName, attribute, filterType, expression = '', value = '' }) {
     const filter = {
       tableName,
       attributeName: attribute.name,
       filterType,
-      operation,
+      expression,
       value,
     };
     commit('addFilter', filter);

@@ -11,7 +11,7 @@ export default {
           type: '',
           tableName: '',
         },
-        operation: '',
+        expression: '',
         value: '',
       },
     };
@@ -33,7 +33,7 @@ export default {
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      return vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.operation && vm.value;
+      return vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.expression && vm.value;
     },
   },
   methods: {
@@ -46,7 +46,7 @@ export default {
         tableName: vm.attributeHelper.tableName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
-        operation: vm.operation,
+        expression: vm.expression,
         value: vm.value,
       });
       this.selectivelyClearAddFilterModel();
@@ -76,7 +76,7 @@ export default {
             <span>Operation</span>
             <span
               class="icon has-text-grey-light tooltip"
-              data-tooltip='The filter operation for the selected column or aggregate.'>
+              data-tooltip='The filter expression for the selected column or aggregate.'>
               <font-awesome-icon icon="info-circle"></font-awesome-icon>
             </span>
           </th>
@@ -134,11 +134,11 @@ export default {
             <p class="control is-expanded">
               <span
                 class="select is-fullwidth is-small">
-                <select v-model='addFilterModel.operation'>
+                <select v-model='addFilterModel.expression'>
                   <option
                     v-for="filterOption in filterOptions"
                     :key='filterOption.label'
-                    :value='filterOption.operation'>{{filterOption.label}}</option>
+                    :value='filterOption.expression'>{{filterOption.label}}</option>
                 </select>
               </span>
             </p>
@@ -174,7 +174,7 @@ export default {
               <p>{{filter.attributeName}}</p>
             </td>
             <td>
-              <p>{{filter.operation}}</p>
+              <p>{{filter.expression}}</p>
             </td>
             <td>
               <p>{{filter.value}}</p>
