@@ -354,6 +354,7 @@ class TestSqlController:
                     }
                 ],
             },
+            "dialect": "pytest",
             "run": False,
         }
 
@@ -435,6 +436,7 @@ class TestSqlController:
                     },
                 ],
             },
+            "dialect": "pytest",
             "run": False,
         }
 

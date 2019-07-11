@@ -194,6 +194,10 @@ def project(test_dir, project_init_service):
     project = project_init_service.init()
     logging.debug(f"Created new project at {project.root}")
 
+    # empty out the `plugins`
+    with project.meltano_update() as meltano:
+        meltano["plugins"] = {}
+
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root_dir(".env"))
 

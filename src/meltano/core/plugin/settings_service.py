@@ -59,11 +59,11 @@ class PluginSettingsService:
     def set(self, plugin: PluginRef, name: str, value, enabled=True):
         try:
             plugin_def = self.get_definition(plugin)
-            setting = self.find_setting(plugin_def, name)
-            env = setting.get("env", self.setting_env(plugin_def.namespace, name))
+            setting_def = self.find_setting(plugin_def, name)
+            env_key = self.setting_env(setting_def, plugin_def)
 
-            if env in os.environ:
-                logging.warning(f"Setting `{name}` is currently set via ${env}.")
+            if env_key in os.environ:
+                logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
                 return
 
             setting = PluginSetting(
@@ -76,7 +76,6 @@ class PluginSettingsService:
             return setting
         except StopIteration:
             logging.warning(f"Setting `{name}` not found.")
-            return None
 
     def unset(self, plugin: PluginRef, name: str):
         self._session.query(PluginSetting).filter_by(
@@ -95,32 +94,33 @@ class PluginSettingsService:
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)
 
-    def setting_env(self, setting, plugin_def):
+    def setting_env(self, setting_def, plugin_def):
         try:
-            return setting["env"]
+            return setting_def["env"]
         except KeyError:
-            parts = (plugin_def.namespace, setting["name"])
+            parts = (plugin_def.namespace, setting_def["name"])
             process = lambda s: s.replace(".", "__").upper()
             return "_".join(map(process, parts))
 
     # TODO: ensure `kind` is handled
     def get_value(self, plugin: PluginRef, name: str):
+        plugin_install = self.get_install(plugin)
+        plugin_def = self.get_definition(plugin)
+        setting_def = self.find_setting(plugin_def, name)
+
         try:
-            plugin_def = self.get_definition(plugin)
-            plugin_install = self.get_install(plugin)
-            setting = self.find_setting(plugin_def, name)
-            env_key = setting_env(setting, plugin_def)
+            env_key = self.setting_env(setting_def, plugin_def)
 
             # priority 1: environment variable
             if env_key in os.environ:
                 logging.debug(
-                    f"Found ENV variable {env} for {plugin_def.namespace}:{name}"
+                    f"Found ENV variable {env_key} for {plugin_def.namespace}:{name}"
                 )
                 return os.environ[env_key]
 
             # priority 2: installed configuration
-            if setting["name"] in plugin_install.config:
-                return plugin_install.config[setting["name"]]
+            if setting_def["name"] in plugin_install.config:
+                return plugin_install.config[setting_def["name"]]
 
             # priority 3: settings database
             return (
@@ -134,4 +134,4 @@ class PluginSettingsService:
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden
-            return setting.get("value")
+            return setting_def.get("value")

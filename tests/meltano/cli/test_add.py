@@ -18,7 +18,7 @@ class TestCliAdd:
             (PluginType.TRANSFORMERS, "dbt"),
             (PluginType.TRANSFORMS, "tap-carbon-intensity"),
             (PluginType.ORCHESTRATORS, "airflow"),
-            (PluginType.CONNECTIONS, "postgresql"),
+            (PluginType.CONNECTIONS, "sqlite"),
         ],
     )
     def test_add(self, plugin_type, plugin_name, project, cli_runner, config_service):
