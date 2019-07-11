@@ -54,9 +54,6 @@ export default {
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
     },
-    selectivelyClearAddFilterModel() {
-      this.addFilterModel.value = '';
-    },
   },
 };
 </script>
@@ -177,17 +174,14 @@ export default {
               <p>{{filter.attributeName}}</p>
             </td>
             <td>
+<<<<<<< HEAD
               <p>{{filter.expression}}</p>
+=======
+              <p>{{filter.operation}}</p>
+>>>>>>> a286e360... cleaned addFilter and removeFilter, updated filters display to read-only for now until I rethink the best approach to allow editing
             </td>
             <td>
-              <p class="control is-expanded">
-                <input
-                  class="input is-small"
-                  :type="getFilterInputType(filter.filterType)"
-                  @focus="$event.target.select()"
-                  v-model='filter.value'
-                  placeholder="Filter value">
-              </p>
+              <p>{{filter.value}}</p>
             </td>
             <td>
               <div class="control">
