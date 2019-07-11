@@ -29,7 +29,7 @@ export default {
       return this.filters ? this.filters.columns.concat(this.filters.aggregates) : [];
     },
     getFilterInputType() {
-      return this.addFilterModel.attributeHelper.type === 'aggregate' ? 'number' : 'text';
+      return filterType => (filterType === 'aggregate' ? 'number' : 'text');
     },
     isValidAdd() {
       const vm = this.addFilterModel;
@@ -147,7 +147,7 @@ export default {
             <p class="control is-expanded">
               <input
                 class="input is-small"
-                :type="getFilterInputType"
+                :type="getFilterInputType(addFilterModel.attributeHelper.type)"
                 @focus="$event.target.select()"
                 v-model='addFilterModel.value'
                 placeholder="Filter value">
@@ -212,7 +212,7 @@ export default {
               <p class="control is-expanded">
                 <input
                   class="input is-small"
-                  type="text"
+                  :type="getFilterInputType(filter.filterType)"
                   @focus="$event.target.select()"
                   v-model='filter.value'
                   placeholder="Filter value">
