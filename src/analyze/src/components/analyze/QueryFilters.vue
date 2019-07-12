@@ -33,9 +33,7 @@ export default {
         : [];
     },
     getFilterInputType() {
-      return (filterType) => {
-        filterType === 'aggregate' ? 'number' : 'text';
-      };
+      return filterType => (filterType === 'aggregate' ? 'number' : 'text');
     },
     isFirstFilterMatch() {
       return (filter) => {
