@@ -9,7 +9,9 @@ FilterOption = collections.namedtuple("FilterOption", "label description express
 
 FilterOptions = [
     FilterOption(
-        label="Less than", description="Less than", expression=MeltanoFilterExpressionType.LessThan
+        label="Less than",
+        description="Less than",
+        expression=MeltanoFilterExpressionType.LessThan,
     ),
     FilterOption(
         label="Less than or equal",
@@ -17,7 +19,9 @@ FilterOptions = [
         expression=MeltanoFilterExpressionType.LessOrEqualThan,
     ),
     FilterOption(
-        label="Equal to", description="Equal to", expression=MeltanoFilterExpressionType.EqualTo
+        label="Equal to",
+        description="Equal to",
+        expression=MeltanoFilterExpressionType.EqualTo,
     ),
     FilterOption(
         label="Greater than or equal",
@@ -35,7 +39,9 @@ FilterOptions = [
         expression=MeltanoFilterExpressionType.Like,
     ),
     FilterOption(
-        label="Is Null", description="Is null", expression=MeltanoFilterExpressionType.IsNull
+        label="Is Null",
+        description="Is null",
+        expression=MeltanoFilterExpressionType.IsNull,
     ),
     FilterOption(
         label="Is Not Null",
