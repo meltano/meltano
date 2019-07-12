@@ -19,6 +19,10 @@ export default {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
     this.$store.dispatch('designs/getFilterOptions');
+    this.$store.dispatch('plugins/getInstalledPlugins')
+      .then(() => {
+        this.dialect = this.installedPlugins.connections[0].name;
+      });
   },
   filters: {
     capitalize,
@@ -65,12 +69,17 @@ export default {
     ...mapState('dashboards', [
       'dashboards',
     ]),
+    ...mapState('plugins', [
+      'installedPlugins',
+    ]),
     ...mapGetters('settings', [
       'isConnectionDialectSqlite',
     ]),
+
     canToggleTimeframe() {
       return !this.isConnectionDialectSqlite(this.dialect);
     },
+
     limit: {
       get() {
         return this.$store.getters['designs/currentLimit'];
@@ -80,10 +89,22 @@ export default {
         this.$store.dispatch('designs/getSQL', { run: false });
       },
     },
+
+    dialect: {
+      get() {
+        return this.$store.getters['designs/getDialect'];
+      },
+      set(value) {
+        this.$store.commit('designs/setDialect', value);
+      },
+    },
   },
   methods: {
     ...mapActions('dashboards', [
       'getDashboards',
+    ]),
+    ...mapActions('designs', [
+      'resetErrorMessage',
     ]),
 
     isActiveReportInDashboard(dashboard) {
@@ -475,25 +496,25 @@ export default {
                   </a>
                   <template v-for="timeframe in join.related_table.timeframes">
                     <a class="panel-block timeframe"
-                        v-if="!timeframe.hidden"
-                        @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
-                        :key="timeframe.label"
-                        :class="{
-                          'is-active': timeframe.selected,
-                          'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
-                        }">
+                       v-if="!timeframe.hidden"
+                       @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
+                       :key="timeframe.label"
+                       :class="{
+                              'is-active': timeframe.selected,
+                              'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
+                              }">
                       {{timeframe.label}}
                       <div class='sqlite-unsupported-container'
-                            v-if='isConnectionDialectSqlite(dialect)'>
+                           v-if='isConnectionDialectSqlite(dialect)'>
                         <small>Unsupported by SQLite</small>
                       </div>
                     </a>
                     <template v-if="timeframe.selected">
                       <template v-for="period in timeframe.periods">
                         <a class="panel-block indented"
-                            :key="timeframe.label.concat('-', period.label)"
-                            @click="timeframePeriodSelected(period)"
-                            :class="{'is-active': period.selected}">
+                           :key="timeframe.label.concat('-', period.label)"
+                           @click="timeframePeriodSelected(period)"
+                           :class="{'is-active': period.selected}">
                           {{period.label}}
                         </a>
                       </template>
@@ -518,9 +539,9 @@ export default {
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a class="panel-block
-                    panel-block-heading
-                    has-background-white"
-                    v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
+                            panel-block-heading
+                            has-background-white"
+                     v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
                     Aggregates
                   </a>
                   <template v-for="aggregate in join.related_table.aggregates">
@@ -618,8 +639,8 @@ export default {
           <div>
             <div v-if="hasChartableResults" class="chart-toggles">
               <chart :chart-type='chartType'
-                      :results='results'
-                      :result-aggregates='resultAggregates'></chart>
+                     :results='results'
+                     :result-aggregates='resultAggregates'></chart>
             </div>
             <div v-if="!hasChartableResults">
               <div class="box is-radiusless is-shadowless has-text-centered">
@@ -654,7 +675,6 @@ export default {
 
         </div>
       </div>
-
     </div>
   </section>
 </template>

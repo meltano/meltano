@@ -68,13 +68,13 @@ export default {
       <div class="column">
         <div class="field is-pulled-right">
 
-          <p class="control">
+          <div class="control">
             <button
               class="button is-interactive-primary"
               @click="createPipeline();">
               <span>Create</span>
             </button>
-          </p>
+          </div>
 
         </div>
       </div>

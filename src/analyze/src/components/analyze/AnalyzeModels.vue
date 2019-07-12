@@ -57,7 +57,7 @@ export default {
               <th>Model</th>
             </tr>
           </thead>
-          <tbody>
+         <tbody>
 
             <template v-for='(modelPlugin, index) in plugins.models'>
               <tr :key="`${modelPlugin}-${index}`">

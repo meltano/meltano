@@ -1,6 +1,5 @@
 <script>
 import { mapGetters } from 'vuex';
-
 import InputDateIso8601 from '@/components/generic/InputDateIso8601';
 
 import utils from '@/utils/utils';
@@ -11,7 +10,12 @@ export default {
     InputDateIso8601,
   },
   props: {
-    configSettings: { type: Object, required: true, default: () => {} },
+    fieldClass: { type: String },
+    configSettings: {
+      type: Object,
+      required: true,
+      default: () => {},
+    },
   },
   computed: {
     ...mapGetters('configuration', [
@@ -46,20 +50,29 @@ export default {
         return type;
       };
     },
+    labelClass() {
+      return this.fieldClass || 'is-normal';
+    },
+    successClass() {
+      return setting =>
+        (this.getIsConfigSettingValid(setting)
+          ? 'is-success has-text-success'
+          : null);
+    },
   },
 };
 </script>
 
 <template>
   <div>
-
+    <slot name="top" />
     <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
-      <div class="field-label is-normal">
-        <label class="label is-small">{{ setting.label || getCleanedLabel(setting.name) }}</label>
+      <div :class="['field-label', labelClass]">
+        <label class="label">{{ setting.label || getCleanedLabel(setting.name) }}</label>
       </div>
       <div class="field-body">
         <div class="field">
-          <p class="control is-expanded">
+          <div class="control is-expanded">
 
             <!-- Boolean -->
             <label
@@ -67,7 +80,7 @@ export default {
               class="checkbox">
               <input
                 v-model="configSettings.config[setting.name]"
-                :class='{ "is-success has-text-success": getIsConfigSettingValid(configSettings.config[setting.name]) }'
+                :class="successClass(setting)"
                 type="checkbox">
             </label>
 
@@ -82,28 +95,27 @@ export default {
             <input
               v-else-if='getIsOfKindTextBased(setting.kind)'
               v-model="configSettings.config[setting.name]"
-              class="input is-small"
-              :class='{ "is-success has-text-success": getIsConfigSettingValid(configSettings.config[setting.name]) }'
+              :class="['input', fieldClass, successClass(setting)]"
               @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
               :placeholder="setting.value || setting.name">
-          </p>
+          </div>
           <p
             v-if="setting.description"
-            class='help is-italic'
+            class="help is-italic"
             >
             {{ setting.description }}
           </p>
           <p
             v-if="setting.documentation"
-            class='help'
+            class="help"
             >
             <a :href="setting.documentation">More Info.</a>
           </p>
         </div>
       </div>
     </div>
-
+    <slot name="bottom" />
   </div>
 </template>
 

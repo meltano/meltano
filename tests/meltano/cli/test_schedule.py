@@ -17,7 +17,8 @@ class TestCliSchedule:
     def test_schedule(
         self, get_value, session, project, cli_runner, schedule_service_factory
     ):
-        get_value.return_value = "2010-01-01"
+        TEST_DATE = "2010-01-01"
+        get_value.return_value = (TEST_DATE, 0)
 
         res = cli_runner.invoke(
             cli,
@@ -43,5 +44,5 @@ class TestCliSchedule:
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
         assert schedule.interval == "@eon"  # not anytime soon ;)
-        assert schedule.start_date == iso8601_datetime(get_value.return_value)
+        assert schedule.start_date == iso8601_datetime(TEST_DATE)
         assert res.exit_code == 0, res.stdout
