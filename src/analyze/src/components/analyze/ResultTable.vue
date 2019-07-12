@@ -37,7 +37,8 @@ export default {
           is-striped
           is-narrow
           is-hoverable
-          is-fullwidth"
+          is-fullwidth
+          is-size-7"
           v-if="hasResults">
         <thead>
           <th v-for="(columnHeader, i) in columnHeaders"
