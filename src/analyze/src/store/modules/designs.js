@@ -114,6 +114,7 @@ const helpers = {
       order,
       limit: state.limit,
       filters,
+      dialect: state.dialect,
     };
   },
 };
@@ -136,6 +137,8 @@ const getters = {
     }
     return state.results.length;
   },
+
+  getDialect: () => state.dialect,
 
   getDistinctsForField: () => field => state.distincts[field],
 
@@ -230,14 +233,6 @@ const actions = {
         commit('setDesign', response.data);
       });
 
-    sqlApi.getDialect(model)
-      .then((response) => {
-        commit('setConnectionDialect', response.data);
-      })
-      .catch((e) => {
-        commit('setSqlErrorMessage', e);
-      });
-
     reportsApi.loadReports()
       .then((response) => {
         state.reports = response.data;
@@ -310,6 +305,7 @@ const actions = {
     commit('setLimit', limit);
   },
 
+  // TODO: remove and use `mapMutations`
   setChartType({ commit }, chartType) {
     commit('setChartType', chartType);
   },
@@ -318,7 +314,7 @@ const actions = {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
-    const queryPayload = load || helpers.getQueryPayloadFromDesign();
+    const queryPayload = Object.assign({}, helpers.getQueryPayloadFromDesign(), load);
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
@@ -460,6 +456,7 @@ const mutations = {
     state.currentDesign = report.design;
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
+    state.dialect = report.queryPayload.dialect;
 
     // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
     const baseTable = state.design.related_table;
@@ -574,10 +571,6 @@ const mutations = {
     state.currentSQL = results.sql;
   },
 
-  setConnectionDialect(_, results) {
-    state.dialect = results.connection_dialect;
-  },
-
   setQueryResults(_, results) {
     state.results = results.results;
     state.keys = results.keys;
@@ -621,6 +614,10 @@ const mutations = {
 
   setLimit(_, limit) {
     state.limit = limit;
+  },
+
+  setDialect(_, dialect) {
+    state.dialect = dialect;
   },
 };
 

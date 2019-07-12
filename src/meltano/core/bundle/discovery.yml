@@ -1,4 +1,4 @@
-version: 2.0
+version: 3.0
 extractors:
   - name: tap-google-analytics
     namespace: google-analytics
@@ -277,3 +277,25 @@ orchestrators:
       - name: webserver.web_server_port
         value: 5010
         env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+connections:
+  - name: sqlite
+    namespace: sqlite
+    settings:
+      - name: dbname
+        label: Database
+        description: Path to the database, relative to the project root.
+        value: meltano.db
+  - name: postgresql
+    namespace: postgresql
+    settings:
+      - name: user
+        value: warehouse
+      - name: password
+        value: warehouse
+      - name: host
+        value: 'localhost:5502'
+      - name: dbname
+        value: warehouse
+      - name: schema
+        value: analytics
+        env: PG_SCHEMA

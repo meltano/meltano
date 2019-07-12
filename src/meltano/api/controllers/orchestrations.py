@@ -4,7 +4,10 @@ from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 from meltano.core.plugin import PluginType, PluginRef
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import (
+    PluginSettingsService,
+    PluginSettingValueSource,
+)
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
@@ -92,7 +95,10 @@ def get_plugin_configuration() -> Response:
 
     return jsonify(
         {
-            "config": flatten(settings.as_config(plugin), reducer="dot"),
+            "config": flatten(
+                settings.as_config(plugin, sources=[PluginSettingValueSource.DB]),
+                reducer="dot",
+            ),
             "settings": settings.get_definition(plugin).settings,
         }
     )
@@ -110,7 +116,10 @@ def save_plugin_configuration() -> Response:
 
     settings = PluginSettingsService(db.session, project)
     for name, value in config.items():
-        settings.set(plugin, name, value)
+        if value == "":
+            settings.unset(plugin, name)
+        else:
+            settings.set(plugin, name, value)
 
     return jsonify(settings.as_config(plugin))
 

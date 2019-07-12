@@ -54,14 +54,14 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
            
           <a
             class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
+                     panel-block-heading
+                     has-background-white-bis
+                     has-text-grey
+                     is-expandable"
           >
             
-                
               
+            
           </a>
            
           <!---->
@@ -103,13 +103,13 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             <div
               class="control field"
             >
-              <p
+              <div
                 class="control"
               >
                 <!---->
-              </p>
+              </div>
                
-              <p
+              <div
                 class="control"
               >
                 <div
@@ -194,11 +194,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     </div>
                   </div>
                 </div>
-              </p>
+              </div>
             </div>
              
-            <p
-              class="control"
+            <div
+              class="control field"
             >
               <div
                 class="dropdown is-right"
@@ -243,18 +243,34 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   </div>
                 </div>
               </div>
-            </p>
+            </div>
              
-            <p
-              class="control"
+            <div
+              class="control field has-addons"
             >
-              <button
-                class="button is-success"
-                disabled="disabled"
+              <div
+                class="control"
               >
-                Run Query
-              </button>
-            </p>
+                <button
+                  class="button is-success"
+                  disabled="disabled"
+                >
+                  Run Query
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <div
+                  class="select is-fullwidth"
+                >
+                  <select
+                    name="connection"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -263,9 +279,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable is-collapsed"
       >
         <span
           class="accordion-title"
@@ -277,7 +293,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
           <div
             class="field has-addons chart-buttons"
           >
-            <p
+            <div
               class="control"
             >
               <button
@@ -292,9 +308,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -309,9 +325,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -326,9 +342,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -343,7 +359,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
           </div>
         </div>
          
@@ -372,9 +388,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable"
       >
         <span>
           Data
@@ -539,14 +555,14 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
            
           <a
             class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
+                     panel-block-heading
+                     has-background-white-bis
+                     has-text-grey
+                     is-expandable"
           >
             
-                
               
+            
           </a>
            
           <!---->
@@ -588,13 +604,13 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
             <div
               class="control field"
             >
-              <p
+              <div
                 class="control"
               >
                 <!---->
-              </p>
+              </div>
                
-              <p
+              <div
                 class="control"
               >
                 <div
@@ -679,11 +695,11 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     </div>
                   </div>
                 </div>
-              </p>
+              </div>
             </div>
              
-            <p
-              class="control"
+            <div
+              class="control field"
             >
               <div
                 class="dropdown is-right"
@@ -721,17 +737,33 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </div>
               </div>
-            </p>
+            </div>
              
-            <p
-              class="control"
+            <div
+              class="control field has-addons"
             >
-              <button
-                class="button is-success"
+              <div
+                class="control"
               >
-                Run Query
-              </button>
-            </p>
+                <button
+                  class="button is-success"
+                >
+                  Run Query
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <div
+                  class="select is-fullwidth"
+                >
+                  <select
+                    name="connection"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -740,9 +772,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable is-collapsed"
       >
         <span
           class="accordion-title"
@@ -754,7 +786,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
           <div
             class="field has-addons chart-buttons"
           >
-            <p
+            <div
               class="control"
             >
               <button
@@ -769,9 +801,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -786,9 +818,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -803,9 +835,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -820,7 +852,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   />
                 </span>
               </button>
-            </p>
+            </div>
           </div>
         </div>
          
@@ -849,9 +881,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable"
       >
         <span>
           Data
@@ -1020,14 +1052,14 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
            
           <a
             class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
+                     panel-block-heading
+                     has-background-white-bis
+                     has-text-grey
+                     is-expandable"
           >
             
-                
               
+            
           </a>
            
           <!---->
@@ -1069,13 +1101,13 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             <div
               class="control field"
             >
-              <p
+              <div
                 class="control"
               >
                 <!---->
-              </p>
+              </div>
                
-              <p
+              <div
                 class="control"
               >
                 <div
@@ -1160,11 +1192,11 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     </div>
                   </div>
                 </div>
-              </p>
+              </div>
             </div>
              
-            <p
-              class="control"
+            <div
+              class="control field"
             >
               <div
                 class="dropdown is-right"
@@ -1202,17 +1234,33 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </div>
               </div>
-            </p>
+            </div>
              
-            <p
-              class="control"
+            <div
+              class="control field has-addons"
             >
-              <button
-                class="button is-success"
+              <div
+                class="control"
               >
-                Run Query
-              </button>
-            </p>
+                <button
+                  class="button is-success"
+                >
+                  Run Query
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <div
+                  class="select is-fullwidth"
+                >
+                  <select
+                    name="connection"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1221,9 +1269,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable is-collapsed"
       >
         <span
           class="accordion-title"
@@ -1235,7 +1283,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           <div
             class="field has-addons chart-buttons"
           >
-            <p
+            <div
               class="control"
             >
               <button
@@ -1250,9 +1298,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1267,9 +1315,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1284,9 +1332,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1301,7 +1349,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   />
                 </span>
               </button>
-            </p>
+            </div>
           </div>
         </div>
          
@@ -1330,9 +1378,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable"
       >
         <span>
           Data
@@ -1501,14 +1549,14 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
            
           <a
             class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
+                     panel-block-heading
+                     has-background-white-bis
+                     has-text-grey
+                     is-expandable"
           >
             
-                
               
+            
           </a>
            
           <!---->
@@ -1543,19 +1591,19 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           <div
             class="field is-grouped is-pulled-right"
           >
-            <p
+            <div
               class="control"
             >
               <dropdown-stub
                 isrightaligned="true"
                 label="Add to Dashboard"
               />
-            </p>
+            </div>
              
             <div
               class="control field has-addons"
             >
-              <p
+              <div
                 class="control"
               >
                 <button
@@ -1565,9 +1613,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     Save
                   </span>
                 </button>
-              </p>
+              </div>
                
-              <p
+              <div
                 class="control"
               >
                 <dropdown-stub
@@ -1576,28 +1624,44 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   isrightaligned="true"
                   label=""
                 />
-              </p>
+              </div>
             </div>
              
-            <p
-              class="control"
+            <div
+              class="control field"
             >
               <dropdown-stub
                 buttonclasses="is-interactive-primary is-outlined"
                 isrightaligned="true"
                 label="Load"
               />
-            </p>
+            </div>
              
-            <p
-              class="control"
+            <div
+              class="control field has-addons"
             >
-              <button
-                class="button is-success"
+              <div
+                class="control"
               >
-                Run Query
-              </button>
-            </p>
+                <button
+                  class="button is-success"
+                >
+                  Run Query
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <div
+                  class="select is-fullwidth"
+                >
+                  <select
+                    name="connection"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1606,9 +1670,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable is-collapsed"
       >
         <span
           class="accordion-title"
@@ -1620,7 +1684,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           <div
             class="field has-addons chart-buttons"
           >
-            <p
+            <div
               class="control"
             >
               <button
@@ -1635,9 +1699,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1652,9 +1716,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1669,9 +1733,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -1686,7 +1750,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-            </p>
+            </div>
           </div>
         </div>
          
@@ -1715,9 +1779,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable"
       >
         <span>
           Data
@@ -1886,14 +1950,14 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
            
           <a
             class="panel-block
-              panel-block-heading
-              has-background-white-bis
-              has-text-grey
-              is-expandable"
+                     panel-block-heading
+                     has-background-white-bis
+                     has-text-grey
+                     is-expandable"
           >
             
-                
               
+            
           </a>
            
           <!---->
@@ -1935,13 +1999,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             <div
               class="control field"
             >
-              <p
+              <div
                 class="control"
               >
                 <!---->
-              </p>
+              </div>
                
-              <p
+              <div
                 class="control"
               >
                 <div
@@ -2026,11 +2090,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     </div>
                   </div>
                 </div>
-              </p>
+              </div>
             </div>
              
-            <p
-              class="control"
+            <div
+              class="control field"
             >
               <div
                 class="dropdown is-right"
@@ -2068,18 +2132,34 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </div>
               </div>
-            </p>
+            </div>
              
-            <p
-              class="control"
+            <div
+              class="control field has-addons"
             >
-              <button
-                class="button is-success"
-                disabled="disabled"
+              <div
+                class="control"
               >
-                Run Query
-              </button>
-            </p>
+                <button
+                  class="button is-success"
+                  disabled="disabled"
+                >
+                  Run Query
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <div
+                  class="select is-fullwidth"
+                >
+                  <select
+                    name="connection"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -2088,9 +2168,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable is-collapsed"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable is-collapsed"
       >
         <span
           class="accordion-title"
@@ -2102,7 +2182,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
           <div
             class="field has-addons chart-buttons"
           >
-            <p
+            <div
               class="control"
             >
               <button
@@ -2117,9 +2197,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -2134,9 +2214,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -2151,9 +2231,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
+            </div>
              
-            <p
+            <div
               class="control"
             >
               <button
@@ -2168,7 +2248,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-            </p>
+            </div>
           </div>
         </div>
          
@@ -2197,9 +2277,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
        
       <div
         class="has-background-primary
-        accordion-header
-        has-text-white-bis
-        is-expandable"
+                  accordion-header
+                  has-text-white-bis
+                  is-expandable"
       >
         <span>
           Data

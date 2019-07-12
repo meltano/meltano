@@ -11,7 +11,7 @@ export default {
   computed: {
     isAnalyzing() {
       return !this.isCurrentLink('/analyze/models/') &&
-        !this.isCurrentLink('/analyze/connection-settings/');
+        !this.isCurrentLink('/analyze/settings/');
     },
     isCurrentLink() {
       return path => this.$route.path === path;
@@ -33,12 +33,12 @@ export default {
             <div class="tabs is-right">
               <ul>
                 <li :class="{ 'is-active': isCurrentLink('/analyze/models/') }">
-                  <router-link to="/analyze/models/">Models</router-link>
+                  <router-link :to="{name: 'analyzeModels'}">Models</router-link>
                 </li>
                 <li
                   class="is-marginless"
-                  :class="{ 'is-active': isCurrentLink('/analyze/connection-settings/') }">
-                  <router-link to="/analyze/connection-settings/">Connections</router-link>
+                  :class="{ 'is-active': isCurrentLink('/analyze/settings/') }">
+                  <router-link :to="{name: 'analyzeSettings'}">Connections</router-link>
                 </li>
               </ul>
             </div>

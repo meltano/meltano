@@ -10,7 +10,7 @@ from itertools import groupby, chain
 import meltano.core.bundle as bundle
 from .behavior.versioned import Versioned, IncompatibleVersionError
 from .config_service import ConfigService
-from .plugin import Plugin, PluginInstall, PluginType
+from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
 
 
@@ -34,7 +34,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService(Versioned):
-    __version__ = 2
+    __version__ = 3
 
     def __init__(
         self,
@@ -142,7 +142,6 @@ class PluginDiscoveryService(Versioned):
                 plugin_type,
                 plugin_def.pop("name"),
                 plugin_def.pop("namespace"),
-                plugin_def.pop("pip_url"),
                 **plugin_def,
             )
             for plugin_type, plugin_defs in plugins.items()
@@ -151,14 +150,15 @@ class PluginDiscoveryService(Versioned):
         )
 
     def find_plugin(self, plugin_type: PluginType, plugin_name: str):
+        name, _ = PluginRef.parse_name(plugin_name)
         try:
             return next(
                 plugin
                 for plugin in self.plugins()
-                if (plugin.type == plugin_type and plugin.name == plugin_name)
+                if (plugin.type == plugin_type and plugin.name == name)
             )
         except StopIteration:
-            raise PluginNotFoundError()
+            raise PluginNotFoundError(name)
 
     def discover(self, plugin_type: PluginType):
         """Return a pretty printed list of available plugins."""
@@ -169,6 +169,7 @@ class PluginDiscoveryService(Versioned):
                 PluginType.TRANSFORMERS,
                 PluginType.MODELS,
                 PluginType.TRANSFORMS,
+                PluginType.CONNECTIONS,
                 PluginType.ORCHESTRATORS,
             )
             if plugin_type == PluginType.ALL
