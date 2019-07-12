@@ -9,7 +9,7 @@ export default {
         attributeHelper: {
           attribute: null,
           type: '',
-          tableName: '',
+          table_name: '',
         },
         expression: '',
         value: '',
@@ -33,7 +33,7 @@ export default {
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      return vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.expression && vm.value;
+      return vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression && vm.value;
     },
   },
   methods: {
@@ -43,7 +43,7 @@ export default {
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
-        tableName: vm.attributeHelper.tableName,
+        table_name: vm.attributeHelper.table_name,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
@@ -111,7 +111,7 @@ export default {
                       :key='column.label'
                       :value="{
                         attribute: column,
-                        tableName: attributeTable.tableName,
+                        table_name: attributeTable.table_name,
                         type: 'column'}">
                       {{column.label}}
                     </option>
@@ -121,7 +121,7 @@ export default {
                       :key='aggregate.label'
                       :value="{
                         attribute: aggregate,
-                        tableName: attributeTable.tableName,
+                        table_name: attributeTable.table_name,
                         type: 'aggregate'}">
                       {{aggregate.label}}
                     </option>
@@ -169,9 +169,9 @@ export default {
 
           <tr
             v-for='filter in getFlattenedFilters'
-            :key='`${filter.tableName}-${filter.attributeName}`'>
+            :key='`${filter.table_name}-${filter.name}`'>
             <td>
-              <p>{{filter.attributeName}}</p>
+              <p>{{filter.name}}</p>
             </td>
             <td>
               <p>{{filter.expression}}</p>

@@ -139,7 +139,7 @@ const getters = {
     if (design.label) {
       attributeTables.push({
         tableLabel: design.label,
-        tableName: design.from,
+        table_name: design.from,
         columns: design.related_table.columns.filter(attributeFilter),
         aggregates: design.related_table.aggregates.filter(attributeFilter),
       });
@@ -148,7 +148,7 @@ const getters = {
       design.joins.forEach((join) => {
         attributeTables.push({
           tableLabel: join.label,
-          tableName: join.name,
+          table_name: join.name,
           columns: join.related_table.columns.filter(attributeFilter),
           aggregates: join.related_table.aggregates.filter(attributeFilter),
         });
@@ -157,8 +157,8 @@ const getters = {
     return attributeTables;
   },
 
-  getFilter(tableName, attributeName, filterType) {
-    return getters.getFiltersByType(filterType).find(filter => filter.attributeName === attributeName && filter.tableName === tableName);
+  getFilter(table_name, name, filterType) {
+    return getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.table_name === table_name);
   },
 
   getFiltersByType(filterType) {
@@ -166,7 +166,7 @@ const getters = {
   },
 
   getIsAttributeInFilters() {
-    return (tableName, attributeName, filterType) => !!getters.getFilter(tableName, attributeName, filterType);
+    return (table_name, name, filterType) => !!getters.getFilter(table_name, name, filterType);
   },
 
   attributesCount() {
@@ -310,11 +310,11 @@ const actions = {
     commit('toggleSelected', timeframePeriod);
   },
 
-  toggleAggregate({ commit }, { aggregate, tableName }) {
+  toggleAggregate({ commit }, { aggregate, table_name }) {
     commit('toggleSelected', aggregate);
 
     if (!aggregate.selected) {
-      const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
+      const filter = getters.getFilter(table_name, aggregate.name, 'aggregate');
       if (filter) {
         commit('removeFilter', filter);
       }
@@ -418,10 +418,10 @@ const actions = {
     });
   },
 
-  addFilter({ commit }, { tableName, attribute, filterType, expression = '', value = '' }) {
+  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '' }) {
     const filter = {
-      tableName,
-      attributeName: attribute.name,
+      table_name,
+      name: attribute.name,
       filterType,
       expression,
       value,
