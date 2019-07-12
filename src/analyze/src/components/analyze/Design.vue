@@ -622,7 +622,7 @@ export default {
                       :result-aggregates='resultAggregates'></chart>
             </div>
             <div v-if="!hasChartableResults">
-              <div class="box is-radiusless is-shadowless">
+              <div class="box is-radiusless is-shadowless has-text-centered">
                 <p>
                   Run a query with at least one aggregate selected or load a report
                 </p>
