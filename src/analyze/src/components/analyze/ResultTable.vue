@@ -29,7 +29,7 @@ export default {
 
 <template>
     <div class="result-data">
-      <div class="notification is-info" v-if="!hasResults">
+      <div class="notification is-italic" v-if="!hasResults">
         No results
       </div>
       <table class="table
