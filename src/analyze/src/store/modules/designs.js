@@ -418,9 +418,10 @@ const actions = {
     const filter = {
       table_name,
       name: attribute.name,
-      filterType,
       expression,
       value,
+      attribute,
+      filterType,
     };
     commit('addFilter', filter);
 

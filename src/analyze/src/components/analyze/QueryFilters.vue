@@ -1,6 +1,8 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
 
+import _ from 'lodash';
+
 export default {
   name: 'QueryFilters',
   data() {
@@ -26,10 +28,22 @@ export default {
       'hasFilters',
     ]),
     getFlattenedFilters() {
-      return this.filters ? this.filters.columns.concat(this.filters.aggregates) : [];
+      return this.hasFilters
+        ? _.sortBy(this.filters.columns.concat(this.filters.aggregates), 'name')
+        : [];
     },
     getFilterInputType() {
-      return filterType => (filterType === 'aggregate' ? 'number' : 'text');
+      return (filterType) => {
+        filterType === 'aggregate' ? 'number' : 'text';
+      };
+    },
+    isFirstFilterMatch() {
+      return (filter) => {
+        const match = this.getFlattenedFilters.find(tempFilter => {
+          return tempFilter.table_name === filter.table_name && tempFilter.name === filter.name
+        });
+        return match === filter;
+      };
     },
     isValidAdd() {
       const vm = this.addFilterModel;
@@ -168,26 +182,43 @@ export default {
           <br>
 
           <tr
-            v-for='filter in getFlattenedFilters'
-            :key='`${filter.table_name}-${filter.name}`'>
+            v-for='(filter, index) in getFlattenedFilters'
+            :key='`${filter.table_name}-${filter.name}-${index}`'>
             <td>
-              <p>{{filter.name}}</p>
+              <p class="is-small">
+                <span v-if='isFirstFilterMatch(filter)'>
+                  {{filter.attribute.label}}
+                </span>
+              </p>
             </td>
             <td>
-<<<<<<< HEAD
-              <p>{{filter.expression}}</p>
-=======
-              <p>{{filter.operation}}</p>
->>>>>>> a286e360... cleaned addFilter and removeFilter, updated filters display to read-only for now until I rethink the best approach to allow editing
+              <p class="control is-expanded">
+                <span
+                  class="select is-fullwidth is-small">
+                  <select v-model='filter.expression'>
+                    <option
+                      v-for="filterOption in filterOptions"
+                      :key='filterOption.label'
+                      :value='filterOption.expression'>{{filterOption.label}}</option>
+                  </select>
+                </span>
+              </p>
             </td>
             <td>
-              <p>{{filter.value}}</p>
+              <p class="control is-expanded">
+                <input
+                  class="input is-small"
+                  :type="getFilterInputType(filter.filterType)"
+                  @focus="$event.target.select()"
+                  v-model='filter.value'
+                  placeholder="Filter value">
+              </p>
             </td>
             <td>
               <div class="control">
                 <button
                   class="button is-small is-fullwidth"
-                  @click='removeFilter(filter)'>
+                  @click.stop='removeFilter(filter)'>
                   Remove</button>
               </div>
             </td>
