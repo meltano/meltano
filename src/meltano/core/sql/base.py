@@ -474,8 +474,8 @@ class MeltanoFilter(MeltanoBase):
         """
         Validate the Filter definition
         """
-        table_name = definition.get("tableName", None)
-        attribute_name = definition.get("attributeName", None)
+        table_name = definition.get("table_name", None)
+        attribute_name = definition.get("name", None)
 
         if self.expression_type == MeltanoFilterExpressionType.Unknown:
             raise NotImplementedError(
