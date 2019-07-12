@@ -953,11 +953,16 @@ class MeltanoQuery(MeltanoBase):
 
         # Start By building the Join
         for join in self.join_order:
+            table = next(
+                iter([t for t in self.tables if t.name == join["table"]]), None
+            )
+
+            # Create a pypika Table based on the Table's name
+            db_table = Table(table.sql_table_name, alias=table.sql_table_name)
+
             if join["on"] is None:
-                db_table = Table(join["table"], alias=join["table"])
                 base_join_query = base_join_query.from_(db_table)
             else:
-                db_table = Table(join["table"], alias=join["table"])
                 base_join_query = base_join_query.join(db_table).on(join["on"])
 
         # precompute the group_by attributes that will be used in all intermediary
@@ -1211,13 +1216,17 @@ class MeltanoQuery(MeltanoBase):
 
         schema_query = query
         for join in self.join_order:
+            table = next((t for t in self.tables if t.name == join["table"]), None)
+
             if join["on"] is None:
                 schema_query = schema_query.replace(
-                    f'FROM "{join["table"]}"', f'FROM "{self.schema}"."{join["table"]}"'
+                    f'FROM "{table.sql_table_name}"',
+                    f'FROM "{self.schema}"."{table.sql_table_name}"',
                 )
             else:
                 schema_query = schema_query.replace(
-                    f'JOIN "{join["table"]}"', f'JOIN "{self.schema}"."{join["table"]}"'
+                    f'JOIN "{table.sql_table_name}"',
+                    f'JOIN "{self.schema}"."{table.sql_table_name}"',
                 )
 
         return schema_query
