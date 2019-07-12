@@ -131,3 +131,15 @@ Modifer helpers with names based on Bulma naming conventions
 .is-borderless {
   border: none;
 }
+
+.is-flex-wrap {
+  flex-wrap: wrap;
+}
+
+.is-flex-no-grow {
+  flex-grow: 0;
+}
+
+.is-flex-column {
+  flex-direction: column;
+}

@@ -26,6 +26,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
             PluginType.MODELS,
             PluginType.TRANSFORMS,
             PluginType.ORCHESTRATORS,
+            PluginType.CONNECTIONS,
             PluginType.ALL,
         ]
     ),

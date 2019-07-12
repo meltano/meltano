@@ -120,7 +120,7 @@ export default {
           <tbody>
             <tr>
               <th>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <input
                     class="input"
                     :class="{
@@ -130,10 +130,10 @@ export default {
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">
-                </p>
+                </div>
               </th>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
@@ -148,10 +148,10 @@ export default {
                         :key='extractor.name'>{{extractor.name}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
@@ -166,10 +166,10 @@ export default {
                         :key='loader.name'>{{loader.name}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control">
+                <div class="control">
                   <span
                     class="select is-fullwidth"
                     :class="{
@@ -183,10 +183,10 @@ export default {
                         :key='transform'>{{transform}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
@@ -200,10 +200,10 @@ export default {
                         :key='interval'>{{interval}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <Dropdown
                     :label='hasCatchupDate ? getFormattedDateStringYYYYMMDD : "None"'
                     :button-classes='(pipeline.startDate || !hasCatchupDate)
@@ -231,7 +231,7 @@ export default {
                       </div>
                     </div>
                   </Dropdown>
-                </p>
+                </div>
               </td>
             </tr>
           </tbody>

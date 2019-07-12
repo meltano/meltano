@@ -1,6 +1,7 @@
 import pytest
 
 from meltano.core.plugin.setting import PluginSetting
+from meltano.core.plugin.settings_service import PluginSettingValueSource
 
 
 def test_create(session):
@@ -26,26 +27,41 @@ class TestPluginSettingsService:
 
     def test_get_value(self, session, subject, project, tap, monkeypatch):
         # returns the default value when unset
-        assert subject.get_value(tap, "test") == "mock"
+        assert subject.get_value(tap, "test") == (
+            "mock",
+            PluginSettingValueSource.DEFAULT,
+        )
 
         # overriden by an PluginSetting db value when set
         setting = subject.set(tap, "test", "THIS_IS_FROM_DB")
-        assert subject.get_value(tap, "test") == "THIS_IS_FROM_DB"
+        assert subject.get_value(tap, "test") == (
+            "THIS_IS_FROM_DB",
+            PluginSettingValueSource.DB,
+        )
 
         # but only if enabled
         setting.enabled = False
         session.merge(setting)
         session.commit()
-        assert subject.get_value(tap, "test") == "mock"
+        assert subject.get_value(tap, "test") == (
+            "mock",
+            PluginSettingValueSource.DEFAULT,
+        )
 
         # overriden via the `meltano.yml` configuration
         project._meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
-        assert subject.get_value(tap, "test") == 42
+        assert subject.get_value(tap, "test") == (
+            42,
+            PluginSettingValueSource.MELTANO_YML,
+        )
         project.reload()
 
         # overriden via ENV
         monkeypatch.setenv("PYTEST_TEST", "N33DC0F33")
-        assert subject.get_value(tap, "test") == "N33DC0F33"
+        assert subject.get_value(tap, "test") == (
+            "N33DC0F33",
+            PluginSettingValueSource.ENV,
+        )
 
     def test_as_config(self, subject, tap):
         assert subject.as_config(tap) == {"test": "mock", "start_date": None}

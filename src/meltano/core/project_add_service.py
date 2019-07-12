@@ -39,9 +39,5 @@ class ProjectAddService:
 
     def add(self, plugin_type: PluginType, plugin_name: str, **kwargs) -> PluginInstall:
         plugin = self.discovery_service.find_plugin(plugin_type, plugin_name)
-
-        if not plugin.pip_url:
-            raise PluginNotSupportedException()
-
         installed = plugin.as_installed()
         return self.config_service.add_to_file(installed)

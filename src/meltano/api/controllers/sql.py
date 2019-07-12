@@ -59,36 +59,6 @@ def default(obj):
     raise TypeError(f"Object of type {type(obj).__name__} is not JSON serialize-able")
 
 
-def get_db_engine(connection_name):
-    project = Project.find()
-    settings_helper = SettingsHelper()
-    connections = settings_helper.get_connections()["settings"]["connections"]
-
-    try:
-        connection = next(
-            connection
-            for connection in connections
-            if connection["name"] == connection_name
-        )
-
-        if connection["dialect"] == "postgresql":
-            psql_params = ["username", "password", "host", "port", "database"]
-            user, pw, host, port, db = [connection[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
-            engine = sqlalchemy.create_engine(connection_url)
-            engine.execute(f"SET search_path TO {connection['schema']},public ")
-        elif connection["dialect"] == "sqlite":
-            db_path = project.root.joinpath(connection["path"])
-            connection_url = f"sqlite:///{db_path}"
-            engine = sqlalchemy.create_engine(connection_url)
-
-        return engine
-
-        raise ConnectionNotFound(connection_name)
-    except StopIteration:
-        raise ConnectionNotFound(connection_name)
-
-
 @sqlBP.before_request
 @api_auth_required
 def before_request():
@@ -100,6 +70,7 @@ def index():
     return jsonify({"result": True})
 
 
+# TODO: remove this
 @sqlBP.route("/get/<topic_name>/dialect", methods=["GET"])
 def get_dialect(topic_name):
     sqlHelper = SqlHelper()
@@ -116,13 +87,12 @@ def get_sql(topic_name, design_name):
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
-    # Get the connection currently used in Meltano UI
-    # It is used in order to dynamically generate the proper SQL queries
-    #  using the schema (Postgres) or even the database (Snowflake) at run time
-    connection_name = m5oc.connection("connection")
-    connection = sqlHelper.get_connection(connection_name)
+    # for now let's stick to the first connection that fits
+    # the dialect
+    dialect = incoming_json["dialect"]
+    connection = sqlHelper.get_connection(dialect)
 
-    sql_dict = sqlHelper.get_sql(design, incoming_json, connection.get("schema", None))
+    sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
     column_headers = sql_dict["column_headers"]
@@ -136,7 +106,7 @@ def get_sql(topic_name, design_name):
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
-    results = sqlHelper.get_query_results(connection_name, outgoing_sql)
+    results = sqlHelper.get_query_results(dialect, outgoing_sql)
 
     base_dict["results"] = results
     if not len(results):

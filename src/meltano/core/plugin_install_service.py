@@ -5,7 +5,12 @@ from .venv_service import VenvService
 from .utils import noop
 from .plugin import PluginInstall, Plugin, PluginRef
 from .project import Project
-from .error import PluginInstallError, PluginInstallWarning, SubprocessError
+from .error import (
+    PluginInstallError,
+    PluginInstallWarning,
+    SubprocessError,
+    PluginNotInstallable,
+)
 
 
 class PluginInstallService:
@@ -52,8 +57,12 @@ class PluginInstallService:
         return {"errors": errors, "installed": installed}
 
     def install_plugin(self, plugin: PluginInstall):
+        if not plugin.installable():
+            raise PluginNotInstallable()
+
         try:
             with plugin.trigger_hooks("install", self.project):
+                self.create_venv(plugin)
                 return self.venv_service.install(
                     namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
                 )

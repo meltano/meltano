@@ -90,7 +90,7 @@ def install_missing_plugins(
 
     if transform != "only":
         try:
-            config_service.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
+            config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
         except PluginMissingError:
             click.secho(
                 f"Extractor '{extractor}' is missing, trying to install it...",
@@ -99,7 +99,7 @@ def install_missing_plugins(
             add_plugin(add_service, project, PluginType.EXTRACTORS, extractor)
 
         try:
-            config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
+            config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
         except PluginMissingError:
             click.secho(
                 f"Loader '{loader}' is missing, trying to install it...", fg="yellow"
@@ -108,7 +108,7 @@ def install_missing_plugins(
 
     if transform != "skip":
         try:
-            config_service.get_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
+            config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
         except PluginMissingError as e:
             click.secho(
                 f"Transformer 'dbt' is missing, trying to install it...", fg="yellow"
@@ -118,7 +118,7 @@ def install_missing_plugins(
         transform_add_service = TransformAddService(project)
         try:
             # the extractor name should match the transform name
-            plugin = config_service.get_plugin(
+            plugin = config_service.find_plugin(
                 extractor, plugin_type=PluginType.TRANSFORMS
             )
 

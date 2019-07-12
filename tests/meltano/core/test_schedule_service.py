@@ -70,6 +70,6 @@ class TestScheduleService:
         assert schedule.start_date == datetime.utcnow()
 
         # or use the start_date in the extractor configuration
-        subject.settings_service.set(tap, "start_date", datetime(2002, 1, 1))
+        subject.plugin_settings_service.set(tap, "start_date", datetime(2002, 1, 1))
         schedule = add("with_default_start_date", None)
         assert schedule.start_date == datetime(2002, 1, 1)

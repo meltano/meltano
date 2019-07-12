@@ -21,7 +21,7 @@ def invoke(project, plugin_name, plugin_args, engine_uri):
 
     try:
         config_service = ConfigService(project)
-        plugin = config_service.get_plugin(plugin_name)
+        plugin = config_service.find_plugin(plugin_name)
         service = invoker_factory(session, project, plugin)
         handle = service.invoke(*plugin_args)
 

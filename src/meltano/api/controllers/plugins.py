@@ -51,7 +51,7 @@ def install():
     install_service = PluginInstallService(project)
     config_service = ConfigService(project)
 
-    plugin = config_service.get_plugin(plugin_name, plugin_type=plugin_type)
+    plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
     run_venv = install_service.create_venv(plugin)
     run_install_plugin = install_service.install_plugin(plugin)
 

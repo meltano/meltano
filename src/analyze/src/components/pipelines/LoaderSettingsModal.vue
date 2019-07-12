@@ -65,7 +65,7 @@ export default {
       }
     },
     saveConfigAndGoToOrchestration() {
-      this.$store.dispatch('configuration/saveLoaderConfiguration', {
+      this.$store.dispatch('configuration/savePluginConfiguration', {
         name: this.loader.name,
         type: 'loaders',
         config: this.configSettings.config,
@@ -104,6 +104,7 @@ export default {
 
         <ConnectorSettings
           v-if='!isLoadingConfigSettings'
+          fieldClass="is-small"
           :config-settings='configSettings'/>
 
         <progress
