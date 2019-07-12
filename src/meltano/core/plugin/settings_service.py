@@ -59,14 +59,20 @@ class PluginSettingsService:
 
         return config
 
-    def as_env(self, plugin: PluginRef) -> Dict[str, str]:
+    def as_env(
+        self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
+    ) -> Dict[str, str]:
         # defaults to the meltano.yml for extraneous settings
         plugin_def = self.get_definition(plugin)
         env = {}
 
         for setting in plugin_def.settings:
+            value, source = self.get_value(plugin, setting["name"])
+            if sources and source not in sources:
+                continue
+
             env_key = self.setting_env(setting, plugin_def)
-            env[env_key] = str(self.get_value(plugin, setting["name"]))
+            env[env_key] = str(value)
 
         return env
 
