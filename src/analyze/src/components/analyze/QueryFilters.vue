@@ -39,9 +39,7 @@ export default {
     },
     isFirstFilterMatch() {
       return (filter) => {
-        const match = this.getFlattenedFilters.find(tempFilter => {
-          return tempFilter.table_name === filter.table_name && tempFilter.name === filter.name
-        });
+        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.table_name === filter.table_name && tempFilter.name === filter.name);
         return match === filter;
       };
     },
