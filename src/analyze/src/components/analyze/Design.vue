@@ -302,6 +302,14 @@ export default {
             </Dropdown>
           </p>
 
+          <div class="control">
+            <div class="select">
+              <select name="connection" v-model="dialect">
+                <option :key="connection.name" v-for="connection in installedPlugins.connections">{{connection.name}}</option>
+              </select>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
