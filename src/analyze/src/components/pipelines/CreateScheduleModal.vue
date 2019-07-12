@@ -113,14 +113,14 @@ export default {
       </header>
       <section class="modal-card-body">
 
-        <table class="table pipelines-table is-fullwidth">
+        <table class="table is-fullwidth">
 
           <ScheduleTableHead />
 
           <tbody>
             <tr>
-              <th>
-                <div class="control is-expanded">
+              <td>
+                <p class="control is-expanded">
                   <input
                     class="input"
                     :class="{
@@ -130,8 +130,8 @@ export default {
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">
-                </div>
-              </th>
+                </p>
+              </td>
               <td>
                 <div class="control is-expanded">
                   <span
@@ -210,10 +210,10 @@ export default {
                       ? "is-success is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
-                    <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    <div class="dropdown-content" slot-scope="{ dropdownClose }">
                       <a
                         class="dropdown-item"
-                        @click="setHasCatchupDate(false); dropdownForceClose();">
+                        @click="setHasCatchupDate(false); dropdownClose();">
                         None
                       </a>
                       <hr class="dropdown-divider">
@@ -221,10 +221,11 @@ export default {
                         <div class="dropdown-item">
                           <InputDateIso8601
                             v-model="pipeline.startDate"
-                            name='catchup-start' />
+                            name='catchup-start'
+                            input-classes='is-small' />
                           <button
-                            class="button is-interactive-primary is-outlined is-small"
-                            @click="setHasCatchupDate(true); dropdownForceClose();">
+                            class="button is-interactive-primary is-outlined is-small is-inline"
+                            @click="setHasCatchupDate(true); dropdownClose();">
                             Set
                           </button>
                         </div>

@@ -65,7 +65,7 @@ export default {
     <div class="container view-body is-fluid">
       <section>
         <div class="columns is-gapless">
-          <aside class="column is-one-quarter vh-scrollable">
+          <aside class="column is-one-quarter">
             <nav class="panel has-background-white">
               <p class="panel-heading">
                 Dashboards
@@ -88,7 +88,7 @@ export default {
 
             </nav>
           </aside>
-          <div class="column is-three-quarters vh-scrollable">
+          <div class="column is-three-quarters">
             <ClosableMessage title='Meltano Dashboards'>
               <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
               <p><span class="is-italic">You need to save an analysis to a dashboard first</span>. Manage your dashboards below.</p>

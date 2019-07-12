@@ -19,19 +19,20 @@ describe('designs Vuex store', () => {
       columnNames: [],
       resultAggregates: {},
       loadingQuery: false,
-      currentDataTab: 'sql',
       currentSQL: '',
-      filtersOpen: false,
-      dataOpen: true,
-      chartsOpen: false,
       saveReportSettings: { name: null },
       reports: [],
       chartType: 'BarChart',
-      limit: 3,
-      distincts: {},
+      limit: 50,
       sortColumn: null,
       sortDesc: false,
       dialect: null,
+      selectedAttributeCount: 0,
+      filterOptions: null,
+      filters: {
+        columns: [],
+        aggregates: [],
+      },
     };
   });
 

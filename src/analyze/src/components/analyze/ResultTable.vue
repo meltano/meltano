@@ -17,7 +17,6 @@ export default {
       'isColumnSorted',
       'getFormattedValue',
       'isColumnSelectedAggregate',
-      'isResultsTab',
     ]),
   },
   methods: {
@@ -29,8 +28,8 @@ export default {
 </script>
 
 <template>
-    <div class="result-data" v-if="isResultsTab">
-      <div class="notification is-info" v-if="!hasResults">
+    <div class="result-data">
+      <div class="notification is-italic" v-if="!hasResults">
         No results
       </div>
       <table class="table
@@ -38,7 +37,8 @@ export default {
           is-striped
           is-narrow
           is-hoverable
-          is-fullwidth"
+          is-fullwidth
+          is-size-7"
           v-if="hasResults">
         <thead>
           <th v-for="(columnHeader, i) in columnHeaders"
