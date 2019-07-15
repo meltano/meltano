@@ -10,12 +10,21 @@
     "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
+    "bulma": "^0.7.5",
+    "bulma-steps": "^2.2.1",
+    "bulma-tooltip": "^2.0.2",
     "core-js": "^2.6.5",
+    "dotenv": "^8.0.0",
+    "lodash": "^4.17.14",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
-    "vuex": "^3.0.1"
+    "vuex": "^3.0.1",
+    "yarn": "^1.17.3"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.19",
+    "@fortawesome/free-solid-svg-icons": "^5.9.0",
+    "@fortawesome/vue-fontawesome": "^0.1.6",
     "@vue/cli-plugin-babel": "^3.9.0",
     "@vue/cli-plugin-e2e-cypress": "^3.9.0",
     "@vue/cli-plugin-eslint": "^3.9.0",
@@ -23,15 +32,22 @@
     "@vue/cli-service": "^3.9.0",
     "@vue/eslint-config-prettier": "^4.0.1",
     "@vue/test-utils": "1.0.0-beta.29",
+    "axios": "^0.19.0",
+    "axios-middleware": "^0.3.1",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^23.6.0",
+    "chart.js": "^2.8.0",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "jwt-decode": "^2.2.0",
     "lint-staged": "^8.1.5",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.1.0",
-    "vue-template-compiler": "^2.6.10"
+    "sql-formatter": "^2.3.3",
+    "ssf": "^0.10.2",
+    "vue-template-compiler": "^2.6.10",
+    "vue-toasted": "^1.1.27"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
