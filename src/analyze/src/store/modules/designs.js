@@ -563,6 +563,7 @@ const mutations = {
 
   setSQLResults(_, results) {
     state.currentSQL = results.sql;
+    console.log(results.sql)
   },
 
   setQueryResults(_, results) {

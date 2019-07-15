@@ -142,7 +142,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   data-dropdown-auto-close=""
                 >
                   
-                test
+                
               
                 </a>
               </div>
@@ -2208,9 +2208,19 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
       </div>
        
       <div
+<<<<<<< HEAD
         class="accordion-body"
       >
         <!---->
+=======
+        class="is-grouped is-pulled-left"
+      >
+        <div>
+          <em>
+            Untitled Report
+          </em>
+        </div>
+>>>>>>> 5498cf48... updated test to match UI related edits for the Analyze page
       </div>
        
       <div
@@ -2219,16 +2229,24 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   has-text-white-bis
                   is-expandable"
       >
+<<<<<<< HEAD
         <span>
           Data
         </span>
          
         <div
           class="accordion-toggle"
+=======
+        <!---->
+         
+        <div
+          class="control field"
+>>>>>>> 5498cf48... updated test to match UI related edits for the Analyze page
         >
           <a
             class="button is-primary is-small"
           >
+<<<<<<< HEAD
             <span
               class="icon is-small"
             >
@@ -2238,6 +2256,96 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             </span>
           </a>
         </div>
+=======
+            <!---->
+          </p>
+           
+          <p
+            class="control"
+          >
+            <dropdown-stub
+              buttonclasses="is-interactive-primary is-outlined"
+              disabled="true"
+              isrightaligned="true"
+              label="Save"
+            >
+              <div
+                class="dropdown-content"
+              >
+                <div
+                  class="dropdown-item"
+                >
+                  <div
+                    class="field"
+                  >
+                    <!---->
+                     
+                    <div
+                      class="control"
+                    >
+                      <input
+                        class="input"
+                        placeholder="Name your report"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                   
+                  <div
+                    class="field is-grouped"
+                  >
+                    <div
+                      class="control"
+                    >
+                      <button
+                        class="button is-interactive-primary"
+                        disabled="disabled"
+                      >
+                        Save
+                      </button>
+                    </div>
+                     
+                    <div
+                      class="control"
+                    >
+                      <button
+                        class="button is-text"
+                        data-dropdown-auto-close=""
+                      >
+                        
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </dropdown-stub>
+          </p>
+        </div>
+         
+        <p
+          class="control"
+        >
+          <dropdown-stub
+            buttonclasses="is-interactive-primary is-outlined"
+            isrightaligned="true"
+            label="Load"
+          >
+            <div
+              class="dropdown-content"
+            >
+              <a
+                class="dropdown-item"
+                data-dropdown-auto-close=""
+              >
+                
+                
+              
+              </a>
+            </div>
+          </dropdown-stub>
+        </p>
+>>>>>>> 5498cf48... updated test to match UI related edits for the Analyze page
       </div>
        
       <div
@@ -2254,6 +2362,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             <div
               class="column"
             >
+<<<<<<< HEAD
               <div
                 class="tabs"
               >
@@ -2282,6 +2391,13 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             >
               <div
                 class="field is-horizontal is-marginless is-pulled-right"
+=======
+              <dropdown-stub
+                buttonclasses="is-text is-small"
+                disabled="true"
+                iscaretremoved="true"
+                label="SQL"
+>>>>>>> 5498cf48... updated test to match UI related edits for the Analyze page
               >
                 <div
                   class="field-label"
@@ -2310,6 +2426,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     </div>
                   </div>
                 </div>
+<<<<<<< HEAD
               </div>
             </div>
           </div>
@@ -2321,6 +2438,16 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               <code>
                 
               </code>
+=======
+              </dropdown-stub>
+               
+              <button
+                class="button is-success"
+                disabled="disabled"
+              >
+                Run
+              </button>
+>>>>>>> 5498cf48... updated test to match UI related edits for the Analyze page
             </div>
           </div>
         </div>
