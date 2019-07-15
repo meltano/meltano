@@ -379,7 +379,7 @@ class TestQueryGeneration:
                 definition=bad_payload.payload, design_helper=gitflix.design("users")
             )
 
-        assert "MeltanoFilterExpressionType.EqualTo needs a non-empty value" in str(
+        assert "Filter expression: equal_to needs a non-empty value." in str(
             e.value
         )
 
