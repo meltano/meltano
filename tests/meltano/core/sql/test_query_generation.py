@@ -379,9 +379,7 @@ class TestQueryGeneration:
                 definition=bad_payload.payload, design_helper=gitflix.design("users")
             )
 
-        assert "Filter expression: equal_to needs a non-empty value." in str(
-            e.value
-        )
+        assert "Filter expression: equal_to needs a non-empty value." in str(e.value)
 
         # Test for table not defined in design
         bad_payload = (
