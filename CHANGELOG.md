@@ -9,17 +9,26 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.32.0 - (2019-07-15)
+---
+
+### New
 * [!718](https://gitlab.com/meltano/meltano/merge_requests/718) Add support for filters (WHERE and HAVING clauses) to MeltanoQuery and Meltano's SQL generation engine
 * [#748](https://gitlab.com/meltano/meltano/issues/748) Added the `Connections` plugin to move the Analyze connection settings to the system database
 * [#748](https://gitlab.com/meltano/meltano/issues/748) Added the `meltano config` command to manipulate a plugin's configuration
 * [!759](https://gitlab.com/meltano/meltano/merge_requests/759) Added filtering functionality to the Analyze UI while additionally cleaning it up from a UI/UX lens
 
-### Changes
 
 ### Fixes
 [!726](https://gitlab.com/meltano/meltano/merge_requests/726) Fixed InputDateIso8601's default value to align with HTML's expected empty string default
-
-### Breaks
 
 
 ## 0.31.0 - (2019-07-08)
