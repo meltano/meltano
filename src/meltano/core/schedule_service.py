@@ -1,8 +1,9 @@
+import logging
 from collections import namedtuple
 from typing import Optional
 from datetime import datetime, date
 
-from .plugin.settings_service import PluginSettingsService
+from .plugin.settings_service import PluginSettingsService, PluginSettingMissingError
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
@@ -43,7 +44,7 @@ class ScheduleService:
         transform: str,
         interval: str,
         start_date: Optional[datetime] = None,
-        **env
+        **env,
     ):
         start_date = start_date or self.default_start_date(extractor)
         schedule = Schedule(
@@ -57,9 +58,13 @@ class ScheduleService:
         Returns the `start_date` of the extractor, or now.
         """
         extractor_ref = PluginRef(PluginType.EXTRACTORS, extractor)
-        start_date, _ = self.plugin_settings_service.get_value(
-            extractor_ref, "start_date"
-        )
+        start_date = None
+        try:
+            start_date, _ = self.plugin_settings_service.get_value(
+                extractor_ref, "start_date"
+            )
+        except PluginSettingMissingError:
+            logging.debug(f"`start_date` not found in {extractor}.")
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting

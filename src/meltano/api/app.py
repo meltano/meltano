@@ -14,7 +14,10 @@ from urllib.parse import urlsplit
 
 from meltano.core.project import Project
 from meltano.core.plugin.error import PluginMissingError
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import (
+    PluginSettingsService,
+    PluginSettingMissingError,
+)
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from .external_connector import ExternalConnector
@@ -107,7 +110,7 @@ def create_app(config={}):
             g.jsContext["airflowUrl"] = appUrl._replace(
                 netloc=f"{appUrl.hostname}:{airflow_port}"
             ).geturl()[:-1]
-        except PluginMissingError:
+        except (PluginMissingError, PluginSettingMissingError):
             pass
 
     @app.after_request
