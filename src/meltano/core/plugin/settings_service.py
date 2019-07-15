@@ -9,8 +9,16 @@ from meltano.core.db import project_engine
 from meltano.core.utils import nest
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.error import Error
 from . import PluginRef, PluginType, Plugin, PluginInstall
 from .setting import PluginSetting
+
+
+class PluginSettingMissingError(Error):
+    """Occurs when a setting is missing."""
+
+    def __init__(self, plugin: PluginRef, name: str):
+        super().__init__(f"Cannot find setting {name} in {plugin}")
 
 
 class PluginSettingValueSource(int, Enum):
@@ -126,7 +134,11 @@ class PluginSettingsService:
     def get_value(self, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
-        setting_def = self.find_setting(plugin_def, name)
+
+        try:
+            setting_def = self.find_setting(plugin_def, name)
+        except StopIteration:
+            raise PluginSettingMissingError(plugin_def, name)
 
         try:
             env_key = self.setting_env(setting_def, plugin_def)
@@ -155,8 +167,6 @@ class PluginSettingsService:
                 ),
                 PluginSettingValueSource.DB,
             )
-        except StopIteration:
-            logging.warning(f"Cannot find {name} for {plugin.name}.")
         except sqlalchemy.orm.exc.NoResultFound:
             # priority 4: setting default value
             # that means it was not overriden
