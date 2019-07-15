@@ -46,6 +46,9 @@ class MeltanoBase:
     def __getattr__(self, attr: str):
         return self._definition.get(attr, None)
 
+    def __repr__(self):
+        return f"<{self.__class__.__name__} name={self.name}>"
+
 
 class MeltanoDesign(MeltanoBase):
     """
@@ -73,10 +76,24 @@ class MeltanoDesign(MeltanoBase):
         ]
 
     def get_table(self, name: str) -> MeltanoBase:
-        return next((t for t in self.tables() if t.name == name), None)
+        return next(t for t in self.tables() if t.name == name)
 
     def get_join(self, name: str) -> MeltanoBase:
-        return next((t for t in self.joins() if t.name == name), None)
+        return next(t for t in self.joins() if t.name == name)
+
+    def find_table(self, name: str):
+        table_def = None
+
+        if name == self.name:
+            table_def = self._definition["related_table"]
+        else:
+            try:
+                join = self.get_join(name)
+                table_def = join.related_table
+            except StopIteration:
+                raise ParseError(f"{name} not found in design {self.name}")
+
+        return MeltanoTable(table_def, design=self)
 
 
 class MeltanoTable(MeltanoBase):
@@ -103,7 +120,6 @@ class MeltanoTable(MeltanoBase):
         # Those are the PK columns of the table that have not been directly
         #  requested in the Query
         self.optional_pkeys = []
-
         self.sql_table_name = definition.get("sql_table_name", None)
 
         super().__init__(definition)
@@ -222,6 +238,9 @@ class MeltanoColumn(MeltanoBase):
             self._attributes[name] = value
         else:
             super(MeltanoColumn, self).__setattr__(name, value)
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__} name={self.name}, alias={self.alias()}>"
 
 
 class MeltanoAggregate(MeltanoBase):
@@ -501,15 +520,17 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if self.design:
-            table_def = self.design.get_table(table_name)
-            if not table_def:
+            try:
+                table_def = self.design.get_table(table_name)
+            except StopIteration:
                 raise ParseError(
                     f"Requested table {table_name} in filter '{definition}' is not defined in the design"
                 )
 
             column_def = table_def.get_column(attribute_name)
             aggregate_def = table_def.get_aggregate(attribute_name)
-            if not column_def and not aggregate_def:
+
+            if not any((column_def, aggregate_def)):
                 raise ParseError(
                     f"Requested column {table_name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
@@ -605,29 +626,29 @@ class MeltanoQuery(MeltanoBase):
 
         # Find the tables defined in the Query and add them as Table Objects
         #  with the proper Columns, Aggregates and Timeframe Objects
-        primary_table = {
-            "name": definition.get("table", None),
+        primary_definition = {
+            "name": definition.get("name", None),
             "columns": definition.get("columns", None),
             "aggregates": definition.get("aggregates", None),
             "timeframes": definition.get("timeframes", None),
         }
-        related_tables = [primary_table] + definition.get("joins", [])
+        related_definitions = [primary_definition] + definition.get("joins", [])
 
         # get the graph defined in the design: it is used for finding the
         #  shortest path and adding missing tables in case a required table
         #  is missing
         design_graph = json_graph.node_link_graph(self.design.graph)
 
-        for related_table in related_tables:
+        for related_def in related_definitions:
             # Find the requested table in the Design
-            table_def = self.design.get_table(related_table.get("name", None))
+            table_def = self.design.find_table(related_def["name"])
 
             if table_def:
                 table = MeltanoTable()
                 table.name = table_def.name
                 table.sql_table_name = table_def.sql_table_name
 
-                for column in related_table.get("columns", []):
+                for column in related_def.get("columns", []):
                     column_def = table_def.get_column(column)
                     if column_def:
                         c = MeltanoColumn(table=table)
@@ -638,7 +659,7 @@ class MeltanoQuery(MeltanoBase):
                             f"Requested column {table.name}.{column} is not defined in the design"
                         )
 
-                for aggregate in related_table.get("aggregates", []):
+                for aggregate in related_def.get("aggregates", []):
                     aggregate_def = table_def.get_aggregate(aggregate)
                     if aggregate_def:
                         a = MeltanoAggregate(table=table)
@@ -649,7 +670,7 @@ class MeltanoQuery(MeltanoBase):
                             f"Requested aggregate {table.name}.{aggregate} is not defined in the design"
                         )
 
-                for timeframe in related_table.get("timeframes", []):
+                for timeframe in related_def.get("timeframes", []):
                     requested_periods = timeframe.get("periods", None)
 
                     timeframe_def = table_def.get_timeframe(timeframe.get("name", None))
@@ -679,46 +700,56 @@ class MeltanoQuery(MeltanoBase):
 
                 # Add tables that have at least a Column, Aggregate or Timeframe
                 #  requested in the Query definition
-                if table.name != primary_table["name"] and (
+                if related_def is not primary_definition and (
                     table.columns() or table.aggregates() or table.timeframes()
                 ):
                     # Find the related joins needed to gather this data
                     #  Using the design graph, we can find the shortest path to a
                     #  table from the primary table up to any table in the design.
                     #
-                    #  primary_table → (related tables...) → table
+                    #  base_table → (join tables...) → target_table
                     new_joins = self.joins_for_table(
-                        design_graph, primary_table["name"], table.name
+                        design_graph, primary_definition["name"], related_def["name"]
                     )
+
+                    # filter out already defined joins
                     new_joins = list(
                         filter(
-                            lambda t: t not in [j["table"] for j in self.join_order],
+                            lambda t: t not in [j["name"] for j in self.join_order],
                             new_joins,
                         )
                     )
 
-                    for join in new_joins:
-                        join_on = None
-                        if join != primary_table["name"]:
-                            join_def = self.design.get_join(join)
-                            if join_def:
-                                join_on = self.design_helper.join_for(
-                                    join_def._definition
-                                )["on"]
-                            else:
-                                raise ParseError(
-                                    f"Requested join {join} is not defined in the design"
-                                )
+                    for join_name in new_joins:
+                        if join_name == primary_definition["name"]:
+                            continue
 
-                        self.join_order.append({"table": join, "on": join_on})
+                        try:
+                            join = self.design.get_join(join_name)
+                            join_on = self.design_helper.join_for(join._definition)[
+                                "on"
+                            ]
+
+                            self.join_order.append({
+                                "name": join_name,
+                                "table": join.related_table["name"],
+                                "on": join_on
+                            })
+                        except StopIteration:
+                            raise ParseError(
+                                f"Requested join {join} is not defined in the design"
+                            )
 
                 # Take care care for the single table, no join query case
                 if not self.join_order:
-                    self.join_order.append({"table": primary_table["name"], "on": None})
-
+                    self.join_order.append({
+                        "name": primary_definition["name"],
+                        "table": table.name,
+                        "on": None
+                    })
             else:
                 raise ParseError(
-                    f'Requested table {related_table.get("name", None)} is not defined in the design'
+                    f"Requested table {related_table.get('name', None)} is not defined in the design"
                 )
 
         # Parse and store the provided filters
@@ -813,7 +844,6 @@ class MeltanoQuery(MeltanoBase):
             table = next(
                 iter([t for t in self.tables if t.name == join["table"]]), None
             )
-
             # Create a pypika Table based on the Table's name
             pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
 

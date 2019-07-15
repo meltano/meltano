@@ -6,6 +6,8 @@ from enum import Enum, auto
 from functools import singledispatch
 from typing import List
 
+from meltano.core.behavior.visitor import visit_with
+
 
 SelectPattern = namedtuple(
     "SelectPattern", ("stream_pattern", "property_pattern", "negated")
@@ -68,6 +70,46 @@ class SelectionType(str, Enum):
         return SelectionType.SELECTED
 
 
+@singledispatch
+def visit(node, executor, path: str = ""):
+    logging.debug(f"Skipping node at '{path}'")
+
+
+@visit.register(dict)
+def _(node: dict, executor, path=""):
+    node_type = None
+
+    if re.search(r"streams\[\d+\]$", path):
+        node_type = CatalogNode.STREAM
+
+    if re.search(r"schema(\.properties\.\w*)+$", path):
+        node_type = CatalogNode.STREAM_PROPERTY
+
+    if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
+        if len(node["breadcrumb"]) == 0:
+            node_type = CatalogNode.STREAM_METADATA
+        else:
+            node_type = CatalogNode.STREAM_PROPERTY_METADATA
+
+    if node_type:
+        logging.debug(f"Visiting {node_type} at '{path}'.")
+        executor(node_type, node, path)
+
+    for child_path, child_node in node.items():
+        if node_type is CatalogNode.STREAM_PROPERTY and child_path in ["anyOf", "type"]:
+            continue
+
+        # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
+        executor.visit(child_node, path=f"{path}.{child_path}")
+
+
+@visit.register(list)
+def _(node: list, executor, path=""):
+    for index, child_node in enumerate(node):
+        executor.visit(child_node, path=f"{path}[{index}]")
+
+
+@visit_with(visit)
 class CatalogExecutor:
     def execute(self, node_type: CatalogNode, node, path):
         dispatch = {
@@ -269,42 +311,3 @@ class ListSelectedExecutor(CatalogExecutor):
         selection = self.SelectedNode(prop, self.node_selection(node))
 
         self.properties[self._stream].add(selection)
-
-
-@singledispatch
-def visit(node, executor, path: str = ""):
-    logging.debug(f"Skipping node at '{path}'")
-
-
-@visit.register(dict)
-def _(node: dict, executor, path=""):
-    node_type = None
-
-    if re.search(r"streams\[\d+\]$", path):
-        node_type = CatalogNode.STREAM
-
-    if re.search(r"schema(\.properties\.\w*)+$", path):
-        node_type = CatalogNode.STREAM_PROPERTY
-
-    if re.search(r"metadata\[\d+\]$", path) and "breadcrumb" in node:
-        if len(node["breadcrumb"]) == 0:
-            node_type = CatalogNode.STREAM_METADATA
-        else:
-            node_type = CatalogNode.STREAM_PROPERTY_METADATA
-
-    if node_type:
-        logging.debug(f"Visiting {node_type} at '{path}'.")
-        executor(node_type, node, path)
-
-    for child_path, child_node in node.items():
-        if node_type is CatalogNode.STREAM_PROPERTY and child_path in ["anyOf", "type"]:
-            continue
-
-        # TODO mbergeron: refactor this to use a dynamic visitor per CatalogNode
-        visit(child_node, executor, path=f"{path}.{child_path}")
-
-
-@visit.register(list)
-def _(node: list, executor, path=""):
-    for index, child_node in enumerate(node):
-        visit(child_node, executor, path=f"{path}[{index}]")
