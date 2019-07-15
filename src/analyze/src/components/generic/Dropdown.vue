@@ -58,6 +58,11 @@ export default {
     toggleDropdown() {
       this.isOpen = !this.isOpen;
     },
+    onBubbleClose(e) {
+      if ('dropdownAutoClose' in e.target.dataset) {
+        this.close();
+      }
+    },
     onDocumentClick(el) {
       const targetEl = el.target.closest('.dropdown');
       const matchEl = this.$el.closest('.dropdown');
@@ -75,7 +80,8 @@ export default {
           'is-active': isOpen,
           'is-right': isRightAligned,
           'is-fullwidth': isFullWidth,
-        }">
+        }"
+        @click='onBubbleClose'>
     <div class="dropdown-trigger">
       <button class="button"
               :class="buttonClasses"
@@ -93,7 +99,7 @@ export default {
          :class="menuClasses"
          :id="getHyphenatedLabel"
          role="menu">
-      <slot :dropdown-close="close"></slot>
+      <slot></slot>
     </div>
   </div>
 </template>

@@ -216,10 +216,11 @@ export default {
 
           <p v-if="hasActiveReport()" class="control" @click="getDashboards">
             <Dropdown label="Add to Dashboard" is-right-aligned>
-              <div class="dropdown-content" slot-scope="{ dropdownClose }">
+              <div class="dropdown-content">
                 <a
                   class="dropdown-item"
-                  @click="toggleNewDashboardModal(); dropdownClose();">
+                  data-dropdown-auto-close
+                  @click="toggleNewDashboardModal();">
                   New Dashboard
                 </a>
                 <div v-if="dashboards.length">
@@ -227,9 +228,8 @@ export default {
                       v-for="dashboard in dashboards"
                       :key="dashboard.id">
                     <label for="'checkbox-' + dashboard.id"
-                            @click="
-                              toggleActiveReportInDashboard(dashboard);
-                              dropdownClose();">
+                            data-dropdown-auto-close
+                            @click="toggleActiveReportInDashboard(dashboard);">
                       <input type="checkbox"
                             :id="'checkbox-' + dashboard.id"
                             :checked="isActiveReportInDashboard(dashboard)">
@@ -256,7 +256,7 @@ export default {
                 :label="hasActiveReport() ? '' : 'Save'"
                 button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
-                <div class="dropdown-content" slot-scope="{ dropdownClose }">
+                <div class="dropdown-content">
                   <div class="dropdown-item">
                     <div class="field">
                       <label class="label" v-if="hasActiveReport()">Save as</label>
@@ -271,11 +271,11 @@ export default {
                       <div class="control">
                         <button class="button is-interactive-primary"
                                 :disabled="!saveReportSettings.name"
-                                @click="saveReport(); dropdownClose();">Save</button>
+                                @click="saveReport();">Save</button>
                       </div>
                       <div class="control">
                         <button class="button is-text"
-                                @click="dropdownClose();">
+                                data-dropdown-auto-close>
                           Cancel</button>
                       </div>
                     </div>
@@ -291,11 +291,12 @@ export default {
               label="Load"
               button-classes='is-interactive-primary is-outlined'
               is-right-aligned>
-              <div class="dropdown-content" slot-scope="{ dropdownClose }">
+              <div class="dropdown-content">
                 <a class="dropdown-item"
                     v-for="report in reports"
                     :key="report.name"
-                    @click="loadReport(report); dropdownClose();">
+                    data-dropdown-auto-close
+                    @click="loadReport(report);">
                   {{report.name}}
                 </a>
               </div>

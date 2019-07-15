@@ -210,10 +210,11 @@ export default {
                       ? "is-success is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
-                    <div class="dropdown-content" slot-scope="{ dropdownClose }">
+                    <div class="dropdown-content">
                       <a
                         class="dropdown-item"
-                        @click="setHasCatchupDate(false); dropdownClose();">
+                        data-dropdown-auto-close
+                        @click="setHasCatchupDate(false);">
                         None
                       </a>
                       <hr class="dropdown-divider">
@@ -225,7 +226,8 @@ export default {
                             input-classes='is-small' />
                           <button
                             class="button is-interactive-primary is-outlined is-small is-inline"
-                            @click="setHasCatchupDate(true); dropdownClose();">
+                            data-dropdown-auto-close
+                            @click="setHasCatchupDate(true);">
                             Set
                           </button>
                         </div>
