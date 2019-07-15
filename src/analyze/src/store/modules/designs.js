@@ -141,8 +141,12 @@ const getters = {
       attributeTables.push({
         tableLabel: design.label,
         table_name: design.from,
-        columns: design.related_table.columns.filter(attributeFilter),
-        aggregates: design.related_table.aggregates.filter(attributeFilter),
+        columns: design.related_table.columns
+          ? design.related_table.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.related_table.aggregates
+          ? design.related_table.aggregates.filter(attributeFilter)
+          : [],
       });
     }
     if (design.joins) {
@@ -150,8 +154,12 @@ const getters = {
         attributeTables.push({
           tableLabel: join.label,
           table_name: join.name,
-          columns: join.related_table.columns.filter(attributeFilter),
-          aggregates: join.related_table.aggregates.filter(attributeFilter),
+          columns: join.related_table.columns
+            ? join.related_table.columns.filter(attributeFilter)
+            : [],
+          aggregates: join.related_table.aggregates
+            ? join.related_table.aggregates.filter(attributeFilter)
+            : [],
         });
       });
     }
