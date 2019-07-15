@@ -4,7 +4,7 @@ import utils from '@/utils/utils';
 export default {
   name: 'InputDateIso8601',
   props: {
-    value: { type: String, default: 'null' },
+    value: { type: String, default: '' },
     name: { type: String, required: true, default: '' },
   },
   computed: {
