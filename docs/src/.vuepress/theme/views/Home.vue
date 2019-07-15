@@ -42,7 +42,7 @@
         <div class="feature-left">
           <img 
             style="max-width: 100%; margin: 0 auto; display: block;"
-            src="/screenshots/analyze-page.png" 
+            src="/screenshots/meltano-queries.png" 
             alt="Screenshot of Meltano Analyze page" 
           />
         </div>
