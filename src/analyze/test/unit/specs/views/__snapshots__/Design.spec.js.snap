@@ -142,7 +142,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   data-dropdown-auto-close=""
                 >
                   
-                Report 1 Test
+                test
               
                 </a>
               </div>

@@ -28,7 +28,7 @@ describe('designs Vuex store', () => {
       sortDesc: false,
       dialect: null,
       selectedAttributeCount: 0,
-      filterOptions: null,
+      filterOptions: [],
       filters: {
         columns: [],
         aggregates: [],

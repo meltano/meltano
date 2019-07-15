@@ -94,7 +94,7 @@ describe('Design.vue', () => {
 
   it('Load report button enabled if reports exist', () => {
     // eslint-disable-next-line
-    state.reports = [{ chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' }];
+    state.reports = [{name: "test", model: "carbon", design: "region", chartType: "BarChart", queryPayload: {table: "region", columns: ["name"], aggregates: ["count"], timeframes: [], joins: [{name: "entry", columns: [], aggregates: [], timeframes: []}, {name: "generationmix", columns: [], aggregates: []}], order: null, limit: "3", filters: {columns: [], aggregates: []}}, path: "/Users/dknox-gitlab/Documents/Projects/gitlab/model/test.report.m5o", id: "F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3HNF2GYYLCF5WW6ZDFNQXWGLTSMVYG64TUFZWTK3Y=", slug: "test", createdAt: 1563204808.6965702, version: "1.0.0"}];
     const wrapper = createWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
@@ -102,7 +102,7 @@ describe('Design.vue', () => {
 
   it('a loaded report renders report name, selections, chart, SQL, and results where the Save, Load, and Run Query buttons are enabled', () => {
     // eslint-disable-next-line
-    const report = { chartType: 'BarChart', createdAt: 1552937196.941, design: 'region', id: 'F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3DMFZGE33OF5WW6ZDFNQXXEZLQN5ZHILJRFV2GK43UFZZGK4DPOJ2C43JVN4======', model: 'carbon', name: 'Report 1 Test', path: '/Users/dknox-gitlab/Documents/Projects/carbon/model/report-1-test.report.m5o', queryPayload: { aggregates: ['count'], columns: [], filters: {}, joins: [{ aggregates: [], columns: [], name: 'entry', timeframes: [] }, { aggregates: [], columns: [], name: 'generationmix' }], limit: 3, order: null, table: 'region', timeframes: [] }, slug: 'report-1-test', version: '1.0.0' };
+    const report = {name: "test", model: "carbon", design: "region", chartType: "BarChart", queryPayload: {table: "region", columns: ["name"], aggregates: ["count"], timeframes: [], joins: [{name: "entry", columns: [], aggregates: [], timeframes: []}, {name: "generationmix", columns: [], aggregates: []}], order: null, limit: "3", filters: {columns: [], aggregates: []}}, path: "/Users/dknox-gitlab/Documents/Projects/gitlab/model/test.report.m5o", id: "F5KXGZLSOMXWI23ON54C2Z3JORWGCYRPIRXWG5LNMVXHI4ZPKBZG62TFMN2HGL3HNF2GYYLCF5WW6ZDFNQXWGLTSMVYG64TUFZWTK3Y=", slug: "test", createdAt: 1563204808.6965702, version: "1.0.0"};
     state.activeReport = report;
     state.chartType = 'BarChart';
     state.currentSQL = 'SELECT COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region" LIMIT 3;';

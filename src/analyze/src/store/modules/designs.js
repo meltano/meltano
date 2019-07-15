@@ -30,7 +30,7 @@ const state = {
   sortDesc: false,
   dialect: null,
   selectedAttributeCount: 0,
-  filterOptions: null,
+  filterOptions: [],
   filters: {
     columns: [],
     aggregates: [],
