@@ -1,34 +1,33 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
-import capitalize from '@/filters/capitalize';
-import Chart from '@/components/analyze/Chart';
-import Dropdown from '@/components/generic/Dropdown';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import ResultTable from '@/components/analyze/ResultTable';
+import { mapState, mapGetters, mapActions } from 'vuex'
+import capitalize from '@/filters/capitalize'
+import Chart from '@/components/analyze/Chart'
+import Dropdown from '@/components/generic/Dropdown'
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
+import ResultTable from '@/components/analyze/ResultTable'
 
 export default {
   name: 'Design',
   data() {
     return {
-      isNewDashboardModalOpen: false,
-    };
+      isNewDashboardModalOpen: false
+    }
   },
   created() {
-    const { slug, model, design } = this.$route.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug });
-    this.$store.dispatch('plugins/getInstalledPlugins')
-      .then(() => {
-        this.dialect = this.installedPlugins.connections[0].name;
-      });
+    const { slug, model, design } = this.$route.params
+    this.$store.dispatch('designs/getDesign', { model, design, slug })
+    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+      this.dialect = this.installedPlugins.connections[0].name
+    })
   },
   filters: {
-    capitalize,
+    capitalize
   },
   components: {
     Chart,
     NewDashboardModal,
     Dropdown,
-    ResultTable,
+    ResultTable
   },
   computed: {
     ...mapState('designs', [
@@ -47,7 +46,7 @@ export default {
       'sqlErrorMessage',
       'results',
       'resultAggregates',
-      'chartType',
+      'chartType'
     ]),
     ...mapGetters('designs', [
       'currentModelLabel',
@@ -64,186 +63,180 @@ export default {
       'getChartYAxis',
       'hasJoins',
       'showJoinColumnAggregateHeader',
-      'formattedSql',
+      'formattedSql'
     ]),
-    ...mapState('dashboards', [
-      'dashboards',
-    ]),
-    ...mapState('plugins', [
-      'installedPlugins',
-    ]),
-    ...mapGetters('settings', [
-      'isConnectionDialectSqlite',
-    ]),
+    ...mapState('dashboards', ['dashboards']),
+    ...mapState('plugins', ['installedPlugins']),
+    ...mapGetters('settings', ['isConnectionDialectSqlite']),
 
     canToggleTimeframe() {
-      return !this.isConnectionDialectSqlite(this.dialect);
+      return !this.isConnectionDialectSqlite(this.dialect)
     },
 
     limit: {
       get() {
-        return this.$store.getters['designs/currentLimit'];
+        return this.$store.getters['designs/currentLimit']
       },
       set(value) {
-        this.$store.dispatch('designs/limitSet', value);
-        this.$store.dispatch('designs/getSQL', { run: false });
-      },
+        this.$store.dispatch('designs/limitSet', value)
+        this.$store.dispatch('designs/getSQL', { run: false })
+      }
     },
 
     dialect: {
       get() {
-        return this.$store.getters['designs/getDialect'];
+        return this.$store.getters['designs/getDialect']
       },
       set(value) {
-        this.$store.commit('designs/setDialect', value);
-      },
-    },
+        this.$store.commit('designs/setDialect', value)
+      }
+    }
   },
   methods: {
-    ...mapActions('dashboards', [
-      'getDashboards',
-    ]),
-    ...mapActions('designs', [
-      'resetErrorMessage',
-    ]),
+    ...mapActions('dashboards', ['getDashboards']),
+    ...mapActions('designs', ['resetErrorMessage']),
 
     isActiveReportInDashboard(dashboard) {
-      return dashboard.reportIds.includes(this.activeReport.id);
+      return dashboard.reportIds.includes(this.activeReport.id)
     },
 
     hasActiveReport() {
-      return Object.keys(this.activeReport).length > 0;
+      return Object.keys(this.activeReport).length > 0
     },
 
     toggleActiveReportInDashboard(dashboard) {
       const methodName = this.isActiveReportInDashboard(dashboard)
         ? 'removeReportFromDashboard'
-        : 'addReportToDashboard';
+        : 'addReportToDashboard'
       this.$store.dispatch(`dashboards/${methodName}`, {
         reportId: this.activeReport.id,
-        dashboardId: dashboard.id,
-      });
+        dashboardId: dashboard.id
+      })
     },
 
     inputFocused(field) {
       if (!this.getDistinctsForField(field)) {
-        this.$store.dispatch('designs/getDistinct', field);
+        this.$store.dispatch('designs/getDistinct', field)
       }
     },
 
     setAndOpenChart(chartType) {
-      this.$store.dispatch('designs/setChartType', chartType);
+      this.$store.dispatch('designs/setChartType', chartType)
       if (!this.chartsOpen) {
-        this.$store.dispatch('designs/toggleChartsOpen');
+        this.$store.dispatch('designs/toggleChartsOpen')
       }
     },
 
     tableRowClicked(relatedTable) {
-      this.$store.dispatch('designs/expandRow', relatedTable);
+      this.$store.dispatch('designs/expandRow', relatedTable)
     },
 
     joinRowClicked(join) {
-      this.$store.dispatch('designs/expandJoinRow', join);
+      this.$store.dispatch('designs/expandJoinRow', join)
     },
 
     columnSelected(column) {
-      this.$store.dispatch('designs/removeSort', column);
-      this.$store.dispatch('designs/toggleColumn', column);
-      this.$store.dispatch('designs/getSQL', { run: false });
+      this.$store.dispatch('designs/removeSort', column)
+      this.$store.dispatch('designs/toggleColumn', column)
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     timeframeSelected(timeframe) {
       if (!this.canToggleTimeframe) {
-        return;
+        return
       }
-      this.$store.dispatch('designs/toggleTimeframe', timeframe);
+      this.$store.dispatch('designs/toggleTimeframe', timeframe)
     },
 
     timeframePeriodSelected(period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', period);
-      this.$store.dispatch('designs/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleTimeframePeriod', period)
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     aggregateSelected(aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
-      this.$store.dispatch('designs/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleAggregate', aggregate)
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     joinColumnSelected(join, column) {
-      this.$store.dispatch('designs/toggleColumn', column);
-      this.$store.dispatch('designs/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleColumn', column)
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate);
-      this.$store.dispatch('designs/getSQL', { run: false });
+      this.$store.dispatch('designs/toggleAggregate', aggregate)
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     runQuery() {
-      this.$store.dispatch('designs/getSQL', { run: true });
+      this.$store.dispatch('designs/getSQL', { run: true })
     },
 
     loadReport(report) {
-      this.$store.dispatch('designs/loadReport', { name: report.name });
+      this.$store.dispatch('designs/loadReport', { name: report.name })
     },
 
     saveReport() {
-      this.$store.dispatch('designs/saveReport', this.saveReportSettings);
+      this.$store.dispatch('designs/saveReport', this.saveReportSettings)
     },
 
     updateReport() {
-      this.$store.dispatch('designs/updateReport');
+      this.$store.dispatch('designs/updateReport')
     },
 
     setCurrentTab(tab) {
-      this.$store.dispatch('designs/switchCurrentTab', tab);
+      this.$store.dispatch('designs/switchCurrentTab', tab)
     },
 
     toggleFilterOpen() {
-      this.$store.dispatch('designs/toggleFilterOpen');
+      this.$store.dispatch('designs/toggleFilterOpen')
     },
 
     toggleDataOpen() {
-      this.$store.dispatch('designs/toggleDataOpen');
+      this.$store.dispatch('designs/toggleDataOpen')
     },
 
     toggleChartsOpen() {
-      this.$store.dispatch('designs/toggleChartsOpen');
+      this.$store.dispatch('designs/toggleChartsOpen')
     },
 
     toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
     },
 
     dropdownSelected(item, field) {
       this.$store.dispatch('designs/addDistinctSelection', {
         item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
+        field
+      })
+      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     modifierChanged(item, field) {
       this.$store.dispatch('designs/addDistinctModifier', {
         item,
-        field,
-      });
-      this.$store.dispatch('designs/getSQL', { run: false });
-    },
-  },
-};
+        field
+      })
+      this.$store.dispatch('designs/getSQL', { run: false })
+    }
+  }
+}
 </script>
 
 <template>
   <section>
     <div class="columns is-gapless">
-
       <aside class="column is-one-quarter vh-scrollable">
         <nav class="panel has-background-white">
           <div class="panel-block">
             <div class="field has-addons">
               <div class="control is-expanded">
-                <input class="input" type="text" placeholder="Filter" disabled>
+                <input
+                  class="input"
+                  type="text"
+                  placeholder="Filter"
+                  disabled
+                />
               </div>
               <div class="control">
                 <button class="button" disabled>
@@ -265,68 +258,94 @@ export default {
                          has-background-white-bis
                          has-text-grey
                          is-expandable"
-                  :class="{'is-collapsed': join.collapsed}"
+                  :class="{ 'is-collapsed': join.collapsed }"
                   :key="join.label"
-                  @click="joinRowClicked(join)">
-                  {{join.label}}
+                  @click="joinRowClicked(join)"
+                >
+                  {{ join.label }}
                 </a>
                 <template v-if="!join.collapsed">
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
-                  <a class="panel-block
+                  <a
+                    class="panel-block
                             panel-block-heading
                             has-background-white"
-                     v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
+                    v-if="
+                      showJoinColumnAggregateHeader(join.related_table.columns)
+                    "
+                  >
                     Columns
                   </a>
                   <template v-for="timeframe in join.related_table.timeframes">
-                    <a class="panel-block timeframe"
-                       v-if="!timeframe.hidden"
-                       @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
-                       :key="timeframe.label"
-                       :class="{
-                              'is-active': timeframe.selected,
-                              'is-sqlite-unsupported': isConnectionDialectSqlite(dialect)
-                              }">
-                      {{timeframe.label}}
-                      <div class='sqlite-unsupported-container'
-                           v-if='isConnectionDialectSqlite(dialect)'>
+                    <a
+                      class="panel-block timeframe"
+                      v-if="!timeframe.hidden"
+                      @click="
+                        isConnectionDialectSqlite(dialect) ||
+                          timeframeSelected(timeframe)
+                      "
+                      :key="timeframe.label"
+                      :class="{
+                        'is-active': timeframe.selected,
+                        'is-sqlite-unsupported': isConnectionDialectSqlite(
+                          dialect
+                        )
+                      }"
+                    >
+                      {{ timeframe.label }}
+                      <div
+                        class="sqlite-unsupported-container"
+                        v-if="isConnectionDialectSqlite(dialect)"
+                      >
                         <small>Unsupported by SQLite</small>
                       </div>
                     </a>
                     <template v-if="timeframe.selected">
                       <template v-for="period in timeframe.periods">
-                        <a class="panel-block indented"
-                           :key="timeframe.label.concat('-', period.label)"
-                           @click="timeframePeriodSelected(period)"
-                           :class="{'is-active': period.selected}">
-                          {{period.label}}
+                        <a
+                          class="panel-block indented"
+                          :key="timeframe.label.concat('-', period.label)"
+                          @click="timeframePeriodSelected(period)"
+                          :class="{ 'is-active': period.selected }"
+                        >
+                          {{ period.label }}
                         </a>
                       </template>
                     </template>
                   </template>
                   <template v-for="column in join.related_table.columns">
-                    <a class="panel-block"
-                       v-if="!column.hidden"
-                       :key="column.label"
-                       :class="{'is-active': column.selected}"
-                       @click="joinColumnSelected(join, column)">
-                      {{column.label}}
+                    <a
+                      class="panel-block"
+                      v-if="!column.hidden"
+                      :key="column.label"
+                      :class="{ 'is-active': column.selected }"
+                      @click="joinColumnSelected(join, column)"
+                    >
+                      {{ column.label }}
                     </a>
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
-                  <a class="panel-block
+                  <a
+                    class="panel-block
                             panel-block-heading
                             has-background-white"
-                     v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
+                    v-if="
+                      showJoinColumnAggregateHeader(
+                        join.related_table.aggregates
+                      )
+                    "
+                  >
                     Aggregates
                   </a>
                   <template v-for="aggregate in join.related_table.aggregates">
-                    <a class="panel-block"
-                       v-if="!aggregate.hidden"
-                       :key="aggregate.label"
-                       :class="{'is-active': aggregate.selected}"
-                       @click="joinAggregateSelected(join, aggregate)">
-                      {{aggregate.label}}
+                    <a
+                      class="panel-block"
+                      v-if="!aggregate.hidden"
+                      :key="aggregate.label"
+                      :class="{ 'is-active': aggregate.selected }"
+                      @click="joinAggregateSelected(join, aggregate)"
+                    >
+                      {{ aggregate.label }}
                     </a>
                   </template>
                 </template>
@@ -339,97 +358,129 @@ export default {
                        has-background-white-bis
                        has-text-grey
                        is-expandable"
-                :class="{'is-collapsed': design.related_table.collapsed}"
-                @click="tableRowClicked(design.related_table)">
-                {{design.label}}
+                :class="{ 'is-collapsed': design.related_table.collapsed }"
+                @click="tableRowClicked(design.related_table)"
+              >
+                {{ design.label }}
               </a>
             </template>
             <template v-if="!design.related_table.collapsed">
-              <a class="panel-block
+              <a
+                class="panel-block
                         panel-block-heading
                         has-background-white"
-                 v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
+                v-if="
+                  showJoinColumnAggregateHeader(design.related_table.columns)
+                "
+              >
                 Columns
               </a>
               <template v-for="timeframe in design.related_table.timeframes">
-                <a class="panel-block dimension-group"
-                   :key="timeframe.label"
-                   v-if="!timeframe.related_view.hidden"
-                   @click="timeframeSelected(timeframe)"
-                   :class="{'is-active': timeframe.selected}">
-                  {{timeframe.label}}
+                <a
+                  class="panel-block dimension-group"
+                  :key="timeframe.label"
+                  v-if="!timeframe.related_view.hidden"
+                  @click="timeframeSelected(timeframe)"
+                  :class="{ 'is-active': timeframe.selected }"
+                >
+                  {{ timeframe.label }}
                 </a>
                 <template v-for="period in timeframe.periods">
-                  <a class="panel-block indented"
-                     :key="period.label"
-                     @click="timeframePeriodSelected(period)"
-                     v-if="timeframe.selected"
-                     :class="{'is-active': period.selected}">
-                    {{period.label}}
+                  <a
+                    class="panel-block indented"
+                    :key="period.label"
+                    @click="timeframePeriodSelected(period)"
+                    v-if="timeframe.selected"
+                    :class="{ 'is-active': period.selected }"
+                  >
+                    {{ period.label }}
                   </a>
                 </template>
               </template>
-              <a class="panel-block"
-                 v-for="column in design.related_table.columns"
-                 :key="column.label"
-                 v-if="!column.hidden"
-                 @click="columnSelected(column)"
-                 :class="{'is-active': column.selected}">
-                {{column.label}}
+              <a
+                class="panel-block"
+                v-for="column in design.related_table.columns"
+                :key="column.label"
+                v-if="!column.hidden"
+                @click="columnSelected(column)"
+                :class="{ 'is-active': column.selected }"
+              >
+                {{ column.label }}
               </a>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
-              <a class="panel-block
+              <a
+                class="panel-block
                         panel-block-heading
                         has-background-white"
-                 v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
+                v-if="
+                  showJoinColumnAggregateHeader(design.related_table.aggregates)
+                "
+              >
                 Aggregates
               </a>
-              <a class="panel-block"
-                 v-for="aggregate in design.related_table.aggregates"
-                 :key="aggregate.label"
-                 @click="aggregateSelected(aggregate)"
-                 :class="{'is-active': aggregate.selected}">
-                {{aggregate.label}}
+              <a
+                class="panel-block"
+                v-for="aggregate in design.related_table.aggregates"
+                :key="aggregate.label"
+                @click="aggregateSelected(aggregate)"
+                :class="{ 'is-active': aggregate.selected }"
+              >
+                {{ aggregate.label }}
               </a>
             </template>
           </div>
-
         </nav>
       </aside>
 
       <div class="column is-three-quarters vh-scrollable">
         <div class="columns is-vcentered">
-
           <div class="column is-one-quarter">
             <div class="is-grouped is-pulled-left">
-              <div v-if="hasActiveReport()">{{activeReport.name}}</div>
+              <div v-if="hasActiveReport()">{{ activeReport.name }}</div>
               <div v-else><em>Untitled Report</em></div>
             </div>
           </div>
 
           <div class="column">
             <div class="field is-grouped is-pulled-right">
-
-              <div v-if="hasActiveReport()" class="control" @click="getDashboards">
+              <div
+                v-if="hasActiveReport()"
+                class="control"
+                @click="getDashboards"
+              >
                 <Dropdown label="Add to Dashboard" is-right-aligned>
-                  <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                  <div
+                    class="dropdown-content"
+                    slot-scope="{ dropdownForceClose }"
+                  >
                     <a
                       class="dropdown-item"
-                      @click="toggleNewDashboardModal(); dropdownForceClose();">
+                      @click="
+                        toggleNewDashboardModal()
+                        dropdownForceClose()
+                      "
+                    >
                       New Dashboard
                     </a>
                     <div v-if="dashboards.length">
-                      <div class="dropdown-item"
-                           v-for="dashboard in dashboards"
-                           :key="dashboard.id">
-                        <label for="'checkbox-' + dashboard.id"
-                               @click="
-                                    toggleActiveReportInDashboard(dashboard);
-                                    dropdownForceClose();">
-                          <input type="checkbox"
-                                 :id="'checkbox-' + dashboard.id"
-                                 :checked="isActiveReportInDashboard(dashboard)">
-                          {{dashboard.name}}
+                      <div
+                        class="dropdown-item"
+                        v-for="dashboard in dashboards"
+                        :key="dashboard.id"
+                      >
+                        <label
+                          for="'checkbox-' + dashboard.id"
+                          @click="
+                            toggleActiveReportInDashboard(dashboard)
+                            dropdownForceClose()
+                          "
+                        >
+                          <input
+                            type="checkbox"
+                            :id="'checkbox-' + dashboard.id"
+                            :checked="isActiveReportInDashboard(dashboard)"
+                          />
+                          {{ dashboard.name }}
                         </label>
                       </div>
                     </div>
@@ -437,12 +488,16 @@ export default {
                 </Dropdown>
               </div>
 
-              <div class="control field" :class="{'has-addons': hasActiveReport()}">
+              <div
+                class="control field"
+                :class="{ 'has-addons': hasActiveReport() }"
+              >
                 <div class="control">
                   <button
                     class="button is-interactive-primary is-outlined"
                     v-if="hasActiveReport()"
-                    @click="updateReport();">
+                    @click="updateReport()"
+                  >
                     <span>Save</span>
                   </button>
                 </div>
@@ -450,29 +505,47 @@ export default {
                   <Dropdown
                     :disabled="!hasChartableResults"
                     :label="hasActiveReport() ? '' : 'Save'"
-                    button-classes='is-interactive-primary is-outlined'
-                    is-right-aligned>
-                    <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    button-classes="is-interactive-primary is-outlined"
+                    is-right-aligned
+                  >
+                    <div
+                      class="dropdown-content"
+                      slot-scope="{ dropdownForceClose }"
+                    >
                       <div class="dropdown-item">
                         <div class="field">
-                          <label class="label" v-if="hasActiveReport()">Save as</label>
+                          <label class="label" v-if="hasActiveReport()"
+                            >Save as</label
+                          >
                           <div class="control">
-                            <input class="input"
-                                   type="text"
-                                   placeholder="Name your report"
-                                   v-model="saveReportSettings.name">
+                            <input
+                              class="input"
+                              type="text"
+                              placeholder="Name your report"
+                              v-model="saveReportSettings.name"
+                            />
                           </div>
                         </div>
                         <div class="field is-grouped">
                           <div class="control">
-                            <button class="button is-interactive-primary"
-                                    :disabled="!saveReportSettings.name"
-                                    @click="saveReport(); dropdownForceClose();">Save</button>
+                            <button
+                              class="button is-interactive-primary"
+                              :disabled="!saveReportSettings.name"
+                              @click="
+                                saveReport()
+                                dropdownForceClose()
+                              "
+                            >
+                              Save
+                            </button>
                           </div>
                           <div class="control">
-                            <button class="button is-text"
-                                    @click="dropdownForceClose();">
-                              Cancel</button>
+                            <button
+                              class="button is-text"
+                              @click="dropdownForceClose()"
+                            >
+                              Cancel
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -485,14 +558,23 @@ export default {
                 <Dropdown
                   :disabled="!reports.length"
                   label="Load"
-                  button-classes='is-interactive-primary is-outlined'
-                  is-right-aligned>
-                  <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
-                    <a class="dropdown-item"
-                       v-for="report in reports"
-                       :key="report.name"
-                       @click="loadReport(report); dropdownForceClose();">
-                      {{report.name}}
+                  button-classes="is-interactive-primary is-outlined"
+                  is-right-aligned
+                >
+                  <div
+                    class="dropdown-content"
+                    slot-scope="{ dropdownForceClose }"
+                  >
+                    <a
+                      class="dropdown-item"
+                      v-for="report in reports"
+                      :key="report.name"
+                      @click="
+                        loadReport(report)
+                        dropdownForceClose()
+                      "
+                    >
+                      {{ report.name }}
                     </a>
                   </div>
                 </Dropdown>
@@ -500,15 +582,23 @@ export default {
 
               <div class="control field has-addons">
                 <div class="control">
-                  <button class="button is-success"
-                          :class="{'is-loading': loadingQuery}"
-                          :disabled="!currentSQL"
-                          @click="runQuery">Run Query</button>
+                  <button
+                    class="button is-success"
+                    :class="{ 'is-loading': loadingQuery }"
+                    :disabled="!currentSQL"
+                    @click="runQuery"
+                  >
+                    Run Query
+                  </button>
                 </div>
                 <div class="control">
                   <div class="select is-fullwidth">
                     <select name="connection" v-model="dialect">
-                      <option :key="connection.name" v-for="connection in installedPlugins.connections">{{connection.name}}</option>
+                      <option
+                        :key="connection.name"
+                        v-for="connection in installedPlugins.connections"
+                        >{{ connection.name }}</option
+                      >
                     </select>
                   </div>
                 </div>
@@ -519,18 +609,21 @@ export default {
 
         <!-- filters tab -->
         <div v-if="design.has_filters">
-          <div class="has-background-primary
+          <div
+            class="has-background-primary
                       accordion-header
                       has-text-white-bis
                       is-expandable"
-               @click="toggleFilterOpen"
-               :class="{'is-collapsed': !filtersOpen}">
-
+            @click="toggleFilterOpen"
+            :class="{ 'is-collapsed': !filtersOpen }"
+          >
             <span>Filters</span>
             <div class="accordion-toggle">
               <a class="button is-primary is-small">
                 <span class="icon is-small">
-                  <font-awesome-icon :icon="filtersOpen ? 'angle-up' : 'angle-down'">
+                  <font-awesome-icon
+                    :icon="filtersOpen ? 'angle-up' : 'angle-down'"
+                  >
                   </font-awesome-icon>
                 </span>
               </a>
@@ -540,9 +633,9 @@ export default {
             <div v-if="filtersOpen">
               <div class="columns">
                 <div class="column is-3">
-                  <strong>{{filter.design_label}}</strong>
-                  <span>{{filter.label}}</span>
-                  <span>({{filter.type}})</span>
+                  <strong>{{ filter.design_label }}</strong>
+                  <span>{{ filter.label }}</span>
+                  <span>({{ filter.type }})</span>
                 </div>
                 <div class="column is-9">
                   <yes-no-filter v-if="filter.type === 'yesno'"></yes-no-filter>
@@ -554,13 +647,18 @@ export default {
                       :dropdownLabelKey="getKeyFromDistinct(filter.sql)"
                       @focused="inputFocused(filter.sql)"
                       @selected="dropdownSelected"
-                      @modifierChanged="modifierChanged">
+                      @modifierChanged="modifierChanged"
+                    >
                     </select-dropdown>
                   </div>
                   <div class="tags selected-filters">
-                    <template v-for="(selected, key) in getSelectionsFromDistinct(filter.sql)">
+                    <template
+                      v-for="(selected, key) in getSelectionsFromDistinct(
+                        filter.sql
+                      )"
+                    >
                       <span class="tag is-link" :key="key">
-                        {{selected}}
+                        {{ selected }}
                         <button class="delete is-small"></button>
                       </span>
                     </template>
@@ -572,21 +670,23 @@ export default {
         </div>
 
         <!-- charts tab -->
-        <div class="has-background-primary
+        <div
+          class="has-background-primary
                     accordion-header
                     has-text-white-bis
                     is-expandable"
-             @click="toggleChartsOpen"
-             :class="{'is-collapsed': !chartsOpen}">
-
+          @click="toggleChartsOpen"
+          :class="{ 'is-collapsed': !chartsOpen }"
+        >
           <span class="accordion-title">Charts</span>
           <div>
             <div class="field has-addons chart-buttons">
               <div class="control" @click.stop="setAndOpenChart('BarChart')">
                 <button
                   class="button is-small is-text has-text-white"
-                  :class="{'is-active': chartType === 'BarChart'}"
-                  :disabled="!hasChartableResults">
+                  :class="{ 'is-active': chartType === 'BarChart' }"
+                  :disabled="!hasChartableResults"
+                >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-bar"></font-awesome-icon>
                   </span>
@@ -595,8 +695,9 @@ export default {
               <div class="control" @click.stop="setAndOpenChart('LineChart')">
                 <button
                   class="button is-small is-text has-text-white"
-                  :class="{'is-active': chartType === 'LineChart'}"
-                  :disabled="!hasChartableResults">
+                  :class="{ 'is-active': chartType === 'LineChart' }"
+                  :disabled="!hasChartableResults"
+                >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-line"></font-awesome-icon>
                   </span>
@@ -605,18 +706,23 @@ export default {
               <div class="control" @click.stop="setAndOpenChart('AreaChart')">
                 <button
                   class="button is-small is-text has-text-white"
-                  :class="{'is-active': chartType === 'AreaChart'}"
-                  :disabled="!hasChartableResults">
+                  :class="{ 'is-active': chartType === 'AreaChart' }"
+                  :disabled="!hasChartableResults"
+                >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-area"></font-awesome-icon>
                   </span>
                 </button>
               </div>
-              <div class="control" @click.stop="setAndOpenChart('ScatterChart')">
+              <div
+                class="control"
+                @click.stop="setAndOpenChart('ScatterChart')"
+              >
                 <button
                   class="button is-small is-text has-text-white"
-                  :class="{'is-active': chartType === 'ScatterChart'}"
-                  :disabled="!hasChartableResults">
+                  :class="{ 'is-active': chartType === 'ScatterChart' }"
+                  :disabled="!hasChartableResults"
+                >
                   <span class="icon is-small">
                     <font-awesome-icon icon="dot-circle"></font-awesome-icon>
                   </span>
@@ -628,24 +734,28 @@ export default {
           <div class="accordion-toggle">
             <a class="button is-primary is-small">
               <span class="icon is-small">
-                <font-awesome-icon :icon="chartsOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+                <font-awesome-icon
+                  :icon="chartsOpen ? 'angle-up' : 'angle-down'"
+                ></font-awesome-icon>
               </span>
             </a>
           </div>
-
         </div>
 
         <div class="accordion-body">
-          <div v-if="chartsOpen" >
+          <div v-if="chartsOpen">
             <div v-if="hasChartableResults" class="chart-toggles">
-              <chart :chart-type='chartType'
-                     :results='results'
-                     :result-aggregates='resultAggregates'></chart>
+              <chart
+                :chart-type="chartType"
+                :results="results"
+                :result-aggregates="resultAggregates"
+              ></chart>
             </div>
             <div v-if="!hasChartableResults">
               <div class="box is-radiusless is-shadowless">
                 <p>
-                  Run a query with at least one aggregate selected or load a report
+                  Run a query with at least one aggregate selected or load a
+                  report
                 </p>
               </div>
             </div>
@@ -653,18 +763,21 @@ export default {
         </div>
 
         <!-- results/SQL tab -->
-        <div class="has-background-primary
+        <div
+          class="has-background-primary
                     accordion-header
                     has-text-white-bis
                     is-expandable"
-             @click="toggleDataOpen"
-             :class="{'is-collapsed': !dataOpen}">
-
+          @click="toggleDataOpen"
+          :class="{ 'is-collapsed': !dataOpen }"
+        >
           <span>Data</span>
           <div class="accordion-toggle">
             <a class="button is-primary is-small">
               <span class="icon is-small">
-                <font-awesome-icon :icon="dataOpen ? 'angle-up' : 'angle-down'"></font-awesome-icon>
+                <font-awesome-icon
+                  :icon="dataOpen ? 'angle-up' : 'angle-down'"
+                ></font-awesome-icon>
               </span>
             </a>
           </div>
@@ -674,18 +787,25 @@ export default {
             <div class="notification is-danger" v-if="hasSQLError">
               <button class="delete" @click="resetErrorMessage"></button>
               <ul>
-                <li v-for="(error, key) in sqlErrorMessage" :key="key">{{error}}</li>
+                <li v-for="(error, key) in sqlErrorMessage" :key="key">
+                  {{ error }}
+                </li>
               </ul>
             </div>
             <div class="columns is-vcentered">
-
               <div class="column">
                 <div class="tabs">
                   <ul>
-                    <li :class="{'is-active': isResultsTab}" @click="setCurrentTab('results')">
-                      <a>Results ({{numResults}})</a>
+                    <li
+                      :class="{ 'is-active': isResultsTab }"
+                      @click="setCurrentTab('results')"
+                    >
+                      <a>Results ({{ numResults }})</a>
                     </li>
-                    <li :class="{'is-active': isSQLTab}" @click="setCurrentTab('sql')">
+                    <li
+                      :class="{ 'is-active': isSQLTab }"
+                      @click="setCurrentTab('sql')"
+                    >
                       <a>SQL</a>
                     </li>
                   </ul>
@@ -700,18 +820,22 @@ export default {
                   <div class="field-body">
                     <div class="field">
                       <div class="control">
-                        <input class="input is-small" type="text" v-model="limit" placeholder="Limit">
+                        <input
+                          class="input is-small"
+                          type="text"
+                          v-model="limit"
+                          placeholder="Limit"
+                        />
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
             </div>
             <ResultTable></ResultTable>
             <div>
               <div class="" v-if="isSQLTab && currentSQL">
-                <code>{{formattedSql}}</code>
+                <code>{{ formattedSql }}</code>
               </div>
             </div>
           </div>
@@ -721,9 +845,9 @@ export default {
         <NewDashboardModal
           v-if="isNewDashboardModalOpen"
           @close="toggleNewDashboardModal"
-          :report="activeReport">
+          :report="activeReport"
+        >
         </NewDashboardModal>
-
       </div>
     </div>
   </section>
@@ -731,7 +855,7 @@ export default {
 
 <style lang="scss" scoped>
 @import '@/scss/bulma-preset-overrides.scss';
-@import "../../../node_modules/bulma/bulma";
+@import '../../../node_modules/bulma/bulma';
 
 code {
   white-space: pre;
@@ -756,7 +880,7 @@ code {
     }
   }
   &.is-sqlite-unsupported {
-    opacity: .5;
+    opacity: 0.5;
     cursor: not-allowed;
     .sqlite-unsupported-container {
       display: flex;
@@ -782,7 +906,7 @@ code {
       border-radius: 2px;
       border-right: 0;
       border-top: 0;
-      content: " ";
+      content: ' ';
       display: block;
       height: 0.625em;
       margin-top: -0.321em;
@@ -807,11 +931,11 @@ code {
 }
 
 .data-toggles {
-  padding-top: .5rem;
+  padding-top: 0.5rem;
 }
 
 .accordion-header {
-  padding: .5rem .5rem .5rem 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
   display: flex;
   align-items: center;
   justify-content: flex-start;

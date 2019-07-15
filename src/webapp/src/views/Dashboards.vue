@@ -1,63 +1,61 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import Chart from '@/components/analyze/Chart';
-import ClosableMessage from '@/components/generic/ClosableMessage';
-import NewDashboardModal from '@/components/dashboards/NewDashboardModal';
-import RouterViewLayout from '@/views/RouterViewLayout';
+import { mapState, mapActions } from 'vuex'
+import Chart from '@/components/analyze/Chart'
+import ClosableMessage from '@/components/generic/ClosableMessage'
+import NewDashboardModal from '@/components/dashboards/NewDashboardModal'
+import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboards',
   created() {
-    this.initialize(this.$route.params.slug);
+    this.initialize(this.$route.params.slug)
   },
   data() {
     return {
-      isNewDashboardModalOpen: false,
-    };
+      isNewDashboardModalOpen: false
+    }
   },
   components: {
     Chart,
     ClosableMessage,
     NewDashboardModal,
-    RouterViewLayout,
+    RouterViewLayout
   },
   computed: {
     ...mapState('dashboards', [
       'activeDashboard',
       'activeDashboardReports',
       'dashboards',
-      'reports',
-    ]),
+      'reports'
+    ])
   },
   methods: {
     ...mapActions('dashboards', [
       'initialize',
       'setDashboard',
-      'getActiveDashboardReportsWithQueryResults',
+      'getActiveDashboardReportsWithQueryResults'
     ]),
     isActive(dashboard) {
-      return dashboard.id === this.activeDashboard.id;
+      return dashboard.id === this.activeDashboard.id
     },
     toggleNewDashboardModal() {
-      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
-    },
+      this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    }
   },
   watch: {
     activeDashboard() {
-      this.getActiveDashboardReportsWithQueryResults();
-    },
-  },
-};
-
+      this.getActiveDashboardReportsWithQueryResults()
+    }
+  }
+}
 </script>
 
 <template>
   <router-view-layout>
-
     <div class="container view-header">
       <div class="content">
         <div class="level">
-          <h1 class='is-marginless'>Dashboards</h1>
+          <h1 class="is-marginless">Dashboards</h1>
         </div>
       </div>
     </div>
@@ -71,50 +69,67 @@ export default {
                 Dashboards
               </p>
 
-              <div class='panel-block'>
-                <a class='button is-secondary is-fullwidth'
-                    @click="toggleNewDashboardModal">New Dashboard</a>
+              <div class="panel-block">
+                <a
+                  class="button is-secondary is-fullwidth"
+                  @click="toggleNewDashboardModal"
+                  >New Dashboard</a
+                >
               </div>
 
-              <div v-for="dashboard in dashboards"
-                  class='panel-block'
-                  :class="{'is-active': isActive(dashboard)}"
-                  :key="dashboard.id"
-                  @click="setDashboard(dashboard)">
+              <div
+                v-for="dashboard in dashboards"
+                class="panel-block"
+                :class="{ 'is-active': isActive(dashboard) }"
+                :key="dashboard.id"
+                @click="setDashboard(dashboard)"
+              >
                 <div>
-                  <div>{{dashboard.name}}</div>
+                  <div>{{ dashboard.name }}</div>
                 </div>
               </div>
-
             </nav>
           </aside>
           <div class="column is-three-quarters vh-scrollable">
-            <ClosableMessage title='Meltano Dashboards'>
-              <p><span class='has-text-weight-bold'>Meltano</span> streamlines the collection, analysis, and dashboarding of data.</p>
-              <p><span class="is-italic">You need to save an analysis to a dashboard first</span>. Manage your dashboards below.</p>
+            <ClosableMessage title="Meltano Dashboards">
+              <p>
+                <span class="has-text-weight-bold">Meltano</span> streamlines
+                the collection, analysis, and dashboarding of data.
+              </p>
+              <p>
+                <span class="is-italic"
+                  >You need to save an analysis to a dashboard first</span
+                >. Manage your dashboards below.
+              </p>
             </ClosableMessage>
 
-            <h1>{{activeDashboard.name}}</h1>
-            <h2 v-if="activeDashboard.description">{{activeDashboard.description}}</h2>
-            <hr v-if="activeDashboardReports.length">
+            <h1>{{ activeDashboard.name }}</h1>
+            <h2 v-if="activeDashboard.description">
+              {{ activeDashboard.description }}
+            </h2>
+            <hr v-if="activeDashboardReports.length" />
             <div
-              class='box'
+              class="box"
               v-for="report in activeDashboardReports"
-              :key="report.id">
-              <p>{{report.name}}</p>
-              <chart :chart-type='report.chartType'
-                      :results='report.queryResults'
-                      :result-aggregates='report.queryResultAggregates'></chart>
+              :key="report.id"
+            >
+              <p>{{ report.name }}</p>
+              <chart
+                :chart-type="report.chartType"
+                :results="report.queryResults"
+                :result-aggregates="report.queryResultAggregates"
+              ></chart>
             </div>
 
-            <NewDashboardModal v-if="isNewDashboardModalOpen" @close="toggleNewDashboardModal" />
+            <NewDashboardModal
+              v-if="isNewDashboardModalOpen"
+              @close="toggleNewDashboardModal"
+            />
           </div>
         </div>
       </section>
     </div>
   </router-view-layout>
-
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

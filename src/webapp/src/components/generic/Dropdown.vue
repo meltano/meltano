@@ -1,81 +1,87 @@
 <script>
-import hyphenate from '@/filters/hyphenate';
+import hyphenate from '@/filters/hyphenate'
 
 export default {
   name: 'Dropdown',
   created() {
-    document.addEventListener('click', this.onDocumentClick);
+    document.addEventListener('click', this.onDocumentClick)
   },
   beforeDestroy() {
-    document.removeEventListener('click', this.onDocumentClick);
+    document.removeEventListener('click', this.onDocumentClick)
   },
   data() {
     return {
       isOpen: false,
-      lastDropdownOpen: null,
-    };
+      lastDropdownOpen: null
+    }
   },
   computed: {
     getHyphenatedLabel() {
-      return hyphenate(this.label, 'dropdown');
-    },
+      return hyphenate(this.label, 'dropdown')
+    }
   },
   filters: {
-    hyphenate,
+    hyphenate
   },
   props: {
     label: {
-      type: String,
+      type: String
     },
     buttonClasses: {
-      type: String,
+      type: String
     },
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     isRightAligned: {
-      type: Boolean,
+      type: Boolean
     },
     isFullWidth: {
-      type: Boolean,
-    },
+      type: Boolean
+    }
   },
   methods: {
     forceClose() {
-      this.isOpen = false;
+      this.isOpen = false
     },
     toggleDropdown() {
-      this.isOpen = !this.isOpen;
+      this.isOpen = !this.isOpen
     },
     onDocumentClick(el) {
-      const targetEl = el.target.closest('.dropdown');
-      const matchEl = this.$el.closest('.dropdown');
+      const targetEl = el.target.closest('.dropdown')
+      const matchEl = this.$el.closest('.dropdown')
       if (targetEl !== matchEl) {
-        this.forceClose();
+        this.forceClose()
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <template>
-  <div class="dropdown"
-        :class="{
-          'is-active': isOpen,
-          'is-right': isRightAligned,
-          'is-fullwidth': isFullWidth,
-        }">
+  <div
+    class="dropdown"
+    :class="{
+      'is-active': isOpen,
+      'is-right': isRightAligned,
+      'is-fullwidth': isFullWidth
+    }"
+  >
     <div class="dropdown-trigger">
-      <button class="button"
-              :class="buttonClasses"
-              :disabled="disabled"
-              :aria-controls="getHyphenatedLabel"
-              aria-haspopup="true"
-              @click="toggleDropdown">
-        <span v-if="label">{{label}}</span>
+      <button
+        class="button"
+        :class="buttonClasses"
+        :disabled="disabled"
+        :aria-controls="getHyphenatedLabel"
+        aria-haspopup="true"
+        @click="toggleDropdown"
+      >
+        <span v-if="label">{{ label }}</span>
         <span class="icon is-small">
-          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
+          <font-awesome-icon
+            :icon="isOpen ? 'caret-up' : 'caret-down'"
+          ></font-awesome-icon>
         </span>
       </button>
     </div>

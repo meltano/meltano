@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'ResultTable',
@@ -10,64 +10,71 @@ export default {
       'columnNames',
       'results',
       'keys',
-      'sortDesc',
+      'sortDesc'
     ]),
     ...mapGetters('designs', [
       'hasResults',
       'isColumnSorted',
       'getFormattedValue',
       'isColumnSelectedAggregate',
-      'isResultsTab',
-    ]),
+      'isResultsTab'
+    ])
   },
   methods: {
-    ...mapActions('designs', [
-      'sortBy',
-    ]),
-  },
-};
+    ...mapActions('designs', ['sortBy'])
+  }
+}
 </script>
 
 <template>
-    <div class="result-data" v-if="isResultsTab">
-      <div class="notification is-info" v-if="!hasResults">
-        No results
-      </div>
-      <table class="table
+  <div class="result-data" v-if="isResultsTab">
+    <div class="notification is-info" v-if="!hasResults">
+      No results
+    </div>
+    <table
+      class="table
           is-bordered
           is-striped
           is-narrow
           is-hoverable
           is-fullwidth"
-          v-if="hasResults">
-        <thead>
-          <th v-for="(columnHeader, i) in columnHeaders"
-              class="sortable-header"
-              :key="columnHeader + i"
-              :class="{
-                'has-background-warning': isColumnSelectedAggregate(keys[i]),
-                'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
-                'is-desc': sortDesc,
-              }"
-              @click="sortBy(columnNames[i])">
-            {{columnHeader}}
-          </th>
-        </thead>
-        <tbody>
-          <!-- eslint-disable-next-line vue/require-v-for-key -->
-          <tr v-for="result in results">
-            <template v-for="key in keys">
+      v-if="hasResults"
+    >
+      <thead>
+        <th
+          v-for="(columnHeader, i) in columnHeaders"
+          class="sortable-header"
+          :key="columnHeader + i"
+          :class="{
+            'has-background-warning': isColumnSelectedAggregate(keys[i]),
+            'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
+            'is-desc': sortDesc
+          }"
+          @click="sortBy(columnNames[i])"
+        >
+          {{ columnHeader }}
+        </th>
+      </thead>
+      <tbody>
+        <!-- eslint-disable-next-line vue/require-v-for-key -->
+        <tr v-for="result in results">
+          <template v-for="key in keys">
             <td :key="key" v-if="isColumnSelectedAggregate(key)">
-              {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}
+              {{
+                getFormattedValue(
+                  resultAggregates[key]['value_format'],
+                  result[key]
+                )
+              }}
             </td>
             <td :key="key" v-else>
-              {{result[key]}}
+              {{ result[key] }}
             </td>
-            </template>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          </template>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 
 <style lang="scss">
@@ -84,21 +91,21 @@ export default {
 }
 .sorted {
   &::after {
-    content: "asc";
+    content: 'asc';
     position: relative;
     width: 22px;
     height: 20px;
     float: right;
     font-size: 9px;
     padding: 2px;
-    color: #AAA;
-    border: 1px solid #AAA;
+    color: #aaa;
+    border: 1px solid #aaa;
     border-radius: 4px;
     margin-top: 2px;
   }
   &.is-desc {
     &::after {
-      content: "desc";
+      content: 'desc';
       width: 28px;
     }
   }
