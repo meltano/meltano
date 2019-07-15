@@ -171,7 +171,7 @@ const getters = {
   },
 
   getFiltersByType(filterType) {
-    return state.filters[`${filterType}s`];
+    return state.filters[`${filterType}s`] || [];
   },
 
   getIsAttributeInFilters() {
