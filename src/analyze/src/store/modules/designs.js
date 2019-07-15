@@ -166,7 +166,9 @@ const getters = {
     return attributeTables;
   },
 
+  // eslint-disable-next-line
   getFilter(table_name, name, filterType) {
+    // eslint-disable-next-line
     return getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.table_name === table_name);
   },
 
@@ -175,6 +177,7 @@ const getters = {
   },
 
   getIsAttributeInFilters() {
+    // eslint-disable-next-line
     return (table_name, name, filterType) => !!getters.getFilter(table_name, name, filterType);
   },
 
@@ -313,6 +316,7 @@ const actions = {
     commit('toggleSelected', timeframePeriod);
   },
 
+  // eslint-disable-next-line
   toggleAggregate({ commit }, { aggregate, table_name }) {
     commit('toggleSelected', aggregate);
 
@@ -422,6 +426,7 @@ const actions = {
     });
   },
 
+  // eslint-disable-next-line
   addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '' }) {
     const filter = {
       table_name,
