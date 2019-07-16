@@ -105,7 +105,6 @@ export default {
     ]),
     ...mapActions('designs', [
       'resetErrorMessage',
-      'toggleFilter',
     ]),
 
     isActiveReportInDashboard(dashboard) {
