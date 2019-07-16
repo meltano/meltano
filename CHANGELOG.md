@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * [!759](https://gitlab.com/meltano/meltano/merge_requests/759) Added filtering functionality to the Analyze UI while additionally cleaning it up from a UI/UX lens
+* [!735](https://gitlab.com/meltano/meltano/merge_requests/735) Added documentation regarding patch vs. normal releases
 
 ### Changes
 
