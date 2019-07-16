@@ -285,6 +285,14 @@ target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
 target-postgres==...
 ```
 
+## Generate Mac Binary
+`cd` into your meltano directory
+```
+chmod a+x ./scripts/mac/postinstall
+sudo pkgbuild --identifier com.meltano.meltano_installer --nopayload --scripts ./scripts/mac "./bin/meltano.pkg"
+```
+A mac binary will now exist in the `./bin` directory which can be distributed.
+
 ## Tmuxinator
 
 Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.

@@ -1,0 +1,46 @@
+#!/bin/sh
+
+if [ `id -ur` = 0 ]; then
+    # Run from the installer, do some trickery to fetch the information
+    # we need.
+    theShell="`finger $USER | grep Shell: | head  -1 | awk '{ print $NF }'`"
+
+else
+    theShell="${SHELL}"
+fi
+
+BSH="`basename "${theShell}"`"
+
+case "${BSH}" in
+bash)
+    if [ -e "${HOME}/.bash_profile" ]; then
+        PR="${HOME}/.bash_profile"
+    elif [ -e "${HOME}/.bash_login" ]; then
+        PR="${HOME}/.bash_login"
+    elif [ -e "${HOME}/.profile" ]; then
+        PR="${HOME}/.profile"
+    else
+        PR="${HOME}/.bash_profile"
+    fi
+    ;;
+zsh)
+    PR="${HOME}/.zprofile"
+    ;;
+*sh)
+    PR="${HOME}/.profile"
+    ;;
+esac
+
+# need to source the profile to see if python is installed already
+source ${PR}
+
+# if user doesn't have python3 installed, install from pkg
+if ! command -v python3 &>/dev/null; then
+    echo "installing python 3"
+    curl https://www.python.org/ftp/python/3.7.4/python-3.7.4-macosx10.9.pkg -o ~/python3.7.pkg;
+    installer -pkg ~/python3.7.pkg -target /;
+    rm ~/python3.7.pkg;
+fi
+
+source ${PR}
+pip3 install --upgrade meltano;
