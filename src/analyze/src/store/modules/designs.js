@@ -499,7 +499,7 @@ const mutations = {
     // aggregates
     setSelected(baseTable.aggregates, queryPayload.aggregates);
     // filters
-    // TODO
+    state.filters = queryPayload.filters;
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
       // joins - columns
