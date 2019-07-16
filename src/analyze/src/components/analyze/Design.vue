@@ -502,22 +502,6 @@ export default {
                     has-background-white"
                     v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
                     Columns
-          <nav class="panel has-background-white">
-
-            <div class="is-unselectable">
-              <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
-              <template v-if="hasJoins">
-                <template v-for="join in design.joins">
-                  <a
-                    class="panel-block
-                      panel-block-heading
-                      has-background-white-bis
-                      has-text-grey
-                      is-expandable"
-                      :class="{'is-collapsed': join.collapsed}"
-                      :key="join.label"
-                      @click="joinRowClicked(join)">
-                      {{join.label}}
                   </a>
                   <template v-for="timeframe in join.related_table.timeframes">
                     <a class="panel-block timeframe"
