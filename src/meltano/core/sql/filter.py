@@ -48,12 +48,4 @@ FilterOptions = [
         description="Is not null",
         expression=MeltanoFilterExpressionType.IsNotNull,
     ),
-    FilterOption(
-        label="Is Null", description="Is null", operation=FilterOptionType.IS_NULL
-    ),
-    FilterOption(
-        label="Is Not Null",
-        description="Is not null",
-        operation=FilterOptionType.IS_NOT_NULL,
-    ),
 ]
