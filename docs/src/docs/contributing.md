@@ -55,9 +55,9 @@ meltano ui
 ```
 
 :::warning Troubleshooting
-If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed. 
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
 
-On a OSX, this can be solved by running `brew install yarn`. 
+On a OSX, this can be solved by running `brew install yarn`.
 :::
 
 ### Meltano UI Development
@@ -227,10 +227,24 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
     # view changelog (verify changes made match changes logged)
     $ changelog view
+    ```
 
+    ::: tip Release Type
+    Consider whether this is a *normal* or *patch* release:
+    :::
+    *Normal*
+    ```bash
     # after changelog validation, build the release
     $ make release
+    ```
+    *Patch*
+    ```bash
+    # after changelog validation, patch the release
+    $ changelog release --patch
+    ```
 
+    And then continue:
+    ```bash
     # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
     # occasionally the version bump can go to a version you don't expect.
     $ changelog view
