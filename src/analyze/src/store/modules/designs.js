@@ -6,36 +6,40 @@ import designApi from '../../api/design';
 import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
-const state = {
-  activeReport: {},
-  design: {
-    related_table: {},
-  },
-  hasSQLError: false,
-  sqlErrorMessage: [],
-  currentModel: '',
-  currentDesign: '',
-  results: [],
-  keys: [],
-  columnHeaders: [],
-  columnNames: [],
-  resultAggregates: {},
-  loadingQuery: false,
-  currentSQL: '',
-  saveReportSettings: { name: null },
-  reports: [],
-  chartType: 'BarChart',
-  limit: 50,
-  sortColumn: null,
-  sortDesc: false,
-  dialect: null,
-  selectedAttributeCount: 0,
-  filterOptions: [],
-  filters: {
-    columns: [],
-    aggregates: [],
-  },
-};
+function defaultState() {
+  return {
+    activeReport: {},
+    design: {
+      related_table: {},
+    },
+    hasSQLError: false,
+    sqlErrorMessage: [],
+    currentModel: '',
+    currentDesign: '',
+    results: [],
+    keys: [],
+    columnHeaders: [],
+    columnNames: [],
+    resultAggregates: {},
+    loadingQuery: false,
+    currentSQL: '',
+    saveReportSettings: { name: null },
+    reports: [],
+    chartType: 'BarChart',
+    limit: 50,
+    sortColumn: null,
+    sortDesc: false,
+    dialect: null,
+    selectedAttributeCount: 0,
+    filterOptions: [],
+    filters: {
+      columns: [],
+      aggregates: [],
+    },
+  };
+}
+
+const state = defaultState();
 
 const helpers = {
   getQueryPayloadFromDesign() {
@@ -234,6 +238,8 @@ const getters = {
 };
 
 const actions = {
+  resetDefaults: ({ commit }) => commit('resetDefaults'),
+
   getDesign({ dispatch, commit }, { model, design, slug }) {
     state.currentSQL = '';
     state.currentModel = model;
@@ -450,11 +456,18 @@ const actions = {
 };
 
 const mutations = {
+  resetDefaults() {
+    const defaults = defaultState();
+    Object.keys(defaults).forEach((key) => {
+      state[key] = defaults[key];
+    });
+  },
+
   setRemoveSort() {
     state.sortColumn = null;
   },
 
-  setChartType(context, chartType) {
+  setChartType(_, chartType) {
     state.chartType = chartType;
   },
 

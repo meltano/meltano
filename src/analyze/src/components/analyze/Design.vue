@@ -15,6 +15,9 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
+  beforeDestroy() {
+    this.$store.dispatch('designs/resetDefaults');
+  },
   created() {
     const { slug, model, design } = this.$route.params;
     this.$store.dispatch('designs/getDesign', { model, design, slug });
