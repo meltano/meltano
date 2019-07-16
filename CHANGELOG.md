@@ -18,6 +18,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Breaks
 
 
+## 0.32.2 - (2019-07-16)
+---
+
+### New
+* [#759](https://gitlab.com/meltano/meltano/issues/759) Added filtering functionality to the Analyze UI while additionally cleaning it up from a UI/UX lens
+
 ## 0.32.1 - (2019-07-15)
 ---
 
