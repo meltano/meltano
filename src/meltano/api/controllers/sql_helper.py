@@ -93,9 +93,9 @@ class SqlHelper(SqlUtils):
 
         return engine
 
-    def get_query_results(self, dialect, sql):
-        engine = self.get_db_engine(dialect)
-        results = engine.execute(sql)
+    def get_query_results(self, connection_name, sql):
+        engine = self.get_db_engine(connection_name)
+        results = engine.execute(sqlalchemy.text(sql))
         results = [OrderedDict(row) for row in results]
         return results
 

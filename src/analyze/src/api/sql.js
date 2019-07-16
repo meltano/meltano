@@ -9,4 +9,12 @@ export default {
   getDistinct(model, design, field) {
     return axios.post(utils.apiUrl('sql/distinct', `${model}/${design}`), { field });
   },
+
+  getDialect(model) {
+    return axios.get(utils.apiUrl('sql/get', `${model}/dialect`));
+  },
+
+  getFilterOptions() {
+    return axios.get(utils.apiUrl('sql/get', 'filter-options'));
+  },
 };

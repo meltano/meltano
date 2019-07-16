@@ -21,19 +21,20 @@ const state = {
   columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
-  currentDataTab: 'sql',
   currentSQL: '',
-  filtersOpen: false,
-  dataOpen: true,
-  chartsOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
-  limit: 3,
-  distincts: {},
+  limit: 50,
   sortColumn: null,
   sortDesc: false,
   dialect: null,
+  selectedAttributeCount: 0,
+  filterOptions: [],
+  filters: {
+    columns: [],
+    aggregates: [],
+  },
 };
 
 const helpers = {
@@ -62,13 +63,6 @@ const helpers = {
         direction: state.sortDesc ? 'desc' : 'asc',
       };
     }
-
-    const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters);
-    filtersKeys.forEach((prop) => {
-      delete filters[prop].results;
-      delete filters[prop].sql;
-    });
 
     if (!state.design.joins) {
       state.design.joins = [];
@@ -113,13 +107,17 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      filters,
       dialect: state.dialect,
+      filters: state.filters,
     };
   },
 };
 
 const getters = {
+  filtersCount() {
+    return state.filters.columns.length + state.filters.aggregates.length;
+  },
+
   hasResults() {
     if (!state.results) {
       return false;
@@ -131,7 +129,63 @@ const getters = {
     return getters.hasResults() && state.resultAggregates.length;
   },
 
-  numResults() {
+  hasFilters() {
+    return getters.filtersCount() > 0;
+  },
+
+  getAttributesByTable() {
+    const attributeTables = [];
+    const design = state.design;
+    const attributeFilter = attr => !attr.hidden;
+    if (design.label) {
+      attributeTables.push({
+        tableLabel: design.label,
+        table_name: design.from,
+        columns: design.related_table.columns
+          ? design.related_table.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.related_table.aggregates
+          ? design.related_table.aggregates.filter(attributeFilter)
+          : [],
+      });
+    }
+    if (design.joins) {
+      design.joins.forEach((join) => {
+        attributeTables.push({
+          tableLabel: join.label,
+          table_name: join.name,
+          columns: join.related_table.columns
+            ? join.related_table.columns.filter(attributeFilter)
+            : [],
+          aggregates: join.related_table.aggregates
+            ? join.related_table.aggregates.filter(attributeFilter)
+            : [],
+        });
+      });
+    }
+    return attributeTables;
+  },
+
+  // eslint-disable-next-line
+  getFilter(table_name, name, filterType) {
+    // eslint-disable-next-line
+    return getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.table_name === table_name);
+  },
+
+  getFiltersByType(filterType) {
+    return state.filters[`${filterType}s`] || [];
+  },
+
+  getIsAttributeInFilters() {
+    // eslint-disable-next-line
+    return (table_name, name, filterType) => !!getters.getFilter(table_name, name, filterType);
+  },
+
+  attributesCount() {
+    return state.selectedAttributeCount;
+  },
+
+  resultsCount() {
     if (!state.results) {
       return 0;
     }
@@ -139,16 +193,6 @@ const getters = {
   },
 
   getDialect: () => state.dialect,
-
-  getDistinctsForField: () => field => state.distincts[field],
-
-  getResultsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.results;
-  },
 
   hasJoins() {
     return !!(state.design.joins && state.design.joins.length);
@@ -159,26 +203,6 @@ const getters = {
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
-
-  getKeyFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.keys[0];
-  },
-
-  getSelectionsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return [];
-    }
-    const thisDistinctSelections = thisDistinct.selections;
-    if (!thisDistinctSelections) {
-      return [];
-    }
-    return thisDistinctSelections;
-  },
 
   getChartYAxis() {
     if (!state.resultAggregates) {
@@ -198,18 +222,6 @@ const getters = {
 
   currentDesignLabel() {
     return utils.titleCase(state.currentModel);
-  },
-
-  isDataTab() {
-    return state.currentDataTab === 'data';
-  },
-
-  isResultsTab() {
-    return state.currentDataTab === 'results';
-  },
-
-  isSQLTab() {
-    return state.currentDataTab === 'sql';
   },
 
   currentLimit() {
@@ -249,6 +261,13 @@ const actions = {
       });
 
     return index;
+  },
+
+  getFilterOptions({ commit }) {
+    sqlApi.getFilterOptions()
+      .then((response) => {
+        commit('setFilterOptions', response.data);
+      });
   },
 
   expandRow({ commit }, row) {
@@ -297,8 +316,16 @@ const actions = {
     commit('toggleSelected', timeframePeriod);
   },
 
-  toggleAggregate({ commit }, aggregate) {
+  // eslint-disable-next-line
+  toggleAggregate({ commit }, { aggregate, table_name }) {
     commit('toggleSelected', aggregate);
+
+    if (!aggregate.selected) {
+      const filter = getters.getFilter(table_name, aggregate.name, 'aggregate');
+      if (filter) {
+        commit('removeFilter', filter);
+      }
+    }
   },
 
   limitSet({ commit }, limit) {
@@ -322,11 +349,9 @@ const actions = {
         if (run) {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'results');
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'sql');
         }
       })
       .catch((e) => {
@@ -390,43 +415,8 @@ const actions = {
     commit('setErrorState');
   },
 
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then((response) => {
-        commit('setDistincts', {
-          data: response.data,
-          field,
-        });
-      });
-  },
-
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data);
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data);
-  },
-
-  switchCurrentTab({ commit }, tab) {
-    commit('setCurrentTab', tab);
-  },
-
-  toggleFilterOpen({ commit }) {
-    commit('setFilterToggle');
-  },
-
-  toggleDataOpen({ commit }) {
-    commit('setDataToggle');
-  },
-
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
-  },
-
-  toggleChartsOpen({ commit }) {
-    commit('setChartToggle');
   },
 
   sortBy({ commit }, name) {
@@ -434,6 +424,28 @@ const actions = {
     this.dispatch('designs/getSQL', {
       run: true,
     });
+  },
+
+  // eslint-disable-next-line
+  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '' }) {
+    const filter = {
+      table_name,
+      name: attribute.name,
+      expression,
+      value,
+      attribute,
+      filterType,
+    };
+    commit('addFilter', filter);
+
+    const isValidToggleSelection = !attribute.hasOwnProperty('selected') || !attribute.selected;
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute);
+    }
+  },
+
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter);
   },
 };
 
@@ -448,6 +460,10 @@ const mutations = {
 
   setCurrentReport(_, report) {
     state.activeReport = report;
+  },
+
+  setFilterOptions(_, options) {
+    state.filterOptions = options;
   },
 
   setStateFromLoadedReport(_, report) {
@@ -511,6 +527,18 @@ const mutations = {
     // TODO
   },
 
+  addFilter(_, filter) {
+    getters.getFiltersByType(filter.filterType).push(filter);
+  },
+
+  removeFilter(_, filter) {
+    if (filter) {
+      const filtersByType = getters.getFiltersByType(filter.filterType);
+      const idx = filtersByType.indexOf(filter);
+      filtersByType.splice(idx, 1);
+    }
+  },
+
   addSavedReportToReports(_, report) {
     state.reports.push(report);
   },
@@ -520,10 +548,6 @@ const mutations = {
       state.sortDesc = !state.sortDesc;
     }
     state.sortColumn = name;
-  },
-
-  setDistincts(_, { data, field }) {
-    Vue.set(state.distincts, field, data);
   },
 
   setJoinColumns(_, { columns, join }) {
@@ -538,33 +562,8 @@ const mutations = {
     join.aggregates = aggregates;
   },
 
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', []);
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item);
-    }
-  },
-
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item);
-  },
-
-  setFilterToggle() {
-    state.filtersOpen = !state.filtersOpen;
-  },
-
-  setDataToggle() {
-    state.dataOpen = !state.dataOpen;
-  },
-
   resetSaveReportSettings() {
     state.saveReportSettings = { name: null };
-  },
-
-  setChartToggle() {
-    state.chartsOpen = !state.chartsOpen;
   },
 
   setSQLResults(_, results) {
@@ -598,6 +597,7 @@ const mutations = {
 
   toggleSelected(_, selectable) {
     Vue.set(selectable, 'selected', !selectable.selected);
+    state.selectedAttributeCount += selectable.selected ? 1 : -1;
   },
 
   toggleCollapsed(_, collapsable) {
@@ -606,10 +606,6 @@ const mutations = {
 
   setDesign(_, designData) {
     state.design = designData;
-  },
-
-  setCurrentTab(_, tab) {
-    state.currentDataTab = tab;
   },
 
   setLimit(_, limit) {

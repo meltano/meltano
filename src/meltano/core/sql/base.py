@@ -14,7 +14,7 @@ class ParseError(Exception):
     pass
 
 
-class MeltanoFilterExpressionType(Enum):
+class MeltanoFilterExpressionType(str, Enum):
     Unknown = "UNKNOWN"
     LessThan = "less_than"
     LessOrEqualThan = "less_or_equal_than"

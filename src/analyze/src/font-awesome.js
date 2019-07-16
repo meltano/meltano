@@ -14,9 +14,11 @@ import {
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
+  faFilter,
   faGlobeAmericas,
   faHashtag,
   faInfoCircle,
+  faTable,
   faSearch,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
@@ -43,9 +45,11 @@ export default {
     library.add(faDotCircle);
     library.add(faDraftingCompass);
     library.add(faExclamationTriangle);
+    library.add(faFilter);
     library.add(faGlobeAmericas);
     library.add(faHashtag);
     library.add(faInfoCircle);
+    library.add(faTable);
     library.add(faSearch);
     library.add(faUser);
 

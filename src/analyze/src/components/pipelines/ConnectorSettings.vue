@@ -88,7 +88,8 @@ export default {
             <InputDateIso8601
               v-else-if='getIsOfKindDate(setting.kind)'
               v-model="configSettings.config[setting.name]"
-              :name='setting.name' />
+              :name='setting.name'
+              input-classes='is-small' />
 
             <!-- Text / Password / Email -->
             <input
