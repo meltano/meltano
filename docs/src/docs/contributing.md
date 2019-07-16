@@ -33,7 +33,7 @@ source ~/virtualenvs/meltano-development/bin/activate
 pip install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-# Note: you may have to escape the `.[dev]` argument on some shells, like zsh
+# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
 pip install -e .[dev]
 
 # Run scripts to create remaining required files
