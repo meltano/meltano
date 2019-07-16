@@ -298,4 +298,3 @@ connections:
         value: warehouse
       - name: schema
         value: analytics
-        env: PG_SCHEMA
