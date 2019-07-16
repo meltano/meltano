@@ -1,6 +1,6 @@
 # Installation
 
-In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/meltano-cli.html#using-docker).
+In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/tutorial.html#using-docker).
 
 ::: warning
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
