@@ -87,7 +87,7 @@ describe('Design.vue', () => {
     state.currentSQL = 'SELECT COALESCE(COUNT("region"."id"),0) "region.count" FROM "region" "region" LIMIT 3;';
     state.resultAggregates = ['region.count'];
     state.results = [{ 'region.count': 17 }];
-    const wrapper = createWrapper();
+    const wrapper = createShallowWrapper();
 
     expect(wrapper.element).toMatchSnapshot();
   });
