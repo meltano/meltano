@@ -1,13 +1,15 @@
 <script>
 import { mapGetters } from 'vuex'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import TooltipCircle from '@/components/generic/TooltipCircle'
 
 import utils from '@/utils/utils'
 
 export default {
 	name: 'ConnectorSettings',
 	components: {
-		InputDateIso8601
+		InputDateIso8601,
+		TooltipCircle
 	},
 	props: {
 		fieldClass: { type: String },
@@ -15,6 +17,40 @@ export default {
 			type: Object,
 			required: true,
 			default: () => {}
+		}
+	},
+	watch: {
+		configSettings: {
+			handler(newVal, oldVal) {
+				/**
+				 * Improve account UX by auto-detecting Account ID via URL
+				 */
+
+				let accountInput = newVal.config.account
+				let domainFlag = 'snowflakecomputing.com'
+				let domainLocation = accountInput.indexOf(domainFlag)
+
+				// If the domain exists in user input, assume URL
+				if (domainLocation > -1) {
+					let shortenedUrl = accountInput.slice(
+						0,
+						domainLocation + domainFlag.length
+					)
+
+					// Clean up URL if http is detected
+					if (shortenedUrl.indexOf('http') > -1) {
+						shortenedUrl = shortenedUrl.slice(shortenedUrl.indexOf('//') + 2)
+					}
+
+					// This could eventually parse data like region if needed
+					let accountId = shortenedUrl.split('.')[0]
+
+					this.configSettings.config.account = accountId
+				} else {
+					this.configSettings.config.account = newVal.config.account
+				}
+			},
+			deep: true
 		}
 	},
 	computed: {
@@ -70,10 +106,15 @@ export default {
 			v-for="setting in configSettings.settings"
 			:key="setting.name"
 		>
-			<div :class="['field-label', labelClass]">
+			<div :class="['is-flex', 'field-label', labelClass]">
 				<label class="label">{{
 					setting.label || getCleanedLabel(setting.name)
 				}}</label>
+				<TooltipCircle
+					v-if="getCleanedLabel(setting.name) === 'Account'"
+					text="Paste your login URL if you don't know your account ID."
+					style="margin-left: 2px"
+				/>
 			</div>
 			<div class="field-body">
 				<div class="field">
