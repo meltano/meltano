@@ -205,7 +205,9 @@ export default {
               <p class="control is-expanded">
                 <span
                   class="select is-fullwidth is-small">
-                  <select v-model='filter.expression'>
+                  <select
+                    v-model='filter.expression'
+                    @change='onChangeExpressionSelector(filter)'>
                     <option
                       v-for="filterOption in filterOptions"
                       :key='filterOption.label'
@@ -218,6 +220,7 @@ export default {
               <p class="control is-expanded">
                 <input
                   class="input is-small"
+                  :disabled='getIsExpressionNullRelated(filter.expression)'
                   :type="getFilterInputType(filter.filterType)"
                   @focus="$event.target.select()"
                   v-model='filter.value'
