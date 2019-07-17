@@ -40,6 +40,9 @@ function defaultState() {
 }
 
 const helpers = {
+  getFilterTypePlural(filterType) {
+    return `${filterType}s`;
+  },
   getQueryPayloadFromDesign(state) {
     const selected = x => x.selected;
     const namesOfSelected = (arr) => {
@@ -174,7 +177,7 @@ const getters = {
   },
 
   getFiltersByType(state) {
-    return filterType => state.filters[`${filterType}s`] || [];
+    return filterType => state.filters[helpers.getFilterTypePlural(filterType)] || [];
   },
 
   getIsAttributeInFilters(_, gettersRef) {
@@ -538,12 +541,12 @@ const mutations = {
   },
 
   addFilter(state, filter) {
-    state.filters[`${filter.filterType}s`].push(filter);
+    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter);
   },
 
   removeFilter(state, filter) {
     if (filter) {
-      const filtersByType = state.filters[`${filter.filterType}s`];
+      const filtersByType = state.filters[helpers.getFilterTypePlural(filter.filterType)];
       const idx = filtersByType.indexOf(filter);
       filtersByType.splice(idx, 1);
     }
