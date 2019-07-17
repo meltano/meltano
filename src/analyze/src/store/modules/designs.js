@@ -1,43 +1,43 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
+import lodash from 'lodash';
+
 import utils from '@/utils/utils';
 import designApi from '../../api/design';
 import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
-function defaultState() {
-  return {
-    activeReport: {},
-    design: {
-      related_table: {},
-    },
-    hasSQLError: false,
-    sqlErrorMessage: [],
-    currentModel: '',
-    currentDesign: '',
-    results: [],
-    keys: [],
-    columnHeaders: [],
-    columnNames: [],
-    resultAggregates: {},
-    loadingQuery: false,
-    currentSQL: '',
-    saveReportSettings: { name: null },
-    reports: [],
-    chartType: 'BarChart',
-    limit: 50,
-    sortColumn: null,
-    sortDesc: false,
-    dialect: null,
-    selectedAttributeCount: 0,
-    filterOptions: [],
-    filters: {
-      columns: [],
-      aggregates: [],
-    },
-  };
-}
+const defaultState = {
+  activeReport: {},
+  design: {
+    related_table: {},
+  },
+  hasSQLError: false,
+  sqlErrorMessage: [],
+  currentModel: '',
+  currentDesign: '',
+  results: [],
+  keys: [],
+  columnHeaders: [],
+  columnNames: [],
+  resultAggregates: {},
+  loadingQuery: false,
+  currentSQL: '',
+  saveReportSettings: { name: null },
+  reports: [],
+  chartType: 'BarChart',
+  limit: 50,
+  sortColumn: null,
+  sortDesc: false,
+  dialect: null,
+  selectedAttributeCount: 0,
+  filterOptions: [],
+  filters: {
+    columns: [],
+    aggregates: [],
+  },
+};
 
 const helpers = {
   getFilterTypePlural(filterType) {
@@ -457,9 +457,8 @@ const actions = {
 
 const mutations = {
   resetDefaults(state) {
-    const defaults = defaultState();
-    Object.keys(defaults).forEach((key) => {
-      state[key] = defaults[key];
+    Object.keys(defaultState).forEach((key) => {
+      state[key] = defaultState[key];
     });
   },
 
@@ -633,7 +632,7 @@ const mutations = {
 export default {
   namespaced: true,
   helpers,
-  state: defaultState(),
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,
