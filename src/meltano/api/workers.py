@@ -100,19 +100,21 @@ class ELTWorker(threading.Thread):
             job_id=self.job_id,
             run_dir=os.getenv("SINGER_RUN_DIR", self.project.meltano_dir("run")),
             target_config_dir=self.project.meltano_dir(PluginType.LOADERS, self.loader),
-            tap_config_dir=self.project.meltano_dir(PluginType.EXTRACTORS, self.extractor),
+            tap_config_dir=self.project.meltano_dir(
+                PluginType.EXTRACTORS, self.extractor
+            ),
         )
 
         try:
             if self.transform == "run" or self.transform == "skip":
-                print("******** RUN OR SKIP", self.transform)
                 singer_runner.run(self.extractor, self.loader)
             if self.transform == "run":
-                print("******** RUN!!!!", self.transform)
                 dbt_runner = DbtRunner(self.project)
                 dbt_runner.run(self.extractor, self.loader, models=self.extractor)
         except Exception as err:
-            raise Exception("ELT could not complete, an error happened during the process.")
+            raise Exception(
+                "ELT could not complete, an error happened during the process."
+            )
 
         self.stop()
 

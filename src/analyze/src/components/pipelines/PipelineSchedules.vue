@@ -35,10 +35,7 @@ export default {
       this.$router.push({ name: 'createSchedule' });
     },
     runELT(pipeline) {
-      this.$store.dispatch('configuration/run', pipeline)
-        .then((response) => {
-          console.log('run success', response.data);
-        });
+      this.$store.dispatch('configuration/run', pipeline);
     },
   },
 };

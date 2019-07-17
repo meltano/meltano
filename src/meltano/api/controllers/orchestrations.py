@@ -22,7 +22,6 @@ from meltano.api.workers import ELTWorker
 from meltano.cli.add import extractor
 
 
-
 orchestrationsBP = Blueprint(
     "orchestrations", __name__, url_prefix="/api/v1/orchestrations"
 )
@@ -46,7 +45,7 @@ def run():
     worker = ELTWorker(project, schedule_payload)
     # worker.start()
 
-    return jsonify({ "test": "winning" })
+    return jsonify({"test": "winning"})
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
