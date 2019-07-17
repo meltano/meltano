@@ -79,6 +79,10 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
+  run(_, pipelinePayload) {
+    return orchestrationsApi.run(pipelinePayload);
+  },
+
   savePluginConfiguration(_, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from

@@ -34,6 +34,12 @@ export default {
     createPipeline() {
       this.$router.push({ name: 'createSchedule' });
     },
+    runELT(pipeline) {
+      this.$store.dispatch('configuration/run', pipeline)
+        .then((response) => {
+          console.log('run success', response.data);
+        });
+    },
   },
 };
 </script>
@@ -117,6 +123,10 @@ export default {
                     class="button is-interactive-primary is-outlined is-small"
                     v-if="getIsPluginInstalled('orchestrators', 'airflow')"
                     :to="{name: 'orchestration'}">Orchestration</router-link>
+                  <a
+                    class='button is-interactive-primary is-outlined is-small tooltip is-tooltip-left'
+                    data-tooltip='Run this ELT definition once without scheduling.'
+                    @click='runELT(pipeline)'>Run</a>
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{name: 'analyze'}">Analyze</router-link>
