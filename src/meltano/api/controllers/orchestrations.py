@@ -43,7 +43,7 @@ def run():
     project = Project.find()
     schedule_payload = request.get_json()
     worker = ELTWorker(project, schedule_payload)
-    # worker.start()
+    worker.start()
 
     return jsonify({"test": "winning"})
 

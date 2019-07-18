@@ -116,9 +116,6 @@ class ELTWorker(threading.Thread):
                 "ELT could not complete, an error happened during the process."
             )
 
-        self.stop()
-
-    def stop(self):
         self._complete = True
 
 
