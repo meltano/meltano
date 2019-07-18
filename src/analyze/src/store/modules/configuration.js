@@ -143,7 +143,7 @@ const actions = {
 const mutations = {
   reset(state, attr) {
     if (defaultState.hasOwnProperty(attr)) {
-      state[attr] = defaultState[attr];
+      state[attr] = lodash.cloneDeep(defaultState[attr]);
     }
   },
 

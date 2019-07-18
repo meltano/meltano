@@ -457,9 +457,7 @@ const actions = {
 
 const mutations = {
   resetDefaults(state) {
-    Object.keys(defaultState).forEach((key) => {
-      state[key] = defaultState[key];
-    });
+    lodash.assign(state, lodash.cloneDeep(defaultState));
   },
 
   setRemoveSort(state) {
