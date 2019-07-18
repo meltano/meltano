@@ -1,6 +1,6 @@
 import logging
 
-from flask import Blueprint, request, url_for, jsonify, make_response, Response
+from flask import Blueprint, request, url_for, jsonify, make_response, Response, g
 
 from meltano.core.plugin import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
@@ -38,12 +38,14 @@ def connection_names():
     return jsonify(connections)
 
 
+
 @orchestrationsBP.route("/run", methods=["POST"])
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
     worker = ELTWorker(project, schedule_payload)
-    worker.start()
+    # worker.start()
+    print("g.executor", g.executor)
 
     return jsonify({"test": "winning"})
 

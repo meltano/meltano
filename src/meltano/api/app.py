@@ -2,8 +2,10 @@ import datetime
 import logging
 import logging.handlers
 import os
+
 from flask import Flask, request, render_template, g
 from flask import jsonify
+from flask_executor import Executor
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
 from flask_login import current_user
@@ -47,6 +49,10 @@ def create_app(config={}):
         compiler.compile()
     except Exception as e:
         pass
+
+    # Executor
+    executor = Executor(app)
+    app.config['EXECUTOR_TYPE'] = 'thread'
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
@@ -97,6 +103,12 @@ def create_app(config={}):
         from .profiler import init
 
         init(app)
+
+    @app.before_request
+    def setup_executor():
+        # TODO: This is the only way I could get the g.executor ref within orchestraions.py's run()
+        # Is this the correct approach? The others I tried never had executor attached to g in endpoints
+        g.executor = executor
 
     @app.before_request
     def setup_js_context():

@@ -24,6 +24,7 @@ decorator==4.3.0
 docutils==0.14
 Flask==1.0.2
 Flask-Cors==3.0.6
+Flask-Executor==0.9.2
 Flask-SQLAlchemy==2.3.2
 future==0.16.0
 gitdb2==2.0.4
