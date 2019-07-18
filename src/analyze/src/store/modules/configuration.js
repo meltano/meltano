@@ -5,14 +5,14 @@ import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
 
-const defaultState = {
+const defaultState = Object.freeze({
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
-};
+});
 
 const getters = {
   getHasPipelines(state) {

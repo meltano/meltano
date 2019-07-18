@@ -8,7 +8,7 @@ import designApi from '../../api/design';
 import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
-const defaultState = {
+const defaultState = Object.freeze({
   activeReport: {},
   design: {
     related_table: {},
@@ -37,7 +37,7 @@ const defaultState = {
     columns: [],
     aggregates: [],
   },
-};
+});
 
 const helpers = {
   getFilterTypePlural(filterType) {
