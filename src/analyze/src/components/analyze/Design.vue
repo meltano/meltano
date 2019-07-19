@@ -20,11 +20,19 @@ export default {
   },
   created() {
     const { slug, model, design } = this.$route.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug });
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    const uponDesign = this.$store.dispatch('designs/getDesign', { model, design, slug });
+    const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins');
+
+    Promise.all([uponDesign, uponPlugins])
       .then(() => {
-        this.dialect = this.installedPlugins.connections[0].name;
+        const defaultDialect = localStorage.getItem(`dialect:${this.currentModel}:${this.currentDesign}`)
+                              || localStorage.getItem('dialect')
+                              || this.installedPlugins.connections[0].name;
+
+          // don't use the setter here not to update the user's preferences
+        this.$store.commit('designs/setDialect', defaultDialect);
       });
+
     this.$store.dispatch('designs/getFilterOptions');
   },
   filters: {
@@ -99,6 +107,12 @@ export default {
       },
       set(value) {
         this.$store.commit('designs/setDialect', value);
+
+        // set the default dialect for unknown designs
+        localStorage.setItem('dialect', value);
+
+        // set the connection for this specific design
+        localStorage.setItem(`dialect:${this.currentModel}:${this.currentDesign}`, value);
       },
     },
   },
