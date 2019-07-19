@@ -5,7 +5,6 @@ import os
 
 from flask import Flask, request, render_template, g
 from flask import jsonify
-from flask_executor import Executor
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import login_required
 from flask_login import current_user
@@ -50,10 +49,6 @@ def create_app(config={}):
     except Exception as e:
         pass
 
-    # Executor
-    executor = Executor(app)
-    app.config['EXECUTOR_TYPE'] = 'thread'
-
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
         app.config["LOG_PATH"], maxBytes=2000, backupCount=10
@@ -72,11 +67,13 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
+    from .executor import setup_executor
     from .security import security, users, setup_security
     from .security.oauth import setup_oauth
 
     db.init_app(app)
     mail.init_app(app)
+    setup_executor(app, project)
     setup_security(app, project)
     setup_oauth(app)
     CORS(app, origins="*")
@@ -104,11 +101,6 @@ def create_app(config={}):
 
         init(app)
 
-    @app.before_request
-    def setup_executor():
-        # TODO: This is the only way I could get the g.executor ref within orchestraions.py's run()
-        # Is this the correct approach? The others I tried never had executor attached to g in endpoints
-        g.executor = executor
 
     @app.before_request
     def setup_js_context():

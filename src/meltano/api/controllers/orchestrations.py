@@ -1,11 +1,8 @@
-import asyncio
-import datetime
 import logging
-import os
 
-from flask import Blueprint, request, url_for, jsonify, make_response, Response, g
+from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
-from meltano.core.plugin import PluginRef, PluginType
+from meltano.core.plugin import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
@@ -21,11 +18,9 @@ from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import flatten, iso8601_datetime
 from meltano.api.models import db
-from meltano.api.workers import ELTWorker
 from meltano.cli.add import extractor
 
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.runner.singer import SingerRunner
+from meltano.api.executor import run_elt
 
 
 orchestrationsBP = Blueprint(
@@ -44,41 +39,11 @@ def connection_names():
     return jsonify(connections)
 
 
-def runElt(project: Project, schedule_payload: dict):
-    extractor = schedule_payload["extractor"]
-    loader = schedule_payload["loader"]
-    transform = schedule_payload.get("transform")
-    schedule_name = schedule_payload.get("name")
-    job_id = f'job_{schedule_name}_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
-
-    singer_runner = SingerRunner(
-        project,
-        job_id=job_id,
-        run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
-        target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
-        tap_config_dir=project.meltano_dir(
-            PluginType.EXTRACTORS, extractor
-        ),
-    )
-
-    try:
-        if transform == "run" or transform == "skip":
-            print("run *************")
-            singer_runner.run(extractor, loader)
-        if transform == "run":
-            dbt_runner = DbtRunner(project)
-            dbt_runner.run(extractor, loader, models=extractor)
-    except Exception as err:
-        raise Exception(
-            "ELT could not complete, an error happened during the process."
-        )
-
-
 @orchestrationsBP.route("/run", methods=["POST"])
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    future = g.executor.submit(runElt, project, schedule_payload)
+    run_elt(project, schedule_payload)
 
     return jsonify({"test": "winning"})
 

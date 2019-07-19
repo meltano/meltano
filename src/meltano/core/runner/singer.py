@@ -156,10 +156,10 @@ class SingerRunner(Runner):
 
             with self.job.run(session):
                 self.restore_bookmark(session, extractor)
-                # loop = asyncio.get_event_loop()
                 loop = asyncio.new_event_loop()
-                watcher = asyncio.get_child_watcher()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(self.invoke(extractor, loader))
+                coroutine = self.invoke(extractor, loader)
+                future = loop.create_task(coroutine)
+                loop.run_until_complete(future)
         finally:
             session.close()

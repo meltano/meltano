@@ -1,6 +1,4 @@
-import datetime
 import logging
-import os
 import requests
 import threading
 import time
@@ -11,12 +9,10 @@ from colorama import Fore
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 from meltano.core.project import Project
-from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.plugin import PluginInstall
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.runner.dbt import DbtRunner
-from meltano.core.runner.singer import SingerRunner
 from meltano.api.models import db
 
 
@@ -80,43 +76,6 @@ class AirflowWorker(threading.Thread):
     def stop(self):
         self._webserver.terminate()
         self._scheduler.terminate()
-
-
-class ELTWorker(threading.Thread):
-    def __init__(self, project: Project, schedule_payload: dict):
-        super().__init__()
-
-        self._complete = False
-        self.project = project
-        self.extractor = schedule_payload["extractor"]
-        self.loader = schedule_payload["loader"]
-        self.transform = schedule_payload.get("transform")
-        self.schedule_name = schedule_payload.get("name")
-        self.job_id = f'job_{self.schedule_name}_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
-
-    def run(self):
-        singer_runner = SingerRunner(
-            self.project,
-            job_id=self.job_id,
-            run_dir=os.getenv("SINGER_RUN_DIR", self.project.meltano_dir("run")),
-            target_config_dir=self.project.meltano_dir(PluginType.LOADERS, self.loader),
-            tap_config_dir=self.project.meltano_dir(
-                PluginType.EXTRACTORS, self.extractor
-            ),
-        )
-
-        try:
-            if self.transform == "run" or self.transform == "skip":
-                singer_runner.run(self.extractor, self.loader)
-            if self.transform == "run":
-                dbt_runner = DbtRunner(self.project)
-                dbt_runner.run(self.extractor, self.loader, models=self.extractor)
-        except Exception as err:
-            raise Exception(
-                "ELT could not complete, an error happened during the process."
-            )
-
-        self._complete = True
 
 
 class UIAvailableWorker(threading.Thread):
