@@ -43,9 +43,9 @@ def connection_names():
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    run_elt(project, schedule_payload)
+    job_id = run_elt(project, schedule_payload)
 
-    return jsonify({"test": "winning"})
+    return jsonify({"runJobId": job_id})
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
