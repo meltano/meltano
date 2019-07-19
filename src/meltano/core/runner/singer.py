@@ -156,7 +156,10 @@ class SingerRunner(Runner):
 
             with self.job.run(session):
                 self.restore_bookmark(session, extractor)
-                loop = asyncio.get_event_loop()
+                # loop = asyncio.get_event_loop()
+                loop = asyncio.new_event_loop()
+                watcher = asyncio.get_child_watcher()
+                asyncio.set_event_loop(loop)
                 loop.run_until_complete(self.invoke(extractor, loader))
         finally:
             session.close()
