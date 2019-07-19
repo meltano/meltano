@@ -71,16 +71,14 @@ class PypikaJoinExecutor:
 
         left_field = getattr(
             AnalysisHelper.db_table(
-                left_table.sql_table_name,
-                alias=left_table.sql_table_name,
+                left_table.sql_table_name, alias=left_table.sql_table_name
             ),
             left.field,
         )
 
         right_field = getattr(
             AnalysisHelper.db_table(
-                right_table.sql_table_name,
-                alias=right_table.sql_table_name,
+                right_table.sql_table_name, alias=right_table.sql_table_name
             ),
             right.field,
         )

@@ -730,11 +730,13 @@ class MeltanoQuery(MeltanoBase):
                                 "on"
                             ]
 
-                            self.join_order.append({
-                                "name": join_name,
-                                "table": join.related_table["name"],
-                                "on": join_on
-                            })
+                            self.join_order.append(
+                                {
+                                    "name": join_name,
+                                    "table": join.related_table["name"],
+                                    "on": join_on,
+                                }
+                            )
                         except StopIteration:
                             raise ParseError(
                                 f"Requested join {join} is not defined in the design"
@@ -742,11 +744,13 @@ class MeltanoQuery(MeltanoBase):
 
                 # Take care care for the single table, no join query case
                 if not self.join_order:
-                    self.join_order.append({
-                        "name": primary_definition["name"],
-                        "table": table.name,
-                        "on": None
-                    })
+                    self.join_order.append(
+                        {
+                            "name": primary_definition["name"],
+                            "table": table.name,
+                            "on": None,
+                        }
+                    )
             else:
                 raise ParseError(
                     f"Requested table {related_table.get('name', None)} is not defined in the design"

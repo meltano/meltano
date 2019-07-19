@@ -2,10 +2,10 @@ import pytest
 import json
 import os
 import shutil
-
 from pathlib import Path
 from os.path import join
 
+from support.payload_builder import PayloadBuilder
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.sql.sql_utils import SqlUtils
 from meltano.core.sql.analysis_helper import AnalysisHelper
@@ -47,84 +47,6 @@ def gitflix(project, setup_test_models):
     # Load the m5oc file for gitflix
     m5oc_file = project.root_dir("model", "gitflix.topic.m5oc")
     return M5ocFile.load(m5oc_file)
-
-
-class PayloadBuilder:
-    def __init__(self, source_name: str):
-        self._name = source_name
-        self._columns = set()
-        self._aggregates = set()
-        self._joins = {}
-        self._column_filters = []
-        self._aggregate_filters = []
-
-    def join(self, name: str):
-        if name not in self._joins:
-            self._joins[name] = PayloadBuilder(name)
-
-        return self._joins[name]
-
-    def columns(self, *columns, join=None):
-        if join:
-            self.join(join).columns(*columns)
-        else:
-            self._columns.update(columns)
-
-        return self
-
-    def aggregates(self, *aggregates, join=None):
-        if join:
-            self.join(join).aggregates(*aggregates)
-        else:
-            self._aggregates.update(aggregates)
-
-        return self
-
-    def column_filter(self, table_name, name, expression, value):
-        filter = {
-            "table_name": table_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._column_filters.append(filter)
-
-        return self
-
-    def aggregate_filter(self, table_name, name, expression, value):
-        filter = {
-            "table_name": table_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._aggregate_filters.append(filter)
-
-        return self
-
-    def as_join(self):
-        return {
-            "name": self._name,
-            "columns": self._columns,
-            "aggregates": self._aggregates,
-        }
-
-    @property
-    def payload(self):
-        return {
-            "run": True,
-            "name": self._name,
-            "columns": self._columns,
-            "aggregates": self._aggregates,
-            "timeframes": [],
-            "joins": [join.as_join() for join in self._joins.values()],
-            "order": None,
-            "limit": "50",
-            "filters": {
-                "columns": self._column_filters,
-                "aggregates": self._aggregate_filters,
-            },
-        }
 
 
 class TestQueryGeneration:
