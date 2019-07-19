@@ -75,6 +75,18 @@ export default {
       .concat(arr2.filter(x => !arr1.includes(x)));
   },
 
+  deepFreeze(object) {
+    // Inspired by https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+    const propNames = Object.getOwnPropertyNames(object);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const name of propNames) {
+      const value = object[name];
+      // eslint-disable-next-line no-undef
+      object[name] = value && typeof value === 'object' ? this.deepFreeze(value) : value;
+    }
+    return Object.freeze(object);
+  },
+
   // String Utils
   capitalize(value) {
     if (!value) {

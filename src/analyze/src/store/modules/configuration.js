@@ -5,14 +5,14 @@ import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
 
-const defaultState = {
+const defaultState = utils.deepFreeze({
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
-};
+});
 
 const getters = {
   getHasPipelines(state) {
@@ -143,7 +143,7 @@ const actions = {
 const mutations = {
   reset(state, attr) {
     if (defaultState.hasOwnProperty(attr)) {
-      state[attr] = defaultState[attr];
+      state[attr] = lodash.cloneDeep(defaultState[attr]);
     }
   },
 

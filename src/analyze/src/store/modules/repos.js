@@ -1,7 +1,9 @@
-import _ from 'lodash';
+import lodash from 'lodash';
+
+import utils from '@/utils/utils';
 import repoApi from '../../api/repo';
 
-const initialState = {
+const defaultState = utils.deepFreeze({
   activeView: {
     is_markdown: false,
     file: '',
@@ -13,7 +15,7 @@ const initialState = {
   validated: false,
   errors: [],
   files: {},
-};
+});
 
 const getters = {
   hasMarkdown(state) {
@@ -35,7 +37,7 @@ const getters = {
   },
 
   hasModels(state) {
-    return !_.isEmpty(state.models);
+    return !lodash.isEmpty(state.models);
   },
 
   passedValidation(state) {
@@ -121,7 +123,7 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state: initialState,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,
