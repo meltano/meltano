@@ -44,7 +44,7 @@ class SelectService:
             list_all.visit(schema)
         except FileNotFoundError as e:
             logging.error(
-                "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --disver`"
+                "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"
             )
             raise e
 
