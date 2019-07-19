@@ -245,13 +245,11 @@ const actions = {
     state.currentModel = model;
     state.currentDesign = design;
 
-    // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(model, design)
+    return designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      });
-
-    reportsApi.loadReports()
+      })
+      .then(reportsApi.loadReports)
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -265,8 +263,6 @@ const actions = {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
-
-    return index;
   },
 
   getFilterOptions({ commit }) {
