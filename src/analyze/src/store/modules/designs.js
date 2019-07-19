@@ -8,7 +8,7 @@ import designApi from '../../api/design';
 import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   activeReport: {},
   design: {
     related_table: {},

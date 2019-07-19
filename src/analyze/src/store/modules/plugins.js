@@ -1,8 +1,9 @@
 import lodash from 'lodash';
 
+import utils from '@/utils/utils';
 import pluginsApi from '../../api/plugins';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   plugins: {},
   installedPlugins: {},
   installingPlugins: {

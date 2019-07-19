@@ -1,7 +1,9 @@
 import lodash from 'lodash';
+
+import utils from '@/utils/utils';
 import repoApi from '../../api/repo';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   activeView: {
     is_markdown: false,
     file: '',

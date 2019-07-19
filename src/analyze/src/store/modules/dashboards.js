@@ -1,9 +1,10 @@
 import lodash from 'lodash';
 
+import utils from '@/utils/utils';
 import dashboardsApi from '../../api/dashboards';
 import reportsApi from '../../api/reports';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReports: [],
   dashboards: [],

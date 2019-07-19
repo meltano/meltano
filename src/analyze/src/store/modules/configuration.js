@@ -5,7 +5,7 @@ import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},

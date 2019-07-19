@@ -1,8 +1,9 @@
 import lodash from 'lodash';
 
+import utils from '@/utils/utils';
 import settingsApi from '../../api/settings';
 
-const defaultState = Object.freeze({
+const defaultState = utils.deepFreeze({
   settings: {
     connections: [],
   },
