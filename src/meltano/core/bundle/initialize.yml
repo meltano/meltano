@@ -8,37 +8,19 @@ meltano.yml: |
   send_anonymous_usage_stats: True
 README.md: ""
 .env: |
-  export FLASK_ENV=development
-  export SQLITE_DATABASE=meltano
-  export PG_PASSWORD=warehouse
-  export PG_USERNAME=warehouse
-  export PG_ADDRESS=localhost
-  export PG_SCHEMA=meltano
-  export PG_PORT=5502
-  export PG_DATABASE=warehouse
+  FLASK_ENV=development
+  SQLITE_DATABASE=meltano
+  PG_PASSWORD=warehouse
+  PG_USERNAME=warehouse
+  PG_ADDRESS=localhost
+  PG_SCHEMA=meltano
+  PG_PORT=5502
+  PG_DATABASE=warehouse
 .gitignore: |
   /venv
   /.meltano
   .env
 model/.gitkeep: ""
-model/:
-  database.settings.m5o: |
-    {
-      "version": 1,
-      "settings": {
-        "connections": [{
-          "name": "runners_db", 
-          "database": "", 
-          "schema": "", 
-          "dialect": "sqlite", 
-          "host": "", 
-          "port": "", 
-          "username": "", 
-          "password": "", 
-          "path": "meltano.db"
-        }]
-      }
-    }
 extract/.gitkeep: ""
 docker-compose.yml: |
   version: '3.1'
