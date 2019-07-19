@@ -127,32 +127,26 @@ meltano add loader target-postgres
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
-export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
+FLASK_ENV=development
+SQLITE_DATABASE=meltano
 
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_SCHEMA=analytics
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+PG_PASSWORD=warehouse
+PG_USERNAME=warehouse
+PG_ADDRESS=localhost
+PG_SCHEMA=analytics
+PG_PORT=5502
+PG_DATABASE=warehouse
 
-export SFDC_URL=
-export SFDC_USERNAME=''
-export SFDC_PASSWORD=''
-export SFDC_SECURITY_TOKEN=''
-export SFDC_CLIENT_ID='secret_client_id'
+SFDC_URL=
+SFDC_USERNAME=''
+SFDC_PASSWORD=''
+SFDC_SECURITY_TOKEN=''
+SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-03-01T00:00:00Z'
+SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
 You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
-
-Finally, make the credentials available to Meltano by executing the following command in your terminal:
-
-```bash
-source .env
-```
 
 ### Select The Entities to Export from Salesforce
 
@@ -545,11 +539,6 @@ models:
       livemode: false
       schema: '{{ env_var(''PG_SCHEMA'') }}'
 ```
-Before we re-run the ELT process, we should update our environment variables.
-
-```bash
-source .env
-```
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
 
@@ -850,7 +839,9 @@ Once the installation is completed, you are set to use Jupyter Notebooks with Me
 
 ```bash
 cd /path/to/my/meltano/project
+set +a
 source .env
+set -a 
 ```
 
 This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.
