@@ -4,41 +4,41 @@
   connection = runners_db
   label = GitFlix Example
   designs {
-    users {
+    users_design {
       label = HDA Example
       from = users_table
       description = Base for Hyper Dymensional Aggregates
       joins {
-	streams {
+	streams_join {
 	  label = Streams
 	  from = streams_table
-	  sql_on = "users.id = streams.user_id"
+	  sql_on = "users_design.id = streams_join.user_id"
 	  relationship = many_to_one
 	}
-	episodes {
+	episodes_join {
 	  label = Episodes
 	  from = episodes_table
-	  sql_on = "episodes.id = streams.episode_id"
+	  sql_on = "episodes_join.id = streams_join.episode_id"
 	  relationship = many_to_one
 	}
       }
     }
 
-    streams {
+    streams_design {
       label = Streams
       from = streams_table
       description = HDA from Streams
       joins {
-	users {
+	users_join {
 	  label = Users
 	  from = users_table
-	  sql_on = "streams.user_id = users.id"
+	  sql_on = "streams_design.user_id = users_join.id"
 	  relationship = many_to_one
 	}
-	episodes {
+	episodes_join {
 	  label = Episodes
 	  from = episodes_table
-	  sql_on = "streams.episode_id = episodes.id"
+	  sql_on = "streams_design.episode_id = episodes_join.id"
 	  relationship = many_to_one
 	}
       }
