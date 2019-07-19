@@ -81,7 +81,7 @@ class MeltanoDesign(MeltanoBase):
     def get_join(self, name: str) -> MeltanoBase:
         return next(t for t in self.joins() if t.name == name)
 
-    def find_table(self, name: str):
+    def find_table(self, name: str) -> MeltanoBase:
         table_def = None
 
         if name == self.name:
