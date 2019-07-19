@@ -35,6 +35,9 @@ export default {
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text');
     },
+    getIsExpressionNullRelated() {
+      return expression => expression === 'is_null' || expression === 'is_not_null';
+    },
     isFirstFilterMatch() {
       return (filter) => {
         const match = this.getFlattenedFilters.find(tempFilter => tempFilter.table_name === filter.table_name && tempFilter.name === filter.name);
@@ -43,7 +46,9 @@ export default {
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      return vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression && vm.value;
+      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression;
+      const hasValidatedOptionals = this.getIsExpressionNullRelated(vm.expression) || vm.value;
+      return hasRequiredValues && hasValidatedOptionals;
     },
   },
   methods: {
@@ -60,6 +65,12 @@ export default {
         value: vm.value,
       });
       this.selectivelyClearAddFilterModel();
+    },
+    onChangeExpressionSelector(filter) {
+      const isNullRelated = this.getIsExpressionNullRelated(filter.expression);
+      if (isNullRelated) {
+        filter.value = '';
+      }
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
@@ -144,7 +155,9 @@ export default {
             <p class="control is-expanded">
               <span
                 class="select is-fullwidth is-small">
-                <select v-model='addFilterModel.expression'>
+                <select
+                  v-model='addFilterModel.expression'
+                  @change='onChangeExpressionSelector(addFilterModel)'>
                   <option
                     v-for="filterOption in filterOptions"
                     :key='filterOption.label'
@@ -157,6 +170,7 @@ export default {
             <p class="control is-expanded">
               <input
                 class="input is-small"
+                :disabled='getIsExpressionNullRelated(addFilterModel.expression)'
                 :type="getFilterInputType(addFilterModel.attributeHelper.type)"
                 @focus="$event.target.select()"
                 v-model='addFilterModel.value'
@@ -191,7 +205,9 @@ export default {
               <p class="control is-expanded">
                 <span
                   class="select is-fullwidth is-small">
-                  <select v-model='filter.expression'>
+                  <select
+                    v-model='filter.expression'
+                    @change='onChangeExpressionSelector(filter)'>
                     <option
                       v-for="filterOption in filterOptions"
                       :key='filterOption.label'
@@ -204,6 +220,7 @@ export default {
               <p class="control is-expanded">
                 <input
                   class="input is-small"
+                  :disabled='getIsExpressionNullRelated(filter.expression)'
                   :type="getFilterInputType(filter.filterType)"
                   @focus="$event.target.select()"
                   v-model='filter.value'
