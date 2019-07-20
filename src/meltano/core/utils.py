@@ -168,6 +168,10 @@ def noop(*_args, **_kwargs):
     pass
 
 
+def identity(x):
+    return x
+
+
 def map_dict(f: Callable, d: Dict):
     for k, v in d.items():
         yield k, f(v)

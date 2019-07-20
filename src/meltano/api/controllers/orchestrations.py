@@ -131,8 +131,8 @@ def selectEntities() -> Response:
     """
     project = Project.find()
     incoming = request.get_json()
-    extractor_name = incoming["extractorName"]
-    entity_groups = incoming["entityGroups"]
+    extractor_name = incoming["extractor_name"]
+    entity_groups = incoming["entity_groups"]
     select_service = SelectService(project, extractor_name)
 
     for entity_group in entity_groups:

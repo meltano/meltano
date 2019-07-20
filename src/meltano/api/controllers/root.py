@@ -1,5 +1,5 @@
 from urllib.parse import urlsplit
-from flask import Blueprint, render_template, jsonify, redirect, g
+from flask import Blueprint, render_template, request, jsonify, redirect, g
 from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
@@ -37,3 +37,10 @@ def drop_it():
     SqlHelper().reset_db()
 
     return "Database reset.", 200
+
+
+@root.route("/echo", methods=["POST"])
+def echo():
+    payload = request.get_json()
+    print(payload)
+    return jsonify(payload)
