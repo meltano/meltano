@@ -7,16 +7,22 @@ class TestJSON:
     @pytest.mark.parametrize(
         "scheme,expected",
         [
-            ("camel", {
-                "aDict": {"snakeCase": 1},
-                "aList": [{"snakeCase": 1}],
-                "aVal": "simple_value",
-                }),
-            ("snake", {
-                "a_dict": {"snake_case": 1},
-                "a_list": [{"snake_case": 1}],
-                "a_val": "simple_value",
-                }),
+            (
+                "camel",
+                {
+                    "aDict": {"snakeCase": 1},
+                    "aList": [{"snakeCase": 1}],
+                    "aVal": "simple_value",
+                },
+            ),
+            (
+                "snake",
+                {
+                    "a_dict": {"snake_case": 1},
+                    "a_list": [{"snake_case": 1}],
+                    "a_val": "simple_value",
+                },
+            ),
         ],
     )
     def test_json_scheme_encoder(self, app, scheme, expected):
@@ -35,11 +41,14 @@ class TestJSON:
             assert decoded == expected
 
     @pytest.mark.parametrize(
-        "payload", [{
-            "aDict": {"camelCase": 1},
-            "aList": [{"camelCase": 1}],
-            "aVal": "simpleValue",
-        }]
+        "payload",
+        [
+            {
+                "aDict": {"camelCase": 1},
+                "aList": [{"camelCase": 1}],
+                "aVal": "simpleValue",
+            }
+        ],
     )
     def test_json_scheme_decoder(self, app, payload):
         expected = {
@@ -57,7 +66,6 @@ class TestJSON:
     def test_json_scheme_fails(self, app):
         payload = {"snakeCase": 1, "snake_case": 2}
 
-        with pytest.raises(ValueError) as e, \
-          app.test_request_context():
+        with pytest.raises(ValueError) as e, app.test_request_context():
             encoded = _json.dumps(payload)
             json.loads(encoded)
