@@ -36,14 +36,14 @@ export default {
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text');
     },
+    getHasValidatedOptionals() {
+      return (expression, value) => this.getIsExpressionNullRelated(expression) || Boolean(value);
+    },
     getIsExpressionNullRelated() {
       return expression => expression === 'is_null' || expression === 'is_not_null';
     },
     getIsFilterValid() {
-      return (filter) => {
-        const hasValidatedOptionals = this.getIsExpressionNullRelated(filter.expression) || filter.value;
-        return hasValidatedOptionals;
-      };
+      return filter => this.getHasValidatedOptionals(filter.expression, filter.value);
     },
     isFirstFilterMatch() {
       return (filter) => {
@@ -54,7 +54,7 @@ export default {
     isValidAdd() {
       const vm = this.addFilterModel;
       const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression;
-      const hasValidatedOptionals = this.getIsExpressionNullRelated(vm.expression) || Boolean(vm.value);
+      const hasValidatedOptionals = this.getHasValidatedOptionals(vm.expression, vm.value);
       return hasRequiredValues && hasValidatedOptionals;
     },
   },
@@ -81,7 +81,7 @@ export default {
       }
     },
     onChangeFilterValue(filter) {
-      const hasValidatedOptionals = this.getIsExpressionNullRelated(filter.expression) || Boolean(filter.value);
+      const hasValidatedOptionals = this.getHasValidatedOptionals(filter.expression, filter.value);
       filter.isActive = hasValidatedOptionals;
     },
     selectivelyClearAddFilterModel() {
