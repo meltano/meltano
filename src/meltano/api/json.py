@@ -1,3 +1,4 @@
+import logging
 import stringcase
 from enum import Enum
 from collections.abc import Mapping, Iterable
@@ -10,24 +11,21 @@ class JSONScheme(str, Enum):
 
 
 def key_convert(obj, converter):
-    if not isinstance(obj, dict):
-        return obj
+    if isinstance(obj, dict):
+        converted = {}
+        for k, v in obj.items():
+            new_k = converter(k)
 
-    converted = {}
-    for k, v in obj.items():
-        new_k = converter(k)
+            if new_k in converted:
+                raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
 
-        if new_k in converted:
-            raise ValueError(f"Naming scheme conversion conflict on `{new_k}`")
-
-        if isinstance(v, dict):
             converted[new_k] = key_convert(v, converter)
-        elif isinstance(v, list):
-            converted[new_k] = [key_convert(x, converter) for x in v]
-        else:
-            converted[new_k] = v
 
-    return converted
+        return converted
+    elif isinstance(obj, list):
+        return [key_convert(x, converter) for x in obj]
+    else:
+        return obj
 
 
 class JSONSchemeDecoder(json.JSONDecoder):
@@ -63,6 +61,7 @@ class JSONSchemeEncoder(json.JSONEncoder):
     def encode(self, obj):
         scheme = request.headers.get("X-Json-Scheme", JSONScheme.SNAKE_CASE)
         strategy = self.__class__.case_strategies[scheme]
+        logging.debug(f"Using JSON Scheme: {scheme}")
         obj = key_convert(obj, strategy)
 
         return super().encode(obj)

@@ -36,6 +36,7 @@ class DashboardsHelper:
 
             report["queryResults"] = sqlHelper.get_query_results(dialect, outgoing_sql)
             report["queryResultAggregates"] = aggregates
+
         return reports
 
     def get_dashboard(self, dashboard_id):

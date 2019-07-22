@@ -323,22 +323,9 @@ def get_pipeline_schedules():
     """
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)
-    schedules = schedule_service.schedules()
+    schedules = [s._asdict() for s in schedule_service.schedules()]
 
-    cleaned_schedules = []
-    for schedule in list(schedules):
-        cleaned_schedules.append(
-            {
-                "name": schedule.name,
-                "extractor": schedule.extractor,
-                "loader": schedule.loader,
-                "transform": schedule.transform,
-                "interval": schedule.interval,
-                "startDate": schedule.start_date,
-            }
-        )
-
-    return jsonify(cleaned_schedules)
+    return jsonify(schedules)
 
 
 @orchestrationsBP.route("/save/pipeline_schedule", methods=["POST"])
@@ -353,7 +340,7 @@ def save_pipeline_schedule() -> Response:
     loader = incoming["loader"]
     transform = incoming["transform"]
     interval = incoming["interval"]
-    start_date = incoming["startDate"]
+    start_date = incoming["start_date"]
 
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)
