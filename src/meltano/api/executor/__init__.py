@@ -11,7 +11,7 @@ from meltano.core.project import Project
 executor = Executor()  # TODO name this executor_elt, follow the security pattern
 
 
-def setup_executor(app):
+def setup_executor(app, project):
     executor.init_app(app)
 
 
