@@ -106,8 +106,9 @@ const helpers = {
       .filter(tf => tf.periods.length);
 
     // Enforce number type for aggregates as v-model approach always overwrites as string
-    if (state.filters && state.filters.aggregates) {
-      state.filters.aggregates = state.filters.aggregates.map((aggregate) => {
+    const filters = lodash.cloneDeep(state.filters);
+    if (filters && filters.aggregates) {
+      filters.aggregates = filters.aggregates.map((aggregate) => {
         aggregate.value = Number(aggregate.value);
         return aggregate;
       });
@@ -122,7 +123,7 @@ const helpers = {
       order,
       limit: state.limit,
       dialect: state.dialect,
-      filters: state.filters,
+      filters,
     };
   },
 };
