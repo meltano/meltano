@@ -1,6 +1,7 @@
 import stringcase
-from flask import request, json
 from enum import Enum
+from collections.abc import Mapping, Iterable
+from flask import request, json
 
 
 class JSONScheme(str, Enum):
@@ -21,6 +22,8 @@ def key_convert(obj, converter):
 
         if isinstance(v, dict):
             converted[new_k] = key_convert(v, converter)
+        elif isinstance(v, list):
+            converted[new_k] = [key_convert(x, converter) for x in v]
         else:
             converted[new_k] = v
 
