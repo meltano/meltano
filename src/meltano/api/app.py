@@ -73,7 +73,7 @@ def create_app(config={}):
 
     db.init_app(app)
     mail.init_app(app)
-    setup_executor(app, project)
+    setup_executor(app)
     setup_security(app, project)
     setup_oauth(app)
     CORS(app, origins="*")
