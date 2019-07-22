@@ -106,10 +106,12 @@ const helpers = {
       .filter(tf => tf.periods.length);
 
     // Enforce number type for aggregates as v-model approach always overwrites as string
-    state.filters.aggregates = state.filters.aggregates.map((aggregate) => {
-      aggregate.value = Number(aggregate.value);
-      return aggregate;
-    });
+    if (state.filters && state.filters.aggregates) {
+      state.filters.aggregates = state.filters.aggregates.map((aggregate) => {
+        aggregate.value = Number(aggregate.value);
+        return aggregate;
+      });
+    }
 
     return {
       name: state.design.name,
