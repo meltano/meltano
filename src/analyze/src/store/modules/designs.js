@@ -72,6 +72,7 @@ const helpers = {
     if (!state.design.joins) {
       state.design.joins = [];
     }
+
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
@@ -105,7 +106,7 @@ const helpers = {
       .filter(tf => tf.periods.length);
 
     return {
-      table: baseTable.name,
+      name: state.design.name,
       columns,
       aggregates,
       timeframes,

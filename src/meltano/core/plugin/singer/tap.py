@@ -8,7 +8,7 @@ from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.error import PluginExecutionError
 
 from . import SingerPlugin, PluginType
-from .catalog import visit, SelectExecutor
+from .catalog import SelectExecutor
 
 
 class SingerTap(SingerPlugin):
@@ -81,8 +81,9 @@ class SingerTap(SingerPlugin):
 
             reset_executor = SelectExecutor(["!*.*"])
             select_executor = SelectExecutor(self.select)
-            visit(schema, reset_executor)
-            visit(schema, select_executor)
+
+            reset_executor.visit(schema)
+            select_executor.visit(schema)
 
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)

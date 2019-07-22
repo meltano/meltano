@@ -13,6 +13,7 @@ from . import (
     select,
     repl,
     config,
+    model,
 )
 
 

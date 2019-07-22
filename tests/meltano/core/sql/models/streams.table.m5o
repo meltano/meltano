@@ -1,7 +1,7 @@
 {
   version = 1
   sql_table_name = streams
-  name = streams
+  name = streams_table
   columns {
     id {
       primary_key = true

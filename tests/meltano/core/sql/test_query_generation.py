@@ -2,10 +2,10 @@ import pytest
 import json
 import os
 import shutil
-
 from pathlib import Path
 from os.path import join
 
+from support.payload_builder import PayloadBuilder
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.sql.sql_utils import SqlUtils
 from meltano.core.sql.analysis_helper import AnalysisHelper
@@ -49,161 +49,84 @@ def gitflix(project, setup_test_models):
     return M5ocFile.load(m5oc_file)
 
 
-class PayloadBuilder:
-    def __init__(self, table: str):
-        self._table = table
-        self._columns = set()
-        self._aggregates = set()
-        self._joins = {}
-        self._column_filters = []
-        self._aggregate_filters = []
-
-    def join(self, name: str):
-        if name not in self._joins:
-            self._joins[name] = PayloadBuilder(name)
-
-        return self._joins[name]
-
-    def columns(self, *columns, join=None):
-        if join:
-            self.join(join).columns(*columns)
-        else:
-            self._columns.update(columns)
-
-        return self
-
-    def aggregates(self, *aggregates, join=None):
-        if join:
-            self.join(join).aggregates(*aggregates)
-        else:
-            self._aggregates.update(aggregates)
-
-        return self
-
-    def column_filter(self, table_name, name, expression, value):
-        filter = {
-            "table_name": table_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._column_filters.append(filter)
-
-        return self
-
-    def aggregate_filter(self, table_name, name, expression, value):
-        filter = {
-            "table_name": table_name,
-            "name": name,
-            "expression": expression,
-            "value": value,
-        }
-        self._aggregate_filters.append(filter)
-
-        return self
-
-    def as_join(self):
-        return {
-            "name": self._table,
-            "columns": self._columns,
-            "aggregates": self._aggregates,
-        }
-
-    @property
-    def payload(self):
-        return {
-            "run": True,
-            "table": self._table,
-            "columns": self._columns,
-            "aggregates": self._aggregates,
-            "timeframes": [],
-            "joins": [join.as_join() for join in self._joins.values()],
-            "order": None,
-            "limit": "50",
-            "filters": {
-                "columns": self._column_filters,
-                "aggregates": self._aggregate_filters,
-            },
-        }
-
-
 class TestQueryGeneration:
     @pytest.fixture
     def users(self):
         return (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .columns("day", "month", "year", join="streams")
-            .aggregates("count", "sum_minutes", "count_days", join="streams")
-            .columns("tv_series", join="episodes")
-            .aggregates("count", "avg_rating", join="episodes")
+            .columns("day", "month", "year", join="streams_join")
+            .aggregates("count", "sum_minutes", "count_days", join="streams_join")
+            .columns("tv_series", join="episodes_join")
+            .aggregates("count", "avg_rating", join="episodes_join")
         )
 
     @pytest.fixture
     def streams(self):
         return (
-            PayloadBuilder("streams")
+            PayloadBuilder("streams_design")
             .columns("day", "month", "year")
             .aggregates("count", "sum_minutes", "count_days")
-            .columns("gender", join="users")
-            .aggregates("count", "avg_age", "sum_clv", join="users")
-            .columns("tv_series", join="episodes")
-            .aggregates("count", "avg_rating", join="episodes")
+            .columns("gender", join="users_join")
+            .aggregates("count", "avg_age", "sum_clv", join="users_join")
+            .columns("tv_series", join="episodes_join")
+            .aggregates("count", "avg_rating", join="episodes_join")
         )
 
     @pytest.fixture
     def no_join_with_filters(self):
         return (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("name", "gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users", "name", "is_not_null", "")
-            .column_filter("users", "name", "like", "%yannis%")
-            .column_filter("users", "gender", "is_null", "")
-            .aggregate_filter("users", "count", "equal_to", 10)
-            .aggregate_filter("users", "avg_age", "greater_than", 20)
-            .aggregate_filter("users", "avg_age", "less_than", 40)
-            .aggregate_filter("users", "sum_clv", "greater_or_equal_than", 100)
-            .aggregate_filter("users", "sum_clv", "less_or_equal_than", 500)
+            .column_filter("users_table", "name", "is_not_null", "")
+            .column_filter("users_table", "name", "like", "%yannis%")
+            .column_filter("users_table", "gender", "is_null", "")
+            .aggregate_filter("users_table", "count", "equal_to", 10)
+            .aggregate_filter("users_table", "avg_age", "greater_than", 20)
+            .aggregate_filter("users_table", "avg_age", "less_than", 40)
+            .aggregate_filter("users_table", "sum_clv", "greater_or_equal_than", 100)
+            .aggregate_filter("users_table", "sum_clv", "less_or_equal_than", 500)
         )
 
     @pytest.fixture
     def join_with_filters(self):
         return (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .columns("day", "month", "year", join="streams")
-            .aggregates("count", "sum_minutes", "count_days", join="streams")
-            .columns("tv_series", join="episodes")
-            .aggregates("count", "avg_rating", join="episodes")
-            .column_filter("users", "gender", "equal_to", "male")
-            .column_filter("streams", "year", "greater_or_equal_than", "2017")
-            .column_filter("episodes", "tv_series", "like", "Marvel")
-            .aggregate_filter("users", "sum_clv", "less_than", 50)
-            .aggregate_filter("episodes", "avg_rating", "greater_than", 8)
+            .columns("day", "month", "year", join="streams_join")
+            .aggregates("count", "sum_minutes", "count_days", join="streams_join")
+            .columns("tv_series", join="episodes_join")
+            .aggregates("count", "avg_rating", join="episodes_join")
+            .column_filter("users_table", "gender", "equal_to", "male")
+            .column_filter("streams_table", "year", "greater_or_equal_than", "2017")
+            .column_filter("episodes_table", "tv_series", "like", "Marvel")
+            .aggregate_filter("users_table", "sum_clv", "less_than", 50)
+            .aggregate_filter("episodes_table", "avg_rating", "greater_than", 8)
         )
 
     def test_compile_and_load_m5o_files(self, project, gitflix):
-        design = MeltanoDesign(definition=gitflix.design("users").design)
+        design = MeltanoDesign(definition=gitflix.design("users_design").design)
 
-        assert design.name == "users"
+        assert design.name == "users_design"
         assert len(design.tables()) == 3
         assert len(design.joins()) == 2
 
     def test_meltano_base_classes(self, gitflix):
-        design = MeltanoDesign(definition=gitflix.design("users").design)
+        design = MeltanoDesign(definition=gitflix.design("users_design").design)
 
-        assert design.name == "users"
+        assert design.name == "users_design"
         assert len(design.tables()) == 3
         assert len(design.joins()) == 2
 
-        table = design.get_table("streams")
-        assert table.name == "streams"
+        table = design.find_table("streams_join")
+        assert table.name == "streams_table"
 
-        join = design.get_join("episodes")
-        assert join.name == "episodes"
+        join = design.get_join("episodes_join")
+        assert join.name == "episodes_join"
+        assert join.related_table["name"] == "episodes_table"
 
         # Test Meltano Tables and Columns
         assert "id" in [c.column_name() for c in table.primary_keys()]
@@ -237,13 +160,13 @@ class TestQueryGeneration:
         # Test parsing a json payload using a Design generated from a m5oc file
         #  and generating a proper MeltanoQuery Object
         q = MeltanoQuery(
-            definition=users.payload, design_helper=gitflix.design("users")
+            definition=users.payload, design_helper=gitflix.design("users_design")
         )
 
-        assert q.design.name == "users"
+        assert q.design.name == "users_design"
         assert len(q.tables) == 3
         assert len(q.join_order) == 3
-        assert q.join_order[2]["table"] == "episodes"
+        assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
         (sql, column_headers, column_names, aggregate_columns) = q.get_query()
@@ -252,8 +175,8 @@ class TestQueryGeneration:
         assert "users.sum_clv" in aggregate_columns
 
         assert "WITH base_join AS (SELECT" in sql
-        assert "base_streams AS (SELECT DISTINCT" in sql
-        assert "users_stats AS (" in sql
+        assert "base_streams_table AS (SELECT DISTINCT" in sql
+        assert "users_table_stats AS (" in sql
         assert 'COALESCE(AVG("episodes.rating"),0)' in sql
         assert 'COALESCE(COUNT("users.id"),0)' in sql
         assert 'COALESCE(SUM("users.clv"),0)' in sql
@@ -271,13 +194,13 @@ class TestQueryGeneration:
         # Test parsing a json payload using a Design generated from a m5oc file
         #  and generating a proper MeltanoQuery Object
         q = MeltanoQuery(
-            definition=streams.payload, design_helper=gitflix.design("streams")
+            definition=streams.payload, design_helper=gitflix.design("streams_design")
         )
 
-        assert q.design.name == "streams"
+        assert q.design.name == "streams_design"
         assert len(q.tables) == 3
         assert len(q.join_order) == 3
-        assert q.join_order[2]["table"] == "episodes"
+        assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
         (sql, column_headers, column_names, aggregate_columns) = q.get_query()
@@ -287,8 +210,8 @@ class TestQueryGeneration:
         assert "users.sum_clv" in aggregate_columns
 
         assert "WITH base_join AS (SELECT" in sql
-        assert "base_streams AS (SELECT DISTINCT" in sql
-        assert "users_stats AS (" in sql
+        assert "base_streams_table AS (SELECT DISTINCT" in sql
+        assert "users_table_stats AS (" in sql
         assert 'COALESCE(AVG("episodes.rating"),0)' in sql
         assert 'COALESCE(COUNT("users.id"),0)' in sql
         assert 'COALESCE(SUM("users.clv"),0)' in sql
@@ -306,7 +229,7 @@ class TestQueryGeneration:
         # Test a no-join query with filters
         q = MeltanoQuery(
             definition=no_join_with_filters.payload,
-            design_helper=gitflix.design("users"),
+            design_helper=gitflix.design("users_design"),
         )
 
         # Test generating an HDA query
@@ -331,7 +254,8 @@ class TestQueryGeneration:
     def test_meltano_hda_query_filters(self, join_with_filters, gitflix):
         # Test an HDA query with filters
         q = MeltanoQuery(
-            definition=join_with_filters.payload, design_helper=gitflix.design("users")
+            definition=join_with_filters.payload,
+            design_helper=gitflix.design("users_design"),
         )
 
         # Test generating an HDA query
@@ -353,37 +277,39 @@ class TestQueryGeneration:
     def test_meltano_invalid_filters(self, gitflix):
         # Test for wrong expression
         bad_payload = (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users", "gender", "WRONG_EXPRESSION_TYPE", "male")
+            .column_filter("users_table", "gender", "WRONG_EXPRESSION_TYPE", "male")
         )
 
         with pytest.raises(NotImplementedError) as e:
             assert MeltanoQuery(
-                definition=bad_payload.payload, design_helper=gitflix.design("users")
+                definition=bad_payload.payload,
+                design_helper=gitflix.design("users_design"),
             )
 
         assert "Unknown filter expression: WRONG_EXPRESSION_TYPE" in str(e.value)
 
         # Test for wrong value
         bad_payload = (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .aggregate_filter("users", "sum_clv", "equal_to", None)
+            .aggregate_filter("users_table", "sum_clv", "equal_to", None)
         )
 
         with pytest.raises(ParseError) as e:
             assert MeltanoQuery(
-                definition=bad_payload.payload, design_helper=gitflix.design("users")
+                definition=bad_payload.payload,
+                design_helper=gitflix.design("users_design"),
             )
 
         assert "Filter expression: equal_to needs a non-empty value." in str(e.value)
 
         # Test for table not defined in design
         bad_payload = (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
             .column_filter("UNAVAILABLE_TABLE", "gender", "equal_to", "male")
@@ -391,37 +317,40 @@ class TestQueryGeneration:
 
         with pytest.raises(ParseError) as e:
             assert MeltanoQuery(
-                definition=bad_payload.payload, design_helper=gitflix.design("users")
+                definition=bad_payload.payload,
+                design_helper=gitflix.design("users_design"),
             )
 
         assert "Requested table UNAVAILABLE_TABLE" in str(e.value)
 
         # Test for column not defined in design
         bad_payload = (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users", "UNAVAILABLE_COLUMN", "equal_to", "male")
+            .column_filter("users_table", "UNAVAILABLE_COLUMN", "equal_to", "male")
         )
 
         with pytest.raises(ParseError) as e:
             assert MeltanoQuery(
-                definition=bad_payload.payload, design_helper=gitflix.design("users")
+                definition=bad_payload.payload,
+                design_helper=gitflix.design("users_design"),
             )
 
-        assert "Requested column users.UNAVAILABLE_COLUMN" in str(e.value)
+        assert "Requested column users_table.UNAVAILABLE_COLUMN" in str(e.value)
 
         # Test for aggregate not defined in design
         bad_payload = (
-            PayloadBuilder("users")
+            PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .aggregate_filter("users", "UNAVAILABLE_AGGREGATE", "less_than", 50)
+            .aggregate_filter("users_table", "UNAVAILABLE_AGGREGATE", "less_than", 50)
         )
 
         with pytest.raises(ParseError) as e:
             assert MeltanoQuery(
-                definition=bad_payload.payload, design_helper=gitflix.design("users")
+                definition=bad_payload.payload,
+                design_helper=gitflix.design("users_design"),
             )
 
-        assert "Requested column users.UNAVAILABLE_AGGREGATE" in str(e.value)
+        assert "Requested column users_table.UNAVAILABLE_AGGREGATE" in str(e.value)
