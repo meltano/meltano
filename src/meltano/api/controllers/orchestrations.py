@@ -17,8 +17,9 @@ from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExists
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import flatten, iso8601_datetime, slugify
-from meltano.api.models import db
 from meltano.cli.add import extractor
+from meltano.api.models import db
+from meltano.api.json import freeze_keys
 
 
 orchestrationsBP = Blueprint(
@@ -93,12 +94,13 @@ def get_plugin_configuration() -> Response:
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(db.session, project)
 
+    config = flatten(
+        settings.as_config(plugin, sources=[PluginSettingValueSource.DB]), reducer="dot"
+    )
+
     return jsonify(
         {
-            "config": flatten(
-                settings.as_config(plugin, sources=[PluginSettingValueSource.DB]),
-                reducer="dot",
-            ),
+            "config": freeze_keys(config),
             "settings": settings.get_definition(plugin).settings,
         }
     )
