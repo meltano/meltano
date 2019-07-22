@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* [#807](https://gitlab.com/meltano/meltano/issues/807) Fix filter input validation when editing saved filters
 
 ### Breaks
 
