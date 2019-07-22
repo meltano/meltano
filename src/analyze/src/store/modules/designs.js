@@ -430,7 +430,7 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '' }) {
+  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '', isActive = true }) {
     const filter = {
       table_name,
       name: attribute.name,
@@ -438,6 +438,7 @@ const actions = {
       value,
       attribute,
       filterType,
+      isActive,
     };
     commit('addFilter', filter);
 

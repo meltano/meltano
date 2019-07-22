@@ -15,6 +15,7 @@ export default {
         },
         expression: '',
         value: '',
+        isActive: true,
       },
     };
   },
@@ -38,6 +39,12 @@ export default {
     getIsExpressionNullRelated() {
       return expression => expression === 'is_null' || expression === 'is_not_null';
     },
+    getIsFilterValid() {
+      return (filter) => {
+        const hasValidatedOptionals = this.getIsExpressionNullRelated(filter.expression) || filter.value;
+        return hasValidatedOptionals;
+      };
+    },
     isFirstFilterMatch() {
       return (filter) => {
         const match = this.getFlattenedFilters.find(tempFilter => tempFilter.table_name === filter.table_name && tempFilter.name === filter.name);
@@ -47,7 +54,7 @@ export default {
     isValidAdd() {
       const vm = this.addFilterModel;
       const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression;
-      const hasValidatedOptionals = this.getIsExpressionNullRelated(vm.expression) || vm.value;
+      const hasValidatedOptionals = this.getIsExpressionNullRelated(vm.expression) || Boolean(vm.value);
       return hasRequiredValues && hasValidatedOptionals;
     },
   },
@@ -63,6 +70,7 @@ export default {
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
         value: vm.value,
+        isActive: vm.isActive,
       });
       this.selectivelyClearAddFilterModel();
     },
@@ -71,6 +79,10 @@ export default {
       if (isNullRelated) {
         filter.value = '';
       }
+    },
+    onChangeFilterValue(filter) {
+      const hasValidatedOptionals = this.getIsExpressionNullRelated(filter.expression) || Boolean(filter.value);
+      filter.isActive = hasValidatedOptionals;
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
@@ -217,14 +229,20 @@ export default {
               </p>
             </td>
             <td>
-              <p class="control is-expanded">
+              <p class="control has-icons-right is-expanded">
                 <input
                   class="input is-small"
+                  :class="{ 'is-danger': !getIsFilterValid(filter) }"
                   :disabled='getIsExpressionNullRelated(filter.expression)'
                   :type="getFilterInputType(filter.filterType)"
                   @focus="$event.target.select()"
+                  @input="onChangeFilterValue(filter)"
                   v-model='filter.value'
-                  placeholder="Filter value">
+                  :placeholder="getIsFilterValid(filter) ? 'Filter value' : 'Invalid value'">
+                <span class="icon is-small is-right">
+                  <font-awesome-icon
+                    :icon="getIsFilterValid(filter) ? 'check' : 'exclamation-triangle'"></font-awesome-icon>
+                </span>
               </p>
             </td>
             <td>
