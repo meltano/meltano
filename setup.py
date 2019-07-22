@@ -26,6 +26,7 @@ requires = [
     'pyyaml==3.13',
     'snowflake-connector-python==1.6.10',
     'snowflake-sqlalchemy==1.1.2',
+    'stringcase==1.2.0',
     'sqlalchemy==1.2.12',
     'fasteners==0.15.0',
     'flask>=1.0.2',
