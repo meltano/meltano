@@ -1,8 +1,20 @@
 import logging
-import stringcase
+import humps
 from enum import Enum
 from collections.abc import Mapping, Iterable
 from flask import request, json
+
+
+class FrozenDict(dict):
+    pass
+
+
+def freeze_keys(d: dict):
+    """
+    Mark the dictionarry as frozen, no automatic conversion
+    will be operated on it.
+    """
+    return FrozenDict(d)
 
 
 class JSONScheme(str, Enum):
@@ -11,7 +23,7 @@ class JSONScheme(str, Enum):
 
 
 def key_convert(obj, converter):
-    if isinstance(obj, dict):
+    if isinstance(obj, dict) and not isinstance(obj, FrozenDict):
         converted = {}
         for k, v in obj.items():
             new_k = converter(k)
@@ -39,7 +51,7 @@ class JSONSchemeDecoder(json.JSONDecoder):
 
     def hook(self, obj):
         # transform to snakecase
-        obj = key_convert(obj, stringcase.snakecase)
+        obj = key_convert(obj, humps.decamelize)
 
         return obj
 
@@ -54,8 +66,8 @@ class JSONSchemeEncoder(json.JSONEncoder):
     """
 
     case_strategies = {
-        JSONScheme.CAMEL_CASE: stringcase.camelcase,
-        JSONScheme.SNAKE_CASE: stringcase.snakecase,
+        JSONScheme.CAMEL_CASE: humps.camelize,
+        JSONScheme.SNAKE_CASE: humps.decamelize,
     }
 
     def encode(self, obj):
