@@ -13,7 +13,7 @@ const defaultState = {
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
-  polledPipelines: [],
+  pipelineJobs: [],
 };
 
 const getters = {
@@ -86,10 +86,10 @@ const actions = {
       .then((response) => {
         const isComplete = response.data.jobId === pollMetadata.jobId;
         if (isComplete) {
-          const pipelineJobData = state.polledPipelines
-            .find(jobData => jobData.pipelinePoller.getMetadata().jobId === pollMetadata.jobId);
-          commit('setPipelineIsRunning', { pipeline: pipelineJobData.pipeline, value: false });
-          commit('removeELTJobPoller', pipelineJobData.pipelinePoller);
+          const targetJob = state.pipelineJobs
+            .find(job => job.pipelinePoller.getMetadata().jobId === pollMetadata.jobId);
+          commit('setPipelineIsRunning', { pipeline: targetJob.pipeline, value: false });
+          commit('removePipelineJob', targetJob);
         }
       });
   },
@@ -102,7 +102,7 @@ const actions = {
         const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
         pipelinePoller.init();
         commit('setPipelineIsRunning', { pipeline, value: true });
-        commit('addELTJobPoller', { pipeline, pipelinePoller });
+        commit('addPipelineJob', { pipeline, pipelinePoller });
       });
   },
 
@@ -168,15 +168,14 @@ const actions = {
 };
 
 const mutations = {
-  addELTJobPoller(state, { pipeline, pipelinePoller }) {
-    state.polledPipelines.push({ pipeline, pipelinePoller });
+  addPipelineJob(state, pipelineJob) {
+    state.pipelineJobs.push(pipelineJob);
   },
 
-  removeELTJobPoller(state, pipelinePoller) {
-    pipelinePoller.dispose();
-    const targetPoller = state.polledPipelines.find(jobData => jobData.pipelinePoller === pipelinePoller);
-    const idx = state.polledPipelines.indexOf(targetPoller);
-    state.polledPipelines.splice(idx, 1);
+  removePipelineJob(state, pipelineJob) {
+    pipelineJob.pipelinePoller.dispose();
+    const idx = state.pipelineJobs.indexOf(pipelineJob);
+    state.pipelineJobs.splice(idx, 1);
   },
 
   reset(state, attr) {
