@@ -108,10 +108,12 @@ const helpers = {
     // Enforce number type for aggregates as v-model approach always overwrites as string
     const filters = lodash.cloneDeep(state.filters);
     if (filters && filters.aggregates) {
-      filters.aggregates = filters.aggregates.map((aggregate) => {
-        aggregate.value = Number(aggregate.value);
-        return aggregate;
-      });
+      filters.aggregates = filters.aggregates
+        .filter(aggregate => aggregate.isActive)
+        .map((aggregate) => {
+          aggregate.value = Number(aggregate.value);
+          return aggregate;
+        });
     }
 
     return {
@@ -439,7 +441,7 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '' }) {
+  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '', isActive = true }) {
     const filter = {
       table_name,
       name: attribute.name,
@@ -447,6 +449,7 @@ const actions = {
       value,
       attribute,
       filterType,
+      isActive,
     };
     commit('addFilter', filter);
 
