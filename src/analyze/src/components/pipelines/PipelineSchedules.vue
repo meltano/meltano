@@ -124,6 +124,7 @@ export default {
                   <a
                     v-else
                     class='button is-interactive-primary is-outlined is-small tooltip is-tooltip-left'
+                    :class="{ 'is-loading': pipeline.isRunning }"
                     data-tooltip='Run this ELT definition once without scheduling.'
                     @click='runELT(pipeline)'>Run</a>
 
@@ -131,6 +132,7 @@ export default {
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{name: 'analyze'}">Analyze</router-link>
                   <a
+                    :disabled="pipeline.isRunning"
                     class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
                     data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Edit</a>
                 </div>

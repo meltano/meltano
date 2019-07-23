@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import utils from '@/utils/utils';
+import poller from '@/utils/poller';
 import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
@@ -12,6 +13,7 @@ const defaultState = {
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
+  polledPipelines: [],
 };
 
 const getters = {
@@ -79,8 +81,29 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  run(_, pipelinePayload) {
-    return orchestrationsApi.run(pipelinePayload);
+  getPolledJobStatus({ commit, state }, pollMetadata) {
+    return orchestrationsApi.getPolledJobStatus(pollMetadata)
+      .then((response) => {
+        const isComplete = response.data.jobId === pollMetadata.jobId;
+        if (isComplete) {
+          const pipelineJobData = state.polledPipelines
+            .find(jobData => jobData.pipelinePoller.getMetadata().jobId === pollMetadata.jobId);
+          commit('removeELTJobPoller', pipelineJobData.pipelinePoller);
+          commit('setPipelineIsRunning', { pipeline: pipelineJobData.pipeline, value: false });
+        }
+      });
+  },
+
+  run({ commit, dispatch }, pipeline) {
+    return orchestrationsApi.run(pipeline)
+      .then((response) => {
+        const pollMetadata = response.data;
+        const pollFn = () => dispatch('getPolledJobStatus', pollMetadata);
+        const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
+        pipelinePoller.init();
+        commit('addELTJobPoller', { pipeline, pipelinePoller });
+        commit('setPipelineIsRunning', { pipeline, value: true });
+      });
   },
 
   savePluginConfiguration(_, configPayload) {
@@ -145,6 +168,20 @@ const actions = {
 };
 
 const mutations = {
+  addELTJobPoller(state, { pipeline, pipelinePoller }) {
+    console.log('adding polled job', pipelinePoller.getMetadata().jobId, 'was', state.polledPipelines.length);
+    state.polledPipelines.push({ pipeline, pipelinePoller });
+    console.log('now', state.polledPipelines.length);
+  },
+
+  removeELTJobPoller(state, pipelineJobPoller) {
+    console.log('removing polled job', pipelineJobPoller.getMetadata().jobId, 'was', state.polledPipelines.length);
+    pipelineJobPoller.dispose();
+    const idx = state.polledPipelines.indexOf(pipelineJobPoller);
+    state.polledPipelines.splice(idx, 1);
+    console.log('now', state.polledPipelines.length);
+  },
+
   reset(state, attr) {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = defaultState[attr];
@@ -174,6 +211,10 @@ const mutations = {
 
   setConnectionInFocusConfiguration(state, configuration) {
     state.connectionInFocusConfiguration = configuration;
+  },
+
+  setPipelineIsRunning(_, { pipeline, value }) {
+    Vue.set(pipeline, 'isRunning', value);
   },
 
   setPipelines(state, pipelines) {

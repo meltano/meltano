@@ -39,13 +39,30 @@ def connection_names():
     return jsonify(connections)
 
 
+@orchestrationsBP.route("get/job_status", methods=["POST"])
+def get_job_status() -> Response:
+    """
+    endpoint for getting a an job's status
+    """
+    project = Project.find()
+    payload = request.get_json()
+    job_id = payload["jobId"]
+
+    # TODO when reloading the page and getting all pipelines to the client, we likely need to reuse the same job lookup code
+    # where the id is instead an aggregation of the pipeline data so it can be auto inferred on the backend vs requiring
+    # a client sent id, this will allow us to reliably tell if it's running or not regardless of route changes and page reloads
+
+    return jsonify({ "jobId": "test123" })
+
+
 @orchestrationsBP.route("/run", methods=["POST"])
 def run():
     project = Project.find()
     schedule_payload = request.get_json()
-    job_id = run_elt(project, schedule_payload)
+    # job_id = run_elt(project, schedule_payload)
+    job_id = "test123"
 
-    return jsonify({"runJobId": job_id})
+    return jsonify({"jobId": job_id})
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
