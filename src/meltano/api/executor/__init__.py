@@ -16,7 +16,7 @@ def setup_executor(app, project):
 
 
 def run_elt(project: Project, schedule_payload: dict):
-    job_id = f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
+    job_id = f'job_{schedule_payload.get("name")}'
     extractor = schedule_payload["extractor"]
     loader = schedule_payload["loader"]
     transform = schedule_payload.get("transform")

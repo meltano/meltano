@@ -183,6 +183,9 @@ def get_pipeline_schedules():
     schedule_service = ScheduleService(db.session, project)
     schedules = schedule_service.schedules()
 
+    # TODO  init with isRunning based on pending status of
+    # job_id = f'job_{schedule.name})}'
+
     cleaned_schedules = []
     for schedule in list(schedules):
         cleaned_schedules.append(
