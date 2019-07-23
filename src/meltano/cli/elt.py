@@ -5,7 +5,7 @@ import datetime
 
 from . import cli
 from .add import add_plugin, add_transform
-from .params import db_options, project
+from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
@@ -30,9 +30,8 @@ from meltano.core.plugin_discovery_service import (
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@db_options
 @project
-def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
+def elt(project, extractor, loader, dry, transform, job_id):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
@@ -40,8 +39,6 @@ def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
     loader_name: Which loader should be used in this extraction
     """
 
-    # register the project engine
-    project_engine(project, engine_uri, default=True)
     install_missing_plugins(project, extractor, loader, transform)
 
     if job_id is None:

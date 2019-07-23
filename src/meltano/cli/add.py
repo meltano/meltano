@@ -7,7 +7,7 @@ import logging
 from urllib.parse import urlparse
 
 from . import cli
-from .params import project, db_options
+from .params import project
 from meltano.core.project_add_service import (
     ProjectAddService,
     PluginNotSupportedException,
@@ -30,12 +30,9 @@ from meltano.core.db import project_engine
 
 @cli.group()
 @click.option("--custom", is_flag=True)
-@db_options
 @project
 @click.pass_context
-def add(ctx, project, custom, engine_uri):
-    project_engine(project, engine_uri, default=True)
-
+def add(ctx, project, custom):
     if custom:
         if ctx.invoked_subcommand in (
             "transformer",
@@ -74,9 +71,9 @@ def database(project, name, host, database, schema, username, password):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def extractor(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.EXTRACTORS, plugin_name)
 
@@ -85,9 +82,9 @@ def extractor(ctx, project, plugin_name):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def model(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.MODELS, plugin_name)
 
@@ -96,9 +93,9 @@ def model(ctx, project, plugin_name):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def loader(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.LOADERS, plugin_name)
 
@@ -107,9 +104,9 @@ def loader(ctx, project, plugin_name):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def transformer(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.TRANSFORMERS, plugin_name)
 
@@ -118,9 +115,9 @@ def transformer(ctx, project, plugin_name):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def orchestrator(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.ORCHESTRATORS, plugin_name)
 
@@ -129,8 +126,8 @@ def orchestrator(ctx, project, plugin_name):
 
 
 @add.command()
-@project
 @click.argument("plugin_name")
+@project
 def transform(project, plugin_name):
     add_transform(project, plugin_name)
 
@@ -139,9 +136,9 @@ def transform(project, plugin_name):
 
 
 @add.command()
+@click.argument("plugin_name")
 @project
 @click.pass_context
-@click.argument("plugin_name")
 def connection(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.CONNECTIONS, plugin_name)
 
