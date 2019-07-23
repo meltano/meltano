@@ -21,7 +21,16 @@ def run_elt(project: Project, schedule_payload: dict):
     loader = schedule_payload["loader"]
     transform = schedule_payload.get("transform")
 
-    cmd = ["meltano", "elt", "--job_id", job_id, extractor, loader, "--transform", transform]
+    cmd = [
+        "meltano",
+        "elt",
+        "--job_id",
+        job_id,
+        extractor,
+        loader,
+        "--transform",
+        transform,
+    ]
     executor.submit(subprocess.run, cmd, capture_output=True)
     logging.debug(f"Defered `{' '.join(cmd)}` to the executor.")
 

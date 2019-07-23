@@ -52,10 +52,10 @@ def get_job_status() -> Response:
     finder = JobFinder(job_id)
     state_job = finder.latest_success(db.session)
 
-    if (state_job == None):
+    if state_job == None:
         job_id = None
 
-    return jsonify({ "jobId": job_id })
+    return jsonify({"jobId": job_id})
 
 
 @orchestrationsBP.route("/run", methods=["POST"])
@@ -64,7 +64,7 @@ def run():
     schedule_payload = request.get_json()
     job_id = run_elt(project, schedule_payload)
 
-    return jsonify({ "jobId": job_id })
+    return jsonify({"jobId": job_id})
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
