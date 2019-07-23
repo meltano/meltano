@@ -23,16 +23,7 @@ from meltano.core.db import project_engine
 )
 @click.option("--start-date", type=click.DateTime(), default=None)
 @project
-def schedule(
-    project,
-    name,
-    extractor,
-    loader,
-    interval,
-    transform,
-    job_id,
-    start_date,
-):
+def schedule(project, name, extractor, loader, interval, transform, job_id, start_date):
     """
     meltano schedule SCHEDULE_NAME EXTRACTOR_NAME LOADER_NAME INTERVAL
 
