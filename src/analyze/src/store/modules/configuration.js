@@ -169,17 +169,13 @@ const actions = {
 
 const mutations = {
   addELTJobPoller(state, { pipeline, pipelinePoller }) {
-    console.log('adding polled job', pipelinePoller.getMetadata().jobId, 'was', state.polledPipelines.length);
     state.polledPipelines.push({ pipeline, pipelinePoller });
-    console.log('now', state.polledPipelines.length);
   },
 
   removeELTJobPoller(state, pipelineJobPoller) {
-    console.log('removing polled job', pipelineJobPoller.getMetadata().jobId, 'was', state.polledPipelines.length);
     pipelineJobPoller.dispose();
     const idx = state.polledPipelines.indexOf(pipelineJobPoller);
     state.polledPipelines.splice(idx, 1);
-    console.log('now', state.polledPipelines.length);
   },
 
   reset(state, attr) {
