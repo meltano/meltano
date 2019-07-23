@@ -88,8 +88,8 @@ const actions = {
         if (isComplete) {
           const pipelineJobData = state.polledPipelines
             .find(jobData => jobData.pipelinePoller.getMetadata().jobId === pollMetadata.jobId);
-          commit('removeELTJobPoller', pipelineJobData.pipelinePoller);
           commit('setPipelineIsRunning', { pipeline: pipelineJobData.pipeline, value: false });
+          commit('removeELTJobPoller', pipelineJobData.pipelinePoller);
         }
       });
   },
@@ -101,8 +101,8 @@ const actions = {
         const pollFn = () => dispatch('getPolledJobStatus', pollMetadata);
         const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
         pipelinePoller.init();
-        commit('addELTJobPoller', { pipeline, pipelinePoller });
         commit('setPipelineIsRunning', { pipeline, value: true });
+        commit('addELTJobPoller', { pipeline, pipelinePoller });
       });
   },
 
@@ -172,9 +172,10 @@ const mutations = {
     state.polledPipelines.push({ pipeline, pipelinePoller });
   },
 
-  removeELTJobPoller(state, pipelineJobPoller) {
-    pipelineJobPoller.dispose();
-    const idx = state.polledPipelines.indexOf(pipelineJobPoller);
+  removeELTJobPoller(state, pipelinePoller) {
+    pipelinePoller.dispose();
+    const targetPoller = state.polledPipelines.find(jobData => jobData.pipelinePoller === pipelinePoller);
+    const idx = state.polledPipelines.indexOf(targetPoller);
     state.polledPipelines.splice(idx, 1);
   },
 
