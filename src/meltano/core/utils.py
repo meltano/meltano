@@ -5,7 +5,7 @@ import logging
 import flatten_dict
 from datetime import datetime, date, time
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
@@ -147,6 +147,10 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
+def compact(xs: Iterable) -> Iterable:
+    return (x for x in xs if x is not None)
+
+
 def file_has_data(file: Union[Path, str]):
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
@@ -187,8 +191,12 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         return None
 
     try:
-        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S.000Z")
+        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%SZ")
     except:
         pass
 
     return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))
+
+
+def find_named(xs: Iterable[dict], name: str):
+    return next(x for x in xs if x["name"] == name)

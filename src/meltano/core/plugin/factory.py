@@ -17,6 +17,7 @@ def plugin_factory(plugin_type: PluginType, plugin_def: Dict):
         PluginType.TRANSFORMERS: lazy_import(".dbt", "DbtPlugin"),
         PluginType.TRANSFORMS: lazy_import(".dbt", "DbtTransformPlugin"),
         PluginType.MODELS: lazy_import(".model", "ModelPlugin"),
+        PluginType.CONNECTIONS: lazy_import(".connection", "ConnectionPlugin"),
         PluginType.ORCHESTRATORS: lazy_import(".airflow", "Airflow"),
     }
 

@@ -5,7 +5,7 @@ import datetime
 
 from . import cli
 from .add import add_plugin, add_transform
-from .params import db_options, project
+from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
@@ -30,9 +30,8 @@ from meltano.core.plugin_discovery_service import (
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@db_options
 @project
-def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
+def elt(project, extractor, loader, dry, transform, job_id):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME
 
@@ -40,8 +39,6 @@ def elt(project, extractor, loader, dry, transform, job_id, engine_uri):
     loader_name: Which loader should be used in this extraction
     """
 
-    # register the project engine
-    project_engine(project, engine_uri, default=True)
     install_missing_plugins(project, extractor, loader, transform)
 
     if job_id is None:
@@ -90,7 +87,7 @@ def install_missing_plugins(
 
     if transform != "only":
         try:
-            config_service.get_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
+            config_service.find_plugin(extractor, plugin_type=PluginType.EXTRACTORS)
         except PluginMissingError:
             click.secho(
                 f"Extractor '{extractor}' is missing, trying to install it...",
@@ -99,7 +96,7 @@ def install_missing_plugins(
             add_plugin(add_service, project, PluginType.EXTRACTORS, extractor)
 
         try:
-            config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
+            config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
         except PluginMissingError:
             click.secho(
                 f"Loader '{loader}' is missing, trying to install it...", fg="yellow"
@@ -108,7 +105,7 @@ def install_missing_plugins(
 
     if transform != "skip":
         try:
-            config_service.get_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
+            config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
         except PluginMissingError as e:
             click.secho(
                 f"Transformer 'dbt' is missing, trying to install it...", fg="yellow"
@@ -118,7 +115,7 @@ def install_missing_plugins(
         transform_add_service = TransformAddService(project)
         try:
             # the extractor name should match the transform name
-            plugin = config_service.get_plugin(
+            plugin = config_service.find_plugin(
                 extractor, plugin_type=PluginType.TRANSFORMS
             )
 

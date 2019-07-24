@@ -1,12 +1,13 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
-import _ from 'lodash';
+import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
 export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
+    ConnectorSettings,
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
@@ -21,6 +22,9 @@ export default {
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
+    ...mapGetters('configuration', [
+      'getHasValidConfigSettings',
+    ]),
     ...mapState('configuration', [
       'loaderInFocusConfiguration',
     ]),
@@ -32,10 +36,18 @@ export default {
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
         : this.loaderInFocusConfiguration;
     },
+    isInstalled() {
+      return this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+    },
+    isInstalling() {
+      return this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
+    },
+    isLoadingConfigSettings() {
+      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+    },
     isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('loaders', this.loaderNameFromRoute);
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return !this.isInstalling && this.isInstalled && isValid;
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders
@@ -53,12 +65,13 @@ export default {
       }
     },
     saveConfigAndGoToOrchestration() {
-      this.$store.dispatch('configuration/saveLoaderConfiguration', {
+      this.$store.dispatch('configuration/savePluginConfiguration', {
         name: this.loader.name,
         type: 'loaders',
         config: this.configSettings.config,
+      }).then(() => {
+        this.$router.push({ name: 'schedules' });
       });
-      this.$router.push({ name: 'schedules' });
     },
   },
 };
@@ -67,17 +80,18 @@ export default {
 <template>
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
+    <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='loaderNameFromRoute' />
         </div>
-        <p class="modal-card-title">Loader Settings</p>
+        <p class="modal-card-title">Loader Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
       <section class="modal-card-body">
-        <template v-if='getIsInstallingPlugin("loaders", loaderNameFromRoute)'>
+
+        <template v-if='isInstalling'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -88,25 +102,15 @@ export default {
           </div>
         </template>
 
-        <template v-if='configSettings'>
-          <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
-            <div class="field-label is-normal">
-              <label class="label">{{ setting.label || setting.name }}</label>
-              <p v-if="setting.description">{{ setting.description }}</p>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    :placeholder="setting.value"
-                    v-model="configSettings.config[setting.name]">
-                </p>
-              </div>
-            </div>
-          </div>
-        </template>
+        <ConnectorSettings
+          v-if='!isLoadingConfigSettings'
+          fieldClass="is-small"
+          :config-settings='configSettings'/>
+
+        <progress
+          v-if='isLoadingConfigSettings && !isInstalling'
+          class="progress is-small is-info"></progress>
+
       </section>
 
       <footer class="modal-card-foot buttons is-right">

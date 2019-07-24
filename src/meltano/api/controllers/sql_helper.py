@@ -5,10 +5,13 @@ from pathlib import Path
 from collections import OrderedDict
 from flask import jsonify, redirect, url_for
 from pypika import Query, Order
+from sqlalchemy.event import listen
 
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
 from meltano.core.project import Project
+from meltano.core.config_service import ConfigService
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
@@ -43,40 +46,56 @@ class SqlHelper(SqlUtils):
         m5oc_file = project.root_dir("model", f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
-    def get_connection(self, connection_name):
-        settings_helper = SettingsHelper()
-        connections = settings_helper.get_connections()["settings"]["connections"]
-
-        try:
-            connection = next(
-                connection
-                for connection in connections
-                if connection["name"] == connection_name
-            )
-
-            return connection
-        except StopIteration:
-            raise ConnectionNotFound(connection_name)
-
-    def get_db_engine(self, connection_name):
+    def get_connection(self, dialect):
         project = Project.find()
-        connection = self.get_connection(connection_name)
+        config = ConfigService(project)
+        connections = list(config.get_connections())
 
-        if connection["dialect"] == "postgresql":
-            psql_params = ["username", "password", "host", "port", "database"]
-            user, pw, host, port, db = [connection[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
-        elif connection["dialect"] == "sqlite":
-            db_path = project.root.joinpath(connection["path"])
+        # for now let's just find the first connection that
+        # match dialect-wise
+        try:
+            return next(
+                connection for connection in connections if connection.name == dialect
+            )
+        except StopIteration:
+            raise ConnectionNotFound(dialect)
+
+    def get_db_engine(self, dialect):
+        project = Project.find()
+        connection = self.get_connection(dialect)
+        config = PluginSettingsService(db.session, project).as_config(connection)
+        engine_hooks = []
+
+        if dialect == "postgresql":
+            psql_params = ["user", "password", "host", "dbname"]
+            user, pw, host, dbname = [config[param] for param in psql_params]
+            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}/{dbname}"
+
+            def set_connection_schema(raw, conn):
+                schema = config["schema"]
+                with raw.cursor() as cursor:
+                    res = cursor.execute(f"SET search_path TO {schema};")
+                    logging.debug(f"Connection schema set to {schema}")
+
+            engine_hooks.append(
+                lambda engine: listen(engine, "first_connect", set_connection_schema)
+            )
+        elif dialect == "sqlite":
+            db_path = project.root.joinpath(config["dbname"])
             connection_url = f"sqlite:///{db_path}"
         else:
-            raise UnsupportedConnectionDialect(connection["dialect"])
+            raise UnsupportedConnectionDialect(dialect)
 
-        return sqlalchemy.create_engine(connection_url)
+        engine = sqlalchemy.create_engine(connection_url)
+
+        for hook in engine_hooks:
+            hook(engine)
+
+        return engine
 
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)
-        results = engine.execute(sql)
+        results = engine.execute(sqlalchemy.text(sql))
         results = [OrderedDict(row) for row in results]
         return results
 

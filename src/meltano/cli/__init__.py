@@ -12,6 +12,8 @@ from . import (
     schedule,
     select,
     repl,
+    config,
+    model,
 )
 
 

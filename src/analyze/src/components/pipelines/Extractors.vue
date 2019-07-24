@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
+
 
 export default {
   name: 'Extractors',
@@ -68,7 +68,7 @@ export default {
 
     <div
       v-else
-      class="tile is-ancestor flex-and-wrap">
+      class="tile is-ancestor is-flex is-flex-wrap">
       <div
         class="tile is-parent is-3"
         v-for="(extractor, index) in plugins.extractors"
@@ -88,7 +88,7 @@ export default {
               <div class="buttons are-small">
                 <a
                   class='button is-interactive-primary flex-grow-1'
-                  @click="updateExtractorSettings(extractor)">Account Settings</a>
+                  @click="updateExtractorSettings(extractor)">Configure</a>
                 <a
                   class='button tooltip is-tooltip-warning is-tooltip-multiline'
                   data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Uninstall</a>

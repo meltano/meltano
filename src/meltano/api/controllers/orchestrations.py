@@ -4,7 +4,10 @@ from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 from meltano.core.plugin import PluginType, PluginRef
 from meltano.core.plugin.error import PluginExecutionError
-from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.plugin.settings_service import (
+    PluginSettingsService,
+    PluginSettingValueSource,
+)
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
@@ -88,12 +91,15 @@ def get_plugin_configuration() -> Response:
     project = Project.find()
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
-    settings = PluginSettingsService(db.session, project, plugin)
+    settings = PluginSettingsService(db.session, project)
 
     return jsonify(
         {
-            "config": flatten(settings.as_config(), reducer="dot"),
-            "settings": settings.get_definition().settings,
+            "config": flatten(
+                settings.as_config(plugin, sources=[PluginSettingValueSource.DB]),
+                reducer="dot",
+            ),
+            "settings": settings.get_definition(plugin).settings,
         }
     )
 
@@ -108,11 +114,14 @@ def save_plugin_configuration() -> Response:
     plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
-    settings = PluginSettingsService(db.session, project, plugin)
+    settings = PluginSettingsService(db.session, project)
     for name, value in config.items():
-        settings.set(name, value)
+        if value == "":
+            settings.unset(plugin, name)
+        else:
+            settings.set(plugin, name, value)
 
-    return jsonify(settings.as_config())
+    return jsonify(settings.as_config(plugin))
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])
@@ -310,10 +319,10 @@ def run_transform(topic_name, connection_name):
 @orchestrationsBP.route("/get/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """
-    endpoint for getting a the pipeline schedules
+    endpoint for getting the pipeline schedules
     """
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(db.session, project)
     schedules = schedule_service.schedules()
 
     cleaned_schedules = []
@@ -346,7 +355,7 @@ def save_pipeline_schedule() -> Response:
     start_date = incoming["startDate"]
 
     project = Project.find()
-    schedule_service = ScheduleService(project)
+    schedule_service = ScheduleService(db.session, project)
 
     try:
         schedule = schedule_service.add(

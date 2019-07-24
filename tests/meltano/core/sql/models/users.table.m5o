@@ -1,7 +1,7 @@
 {
   version = 1
   sql_table_name = users
-  name = users
+  name = users_table
   columns {
     id {
       primary_key = true

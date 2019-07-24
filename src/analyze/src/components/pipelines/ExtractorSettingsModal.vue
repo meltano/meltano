@@ -1,12 +1,13 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
-import _ from 'lodash';
+import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
 export default {
   name: 'ExtractorSettingsModal',
   components: {
     ConnectorLogo,
+    ConnectorSettings,
   },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor;
@@ -21,6 +22,9 @@ export default {
       'getIsPluginInstalled',
       'getIsInstallingPlugin',
     ]),
+    ...mapGetters('configuration', [
+      'getHasValidConfigSettings',
+    ]),
     ...mapState('configuration', [
       'extractorInFocusConfiguration',
     ]),
@@ -33,7 +37,7 @@ export default {
         : this.extractorInFocusConfiguration;
     },
     extractorLacksConfigSettingsAndIsInstalled() {
-      return !this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute) &&
+      return !this.isInstalling &&
              this.configSettings.settings &&
              this.configSettings.settings.length === 0;
     },
@@ -43,10 +47,18 @@ export default {
         : null;
       return targetExtractor || {};
     },
+    isInstalled() {
+      return this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+    },
+    isInstalling() {
+      return this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
+    },
+    isLoadingConfigSettings() {
+      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+    },
     isSaveable() {
-      const hasOwns = [];
-      _.forOwn(this.configSettings, val => hasOwns.push(val));
-      return hasOwns.length > 0 && this.getIsPluginInstalled('extractors', this.extractorNameFromRoute);
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return !this.isInstalling && this.isInstalled && isValid;
     },
   },
   methods: {
@@ -57,16 +69,17 @@ export default {
         this.$router.push({ name: 'extractors' });
       }
     },
-    beginEntitySelection() {
-      this.$router.push({ name: 'extractorEntities', params: { extractor: this.extractor.name } });
-    },
     saveConfigAndBeginEntitySelection() {
-      this.$store.dispatch('configuration/saveExtractorConfiguration', {
+      this.$store.dispatch('configuration/savePluginConfiguration', {
         name: this.extractor.name,
         type: 'extractors',
         config: this.configSettings.config,
+      }).then(() => {
+        this.$router.push({
+          name: 'extractorEntities',
+          params: { extractor: this.extractor.name },
+        });
       });
-      this.beginEntitySelection();
     },
   },
 };
@@ -75,17 +88,17 @@ export default {
 <template>
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
-    <div class="modal-card">
+    <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector='extractorNameFromRoute' />
         </div>
-        <p class="modal-card-title">Extractor Settings</p>
+        <p class="modal-card-title">Extractor Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
 
-        <template v-if='getIsInstallingPlugin("extractors", extractorNameFromRoute)'>
+        <template v-if='isInstalling'>
           <div class="content">
             <div class="level">
               <div class="level-item">
@@ -96,27 +109,14 @@ export default {
           </div>
         </template>
 
-        <template v-if='configSettings'>
+        <ConnectorSettings
+          v-if='!isLoadingConfigSettings'
+          fieldClass="is-small"
+          :config-settings='configSettings'/>
 
-          <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
-            <div class="field-label is-normal">
-              <label class="label">{{ setting.label || setting.name }}</label>
-              <p v-if="setting.description">{{ setting.description }}</p>
-            </div>
-            <div class="field-body">
-              <div class="field">
-                <p class="control">
-                  <input
-                    class="input"
-                    type="text"
-                    :placeholder="setting.value"
-                    v-model="configSettings.config[setting.name]">
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </template>
+        <progress
+          v-if='isLoadingConfigSettings && !isInstalling'
+          class="progress is-small is-info"></progress>
 
         <template v-if='extractorLacksConfigSettingsAndIsInstalled'>
           <div class="content">

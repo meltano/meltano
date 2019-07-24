@@ -139,10 +139,10 @@ class SingerRunner(Runner):
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
     def run(self, extractor: str, loader: str, dry_run=False):
-        tap = self.config_service.get_plugin(
+        tap = self.config_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
-        target = self.config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
+        target = self.config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
 
         try:
             session = self._session_cls()

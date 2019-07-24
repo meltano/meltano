@@ -28,16 +28,13 @@ class DashboardsHelper:
             # TODO: refactor front-end `model` → `topic`
             m5oc = sqlHelper.get_m5oc_topic(report["model"])
             design = m5oc.design(report["design"])
-            connection_name = m5oc.connection("connection")
+            dialect = report["queryPayload"]["dialect"]
 
             sql_dict = sqlHelper.get_sql(design, report["queryPayload"])
             outgoing_sql = sql_dict["sql"]
             aggregates = sql_dict["aggregates"]
-            db_table = sql_dict["db_table"]
 
-            report["queryResults"] = sqlHelper.get_query_results(
-                connection_name, outgoing_sql
-            )
+            report["queryResults"] = sqlHelper.get_query_results(dialect, outgoing_sql)
             report["queryResultAggregates"] = aggregates
         return reports
 

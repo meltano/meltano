@@ -1,4 +1,4 @@
-version: 2.0
+version: 3.0
 extractors:
   - name: tap-google-analytics
     namespace: google-analytics
@@ -8,10 +8,15 @@ extractors:
         env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
         kind: file
       - name: view_id
+        env: GOOGLE_ANALYTICS_API_VIEW_ID
+        label: View ID
       - name: reports
+        env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
+        env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
+        env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
   - name: tap-gitlab
     namespace: gitlab
@@ -21,19 +26,20 @@ extractors:
         label: GitLab API URL
         value: "https://gitlab.com/api/v4"
       - name: private_token
-        env: GITLAB_API_PRIVATE_TOKEN
+        env: GITLAB_API_TOKEN
       - name: groups
         value: ""
         env: GITLAB_API_GROUPS
       - name: projects
         value: ""
         env: GITLAB_API_PROJECTS
+      - name: ultimate_license
+        value: false
+        kind: boolean
+        env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
         kind: date_iso8601
         env: GITLAB_API_START_DATE
-      - name: ultimate_license
-        value: false
-        env: GITLAB_API_ULTIMATE_LICENSE
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     namespace: zendesk
@@ -44,7 +50,8 @@ extractors:
       - name: api_token
         label: Zendesk API Token
       - name: subdomain
-        label: Zendesk Domain (<subdomain>.zendesk.com)
+        label: Zendesk Domain
+        description: <subdomain>.zendesk.com
       - name: start_date
         kind: date_iso8601
   - name: tap-zuora
@@ -54,35 +61,37 @@ extractors:
       - name: username
       - name: password
         kind: password
-      - name: api_type
       - name: partner_id
       - name: api_token
-      - name: start_date
-        kind: date_iso8601
+      - name: api_type
       - name: sandbox
         kind: boolean
+      - name: start_date
+        kind: date_iso8601
     docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
     namespace: marketo
     pip_url: "git+https://gitlab.com/meltano/tap-marketo.git"
     settings:
-      - name: endpoint
       - name: identity
       - name: client_id
+        label: Client ID
       - name: client_secret
+      - name: endpoint
       - name: start_time
         kind: date_iso8601
   - name: tap-salesforce
-    namespace: salesforce
+    namespace: sfdc
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     settings:
       # TODO: remove, should be injected from Meltano
-      - name: api_type
-        value: REST
       - name: client_id
+        label: Client ID
       - name: username
       - name: password
       - name: security_token
+      - name: api_type
+        value: REST
       - name: select_fields_by_default
         value: true
         kind: boolean
@@ -92,26 +101,31 @@ extractors:
     namespace: mongodb
     pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
     settings:
+      - name: user
+        env: MONGODB_USERNAME
+      - name: password
+        kind: password
       - name: host
       - name: port
         value: 27017
-      - name: user
-      - name: password
-        kind: password
       - name: dbname
+        label: Database Name
   - name: tap-stripe
     namespace: stripe
     pip_url: "git+https://github.com/meltano/tap-stripe.git@v0.2.4"
     settings:
+      - name: account_id
+        label: Account ID
       - name: client_secret
+        env: STRIPE_API_KEY
       - name: start_date
         kind: date_iso8601
-      - name: account_id
   - name: tap-fastly
     namespace: fastly
     pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
     settings:
       - name: api_token
+        label: API Token
       - name: start_date
         label: Start Date
         kind: date_iso8601
@@ -123,7 +137,10 @@ extractors:
     pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
     settings:
       - name: csv_files_definition
+        env: TAP_CSV_FILES_DEFINITION
+        label: CSV Files Definition
         kind: file
+        documentation: https://gitlab.com/meltano/tap-csv#run
     docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
@@ -132,8 +149,10 @@ loaders:
     settings:
       - name: delimiter
         value: "\t"
+        description: A one-character string used to separate fields. It defaults to ','
       - name: quotechar
         value: "'"
+        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '"'.
   - name: target-snowflake
     namespace: snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
@@ -142,25 +161,33 @@ loaders:
     # connection from analyze.
     settings:
       - name: account
+        env: SF_ACCOUNT
       - name: username
+        env: SF_USER
       - name: password
+        env: SF_PASSWORD
         kind: password
       - name: role
+        env: SF_ROLE
       - name: database
+        env: SF_DATABASE
       - name: schema
+        env: SF_SCHEMA
       - name: warehouse
+        env: SF_WAREHOUSE
   - name: target-postgres
     namespace: pg
     pip_url: "git+https://github.com/meltano/target-postgres.git"
     settings:
-      - name: host
-        env: PG_ADDRESS
       - name: user
         env: PG_USERNAME
-      - name: port
       - name: password
         kind: password
+      - name: host
+        env: PG_ADDRESS
+      - name: port
       - name: dbname
+        label: Database Name
         env: PG_DATABASE
       - name: schema
   - name: target-sqlite
@@ -264,3 +291,24 @@ orchestrators:
       - name: webserver.web_server_port
         value: 5010
         env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+connections:
+  - name: sqlite
+    namespace: sqlite
+    settings:
+      - name: dbname
+        label: Database
+        description: Path to the database, relative to the project root.
+        value: meltano.db
+  - name: postgresql
+    namespace: postgresql
+    settings:
+      - name: user
+        value: warehouse
+      - name: password
+        value: warehouse
+      - name: host
+        value: 'localhost:5502'
+      - name: dbname
+        value: warehouse
+      - name: schema
+        value: analytics

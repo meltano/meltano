@@ -14,8 +14,11 @@ class TestCliSchedule:
     @mock.patch(
         "meltano.core.schedule_service.PluginSettingsService.get_value", autospec=True
     )
-    def test_schedule(self, get_value, project, cli_runner, schedule_service):
-        get_value.return_value = "2010-01-01"
+    def test_schedule(
+        self, get_value, session, project, cli_runner, schedule_service_factory
+    ):
+        TEST_DATE = "2010-01-01"
+        get_value.return_value = (TEST_DATE, 0)
 
         res = cli_runner.invoke(
             cli,
@@ -33,11 +36,13 @@ class TestCliSchedule:
         assert_cli_runner(res)
         project.reload()
 
+        schedule_service = schedule_service_factory(session)
         schedule = next(schedule_service.schedules())
+
         assert schedule.name == "schedule-mock"
         assert schedule.extractor == "tap-mock"
         assert schedule.loader == "target-mock"
         assert schedule.transform == "run"
         assert schedule.interval == "@eon"  # not anytime soon ;)
-        assert schedule.start_date == iso8601_datetime(get_value.return_value)
+        assert schedule.start_date == iso8601_datetime(TEST_DATE)
         assert res.exit_code == 0, res.stdout

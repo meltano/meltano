@@ -1,13 +1,15 @@
-import os
-import yaml
+import fasteners
 import logging
+import os
 import sys
+import threading
+import yaml
 from copy import deepcopy
+from contextlib import contextmanager
+from dotenv import load_dotenv
+from functools import wraps
 from pathlib import Path
 from typing import Union, Dict
-from contextlib import contextmanager
-from functools import wraps
-from dotenv import load_dotenv
 
 from .error import Error
 from .behavior.versioned import Versioned
@@ -28,18 +30,26 @@ class Project(Versioned):
 
     _meltano = {}
     __version__ = 1
+    _activate_lock = threading.Lock()
+    _find_lock = threading.Lock()
+    _default = None
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
 
-    def activate(self):
+    @classmethod
+    @fasteners.locked(lock="_activate_lock")
+    def activate(cls, project: "Project"):
+        project.ensure_compatible()
+
         # helpful to refer to the current absolute project path
-        os.environ["MELTANO_PROJECT_ROOT"] = str(self.root)
+        os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
 
-        load_dotenv(dotenv_path=self.root.joinpath(".env"))
-        logging.debug(f"Activated project at {self.root}")
+        load_dotenv(dotenv_path=project.root.joinpath(".env"))
+        logging.debug(f"Activated project at {project.root}")
 
-        self.ensure_compatible()
+        # set the default project
+        cls._default = project
 
     @property
     def backend_version(self):
@@ -49,18 +59,21 @@ class Project(Versioned):
         """Force a reload from `meltano.yml`"""
         self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
 
-    def has_plugin(self, plugin: str):
-        config_service = ConfigService
-
     @classmethod
+    @fasteners.locked(lock="_find_lock")
     def find(cls, from_dir: Union[Path, str] = None, activate=True):
+        if cls._default:
+            return cls._default
+
         project = Project(from_dir)
 
         if not project.meltanofile.exists():
             raise ProjectNotFound()
 
+        # if we activate a project using `find()`, it should
+        # be set as the default project for future `find()`
         if activate:
-            project.activate()
+            cls.activate(project)
 
         return project
 

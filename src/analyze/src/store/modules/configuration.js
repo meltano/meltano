@@ -1,33 +1,39 @@
 import Vue from 'vue';
 
+import utils from '@/utils/utils';
+import lodash from 'lodash';
+
 import orchestrationsApi from '../../api/orchestrations';
 
-const state = {
+const defaultState = utils.deepFreeze({
   hasExtractorLoadingError: false,
-  loaderInFocusConfiguration: { config: {}, settings: [] },
-  extractorInFocusConfiguration: { config: {}, settings: [] },
+  loaderInFocusConfiguration: {},
+  extractorInFocusConfiguration: {},
+  connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
-};
+});
 
 const getters = {
-  getHasPipelines() {
+  getHasPipelines(state) {
     return state.pipelines.length > 0;
+  },
+  getHasValidConfigSettings(_, gettersRef) {
+    return (configSettings) => {
+      const isValid = setting => gettersRef.getIsConfigSettingValid(configSettings.config[setting.name]);
+      return configSettings.settings && lodash.every(configSettings.settings, isValid);
+    };
+  },
+  getIsConfigSettingValid() {
+    return value => value !== null && value !== undefined && value !== '';
   },
 };
 
 const actions = {
-  clearExtractorInFocusEntities({ commit }) {
-    commit('setAllExtractorInFocusEntities', null);
-  },
-
-  clearExtractorInFocusConfiguration({ commit }) {
-    commit('setExtractorInFocusConfiguration', {});
-  },
-
-  clearLoaderInFocusConfiguration({ commit }) {
-    commit('setLoaderInFocusConfiguration', {});
-  },
+  clearExtractorInFocusEntities: ({ commit }) => commit('reset', 'extractorInFocusEntities'),
+  clearExtractorInFocusConfiguration: ({ commit }) => commit('reset', 'extractorInFocusConfiguration'),
+  clearLoaderInFocusConfiguration: ({ commit }) => commit('reset', 'loaderInFocusConfiguration'),
+  clearConnectionInFocusConfiguration: ({ commit }) => commit('reset', 'connectionInFocusConfiguration'),
 
   getAllPipelineSchedules({ commit }) {
     orchestrationsApi.getAllPipelineSchedules()
@@ -62,20 +68,21 @@ const actions = {
       });
   },
 
+  getConnectionConfiguration({ commit, dispatch }, connection) {
+    dispatch('getPluginConfiguration', { name: connection, type: 'connections' })
+      .then((response) => {
+        commit('setConnectionInFocusConfiguration', response.data);
+      });
+  },
+
   getPluginConfiguration(_, pluginPayload) {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  saveExtractorConfiguration(_, configPayload) {
+  savePluginConfiguration(_, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload);
     // TODO commit if values are properly saved, they are initially copied from
     // the extractor's config and we'd have to update this
-  },
-
-  saveLoaderConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload);
-    // TODO commit if values are properly saved, they are initially copied from
-    // the loader's config and we'd have to update this
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
@@ -85,14 +92,14 @@ const actions = {
       });
   },
 
-  selectEntities() {
+  selectEntities({ state }) {
     orchestrationsApi.selectEntities(state.extractorInFocusEntities)
       .then(() => {
         // TODO confirm success or handle error in UI
       });
   },
 
-  toggleAllEntityGroupsOn({ dispatch }) {
+  toggleAllEntityGroupsOn({ dispatch, state }) {
     state.extractorInFocusEntities.entityGroups.forEach((group) => {
       if (!group.selected) {
         dispatch('toggleEntityGroup', group);
@@ -100,7 +107,7 @@ const actions = {
     });
   },
 
-  toggleAllEntityGroupsOff({ commit, dispatch }) {
+  toggleAllEntityGroupsOff({ commit, dispatch, state }) {
     state.extractorInFocusEntities.entityGroups.forEach((entityGroup) => {
       if (entityGroup.selected) {
         dispatch('toggleEntityGroup', entityGroup);
@@ -134,7 +141,13 @@ const actions = {
 };
 
 const mutations = {
-  setAllExtractorInFocusEntities(_, entitiesData) {
+  reset(state, attr) {
+    if (defaultState.hasOwnProperty(attr)) {
+      state[attr] = lodash.cloneDeep(defaultState[attr]);
+    }
+  },
+
+  setAllExtractorInFocusEntities(state, entitiesData) {
     state.extractorInFocusEntities = entitiesData
       ? {
         extractorName: entitiesData.extractor_name,
@@ -143,34 +156,42 @@ const mutations = {
       : {};
   },
 
-  setExtractorInFocusConfiguration(_, configuration) {
+  setExtractorInFocusConfiguration(state, configuration) {
     state.extractorInFocusConfiguration = configuration;
   },
 
-  setHasExtractorLoadingError(_, value) {
+  setHasExtractorLoadingError(state, value) {
     state.hasExtractorLoadingError = value;
   },
 
-  setLoaderInFocusConfiguration(_, configuration) {
+  setLoaderInFocusConfiguration(state, configuration) {
     state.loaderInFocusConfiguration = configuration;
   },
 
-  setPipelines(_, pipelines) {
+  setConnectionInFocusConfiguration(state, configuration) {
+    state.connectionInFocusConfiguration = configuration;
+  },
+
+  setPipelines(state, pipelines) {
+    pipelines.forEach((pipeline) => {
+      pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate);
+    });
     state.pipelines = pipelines;
   },
 
-  toggleSelected(_, selectable) {
+  toggleSelected(state, selectable) {
     Vue.set(selectable, 'selected', !selectable.selected);
   },
 
-  updatePipelines(_, pipeline) {
+  updatePipelines(state, pipeline) {
+    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.start_date);
     state.pipelines.push(pipeline);
   },
 };
 
 export default {
   namespaced: true,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,

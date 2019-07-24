@@ -38,6 +38,9 @@ export default {
         : `Show all ${this.extractorInFocusEntities.entityGroups.length}`;
       return `${prefix} entities`;
     },
+    extractorLacksEntitySelectionAndIsInstalled() {
+      return !this.isLoading && !this.hasEntities;
+    },
     getIsSelectedMode() {
       return mode => mode === this.selectedMode;
     },
@@ -63,7 +66,9 @@ export default {
         .reduce((acc, curr) => acc + curr.attributes.length, 0);
     },
     getTotalEntityCount() {
-      return this.extractorInFocusEntities.entityGroups.length;
+      return this.extractorInFocusEntities.entityGroups
+        ? this.extractorInFocusEntities.entityGroups.length
+        : -1;
     },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount;
@@ -75,7 +80,7 @@ export default {
       return this.getSelectedAttributeCount > 0;
     },
     isLoading() {
-      return !Object.prototype.hasOwnProperty.call(this.extractorInFocusEntities, 'entityGroups');
+      return !this.extractorInFocusEntities.hasOwnProperty('entityGroups');
     },
     isSaveable() {
       return this.hasEntities && this.hasSelectedAttributes;
@@ -117,8 +122,10 @@ export default {
       this.isExpanded = !this.isExpanded;
     },
     selectEntitiesAndBeginLoaderInstall() {
-      this.$store.dispatch('configuration/selectEntities');
-      this.$router.push({ name: 'loaders' });
+      this.$store.dispatch('configuration/selectEntities')
+        .then(() => {
+          this.$router.push({ name: 'loaders' });
+        });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
@@ -238,9 +245,13 @@ export default {
           </div>
         </template>
 
-        <template v-if='!isLoading && !hasEntities'>
+        <template v-if='extractorLacksEntitySelectionAndIsInstalled'>
           <div class="content">
-            <p>There are no entities for this extractor.</p>
+            <p>There are no entities to select for {{extractorNameFromRoute}}.</p>
+            <ul>
+              <li>Click "Next" to advance</li>
+              <li>Click "Cancel" to select another extractor's entities</li>
+            </ul>
           </div>
         </template>
 
@@ -250,10 +261,15 @@ export default {
           class="button"
           @click="close">Cancel</button>
         <button
-          v-if='!isLoading'
+          v-if='extractorLacksEntitySelectionAndIsInstalled'
+          class='button is-interactive-primary'
+          @click='selectEntitiesAndBeginLoaderInstall'>Next</button>
+        <button
+          v-else
           class='button is-interactive-primary'
           :disabled="!isSaveable"
           @click='selectEntitiesAndBeginLoaderInstall'>Save</button>
+
       </footer>
     </div>
   </div>

@@ -39,7 +39,7 @@ class PluginInvoker:
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
         self.plugin_settings = plugin_settings_service or PluginSettingsService(
-            session, project, plugin
+            session, project
         )
         self._prepared = False
 
@@ -60,7 +60,9 @@ class PluginInvoker:
 
     def exec_path(self):
         return self.venv_service.exec_path(
-            self.plugin.executable, name=self.plugin.name, namespace=self.plugin.type
+            self.plugin.executable,
+            name=self.plugin.canonical_name,
+            namespace=self.plugin.type,
         )
 
     def exec_args(self):

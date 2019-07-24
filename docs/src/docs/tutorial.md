@@ -127,32 +127,26 @@ meltano add loader target-postgres
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
-export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
+FLASK_ENV=development
+SQLITE_DATABASE=meltano
 
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_SCHEMA=analytics
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+PG_PASSWORD=warehouse
+PG_USERNAME=warehouse
+PG_ADDRESS=localhost
+PG_SCHEMA=analytics
+PG_PORT=5502
+PG_DATABASE=warehouse
 
-export SFDC_URL=
-export SFDC_USERNAME=''
-export SFDC_PASSWORD=''
-export SFDC_SECURITY_TOKEN=''
-export SFDC_CLIENT_ID='secret_client_id'
+SFDC_URL=
+SFDC_USERNAME=''
+SFDC_PASSWORD=''
+SFDC_SECURITY_TOKEN=''
+SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-03-01T00:00:00Z'
+SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
 You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
-
-Finally, make the credentials available to Meltano by executing the following command in your terminal:
-
-```bash
-source .env
-```
 
 ### Select The Entities to Export from Salesforce
 
@@ -203,6 +197,44 @@ In order to visualize the data with existing transformations in the UI, the fina
 meltano add model model-salesforce
 ```
 
+#### Setup incremental ELT
+
+Per default, Meltano will pull all data in the ELT process. This behavior is perfect to get started because of its simplicity. However, some datasets are too big to query as a whole: the solution is incremental ELT.
+
+Incremental ELT will persist the extraction cursor (named `state`) to make sure any subsequent ELT only pull the data that changed **after** this cursor. This feature is currently implemented by the extractors and is pretty simple to setup in your Meltano project.
+
+:::warning
+Support for incremental ELT varies from extractor to extractor.
+:::
+
+To enable it, Meltano must know which cursor to use for the ELT, which is set using the `--job_id` parameter on the `meltano elt` command.
+Alternatively, one can use the `MELTANO_JOB_ID` environmental variable. For each subsequent `ELT`, Meltano will look for a previous cursor to start from.
+
+```bash
+# the first run will create a cursor state
+$ meltano elt --job_id=gitlab tap-gitlab target-postgres
+No state was found, complete import.
+…
+ELT Completed …
+
+# subsequent runs will start from this cursor
+$ meltano elt --job_id=gitlab tap-gitlab target-postgres
+Found state from …
+…
+ELT Completed …
+```
+
+:::warning
+Schedules currently only support the `MELTANO_JOB_ID` environment variable, which need to be set manually in the **meltano.yml**.
+```yaml
+schedules:
+  - name: gitlab_postgres
+    …
+    env:
+      MELTANO_JOB_ID=gitlab
+```
+:::
+
 ### Interact with Your Data in The Web App
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
@@ -214,7 +246,7 @@ meltano ui
 
 When you visit the URL, you will be using the default connection to Meltano's SQLite database. In order to allow the UI to access your postgres DB instance, please follow the steps below:
 
-1. Navigate to the Postgres Loader Settings (Configuration > Loaders > target-postgres > Account Settings)
+1. Navigate to the Postgres Loader Configuration (Configuration > Loaders > target-postgres > Configure)
 2. Enter connection settings
   - Name = `postgres_db` (important to use that name if you are following the tutorial)
   - Dialect = `PostgresSQl`
@@ -241,6 +273,7 @@ We aim to make Meltano as thin as possible on top of the components it abstracts
 
 First things first, you'll need a data source to integrate: in this example, let's say we want to create a tap to fetch data from `GitLab`.
 
+::: warning Heads-up!
 If you are looking to integrate GitLab's data into your warehouse, please use tap official [https://gitlab.com/meltano/tap-gitlab](tap-gitlab).
 :::
 
@@ -267,9 +300,9 @@ Using `-e` will install the plugin as editable so any change you make is readily
 :::
 
 ```bash
-# test
 $ meltano add --custom extractor tap-gitlab-custom
 ...
+> namespace: gitlab 
 > pip_url: -e tap-gitlab-custom
 > executable: tap-gitlab-custom
 ```
@@ -277,18 +310,18 @@ $ meltano add --custom extractor tap-gitlab-custom
 Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
 
 ::: tip
-Meltano manages converting the `config` section to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
+Meltano manages converting the plugin's configuration to the appropriate definition for the plugin. You can find the generated file in `.meltano/run/tap-gitlab-custom/tap.config.json`.
 :::
 
-Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `config` section is `null`):
+Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `settings` section is missing):
 
 **meltano.yml**
 ```yaml
 plugins:
   extractors:
-  - config: null
-    executable: tap-gitlab-custom
+  - executable: tap-gitlab-custom
     name: tap-gitlab-custom
+    namespace: gitlab
     pip_url: -e tap-gitlab-custom
 ...
 ```
@@ -299,18 +332,51 @@ Let's include the default configuration for a sample tap:
 ```yaml
 plugins:
   extractors:
-  - config:
-	  username: $GITLAB_USERNAME # supports env expansion
-	  password: my_password
-	  start_date: "2015-09-21T04:00:00Z"
-    executable: tap-gitlab-custom
+  - executable: tap-gitlab-custom
     name: tap-gitlab-custom
+    namespace: gitlab
     pip_url: -e tap-gitlab-custom
+    settings:
+    - name: username
+    - name: password
+      kind: password
+    - name: start_date
+      value: "2015-09-21T04:00:00Z"
 ...
 ```
 
+#### Plugin Setting
+
+When creating a new plugin, you'll often have to expose some settings to the user so that Meltano can generate the correct configuration to run your plugin.
+
+To expose such a setting, you'll need to define it as such
+
+ - **name**: Identifier of this setting in the configuration.  
+ The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.  
+ Nesting can be represented using the `.` separator.  
+
+    - `foo` represents the `{ foo: VALUE }` in the output configuration.  
+    - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.  
+
+  - **kind**: Represent the type of value this should be, (e.g. `password` or `date_iso8601`). 
+  
+::: warning WIP
+We are currently working on defining the complete list of setting's kind. See [issue (#739)](https://gitlab.com/meltano/meltano/issues/739) for more details.
+:::
+
+  - **env** (optional): Define the environment variable name used to set this value at runtime. *Defaults to `NAMESPACE_NAME`*.
+  - **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
+
+
+Once the settings are exposed, you can use any of the following to set the proper values (in order of precedence):
+
+  - Environment variables
+  - `config` section in the plugin
+  - Meltano UI 
+  - `value` of the setting's definition
+
 ::: warning
-Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `config` section of a plugin.
+Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `settings` section of a plugin.
 :::
 
 ### Interacting with your new plugin
@@ -472,11 +538,6 @@ models:
     vars:
       livemode: false
       schema: '{{ env_var(''PG_SCHEMA'') }}'
-```
-Before we re-run the ELT process, we should update our environment variables.
-
-```bash
-source .env
 ```
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
@@ -778,7 +839,9 @@ Once the installation is completed, you are set to use Jupyter Notebooks with Me
 
 ```bash
 cd /path/to/my/meltano/project
+set +a
 source .env
+set -a 
 ```
 
 This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.

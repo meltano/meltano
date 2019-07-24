@@ -1,4 +1,5 @@
-const connectorLogoRegExp = /(?:tap-|target-)?(.*)/;
+const regExpConnectorLogo = /(?:tap-|target-)?(.*)/;
+const regExpPrivateInput = /(password|private|token)/;
 
 export default {
 
@@ -25,8 +26,18 @@ export default {
   },
 
   getConnectorLogoUrl(connectorName) {
-    const name = connectorLogoRegExp.exec(connectorName)[1];
+    connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName;
+    const name = regExpConnectorLogo.exec(connectorName)[1];
+
     return `/static/logos/${name}-logo.png`;
+  },
+
+  getIsSubRouteOf(parentPath, currentPath) {
+    return currentPath.includes(parentPath);
+  },
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   },
 
   // Color Utils
@@ -64,6 +75,18 @@ export default {
       .concat(arr2.filter(x => !arr1.includes(x)));
   },
 
+  deepFreeze(object) {
+    // Inspired by https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+    const propNames = Object.getOwnPropertyNames(object);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const name of propNames) {
+      const value = object[name];
+      // eslint-disable-next-line no-undef
+      object[name] = value && typeof value === 'object' ? this.deepFreeze(value) : value;
+    }
+    return Object.freeze(object);
+  },
+
   // String Utils
   capitalize(value) {
     if (!value) {
@@ -79,6 +102,13 @@ export default {
     let hyphenateMe = `${prepend}-` || '';
     hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-');
     return hyphenateMe;
+  },
+  inferInputType(value, defaultType = 'text') {
+    let type = defaultType;
+    if (regExpPrivateInput.test(value)) {
+      type = 'password';
+    }
+    return type;
   },
   jsDashify(type, name) {
     if (!type || !name) {
@@ -124,8 +154,16 @@ export default {
   },
 
   // Date Utils
-  getTodayYYYYMMDD() {
-    return this.formatDateYYYYMMDD(new Date());
+  getDateStringAsIso8601OrNull(dateString) {
+    return dateString ? new Date(dateString).toISOString() : null;
+  },
+
+  getInputDateMeta() {
+    return {
+      min: '2000-01-01',
+      pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
+      today: this.formatDateStringYYYYMMDD(new Date()),
+    };
   },
 
   getIsDateStringInFormatYYYYMMDD(dateString) {
@@ -133,19 +171,7 @@ export default {
     return result;
   },
 
-  formatDateYYYYMMDD(date) {
-    const d = new Date(date);
-    let month = `${d.getMonth() + 1}`;
-    let day = `${d.getDate()}`;
-    const year = d.getFullYear();
-
-    if (month.length < 2) {
-      month = `0${month}`;
-    }
-    if (day.length < 2) {
-      day = `0${day}`;
-    }
-
-    return [year, month, day].join('-');
+  formatDateStringYYYYMMDD(date) {
+    return new Date(date).toISOString().split('T')[0];
   },
 };

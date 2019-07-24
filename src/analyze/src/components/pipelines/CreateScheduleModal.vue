@@ -1,19 +1,27 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
-import _ from 'lodash';
 
 import Dropdown from '@/components/generic/Dropdown';
+import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead';
 
 import utils from '@/utils/utils';
+
+import _ from 'lodash';
 
 export default {
   name: 'CreateScheduleModal',
   components: {
     Dropdown,
+    InputDateIso8601,
+    ScheduleTableHead,
   },
   created() {
     this.$store.dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm);
+  },
+  mounted() {
+    this.$refs.name.focus();
   },
   computed: {
     ...mapGetters('plugins', [
@@ -22,22 +30,16 @@ export default {
     ...mapState('plugins', [
       'installedPlugins',
     ]),
+    getFormattedDateStringYYYYMMDD() {
+      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate);
+    },
+    getInputDateMeta() {
+      return utils.getInputDateMeta();
+    },
     isSaveable() {
       const hasOwns = [];
       _.forOwn(this.pipeline, val => hasOwns.push(val));
       return hasOwns.find(val => val === '') === undefined;
-    },
-    isStartDateSettable() {
-      return this.isStartDateValid && this.isStartDateMinYearValid;
-    },
-    isStartDateValid() {
-      return utils.getIsDateStringInFormatYYYYMMDD(this.pipeline.startDate);
-    },
-    isStartDateMinYearValid() {
-      return Number(this.pipeline.startDate.substring(0, 4)) >= this.minYear;
-    },
-    todaysDate() {
-      return utils.getTodayYYYYMMDD();
     },
   },
   data() {
@@ -50,14 +52,14 @@ export default {
         '@monthly',
         '@yearly',
       ],
-      minYear: '2000',
+      hasCatchupDate: false,
       pipeline: {
         name: '',
         extractor: '',
         loader: '',
         transform: '',
         interval: '',
-        startDate: 'None',
+        startDate: null,
       },
       transformOptions: [
         'skip',
@@ -76,7 +78,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = `Default-${this.todaysDate}`;
+      this.pipeline.name = '';
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name : '';
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
@@ -87,15 +89,14 @@ export default {
         ? this.intervalOptions[0] : '';
     },
     save() {
-      const pipeline = Object.assign({}, this.pipeline);
-      pipeline.startDate = this.pipeline.startDate === 'None'
-        ? null : new Date(this.pipeline.startDate).toISOString();
-
-      this.$store.dispatch('configuration/savePipelineSchedule', pipeline)
+      this.$store.dispatch('configuration/savePipelineSchedule', this.pipeline)
         .then(() => this.close());
     },
-    setCatchUpDateToNone() {
-      this.pipeline.startDate = 'None';
+    setHasCatchupDate(val) {
+      this.hasCatchupDate = val;
+      if (!this.hasCatchupDate) {
+        this.pipeline.startDate = null;
+      }
     },
   },
 };
@@ -112,41 +113,34 @@ export default {
       </header>
       <section class="modal-card-body">
 
-        <table class="table pipelines-table is-fullwidth">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th class='has-text-centered'>Extractor</th>
-              <th class='has-text-centered'>Loader</th>
-              <th class='has-text-centered'>Transform</th>
-              <th class='has-text-centered'>Interval</th>
-              <th class='has-text-centered'>Catch-up Date</th>
-            </tr>
-          </thead>
+        <table class="table is-fullwidth">
+
+          <ScheduleTableHead />
 
           <tbody>
             <tr>
-              <th>
-                <p class="control is-expanded">
+              <td>
+                <div class="control is-expanded">
                   <input
                     class="input"
                     :class="{
-                      'is-interactive-secondary has-text-interactive-secondary': pipeline.name }"
+                      'is-success has-text-success': pipeline.name }"
                     type="text"
+                    ref='name'
                     @focus="$event.target.select()"
                     v-model='pipeline.name'
                     placeholder="Name">
-                </p>
-              </th>
+                </div>
+              </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.extractor,
+                      'is-success': pipeline.extractor,
                       'is-loading': !pipeline.extractor }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.extractor }"
+                      :class="{ 'has-text-success': pipeline.extractor }"
                       v-model="pipeline.extractor"
                       :disabled='!getHasInstalledPluginsOfType("extractors")'>
                       <option
@@ -154,17 +148,17 @@ export default {
                         :key='extractor.name'>{{extractor.name}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.loader,
+                      'is-success': pipeline.loader,
                       'is-loading': !pipeline.loader }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.loader }"
+                      :class="{ 'has-text-success': pipeline.loader }"
                       v-model="pipeline.loader"
                       :disabled='!getHasInstalledPluginsOfType("loaders")'>
                       <option
@@ -172,78 +166,75 @@ export default {
                         :key='loader.name'>{{loader.name}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control">
+                <div class="control">
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.transform,
+                      'is-success': pipeline.transform,
                       'is-loading': !pipeline.transform }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.transform }"
+                      :class="{ 'has-text-success': pipeline.transform }"
                       v-model="pipeline.transform">
                       <option
                         v-for="transform in transformOptions"
                         :key='transform'>{{transform}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
                     :class="{
-                      'is-interactive-secondary': pipeline.interval,
+                      'is-success': pipeline.interval,
                       'is-loading': !pipeline.interval }">
                     <select
-                      :class="{ 'has-text-interactive-secondary': pipeline.interval }"
+                      :class="{ 'has-text-success': pipeline.interval }"
                       v-model="pipeline.interval">
                       <option
                         v-for="interval in intervalOptions"
                         :key='interval'>{{interval}}</option>
                     </select>
                   </span>
-                </p>
+                </div>
               </td>
               <td>
-                <p class="control is-expanded">
+                <div class="control is-expanded">
                   <Dropdown
-                    :label='pipeline.startDate'
-                    :button-classes='pipeline.startDate
-                      ? "is-interactive-secondary is-outlined" : ""'
+                    :label='hasCatchupDate ? getFormattedDateStringYYYYMMDD : "None"'
+                    :button-classes='(pipeline.startDate || !hasCatchupDate)
+                      ? "is-success is-outlined" : ""'
                     is-right-aligned
                     is-full-width>
-                    <div class="dropdown-content" slot-scope="{ dropdownForceClose }">
+                    <div class="dropdown-content">
                       <a
                         class="dropdown-item"
-                        @click="setCatchUpDateToNone(); dropdownForceClose();">
+                        data-dropdown-auto-close
+                        @click="setHasCatchupDate(false);">
                         None
                       </a>
                       <hr class="dropdown-divider">
                       <div>
                         <div class="dropdown-item">
-                          <input
-                            type="date"
-                            id="catchup-start"
-                            name="catchup-start"
-                            v-model='pipeline.startDate'
-                            pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}"
-                            :min='`${minYear}-01-01`'
-                            :max='todaysDate'>
+                          <InputDateIso8601
+                            v-model="pipeline.startDate"
+                            name='catchup-start'
+                            input-classes='is-small' />
                           <button
-                            class="button is-interactive-primary is-outlined is-small"
-                            :disabled='!isStartDateSettable'
-                            @click="dropdownForceClose();">
+                            class="button is-interactive-primary is-outlined is-small is-inline"
+                            data-dropdown-auto-close
+                            @click="setHasCatchupDate(true);">
                             Set
                           </button>
                         </div>
                       </div>
                     </div>
                   </Dropdown>
-                </p>
+                </div>
               </td>
             </tr>
           </tbody>

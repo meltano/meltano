@@ -9,7 +9,11 @@ from meltano.core.utils import coerce_datetime
 
 
 project = Project.find()
-schedule_service = ScheduleService(project)
+
+# I really don't like sending None here because it
+# totally breaks the encapsulation. We should uncouple
+# `Session` from the service.
+schedule_service = ScheduleService(None, project)
 
 default_args = {
     "owner": "airflow",

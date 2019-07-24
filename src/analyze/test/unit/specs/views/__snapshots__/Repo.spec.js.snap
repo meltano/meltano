@@ -5,7 +5,7 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -36,7 +36,7 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -99,7 +99,7 @@ exports[`Repo.vue renders code in the preview pane for code files 1`] = `
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -130,7 +130,7 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -161,7 +161,7 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -224,7 +224,7 @@ exports[`Repo.vue renders markdown in the preview pane for markdown files 1`] = 
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -251,7 +251,7 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -282,7 +282,7 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -345,7 +345,7 @@ exports[`Repo.vue renders no code or markdown by default 1`] = `
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <div>
                 <div
@@ -376,7 +376,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -407,7 +407,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -498,8 +498,8 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
                       class="column is-one-fifth"
                     >
                       <a
-                        class="button is-secondary is-light is-small is-pulled-right"
-                        href="/dashboards/dashboard/some"
+                        class="button is-secondary is-light is-small is-pulled-right router-link-active"
+                        href="/"
                       >
                         <font-awesome-icon-stub
                           icon="arrow-right"
@@ -512,7 +512,7 @@ exports[`Repo.vue renders the dashboard list when dashboards exist and calls get
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -543,7 +543,7 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -574,7 +574,7 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -668,7 +668,7 @@ exports[`Repo.vue renders the document list when documents exist and calls getFi
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -699,7 +699,7 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -730,7 +730,7 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -821,8 +821,8 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
                       class="column is-one-fifth"
                     >
                       <a
-                        class="button is-secondary is-light is-small is-pulled-right"
-                        href="/analyze/carbon/region/reports/report/some"
+                        class="button is-secondary is-light is-small is-pulled-right router-link-active"
+                        href="/"
                       >
                         <font-awesome-icon-stub
                           icon="arrow-right"
@@ -835,7 +835,7 @@ exports[`Repo.vue renders the report list when reports exist and calls getFile()
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -866,7 +866,7 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -897,7 +897,7 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -991,7 +991,7 @@ exports[`Repo.vue renders the table list when tables exist and calls getFile() w
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                
@@ -1022,7 +1022,7 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
   class="columns is-gapless"
 >
   <section
-    class="column is-full vh-scrollable"
+    class="column is-full"
   >
     <div
       class="box-transparent box is-radiusless is-shadowless"
@@ -1053,7 +1053,7 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
             class="columns is-gapless"
           >
             <aside
-              class="column is-one-quarter vh-scrollable"
+              class="column is-one-quarter"
             >
               <div
                 class="level"
@@ -1141,7 +1141,7 @@ exports[`Repo.vue renders the topic list when topics exist and calls getFile() w
             </aside>
              
             <div
-              class="column is-three-quarters vh-scrollable"
+              class="column is-three-quarters"
             >
               <!---->
                

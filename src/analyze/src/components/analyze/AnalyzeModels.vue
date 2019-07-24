@@ -49,29 +49,42 @@ export default {
     <div class="columns">
       <div class="column is-one-third">
         <h2 class='title is-5'>Available</h2>
-        <div class="content is-small">
-          <div
-            class="level level-tight"
-            v-for='(modelPlugin, index) in plugins.models'
-            :key="`${modelPlugin}-${index}`">
-            <div class='level-left'>
-              {{modelPlugin}}
-            </div>
-            <div class="level-right">
-              <a
-                v-if='!getIsPluginInstalled("models", modelPlugin)'
-                :class='{ "is-loading": getIsInstallingPlugin("models", modelPlugin) }'
-                class='button is-interactive-primary is-outlined is-block is-small'
-                @click="installModel(modelPlugin)">Install</a>
-              <a
-                v-else
-                disabled
-                class='button is-outlined is-block is-small tooltip is-tooltip-left'
-                data-tooltip="Not implemented">Uninstall</a>
-            </div>
-          </div>
 
-        </div>
+        <table class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Model</th>
+            </tr>
+          </thead>
+         <tbody>
+
+            <template v-for='(modelPlugin, index) in plugins.models'>
+              <tr :key="`${modelPlugin}-${index}`">
+                <td>
+                  <div class="buttons">
+                    <a
+                      v-if='!getIsPluginInstalled("models", modelPlugin)'
+                      :class='{ "is-loading": getIsInstallingPlugin("models", modelPlugin) }'
+                      class='button is-interactive-primary is-outlined is-block is-small'
+                      @click="installModel(modelPlugin)">Install</a>
+                    <a
+                      v-else
+                      class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-right'
+                      data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Uninstall</a>
+                  </div>
+                </td>
+                <td>
+                  <p>{{modelPlugin}}</p>
+                </td>
+
+              </tr>
+
+            </template>
+
+          </tbody>
+        </table>
+
       </div>
       <div class="column is-two-thirds">
         <h2 class='title is-5'>Installed</h2>
@@ -104,7 +117,6 @@ export default {
 </template>
 
 <style lang="scss">
-.level:not(:last-child),
 .level-tight:not(:last-child) {
   margin-bottom: .5rem;
 }

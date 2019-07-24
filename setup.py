@@ -20,6 +20,7 @@ requires = [
     'networkx==2.2',
     'pandas==0.24.1',
     'psycopg2==2.7.7',
+    'psutil==5.6.3',
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',
@@ -52,6 +53,7 @@ dev_requires = [
     'black==18.9b0',
     'bumpversion==0.5.3',
     'changelog-cli==0.6.2',
+    'freezegun==0.3.12',
     'pytest==4.3.1',
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',
@@ -60,7 +62,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.29.0",
+    version="0.33.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

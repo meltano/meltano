@@ -1,12 +1,14 @@
 import SSF from 'ssf';
 import Vue from 'vue';
 import sqlFormatter from 'sql-formatter';
+import lodash from 'lodash';
+
 import utils from '@/utils/utils';
 import designApi from '../../api/design';
 import reportsApi from '../../api/reports';
 import sqlApi from '../../api/sql';
 
-const state = {
+const defaultState = utils.deepFreeze({
   activeReport: {},
   design: {
     related_table: {},
@@ -21,23 +23,27 @@ const state = {
   columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
-  currentDataTab: 'sql',
   currentSQL: '',
-  filtersOpen: false,
-  dataOpen: true,
-  chartsOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
-  limit: 3,
-  distincts: {},
+  limit: 50,
   sortColumn: null,
   sortDesc: false,
   dialect: null,
-};
+  selectedAttributeCount: 0,
+  filterOptions: [],
+  filters: {
+    columns: [],
+    aggregates: [],
+  },
+});
 
 const helpers = {
-  getQueryPayloadFromDesign() {
+  getFilterTypePlural(filterType) {
+    return `${filterType}s`;
+  },
+  getQueryPayloadFromDesign(state) {
     const selected = x => x.selected;
     const namesOfSelected = (arr) => {
       if (!Array.isArray(arr)) {
@@ -63,16 +69,10 @@ const helpers = {
       };
     }
 
-    const filters = JSON.parse(JSON.stringify(state.distincts));
-    const filtersKeys = Object.keys(filters);
-    filtersKeys.forEach((prop) => {
-      delete filters[prop].results;
-      delete filters[prop].sql;
-    });
-
     if (!state.design.joins) {
       state.design.joins = [];
     }
+
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
@@ -105,79 +105,122 @@ const helpers = {
       }))
       .filter(tf => tf.periods.length);
 
+    // Enforce number type for aggregates as v-model approach always overwrites as string
+    const filters = lodash.cloneDeep(state.filters);
+    if (filters && filters.aggregates) {
+      filters.aggregates = filters.aggregates
+        .filter(aggregate => aggregate.isActive)
+        .map((aggregate) => {
+          aggregate.value = Number(aggregate.value);
+          return aggregate;
+        });
+    }
+
     return {
-      table: baseTable.name,
+      name: state.design.name,
       columns,
       aggregates,
       timeframes,
       joins,
       order,
       limit: state.limit,
+      dialect: state.dialect,
       filters,
     };
   },
 };
 
 const getters = {
-  hasResults() {
+  filtersCount(state) {
+    return state.filters.columns.length + state.filters.aggregates.length;
+  },
+
+  hasResults(state) {
     if (!state.results) {
       return false;
     }
     return !!state.results.length;
   },
 
-  hasChartableResults() {
-    return getters.hasResults() && state.resultAggregates.length;
+  hasChartableResults(state, gettersRef) {
+    return gettersRef.hasResults && state.resultAggregates.length;
   },
 
-  numResults() {
+  hasFilters(_, gettersRef) {
+    return gettersRef.filtersCount > 0;
+  },
+
+  getAttributesByTable(state) {
+    const attributeTables = [];
+    const design = state.design;
+    const attributeFilter = attr => !attr.hidden;
+    if (design.label) {
+      attributeTables.push({
+        tableLabel: design.label,
+        table_name: design.from,
+        columns: design.related_table.columns
+          ? design.related_table.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.related_table.aggregates
+          ? design.related_table.aggregates.filter(attributeFilter)
+          : [],
+      });
+    }
+    if (design.joins) {
+      design.joins.forEach((join) => {
+        attributeTables.push({
+          tableLabel: join.label,
+          table_name: join.name,
+          columns: join.related_table.columns
+            ? join.related_table.columns.filter(attributeFilter)
+            : [],
+          aggregates: join.related_table.aggregates
+            ? join.related_table.aggregates.filter(attributeFilter)
+            : [],
+        });
+      });
+    }
+    return attributeTables;
+  },
+
+  getFilter(_, gettersRef) {
+    // eslint-disable-next-line
+    return (table_name, name, filterType) => gettersRef.getFiltersByType(filterType).find(filter => filter.name === name && filter.table_name === table_name);
+  },
+
+  getFiltersByType(state) {
+    return filterType => state.filters[helpers.getFilterTypePlural(filterType)] || [];
+  },
+
+  getIsAttributeInFilters(_, gettersRef) {
+    // eslint-disable-next-line
+    return (table_name, name, filterType) => !!gettersRef.getFilter(table_name, name, filterType);
+  },
+
+  attributesCount(state) {
+    return state.selectedAttributeCount;
+  },
+
+  resultsCount(state) {
     if (!state.results) {
       return 0;
     }
     return state.results.length;
   },
 
-  getDistinctsForField: () => field => state.distincts[field],
+  getDialect: state => state.dialect,
 
-  getResultsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.results;
-  },
-
-  hasJoins() {
+  hasJoins(state) {
     return !!(state.design.joins && state.design.joins.length);
   },
 
-  isColumnSorted: () => key => state.sortColumn === key,
+  isColumnSorted: state => key => state.sortColumn === key,
 
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
 
-  getKeyFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return null;
-    }
-    return thisDistinct.keys[0];
-  },
-
-  getSelectionsFromDistinct: () => (field) => {
-    const thisDistinct = state.distincts[field];
-    if (!thisDistinct) {
-      return [];
-    }
-    const thisDistinctSelections = thisDistinct.selections;
-    if (!thisDistinctSelections) {
-      return [];
-    }
-    return thisDistinctSelections;
-  },
-
-  getChartYAxis() {
+  getChartYAxis(state) {
     if (!state.resultAggregates) {
       return [];
     }
@@ -185,60 +228,40 @@ const getters = {
     return aggregates;
   },
 
-  isColumnSelectedAggregate: () => columnName => columnName in state.resultAggregates,
+  isColumnSelectedAggregate: state => columnName => columnName in state.resultAggregates,
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
-  currentModelLabel() {
+  currentModelLabel(state) {
     return utils.titleCase(state.currentModel);
   },
 
-  currentDesignLabel() {
+  currentDesignLabel(state) {
     return utils.titleCase(state.currentModel);
   },
 
-  isDataTab() {
-    return state.currentDataTab === 'data';
-  },
-
-  isResultsTab() {
-    return state.currentDataTab === 'results';
-  },
-
-  isSQLTab() {
-    return state.currentDataTab === 'sql';
-  },
-
-  currentLimit() {
+  currentLimit(state) {
     return state.limit;
   },
 
-  formattedSql() {
+  formattedSql(state) {
     return sqlFormatter.format(state.currentSQL);
   },
 };
 
 const actions = {
-  getDesign({ dispatch, commit }, { model, design, slug }) {
+  resetDefaults: ({ commit }) => commit('resetDefaults'),
+
+  getDesign({ commit, dispatch, state }, { model, design, slug }) {
     state.currentSQL = '';
     state.currentModel = model;
     state.currentDesign = design;
 
-    // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(model, design)
+    return designApi.index(model, design)
       .then((response) => {
         commit('setDesign', response.data);
-      });
-
-    sqlApi.getDialect(model)
-      .then((response) => {
-        commit('setConnectionDialect', response.data);
       })
-      .catch((e) => {
-        commit('setSqlErrorMessage', e);
-      });
-
-    reportsApi.loadReports()
+      .then(reportsApi.loadReports)
       .then((response) => {
         state.reports = response.data;
         if (slug) {
@@ -252,8 +275,13 @@ const actions = {
         commit('setSqlErrorMessage', e);
         state.loadingQuery = false;
       });
+  },
 
-    return index;
+  getFilterOptions({ commit }) {
+    sqlApi.getFilterOptions()
+      .then((response) => {
+        commit('setFilterOptions', response.data);
+      });
   },
 
   expandRow({ commit }, row) {
@@ -283,7 +311,7 @@ const actions = {
       });
   },
 
-  removeSort({ commit }, column) {
+  removeSort({ commit, state }, column) {
     if (!state.sortColumn || state.sortColumn !== column.name) {
       return;
     }
@@ -302,23 +330,32 @@ const actions = {
     commit('toggleSelected', timeframePeriod);
   },
 
-  toggleAggregate({ commit }, aggregate) {
+  // eslint-disable-next-line
+  toggleAggregate({ commit, getters }, { aggregate, table_name }) {
     commit('toggleSelected', aggregate);
+
+    if (!aggregate.selected) {
+      const filter = getters.getFilter(table_name, aggregate.name, 'aggregate');
+      if (filter) {
+        commit('removeFilter', filter);
+      }
+    }
   },
 
   limitSet({ commit }, limit) {
     commit('setLimit', limit);
   },
 
+  // TODO: remove and use `mapMutations`
   setChartType({ commit }, chartType) {
     commit('setChartType', chartType);
   },
 
-  getSQL({ commit }, { run, load }) {
+  getSQL({ commit, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
-    const queryPayload = load || helpers.getQueryPayloadFromDesign();
+    const queryPayload = Object.assign({}, helpers.getQueryPayloadFromDesign(state), load);
     const postData = Object.assign({ run }, queryPayload);
     sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
@@ -326,11 +363,9 @@ const actions = {
         if (run) {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'results');
           state.loadingQuery = false;
         } else {
           commit('setSQLResults', response.data);
-          commit('setCurrentTab', 'sql');
         }
       })
       .catch((e) => {
@@ -339,7 +374,7 @@ const actions = {
       });
   },
 
-  loadReport({ commit }, { name }) {
+  loadReport({ commit, state }, { name }) {
     reportsApi.loadReport(name)
       .then((response) => {
         const report = response.data;
@@ -356,13 +391,13 @@ const actions = {
       });
   },
 
-  saveReport({ commit }, { name }) {
+  saveReport({ commit, state }, { name }) {
     const postData = {
       name,
       model: state.currentModel,
       design: state.currentDesign,
       chartType: state.chartType,
-      queryPayload: helpers.getQueryPayloadFromDesign(),
+      queryPayload: helpers.getQueryPayloadFromDesign(state),
     };
     reportsApi.saveReport(postData)
       .then((response) => {
@@ -376,8 +411,8 @@ const actions = {
       });
   },
 
-  updateReport({ commit }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign();
+  updateReport({ commit, state }) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state);
     state.activeReport.chartType = state.chartType;
     reportsApi.updateReport(state.activeReport)
       .then((response) => {
@@ -394,43 +429,8 @@ const actions = {
     commit('setErrorState');
   },
 
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then((response) => {
-        commit('setDistincts', {
-          data: response.data,
-          field,
-        });
-      });
-  },
-
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data);
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data);
-  },
-
-  switchCurrentTab({ commit }, tab) {
-    commit('setCurrentTab', tab);
-  },
-
-  toggleFilterOpen({ commit }) {
-    commit('setFilterToggle');
-  },
-
-  toggleDataOpen({ commit }) {
-    commit('setDataToggle');
-  },
-
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
-  },
-
-  toggleChartsOpen({ commit }) {
-    commit('setChartToggle');
   },
 
   sortBy({ commit }, name) {
@@ -439,27 +439,59 @@ const actions = {
       run: true,
     });
   },
+
+  // eslint-disable-next-line
+  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '', isActive = true }) {
+    const filter = {
+      table_name,
+      name: attribute.name,
+      expression,
+      value,
+      attribute,
+      filterType,
+      isActive,
+    };
+    commit('addFilter', filter);
+
+    const isValidToggleSelection = !attribute.hasOwnProperty('selected') || !attribute.selected;
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute);
+    }
+  },
+
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter);
+  },
 };
 
 const mutations = {
-  setRemoveSort() {
+  resetDefaults(state) {
+    lodash.assign(state, lodash.cloneDeep(defaultState));
+  },
+
+  setRemoveSort(state) {
     state.sortColumn = null;
   },
 
-  setChartType(context, chartType) {
+  setChartType(state, chartType) {
     state.chartType = chartType;
   },
 
-  setCurrentReport(_, report) {
+  setCurrentReport(state, report) {
     state.activeReport = report;
   },
 
-  setStateFromLoadedReport(_, report) {
+  setFilterOptions(state, options) {
+    state.filterOptions = options;
+  },
+
+  setStateFromLoadedReport(state, report) {
     // General UI state updates
     state.currentModel = report.model;
     state.currentDesign = report.design;
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
+    state.dialect = report.queryPayload.dialect;
 
     // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
     const baseTable = state.design.related_table;
@@ -486,7 +518,7 @@ const mutations = {
     // aggregates
     setSelected(baseTable.aggregates, queryPayload.aggregates);
     // filters
-    // TODO
+    state.filters = queryPayload.filters;
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
       // joins - columns
@@ -514,19 +546,27 @@ const mutations = {
     // TODO
   },
 
-  addSavedReportToReports(_, report) {
+  addFilter(state, filter) {
+    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter);
+  },
+
+  removeFilter(state, filter) {
+    if (filter) {
+      const filtersByType = state.filters[helpers.getFilterTypePlural(filter.filterType)];
+      const idx = filtersByType.indexOf(filter);
+      filtersByType.splice(idx, 1);
+    }
+  },
+
+  addSavedReportToReports(state, report) {
     state.reports.push(report);
   },
 
-  setSortColumn(context, name) {
+  setSortColumn(state, name) {
     if (state.sortColumn === name) {
       state.sortDesc = !state.sortDesc;
     }
     state.sortColumn = name;
-  },
-
-  setDistincts(_, { data, field }) {
-    Vue.set(state.distincts, field, data);
   },
 
   setJoinColumns(_, { columns, join }) {
@@ -541,44 +581,15 @@ const mutations = {
     join.aggregates = aggregates;
   },
 
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', []);
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item);
-    }
-  },
-
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item);
-  },
-
-  setFilterToggle() {
-    state.filtersOpen = !state.filtersOpen;
-  },
-
-  setDataToggle() {
-    state.dataOpen = !state.dataOpen;
-  },
-
-  resetSaveReportSettings() {
+  resetSaveReportSettings(state) {
     state.saveReportSettings = { name: null };
   },
 
-  setChartToggle() {
-    state.chartsOpen = !state.chartsOpen;
-  },
-
-  setSQLResults(_, results) {
+  setSQLResults(state, results) {
     state.currentSQL = results.sql;
   },
 
-  setConnectionDialect(_, results) {
-    state.dialect = results.connection_dialect;
-  },
-
-  setQueryResults(_, results) {
+  setQueryResults(state, results) {
     state.results = results.results;
     state.keys = results.keys;
     state.columnHeaders = results.column_headers;
@@ -586,7 +597,7 @@ const mutations = {
     state.resultAggregates = results.aggregates;
   },
 
-  setSqlErrorMessage(_, e) {
+  setSqlErrorMessage(state, e) {
     state.hasSQLError = true;
     if (!e.response) {
       state.sqlErrorMessage = [
@@ -598,36 +609,37 @@ const mutations = {
     state.sqlErrorMessage = [error.code, error.orig, error.statement];
   },
 
-  setErrorState() {
+  setErrorState(state) {
     state.hasSQLError = false;
     state.sqlErrorMessage = [];
   },
 
-  toggleSelected(_, selectable) {
+  toggleSelected(state, selectable) {
     Vue.set(selectable, 'selected', !selectable.selected);
+    state.selectedAttributeCount += selectable.selected ? 1 : -1;
   },
 
-  toggleCollapsed(_, collapsable) {
+  toggleCollapsed(state, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
-  setDesign(_, designData) {
+  setDesign(state, designData) {
     state.design = designData;
   },
 
-  setCurrentTab(_, tab) {
-    state.currentDataTab = tab;
+  setLimit(state, limit) {
+    state.limit = limit;
   },
 
-  setLimit(_, limit) {
-    state.limit = limit;
+  setDialect(state, dialect) {
+    state.dialect = dialect;
   },
 };
 
 export default {
   namespaced: true,
   helpers,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,

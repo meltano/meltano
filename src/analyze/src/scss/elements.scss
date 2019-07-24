@@ -9,10 +9,3 @@ html {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: $app-background-color;
 }
-
-@include tablet() {
-   // Favor RouterViewLayout's control of scrollable columns unless on mobile
-  html {
-    overflow-y: hidden;
-  }
-}

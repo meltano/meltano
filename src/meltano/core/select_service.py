@@ -4,7 +4,7 @@ import logging
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin.singer.catalog import visit, ListSelectedExecutor
+from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from .project import Project
 from .db import project_engine
 
@@ -13,7 +13,7 @@ class SelectService:
     def __init__(self, project: Project, extractor: str):
         self.project = project
         self.config = ConfigService(project)
-        self.extractor = self.config.get_plugin(extractor, PluginType.EXTRACTORS)
+        self.extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
 
     def get_extractor(self):
         return self.extractor
@@ -41,7 +41,7 @@ class SelectService:
 
         try:
             schema = self.load_schema()
-            visit(schema, list_all)
+            list_all.visit(schema)
         except FileNotFoundError as e:
             logging.error(
                 "Cannot find catalog: make sure the tap runs correctly with --discover; `meltano invoke TAP --discover`"

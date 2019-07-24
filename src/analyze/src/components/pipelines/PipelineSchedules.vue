@@ -1,8 +1,15 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 
+import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead';
+
+import utils from '@/utils/utils';
+
 export default {
   name: 'PipelineSchedules',
+  components: {
+    ScheduleTableHead,
+  },
   created() {
     this.$store.dispatch('configuration/getAllPipelineSchedules');
     if (!this.getHasPipelines) {
@@ -16,6 +23,12 @@ export default {
     ...mapGetters('configuration', [
       'getHasPipelines',
     ]),
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+    ]),
+    getFormattedDateStringYYYYMMDD() {
+      return val => utils.formatDateStringYYYYMMDD(val);
+    },
   },
   methods: {
     createPipeline() {
@@ -55,13 +68,13 @@ export default {
       <div class="column">
         <div class="field is-pulled-right">
 
-          <p class="control">
+          <div class="control">
             <button
               class="button is-interactive-primary"
               @click="createPipeline();">
               <span>Create</span>
             </button>
-          </p>
+          </div>
 
         </div>
       </div>
@@ -69,18 +82,10 @@ export default {
     </div>
 
     <div v-if='getHasPipelines' class="box">
-      <table class="table pipelines-table is-fullwidth is-narrow is-hoverable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th class='has-text-centered'>Extractor</th>
-            <th class='has-text-centered'>Loader</th>
-            <th class='has-text-centered'>Transform</th>
-            <th class='has-text-centered'>Interval</th>
-            <th class='has-text-centered'>Catch-up Date</th>
-            <th class='has-text-centered'></th>
-          </tr>
-        </thead>
+      <table class="table is-fullwidth is-narrow is-hoverable">
+
+        <ScheduleTableHead has-actions />
+
         <tbody>
 
           <template v-for="pipeline in pipelines">
@@ -101,17 +106,23 @@ export default {
                 <p class='has-text-centered'>{{pipeline.interval}}</p>
               </td>
               <td>
-                <p class='has-text-centered'>{{pipeline.startDate || 'None'}}</p>
+                <p class='has-text-centered'>{{pipeline.startDate
+                  ? getFormattedDateStringYYYYMMDD(pipeline.startDate)
+                  : 'None'
+                }}</p>
               </td>
               <td>
                 <div class="buttons is-right">
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
+                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
                     :to="{name: 'orchestration'}">Orchestration</router-link>
-                  <button
-                    class="button is-small tooltip is-tooltip-left"
-                    disabled
-                    data-tooltip="Not implemented">Edit</button>
+                  <router-link
+                    class="button is-interactive-primary is-outlined is-small"
+                    :to="{name: 'analyze'}">Analyze</router-link>
+                  <a
+                    class='button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
+                    data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>Edit</a>
                 </div>
               </td>
 
@@ -131,9 +142,4 @@ export default {
 </template>
 
 <style lang="scss">
-.pipelines-table {
-  td {
-    vertical-align: middle;
-  }
-}
 </style>

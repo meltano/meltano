@@ -65,7 +65,7 @@ class Airflow(PluginInstall):
                 airflow_cfg.read_file(cfg)
             logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-            for section, cfg in invoker.plugin_settings.as_config().items():
+            for section, cfg in invoker.plugin_settings.as_config(self).items():
                 airflow_cfg[section].update(map_dict(str, cfg))
                 logging.debug(f"\tUpdated section [{section}] with {cfg}")
 
