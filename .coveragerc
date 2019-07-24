@@ -1,4 +1,5 @@
 [run]
+source = src/
 omit =
      */site-packages/*
      tests/*
