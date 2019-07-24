@@ -720,6 +720,14 @@ This way we do not run into `docker-in-docker` problems (buffering, permissions,
 
 The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
 
+### Setup
+
+To get setup, make sure that your [Docker Desktop](https://www.docker.com/products/docker-desktop) is running. You can verify this on Mac by checking for the Docker icon in the upper right.
+
+![Screenshot of working Docker Desktop](/screenshots/docker-desktop.png)
+
+Once Docker Desktop is running, you can now run Docker commands in your terminal
+
 ### Using pre-built Docker images
 
 We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
