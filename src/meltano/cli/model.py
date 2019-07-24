@@ -1,6 +1,6 @@
 import click
 from . import cli
-from .params import db_options, project
+from .params import project
 
 from meltano.core.compiler.project_compiler import ProjectCompiler
 

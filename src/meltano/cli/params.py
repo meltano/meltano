@@ -1,10 +1,12 @@
 import os
 import functools
-import click
 import urllib
+import click
+import click.globals
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
+from meltano.core.db import project_engine
 
 
 def db_options(func):
@@ -40,7 +42,7 @@ def db_options(func):
         help="Specifies the user to connect to the database with.",
     )
     @click.password_option(prompt=False, envvar="PG_PASSWORD")
-    def wrapper(*args, **kwargs):
+    def decorate(*args, **kwargs):
         engine_uri = os.getenv("SQL_ENGINE_URI")
         backend = kwargs.pop("backend")
 
@@ -61,14 +63,16 @@ def db_options(func):
                 **pg_config
             )
 
-        return func(*args, **kwargs, engine_uri=engine_uri)
+        return func(engine_uri, *args, **kwargs)
 
-    return functools.update_wrapper(wrapper, func)
+    return functools.update_wrapper(decorate, func)
 
 
 def project(func):
-    @click.pass_context
-    def decorate(ctx, *args, **kwargs):
+    @db_options
+    def decorate(engine_uri, *args, **kwargs):
+        ctx = click.globals.get_current_context()
+
         project = ctx.obj["project"]
         if not project:
             raise click.ClickException(
@@ -76,6 +80,9 @@ def project(func):
                 "\nUse `meltano init <project_name>` to create one."
             )
 
-        ctx.invoke(func, project, *args, **kwargs)
+        # register the system database connection
+        project_engine(project, engine_uri, default=True)
+
+        func(project, *args, **kwargs)
 
     return functools.update_wrapper(decorate, func)

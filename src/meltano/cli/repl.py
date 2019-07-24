@@ -1,6 +1,4 @@
 from . import cli
-from .params import db_options
-from meltano.core.db import project_engine
 
 
 @cli.command(hidden=True)

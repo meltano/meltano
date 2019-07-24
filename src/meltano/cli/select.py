@@ -12,6 +12,7 @@ from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 def selection_color(selection):
@@ -38,13 +39,13 @@ def selection_mark(selection):
 
 
 @cli.command()
-@project
 @click.argument("extractor")
 @click.argument("entities_filter", default="*")
 @click.argument("attributes_filter", default="*")
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
+@project
 def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:

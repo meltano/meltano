@@ -1,6 +1,6 @@
 import click
 from . import cli
-from .params import project, db_options
+from .params import project
 
 from meltano.core.db import project_engine
 from meltano.core.project import Project
@@ -9,15 +9,14 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 
 
 @cli.group(invoke_without_command=True)
-@project
 @click.argument("plugin_name")
+@project
 @click.pass_context
-@db_options
-def config(ctx, project, plugin_name, engine_uri):
+def config(ctx, project, plugin_name):
     config = ConfigService(project)
     plugin = config.find_plugin(plugin_name)
 
-    _, Session = project_engine(project, engine_uri, default=True)
+    _, Session = project_engine(project)
     session = Session()
     settings = PluginSettingsService(session, project)
 
@@ -41,7 +40,6 @@ def set(ctx, setting_name, value):
 
 @config.command()
 @click.argument("setting_name")
-@click.argument("value")
 @click.pass_context
 def unset(ctx, setting_name):
     settings = ctx.obj["settings"]
