@@ -29,6 +29,9 @@ const getters = {
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== '';
   },
+  getPendingJobs(state) {
+    return { jobIds: state.pipelineJobs.map(job => job.pipelinePoller.getMetadata().jobId) };
+  },
 };
 
 const actions = {
@@ -81,16 +84,18 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
   },
 
-  getPolledJobStatus({ commit, state }, pollMetadata) {
-    return orchestrationsApi.getPolledJobStatus(pollMetadata)
+  // eslint-disable-next-line no-shadow
+  getPolledJobStatus({ commit, getters, state }) {
+    return orchestrationsApi.getPolledJobStatus(getters.getPendingJobs)
       .then((response) => {
-        const isComplete = response.data.jobId === pollMetadata.jobId;
-        if (isComplete) {
-          const targetJob = state.pipelineJobs
-            .find(job => job.pipelinePoller.getMetadata().jobId === pollMetadata.jobId);
-          commit('setPipelineIsRunning', { pipeline: targetJob.pipeline, value: false });
-          commit('removePipelineJob', targetJob);
-        }
+        response.data.jobs.forEach((jobStatus) => {
+          if (jobStatus.isComplete) {
+            const targetJob = state.pipelineJobs
+              .find(job => job.pipelinePoller.getMetadata().jobId === jobStatus.jobId);
+            commit('setPipelineIsRunning', { pipeline: targetJob.pipeline, value: false });
+            commit('removePipelineJob', targetJob);
+          }
+        });
       });
   },
 
@@ -98,7 +103,7 @@ const actions = {
     return orchestrationsApi.run(pipeline)
       .then((response) => {
         const pollMetadata = response.data;
-        const pollFn = () => dispatch('getPolledJobStatus', pollMetadata);
+        const pollFn = () => dispatch('getPolledJobStatus');
         const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
         pipelinePoller.init();
         commit('setPipelineIsRunning', { pipeline, value: true });

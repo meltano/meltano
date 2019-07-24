@@ -40,22 +40,25 @@ def connection_names():
     return jsonify(connections)
 
 
-@orchestrationsBP.route("get/job_status", methods=["POST"])
-def get_job_status() -> Response:
+@orchestrationsBP.route("/job/state", methods=["POST"])
+def job_state() -> Response:
     """
-    endpoint for getting a an job's status
+    endpoint for getting the status of N jobs
     """
     project = Project.find()
     poll_payload = request.get_json()
-    job_id = poll_payload["jobId"]
+    job_ids = poll_payload["jobIds"]
 
-    finder = JobFinder(job_id)
-    state_job = finder.latest_success(db.session)
+    jobs = []
+    for job_id in job_ids:
+        finder = JobFinder(job_id)
+        state_job = finder.latest_success(db.session)
+        jobs.append({
+            "jobId": job_id,
+            "isComplete": state_job != None,
+        })
 
-    if state_job == None:
-        job_id = None
-
-    return jsonify({"jobId": job_id})
+    return jsonify({"jobs": jobs})
 
 
 @orchestrationsBP.route("/run", methods=["POST"])

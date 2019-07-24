@@ -23,7 +23,7 @@ export default {
   },
 
   getPolledJobStatus(pollPayload) {
-    return axios.post(utils.apiUrl('orchestrations', 'get/job_status'), pollPayload);
+    return axios.post(utils.apiUrl('orchestrations', 'job/state'), pollPayload);
   },
 
   run(eltPayload) {
