@@ -6,7 +6,21 @@ import click.globals
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
+<<<<<<< Updated upstream
 from meltano.core.db import project_engine
+=======
+from meltano.core.migration_service import MigrationService
+from meltano.core.db import register_engine_hook
+
+
+def sqlite_wal_hook(engine):
+    """Enable WAL to handle concurrent processes gracefully."""
+    engine.execute("PRAGMA journal_mode=WAL")
+
+
+def migrate_hook(engine):
+    MigrationService(engine).upgrade()
+>>>>>>> Stashed changes
 
 
 def db_options(func):
@@ -62,6 +76,11 @@ def db_options(func):
             engine_uri = "postgresql://{username}:{password}@{host}:{port}/{database}".format(
                 **pg_config
             )
+
+        # setup hooks
+        register_engine_hook(migrate_hook)
+        if backend == "sqlite":
+            register_engine_hook(sqlite_wal_hook)
 
         return func(engine_uri, *args, **kwargs)
 

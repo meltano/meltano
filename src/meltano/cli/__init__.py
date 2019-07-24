@@ -8,6 +8,7 @@ from . import (
     install,
     invoke,
     ui,
+    upgrade,
     permissions,
     schedule,
     select,

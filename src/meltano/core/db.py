@@ -11,6 +11,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
+from meltano.core.migration_service import MigrationService
 
 
 SystemMetadata = MetaData()
@@ -19,6 +20,11 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = dict()
+_hooks = set()
+
+
+def register_engine_hook(hook):
+    _hooks.add(hook)
 
 
 def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
@@ -36,7 +42,13 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
 
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri)
-    init_hook(engine)
+
+    for hook in _hooks:
+        try:
+            hook(engine)
+        except Exception as e:
+            logging.exception(e)
+            logging.fatal(f"Can't initialize database.")
 
     create_session = sessionmaker(bind=engine)
     engine_session = (engine, create_session)
@@ -48,52 +60,6 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
         _engines[(project, engine_uri)] = engine_session
 
     return engine_session
-
-
-def init_hook(engine):
-    function_map = {"sqlite": init_sqlite_hook, "postgresql": init_postgresql_hook}
-
-    try:
-        function_map[engine.dialect.name](engine)
-    except KeyError:
-        raise Exception("Meltano only supports SQLite and PostgreSQL")
-    except Exception as e:
-        logging.exception(e)
-        logging.fatal(f"Can't initialize database.")
-
-
-def init_postgresql_hook(engine):
-    schema = os.getenv("PG_SCHEMA", "meltano")
-    DB.ensure_schema_exists(engine, schema)
-
-    SystemMetadata.schema = schema
-
-    # we need to manually set the schema for Table that
-    # are already imported.
-    for table in SystemMetadata.tables.values():
-        table.schema = schema
-
-    seed(engine)
-
-
-def init_sqlite_hook(engine):
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """Enable WAL to handle concurrent processes gracefully."""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.close()
-
-    event.listen(engine, "connect", set_sqlite_pragma, once=True)
-    seed(engine)
-
-
-# TODO: alembic hook?
-def seed(engine):
-    # import all the models
-    import meltano.models
-
-    # seed the database
-    SystemMetadata.create_all(engine)
 
 
 class DB:

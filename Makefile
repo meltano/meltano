@@ -132,8 +132,11 @@ bundle_ui: ui
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
 
+freeze_db:
+	scripts/alembic_freeze.py
+
 .PHONY: bundle
-bundle: bundle_ui
+bundle: bundle_ui freeze_db
 
 sdist: bundle
 	python setup.py sdist
