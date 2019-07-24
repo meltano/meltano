@@ -13,10 +13,9 @@ from .params import project, db_options
 
 
 @cli.command()
-@project
 @db_options
 @click.pass_context
-def upgrade(ctx, project, engine_uri):
+def upgrade(ctx, engine_uri):
     engine = create_engine(engine_uri)
 
     migration_service = MigrationService(engine)

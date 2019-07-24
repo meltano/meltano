@@ -6,11 +6,8 @@ import click.globals
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
-<<<<<<< Updated upstream
-from meltano.core.db import project_engine
-=======
 from meltano.core.migration_service import MigrationService
-from meltano.core.db import register_engine_hook
+from meltano.core.db import project_engine, register_engine_hook
 
 
 def sqlite_wal_hook(engine):
@@ -20,7 +17,6 @@ def sqlite_wal_hook(engine):
 
 def migrate_hook(engine):
     MigrationService(engine).upgrade()
->>>>>>> Stashed changes
 
 
 def db_options(func):
