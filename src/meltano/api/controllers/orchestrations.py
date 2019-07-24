@@ -16,7 +16,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import flatten, iso8601_datetime
+from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.api.models import db
 from meltano.cli.add import extractor
 
@@ -347,7 +347,8 @@ def save_pipeline_schedule() -> Response:
     endpoint for persisting a pipeline schedule
     """
     incoming = request.get_json()
-    name = incoming["name"]
+    # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
+    name = slugify(incoming["name"])
     extractor = incoming["extractor"]
     loader = incoming["loader"]
     transform = incoming["transform"]
