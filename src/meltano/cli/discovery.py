@@ -15,7 +15,6 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 
 
 @cli.command()
-@project
 @click.argument(
     "plugin_type",
     type=click.Choice(
@@ -31,6 +30,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
         ]
     ),
 )
+@project
 def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     try:
