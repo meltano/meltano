@@ -53,10 +53,7 @@ def job_state() -> Response:
     for job_id in job_ids:
         finder = JobFinder(job_id)
         state_job = finder.latest_success(db.session)
-        jobs.append({
-            "jobId": job_id,
-            "isComplete": state_job != None,
-        })
+        jobs.append({"jobId": job_id, "isComplete": state_job != None})
 
     return jsonify({"jobs": jobs})
 
