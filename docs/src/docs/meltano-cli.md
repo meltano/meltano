@@ -260,6 +260,10 @@ Its syntax is inspired by [pgbedrock](https://github.com/Squarespace/pgbedrock),
 
 All permissions are abreviated as `read` or `write` permissions, with Meltano generating the proper grants for each type of object.
 
+Tables and views are listed under `tables` and handled properly behind the scenes. 
+
+If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>S in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
+
 A specification file has the following structure:
 
 ```
