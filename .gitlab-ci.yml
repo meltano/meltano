@@ -6,9 +6,9 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - test
   - docs
   - build-base
+  - test
   - build-meltano
   - build-runner
   - test-docker
@@ -87,7 +87,7 @@ docs:
 .test: &test
   stage: test
   image:
-    name: registry.gitlab.com/meltano/meltano/base
+    name: registry.gitlab.com/meltano/meltano/base:$CI_COMMIT_SHA
     entrypoint: [""]
   before_script:
     - make bundle
