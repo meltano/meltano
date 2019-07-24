@@ -11,7 +11,7 @@ import sqlApi from '../../api/sql';
 const defaultState = utils.deepFreeze({
   activeReport: {},
   design: {
-    related_table: {},
+    relatedTable: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -53,7 +53,7 @@ const helpers = {
       return arr.filter(selected).map(x => x.name);
     };
 
-    const baseTable = state.design.related_table;
+    const baseTable = state.design.relatedTable;
     const columns = namesOfSelected(baseTable.columns);
     const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
@@ -75,7 +75,7 @@ const helpers = {
 
     const joins = state.design.joins
       .map((j) => {
-        const table = j.related_table;
+        const table = j.relatedTable;
         const newJoin = {};
 
         newJoin.name = j.name;
@@ -157,12 +157,12 @@ const getters = {
     if (design.label) {
       attributeTables.push({
         tableLabel: design.label,
-        table_name: design.from,
-        columns: design.related_table.columns
-          ? design.related_table.columns.filter(attributeFilter)
+        tableName: design.from,
+        columns: design.relatedTable.columns
+          ? design.relatedTable.columns.filter(attributeFilter)
           : [],
-        aggregates: design.related_table.aggregates
-          ? design.related_table.aggregates.filter(attributeFilter)
+        aggregates: design.relatedTable.aggregates
+          ? design.relatedTable.aggregates.filter(attributeFilter)
           : [],
       });
     }
@@ -170,12 +170,12 @@ const getters = {
       design.joins.forEach((join) => {
         attributeTables.push({
           tableLabel: join.label,
-          table_name: join.name,
-          columns: join.related_table.columns
-            ? join.related_table.columns.filter(attributeFilter)
+          tableName: join.name,
+          columns: join.relatedTable.columns
+            ? join.relatedTable.columns.filter(attributeFilter)
             : [],
-          aggregates: join.related_table.aggregates
-            ? join.related_table.aggregates.filter(attributeFilter)
+          aggregates: join.relatedTable.aggregates
+            ? join.relatedTable.aggregates.filter(attributeFilter)
             : [],
         });
       });
@@ -185,7 +185,7 @@ const getters = {
 
   getFilter(_, gettersRef) {
     // eslint-disable-next-line
-    return (table_name, name, filterType) => gettersRef.getFiltersByType(filterType).find(filter => filter.name === name && filter.table_name === table_name);
+    return (tableName, name, filterType) => gettersRef.getFiltersByType(filterType).find(filter => filter.name === name && filter.tableName === tableName);
   },
 
   getFiltersByType(state) {
@@ -194,7 +194,7 @@ const getters = {
 
   getIsAttributeInFilters(_, gettersRef) {
     // eslint-disable-next-line
-    return (table_name, name, filterType) => !!gettersRef.getFilter(table_name, name, filterType);
+    return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
   attributesCount(state) {
@@ -291,10 +291,10 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched columns
     commit('toggleCollapsed', join);
-    if (join.related_table.columns.length) {
+    if (join.relatedTable.columns.length) {
       return;
     }
-    designApi.getTable(join.related_table.name)
+    designApi.getTable(join.relatedTable.name)
       .then((response) => {
         commit('setJoinColumns', {
           columns: response.data.columns,
@@ -331,11 +331,11 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  toggleAggregate({ commit, getters }, { aggregate, table_name }) {
+  toggleAggregate({ commit, getters }, { aggregate, tableName }) {
     commit('toggleSelected', aggregate);
 
     if (!aggregate.selected) {
-      const filter = getters.getFilter(table_name, aggregate.name, 'aggregate');
+      const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
       if (filter) {
         commit('removeFilter', filter);
       }
@@ -441,9 +441,9 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  addFilter({ commit }, { table_name, attribute, filterType, expression = '', value = '', isActive = true }) {
+  addFilter({ commit }, { tableName, attribute, filterType, expression = '', value = '', isActive = true }) {
     const filter = {
-      table_name,
+      tableName,
       name: attribute.name,
       expression,
       value,
@@ -494,14 +494,14 @@ const mutations = {
     state.dialect = report.queryPayload.dialect;
 
     // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
-    const baseTable = state.design.related_table;
+    const baseTable = state.design.relatedTable;
     const queryPayload = report.queryPayload;
     const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
       acc.push({
         name: curr.name,
-        columns: curr.related_table.columns,
-        aggregates: curr.related_table.aggregates,
-        timeframes: curr.related_table.timeframes,
+        columns: curr.relatedTable.columns,
+        aggregates: curr.relatedTable.aggregates,
+        timeframes: curr.relatedTable.timeframes,
       });
       return acc;
     }, []);
@@ -592,8 +592,8 @@ const mutations = {
   setQueryResults(state, results) {
     state.results = results.results;
     state.keys = results.keys;
-    state.columnHeaders = results.column_headers;
-    state.columnNames = results.column_names;
+    state.columnHeaders = results.columnHeaders;
+    state.columnNames = results.columnNames;
     state.resultAggregates = results.aggregates;
   },
 
