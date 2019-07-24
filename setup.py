@@ -21,6 +21,7 @@ requires = [
     'pandas==0.24.1',
     'psycopg2==2.7.7',
     'psutil==5.6.3',
+    'pyhumps==0.4.0',
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',

@@ -12,9 +12,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#812](https://gitlab.com/meltano/meltano/issues/812) `meltano ui` will now stop stale Airflow workers when starting
 
 ### Changes
+* [#828](https://gitlab.com/meltano/meltano/issues/828) Docker installation instructions have been dogfooded, clarified, and moved to Installation section
 
 ### Fixes
 * [#807](https://gitlab.com/meltano/meltano/issues/807) Fix filter input validation when editing saved filters
+* [#822](https://gitlab.com/meltano/meltano/issues/822) Fix pipeline schedule naming via slugify to align with Airflow DAG naming requirements
 * [#820](https://gitlab.com/meltano/meltano/issues/820) Fix `meltano select` not properly connecting to the system database
 * [#787](https://gitlab.com/meltano/meltano/issues/787) Fix results sorting to support join tables
 
