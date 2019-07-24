@@ -44,35 +44,24 @@ const helpers = {
     return `${filterType}s`;
   },
   getQueryPayloadFromDesign(state) {
+    // Inline fn helpers
     const selected = x => x.selected;
     const namesOfSelected = (arr) => {
       if (!Array.isArray(arr)) {
         return null;
       }
-
       return arr.filter(selected).map(x => x.name);
     };
 
+    // Base table setup
     const baseTable = state.design.related_table;
     const columns = namesOfSelected(baseTable.columns);
     const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
-    let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn);
-    if (!sortColumn) {
-      sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn);
-    }
-    let order = null;
-    if (sortColumn && sortColumn.selected) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
-
+    // Join table(s) setup
     if (!state.design.joins) {
       state.design.joins = [];
     }
-
     const joins = state.design.joins
       .map((j) => {
         const table = j.related_table;
@@ -105,7 +94,26 @@ const helpers = {
       }))
       .filter(tf => tf.periods.length);
 
-    // Enforce number type for aggregates as v-model approach always overwrites as string
+    // Sorting setup - baseTable then joins if no match
+    let sortColumn = helpers.getSortColumn(state, baseTable);
+    if (!sortColumn) {
+      // Intentionally using state.design.joins vs joins to leverage join object vs join name
+      state.design.joins.some((join) => {
+        sortColumn = helpers.getSortColumn(state, join.related_table);
+        return Boolean(sortColumn);
+      });
+    }
+
+    // Ordering setup - TODO - Iterate when we implement multiple order sorting on backend
+    let order = null;
+    if (sortColumn && sortColumn.selected) {
+      order = {
+        column: sortColumn.name,
+        direction: state.sortDesc ? 'desc' : 'asc',
+      };
+    }
+
+    // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters);
     if (filters && filters.aggregates) {
       filters.aggregates = filters.aggregates
@@ -127,6 +135,17 @@ const helpers = {
       dialect: state.dialect,
       filters,
     };
+  },
+  getSortColumn(state, table) {
+    const finder = (collection, targetName) => collection.find(d => d.name === targetName);
+    let sortColumn;
+    if (table.columns) {
+      sortColumn = finder(table.columns, state.sortColumn);
+    }
+    if (table.aggregates && !sortColumn) {
+      sortColumn = finder(table.aggregates, state.sortColumn);
+    }
+    return sortColumn;
   },
 };
 
