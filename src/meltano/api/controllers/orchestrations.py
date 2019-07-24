@@ -64,7 +64,7 @@ def run():
     schedule_payload = request.get_json()
     job_id = run_elt(project, schedule_payload)
 
-    return jsonify({"jobId": job_id})
+    return jsonify({"jobId": job_id}), 202
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
