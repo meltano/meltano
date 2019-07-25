@@ -11,6 +11,7 @@ from meltano.migrations import MIGRATION_DIR, LOCK_PATH
 
 class MigrationUneededException(Exception):
     """Occurs when no migrations are needed."""
+
     pass
 
 
@@ -21,7 +22,7 @@ class MigrationService:
     def ensure_migration_needed(self, script, context, target_revision):
         current_head = context.get_current_revision()
 
-        for rev in script.iterate_revisions(current_head, 'base'):
+        for rev in script.iterate_revisions(current_head, "base"):
             if rev.revision == target_revision:
                 raise MigrationUneededException
 
