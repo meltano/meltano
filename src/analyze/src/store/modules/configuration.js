@@ -29,6 +29,9 @@ const getters = {
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== '';
   },
+  getRunningPipelineJobsCount(state) {
+    return state.pipelinePollers.length;
+  },
   getRunningPipelineJobIds(state) {
     return state.pipelinePollers.map(pipelinePoller => pipelinePoller.getMetadata().jobId);
   },
