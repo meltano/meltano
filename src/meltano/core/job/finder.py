@@ -10,7 +10,6 @@ class JobFinder:
     def __init__(self, job_id: str):
         self.job_id = job_id
 
-    # TODO add test
     def latest(self, session):
         return (
             session.query(Job)
