@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
+from pathlib import Path
 from alembic.script import ScriptDirectory
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH
 
+
+MIGRATION_DIR = Path("src/meltano/migrations")
+LOCK_PATH = MIGRATION_DIR.joinpath("db.lock")
 
 scripts = ScriptDirectory(str(MIGRATION_DIR))
 

@@ -8,9 +8,7 @@ Create Date: 2019-07-23 16:05:29.073296
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.ext.mutable import MutableDict
-from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag
-
-from meltano.core.job.job import JobState
+from enum import Enum
 
 
 # revision identifiers, used by Alembic.
@@ -19,13 +17,27 @@ down_revision = None
 branch_labels = None
 depends_on = None
 
+# compat for types declared in `meltano.core.sqlalchemy`
+# basically returns the `impl` type backing the field
+JSONEncodedDict = sa.VARCHAR
+IntFlag = sa.INTEGER
+
+
+# from `src/meltano/core/job.py`
+class State(Enum):
+    IDLE = (0, ("RUNNING", "FAIL"))
+    RUNNING = (1, ("SUCCESS", "FAIL"))
+    SUCCESS = (2, ())
+    FAIL = (3, ("RUNNING",))
+    DEAD = (4, ())
+
 
 def upgrade():
     op.create_table(
         "job",
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("job_id", sa.String),
-        sa.Column("state", JobState),
+        sa.Column("state", sa.Enum(State, name="job_state")),
         sa.Column("started_at", sa.DateTime),
         sa.Column("ended_at", sa.DateTime),
         sa.Column("payload", MutableDict.as_mutable(JSONEncodedDict)),

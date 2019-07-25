@@ -11,6 +11,7 @@ from sqlalchemy.sql import text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
+
 from meltano.core.migration_service import MigrationService
 
 
@@ -20,11 +21,6 @@ SystemModel = declarative_base(metadata=SystemMetadata)
 # Keep a Project → Engine mapping to serve
 # the same engine for the same Project
 _engines = dict()
-_hooks = set()
-
-
-def register_engine_hook(hook):
-    _hooks.add(hook)
 
 
 def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessionmaker):
@@ -43,12 +39,8 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     logging.debug(f"Creating engine {project}@{engine_uri}")
     engine = create_engine(engine_uri)
 
-    for hook in _hooks:
-        try:
-            hook(engine)
-        except Exception as e:
-            logging.exception(e)
-            logging.fatal(f"Can't initialize database.")
+    init_hook(engine)
+    seed(engine)
 
     create_session = sessionmaker(bind=engine)
     engine_session = (engine, create_session)
@@ -60,6 +52,27 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
         _engines[(project, engine_uri)] = engine_session
 
     return engine_session
+
+
+def init_hook(engine):
+    function_map = {"sqlite": init_sqlite_hook}
+
+    try:
+        function_map[engine.dialect.name](engine)
+    except KeyError:
+        pass
+    except Exception as e:
+        logging.exception(e)
+        logging.fatal(f"Can't initialize database.")
+
+
+def init_sqlite_hook(engine):
+    # enable the WAL
+    engine.execute("PRAGMA journal_mode=WAL")
+
+
+def seed(engine):
+    MigrationService(engine).upgrade()
 
 
 class DB:

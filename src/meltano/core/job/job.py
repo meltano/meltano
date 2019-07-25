@@ -37,15 +37,12 @@ class State(Enum):
         return self.name
 
 
-JobState = types.Enum(State, name="job_state")
-
-
 class Job(SystemModel):
     __tablename__ = "job"
 
     id = Column(types.Integer, primary_key=True)
     job_id = Column(types.String)
-    state = Column(JobState)
+    state = Column(types.Enum(State, name="job_state"))
     started_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)
     payload = Column(MutableDict.as_mutable(JSONEncodedDict))
