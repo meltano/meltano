@@ -20,28 +20,35 @@ We welcome contributions and improvements, please see the [contribution guidelin
 
 ### Metrics Preferences
 
-As you contribute to Meltano, you may want to disable metrics tracking globally rather than by project. To do this, you can do this by exporting a global variable.
+As you contribute to Meltano, you may want to disable metrics tracking globally rather than by project. To do this, you can do this by setting the environment variable `MELTANO_DISABLE_TRACKING=True`.
 
 #### bash
 
 1. Open your terminal
-2. Run `export MELTANO_DISABLE_TRACKING=True`
-3. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
-
-#### Zsh
-
-1. Open your terminal
-2. Run `open ~/.zshrc` to open your Zsh preferences file with a text editor
-3. Add the following lines to any new line / section in the file:
+2. Edit `~/.bashrc` with a text editor
+3. Add the following lines:
 
 ```bash
 # Disable tracking across all Meltano projects
 export MELTANO_DISABLE_TRACKING=True
 ```
 
-4. Save your changes
-5. Restart your terminal
-6. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
+4. Restart your terminal
+5. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
+
+#### Zsh
+
+1. Open your terminal
+2. Edit `~/.zshrc` with a text editor
+3. Add the following lines:
+
+```bash
+# Disable tracking across all Meltano projects
+export MELTANO_DISABLE_TRACKING=True
+```
+
+4. Restart your terminal
+5. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
 
 ## License
 
