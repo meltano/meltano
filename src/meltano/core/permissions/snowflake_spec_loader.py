@@ -509,11 +509,7 @@ class SnowflakeSpecLoader:
         tables = conn.show_tables()
         views = conn.show_views()
         for table in self.entities["table_refs"]:
-            if (
-                "*" not in table
-                and table.upper() not in tables
-                and table.upper() not in views
-            ):
+            if "*" not in table and table.upper() not in tables and table.upper() not in views:
                 error_messages.append(
                     f"Missing Entity Error: Table/View {table} was not found on"
                     " Snowflake Server. Please create it before continuing."

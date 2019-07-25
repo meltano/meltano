@@ -11,9 +11,13 @@ GRANT_PRIVILEGES_TEMPLATE = (
     "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
 )
 
-GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+GRANT_ALL_PRIVILEGES_TEMPLATE = (
+    "GRANT {privileges} ON ALL {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+)
 
-GRANT_FUTURE_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON FUTURE {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+GRANT_FUTURE_PRIVILEGES_TEMPLATE = (
+    "GRANT {privileges} ON FUTURE {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+)
 
 ALTER_USER_TEMPLATE = "ALTER USER {user_name} SET {privileges}"
 
@@ -582,62 +586,64 @@ class SnowflakeGrantsGenerator:
             )
             sql_commands.extend(new_commands)
 
+        
         if name_parts[2] == "*":
             # If *.* then you can grant all and grant future and exit
             for schema in schemas:
                 # Grant on ALL tables
                 sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
-                            privileges=privileges,
-                            resource_type="TABLE",
-                            resource_name=SnowflakeConnector.snowflaky(schema),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
+                                privileges=privileges,
+                                resource_type="TABLE",
+                                resource_name=SnowflakeConnector.snowflaky(schema),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
 
                 # Grant on ALL views
                 sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
-                            privileges=privileges,
-                            resource_type="VIEW",
-                            resource_name=SnowflakeConnector.snowflaky(schema),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
-
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
+                                privileges=privileges,
+                                resource_type="VIEW",
+                                resource_name=SnowflakeConnector.snowflaky(schema),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
+                
                 # Grant future on all tables
                 sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
-                            privileges=privileges,
-                            resource_type="TABLE",
-                            resource_name=SnowflakeConnector.snowflaky(schema),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
+                                privileges=privileges,
+                                resource_type="TABLE",
+                                resource_name=SnowflakeConnector.snowflaky(schema),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
                 # Grant future on all views
                 sql_commands.append(
-                    {
-                        "already_granted": False,
-                        "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
-                            privileges=privileges,
-                            resource_type="VIEW",
-                            resource_name=SnowflakeConnector.snowflaky(schema),
-                            role=SnowflakeConnector.snowflaky(role),
-                        ),
-                    }
-                )
+                        {
+                            "already_granted": False,
+                            "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
+                                privileges=privileges,
+                                resource_type="VIEW",
+                                resource_name=SnowflakeConnector.snowflaky(schema),
+                                role=SnowflakeConnector.snowflaky(role),
+                            ),
+                        }
+                    )
 
             return (sql_commands, usage_granted)
 
+        
         else:
             # Only one table/view to be granted permissions to
             if table.upper() in table_list:
@@ -674,7 +680,7 @@ class SnowflakeGrantsGenerator:
                     ),
                 }
             )
-
+        
         for db_view in views:
             already_granted = False
             if (
