@@ -26,6 +26,10 @@ RUN make sdist
 
 # runtime
 FROM python:3.6
+
+# meltano can run as a user
+RUN adduser meltano
+
 COPY --from=builder /build/dist /meltano/dist
 
 # install the built artifact
@@ -35,6 +39,9 @@ RUN pip install /meltano/dist/meltano-*.tar.gz
 
 # cleanup the build directory
 RUN rm -rf /meltano
+
+# switch to the `meltano` user
+USER meltano
 
 # meltano project directory, this is where you should
 # mount your application volume
