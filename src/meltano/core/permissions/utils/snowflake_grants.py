@@ -567,23 +567,9 @@ class SnowflakeGrantsGenerator:
             #  that will be granted the permissions
             table_list.extend(conn.show_tables(schema=schema))
             view_list.extend(conn.show_views(schema=schema))
-        # Check if the role has been granted usage on the schema
-        schema = f"{name_parts[0]}.{name_parts[1]}"
-        if (
-            schema.upper() not in usage_granted["schemas"]
-            and f"{name_parts[0].upper()}.*" not in usage_granted["schemas"]
-        ):
-            new_commands, usage_granted = self.generate_schema_grants(
-                role=role,
-                schema=schema,
-                grant_type="read",
-                usage_granted=usage_granted,
-                shared_dbs=shared_dbs,
-            )
-            sql_commands.extend(new_commands)
 
         if name_parts[2] == "*":
-            # If *.* then you can grant all and grant future and exit
+            # If *.* then you can grant all, grant future, and exit
             for schema in schemas:
                 # Grant on ALL tables
                 sql_commands.append(
