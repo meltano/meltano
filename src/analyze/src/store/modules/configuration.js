@@ -13,7 +13,7 @@ const defaultState = {
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
-  pipelineJobs: [],
+  pipelinePollers: [],
 };
 
 const getters = {
@@ -29,8 +29,8 @@ const getters = {
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== '';
   },
-  getPendingJobs(state) {
-    return { jobIds: state.pipelineJobs.map(job => job.pipelinePoller.getMetadata().jobId) };
+  getRunningPipelineJobIds(state) {
+    return state.pipelinePollers.map(pipelinePoller => pipelinePoller.getMetadata().jobId);
   },
 };
 
@@ -40,10 +40,11 @@ const actions = {
   clearLoaderInFocusConfiguration: ({ commit }) => commit('reset', 'loaderInFocusConfiguration'),
   clearConnectionInFocusConfiguration: ({ commit }) => commit('reset', 'connectionInFocusConfiguration'),
 
-  getAllPipelineSchedules({ commit }) {
+  getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules()
       .then((response) => {
         commit('setPipelines', response.data);
+        dispatch('rehydratePollers');
       });
   },
 
@@ -85,29 +86,42 @@ const actions = {
   },
 
   // eslint-disable-next-line no-shadow
-  getPolledJobStatus({ commit, getters, state }) {
-    return orchestrationsApi.getPolledJobStatus(getters.getPendingJobs)
+  getPolledPipelineJobStatus({ commit, getters, state }) {
+    return orchestrationsApi.getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
       .then((response) => {
         response.data.jobs.forEach((jobStatus) => {
           if (jobStatus.isComplete) {
-            const targetJob = state.pipelineJobs
-              .find(job => job.pipelinePoller.getMetadata().jobId === jobStatus.jobId);
-            commit('setPipelineIsRunning', { pipeline: targetJob.pipeline, value: false });
-            commit('removePipelineJob', targetJob);
+            const targetPoller = state.pipelinePollers
+              .find(pipelinePoller => pipelinePoller.getMetadata().jobId === jobStatus.jobId);
+            commit('removePipelinePoller', targetPoller);
+
+            const targetPipeline = state.pipelines.find(pipeline => pipeline.name === jobStatus.jobId.replace('job_', ''));
+            commit('setPipelineIsRunning', { pipeline: targetPipeline, value: false });
           }
         });
       });
   },
 
+  queuePipelinePoller({ commit, dispatch }, pollMetadata) {
+    const pollFn = () => dispatch('getPolledPipelineJobStatus');
+    const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
+    pipelinePoller.init();
+    commit('addPipelinePoller', pipelinePoller);
+  },
+
+  rehydratePollers({ dispatch, state }) {
+    // Handle page refresh condition resulting in jobs running but no pollers
+    const runningPipelines = state.pipelines.filter(pipeline => pipeline.isRunning);
+    if (runningPipelines.length > 0 && state.pipelinePollers.length === 0) {
+      runningPipelines.forEach(pipeline => dispatch('queuePipelinePoller', { jobId: `job_${pipeline.name}` }));
+    }
+  },
+
   run({ commit, dispatch }, pipeline) {
     return orchestrationsApi.run(pipeline)
       .then((response) => {
-        const pollMetadata = response.data;
-        const pollFn = () => dispatch('getPolledJobStatus');
-        const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
-        pipelinePoller.init();
+        dispatch('queuePipelinePoller', response.data);
         commit('setPipelineIsRunning', { pipeline, value: true });
-        commit('addPipelineJob', { pipeline, pipelinePoller });
       });
   },
 
@@ -173,14 +187,14 @@ const actions = {
 };
 
 const mutations = {
-  addPipelineJob(state, pipelineJob) {
-    state.pipelineJobs.push(pipelineJob);
+  addPipelinePoller(state, pipelinePoller) {
+    state.pipelinePollers.push(pipelinePoller);
   },
 
-  removePipelineJob(state, pipelineJob) {
-    pipelineJob.pipelinePoller.dispose();
-    const idx = state.pipelineJobs.indexOf(pipelineJob);
-    state.pipelineJobs.splice(idx, 1);
+  removePipelinePoller(state, pipelinePoller) {
+    pipelinePoller.dispose();
+    const idx = state.pipelinePollers.indexOf(pipelinePoller);
+    state.pipelinePollers.splice(idx, 1);
   },
 
   reset(state, attr) {

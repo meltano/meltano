@@ -22,7 +22,7 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', 'get/configuration'), pluginPayload);
   },
 
-  getPolledJobStatus(pollPayload) {
+  getPolledPipelineJobStatus(pollPayload) {
     return axios.post(utils.apiUrl('orchestrations', 'job/state'), pollPayload);
   },
 
