@@ -546,7 +546,7 @@ class SnowflakeGrantsGenerator:
                     schemas.append(schema)
         else:
             schemas = [f"{name_parts[0]}.{name_parts[1]}"]
-        print(schemas)
+        
         for schema in schemas:
             # first check if the role has been granted usage on the schema
             # either directly or indirectly (by granting to DB.*)
