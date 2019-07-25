@@ -13,9 +13,7 @@ class JobFinder:
     def latest(self, session):
         return (
             session.query(Job)
-            .filter(
-                (Job.job_id == self.job_id)
-            )
+            .filter((Job.job_id == self.job_id))
             .order_by(Job.started_at.desc())
             .first()
         )
