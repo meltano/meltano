@@ -8,11 +8,11 @@ from flask_executor import Executor
 from meltano.core.plugin import PluginRef, PluginType
 from meltano.core.project import Project
 
-executor = Executor()  # TODO name this executor_elt, follow the security pattern
+executor_elt = Executor()
 
 
 def setup_executor(app, project):
-    executor.init_app(app)
+    executor_elt.init_app(app)
 
 
 def run_elt(project: Project, schedule_payload: dict):
@@ -31,7 +31,7 @@ def run_elt(project: Project, schedule_payload: dict):
         "--transform",
         transform,
     ]
-    executor.submit(subprocess.run, cmd, capture_output=True)
+    executor_elt.submit(subprocess.run, cmd, capture_output=True)
     logging.debug(f"Defered `{' '.join(cmd)}` to the executor.")
 
     return job_id

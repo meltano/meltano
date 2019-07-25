@@ -2,7 +2,7 @@ import logging
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
-from meltano.core.job import JobFinder
+from meltano.core.job import JobFinder, State
 from meltano.core.plugin import PluginRef
 from meltano.core.plugin.error import PluginExecutionError
 from meltano.core.plugin.settings_service import (
@@ -52,8 +52,9 @@ def job_state() -> Response:
     jobs = []
     for job_id in job_ids:
         finder = JobFinder(job_id)
-        state_job = finder.latest_success(db.session)
-        jobs.append({"jobId": job_id, "isComplete": state_job != None})
+        state_job = finder.latest(db.session)
+        is_complete = state_job.state == State.SUCCESS
+        jobs.append({"jobId": job_id, "isComplete": is_complete})
 
     return jsonify({"jobs": jobs})
 
@@ -183,11 +184,15 @@ def get_pipeline_schedules():
     schedule_service = ScheduleService(db.session, project)
     schedules = schedule_service.schedules()
 
-    # TODO  init with isRunning based on pending status of
-    # job_id = f'job_{schedule.name})}'
-
     cleaned_schedules = []
     for schedule in list(schedules):
+
+        finder = JobFinder(f'job_{schedule.name}')
+        state_job = finder.latest(db.session)
+        is_running = False
+        if(state_job != None):
+            is_running = state_job.state == State.RUNNING
+
         cleaned_schedules.append(
             {
                 "name": schedule.name,
@@ -196,6 +201,7 @@ def get_pipeline_schedules():
                 "transform": schedule.transform,
                 "interval": schedule.interval,
                 "startDate": schedule.start_date,
+                "isRunning": is_running,
             }
         )
 

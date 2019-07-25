@@ -10,6 +10,17 @@ class JobFinder:
     def __init__(self, job_id: str):
         self.job_id = job_id
 
+    # TODO add test
+    def latest(self, session):
+        return (
+            session.query(Job)
+            .filter(
+                (Job.job_id == self.job_id)
+            )
+            .order_by(Job.started_at.desc())
+            .first()
+        )
+
     def latest_success(self, session):
         return (
             session.query(Job)
