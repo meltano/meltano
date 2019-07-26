@@ -78,6 +78,26 @@ npm install # or yarn
 npm run dev # or yarn dev
 ```
 
+### Meltano System Database
+
+Meltano API and CLI are both supported by a database that is managed via Alembic migrations.
+
+:::info Note
+[Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy. 
+:::
+
+Migrations for the system database are located inside the `meltano.migrations` module.
+
+To create a new migration, use the `alembic revision -m "message"` command, then edit the created file with the necessary database changes. Make sure to implement both `upgrade` and `downgrade`, so the migration is reversible, as this will be used in migration tests in the future.
+
+Each migration should be isolated from the `meltano` module, so don't import any model definition inside a migration.
+
+:::warning
+Meltano doesn't currently support auto-generating migration from the models definition.
+:::
+
+To run the migrations, use `meltano upgrade` inside a Meltano project.
+
 ## Documentation
 
 ### Text
