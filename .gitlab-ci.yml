@@ -87,7 +87,6 @@ docs:
     name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_SHA
     entrypoint: [""]
   before_script:
-    - make bundle
     - pip install '.[dev]'
   script:
     - pytest -v

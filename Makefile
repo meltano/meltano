@@ -136,9 +136,9 @@ freeze_db:
 	scripts/alembic_freeze.py
 
 .PHONY: bundle
-bundle: bundle_ui freeze_db
+bundle: bundle_ui
 
-sdist: bundle
+sdist: bundle freeze_db
 	python setup.py sdist
 
 docker_sdist: base_image
