@@ -251,7 +251,7 @@ const mutations = {
   },
 
   updatePipelines(state, pipeline) {
-    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.start_date);
+    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate);
     state.pipelines.push(pipeline);
   },
 };
