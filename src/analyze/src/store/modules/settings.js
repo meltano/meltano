@@ -1,8 +1,9 @@
-import _ from 'lodash';
+import lodash from 'lodash';
 
+import utils from '@/utils/utils';
 import settingsApi from '../../api/settings';
 
-const state = {
+const defaultState = utils.deepFreeze({
   settings: {
     connections: [],
   },
@@ -11,25 +12,25 @@ const state = {
     roles: [],
     permissions: [],
   },
-};
+});
 
 const getters = {
-  hasConnections() {
+  hasConnections(state) {
     return state.settings.connections && state.settings.connections.length;
   },
   isConnectionDialectSqlite() {
     return connectionDialect => connectionDialect === 'sqlite';
   },
-  rolesName() {
-    return _.map(state.acl.roles, _.property('name'));
+  rolesName(state) {
+    return lodash.map(state.acl.roles, lodash.property('name'));
   },
-  rolesContexts() {
-    return type => _.map(state.acl.roles, (r) => {
+  rolesContexts(state) {
+    return type => lodash.map(state.acl.roles, (r) => {
       // filter out other permission types
-      const perms = _(r.permissions).groupBy('type').get(type);
+      const perms = lodash(r.permissions).groupBy('type').get(type);
       return {
         name: r.name,
-        contexts: _.map(perms, 'context'),
+        contexts: lodash.map(perms, 'context'),
       };
     });
   },
@@ -48,7 +49,7 @@ const actions = {
         commit('setSettings', response.data.settings);
       });
   },
-  deleteConnection({ commit }, connection) {
+  deleteConnection({ commit, state }, connection) {
     const connectionToRemove = state.settings.connections
       .find(item => item === connection);
     settingsApi.deleteConnection(connectionToRemove)
@@ -77,7 +78,7 @@ const actions = {
         commit('assignUserRoles', { user, role });
       });
   },
-  deleteRole({ commit }, { role }) {
+  deleteRole({ commit, state }, { role }) {
     settingsApi.deleteRole({ name: role })
       .then(() => {
         commit('removeRole', role);
@@ -117,56 +118,56 @@ const actions = {
 };
 
 const mutations = {
-  setSettings(_store, settings) {
+  setSettings(state, settings) {
     state.settings = settings;
   },
-  setACL(_store, acl) {
+  setACL(state, acl) {
     state.acl = acl;
   },
-  addRole(_store, role) {
-    if (_.find(state.acl.roles, ['name', role.name])) {
+  addRole(state, role) {
+    if (lodash.find(state.acl.roles, ['name', role.name])) {
       return;
     }
 
-    state.acl.roles = _.concat(state.acl.roles, role);
+    state.acl.roles = lodash.concat(state.acl.roles, role);
   },
-  removeRole(_store, role) {
-    state.acl.roles = _.filter(state.acl.roles, r => r.name !== role);
+  removeRole(state, role) {
+    state.acl.roles = lodash.filter(state.acl.roles, r => r.name !== role);
   },
-  unassignUserRole(_store, { user, role }) {
-    const assignedUser = _.find(state.acl.users, ['username', user]);
-    assignedUser.roles = _.without(assignedUser.roles, role);
+  unassignUserRole(state, { user, role }) {
+    const assignedUser = lodash.find(state.acl.users, ['username', user]);
+    assignedUser.roles = lodash.without(assignedUser.roles, role);
   },
-  assignUserRoles(_store, { user, role }) {
-    const assignedUser = _.find(state.acl.users, ['username', user]);
+  assignUserRoles(state, { user, role }) {
+    const assignedUser = lodash.find(state.acl.users, ['username', user]);
 
     if (assignedUser && !assignedUser.roles.includes(role)) {
-      assignedUser.roles = _.concat(assignedUser.roles, role);
+      assignedUser.roles = lodash.concat(assignedUser.roles, role);
     }
   },
-  addRolePermission(_store, { permissionType, role, context }) {
-    const assignedRole = _.find(state.acl.roles, ['name', role]);
+  addRolePermission(state, { permissionType, role, context }) {
+    const assignedRole = lodash.find(state.acl.roles, ['name', role]);
     const perms = assignedRole.permissions[permissionType];
 
     if (assignedRole && !perms.includes(context)) {
-      assignedRole.permissions[permissionType] = _.concat(perms, context);
+      assignedRole.permissions[permissionType] = lodash.concat(perms, context);
     }
   },
-  removeRolePermission(_store, { permissionType, role, context }) {
-    const assignedRole = _.find(state.acl.roles, ['name', role]);
+  removeRolePermission(state, { permissionType, role, context }) {
+    const assignedRole = lodash.find(state.acl.roles, ['name', role]);
     const perms = assignedRole.permissions[permissionType];
 
-    assignedRole.permissions[permissionType] = _.without(perms, context);
+    assignedRole.permissions[permissionType] = lodash.without(perms, context);
   },
-  updateRole(_store, role) {
+  updateRole(state, role) {
     const update = r => (r.name === role.name ? role : r);
-    state.acl.roles = _.map(state.acl.roles, update);
+    state.acl.roles = lodash.map(state.acl.roles, update);
   },
 };
 
 export default {
   namespaced: true,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations,

@@ -473,7 +473,7 @@ class SnowflakeSpecLoader:
     def check_entities_on_snowflake_server(self) -> None:
         """
         Make sure that all [warehouses, dbs, schemas, tables, users, roles]
-        referenced in the spec are defined in SNowflake.
+        referenced in the spec are defined in Snowflake.
 
         Raises a SpecLoadingError with all the errors found while checking
         Snowflake for missinf entities.
@@ -507,10 +507,15 @@ class SnowflakeSpecLoader:
                 )
 
         tables = conn.show_tables()
+        views = conn.show_views()
         for table in self.entities["table_refs"]:
-            if "*" not in table and table.upper() not in tables:
+            if (
+                "*" not in table
+                and table.upper() not in tables
+                and table.upper() not in views
+            ):
                 error_messages.append(
-                    f"Missing Entity Error: Table {table} was not found on"
+                    f"Missing Entity Error: Table/View {table} was not found on"
                     " Snowflake Server. Please create it before continuing."
                 )
 

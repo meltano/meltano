@@ -196,3 +196,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         pass
 
     return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))
+
+
+def find_named(xs: Iterable[dict], name: str):
+    return next(x for x in xs if x["name"] == name)

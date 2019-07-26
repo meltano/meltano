@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-
 import _ from 'lodash';
+
 
 export default {
   name: 'QueryFilters',
@@ -11,10 +11,11 @@ export default {
         attributeHelper: {
           attribute: null,
           type: '',
-          table_name: '',
+          tableName: '',
         },
         expression: '',
         value: '',
+        isActive: true,
       },
     };
   },
@@ -35,15 +36,26 @@ export default {
     getFilterInputType() {
       return filterType => (filterType === 'aggregate' ? 'number' : 'text');
     },
+    getHasValidatedOptionals() {
+      return (expression, value) => this.getIsExpressionNullRelated(expression) || Boolean(value);
+    },
+    getIsExpressionNullRelated() {
+      return expression => expression === 'is_null' || expression === 'is_not_null';
+    },
+    getIsFilterValid() {
+      return filter => this.getHasValidatedOptionals(filter.expression, filter.value);
+    },
     isFirstFilterMatch() {
       return (filter) => {
-        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.table_name === filter.table_name && tempFilter.name === filter.name);
+        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.tableName === filter.tableName && tempFilter.name === filter.name);
         return match === filter;
       };
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      return vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression && vm.value;
+      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.expression;
+      const hasValidatedOptionals = this.getHasValidatedOptionals(vm.expression, vm.value);
+      return hasRequiredValues && hasValidatedOptionals;
     },
   },
   methods: {
@@ -53,13 +65,24 @@ export default {
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
-        table_name: vm.attributeHelper.table_name,
+        tableName: vm.attributeHelper.tableName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
         value: vm.value,
+        isActive: vm.isActive,
       });
       this.selectivelyClearAddFilterModel();
+    },
+    onChangeExpressionSelector(filter) {
+      const isNullRelated = this.getIsExpressionNullRelated(filter.expression);
+      if (isNullRelated) {
+        filter.value = '';
+      }
+    },
+    onChangeFilterValue(filter) {
+      const hasValidatedOptionals = this.getHasValidatedOptionals(filter.expression, filter.value);
+      filter.isActive = hasValidatedOptionals;
     },
     selectivelyClearAddFilterModel() {
       this.addFilterModel.value = '';
@@ -121,7 +144,7 @@ export default {
                       :key='column.label'
                       :value="{
                         attribute: column,
-                        table_name: attributeTable.table_name,
+                        tableName: attributeTable.tableName,
                         type: 'column'}">
                       {{column.label}}
                     </option>
@@ -131,7 +154,7 @@ export default {
                       :key='aggregate.label'
                       :value="{
                         attribute: aggregate,
-                        table_name: attributeTable.table_name,
+                        tableName: attributeTable.tableName,
                         type: 'aggregate'}">
                       {{aggregate.label}}
                     </option>
@@ -144,7 +167,9 @@ export default {
             <p class="control is-expanded">
               <span
                 class="select is-fullwidth is-small">
-                <select v-model='addFilterModel.expression'>
+                <select
+                  v-model='addFilterModel.expression'
+                  @change='onChangeExpressionSelector(addFilterModel)'>
                   <option
                     v-for="filterOption in filterOptions"
                     :key='filterOption.label'
@@ -157,6 +182,7 @@ export default {
             <p class="control is-expanded">
               <input
                 class="input is-small"
+                :disabled='getIsExpressionNullRelated(addFilterModel.expression)'
                 :type="getFilterInputType(addFilterModel.attributeHelper.type)"
                 @focus="$event.target.select()"
                 v-model='addFilterModel.value'
@@ -179,7 +205,7 @@ export default {
 
           <tr
             v-for='(filter, index) in getFlattenedFilters'
-            :key='`${filter.table_name}-${filter.name}-${index}`'>
+            :key='`${filter.tableName}-${filter.name}-${index}`'>
             <td>
               <p class="is-small">
                 <span v-if='isFirstFilterMatch(filter)'>
@@ -191,7 +217,9 @@ export default {
               <p class="control is-expanded">
                 <span
                   class="select is-fullwidth is-small">
-                  <select v-model='filter.expression'>
+                  <select
+                    v-model='filter.expression'
+                    @change='onChangeExpressionSelector(filter)'>
                     <option
                       v-for="filterOption in filterOptions"
                       :key='filterOption.label'
@@ -201,13 +229,20 @@ export default {
               </p>
             </td>
             <td>
-              <p class="control is-expanded">
+              <p class="control has-icons-right is-expanded">
                 <input
                   class="input is-small"
+                  :class="{ 'is-danger': !getIsFilterValid(filter) }"
+                  :disabled='getIsExpressionNullRelated(filter.expression)'
                   :type="getFilterInputType(filter.filterType)"
                   @focus="$event.target.select()"
+                  @input="onChangeFilterValue(filter)"
                   v-model='filter.value'
-                  placeholder="Filter value">
+                  :placeholder="getIsFilterValid(filter) ? 'Filter value' : 'Invalid value'">
+                <span class="icon is-small is-right">
+                  <font-awesome-icon
+                    :icon="getIsFilterValid(filter) ? 'check' : 'exclamation-triangle'"></font-awesome-icon>
+                </span>
               </p>
             </td>
             <td>

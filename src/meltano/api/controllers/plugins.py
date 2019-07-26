@@ -29,21 +29,20 @@ def installed():
 @pluginsBP.route("/add", methods=["POST"])
 def add():
     payload = request.get_json()
-    plugin_type = PluginType(payload["pluginType"])
+    plugin_type = PluginType(payload["plugin_type"])
     plugin_name = payload["name"]
 
     project = Project.find()
     add_service = ProjectAddService(project)
-
     plugin = add_service.add(plugin_type, plugin_name)
 
-    return jsonify({"name": plugin.name, "pluginType": plugin.type})
+    return jsonify(plugin.canonical())
 
 
 @pluginsBP.route("/install", methods=["POST"])
 def install():
     payload = request.get_json()
-    plugin_type = PluginType(payload["pluginType"])
+    plugin_type = PluginType(payload["plugin_type"])
     plugin_name = payload["name"]
 
     project = Project.find()
@@ -64,4 +63,4 @@ def install():
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
-    return jsonify({"name": plugin.name, "pluginType": plugin.type})
+    return jsonify(plugin.canonical())

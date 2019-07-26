@@ -14,7 +14,6 @@ SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
 
 # Meltano
 # -----------------
-LOG_PATH = os.getenv("MELTANO_LOG_PATH", "meltano.log")
 MELTANO_AUTHENTICATION = os.getenv("MELTANO_AUTHENTICATION") in TRUTHY
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "")
 AIRFLOW_DISABLED = os.getenv("MELTANO_DISABLE_AIRFLOW") in TRUTHY
@@ -71,3 +70,7 @@ MAIL_DEFAULT_SENDER = '"Meltano" <bot@metlano.com>'
 
 GITLAB_CLIENT_ID = os.getenv("OAUTH_GITLAB_APPLICATION_ID")
 GITLAB_CLIENT_SECRET = os.getenv("OAUTH_GITLAB_SECRET")
+
+# Flask-RESTful
+
+RESTFUL_JSON = {}

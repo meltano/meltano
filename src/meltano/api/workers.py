@@ -3,7 +3,7 @@ import requests
 import threading
 import time
 import webbrowser
-
+import psutil
 from colorama import Fore
 
 from watchdog.observers import Observer
@@ -58,26 +58,6 @@ class MeltanoBackgroundCompiler:
         self.observer.stop()
 
 
-class AirflowWorker(threading.Thread):
-    def __init__(self, project: Project, airflow: PluginInstall = None):
-        super().__init__()
-
-        self.project = project
-        self._plugin = airflow or ConfigService(project).find_plugin("airflow")
-
-    def start_all(self):
-        invoker = invoker_factory(db.session, self.project, self._plugin)
-        self._webserver = invoker.invoke("webserver")
-        self._scheduler = invoker.invoke("scheduler")
-
-    def run(self):
-        return self.start_all()
-
-    def stop(self):
-        self._webserver.terminate()
-        self._scheduler.terminate()
-
-
 class UIAvailableWorker(threading.Thread):
     def __init__(self, url, open_browser=False):
         super().__init__()
@@ -103,3 +83,72 @@ class UIAvailableWorker(threading.Thread):
 
     def stop(self):
         self._terminate = True
+
+
+class AirflowWorker(threading.Thread):
+    def __init__(self, project: Project, airflow: PluginInstall = None):
+        super().__init__()
+
+        self.project = project
+        self._plugin = airflow or ConfigService(project).find_plugin("airflow")
+        self._webserver = None
+        self._scheduler = None
+
+    def kill_stale_workers(self):
+        stale_workers = []
+        workers_pid = map(self.pid_path, ("webserver", "scheduler"))
+
+        for f in workers_pid:
+            try:
+                pid = int(f.open().read())
+                stale_workers.append(psutil.Process(pid))
+            except psutil.NoSuchProcess:
+                f.unlink()
+            except FileNotFoundError:
+                pass
+
+        def on_terminate(proc):
+            logging.info(f"Process {proc} ended with exit code {proc.returncode}")
+
+        for p in stale_workers:
+            logging.debug(f"Process {p} is stale, terminating it.")
+            p.terminate()
+
+        gone, alive = psutil.wait_procs(stale_workers, timeout=5, callback=on_terminate)
+
+        # kill the rest
+        for p in alive:
+            p.kill()
+
+    def start_all(self):
+        logs_dir = self.project.run_dir("airflow", "logs")
+        invoker = invoker_factory(db.session, self.project, self._plugin)
+
+        with logs_dir.joinpath("webserver.log").open(
+            "w"
+        ) as webserver, logs_dir.joinpath("scheduler.log").open(
+            "w"
+        ) as scheduler, self.pid_path(
+            "webserver"
+        ).open(
+            "w"
+        ) as webserver_pid, self.pid_path(
+            "scheduler"
+        ).open(
+            "w"
+        ) as scheduler_pid:
+            self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
+            self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
+
+            webserver_pid.write(str(self._webserver.pid))
+            scheduler_pid.write(str(self._scheduler.pid))
+
+    def pid_path(self, name):
+        return self.project.run_dir("airflow", f"{name}.pid")
+
+    def run(self):
+        self.kill_stale_workers()
+        self.start_all()
+
+    def stop(self):
+        self.kill_stale_workers()

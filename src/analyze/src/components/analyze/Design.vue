@@ -15,13 +15,24 @@ export default {
       isNewDashboardModalOpen: false,
     };
   },
+  beforeDestroy() {
+    this.$store.dispatch('designs/resetDefaults');
+  },
   created() {
     const { slug, model, design } = this.$route.params;
-    this.$store.dispatch('designs/getDesign', { model, design, slug });
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    const uponDesign = this.$store.dispatch('designs/getDesign', { model, design, slug });
+    const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins');
+
+    Promise.all([uponDesign, uponPlugins])
       .then(() => {
-        this.dialect = this.installedPlugins.connections[0].name;
+        const defaultDialect = localStorage.getItem(`dialect:${this.currentModel}:${this.currentDesign}`)
+                              || localStorage.getItem('dialect')
+                              || this.installedPlugins.connections[0].name;
+
+          // don't use the setter here not to update the user's preferences
+        this.$store.commit('designs/setDialect', defaultDialect);
       });
+
     this.$store.dispatch('designs/getFilterOptions');
   },
   filters: {
@@ -96,6 +107,12 @@ export default {
       },
       set(value) {
         this.$store.commit('designs/setDialect', value);
+
+        // set the default dialect for unknown designs
+        localStorage.setItem('dialect', value);
+
+        // set the connection for this specific design
+        localStorage.setItem(`dialect:${this.currentModel}:${this.currentDesign}`, value);
       },
     },
   },
@@ -404,25 +421,25 @@ export default {
                 has-background-white-bis
                 has-text-grey
                 is-expandable"
-                :class="{'is-collapsed': design.related_table.collapsed}"
-                @click="tableRowClicked(design.related_table)">
+                :class="{'is-collapsed': design.relatedTable.collapsed}"
+                @click="tableRowClicked(design.relatedTable)">
                 <span class="icon is-small panel-icon">
                   <font-awesome-icon icon="table"></font-awesome-icon>
                 </span>
                 {{design.label}}
                 </a>
             </template>
-            <template v-if="!design.related_table.collapsed">
+            <template v-if="!design.relatedTable.collapsed">
               <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinColumnAggregateHeader(design.related_table.columns)">
+                  v-if="showJoinColumnAggregateHeader(design.relatedTable.columns)">
                 Columns
               </a>
-              <template v-for="timeframe in design.related_table.timeframes">
+              <template v-for="timeframe in design.relatedTable.timeframes">
                 <a class="panel-block dimension-group"
                     :key="timeframe.label"
-                    v-if="!timeframe.related_view.hidden"
+                    v-if="!timeframe.relatedView.hidden"
                     @click="timeframeSelected(timeframe)"
                     :class="{'is-active': timeframe.selected}">
                   {{timeframe.label}}
@@ -438,7 +455,7 @@ export default {
                 </template>
               </template>
               <a class="panel-block space-between has-text-weight-medium"
-                  v-for="column in design.related_table.columns"
+                  v-for="column in design.relatedTable.columns"
                   :key="column.label"
                   v-if="!column.hidden"
                   @click="columnSelected(column)"
@@ -457,11 +474,11 @@ export default {
               <a class="panel-block
                   panel-block-heading
                   has-background-white"
-                  v-if="showJoinColumnAggregateHeader(design.related_table.aggregates)">
+                  v-if="showJoinColumnAggregateHeader(design.relatedTable.aggregates)">
                 Aggregates
               </a>
               <a class="panel-block space-between has-text-weight-medium"
-                  v-for="aggregate in design.related_table.aggregates"
+                  v-for="aggregate in design.relatedTable.aggregates"
                   :key="aggregate.label"
                   @click="aggregateSelected(aggregate)"
                   :class="{'is-active': aggregate.selected}">
@@ -500,10 +517,10 @@ export default {
                     panel-block-heading
                     has-text-weight-light
                     has-background-white"
-                    v-if="showJoinColumnAggregateHeader(join.related_table.columns)">
+                    v-if="showJoinColumnAggregateHeader(join.relatedTable.columns)">
                     Columns
                   </a>
-                  <template v-for="timeframe in join.related_table.timeframes">
+                  <template v-for="timeframe in join.relatedTable.timeframes">
                     <a class="panel-block timeframe"
                         v-if="!timeframe.hidden"
                         @click="isConnectionDialectSqlite(dialect) || timeframeSelected(timeframe)"
@@ -529,7 +546,7 @@ export default {
                       </template>
                     </template>
                   </template>
-                  <template v-for="column in join.related_table.columns">
+                  <template v-for="column in join.relatedTable.columns">
                     <a class="panel-block space-between has-text-weight-medium"
                       v-if="!column.hidden"
                       :key="column.label"
@@ -550,10 +567,10 @@ export default {
                   <a class="panel-block
                     panel-block-heading
                     has-background-white"
-                    v-if="showJoinColumnAggregateHeader(join.related_table.aggregates)">
+                    v-if="showJoinColumnAggregateHeader(join.relatedTable.aggregates)">
                     Aggregates
                   </a>
-                  <template v-for="aggregate in join.related_table.aggregates">
+                  <template v-for="aggregate in join.relatedTable.aggregates">
                     <a class="panel-block space-between has-text-weight-medium"
                       v-if="!aggregate.hidden"
                       :key="aggregate.label"

@@ -17,9 +17,10 @@ from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import flatten, iso8601_datetime
-from meltano.api.models import db
+from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.cli.add import extractor
+from meltano.api.models import db
+from meltano.api.json import freeze_keys
 
 from meltano.api.executor import run_elt
 
@@ -47,14 +48,14 @@ def job_state() -> Response:
     """
     project = Project.find()
     poll_payload = request.get_json()
-    job_ids = poll_payload["jobIds"]
+    job_ids = poll_payload["job_ids"]
 
     jobs = []
     for job_id in job_ids:
         finder = JobFinder(job_id)
         state_job = finder.latest(db.session)
         is_complete = state_job.state == State.SUCCESS
-        jobs.append({"jobId": job_id, "isComplete": is_complete})
+        jobs.append({"job_id": job_id, "is_complete": is_complete})
 
     return jsonify({"jobs": jobs})
 
@@ -65,7 +66,7 @@ def run():
     schedule_payload = request.get_json()
     job_id = run_elt(project, schedule_payload)
 
-    return jsonify({"jobId": job_id}), 202
+    return jsonify({"job_id": job_id}), 202
 
 
 @orchestrationsBP.route("/get/configuration", methods=["POST"])
@@ -78,12 +79,13 @@ def get_plugin_configuration() -> Response:
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(db.session, project)
 
+    config = flatten(
+        settings.as_config(plugin, sources=[PluginSettingValueSource.DB]), reducer="dot"
+    )
+
     return jsonify(
         {
-            "config": flatten(
-                settings.as_config(plugin, sources=[PluginSettingValueSource.DB]),
-                reducer="dot",
-            ),
+            "config": freeze_keys(config),
             "settings": settings.get_definition(plugin).settings,
         }
     )
@@ -116,8 +118,8 @@ def selectEntities() -> Response:
     """
     project = Project.find()
     incoming = request.get_json()
-    extractor_name = incoming["extractorName"]
-    entity_groups = incoming["entityGroups"]
+    extractor_name = incoming["extractor_name"]
+    entity_groups = incoming["entity_groups"]
     select_service = SelectService(project, extractor_name)
 
     for entity_group in entity_groups:
@@ -182,28 +184,14 @@ def get_pipeline_schedules():
     """
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)
-    schedules = schedule_service.schedules()
-
-    cleaned_schedules = []
-    for schedule in list(schedules):
-
-        finder = JobFinder(f"job_{schedule.name}")
+    schedules = [s._asdict() for s in schedule_service.schedules()]
+    for schedule in schedules:
+        finder = JobFinder(f"job_{schedule['name']}")
         state_job = finder.latest(db.session)
         is_running = state_job.state is State.RUNNING if state_job else False
+        schedule["is_running"] = is_running
 
-        cleaned_schedules.append(
-            {
-                "name": schedule.name,
-                "extractor": schedule.extractor,
-                "loader": schedule.loader,
-                "transform": schedule.transform,
-                "interval": schedule.interval,
-                "startDate": schedule.start_date,
-                "isRunning": is_running,
-            }
-        )
-
-    return jsonify(cleaned_schedules)
+    return jsonify(schedules)
 
 
 @orchestrationsBP.route("/save/pipeline_schedule", methods=["POST"])
@@ -212,12 +200,13 @@ def save_pipeline_schedule() -> Response:
     endpoint for persisting a pipeline schedule
     """
     incoming = request.get_json()
-    name = incoming["name"]
+    # Airflow requires alphanumeric characters, dashes, dots and underscores exclusively
+    name = slugify(incoming["name"])
     extractor = incoming["extractor"]
     loader = incoming["loader"]
     transform = incoming["transform"]
     interval = incoming["interval"]
-    start_date = incoming["startDate"]
+    start_date = incoming["start_date"]
 
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)

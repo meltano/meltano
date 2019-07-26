@@ -3,7 +3,7 @@ import subprocess
 import click
 
 from . import cli
-from .params import project, db_options
+from .params import project
 from meltano.api.app import start
 from meltano.core.db import project_engine
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -29,11 +29,8 @@ from meltano.core.tracking import GoogleAnalyticsTracker
     help="The hostname (or IP address) to bind on",
     envvar="MELTANO_API_HOSTNAME",
 )
-@db_options
 @project
-def ui(project, debug, bind_port, reload, bind, engine_uri):
-    project_engine(project, engine_uri, default=True)
-
+def ui(project, debug, bind_port, reload, bind):
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
 
