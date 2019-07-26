@@ -1,5 +1,5 @@
+ARG BASE_IMAGE=meltano/meltano/base
 FROM $BASE_IMAGE as builder
-ENV NODE_VERSION 10
 
 WORKDIR /meltano
 
