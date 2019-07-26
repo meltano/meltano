@@ -166,7 +166,7 @@ runner:
 ##########
 
 .test_docker: &test_docker
-  stage: test-docker
+  stage: test
   image:
     name: $CI_REGISTRY_IMAGE:$IMAGE_TAG
     entrypoint: [""]

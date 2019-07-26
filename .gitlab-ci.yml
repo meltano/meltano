@@ -8,14 +8,11 @@ include:
 stages:
   - docs
   - build-base
-  - test
   - build-meltano
   - test
   - build-runner
-  - test-docker
   - publish
   - review
-  # - production
 
 lint:
   stage: test
