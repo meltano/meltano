@@ -1,14 +1,13 @@
 import logging
+import requests
 import threading
 import time
-import requests
 import webbrowser
 import psutil
 from colorama import Fore
 
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
-
 from meltano.core.project import Project
 from meltano.core.plugin import PluginInstall
 from meltano.core.config_service import ConfigService

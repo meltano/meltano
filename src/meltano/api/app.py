@@ -61,12 +61,14 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
+    from .executor import setup_executor
     from .security import security, users, setup_security
     from .security.oauth import setup_oauth
     from .json import setup_json
 
     db.init_app(app)
     mail.init_app(app)
+    setup_executor(app, project)
     setup_security(app, project)
     setup_oauth(app)
     setup_json(app)

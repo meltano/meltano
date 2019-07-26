@@ -1,6 +1,7 @@
 import Vue from 'vue';
 
 import utils from '@/utils/utils';
+import poller from '@/utils/poller';
 import lodash from 'lodash';
 
 import orchestrationsApi from '../../api/orchestrations';
@@ -12,6 +13,7 @@ const defaultState = utils.deepFreeze({
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
   pipelines: [],
+  pipelinePollers: [],
 });
 
 const getters = {
@@ -27,6 +29,12 @@ const getters = {
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== '';
   },
+  getRunningPipelineJobsCount(state) {
+    return state.pipelinePollers.length;
+  },
+  getRunningPipelineJobIds(state) {
+    return state.pipelinePollers.map(pipelinePoller => pipelinePoller.getMetadata().jobId);
+  },
 };
 
 const actions = {
@@ -35,10 +43,11 @@ const actions = {
   clearLoaderInFocusConfiguration: ({ commit }) => commit('reset', 'loaderInFocusConfiguration'),
   clearConnectionInFocusConfiguration: ({ commit }) => commit('reset', 'connectionInFocusConfiguration'),
 
-  getAllPipelineSchedules({ commit }) {
+  getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules()
       .then((response) => {
         commit('setPipelines', response.data);
+        dispatch('rehydratePollers');
       });
   },
 
@@ -77,6 +86,50 @@ const actions = {
 
   getPluginConfiguration(_, pluginPayload) {
     return orchestrationsApi.getPluginConfiguration(pluginPayload);
+  },
+
+  // eslint-disable-next-line no-shadow
+  getPolledPipelineJobStatus({ commit, getters, state }) {
+    return orchestrationsApi.getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
+      .then((response) => {
+        response.data.jobs.forEach((jobStatus) => {
+          if (jobStatus.isComplete) {
+            const targetPoller = state.pipelinePollers
+              .find(pipelinePoller => pipelinePoller.getMetadata().jobId === jobStatus.jobId);
+            commit('removePipelinePoller', targetPoller);
+
+            const targetPipeline = state.pipelines.find(pipeline => pipeline.name === jobStatus.jobId.replace('job_', ''));
+            commit('setPipelineIsRunning', { pipeline: targetPipeline, value: false });
+          }
+        });
+      });
+  },
+
+  queuePipelinePoller({ commit, dispatch }, pollMetadata) {
+    const pollFn = () => dispatch('getPolledPipelineJobStatus');
+    const pipelinePoller = poller.create(pollFn, pollMetadata, 8000);
+    pipelinePoller.init();
+    commit('addPipelinePoller', pipelinePoller);
+  },
+
+  rehydratePollers({ dispatch, state }) {
+    // Handle page refresh condition resulting in jobs running but no pollers
+    const runningPipelines = state.pipelines.filter(pipeline => pipeline.isRunning);
+    runningPipelines.forEach((pipeline) => {
+      const jobId = `job_${pipeline.name}`;
+      const isMissingPoller = state.pipelinePollers.find(pipelinePoller => pipelinePoller.getMetadata().jobId === jobId) === undefined;
+      if (isMissingPoller) {
+        dispatch('queuePipelinePoller', { jobId });
+      }
+    });
+  },
+
+  run({ commit, dispatch }, pipeline) {
+    return orchestrationsApi.run(pipeline)
+      .then((response) => {
+        dispatch('queuePipelinePoller', response.data);
+        commit('setPipelineIsRunning', { pipeline, value: true });
+      });
   },
 
   savePluginConfiguration(_, configPayload) {
@@ -141,6 +194,16 @@ const actions = {
 };
 
 const mutations = {
+  addPipelinePoller(state, pipelinePoller) {
+    state.pipelinePollers.push(pipelinePoller);
+  },
+
+  removePipelinePoller(state, pipelinePoller) {
+    pipelinePoller.dispose();
+    const idx = state.pipelinePollers.indexOf(pipelinePoller);
+    state.pipelinePollers.splice(idx, 1);
+  },
+
   reset(state, attr) {
     if (defaultState.hasOwnProperty(attr)) {
       state[attr] = lodash.cloneDeep(defaultState[attr]);
@@ -172,6 +235,10 @@ const mutations = {
     state.connectionInFocusConfiguration = configuration;
   },
 
+  setPipelineIsRunning(_, { pipeline, value }) {
+    Vue.set(pipeline, 'isRunning', value);
+  },
+
   setPipelines(state, pipelines) {
     pipelines.forEach((pipeline) => {
       pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate);
@@ -184,7 +251,7 @@ const mutations = {
   },
 
   updatePipelines(state, pipeline) {
-    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.start_date);
+    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate);
     state.pipelines.push(pipeline);
   },
 };

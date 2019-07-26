@@ -30,6 +30,7 @@ requires = [
     'fasteners==0.15.0',
     'flask>=1.0.2',
     'flask-cors==3.0.7',
+    'flask-executor==0.9.2',
     'flask-sqlalchemy==2.3.2',
     'flask-restful==0.3.7',
     'flask-jwt-extended==3.17.0',
