@@ -1,5 +1,5 @@
-[run]
-source = src/
-omit =
-     */site-packages/*
-     tests/*
+[paths]
+source = 
+  src/meltano
+  **/site-packages/meltano
+  **/site-packages/meltano*/meltano

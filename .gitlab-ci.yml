@@ -93,7 +93,10 @@ docs:
     - make bundle
     - pip install '.[dev]'
   script:
-    - pytest -v --cov-report html --cov-report term --cov
+    - pytest -v --cov-report= --cov meltano
+    - coverage combine .coverage
+    - coverage report
+    - coverage html
   artifacts:
     paths:
       - htmlcov/
