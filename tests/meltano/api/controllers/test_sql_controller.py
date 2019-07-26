@@ -33,14 +33,14 @@ class TestSqlController:
             "meltano.api.controllers.sql.SqlHelper.get_db_engine", return_value=engine
         )
         def _post(payload, engine_mock):
-            return api.post(self.url(app, "carbon", "region"), json=payload)
+            with app.test_request_context():
+                return api.post(self.url(app, "carbon", "region"), json=payload)
 
         return _post
 
     @classmethod
     def url(cls, app, topic, design):
-        with app.test_request_context():
-            return url_for("sql.get_sql", topic_name=topic, design_name=design)
+        return url_for("sql.get_sql", topic_name=topic, design_name=design)
 
     def test_get_sql(self, post, payload_builder_factory):
         self.assert_empty_query(post, payload_builder_factory())

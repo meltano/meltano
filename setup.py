@@ -9,12 +9,10 @@ requires = [
     'alembic==1.0.11',
     'authlib==0.10',
     'backoff==1.8.0',
-    'urllib3==1.23',
     'bcrypt==3.1.6',
+    'Cerberus==1.2',
     'click==7.0',
     'colorama==0.3.9',
-    'Cerberus==1.2',
-    'sqlparse==0.3.0',
     'gitpython==2.1.11',
     'jsonschema==2.6.0',
     'markdown==3.0.1',
@@ -22,6 +20,7 @@ requires = [
     'pandas==0.24.1',
     'psycopg2==2.7.7',
     'psutil==5.6.3',
+    'pyhumps==0.4.0',
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',
@@ -40,13 +39,15 @@ requires = [
     'python-dotenv==0.10.1',
     'python-gitlab==1.8.0',
     'simplejson==3.16.0',
+    'urllib3==1.23',
+    'sqlparse==0.3.0',
     'watchdog==0.9.0',
 ]
 
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
 conflicts = [
-    'idna==2.7',
     'aenum==2.1.2',
+    'idna==2.7',
 ]
 
 dev_requires = [
@@ -59,6 +60,7 @@ dev_requires = [
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',
     'ipython==7.5.0',
+    'pytest-cov==2.6.1',
 ]
 
 setup(

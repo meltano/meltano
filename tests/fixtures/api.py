@@ -30,7 +30,7 @@ def impersonate(app):
     return factory
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def app(create_app):
     return create_app()
 
@@ -41,7 +41,7 @@ def app_context(app):
         yield
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def create_app(request, add_model, project):
     def _factory(**kwargs):
         config = {
@@ -65,6 +65,6 @@ def create_app(request, add_model, project):
     return _factory
 
 
-@pytest.fixture
+@pytest.fixture()
 def api(app):
     return app.test_client()

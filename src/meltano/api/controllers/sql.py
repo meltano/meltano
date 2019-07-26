@@ -10,6 +10,7 @@ from flask_security import auth_required
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.security import api_auth_required
+from meltano.api.json import freeze_keys
 from meltano.core.project import Project
 from meltano.core.sql.filter import FilterOptions
 
@@ -99,7 +100,11 @@ def get_sql(topic_name, design_name):
 
     results = sqlHelper.get_query_results(dialect, outgoing_sql)
 
-    base_dict["results"] = results
+    # we need to `freeze` each result because we are sending an
+    # inference map with it (`keys`).
+    # thus we need to make sure the lookup will still be valid
+    base_dict["results"] = [freeze_keys(r) for r in results]
+
     if not len(results):
         base_dict["empty"] = True
     else:

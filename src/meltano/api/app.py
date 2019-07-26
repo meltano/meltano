@@ -63,11 +63,13 @@ def create_app(config={}):
     from .mail import mail
     from .security import security, users, setup_security
     from .security.oauth import setup_oauth
+    from .json import setup_json
 
     db.init_app(app)
     mail.init_app(app)
     setup_security(app, project)
     setup_oauth(app)
+    setup_json(app)
     CORS(app, origins="*")
 
     from .controllers.root import root

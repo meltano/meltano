@@ -1,7 +1,7 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex';
-
 import _ from 'lodash';
+
 
 export default {
   name: 'QueryFilters',
@@ -11,7 +11,7 @@ export default {
         attributeHelper: {
           attribute: null,
           type: '',
-          table_name: '',
+          tableName: '',
         },
         expression: '',
         value: '',
@@ -47,13 +47,13 @@ export default {
     },
     isFirstFilterMatch() {
       return (filter) => {
-        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.table_name === filter.table_name && tempFilter.name === filter.name);
+        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.tableName === filter.tableName && tempFilter.name === filter.name);
         return match === filter;
       };
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.table_name && vm.expression;
+      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.expression;
       const hasValidatedOptionals = this.getHasValidatedOptionals(vm.expression, vm.value);
       return hasRequiredValues && hasValidatedOptionals;
     },
@@ -65,7 +65,7 @@ export default {
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
-        table_name: vm.attributeHelper.table_name,
+        tableName: vm.attributeHelper.tableName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
@@ -144,7 +144,7 @@ export default {
                       :key='column.label'
                       :value="{
                         attribute: column,
-                        table_name: attributeTable.table_name,
+                        tableName: attributeTable.tableName,
                         type: 'column'}">
                       {{column.label}}
                     </option>
@@ -154,7 +154,7 @@ export default {
                       :key='aggregate.label'
                       :value="{
                         attribute: aggregate,
-                        table_name: attributeTable.table_name,
+                        tableName: attributeTable.tableName,
                         type: 'aggregate'}">
                       {{aggregate.label}}
                     </option>
@@ -205,7 +205,7 @@ export default {
 
           <tr
             v-for='(filter, index) in getFlattenedFilters'
-            :key='`${filter.table_name}-${filter.name}-${index}`'>
+            :key='`${filter.tableName}-${filter.name}-${index}`'>
             <td>
               <p class="is-small">
                 <span v-if='isFirstFilterMatch(filter)'>
