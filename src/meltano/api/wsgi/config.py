@@ -10,6 +10,7 @@ project = Project.find()
 
 _workers = []
 _workers.append(MeltanoBackgroundCompiler(project))
+
 try:
     _workers.append(AirflowWorker(project))
 except:
