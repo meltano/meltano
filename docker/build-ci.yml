@@ -115,19 +115,6 @@ meltano:
 
 # Manages:
 #   - meltano/meltano/runner:<sha>
-runner_dev:
-  <<: *docker_build
-  stage: build-runner
-  variables:
-    DOCKERFILE: $CI_PROJECT_DIR/docker/runner/Dockerfile
-    IMAGE_NAME: $CI_REGISTRY_IMAGE/runner
-    EXTRA_ARGS: "--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE:$CI_COMMIT_SHA"
-  except:
-    - master
-    - tags
-
-# Manages:
-#   - meltano/meltano/runner:<sha>
 #   - meltano/meltano/runner:edge
 runner_edge:
   <<: *docker_build
