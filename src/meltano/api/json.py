@@ -11,7 +11,7 @@ class FrozenDict(dict):
 
 def freeze_keys(d: dict):
     """
-    Mark the dictionarry as frozen, no automatic conversion
+    Mark the dictionary as frozen, no automatic conversion
     will be operated on it.
     """
     return FrozenDict(d)

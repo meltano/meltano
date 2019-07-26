@@ -220,6 +220,6 @@ def save_pipeline_schedule() -> Response:
             interval,
             start_date=iso8601_datetime(start_date),
         )
-        return jsonify(schedule), 201
+        return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:
         return jsonify(e.schedule), 200
