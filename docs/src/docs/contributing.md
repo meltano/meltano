@@ -82,7 +82,7 @@ npm run dev # or yarn dev
 
 Meltano API and CLI are both supported by a database that is managed via Alembic migrations.
 
-:::info Note
+:::tip Note
 [Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy. 
 :::
 
