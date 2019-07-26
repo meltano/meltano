@@ -154,7 +154,7 @@ class RolesResource(Resource):
 class RolePermissionsResource(Resource):
     def _parse_request(self):
         payload = request.get_json()
-        return payload["role"], payload["permissionType"], payload["context"]
+        return payload["role"], payload["permission_type"], payload["context"]
 
     @roles_required("admin")
     @marshal_with(AclResource.RoleDefinition)

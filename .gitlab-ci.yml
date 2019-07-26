@@ -8,6 +8,7 @@ include:
 stages:
   - docs
   - build-base
+  - test
   - build-meltano
   - test
   - build-runner
@@ -89,10 +90,14 @@ docs:
   before_script:
     - pip install '.[dev]'
   script:
-    - pytest -v
+    - pytest -v --cov-report= --cov meltano
+    - coverage combine .coverage
+    - coverage report
+    - coverage html
   artifacts:
     paths:
-      - pytest.log
+      - htmlcov/
+    when: on_success
 
 test_postgres:
   <<: *test

@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Toasted from 'vue-toasted';
+import axios from 'axios';
 import Auth from '@/middleware/auth';
 import FatalError from '@/middleware/fatalError';
 import FontAwesome from './font-awesome';
@@ -56,6 +57,9 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
     },
   ],
 });
+
+// Axios config
+axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel';
 
 /* eslint-disable no-new */
 new Vue({

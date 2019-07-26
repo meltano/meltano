@@ -102,6 +102,28 @@ class SnowflakeConnector:
 
         return names
 
+    def show_views(self, database: str = None, schema: str = None) -> List[str]:
+        names = []
+
+        if schema:
+            query = f"SHOW TERSE VIEWS IN SCHEMA {schema}"
+        elif database:
+            query = f"SHOW TERSE VIEWS IN DATABASE {database}"
+        else:
+            query = f"SHOW TERSE VIEWS IN ACCOUNT"
+
+        with self.engine.connect() as connection:
+            results = connection.execute(query).fetchall()
+
+            for result in results:
+                names.append(
+                    f"{result['database_name'].upper()}"
+                    + f".{result['schema_name'].upper()}"
+                    + f".{result['name'].upper()}"
+                )
+
+        return names
+
     def show_grants_to_role(self, role) -> List[str]:
         grants = {}
 

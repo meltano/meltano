@@ -11,6 +11,10 @@ GRANT_PRIVILEGES_TEMPLATE = (
     "GRANT {privileges} ON {resource_type} {resource_name} TO ROLE {role}"
 )
 
+GRANT_ALL_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON ALL {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+
+GRANT_FUTURE_PRIVILEGES_TEMPLATE = "GRANT {privileges} ON FUTURE {resource_type}S IN SCHEMA {resource_name} TO ROLE {role}"
+
 ALTER_USER_TEMPLATE = "ALTER USER {user_name} SET {privileges}"
 
 GRANT_OWNERSHIP_TEMPLATE = (
@@ -202,7 +206,7 @@ class SnowflakeGrantsGenerator:
 
         try:
             for table in config["privileges"]["tables"]["read"]:
-                new_commands, usage_granted = self.generate_table_grants(
+                new_commands, usage_granted = self.generate_table_and_view_grants(
                     role=role,
                     table=table,
                     grant_type="read",
@@ -219,7 +223,7 @@ class SnowflakeGrantsGenerator:
 
         try:
             for table in config["privileges"]["tables"]["write"]:
-                new_commands, usage_granted = self.generate_table_grants(
+                new_commands, usage_granted = self.generate_table_and_view_grants(
                     role=role,
                     table=table,
                     grant_type="write",
@@ -461,7 +465,7 @@ class SnowflakeGrantsGenerator:
 
         return (sql_commands, usage_granted)
 
-    def generate_table_grants(
+    def generate_table_and_view_grants(
         self,
         role: str,
         table: str,
@@ -470,10 +474,10 @@ class SnowflakeGrantsGenerator:
         shared_dbs: Set,
     ) -> Tuple[List[str], Dict]:
         """
-        Generate the GRANT statements for TABLEs.
+        Generate the GRANT statements for TABLEs and VIEWs.
 
         role: the name of the role the privileges are GRANTed to
-        table: the name of the TABLE (e.g. "RAW.PUBLIC.MY_TABLE")
+        table: the name of the TABLE/VIEW (e.g. "RAW.PUBLIC.MY_TABLE")
         grant_type: What type of privileges are granted? One of {"read", "write"}
         usage_granted: Passed by generate_grant_privileges_to_role() to track all
             all the entities a role has been granted access (USAGE) to.
@@ -498,7 +502,7 @@ class SnowflakeGrantsGenerator:
             privileges = "SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES"
         else:
             raise SpecLoadingError(
-                f"Wrong grant_type {spec_path} provided to generate_table_grants()"
+                f"Wrong grant_type {spec_path} provided to generate_table_and_view_grants()"
             )
 
         # Generate the INFORMATION_SCHEMA identifier for that database
@@ -519,47 +523,33 @@ class SnowflakeGrantsGenerator:
             )
             sql_commands.extend(new_commands)
 
-        # Gather the tables that privileges will be granted to
+        # Gather the tables/views that privileges will be granted to
         tables = []
+        views = []
 
-        if name_parts[2] == "*":
-            schemas = []
-            conn = SnowflakeConnector()
+        # List of all tables/views in schema
+        table_list = []
+        view_list = []
 
-            if name_parts[1] == "*":
-                # If {DB_NAME}.*.* was provided as the identifier, we have to fetch
-                #  each schema in database DB_NAME, so that we can grant privileges
-                #  for all tables in that schema
-                # (You can not GRANT to all table with a wild card for the schema name)
-                db_schemas = conn.show_schemas(name_parts[0])
-                for schema in db_schemas:
-                    if schema != info_schema:
-                        schemas.append(schema)
-            else:
-                schemas = [f"{name_parts[0]}.{name_parts[1]}"]
+        schemas = []
 
-            for schema in schemas:
-                # first check if the role has been granted usage on the schema
-                # either directly or indirectly (by granting to DB.*)
-                if (
-                    schema.upper() not in usage_granted["schemas"]
-                    and f"{name_parts[0].upper()}.*" not in usage_granted["schemas"]
-                ):
-                    new_commands, usage_granted = self.generate_schema_grants(
-                        role=role,
-                        schema=schema,
-                        grant_type="read",
-                        usage_granted=usage_granted,
-                        shared_dbs=shared_dbs,
-                    )
-                    sql_commands.extend(new_commands)
+        conn = SnowflakeConnector()
 
-                # And then add the tables for that schema to the tables[]
-                #  that will be granted the permissions
-                tables.extend(conn.show_tables(schema=schema))
+        if name_parts[1] == "*":
+            # If {DB_NAME}.*.* was provided as the identifier, we have to fetch
+            #  each schema in database DB_NAME, so that we can grant privileges
+            #  for all tables in that schema
+            # (You can not GRANT to all table with a wild card for the schema name)
+            db_schemas = conn.show_schemas(name_parts[0])
+            for schema in db_schemas:
+                if schema != info_schema:
+                    schemas.append(schema)
         else:
-            # Check if the role has been granted usage on the schema
-            schema = f"{name_parts[0]}.{name_parts[1]}"
+            schemas = [f"{name_parts[0]}.{name_parts[1]}"]
+
+        for schema in schemas:
+            # first check if the role has been granted usage on the schema
+            # either directly or indirectly (by granting to DB.*)
             if (
                 schema.upper() not in usage_granted["schemas"]
                 and f"{name_parts[0].upper()}.*" not in usage_granted["schemas"]
@@ -573,8 +563,73 @@ class SnowflakeGrantsGenerator:
                 )
                 sql_commands.extend(new_commands)
 
-            # Only one table to be granted permissions to
-            tables = [table]
+            # And then add the tables for that schema to the tables[] and views[]
+            #  that will be granted the permissions
+            table_list.extend(conn.show_tables(schema=schema))
+            view_list.extend(conn.show_views(schema=schema))
+
+        if name_parts[2] == "*":
+            # If *.* then you can grant all, grant future, and exit
+            for schema in schemas:
+                # Grant on ALL tables
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
+                            privileges=privileges,
+                            resource_type="TABLE",
+                            resource_name=SnowflakeConnector.snowflaky(schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+                # Grant on ALL views
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_ALL_PRIVILEGES_TEMPLATE.format(
+                            privileges=privileges,
+                            resource_type="VIEW",
+                            resource_name=SnowflakeConnector.snowflaky(schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+                # Grant future on all tables
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
+                            privileges=privileges,
+                            resource_type="TABLE",
+                            resource_name=SnowflakeConnector.snowflaky(schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+                # Grant future on all views
+                sql_commands.append(
+                    {
+                        "already_granted": False,
+                        "sql": GRANT_FUTURE_PRIVILEGES_TEMPLATE.format(
+                            privileges=privileges,
+                            resource_type="VIEW",
+                            resource_name=SnowflakeConnector.snowflaky(schema),
+                            role=SnowflakeConnector.snowflaky(role),
+                        ),
+                    }
+                )
+
+            return (sql_commands, usage_granted)
+
+        else:
+            # Only one table/view to be granted permissions to
+            if table.upper() in table_list:
+                tables = [table]
+            if table.upper() in view_list:
+                views = [table]
 
         # And then grant privileges to all tables in that schema
         for db_table in tables:
@@ -601,6 +656,35 @@ class SnowflakeGrantsGenerator:
                         privileges=privileges,
                         resource_type="TABLE",
                         resource_name=SnowflakeConnector.snowflaky(db_table),
+                        role=SnowflakeConnector.snowflaky(role),
+                    ),
+                }
+            )
+
+        for db_view in views:
+            already_granted = False
+            if (
+                grant_type == "read"
+                and self.check_grant_to_role(role, "SELECT", "VIEW", db_view)
+            ) or (
+                grant_type == "write"
+                and self.check_grant_to_role(role, "SELECT", "VIEW", db_view)
+                and self.check_grant_to_role(role, "INSERT", "VIEW", db_view)
+                and self.check_grant_to_role(role, "UPDATE", "VIEW", db_view)
+                and self.check_grant_to_role(role, "DELETE", "VIEW", db_view)
+                and self.check_grant_to_role(role, "TRUNCATE", "VIEW", db_view)
+                and self.check_grant_to_role(role, "REFERENCES", "VIEW", db_view)
+            ):
+                already_granted = True
+
+            # And then grant privileges to the db_view
+            sql_commands.append(
+                {
+                    "already_granted": already_granted,
+                    "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                        privileges=privileges,
+                        resource_type="VIEW",
+                        resource_name=SnowflakeConnector.snowflaky(db_view),
                         role=SnowflakeConnector.snowflaky(role),
                     ),
                 }
