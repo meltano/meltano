@@ -189,9 +189,7 @@ def get_pipeline_schedules():
 
         finder = JobFinder(f"job_{schedule.name}")
         state_job = finder.latest(db.session)
-        is_running = False
-        if state_job != None:
-            is_running = state_job.state == State.RUNNING
+        is_running = state_job.state is State.RUNNING if state_job else False
 
         cleaned_schedules.append(
             {
