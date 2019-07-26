@@ -1,6 +1,7 @@
 .docker_build_before_script: &docker_build_before_script |
   apk add git
   export BASE_SHA=$(git hash-object requirements.txt)
+  echo Building Meltano on $BASE_SHA
 
 .docker_build_script: &docker_build_script |
   export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
