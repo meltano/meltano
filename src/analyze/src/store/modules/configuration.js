@@ -115,9 +115,13 @@ const actions = {
   rehydratePollers({ dispatch, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
     const runningPipelines = state.pipelines.filter(pipeline => pipeline.isRunning);
-    if (runningPipelines.length > 0 && state.pipelinePollers.length === 0) {
-      runningPipelines.forEach(pipeline => dispatch('queuePipelinePoller', { jobId: `job_${pipeline.name}` }));
-    }
+    runningPipelines.forEach((pipeline) => {
+      const jobId = `job_${pipeline.name}`;
+      const isMissingPoller = state.pipelinePollers.find(pipelinePoller => pipelinePoller.getMetadata().jobId === jobId) === undefined;
+      if (isMissingPoller) {
+        dispatch('queuePipelinePoller', { jobId });
+      }
+    });
   },
 
   run({ commit, dispatch }, pipeline) {
