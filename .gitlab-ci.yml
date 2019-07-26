@@ -127,8 +127,7 @@ publish:
   before_script:
     - pip install twine
   script:
-    - make sdist
-    - twine upload dist/*
+    - twine upload /meltano/dist/*
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
