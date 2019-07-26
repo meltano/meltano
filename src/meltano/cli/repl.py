@@ -19,6 +19,7 @@ def repl():
         "from meltano.core.plugin.settings_service import PluginSettingsService",
         "from meltano.core.config_service import ConfigService",
         "from meltano.core.db import project_engine",
+        "from meltano.core.job import Job, State",
         "%autoreload 2",
     ]
     # c.InteractiveShell.colors = 'LightBG'

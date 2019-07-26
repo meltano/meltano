@@ -6,6 +6,7 @@ import click.globals
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
+from meltano.core.migration_service import MigrationService
 from meltano.core.db import project_engine
 
 

@@ -36,7 +36,7 @@ def engine_sessionmaker(project, engine_uri):
 def session(request, engine_sessionmaker):
     """Creates a new database session for a test."""
     engine, sessionmaker = engine_sessionmaker
-    truncate_tables(engine, schema="meltano")
+    truncate_tables(engine)
 
     session = sessionmaker()
 
@@ -45,7 +45,7 @@ def session(request, engine_sessionmaker):
     # teardown
     session.close()
     logging.debug("Session closed.")
-    truncate_tables(engine, schema="meltano")
+    truncate_tables(engine)
 
 
 def truncate_tables(engine, schema=None):
@@ -55,7 +55,11 @@ def truncate_tables(engine, schema=None):
         with con.begin():
             meta = MetaData(bind=engine, schema=schema)
             meta.reflect()
+
             for table in meta.sorted_tables:
+                if table.name == "alembic_version":
+                    continue
+
                 logging.debug(f"table {table} truncated.")
                 con.execute(table.delete())
 
