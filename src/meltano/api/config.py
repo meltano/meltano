@@ -1,6 +1,7 @@
 import os
 import datetime
 
+
 TRUTHY = ("True", "true", "1", "yes", "on")
 
 # Flask
@@ -26,7 +27,7 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 # -----------------
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_API_DATABASE_URI")
+SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_API_DATABASE_URI",  f"sqlite:///meltano.db")
 
 # Flask-security
 # -----------------
