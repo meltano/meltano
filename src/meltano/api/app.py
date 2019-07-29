@@ -18,18 +18,28 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
-from . import config as default_config
 
 
 logger = logging.getLogger(__name__)
 
 
 def create_app(config={}):
-    app = Flask(__name__)
-    app.config.from_object(reload(default_config))
+    project = Project.find()
+
+    app = Flask(
+        __name__, instance_path=str(project.root), instance_relative_config=True
+    )
+
+    app.config.from_object("meltano.api.config")
+    app.config.from_pyfile("ui.cfg", silent=True)
     app.config.update(**config)
 
-    project = Project.find()
+    # the database should be instance_relative if we are using `sqlite`
+    scheme, netloc, path, *parts = urlsplit(app.config["SQLALCHEMY_DATABASE_URI"])
+    if scheme == "sqlite":
+        app.config["SQLALCHEMY_DATABASE_URI"] = (
+            scheme + ":///" + app.instance_path + path
+        )
 
     # Initial compilation
     compiler = ProjectCompiler(project)
