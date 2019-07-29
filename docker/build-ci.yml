@@ -91,6 +91,7 @@ meltano_edge:
       - dist
 
 # Manages:
+#  - meltano/meltano:<sha>
 #  - meltano/meltano:<tag>
 #  - meltano/meltano:latest
 meltano:
@@ -98,13 +99,14 @@ meltano:
   stage: build-meltano
   variables:
     DOCKERFILE: docker/prod/Dockerfile
-    IMAGE_TAG: $CI_COMMIT_TAG
   before_script:
     - *docker_build_before_script
     - export EXTRA_ARGS="--build-arg BASE_IMAGE=$CI_REGISTRY_IMAGE/base:$BASE_SHA"
   script:
     - *docker_build_script
+    - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG
     - docker tag $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG $DOCKER_IMAGE_NAME:latest
+    - docker push $DOCKER_IMAGE_NAME:$CI_COMMIT_TAG
     - docker push $DOCKER_IMAGE_NAME:latest
   only:
     variables:
@@ -156,34 +158,9 @@ runner:
 .test_docker: &test_docker
   stage: test
   image:
-    name: $CI_REGISTRY_IMAGE:$IMAGE_TAG
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
   script:
     - mkdir -p /meltano_projects && cd /meltano_projects
     - meltano init --no_usage_stats carbon && cd carbon
     - meltano elt tap-carbon-intensity target-sqlite
-
-test_e2e_dev:
-  <<: *test_docker
-  variables:
-    IMAGE_TAG: $CI_COMMIT_SHA
-  except:
-    - master
-    - tags
-
-test_e2e_edge:
-  <<: *test_docker
-  variables:
-    IMAGE_TAG: edge
-  only:
-    - master
-  except:
-    - tags
-
-test_e2e:
-  <<: *test_docker
-  variables:
-    IMAGE_TAG: latest
-  only:
-    variables:
-      - $CI_COMMIT_TAG =~ /^v*/
