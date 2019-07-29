@@ -2,6 +2,7 @@
 import { mapState, mapGetters, mapActions } from 'vuex';
 
 import Dropdown from '@/components/generic/Dropdown';
+import QuerySortBy from '@/components/analyze/QuerySortBy';
 
 export default {
   name: 'ResultTable',
@@ -23,6 +24,7 @@ export default {
   },
   components: {
     Dropdown,
+    QuerySortBy,
   },
   methods: {
     ...mapActions('designs', [
@@ -53,7 +55,7 @@ export default {
                 'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
                 'is-desc': sortDesc,
               }"
-              @click="sortBy(columnNames[i])">
+              >
             <span>{{columnHeader}}</span>
             <div class='is-pulled-right'>
               <Dropdown
@@ -64,9 +66,7 @@ export default {
                 is-up
                 ref='order-dropdown'>
                 <div class="dropdown-content">
-                  <div class="dropdown-item">
-                    Test...
-                  </div>
+                  <QuerySortBy></QuerySortBy>
                 </div>
               </Dropdown>
             </div>

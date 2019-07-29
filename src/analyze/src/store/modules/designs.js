@@ -37,6 +37,10 @@ const defaultState = utils.deepFreeze({
     columns: [],
     aggregates: [],
   },
+  order: {
+    assigned: [],
+    unassigned: [],
+  },
 });
 
 const helpers = {

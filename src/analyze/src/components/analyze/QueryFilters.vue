@@ -2,7 +2,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex';
 import _ from 'lodash';
 
-
 export default {
   name: 'QueryFilters',
   data() {
