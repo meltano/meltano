@@ -148,11 +148,31 @@ loaders:
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
     settings:
       - name: delimiter
-        value: "\t"
+        kind: dropdown
+        options:
+          - label: Comma (,)
+            value: ','
+            default: true
+          - label: Tab (  )
+            value: '\t'
+          - label: Semi-colon (;)
+            value: ';'
+          - label: Pipes (|)
+            value: '|'
+          - label: Carets (^)
+            value: '^'
+        value: ","
         description: A one-character string used to separate fields. It defaults to ','
       - name: quotechar
+        kind: dropdown
+        options:
+          - label: Single Quote (')
+            value: "'"
+            default: true
+          - label: Double Quote (")
+            value: '"'
         value: "'"
-        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '"'.
+        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-snowflake
     namespace: snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
