@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+* [#796](https://gitlab.com/meltano/meltano/issues/796) Add dropdown option to Connector Settings to allow for more defined UI interactions
 
 ### Fixes
 
