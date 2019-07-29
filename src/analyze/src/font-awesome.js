@@ -20,6 +20,7 @@ import {
   faInfoCircle,
   faTable,
   faSearch,
+  faSort,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -51,6 +52,7 @@ export default {
     library.add(faInfoCircle);
     library.add(faTable);
     library.add(faSearch);
+    library.add(faSort);
     library.add(faUser);
 
     Vue.component('font-awesome-icon', FontAwesomeIcon);

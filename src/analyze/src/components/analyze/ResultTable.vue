@@ -1,6 +1,8 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 
+import Dropdown from '@/components/generic/Dropdown';
+
 export default {
   name: 'ResultTable',
   computed: {
@@ -19,6 +21,9 @@ export default {
       'isColumnSelectedAggregate',
     ]),
   },
+  components: {
+    Dropdown,
+  },
   methods: {
     ...mapActions('designs', [
       'sortBy',
@@ -28,18 +33,17 @@ export default {
 </script>
 
 <template>
-    <div class="result-data">
-      <div class="notification is-italic" v-if="!hasResults">
-        No results
-      </div>
+  <div class="result-data">
+
+    <div v-if="hasResults">
+
       <table class="table
           is-bordered
           is-striped
           is-narrow
           is-hoverable
           is-fullwidth
-          is-size-7"
-          v-if="hasResults">
+          is-size-7">
         <thead>
           <th v-for="(columnHeader, i) in columnHeaders"
               class="sortable-header"
@@ -50,7 +54,22 @@ export default {
                 'is-desc': sortDesc,
               }"
               @click="sortBy(columnNames[i])">
-            {{columnHeader}}
+            <span>{{columnHeader}}</span>
+            <div class='is-pulled-right'>
+              <Dropdown
+                :label="'1 asc'"
+                button-classes="is-small has-text-interactive-secondary"
+                icon-open='sort'
+                is-right-aligned
+                is-up
+                ref='order-dropdown'>
+                <div class="dropdown-content">
+                  <div class="dropdown-item">
+                    Test...
+                  </div>
+                </div>
+              </Dropdown>
+            </div>
           </th>
         </thead>
         <tbody>
@@ -68,6 +87,12 @@ export default {
         </tbody>
       </table>
     </div>
+
+    <div class="notification is-italic" v-else>
+      No results
+    </div>
+
+  </div>
 </template>
 
 <style lang="scss">
@@ -75,8 +100,6 @@ export default {
   cursor: pointer;
 }
 .result-data {
-  width: 100%;
-  overflow-x: auto;
   table {
     width: 100%;
     max-width: 100%;

@@ -346,7 +346,7 @@ export default {
                   label="SQL"
                   button-classes='is-text is-small'
                   :disabled='!currentSQL'
-                  is-caret-removed>
+                  is-icon-removed>
                   <div class="dropdown-content">
                     <div class="level">
                       <div class="level-item">

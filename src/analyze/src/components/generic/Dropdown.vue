@@ -33,11 +33,19 @@ export default {
     menuClasses: {
       type: String,
     },
+    iconOpen: {
+      type: String,
+      default: 'caret-up',
+    },
+    iconClose: {
+      type: String,
+      default: 'caret-down',
+    },
     disabled: {
       type: Boolean,
       default: false,
     },
-    isCaretRemoved: {
+    isIconRemoved: {
       type: Boolean,
       default: false,
     },
@@ -45,6 +53,9 @@ export default {
       type: Boolean,
     },
     isRightAligned: {
+      type: Boolean,
+    },
+    isUp: {
       type: Boolean,
     },
   },
@@ -80,6 +91,7 @@ export default {
           'is-active': isOpen,
           'is-right': isRightAligned,
           'is-fullwidth': isFullWidth,
+          'is-up': isUp,
         }"
         @click='onBubbleClose'>
     <div class="dropdown-trigger">
@@ -90,8 +102,8 @@ export default {
               aria-haspopup="true"
               @click="toggleDropdown">
         <span v-if="label">{{label}}</span>
-        <span v-if='!isCaretRemoved' class="icon is-small">
-          <font-awesome-icon :icon="isOpen ? 'caret-up' : 'caret-down'"></font-awesome-icon>
+        <span v-if='!isIconRemoved' class="icon is-small">
+          <font-awesome-icon :icon="isOpen ? iconClose: iconOpen"></font-awesome-icon>
         </span>
       </button>
     </div>
