@@ -36,7 +36,7 @@ def create_app(config={}):
 
     # the database should be instance_relative if we are using `sqlite`
     scheme, netloc, path, *parts = urlsplit(app.config["SQLALCHEMY_DATABASE_URI"])
-    if scheme == "sqlite":
+    if scheme == "sqlite" and path:
         app.config["SQLALCHEMY_DATABASE_URI"] = (
             scheme + ":///" + app.instance_path + path
         )
