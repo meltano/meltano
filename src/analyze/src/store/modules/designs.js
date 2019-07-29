@@ -31,7 +31,6 @@ const defaultState = utils.deepFreeze({
   sortColumn: null,
   sortDesc: false,
   dialect: null,
-  selectedAttributeCount: 0,
   filterOptions: [],
   filters: {
     columns: [],
@@ -219,8 +218,25 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
-  attributesCount(state) {
-    return state.selectedAttributeCount;
+  getSelectedAttributesCount(state) {
+    let total = 0;
+    const counter = (acc, attribute) => acc + (attribute.selected ? 1 : 0);
+    const batcher = (table, attributeTypes) => {
+      attributeTypes.forEach((attributeType) => {
+        if (table[attributeType]) {
+          total += table[attributeType].reduce(counter, 0);
+        }
+      });
+    };
+
+    batcher(state.design.relatedTable, ['columns', 'aggregates', 'timeframes']);
+    if (state.design.joins) {
+      state.design.joins.forEach((join) => {
+        batcher(join.relatedTable, ['columns', 'aggregates', 'timeframes']);
+      });
+    }
+
+    return total;
   },
 
   resultsCount(state) {
@@ -636,9 +652,8 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleSelected(state, selectable) {
-    Vue.set(selectable, 'selected', !selectable.selected);
-    state.selectedAttributeCount += selectable.selected ? 1 : -1;
+  toggleSelected(state, attribute) {
+    Vue.set(attribute, 'selected', !attribute.selected);
   },
 
   toggleCollapsed(state, collapsable) {

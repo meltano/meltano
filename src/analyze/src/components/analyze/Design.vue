@@ -64,7 +64,7 @@ export default {
       'filterOptions',
     ]),
     ...mapGetters('designs', [
-      'attributesCount',
+      'getSelectedAttributesCount',
       'currentModelLabel',
       'currentDesignLabel',
       'hasChartableResults',
@@ -407,8 +407,8 @@ export default {
             <label class="label">
               <span>Attributes</span>
               <span
-                v-if='attributesCount > 0'
-                class='has-text-weight-light has-text-grey-light is-size-7'>({{attributesCount}})</span>
+                v-if='getSelectedAttributesCount > 0'
+                class='has-text-weight-light has-text-grey-light is-size-7'>({{getSelectedAttributesCount}})</span>
             </label>
           </div>
 
