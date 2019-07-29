@@ -7,7 +7,7 @@ from meltano.core.db import DB, project_engine
 from sqlalchemy import create_engine, MetaData
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def engine_uri():
     return "sqlite://"
 
