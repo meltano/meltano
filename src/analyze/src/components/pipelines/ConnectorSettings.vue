@@ -66,52 +66,57 @@ export default {
 <template>
   <div>
     <slot name="top" />
-    <div class="field is-horizontal" v-for='setting in configSettings.settings' :key='setting.name'>
-      <div :class="['field-label', labelClass]">
-        <label class="label">{{ setting.label || getCleanedLabel(setting.name) }}</label>
+    <div v-for='setting in configSettings.settings' :key='setting.name'>
+      <div v-if="setting.name === 'introduction'" class="intro-module">
+        <p v-if="setting.signup">If you don't have an account yet, you can <a :href="setting.link">sign up for an account here</a>!</p>
+        <p v-if="setting.docs">Need help finding this information? We got you covered with our <a :href="setting.docs">docs here</a>.</p>
       </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control is-expanded">
+      <div v-else class="field is-horizontal" >
+        <div :class="['field-label', labelClass]">
+          <label class="label">{{ setting.label || getCleanedLabel(setting.name) }}</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control is-expanded">
+              <!-- Boolean -->
+              <label
+                v-if='getIsOfKindBoolean(setting.kind)'
+                class="checkbox">
+                <input
+                  v-model="configSettings.config[setting.name]"
+                  :class="successClass(setting)"
+                  type="checkbox">
+              </label>
 
-            <!-- Boolean -->
-            <label
-              v-if='getIsOfKindBoolean(setting.kind)'
-              class="checkbox">
-              <input
+              <!-- Date -->
+              <InputDateIso8601
+                v-else-if='getIsOfKindDate(setting.kind)'
                 v-model="configSettings.config[setting.name]"
-                :class="successClass(setting)"
-                type="checkbox">
-            </label>
+                :name='setting.name'
+                input-classes='is-small' />
 
-            <!-- Date -->
-            <InputDateIso8601
-              v-else-if='getIsOfKindDate(setting.kind)'
-              v-model="configSettings.config[setting.name]"
-              :name='setting.name'
-              input-classes='is-small' />
-
-            <!-- Text / Password / Email -->
-            <input
-              v-else-if='getIsOfKindTextBased(setting.kind)'
-              v-model="configSettings.config[setting.name]"
-              :class="['input', fieldClass, successClass(setting)]"
-              @focus="$event.target.select()"
-              :type="getTextBasedInputType(setting)"
-              :placeholder="setting.value || setting.name">
+              <!-- Text / Password / Email -->
+              <input
+                v-else-if='getIsOfKindTextBased(setting.kind)'
+                v-model="configSettings.config[setting.name]"
+                :class="['input', fieldClass, successClass(setting)]"
+                @focus="$event.target.select()"
+                :type="getTextBasedInputType(setting)"
+                :placeholder="setting.value || setting.name">
+            </div>
+            <p
+              v-if="setting.description"
+              class="help is-italic"
+              >
+              {{ setting.description }}
+            </p>
+            <p
+              v-if="setting.documentation"
+              class="help"
+              >
+              <a :href="setting.documentation">More Info.</a>
+            </p>
           </div>
-          <p
-            v-if="setting.description"
-            class="help is-italic"
-            >
-            {{ setting.description }}
-          </p>
-          <p
-            v-if="setting.documentation"
-            class="help"
-            >
-            <a :href="setting.documentation">More Info.</a>
-          </p>
         </div>
       </div>
     </div>
@@ -120,4 +125,7 @@ export default {
 </template>
 
 <style lang="scss">
+.intro-module {
+  margin-bottom: 15px;
+}
 </style>
