@@ -505,6 +505,13 @@ export SF_DATABASE=""   # in UPPERCASE
 export SF_WAREHOUSE=""  # in UPPERCASE
 ```
 
+- **SF_ACCOUNT"** - This is the account name which is derived from the URL. More info can be found on the [Snowflake docs](https://docs.snowflake.net/manuals/user-guide/connecting.html#your-snowflake-account-name-and-url)
+- **SF_USER** - This is the username you use for logging in
+- **SF_PASSWORD** - This is the password you use for logging in
+- **SF_ROLE** - This is the role that you have assigned privileges to for the database
+- **SF_DATABASE** - The name of the Snowflake database you want to use
+- **SF_WAREHOUSE** - The name of the Snowflake warehouse you want to use
+
 ### Postgres
 
 `target-postgres` is a loader that works with other extractors in order to move data into a Postgres database.
