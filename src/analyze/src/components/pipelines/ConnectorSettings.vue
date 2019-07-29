@@ -60,6 +60,23 @@ export default {
           : null);
     },
   },
+  created() {
+    /**
+     * For select input elements
+     * Search through settings for default values
+     * Required because of v-model being undefined
+     * which overrides `selected` property on options
+     */
+    if (this.configSettings.settings) {
+      this.configSettings.settings.forEach((setting) => {
+        if (setting.kind === 'dropdown') {
+          const defaultSetting = setting.options.find(item => item.default === true);
+
+          this.configSettings.config[setting.name] = defaultSetting.value;
+        }
+      });
+    }
+  },
 };
 </script>
 
@@ -90,6 +107,21 @@ export default {
               v-model="configSettings.config[setting.name]"
               :name='setting.name'
               input-classes='is-small' />
+
+            <!-- Dropdown -->
+            <div v-else-if="setting.kind === 'dropdown'" class="select is-small">
+              <select
+                v-model="configSettings.config[setting.name]"
+                :name="`${setting.name}-dropdown`"
+                :id="`${setting.name}-select-menu`">
+                <option v-for="(option, index) in setting.options"
+                  :key="`${option.label}-${index}`"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
 
             <!-- Text / Password / Email -->
             <input
