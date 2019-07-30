@@ -62,6 +62,7 @@ export default {
                 :label="'1 asc'"
                 button-classes="is-small has-text-interactive-secondary"
                 icon-open='sort'
+                icon-close='caret-down'
                 is-right-aligned
                 is-up
                 ref='order-dropdown'>

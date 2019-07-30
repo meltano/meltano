@@ -35,11 +35,11 @@ export default {
     },
     iconOpen: {
       type: String,
-      default: 'caret-up',
+      default: 'caret-down',
     },
     iconClose: {
       type: String,
-      default: 'caret-down',
+      default: 'caret-up',
     },
     disabled: {
       type: Boolean,
@@ -103,7 +103,7 @@ export default {
               @click="toggleDropdown">
         <span v-if="label">{{label}}</span>
         <span v-if='!isIconRemoved' class="icon is-small">
-          <font-awesome-icon :icon="isOpen ? iconClose: iconOpen"></font-awesome-icon>
+          <font-awesome-icon :icon="isOpen ? iconClose : iconOpen"></font-awesome-icon>
         </span>
       </button>
     </div>
