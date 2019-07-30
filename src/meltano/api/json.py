@@ -71,10 +71,13 @@ class JSONSchemeEncoder(json.JSONEncoder):
     }
 
     def encode(self, obj):
-        scheme = request.headers.get("X-Json-Scheme", JSONScheme.SNAKE_CASE)
-        strategy = self.__class__.case_strategies[scheme]
-        logging.debug(f"Using JSON Scheme: {scheme}")
-        obj = key_convert(obj, strategy)
+        try:
+            scheme = request.headers.get("X-Json-Scheme")
+            strategy = self.__class__.case_strategies[scheme]
+            logging.debug(f"Using JSON Scheme: {scheme}")
+            obj = key_convert(obj, strategy)
+        except KeyError:
+            pass
 
         return super().encode(obj)
 
