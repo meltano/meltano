@@ -55,7 +55,7 @@ export default {
                 'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
                 'is-desc': sortDesc,
               }"
-              >
+            >
             <span>{{columnHeader}}</span>
             <div class='is-pulled-right'>
               <Dropdown
@@ -77,12 +77,12 @@ export default {
           <!-- eslint-disable-next-line vue/require-v-for-key -->
           <tr v-for="result in results">
             <template v-for="key in keys">
-            <td :key="key" v-if="isColumnSelectedAggregate(key)">
-              {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}
-            </td>
-            <td :key="key" v-else>
-              {{result[key]}}
-            </td>
+              <td :key="key" v-if="isColumnSelectedAggregate(key)">
+                {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}
+              </td>
+              <td :key="key" v-else>
+                {{result[key]}}
+              </td>
             </template>
           </tr>
         </tbody>

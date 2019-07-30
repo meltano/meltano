@@ -171,6 +171,26 @@ const getters = {
     return gettersRef.filtersCount > 0;
   },
 
+  getAllAttributes(state) {
+    let attributes = [];
+    const joinSources = state.design.joins || [];
+    const sources = [state.design].concat(joinSources);
+    const batchCollect = (table, attributeTypes) => {
+      attributeTypes.forEach((attributeType) => {
+        const attributesByType = table[attributeType];
+        if (attributesByType) {
+          attributes = attributes.concat(attributesByType);
+        }
+      });
+    };
+
+    sources.forEach((source) => {
+      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes']);
+    });
+
+    return attributes;
+  },
+
   getAttributesByTable(state) {
     const attributeTables = [];
     const design = state.design;
@@ -218,25 +238,9 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
-  getSelectedAttributes(state) {
-    let selectedAttributes = [];
-    const joinSources = state.design.joins || [];
-    const sources = [state.design].concat(joinSources);
+  getSelectedAttributes(_, gettersRef) {
     const selector = attribute => attribute.selected;
-    const batchSelect = (table, attributeTypes) => {
-      attributeTypes.forEach((attributeType) => {
-        const attributesByType = table[attributeType];
-        if (attributesByType) {
-          selectedAttributes = selectedAttributes.concat(attributesByType.filter(selector));
-        }
-      });
-    };
-
-    sources.forEach((source) => {
-      batchSelect(source.relatedTable, ['columns', 'aggregates', 'timeframes']);
-    });
-
-    return selectedAttributes;
+    return gettersRef.getAllAttributes.filter(selector);
   },
 
   getSelectedAttributesCount(_, gettersRef) {
@@ -393,7 +397,7 @@ const actions = {
     commit('setChartType', chartType);
   },
 
-  getSQL({ commit, state }, { run, load }) {
+  getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
@@ -406,6 +410,7 @@ const actions = {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
           state.loadingQuery = false;
+          commit('updateSorting', getters.getAllAttributes);
         } else {
           commit('setSQLResults', response.data);
         }
@@ -637,6 +642,27 @@ const mutations = {
     state.columnHeaders = results.columnHeaders;
     state.columnNames = results.columnNames;
     state.resultAggregates = results.aggregates;
+  },
+
+  updateSorting(state, allAttributes) {
+    const pairings = state.keys.map((keyString) => {
+      const split = keyString.split('.');
+      // TODO ensure I get correct payload from server that has these pairings prebuilt
+      // as region.dnoregion vs region.name is returned for region > name selection (/*split[1]*/ )
+      return { tableName: split[0], attributeName: 'name' };
+    });
+    pairings.forEach((pairing) => {
+      const finder = item => item.source.name === pairing.tableName && item.name === pairing.attributeName;
+      const attribute = allAttributes.find(finder);
+      const isSorted = state.order.assigned.find(finder);
+      if (!isSorted) {
+        state.order.unassigned.push({
+          tableName: attribute.source.name,
+          attributeName: attribute.name,
+          direction: 'asc',
+        });
+      }
+    });
   },
 
   setSqlErrorMessage(state, e) {
