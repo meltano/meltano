@@ -13,9 +13,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-* [#834](https://gitlab.com/meltano/meltano/issues/834) Fixed a problem with the Meltano UI not having the proper API URL set
 
 ### Breaks
+
+
+## 0.34.1 - (2019-07-30)
+---
+
+### Fixes
+* [#834](https://gitlab.com/meltano/meltano/issues/834) Fixed a problem with the Meltano UI not having the proper API URL set
 
 
 ## 0.34.0 - (2019-07-29)
