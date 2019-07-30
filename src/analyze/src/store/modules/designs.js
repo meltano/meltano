@@ -218,13 +218,14 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
-  getSelectedAttributes(state) {
+  getSelectedAttributesWithTable(state) {
     let attributes = [];
     const selector = attribute => attribute.selected;
     const batcher = (table, attributeTypes) => {
       attributeTypes.forEach((attributeType) => {
-        if (table[attributeType]) {
-          attributes = attributes.concat(table[attributeType].filter(selector));
+        const attributesByType = table[attributeType];
+        if (attributesByType) {
+          attributes = [].concat(attributesByType.filter(selector));
         }
       });
     };
@@ -236,11 +237,13 @@ const getters = {
       });
     }
 
+    // TODO likely need to append tableName and tableLabel or otherwise add a ref to the table
+    console.log(attributes);
     return attributes;
   },
 
   getSelectedAttributesCount(_, gettersRef) {
-    return gettersRef.getSelectedAttributes.length;
+    return gettersRef.getSelectedAttributesWithTable.length;
   },
 
   resultsCount(state) {
@@ -665,6 +668,24 @@ const mutations = {
   },
 
   setDesign(state, designData) {
+    const sourcer = (source, attributeTypes) => {
+      const table = source.relatedTable;
+      attributeTypes.forEach((attributeType) => {
+        if (table[attributeType]) {
+          table[attributeType].forEach((attribute) => {
+            attribute.source = source;
+          });
+        }
+      });
+    };
+
+    sourcer(designData, ['columns', 'aggregates', 'timeframes']);
+    if (designData.joins) {
+      designData.joins.forEach((join) => {
+        sourcer(join, ['columns', 'aggregates', 'timeframes']);
+      });
+    }
+
     state.design = designData;
   },
 
