@@ -42,7 +42,7 @@ def app_context(app):
 
 
 @pytest.fixture(scope="class")
-def create_app(request, add_model, project, engine_uri):
+def create_app(request, project, engine_uri):
     def _factory(**kwargs):
         config = {
             "TESTING": True,
