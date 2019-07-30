@@ -6,11 +6,16 @@ import QuerySortBy from '@/components/analyze/QuerySortBy';
 
 export default {
   name: 'ResultTable',
+  components: {
+    Dropdown,
+    QuerySortBy,
+  },
   computed: {
     ...mapState('designs', [
       'resultAggregates',
       'columnHeaders',
       'columnNames',
+      'order',
       'results',
       'keys',
       'sortDesc',
@@ -21,10 +26,14 @@ export default {
       'getFormattedValue',
       'isColumnSelectedAggregate',
     ]),
-  },
-  components: {
-    Dropdown,
-    QuerySortBy,
+    getOrderStatusLabel() {
+      // TODO ensure tableName and attributeName are used
+      return (name) => {
+        const match = this.order.assigned.find(orderStatus => orderStatus.attributeName === name);
+        const idx = this.order.assigned.indexOf(match);
+        return match ? `${idx + 1} ${match.direction}` : '';
+      };
+    },
   },
   methods: {
     ...mapActions('designs', [
@@ -58,8 +67,9 @@ export default {
             >
             <span>{{columnHeader}}</span>
             <div class='is-pulled-right'>
+              <!-- TODO -->
               <Dropdown
-                :label="'1 asc'"
+                :label="getOrderStatusLabel('name')"
                 button-classes="is-small has-text-interactive-secondary"
                 icon-open='sort'
                 icon-close='caret-down'
