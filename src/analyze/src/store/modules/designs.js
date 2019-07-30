@@ -218,13 +218,13 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
-  getSelectedAttributesCount(state) {
-    let total = 0;
-    const counter = (acc, attribute) => acc + (attribute.selected ? 1 : 0);
+  getSelectedAttributes(state) {
+    let attributes = [];
+    const selector = attribute => attribute.selected;
     const batcher = (table, attributeTypes) => {
       attributeTypes.forEach((attributeType) => {
         if (table[attributeType]) {
-          total += table[attributeType].reduce(counter, 0);
+          attributes = attributes.concat(table[attributeType].filter(selector));
         }
       });
     };
@@ -236,7 +236,11 @@ const getters = {
       });
     }
 
-    return total;
+    return attributes;
+  },
+
+  getSelectedAttributesCount(_, gettersRef) {
+    return gettersRef.getSelectedAttributes.length;
   },
 
   resultsCount(state) {
