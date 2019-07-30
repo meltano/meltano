@@ -26,10 +26,16 @@ export default {
       'getFormattedValue',
       'isColumnSelectedAggregate',
     ]),
-    getOrderStatusLabel() {
+    getAssignedOrderable() {
+      return name => this.order.assigned.find(orderable => orderable.attributeName === name);
+    },
+    getIsOrderableAssigned() {
+      return name => Boolean(this.getAssignedOrderable(name));
+    },
+    getOrderableStatusLabel() {
       // TODO ensure tableName and attributeName are used
       return (name) => {
-        const match = this.order.assigned.find(orderStatus => orderStatus.attributeName === name);
+        const match = this.getAssignedOrderable(name);
         const idx = this.order.assigned.indexOf(match);
         return match ? `${idx + 1} ${match.direction}` : '';
       };
@@ -67,10 +73,12 @@ export default {
             >
             <span>{{columnHeader}}</span>
             <div class='is-pulled-right'>
-              <!-- TODO -->
+              <!-- TODO properly leverage tableName/attributeName pairings -->
               <Dropdown
-                :label="getOrderStatusLabel('name')"
-                button-classes="is-small has-text-interactive-secondary"
+                :label="getOrderableStatusLabel('name')"
+                :button-classes="`is-small ${getIsOrderableAssigned('name')
+                  ? 'has-text-interactive-secondary'
+                  : ''}`"
                 icon-open='sort'
                 icon-close='caret-down'
                 is-right-aligned
