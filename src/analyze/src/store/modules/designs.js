@@ -218,32 +218,29 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
-  getSelectedAttributesWithTable(state) {
-    let attributes = [];
+  getSelectedAttributes(state) {
+    let selectedAttributes = [];
+    const joinSources = state.design.joins || [];
+    const sources = [state.design].concat(joinSources);
     const selector = attribute => attribute.selected;
-    const batcher = (table, attributeTypes) => {
+    const batchSelect = (table, attributeTypes) => {
       attributeTypes.forEach((attributeType) => {
         const attributesByType = table[attributeType];
         if (attributesByType) {
-          attributes = [].concat(attributesByType.filter(selector));
+          selectedAttributes = selectedAttributes.concat(attributesByType.filter(selector));
         }
       });
     };
 
-    batcher(state.design.relatedTable, ['columns', 'aggregates', 'timeframes']);
-    if (state.design.joins) {
-      state.design.joins.forEach((join) => {
-        batcher(join.relatedTable, ['columns', 'aggregates', 'timeframes']);
-      });
-    }
+    sources.forEach((source) => {
+      batchSelect(source.relatedTable, ['columns', 'aggregates', 'timeframes']);
+    });
 
-    // TODO likely need to append tableName and tableLabel or otherwise add a ref to the table
-    console.log(attributes);
-    return attributes;
+    return selectedAttributes;
   },
 
   getSelectedAttributesCount(_, gettersRef) {
-    return gettersRef.getSelectedAttributesWithTable.length;
+    return gettersRef.getSelectedAttributes.length;
   },
 
   resultsCount(state) {
@@ -668,7 +665,9 @@ const mutations = {
   },
 
   setDesign(state, designData) {
-    const sourcer = (source, attributeTypes) => {
+    const joinSources = designData.joins || [];
+    const sources = [designData].concat(joinSources);
+    const batchSourcer = (source, attributeTypes) => {
       const table = source.relatedTable;
       attributeTypes.forEach((attributeType) => {
         if (table[attributeType]) {
@@ -679,12 +678,9 @@ const mutations = {
       });
     };
 
-    sourcer(designData, ['columns', 'aggregates', 'timeframes']);
-    if (designData.joins) {
-      designData.joins.forEach((join) => {
-        sourcer(join, ['columns', 'aggregates', 'timeframes']);
-      });
-    }
+    sources.forEach((source) => {
+      batchSourcer(source, ['columns', 'aggregates', 'timeframes']);
+    });
 
     state.design = designData;
   },
