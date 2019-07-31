@@ -47,7 +47,7 @@ export default {
             class='drag-list-item has-background-white'>
             <div class="drag-handle">
               <span class="icon is-small">
-                <font-awesome-icon icon="sort"></font-awesome-icon>
+                <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
               <span>{{orderable.attributeLabel}}</span>
             </div>
@@ -66,10 +66,10 @@ export default {
           <div
             v-for='(orderable, idx) in order.assigned'
             :key='`${orderable.attributeName}-${orderable.id}`'
-            class='drag-list-item has-background-white'>
+            class='drag-list-item has-background-white has-text-interactive-secondary'>
             <div class="drag-handle">
               <span class="icon is-small">
-                <font-awesome-icon icon="sort"></font-awesome-icon>
+                <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
               <span>{{idx + 1}}.</span>
               <span>{{orderable.attributeLabel}}</span>
@@ -77,9 +77,9 @@ export default {
             <button
               class="button is-small"
               @click="toggleDirection">
-              <span class="icon is-small">
+              <span class="icon is-small has-text-interactive-secondary">
                 <!-- TODO toggle icon based on asc/desc -->
-                <font-awesome-icon icon="arrow-down"></font-awesome-icon>
+                <font-awesome-icon icon="sort-amount-down"></font-awesome-icon>
               </span>
             </button>
           </div>

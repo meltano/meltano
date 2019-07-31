@@ -3,6 +3,7 @@ import {
   faAngleDown,
   faAngleUp,
   faArrowDown,
+  faArrowsAltV,
   faArrowRight,
   faArrowUp,
   faCaretDown,
@@ -23,6 +24,8 @@ import {
   faTable,
   faSearch,
   faSort,
+  faSortAmountDown,
+  faSortAmountUp,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -36,6 +39,7 @@ export default {
   install(Vue) {
     library.add(faAngleDown);
     library.add(faAngleUp);
+    library.add(faArrowsAltV);
     library.add(faArrowDown);
     library.add(faArrowRight);
     library.add(faArrowUp);
@@ -57,6 +61,8 @@ export default {
     library.add(faTable);
     library.add(faSearch);
     library.add(faSort);
+    library.add(faSortAmountDown);
+    library.add(faSortAmountUp);
     library.add(faUser);
 
     Vue.component('font-awesome-icon', FontAwesomeIcon);

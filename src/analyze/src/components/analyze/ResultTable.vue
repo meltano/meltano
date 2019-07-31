@@ -93,7 +93,7 @@ export default {
                 is-right-aligned
                 is-up
                 ref='order-dropdown'>
-                <div class="dropdown-content">
+                <div class="dropdown-content is-unselectable">
                   <QuerySortBy></QuerySortBy>
                 </div>
               </Dropdown>
