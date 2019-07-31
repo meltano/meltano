@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 import draggable from 'vuedraggable';
 
@@ -26,6 +26,11 @@ export default {
         swapThreshold: 1,
       };
     },
+  },
+  methods: {
+    ...mapActions('designs', [
+      'updateSortAttribute',
+    ]),
   },
 };
 </script>
@@ -72,9 +77,10 @@ export default {
               <span>{{idx + 1}}.</span>
               <span>{{orderable.attributeLabel}}</span>
             </div>
-            <button class="button is-small">
+            <button
+              class="button is-small"
+              @click="updateSortAttribute(orderable)">
               <span class="icon is-small has-text-interactive-secondary">
-                <!-- TODO toggle icon based on asc/desc -->
                 <font-awesome-icon :icon="getIsOrderableAttributeAscending(orderable) ? 'sort-amount-down' : 'sort-amount-up'"></font-awesome-icon>
               </span>
             </button>
