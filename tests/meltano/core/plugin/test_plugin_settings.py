@@ -16,15 +16,14 @@ def test_create(session):
     assert setting == fetched
 
 
+@pytest.fixture
+def subject(session, project_add_service, tap, plugin_settings_service_factory):
+    plugin = project_add_service.add("extractors", tap.name)
+
+    return plugin_settings_service_factory(session)
+
+
 class TestPluginSettingsService:
-    @pytest.fixture
-    def subject(
-        self, session, project_add_service, tap, plugin_settings_service_factory
-    ):
-        plugin = project_add_service.add("extractors", tap.name)
-
-        return plugin_settings_service_factory(session)
-
     def test_get_value(self, session, subject, project, tap, monkeypatch):
         # returns the default value when unset
         assert subject.get_value(tap, "test") == (
@@ -79,3 +78,31 @@ class TestPluginSettingsService:
 
         subject.unset(tap, "test")
         assert session.query(PluginSetting).count() == 0
+
+
+class TestCustomPluginSettingsService:
+    @pytest.fixture(scope="class", autouse=True)
+    def custom_setting(subject, project, config_service, tap):
+        with project.meltano_update() as meltano:
+            custom_settings = [
+                {
+                    "name": "custom_setting",
+                    "value": "pytest",
+                    "kind": "pytest",
+                    "env": "PYTEST_CUSTOM_SETTING",
+                },
+                {"name": "test", "value": "override"},
+            ]
+
+            tap_mock = meltano["plugins"]["extractors"][0]
+            tap_mock["settings"] = custom_settings
+
+    def test_setting_exists(self, subject, tap):
+        exists = lambda setting: setting["name"] == "custom_setting"
+
+        assert any(map(exists, subject.definitions(tap)))
+
+    def test_precedence(self, subject, tap):
+        value, _ = subject.get_value(tap, "test")
+
+        assert value == "override"
