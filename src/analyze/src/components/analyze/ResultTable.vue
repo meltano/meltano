@@ -59,7 +59,7 @@ export default {
     <div v-if="hasResults">
 
       <ul>
-        <li v-for="(orderable, i) in getOrderables" :key="i">
+        <li v-for="(orderable, i) in getOrderables" :key="i" @click='updateSortAttribute(orderable)'>
           {{`${orderable.sourceLabel} - ${orderable.attributeLabel} - ${orderable.direction}`}}
         </li>
       </ul>

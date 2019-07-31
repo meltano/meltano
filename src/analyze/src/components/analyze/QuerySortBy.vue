@@ -24,11 +24,6 @@ export default {
       };
     },
   },
-  methods: {
-    toggleDirection: (orderable) => {
-      console.log('toggleDirection', orderable);
-    },
-  },
 };
 </script>
 
@@ -74,9 +69,7 @@ export default {
               <span>{{idx + 1}}.</span>
               <span>{{orderable.attributeLabel}}</span>
             </div>
-            <button
-              class="button is-small"
-              @click="toggleDirection">
+            <button class="button is-small">
               <span class="icon is-small has-text-interactive-secondary">
                 <!-- TODO toggle icon based on asc/desc -->
                 <font-awesome-icon icon="sort-amount-down"></font-awesome-icon>

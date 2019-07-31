@@ -487,9 +487,15 @@ const actions = {
     });
   },
 
-  updateSortAttribute({ commit }, attribute) {
-    // TODO determine if append or toggle asc/desc if already in assigned
-    // commit('setSortAttribute', attribute);
+  updateSortAttribute({ commit, getters, state }, orderableAttribute) {
+    const match = state.order.assigned.find(orderableAttr => orderableAttr === orderableAttribute);
+    if (match) {
+      commit('toggleSortAttributeDirection', match);
+    } else {
+      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.source.name === orderableAttribute.sourceName);
+      commit('addSortAttribute', attributeMatch);
+    }
+
     this.dispatch('designs/getSQL', {
       run: true,
     });
@@ -520,6 +526,13 @@ const actions = {
 };
 
 const mutations = {
+  addSortAttribute(state, attribute) {
+    const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.source.name);
+    const idx = state.order.unassigned.indexOf(orderableAttribute);
+    state.order.unassigned.splice(idx, 1);
+    state.order.assigned.push(orderableAttribute);
+  },
+
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState));
   },
@@ -624,10 +637,6 @@ const mutations = {
     state.sortColumn = name;
   },
 
-  setSortAttribute(state, attribute) {
-    console.log('setSortAttribute', attribute);
-  },
-
   setJoinColumns(_, { columns, join }) {
     join.columns = columns;
   },
@@ -702,6 +711,10 @@ const mutations = {
 
   toggleCollapsed(state, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
+  },
+
+  toggleSortAttributeDirection(_, orderableAttribute) {
+    orderableAttribute.direction = orderableAttribute.direction === 'asc' ? 'desc' : 'asc';
   },
 
   setDesign(state, designData) {
