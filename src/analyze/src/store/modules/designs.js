@@ -238,6 +238,10 @@ const getters = {
     return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
   },
 
+  getIsOrderableAttributeAscending() {
+    return orderableAttribute => orderableAttribute.direction === 'asc';
+  },
+
   getSelectedAttributes(_, gettersRef) {
     const selector = attribute => attribute.selected;
     return gettersRef.getAllAttributes.filter(selector);
@@ -490,10 +494,11 @@ const actions = {
   updateSortAttribute({ commit, getters, state }, orderableAttribute) {
     const match = state.order.assigned.find(orderableAttr => orderableAttr === orderableAttribute);
     if (match) {
-      commit('toggleSortAttributeDirection', match);
+      const direction = getters.getIsOrderableAttributeAscending(orderableAttribute) ? 'desc' : 'asc';
+      commit('setSortableAttributeDirection', { orderableAttribute: match, direction });
     } else {
       const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.source.name === orderableAttribute.sourceName);
-      commit('addSortAttribute', attributeMatch);
+      commit('assignSortableAttribute', attributeMatch);
     }
 
     this.dispatch('designs/getSQL', {
@@ -526,7 +531,7 @@ const actions = {
 };
 
 const mutations = {
-  addSortAttribute(state, attribute) {
+  assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.source.name);
     const idx = state.order.unassigned.indexOf(orderableAttribute);
     state.order.unassigned.splice(idx, 1);
@@ -713,8 +718,8 @@ const mutations = {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
-  toggleSortAttributeDirection(_, orderableAttribute) {
-    orderableAttribute.direction = orderableAttribute.direction === 'asc' ? 'desc' : 'asc';
+  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
+    orderableAttribute.direction = direction;
   },
 
   setDesign(state, designData) {

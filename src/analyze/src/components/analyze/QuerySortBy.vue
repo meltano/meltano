@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 
 import draggable from 'vuedraggable';
 
@@ -11,6 +11,9 @@ export default {
   computed: {
     ...mapState('designs', [
       'order',
+    ]),
+    ...mapGetters('designs', [
+      'getIsOrderableAttributeAscending',
     ]),
     draggableOptions() {
       return {
@@ -72,7 +75,7 @@ export default {
             <button class="button is-small">
               <span class="icon is-small has-text-interactive-secondary">
                 <!-- TODO toggle icon based on asc/desc -->
-                <font-awesome-icon icon="sort-amount-down"></font-awesome-icon>
+                <font-awesome-icon :icon="getIsOrderableAttributeAscending(orderable) ? 'sort-amount-down' : 'sort-amount-up'"></font-awesome-icon>
               </span>
             </button>
           </div>
