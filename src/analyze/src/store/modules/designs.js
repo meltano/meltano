@@ -410,7 +410,7 @@ const actions = {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
           state.loadingQuery = false;
-          commit('updateSorting', getters.getAllAttributes);
+          commit('setSorting', getters.getAllAttributes);
         } else {
           commit('setSQLResults', response.data);
         }
@@ -482,6 +482,14 @@ const actions = {
 
   sortBy({ commit }, name) {
     commit('setSortColumn', name);
+    this.dispatch('designs/getSQL', {
+      run: true,
+    });
+  },
+
+  updateSortAttribute({ commit }, attribute) {
+    // TODO determine if append or toggle asc/desc if already in assigned
+    // commit('setSortAttribute', attribute);
     this.dispatch('designs/getSQL', {
       run: true,
     });
@@ -616,6 +624,10 @@ const mutations = {
     state.sortColumn = name;
   },
 
+  setSortAttribute(state, attribute) {
+    console.log('setSortAttribute', attribute);
+  },
+
   setJoinColumns(_, { columns, join }) {
     join.columns = columns;
   },
@@ -644,21 +656,21 @@ const mutations = {
     state.resultAggregates = results.aggregates;
   },
 
-  updateSorting(state, allAttributes) {
+  setSorting(state, allAttributes) {
     const pairings = state.keys.map((keyString) => {
       const split = keyString.split('.');
       // TODO ensure I get correct payload from server that has these pairings prebuilt
       // as region.dnoregion vs region.name is returned for region > name selection (/*split[1]*/ )
-      return { tableName: split[0], attributeName: 'name' };
+      return { sourceName: split[0], attributeName: 'name' };
     });
     pairings.forEach((pairing) => {
-      const finder = item => item.source.name === pairing.tableName && item.name === pairing.attributeName;
+      const finder = item => item.source.name === pairing.sourceName && item.name === pairing.attributeName;
       const attribute = allAttributes.find(finder);
       const isSorted = state.order.assigned.find(finder);
       if (!isSorted) {
         state.order.unassigned.push({
-          tableName: attribute.source.name,
-          tableLabel: attribute.source.label,
+          sourceName: attribute.source.name,
+          sourceLabel: attribute.source.label,
           attributeName: attribute.name,
           attributeLabel: attribute.label,
           direction: 'asc',

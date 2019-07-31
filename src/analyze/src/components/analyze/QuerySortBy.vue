@@ -27,8 +27,8 @@ export default {
   methods: {
     toggleDirection: (orderable) => {
       console.log('toggleDirection', orderable);
-    }
-  }
+    },
+  },
 };
 </script>
 

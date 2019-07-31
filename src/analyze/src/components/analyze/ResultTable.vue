@@ -36,7 +36,7 @@ export default {
       return this.order.unassigned.concat(this.order.assigned);
     },
     getOrderableStatusLabel() {
-      // TODO ensure tableName and attributeName are used
+      // TODO ensure sourceName and attributeName are used
       return (name) => {
         const match = this.getAssignedOrderable(name);
         const idx = this.order.assigned.indexOf(match);
@@ -47,6 +47,7 @@ export default {
   methods: {
     ...mapActions('designs', [
       'sortBy',
+      'updateSortAttribute',
     ]),
   },
 };
@@ -59,7 +60,7 @@ export default {
 
       <ul>
         <li v-for="(orderable, i) in getOrderables" :key="i">
-          {{`${orderable.tableLabel} - ${orderable.attributeLabel} - ${orderable.direction}`}}
+          {{`${orderable.sourceLabel} - ${orderable.attributeLabel} - ${orderable.direction}`}}
         </li>
       </ul>
 
@@ -71,34 +72,37 @@ export default {
           is-fullwidth
           is-size-7">
         <thead>
-          <th v-for="(columnHeader, i) in columnHeaders"
-              class="sortable-header"
-              :key="columnHeader + i"
-              :class="{
-                'has-background-warning': isColumnSelectedAggregate(keys[i]),
-                'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
-                'is-desc': sortDesc,
-              }"
-            >
-            <span>{{columnHeader}}</span>
-            <div class='is-pulled-right'>
-              <!-- TODO properly leverage tableName/attributeName pairings -->
-              <Dropdown
-                :label="getOrderableStatusLabel('name')"
-                :button-classes="`is-small ${getIsOrderableAssigned('name')
-                  ? 'has-text-interactive-secondary'
-                  : ''}`"
-                icon-open='sort'
-                icon-close='caret-down'
-                is-right-aligned
-                is-up
-                ref='order-dropdown'>
-                <div class="dropdown-content is-unselectable">
-                  <QuerySortBy></QuerySortBy>
+          <tr>
+            <th v-for="(columnHeader, i) in columnHeaders"
+                :key="columnHeader + i"
+                :class="{
+                  'has-background-warning': isColumnSelectedAggregate(keys[i]),
+                  'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
+                  'is-desc': sortDesc,
+                }"
+              >
+              <div class="is-flex">
+                <div class='sort-header' @click='updateSortAttribute(columnHeader)'>
+                  <span>{{columnHeader}}</span>
                 </div>
-              </Dropdown>
-            </div>
-          </th>
+                <!-- TODO properly leverage sourceName/attributeName pairings -->
+                <Dropdown
+                  :label="getOrderableStatusLabel('name')"
+                  :button-classes="`is-small ${getIsOrderableAssigned('name')
+                    ? 'has-text-interactive-secondary'
+                    : ''}`"
+                  icon-open='sort'
+                  icon-close='caret-down'
+                  is-right-aligned
+                  is-up
+                  ref='order-dropdown'>
+                  <div class="dropdown-content is-unselectable">
+                    <QuerySortBy></QuerySortBy>
+                  </div>
+                </Dropdown>
+              </div>
+            </th>
+          </tr>
         </thead>
         <tbody>
           <!-- eslint-disable-next-line vue/require-v-for-key -->
@@ -124,13 +128,17 @@ export default {
 </template>
 
 <style lang="scss">
-.sortable-header {
-  cursor: pointer;
-}
 .result-data {
   table {
     width: 100%;
     max-width: 100%;
+
+    .sort-header {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      cursor: pointer;
+    }
   }
 }
 .sorted {
