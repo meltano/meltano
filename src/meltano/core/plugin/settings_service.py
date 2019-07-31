@@ -28,6 +28,26 @@ class PluginSettingValueSource(int, Enum):
     DEFAULT = 3
 
 
+class SettingDefinition:
+    def __init__(self, definition: dict):
+        if "name" not in definition:
+            raise ValueError("Setting definition must have a `name`.")
+
+        self._definition = definition
+
+    def __getattr__(self, attr):
+        return getattr(self._definition, attr)
+
+    def __getitem__(self, item):
+        return self._definition[item]
+
+    def __eq__(self, other):
+        return self["name"] == other["name"]
+
+    def __hash__(self):
+        return hash(self["name"])
+
+
 class PluginSettingsService:
     def __init__(
         self,
@@ -41,16 +61,6 @@ class PluginSettingsService:
         self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
         self._session = session
 
-    def settings(self, plugin: PluginRef, enabled_only=True):
-        q = self._session.query(PluginSetting).filter_by(
-            namespace=plugin.qualified_name
-        )
-
-        if enabled_only:
-            q.filter_by(enabled=True)
-
-        return q.all()
-
     def as_config(
         self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
     ) -> Dict:
@@ -60,7 +70,7 @@ class PluginSettingsService:
         config = deepcopy(plugin_install.config)
 
         # definition settings
-        for setting in self.plugin_settings(plugin):
+        for setting in self.definitions(plugin):
             value, source = self.get_value(plugin, setting["name"])
             if sources and source not in sources:
                 continue
@@ -76,7 +86,7 @@ class PluginSettingsService:
         plugin_def = self.get_definition(plugin)
         env = {}
 
-        for setting in self.plugin_settings(plugin):
+        for setting in self.definitions(plugin):
             value, source = self.get_value(plugin, setting["name"])
             if sources and source not in sources:
                 continue
@@ -120,24 +130,32 @@ class PluginSettingsService:
         try:
             return next(
                 setting
-                for setting in self.plugin_settings(plugin)
+                for setting in self.definitions(plugin)
                 if setting["name"] == name
             )
         except StopIteration:
             raise PluginSettingMissingError(plugin, name)
 
-    def plugin_settings(self, plugin_ref: PluginRef) -> Iterable[Dict]:
+    def definitions(self, plugin_ref: PluginRef) -> Iterable[Dict]:
+        settings = set()
         plugin_def = self.get_definition(plugin_ref)
-        settings = plugin_def.settings
 
         try:
             # there might be some settings declared on the PluginInstall
+            # and such settings have precedence over the the definition
             plugin_install = self.get_install(plugin_ref)
-            settings += plugin_install._extras.get("settings", [])
+            for setting_def in map(
+                SettingDefinition, plugin_install._extras.get("settings", [])
+            ):
+                settings.add(setting_def)
         except PluginMissingError:
             pass
 
-        return settings
+        # add the plugin definition settings
+        for setting_def in map(SettingDefinition, plugin_def.settings):
+            settings.add(setting_def)
+
+        return list(settings)
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)

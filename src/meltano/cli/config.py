@@ -41,7 +41,6 @@ def set(ctx, setting_name, value):
 
 @config.command()
 @click.argument("setting_name")
-@click.argument("value")
 @click.pass_context
 def unset(ctx, setting_name):
     settings = ctx.obj["settings"]
@@ -56,7 +55,7 @@ def reset(ctx):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
 
-    for setting in settings.settings(plugin):
+    for setting in settings.definitions(plugin):
         settings.unset(plugin, setting.name)
 
 
@@ -67,9 +66,9 @@ def list(ctx):
     plugin = ctx.obj["plugin"]
     plugin_def = settings.get_definition(plugin)
 
-    for setting_def in settings.plugin_settings(plugin):
+    for setting_def in settings.definitions(plugin):
         env_key = settings.setting_env(setting_def, plugin_def)
         description_marker = (
-            f": {setting_def['description']}" if "description" in setting_def else ""
+            f": {setting_def['description']}" if setting_def.get("description") else ""
         )
         click.secho(f"{setting_def['name']} [{env_key}]{description_marker}")
