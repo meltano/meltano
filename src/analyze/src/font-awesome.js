@@ -2,7 +2,9 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAngleDown,
   faAngleUp,
+  faArrowDown,
   faArrowRight,
+  faArrowUp,
   faCaretDown,
   faCaretUp,
   faCertificate,
@@ -34,7 +36,9 @@ export default {
   install(Vue) {
     library.add(faAngleDown);
     library.add(faAngleUp);
+    library.add(faArrowDown);
     library.add(faArrowRight);
+    library.add(faArrowUp);
     library.add(faCaretDown);
     library.add(faCaretUp);
     library.add(faCertificate);

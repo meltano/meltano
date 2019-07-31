@@ -32,6 +32,9 @@ export default {
     getIsOrderableAssigned() {
       return name => Boolean(this.getAssignedOrderable(name));
     },
+    getOrderables() {
+      return this.order.unassigned.concat(this.order.assigned);
+    },
     getOrderableStatusLabel() {
       // TODO ensure tableName and attributeName are used
       return (name) => {
@@ -53,6 +56,12 @@ export default {
   <div class="result-data">
 
     <div v-if="hasResults">
+
+      <ul>
+        <li v-for="(orderable, i) in getOrderables" :key="i">
+          {{`${orderable.tableLabel} - ${orderable.attributeLabel} - ${orderable.direction}`}}
+        </li>
+      </ul>
 
       <table class="table
           is-bordered

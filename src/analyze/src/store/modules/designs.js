@@ -658,7 +658,9 @@ const mutations = {
       if (!isSorted) {
         state.order.unassigned.push({
           tableName: attribute.source.name,
+          tableLabel: attribute.source.label,
           attributeName: attribute.name,
+          attributeLabel: attribute.label,
           direction: 'asc',
         });
       }
