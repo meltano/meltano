@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 * [#821](https://gitlab.com/meltano/meltano/issues/821) Fix `meltano config` not properly loading settings defined in the `meltano.yml`
+* [#841](https://gitlab.com/meltano/meltano/issues/841) Fix a problem when model names were mangled by the API
+
 
 ### Breaks
 

@@ -5,7 +5,7 @@ from collections.abc import Mapping, Iterable
 from flask import request, json
 
 
-class FrozenDict(dict):
+class KeyFrozenDict(dict):
     pass
 
 
@@ -14,7 +14,10 @@ def freeze_keys(d: dict):
     Mark the dictionary as frozen, no automatic conversion
     will be operated on it.
     """
-    return FrozenDict(d)
+    if isinstance(d, KeyFrozenDict):
+        return d
+
+    return KeyFrozenDict(d)
 
 
 class JSONScheme(str, Enum):
@@ -23,7 +26,7 @@ class JSONScheme(str, Enum):
 
 
 def key_convert(obj, converter):
-    if isinstance(obj, dict) and not isinstance(obj, FrozenDict):
+    if isinstance(obj, dict) and not isinstance(obj, KeyFrozenDict):
         converted = {}
         for k, v in obj.items():
             new_k = converter(k)
