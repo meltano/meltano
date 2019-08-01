@@ -73,10 +73,12 @@ class TestSqlController:
         assert res.status_code == 200
         assertIsSQL(res.json["sql"])
         assertListEquivalence(
-            res.json["column_headers"], ["Name", "Forecast", "Percent (%)", "Fuel Type"]
+            [attr["attribute_label"] for attr in res.json["query_attributes"]],
+            ["Name", "Forecast", "Percent (%)", "Fuel Type"],
         )
         assertListEquivalence(
-            res.json["column_names"], ["name", "forecast", "perc", "fuel"]
+            [attr["attribute_name"] for attr in res.json["query_attributes"]],
+            ["name", "forecast", "perc", "fuel"],
         )
 
     def assert_aggregate_query(self, post, payload_builder):
@@ -89,7 +91,10 @@ class TestSqlController:
         assertIsSQL(res.json["sql"])
 
         assert "region.count" in res.json["aggregates"]
-        assertListEquivalence(res.json["column_names"], ["name", "count"])
+        assertListEquivalence(
+            [attr["attribute_name"] for attr in res.json["query_attributes"]],
+            ["name", "count"],
+        )
 
     def assert_timeframe_query(self, post, payload_builder):
         payload = {
@@ -123,10 +128,10 @@ class TestSqlController:
         assert res.status_code == 200, res.data
         assertIsSQL(res.json["sql"])
         assertListEquivalence(
-            res.json["column_headers"],
+            [attr["attribute_label"] for attr in res.json["query_attributes"]],
             ["Name", "Forecast", "entry.From (Week)", "Percent (%)", "Fuel Type"],
         )
         assertListEquivalence(
-            res.json["column_names"],
+            [attr["attribute_name"] for attr in res.json["query_attributes"]],
             ["name", "forecast", "entry.from.week", "perc", "fuel"],
         )

@@ -86,12 +86,10 @@ def get_sql(topic_name, design_name):
     sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    column_headers = sql_dict["column_headers"]
-    column_names = sql_dict["column_names"]
+    query_attributes = sql_dict["query_attributes"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
-    base_dict["column_headers"] = column_headers
-    base_dict["column_names"] = column_names
+    base_dict["query_attributes"] = query_attributes
     base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:

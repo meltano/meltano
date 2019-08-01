@@ -178,9 +178,11 @@ class TestQueryGeneration:
         assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
-        (sql, column_headers, column_names, aggregate_columns) = q.get_query()
-        assert "Average Age" in column_headers
-        assert "sum_minutes" in column_names
+        (sql, query_attributes, aggregate_columns) = q.get_query()
+        assert any(
+            attr["attribute_label"] == "Average Age" for attr in query_attributes
+        )
+        assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
         assert "users.sum_clv" in aggregate_columns
 
         assert "WITH base_join AS (SELECT" in sql
@@ -212,10 +214,12 @@ class TestQueryGeneration:
         assert q.join_order[2]["table"] == "episodes_table"
 
         # Test generating an HDA query
-        (sql, column_headers, column_names, aggregate_columns) = q.get_query()
+        (sql, query_attributes, aggregate_columns) = q.get_query()
 
-        assert "Average Age" in column_headers
-        assert "sum_minutes" in column_names
+        assert any(
+            attr["attribute_label"] == "Average Age" for attr in query_attributes
+        )
+        assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
         assert "users.sum_clv" in aggregate_columns
 
         assert "WITH base_join AS (SELECT" in sql
@@ -242,7 +246,7 @@ class TestQueryGeneration:
         )
 
         # Test generating an HDA query
-        (sql, column_headers, column_names, aggregate_columns) = q.get_query()
+        (sql, query_attributes, aggregate_columns) = q.get_query()
 
         # There should be one where clause and 1 having clause
         assert sql.count("WHERE") == 1
@@ -273,7 +277,7 @@ class TestQueryGeneration:
         )
 
         # Test generating an HDA query
-        (sql, column_headers, column_names, aggregate_columns) = q.get_query()
+        (sql, query_attributes, aggregate_columns) = q.get_query()
 
         # There should be one where clause and 2 having clauses
         assert sql.count("WHERE") == 1
