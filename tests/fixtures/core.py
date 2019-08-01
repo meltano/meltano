@@ -82,7 +82,7 @@ def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(project, discovery=discovery)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def project_compiler(project):
     return ProjectCompiler(project)
 
