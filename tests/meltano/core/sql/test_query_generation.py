@@ -88,6 +88,9 @@ class TestQueryGeneration:
             .aggregate_filter("users_table", "avg_age", "less_than", 40)
             .aggregate_filter("users_table", "sum_clv", "greater_or_equal_than", 100)
             .aggregate_filter("users_table", "sum_clv", "less_or_equal_than", 500)
+            .order_by("users_design", "name", "asc")
+            .order_by("users_design", "avg_age", "desc")
+            .order_by("users_design", "sum_clv", "")
         )
 
     @pytest.fixture
@@ -105,6 +108,12 @@ class TestQueryGeneration:
             .column_filter("episodes_table", "tv_series", "like", "Marvel")
             .aggregate_filter("users_table", "sum_clv", "less_than", 50)
             .aggregate_filter("episodes_table", "avg_rating", "greater_than", 8)
+            .order_by("users_design", "gender", "asc")
+            .order_by("users_design", "avg_age", "asc")
+            .order_by("streams_join", "year", "desc")
+            .order_by("streams_join", "sum_minutes", "desc")
+            .order_by("episodes_join", "tv_series", "")
+            .order_by("episodes_join", "avg_rating", "")
         )
 
     def test_compile_and_load_m5o_files(self, project, gitflix):
@@ -251,6 +260,11 @@ class TestQueryGeneration:
         assert 'COALESCE(AVG("users"."age"),0)>20' in sql
         assert 'COALESCE(AVG("users"."age"),0)<40' in sql
 
+        # Check that the correct order by clauses have been generated
+        assert (
+            'ORDER BY "users.name" ASC,"users.avg_age" DESC,"users.sum_clv" ASC' in sql
+        )
+
     def test_meltano_hda_query_filters(self, join_with_filters, gitflix):
         # Test an HDA query with filters
         q = MeltanoQuery(
@@ -273,6 +287,18 @@ class TestQueryGeneration:
         # Check that all the HAVING filters were added correctly
         assert 'HAVING COALESCE(SUM("users.clv"),0)<50' in sql
         assert 'HAVING COALESCE(AVG("episodes.rating"),0)>8' in sql
+
+        # Check that the correct order by clauses have been generated
+        #  and that they are in the correct order
+        order_by_clause = (
+            'ORDER BY "result"."users.gender" ASC,'
+            '"result"."users.avg_age" ASC,'
+            '"result"."streams.year" DESC,'
+            '"result"."streams.sum_minutes" DESC,'
+            '"result"."episodes.tv_series" ASC,'
+            '"result"."episodes.avg_rating" ASC'
+        )
+        assert order_by_clause in sql
 
     def test_meltano_invalid_filters(self, gitflix):
         # Test for wrong expression

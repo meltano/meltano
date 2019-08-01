@@ -159,6 +159,20 @@ class MeltanoTable(MeltanoBase):
     def get_timeframe(self, name: str) -> MeltanoBase:
         return next((t for t in self.timeframes() if t.name == name), None)
 
+    def get_attribute(self, name: str) -> MeltanoBase:
+        """
+        Given an attribute name, find if there is a column / aggregate / timeframe
+         with that name and return it
+        """
+        if self.get_column(name):
+            return self.get_column(name)
+        elif self.get_aggregate(name):
+            return self.get_aggregate(name)
+        elif self.get_timeframe(name):
+            return self.get_timeframe(name)
+        else:
+            raise ParseError(f"Attribute {name} not found in Meltano Table {self.name}")
+
     def add_column(self, column) -> None:
         self._columns.append(column)
 
@@ -353,7 +367,7 @@ class MeltanoTimeframe(MeltanoBase):
         (table, column) = self.sql.split(".")
         return column
 
-    def column_alias(self) -> str:
+    def alias(self) -> str:
         return f"{self.table.sql_table_name}.{self.column_name()}"
 
     def period_column_name(self, period) -> str:
@@ -614,9 +628,46 @@ class MeltanoQuery(MeltanoBase):
         # The proper join order that will be used for the query (list of table names)
         self.join_order = []
 
+        self.validate_definition(definition)
         self.parse_definition(definition)
 
         super().__init__(definition)
+
+    def validate_definition(self, definition: Dict) -> None:
+        """
+        Validate that the definition is properly formated
+        """
+        if not isinstance(definition.get("columns"), list):
+            raise ParseError(f"Query definition property `columns` must be a list")
+
+        if not isinstance(definition.get("aggregates"), list):
+            raise ParseError(f"Query definition property `aggregates` must be a list")
+
+        timeframes = definition.get("timeframes")
+        if timeframes and not isinstance(timeframes, list):
+            raise ParseError(f"Query definition property `timeframes` must be a list")
+
+        order = definition.get("order")
+        if order and not isinstance(order, list):
+            raise ParseError(f"Query definition property `order` must be a list")
+
+        joins = definition.get("joins")
+        if joins and not isinstance(joins, list):
+            raise ParseError(f"Query definition property `joins` must be a list")
+
+        filters = definition.get("filters", None)
+        if filters:
+            columns = filters.get("columns")
+            if columns and not isinstance(columns, list):
+                raise ParseError(
+                    f"Query definition property `filters[columns]` must be a list"
+                )
+
+            aggregates = filters.get("aggregates")
+            if aggregates and not isinstance(aggregates, list):
+                raise ParseError(
+                    f"Query definition property `filters[aggregates]` must be a list"
+                )
 
     def parse_definition(self, definition: Dict) -> None:
         """
@@ -918,31 +969,18 @@ class MeltanoQuery(MeltanoBase):
 
         # Add the Order By clause(s) for the final query
         if self.order:
-            orderby = self.order.get("column", None)
-            if self.order.get("direction", None) == "desc":
-                order = Order.desc
-            else:
-                order = Order.asc
+            for order_clause in self.order:
+                source_name = order_clause.get("source_name")
+                attribute_name = order_clause.get("attribute_name", None)
+                if order_clause.get("direction", None) == "desc":
+                    order = Order.desc
+                else:
+                    order = Order.asc
 
-            try:
-                orderby_field = next(
-                    Field(t.get_column(orderby).alias())
-                    for t in self.tables
-                    if t.get_column(orderby)
-                )
-            except StopIteration:
-                try:
-                    orderby_field = next(
-                        Field(t.get_aggregate(orderby).alias())
-                        for t in self.tables
-                        if t.get_aggregate(orderby)
-                    )
-                except StopIteration:
-                    raise ParseError(
-                        f"Requested Order By Attribute {orderby} is not defined in the design"
-                    )
+                table_def = self.design.find_table(source_name)
+                orderby_field = Field(table_def.get_attribute(attribute_name).alias())
 
-            no_join_query = no_join_query.orderby(orderby_field, order=order)
+                no_join_query = no_join_query.orderby(orderby_field, order=order)
         else:
             # By default order by all the Group By attributes asc
             order = Order.asc
@@ -1179,42 +1217,26 @@ class MeltanoQuery(MeltanoBase):
 
         # Add the Order By clause(s) for the final query
         if self.order:
-            orderby = self.order.get("column", None)
-            if self.order.get("direction", None) == "desc":
-                order = Order.desc
-            else:
-                order = Order.asc
+            for order_clause in self.order:
+                source_name = order_clause.get("source_name")
+                attribute_name = order_clause.get("attribute_name", None)
+                if order_clause.get("direction", None) == "desc":
+                    order = Order.desc
+                else:
+                    order = Order.asc
 
-            try:
-                orderby_field = next(
-                    Field(t.get_column(orderby).alias(), table=results_pika_table)
-                    for t in self.tables
-                    if t.get_column(orderby)
+                table_def = self.design.find_table(source_name)
+                orderby_field = Field(
+                    table_def.get_attribute(attribute_name).alias(),
+                    table=results_pika_table,
                 )
-            except StopIteration:
-                try:
-                    orderby_field = next(
-                        Field(
-                            t.get_aggregate(orderby).alias(), table=results_pika_table
-                        )
-                        for t in self.tables
-                        if t.get_aggregate(orderby)
-                    )
-                except StopIteration:
-                    raise ParseError(
-                        f"Requested Order By Attribute {orderby} is not defined in the design"
-                    )
 
-            hda_query = hda_query.orderby(orderby_field, order=order)
+                hda_query = hda_query.orderby(orderby_field, order=order)
         else:
             # By default order by all the Group By attributes asc
             order = Order.asc
-            orderby_fields = [
-                Field(c.alias(), table=results_pika_table)
-                for t in self.tables
-                for c in t.columns()
-            ]
-            for field in orderby_fields:
+            for attr in group_by_attributes:
+                field = Field(attr, table=results_pika_table)
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_query(str(hda_query))
