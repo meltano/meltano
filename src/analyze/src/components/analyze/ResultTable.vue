@@ -13,6 +13,7 @@ export default {
   computed: {
     ...mapState('designs', [
       'resultAggregates',
+      'queryAttributes',
       'order',
       'results',
       'keys',
@@ -23,20 +24,19 @@ export default {
       'isColumnSelectedAggregate',
     ]),
     getAssignedOrderable() {
-      return name => this.order.assigned.find(orderable => orderable.attributeName === name);
+      return attributeName => this.order.assigned.find(orderable => orderable.attributeName === attributeName);
     },
     getIsOrderableAssigned() {
-      return name => Boolean(this.getAssignedOrderable(name));
+      return attributeName => Boolean(this.getAssignedOrderable(attributeName));
     },
     getOrderables() {
       return this.order.unassigned.concat(this.order.assigned);
     },
     getOrderableStatusLabel() {
-      // TODO ensure sourceName and attributeName are used
-      return (name) => {
-        const match = this.getAssignedOrderable(name);
+      return (queryAttribute) => {
+        const match = this.getAssignedOrderable(queryAttribute.attributeName);
         const idx = this.order.assigned.indexOf(match);
-        return match ? `${idx + 1} ${match.direction}` : '';
+        return match ? `${idx + 1}. ${match.direction}` : '';
       };
     },
   },
@@ -53,12 +53,6 @@ export default {
 
     <div v-if="hasResults">
 
-      <ul>
-        <li v-for="(orderable, i) in getOrderables" :key="i" @click='updateSortAttribute(orderable)'>
-          {{`${orderable.sourceLabel} - ${orderable.attributeLabel} - ${orderable.direction}`}}
-        </li>
-      </ul>
-
       <table class="table
           is-bordered
           is-striped
@@ -68,21 +62,16 @@ export default {
           is-size-7">
         <thead>
           <tr>
-            <!-- <th v-for="(columnHeader, i) in columnHeaders"
-                :key="columnHeader + i"
-                :class="{
-                  'has-background-warning': isColumnSelectedAggregate(keys[i]),
-                  'has-background-white-ter sorted': isColumnSorted(columnNames[i]),
-                  'is-desc': sortDesc,
-                }"
+            <th v-for="queryAttribute in queryAttributes"
+                :key="`${queryAttribute.sourceName}-${queryAttribute.attributeName}`"
               >
               <div class="is-flex">
-                <div class='sort-header' @click='updateSortAttribute(columnHeader)'>
-                  <span>{{columnHeader}}</span>
+                <div class='sort-header' @click='updateSortAttribute(queryAttribute)'>
+                  <span>{{queryAttribute.attributeLabel}}</span>
                 </div>
                 <Dropdown
-                  :label="getOrderableStatusLabel('name')"
-                  :button-classes="`is-small ${getIsOrderableAssigned('name')
+                  :label="getOrderableStatusLabel(queryAttribute)"
+                  :button-classes="`is-small ${getIsOrderableAssigned(queryAttribute.attributeName)
                     ? 'has-text-interactive-secondary'
                     : ''}`"
                   icon-open='sort'
@@ -95,12 +84,12 @@ export default {
                   </div>
                 </Dropdown>
               </div>
-            </th> -->
+            </th>
           </tr>
         </thead>
         <tbody>
           <!-- eslint-disable-next-line vue/require-v-for-key -->
-          <tr v-for="result in results">
+          <tr v-for="(result, i) in results" :key="i">
             <template v-for="key in keys">
               <td :key="key" v-if="isColumnSelectedAggregate(key)">
                 {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}

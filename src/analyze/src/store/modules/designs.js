@@ -19,6 +19,7 @@ const defaultState = utils.deepFreeze({
   currentDesign: '',
   results: [],
   keys: [],
+  queryAttributes: [],
   resultAggregates: {},
   loadingQuery: false,
   currentSQL: '',
@@ -613,23 +614,20 @@ const mutations = {
   setQueryResults(state, results) {
     state.results = results.results;
     state.keys = results.keys;
+    state.queryAttributes = results.queryAttributes;
     state.resultAggregates = results.aggregates;
   },
 
   setSorting(state, allAttributes) {
-    const pairings = state.keys.map((keyString) => {
-      const split = keyString.split('.');
-      // TODO ensure I get correct payload from server that has these pairings prebuilt
-      // as region.dnoregion vs region.name is returned for region > name selection (/*split[1]*/ )
-      return { sourceName: split[0], attributeName: split[1] };
-    });
-    pairings.forEach((pairing) => {
-      const targetAttribute = allAttributes.find(attribute => attribute.sourceName === pairing.sourceName && attribute.name === pairing.attributeName);
-      const isSorted = state.order.assigned.find(orderableAttribute => orderableAttribute.sourceName === pairing.sourceName && orderableAttribute.attributeName === pairing.attributeName);
-      if (isSorted !== undefined) {
+    state.queryAttributes.forEach((queryAttribute) => {
+      const accounted = state.order.assigned.concat(state.order.unassigned);
+      const finder = orderableAttribute => orderableAttribute.sourceName === queryAttribute.sourceName && orderableAttribute.attributeName === queryAttribute.attributeName;
+      const isAccountedFor = accounted.find(finder);
+      if (!isAccountedFor) {
+        const targetAttribute = allAttributes.find(attribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName);
         state.order.unassigned.push({
           sourceName: targetAttribute.sourceName,
-          sourceLabel: targetAttribute.source.label,
+          sourceLabel: targetAttribute.sourceLabel,
           attributeName: targetAttribute.name,
           attributeLabel: targetAttribute.label,
           direction: 'asc',
