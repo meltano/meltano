@@ -16,7 +16,6 @@ export default {
       'order',
       'results',
       'keys',
-      'sortDesc',
     ]),
     ...mapGetters('designs', [
       'hasResults',
