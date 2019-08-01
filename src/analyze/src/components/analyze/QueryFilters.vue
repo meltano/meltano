@@ -10,7 +10,7 @@ export default {
         attributeHelper: {
           attribute: null,
           type: '',
-          tableName: '',
+          sourceName: '',
         },
         expression: '',
         value: '',
@@ -24,7 +24,7 @@ export default {
       'filters',
     ]),
     ...mapGetters('designs', [
-      'getAttributesByTable',
+      'getAttributesBySource',
       'hasFilters',
     ]),
     getFlattenedFilters() {
@@ -46,13 +46,13 @@ export default {
     },
     isFirstFilterMatch() {
       return (filter) => {
-        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.tableName === filter.tableName && tempFilter.name === filter.name);
+        const match = this.getFlattenedFilters.find(tempFilter => tempFilter.sourceName === filter.sourceName && tempFilter.name === filter.name);
         return match === filter;
       };
     },
     isValidAdd() {
       const vm = this.addFilterModel;
-      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.tableName && vm.expression;
+      const hasRequiredValues = vm.attributeHelper.attribute && vm.attributeHelper.sourceName && vm.expression;
       const hasValidatedOptionals = this.getHasValidatedOptionals(vm.expression, vm.value);
       return hasRequiredValues && hasValidatedOptionals;
     },
@@ -64,7 +64,7 @@ export default {
     addFilter() {
       const vm = this.addFilterModel;
       this.$store.dispatch('designs/addFilter', {
-        tableName: vm.attributeHelper.tableName,
+        sourceName: vm.attributeHelper.sourceName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
         expression: vm.expression,
@@ -134,26 +134,26 @@ export default {
                 class="select is-fullwidth is-small">
                 <select v-model='addFilterModel.attributeHelper'>
                   <optgroup
-                    v-for="attributeTable in getAttributesByTable"
-                    :key='attributeTable.tableLabel'
-                    :label="attributeTable.tableLabel">
+                    v-for="attribute in getAttributesBySource"
+                    :key='attribute.tableLabel'
+                    :label="attribute.tableLabel">
                     <option disabled>Columns</option>
                     <option
-                      v-for="column in attributeTable.columns"
+                      v-for="column in attribute.columns"
                       :key='column.label'
                       :value="{
                         attribute: column,
-                        tableName: attributeTable.tableName,
+                        sourceName: attribute.sourceName,
                         type: 'column'}">
                       {{column.label}}
                     </option>
                     <option disabled>Aggregates</option>
                     <option
-                      v-for="aggregate in attributeTable.aggregates"
+                      v-for="aggregate in attribute.aggregates"
                       :key='aggregate.label'
                       :value="{
                         attribute: aggregate,
-                        tableName: attributeTable.tableName,
+                        sourceName: attribute.sourceName,
                         type: 'aggregate'}">
                       {{aggregate.label}}
                     </option>
@@ -204,7 +204,7 @@ export default {
 
           <tr
             v-for='(filter, index) in getFlattenedFilters'
-            :key='`${filter.tableName}-${filter.name}-${index}`'>
+            :key='`${filter.sourceName}-${filter.name}-${index}`'>
             <td>
               <p class="is-small">
                 <span v-if='isFirstFilterMatch(filter)'>

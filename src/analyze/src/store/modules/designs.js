@@ -132,7 +132,7 @@ const helpers = {
       aggregates,
       timeframes,
       joins,
-      order,
+      order: null, // TODO swap back to proper state.order, this is change for testing
       limit: state.limit,
       dialect: state.dialect,
       filters,
@@ -193,14 +193,14 @@ const getters = {
     return attributes;
   },
 
-  getAttributesByTable(state) {
-    const attributeTables = [];
+  getAttributesBySource(state) {
+    const sources = [];
     const design = state.design;
     const attributeFilter = attr => !attr.hidden;
     if (design.label) {
-      attributeTables.push({
+      sources.push({
         tableLabel: design.label,
-        tableName: design.from,
+        sourceName: design.name,
         columns: design.relatedTable.columns
           ? design.relatedTable.columns.filter(attributeFilter)
           : [],
@@ -211,9 +211,9 @@ const getters = {
     }
     if (design.joins) {
       design.joins.forEach((join) => {
-        attributeTables.push({
+        sources.push({
           tableLabel: join.label,
-          tableName: join.name,
+          sourceName: join.name,
           columns: join.relatedTable.columns
             ? join.relatedTable.columns.filter(attributeFilter)
             : [],
@@ -223,13 +223,13 @@ const getters = {
         });
       });
     }
-    return attributeTables;
+    return sources;
   },
 
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.tableName === tableName);
+    return (sourceName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.sourceName === sourceName);
   },
 
   getFiltersByType(state) {
@@ -239,20 +239,18 @@ const getters = {
   // eslint-disable-next-line no-shadow
   getIsAttributeInFilters(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => !!getters.getFilter(tableName, name, filterType);
+    return (sourceName, name, filterType) => !!getters.getFilter(sourceName, name, filterType);
   },
 
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc';
   },
 
-  // eslint-disable-next-line
   getSelectedAttributes(_, getters) {
     const selector = attribute => attribute.selected;
     return getters.getAllAttributes.filter(selector);
   },
 
-  // eslint-disable-next-line
   getSelectedAttributesCount(_, getters) {
     return getters.getSelectedAttributes.length;
   },
@@ -387,11 +385,11 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  toggleAggregate({ commit, getters }, { aggregate, tableName }) {
+  toggleAggregate({ commit, getters }, { aggregate, sourceName }) {
     commit('toggleSelected', aggregate);
 
     if (!aggregate.selected) {
-      const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
+      const filter = getters.getFilter(sourceName, aggregate.name, 'aggregate');
       if (filter) {
         commit('removeFilter', filter);
       }
@@ -513,9 +511,9 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  addFilter({ commit }, { tableName, attribute, filterType, expression = '', value = '', isActive = true }) {
+  addFilter({ commit }, { sourceName, attribute, filterType, expression = '', value = '', isActive = true }) {
     const filter = {
-      tableName,
+      sourceName,
       name: attribute.name,
       expression,
       value,
