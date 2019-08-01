@@ -496,11 +496,13 @@ const actions = {
   },
 
   updateSortAttribute({ commit, getters, state }, orderableAttribute) {
-    const match = state.order.assigned.find(orderableAttr => orderableAttr === orderableAttribute);
-    if (match) {
+    const matcher = orderableAttr => orderableAttr === orderableAttribute;
+    const matchInAssigned = state.order.assigned.find(matcher);
+    const matchInUnassigned = state.order.assigned.find(matcher);
+    if (matchInAssigned) {
       const direction = getters.getIsOrderableAttributeAscending(orderableAttribute) ? 'desc' : 'asc';
-      commit('setSortableAttributeDirection', { orderableAttribute: match, direction });
-    } else {
+      commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
+    } else if (!matchInUnassigned) {
       const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.source.name === orderableAttribute.sourceName);
       commit('assignSortableAttribute', attributeMatch);
     }
@@ -682,15 +684,14 @@ const mutations = {
       return { sourceName: split[0], attributeName: 'name' };
     });
     pairings.forEach((pairing) => {
-      const finder = item => item.source.name === pairing.sourceName && item.name === pairing.attributeName;
-      const attribute = allAttributes.find(finder);
-      const isSorted = state.order.assigned.find(finder);
-      if (!isSorted) {
+      const targetAttribute = allAttributes.find(attribute => attribute.source.name === pairing.sourceName && attribute.name === pairing.attributeName);
+      const isSorted = state.order.assigned.find(orderableAttribute => orderableAttribute.sourceName === pairing.sourceName && orderableAttribute.attributeName === pairing.attributeName);
+      if (isSorted !== undefined) {
         state.order.unassigned.push({
-          sourceName: attribute.source.name,
-          sourceLabel: attribute.source.label,
-          attributeName: attribute.name,
-          attributeLabel: attribute.label,
+          sourceName: targetAttribute.source.name,
+          sourceLabel: targetAttribute.source.label,
+          attributeName: targetAttribute.name,
+          attributeLabel: targetAttribute.label,
           direction: 'asc',
         });
       }
