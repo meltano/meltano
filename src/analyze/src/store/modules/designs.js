@@ -449,15 +449,15 @@ const actions = {
     commit('setLoadReportToggle');
   },
 
-  updateSortAttribute({ commit, getters, state }, orderableAttribute) {
-    const matcher = orderableAttr => orderableAttr === orderableAttribute;
+  updateSortAttribute({ commit, getters, state }, queryAttribute) {
+    const matcher = orderableAttr => orderableAttr.sourceName === queryAttribute.sourceName && orderableAttr.attributeName === queryAttribute.attributeName;
     const matchInAssigned = state.order.assigned.find(matcher);
     const matchInUnassigned = state.order.assigned.find(matcher);
     if (matchInAssigned) {
-      const direction = getters.getIsOrderableAttributeAscending(orderableAttribute) ? 'desc' : 'asc';
+      const direction = getters.getIsOrderableAttributeAscending(matchInAssigned) ? 'desc' : 'asc';
       commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
     } else if (!matchInUnassigned) {
-      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.sourceName === orderableAttribute.sourceName);
+      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === queryAttribute.attributeName && attr.sourceName === queryAttribute.sourceName);
       commit('assignSortableAttribute', attributeMatch);
     }
 
