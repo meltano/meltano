@@ -18,14 +18,14 @@ export default {
     draggableOptions() {
       return {
         animation: 100,
-        delay: -1,
-        disabled: false,
         emptyInsertThreshold: 30,
         ghostClass: 'drag-ghost',
         group: 'sortBy',
-        swapThreshold: 1,
       };
     },
+    getIsDashed() {
+      return collection => collection.length === 0 ? "dashed" : "";
+    }
   },
   methods: {
     ...mapActions('designs', [
@@ -42,7 +42,7 @@ export default {
         v-model='order.unassigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='order.unassigned.length === 0 ? "dashed" : ""'>
+        :class='getIsDashed(order.unassigned)'>
         <transition-group>
           <div
             v-for='orderable in order.unassigned'
@@ -64,7 +64,7 @@ export default {
         v-model='order.assigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='order.assigned.length === 0 ? "dashed" : ""'>
+        :class='getIsDashed(order.assigned)'>
         <transition-group>
           <div
             v-for='(orderable, idx) in order.assigned'
@@ -97,7 +97,7 @@ export default {
   font-weight: normal;
 
   &.dashed {
-    border: 2px dashed lightgrey;
+    border: 1px dashed lightgrey;
   }
 }
 .drag-list-item {
