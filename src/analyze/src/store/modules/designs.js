@@ -19,8 +19,6 @@ const defaultState = utils.deepFreeze({
   currentDesign: '',
   results: [],
   keys: [],
-  columnHeaders: [],
-  columnNames: [],
   resultAggregates: {},
   loadingQuery: false,
   currentSQL: '',
@@ -28,8 +26,6 @@ const defaultState = utils.deepFreeze({
   reports: [],
   chartType: 'BarChart',
   limit: 50,
-  sortColumn: null,
-  sortDesc: false,
   dialect: null,
   filterOptions: [],
   filters: {
@@ -96,16 +92,6 @@ const helpers = {
       }))
       .filter(tf => tf.periods.length);
 
-    // Sorting setup - baseTable then joins if no match
-    let sortColumn = helpers.getSortColumn(state, baseTable);
-    if (!sortColumn) {
-      // Intentionally using state.design.joins vs joins to leverage join object vs join name
-      state.design.joins.some((join) => {
-        sortColumn = helpers.getSortColumn(state, join.relatedTable);
-        return Boolean(sortColumn);
-      });
-    }
-
     // Ordering setup
     const order = state.order.assigned;
 
@@ -131,17 +117,6 @@ const helpers = {
       dialect: state.dialect,
       filters,
     };
-  },
-  getSortColumn(state, table) {
-    const finder = (collection, targetName) => collection.find(d => d.name === targetName);
-    let sortColumn;
-    if (table.columns) {
-      sortColumn = finder(table.columns, state.sortColumn);
-    }
-    if (table.aggregates && !sortColumn) {
-      sortColumn = finder(table.aggregates, state.sortColumn);
-    }
-    return sortColumn;
   },
 };
 
@@ -262,8 +237,6 @@ const getters = {
     return !!(state.design.joins && state.design.joins.length);
   },
 
-  isColumnSorted: state => key => state.sortColumn === key,
-
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
@@ -357,13 +330,6 @@ const actions = {
           join,
         });
       });
-  },
-
-  removeSort({ commit, state }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) {
-      return;
-    }
-    commit('setRemoveSort', column);
   },
 
   toggleColumn({ commit }, column) {
@@ -482,13 +448,6 @@ const actions = {
     commit('setLoadReportToggle');
   },
 
-  sortBy({ commit }, name) {
-    commit('setSortColumn', name);
-    this.dispatch('designs/getSQL', {
-      run: true,
-    });
-  },
-
   updateSortAttribute({ commit, getters, state }, orderableAttribute) {
     const matcher = orderableAttr => orderableAttr === orderableAttribute;
     const matchInAssigned = state.order.assigned.find(matcher);
@@ -540,10 +499,6 @@ const mutations = {
 
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState));
-  },
-
-  setRemoveSort(state) {
-    state.sortColumn = null;
   },
 
   setChartType(state, chartType) {
@@ -635,13 +590,6 @@ const mutations = {
     state.reports.push(report);
   },
 
-  setSortColumn(state, name) {
-    if (state.sortColumn === name) {
-      state.sortDesc = !state.sortDesc;
-    }
-    state.sortColumn = name;
-  },
-
   setJoinColumns(_, { columns, join }) {
     join.columns = columns;
   },
@@ -665,8 +613,6 @@ const mutations = {
   setQueryResults(state, results) {
     state.results = results.results;
     state.keys = results.keys;
-    state.columnHeaders = results.columnHeaders;
-    state.columnNames = results.columnNames;
     state.resultAggregates = results.aggregates;
   },
 

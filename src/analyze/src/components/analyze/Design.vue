@@ -160,7 +160,6 @@ export default {
     },
 
     columnSelected(column) {
-      this.$store.dispatch('designs/removeSort', column);
       this.$store.dispatch('designs/toggleColumn', column);
       this.$store.dispatch('designs/getSQL', { run: false });
     },

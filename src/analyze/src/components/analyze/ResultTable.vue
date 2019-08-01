@@ -13,8 +13,6 @@ export default {
   computed: {
     ...mapState('designs', [
       'resultAggregates',
-      'columnHeaders',
-      'columnNames',
       'order',
       'results',
       'keys',
@@ -22,7 +20,6 @@ export default {
     ]),
     ...mapGetters('designs', [
       'hasResults',
-      'isColumnSorted',
       'getFormattedValue',
       'isColumnSelectedAggregate',
     ]),
@@ -46,7 +43,6 @@ export default {
   },
   methods: {
     ...mapActions('designs', [
-      'sortBy',
       'updateSortAttribute',
     ]),
   },
@@ -73,7 +69,7 @@ export default {
           is-size-7">
         <thead>
           <tr>
-            <th v-for="(columnHeader, i) in columnHeaders"
+            <!-- <th v-for="(columnHeader, i) in columnHeaders"
                 :key="columnHeader + i"
                 :class="{
                   'has-background-warning': isColumnSelectedAggregate(keys[i]),
@@ -85,7 +81,6 @@ export default {
                 <div class='sort-header' @click='updateSortAttribute(columnHeader)'>
                   <span>{{columnHeader}}</span>
                 </div>
-                <!-- TODO properly leverage sourceName/attributeName pairings -->
                 <Dropdown
                   :label="getOrderableStatusLabel('name')"
                   :button-classes="`is-small ${getIsOrderableAssigned('name')
@@ -101,7 +96,7 @@ export default {
                   </div>
                 </Dropdown>
               </div>
-            </th>
+            </th> -->
           </tr>
         </thead>
         <tbody>
