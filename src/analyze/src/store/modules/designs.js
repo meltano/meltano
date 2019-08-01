@@ -163,12 +163,14 @@ const getters = {
     return !!state.results.length;
   },
 
-  hasChartableResults(state, gettersRef) {
-    return gettersRef.hasResults && state.resultAggregates.length;
+  // eslint-disable-next-line
+  hasChartableResults(state, getters) {
+    return getters.hasResults && state.resultAggregates.length;
   },
 
-  hasFilters(_, gettersRef) {
-    return gettersRef.filtersCount > 0;
+  // eslint-disable-next-line
+  hasFilters(_, getters) {
+    return getters.filtersCount > 0;
   },
 
   getAllAttributes(state) {
@@ -224,31 +226,35 @@ const getters = {
     return attributeTables;
   },
 
-  getFilter(_, gettersRef) {
+  // eslint-disable-next-line no-shadow
+  getFilter(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => gettersRef.getFiltersByType(filterType).find(filter => filter.name === name && filter.tableName === tableName);
+    return (tableName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.tableName === tableName);
   },
 
   getFiltersByType(state) {
     return filterType => state.filters[helpers.getFilterTypePlural(filterType)] || [];
   },
 
-  getIsAttributeInFilters(_, gettersRef) {
+  // eslint-disable-next-line no-shadow
+  getIsAttributeInFilters(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
+    return (tableName, name, filterType) => !!getters.getFilter(tableName, name, filterType);
   },
 
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc';
   },
 
-  getSelectedAttributes(_, gettersRef) {
+  // eslint-disable-next-line
+  getSelectedAttributes(_, getters) {
     const selector = attribute => attribute.selected;
-    return gettersRef.getAllAttributes.filter(selector);
+    return getters.getAllAttributes.filter(selector);
   },
 
-  getSelectedAttributesCount(_, gettersRef) {
-    return gettersRef.getSelectedAttributes.length;
+  // eslint-disable-next-line
+  getSelectedAttributesCount(_, getters) {
+    return getters.getSelectedAttributes.length;
   },
 
   resultsCount(state) {
