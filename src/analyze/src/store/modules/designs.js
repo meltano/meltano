@@ -106,14 +106,8 @@ const helpers = {
       });
     }
 
-    // Ordering setup - TODO - Iterate when we implement multiple order sorting on backend
-    let order = null;
-    if (sortColumn && sortColumn.selected) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
+    // Ordering setup
+    const order = state.order.assigned;
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters);
@@ -132,7 +126,7 @@ const helpers = {
       aggregates,
       timeframes,
       joins,
-      order: null, // TODO swap back to proper state.order, this is change for testing
+      order,
       limit: state.limit,
       dialect: state.dialect,
       filters,
@@ -681,7 +675,7 @@ const mutations = {
       const split = keyString.split('.');
       // TODO ensure I get correct payload from server that has these pairings prebuilt
       // as region.dnoregion vs region.name is returned for region > name selection (/*split[1]*/ )
-      return { sourceName: split[0], attributeName: 'name' };
+      return { sourceName: split[0], attributeName: split[1] };
     });
     pairings.forEach((pairing) => {
       const targetAttribute = allAttributes.find(attribute => attribute.source.name === pairing.sourceName && attribute.name === pairing.attributeName);
