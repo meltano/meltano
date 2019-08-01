@@ -570,7 +570,7 @@ const mutations = {
       }
     });
     // order
-    // TODO
+    state.order = queryPayload.order;
     // base_table timeframes
     // TODO
   },
