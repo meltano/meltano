@@ -216,11 +216,13 @@ const getters = {
     return orderableAttribute => orderableAttribute.direction === 'asc';
   },
 
+  // eslint-disable-next-line no-shadow
   getSelectedAttributes(_, getters) {
     const selector = attribute => attribute.selected;
     return getters.getAllAttributes.filter(selector);
   },
 
+  // eslint-disable-next-line no-shadow
   getSelectedAttributesCount(_, getters) {
     return getters.getSelectedAttributes.length;
   },
@@ -366,6 +368,7 @@ const actions = {
     commit('setChartType', chartType);
   },
 
+  // eslint-disable-next-line no-shadow
   getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
@@ -449,6 +452,7 @@ const actions = {
     commit('setLoadReportToggle');
   },
 
+  // eslint-disable-next-line no-shadow
   updateSortAttribute({ commit, getters, state }, queryAttribute) {
     const matcher = orderableAttr => orderableAttr.sourceName === queryAttribute.sourceName && orderableAttr.attributeName === queryAttribute.attributeName;
     const matchInAssigned = state.order.assigned.find(matcher);
