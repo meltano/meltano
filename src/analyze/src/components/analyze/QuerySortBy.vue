@@ -24,8 +24,8 @@ export default {
       };
     },
     getIsDashed() {
-      return collection => collection.length === 0 ? "dashed" : "";
-    }
+      return collection => (collection.length === 0 ? 'dashed' : '');
+    },
   },
   methods: {
     ...mapActions('designs', [
