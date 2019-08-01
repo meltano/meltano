@@ -473,7 +473,7 @@ class MeltanoFilter(MeltanoBase):
     An internal representation of a Filter (WHERE or HAVING clause)
     defined in a MeltanoQuery.
 
-    definition: {"table_name", "name", "expression", "value"}
+    definition: {"source_name", "name", "expression", "value"}
 
     In the most simple case, the idea is to use it in order to generate a simple clause:
       table_name.name {expression} value
@@ -507,7 +507,7 @@ class MeltanoFilter(MeltanoBase):
         """
         Validate the Filter definition
         """
-        table_name = definition.get("table_name", None)
+        table_name = definition.get("source_name", None)
         attribute_name = definition.get("name", None)
 
         if self.expression_type == MeltanoFilterExpressionType.Unknown:

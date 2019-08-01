@@ -456,7 +456,7 @@ const actions = {
       const direction = getters.getIsOrderableAttributeAscending(orderableAttribute) ? 'desc' : 'asc';
       commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
     } else if (!matchInUnassigned) {
-      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.source.name === orderableAttribute.sourceName);
+      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === orderableAttribute.attributeName && attr.sourceName === orderableAttribute.sourceName);
       commit('assignSortableAttribute', attributeMatch);
     }
 
@@ -491,7 +491,7 @@ const actions = {
 
 const mutations = {
   assignSortableAttribute(state, attribute) {
-    const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.source.name);
+    const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.sourceName);
     const idx = state.order.unassigned.indexOf(orderableAttribute);
     state.order.unassigned.splice(idx, 1);
     state.order.assigned.push(orderableAttribute);
@@ -624,11 +624,11 @@ const mutations = {
       return { sourceName: split[0], attributeName: split[1] };
     });
     pairings.forEach((pairing) => {
-      const targetAttribute = allAttributes.find(attribute => attribute.source.name === pairing.sourceName && attribute.name === pairing.attributeName);
+      const targetAttribute = allAttributes.find(attribute => attribute.sourceName === pairing.sourceName && attribute.name === pairing.attributeName);
       const isSorted = state.order.assigned.find(orderableAttribute => orderableAttribute.sourceName === pairing.sourceName && orderableAttribute.attributeName === pairing.attributeName);
       if (isSorted !== undefined) {
         state.order.unassigned.push({
-          sourceName: targetAttribute.source.name,
+          sourceName: targetAttribute.sourceName,
           sourceLabel: targetAttribute.source.label,
           attributeName: targetAttribute.name,
           attributeLabel: targetAttribute.label,
@@ -675,7 +675,7 @@ const mutations = {
       attributeTypes.forEach((attributeType) => {
         if (table[attributeType]) {
           table[attributeType].forEach((attribute) => {
-            attribute.source = source;
+            attribute.sourceName = source.name;
           });
         }
       });
