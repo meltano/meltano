@@ -448,6 +448,10 @@ const actions = {
     commit('setErrorState');
   },
 
+  resetSortAttributes({ commit }) {
+    commit('resetSortAttributes');
+  },
+
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
   },
@@ -504,6 +508,12 @@ const mutations = {
 
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState));
+  },
+
+  resetSortAttributes(state) {
+    const assigned = state.order.assigned;
+    state.order.unassigned = state.order.unassigned.concat(assigned);
+    state.order.assigned = [];
   },
 
   setChartType(state, chartType) {

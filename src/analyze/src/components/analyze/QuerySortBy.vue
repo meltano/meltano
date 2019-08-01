@@ -29,6 +29,7 @@ export default {
   },
   methods: {
     ...mapActions('designs', [
+      'resetSortAttributes',
       'updateSortAttribute',
     ]),
   },
@@ -88,6 +89,12 @@ export default {
         </transition-group>
       </draggable>
     </div>
+    <template v-if='order.assigned.length > 0'>
+      <hr class='dropdown-divider'>
+      <div class="dropdown-item">
+        <a class='button is-small is-block has-text-weight-normal' @click.stop='resetSortAttributes'>Reset</a>
+      </div>
+    </template>
   </div>
 </template>
 
