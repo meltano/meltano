@@ -452,6 +452,12 @@ const actions = {
     commit('resetSortAttributes');
   },
 
+  runQuery() {
+    this.dispatch('designs/getSQL', {
+      run: true,
+    });
+  },
+
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle');
   },
@@ -469,9 +475,7 @@ const actions = {
       commit('assignSortableAttribute', attributeMatch);
     }
 
-    this.dispatch('designs/getSQL', {
-      run: true,
-    });
+    this.dispatch('designs/runQuery');
   },
 
   // eslint-disable-next-line

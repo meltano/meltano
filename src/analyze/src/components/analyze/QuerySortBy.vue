@@ -30,6 +30,7 @@ export default {
   methods: {
     ...mapActions('designs', [
       'resetSortAttributes',
+      'runQuery',
       'updateSortAttribute',
     ]),
   },
@@ -43,7 +44,8 @@ export default {
         v-model='order.unassigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.unassigned)'>
+        :class='getIsDashed(order.unassigned)'
+        @end="runQuery">
         <transition-group>
           <div
             v-for='orderable in order.unassigned'
@@ -65,7 +67,8 @@ export default {
         v-model='order.assigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.assigned)'>
+        :class='getIsDashed(order.assigned)'
+        @end="runQuery">
         <transition-group>
           <div
             v-for='(orderable, idx) in order.assigned'
