@@ -13,11 +13,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
-* [#821](https://gitlab.com/meltano/meltano/issues/821) Fix `meltano config` not properly loading settings defined in the `meltano.yml`
-* [#841](https://gitlab.com/meltano/meltano/issues/841) Fix a problem when model names were mangled by the API
-
 
 ### Breaks
+
+
+## 0.34.2 - (2019-08-01)
+---
+
+### Fixes
+* [#821](https://gitlab.com/meltano/meltano/issues/821) Fix `meltano config` not properly loading settings defined in the `meltano.yml`
+* [#841](https://gitlab.com/meltano/meltano/issues/841) Fix a problem when model names were mangled by the API
 
 
 ## 0.34.1 - (2019-07-30)
