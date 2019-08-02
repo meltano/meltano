@@ -22,6 +22,11 @@ def all():
 
 @pluginsBP.route("/installed", methods=["GET"])
 def installed():
+    """Returns JSON of all installed plugins
+
+    Fuses the discovery.yml data with meltano.yml data
+    """
+
     project = Project.find()
     config = ConfigService(project)
     plugins = []
