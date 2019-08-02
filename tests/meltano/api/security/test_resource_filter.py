@@ -19,13 +19,6 @@ def identity(app):
         yield identity
 
 
-@pytest.fixture
-@pytest.mark.usefixtures("add_model")
-def compile_models(project_compiler):
-    project_compiler.compile()
-
-
-@pytest.mark.usefixtures("compile_models")
 class TestResourcePermission:
     def test_allows(self, identity):
         resource_need = Need("view:design", "*")
@@ -39,11 +32,14 @@ class TestResourcePermission:
         assert not ResourcePermission(item_need).allows(identity)
 
 
-@pytest.mark.usefixtures("compile_models")
 class TestTopicFilter:
     @pytest.fixture
     def subject(self):
         return TopicFilter()
+
+    @pytest.fixture(scope="class", autouse=True)
+    def compile_models(self, add_model, project_compiler):
+        project_compiler.compile()
 
     def test_filter(self, project, identity, app):
         identity.provides.add(Need("view:topic", "*"))

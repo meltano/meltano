@@ -51,6 +51,9 @@ class PluginInstallService:
                 status["status"] = "warning"
                 status["message"] = str(warn)
                 errors.append(status)
+            except PluginNotInstallable as info:
+                # let's totally ignore these plugins
+                pass
 
             status_cb(status)
 

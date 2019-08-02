@@ -2,13 +2,10 @@ import datetime
 import logging
 import logging.handlers
 import os
-from flask import Flask, request, render_template, g
-from flask import jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_security import login_required
+import atexit
+from flask import Flask, request, g
 from flask_login import current_user
 from flask_cors import CORS
-from jinja2.exceptions import TemplateNotFound
 from importlib import reload
 from urllib.parse import urlsplit
 
@@ -20,26 +17,29 @@ from meltano.core.plugin.settings_service import (
 )
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from .external_connector import ExternalConnector
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
-from . import config as default_config
 
 
-connector = ExternalConnector()
 logger = logging.getLogger(__name__)
 
 
 def create_app(config={}):
     project = Project.find()
 
-    app = Flask(__name__)
-    app.config.from_object(reload(default_config))
+    app = Flask(
+        __name__, instance_path=str(project.root), instance_relative_config=True
+    )
+
+    app.config.from_object("meltano.api.config")
+    app.config.from_pyfile("ui.cfg", silent=True)
     app.config.update(**config)
 
-    if not app.config["SQLALCHEMY_DATABASE_URI"]:
-        app.config[
-            "SQLALCHEMY_DATABASE_URI"
-        ] = f"sqlite:///{project.root.joinpath('meltano.db')}"
+    # the database should be instance_relative if we are using `sqlite`
+    scheme, netloc, path, *parts = urlsplit(app.config["SQLALCHEMY_DATABASE_URI"])
+    if scheme == "sqlite" and path:
+        app.config["SQLALCHEMY_DATABASE_URI"] = (
+            scheme + ":///" + app.instance_path + path
+        )
 
     # Initial compilation
     compiler = ProjectCompiler(project)
@@ -50,7 +50,7 @@ def create_app(config={}):
 
     # Logging
     file_handler = logging.handlers.RotatingFileHandler(
-        app.config["LOG_PATH"], maxBytes=2000, backupCount=10
+        str(project.run_dir("meltano-ui.log")), backupCount=3
     )
     stdout_handler = logging.StreamHandler()
 
@@ -66,13 +66,17 @@ def create_app(config={}):
 
     from .models import db
     from .mail import mail
+    from .executor import setup_executor
     from .security import security, users, setup_security
     from .security.oauth import setup_oauth
+    from .json import setup_json
 
     db.init_app(app)
     mail.init_app(app)
+    setup_executor(app, project)
     setup_security(app, project)
     setup_oauth(app)
+    setup_json(app)
     CORS(app, origins="*")
 
     from .controllers.root import root
@@ -120,7 +124,7 @@ def create_app(config={}):
         if request.method != "OPTIONS":
             request_message += f" as {current_user}"
 
-        logging.info(request_message)
+        logger.info(request_message)
         return res
 
     return app
@@ -129,26 +133,22 @@ def create_app(config={}):
 def start(project, **kwargs):
     """Start Meltano UI as a single-threaded web server."""
 
-    cleanup = None
-    try:
-        app_config = kwargs.pop("app_config", {})
-        app = create_app(app_config)
-        from .security.identity import create_dev_user
+    app_config = kwargs.pop("app_config", {})
+    app = create_app(app_config)
+    from .security.identity import create_dev_user
 
-        with app.app_context():
-            # TODO: alembic migration
-            create_dev_user()
+    with app.app_context():
+        # TODO: alembic migration
+        create_dev_user()
 
-        # ensure we only start the workers on the via the main thread
-        # this will make sure we don't start everything twice
-        # when code reload is enabled
-        if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-            cleanup = start_workers(app, project)
+    # ensure we only start the workers on the via the main thread
+    # this will make sure we don't start everything twice
+    # when code reload is enabled
+    if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        cleanup = start_workers(app, project)
+        atexit.register(cleanup)
 
-        app.run(**kwargs)
-    finally:
-        if cleanup:
-            cleanup()
+    app.run(**kwargs)
 
 
 def start_workers(app, project):
@@ -157,7 +157,7 @@ def start_workers(app, project):
         if not app.config["AIRFLOW_DISABLED"]:
             workers.append(AirflowWorker(project))
     except:
-        logging.info("Airflow is not installed.")
+        logger.info("Airflow is not installed.")
 
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(
@@ -165,6 +165,7 @@ def start_workers(app, project):
     )
 
     def stop_all():
+        logger.info("Stopping all background workers...")
         for worker in workers:
             worker.stop()
 

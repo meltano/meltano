@@ -5,7 +5,18 @@ import contextlib
 import logging
 
 from meltano.core.db import DB, project_engine
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import text, create_engine, MetaData
+
+
+def recreate_database(engine, db_name):
+    """
+    Drop & Create a new database, PostgreSQL only.
+    """
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
+        engine.execute(text(f"DROP DATABASE {db_name}"))
+
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
+        engine.execute(text(f"CREATE DATABASE {db_name}"))
 
 
 @pytest.fixture(scope="session")
@@ -18,8 +29,7 @@ def engine_uri():
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
-    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
-        DB.create_database(engine, "pytest")
+    recreate_database(engine, "pytest")
 
     return f"postgresql://{user}:{password}@{host}:{port}/pytest"
 
@@ -36,7 +46,7 @@ def engine_sessionmaker(project, engine_uri):
 def session(request, engine_sessionmaker):
     """Creates a new database session for a test."""
     engine, sessionmaker = engine_sessionmaker
-    truncate_tables(engine, schema="meltano")
+    truncate_tables(engine)
 
     session = sessionmaker()
 
@@ -45,7 +55,7 @@ def session(request, engine_sessionmaker):
     # teardown
     session.close()
     logging.debug("Session closed.")
-    truncate_tables(engine, schema="meltano")
+    truncate_tables(engine)
 
 
 def truncate_tables(engine, schema=None):
@@ -55,7 +65,11 @@ def truncate_tables(engine, schema=None):
         with con.begin():
             meta = MetaData(bind=engine, schema=schema)
             meta.reflect()
+
             for table in meta.sorted_tables:
+                if table.name == "alembic_version":
+                    continue
+
                 logging.debug(f"table {table} truncated.")
                 con.execute(table.delete())
 

@@ -81,8 +81,6 @@ class FreeUser:
 
 
 def create_dev_user():
-    db.create_all()
-
     for role in SEED_ROLES:
         role = role.copy()
         role_name = role.pop("name")

@@ -6,20 +6,21 @@ with open("README.md", "r") as fh:
 
 requires = [
     'aiohttp==3.4.4',
+    'alembic==1.0.11',
     'authlib==0.10',
     'backoff==1.8.0',
-    'urllib3==1.23',
     'bcrypt==3.1.6',
+    'Cerberus==1.2',
     'click==7.0',
     'colorama==0.3.9',
-    'Cerberus==1.2',
-    'sqlparse==0.3.0',
     'gitpython==2.1.11',
     'jsonschema==2.6.0',
     'markdown==3.0.1',
     'networkx==2.2',
     'pandas==0.24.1',
     'psycopg2==2.7.7',
+    'psutil==5.6.3',
+    'pyhumps==0.4.0',
     'pypika==0.25.1',
     'python-dotenv==0.10.1',
     'pyyaml==3.13',
@@ -29,6 +30,7 @@ requires = [
     'fasteners==0.15.0',
     'flask>=1.0.2',
     'flask-cors==3.0.7',
+    'flask-executor==0.9.2',
     'flask-sqlalchemy==2.3.2',
     'flask-restful==0.3.7',
     'flask-jwt-extended==3.17.0',
@@ -38,13 +40,15 @@ requires = [
     'python-dotenv==0.10.1',
     'python-gitlab==1.8.0',
     'simplejson==3.16.0',
+    'urllib3==1.23',
+    'sqlparse==0.3.0',
     'watchdog==0.9.0',
 ]
 
 # conflicts resolution, see https://gitlab.com/meltano/meltano/issues/193
 conflicts = [
-    'idna==2.7',
     'aenum==2.1.2',
+    'idna==2.7',
 ]
 
 dev_requires = [
@@ -57,11 +61,12 @@ dev_requires = [
     'pytest-asyncio==0.10.0',
     'requests-mock==1.6.0',
     'ipython==7.5.0',
+    'pytest-cov==2.6.1',
 ]
 
 setup(
     name="meltano",
-    version="0.32.1",
+    version="0.34.2",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

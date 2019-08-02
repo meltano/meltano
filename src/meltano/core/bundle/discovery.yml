@@ -8,11 +8,15 @@ extractors:
         env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
         kind: file
       - name: view_id
+        env: GOOGLE_ANALYTICS_API_VIEW_ID
         label: View ID
       - name: reports
+        env: GOOGLE_ANALYTICS_API_REPORTS
       - name: start_date
+        env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
       - name: end_date
+        env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
   - name: tap-gitlab
     namespace: gitlab
@@ -22,7 +26,7 @@ extractors:
         label: GitLab API URL
         value: "https://gitlab.com/api/v4"
       - name: private_token
-        env: GITLAB_API_PRIVATE_TOKEN
+        env: GITLAB_API_TOKEN
       - name: groups
         value: ""
         env: GITLAB_API_GROUPS
@@ -77,7 +81,7 @@ extractors:
       - name: start_time
         kind: date_iso8601
   - name: tap-salesforce
-    namespace: salesforce
+    namespace: sfdc
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     settings:
       # TODO: remove, should be injected from Meltano
@@ -98,6 +102,7 @@ extractors:
     pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
     settings:
       - name: user
+        env: MONGODB_USERNAME
       - name: password
         kind: password
       - name: host
@@ -112,6 +117,7 @@ extractors:
       - name: account_id
         label: Account ID
       - name: client_secret
+        env: STRIPE_API_KEY
       - name: start_date
         kind: date_iso8601
   - name: tap-fastly
@@ -131,6 +137,7 @@ extractors:
     pip_url: "git+https://gitlab.com/meltano/tap-csv.git"
     settings:
       - name: csv_files_definition
+        env: TAP_CSV_FILES_DEFINITION
         label: CSV Files Definition
         kind: file
         documentation: https://gitlab.com/meltano/tap-csv#run
@@ -154,13 +161,20 @@ loaders:
     # connection from analyze.
     settings:
       - name: account
+        env: SF_ACCOUNT
       - name: username
+        env: SF_USER
       - name: password
+        env: SF_PASSWORD
         kind: password
       - name: role
+        env: SF_ROLE
       - name: database
+        env: SF_DATABASE
       - name: schema
+        env: SF_SCHEMA
       - name: warehouse
+        env: SF_WAREHOUSE
   - name: target-postgres
     namespace: pg
     pip_url: "git+https://github.com/meltano/target-postgres.git"

@@ -6,24 +6,21 @@ include:
   - "/docker/build-ci.yml"
 
 stages:
-  - test
   - docs
   - build-base
   - build-meltano
+  - test
   - build-runner
-  - test-docker
   - publish
   - review
-  # - production
 
 lint:
   stage: test
   image:
-    name: registry.gitlab.com/meltano/meltano/base
+    name: registry.gitlab.com/meltano/meltano
     entrypoint: [""]
-  before_script:
-    - pip install black
   script:
+    - pip install black
     - make show_lint
 
 install_e2e:
@@ -87,16 +84,19 @@ docs:
 .test: &test
   stage: test
   image:
-    name: registry.gitlab.com/meltano/meltano/base
+    name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_SHA
     entrypoint: [""]
   before_script:
-    - make bundle
     - pip install '.[dev]'
   script:
-    - pytest -v
+    - pytest -v --cov-report= --cov meltano
+    - coverage combine .coverage
+    - coverage report
+    - coverage html
   artifacts:
     paths:
-      - pytest.log
+      - htmlcov/
+    when: on_success
 
 test_postgres:
   <<: *test
@@ -122,31 +122,18 @@ test_sqlite:
     PYTEST_BACKEND: sqlite
     SQLITE_DATABASE: pytest
 
-package:
-  stage: test
-  image:
-    name: registry.gitlab.com/meltano/meltano/base
-    entrypoint: [""]
-  script:
-    - make sdist
-  artifacts:
-    paths:
-      - dist
-
 publish:
   image:
-    name: registry.gitlab.com/meltano/meltano/base
+    name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_TAG
     entrypoint: [""]
   stage: publish
   before_script:
     - pip install twine
   script:
-    - make sdist
-    - twine upload dist/*
+    - twine upload /meltano/dist/*
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
-
 
 .review:
   image: silvs/kubectl:latest
@@ -187,17 +174,3 @@ hub_meltano: &docker_hub_publish
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
-
-.production:
-  image: silvs/kubectl:latest
-  stage: production
-  environment:
-    name: production
-    url: https://melt.gitlab-bizops.com
-  script:
-    - cd app/chart/meltano
-    - helm init --client-only
-    - helm dep update
-    - helm upgrade --install --namespace default meltano . --set image.repository=$CI_REGISTRY_IMAGE/meltano,image.tag=base-$CI_COMMIT_SHA,ingress.enabled=true,'global.ingress.hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].hosts[0]=melt.gitlab-bizops.com','global.ingress.tls[0].secretName=melt-tls',postgresql.postgresPassword=$POSTGRES_PASSWORD,oauth2-proxy.clientId=$OAUTH2_PROXY_CLIENT_ID,oauth2-proxy.clientSecret=$OAUTH2_PROXY_CLIENT_SECRET,oauth2-proxy.cookieSecret=$OAUTH2_PROXY_COOKIE_SECRET,oauth2-proxy.enabled=true,global.oauth2-proxy.enabled=true,oauth2-proxy.emailDomain=gitlab.com,oauth2-proxy.gitlabHost=https://dev.gitlab.org
-  only:
-    - master

@@ -60,6 +60,7 @@ export default {
         transform: '',
         interval: '',
         startDate: null,
+        isRunning: false,
       },
       transformOptions: [
         'skip',

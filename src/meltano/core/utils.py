@@ -10,8 +10,6 @@ from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
 
-from .db import DB
-
 
 TRUTHY = ("true", "1", "yes", "on")
 
@@ -67,13 +65,6 @@ def slugify(s):
     s = s.replace(" ", "-")
 
     return s
-
-
-def setup_db(args=None):
-    if args is None:
-        DB.setup()
-    else:
-        DB.setup(**vars(args))
 
 
 def setup_logging(log_level=logging.INFO):
@@ -196,3 +187,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         pass
 
     return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))
+
+
+def find_named(xs: Iterable[dict], name: str):
+    return next(x for x in xs if x["name"] == name)

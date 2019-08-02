@@ -127,32 +127,26 @@ meltano add loader target-postgres
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
-export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
+FLASK_ENV=development
+SQLITE_DATABASE=meltano
 
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_SCHEMA=analytics
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+PG_PASSWORD=warehouse
+PG_USERNAME=warehouse
+PG_ADDRESS=localhost
+PG_SCHEMA=analytics
+PG_PORT=5502
+PG_DATABASE=warehouse
 
-export SFDC_URL=
-export SFDC_USERNAME=''
-export SFDC_PASSWORD=''
-export SFDC_SECURITY_TOKEN=''
-export SFDC_CLIENT_ID='secret_client_id'
+SFDC_URL=
+SFDC_USERNAME=''
+SFDC_PASSWORD=''
+SFDC_SECURITY_TOKEN=''
+SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-03-01T00:00:00Z'
+SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
 You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
-
-Finally, make the credentials available to Meltano by executing the following command in your terminal:
-
-```bash
-source .env
-```
 
 ### Select The Entities to Export from Salesforce
 
@@ -545,11 +539,6 @@ models:
       livemode: false
       schema: '{{ env_var(''PG_SCHEMA'') }}'
 ```
-Before we re-run the ELT process, we should update our environment variables.
-
-```bash
-source .env
-```
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
 
@@ -723,90 +712,6 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 [Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 
-## Using Docker
-
-A Docker image should be built containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
-
-This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
-
-The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
-
-### Using pre-built Docker images
-
-We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
-
-> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
-
-This image contains everything you need to get started with Meltano.
-
-```bash
-# to download or update to the latest version
-$ docker pull meltano/meltano
-
-# to look the currently installed version
-$ docker run meltano/meltano --version
-meltano, version …
-```
-
-Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
-
-### Creating your own Docker image
-
-It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
-
-> This tutorial is inspired of the [Starter tutorial](#starter) but with Meltano running inside a Docker container.
-
-We will use `docker run` to execute Meltano using the pre-built docker images.
-
-#### Initialize Your Project
-
-First things first, let's create a new Meltano project named **carbon**.
-
-```
-$ docker run -v $(pwd):/projects \
-             -w /projects \
-             meltano/meltano init carbon
-```
-
-Then you can `cd` into your new project:
-
-```
-$ cd carbon
-```
-
-Now let's extract some data from the **tap-carbon-intensity** into **target-sqlite**:
-
-```
-$ docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano elt tap-carbon-intensity target-sqlite
-```
-
-#### Analyze with Meltano UI
-
-Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
-
-```
-$ docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano add model model-carbon-intensity-sqlite
-```
-
-We can then start the Meltano UI.
-
-```
-# `ui` is the default command, we can omit it.
-$ docker run -v $(pwd):/project \
-             -w /project \
-             -p 5000:5000 \
-             meltano/meltano
-```
-
-You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
-
-For furter analysis, please head to the [Analyze](#analyze) section.
-
-
 ## Using Jupyter Notebooks
 
 Once the `meltano elt` pipeline has successfully completed and data extracted from an API or a Data Source have been transformed and loaded to the `analytics` schema of your Data Warehouse, you can use Meltano UI or any data exploration tool to analyze and generate reports.
@@ -850,7 +755,9 @@ Once the installation is completed, you are set to use Jupyter Notebooks with Me
 
 ```bash
 cd /path/to/my/meltano/project
+set +a
 source .env
+set -a 
 ```
 
 This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.

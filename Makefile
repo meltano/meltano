@@ -132,10 +132,13 @@ bundle_ui: ui
 	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
 	cp -r src/analyze/dist/static src/meltano/api
 
+freeze_db:
+	scripts/alembic_freeze.py
+
 .PHONY: bundle
 bundle: bundle_ui
 
-sdist: bundle
+sdist: bundle freeze_db
 	python setup.py sdist
 
 docker_sdist: base_image
@@ -216,8 +219,12 @@ explain_makefile:
 
 # Release
 # =====================
+ifdef type
+  override type := --$(type)
+endif
+
 release:
 	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; } && \
-	changelog release --yes && \
+	changelog release $(type) --yes && \
 	git add CHANGELOG.md && \
 	bumpversion --tag --allow-dirty --new-version `changelog current` minor

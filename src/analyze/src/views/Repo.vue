@@ -118,7 +118,7 @@ export default {
                     <li class="level">
                       <div class="tags has-addons">
                         <span class="tag is-info">?</span>
-                        <span class="tag">{{err.file_name}}</span>
+                        <span class="tag">{{err.fileName}}</span>
                       </div>
                     </li>
                     <li class="error-desc-cont">

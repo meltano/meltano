@@ -1,12 +1,15 @@
+import lodash from 'lodash';
+
+import utils from '@/utils/utils';
 import dashboardsApi from '../../api/dashboards';
 import reportsApi from '../../api/reports';
 
-const state = {
+const defaultState = utils.deepFreeze({
   activeDashboard: {},
   activeDashboardReports: [],
   dashboards: [],
   reports: [],
-};
+});
 
 const actions = {
   initialize({ dispatch }, slug) {
@@ -17,7 +20,7 @@ const actions = {
         dispatch('preloadDashboard', slug);
       });
   },
-  preloadDashboard({ dispatch }, slug) {
+  preloadDashboard({ dispatch, state }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
     if (slug) {
       const dashboardMatch = state.dashboards.find(dashboard => dashboard.slug === slug);
@@ -50,7 +53,7 @@ const actions = {
         });
     });
   },
-  getActiveDashboardReportsWithQueryResults({ commit }) {
+  getActiveDashboardReportsWithQueryResults({ commit, state }) {
     const ids = state.activeDashboard.reportIds;
     const activeReports = state.reports.filter(report => ids.includes(report.id));
     dashboardsApi.getActiveDashboardReportsWithQueryResults(activeReports)
@@ -95,26 +98,26 @@ const actions = {
 };
 
 const mutations = {
-  addSavedDashboardToDashboards(_, dashboard) {
+  addSavedDashboardToDashboards(state, dashboard) {
     state.dashboards.push(dashboard);
   },
-  setActiveDashboardReports(_, reports) {
+  setActiveDashboardReports(state, reports) {
     state.activeDashboardReports = reports;
   },
-  setCurrentDashboard(_, dashboard) {
+  setCurrentDashboard(state, dashboard) {
     state.activeDashboard = dashboard;
   },
-  setDashboards(_, dashboards) {
+  setDashboards(state, dashboards) {
     state.dashboards = dashboards;
   },
-  setReports(_, reports) {
+  setReports(state, reports) {
     state.reports = reports;
   },
 };
 
 export default {
   namespaced: true,
-  state,
+  state: lodash.cloneDeep(defaultState),
   actions,
   mutations,
 };

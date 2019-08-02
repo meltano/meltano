@@ -897,7 +897,12 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         class="level-item"
                       >
                         <code>
-                          
+                          SELECT
+  COALESCE(COUNT("region"."id"), 0) "region.count"
+FROM
+  "region" "region"
+LIMIT
+  3;
                         </code>
                       </div>
                     </div>
@@ -1337,131 +1342,78 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           <p
             class="control"
           >
-            <div
-              class="dropdown is-right"
+            <dropdown-stub
+              buttonclasses="is-interactive-primary is-outlined"
+              isrightaligned="true"
+              label="Save"
             >
               <div
-                class="dropdown-trigger"
-              >
-                <button
-                  aria-controls="dropdown-save"
-                  aria-haspopup="true"
-                  class="button is-interactive-primary is-outlined"
-                  disabled="disabled"
-                >
-                  <span>
-                    Save
-                  </span>
-                   
-                  <span
-                    class="icon is-small"
-                  >
-                    <font-awesome-icon-stub
-                      icon="caret-down"
-                    />
-                  </span>
-                </button>
-              </div>
-               
-              <div
-                class="dropdown-menu"
-                id="dropdown-save"
-                role="menu"
+                class="dropdown-content"
               >
                 <div
-                  class="dropdown-content"
+                  class="dropdown-item"
                 >
                   <div
-                    class="dropdown-item"
+                    class="field"
+                  >
+                    <!---->
+                     
+                    <div
+                      class="control"
+                    >
+                      <input
+                        class="input"
+                        placeholder="Name your report"
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                   
+                  <div
+                    class="field is-grouped"
                   >
                     <div
-                      class="field"
+                      class="control"
                     >
-                      <!---->
-                       
-                      <div
-                        class="control"
+                      <button
+                        class="button is-interactive-primary"
+                        disabled="disabled"
                       >
-                        <input
-                          class="input"
-                          placeholder="Name your report"
-                          type="text"
-                        />
-                      </div>
+                        Save
+                      </button>
                     </div>
                      
                     <div
-                      class="field is-grouped"
+                      class="control"
                     >
-                      <div
-                        class="control"
+                      <button
+                        class="button is-text"
+                        data-dropdown-auto-close=""
                       >
-                        <button
-                          class="button is-interactive-primary"
-                          disabled="disabled"
-                        >
-                          Save
-                        </button>
-                      </div>
-                       
-                      <div
-                        class="control"
-                      >
-                        <button
-                          class="button is-text"
-                          data-dropdown-auto-close=""
-                        >
-                          
+                        
                         Cancel
-                        </button>
-                      </div>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </dropdown-stub>
           </p>
         </div>
          
         <p
           class="control"
         >
-          <div
-            class="dropdown is-right"
+          <dropdown-stub
+            buttonclasses="is-interactive-primary is-outlined"
+            disabled="true"
+            isrightaligned="true"
+            label="Load"
           >
             <div
-              class="dropdown-trigger"
-            >
-              <button
-                aria-controls="dropdown-load"
-                aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
-                disabled="disabled"
-              >
-                <span>
-                  Load
-                </span>
-                 
-                <span
-                  class="icon is-small"
-                >
-                  <font-awesome-icon-stub
-                    icon="caret-down"
-                  />
-                </span>
-              </button>
-            </div>
-             
-            <div
-              class="dropdown-menu"
-              id="dropdown-load"
-              role="menu"
-            >
-              <div
-                class="dropdown-content"
-              />
-            </div>
-          </div>
+              class="dropdown-content"
+            />
+          </dropdown-stub>
         </p>
          
         <div
@@ -1507,47 +1459,32 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             <div
               class="buttons is-right"
             >
-              <div
-                class="dropdown"
+              <dropdown-stub
+                buttonclasses="is-text is-small"
+                iscaretremoved="true"
+                label="SQL"
               >
                 <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-sql"
-                    aria-haspopup="true"
-                    class="button is-text is-small"
-                  >
-                    <span>
-                      SQL
-                    </span>
-                     
-                    <!---->
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-sql"
-                  role="menu"
+                  class="dropdown-content"
                 >
                   <div
-                    class="dropdown-content"
+                    class="level"
                   >
                     <div
-                      class="level"
+                      class="level-item"
                     >
-                      <div
-                        class="level-item"
-                      >
-                        <code>
-                          
-                        </code>
-                      </div>
+                      <code>
+                        SELECT
+  COALESCE(COUNT("region"."id"), 0) "region.count"
+FROM
+  "region" "region"
+LIMIT
+  3;
+                      </code>
                     </div>
                   </div>
                 </div>
-              </div>
+              </dropdown-stub>
                
               <button
                 class="button is-success"
@@ -1604,168 +1541,22 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               <div
                 class="control is-expanded"
               >
-                <div
-                  class="dropdown is-fullwidth"
+                <dropdown-stub
+                  buttonclasses="is-small "
+                  isfullwidth="true"
+                  label="None"
+                  menuclasses="dropdown-menu-600"
                 >
                   <div
-                    class="dropdown-trigger"
-                  >
-                    <button
-                      aria-controls="dropdown-none"
-                      aria-haspopup="true"
-                      class="button is-small "
-                    >
-                      <span>
-                        None
-                      </span>
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu dropdown-menu-600"
-                    id="dropdown-none"
-                    role="menu"
+                    class="dropdown-content"
                   >
                     <div
-                      class="dropdown-content"
+                      class="dropdown-item"
                     >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <div>
-                          <table
-                            class="table is-size-7 is-fullwidth is-narrow is-hoverable"
-                          >
-                            <thead>
-                              <tr>
-                                <th>
-                                  <span>
-                                    Attribute
-                                  </span>
-                                   
-                                  <span
-                                    class="icon has-text-grey-light tooltip is-tooltip-right"
-                                    data-tooltip="The column or aggregate to filter."
-                                  >
-                                    <font-awesome-icon-stub
-                                      icon="info-circle"
-                                    />
-                                  </span>
-                                </th>
-                                 
-                                <th
-                                  class="has-text-centered"
-                                >
-                                  <span>
-                                    Operation
-                                  </span>
-                                   
-                                  <span
-                                    class="icon has-text-grey-light tooltip"
-                                    data-tooltip="The filter expression for the selected column or aggregate."
-                                  >
-                                    <font-awesome-icon-stub
-                                      icon="info-circle"
-                                    />
-                                  </span>
-                                </th>
-                                 
-                                <th
-                                  class="has-text-centered"
-                                >
-                                  <span>
-                                    Value
-                                  </span>
-                                   
-                                  <span
-                                    class="icon has-text-grey-light tooltip"
-                                    data-tooltip="The value to operate on when filtering."
-                                  >
-                                    <font-awesome-icon-stub
-                                      icon="info-circle"
-                                    />
-                                  </span>
-                                </th>
-                                 
-                                <th
-                                  class="has-text-right"
-                                >
-                                  <span>
-                                    Actions
-                                  </span>
-                                </th>
-                              </tr>
-                            </thead>
-                             
-                            <tbody>
-                              <tr>
-                                <td>
-                                  <p
-                                    class="control is-expanded"
-                                  >
-                                    <span
-                                      class="select is-fullwidth is-small"
-                                    >
-                                      <select />
-                                    </span>
-                                  </p>
-                                </td>
-                                 
-                                <td>
-                                  <p
-                                    class="control is-expanded"
-                                  >
-                                    <span
-                                      class="select is-fullwidth is-small"
-                                    >
-                                      <select />
-                                    </span>
-                                  </p>
-                                </td>
-                                 
-                                <td>
-                                  <p
-                                    class="control is-expanded"
-                                  >
-                                    <input
-                                      class="input is-small"
-                                      placeholder="Filter value"
-                                      type="text"
-                                    />
-                                  </p>
-                                </td>
-                                 
-                                <td>
-                                  <div
-                                    class="control"
-                                  >
-                                    <button
-                                      class="button is-small is-fullwidth is-interactive-primary is-outlined"
-                                      disabled="disabled"
-                                    >
-                                      
-              Add
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                               
-                              <!---->
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
+                      <queryfilters-stub />
                     </div>
                   </div>
-                </div>
+                </dropdown-stub>
               </div>
             </div>
           </div>
@@ -1834,7 +1625,11 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                 Results
               </span>
                
-              <!---->
+              <span
+                class="has-text-weight-light has-text-grey-light is-size-7"
+              >
+                (1)
+              </span>
             </h2>
           </div>
            
@@ -1846,7 +1641,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             >
               <button
                 class="button is-active has-text-interactive-secondary"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -1859,7 +1653,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -1872,7 +1665,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -1885,7 +1677,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -1900,19 +1691,17 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
         </div>
          
         <div>
-          <!---->
-           
-          <div>
-            <div
-              class="box is-radiusless is-shadowless has-text-centered"
-            >
-              <p>
-                
-                Run a query with at least one aggregate selected or load a report
-              
-              </p>
-            </div>
+          <div
+            class="chart-toggles"
+          >
+            <chart-stub
+              charttype="BarChart"
+              resultaggregates="region.count"
+              results="[object Object]"
+            />
           </div>
+           
+          <!---->
         </div>
          
         <hr />
@@ -1920,19 +1709,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
         <div>
           <!---->
            
-          <div
-            class="result-data"
-          >
-            <div
-              class="notification is-italic"
-            >
-              
-    No results
-  
-            </div>
-             
-            <!---->
-          </div>
+          <resulttable-stub />
         </div>
          
         <!---->
@@ -1983,7 +1760,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           >
             <dropdown-stub
               buttonclasses="is-interactive-primary is-outlined"
-              disabled="true"
               isrightaligned="true"
               label="Save"
             >
@@ -2270,7 +2046,11 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 Results
               </span>
                
-              <!---->
+              <span
+                class="has-text-weight-light has-text-grey-light is-size-7"
+              >
+                (1)
+              </span>
             </h2>
           </div>
            
@@ -2282,7 +2062,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             >
               <button
                 class="button is-active has-text-interactive-secondary"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -2295,7 +2074,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -2308,7 +2086,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -2321,7 +2098,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                
               <button
                 class="button has-text-grey-lighter"
-                disabled="disabled"
               >
                 <span
                   class="icon is-small"
@@ -2336,19 +2112,17 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
         </div>
          
         <div>
-          <!---->
-           
-          <div>
-            <div
-              class="box is-radiusless is-shadowless has-text-centered"
-            >
-              <p>
-                
-                Run a query with at least one aggregate selected or load a report
-              
-              </p>
-            </div>
+          <div
+            class="chart-toggles"
+          >
+            <chart-stub
+              charttype="BarChart"
+              resultaggregates="region.count"
+              results="[object Object]"
+            />
           </div>
+           
+          <!---->
         </div>
          
         <hr />
