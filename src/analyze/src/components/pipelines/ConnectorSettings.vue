@@ -111,9 +111,9 @@ export default {
 					setting.label || getCleanedLabel(setting.name)
 				}}</label>
 				<TooltipCircle
-					v-if="getCleanedLabel(setting.name) === 'Account'"
-					text="Paste your login URL if you don't know your account ID."
-					style="margin-left: 2px"
+					v-if="setting.tooltip"
+					:text="setting.tooltip"
+					style="margin-left: 0.25em"
 				/>
 			</div>
 			<div class="field-body">
