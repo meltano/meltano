@@ -1,5 +1,5 @@
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -23,7 +23,40 @@ def all():
 @pluginsBP.route("/installed", methods=["GET"])
 def installed():
     project = Project.find()
-    return jsonify(project.meltano)
+    config = ConfigService(project)
+    plugins = []
+    installedPlugins = {}
+    meltano_manifest = project.meltano
+
+    for plugin in config.plugins():
+        discovery = PluginDiscoveryService(project)
+        try:
+            definition = discovery.find_plugin(plugin.type, plugin.name)
+        except PluginNotFoundError:
+            definition = {}
+        merged = {**definition.canonical(),**plugin.canonical() }
+        plugins.append(merged)
+
+    meltano_plugins = project.meltano['plugins']
+
+    for type in meltano_plugins:
+        installedPlugins[type] = []
+        for type_plugin in meltano_plugins[type]:
+            for complete_plugin in plugins:
+                if type_plugin['name'] == complete_plugin['name']:
+                    this_plugin = complete_plugin
+            
+                    if 'settings' in this_plugin:
+                        del this_plugin['settings']
+                    
+                    if 'select' in this_plugin:
+                        del this_plugin['select']
+
+                    installedPlugins[type].append(this_plugin)
+
+    meltano_manifest['plugins'] = installedPlugins
+
+    return jsonify(meltano_manifest)
 
 
 @pluginsBP.route("/add", methods=["POST"])

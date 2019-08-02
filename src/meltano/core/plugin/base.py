@@ -184,5 +184,23 @@ class Plugin(PluginRef):
         self.docs = docs
         self._extras = extras or {}
 
+    def canonical(self):
+        canonical = {
+            "name": self.name, 
+            "namespace": self.namespace,
+            **self._extras
+        }
+
+        if self.pip_url:
+            canonical.update({"pip_url": self.pip_url})
+
+        if self.docs:
+            canonical.update({"docs": self.docs})
+
+        if self.settings:
+            canonical.update({"settings": self.settings})
+
+        return canonical
+
     def as_installed(self) -> PluginInstall:
         return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)
