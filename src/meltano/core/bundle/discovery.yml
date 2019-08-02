@@ -159,8 +159,6 @@ loaders:
             value: ';'
           - label: Pipes (|)
             value: '|'
-          - label: Carets (^)
-            value: '^'
         value: ","
         description: A one-character string used to separate fields. It defaults to ','
       - name: quotechar
