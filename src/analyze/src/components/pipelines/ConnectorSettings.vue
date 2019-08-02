@@ -63,6 +63,11 @@ export default {
           : null);
     },
   },
+  methods: {
+    findLabel(setting, value) {
+      return setting.options.find(item => item.value === setting.value).label;
+    }
+  },
   created() {
     /**
      * For select input elements
@@ -73,9 +78,7 @@ export default {
     if (this.configSettings.settings) {
       this.configSettings.settings.forEach((setting) => {
         if (setting.kind === 'options') {
-          const defaultSetting = setting.options.find(item => item.value === setting.value);
-
-          this.configSettings.config[setting.name] = defaultSetting.value;
+          this.configSettings.config[setting.name] = "";
         }
       });
     }
@@ -117,6 +120,7 @@ export default {
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
                 :id="`${setting.name}-select-menu`">
+                <option value="" selected>Default - {{ findLabel(setting, setting.value) }}</option>
                 <option v-for="(option, index) in setting.options"
                   :key="`${option.label}-${index}`"
                   :value="option.value"
