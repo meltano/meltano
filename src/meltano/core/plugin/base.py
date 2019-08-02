@@ -185,11 +185,7 @@ class Plugin(PluginRef):
         self._extras = extras or {}
 
     def canonical(self):
-        canonical = {
-            "name": self.name, 
-            "namespace": self.namespace,
-            **self._extras
-        }
+        canonical = {"name": self.name, "namespace": self.namespace, **self._extras}
 
         if self.pip_url:
             canonical.update({"pip_url": self.pip_url})

@@ -1,5 +1,8 @@
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from meltano.core.plugin_discovery_service import PluginDiscoveryService, PluginNotFoundError
+from meltano.core.plugin_discovery_service import (
+    PluginDiscoveryService,
+    PluginNotFoundError,
+)
 from meltano.core.plugin import PluginType
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -39,25 +42,25 @@ def installed():
             definition = discovery.find_plugin(plugin.type, plugin.name)
         except PluginNotFoundError:
             definition = {}
-        merged = {**definition.canonical(),**plugin.canonical() }
+        merged = {**definition.canonical(), **plugin.canonical()}
         plugins.append(merged)
 
-    for type in meltano_manifest['plugins']:
+    for type in meltano_manifest["plugins"]:
         installedPlugins[type] = []
-        for type_plugin in meltano_manifest['plugins'][type]:
+        for type_plugin in meltano_manifest["plugins"][type]:
             for complete_plugin in plugins:
-                if type_plugin['name'] == complete_plugin['name']:
+                if type_plugin["name"] == complete_plugin["name"]:
                     this_plugin = complete_plugin
-            
-                    if 'settings' in this_plugin:
-                        del this_plugin['settings']
-                    
-                    if 'select' in this_plugin:
-                        del this_plugin['select']
+
+                    if "settings" in this_plugin:
+                        del this_plugin["settings"]
+
+                    if "select" in this_plugin:
+                        del this_plugin["select"]
 
                     installedPlugins[type].append(this_plugin)
 
-    meltano_manifest['plugins'] = installedPlugins
+    meltano_manifest["plugins"] = installedPlugins
 
     return jsonify(meltano_manifest)
 
