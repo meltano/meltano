@@ -24,7 +24,7 @@ export default {
       'filters',
     ]),
     ...mapGetters('designs', [
-      'getAttributesBySource',
+      'getFilterAttributes',
       'hasFilters',
     ]),
     getFlattenedFilters() {
@@ -134,7 +134,7 @@ export default {
                 class="select is-fullwidth is-small">
                 <select v-model='addFilterModel.attributeHelper'>
                   <optgroup
-                    v-for="attribute in getAttributesBySource"
+                    v-for="attribute in getFilterAttributes"
                     :key='attribute.tableLabel'
                     :label="attribute.tableLabel">
                     <option disabled>Columns</option>

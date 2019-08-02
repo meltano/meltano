@@ -171,7 +171,7 @@ const getters = {
     };
   },
 
-  getAttributesBySource(state) {
+  getFilterAttributes(state) {
     const sources = [];
     const design = state.design;
     const attributeFilter = attr => !attr.hidden;
