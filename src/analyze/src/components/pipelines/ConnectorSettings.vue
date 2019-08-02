@@ -68,21 +68,6 @@ export default {
       return setting.options.find(item => item.value === setting.value).label;
     }
   },
-  created() {
-    /**
-     * For select input elements
-     * Search through settings for default values
-     * Required because of v-model being undefined
-     * which overrides `selected` property on options
-     */
-    if (this.configSettings.settings) {
-      this.configSettings.settings.forEach((setting) => {
-        if (setting.kind === 'options') {
-          this.configSettings.config[setting.name] = "";
-        }
-      });
-    }
-  },
 };
 </script>
 
@@ -120,7 +105,6 @@ export default {
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
                 :id="`${setting.name}-select-menu`">
-                <option value="">Default - {{ findLabel(setting, setting.value) }}</option>
                 <option v-for="(option, index) in setting.options"
                   :key="`${option.label}-${index}`"
                   :value="option.value"
