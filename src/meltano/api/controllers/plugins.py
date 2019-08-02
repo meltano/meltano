@@ -42,11 +42,9 @@ def installed():
         merged = {**definition.canonical(),**plugin.canonical() }
         plugins.append(merged)
 
-    meltano_plugins = project.meltano['plugins']
-
-    for type in meltano_plugins:
+    for type in meltano_manifest['plugins']:
         installedPlugins[type] = []
-        for type_plugin in meltano_plugins[type]:
+        for type_plugin in meltano_manifest['plugins'][type]:
             for complete_plugin in plugins:
                 if type_plugin['name'] == complete_plugin['name']:
                     this_plugin = complete_plugin
