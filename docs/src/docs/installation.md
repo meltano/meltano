@@ -43,7 +43,7 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### Virtual Environment
 
-::: danger
+::: danger IMPORTANT
 Meltano must be installed inside a virtual environment, unless you are building a Docker image.
 :::
 
