@@ -159,7 +159,7 @@ loaders:
           - label: Pipes (|)
             value: '|'
         value: ","
-        description: A one-character string used to separate fields. It defaults to ','.
+        description: A one-character string used to separate fields. It defaults to a comma (,).
       - name: quotechar
         kind: options
         options:
