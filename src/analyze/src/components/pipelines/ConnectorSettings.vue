@@ -120,7 +120,7 @@ export default {
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
                 :id="`${setting.name}-select-menu`">
-                <option value="" selected>Default - {{ findLabel(setting, setting.value) }}</option>
+                <option value="">Default - {{ findLabel(setting, setting.value) }}</option>
                 <option v-for="(option, index) in setting.options"
                   :key="`${option.label}-${index}`"
                   :value="option.value"
