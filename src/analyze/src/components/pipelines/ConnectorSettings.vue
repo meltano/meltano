@@ -112,7 +112,7 @@ export default {
               input-classes='is-small' />
 
             <!-- Dropdown -->
-            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small">
+            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small is-fullwidth">
               <select
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
