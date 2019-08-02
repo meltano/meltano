@@ -80,14 +80,14 @@ class TestQueryGeneration:
             PayloadBuilder("users_design")
             .columns("name", "gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users_table", "name", "is_not_null", "")
-            .column_filter("users_table", "name", "like", "%yannis%")
-            .column_filter("users_table", "gender", "is_null", "")
-            .aggregate_filter("users_table", "count", "equal_to", 10)
-            .aggregate_filter("users_table", "avg_age", "greater_than", 20)
-            .aggregate_filter("users_table", "avg_age", "less_than", 40)
-            .aggregate_filter("users_table", "sum_clv", "greater_or_equal_than", 100)
-            .aggregate_filter("users_table", "sum_clv", "less_or_equal_than", 500)
+            .column_filter("users_design", "name", "is_not_null", "")
+            .column_filter("users_design", "name", "like", "%yannis%")
+            .column_filter("users_design", "gender", "is_null", "")
+            .aggregate_filter("users_design", "count", "equal_to", 10)
+            .aggregate_filter("users_design", "avg_age", "greater_than", 20)
+            .aggregate_filter("users_design", "avg_age", "less_than", 40)
+            .aggregate_filter("users_design", "sum_clv", "greater_or_equal_than", 100)
+            .aggregate_filter("users_design", "sum_clv", "less_or_equal_than", 500)
             .order_by("users_design", "name", "asc")
             .order_by("users_design", "avg_age", "desc")
             .order_by("users_design", "sum_clv", "")
@@ -103,11 +103,11 @@ class TestQueryGeneration:
             .aggregates("count", "sum_minutes", "count_days", join="streams_join")
             .columns("tv_series", join="episodes_join")
             .aggregates("count", "avg_rating", join="episodes_join")
-            .column_filter("users_table", "gender", "equal_to", "male")
-            .column_filter("streams_table", "year", "greater_or_equal_than", "2017")
-            .column_filter("episodes_table", "tv_series", "like", "Marvel")
-            .aggregate_filter("users_table", "sum_clv", "less_than", 50)
-            .aggregate_filter("episodes_table", "avg_rating", "greater_than", 8)
+            .column_filter("users_design", "gender", "equal_to", "male")
+            .column_filter("streams_join", "year", "greater_or_equal_than", "2017")
+            .column_filter("episodes_join", "tv_series", "like", "Marvel")
+            .aggregate_filter("users_design", "sum_clv", "less_than", 50)
+            .aggregate_filter("episodes_join", "avg_rating", "greater_than", 8)
             .order_by("users_design", "gender", "asc")
             .order_by("users_design", "avg_age", "asc")
             .order_by("streams_join", "year", "desc")
@@ -310,7 +310,7 @@ class TestQueryGeneration:
             PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users_table", "gender", "WRONG_EXPRESSION_TYPE", "male")
+            .column_filter("users_design", "gender", "WRONG_EXPRESSION_TYPE", "male")
         )
 
         with pytest.raises(NotImplementedError) as e:
@@ -326,7 +326,7 @@ class TestQueryGeneration:
             PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .aggregate_filter("users_table", "sum_clv", "equal_to", None)
+            .aggregate_filter("users_design", "sum_clv", "equal_to", None)
         )
 
         with pytest.raises(ParseError) as e:
@@ -342,7 +342,7 @@ class TestQueryGeneration:
             PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("UNAVAILABLE_TABLE", "gender", "equal_to", "male")
+            .column_filter("UNAVAILABLE_SOURCE", "gender", "equal_to", "male")
         )
 
         with pytest.raises(ParseError) as e:
@@ -351,14 +351,14 @@ class TestQueryGeneration:
                 design_helper=gitflix.design("users_design"),
             )
 
-        assert "Requested table UNAVAILABLE_TABLE" in str(e.value)
+        assert "UNAVAILABLE_SOURCE not found in design users_design" in str(e.value)
 
         # Test for column not defined in design
         bad_payload = (
             PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .column_filter("users_table", "UNAVAILABLE_COLUMN", "equal_to", "male")
+            .column_filter("users_design", "UNAVAILABLE_COLUMN", "equal_to", "male")
         )
 
         with pytest.raises(ParseError) as e:
@@ -374,7 +374,7 @@ class TestQueryGeneration:
             PayloadBuilder("users_design")
             .columns("gender")
             .aggregates("count", "avg_age", "sum_clv")
-            .aggregate_filter("users_table", "UNAVAILABLE_AGGREGATE", "less_than", 50)
+            .aggregate_filter("users_design", "UNAVAILABLE_AGGREGATE", "less_than", 50)
         )
 
         with pytest.raises(ParseError) as e:

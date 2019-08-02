@@ -507,8 +507,20 @@ class MeltanoFilter(MeltanoBase):
 
     definition: {"source_name", "name", "expression", "value"}
 
-    In the most simple case, the idea is to use it in order to generate a simple clause:
-      table_name.name {expression} value
+    Where:
+    + "source name" is the way we call a table in a design:
+      - If it is the base table for the design then it is name of the design
+      - If it is part of a join then it is the name of the join
+      The reason for that is that we can have the same table multiple times in
+       a query (e.g. multiple joins or a self join of the base table with its self),
+       so we use the source_name in order to know which version of the table we
+       refer to.
+    + "name" is the name of the attribute accessed (column, aggregate or timeframe)
+    + "expression" is one of the supported expressions defined in MeltanoFilterExpressionType
+    + "value" is the value we are going to use in the expression (for non unary expressions)
+
+    In the most simple case, the idea is to use MeltanoFilter in order to generate a simple clause:
+      table_alias.name {expression} value
     e.g. gitlab_stats_per_user.project_name = 'Meltano'
      or  COALESCE(SUM("gitlab_stats_per_user"."total_issues_authored"),0) > 5
 
@@ -518,7 +530,7 @@ class MeltanoFilter(MeltanoBase):
      (the Pypika Field knows at run time the table, the clause is evaluated against)
 
     It provides access to the metada for the Filter:
-      {type, table_name, name, expression, value}
+      {type, source_name, name, expression, value}
     """
 
     def __init__(self, definition: Dict = {}, design: MeltanoDesign = None) -> None:
@@ -539,7 +551,7 @@ class MeltanoFilter(MeltanoBase):
         """
         Validate the Filter definition
         """
-        table_name = definition.get("source_name", None)
+        source_name = definition.get("source_name", None)
         attribute_name = definition.get("name", None)
 
         if self.expression_type == MeltanoFilterExpressionType.Unknown:
@@ -547,9 +559,9 @@ class MeltanoFilter(MeltanoBase):
                 f"Unknown filter expression: {definition['expression']}."
             )
 
-        if table_name is None:
+        if source_name is None:
             raise ParseError(
-                f"A table name was not provided for filter '{definition}'."
+                f"A source name for a table was not provided for filter '{definition}'."
             )
         elif attribute_name is None:
             raise ParseError(
@@ -566,28 +578,23 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if self.design:
-            try:
-                table_def = self.design.get_table(table_name)
-            except StopIteration:
-                raise ParseError(
-                    f"Requested table {table_name} in filter '{definition}' is not defined in the design"
-                )
+            table_def = self.design.find_table(source_name)
 
             column_def = table_def.get_column(attribute_name)
             aggregate_def = table_def.get_aggregate(attribute_name)
 
             if not any((column_def, aggregate_def)):
                 raise ParseError(
-                    f"Requested column {table_name}.{attribute_name} in filter '{definition}' is not defined in the design"
+                    f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
 
-    def match(self, table_name: str, attribute_name: str) -> bool:
+    def match(self, source_name: str, attribute_name: str) -> bool:
         """
-        Return True if this filter is defined for the given table and attribute
+        Return True if this filter is defined for the given source_name and attribute
         """
         return (
             True
-            if (self.table_name == table_name and self.name == attribute_name)
+            if (self.source_name == source_name and self.name == attribute_name)
             else False
         )
 
@@ -967,7 +974,7 @@ class MeltanoQuery(MeltanoBase):
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.name, c.name)
+                    if f.match(table.find_source_name(), c.name)
                 ]
                 where.extend(matching_criteria)
 
@@ -1005,7 +1012,7 @@ class MeltanoQuery(MeltanoBase):
                 # Also check if there is a filter for this aggregate and add it
                 #  in the HAVING clase
                 for f in self.aggregate_filters:
-                    if f.match(table.name, a.name):
+                    if f.match(table.find_source_name(), a.name):
                         field = a.qualified_sql(pika_table=pika_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None
@@ -1130,7 +1137,7 @@ class MeltanoQuery(MeltanoBase):
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.name, c.name)
+                    if f.match(table.find_source_name(), c.name)
                 ]
                 where.extend(matching_criteria)
 
@@ -1217,7 +1224,7 @@ class MeltanoQuery(MeltanoBase):
 
             for a in table.aggregates():
                 for f in self.aggregate_filters:
-                    if f.match(table.name, a.name):
+                    if f.match(table.find_source_name(), a.name):
                         field = a.qualified_sql(base_db_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None

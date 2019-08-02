@@ -31,9 +31,9 @@ class PayloadBuilder:
 
         return self
 
-    def column_filter(self, table_name, name, expression, value):
+    def column_filter(self, source_name, name, expression, value):
         filter = {
-            "table_name": table_name,
+            "source_name": source_name,
             "name": name,
             "expression": expression,
             "value": value,
@@ -42,9 +42,9 @@ class PayloadBuilder:
 
         return self
 
-    def aggregate_filter(self, table_name, name, expression, value):
+    def aggregate_filter(self, source_name, name, expression, value):
         filter = {
-            "table_name": table_name,
+            "source_name": source_name,
             "name": name,
             "expression": expression,
             "value": value,
