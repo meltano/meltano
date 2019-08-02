@@ -90,7 +90,6 @@ export default {
       </header>
 
       <section class="modal-card-body">
-
         <template v-if='isInstalling'>
           <div class="content">
             <div class="level">
@@ -102,10 +101,18 @@ export default {
           </div>
         </template>
 
+        <div v-if="loader.signupUrl" class="intro-module">
+          <p>This plugin requires an account. If you don't have one, you can <a :href="loader.signupUrl">sign up here</a>.</p>
+        </div>
+
         <ConnectorSettings
           v-if='!isLoadingConfigSettings'
           fieldClass="is-small"
           :config-settings='configSettings'/>
+
+        <div v-if="loader.docs" class="footnote-module">
+          <p>Need help finding this information? We got you covered with our <a :href="loader.docs">docs here</a>.</p>
+        </div>
 
         <progress
           v-if='isLoadingConfigSettings && !isInstalling'
@@ -126,5 +133,12 @@ export default {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.intro-module {
+  margin-bottom: 1rem;
+}
+
+.footnote-module {
+  margin-top: 1rem;
+}
 </style>
