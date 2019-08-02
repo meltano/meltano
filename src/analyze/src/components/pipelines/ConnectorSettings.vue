@@ -70,7 +70,7 @@ export default {
     if (this.configSettings.settings) {
       this.configSettings.settings.forEach((setting) => {
         if (setting.kind === 'options') {
-          const defaultSetting = setting.options.find(item => item.default === true);
+          const defaultSetting = setting.options.find(item => item.value === setting.value);
 
           this.configSettings.config[setting.name] = defaultSetting.value;
         }

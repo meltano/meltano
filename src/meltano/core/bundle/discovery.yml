@@ -152,7 +152,6 @@ loaders:
         options:
           - label: Comma (,)
             value: ','
-            default: true
           - label: Tab (  )
             value: '\t'
           - label: Semi-colon (;)
@@ -160,13 +159,12 @@ loaders:
           - label: Pipes (|)
             value: '|'
         value: ","
-        description: A one-character string used to separate fields. It defaults to ','
+        description: A one-character string used to separate fields. It defaults to ','.
       - name: quotechar
         kind: options
         options:
           - label: Single Quote (')
             value: "'"
-            default: true
           - label: Double Quote (")
             value: '"'
         value: "'"
