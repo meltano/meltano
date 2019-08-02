@@ -30,6 +30,9 @@ export default {
     getIsOfKindDate() {
       return kind => kind === 'date_iso8601';
     },
+    getIsOfKindOptions() {
+      return kind => kind === 'options';
+    },
     getIsOfKindTextBased() {
       return kind => !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind);
     },
@@ -109,7 +112,7 @@ export default {
               input-classes='is-small' />
 
             <!-- Dropdown -->
-            <div v-else-if="setting.kind === 'options'" class="select is-small">
+            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small">
               <select
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
