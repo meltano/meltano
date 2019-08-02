@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 * [!781](https://gitlab.com/meltano/meltano/merge_requests/781) Add new Advanced Tutorial on how to use tap-postgres with Meltano
+* [#784](https://gitlab.com/meltano/meltano/issues/784) Add multiple attribute ordering with drag and drop ordering in the UI
 
 ### Changes
 
