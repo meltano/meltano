@@ -105,7 +105,7 @@ setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
 ```
 :::
 
-## Upgrading Version
+## Upgrading Meltano
 
 We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
@@ -115,6 +115,9 @@ $ pip install --upgrade meltano
 
 Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
+## Deploying Meltano
+
+To learn more about deplying Meltano on services like AWS, check out our [Deployment docs](/docs/deployment.html).
 
 ## Advanced: Install on Docker
 
