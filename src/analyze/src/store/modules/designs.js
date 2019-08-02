@@ -163,6 +163,14 @@ const getters = {
     return attributes;
   },
 
+  // eslint-disable-next-line no-shadow
+  getAttributeByQueryAttribute(state, getters) {
+    return (queryAttribute) => {
+      const finder = attr => attr.sourceName === queryAttribute.sourceName && attr.name === queryAttribute.attributeName;
+      return getters.getAllAttributes.find(finder);
+    };
+  },
+
   getAttributesBySource(state) {
     const sources = [];
     const design = state.design;
@@ -214,6 +222,14 @@ const getters = {
 
   getIsOrderableAttributeAscending() {
     return orderableAttribute => orderableAttribute.direction === 'asc';
+  },
+
+  // eslint-disable-next-line no-shadow
+  getQueryAttributeFromCollectionByAttribute(state) {
+    return (orderCollection, attribute) => {
+      const finder = queryAttribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName;
+      return state.order[orderCollection].find(finder);
+    };
   },
 
   // eslint-disable-next-line no-shadow
@@ -463,16 +479,15 @@ const actions = {
   },
 
   // eslint-disable-next-line no-shadow
-  updateSortAttribute({ commit, getters, state }, queryAttribute) {
-    const matcher = orderableAttr => orderableAttr.sourceName === queryAttribute.sourceName && orderableAttr.attributeName === queryAttribute.attributeName;
-    const matchInAssigned = state.order.assigned.find(matcher);
-    const matchInUnassigned = state.order.assigned.find(matcher);
+  updateSortAttribute({ commit, getters }, queryAttribute) {
+    const attribute = getters.getAttributeByQueryAttribute(queryAttribute);
+    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
     if (matchInAssigned) {
       const direction = getters.getIsOrderableAttributeAscending(matchInAssigned) ? 'desc' : 'asc';
       commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
-    } else if (!matchInUnassigned) {
-      const attributeMatch = getters.getAllAttributes.find(attr => attr.name === queryAttribute.attributeName && attr.sourceName === queryAttribute.sourceName);
-      commit('assignSortableAttribute', attributeMatch);
+    } else if (matchInUnassigned) {
+      commit('assignSortableAttribute', attribute);
     }
 
     this.dispatch('designs/runQuery');
@@ -692,6 +707,7 @@ const mutations = {
         if (table[attributeType]) {
           table[attributeType].forEach((attribute) => {
             attribute.sourceName = source.name;
+            attribute.sourceLabel = source.label;
           });
         }
       });
