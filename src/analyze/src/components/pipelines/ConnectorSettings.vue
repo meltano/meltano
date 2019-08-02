@@ -68,10 +68,9 @@ export default {
     <slot name="top" />
     <div v-for='setting in configSettings.settings' :key='setting.name'>
       <div v-if="setting.name === 'introduction'" class="intro-module">
-        <p v-if="setting.signup">If you don't have an account yet, you can <a :href="setting.link">sign up for an account here</a>!</p>
-        <p v-if="setting.docs">Need help finding this information? We got you covered with our <a :href="setting.docs">docs here</a>.</p>
+        <p v-if="setting.signup" class="mb1r">This plugin requires an account. If you don't have one, you can <a :href="setting.link">sign up here</a>.</p>
       </div>
-      <div v-else class="field is-horizontal" >
+      <div v-else-if="setting.name !== 'footnote'" class="field is-horizontal" >
         <div :class="['field-label', labelClass]">
           <label class="label">{{ setting.label || getCleanedLabel(setting.name) }}</label>
         </div>
@@ -119,6 +118,9 @@ export default {
           </div>
         </div>
       </div>
+      <div v-if="setting.name === 'footnote'" class="footnote-module">
+        <p v-if="setting.docs">Need help finding this information? We got you covered with our <a :href="setting.docs">docs here</a>.</p>
+      </div>
     </div>
     <slot name="bottom" />
   </div>
@@ -126,6 +128,10 @@ export default {
 
 <style lang="scss">
 .intro-module {
-  margin-bottom: 15px;
+  margin-bottom: 1.25rem;
+}
+
+.footnote-module {
+  margin-top: 1.25rem;
 }
 </style>
