@@ -69,7 +69,7 @@ export default {
      */
     if (this.configSettings.settings) {
       this.configSettings.settings.forEach((setting) => {
-        if (setting.kind === 'dropdown') {
+        if (setting.kind === 'options') {
           const defaultSetting = setting.options.find(item => item.default === true);
 
           this.configSettings.config[setting.name] = defaultSetting.value;
@@ -109,10 +109,10 @@ export default {
               input-classes='is-small' />
 
             <!-- Dropdown -->
-            <div v-else-if="setting.kind === 'dropdown'" class="select is-small">
+            <div v-else-if="setting.kind === 'options'" class="select is-small">
               <select
                 v-model="configSettings.config[setting.name]"
-                :name="`${setting.name}-dropdown`"
+                :name="`${setting.name}-options`"
                 :id="`${setting.name}-select-menu`">
                 <option v-for="(option, index) in setting.options"
                   :key="`${option.label}-${index}`"

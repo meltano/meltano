@@ -148,7 +148,7 @@ loaders:
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
     settings:
       - name: delimiter
-        kind: dropdown
+        kind: options
         options:
           - label: Comma (,)
             value: ','
@@ -164,7 +164,7 @@ loaders:
         value: ","
         description: A one-character string used to separate fields. It defaults to ','
       - name: quotechar
-        kind: dropdown
+        kind: options
         options:
           - label: Single Quote (')
             value: "'"
