@@ -30,6 +30,9 @@ export default {
     getIsOfKindDate() {
       return kind => kind === 'date_iso8601';
     },
+    getIsOfKindOptions() {
+      return kind => kind === 'options';
+    },
     getIsOfKindTextBased() {
       return kind => !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind);
     },
@@ -58,6 +61,11 @@ export default {
         (this.getIsConfigSettingValid(setting)
           ? 'is-success has-text-success'
           : null);
+    },
+  },
+  methods: {
+    findLabel(setting) {
+      return setting.options.find(item => item.value === setting.value).label;
     },
   },
 };
@@ -90,6 +98,21 @@ export default {
               v-model="configSettings.config[setting.name]"
               :name='setting.name'
               input-classes='is-small' />
+
+            <!-- Dropdown -->
+            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small is-fullwidth">
+              <select
+                v-model="configSettings.config[setting.name]"
+                :name="`${setting.name}-options`"
+                :id="`${setting.name}-select-menu`">
+                <option v-for="(option, index) in setting.options"
+                  :key="`${option.label}-${index}`"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
 
             <!-- Text / Password / Email -->
             <input
