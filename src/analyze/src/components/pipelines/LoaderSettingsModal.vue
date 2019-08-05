@@ -102,7 +102,7 @@ export default {
         </template>
 
         <div v-if="loader.signupUrl" class="intro-module">
-          <p>This plugin requires an account. If you don't have one, you can <a :href="loader.signupUrl">sign up here</a>.</p>
+          <p>This plugin requires an account. If you don't have one, you can <a :href="loader.signupUrl" target="_blank">sign up here</a>.</p>
         </div>
 
         <ConnectorSettings
@@ -111,7 +111,7 @@ export default {
           :config-settings='configSettings'/>
 
         <div v-if="loader.docs" class="footnote-module">
-          <p>Need help finding this information? We got you covered with our <a :href="loader.docs">docs here</a>.</p>
+          <p>Need help finding this information? We got you covered with our <a :href="loader.docs" target="_blank">docs here</a>.</p>
         </div>
 
         <progress
