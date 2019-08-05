@@ -642,8 +642,6 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
     No results
   
             </div>
-             
-            <!---->
           </div>
         </div>
          
@@ -1291,8 +1289,6 @@ LIMIT
     No results
   
             </div>
-             
-            <!---->
           </div>
         </div>
          
@@ -1344,6 +1340,8 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           >
             <dropdown-stub
               buttonclasses="is-interactive-primary is-outlined"
+              iconclose="caret-up"
+              iconopen="caret-down"
               isrightaligned="true"
               label="Save"
             >
@@ -1407,6 +1405,8 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           <dropdown-stub
             buttonclasses="is-interactive-primary is-outlined"
             disabled="true"
+            iconclose="caret-up"
+            iconopen="caret-down"
             isrightaligned="true"
             label="Load"
           >
@@ -1461,7 +1461,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             >
               <dropdown-stub
                 buttonclasses="is-text is-small"
-                iscaretremoved="true"
+                iconclose="caret-up"
+                iconopen="caret-down"
+                isiconremoved="true"
                 label="SQL"
               >
                 <div
@@ -1543,6 +1545,8 @@ LIMIT
               >
                 <dropdown-stub
                   buttonclasses="is-small "
+                  iconclose="caret-up"
+                  iconopen="caret-down"
                   isfullwidth="true"
                   label="None"
                   menuclasses="dropdown-menu-600"
@@ -1760,6 +1764,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           >
             <dropdown-stub
               buttonclasses="is-interactive-primary is-outlined"
+              iconclose="caret-up"
+              iconopen="caret-down"
               isrightaligned="true"
               label="Save"
             >
@@ -1822,6 +1828,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
         >
           <dropdown-stub
             buttonclasses="is-interactive-primary is-outlined"
+            iconclose="caret-up"
+            iconopen="caret-down"
             isrightaligned="true"
             label="Load"
           >
@@ -1886,7 +1894,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <dropdown-stub
                 buttonclasses="is-text is-small"
                 disabled="true"
-                iscaretremoved="true"
+                iconclose="caret-up"
+                iconopen="caret-down"
+                isiconremoved="true"
                 label="SQL"
               >
                 <div
@@ -1964,6 +1974,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               >
                 <dropdown-stub
                   buttonclasses="is-small "
+                  iconclose="caret-up"
+                  iconopen="caret-down"
                   isfullwidth="true"
                   label="None"
                   menuclasses="dropdown-menu-600"
@@ -2774,8 +2786,6 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
     No results
   
             </div>
-             
-            <!---->
           </div>
         </div>
          
