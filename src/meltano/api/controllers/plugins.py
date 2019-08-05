@@ -38,27 +38,24 @@ def installed():
 
     for plugin in config.plugins():
         discovery = PluginDiscoveryService(project)
+
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
         except PluginNotFoundError:
             definition = {}
-        merged = {**definition.canonical(), **plugin.canonical()}
-        plugins.append(merged)
+
+        merged_plugin_definition = {**definition.canonical(), **plugin.canonical()}
+        merged_plugin_definition.pop("settings", None)
+        merged_plugin_definition.pop("select", None)
+
+        plugins.append(merged_plugin_definition)
 
     for type in meltano_manifest["plugins"]:
         installedPlugins[type] = []
         for type_plugin in meltano_manifest["plugins"][type]:
             for complete_plugin in plugins:
                 if type_plugin["name"] == complete_plugin["name"]:
-                    this_plugin = complete_plugin
-
-                    if "settings" in this_plugin:
-                        del this_plugin["settings"]
-
-                    if "select" in this_plugin:
-                        del this_plugin["select"]
-
-                    installedPlugins[type].append(this_plugin)
+                    installedPlugins[type].append(complete_plugin)
 
     meltano_manifest["plugins"] = installedPlugins
 
