@@ -588,12 +588,12 @@ const mutations = {
 
   setStateFromLoadedReport(state, report) {
     // General UI state updates
+    state.chartType = report.chartType;
     state.currentModel = report.model;
     state.currentDesign = report.design;
-    state.chartType = report.chartType;
-    state.limit = report.queryPayload.limit;
     state.dialect = report.queryPayload.dialect;
     state.filters = report.filters;
+    state.limit = report.queryPayload.limit;
     state.order = report.order;
 
     // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
