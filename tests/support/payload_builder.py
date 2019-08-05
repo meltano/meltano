@@ -6,6 +6,7 @@ class PayloadBuilder:
         self._joins = {}
         self._column_filters = []
         self._aggregate_filters = []
+        self._order_by_clauses = []
         self._defaults = kwargs
 
     def join(self, name: str):
@@ -30,9 +31,9 @@ class PayloadBuilder:
 
         return self
 
-    def column_filter(self, table_name, name, expression, value):
+    def column_filter(self, source_name, name, expression, value):
         filter = {
-            "table_name": table_name,
+            "source_name": source_name,
             "name": name,
             "expression": expression,
             "value": value,
@@ -41,14 +42,24 @@ class PayloadBuilder:
 
         return self
 
-    def aggregate_filter(self, table_name, name, expression, value):
+    def aggregate_filter(self, source_name, name, expression, value):
         filter = {
-            "table_name": table_name,
+            "source_name": source_name,
             "name": name,
             "expression": expression,
             "value": value,
         }
         self._aggregate_filters.append(filter)
+
+        return self
+
+    def order_by(self, source_name, attribute_name, direction):
+        order_by_clause = {
+            "source_name": source_name,
+            "attribute_name": attribute_name,
+            "direction": direction,
+        }
+        self._order_by_clauses.append(order_by_clause)
 
         return self
 
@@ -68,7 +79,7 @@ class PayloadBuilder:
             "aggregates": list(self._aggregates),
             "timeframes": [],
             "joins": [join.as_join() for join in self._joins.values()],
-            "order": None,
+            "order": self._order_by_clauses,
             "limit": "50",
             "filters": {
                 "columns": self._column_filters,

@@ -64,7 +64,7 @@ export default {
       'filterOptions',
     ]),
     ...mapGetters('designs', [
-      'attributesCount',
+      'getSelectedAttributesCount',
       'currentModelLabel',
       'currentDesignLabel',
       'hasChartableResults',
@@ -160,7 +160,6 @@ export default {
     },
 
     columnSelected(column) {
-      this.$store.dispatch('designs/removeSort', column);
       this.$store.dispatch('designs/toggleColumn', column);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
@@ -178,7 +177,7 @@ export default {
     },
 
     aggregateSelected(aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', { aggregate, tableName: this.design.from });
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 
@@ -188,7 +187,7 @@ export default {
     },
 
     joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', { aggregate, tableName: join.name });
+      this.$store.dispatch('designs/toggleAggregate', aggregate);
       this.$store.dispatch('designs/getSQL', { run: false });
     },
 
@@ -346,7 +345,7 @@ export default {
                   label="SQL"
                   button-classes='is-text is-small'
                   :disabled='!currentSQL'
-                  is-caret-removed>
+                  is-icon-removed>
                   <div class="dropdown-content">
                     <div class="level">
                       <div class="level-item">
@@ -407,8 +406,8 @@ export default {
             <label class="label">
               <span>Attributes</span>
               <span
-                v-if='attributesCount > 0'
-                class='has-text-weight-light has-text-grey-light is-size-7'>({{attributesCount}})</span>
+                v-if='getSelectedAttributesCount > 0'
+                class='has-text-weight-light has-text-grey-light is-size-7'>({{getSelectedAttributesCount}})</span>
             </label>
           </div>
 
@@ -462,7 +461,7 @@ export default {
                   :class="{'is-active': column.selected}">
                 {{column.label}}
                 <button
-                  v-if="getIsAttributeInFilters(design.from, column.name, 'column')"
+                  v-if="getIsAttributeInFilters(design.name, column.name, 'column')"
                   class="button is-small"
                   @click.stop='jumpToFilters'>
                   <span class="icon has-text-interactive-secondary">
@@ -484,7 +483,7 @@ export default {
                   :class="{'is-active': aggregate.selected}">
                 {{aggregate.label}}
                 <button
-                  v-if="getIsAttributeInFilters(design.from, aggregate.name, 'aggregate')"
+                  v-if="getIsAttributeInFilters(design.name, aggregate.name, 'aggregate')"
                   class="button is-small"
                   @click.stop='jumpToFilters'>
                   <span class="icon has-text-interactive-secondary">

@@ -8,11 +8,10 @@ class SqlUtils:
             definition=incoming_json, design_helper=design, schema=schema
         )
 
-        (sql, column_headers, column_names, aggregate_columns) = query.get_query()
+        (sql, query_attributes, aggregate_columns) = query.get_query()
 
         return {
             "aggregates": aggregate_columns,
-            "column_headers": column_headers,
-            "column_names": column_names,
+            "query_attributes": query_attributes,
             "sql": sql,
         }

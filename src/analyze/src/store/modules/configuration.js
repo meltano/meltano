@@ -20,9 +20,10 @@ const getters = {
   getHasPipelines(state) {
     return state.pipelines.length > 0;
   },
-  getHasValidConfigSettings(_, gettersRef) {
+  // eslint-disable-next-line
+  getHasValidConfigSettings(_, getters) {
     return (configSettings) => {
-      const isValid = setting => gettersRef.getIsConfigSettingValid(configSettings.config[setting.name]);
+      const isValid = setting => getters.getIsConfigSettingValid(configSettings.config[setting.name]);
       return configSettings.settings && lodash.every(configSettings.settings, isValid);
     };
   },
