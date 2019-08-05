@@ -27,12 +27,9 @@ export default {
          */
 
         const accountInput = newVal.config.account;
+        const parsedAccountId = utils.snowflakeAccountParser(accountInput);
 
-        if (utils.snowflakeAccountParser(accountInput)) {
-          this.configSettings.config.account = utils.snowflakeAccountParser(accountInput);
-        } else {
-          this.configSettings.config.account = newVal.config.account;
-        }
+        this.configSettings.config.account = parsedAccountId || newVal.config.account;
       },
       deep: true,
     },
