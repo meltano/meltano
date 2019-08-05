@@ -1,5 +1,9 @@
 # Deployment
 
+## Prerequisites
+
+This section assumes that you are familiar with how to install Meltano. If you need instructions on how to do so, please visit our [Installation docs](/docs/installation.html).
+
 ## Amazon Web Services (AWS)
 
 ::: warning Prerequisites

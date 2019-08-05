@@ -32,7 +32,7 @@ We take user security and privacy seriously at GitLab. We internally use Meltano
 
 ## Role Based Access Control (RBAC) <sup>ALPHA</sup>
 
-::: danger
+::: danger IMPORTANT
 This feature is experimental and subject to change.
 :::
 

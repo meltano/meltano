@@ -43,8 +43,8 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ### Virtual Environment
 
-::: danger
-Meltano must be installed inside a virtual environment, unless you are building a Docker image.
+::: danger IMPORTANT
+Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
 :::
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
@@ -105,7 +105,7 @@ setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
 ```
 :::
 
-## Upgrading Version
+## Upgrading Meltano
 
 We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
@@ -115,6 +115,9 @@ $ pip install --upgrade meltano
 
 Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
+## Deploying Meltano
+
+To learn more about deplying Meltano on services like AWS, check out our [Deployment docs](/docs/deployment.html).
 
 ## Advanced: Install on Docker
 

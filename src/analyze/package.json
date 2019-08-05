@@ -34,6 +34,7 @@
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vue-toasted": "^1.1.26",
+    "vuedraggable": "^2.23.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {
