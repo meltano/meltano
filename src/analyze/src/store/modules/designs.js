@@ -290,6 +290,31 @@ const getters = {
 };
 
 const actions = {
+  // eslint-disable-next-line no-shadow
+  cleanFiltering({ commit, getters }, { attribute, type }) {
+    if (!attribute.selected) {
+      const filter = getters.getFilter(attribute.sourceName, attribute.name, type);
+      if (filter) {
+        commit('removeFilter', filter);
+      }
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  cleanOrdering({ commit, dispatch, getters, state }, attribute) {
+    if (!attribute.selected) {
+      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
+      if (matchAssigned || matchUnassigned) {
+        commit('removeOrder', {
+          collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
+          queryAttribute: matchAssigned || matchUnassigned,
+        });
+        dispatch('runQuery');
+      }
+    }
+  },
+
   resetDefaults: ({ commit }) => commit('resetDefaults'),
 
   getDesign({ commit, dispatch, state }, { model, design, slug }) {
@@ -351,28 +376,25 @@ const actions = {
       });
   },
 
-  toggleColumn({ commit }, column) {
+  toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column);
+    dispatch('cleanOrdering', column);
   },
 
-  toggleTimeframe({ commit }, timeframe) {
+  toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe);
+    dispatch('cleanOrdering', timeframe);
   },
 
-  toggleTimeframePeriod({ commit }, timeframePeriod) {
+  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod);
+    dispatch('cleanOrdering', timeframePeriod);
   },
 
-  // eslint-disable-next-line
-  toggleAggregate({ commit, getters }, aggregate) {
+  toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate);
-
-    if (!aggregate.selected) {
-      const filter = getters.getFilter(aggregate.sourceName, aggregate.name, 'aggregate');
-      if (filter) {
-        commit('removeFilter', filter);
-      }
-    }
+    dispatch('cleanOrdering', aggregate);
+    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' });
   },
 
   limitSet({ commit }, limit) {
@@ -523,6 +545,11 @@ const mutations = {
     const idx = state.order.unassigned.indexOf(orderableAttribute);
     state.order.unassigned.splice(idx, 1);
     state.order.assigned.push(orderableAttribute);
+  },
+
+  removeOrder(state, { collection, queryAttribute }) {
+    const idx = collection.indexOf(queryAttribute);
+    collection.splice(idx, 1);
   },
 
   resetDefaults(state) {
