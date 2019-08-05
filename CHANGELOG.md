@@ -19,7 +19,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#853](https://gitlab.com/meltano/meltano/issues/853) Improve UX for multi-attribute ordering (wider sub-UI for easier reading, clear drop target, and clearer drag animation for reenforcing sorting interaction)
 
 ### Fixes
+<<<<<<< HEAD
 * [#855](https://gitlab.com/meltano/meltano/issues/855) Fix bug that duplicated a dashboard's `reportIds` that also prevented immediate UI feedback when reports were toggled (added or removed) from a dashboard via Analyze's "Add to Dashboard" dropdown
+=======
+* [#851](https://gitlab.com/meltano/meltano/issues/851) Fix report saving and loading to work with filters and sortBy ordering
+>>>>>>> changelog update
 
 ### Breaks
 
