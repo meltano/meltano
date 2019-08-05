@@ -712,6 +712,182 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 [Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 
+## Advanced - Using tap-postgres with Meltano
+
+This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltano.
+
+### Intro
+
+`tap-postgres` is not currently officially supported by Meltano, so you have to add it as a custom tap. For more details, check the [documentation on adding a custom extractor](./tutorial.html#advanced-create-a-custom-extractor).
+
+### Project Initialization 
+
+Let's start by initializing a new Meltano Project and add the supported loader `target-postgres`:
+
+```
+meltano init tap-postgres --no_usage_stats
+cd tap-postgres
+meltano add loader target-postgres
+```
+
+### Adding a Custom Extractor
+
+Next step is to add `tap-postgres` as a [custom extractor](./tutorial.html#advanced-create-a-custom-extractor). We'll use the [ tap-postgres provided by the Singer.io community](https://github.com/singer-io/tap-postgres/):
+
+```bash
+meltano add --custom extractor tap-postgres
+
+  (namespace): tap-postgres
+  (pip_url): tap-postgres
+  (executable) [tap-postgres]: tap-postgres
+```
+
+We should then update `meltano.yml` and add the configuration parameters this tap needs in order to run:
+
+**meltano.yml**
+```yaml
+plugins:
+  connections:
+  - name: sqlite
+  - name: postgresql
+  extractors:
+  - executable: tap-postgres
+    name: tap-postgres
+    namespace: tap-postgres
+    pip_url: tap-postgres
+    settings:
+      - name: dbname
+        env: TAP_PG_DATABASE
+      - name: host
+        env: TAP_PG_ADDRESS
+      - name: password
+        env: TAP_PG_PASSWORD
+      - name: port
+        env: TAP_PG_PORT
+      - name: user
+        env: TAP_PG_USERNAME
+    config:
+      default_replication_method: FULL_TABLE
+      include_schemas_in_destination_stream_name: true
+  loaders:
+  - name: target-postgres
+    pip_url: git+https://github.com/meltano/target-postgres.git
+send_anonymous_usage_stats: false
+version: 1.0
+```
+
+And finally update the project's `.env` to add the proper settings for the source and the target databases. The `TAP_PG_*` variables are used by the Tap (i.e. they define the source DB where the data are extracted from), while the `PG_*` variables are used by the Target (i.e. they define the target DB where the data will be loaded at)
+
+**.env**
+```bash
+export FLASK_ENV=development
+export SQLITE_DATABASE=meltano
+
+export TAP_PG_DATABASE=my_source_db
+export TAP_PG_ADDRESS=localhost
+export TAP_PG_PORT=5432
+export TAP_PG_USERNAME=source_username
+export TAP_PG_PASSWORD=source_password
+
+export PG_DATABASE=my_target_db
+export PG_PASSWORD=target_password
+export PG_USERNAME=target_username
+export PG_ADDRESS=localhost
+export PG_PORT=5432
+export PG_SCHEMA='test_tap_postgres'
+```
+
+Let's make sure that everything has been set correctly:
+
+```bash
+meltano config tap-postgres
+
+  {'default_replication_method': 'FULL_TABLE', 'include_schemas_in_destination_stream_name': True, 'dbname': 'my_source_db', 'host': 'localhost', 'password': '***', 'port': '5432', 'user': '***'}
+
+meltano config target-postgres
+
+  {'user': '***', 'password': '***', 'host': 'localhost', 'port': '5432', 'dbname': 'my_target_db', 'schema': 'test_tap_postgres'}
+```
+
+### Filtering out data
+
+This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
+
+We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](./meltano-cli.html#select).
+
+In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB.
+
+For example, assume that you want to only export all the transformed tables in the `analytics` schema from the Carbon Intensity onboarding example in the Meltano documentation.
+
+The following will only keep the `carbon_intensity_entry`, `carbon_intensity_generationmix`, `carbon_intensity_region` and `carbon_intensity_summary` tables:
+
+```bash
+meltano select --exclude tap-postgres "!(carbon_intensity_*)" "*"
+meltano select tap-postgres "carbon_intensity_entry" "*"
+meltano select tap-postgres "carbon_intensity_generationmix" "*"
+meltano select tap-postgres "carbon_intensity_region" "*"
+meltano select tap-postgres "carbon_intensity_summary" "*"
+```
+
+In the case of `tap-postgres`, we also have to exclude everything else (first rule) as all Entities are automatically included in the export.
+
+Finally, you can use `meltano select <tap_name> --list` command to make sure that everything has been set correctly:
+
+```bash
+meltano select tap-postgres --list
+
+Enabled patterns:
+  carbon_intensity_region.*
+  carbon_intensity_generationmix.*
+  !(carbon_intensity_*).*
+  carbon_intensity_summary.*
+  carbon_intensity_entry.*
+
+Selected properties:
+  [selected ] carbon_intensity_summary.shortname
+  [selected ] carbon_intensity_summary.to
+  [selected ] carbon_intensity_summary.forecast
+  [selected ] carbon_intensity_summary.from
+  [selected ] carbon_intensity_summary.fuel
+  [selected ] carbon_intensity_summary.perc
+  [selected ] carbon_intensity_entry.id
+  [selected ] carbon_intensity_entry.index
+  [selected ] carbon_intensity_entry.region_id
+  [selected ] carbon_intensity_entry.forecast
+  [selected ] carbon_intensity_entry.to
+  [selected ] carbon_intensity_entry.from
+  [selected ] carbon_intensity_region.shortname
+  [selected ] carbon_intensity_region.dnoregion
+  [selected ] carbon_intensity_region.id
+  [selected ] carbon_intensity_generationmix.id
+  [selected ] carbon_intensity_generationmix.fuel
+  [selected ] carbon_intensity_generationmix.perc
+  [selected ] carbon_intensity_generationmix.entry_id
+```
+
+#### Figuring out the names of the streams
+
+In case you are not sure what the names of the streams are, you can use `meltano invoke` to run `tap-postgres` in isolation and generate a config file
+
+```bash
+meltano invoke tap-postgres --discover > .meltano/run/tap-postgres/tap.properties.json
+```
+
+You can then check that file and decide which Streams (tables in this case) should be exported and use their names when running `meltano select`.
+
+### Run Meltano ELT
+
+Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by `PG_SCHEMA` (`test_tap_postgres` in this example)
+
+```bash
+meltano elt tap-postgres target-postgres 
+```
+
+### Next Steps
+
+If you want to add custom Transforms and explore the extracted data using Meltano UI, you should check the advanced tutorial on [Adding Custom Transformations and Models](./tutorial.html#advanced-adding-custom-transformations-and-models)
+
+
 ## Using Jupyter Notebooks
 
 Once the `meltano elt` pipeline has successfully completed and data extracted from an API or a Data Source have been transformed and loaded to the `analytics` schema of your Data Warehouse, you can use Meltano UI or any data exploration tool to analyze and generate reports.

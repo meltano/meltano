@@ -7,6 +7,10 @@ WORKDIR /meltano
 COPY . .
 RUN make sdist
 
+FROM $BASE_IMAGE as runtime
+# grab the built package
+COPY --from=builder /meltano/dist /meltano/dist
+
 # install the built artifact to make sure we are
 # installing the application the same way our user
 # do when using PyPI

@@ -19,8 +19,7 @@ const defaultState = utils.deepFreeze({
   currentDesign: '',
   results: [],
   keys: [],
-  columnHeaders: [],
-  columnNames: [],
+  queryAttributes: [],
   resultAggregates: {},
   loadingQuery: false,
   currentSQL: '',
@@ -28,14 +27,15 @@ const defaultState = utils.deepFreeze({
   reports: [],
   chartType: 'BarChart',
   limit: 50,
-  sortColumn: null,
-  sortDesc: false,
   dialect: null,
-  selectedAttributeCount: 0,
   filterOptions: [],
   filters: {
     columns: [],
     aggregates: [],
+  },
+  order: {
+    assigned: [],
+    unassigned: [],
   },
 });
 
@@ -93,24 +93,8 @@ const helpers = {
       }))
       .filter(tf => tf.periods.length);
 
-    // Sorting setup - baseTable then joins if no match
-    let sortColumn = helpers.getSortColumn(state, baseTable);
-    if (!sortColumn) {
-      // Intentionally using state.design.joins vs joins to leverage join object vs join name
-      state.design.joins.some((join) => {
-        sortColumn = helpers.getSortColumn(state, join.relatedTable);
-        return Boolean(sortColumn);
-      });
-    }
-
-    // Ordering setup - TODO - Iterate when we implement multiple order sorting on backend
-    let order = null;
-    if (sortColumn && sortColumn.selected) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc',
-      };
-    }
+    // Ordering setup
+    const order = state.order.assigned;
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters);
@@ -135,17 +119,6 @@ const helpers = {
       filters,
     };
   },
-  getSortColumn(state, table) {
-    const finder = (collection, targetName) => collection.find(d => d.name === targetName);
-    let sortColumn;
-    if (table.columns) {
-      sortColumn = finder(table.columns, state.sortColumn);
-    }
-    if (table.aggregates && !sortColumn) {
-      sortColumn = finder(table.aggregates, state.sortColumn);
-    }
-    return sortColumn;
-  },
 };
 
 const getters = {
@@ -160,22 +133,52 @@ const getters = {
     return !!state.results.length;
   },
 
-  hasChartableResults(state, gettersRef) {
-    return gettersRef.hasResults && state.resultAggregates.length;
+  // eslint-disable-next-line
+  hasChartableResults(state, getters) {
+    return getters.hasResults && state.resultAggregates.length;
   },
 
-  hasFilters(_, gettersRef) {
-    return gettersRef.filtersCount > 0;
+  // eslint-disable-next-line
+  hasFilters(_, getters) {
+    return getters.filtersCount > 0;
   },
 
-  getAttributesByTable(state) {
-    const attributeTables = [];
+  getAllAttributes(state) {
+    let attributes = [];
+    const joinSources = state.design.joins || [];
+    const sources = [state.design].concat(joinSources);
+    const batchCollect = (table, attributeTypes) => {
+      attributeTypes.forEach((attributeType) => {
+        const attributesByType = table[attributeType];
+        if (attributesByType) {
+          attributes = attributes.concat(attributesByType);
+        }
+      });
+    };
+
+    sources.forEach((source) => {
+      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes']);
+    });
+
+    return attributes;
+  },
+
+  // eslint-disable-next-line no-shadow
+  getAttributeByQueryAttribute(state, getters) {
+    return (queryAttribute) => {
+      const finder = attr => attr.sourceName === queryAttribute.sourceName && attr.name === queryAttribute.attributeName;
+      return getters.getAllAttributes.find(finder);
+    };
+  },
+
+  getFilterAttributes(state) {
+    const sources = [];
     const design = state.design;
     const attributeFilter = attr => !attr.hidden;
     if (design.label) {
-      attributeTables.push({
+      sources.push({
         tableLabel: design.label,
-        tableName: design.from,
+        sourceName: design.name,
         columns: design.relatedTable.columns
           ? design.relatedTable.columns.filter(attributeFilter)
           : [],
@@ -186,9 +189,9 @@ const getters = {
     }
     if (design.joins) {
       design.joins.forEach((join) => {
-        attributeTables.push({
+        sources.push({
           tableLabel: join.label,
-          tableName: join.name,
+          sourceName: join.name,
           columns: join.relatedTable.columns
             ? join.relatedTable.columns.filter(attributeFilter)
             : [],
@@ -198,25 +201,46 @@ const getters = {
         });
       });
     }
-    return attributeTables;
+    return sources;
   },
 
-  getFilter(_, gettersRef) {
+  // eslint-disable-next-line no-shadow
+  getFilter(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => gettersRef.getFiltersByType(filterType).find(filter => filter.name === name && filter.tableName === tableName);
+    return (sourceName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.sourceName === sourceName);
   },
 
   getFiltersByType(state) {
     return filterType => state.filters[helpers.getFilterTypePlural(filterType)] || [];
   },
 
-  getIsAttributeInFilters(_, gettersRef) {
+  // eslint-disable-next-line no-shadow
+  getIsAttributeInFilters(_, getters) {
     // eslint-disable-next-line
-    return (tableName, name, filterType) => !!gettersRef.getFilter(tableName, name, filterType);
+    return (sourceName, name, filterType) => !!getters.getFilter(sourceName, name, filterType);
   },
 
-  attributesCount(state) {
-    return state.selectedAttributeCount;
+  getIsOrderableAttributeAscending() {
+    return orderableAttribute => orderableAttribute.direction === 'asc';
+  },
+
+  // eslint-disable-next-line no-shadow
+  getQueryAttributeFromCollectionByAttribute(state) {
+    return (orderCollection, attribute) => {
+      const finder = queryAttribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName;
+      return state.order[orderCollection].find(finder);
+    };
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributes(_, getters) {
+    const selector = attribute => attribute.selected;
+    return getters.getAllAttributes.filter(selector);
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributesCount(_, getters) {
+    return getters.getSelectedAttributes.length;
   },
 
   resultsCount(state) {
@@ -231,8 +255,6 @@ const getters = {
   hasJoins(state) {
     return !!(state.design.joins && state.design.joins.length);
   },
-
-  isColumnSorted: state => key => state.sortColumn === key,
 
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
@@ -268,6 +290,36 @@ const getters = {
 };
 
 const actions = {
+  checkAutoRun({ dispatch, state }) {
+    if (state.results.length > 0) {
+      dispatch('runQuery');
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  cleanFiltering({ commit, getters }, { attribute, type }) {
+    if (!attribute.selected) {
+      const filter = getters.getFilter(attribute.sourceName, attribute.name, type);
+      if (filter) {
+        commit('removeFilter', filter);
+      }
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  cleanOrdering({ commit, getters, state }, attribute) {
+    if (!attribute.selected) {
+      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
+      if (matchAssigned || matchUnassigned) {
+        commit('removeOrder', {
+          collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
+          queryAttribute: matchAssigned || matchUnassigned,
+        });
+      }
+    }
+  },
+
   resetDefaults: ({ commit }) => commit('resetDefaults'),
 
   getDesign({ commit, dispatch, state }, { model, design, slug }) {
@@ -329,35 +381,29 @@ const actions = {
       });
   },
 
-  removeSort({ commit, state }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) {
-      return;
-    }
-    commit('setRemoveSort', column);
-  },
-
-  toggleColumn({ commit }, column) {
+  toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column);
+    dispatch('cleanOrdering', column);
+    dispatch('checkAutoRun');
   },
 
-  toggleTimeframe({ commit }, timeframe) {
+  toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe);
+    dispatch('cleanOrdering', timeframe);
+    dispatch('checkAutoRun');
   },
 
-  toggleTimeframePeriod({ commit }, timeframePeriod) {
+  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod);
+    dispatch('cleanOrdering', timeframePeriod);
+    dispatch('checkAutoRun');
   },
 
-  // eslint-disable-next-line
-  toggleAggregate({ commit, getters }, { aggregate, tableName }) {
+  toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate);
-
-    if (!aggregate.selected) {
-      const filter = getters.getFilter(tableName, aggregate.name, 'aggregate');
-      if (filter) {
-        commit('removeFilter', filter);
-      }
-    }
+    dispatch('cleanOrdering', aggregate);
+    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' });
+    dispatch('checkAutoRun');
   },
 
   limitSet({ commit }, limit) {
@@ -369,7 +415,8 @@ const actions = {
     commit('setChartType', chartType);
   },
 
-  getSQL({ commit, state }, { run, load }) {
+  // eslint-disable-next-line no-shadow
+  getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage');
     state.loadingQuery = !!run;
 
@@ -382,6 +429,7 @@ const actions = {
           commit('setQueryResults', response.data);
           commit('setSQLResults', response.data);
           state.loadingQuery = false;
+          commit('setSorting', getters.getAllAttributes);
         } else {
           commit('setSQLResults', response.data);
         }
@@ -447,21 +495,39 @@ const actions = {
     commit('setErrorState');
   },
 
-  toggleLoadReportOpen({ commit }) {
-    commit('setLoadReportToggle');
+  resetSortAttributes({ commit }) {
+    commit('resetSortAttributes');
   },
 
-  sortBy({ commit }, name) {
-    commit('setSortColumn', name);
+  runQuery() {
     this.dispatch('designs/getSQL', {
       run: true,
     });
   },
 
+  toggleLoadReportOpen({ commit }) {
+    commit('setLoadReportToggle');
+  },
+
+  // eslint-disable-next-line no-shadow
+  updateSortAttribute({ commit, getters }, queryAttribute) {
+    const attribute = getters.getAttributeByQueryAttribute(queryAttribute);
+    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
+    if (matchInAssigned) {
+      const direction = getters.getIsOrderableAttributeAscending(matchInAssigned) ? 'desc' : 'asc';
+      commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
+    } else if (matchInUnassigned) {
+      commit('assignSortableAttribute', attribute);
+    }
+
+    this.dispatch('designs/runQuery');
+  },
+
   // eslint-disable-next-line
-  addFilter({ commit }, { tableName, attribute, filterType, expression = '', value = '', isActive = true }) {
+  addFilter({ commit }, { sourceName, attribute, filterType, expression = '', value = '', isActive = true }) {
     const filter = {
-      tableName,
+      sourceName,
       name: attribute.name,
       expression,
       value,
@@ -483,12 +549,26 @@ const actions = {
 };
 
 const mutations = {
+  assignSortableAttribute(state, attribute) {
+    const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.sourceName);
+    const idx = state.order.unassigned.indexOf(orderableAttribute);
+    state.order.unassigned.splice(idx, 1);
+    state.order.assigned.push(orderableAttribute);
+  },
+
+  removeOrder(state, { collection, queryAttribute }) {
+    const idx = collection.indexOf(queryAttribute);
+    collection.splice(idx, 1);
+  },
+
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState));
   },
 
-  setRemoveSort(state) {
-    state.sortColumn = null;
+  resetSortAttributes(state) {
+    const assigned = state.order.assigned;
+    state.order.unassigned = state.order.unassigned.concat(assigned);
+    state.order.assigned = [];
   },
 
   setChartType(state, chartType) {
@@ -559,7 +639,7 @@ const mutations = {
       }
     });
     // order
-    // TODO
+    state.order = queryPayload.order;
     // base_table timeframes
     // TODO
   },
@@ -578,13 +658,6 @@ const mutations = {
 
   addSavedReportToReports(state, report) {
     state.reports.push(report);
-  },
-
-  setSortColumn(state, name) {
-    if (state.sortColumn === name) {
-      state.sortDesc = !state.sortDesc;
-    }
-    state.sortColumn = name;
   },
 
   setJoinColumns(_, { columns, join }) {
@@ -610,9 +683,26 @@ const mutations = {
   setQueryResults(state, results) {
     state.results = results.results;
     state.keys = results.keys;
-    state.columnHeaders = results.columnHeaders;
-    state.columnNames = results.columnNames;
+    state.queryAttributes = results.queryAttributes;
     state.resultAggregates = results.aggregates;
+  },
+
+  setSorting(state, allAttributes) {
+    state.queryAttributes.forEach((queryAttribute) => {
+      const accounted = state.order.assigned.concat(state.order.unassigned);
+      const finder = orderableAttribute => orderableAttribute.sourceName === queryAttribute.sourceName && orderableAttribute.attributeName === queryAttribute.attributeName;
+      const isAccountedFor = accounted.find(finder);
+      if (!isAccountedFor) {
+        const targetAttribute = allAttributes.find(attribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName);
+        state.order.unassigned.push({
+          sourceName: targetAttribute.sourceName,
+          sourceLabel: targetAttribute.sourceLabel,
+          attributeName: targetAttribute.name,
+          attributeLabel: targetAttribute.label,
+          direction: 'asc',
+        });
+      }
+    });
   },
 
   setSqlErrorMessage(state, e) {
@@ -632,16 +722,37 @@ const mutations = {
     state.sqlErrorMessage = [];
   },
 
-  toggleSelected(state, selectable) {
-    Vue.set(selectable, 'selected', !selectable.selected);
-    state.selectedAttributeCount += selectable.selected ? 1 : -1;
+  toggleSelected(state, attribute) {
+    Vue.set(attribute, 'selected', !attribute.selected);
   },
 
   toggleCollapsed(state, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
+  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
+    orderableAttribute.direction = direction;
+  },
+
   setDesign(state, designData) {
+    const joinSources = designData.joins || [];
+    const sources = [designData].concat(joinSources);
+    const batchSourcer = (source, attributeTypes) => {
+      const table = source.relatedTable;
+      attributeTypes.forEach((attributeType) => {
+        if (table[attributeType]) {
+          table[attributeType].forEach((attribute) => {
+            attribute.sourceName = source.name;
+            attribute.sourceLabel = source.label;
+          });
+        }
+      });
+    };
+
+    sources.forEach((source) => {
+      batchSourcer(source, ['columns', 'aggregates', 'timeframes']);
+    });
+
     state.design = designData;
   },
 

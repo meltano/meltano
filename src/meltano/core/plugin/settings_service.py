@@ -28,6 +28,26 @@ class PluginSettingValueSource(int, Enum):
     DEFAULT = 3
 
 
+class SettingDefinition:
+    def __init__(self, definition: dict):
+        if "name" not in definition:
+            raise ValueError("Setting definition must have a `name`.")
+
+        self._definition = definition
+
+    def __getattr__(self, attr):
+        return getattr(self._definition, attr)
+
+    def __getitem__(self, item):
+        return self._definition[item]
+
+    def __eq__(self, other):
+        return self["name"] == other["name"]
+
+    def __hash__(self):
+        return hash(self["name"])
+
+
 class PluginSettingsService:
     def __init__(
         self,
@@ -41,24 +61,16 @@ class PluginSettingsService:
         self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
         self._session = session
 
-    def settings(self, plugin: PluginRef, enabled_only=True):
-        q = self._session.query(PluginSetting).filter_by(
-            namespace=plugin.qualified_name
-        )
-
-        if enabled_only:
-            q.filter_by(enabled=True)
-
-        return q.all()
-
     def as_config(
         self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
     ) -> Dict:
         # defaults to the meltano.yml for extraneous settings
-        config = deepcopy(self.get_install(plugin).config)
+        plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
+        config = deepcopy(plugin_install.config)
 
-        for setting in plugin_def.settings:
+        # definition settings
+        for setting in self.definitions(plugin):
             value, source = self.get_value(plugin, setting["name"])
             if sources and source not in sources:
                 continue
@@ -74,7 +86,7 @@ class PluginSettingsService:
         plugin_def = self.get_definition(plugin)
         env = {}
 
-        for setting in plugin_def.settings:
+        for setting in self.definitions(plugin):
             value, source = self.get_value(plugin, setting["name"])
             if sources and source not in sources:
                 continue
@@ -87,7 +99,7 @@ class PluginSettingsService:
     def set(self, plugin: PluginRef, name: str, value, enabled=True):
         try:
             plugin_def = self.get_definition(plugin)
-            setting_def = self.find_setting(plugin_def, name)
+            setting_def = self.find_setting(plugin, name)
             env_key = self.setting_env(setting_def, plugin_def)
 
             if env_key in os.environ:
@@ -114,10 +126,36 @@ class PluginSettingsService:
     def get_definition(self, plugin: PluginRef) -> Plugin:
         return self.plugin_discovery.find_plugin(plugin.type, plugin.name)
 
-    def find_setting(self, plugin_def: Dict, name: str) -> Dict:
-        return next(
-            setting for setting in plugin_def.settings if setting["name"] == name
-        )
+    def find_setting(self, plugin: PluginRef, name: str) -> Dict:
+        try:
+            return next(
+                setting
+                for setting in self.definitions(plugin)
+                if setting["name"] == name
+            )
+        except StopIteration:
+            raise PluginSettingMissingError(plugin, name)
+
+    def definitions(self, plugin_ref: PluginRef) -> Iterable[Dict]:
+        settings = set()
+        plugin_def = self.get_definition(plugin_ref)
+
+        try:
+            # there might be some settings declared on the PluginInstall
+            # and such settings have precedence over the the definition
+            plugin_install = self.get_install(plugin_ref)
+            for setting_def in map(
+                SettingDefinition, plugin_install._extras.get("settings", [])
+            ):
+                settings.add(setting_def)
+        except PluginMissingError:
+            pass
+
+        # add the plugin definition settings
+        for setting_def in map(SettingDefinition, plugin_def.settings):
+            settings.add(setting_def)
+
+        return list(settings)
 
     def get_install(self, plugin: PluginRef) -> PluginInstall:
         return self.config_service.find_plugin(plugin.name, plugin_type=plugin.type)
@@ -134,11 +172,7 @@ class PluginSettingsService:
     def get_value(self, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
-
-        try:
-            setting_def = self.find_setting(plugin_def, name)
-        except StopIteration:
-            raise PluginSettingMissingError(plugin_def, name)
+        setting_def = self.find_setting(plugin, name)
 
         try:
             env_key = self.setting_env(setting_def, plugin_def)

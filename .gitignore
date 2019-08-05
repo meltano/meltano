@@ -140,12 +140,13 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-api/tmp/output.json
-static/tmp
-src/analyze/dist/
 meltano.log.*
 *.m5oc
-src/meltano/core/bundle/model/
+
+# analyze builds
+src/analyze/dist/
+src/meltano/api/static/
+src/meltano/api/templates/analyze.html
 
 # sqlite
 *.db
