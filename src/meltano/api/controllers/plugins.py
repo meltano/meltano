@@ -32,13 +32,13 @@ def installed():
 
     project = Project.find()
     config = ConfigService(project)
-    plugins = []
-    installedPlugins = {}
+    discovery = PluginDiscoveryService(project)
     meltano_manifest = project.meltano
+    installedPlugins = {}
+    plugins = []
+
 
     for plugin in config.plugins():
-        discovery = PluginDiscoveryService(project)
-
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
         except PluginNotFoundError:
