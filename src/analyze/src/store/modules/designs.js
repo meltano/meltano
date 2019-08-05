@@ -364,11 +364,11 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  toggleAggregate({ commit, getters }, { aggregate, sourceName }) {
+  toggleAggregate({ commit, getters }, aggregate) {
     commit('toggleSelected', aggregate);
 
     if (!aggregate.selected) {
-      const filter = getters.getFilter(sourceName, aggregate.name, 'aggregate');
+      const filter = getters.getFilter(aggregate.sourceName, aggregate.name, 'aggregate');
       if (filter) {
         commit('removeFilter', filter);
       }
