@@ -37,7 +37,6 @@ def installed():
     installedPlugins = {}
     plugins = []
 
-
     for plugin in config.plugins():
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
