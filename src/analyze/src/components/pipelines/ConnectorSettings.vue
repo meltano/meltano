@@ -64,9 +64,9 @@ export default {
     },
   },
   methods: {
-    findLabel(setting, value) {
+    findLabel(setting) {
       return setting.options.find(item => item.value === setting.value).label;
-    }
+    },
   },
 };
 </script>
