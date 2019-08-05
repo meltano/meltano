@@ -155,7 +155,9 @@ loaders:
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '"'.
   - name: target-snowflake
     namespace: snowflake
+    docs: https://www.meltano.com/docs/plugins.html#snowflake
     pip_url: "git+https://gitlab.com/meltano/target-snowflake.git"
+    signup_url: https://trial.snowflake.com?referrer=meltano
     # TODO: in reality this should be a Meltano database concept
     # instead of a granular connection. We could use an existing
     # connection from analyze.
