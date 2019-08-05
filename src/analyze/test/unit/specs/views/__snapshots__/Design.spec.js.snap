@@ -48,7 +48,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 <button
                   aria-controls="dropdown-save"
                   aria-haspopup="true"
-                  class="button is-interactive-primary is-outlined"
+                  class="button"
                   disabled="disabled"
                 >
                   <span>
@@ -93,30 +93,23 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     </div>
                      
                     <div
-                      class="field is-grouped"
+                      class="buttons is-right"
                     >
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small is-text"
+                        data-dropdown-auto-close=""
                       >
-                        <button
-                          class="button is-interactive-primary"
-                          disabled="disabled"
-                        >
-                          Save
-                        </button>
-                      </div>
+                        
+                      Cancel
+                      </button>
                        
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small"
+                        data-dropdown-auto-close=""
+                        disabled="disabled"
                       >
-                        <button
-                          class="button is-text"
-                          data-dropdown-auto-close=""
-                        >
-                          
-                        Cancel
-                        </button>
-                      </div>
+                        Save
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -137,7 +130,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
               >
                 <span>
                   Reports
@@ -704,7 +697,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 <button
                   aria-controls="dropdown-save"
                   aria-haspopup="true"
-                  class="button is-interactive-primary is-outlined"
+                  class="button"
                   disabled="disabled"
                 >
                   <span>
@@ -749,30 +742,23 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     </div>
                      
                     <div
-                      class="field is-grouped"
+                      class="buttons is-right"
                     >
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small is-text"
+                        data-dropdown-auto-close=""
                       >
-                        <button
-                          class="button is-interactive-primary"
-                          disabled="disabled"
-                        >
-                          Save
-                        </button>
-                      </div>
+                        
+                      Cancel
+                      </button>
                        
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small"
+                        data-dropdown-auto-close=""
+                        disabled="disabled"
                       >
-                        <button
-                          class="button is-text"
-                          data-dropdown-auto-close=""
-                        >
-                          
-                        Cancel
-                        </button>
-                      </div>
+                        Save
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -793,7 +779,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
                 disabled="disabled"
               >
                 <span>
@@ -1347,7 +1333,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             class="control"
           >
             <dropdown-stub
-              buttonclasses="is-interactive-primary is-outlined"
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
@@ -1376,30 +1361,23 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   </div>
                    
                   <div
-                    class="field is-grouped"
+                    class="buttons is-right"
                   >
-                    <div
-                      class="control"
+                    <button
+                      class="button is-small is-text"
+                      data-dropdown-auto-close=""
                     >
-                      <button
-                        class="button is-interactive-primary"
-                        disabled="disabled"
-                      >
-                        Save
-                      </button>
-                    </div>
+                      
+                      Cancel
+                    </button>
                      
-                    <div
-                      class="control"
+                    <button
+                      class="button is-small"
+                      data-dropdown-auto-close=""
+                      disabled="disabled"
                     >
-                      <button
-                        class="button is-text"
-                        data-dropdown-auto-close=""
-                      >
-                        
-                        Cancel
-                      </button>
-                    </div>
+                      Save
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1411,7 +1389,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           class="control"
         >
           <dropdown-stub
-            buttonclasses="is-interactive-primary is-outlined"
             disabled="true"
             iconclose="caret-up"
             iconopen="caret-down"
@@ -1775,7 +1752,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             class="control"
           >
             <dropdown-stub
-              buttonclasses="is-interactive-primary is-outlined"
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
@@ -1804,30 +1780,23 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   </div>
                    
                   <div
-                    class="field is-grouped"
+                    class="buttons is-right"
                   >
-                    <div
-                      class="control"
+                    <button
+                      class="button is-small is-text"
+                      data-dropdown-auto-close=""
                     >
-                      <button
-                        class="button is-interactive-primary"
-                        disabled="disabled"
-                      >
-                        Save
-                      </button>
-                    </div>
+                      
+                      Cancel
+                    </button>
                      
-                    <div
-                      class="control"
+                    <button
+                      class="button is-small"
+                      data-dropdown-auto-close=""
+                      disabled="disabled"
                     >
-                      <button
-                        class="button is-text"
-                        data-dropdown-auto-close=""
-                      >
-                        
-                        Cancel
-                      </button>
-                    </div>
+                      Save
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1839,7 +1808,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           class="control"
         >
           <dropdown-stub
-            buttonclasses="is-interactive-primary is-outlined"
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
@@ -2216,7 +2184,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 <button
                   aria-controls="dropdown-save"
                   aria-haspopup="true"
-                  class="button is-interactive-primary is-outlined"
+                  class="button"
                   disabled="disabled"
                 >
                   <span>
@@ -2261,30 +2229,23 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     </div>
                      
                     <div
-                      class="field is-grouped"
+                      class="buttons is-right"
                     >
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small is-text"
+                        data-dropdown-auto-close=""
                       >
-                        <button
-                          class="button is-interactive-primary"
-                          disabled="disabled"
-                        >
-                          Save
-                        </button>
-                      </div>
+                        
+                      Cancel
+                      </button>
                        
-                      <div
-                        class="control"
+                      <button
+                        class="button is-small"
+                        data-dropdown-auto-close=""
+                        disabled="disabled"
                       >
-                        <button
-                          class="button is-text"
-                          data-dropdown-auto-close=""
-                        >
-                          
-                        Cancel
-                        </button>
-                      </div>
+                        Save
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2305,7 +2266,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
                 disabled="disabled"
               >
                 <span>
