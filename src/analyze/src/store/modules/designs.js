@@ -459,10 +459,12 @@ const actions = {
 
   saveReport({ commit, state }, { name }) {
     const postData = {
-      name,
-      model: state.currentModel,
-      design: state.currentDesign,
       chartType: state.chartType,
+      design: state.currentDesign,
+      filters: state.filters,
+      model: state.currentModel,
+      name,
+      order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state),
     };
     reportsApi.saveReport(postData)
@@ -591,8 +593,10 @@ const mutations = {
     state.chartType = report.chartType;
     state.limit = report.queryPayload.limit;
     state.dialect = report.queryPayload.dialect;
+    state.filters = report.filters;
+    state.order = report.order;
 
-    // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
     const baseTable = state.design.relatedTable;
     const queryPayload = report.queryPayload;
     const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
@@ -616,8 +620,6 @@ const mutations = {
     setSelected(baseTable.columns, queryPayload.columns);
     // aggregates
     setSelected(baseTable.aggregates, queryPayload.aggregates);
-    // filters
-    state.filters = queryPayload.filters;
     // joins, timeframes, and periods
     joinColumnGroups.forEach((joinGroup) => {
       // joins - columns
@@ -639,10 +641,6 @@ const mutations = {
         });
       }
     });
-    // order
-    state.order = queryPayload.order;
-    // base_table timeframes
-    // TODO
   },
 
   addFilter(state, filter) {
