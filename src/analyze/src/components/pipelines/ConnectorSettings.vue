@@ -113,7 +113,7 @@ export default {
         <TooltipCircle
           v-if="setting.tooltip"
           :text="setting.tooltip"
-          style="margin-left: 0.25em"
+          class="label-tooltip"
         />
       </div>
       <div class="field-body">
@@ -159,4 +159,8 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.label-tooltip  {
+  margin-left: 0.25em;
+}
+</style>
