@@ -290,6 +290,12 @@ const getters = {
 };
 
 const actions = {
+  checkAutoRun({ dispatch, state }) {
+    if (state.results.length > 0) {
+      dispatch('runQuery');
+    }
+  },
+
   // eslint-disable-next-line no-shadow
   cleanFiltering({ commit, getters }, { attribute, type }) {
     if (!attribute.selected) {
@@ -301,7 +307,7 @@ const actions = {
   },
 
   // eslint-disable-next-line no-shadow
-  cleanOrdering({ commit, dispatch, getters, state }, attribute) {
+  cleanOrdering({ commit, getters, state }, attribute) {
     if (!attribute.selected) {
       const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
       const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
@@ -310,7 +316,6 @@ const actions = {
           collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
           queryAttribute: matchAssigned || matchUnassigned,
         });
-        dispatch('runQuery');
       }
     }
   },
@@ -379,22 +384,26 @@ const actions = {
   toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column);
     dispatch('cleanOrdering', column);
+    dispatch('checkAutoRun');
   },
 
   toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe);
     dispatch('cleanOrdering', timeframe);
+    dispatch('checkAutoRun');
   },
 
   toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod);
     dispatch('cleanOrdering', timeframePeriod);
+    dispatch('checkAutoRun');
   },
 
   toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate);
     dispatch('cleanOrdering', aggregate);
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' });
+    dispatch('checkAutoRun');
   },
 
   limitSet({ commit }, limit) {
