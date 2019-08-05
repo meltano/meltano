@@ -27,25 +27,9 @@ export default {
          */
 
         const accountInput = newVal.config.account;
-        const domainFlag = 'snowflakecomputing.com';
-        const domainLocation = accountInput.indexOf(domainFlag);
 
-        // If the domain exists in user input, assume URL
-        if (domainLocation > -1) {
-          let shortenedUrl = accountInput.slice(
-            0,
-            domainLocation + domainFlag.length,
-          );
-
-          // Clean up URL if http is detected
-          if (shortenedUrl.indexOf('http') > -1) {
-            shortenedUrl = shortenedUrl.slice(shortenedUrl.indexOf('//') + 2);
-          }
-
-          // This could eventually parse data like region if needed
-          const accountId = shortenedUrl.split('.')[0];
-
-          this.configSettings.config.account = accountId;
+        if (utils.snowflakeAccountParser(accountInput)) {
+          this.configSettings.config.account = utils.snowflakeAccountParser(accountInput);
         } else {
           this.configSettings.config.account = newVal.config.account;
         }
