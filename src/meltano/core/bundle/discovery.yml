@@ -162,9 +162,6 @@ loaders:
     # instead of a granular connection. We could use an existing
     # connection from analyze.
     settings:
-      - name: introduction
-        signup: https://trial.snowflake.com?referrer=meltano
-        docs: https://www.meltano.com/docs/plugins.html#snowflake
       - name: account
         env: SF_ACCOUNT
       - name: username
