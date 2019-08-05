@@ -2,7 +2,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faAngleDown,
   faAngleUp,
+  faArrowDown,
+  faArrowsAltV,
   faArrowRight,
+  faArrowUp,
   faCaretDown,
   faCaretUp,
   faCertificate,
@@ -20,6 +23,9 @@ import {
   faInfoCircle,
   faTable,
   faSearch,
+  faSort,
+  faSortAmountDown,
+  faSortAmountUp,
   faUser,
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -33,7 +39,10 @@ export default {
   install(Vue) {
     library.add(faAngleDown);
     library.add(faAngleUp);
+    library.add(faArrowsAltV);
+    library.add(faArrowDown);
     library.add(faArrowRight);
+    library.add(faArrowUp);
     library.add(faCaretDown);
     library.add(faCaretUp);
     library.add(faCertificate);
@@ -51,6 +60,9 @@ export default {
     library.add(faInfoCircle);
     library.add(faTable);
     library.add(faSearch);
+    library.add(faSort);
+    library.add(faSortAmountDown);
+    library.add(faSortAmountUp);
     library.add(faUser);
 
     Vue.component('font-awesome-icon', FontAwesomeIcon);

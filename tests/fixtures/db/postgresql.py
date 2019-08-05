@@ -5,7 +5,18 @@ import contextlib
 import logging
 
 from meltano.core.db import DB, project_engine
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import text, create_engine, MetaData
+
+
+def recreate_database(engine, db_name):
+    """
+    Drop & Create a new database, PostgreSQL only.
+    """
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
+        engine.execute(text(f"DROP DATABASE {db_name}"))
+
+    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
+        engine.execute(text(f"CREATE DATABASE {db_name}"))
 
 
 @pytest.fixture(scope="session")
@@ -18,8 +29,7 @@ def engine_uri():
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
-    with contextlib.suppress(sqlalchemy.exc.ProgrammingError):
-        DB.create_database(engine, "pytest")
+    recreate_database(engine, "pytest")
 
     return f"postgresql://{user}:{password}@{host}:{port}/pytest"
 

@@ -8,31 +8,38 @@ $steps-completed-color:	$white-ter;
 $steps-active-color:	$interactive-navigation;
 $steps-divider-height:	.1em;
 
-.steps .step-item {
-  color: $interactive-navigation-inactive;
+.steps {
 
-  &.is-active {
-    color: $interactive-navigation;
-
-    .step-marker {
-      color: $interactive-navigation !important;
-      background-color: $white-ter !important;
-    }
-  }
-
-  &.is-completed {
-    color: $interactive-navigation;
+  .step-item {
+    color: $interactive-navigation-inactive;
 
     &.is-active {
-      color: $interactive-navigation !important;
+      color: $interactive-navigation;
+
+      .step-marker {
+        color: $interactive-navigation !important;
+        background-color: $white-ter !important;
+      }
+    }
+
+    &.is-completed {
+      color: $interactive-navigation;
+
+      &.is-active {
+        color: $interactive-navigation !important;
+      }
+    }
+
+    .step-marker {
+      color: $interactive-navigation-inactive !important;
+    }
+
+    .step-title {
+      margin-bottom: .4rem;
     }
   }
 
-  .step-marker {
-    color: $interactive-navigation-inactive !important;
-  }
-
-  .step-title {
-    margin-bottom: .4rem;
+  .steps-content {
+    margin-bottom: 0 !important;
   }
 }

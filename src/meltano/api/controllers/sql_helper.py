@@ -9,6 +9,7 @@ from sqlalchemy.event import listen
 
 from meltano.api.models import db
 from meltano.api.security import create_dev_user
+from meltano.api.json import freeze_keys
 from meltano.core.project import Project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -93,10 +94,12 @@ class SqlHelper(SqlUtils):
 
         return engine
 
+    # we need to `freeze` each result to make sure
+    # the attribute name will be correct for the lookup
     def get_query_results(self, connection_name, sql):
         engine = self.get_db_engine(connection_name)
         results = engine.execute(sqlalchemy.text(sql))
-        results = [OrderedDict(row) for row in results]
+        results = [freeze_keys(OrderedDict(row)) for row in results]
         return results
 
     def reset_db(self):

@@ -95,6 +95,24 @@ class MeltanoDesign(MeltanoBase):
 
         return MeltanoTable(table_def, design=self)
 
+    def find_source_name(self, table_name: str) -> str:
+        """
+        Given the name of a table, get its source name:
+        - If it is the base table for this design then return the name of the design
+        - If it is part of a join then return the name of the join
+        """
+        if self._definition["related_table"]["name"] == table_name:
+            return self.name
+
+        try:
+            return next(
+                j["name"]
+                for j in self._definition.get("joins", [])
+                if j["related_table"]["name"] == table_name
+            )
+        except StopIteration:
+            raise ParseError(f"Table {table_name} not found in design {self.name}")
+
 
 class MeltanoTable(MeltanoBase):
     """
@@ -159,6 +177,20 @@ class MeltanoTable(MeltanoBase):
     def get_timeframe(self, name: str) -> MeltanoBase:
         return next((t for t in self.timeframes() if t.name == name), None)
 
+    def get_attribute(self, name: str) -> MeltanoBase:
+        """
+        Given an attribute name, find if there is a column / aggregate / timeframe
+         with that name and return it
+        """
+        if self.get_column(name):
+            return self.get_column(name)
+        elif self.get_aggregate(name):
+            return self.get_aggregate(name)
+        elif self.get_timeframe(name):
+            return self.get_timeframe(name)
+        else:
+            raise ParseError(f"Attribute {name} not found in Meltano Table {self.name}")
+
     def add_column(self, column) -> None:
         self._columns.append(column)
 
@@ -167,6 +199,20 @@ class MeltanoTable(MeltanoBase):
 
     def add_timeframe(self, timeframe) -> None:
         self._timeframes.append(timeframe)
+
+    def find_source_name(self) -> str:
+        """
+        Get the source name for this table:
+        (1) if a source name has been set for this table then return that name
+        (2) Otherwise, if it is defined in a design, then get it from the design
+        (3) Finally, default to MeltanoTable.name if everything else is missing
+        """
+        if self.source_name:
+            return self.source_name
+        elif self.design:
+            return self.design.find_source_name(self.name)
+        else:
+            return self.name
 
     def __getattr__(self, attr: str):
         try:
@@ -184,7 +230,7 @@ class MeltanoTable(MeltanoBase):
                 except ValueError:
                     self._attributes["schema"] = None
                     self._attributes["sql_table_name"] = value
-        elif name in ["name", "schema"]:
+        elif name in ["name", "schema", "source_name"]:
             self._attributes[name] = value
         else:
             super(MeltanoTable, self).__setattr__(name, value)
@@ -353,7 +399,7 @@ class MeltanoTimeframe(MeltanoBase):
         (table, column) = self.sql.split(".")
         return column
 
-    def column_alias(self) -> str:
+    def alias(self) -> str:
         return f"{self.table.sql_table_name}.{self.column_name()}"
 
     def period_column_name(self, period) -> str:
@@ -459,10 +505,22 @@ class MeltanoFilter(MeltanoBase):
     An internal representation of a Filter (WHERE or HAVING clause)
     defined in a MeltanoQuery.
 
-    definition: {"table_name", "name", "expression", "value"}
+    definition: {"source_name", "name", "expression", "value"}
 
-    In the most simple case, the idea is to use it in order to generate a simple clause:
-      table_name.name {expression} value
+    Where:
+    + "source name" is the way we call a table in a design:
+      - If it is the base table for the design then it is name of the design
+      - If it is part of a join then it is the name of the join
+      The reason for that is that we can have the same table multiple times in
+       a query (e.g. multiple joins or a self join of the base table with its self),
+       so we use the source_name in order to know which version of the table we
+       refer to.
+    + "name" is the name of the attribute accessed (column, aggregate or timeframe)
+    + "expression" is one of the supported expressions defined in MeltanoFilterExpressionType
+    + "value" is the value we are going to use in the expression (for non unary expressions)
+
+    In the most simple case, the idea is to use MeltanoFilter in order to generate a simple clause:
+      table_alias.name {expression} value
     e.g. gitlab_stats_per_user.project_name = 'Meltano'
      or  COALESCE(SUM("gitlab_stats_per_user"."total_issues_authored"),0) > 5
 
@@ -472,7 +530,7 @@ class MeltanoFilter(MeltanoBase):
      (the Pypika Field knows at run time the table, the clause is evaluated against)
 
     It provides access to the metada for the Filter:
-      {type, table_name, name, expression, value}
+      {type, source_name, name, expression, value}
     """
 
     def __init__(self, definition: Dict = {}, design: MeltanoDesign = None) -> None:
@@ -493,7 +551,7 @@ class MeltanoFilter(MeltanoBase):
         """
         Validate the Filter definition
         """
-        table_name = definition.get("table_name", None)
+        source_name = definition.get("source_name", None)
         attribute_name = definition.get("name", None)
 
         if self.expression_type == MeltanoFilterExpressionType.Unknown:
@@ -501,9 +559,9 @@ class MeltanoFilter(MeltanoBase):
                 f"Unknown filter expression: {definition['expression']}."
             )
 
-        if table_name is None:
+        if source_name is None:
             raise ParseError(
-                f"A table name was not provided for filter '{definition}'."
+                f"A source name for a table was not provided for filter '{definition}'."
             )
         elif attribute_name is None:
             raise ParseError(
@@ -520,28 +578,23 @@ class MeltanoFilter(MeltanoBase):
             )
 
         if self.design:
-            try:
-                table_def = self.design.get_table(table_name)
-            except StopIteration:
-                raise ParseError(
-                    f"Requested table {table_name} in filter '{definition}' is not defined in the design"
-                )
+            table_def = self.design.find_table(source_name)
 
             column_def = table_def.get_column(attribute_name)
             aggregate_def = table_def.get_aggregate(attribute_name)
 
             if not any((column_def, aggregate_def)):
                 raise ParseError(
-                    f"Requested column {table_name}.{attribute_name} in filter '{definition}' is not defined in the design"
+                    f"Requested column {table_def.name}.{attribute_name} in filter '{definition}' is not defined in the design"
                 )
 
-    def match(self, table_name: str, attribute_name: str) -> bool:
+    def match(self, source_name: str, attribute_name: str) -> bool:
         """
-        Return True if this filter is defined for the given table and attribute
+        Return True if this filter is defined for the given source_name and attribute
         """
         return (
             True
-            if (self.table_name == table_name and self.name == attribute_name)
+            if (self.source_name == source_name and self.name == attribute_name)
             else False
         )
 
@@ -614,9 +667,46 @@ class MeltanoQuery(MeltanoBase):
         # The proper join order that will be used for the query (list of table names)
         self.join_order = []
 
+        self.validate_definition(definition)
         self.parse_definition(definition)
 
         super().__init__(definition)
+
+    def validate_definition(self, definition: Dict) -> None:
+        """
+        Validate that the definition is properly formated
+        """
+        if not isinstance(definition.get("columns"), list):
+            raise ParseError(f"Query definition property `columns` must be a list")
+
+        if not isinstance(definition.get("aggregates"), list):
+            raise ParseError(f"Query definition property `aggregates` must be a list")
+
+        timeframes = definition.get("timeframes")
+        if timeframes and not isinstance(timeframes, list):
+            raise ParseError(f"Query definition property `timeframes` must be a list")
+
+        order = definition.get("order")
+        if order and not isinstance(order, list):
+            raise ParseError(f"Query definition property `order` must be a list")
+
+        joins = definition.get("joins")
+        if joins and not isinstance(joins, list):
+            raise ParseError(f"Query definition property `joins` must be a list")
+
+        filters = definition.get("filters", None)
+        if filters:
+            columns = filters.get("columns")
+            if columns and not isinstance(columns, list):
+                raise ParseError(
+                    f"Query definition property `filters[columns]` must be a list"
+                )
+
+            aggregates = filters.get("aggregates")
+            if aggregates and not isinstance(aggregates, list):
+                raise ParseError(
+                    f"Query definition property `filters[aggregates]` must be a list"
+                )
 
     def parse_definition(self, definition: Dict) -> None:
         """
@@ -647,6 +737,7 @@ class MeltanoQuery(MeltanoBase):
                 table = MeltanoTable()
                 table.name = table_def.name
                 table.sql_table_name = table_def.sql_table_name
+                table.source_name = table_def.find_source_name()
 
                 for column in related_def.get("columns", []):
                     column_def = table_def.get_column(column)
@@ -806,10 +897,12 @@ class MeltanoQuery(MeltanoBase):
         """
         Return the SQL query for this Query definition.
 
-        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
+        Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the SQL:1999 compatible query
-        - (column_names, column_headers): The column names and headers of
-           the final result in the same order as the one defined by the query
+        - query_attributes: Hash with the attributes in the the final result
+           in the same order as the one defined by the query.
+           Keys included in the hash:
+           {table_name, source_name, attribute_name, attribute_label, attribute_type}
         - aggregate_columns: The aggregate columns in the query (fuly qualified)
         """
         if self.needs_hda():
@@ -821,17 +914,18 @@ class MeltanoQuery(MeltanoBase):
         """
         Build a simple, no-join SQL query for this Query definition.
 
-        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
+        Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the SQL:1999 compatible query
-        - (column_names, column_headers): The column names and headers of
-           the final result in the same order as the one defined by the query
+        - query_attributes: Hash with the attributes in the the final result
+           in the same order as the one defined by the query.
+           Keys included in the hash:
+           {table_name, source_name, attribute_name, attribute_label, attribute_type}
         - aggregate_columns: The aggregate columns in the query (fuly qualified)
         """
 
         # Lists with the column names and headers of the final result when the
         #  query is executed
-        column_headers = []
-        column_names = []
+        query_attributes = []
         aggregate_columns = []
 
         select = []
@@ -865,15 +959,22 @@ class MeltanoQuery(MeltanoBase):
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
                 group_by_attributes.append(Field(c.alias()))
 
-                column_headers.append(c.label)
-                column_names.append(c.name)
+                query_attributes.append(
+                    {
+                        "table_name": table.name,
+                        "source_name": table.find_source_name(),
+                        "attribute_name": c.name,
+                        "attribute_label": c.label,
+                        "attribute_type": "column",
+                    }
+                )
 
                 # Also check if there is a filter for this column and add it
                 #  in the WHERE clause
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.name, c.name)
+                    if f.match(table.find_source_name(), c.name)
                 ]
                 where.extend(matching_criteria)
 
@@ -883,21 +984,35 @@ class MeltanoQuery(MeltanoBase):
                     select.append(t.period_sql(period, pika_table=pika_table))
                     group_by_attributes.append(Field(t.period_alias(period)))
 
-                    column_headers.append(t.period_label(period))
-                    column_names.append(t.period_alias(period))
+                    query_attributes.append(
+                        {
+                            "table_name": table.name,
+                            "source_name": table.find_source_name(),
+                            "attribute_name": t.period_alias(period),
+                            "attribute_label": t.period_label(period),
+                            "attribute_type": "timeframe",
+                        }
+                    )
 
             # Generate the Aggregate Clauses
             for a in table.aggregates():
                 select_aggregates.append(a.qualified_sql(pika_table=pika_table))
 
                 aggregate_columns.append(a.alias())
-                column_headers.append(a.label)
-                column_names.append(a.name)
+                query_attributes.append(
+                    {
+                        "table_name": table.name,
+                        "source_name": table.find_source_name(),
+                        "attribute_name": a.name,
+                        "attribute_label": a.label,
+                        "attribute_type": "aggregate",
+                    }
+                )
 
                 # Also check if there is a filter for this aggregate and add it
                 #  in the HAVING clase
                 for f in self.aggregate_filters:
-                    if f.match(table.name, a.name):
+                    if f.match(table.find_source_name(), a.name):
                         field = a.qualified_sql(pika_table=pika_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None
@@ -918,31 +1033,18 @@ class MeltanoQuery(MeltanoBase):
 
         # Add the Order By clause(s) for the final query
         if self.order:
-            orderby = self.order.get("column", None)
-            if self.order.get("direction", None) == "desc":
-                order = Order.desc
-            else:
-                order = Order.asc
+            for order_clause in self.order:
+                source_name = order_clause.get("source_name")
+                attribute_name = order_clause.get("attribute_name", None)
+                if order_clause.get("direction", None) == "desc":
+                    order = Order.desc
+                else:
+                    order = Order.asc
 
-            try:
-                orderby_field = next(
-                    Field(t.get_column(orderby).alias())
-                    for t in self.tables
-                    if t.get_column(orderby)
-                )
-            except StopIteration:
-                try:
-                    orderby_field = next(
-                        Field(t.get_aggregate(orderby).alias())
-                        for t in self.tables
-                        if t.get_aggregate(orderby)
-                    )
-                except StopIteration:
-                    raise ParseError(
-                        f"Requested Order By Attribute {orderby} is not defined in the design"
-                    )
+                table_def = self.design.find_table(source_name)
+                orderby_field = Field(table_def.get_attribute(attribute_name).alias())
 
-            no_join_query = no_join_query.orderby(orderby_field, order=order)
+                no_join_query = no_join_query.orderby(orderby_field, order=order)
         else:
             # By default order by all the Group By attributes asc
             order = Order.asc
@@ -957,7 +1059,7 @@ class MeltanoQuery(MeltanoBase):
         if len(final_query) > 0:
             final_query = final_query + ";"
 
-        return (final_query, column_headers, column_names, aggregate_columns)
+        return (final_query, query_attributes, aggregate_columns)
 
     def hda_query(self) -> Tuple:
         """
@@ -967,17 +1069,18 @@ class MeltanoQuery(MeltanoBase):
         https://gitlab.com/meltano/meltano/issues/286
         https://gitlab.com/meltano/meltano/issues/344
 
-        Returns a Tuple (sql, column_headers, column_names, aggregate_columns)
+        Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the hda_query as a SQL:1999 compatible query
-        - (column_names, column_headers): The column names and headers of
-           the final result in the same order as the one defined by the HDA query
+        - query_attributes: Hash with the attributes in the the final result
+           in the same order as the one defined by the query.
+           Keys included in the hash:
+           {table_name, source_name, attribute_name, attribute_label, attribute_type}
         - aggregate_columns: The aggregate columns in the query
         """
 
         # Lists with the column names and headers of the final result when the
         #  HDA query is executed
-        column_headers = []
-        column_names = []
+        query_attributes = []
         aggregate_columns = []
 
         where = []
@@ -1034,7 +1137,7 @@ class MeltanoQuery(MeltanoBase):
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
-                    if f.match(table.name, c.name)
+                    if f.match(table.find_source_name(), c.name)
                 ]
                 where.extend(matching_criteria)
 
@@ -1056,8 +1159,15 @@ class MeltanoQuery(MeltanoBase):
                     select.append(t.period_sql(period, pika_table=pika_table))
                     group_by_attributes.append(t.period_alias(period))
 
-                    column_headers.append(t.period_label(period))
-                    column_names.append(t.period_alias(period))
+                    query_attributes.append(
+                        {
+                            "table_name": table.name,
+                            "source_name": table.find_source_name(),
+                            "attribute_name": t.period_alias(period),
+                            "attribute_label": t.period_label(period),
+                            "attribute_type": "timeframe",
+                        }
+                    )
 
         base_join_query = base_join_query.select(*select)
 
@@ -1114,7 +1224,7 @@ class MeltanoQuery(MeltanoBase):
 
             for a in table.aggregates():
                 for f in self.aggregate_filters:
-                    if f.match(table.name, a.name):
+                    if f.match(table.find_source_name(), a.name):
                         field = a.qualified_sql(base_db_table)
                         # remove the alias before adding it to the having clause
                         field.alias = None
@@ -1148,10 +1258,17 @@ class MeltanoQuery(MeltanoBase):
 
                 result_query = result_query.select(*result_group_by_attributes)
 
-                column_headers.extend(
-                    [c.label for t in self.tables for c in t.columns()]
-                )
-                column_names.extend([c.name for t in self.tables for c in t.columns()])
+                for t in self.tables:
+                    for c in t.columns():
+                        query_attributes.append(
+                            {
+                                "table_name": t.name,
+                                "source_name": t.find_source_name(),
+                                "attribute_name": c.name,
+                                "attribute_label": c.label,
+                                "attribute_type": "column",
+                            }
+                        )
 
                 result_query_base_table = stats_db_table
 
@@ -1162,8 +1279,15 @@ class MeltanoQuery(MeltanoBase):
                     Field(a.alias(), table=stats_pika_table, alias=a.alias())
                 )
 
-                column_headers.append(a.label)
-                column_names.append(a.name)
+                query_attributes.append(
+                    {
+                        "table_name": table.name,
+                        "source_name": table.find_source_name(),
+                        "attribute_name": a.name,
+                        "attribute_label": a.label,
+                        "attribute_type": "aggregate",
+                    }
+                )
 
             result_query = result_query.select(*table_aggregates)
 
@@ -1179,42 +1303,26 @@ class MeltanoQuery(MeltanoBase):
 
         # Add the Order By clause(s) for the final query
         if self.order:
-            orderby = self.order.get("column", None)
-            if self.order.get("direction", None) == "desc":
-                order = Order.desc
-            else:
-                order = Order.asc
+            for order_clause in self.order:
+                source_name = order_clause.get("source_name")
+                attribute_name = order_clause.get("attribute_name", None)
+                if order_clause.get("direction", None) == "desc":
+                    order = Order.desc
+                else:
+                    order = Order.asc
 
-            try:
-                orderby_field = next(
-                    Field(t.get_column(orderby).alias(), table=results_pika_table)
-                    for t in self.tables
-                    if t.get_column(orderby)
+                table_def = self.design.find_table(source_name)
+                orderby_field = Field(
+                    table_def.get_attribute(attribute_name).alias(),
+                    table=results_pika_table,
                 )
-            except StopIteration:
-                try:
-                    orderby_field = next(
-                        Field(
-                            t.get_aggregate(orderby).alias(), table=results_pika_table
-                        )
-                        for t in self.tables
-                        if t.get_aggregate(orderby)
-                    )
-                except StopIteration:
-                    raise ParseError(
-                        f"Requested Order By Attribute {orderby} is not defined in the design"
-                    )
 
-            hda_query = hda_query.orderby(orderby_field, order=order)
+                hda_query = hda_query.orderby(orderby_field, order=order)
         else:
             # By default order by all the Group By attributes asc
             order = Order.asc
-            orderby_fields = [
-                Field(c.alias(), table=results_pika_table)
-                for t in self.tables
-                for c in t.columns()
-            ]
-            for field in orderby_fields:
+            for attr in group_by_attributes:
+                field = Field(attr, table=results_pika_table)
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_query(str(hda_query))
@@ -1222,7 +1330,7 @@ class MeltanoQuery(MeltanoBase):
         if len(final_query) > 0:
             final_query = final_query + ";"
 
-        return (final_query, column_headers, column_names, aggregate_columns)
+        return (final_query, query_attributes, aggregate_columns)
 
     def add_schema_to_query(self, query: str) -> str:
         """

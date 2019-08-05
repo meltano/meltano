@@ -124,7 +124,7 @@ test_sqlite:
 
 publish:
   image:
-    name: registry.gitlab.com/meltano/meltano
+    name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_TAG
     entrypoint: [""]
   stage: publish
   before_script:
@@ -134,7 +134,6 @@ publish:
   only:
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
-
 
 .review:
   image: silvs/kubectl:latest

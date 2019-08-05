@@ -77,13 +77,6 @@ def seed(engine):
 
 class DB:
     @classmethod
-    def create_database(cls, engine, db_name):
-        """
-        Create a new database, PostgreSQL only.
-        """
-        engine.execute(text(f"CREATE DATABASE {db_name}"))
-
-    @classmethod
     def ensure_schema_exists(cls, engine, schema_name, grant_roles=()):
         """
         Make sure that the given schema_name exists in the database

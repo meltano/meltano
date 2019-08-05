@@ -85,6 +85,7 @@ def get_plugin_configuration() -> Response:
 
     return jsonify(
         {
+            # freeze the keys because they are used for lookups
             "config": freeze_keys(config),
             "settings": settings.get_definition(plugin).settings,
         }

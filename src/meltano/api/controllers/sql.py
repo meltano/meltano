@@ -10,7 +10,6 @@ from flask_security import auth_required
 from .settings_helper import SettingsHelper
 from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDialect
 from meltano.api.security import api_auth_required
-from meltano.api.json import freeze_keys
 from meltano.core.project import Project
 from meltano.core.sql.filter import FilterOptions
 
@@ -87,23 +86,17 @@ def get_sql(topic_name, design_name):
     sql_dict = sqlHelper.get_sql(design, incoming_json)
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
-    column_headers = sql_dict["column_headers"]
-    column_names = sql_dict["column_names"]
+    query_attributes = sql_dict["query_attributes"]
 
     base_dict = {"sql": outgoing_sql, "error": False}
-    base_dict["column_headers"] = column_headers
-    base_dict["column_names"] = column_names
+    base_dict["query_attributes"] = query_attributes
     base_dict["aggregates"] = aggregates
 
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
     results = sqlHelper.get_query_results(dialect, outgoing_sql)
-
-    # we need to `freeze` each result because we are sending an
-    # inference map with it (`keys`).
-    # thus we need to make sure the lookup will still be valid
-    base_dict["results"] = [freeze_keys(r) for r in results]
+    base_dict["results"] = results
 
     if not len(results):
         base_dict["empty"] = True

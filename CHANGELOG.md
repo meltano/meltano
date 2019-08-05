@@ -10,6 +10,44 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.35.0 - (2019-08-05)
+---
+
+### New
+* [!781](https://gitlab.com/meltano/meltano/merge_requests/781) Add new Advanced Tutorial on how to use tap-postgres with Meltano
+* [#784](https://gitlab.com/meltano/meltano/issues/784) Add multiple attribute ordering with drag and drop ordering in the UI
+
+### Changes
+* [#784](https://gitlab.com/meltano/meltano/issues/784) As part of multiple attribute sorting and keeping the attributes and results sub-UIs in sync, we know autorun queries based on user interaction after the initial explicit "Run" button interaction
+
+
+## 0.34.2 - (2019-08-01)
+---
+
+### Fixes
+* [#821](https://gitlab.com/meltano/meltano/issues/821) Fix `meltano config` not properly loading settings defined in the `meltano.yml`
+* [#841](https://gitlab.com/meltano/meltano/issues/841) Fix a problem when model names were mangled by the API
+
+
+## 0.34.1 - (2019-07-30)
+---
+
+### Fixes
+* [#834](https://gitlab.com/meltano/meltano/issues/834) Fixed a problem with the Meltano UI not having the proper API URL set
+
+
+## 0.34.0 - (2019-07-29)
+---
+
+### New
 * [#757](https://gitlab.com/meltano/meltano/issues/757) Update 'meltano permissions' to add support for GRANT ALL and FUTURE GRANTS on tables in schemas
 * [#760](https://gitlab.com/meltano/meltano/issues/760) Update 'meltano permissions' to add support for granting permissions on VIEWs
 * [#812](https://gitlab.com/meltano/meltano/issues/812) `meltano ui` will now stop stale Airflow workers when starting
@@ -25,8 +63,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#820](https://gitlab.com/meltano/meltano/issues/820) Fix `meltano select` not properly connecting to the system database
 * [#787](https://gitlab.com/meltano/meltano/issues/787) Fix results sorting to support join tables
 * [#832](https://gitlab.com/meltano/meltano/issues/832) Fix schedule creation endpoint to return properly typed response (this became an issue as a result of our recent case conversion interceptor)
-
-### Breaks
+* [#819](https://gitlab.com/meltano/meltano/issues/819) Running the Meltano UI using gunicorn will properly update the system database
 
 
 ## 0.33.0 - (2019-07-22)
