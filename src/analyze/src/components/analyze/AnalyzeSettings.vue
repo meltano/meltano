@@ -51,7 +51,8 @@ export default {
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('connections', this.connectionName);
       const isInstalled = this.getIsPluginInstalled('connections', this.connectionName);
-      return !isInstalling && isInstalled;
+      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      return !isInstalling && isInstalled && isValid;
     },
   },
   methods: {
