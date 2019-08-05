@@ -11,26 +11,20 @@ export default {
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader;
-    this.$store.dispatch('configuration/getLoaderConfiguration', this.loaderNameFromRoute);
+    this.$store.dispatch(
+      'configuration/getLoaderConfiguration',
+      this.loaderNameFromRoute,
+    );
     this.$store.dispatch('plugins/getInstalledPlugins');
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/clearLoaderInFocusConfiguration');
   },
   computed: {
-    ...mapGetters('plugins', [
-      'getIsPluginInstalled',
-      'getIsInstallingPlugin',
-    ]),
-    ...mapGetters('configuration', [
-      'getHasValidConfigSettings',
-    ]),
-    ...mapState('configuration', [
-      'loaderInFocusConfiguration',
-    ]),
-    ...mapState('plugins', [
-      'installedPlugins',
-    ]),
+    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('configuration', ['getHasValidConfigSettings']),
+    ...mapState('configuration', ['loaderInFocusConfiguration']),
+    ...mapState('plugins', ['installedPlugins']),
     configSettings() {
       return this.loader.config
         ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
@@ -43,7 +37,10 @@ export default {
       return this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute);
     },
     isLoadingConfigSettings() {
-      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+      return !Object.prototype.hasOwnProperty.call(
+        this.configSettings,
+        'config',
+      );
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(this.configSettings);
@@ -51,7 +48,9 @@ export default {
     },
     loader() {
       const targetLoader = this.installedPlugins.loaders
-        ? this.installedPlugins.loaders.find(item => item.name === this.loaderNameFromRoute)
+        ? this.installedPlugins.loaders.find(
+          item => item.name === this.loaderNameFromRoute,
+        )
         : null;
       return targetLoader || {};
     },
@@ -65,13 +64,15 @@ export default {
       }
     },
     saveConfigAndGoToOrchestration() {
-      this.$store.dispatch('configuration/savePluginConfiguration', {
-        name: this.loader.name,
-        type: 'loaders',
-        config: this.configSettings.config,
-      }).then(() => {
-        this.$router.push({ name: 'schedules' });
-      });
+      this.$store
+        .dispatch('configuration/savePluginConfiguration', {
+          name: this.loader.name,
+          type: 'loaders',
+          config: this.configSettings.config,
+        })
+        .then(() => {
+          this.$router.push({ name: 'schedules' });
+        });
     },
   },
 };
@@ -83,18 +84,20 @@ export default {
     <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector='loaderNameFromRoute' />
+          <ConnectorLogo :connector="loaderNameFromRoute" />
         </div>
         <p class="modal-card-title">Loader Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
 
       <section class="modal-card-body">
-        <template v-if='isInstalling'>
+        <template v-if="isInstalling">
           <div class="content">
             <div class="level">
               <div class="level-item">
-                <p>Installing {{loaderNameFromRoute}} can take up to a minute.</p>
+                <p>
+                  Installing {{ loaderNameFromRoute }} can take up to a minute.
+                </p>
               </div>
             </div>
             <progress class="progress is-small is-info"></progress>
@@ -106,28 +109,30 @@ export default {
         </div>
 
         <ConnectorSettings
-          v-if='!isLoadingConfigSettings'
+          v-if="!isLoadingConfigSettings"
           fieldClass="is-small"
-          :config-settings='configSettings'/>
+          :config-settings="configSettings"
+        />
 
         <div v-if="loader.docs" class="footnote-module">
           <p>Need help finding this information? We got you covered with our <a :href="loader.docs" target="_blank">docs here</a>.</p>
         </div>
 
         <progress
-          v-if='isLoadingConfigSettings && !isInstalling'
-          class="progress is-small is-info"></progress>
-
+          v-if="isLoadingConfigSettings && !isInstalling"
+          class="progress is-small is-info"
+        ></progress>
       </section>
 
       <footer class="modal-card-foot buttons is-right">
+        <button class="button" @click="close">Cancel</button>
         <button
-          class="button"
-          @click="close">Cancel</button>
-        <button
-          class='button is-interactive-primary'
-          :disabled='!isSaveable'
-          @click.prevent="saveConfigAndGoToOrchestration">Save</button>
+          class="button is-interactive-primary"
+          :disabled="!isSaveable"
+          @click.prevent="saveConfigAndGoToOrchestration"
+        >
+          Save
+        </button>
       </footer>
     </div>
   </div>

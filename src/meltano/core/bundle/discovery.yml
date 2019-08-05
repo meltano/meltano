@@ -148,11 +148,27 @@ loaders:
     pip_url: "git+https://gitlab.com/meltano/target-csv.git"
     settings:
       - name: delimiter
-        value: "\t"
-        description: A one-character string used to separate fields. It defaults to ','
+        kind: options
+        options:
+          - label: Comma (,)
+            value: ','
+          - label: Tab (  )
+            value: '\t'
+          - label: Semi-colon (;)
+            value: ';'
+          - label: Pipes (|)
+            value: '|'
+        value: ","
+        description: A one-character string used to separate fields. It defaults to a comma (,).
       - name: quotechar
+        kind: options
+        options:
+          - label: Single Quote (')
+            value: "'"
+          - label: Double Quote (")
+            value: '"'
         value: "'"
-        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to '"'.
+        description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-snowflake
     namespace: snowflake
     docs: https://www.meltano.com/docs/plugins.html#snowflake
@@ -164,19 +180,27 @@ loaders:
     settings:
       - name: account
         env: SF_ACCOUNT
+        description: This is automatically provided by Snowflake and can be found in the URL.
+        tooltip: Copy and paste your login URL if you don't know your account ID.
       - name: username
         env: SF_USER
+        description: The username you use for logging in
       - name: password
         env: SF_PASSWORD
         kind: password
+        description: The password you use for logging in
       - name: role
         env: SF_ROLE
+        description: The role that you have assigned privileges for database access
       - name: database
         env: SF_DATABASE
+        description: The name of the Snowflake database you want to use
       - name: schema
         env: SF_SCHEMA
+        description: The name of the schema 
       - name: warehouse
         env: SF_WAREHOUSE
+        description: The name of the Snowflake warehouse you want to use
   - name: target-postgres
     namespace: pg
     pip_url: "git+https://github.com/meltano/target-postgres.git"
