@@ -612,7 +612,7 @@ export default {
                   class="button"
                   @click.stop="setChartType('BarChart')"
                   :class="{
-                    'has-text-grey-lighter': chartType !== 'BarChart',
+                    'has-text-grey-light': chartType !== 'BarChart',
                     'is-active has-text-interactive-secondary': chartType === 'BarChart',
                   }"
                   :disabled="!hasChartableResults">
@@ -624,7 +624,7 @@ export default {
                   class="button"
                   @click.stop="setChartType('LineChart')"
                   :class="{
-                    'has-text-grey-lighter': chartType !== 'LineChart',
+                    'has-text-grey-light': chartType !== 'LineChart',
                     'is-active has-text-interactive-secondary': chartType === 'LineChart',
                   }"
                   :disabled="!hasChartableResults">
@@ -636,7 +636,7 @@ export default {
                   class="button"
                   @click.stop="setChartType('AreaChart')"
                   :class="{
-                    'has-text-grey-lighter': chartType !== 'AreaChart',
+                    'has-text-grey-light': chartType !== 'AreaChart',
                     'is-active has-text-interactive-secondary': chartType === 'AreaChart',
                   }"
                   :disabled="!hasChartableResults">
@@ -648,7 +648,7 @@ export default {
                   class="button"
                   @click.stop="setChartType('ScatterChart')"
                   :class="{
-                    'has-text-grey-lighter': chartType !== 'ScatterChart',
+                    'has-text-grey-light': chartType !== 'ScatterChart',
                     'is-active has-text-interactive-secondary': chartType === 'ScatterChart',
                   }"
                   :disabled="!hasChartableResults">

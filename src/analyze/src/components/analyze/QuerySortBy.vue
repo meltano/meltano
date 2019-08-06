@@ -47,11 +47,11 @@ export default {
             v-for='orderable in order.unassigned'
             :key='`${orderable.sourceName}-${orderable.attributeName}`'
             class='drag-list-item has-background-white'>
-            <div class="drag-handle">
+            <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span class='has-text-weight-normal'>{{orderable.attributeLabel}}</span>
+              <span>{{orderable.attributeLabel}}</span>
             </div>
           </div>
         </transition-group>
@@ -69,12 +69,11 @@ export default {
             v-for='(orderable, idx) in order.assigned'
             :key='`${orderable.sourceName}-${orderable.attributeName}`'
             class='drag-list-item has-background-white has-text-interactive-secondary'>
-            <div class="drag-handle">
+            <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{idx + 1}}.</span>
-              <span>{{orderable.attributeLabel}}</span>
+              <span>{{idx + 1}}. {{orderable.attributeLabel}}</span>
             </div>
             <button
               class="button is-small"
@@ -114,6 +113,7 @@ export default {
 }
 .drag-list-item {
   display: flex;
+  align-items: center;
   padding: .25rem;
 
   &.drag-target-description {
@@ -125,13 +125,22 @@ export default {
   }
 
   .drag-handle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     flex-grow: 1;
     cursor: grab;
-    margin-left: .25rem;
+    padding-left: .25rem;
 
     .icon {
-      margin-right: .25rem;
+      align-self: flex-start;
+      justify-self: flex-start;
+      margin: .25rem .5rem .25rem 0;
     }
+  }
+
+  .button {
+    align-self: flex-start;
   }
 }
 .drag-ghost {
