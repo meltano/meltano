@@ -191,7 +191,7 @@ docs/serve: docs/build
 
 .PHONY: lint show_lint
 
-BLACK_RUN = black src/ tests/ --exclude src/analyze
+BLACK_RUN = black src/meltano tests/ 
 ESLINT_RUN = cd ${MELTANO_ANALYZE} && yarn run lint
 
 lint_black:

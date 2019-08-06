@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#793](https://gitlab.com/meltano/meltano/issues/793) Add introduction module to Connector Settings to allow for helper text as far as signup and documentation links
 * [#796](https://gitlab.com/meltano/meltano/issues/796) Add dropdown option to Connector Settings to allow for more defined UI interactions
 
 ### Changes

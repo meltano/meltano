@@ -26,8 +26,8 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
 - `meltano config <plugin_name>`: Displays the plugin's configuration.
   - `meltano config <plugin_name> list`: List the available settings for the plugin.
-  - `meltano config <plugin_name> set <name> <value>`: Sets the configuration's setting <name> to <value>.
-  - `meltano config <plugin_name> unset <name>`: Remove the configuration's setting <name>.
+  - `meltano config <plugin_name> set <name> <value>`: Sets the configuration's setting `<name>` to `<value>`.
+  - `meltano config <plugin_name> unset <name>`: Remove the configuration's setting `<name>`.
   - `meltano config <plugin_name> reset`: Clear the configuration (back to defaults).
 
 ### `init`
