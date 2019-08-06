@@ -118,11 +118,14 @@ export default {
   padding: .25rem;
 
   &.drag-target-description {
-    cursor: pointer;
     position: absolute;
     left: 0;
     top: 0;
-    padding: 6px 1rem;
+    padding: 6px 1.25rem;
+
+    .drag-handle {
+      cursor: default;
+    }
   }
 
   .drag-handle {
@@ -142,6 +145,7 @@ export default {
 
   .button {
     align-self: flex-start;
+    margin-left: .25rem;
   }
 }
 .drag-ghost {
