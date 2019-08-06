@@ -37,6 +37,7 @@ export default {
 <template>
   <div>
     <div class="dropdown-item">
+
       <draggable
         v-model='order.unassigned'
         v-bind='draggableOptions'
@@ -56,9 +57,22 @@ export default {
           </div>
         </transition-group>
       </draggable>
+
+      <div
+        v-if='order.unassigned.length === 0'
+        class='drag-list-item drag-target-description'>
+        <div class="drag-handle">
+          <span class="icon is-small has-text-grey-light">
+            <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
+          </span>
+          <span class='is-italic is-size-7 has-text-weight-normal'>Drag & drop here</span>
+        </div>
+      </div>
+
     </div>
     <hr class='dropdown-divider'>
     <div class='dropdown-item'>
+
       <draggable
         v-model='order.assigned'
         v-bind='draggableOptions'
@@ -149,6 +163,6 @@ export default {
   }
 }
 .drag-ghost {
-  opacity: 0.5;
+  opacity: 0;
 }
 </style>
