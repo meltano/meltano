@@ -114,6 +114,7 @@ export default {
 .drag-list-item {
   display: flex;
   align-items: center;
+  margin: .25rem;
   padding: .25rem;
 
   &.drag-target-description {
@@ -121,7 +122,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    padding: 10px 1.25rem;
+    padding: 6px 1rem;
   }
 
   .drag-handle {
