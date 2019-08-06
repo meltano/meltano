@@ -303,7 +303,7 @@ export default {
           <p class="control">
             <Dropdown
               :disabled="!reports.length"
-              label="Load"
+              label="Reports"
               button-classes='is-interactive-primary is-outlined'
               is-right-aligned>
               <div class="dropdown-content">

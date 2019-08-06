@@ -23,9 +23,6 @@ export default {
         group: 'sortBy',
       };
     },
-    getIsDashed() {
-      return collection => (collection.length === 0 ? 'dashed' : '');
-    },
   },
   methods: {
     ...mapActions('designs', [
@@ -44,7 +41,6 @@ export default {
         v-model='order.unassigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.unassigned)'
         @end="runQuery">
         <transition-group>
           <div
@@ -55,7 +51,7 @@ export default {
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{orderable.attributeLabel}}</span>
+              <span class='has-text-weight-normal'>{{orderable.attributeLabel}}</span>
             </div>
           </div>
         </transition-group>
@@ -67,7 +63,6 @@ export default {
         v-model='order.assigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.assigned)'
         @end="runQuery">
         <transition-group>
           <div
@@ -91,6 +86,18 @@ export default {
           </div>
         </transition-group>
       </draggable>
+
+      <div
+        v-if='order.assigned.length === 0'
+        class='drag-list-item drag-target-description'>
+        <div class="drag-handle">
+          <span class="icon is-small has-text-grey-light">
+            <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
+          </span>
+          <span class='is-italic is-size-7 has-text-weight-normal'>Drag & drop here</span>
+        </div>
+      </div>
+
     </div>
     <template v-if='order.assigned.length > 0'>
       <hr class='dropdown-divider'>
@@ -103,22 +110,24 @@ export default {
 
 <style lang="scss">
 .drag-list {
-  min-height: 30px;
-  font-weight: normal;
-
-  &.dashed {
-    border: 1px dashed lightgrey;
-  }
+  min-height: 32px;
 }
 .drag-list-item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 4px;
+  padding: .25rem;
+
+  &.drag-target-description {
+    cursor: pointer;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 10px 1.25rem;
+  }
 
   .drag-handle {
     flex-grow: 1;
     cursor: grab;
+    margin-left: .25rem;
 
     .icon {
       margin-right: .25rem;
