@@ -135,12 +135,12 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               class="dropdown-trigger"
             >
               <button
-                aria-controls="dropdown-load"
+                aria-controls="dropdown-reports"
                 aria-haspopup="true"
                 class="button is-interactive-primary is-outlined"
               >
                 <span>
-                  Load
+                  Reports
                 </span>
                  
                 <span
@@ -155,7 +155,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
              
             <div
               class="dropdown-menu"
-              id="dropdown-load"
+              id="dropdown-reports"
               role="menu"
             >
               <div
@@ -570,7 +570,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -583,7 +583,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -596,7 +596,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -787,13 +787,13 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               class="dropdown-trigger"
             >
               <button
-                aria-controls="dropdown-load"
+                aria-controls="dropdown-reports"
                 aria-haspopup="true"
                 class="button is-interactive-primary is-outlined"
                 disabled="disabled"
               >
                 <span>
-                  Load
+                  Reports
                 </span>
                  
                 <span
@@ -808,7 +808,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
              
             <div
               class="dropdown-menu"
-              id="dropdown-load"
+              id="dropdown-reports"
               role="menu"
             >
               <div
@@ -1217,7 +1217,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -1230,7 +1230,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -1243,7 +1243,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -1408,7 +1408,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
-            label="Load"
+            label="Reports"
           >
             <div
               class="dropdown-content"
@@ -1656,7 +1656,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -1668,7 +1668,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -1680,7 +1680,7 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -1831,7 +1831,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
-            label="Load"
+            label="Reports"
           >
             <div
               class="dropdown-content"
@@ -2085,7 +2085,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -2097,7 +2097,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -2109,7 +2109,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
               >
                 <span
                   class="icon is-small"
@@ -2287,13 +2287,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               class="dropdown-trigger"
             >
               <button
-                aria-controls="dropdown-load"
+                aria-controls="dropdown-reports"
                 aria-haspopup="true"
                 class="button is-interactive-primary is-outlined"
                 disabled="disabled"
               >
                 <span>
-                  Load
+                  Reports
                 </span>
                  
                 <span
@@ -2308,7 +2308,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
              
             <div
               class="dropdown-menu"
-              id="dropdown-load"
+              id="dropdown-reports"
               role="menu"
             >
               <div
@@ -2714,7 +2714,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -2727,7 +2727,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
@@ -2740,7 +2740,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-lighter"
+                class="button has-text-grey-light"
                 disabled="disabled"
               >
                 <span
