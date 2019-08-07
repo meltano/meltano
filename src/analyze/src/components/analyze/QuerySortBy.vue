@@ -23,9 +23,6 @@ export default {
         group: 'sortBy',
       };
     },
-    getIsDashed() {
-      return collection => (collection.length === 0 ? 'dashed' : '');
-    },
   },
   methods: {
     ...mapActions('designs', [
@@ -40,18 +37,18 @@ export default {
 <template>
   <div>
     <div class="dropdown-item">
+
       <draggable
         v-model='order.unassigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.unassigned)'
         @end="runQuery">
         <transition-group>
           <div
             v-for='orderable in order.unassigned'
             :key='`${orderable.sourceName}-${orderable.attributeName}`'
             class='drag-list-item has-background-white'>
-            <div class="drag-handle">
+            <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
@@ -60,26 +57,37 @@ export default {
           </div>
         </transition-group>
       </draggable>
+
+      <div
+        v-if='order.unassigned.length === 0'
+        class='drag-list-item drag-target-description'>
+        <div class="drag-handle">
+          <span class="icon is-small has-text-grey-light">
+            <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
+          </span>
+          <span class='is-italic is-size-7 has-text-weight-normal'>Drag & drop here</span>
+        </div>
+      </div>
+
     </div>
     <hr class='dropdown-divider'>
     <div class='dropdown-item'>
+
       <draggable
         v-model='order.assigned'
         v-bind='draggableOptions'
         class='drag-list is-flex is-flex-column has-background-white-bis'
-        :class='getIsDashed(order.assigned)'
         @end="runQuery">
         <transition-group>
           <div
             v-for='(orderable, idx) in order.assigned'
             :key='`${orderable.sourceName}-${orderable.attributeName}`'
             class='drag-list-item has-background-white has-text-interactive-secondary'>
-            <div class="drag-handle">
+            <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{idx + 1}}.</span>
-              <span>{{orderable.attributeLabel}}</span>
+              <span>{{idx + 1}}. {{orderable.attributeLabel}}</span>
             </div>
             <button
               class="button is-small"
@@ -91,6 +99,18 @@ export default {
           </div>
         </transition-group>
       </draggable>
+
+      <div
+        v-if='order.assigned.length === 0'
+        class='drag-list-item drag-target-description'>
+        <div class="drag-handle">
+          <span class="icon is-small has-text-grey-light">
+            <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
+          </span>
+          <span class='is-italic is-size-7 has-text-weight-normal'>Drag & drop here</span>
+        </div>
+      </div>
+
     </div>
     <template v-if='order.assigned.length > 0'>
       <hr class='dropdown-divider'>
@@ -103,29 +123,46 @@ export default {
 
 <style lang="scss">
 .drag-list {
-  min-height: 30px;
-  font-weight: normal;
-
-  &.dashed {
-    border: 1px dashed lightgrey;
-  }
+  min-height: 32px;
 }
 .drag-list-item {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding: 4px;
+  align-items: center;
+  margin: .25rem;
+  padding: .25rem;
+
+  &.drag-target-description {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 6px 1.25rem;
+
+    .drag-handle {
+      cursor: default;
+    }
+  }
 
   .drag-handle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     flex-grow: 1;
     cursor: grab;
+    padding-left: .25rem;
 
     .icon {
-      margin-right: .25rem;
+      align-self: flex-start;
+      justify-self: flex-start;
+      margin: .25rem .5rem .25rem 0;
     }
+  }
+
+  .button {
+    align-self: flex-start;
+    margin-left: .25rem;
   }
 }
 .drag-ghost {
-  opacity: 0.5;
+  opacity: 0;
 }
 </style>

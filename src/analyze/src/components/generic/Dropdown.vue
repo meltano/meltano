@@ -136,5 +136,8 @@ export default {
   &.dropdown-menu-600 {
     width: 600px;
   }
+  &.dropdown-menu-300 {
+    width: 300px;
+  }
 }
 </style>

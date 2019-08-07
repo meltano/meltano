@@ -495,8 +495,9 @@ const actions = {
     commit('setErrorState');
   },
 
-  resetSortAttributes({ commit }) {
+  resetSortAttributes({ commit, dispatch }) {
     commit('resetSortAttributes');
+    dispatch('checkAutoRun');
   },
 
   runQuery() {

@@ -74,6 +74,7 @@ export default {
                   :button-classes="`is-small ${getIsOrderableAssigned(queryAttribute.attributeName)
                     ? 'has-text-interactive-secondary'
                     : ''}`"
+                  :menu-classes="'dropdown-menu-300'"
                   icon-open='sort'
                   icon-close='caret-down'
                   is-right-aligned
