@@ -258,7 +258,7 @@ export default {
           <div class="control field" :class="{'has-addons': hasActiveReport()}">
             <p class="control">
               <button
-                class="button is-interactive-primary is-outlined"
+                class="button"
                 v-if="hasActiveReport()"
                 @click="updateReport();">
                 <span>Save</span>
@@ -268,7 +268,6 @@ export default {
               <Dropdown
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport() ? '' : 'Save'"
-                button-classes='is-interactive-primary is-outlined'
                 is-right-aligned>
                 <div class="dropdown-content">
                   <div class="dropdown-item">
@@ -281,17 +280,14 @@ export default {
                                 v-model="saveReportSettings.name">
                       </div>
                     </div>
-                    <div class="field is-grouped">
-                      <div class="control">
-                        <button class="button is-interactive-primary"
-                                :disabled="!saveReportSettings.name"
-                                @click="saveReport();">Save</button>
-                      </div>
-                      <div class="control">
-                        <button class="button is-text"
-                                data-dropdown-auto-close>
-                          Cancel</button>
-                      </div>
+                    <div class="buttons is-right">
+                      <button class="button is-small is-text"
+                              data-dropdown-auto-close>
+                        Cancel</button>
+                      <button class="button is-small"
+                              :disabled="!saveReportSettings.name"
+                              data-dropdown-auto-close
+                              @click="saveReport">Save</button>
                     </div>
                   </div>
                 </div>
