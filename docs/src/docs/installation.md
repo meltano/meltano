@@ -105,21 +105,11 @@ setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
 ```
 :::
 
-## Upgrading Meltano
-
-We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
-
-```
-$ pip install --upgrade meltano
-```
-
-Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
-
-## Installing on Docker
+### Installing on Docker
 
 [Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](http://localhost:8080/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
-### Using Pre-built Docker Images
+#### Using Pre-built Docker Images
 
 We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano pre-installed and ready to use.
 
@@ -167,11 +157,11 @@ If you are a Meltano end-user who is not going to be contributing code to our op
 
 Follow the steps in our [Quickstart Guide](./quickstart.html) to get started.
 
-### For Contributors: Example Command Line Syntax for Docker ###
+#### For Contributors: Example Command Line Syntax for Docker ###
 
  Here are some example of CLI commands you may need to run if you are working with Meltano as an open source contributor:
 
-#### Running the ELT from the Command Line
+##### Running the ELT from the Command Line
 To run the ELT and extract some data from the **tap-carbon-intensity** into **target-sqlite**:
 
 ```
@@ -180,7 +170,7 @@ $ docker run -v $(pwd):/project \
              meltano/meltano elt tap-carbon-intensity target-sqlite
 ```
 
-#### Adding a Model from the Command Line
+##### Adding a Model from the Command Line
 
 Now that we have data in your database, let's add the corresponding model bundle as the basis of our analysis.
 
@@ -189,6 +179,16 @@ $ docker run -v $(pwd):/project \
              -w /project \
              meltano/meltano add model model-carbon-intensity-sqlite
 ```
+
+## Upgrading Version
+
+We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
+
+```
+$ pip install --upgrade meltano
+```
+
+Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
 ## Deployment
 
