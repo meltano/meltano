@@ -78,7 +78,7 @@ class TestQueryGeneration:
     def no_join_with_filters(self):
         return (
             PayloadBuilder("users_design")
-            .columns("name", "gender")
+            .columns("name")
             .aggregates("count", "avg_age", "sum_clv")
             .column_filter("users_design", "name", "is_not_null", "")
             .column_filter("users_design", "name", "like", "%yannis%")
@@ -106,6 +106,7 @@ class TestQueryGeneration:
             .column_filter("users_design", "gender", "equal_to", "male")
             .column_filter("streams_join", "year", "greater_or_equal_than", "2017")
             .column_filter("episodes_join", "tv_series", "like", "Marvel")
+            .column_filter("episodes_join", "title", "like", "%Wolverine%")
             .aggregate_filter("users_design", "sum_clv", "less_than", 50)
             .aggregate_filter("episodes_join", "avg_rating", "greater_than", 8)
             .order_by("users_design", "gender", "asc")
@@ -287,6 +288,7 @@ class TestQueryGeneration:
         assert '"users"."gender"=\'male\'' in sql
         assert '"streams"."year">=\'2017\'' in sql
         assert '"episodes"."tv_series" LIKE \'Marvel\'' in sql
+        assert '"episodes"."title" LIKE \'%Wolverine%\'' in sql
 
         # Check that all the HAVING filters were added correctly
         assert 'HAVING COALESCE(SUM("users.clv"),0)<50' in sql
