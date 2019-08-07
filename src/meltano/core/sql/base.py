@@ -140,6 +140,11 @@ class MeltanoTable(MeltanoBase):
         self.optional_pkeys = []
         self.sql_table_name = definition.get("sql_table_name", None)
 
+        # When a MeltanoTable is used as part of a MeltanoQuery,
+        #  we also need to store the column definitions for not selected columns
+        #  that have filters, so that we can use them when constructing the query
+        self._unselected_columns_with_filters = []
+
         super().__init__(definition)
 
     def columns(self) -> List[MeltanoBase]:
@@ -147,6 +152,9 @@ class MeltanoTable(MeltanoBase):
             MeltanoColumn(definition=definition, table=self)
             for definition in self._definition.get("columns", [])
         ] + self._columns
+
+    def unselected_columns_with_filters(self) -> List[MeltanoBase]:
+        return self._unselected_columns_with_filters
 
     def primary_keys(self) -> List[MeltanoBase]:
         return (
@@ -193,6 +201,9 @@ class MeltanoTable(MeltanoBase):
 
     def add_column(self, column) -> None:
         self._columns.append(column)
+
+    def add_column_with_filter(self, column) -> None:
+        self._unselected_columns_with_filters.append(column)
 
     def add_aggregate(self, aggregate) -> None:
         self._aggregates.append(aggregate)
@@ -714,6 +725,20 @@ class MeltanoQuery(MeltanoBase):
          easy access and lookups.
         """
 
+        # Parse and store the provided filters
+        filters = definition.get("filters", None)
+
+        if filters:
+            for column_filter in filters.get("columns", []):
+                # Generate (and automaticaly validate) the filter and then store it
+                mf = MeltanoFilter(definition=column_filter, design=self.design)
+                self.column_filters.append(mf)
+
+            for aggregate_filter in filters.get("aggregates", []):
+                # Generate (and automaticaly validate) the filter and then store it
+                mf = MeltanoFilter(definition=aggregate_filter, design=self.design)
+                self.aggregate_filters.append(mf)
+
         # Find the tables defined in the Query and add them as Table Objects
         #  with the proper Columns, Aggregates and Timeframe Objects
         primary_definition = {
@@ -739,6 +764,7 @@ class MeltanoQuery(MeltanoBase):
                 table.sql_table_name = table_def.sql_table_name
                 table.source_name = table_def.find_source_name()
 
+                # Add the columns
                 for column in related_def.get("columns", []):
                     column_def = table_def.get_column(column)
                     if column_def:
@@ -750,6 +776,27 @@ class MeltanoQuery(MeltanoBase):
                             f"Requested column {table.name}.{column} is not defined in the design"
                         )
 
+                # Also add all the columns that are referenced in column filters
+                #  for this table that are not also selected.
+                # This is important in order to:
+                # (1) Know that a join is required for a table with no selected columns
+                # (2) Make available the missing column_def in get_query()
+                for column_filter in self.column_filters:
+                    if (
+                        column_filter.source_name == table.source_name
+                        and column_filter.name not in related_def.get("columns", [])
+                    ):
+                        column_def = table_def.get_column(column_filter.name)
+                        if column_def:
+                            c = MeltanoColumn(table=table)
+                            c.copy_metadata(column_def)
+                            table.add_column_with_filter(c)
+                        else:
+                            raise ParseError(
+                                f"Requested column {table.name}.{column_filter.name} is not defined in the design"
+                            )
+
+                # Add the aggregates
                 for aggregate in related_def.get("aggregates", []):
                     aggregate_def = table_def.get_aggregate(aggregate)
                     if aggregate_def:
@@ -761,6 +808,7 @@ class MeltanoQuery(MeltanoBase):
                             f"Requested aggregate {table.name}.{aggregate} is not defined in the design"
                         )
 
+                # Add the timeframes
                 for timeframe in related_def.get("timeframes", []):
                     requested_periods = timeframe.get("periods", None)
 
@@ -790,9 +838,13 @@ class MeltanoQuery(MeltanoBase):
                 self.tables.append(table)
 
                 # Add tables that have at least a Column, Aggregate or Timeframe
+                #  or a filter over a non selected column
                 #  requested in the Query definition
                 if related_def is not primary_definition and (
-                    table.columns() or table.aggregates() or table.timeframes()
+                    table.columns()
+                    or table.aggregates()
+                    or table.timeframes()
+                    or table.unselected_columns_with_filters()
                 ):
                     # Find the related joins needed to gather this data
                     #  Using the design graph, we can find the shortest path to a
@@ -846,20 +898,6 @@ class MeltanoQuery(MeltanoBase):
                 raise ParseError(
                     f"Requested table {related_table.get('name', None)} is not defined in the design"
                 )
-
-        # Parse and store the provided filters
-        filters = definition.get("filters", None)
-
-        if filters:
-            for column_filter in filters.get("columns", []):
-                # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=column_filter, design=self.design)
-                self.column_filters.append(mf)
-
-            for aggregate_filter in filters.get("aggregates", []):
-                # Generate (and automaticaly validate) the filter and then store it
-                mf = MeltanoFilter(definition=aggregate_filter, design=self.design)
-                self.aggregate_filters.append(mf)
 
     def joins_for_table(self, design_graph, source_table: str, target_table: str):
         return nx.shortest_path(design_graph, source=source_table, target=target_table)
@@ -950,10 +988,6 @@ class MeltanoQuery(MeltanoBase):
             else:
                 base_query = base_query.join(pika_table).on(join["on"])
 
-            if not (table.columns() or table.aggregates() or table.timeframes()):
-                # After joining the table, skip the rest if nothing was requested
-                continue
-
             # Add all columns in the SELECT clause and as group_by attributes
             for c in table.columns():
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
@@ -969,8 +1003,8 @@ class MeltanoQuery(MeltanoBase):
                     }
                 )
 
-                # Also check if there is a filter for this column and add it
-                #  in the WHERE clause
+            # Add the WHERE clauses using the column filters for this table
+            for c in table.columns() + table.unselected_columns_with_filters():
                 matching_criteria = [
                     f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
@@ -1111,6 +1145,17 @@ class MeltanoQuery(MeltanoBase):
         #  timeframes and the primary keys in case they are not already included
         select = []
         for table in self.tables:
+            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
+
+            # Add the WHERE clauses using the column filters for this table
+            for c in table.columns() + table.unselected_columns_with_filters():
+                matching_criteria = [
+                    f.criterion(Field(c.column_name(), table=pika_table))
+                    for f in self.column_filters
+                    if f.match(table.find_source_name(), c.name)
+                ]
+                where.extend(matching_criteria)
+
             if not (table.columns() or table.aggregates() or table.timeframes()):
                 # Skip tables that don't have at least a Column, Aggregate or
                 #  Timeframe requested in the Query definition
@@ -1127,19 +1172,9 @@ class MeltanoQuery(MeltanoBase):
             groupby_columns_selected = set()
             aggregate_columns_selected = set()
 
-            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
             for c in table.columns() + table.optional_pkeys:
                 select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
                 groupby_columns_selected.add(c.column_name())
-
-                # Also check if there is a filter for this column and add it
-                #  in the WHERE clause
-                matching_criteria = [
-                    f.criterion(Field(c.column_name(), table=pika_table))
-                    for f in self.column_filters
-                    if f.match(table.find_source_name(), c.name)
-                ]
-                where.extend(matching_criteria)
 
             for a in table.aggregates():
                 aggregate_columns.append(a.alias())
