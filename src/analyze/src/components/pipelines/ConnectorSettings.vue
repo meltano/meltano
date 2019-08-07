@@ -23,13 +23,15 @@ export default {
     configSettings: {
       handler(newVal) {
         /**
-         * Improve account UX by auto-detecting Account ID via URL
+         * Improve account UX by auto-detecting Account ID via URL for configs that have `account`
+         * This is currently Loader-Snowflake specific and we'll need a more robust solution
+         * when/if we add UX helpers like this for more connectors
          */
-
         const accountInput = newVal.config.account;
-        const parsedAccountId = utils.snowflakeAccountParser(accountInput);
-
-        this.configSettings.config.account = parsedAccountId || newVal.config.account;
+        if (accountInput) {
+          const parsedAccountId = utils.snowflakeAccountParser(accountInput);
+          this.configSettings.config.account = parsedAccountId || newVal.config.account;
+        }
       },
       deep: true,
     },
