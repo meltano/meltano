@@ -122,9 +122,28 @@ export default {
       </ConnectorSettings>
       <div v-else
            class="box">
-        <p>
-          Please select a connector to configure.
-        </p>
+        <div class="content">
+          <article class="message is-info">
+            <div class="message-header">
+              <a class="button is-borderless has-background-transparent has-text-white">
+                <span class="icon">
+                  <font-awesome-icon icon="info-circle"></font-awesome-icon>
+                </span>
+                <span>Info</span>
+              </a>
+            </div>
+            <div class="message-body">
+              <p>This manual connection requirement will soon be automated :)</p>
+            </div>
+          </article>
+          <p>After successfully setting up a <router-link :to='{ name: "schedules" }'>data pipeline</router-link> Meltano has:</p>
+          <ol>
+            <li><em>Extracted</em> data <em>from</em> a database or API (data source)</li>
+            <li><em>Loaded</em> the extracted data <em>to</em> a database (warehouse)</li>
+            <li><em>Transformed</em> the loaded data <em>to</em> the warehouse under a special <em>analytics schema</em></li>
+          </ol>
+          <p>Now Meltano needs a connection to that <em>analytics schema</em> so Meltano Analyze can connect and query. Use the options to the left to setup the Analyze connection.</p>
+        </div>
       </div>
     </div>
   </section>
