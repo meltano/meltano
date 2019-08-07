@@ -299,14 +299,6 @@ Once you complete the cluster setup, you should be brought to the detail page fo
   - **Source**: Custom 0.0.0.0/0
 1. Click `Save rules`
 
-## Coming Next
-
-- Creating a data warehouse for Meltano
-- Running ELT in the Cloud
-- Growing and Scaling Meltano
-- Running Meltano with AWS EC2
-- Using AWS Lambda with Meltano
-
 ## Troubleshooting
 
 Are you having installation or deployment problems? We are here to help you. Please fill out this [issue template](https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs) and we'll get back to you as soon as we can!
