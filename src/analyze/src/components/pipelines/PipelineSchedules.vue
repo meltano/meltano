@@ -106,7 +106,21 @@ export default {
                 <p class='has-text-centered'>{{pipeline.transform}}</p>
               </td>
               <td>
-                <p class='has-text-centered'>{{pipeline.interval}}</p>
+                <p class='has-text-centered'>
+                  <span v-if="getIsPluginInstalled('orchestrators', 'airflow')">
+                    {{pipeline.interval}}
+                  </span>
+                  <router-link
+                    v-else
+                    class="button is-small tooltip"
+                    data-tooltip='Airflow Orchestrator must be installed for intervaled runs.'
+                    :to="{name: 'orchestration'}">
+                    <span>{{pipeline.interval}}</span>
+                    <span class="icon is-small has-text-warning">
+                      <font-awesome-icon icon="exclamation-triangle"></font-awesome-icon>
+                    </span>
+                  </router-link>
+                </p>
               </td>
               <td>
                 <p class='has-text-centered'>{{pipeline.startDate
@@ -116,18 +130,15 @@ export default {
               </td>
               <td>
                 <div class="buttons is-right">
-
                   <router-link
                     v-if="getIsPluginInstalled('orchestrators', 'airflow')"
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{name: 'orchestration'}">Orchestration</router-link>
                   <a
-                    v-else
                     class='button is-interactive-primary is-outlined is-small tooltip is-tooltip-left'
                     :class="{ 'is-loading': pipeline.isRunning }"
                     data-tooltip='Run this ELT definition once without scheduling.'
                     @click='runELT(pipeline)'>Run</a>
-
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{name: 'analyze'}">Analyze</router-link>
