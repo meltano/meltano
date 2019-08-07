@@ -88,7 +88,7 @@ const actions = {
       });
   },
   removeReportFromDashboard({ commit, dispatch }, data) {
-    commit('removeReportToDashboard', data);
+    commit('removeReportFromDashboard', data);
     dashboardsApi.removeReportFromDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
@@ -104,7 +104,7 @@ const mutations = {
     const targetDashboard = state.dashboards.find(dashboard => dashboard.id === idsPayload.dashboardId);
     targetDashboard.reportIds.push(idsPayload.reportId);
   },
-  removeReportToDashboard(state, idsPayload) {
+  removeReportFromDashboard(state, idsPayload) {
     const targetDashboard = state.dashboards.find(dashboard => dashboard.id === idsPayload.dashboardId);
     const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId);
     targetDashboard.reportIds.splice(idx, 1);

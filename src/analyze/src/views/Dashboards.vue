@@ -26,6 +26,9 @@ export default {
       'dashboards',
       'reports',
     ]),
+    isActive() {
+      return dashboard => dashboard.id === this.activeDashboard.id;
+    },
   },
   methods: {
     ...mapActions('dashboards', [
@@ -33,9 +36,6 @@ export default {
       'setDashboard',
       'getActiveDashboardReportsWithQueryResults',
     ]),
-    isActive(dashboard) {
-      return dashboard.id === this.activeDashboard.id;
-    },
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen;
     },
