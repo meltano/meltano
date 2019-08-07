@@ -91,6 +91,10 @@ export default {
       return !this.isConnectionDialectSqlite(this.dialect);
     },
 
+    isActiveReportInDashboard() {
+      return dashboard => dashboard.reportIds.includes(this.activeReport.id);
+    },
+
     limit: {
       get() {
         return this.$store.getters['designs/currentLimit'];
@@ -123,10 +127,6 @@ export default {
     ...mapActions('designs', [
       'resetErrorMessage',
     ]),
-
-    isActiveReportInDashboard(dashboard) {
-      return dashboard.reportIds.includes(this.activeReport.id);
-    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0;
@@ -243,8 +243,7 @@ export default {
                       v-for="dashboard in dashboards"
                       :key="dashboard.id">
                     <label for="'checkbox-' + dashboard.id"
-                            data-dropdown-auto-close
-                            @click="toggleActiveReportInDashboard(dashboard);">
+                            @click.stop="toggleActiveReportInDashboard(dashboard)">
                       <input type="checkbox"
                             :id="'checkbox-' + dashboard.id"
                             :checked="isActiveReportInDashboard(dashboard)">
