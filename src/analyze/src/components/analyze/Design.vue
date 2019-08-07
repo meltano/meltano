@@ -609,7 +609,8 @@ export default {
             <div class="column">
               <div class="buttons has-addons is-right">
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Bar chart'
                   @click.stop="setChartType('BarChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'BarChart',
@@ -621,7 +622,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Line chart'
                   @click.stop="setChartType('LineChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'LineChart',
@@ -633,7 +635,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Area chart'
                   @click.stop="setChartType('AreaChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'AreaChart',
@@ -645,7 +648,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Scatter chart'
                   @click.stop="setChartType('ScatterChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'ScatterChart',
