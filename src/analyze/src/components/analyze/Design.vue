@@ -708,14 +708,8 @@ export default {
   </section>
 </template>
 
-<style lang="scss" scoped>
-@import '@/scss/bulma-preset-overrides.scss';
-@import "../../../node_modules/bulma/bulma";
+<style lang="scss">
 
-code {
-  white-space: pre;
-  word-wrap: break-word;
-}
 .panel-block {
   position: relative;
   &.space-between {
@@ -723,12 +717,6 @@ code {
   }
   &.indented {
     padding-left: 1.75rem;
-  }
-  &.is-active {
-    color: $interactive-secondary;
-    border-left-color: $interactive-secondary;
-    border-left-width: 2px;
-    @extend .has-background-white-ter;
   }
   &.panel-block-heading {
     padding: 0.25rem 0.75rem;
