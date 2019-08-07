@@ -80,13 +80,15 @@ const actions = {
         });
       });
   },
-  addReportToDashboard({ dispatch }, data) {
+  addReportToDashboard({ commit, dispatch }, data) {
+    commit('addReportToDashboard', data);
     dashboardsApi.addReportToDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
       });
   },
-  removeReportFromDashboard({ dispatch }, data) {
+  removeReportFromDashboard({ commit, dispatch }, data) {
+    commit('removeReportFromDashboard', data);
     dashboardsApi.removeReportFromDashboard(data)
       .then((response) => {
         dispatch('updateCurrentDashboard', response.data);
@@ -98,6 +100,15 @@ const actions = {
 };
 
 const mutations = {
+  addReportToDashboard(state, idsPayload) {
+    const targetDashboard = state.dashboards.find(dashboard => dashboard.id === idsPayload.dashboardId);
+    targetDashboard.reportIds.push(idsPayload.reportId);
+  },
+  removeReportFromDashboard(state, idsPayload) {
+    const targetDashboard = state.dashboards.find(dashboard => dashboard.id === idsPayload.dashboardId);
+    const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId);
+    targetDashboard.reportIds.splice(idx, 1);
+  },
   addSavedDashboardToDashboards(state, dashboard) {
     state.dashboards.push(dashboard);
   },

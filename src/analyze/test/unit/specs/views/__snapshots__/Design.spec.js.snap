@@ -557,7 +557,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               class="buttons has-addons is-right"
             >
               <button
-                class="button is-active has-text-interactive-secondary"
+                class="button tooltip is-active has-text-interactive-secondary"
+                data-tooltip="Bar chart"
                 disabled="disabled"
               >
                 <span
@@ -570,7 +571,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Line chart"
                 disabled="disabled"
               >
                 <span
@@ -583,7 +585,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Area chart"
                 disabled="disabled"
               >
                 <span
@@ -596,7 +599,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Scatter chart"
                 disabled="disabled"
               >
                 <span
@@ -1204,7 +1208,8 @@ LIMIT
               class="buttons has-addons is-right"
             >
               <button
-                class="button is-active has-text-interactive-secondary"
+                class="button tooltip is-active has-text-interactive-secondary"
+                data-tooltip="Bar chart"
                 disabled="disabled"
               >
                 <span
@@ -1217,7 +1222,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Line chart"
                 disabled="disabled"
               >
                 <span
@@ -1230,7 +1236,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Area chart"
                 disabled="disabled"
               >
                 <span
@@ -1243,7 +1250,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Scatter chart"
                 disabled="disabled"
               >
                 <span
@@ -1644,7 +1652,8 @@ LIMIT
               class="buttons has-addons is-right"
             >
               <button
-                class="button is-active has-text-interactive-secondary"
+                class="button tooltip is-active has-text-interactive-secondary"
+                data-tooltip="Bar chart"
               >
                 <span
                   class="icon is-small"
@@ -1656,7 +1665,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Line chart"
               >
                 <span
                   class="icon is-small"
@@ -1668,7 +1678,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Area chart"
               >
                 <span
                   class="icon is-small"
@@ -1680,7 +1691,8 @@ LIMIT
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Scatter chart"
               >
                 <span
                   class="icon is-small"
@@ -2073,7 +2085,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               class="buttons has-addons is-right"
             >
               <button
-                class="button is-active has-text-interactive-secondary"
+                class="button tooltip is-active has-text-interactive-secondary"
+                data-tooltip="Bar chart"
               >
                 <span
                   class="icon is-small"
@@ -2085,7 +2098,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Line chart"
               >
                 <span
                   class="icon is-small"
@@ -2097,7 +2111,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Area chart"
               >
                 <span
                   class="icon is-small"
@@ -2109,7 +2124,8 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Scatter chart"
               >
                 <span
                   class="icon is-small"
@@ -2701,7 +2717,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               class="buttons has-addons is-right"
             >
               <button
-                class="button is-active has-text-interactive-secondary"
+                class="button tooltip is-active has-text-interactive-secondary"
+                data-tooltip="Bar chart"
                 disabled="disabled"
               >
                 <span
@@ -2714,7 +2731,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Line chart"
                 disabled="disabled"
               >
                 <span
@@ -2727,7 +2745,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Area chart"
                 disabled="disabled"
               >
                 <span
@@ -2740,7 +2759,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </button>
                
               <button
-                class="button has-text-grey-light"
+                class="button tooltip has-text-grey-light"
+                data-tooltip="Scatter chart"
                 disabled="disabled"
               >
                 <span

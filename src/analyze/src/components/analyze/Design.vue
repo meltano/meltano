@@ -91,6 +91,10 @@ export default {
       return !this.isConnectionDialectSqlite(this.dialect);
     },
 
+    isActiveReportInDashboard() {
+      return dashboard => dashboard.reportIds.includes(this.activeReport.id);
+    },
+
     limit: {
       get() {
         return this.$store.getters['designs/currentLimit'];
@@ -123,10 +127,6 @@ export default {
     ...mapActions('designs', [
       'resetErrorMessage',
     ]),
-
-    isActiveReportInDashboard(dashboard) {
-      return dashboard.reportIds.includes(this.activeReport.id);
-    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0;
@@ -243,8 +243,7 @@ export default {
                       v-for="dashboard in dashboards"
                       :key="dashboard.id">
                     <label for="'checkbox-' + dashboard.id"
-                            data-dropdown-auto-close
-                            @click="toggleActiveReportInDashboard(dashboard);">
+                            @click.stop="toggleActiveReportInDashboard(dashboard)">
                       <input type="checkbox"
                             :id="'checkbox-' + dashboard.id"
                             :checked="isActiveReportInDashboard(dashboard)">
@@ -609,7 +608,8 @@ export default {
             <div class="column">
               <div class="buttons has-addons is-right">
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Bar chart'
                   @click.stop="setChartType('BarChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'BarChart',
@@ -621,7 +621,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Line chart'
                   @click.stop="setChartType('LineChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'LineChart',
@@ -633,7 +634,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Area chart'
                   @click.stop="setChartType('AreaChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'AreaChart',
@@ -645,7 +647,8 @@ export default {
                   </span>
                 </button>
                 <button
-                  class="button"
+                  class="button tooltip"
+                  data-tooltip='Scatter chart'
                   @click.stop="setChartType('ScatterChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'ScatterChart',
@@ -704,14 +707,8 @@ export default {
   </section>
 </template>
 
-<style lang="scss" scoped>
-@import '@/scss/bulma-preset-overrides.scss';
-@import "../../../node_modules/bulma/bulma";
+<style lang="scss">
 
-code {
-  white-space: pre;
-  word-wrap: break-word;
-}
 .panel-block {
   position: relative;
   &.space-between {
@@ -719,12 +716,6 @@ code {
   }
   &.indented {
     padding-left: 1.75rem;
-  }
-  &.is-active {
-    color: $interactive-secondary;
-    border-left-color: $interactive-secondary;
-    border-left-width: 2px;
-    @extend .has-background-white-ter;
   }
   &.panel-block-heading {
     padding: 0.25rem 0.75rem;

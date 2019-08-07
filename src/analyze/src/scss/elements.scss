@@ -9,3 +9,8 @@ html {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: $app-background-color;
 }
+
+code {
+  white-space: pre;
+  word-wrap: break-word;
+}
