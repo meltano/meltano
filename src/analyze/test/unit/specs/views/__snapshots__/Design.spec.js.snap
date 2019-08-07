@@ -18,7 +18,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
         </div>
       </div>
     </div>
-
+     
     <div
       class="column"
     >
@@ -26,7 +26,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
         class="field is-grouped is-pulled-right"
       >
         <!---->
-
+         
         <div
           class="control field"
         >
@@ -35,7 +35,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
           >
             <!---->
           </p>
-
+           
           <p
             class="control"
           >
@@ -54,7 +54,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <span>
                     Save
                   </span>
-
+                   
                   <span
                     class="icon is-small"
                   >
@@ -64,7 +64,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   </span>
                 </button>
               </div>
-
+               
               <div
                 class="dropdown-menu"
                 id="dropdown-save"
@@ -80,7 +80,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       class="field"
                     >
                       <!---->
-
+                       
                       <div
                         class="control"
                       >
@@ -91,7 +91,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         />
                       </div>
                     </div>
-
+                     
                     <div
                       class="field is-grouped"
                     >
@@ -105,7 +105,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                           Save
                         </button>
                       </div>
-
+                       
                       <div
                         class="control"
                       >
@@ -113,7 +113,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                           class="button is-text"
                           data-dropdown-auto-close=""
                         >
-
+                          
                         Cancel
                         </button>
                       </div>
@@ -124,7 +124,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             </div>
           </p>
         </div>
-
+         
         <p
           class="control"
         >
@@ -142,7 +142,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 <span>
                   Reports
                 </span>
-
+                 
                 <span
                   class="icon is-small"
                 >
@@ -152,7 +152,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 </span>
               </button>
             </div>
-
+             
             <div
               class="dropdown-menu"
               id="dropdown-reports"
@@ -165,15 +165,15 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   class="dropdown-item"
                   data-dropdown-auto-close=""
                 >
-
-
-
+                  
+                
+              
                 </a>
               </div>
             </div>
           </div>
         </p>
-
+         
         <div
           class="control"
         >
@@ -188,7 +188,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
       </div>
     </div>
   </div>
-
+   
   <div
     class="columns"
   >
@@ -210,7 +210,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               Query
             </h2>
           </div>
-
+           
           <div
             class="column is-three-fifths"
           >
@@ -232,11 +232,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     <span>
                       SQL
                     </span>
-
+                     
                     <!---->
                   </button>
                 </div>
-
+                 
                 <div
                   class="dropdown-menu"
                   id="dropdown-sql"
@@ -252,14 +252,14 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         class="level-item"
                       >
                         <code>
-
+                          
                         </code>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+               
               <button
                 class="button is-success"
                 disabled="disabled"
@@ -269,7 +269,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             </div>
           </div>
         </div>
-
+         
         <div
           class="columns is-vcentered"
         >
@@ -284,7 +284,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               >
                 Limit
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -296,7 +296,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               </div>
             </div>
           </div>
-
+           
           <div
             class="column"
           >
@@ -309,10 +309,10 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 <span>
                   Filters
                 </span>
-
+                 
                 <!---->
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -330,7 +330,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       <span>
                         None
                       </span>
-
+                       
                       <span
                         class="icon is-small"
                       >
@@ -340,7 +340,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       </span>
                     </button>
                   </div>
-
+                   
                   <div
                     class="dropdown-menu dropdown-menu-600"
                     id="dropdown-none"
@@ -362,7 +362,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                   <span>
                                     Attribute
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip is-tooltip-right"
                                     data-tooltip="The column or aggregate to filter."
@@ -372,14 +372,14 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Operation
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The filter expression for the selected column or aggregate."
@@ -389,14 +389,14 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Value
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The value to operate on when filtering."
@@ -406,7 +406,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-right"
                                 >
@@ -416,7 +416,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                 </th>
                               </tr>
                             </thead>
-
+                             
                             <tbody>
                               <tr>
                                 <td>
@@ -430,7 +430,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -442,7 +442,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -454,7 +454,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                     />
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <div
                                     class="control"
@@ -463,13 +463,13 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                                       class="button is-small is-fullwidth is-interactive-primary is-outlined"
                                       disabled="disabled"
                                     >
-
+                                      
               Add
                                     </button>
                                   </div>
                                 </td>
                               </tr>
-
+                               
                               <!---->
                             </tbody>
                           </table>
@@ -482,7 +482,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             </div>
           </div>
         </div>
-
+         
         <div
           class="field"
         >
@@ -492,11 +492,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             <span>
               Attributes
             </span>
-
+             
             <!---->
           </label>
         </div>
-
+         
         <nav
           class="panel is-unselectable"
         >
@@ -513,20 +513,20 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 icon="table"
               />
             </span>
-
-
-
+            
+              
+              
           </a>
-
+           
           <!---->
-
+             
           <!---->
-
+            
           <!---->
         </nav>
       </div>
     </aside>
-
+     
     <div
       class="column is-three-quarters"
     >
@@ -545,11 +545,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <span>
                 Results
               </span>
-
+               
               <!---->
             </h2>
           </div>
-
+           
           <div
             class="column"
           >
@@ -569,9 +569,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Line chart"
                 disabled="disabled"
               >
@@ -583,9 +583,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Area chart"
                 disabled="disabled"
               >
@@ -597,9 +597,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Scatter chart"
                 disabled="disabled"
               >
@@ -614,41 +614,41 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             </div>
           </div>
         </div>
-
+         
         <div>
           <!---->
-
+           
           <div>
             <div
               class="box is-radiusless is-shadowless has-text-centered"
             >
               <p>
-
+                
                 Run a query with at least one aggregate selected or load a report
-
+              
               </p>
             </div>
           </div>
         </div>
-
+         
         <hr />
-
+         
         <div>
           <!---->
-
+           
           <div
             class="result-data"
           >
             <div
               class="notification is-italic"
             >
-
+              
     No results
-
+  
             </div>
           </div>
         </div>
-
+         
         <!---->
       </div>
     </div>
@@ -674,7 +674,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
         </div>
       </div>
     </div>
-
+     
     <div
       class="column"
     >
@@ -682,7 +682,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
         class="field is-grouped is-pulled-right"
       >
         <!---->
-
+         
         <div
           class="control field"
         >
@@ -691,7 +691,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
           >
             <!---->
           </p>
-
+           
           <p
             class="control"
           >
@@ -710,7 +710,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <span>
                     Save
                   </span>
-
+                   
                   <span
                     class="icon is-small"
                   >
@@ -720,7 +720,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   </span>
                 </button>
               </div>
-
+               
               <div
                 class="dropdown-menu"
                 id="dropdown-save"
@@ -736,7 +736,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       class="field"
                     >
                       <!---->
-
+                       
                       <div
                         class="control"
                       >
@@ -747,7 +747,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         />
                       </div>
                     </div>
-
+                     
                     <div
                       class="field is-grouped"
                     >
@@ -761,7 +761,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                           Save
                         </button>
                       </div>
-
+                       
                       <div
                         class="control"
                       >
@@ -769,7 +769,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                           class="button is-text"
                           data-dropdown-auto-close=""
                         >
-
+                          
                         Cancel
                         </button>
                       </div>
@@ -780,7 +780,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
             </div>
           </p>
         </div>
-
+         
         <p
           class="control"
         >
@@ -799,7 +799,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 <span>
                   Reports
                 </span>
-
+                 
                 <span
                   class="icon is-small"
                 >
@@ -809,7 +809,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 </span>
               </button>
             </div>
-
+             
             <div
               class="dropdown-menu"
               id="dropdown-reports"
@@ -821,7 +821,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
             </div>
           </div>
         </p>
-
+         
         <div
           class="control"
         >
@@ -836,7 +836,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
       </div>
     </div>
   </div>
-
+   
   <div
     class="columns"
   >
@@ -858,7 +858,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               Query
             </h2>
           </div>
-
+           
           <div
             class="column is-three-fifths"
           >
@@ -879,11 +879,11 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     <span>
                       SQL
                     </span>
-
+                     
                     <!---->
                   </button>
                 </div>
-
+                 
                 <div
                   class="dropdown-menu"
                   id="dropdown-sql"
@@ -911,7 +911,7 @@ LIMIT
                   </div>
                 </div>
               </div>
-
+               
               <button
                 class="button is-success"
               >
@@ -920,7 +920,7 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div
           class="columns is-vcentered"
         >
@@ -935,7 +935,7 @@ LIMIT
               >
                 Limit
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -947,7 +947,7 @@ LIMIT
               </div>
             </div>
           </div>
-
+           
           <div
             class="column"
           >
@@ -960,10 +960,10 @@ LIMIT
                 <span>
                   Filters
                 </span>
-
+                 
                 <!---->
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -981,7 +981,7 @@ LIMIT
                       <span>
                         None
                       </span>
-
+                       
                       <span
                         class="icon is-small"
                       >
@@ -991,7 +991,7 @@ LIMIT
                       </span>
                     </button>
                   </div>
-
+                   
                   <div
                     class="dropdown-menu dropdown-menu-600"
                     id="dropdown-none"
@@ -1013,7 +1013,7 @@ LIMIT
                                   <span>
                                     Attribute
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip is-tooltip-right"
                                     data-tooltip="The column or aggregate to filter."
@@ -1023,14 +1023,14 @@ LIMIT
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Operation
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The filter expression for the selected column or aggregate."
@@ -1040,14 +1040,14 @@ LIMIT
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Value
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The value to operate on when filtering."
@@ -1057,7 +1057,7 @@ LIMIT
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-right"
                                 >
@@ -1067,7 +1067,7 @@ LIMIT
                                 </th>
                               </tr>
                             </thead>
-
+                             
                             <tbody>
                               <tr>
                                 <td>
@@ -1081,7 +1081,7 @@ LIMIT
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -1093,7 +1093,7 @@ LIMIT
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -1105,7 +1105,7 @@ LIMIT
                                     />
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <div
                                     class="control"
@@ -1114,13 +1114,13 @@ LIMIT
                                       class="button is-small is-fullwidth is-interactive-primary is-outlined"
                                       disabled="disabled"
                                     >
-
+                                      
               Add
                                     </button>
                                   </div>
                                 </td>
                               </tr>
-
+                               
                               <!---->
                             </tbody>
                           </table>
@@ -1133,7 +1133,7 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div
           class="field"
         >
@@ -1143,11 +1143,11 @@ LIMIT
             <span>
               Attributes
             </span>
-
+             
             <!---->
           </label>
         </div>
-
+         
         <nav
           class="panel is-unselectable"
         >
@@ -1164,20 +1164,20 @@ LIMIT
                 icon="table"
               />
             </span>
-
-
-
+            
+              
+              
           </a>
-
+           
           <!---->
-
+             
           <!---->
-
+            
           <!---->
         </nav>
       </div>
     </aside>
-
+     
     <div
       class="column is-three-quarters"
     >
@@ -1196,11 +1196,11 @@ LIMIT
               <span>
                 Results
               </span>
-
+               
               <!---->
             </h2>
           </div>
-
+           
           <div
             class="column"
           >
@@ -1220,9 +1220,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Line chart"
                 disabled="disabled"
               >
@@ -1234,9 +1234,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Area chart"
                 disabled="disabled"
               >
@@ -1248,9 +1248,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Scatter chart"
                 disabled="disabled"
               >
@@ -1265,41 +1265,41 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div>
           <!---->
-
+           
           <div>
             <div
               class="box is-radiusless is-shadowless has-text-centered"
             >
               <p>
-
+                
                 Run a query with at least one aggregate selected or load a report
-
+              
               </p>
             </div>
           </div>
         </div>
-
+         
         <hr />
-
+         
         <div>
           <!---->
-
+           
           <div
             class="result-data"
           >
             <div
               class="notification is-italic"
             >
-
+              
     No results
-
+  
             </div>
           </div>
         </div>
-
+         
         <!---->
       </div>
     </div>
@@ -1325,7 +1325,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
         </div>
       </div>
     </div>
-
+     
     <div
       class="column"
     >
@@ -1333,7 +1333,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
         class="field is-grouped is-pulled-right"
       >
         <!---->
-
+         
         <div
           class="control field"
         >
@@ -1342,7 +1342,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           >
             <!---->
           </p>
-
+           
           <p
             class="control"
           >
@@ -1363,7 +1363,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     class="field"
                   >
                     <!---->
-
+                     
                     <div
                       class="control"
                     >
@@ -1374,7 +1374,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                       />
                     </div>
                   </div>
-
+                   
                   <div
                     class="field is-grouped"
                   >
@@ -1388,7 +1388,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                         Save
                       </button>
                     </div>
-
+                     
                     <div
                       class="control"
                     >
@@ -1396,7 +1396,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                         class="button is-text"
                         data-dropdown-auto-close=""
                       >
-
+                        
                         Cancel
                       </button>
                     </div>
@@ -1406,7 +1406,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             </dropdown-stub>
           </p>
         </div>
-
+         
         <p
           class="control"
         >
@@ -1423,7 +1423,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             />
           </dropdown-stub>
         </p>
-
+         
         <div
           class="control"
         >
@@ -1438,7 +1438,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
       </div>
     </div>
   </div>
-
+   
   <div
     class="columns"
   >
@@ -1460,7 +1460,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               Query
             </h2>
           </div>
-
+           
           <div
             class="column is-three-fifths"
           >
@@ -1495,7 +1495,7 @@ LIMIT
                   </div>
                 </div>
               </dropdown-stub>
-
+               
               <button
                 class="button is-success"
               >
@@ -1504,7 +1504,7 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div
           class="columns is-vcentered"
         >
@@ -1519,7 +1519,7 @@ LIMIT
               >
                 Limit
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -1531,7 +1531,7 @@ LIMIT
               </div>
             </div>
           </div>
-
+           
           <div
             class="column"
           >
@@ -1544,10 +1544,10 @@ LIMIT
                 <span>
                   Filters
                 </span>
-
+                 
                 <!---->
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -1573,7 +1573,7 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div
           class="field"
         >
@@ -1583,11 +1583,11 @@ LIMIT
             <span>
               Attributes
             </span>
-
+             
             <!---->
           </label>
         </div>
-
+         
         <nav
           class="panel is-unselectable"
         >
@@ -1604,20 +1604,20 @@ LIMIT
                 icon="table"
               />
             </span>
-
-
-
+            
+              
+              
           </a>
-
+           
           <!---->
-
+             
           <!---->
-
+            
           <!---->
         </nav>
       </div>
     </aside>
-
+     
     <div
       class="column is-three-quarters"
     >
@@ -1636,7 +1636,7 @@ LIMIT
               <span>
                 Results
               </span>
-
+               
               <span
                 class="has-text-weight-light has-text-grey-light is-size-7"
               >
@@ -1644,7 +1644,7 @@ LIMIT
               </span>
             </h2>
           </div>
-
+           
           <div
             class="column"
           >
@@ -1663,9 +1663,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Line chart"
               >
                 <span
@@ -1676,9 +1676,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Area chart"
               >
                 <span
@@ -1689,9 +1689,9 @@ LIMIT
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Scatter chart"
               >
                 <span
@@ -1705,7 +1705,7 @@ LIMIT
             </div>
           </div>
         </div>
-
+         
         <div>
           <div
             class="chart-toggles"
@@ -1716,18 +1716,18 @@ LIMIT
               results="[object Object]"
             />
           </div>
-
+           
           <!---->
         </div>
-
+         
         <hr />
-
+         
         <div>
           <!---->
-
+           
           <resulttable-stub />
         </div>
-
+         
         <!---->
       </div>
     </div>
@@ -1753,7 +1753,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
         </div>
       </div>
     </div>
-
+     
     <div
       class="column"
     >
@@ -1761,7 +1761,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
         class="field is-grouped is-pulled-right"
       >
         <!---->
-
+         
         <div
           class="control field"
         >
@@ -1770,7 +1770,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           >
             <!---->
           </p>
-
+           
           <p
             class="control"
           >
@@ -1791,7 +1791,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     class="field"
                   >
                     <!---->
-
+                     
                     <div
                       class="control"
                     >
@@ -1802,7 +1802,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                       />
                     </div>
                   </div>
-
+                   
                   <div
                     class="field is-grouped"
                   >
@@ -1816,7 +1816,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                         Save
                       </button>
                     </div>
-
+                     
                     <div
                       class="control"
                     >
@@ -1824,7 +1824,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                         class="button is-text"
                         data-dropdown-auto-close=""
                       >
-
+                        
                         Cancel
                       </button>
                     </div>
@@ -1834,7 +1834,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             </dropdown-stub>
           </p>
         </div>
-
+         
         <p
           class="control"
         >
@@ -1852,14 +1852,14 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 class="dropdown-item"
                 data-dropdown-auto-close=""
               >
-
-
-
+                
+                
+              
               </a>
             </div>
           </dropdown-stub>
         </p>
-
+         
         <div
           class="control"
         >
@@ -1874,7 +1874,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
       </div>
     </div>
   </div>
-
+   
   <div
     class="columns"
   >
@@ -1896,7 +1896,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               Query
             </h2>
           </div>
-
+           
           <div
             class="column is-three-fifths"
           >
@@ -1921,13 +1921,13 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                       class="level-item"
                     >
                       <code>
-
+                        
                       </code>
                     </div>
                   </div>
                 </div>
               </dropdown-stub>
-
+               
               <button
                 class="button is-success"
                 disabled="disabled"
@@ -1937,7 +1937,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             </div>
           </div>
         </div>
-
+         
         <div
           class="columns is-vcentered"
         >
@@ -1952,7 +1952,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               >
                 Limit
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -1964,7 +1964,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </div>
             </div>
           </div>
-
+           
           <div
             class="column"
           >
@@ -1977,10 +1977,10 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 <span>
                   Filters
                 </span>
-
+                 
                 <!---->
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -2006,7 +2006,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             </div>
           </div>
         </div>
-
+         
         <div
           class="field"
         >
@@ -2016,11 +2016,11 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             <span>
               Attributes
             </span>
-
+             
             <!---->
           </label>
         </div>
-
+         
         <nav
           class="panel is-unselectable"
         >
@@ -2037,20 +2037,20 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 icon="table"
               />
             </span>
-
-
-
+            
+              
+              
           </a>
-
+           
           <!---->
-
+             
           <!---->
-
+            
           <!---->
         </nav>
       </div>
     </aside>
-
+     
     <div
       class="column is-three-quarters"
     >
@@ -2069,7 +2069,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <span>
                 Results
               </span>
-
+               
               <span
                 class="has-text-weight-light has-text-grey-light is-size-7"
               >
@@ -2077,7 +2077,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               </span>
             </h2>
           </div>
-
+           
           <div
             class="column"
           >
@@ -2096,9 +2096,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Line chart"
               >
                 <span
@@ -2109,9 +2109,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Area chart"
               >
                 <span
@@ -2122,9 +2122,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Scatter chart"
               >
                 <span
@@ -2138,7 +2138,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             </div>
           </div>
         </div>
-
+         
         <div>
           <div
             class="chart-toggles"
@@ -2149,18 +2149,18 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               results="[object Object]"
             />
           </div>
-
+           
           <!---->
         </div>
-
+         
         <hr />
-
+         
         <div>
           <!---->
-
+           
           <resulttable-stub />
         </div>
-
+         
         <!---->
       </div>
     </div>
@@ -2186,7 +2186,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
         </div>
       </div>
     </div>
-
+     
     <div
       class="column"
     >
@@ -2194,7 +2194,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
         class="field is-grouped is-pulled-right"
       >
         <!---->
-
+         
         <div
           class="control field"
         >
@@ -2203,7 +2203,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
           >
             <!---->
           </p>
-
+           
           <p
             class="control"
           >
@@ -2222,7 +2222,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <span>
                     Save
                   </span>
-
+                   
                   <span
                     class="icon is-small"
                   >
@@ -2232,7 +2232,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   </span>
                 </button>
               </div>
-
+               
               <div
                 class="dropdown-menu"
                 id="dropdown-save"
@@ -2248,7 +2248,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       class="field"
                     >
                       <!---->
-
+                       
                       <div
                         class="control"
                       >
@@ -2259,7 +2259,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         />
                       </div>
                     </div>
-
+                     
                     <div
                       class="field is-grouped"
                     >
@@ -2273,7 +2273,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                           Save
                         </button>
                       </div>
-
+                       
                       <div
                         class="control"
                       >
@@ -2281,7 +2281,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                           class="button is-text"
                           data-dropdown-auto-close=""
                         >
-
+                          
                         Cancel
                         </button>
                       </div>
@@ -2292,7 +2292,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             </div>
           </p>
         </div>
-
+         
         <p
           class="control"
         >
@@ -2311,7 +2311,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 <span>
                   Reports
                 </span>
-
+                 
                 <span
                   class="icon is-small"
                 >
@@ -2321,7 +2321,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 </span>
               </button>
             </div>
-
+             
             <div
               class="dropdown-menu"
               id="dropdown-reports"
@@ -2333,7 +2333,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             </div>
           </div>
         </p>
-
+         
         <div
           class="control"
         >
@@ -2348,7 +2348,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
       </div>
     </div>
   </div>
-
+   
   <div
     class="columns"
   >
@@ -2370,7 +2370,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               Query
             </h2>
           </div>
-
+           
           <div
             class="column is-three-fifths"
           >
@@ -2392,11 +2392,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     <span>
                       SQL
                     </span>
-
+                     
                     <!---->
                   </button>
                 </div>
-
+                 
                 <div
                   class="dropdown-menu"
                   id="dropdown-sql"
@@ -2412,14 +2412,14 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         class="level-item"
                       >
                         <code>
-
+                          
                         </code>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+               
               <button
                 class="button is-success"
                 disabled="disabled"
@@ -2429,7 +2429,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             </div>
           </div>
         </div>
-
+         
         <div
           class="columns is-vcentered"
         >
@@ -2444,7 +2444,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               >
                 Limit
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -2456,7 +2456,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               </div>
             </div>
           </div>
-
+           
           <div
             class="column"
           >
@@ -2469,10 +2469,10 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 <span>
                   Filters
                 </span>
-
+                 
                 <!---->
               </label>
-
+               
               <div
                 class="control is-expanded"
               >
@@ -2490,7 +2490,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       <span>
                         None
                       </span>
-
+                       
                       <span
                         class="icon is-small"
                       >
@@ -2500,7 +2500,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       </span>
                     </button>
                   </div>
-
+                   
                   <div
                     class="dropdown-menu dropdown-menu-600"
                     id="dropdown-none"
@@ -2522,7 +2522,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                   <span>
                                     Attribute
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip is-tooltip-right"
                                     data-tooltip="The column or aggregate to filter."
@@ -2532,14 +2532,14 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Operation
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The filter expression for the selected column or aggregate."
@@ -2549,14 +2549,14 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-centered"
                                 >
                                   <span>
                                     Value
                                   </span>
-
+                                   
                                   <span
                                     class="icon has-text-grey-light tooltip"
                                     data-tooltip="The value to operate on when filtering."
@@ -2566,7 +2566,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     />
                                   </span>
                                 </th>
-
+                                 
                                 <th
                                   class="has-text-right"
                                 >
@@ -2576,7 +2576,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                 </th>
                               </tr>
                             </thead>
-
+                             
                             <tbody>
                               <tr>
                                 <td>
@@ -2590,7 +2590,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -2602,7 +2602,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     </span>
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <p
                                     class="control is-expanded"
@@ -2614,7 +2614,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                     />
                                   </p>
                                 </td>
-
+                                 
                                 <td>
                                   <div
                                     class="control"
@@ -2623,13 +2623,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                                       class="button is-small is-fullwidth is-interactive-primary is-outlined"
                                       disabled="disabled"
                                     >
-
+                                      
               Add
                                     </button>
                                   </div>
                                 </td>
                               </tr>
-
+                               
                               <!---->
                             </tbody>
                           </table>
@@ -2642,7 +2642,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             </div>
           </div>
         </div>
-
+         
         <div
           class="field"
         >
@@ -2652,11 +2652,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             <span>
               Attributes
             </span>
-
+             
             <!---->
           </label>
         </div>
-
+         
         <nav
           class="panel is-unselectable"
         >
@@ -2673,20 +2673,20 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 icon="table"
               />
             </span>
-
-
-
+            
+              
+              
           </a>
-
+           
           <!---->
-
+             
           <!---->
-
+            
           <!---->
         </nav>
       </div>
     </aside>
-
+     
     <div
       class="column is-three-quarters"
     >
@@ -2705,11 +2705,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <span>
                 Results
               </span>
-
+               
               <!---->
             </h2>
           </div>
-
+           
           <div
             class="column"
           >
@@ -2729,9 +2729,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Line chart"
                 disabled="disabled"
               >
@@ -2743,9 +2743,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Area chart"
                 disabled="disabled"
               >
@@ -2757,9 +2757,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   />
                 </span>
               </button>
-
+               
               <button
-                class="button tooltip has-text-grey-lighter"
+                class="button tooltip has-text-grey-light"
                 data-tooltip="Scatter chart"
                 disabled="disabled"
               >
@@ -2774,41 +2774,41 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             </div>
           </div>
         </div>
-
+         
         <div>
           <!---->
-
+           
           <div>
             <div
               class="box is-radiusless is-shadowless has-text-centered"
             >
               <p>
-
+                
                 Run a query with at least one aggregate selected or load a report
-
+              
               </p>
             </div>
           </div>
         </div>
-
+         
         <hr />
-
+         
         <div>
           <!---->
-
+           
           <div
             class="result-data"
           >
             <div
               class="notification is-italic"
             >
-
+              
     No results
-
+  
             </div>
           </div>
         </div>
-
+         
         <!---->
       </div>
     </div>
