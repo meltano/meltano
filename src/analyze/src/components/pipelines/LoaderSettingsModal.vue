@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
+import Vue from 'vue';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -67,6 +68,7 @@ export default {
         })
         .then(() => {
           this.$router.push({ name: 'schedules' });
+          Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`);
         });
     },
   },

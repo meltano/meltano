@@ -134,7 +134,6 @@ const actions = {
       });
   },
 
-  // eslint-disable-next-line no-shadow
   savePluginConfiguration({ commit, state }, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload)
       .then((response) => {

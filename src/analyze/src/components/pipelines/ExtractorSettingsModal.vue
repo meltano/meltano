@@ -1,5 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
+import Vue from 'vue';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -74,6 +75,7 @@ export default {
           name: 'extractorEntities',
           params: { extractor: this.extractor.name },
         });
+        Vue.toasted.global.success(`Connection Saved - ${this.extractor.name}`);
       });
     },
   },

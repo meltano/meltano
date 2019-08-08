@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import Vue from 'vue';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -9,6 +10,7 @@ export default {
   data() {
     return {
       connectionName: null,
+      isSavingConfiguration: false,
     };
   },
   components: {
@@ -64,10 +66,14 @@ export default {
       });
     },
     saveConfig() {
+      this.isSavingConfiguration = true;
       this.$store.dispatch('configuration/savePluginConfiguration', {
         type: 'connections',
         name: this.connection.name,
         config: this.connectionInFocusConfiguration.config,
+      }).then(() => {
+        this.isSavingConfiguration = false;
+        Vue.toasted.global.success(`Connection Saved - ${this.connection.name}`);
       });
     },
   },
@@ -112,6 +118,7 @@ export default {
         <section class="field buttons is-right"
                  slot="bottom">
           <button class='button is-interactive-primary'
+                  :class='{ "is-loading": isSavingConfiguration }'
                   :disabled='!isSaveable'
                   @click.prevent="saveConfig">Save</button>
         </section>
