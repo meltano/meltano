@@ -197,7 +197,7 @@ loaders:
         description: The name of the Snowflake database you want to use
       - name: schema
         env: SF_SCHEMA
-        description: The name of the schema 
+        description: The name of the schema
       - name: warehouse
         env: SF_WAREHOUSE
         description: The name of the Snowflake warehouse you want to use
@@ -221,7 +221,9 @@ loaders:
     pip_url: "git+https://gitlab.com/meltano/target-sqlite.git"
     settings:
       - name: database
-        description: E.g. `meltano` will create `meltano.db`
+        label: Database
+        description: Path to the database, relative to the project root.
+        value: meltano.db
 transformers:
   - name: dbt
     namespace: dbt
