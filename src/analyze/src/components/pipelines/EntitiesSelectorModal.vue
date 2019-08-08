@@ -247,7 +247,7 @@ export default {
 
         <template v-if='extractorLacksEntitySelectionAndIsInstalled'>
           <div class="content">
-            <p>There are no entities to select for {{extractorNameFromRoute}}.</p>
+            <p>All entities will be extracted by default as entity selection is not currently supported for {{extractorNameFromRoute}}.</p>
             <ul>
               <li>Click "Next" to advance</li>
               <li>Click "Cancel" to select another extractor's entities</li>
