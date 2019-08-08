@@ -149,10 +149,14 @@ const actions = {
       });
   },
 
-  savePluginConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload);
-    // TODO commit if values are properly saved, they are initially copied from
-    // the extractor's config and we'd have to update this
+  // eslint-disable-next-line no-shadow
+  savePluginConfiguration({ commit, state }, configPayload) {
+    orchestrationsApi.savePluginConfiguration(configPayload)
+      .then((response) => {
+        const configuration = Object.assign({}, state.connectionInFocusConfiguration);
+        configuration.config = response.data;
+        commit('setConnectionInFocusConfiguration', configuration);
+      });
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
