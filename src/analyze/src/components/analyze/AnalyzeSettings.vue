@@ -43,15 +43,10 @@ export default {
         : null;
       return targetConnection || {};
     },
-    configSettings() {
-      return this.connection.config
-        ? Object.assign(this.connection.config, this.connectionInFocusConfiguration)
-        : this.connectionInFocusConfiguration;
-    },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('connections', this.connectionName);
       const isInstalled = this.getIsPluginInstalled('connections', this.connectionName);
-      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      const isValid = this.getHasValidConfigSettings(this.connectionInFocusConfiguration);
       return !isInstalling && isInstalled && isValid;
     },
   },
@@ -72,7 +67,7 @@ export default {
       this.$store.dispatch('configuration/savePluginConfiguration', {
         type: 'connections',
         name: this.connection.name,
-        config: this.configSettings.config,
+        config: this.connectionInFocusConfiguration.config,
       });
     },
   },
@@ -109,11 +104,11 @@ export default {
       </div>
     </div>
 
-    <div class="column" rel="container" v-if="configSettings">
+    <div class="column" rel="container" v-if="connectionInFocusConfiguration">
       <h2 class="title is-5">Configuration</h2>
       <ConnectorSettings v-if='connectionName'
                          class="box"
-                         :config-settings='configSettings'>
+                         :config-settings='connectionInFocusConfiguration'>
         <section class="field buttons is-right"
                  slot="bottom">
           <button class='button is-interactive-primary'

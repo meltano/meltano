@@ -335,7 +335,9 @@ connections:
       - name: password
         value: warehouse
       - name: host
-        value: 'localhost:5502'
+        value: localhost
+      - name: port
+        value: 5502
       - name: dbname
         value: warehouse
       - name: schema

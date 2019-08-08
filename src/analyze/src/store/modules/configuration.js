@@ -17,7 +17,7 @@ const defaultState = utils.deepFreeze({
 });
 
 const getters = {
-  getConnectorConfigurationWithDefaults() {
+  getConfigurationWithDefaults() {
     return (configuration) => {
       const defaultConfiguration = Object.assign({}, configuration);
       defaultConfiguration.settings.forEach((setting) => {
@@ -81,7 +81,7 @@ const actions = {
   getExtractorConfiguration({ commit, dispatch, getters }, extractor) {
     dispatch('getPluginConfiguration', { name: extractor, type: 'extractors' })
       .then((response) => {
-        commit('setExtractorInFocusConfiguration', getters.getConnectorConfigurationWithDefaults(response.data));
+        commit('setExtractorInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
       });
   },
 
@@ -89,14 +89,15 @@ const actions = {
   getLoaderConfiguration({ commit, dispatch, getters }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' })
       .then((response) => {
-        commit('setLoaderInFocusConfiguration', getters.getConnectorConfigurationWithDefaults(response.data));
+        commit('setLoaderInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
       });
   },
 
-  getConnectionConfiguration({ commit, dispatch }, connection) {
+  // eslint-disable-next-line no-shadow
+  getConnectionConfiguration({ commit, dispatch, getters }, connection) {
     dispatch('getPluginConfiguration', { name: connection, type: 'connections' })
       .then((response) => {
-        commit('setConnectionInFocusConfiguration', response.data);
+        commit('setConnectionInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
       });
   },
 
