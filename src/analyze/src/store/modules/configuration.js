@@ -17,6 +17,19 @@ const defaultState = utils.deepFreeze({
 });
 
 const getters = {
+  getConnectorConfigurationWithDefaults() {
+    return (configuration) => {
+      const defaultConfiguration = Object.assign({}, configuration);
+      defaultConfiguration.settings.forEach((setting) => {
+        if (!defaultConfiguration.config.hasOwnProperty[setting.name]) {
+          if (setting.hasOwnProperty('value')) {
+            defaultConfiguration.config[setting.name] = setting.value;
+          }
+        }
+      });
+      return defaultConfiguration;
+    };
+  },
   getHasPipelines(state) {
     return state.pipelines.length > 0;
   },
@@ -64,17 +77,19 @@ const actions = {
       });
   },
 
-  getExtractorConfiguration({ commit, dispatch }, extractor) {
+  // eslint-disable-next-line no-shadow
+  getExtractorConfiguration({ commit, dispatch, getters }, extractor) {
     dispatch('getPluginConfiguration', { name: extractor, type: 'extractors' })
       .then((response) => {
-        commit('setExtractorInFocusConfiguration', response.data);
+        commit('setExtractorInFocusConfiguration', getters.getConnectorConfigurationWithDefaults(response.data));
       });
   },
 
-  getLoaderConfiguration({ commit, dispatch }, loader) {
+  // eslint-disable-next-line no-shadow
+  getLoaderConfiguration({ commit, dispatch, getters }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' })
       .then((response) => {
-        commit('setLoaderInFocusConfiguration', response.data);
+        commit('setLoaderInFocusConfiguration', getters.getConnectorConfigurationWithDefaults(response.data));
       });
   },
 

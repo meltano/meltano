@@ -31,15 +31,10 @@ export default {
     ...mapState('plugins', [
       'installedPlugins',
     ]),
-    configSettings() {
-      return this.extractor.config
-        ? Object.assign(this.extractor.config, this.extractorInFocusConfiguration)
-        : this.extractorInFocusConfiguration;
-    },
     extractorLacksConfigSettingsAndIsInstalled() {
       return !this.isInstalling &&
-             this.configSettings.settings &&
-             this.configSettings.settings.length === 0;
+             this.extractorInFocusConfiguration.settings &&
+             this.extractorInFocusConfiguration.settings.length === 0;
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -54,10 +49,10 @@ export default {
       return this.getIsInstallingPlugin('extractors', this.extractorNameFromRoute);
     },
     isLoadingConfigSettings() {
-      return !Object.prototype.hasOwnProperty.call(this.configSettings, 'config');
+      return !Object.prototype.hasOwnProperty.call(this.extractorInFocusConfiguration, 'config');
     },
     isSaveable() {
-      const isValid = this.getHasValidConfigSettings(this.configSettings);
+      const isValid = this.getHasValidConfigSettings(this.extractorInFocusConfiguration);
       return !this.isInstalling && this.isInstalled && isValid;
     },
   },
@@ -73,7 +68,7 @@ export default {
       this.$store.dispatch('configuration/savePluginConfiguration', {
         name: this.extractor.name,
         type: 'extractors',
-        config: this.configSettings.config,
+        config: this.extractorInFocusConfiguration.config,
       }).then(() => {
         this.$router.push({
           name: 'extractorEntities',
@@ -112,7 +107,7 @@ export default {
         <ConnectorSettings
           v-if='!isLoadingConfigSettings'
           fieldClass="is-small"
-          :config-settings='configSettings'/>
+          :config-settings='extractorInFocusConfiguration'/>
 
         <progress
           v-if='isLoadingConfigSettings && !isInstalling'
