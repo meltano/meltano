@@ -21,7 +21,7 @@ LEGACY_CATALOG = """
 {
   "streams": [
     {
-      "tap_stream_id": "Entity",
+      "tap_stream_id": "UniqueEntitiesName",
       "stream": "entities",
       "key_properties": [
         "id"
@@ -172,7 +172,7 @@ CATALOG = """
 {
   "streams": [
     {
-      "tap_stream_id": "Entity",
+      "tap_stream_id": "UniqueEntitiesName",
       "stream": "entities",
       "schema": {
         "type": "object",
@@ -326,7 +326,7 @@ JSON_SCHEMA = """
 {
   "streams": [
     {
-      "tap_stream_id": "Entity",
+      "tap_stream_id": "UniqueEntitiesName",
       "stream": "entities",
       "schema": {
         "type": "object",
@@ -507,10 +507,10 @@ class TestLegacyCatalogSelectVisitor:
 
     @classmethod
     def assert_catalog_is_selected(cls, catalog):
-        streams = {stream["stream"]: stream for stream in catalog["streams"]}
+        streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
 
         metadatas = {
-            stream["stream"]: metadata
+            stream["tap_stream_id"]: metadata
             for _, stream in streams.items()
             for metadata in stream["metadata"]
         }
@@ -563,7 +563,7 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         visit(catalog, select_all_executor)
         self.assert_catalog_is_selected(catalog)
 
-        streams = {stream["stream"]: stream for stream in catalog["streams"]}
+        streams = {stream["tap_stream_id"]: stream for stream in catalog["streams"]}
         stream_metadata = len(
             [
                 metadata
@@ -597,13 +597,15 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         indirect=["catalog"],
     )
     def test_select(self, catalog, attrs):
-        selector = SelectExecutor(["entities.name", "entities.code"])
+        selector = SelectExecutor(
+            ["UniqueEntitiesName.name", "UniqueEntitiesName.code"]
+        )
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties["entities"] == attrs
+        assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
     @pytest.mark.parametrize(
         "catalog,attrs",
@@ -638,13 +640,15 @@ class TestCatalogSelectVisitor(TestLegacyCatalogSelectVisitor):
         indirect=["catalog"],
     )
     def test_select_negated(self, catalog, attrs):
-        selector = SelectExecutor(["*.*", "!entities.code", "!entities.name"])
+        selector = SelectExecutor(
+            ["*.*", "!UniqueEntitiesName.code", "!UniqueEntitiesName.name"]
+        )
         visit(catalog, selector)
 
         lister = ListSelectedExecutor()
         visit(catalog, lister)
 
-        assert lister.selected_properties["entities"] == attrs
+        assert lister.selected_properties["UniqueEntitiesName"] == attrs
 
 
 class TestListExecutor:
@@ -657,7 +661,7 @@ class TestListExecutor:
         visit(catalog, executor)
 
         assert dict(executor.properties) == {
-            "entities": {
+            "UniqueEntitiesName": {
                 "code",
                 "name",
                 "balance",
