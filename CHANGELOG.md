@@ -18,16 +18,15 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 * [#794](https://gitlab.com/meltano/meltano/issues/794) Update Snowflake fields to have descriptions and utilize tooltip UI
 * [#853](https://gitlab.com/meltano/meltano/issues/853) Improve UX for multi-attribute ordering (wider sub-UI for easier reading, clear drop target, and clearer drag animation for reenforcing sorting interaction)
-* [#842](https://gitlab.com/meltano/meltano/issues/842) Collapse Deployment section in the docs to be under [Installation](http://localhost:8080/docs/installation.html)
+* [#824](https://gitlab.com/meltano/meltano/issues/824) Update `meltano select` to use the unique `tap_stream_id` instead of the `stream` property for filtering streams. This adds support for taps with multiple streams with the same name, like, for example, the ones produced by `tap-postgres` when tables with the same name are defined in different schemas.
 
 ### Fixes
 * [#855](https://gitlab.com/meltano/meltano/issues/855) Fix bug that duplicated a dashboard's `reportIds` that also prevented immediate UI feedback when reports were toggled (added or removed) from a dashboard via Analyze's "Add to Dashboard" dropdown
 * [#851](https://gitlab.com/meltano/meltano/issues/851) Fix report saving and loading to work with filters and sortBy ordering
 * [#852](https://gitlab.com/meltano/meltano/issues/852) Update Scheduling UI to have "Run" button at all times vs conditionally to empower users to run one-off ELT pipelines even if Airflow is installed
 * [#852](https://gitlab.com/meltano/meltano/issues/852) Update Scheduling UI "Interval" column with CTA to install Airflow while communicating why via tooltip
-
-### Fixes
 * [#852](https://gitlab.com/meltano/meltano/issues/852) Fix initial Orchestration page hydration to properly reflect Airflow installation status
+* [#831](https://gitlab.com/meltano/meltano/issues/831) Update `meltano elt` to exit with 1 and report dbt's exit code on an error message when dbt exits with a non-zero code.
 
 ### Breaks
 

@@ -147,7 +147,7 @@ class SelectExecutor(CatalogExecutor):
 
     @property
     def current_stream(self):
-        return self._stream["stream"]
+        return self._stream["tap_stream_id"]
 
     @classmethod
     def _match_patterns(cls, value, include=[], exclude=[]):
@@ -250,7 +250,7 @@ class ListExecutor(CatalogExecutor):
         super().__init__()
 
     def stream_node(self, node, path):
-        stream = node["stream"]
+        stream = node["tap_stream_id"]
         if stream not in self.properties:
             self.properties[stream] = set()
 
@@ -298,7 +298,7 @@ class ListSelectedExecutor(CatalogExecutor):
             return False
 
     def stream_node(self, node, path):
-        self._stream = node["stream"]
+        self._stream = node["tap_stream_id"]
         self.properties[self._stream] = set()
 
     def stream_metadata_node(self, node, path):
