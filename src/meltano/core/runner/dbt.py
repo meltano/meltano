@@ -40,15 +40,29 @@ class DbtRunner(Runner):
 
             # send the elt_context as ENV variables
             env = {**settings.as_env(extractor), **settings.as_env(loader)}
-            self.dbt_service.deps()
+            process = self.dbt_service.deps()
+
+            if process.returncode:
+                raise Exception(
+                    f"dbt deps didn't exit cleanly. Exit code: {process.returncode}"
+                )
 
             if models is not None:
                 models = models.replace("-", "_")
 
             if dry_run:
-                self.dbt_service.compile(models, env=env)
+                process = self.dbt_service.compile(models, env=env)
+                if process.returncode:
+                    raise Exception(
+                        f"dbt compile didn't exit cleanly. Exit code: {process.returncode}"
+                    )
             else:
-                self.dbt_service.run(models, env=env)
+                process = self.dbt_service.run(models, env=env)
+                if process.returncode:
+                    raise Exception(
+                        f"dbt run didn't exit cleanly. Exit code: {process.returncode}"
+                    )
         except Exception as e:
             logging.warning("Could not inject environment to dbt.")
             logging.debug(f"Could not hydrate ENV from the EltContext: {str(e)}")
+            raise e
