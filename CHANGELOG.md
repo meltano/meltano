@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#802](https://gitlab.com/meltano/meltano/issues/802) Add support for Query Filters over columns that are not selected
 * [#855](https://gitlab.com/meltano/meltano/issues/855) Add empty state to Dashboards and cleaned up styling for consistency with Analyze's layout
 * [#856](https://gitlab.com/meltano/meltano/issues/856) Add contextual information to the Analyze Connection UI to aid user understanding
+* [#800](https://gitlab.com/meltano/meltano/issues/800) Add save success feedback for connectors, entities, and connections
 
 ### Changes
 * [#794](https://gitlab.com/meltano/meltano/issues/794) Update Snowflake fields to have descriptions and utilize tooltip UI
@@ -28,6 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#852](https://gitlab.com/meltano/meltano/issues/852) Fix initial Orchestration page hydration to properly reflect Airflow installation status
 * [#831](https://gitlab.com/meltano/meltano/issues/831) Update `meltano elt` to exit with 1 and report dbt's exit code on an error message when dbt exits with a non-zero code.
 * [#857](https://gitlab.com/meltano/meltano/issues/857) Update PluginDiscoveryService to use the cached `discovery.yml` when Meltano can not connect to `meltano.com` while trying to fetch a fresh version of the discovery file.
+* [#800](https://gitlab.com/meltano/meltano/issues/800) Fix connector and connection settings to display saved settings by default while falling back and setting defaults if applicable
 
 ### Breaks
 
