@@ -1,5 +1,6 @@
 <script>
 import { mapState } from 'vuex';
+import Vue from 'vue';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 
 export default {
@@ -125,6 +126,7 @@ export default {
       this.$store.dispatch('configuration/selectEntities')
         .then(() => {
           this.$router.push({ name: 'loaders' });
+          Vue.toasted.global.success(`Entities Saved - ${this.extractorNameFromRoute}`);
         });
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
