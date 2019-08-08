@@ -94,7 +94,11 @@ class PluginDiscoveryService(Versioned):
             with self.cached_discovery_file.open("w") as discovery_cache:
                 discovery_cache.write(response.text)
             logging.debug(f"Discovery cache updated at {self.cached_discovery_file}")
-        except (requests.exceptions.HTTPError, yaml.YAMLError) as e:
+        except (
+            requests.exceptions.ConnectionError,
+            requests.exceptions.HTTPError,
+            yaml.YAMLError,
+        ) as e:
             # let's try loading the cache instead
             self._discovery = self.cached_discovery
         except IncompatibleVersionError as e:
