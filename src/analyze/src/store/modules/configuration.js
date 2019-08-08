@@ -17,19 +17,6 @@ const defaultState = utils.deepFreeze({
 });
 
 const getters = {
-  getConfigurationWithDefaults() {
-    return (configuration) => {
-      const defaultConfiguration = Object.assign({}, configuration);
-      defaultConfiguration.settings.forEach((setting) => {
-        if (!defaultConfiguration.config.hasOwnProperty[setting.name]) {
-          if (setting.hasOwnProperty('value')) {
-            defaultConfiguration.config[setting.name] = setting.value;
-          }
-        }
-      });
-      return defaultConfiguration;
-    };
-  },
   getHasPipelines(state) {
     return state.pipelines.length > 0;
   },
@@ -77,27 +64,25 @@ const actions = {
       });
   },
 
-  // eslint-disable-next-line no-shadow
-  getExtractorConfiguration({ commit, dispatch, getters }, extractor) {
+  getExtractorConfiguration({ commit, dispatch }, extractor) {
     dispatch('getPluginConfiguration', { name: extractor, type: 'extractors' })
       .then((response) => {
-        commit('setExtractorInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
+        commit('setExtractorInFocusConfiguration', response.data);
       });
   },
 
-  // eslint-disable-next-line no-shadow
-  getLoaderConfiguration({ commit, dispatch, getters }, loader) {
+  getLoaderConfiguration({ commit, dispatch }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' })
       .then((response) => {
-        commit('setLoaderInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
+        commit('setLoaderInFocusConfiguration', response.data);
       });
   },
 
   // eslint-disable-next-line no-shadow
-  getConnectionConfiguration({ commit, dispatch, getters }, connection) {
+  getConnectionConfiguration({ commit, dispatch }, connection) {
     dispatch('getPluginConfiguration', { name: connection, type: 'connections' })
       .then((response) => {
-        commit('setConnectionInFocusConfiguration', getters.getConfigurationWithDefaults(response.data));
+        commit('setConnectionInFocusConfiguration', response.data);
       });
   },
 
@@ -240,6 +225,10 @@ const mutations = {
       : {};
   },
 
+  setConnectionInFocusConfiguration(state, configuration) {
+    state.connectionInFocusConfiguration = configuration;
+  },
+
   setExtractorInFocusConfiguration(state, configuration) {
     state.extractorInFocusConfiguration = configuration;
   },
@@ -250,10 +239,6 @@ const mutations = {
 
   setLoaderInFocusConfiguration(state, configuration) {
     state.loaderInFocusConfiguration = configuration;
-  },
-
-  setConnectionInFocusConfiguration(state, configuration) {
-    state.connectionInFocusConfiguration = configuration;
   },
 
   setPipelineIsRunning(_, { pipeline, value }) {
