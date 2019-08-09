@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#852](https://gitlab.com/meltano/meltano/issues/852) Fix initial Orchestration page hydration to properly reflect Airflow installation status
 * [#831](https://gitlab.com/meltano/meltano/issues/831) Update `meltano elt` to exit with 1 and report dbt's exit code on an error message when dbt exits with a non-zero code.
 * [#857](https://gitlab.com/meltano/meltano/issues/857) Update PluginDiscoveryService to use the cached `discovery.yml` when Meltano can not connect to `meltano.com` while trying to fetch a fresh version of the discovery file.
+* [#850](https://gitlab.com/meltano/meltano/issues/850) Fix entities response so entities display as expected (as assumed this simple fix was due to our recent interceptor upgrade)
 * [#800](https://gitlab.com/meltano/meltano/issues/800) Fix connector and connection settings to display saved settings by default while falling back and setting defaults if applicable
 
 ### Breaks

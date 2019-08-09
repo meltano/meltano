@@ -218,8 +218,8 @@ const mutations = {
   setAllExtractorInFocusEntities(state, entitiesData) {
     state.extractorInFocusEntities = entitiesData
       ? {
-        extractorName: entitiesData.extractor_name,
-        entityGroups: entitiesData.entity_groups,
+        extractorName: entitiesData.extractorName,
+        entityGroups: entitiesData.entityGroups,
       }
       : {};
   },
