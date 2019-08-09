@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 
@@ -9,26 +9,14 @@ export default {
     ConnectorLogo,
   },
   created() {
-    this.$store.dispatch('plugins/getAllPlugins');
     this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('plugins', [
-      'getIsPluginInstalled',
-    ]),
     ...mapState('plugins', [
       'installedPlugins',
-      'plugins',
     ]),
   },
   methods: {
-    ...mapActions('plugins', [
-      'installPlugin',
-    ]),
-    installRequired(extractor) {
-      this.installPlugin({ pluginType: 'extractors', name: extractor });
-      this.$router.push({ name: 'extractorSettings', params: { extractor } });
-    },
     udpateExtractorEntities(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } });
     },
@@ -58,27 +46,20 @@ export default {
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(extractor, index) in plugins.extractors"
-        :key="`${extractor}-${index}`">
+        v-for="(extractor, index) in installedPlugins.extractors"
+        :key="`${extractor.name}-${index}`">
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
-            <ConnectorLogo
-              :connector='extractor'
-              :is-grayscale='!getIsPluginInstalled("extractors", extractor)' />
+            <ConnectorLogo :connector='extractor.name'/>
           </div>
           <div class="content is-small">
             <p class='has-text-centered'>
-              {{extractor}}
+              {{extractor.name}}
             </p>
 
             <a
-              v-if='getIsPluginInstalled("extractors", extractor)'
               class='button is-interactive-primary is-block is-small'
-              @click="udpateExtractorEntities(extractor)">Edit Selections</a>
-            <a
-              v-else
-              class='button is-interactive-primary is-outlined is-block is-small'
-              @click="installRequired(extractor)">Install</a>
+              @click="udpateExtractorEntities(extractor.name)">Edit Selections</a>
 
           </div>
         </div>
