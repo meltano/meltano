@@ -55,10 +55,10 @@
 
 
     <div style="background-color: #e5e4e2; padding-bottom: 6rem;">
-      <div class="content-width-wide">
+      <div class="content-width-wide" style="text-align:center;">
         <h2 class="section-title" style="text-align: center; margin-top: 0;">A single workflow for the entire data life cycle.</h2>
 
-        <iframe style="text-align:center;" width="560" height="315" src="https://www.youtube.com/embed/2Glsf89WQ5w" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/2Glsf89WQ5w" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 
         <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
