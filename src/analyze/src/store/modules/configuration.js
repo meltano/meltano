@@ -78,6 +78,7 @@ const actions = {
       });
   },
 
+  // eslint-disable-next-line no-shadow
   getConnectionConfiguration({ commit, dispatch }, connection) {
     dispatch('getPluginConfiguration', { name: connection, type: 'connections' })
       .then((response) => {
@@ -133,10 +134,13 @@ const actions = {
       });
   },
 
-  savePluginConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload);
-    // TODO commit if values are properly saved, they are initially copied from
-    // the extractor's config and we'd have to update this
+  savePluginConfiguration({ commit, state }, configPayload) {
+    orchestrationsApi.savePluginConfiguration(configPayload)
+      .then((response) => {
+        const configuration = Object.assign({}, state.connectionInFocusConfiguration);
+        configuration.config = response.data;
+        commit('setConnectionInFocusConfiguration', configuration);
+      });
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
@@ -220,6 +224,10 @@ const mutations = {
       : {};
   },
 
+  setConnectionInFocusConfiguration(state, configuration) {
+    state.connectionInFocusConfiguration = configuration;
+  },
+
   setExtractorInFocusConfiguration(state, configuration) {
     state.extractorInFocusConfiguration = configuration;
   },
@@ -230,10 +238,6 @@ const mutations = {
 
   setLoaderInFocusConfiguration(state, configuration) {
     state.loaderInFocusConfiguration = configuration;
-  },
-
-  setConnectionInFocusConfiguration(state, configuration) {
-    state.connectionInFocusConfiguration = configuration;
   },
 
   setPipelineIsRunning(_, { pipeline, value }) {
