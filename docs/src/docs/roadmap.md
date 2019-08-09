@@ -1,5 +1,7 @@
 # Roadmap
 
+Meltano is an end-to-end data pipeline and dashboarding tool. We offer a free open source alternative to expensive business intelligence software with an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.
+
 Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) by the GitLab Data & Analytics team, and is now an internal startup within GitLab.
 
 ## Mission
