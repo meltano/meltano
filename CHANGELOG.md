@@ -20,7 +20,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#794](https://gitlab.com/meltano/meltano/issues/794) Update Snowflake fields to have descriptions and utilize tooltip UI
 * [#853](https://gitlab.com/meltano/meltano/issues/853) Improve UX for multi-attribute ordering (wider sub-UI for easier reading, clear drop target, and clearer drag animation for reenforcing sorting interaction)
 * [#735](https://gitlab.com/meltano/meltano/issues/735) Update Entities UI to only display entity selection "Configure" CTAs for installed (vs. previously all) extractors
+* [#548](https://gitlab.com/meltano/meltano/issues/548) Update Meltano mission, vision and path to v1 on [roadmap page](https://meltano.com/docs/roadmap.html) of Meltano.com
 * [#824](https://gitlab.com/meltano/meltano/issues/824) Update `meltano select` to use the unique `tap_stream_id` instead of the `stream` property for filtering streams. This adds support for taps with multiple streams with the same name, like, for example, the ones produced by `tap-postgres` when tables with the same name are defined in different schemas.
+* [#842](https://gitlab.com/meltano/meltano/issues/842) Collapse Deployment section in the docs to be under [Installation](http://localhost:8080/docs/installation.html)
 
 ### Fixes
 * [#855](https://gitlab.com/meltano/meltano/issues/855) Fix bug that duplicated a dashboard's `reportIds` that also prevented immediate UI feedback when reports were toggled (added or removed) from a dashboard via Analyze's "Add to Dashboard" dropdown

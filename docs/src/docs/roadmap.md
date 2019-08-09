@@ -1,14 +1,46 @@
 # Roadmap
 
-## Milestones
+Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) by the GitLab Data & Analytics team, and is now an internal startup within GitLab.
 
-You can track our progress through [ our milestones](https://gitlab.com/groups/meltano/-/milestones).
+## Mission
 
-## Release
+Meltano's mission aligns with the GitLab mission, which is "to change all creative work from read-only to read-write so that everyone can contribute."
 
-Meltano currently follows a weekly release schedule.
+When everyone can contribute, consumers become contributors and we greatly increase the rate of human progress.
+
+
+## Vision
+
+Our contribution to this progress comes through the democratization of data throughout organizations. We help our customers integrate a wide range of data sets to create a single source of truth.
+
+Meltano develops powerful open source software enabling the creation of data pipelines and dashboards. By offering an integrated end-to-end solution leveraging best-in-class open source solutions, we deliver tools that are affordable for any company and easy to use at all levels of technical know-how.
+
+## Strategy
+
+### Path to V1.0
+
+Meltano is approaching its v1 release. The criteria we have chosen for validating that we have achieved v1 are:
+
+- Users can successfully run Meltano end-to-end
+- Users can do everything from the UI (without having to run any commands on the command line)
+- Users have clear documentation, including indication of all limitations to existing taps and targets
+- Meltano core team is prepared to support backward compatibility to v1 (no breaking changes to architecture) until v2 version  
+
+### Beyond V1.0
+
+There is a lot more to build. A few key areas we know we need to invest more time after V1 are:
+- Data Analysis: adopt open source solution so we can bring in many more features without building from scratch
+- One-click deployment to popular hosting solutions (e.g. Amazon AMI marketplace, DigitalOcean droplets, etc.)
+- Creating and managing databases and warehouses
+- Ongoing inclusion of more pre-built taps, targets, and default transforms for popular data sources
+
+## Releases
+
+Meltano currently follows a weekly release schedule on Mondays.
 
 For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md). 
+
+You can track our weekly progress and forward-looking plans in greater detail through [ our milestones](https://gitlab.com/groups/meltano/-/milestones).
 
 ## MAUI
 
