@@ -92,11 +92,11 @@ export default {
 <template>
   <div>
     <slot name="top" />
-    <div
-      class="field is-horizontal"
-      v-for="setting in configSettings.settings"
-      :key="setting.name"
-    >
+      <div
+        class="field is-horizontal"
+        v-for="setting in configSettings.settings"
+        :key="setting.name"
+      >
       <div :class="['is-flex', 'field-label', labelClass]">
         <label class="label">{{
           setting.label || getCleanedLabel(setting.name)

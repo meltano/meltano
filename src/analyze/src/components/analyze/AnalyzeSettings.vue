@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
+import Vue from 'vue';
 import ConnectorLogo from '@/components/generic/ConnectorLogo';
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings';
 
@@ -9,6 +10,7 @@ export default {
   data() {
     return {
       connectionName: null,
+      isSavingConfiguration: false,
     };
   },
   components: {
@@ -43,15 +45,11 @@ export default {
         : null;
       return targetConnection || {};
     },
-    configSettings() {
-      return this.connection.config
-        ? Object.assign(this.connection.config, this.connectionInFocusConfiguration)
-        : this.connectionInFocusConfiguration;
-    },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin('connections', this.connectionName);
       const isInstalled = this.getIsPluginInstalled('connections', this.connectionName);
-      return !isInstalling && isInstalled;
+      const isValid = this.getHasValidConfigSettings(this.connectionInFocusConfiguration);
+      return !isInstalling && isInstalled && isValid;
     },
   },
   methods: {
@@ -68,10 +66,14 @@ export default {
       });
     },
     saveConfig() {
+      this.isSavingConfiguration = true;
       this.$store.dispatch('configuration/savePluginConfiguration', {
         type: 'connections',
         name: this.connection.name,
-        config: this.configSettings.config,
+        config: this.connectionInFocusConfiguration.config,
+      }).then(() => {
+        this.isSavingConfiguration = false;
+        Vue.toasted.global.success(`Connection Saved - ${this.connection.name}`);
       });
     },
   },
@@ -108,23 +110,43 @@ export default {
       </div>
     </div>
 
-    <div class="column" rel="container" v-if="configSettings">
+    <div class="column" rel="container" v-if="connectionInFocusConfiguration">
       <h2 class="title is-5">Configuration</h2>
       <ConnectorSettings v-if='connectionName'
                          class="box"
-                         :config-settings='configSettings'>
+                         :config-settings='connectionInFocusConfiguration'>
         <section class="field buttons is-right"
                  slot="bottom">
           <button class='button is-interactive-primary'
+                  :class='{ "is-loading": isSavingConfiguration }'
                   :disabled='!isSaveable'
                   @click.prevent="saveConfig">Save</button>
         </section>
       </ConnectorSettings>
       <div v-else
            class="box">
-        <p>
-          Please select a connector to configure.
-        </p>
+        <div class="content">
+          <article class="message is-info">
+            <div class="message-header">
+              <a class="button is-borderless has-background-transparent has-text-white">
+                <span class="icon">
+                  <font-awesome-icon icon="info-circle"></font-awesome-icon>
+                </span>
+                <span>Info</span>
+              </a>
+            </div>
+            <div class="message-body">
+              <p>This manual connection requirement will soon be automated :)</p>
+            </div>
+          </article>
+          <p>After successfully setting up a <router-link :to='{ name: "schedules" }'>data pipeline</router-link> Meltano has:</p>
+          <ol>
+            <li><em>Extracted</em> data <em>from</em> a database or API (data source)</li>
+            <li><em>Loaded</em> the extracted data <em>to</em> a database (warehouse)</li>
+            <li><em>Transformed</em> the loaded data <em>to</em> the warehouse under a special <em>analytics schema</em></li>
+          </ol>
+          <p>Now Meltano needs a connection to that <em>analytics schema</em> so Meltano Analyze can connect and query. Use the options to the left to setup the Analyze connection.</p>
+        </div>
       </div>
     </div>
   </section>

@@ -815,21 +815,19 @@ This step is required if you don't want to export everything from the source db.
 
 We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](./meltano-cli.html#select).
 
-In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB.
+In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
 
-For example, assume that you want to only export all the transformed tables in the `analytics` schema from the Carbon Intensity onboarding example in the Meltano documentation.
-
-The following will only keep the `carbon_intensity_entry`, `carbon_intensity_generationmix`, `carbon_intensity_region` and `carbon_intensity_summary` tables:
+For example, assume that you want to export the `users` table and selected attributes from the `issues` table that reside in the `tap_gitlab` schema in `warehouse` DB. The following `meltano select` commands will only export those two tables and data for the selected attributes:
 
 ```bash
-meltano select --exclude tap-postgres "!(carbon_intensity_*)" "*"
-meltano select tap-postgres "carbon_intensity_entry" "*"
-meltano select tap-postgres "carbon_intensity_generationmix" "*"
-meltano select tap-postgres "carbon_intensity_region" "*"
-meltano select tap-postgres "carbon_intensity_summary" "*"
+meltano select tap-postgres "warehouse-tap_gitlab-users" "*"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "project_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "author_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "assignee_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "title"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "state"
 ```
-
-In the case of `tap-postgres`, we also have to exclude everything else (first rule) as all Entities are automatically included in the export.
 
 Finally, you can use `meltano select <tap_name> --list` command to make sure that everything has been set correctly:
 
@@ -837,43 +835,38 @@ Finally, you can use `meltano select <tap_name> --list` command to make sure tha
 meltano select tap-postgres --list
 
 Enabled patterns:
-  carbon_intensity_region.*
-  carbon_intensity_generationmix.*
-  !(carbon_intensity_*).*
-  carbon_intensity_summary.*
-  carbon_intensity_entry.*
+  warehouse-tap_gitlab-issues.title
+  warehouse-tap_gitlab-issues.id
+  warehouse-tap_gitlab-issues.project_id
+  warehouse-tap_gitlab-issues.state
+  warehouse-tap_gitlab-issues.assignee_id
+  warehouse-tap_gitlab-issues.author_id
+  warehouse-tap_gitlab-users.*
 
 Selected properties:
-  [selected ] carbon_intensity_summary.shortname
-  [selected ] carbon_intensity_summary.to
-  [selected ] carbon_intensity_summary.forecast
-  [selected ] carbon_intensity_summary.from
-  [selected ] carbon_intensity_summary.fuel
-  [selected ] carbon_intensity_summary.perc
-  [selected ] carbon_intensity_entry.id
-  [selected ] carbon_intensity_entry.index
-  [selected ] carbon_intensity_entry.region_id
-  [selected ] carbon_intensity_entry.forecast
-  [selected ] carbon_intensity_entry.to
-  [selected ] carbon_intensity_entry.from
-  [selected ] carbon_intensity_region.shortname
-  [selected ] carbon_intensity_region.dnoregion
-  [selected ] carbon_intensity_region.id
-  [selected ] carbon_intensity_generationmix.id
-  [selected ] carbon_intensity_generationmix.fuel
-  [selected ] carbon_intensity_generationmix.perc
-  [selected ] carbon_intensity_generationmix.entry_id
+  [selected ] warehouse-tap_gitlab-issues.title
+  [automatic] warehouse-tap_gitlab-issues.id
+  [selected ] warehouse-tap_gitlab-issues.assignee_id
+  [selected ] warehouse-tap_gitlab-issues.state
+  [selected ] warehouse-tap_gitlab-issues.project_id
+  [selected ] warehouse-tap_gitlab-issues.author_id
+  [automatic] warehouse-tap_gitlab-users.id
+  [selected ] warehouse-tap_gitlab-users.username
+  [selected ] warehouse-tap_gitlab-users.avatar_url
+  [selected ] warehouse-tap_gitlab-users.web_url
+  [selected ] warehouse-tap_gitlab-users.name
+  [selected ] warehouse-tap_gitlab-users.state
 ```
 
 #### Figuring out the names of the streams
 
-In case you are not sure what the names of the streams are, you can use `meltano invoke` to run `tap-postgres` in isolation and generate a config file
+In case you are not sure what the names of the streams are, you can use `meltano invoke` to run `tap-postgres` in isolation and generate a catalog file:
 
 ```bash
 meltano invoke tap-postgres --discover > .meltano/run/tap-postgres/tap.properties.json
 ```
 
-You can then check that file and decide which Streams (tables in this case) should be exported and use their names when running `meltano select`.
+You can then check that file and decide which Streams (tables in this case) should be exported and use their `tap_stream_id` property when running `meltano select`.
 
 ### Run Meltano ELT
 
