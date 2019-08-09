@@ -16,14 +16,15 @@ Vue.use(FontAwesome);
 
 Vue.use(Router);
 
-Vue.use(Toasted, {
+const toastedOptions = {
   router,
   position: 'bottom-right',
   iconPack: 'fontawesome',
   className: 'notification',
   theme: 'outline',
   duration: 9000,
-});
+};
+Vue.use(Toasted, toastedOptions);
 
 Vue.use(Auth, {
   router,
@@ -57,6 +58,11 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
     },
   ],
 });
+// Register a Global success notification
+Vue.toasted.register('success', message => message, Object.assign(toastedOptions, {
+  duration: 3000,
+  type: 'success',
+}));
 
 // Axios config
 axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel';

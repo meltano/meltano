@@ -22,7 +22,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano transform [name of transformation] --warehouse [name of warehouse]`: \*\*
 - `meltano elt <extractor> <loader> [--dry] [--transform run]`: Extract, Load, and Transform the data.
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
-- `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attribute for a specific tap.
+- `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
 - `meltano config <plugin_name>`: Displays the plugin's configuration.
   - `meltano config <plugin_name> list`: List the available settings for the plugin.
