@@ -1,6 +1,6 @@
 <script>
-import _ from 'lodash';
-import Pill from './Pill';
+import _ from 'lodash'
+import Pill from './Pill'
 
 export default {
   name: 'RolePermissions',
@@ -10,64 +10,64 @@ export default {
       model: {
         permissionType: this.permission.type,
         role: null,
-        context: null,
-      },
-    };
+        context: null
+      }
+    }
   },
 
   components: {
-    'context-pill': Pill,
+    'context-pill': Pill
   },
 
   computed: {
     enabled() {
-      return !(_.isEmpty(this.model.role) ||
-               _.isEmpty(this.model.context));
-    },
+      return !(_.isEmpty(this.model.role) || _.isEmpty(this.model.context))
+    }
   },
 
   methods: {
     add() {
-      this.$emit('add', this.model);
-      this.model.context = null;
+      this.$emit('add', this.model)
+      this.model.context = null
     },
     remove(role, context) {
       this.$emit('remove', {
         permissionType: this.permission.type,
         role: role.name,
-        context,
-      });
-    },
-  },
-};
+        context
+      })
+    }
+  }
+}
 </script>
 
 <template>
   <div class="box" style="margin-bottom: 2em;">
-    <p class="is-italic">{{permission.name}}</p>
+    <p class="is-italic">{{ permission.name }}</p>
     <table class="table is-fullwidth">
-              <thead>
-                <tr>
-                  <th>Roles</th>
-            <th>Context</th>
+      <thead>
+        <tr>
+          <th>Roles</th>
+          <th>Context</th>
+        </tr>
+      </thead>
+      <tbody>
+        <template v-for="role in roles">
+          <tr :key="role.name">
+            <td>{{ role.name }}</td>
+            <td>
+              <div class="field is-grouped is-grouped-multiline">
+                <context-pill
+                  v-for="context in role.contexts"
+                  :key="context"
+                  :name="context"
+                  @delete="remove(role, context)"
+                />
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-                <template v-for="role in roles">
-                  <tr :key="role.name">
-                    <td>{{role.name}}</td>
-              <td>
-                      <div class="field is-grouped is-grouped-multiline">
-                        <context-pill v-for="context in role.contexts"
-                                :key="context"
-                                :name="context"
-                                @delete="remove(role, context)"
-                  />
-                </div>
-              </td>
-            </tr>
-          </template>
-        </tbody>
+        </template>
+      </tbody>
     </table>
     <label class="action">Assign filter</label>
     <div class="controls field is-grouped">
@@ -75,24 +75,23 @@ export default {
         <div class="select">
           <select v-model="model.role">
             <option :value="null">Select a role</option>
-            <option v-for="role in roles"
-                    :key="role.name"
-            >{{role.name}}</option>
+            <option v-for="role in roles" :key="role.name">{{
+              role.name
+            }}</option>
           </select>
         </div>
       </div>
       <div class="control is-expanded">
-        <input v-model="model.context"
-               type="text"
-               class="input"
-               placeholder="Design filter"
-               @keyup.enter="enabled && add"
+        <input
+          v-model="model.context"
+          type="text"
+          class="input"
+          placeholder="Design filter"
+          @keyup.enter="enabled && add"
         />
       </div>
       <div class="control">
-        <button @click="add"
-                class="button is-primary"
-                :disabled="!enabled">
+        <button @click="add" class="button is-primary" :disabled="!enabled">
           Add
         </button>
       </div>
@@ -101,10 +100,10 @@ export default {
 </template>
 
 <style scoped>
- .action {
-   font-weight: bold;
- }
- .controls {
-   margin-top: 0.5rem;
- }
+.action {
+  font-weight: bold;
+}
+.controls {
+  margin-top: 0.5rem;
+}
 </style>

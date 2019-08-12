@@ -1,116 +1,124 @@
 <script>
-import hyphenate from '@/filters/hyphenate';
+import hyphenate from '@/filters/hyphenate'
 
 export default {
   name: 'Dropdown',
   created() {
-    document.addEventListener('click', this.onDocumentClick);
+    document.addEventListener('click', this.onDocumentClick)
   },
   beforeDestroy() {
-    document.removeEventListener('click', this.onDocumentClick);
+    document.removeEventListener('click', this.onDocumentClick)
   },
   data() {
     return {
       isOpen: false,
-      lastDropdownOpen: null,
-    };
+      lastDropdownOpen: null
+    }
   },
   computed: {
     getHyphenatedLabel() {
-      return hyphenate(this.label, 'dropdown');
-    },
+      return hyphenate(this.label, 'dropdown')
+    }
   },
   filters: {
-    hyphenate,
+    hyphenate
   },
   props: {
     label: {
-      type: String,
+      type: String
     },
     buttonClasses: {
-      type: String,
+      type: String
     },
     menuClasses: {
-      type: String,
+      type: String
     },
     iconOpen: {
       type: String,
-      default: 'caret-down',
+      default: 'caret-down'
     },
     iconClose: {
       type: String,
-      default: 'caret-up',
+      default: 'caret-up'
     },
     disabled: {
       type: Boolean,
-      default: false,
+      default: false
     },
     isIconRemoved: {
       type: Boolean,
-      default: false,
+      default: false
     },
     isFullWidth: {
-      type: Boolean,
+      type: Boolean
     },
     isRightAligned: {
-      type: Boolean,
+      type: Boolean
     },
     isUp: {
-      type: Boolean,
-    },
+      type: Boolean
+    }
   },
   methods: {
     close() {
-      this.isOpen = false;
+      this.isOpen = false
     },
     open() {
-      this.isOpen = true;
+      this.isOpen = true
     },
     toggleDropdown() {
-      this.isOpen = !this.isOpen;
+      this.isOpen = !this.isOpen
     },
     onBubbleClose(e) {
       if ('dropdownAutoClose' in e.target.dataset) {
-        this.close();
+        this.close()
       }
     },
     onDocumentClick(el) {
-      const targetEl = el.target.closest('.dropdown');
-      const matchEl = this.$el.closest('.dropdown');
+      const targetEl = el.target.closest('.dropdown')
+      const matchEl = this.$el.closest('.dropdown')
       if (targetEl !== matchEl) {
-        this.close();
+        this.close()
       }
-    },
-  },
-};
+    }
+  }
+}
 </script>
 
 <template>
-  <div class="dropdown"
-        :class="{
-          'is-active': isOpen,
-          'is-right': isRightAligned,
-          'is-fullwidth': isFullWidth,
-          'is-up': isUp,
-        }"
-        @click='onBubbleClose'>
+  <div
+    class="dropdown"
+    :class="{
+      'is-active': isOpen,
+      'is-right': isRightAligned,
+      'is-fullwidth': isFullWidth,
+      'is-up': isUp
+    }"
+    @click="onBubbleClose"
+  >
     <div class="dropdown-trigger">
-      <button class="button"
-              :class="buttonClasses"
-              :disabled="disabled"
-              :aria-controls="getHyphenatedLabel"
-              aria-haspopup="true"
-              @click="toggleDropdown">
-        <span v-if="label">{{label}}</span>
-        <span v-if='!isIconRemoved' class="icon is-small">
-          <font-awesome-icon :icon="isOpen ? iconClose : iconOpen"></font-awesome-icon>
+      <button
+        class="button"
+        :class="buttonClasses"
+        :disabled="disabled"
+        :aria-controls="getHyphenatedLabel"
+        aria-haspopup="true"
+        @click="toggleDropdown"
+      >
+        <span v-if="label">{{ label }}</span>
+        <span v-if="!isIconRemoved" class="icon is-small">
+          <font-awesome-icon
+            :icon="isOpen ? iconClose : iconOpen"
+          ></font-awesome-icon>
         </span>
       </button>
     </div>
-    <div class="dropdown-menu"
-         :class="menuClasses"
-         :id="getHyphenatedLabel"
-         role="menu">
+    <div
+      class="dropdown-menu"
+      :class="menuClasses"
+      :id="getHyphenatedLabel"
+      role="menu"
+    >
       <slot></slot>
     </div>
   </div>
@@ -121,13 +129,13 @@ export default {
   width: 100%;
 
   .dropdown-trigger {
-    width: 100%
+    width: 100%;
   }
 
   .button {
     display: flex;
     width: 100%;
-    justify-content: space-between
+    justify-content: space-between;
   }
 }
 .dropdown-menu {

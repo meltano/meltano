@@ -9,5 +9,5 @@
 
 module.exports = {
   appUrl: process.env.MELTANO_ANALYZE_APP_URL,
-  airflowUrl: process.env.AIRFLOW_URL,
-};
+  airflowUrl: process.env.AIRFLOW_URL
+}

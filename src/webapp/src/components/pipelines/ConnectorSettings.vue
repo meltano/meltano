@@ -1,23 +1,23 @@
 <script>
-import { mapGetters } from 'vuex';
-import InputDateIso8601 from '@/components/generic/InputDateIso8601';
-import TooltipCircle from '@/components/generic/TooltipCircle';
+import { mapGetters } from 'vuex'
+import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import TooltipCircle from '@/components/generic/TooltipCircle'
 
-import utils from '@/utils/utils';
+import utils from '@/utils/utils'
 
 export default {
   name: 'ConnectorSettings',
   components: {
     InputDateIso8601,
-    TooltipCircle,
+    TooltipCircle
   },
   props: {
     fieldClass: { type: String },
     configSettings: {
       type: Object,
       required: true,
-      default: () => {},
-    },
+      default: () => {}
+    }
   },
   watch: {
     configSettings: {
@@ -27,76 +27,77 @@ export default {
          * This is currently Loader-Snowflake specific and we'll need a more robust solution
          * when/if we add UX helpers like this for more connectors
          */
-        const accountInput = newVal.config.account;
+        const accountInput = newVal.config.account
         if (accountInput) {
-          const parsedAccountId = utils.snowflakeAccountParser(accountInput);
-          this.configSettings.config.account = parsedAccountId || newVal.config.account;
+          const parsedAccountId = utils.snowflakeAccountParser(accountInput)
+          this.configSettings.config.account =
+            parsedAccountId || newVal.config.account
         }
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   computed: {
     ...mapGetters('configuration', ['getIsConfigSettingValid']),
     getCleanedLabel() {
-      return value => utils.titleCase(utils.underscoreToSpace(value));
+      return value => utils.titleCase(utils.underscoreToSpace(value))
     },
     getIsOfKindBoolean() {
-      return kind => kind === 'boolean';
+      return kind => kind === 'boolean'
     },
     getIsOfKindDate() {
-      return kind => kind === 'date_iso8601';
+      return kind => kind === 'date_iso8601'
     },
     getIsOfKindOptions() {
-      return kind => kind === 'options';
+      return kind => kind === 'options'
     },
     getIsOfKindTextBased() {
       return kind =>
-        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind);
+        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind)
     },
     getTextBasedInputType() {
-      let type = 'text';
-      return (setting) => {
+      let type = 'text'
+      return setting => {
         switch (setting.kind) {
           case 'password':
-            type = 'password';
-            break;
+            type = 'password'
+            break
           case 'email':
-            type = 'email';
-            break;
+            type = 'email'
+            break
           default:
-            type = utils.inferInputType(setting.name, 'text');
-            break;
+            type = utils.inferInputType(setting.name, 'text')
+            break
         }
-        return type;
-      };
+        return type
+      }
     },
     labelClass() {
-      return this.fieldClass || 'is-normal';
+      return this.fieldClass || 'is-normal'
     },
     successClass() {
       return setting =>
-        (this.getIsConfigSettingValid(setting)
+        this.getIsConfigSettingValid(setting)
           ? 'is-success has-text-success'
-          : null);
-    },
+          : null
+    }
   },
   methods: {
     findLabel(setting) {
-      return setting.options.find(item => item.value === setting.value).label;
-    },
-  },
-};
+      return setting.options.find(item => item.value === setting.value).label
+    }
+  }
+}
 </script>
 
 <template>
   <div>
     <slot name="top" />
-      <div
-        class="field is-horizontal"
-        v-for="setting in configSettings.settings"
-        :key="setting.name"
-      >
+    <div
+      class="field is-horizontal"
+      v-for="setting in configSettings.settings"
+      :key="setting.name"
+    >
       <div :class="['is-flex', 'field-label', labelClass]">
         <label class="label">{{
           setting.label || getCleanedLabel(setting.name)
@@ -128,12 +129,17 @@ export default {
             />
 
             <!-- Dropdown -->
-            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small is-fullwidth">
+            <div
+              v-else-if="getIsOfKindOptions(setting.kind)"
+              class="select is-small is-fullwidth"
+            >
               <select
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
-                :id="`${setting.name}-select-menu`">
-                <option v-for="(option, index) in setting.options"
+                :id="`${setting.name}-select-menu`"
+              >
+                <option
+                  v-for="(option, index) in setting.options"
                   :key="`${option.label}-${index}`"
                   :value="option.value"
                 >
@@ -166,7 +172,7 @@ export default {
 </template>
 
 <style lang="scss">
-.label-tooltip  {
+.label-tooltip {
   margin-left: 0.25em;
 }
 </style>

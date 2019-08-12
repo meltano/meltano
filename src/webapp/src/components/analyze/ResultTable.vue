@@ -1,14 +1,14 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex'
 
-import Dropdown from '@/components/generic/Dropdown';
-import QuerySortBy from '@/components/analyze/QuerySortBy';
+import Dropdown from '@/components/generic/Dropdown'
+import QuerySortBy from '@/components/analyze/QuerySortBy'
 
 export default {
   name: 'ResultTable',
   components: {
     Dropdown,
-    QuerySortBy,
+    QuerySortBy
   },
   computed: {
     ...mapState('designs', [
@@ -16,70 +16,82 @@ export default {
       'queryAttributes',
       'order',
       'results',
-      'keys',
+      'keys'
     ]),
     ...mapGetters('designs', [
       'hasResults',
       'getFormattedValue',
-      'isColumnSelectedAggregate',
+      'isColumnSelectedAggregate'
     ]),
     getAssignedOrderable() {
-      return attributeName => this.order.assigned.find(orderable => orderable.attributeName === attributeName);
+      return attributeName =>
+        this.order.assigned.find(
+          orderable => orderable.attributeName === attributeName
+        )
     },
     getIsOrderableAssigned() {
-      return attributeName => Boolean(this.getAssignedOrderable(attributeName));
+      return attributeName => Boolean(this.getAssignedOrderable(attributeName))
     },
     getOrderables() {
-      return this.order.unassigned.concat(this.order.assigned);
+      return this.order.unassigned.concat(this.order.assigned)
     },
     getOrderableStatusLabel() {
-      return (queryAttribute) => {
-        const match = this.getAssignedOrderable(queryAttribute.attributeName);
-        const idx = this.order.assigned.indexOf(match);
-        return match ? `${idx + 1}. ${match.direction}` : '';
-      };
-    },
+      return queryAttribute => {
+        const match = this.getAssignedOrderable(queryAttribute.attributeName)
+        const idx = this.order.assigned.indexOf(match)
+        return match ? `${idx + 1}. ${match.direction}` : ''
+      }
+    }
   },
   methods: {
-    ...mapActions('designs', [
-      'updateSortAttribute',
-    ]),
-  },
-};
+    ...mapActions('designs', ['updateSortAttribute'])
+  }
+}
 </script>
 
 <template>
   <div class="result-data">
-
     <div v-if="hasResults">
-
-      <table class="table
+      <table
+        class="table
           is-bordered
           is-striped
           is-narrow
           is-hoverable
           is-fullwidth
-          is-size-7">
+          is-size-7"
+      >
         <thead>
           <tr>
-            <th v-for="queryAttribute in queryAttributes"
-                :key="`${queryAttribute.sourceName}-${queryAttribute.attributeName}`"
-              >
+            <th
+              v-for="queryAttribute in queryAttributes"
+              :key="
+                `${queryAttribute.sourceName}-${queryAttribute.attributeName}`
+              "
+            >
               <div class="is-flex">
-                <div class='sort-header' @click='updateSortAttribute(queryAttribute)'>
-                  <span>{{queryAttribute.attributeLabel}}</span>
+                <div
+                  class="sort-header"
+                  @click="updateSortAttribute(queryAttribute)"
+                >
+                  <span>{{ queryAttribute.attributeLabel }}</span>
                 </div>
                 <Dropdown
                   :label="getOrderableStatusLabel(queryAttribute)"
-                  :button-classes="`is-small ${getIsOrderableAssigned(queryAttribute.attributeName)
-                    ? 'has-text-interactive-secondary'
-                    : ''}`"
+                  :button-classes="
+                    `is-small ${
+                      getIsOrderableAssigned(queryAttribute.attributeName)
+                        ? 'has-text-interactive-secondary'
+                        : ''
+                    }`
+                  "
                   :menu-classes="'dropdown-menu-300'"
-                  icon-open='sort'
-                  icon-close='caret-down'
+                  icon-open="sort"
+                  icon-close="caret-down"
                   is-right-aligned
                   is-up
-                  ref='order-dropdown'>
+                  ref="order-dropdown"
+                >
                   <div class="dropdown-content is-unselectable">
                     <QuerySortBy></QuerySortBy>
                   </div>
@@ -93,10 +105,15 @@ export default {
           <tr v-for="(result, i) in results" :key="i">
             <template v-for="key in keys">
               <td :key="key" v-if="isColumnSelectedAggregate(key)">
-                {{getFormattedValue(resultAggregates[key]['value_format'], result[key])}}
+                {{
+                  getFormattedValue(
+                    resultAggregates[key]['value_format'],
+                    result[key]
+                  )
+                }}
               </td>
               <td :key="key" v-else>
-                {{result[key]}}
+                {{ result[key] }}
               </td>
             </template>
           </tr>
@@ -107,7 +124,6 @@ export default {
     <div class="notification is-italic" v-else>
       No results
     </div>
-
   </div>
 </template>
 
@@ -127,21 +143,21 @@ export default {
 }
 .sorted {
   &::after {
-    content: "asc";
+    content: 'asc';
     position: relative;
     width: 22px;
     height: 20px;
     float: right;
     font-size: 9px;
     padding: 2px;
-    color: #AAA;
-    border: 1px solid #AAA;
+    color: #aaa;
+    border: 1px solid #aaa;
     border-radius: 4px;
     margin-top: 2px;
   }
   &.is-desc {
     &::after {
-      content: "desc";
+      content: 'desc';
       width: 28px;
     }
   }

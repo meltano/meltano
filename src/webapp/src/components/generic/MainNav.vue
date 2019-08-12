@@ -1,101 +1,107 @@
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
 
-import utils from '@/utils/utils';
+import utils from '@/utils/utils'
 
-import Logo from './Logo';
+import Logo from './Logo'
 
 export default {
   name: 'MainNav',
   components: {
-    Logo,
+    Logo
   },
   watch: {
     $route() {
       if (this.isMobileMenuOpen) {
-        this.closeMobileMenu();
+        this.closeMobileMenu()
       }
-    },
+    }
   },
   data() {
     return {
-      isMobileMenuOpen: false,
-    };
+      isMobileMenuOpen: false
+    }
   },
   computed: {
-    ...mapGetters('configuration', [
-      'getRunningPipelineJobsCount',
-    ]),
+    ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
     getIsSubRouteOf() {
-      return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path);
-    },
+      return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
+    }
   },
   methods: {
     goToSchedules() {
-      this.$router.push({ name: 'schedules' });
+      this.$router.push({ name: 'schedules' })
     },
     mobileMenuClicked() {
-      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+      this.isMobileMenuOpen = !this.isMobileMenuOpen
     },
     closeMobileMenu() {
-      this.isMobileMenuOpen = false;
-    },
-  },
-};
+      this.isMobileMenuOpen = false
+    }
+  }
+}
 </script>
 
 <template>
   <nav class="navbar is-transparent">
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
-        <Logo/>
+        <Logo />
       </div>
-      <div class="navbar-burger burger"
-           :class="{'is-active': isMobileMenuOpen}"
-           data-target="meltnavbar-transparent"
-           @click="mobileMenuClicked">
+      <div
+        class="navbar-burger burger"
+        :class="{ 'is-active': isMobileMenuOpen }"
+        data-target="meltnavbar-transparent"
+        @click="mobileMenuClicked"
+      >
         <span></span>
         <span></span>
         <span></span>
       </div>
     </div>
 
-    <div id="meltnavbar-transparent"
-         class="navbar-menu"
-         :class="{'is-active': isMobileMenuOpen}">
+    <div
+      id="meltnavbar-transparent"
+      class="navbar-menu"
+      :class="{ 'is-active': isMobileMenuOpen }"
+    >
       <div class="navbar-start">
-
         <router-link
-          :to="{name: 'dataSetup'}"
-          :class="{'router-link-active': getIsSubRouteOf('/pipelines')}"
-          class="navbar-item navbar-child has-text-weight-semibold">
+          :to="{ name: 'dataSetup' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
           Pipelines
           <span
-            v-if='getRunningPipelineJobsCount > 0'
+            v-if="getRunningPipelineJobsCount > 0"
             class="tag tag-running-pipelines is-rounded is-info"
-            @click.prevent="goToSchedules">
-            {{getRunningPipelineJobsCount}}
+            @click.prevent="goToSchedules"
+          >
+            {{ getRunningPipelineJobsCount }}
           </span>
         </router-link>
 
         <router-link
-          :to="{name: 'orchestration'}"
-          :class="{'router-link-active': getIsSubRouteOf('/orchestration')}"
-          class="navbar-item navbar-child has-text-weight-semibold">
+          :to="{ name: 'orchestration' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/orchestration') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
           Orchestration
         </router-link>
 
         <router-link
-          :to="{name: 'analyze'}"
-          :class="{'router-link-active': getIsSubRouteOf('/analyze')}"
-          class="navbar-item navbar-child has-text-weight-semibold">
+          :to="{ name: 'analyze' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
           Analyze
         </router-link>
 
         <router-link
-          :to="{name: 'dashboards'}"
-          :class="{'router-link-active': getIsSubRouteOf('/dashboards')}"
-          class="navbar-item navbar-child has-text-weight-semibold">
+          :to="{ name: 'dashboards' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
           Dashboards
         </router-link>
       </div>
@@ -103,12 +109,14 @@ export default {
       <div class="navbar-end">
         <div class="navbar-item navbar-child">
           <a
-            class='button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left'
-            data-tooltip='This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues.'>
-          <font-awesome-icon
-            :icon="'user'"
-            :style="{ color: '#0F3B66' }"
-            title="Login currently disabled"></font-awesome-icon>
+            class="button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
+            data-tooltip="This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues."
+          >
+            <font-awesome-icon
+              :icon="'user'"
+              :style="{ color: '#0F3B66' }"
+              title="Login currently disabled"
+            ></font-awesome-icon>
           </a>
         </div>
       </div>
@@ -164,6 +172,6 @@ export default {
   padding-left: 1.5rem;
 }
 .tag-running-pipelines {
-  margin-left: .5rem;
+  margin-left: 0.5rem;
 }
 </style>

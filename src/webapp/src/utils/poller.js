@@ -1,31 +1,31 @@
 function JobPoller(pollFn, pollFnMetadata, delay) {
-  let poller;
+  let poller
 
   function getMetadata() {
-    return pollFnMetadata;
+    return pollFnMetadata
   }
 
   function poll() {
-    pollFn(pollFnMetadata);
+    pollFn(pollFnMetadata)
   }
 
   function dispose() {
-    clearInterval(poller);
+    clearInterval(poller)
   }
 
   function init() {
-    poller = setInterval(poll, delay);
+    poller = setInterval(poll, delay)
   }
 
   return {
     init,
     getMetadata,
-    dispose,
-  };
+    dispose
+  }
 }
 
 export default {
   create(pollFn, pollFnMetadata, delay) {
-    return new JobPoller(pollFn, pollFnMetadata, delay);
-  },
-};
+    return new JobPoller(pollFn, pollFnMetadata, delay)
+  }
+}

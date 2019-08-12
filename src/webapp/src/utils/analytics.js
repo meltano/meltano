@@ -8,4 +8,4 @@ document.write(`
 
     gtag('config', 'UA-132758957-2');
   </script>
-`);
+`)

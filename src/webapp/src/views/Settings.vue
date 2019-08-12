@@ -1,54 +1,57 @@
 <script>
-import RouterViewLayout from '@/views/RouterViewLayout';
+import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Settings',
   components: {
-    RouterViewLayout,
+    RouterViewLayout
   },
   data() {
     return {
       categories: [
         {
           name: 'Database',
-          pages: [{
-            title: 'Database',
-            href: '/settings/database',
-          }],
+          pages: [
+            {
+              title: 'Database',
+              href: '/settings/database'
+            }
+          ]
         },
         {
           name: 'Access control',
-          pages: [{
-            title: 'Roles',
-            href: '/settings/roles',
-          }],
+          pages: [
+            {
+              title: 'Roles',
+              href: '/settings/roles'
+            }
+          ]
         },
         {
           name: 'Connectors',
           pages: [
             {
               title: 'Extractors',
-              href: '/settings/connectors#extractors',
+              href: '/settings/connectors#extractors'
             },
             {
               title: 'Loaders',
-              href: '/settings/connectors#loaders',
-            },
-          ],
-        },
-      ],
-    };
-  },
-};
+              href: '/settings/connectors#loaders'
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
 </script>
 
 <template>
   <router-view-layout>
-
     <div class="container view-header">
       <div class="content">
         <div class="level">
-          <h1 class='is-marginless'>Settings</h1>
+          <h1 class="is-marginless">Settings</h1>
         </div>
       </div>
     </div>
@@ -58,14 +61,10 @@ export default {
         <div class="columns is-gapless">
           <div class="column is-one-quarter">
             <ul class="menu-list">
-              <router-link
-                tag="li"
-                :to="{name:'database'}">
+              <router-link tag="li" :to="{ name: 'database' }">
                 <a>Database</a>
               </router-link>
-              <router-link
-                tag="li"
-                :to="{name:'connectors'}">
+              <router-link tag="li" :to="{ name: 'connectors' }">
                 <a>Connectors</a>
               </router-link>
             </ul>
@@ -77,9 +76,7 @@ export default {
         </div>
       </section>
     </div>
-
   </router-view-layout>
 </template>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

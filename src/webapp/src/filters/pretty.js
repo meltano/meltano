@@ -1,5 +1,5 @@
-import utils from '@/utils/utils';
+import utils from '@/utils/utils'
 
 export default function pretty(value) {
-  return utils.pretty(value);
+  return utils.pretty(value)
 }
