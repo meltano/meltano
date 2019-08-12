@@ -1,23 +1,23 @@
-import Router from 'vue-router'
+import Router from 'vue-router';
 
-import AnalyzeModels from '@/components/analyze/AnalyzeModels'
-import AnalyzeSettings from '@/components/analyze/AnalyzeSettings'
-import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
-import Design from '@/components/analyze/Design'
-import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal'
-import Entities from '@/components/pipelines/Entities'
-import Extractors from '@/components/pipelines/Extractors'
-import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
-import Loaders from '@/components/pipelines/Loaders'
-import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
-import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
+import AnalyzeModels from '@/components/analyze/AnalyzeModels';
+import AnalyzeSettings from '@/components/analyze/AnalyzeSettings';
+import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal';
+import Design from '@/components/analyze/Design';
+import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal';
+import Entities from '@/components/pipelines/Entities';
+import Extractors from '@/components/pipelines/Extractors';
+import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal';
+import Loaders from '@/components/pipelines/Loaders';
+import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal';
+import PipelineSchedules from '@/components/pipelines/PipelineSchedules';
 
-import Dashboards from '@/views/Dashboards'
-import Analyze from '@/views/Analyze'
-import NotFound from '@/views/NotFound'
-import Orchestration from '@/views/Orchestration'
-import Pipelines from '@/views/Pipelines'
-import Repo from '@/views/Repo'
+import Dashboards from '@/views/Dashboards';
+import Analyze from '@/views/Analyze';
+import NotFound from '@/views/NotFound';
+import Orchestration from '@/views/Orchestration';
+import Pipelines from '@/views/Pipelines';
+import Repo from '@/views/Repo';
 
 const router = new Router({
   mode: 'history',
@@ -25,11 +25,11 @@ const router = new Router({
     {
       path: '*',
       name: '404',
-      component: NotFound
+      component: NotFound,
     },
     {
       path: '/',
-      redirect: '/pipelines'
+      redirect: '/pipelines',
     },
     {
       path: '/pipelines/',
@@ -41,97 +41,97 @@ const router = new Router({
           path: 'extractors',
           name: 'extractors',
           components: {
-            default: Extractors
+            default: Extractors,
           },
           meta: {
-            isModal: false
-          }
+            isModal: false,
+          },
         },
         {
           path: 'extractors/:extractor',
           name: 'extractorSettings',
           components: {
             default: Extractors,
-            extractorSettings: ExtractorSettingsModal
+            extractorSettings: ExtractorSettingsModal,
           },
           meta: {
-            isModal: true
-          }
+            isModal: true,
+          },
         },
         {
           path: 'entities',
           name: 'entities',
           components: {
-            default: Entities
+            default: Entities,
           },
           meta: {
-            isModal: false
-          }
+            isModal: false,
+          },
         },
         {
           path: 'entities/:extractor',
           name: 'extractorEntities',
           components: {
             default: Entities,
-            extractorEntities: EntitiesSelectorModal
+            extractorEntities: EntitiesSelectorModal,
           },
           meta: {
-            isModal: true
-          }
+            isModal: true,
+          },
         },
         {
           path: 'loaders',
           name: 'loaders',
           components: {
-            default: Loaders
+            default: Loaders,
           },
           meta: {
-            isModal: false
-          }
+            isModal: false,
+          },
         },
         {
           path: 'loaders/:loader',
           name: 'loaderSettings',
           components: {
             default: Loaders,
-            loaderSettings: LoaderSettingsModal
+            loaderSettings: LoaderSettingsModal,
           },
           meta: {
-            isModal: true
-          }
+            isModal: true,
+          },
         },
         {
           path: 'schedules',
           name: 'schedules',
           components: {
-            default: PipelineSchedules
+            default: PipelineSchedules,
           },
           meta: {
-            isModal: false
-          }
+            isModal: false,
+          },
         },
         {
           path: 'schedules/create',
           name: 'createSchedule',
           components: {
             default: PipelineSchedules,
-            createSchedule: CreateScheduleModal
+            createSchedule: CreateScheduleModal,
           },
           meta: {
-            isModal: true
-          }
-        }
-      ]
+            isModal: true,
+          },
+        },
+      ],
     },
     {
       path: '/orchestration/',
       name: 'orchestration',
-      component: Orchestration
+      component: Orchestration,
     },
     {
       path: '/files/',
       name: 'projectFiles',
-      component: Repo
+      component: Repo,
     },
     {
       path: '/analyze/',
@@ -142,36 +142,36 @@ const router = new Router({
         {
           path: 'models',
           name: 'analyzeModels',
-          component: AnalyzeModels
+          component: AnalyzeModels,
         },
         {
           path: 'settings',
           name: 'analyzeSettings',
-          component: AnalyzeSettings
+          component: AnalyzeSettings,
         },
         {
           path: '/analyze/:model/:design',
           name: 'analyzeDesign',
-          component: Design
+          component: Design,
         },
         {
           path: '/analyze/:model/:design/reports/report/:slug',
           name: 'report',
-          component: Design
-        }
-      ]
+          component: Design,
+        },
+      ],
     },
     {
       path: '/dashboards/',
       name: 'dashboards',
-      component: Dashboards
+      component: Dashboards,
     },
     {
       path: '/dashboards/dashboard/:slug',
       name: 'dashboard',
-      component: Dashboards
-    }
-  ]
-})
+      component: Dashboards,
+    },
+  ],
+});
 
-export default router
+export default router;

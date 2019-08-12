@@ -1,6 +1,6 @@
 <script>
-import _ from 'lodash'
-import Pill from './Pill'
+import _ from 'lodash';
+import Pill from './Pill';
 
 export default {
   name: 'RoleMember',
@@ -9,21 +9,22 @@ export default {
     return {
       model: {
         user: null,
-        role: null
-      }
-    }
+        role: null,
+      },
+    };
   },
 
   computed: {
     enabled() {
-      return !(_.isEmpty(this.model.role) || _.isEmpty(this.model.user))
-    }
+      return !(_.isEmpty(this.model.role) ||
+               _.isEmpty(this.model.user));
+    },
   },
 
   components: {
-    'role-pill': Pill
-  }
-}
+    'role-pill': Pill,
+  },
+};
 </script>
 
 <template>
@@ -41,11 +42,10 @@ export default {
             <td>{{ user.username }}</td>
             <td>
               <div class="field is-grouped is-grouped-multiline">
-                <role-pill
-                  v-for="role in user.roles"
-                  @delete="$emit('remove', { role, user: user.username })"
-                  :key="role"
-                  :name="role"
+                <role-pill v-for="role in user.roles"
+                           @delete="$emit('remove', { role, user: user.username })"
+                           :key="role"
+                           :name="role"
                 />
               </div>
             </td>
@@ -59,9 +59,9 @@ export default {
         <div class="select">
           <select v-model="model.user">
             <option :value="null">Select a user</option>
-            <option v-for="user in users" :key="user.username">{{
-              user.username
-            }}</option>
+            <option v-for="user in users"
+                    :key="user.username"
+            >{{user.username}}</option>
           </select>
         </div>
       </div>
@@ -69,16 +69,16 @@ export default {
         <div class="select">
           <select v-model="model.role">
             <option :value="null">Select a role</option>
-            <option v-for="role in roles" :key="role">{{ role }}</option>
+            <option v-for="role in roles"
+                    :key="role"
+            >{{role}}</option>
           </select>
         </div>
       </div>
       <div class="control">
-        <button
-          class="button is-primary"
-          @click="$emit('add', model)"
-          :disabled="!enabled"
-        >
+        <button class="button is-primary"
+                @click="$emit('add', model)"
+                :disabled="!enabled">
           Assign
         </button>
       </div>
@@ -87,10 +87,10 @@ export default {
 </template>
 
 <style scoped>
-.action {
-  font-weight: bold;
-}
-.controls {
-  margin-top: 0.5rem;
-}
+ .action {
+   font-weight: bold;
+ }
+ .controls {
+   margin-top: 0.5rem;
+ }
 </style>

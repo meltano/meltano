@@ -3,37 +3,35 @@ export default {
   name: 'NewDashboardModal',
   data() {
     return {
-      saveDashboardSettings: { name: null, description: null }
-    }
+      saveDashboardSettings: { name: null, description: null },
+    };
   },
   methods: {
     close() {
-      this.$emit('close')
+      this.$emit('close');
     },
     saveDashboard() {
-      let action = null
+      let action = null;
       if (this.report) {
         action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
           data: this.saveDashboardSettings,
-          report: this.report
-        })
+          report: this.report,
+        });
       } else {
-        action = this.$store.dispatch(
-          'dashboards/saveDashboard',
-          this.saveDashboardSettings
-        )
+        action = this.$store.dispatch('dashboards/saveDashboard', this.saveDashboardSettings);
       }
 
-      action.then(this.close)
-    }
+      action.then(this.close);
+    },
   },
   props: {
-    report: Object
-  }
-}
+    report: Object,
+  },
+};
 </script>
 
 <template>
+
   <div class="modal is-active">
     <div class="modal-background" @click="close"></div>
     <div class="modal-card">
@@ -42,26 +40,22 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
-        <div>
-          <div class="field">
+          <div>
+            <div class="field">
             <label class="label">Name</label>
             <div class="control">
-              <input
-                class="input"
-                type="text"
-                placeholder="Name your dashboard"
-                v-model="saveDashboardSettings.name"
-              />
+              <input class="input"
+                      type="text"
+                      placeholder="Name your dashboard"
+                      v-model="saveDashboardSettings.name">
             </div>
           </div>
           <div class="field">
             <label class="label">Description</label>
             <div class="control">
-              <textarea
-                class="textarea"
-                placeholder="Describe your dashboard for easier reference later"
-                v-model="saveDashboardSettings.description"
-              ></textarea>
+              <textarea class="textarea"
+                        placeholder="Describe your dashboard for easier reference later"
+                        v-model="saveDashboardSettings.description"></textarea>
             </div>
           </div>
         </div>
@@ -71,13 +65,12 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!saveDashboardSettings.name"
-          @click="saveDashboard"
-        >
-          Create
-        </button>
+          @click="saveDashboard">Create</button>
       </footer>
     </div>
   </div>
+
 </template>
 
-<style></style>
+<style>
+</style>

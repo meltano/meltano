@@ -10,9 +10,7 @@ html {
   background-color: $app-background-color;
 }
 
-@include tablet() {
-   // Favor RouterViewLayout's control of scrollable columns unless on mobile
-  html {
-    overflow-y: hidden;
-  }
+code {
+  white-space: pre;
+  word-wrap: break-word;
 }

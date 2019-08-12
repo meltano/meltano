@@ -1,5 +1,5 @@
 <script>
-import { BarChart, LineChart, AreaChart, ScatterChart } from './charts'
+import { BarChart, LineChart, AreaChart, ScatterChart } from './charts';
 
 export default {
   name: 'Bar',
@@ -7,21 +7,24 @@ export default {
     BarChart,
     LineChart,
     AreaChart,
-    ScatterChart
+    ScatterChart,
   },
-  props: ['chartType', 'results', 'resultAggregates']
-}
+  props: [
+    'chartType',
+    'results',
+    'resultAggregates',
+  ],
+};
 </script>
 
 <template>
   <div v-show="results.length">
-    <component
-      :is="chartType"
-      :chart-type="chartType"
-      :results="results"
-      :result-aggregates="resultAggregates"
-    ></component>
+    <component :is="chartType"
+                :chart-type='chartType'
+                :results='results'
+                :result-aggregates='resultAggregates'></component>
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

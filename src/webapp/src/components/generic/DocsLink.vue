@@ -1,5 +1,5 @@
 <script>
-import utils from '@/utils/utils'
+import utils from '@/utils/utils';
 
 export default {
   name: 'DocsLink',
@@ -8,22 +8,23 @@ export default {
   data() {
     return {
       linkPage: `/${this.page}`,
-      linkTarget: this.target || '_blank'
-    }
+      linkTarget: this.target || '_blank',
+    };
   },
 
   computed: {
     url() {
-      return utils.docsUrl(this.linkPage, this.fragment)
-    }
-  }
-}
+      return utils.docsUrl(this.linkPage, this.fragment);
+    },
+  },
+};
 </script>
 
 <template>
   <a :href="url" :target="linkTarget">
-    <slot />
+    <slot/>
   </a>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

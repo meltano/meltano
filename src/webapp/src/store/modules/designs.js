@@ -1,15 +1,17 @@
-import SSF from 'ssf'
-import Vue from 'vue'
-import sqlFormatter from 'sql-formatter'
-import utils from '@/utils/utils'
-import designApi from '../../api/design'
-import reportsApi from '../../api/reports'
-import sqlApi from '../../api/sql'
+import SSF from 'ssf';
+import Vue from 'vue';
+import sqlFormatter from 'sql-formatter';
+import lodash from 'lodash';
 
-const state = {
+import utils from '@/utils/utils';
+import designApi from '../../api/design';
+import reportsApi from '../../api/reports';
+import sqlApi from '../../api/sql';
+
+const defaultState = utils.deepFreeze({
   activeReport: {},
   design: {
-    related_table: {}
+    relatedTable: {},
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -17,629 +19,756 @@ const state = {
   currentDesign: '',
   results: [],
   keys: [],
-  columnHeaders: [],
-  columnNames: [],
+  queryAttributes: [],
   resultAggregates: {},
   loadingQuery: false,
-  currentDataTab: 'sql',
   currentSQL: '',
-  filtersOpen: false,
-  dataOpen: true,
-  chartsOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
-  limit: 3,
-  distincts: {},
-  sortColumn: null,
-  sortDesc: false,
-  dialect: null
-}
+  limit: 50,
+  dialect: null,
+  filterOptions: [],
+  filters: {
+    columns: [],
+    aggregates: [],
+  },
+  order: {
+    assigned: [],
+    unassigned: [],
+  },
+});
 
 const helpers = {
-  getQueryPayloadFromDesign() {
-    const selected = x => x.selected
-    const namesOfSelected = arr => {
+  getFilterTypePlural(filterType) {
+    return `${filterType}s`;
+  },
+  getQueryPayloadFromDesign(state) {
+    // Inline fn helpers
+    const selected = x => x.selected;
+    const namesOfSelected = (arr) => {
       if (!Array.isArray(arr)) {
-        return null
+        return null;
       }
+      return arr.filter(selected).map(x => x.name);
+    };
 
-      return arr.filter(selected).map(x => x.name)
-    }
+    const baseTable = state.design.relatedTable;
+    const columns = namesOfSelected(baseTable.columns);
+    const aggregates = namesOfSelected(baseTable.aggregates) || [];
 
-    const baseTable = state.design.related_table
-    const columns = namesOfSelected(baseTable.columns)
-    const aggregates = namesOfSelected(baseTable.aggregates) || []
-
-    let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn)
-    if (!sortColumn) {
-      sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn)
-    }
-    let order = null
-    if (sortColumn && sortColumn.selected) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc'
-      }
-    }
-
-    const filters = JSON.parse(JSON.stringify(state.distincts))
-    const filtersKeys = Object.keys(filters)
-    filtersKeys.forEach(prop => {
-      delete filters[prop].results
-      delete filters[prop].sql
-    })
-
+    // Join table(s) setup
     if (!state.design.joins) {
-      state.design.joins = []
+      state.design.joins = [];
     }
     const joins = state.design.joins
-      .map(j => {
-        const table = j.related_table
-        const newJoin = {}
+      .map((j) => {
+        const table = j.relatedTable;
+        const newJoin = {};
 
-        newJoin.name = j.name
-        newJoin.columns = namesOfSelected(table.columns) || []
-        newJoin.aggregates = namesOfSelected(table.aggregates) || []
+        newJoin.name = j.name;
+        newJoin.columns = namesOfSelected(table.columns) || [];
+        newJoin.aggregates = namesOfSelected(table.aggregates) || [];
 
         if (table.timeframes) {
           newJoin.timeframes = table.timeframes
             .filter(selected)
             .map(({ name, periods }) => ({
               name,
-              periods: periods.filter(selected)
-            }))
+              periods: periods.filter(selected),
+            }));
         }
 
-        return newJoin
+        return newJoin;
       })
-      .filter(j => !!(j.columns || j.aggregates))
+      .filter(j => !!(j.columns || j.aggregates));
 
     // TODO update default empty array likely
     // in the ma_file_parser to set proper defaults
     // if user's exclude certain properties in their models
-    const timeframes =
-      baseTable.timeframes ||
-      []
-        .map(tf => ({
-          name: tf.name,
-          periods: tf.periods.filter(selected)
-        }))
-        .filter(tf => tf.periods.length)
+    const timeframes = baseTable.timeframes || []
+      .map(tf => ({
+        name: tf.name,
+        periods: tf.periods.filter(selected),
+      }))
+      .filter(tf => tf.periods.length);
+
+    // Ordering setup
+    const order = state.order.assigned;
+
+    // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
+    const filters = lodash.cloneDeep(state.filters);
+    if (filters && filters.aggregates) {
+      filters.aggregates = filters.aggregates
+        .filter(aggregate => aggregate.isActive)
+        .map((aggregate) => {
+          aggregate.value = Number(aggregate.value);
+          return aggregate;
+        });
+    }
 
     return {
-      table: baseTable.name,
+      name: state.design.name,
       columns,
       aggregates,
       timeframes,
       joins,
       order,
       limit: state.limit,
+      dialect: state.dialect,
       filters,
-      dialect: state.dialect
-    }
-  }
-}
+    };
+  },
+};
 
 const getters = {
-  hasResults() {
+  filtersCount(state) {
+    return state.filters.columns.length + state.filters.aggregates.length;
+  },
+
+  hasResults(state) {
     if (!state.results) {
-      return false
+      return false;
     }
-    return !!state.results.length
+    return !!state.results.length;
   },
 
-  hasChartableResults() {
-    return getters.hasResults() && state.resultAggregates.length
+  // eslint-disable-next-line
+  hasChartableResults(state, getters) {
+    return getters.hasResults && state.resultAggregates.length;
   },
 
-  numResults() {
+  // eslint-disable-next-line
+  hasFilters(_, getters) {
+    return getters.filtersCount > 0;
+  },
+
+  getAllAttributes(state) {
+    let attributes = [];
+    const joinSources = state.design.joins || [];
+    const sources = [state.design].concat(joinSources);
+    const batchCollect = (table, attributeTypes) => {
+      attributeTypes.forEach((attributeType) => {
+        const attributesByType = table[attributeType];
+        if (attributesByType) {
+          attributes = attributes.concat(attributesByType);
+        }
+      });
+    };
+
+    sources.forEach((source) => {
+      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes']);
+    });
+
+    return attributes;
+  },
+
+  // eslint-disable-next-line no-shadow
+  getAttributeByQueryAttribute(state, getters) {
+    return (queryAttribute) => {
+      const finder = attr => attr.sourceName === queryAttribute.sourceName && attr.name === queryAttribute.attributeName;
+      return getters.getAllAttributes.find(finder);
+    };
+  },
+
+  getFilterAttributes(state) {
+    const sources = [];
+    const design = state.design;
+    const attributeFilter = attr => !attr.hidden;
+    if (design.label) {
+      sources.push({
+        tableLabel: design.label,
+        sourceName: design.name,
+        columns: design.relatedTable.columns
+          ? design.relatedTable.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.relatedTable.aggregates
+          ? design.relatedTable.aggregates.filter(attributeFilter)
+          : [],
+      });
+    }
+    if (design.joins) {
+      design.joins.forEach((join) => {
+        sources.push({
+          tableLabel: join.label,
+          sourceName: join.name,
+          columns: join.relatedTable.columns
+            ? join.relatedTable.columns.filter(attributeFilter)
+            : [],
+          aggregates: join.relatedTable.aggregates
+            ? join.relatedTable.aggregates.filter(attributeFilter)
+            : [],
+        });
+      });
+    }
+    return sources;
+  },
+
+  // eslint-disable-next-line no-shadow
+  getFilter(_, getters) {
+    // eslint-disable-next-line
+    return (sourceName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.sourceName === sourceName);
+  },
+
+  getFiltersByType(state) {
+    return filterType => state.filters[helpers.getFilterTypePlural(filterType)] || [];
+  },
+
+  // eslint-disable-next-line no-shadow
+  getIsAttributeInFilters(_, getters) {
+    // eslint-disable-next-line
+    return (sourceName, name, filterType) => !!getters.getFilter(sourceName, name, filterType);
+  },
+
+  getIsOrderableAttributeAscending() {
+    return orderableAttribute => orderableAttribute.direction === 'asc';
+  },
+
+  // eslint-disable-next-line no-shadow
+  getQueryAttributeFromCollectionByAttribute(state) {
+    return (orderCollection, attribute) => {
+      const finder = queryAttribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName;
+      return state.order[orderCollection].find(finder);
+    };
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributes(_, getters) {
+    const selector = attribute => attribute.selected;
+    return getters.getAllAttributes.filter(selector);
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributesCount(_, getters) {
+    return getters.getSelectedAttributes.length;
+  },
+
+  resultsCount(state) {
     if (!state.results) {
-      return 0
+      return 0;
     }
-    return state.results.length
+    return state.results.length;
   },
 
-  getDialect: () => state.dialect,
+  getDialect: state => state.dialect,
 
-  getDistinctsForField: () => field => state.distincts[field],
-
-  getResultsFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return null
-    }
-    return thisDistinct.results
+  hasJoins(state) {
+    return !!(state.design.joins && state.design.joins.length);
   },
-
-  hasJoins() {
-    return !!(state.design.joins && state.design.joins.length)
-  },
-
-  isColumnSorted: () => key => state.sortColumn === key,
 
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
 
-  getKeyFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return null
-    }
-    return thisDistinct.keys[0]
-  },
-
-  getSelectionsFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return []
-    }
-    const thisDistinctSelections = thisDistinct.selections
-    if (!thisDistinctSelections) {
-      return []
-    }
-    return thisDistinctSelections
-  },
-
-  getChartYAxis() {
+  getChartYAxis(state) {
     if (!state.resultAggregates) {
-      return []
+      return [];
     }
-    const aggregates = Object.keys(state.resultAggregates)
-    return aggregates
+    const aggregates = Object.keys(state.resultAggregates);
+    return aggregates;
   },
 
-  isColumnSelectedAggregate: () => columnName =>
-    columnName in state.resultAggregates,
+  isColumnSelectedAggregate: state => columnName => columnName in state.resultAggregates,
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
-  currentModelLabel() {
-    return utils.titleCase(state.currentModel)
+  currentModelLabel(state) {
+    return utils.titleCase(state.currentModel);
   },
 
-  currentDesignLabel() {
-    return utils.titleCase(state.currentModel)
+  currentDesignLabel(state) {
+    return utils.titleCase(state.currentModel);
   },
 
-  isDataTab() {
-    return state.currentDataTab === 'data'
+  currentLimit(state) {
+    return state.limit;
   },
 
-  isResultsTab() {
-    return state.currentDataTab === 'results'
+  formattedSql(state) {
+    return sqlFormatter.format(state.currentSQL);
   },
-
-  isSQLTab() {
-    return state.currentDataTab === 'sql'
-  },
-
-  currentLimit() {
-    return state.limit
-  },
-
-  formattedSql() {
-    return sqlFormatter.format(state.currentSQL)
-  }
-}
+};
 
 const actions = {
-  getDesign({ dispatch, commit }, { model, design, slug }) {
-    state.currentSQL = ''
-    state.currentModel = model
-    state.currentDesign = design
+  checkAutoRun({ dispatch, state }) {
+    if (state.results.length > 0) {
+      dispatch('runQuery');
+    }
+  },
 
-    // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(model, design).then(response => {
-      commit('setDesign', response.data)
-    })
+  // eslint-disable-next-line no-shadow
+  cleanFiltering({ commit, getters }, { attribute, type }) {
+    if (!attribute.selected) {
+      const filter = getters.getFilter(attribute.sourceName, attribute.name, type);
+      if (filter) {
+        commit('removeFilter', filter);
+      }
+    }
+  },
 
-    reportsApi
-      .loadReports()
-      .then(response => {
-        state.reports = response.data
+  // eslint-disable-next-line no-shadow
+  cleanOrdering({ commit, getters, state }, attribute) {
+    if (!attribute.selected) {
+      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
+      if (matchAssigned || matchUnassigned) {
+        commit('removeOrder', {
+          collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
+          queryAttribute: matchAssigned || matchUnassigned,
+        });
+      }
+    }
+  },
+
+  resetDefaults: ({ commit }) => commit('resetDefaults'),
+
+  getDesign({ commit, dispatch, state }, { model, design, slug }) {
+    state.currentSQL = '';
+    state.currentModel = model;
+    state.currentDesign = design;
+
+    return designApi.index(model, design)
+      .then((response) => {
+        commit('setDesign', response.data);
+      })
+      .then(reportsApi.loadReports)
+      .then((response) => {
+        state.reports = response.data;
         if (slug) {
-          const reportMatch = state.reports.find(report => report.slug === slug)
+          const reportMatch = state.reports.find(report => report.slug === slug);
           if (reportMatch) {
-            dispatch('loadReport', reportMatch)
+            dispatch('loadReport', reportMatch);
           }
         }
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
+  },
 
-    return index
+  getFilterOptions({ commit }) {
+    sqlApi.getFilterOptions()
+      .then((response) => {
+        commit('setFilterOptions', response.data);
+      });
   },
 
   expandRow({ commit }, row) {
-    commit('toggleCollapsed', row)
+    commit('toggleCollapsed', row);
   },
 
   expandJoinRow({ commit }, join) {
     // already fetched columns
-    commit('toggleCollapsed', join)
-    if (join.related_table.columns.length) {
-      return
+    commit('toggleCollapsed', join);
+    if (join.relatedTable.columns.length) {
+      return;
     }
-    designApi.getTable(join.related_table.name).then(response => {
-      commit('setJoinColumns', {
-        columns: response.data.columns,
-        join
-      })
-      commit('setJoinTimeframes', {
-        timeframes: response.data.timeframes,
-        join
-      })
-      commit('setJoinAggregates', {
-        aggregates: response.data.aggregates,
-        join
-      })
-    })
+    designApi.getTable(join.relatedTable.name)
+      .then((response) => {
+        commit('setJoinColumns', {
+          columns: response.data.columns,
+          join,
+        });
+        commit('setJoinTimeframes', {
+          timeframes: response.data.timeframes,
+          join,
+        });
+        commit('setJoinAggregates', {
+          aggregates: response.data.aggregates,
+          join,
+        });
+      });
   },
 
-  removeSort({ commit }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) {
-      return
-    }
-    commit('setRemoveSort', column)
+  toggleColumn({ commit, dispatch }, column) {
+    commit('toggleSelected', column);
+    dispatch('cleanOrdering', column);
+    dispatch('checkAutoRun');
   },
 
-  toggleColumn({ commit }, column) {
-    commit('toggleSelected', column)
+  toggleTimeframe({ commit, dispatch }, timeframe) {
+    commit('toggleSelected', timeframe);
+    dispatch('cleanOrdering', timeframe);
+    dispatch('checkAutoRun');
   },
 
-  toggleTimeframe({ commit }, timeframe) {
-    commit('toggleSelected', timeframe)
+  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
+    commit('toggleSelected', timeframePeriod);
+    dispatch('cleanOrdering', timeframePeriod);
+    dispatch('checkAutoRun');
   },
 
-  toggleTimeframePeriod({ commit }, timeframePeriod) {
-    commit('toggleSelected', timeframePeriod)
-  },
-
-  toggleAggregate({ commit }, aggregate) {
-    commit('toggleSelected', aggregate)
+  toggleAggregate({ commit, dispatch }, aggregate) {
+    commit('toggleSelected', aggregate);
+    dispatch('cleanOrdering', aggregate);
+    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' });
+    dispatch('checkAutoRun');
   },
 
   limitSet({ commit }, limit) {
-    commit('setLimit', limit)
+    commit('setLimit', limit);
   },
 
   // TODO: remove and use `mapMutations`
   setChartType({ commit }, chartType) {
-    commit('setChartType', chartType)
+    commit('setChartType', chartType);
   },
 
-  getSQL({ commit }, { run, load }) {
-    this.dispatch('designs/resetErrorMessage')
-    state.loadingQuery = !!run
+  // eslint-disable-next-line no-shadow
+  getSQL({ commit, getters, state }, { run, load }) {
+    this.dispatch('designs/resetErrorMessage');
+    state.loadingQuery = !!run;
 
-    const queryPayload = Object.assign(
-      {},
-      helpers.getQueryPayloadFromDesign(),
-      load
-    )
-    const postData = Object.assign({ run }, queryPayload)
+    const queryPayload = Object.assign({}, helpers.getQueryPayloadFromDesign(state), load);
+    const postData = Object.assign({ run }, queryPayload);
     sqlApi
       .getSql(state.currentModel, state.currentDesign, postData)
-      .then(response => {
+      .then((response) => {
         if (run) {
-          commit('setQueryResults', response.data)
-          commit('setSQLResults', response.data)
-          commit('setCurrentTab', 'results')
-          state.loadingQuery = false
+          commit('setQueryResults', response.data);
+          commit('setSQLResults', response.data);
+          state.loadingQuery = false;
+          commit('setSorting', getters.getAllAttributes);
         } else {
-          commit('setSQLResults', response.data)
-          commit('setCurrentTab', 'sql')
+          commit('setSQLResults', response.data);
         }
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
-  loadReport({ commit }, { name }) {
-    reportsApi
-      .loadReport(name)
-      .then(response => {
-        const report = response.data
+  loadReport({ commit, state }, { name }) {
+    reportsApi.loadReport(name)
+      .then((response) => {
+        const report = response.data;
         this.dispatch('designs/getSQL', {
           run: true,
-          load: report.queryPayload
-        })
-        commit('setCurrentReport', report)
-        commit('setStateFromLoadedReport', report)
+          load: report.queryPayload,
+        });
+        commit('setCurrentReport', report);
+        commit('setStateFromLoadedReport', report);
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
-  saveReport({ commit }, { name }) {
+  saveReport({ commit, state }, { name }) {
     const postData = {
-      name,
-      model: state.currentModel,
-      design: state.currentDesign,
       chartType: state.chartType,
-      queryPayload: helpers.getQueryPayloadFromDesign()
-    }
-    reportsApi
-      .saveReport(postData)
-      .then(response => {
-        commit('resetSaveReportSettings')
-        commit('setCurrentReport', response.data)
-        commit('addSavedReportToReports', response.data)
+      design: state.currentDesign,
+      filters: state.filters,
+      model: state.currentModel,
+      name,
+      order: state.order,
+      queryPayload: helpers.getQueryPayloadFromDesign(state),
+    };
+    reportsApi.saveReport(postData)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
+        commit('addSavedReportToReports', response.data);
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
-  updateReport({ commit }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign()
-    state.activeReport.chartType = state.chartType
-    reportsApi
-      .updateReport(state.activeReport)
-      .then(response => {
-        commit('resetSaveReportSettings')
-        commit('setCurrentReport', response.data)
+  updateReport({ commit, state }) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state);
+    state.activeReport.chartType = state.chartType;
+    reportsApi.updateReport(state.activeReport)
+      .then((response) => {
+        commit('resetSaveReportSettings');
+        commit('setCurrentReport', response.data);
       })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+      .catch((e) => {
+        commit('setSqlErrorMessage', e);
+        state.loadingQuery = false;
+      });
   },
 
   resetErrorMessage({ commit }) {
-    commit('setErrorState')
+    commit('setErrorState');
   },
 
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then(response => {
-        commit('setDistincts', {
-          data: response.data,
-          field
-        })
-      })
+  resetSortAttributes({ commit, dispatch }) {
+    commit('resetSortAttributes');
+    dispatch('checkAutoRun');
   },
 
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data)
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data)
-  },
-
-  switchCurrentTab({ commit }, tab) {
-    commit('setCurrentTab', tab)
-  },
-
-  toggleFilterOpen({ commit }) {
-    commit('setFilterToggle')
-  },
-
-  toggleDataOpen({ commit }) {
-    commit('setDataToggle')
+  runQuery() {
+    this.dispatch('designs/getSQL', {
+      run: true,
+    });
   },
 
   toggleLoadReportOpen({ commit }) {
-    commit('setLoadReportToggle')
+    commit('setLoadReportToggle');
   },
 
-  toggleChartsOpen({ commit }) {
-    commit('setChartToggle')
+  // eslint-disable-next-line no-shadow
+  updateSortAttribute({ commit, getters }, queryAttribute) {
+    const attribute = getters.getAttributeByQueryAttribute(queryAttribute);
+    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute('assigned', attribute);
+    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute('unassigned', attribute);
+    if (matchInAssigned) {
+      const direction = getters.getIsOrderableAttributeAscending(matchInAssigned) ? 'desc' : 'asc';
+      commit('setSortableAttributeDirection', { orderableAttribute: matchInAssigned, direction });
+    } else if (matchInUnassigned) {
+      commit('assignSortableAttribute', attribute);
+    }
+
+    this.dispatch('designs/runQuery');
   },
 
-  sortBy({ commit }, name) {
-    commit('setSortColumn', name)
-    this.dispatch('designs/getSQL', {
-      run: true
-    })
-  }
-}
+  // eslint-disable-next-line
+  addFilter({ commit }, { sourceName, attribute, filterType, expression = '', value = '', isActive = true }) {
+    const filter = {
+      sourceName,
+      name: attribute.name,
+      expression,
+      value,
+      attribute,
+      filterType,
+      isActive,
+    };
+    commit('addFilter', filter);
+
+    const isValidToggleSelection = !attribute.hasOwnProperty('selected') || !attribute.selected;
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute);
+    }
+  },
+
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter);
+  },
+};
 
 const mutations = {
-  setRemoveSort() {
-    state.sortColumn = null
+  assignSortableAttribute(state, attribute) {
+    const orderableAttribute = state.order.unassigned.find(orderableAttr => orderableAttr.attributeName === attribute.name && orderableAttr.sourceName === attribute.sourceName);
+    const idx = state.order.unassigned.indexOf(orderableAttribute);
+    state.order.unassigned.splice(idx, 1);
+    state.order.assigned.push(orderableAttribute);
   },
 
-  setChartType(context, chartType) {
-    state.chartType = chartType
+  removeOrder(state, { collection, queryAttribute }) {
+    const idx = collection.indexOf(queryAttribute);
+    collection.splice(idx, 1);
   },
 
-  setCurrentReport(_, report) {
-    state.activeReport = report
+  resetDefaults(state) {
+    lodash.assign(state, lodash.cloneDeep(defaultState));
   },
 
-  setStateFromLoadedReport(_, report) {
+  resetSortAttributes(state) {
+    const assigned = state.order.assigned;
+    state.order.unassigned = state.order.unassigned.concat(assigned);
+    state.order.assigned = [];
+  },
+
+  setChartType(state, chartType) {
+    state.chartType = chartType;
+  },
+
+  setCurrentReport(state, report) {
+    state.activeReport = report;
+  },
+
+  setFilterOptions(state, options) {
+    state.filterOptions = options;
+  },
+
+  setStateFromLoadedReport(state, report) {
     // General UI state updates
-    state.currentModel = report.model
-    state.currentDesign = report.design
-    state.chartType = report.chartType
-    state.limit = report.queryPayload.limit
-    state.dialect = report.queryPayload.dialect
+    state.chartType = report.chartType;
+    state.currentModel = report.model;
+    state.currentDesign = report.design;
+    state.dialect = report.queryPayload.dialect;
+    state.filters = report.filters;
+    state.limit = report.queryPayload.limit;
+    state.order = report.order;
 
-    // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
-    const baseTable = state.design.related_table
-    const queryPayload = report.queryPayload
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
+    const baseTable = state.design.relatedTable;
+    const queryPayload = report.queryPayload;
     const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
       acc.push({
         name: curr.name,
-        columns: curr.related_table.columns,
-        aggregates: curr.related_table.aggregates,
-        timeframes: curr.related_table.timeframes
-      })
-      return acc
-    }, [])
-    const nameMatcher = (source, target) => source.name === target.name
-    const nameMapper = item => item.name
+        columns: curr.relatedTable.columns,
+        aggregates: curr.relatedTable.aggregates,
+        timeframes: curr.relatedTable.timeframes,
+      });
+      return acc;
+    }, []);
+    const nameMatcher = (source, target) => source.name === target.name;
+    const nameMapper = item => item.name;
     const setSelected = (sourceCollection, targetCollection) => {
-      sourceCollection.forEach(item => {
-        item.selected = targetCollection.includes(item.name)
-      })
-    }
+      sourceCollection.forEach((item) => {
+        item.selected = targetCollection.includes(item.name);
+      });
+    };
 
     // columns
-    setSelected(baseTable.columns, queryPayload.columns)
+    setSelected(baseTable.columns, queryPayload.columns);
     // aggregates
-    setSelected(baseTable.aggregates, queryPayload.aggregates)
-    // filters
-    // TODO
+    setSelected(baseTable.aggregates, queryPayload.aggregates);
     // joins, timeframes, and periods
-    joinColumnGroups.forEach(joinGroup => {
+    joinColumnGroups.forEach((joinGroup) => {
       // joins - columns
-      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup))
-      setSelected(joinGroup.columns, targetJoin.columns)
+      const targetJoin = queryPayload.joins.find(j => nameMatcher(j, joinGroup));
+      setSelected(joinGroup.columns, targetJoin.columns);
       // joins - aggregates
       if (joinGroup.aggregates) {
-        setSelected(joinGroup.aggregates, targetJoin.aggregates)
+        setSelected(joinGroup.aggregates, targetJoin.aggregates);
       }
       // timeframes
       if (targetJoin && targetJoin.timeframes) {
-        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper))
+        setSelected(joinGroup.timeframes, targetJoin.timeframes.map(nameMapper));
         // periods
-        joinGroup.timeframes.forEach(timeframe => {
-          const targetTimeframe = targetJoin.timeframes.find(tf =>
-            nameMatcher(tf, timeframe)
-          )
+        joinGroup.timeframes.forEach((timeframe) => {
+          const targetTimeframe = targetJoin.timeframes.find(tf => nameMatcher(tf, timeframe));
           if (targetTimeframe && targetTimeframe.periods) {
-            setSelected(
-              timeframe.periods,
-              targetTimeframe.periods.map(nameMapper)
-            )
+            setSelected(timeframe.periods, targetTimeframe.periods.map(nameMapper));
           }
-        })
+        });
       }
-    })
-    // order
-    // TODO
-    // base_table timeframes
-    // TODO
+    });
   },
 
-  addSavedReportToReports(_, report) {
-    state.reports.push(report)
+  addFilter(state, filter) {
+    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter);
   },
 
-  setSortColumn(context, name) {
-    if (state.sortColumn === name) {
-      state.sortDesc = !state.sortDesc
+  removeFilter(state, filter) {
+    if (filter) {
+      const filtersByType = state.filters[helpers.getFilterTypePlural(filter.filterType)];
+      const idx = filtersByType.indexOf(filter);
+      filtersByType.splice(idx, 1);
     }
-    state.sortColumn = name
   },
 
-  setDistincts(_, { data, field }) {
-    Vue.set(state.distincts, field, data)
+  addSavedReportToReports(state, report) {
+    state.reports.push(report);
   },
 
   setJoinColumns(_, { columns, join }) {
-    join.columns = columns
+    join.columns = columns;
   },
 
   setJoinTimeframes(_, { timeframes, join }) {
-    join.timeframes = timeframes
+    join.timeframes = timeframes;
   },
 
   setJoinAggregates(_, { aggregates, join }) {
-    join.aggregates = aggregates
+    join.aggregates = aggregates;
   },
 
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', [])
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item)
-    }
+  resetSaveReportSettings(state) {
+    state.saveReportSettings = { name: null };
   },
 
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item)
+  setSQLResults(state, results) {
+    state.currentSQL = results.sql;
   },
 
-  setFilterToggle() {
-    state.filtersOpen = !state.filtersOpen
+  setQueryResults(state, results) {
+    state.results = results.results;
+    state.keys = results.keys;
+    state.queryAttributes = results.queryAttributes;
+    state.resultAggregates = results.aggregates;
   },
 
-  setDataToggle() {
-    state.dataOpen = !state.dataOpen
+  setSorting(state, allAttributes) {
+    state.queryAttributes.forEach((queryAttribute) => {
+      const accounted = state.order.assigned.concat(state.order.unassigned);
+      const finder = orderableAttribute => orderableAttribute.sourceName === queryAttribute.sourceName && orderableAttribute.attributeName === queryAttribute.attributeName;
+      const isAccountedFor = accounted.find(finder);
+      if (!isAccountedFor) {
+        const targetAttribute = allAttributes.find(attribute => attribute.sourceName === queryAttribute.sourceName && attribute.name === queryAttribute.attributeName);
+        state.order.unassigned.push({
+          sourceName: targetAttribute.sourceName,
+          sourceLabel: targetAttribute.sourceLabel,
+          attributeName: targetAttribute.name,
+          attributeLabel: targetAttribute.label,
+          direction: 'asc',
+        });
+      }
+    });
   },
 
-  resetSaveReportSettings() {
-    state.saveReportSettings = { name: null }
-  },
-
-  setChartToggle() {
-    state.chartsOpen = !state.chartsOpen
-  },
-
-  setSQLResults(_, results) {
-    state.currentSQL = results.sql
-  },
-
-  setQueryResults(_, results) {
-    state.results = results.results
-    state.keys = results.keys
-    state.columnHeaders = results.column_headers
-    state.columnNames = results.column_names
-    state.resultAggregates = results.aggregates
-  },
-
-  setSqlErrorMessage(_, e) {
-    state.hasSQLError = true
+  setSqlErrorMessage(state, e) {
+    state.hasSQLError = true;
     if (!e.response) {
       state.sqlErrorMessage = [
-        "Something went wrong on our end. We'll check our error logs and get back to you."
-      ]
-      return
+        "Something went wrong on our end. We'll check our error logs and get back to you.",
+      ];
+      return;
     }
-    const error = e.response.data
-    state.sqlErrorMessage = [error.code, error.orig, error.statement]
+    const error = e.response.data;
+    state.sqlErrorMessage = [error.code, error.orig, error.statement];
   },
 
-  setErrorState() {
-    state.hasSQLError = false
-    state.sqlErrorMessage = []
+  setErrorState(state) {
+    state.hasSQLError = false;
+    state.sqlErrorMessage = [];
   },
 
-  toggleSelected(_, selectable) {
-    Vue.set(selectable, 'selected', !selectable.selected)
+  toggleSelected(state, attribute) {
+    Vue.set(attribute, 'selected', !attribute.selected);
   },
 
-  toggleCollapsed(_, collapsable) {
-    Vue.set(collapsable, 'collapsed', !collapsable.collapsed)
+  toggleCollapsed(state, collapsable) {
+    Vue.set(collapsable, 'collapsed', !collapsable.collapsed);
   },
 
-  setDesign(_, designData) {
-    state.design = designData
+  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
+    orderableAttribute.direction = direction;
   },
 
-  setCurrentTab(_, tab) {
-    state.currentDataTab = tab
+  setDesign(state, designData) {
+    const joinSources = designData.joins || [];
+    const sources = [designData].concat(joinSources);
+    const batchSourcer = (source, attributeTypes) => {
+      const table = source.relatedTable;
+      attributeTypes.forEach((attributeType) => {
+        if (table[attributeType]) {
+          table[attributeType].forEach((attribute) => {
+            attribute.sourceName = source.name;
+            attribute.sourceLabel = source.label;
+          });
+        }
+      });
+    };
+
+    sources.forEach((source) => {
+      batchSourcer(source, ['columns', 'aggregates', 'timeframes']);
+    });
+
+    state.design = designData;
   },
 
-  setLimit(_, limit) {
-    state.limit = limit
+  setLimit(state, limit) {
+    state.limit = limit;
   },
 
-  setDialect(_, dialect) {
-    state.dialect = dialect
-  }
-}
+  setDialect(state, dialect) {
+    state.dialect = dialect;
+  },
+};
 
 export default {
   namespaced: true,
   helpers,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
-  mutations
-}
+  mutations,
+};

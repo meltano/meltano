@@ -1,7 +1,7 @@
 <script>
 export default {
-  name: 'NotFound'
-}
+  name: 'NotFound',
+};
 </script>
 
 <template>
@@ -20,4 +20,5 @@ export default {
   </section>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

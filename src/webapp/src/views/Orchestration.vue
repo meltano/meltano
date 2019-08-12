@@ -1,55 +1,54 @@
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
 
-import Airflow from '@/components/orchestration/Airflow'
-import RouterViewLayout from '@/views/RouterViewLayout'
+import Airflow from '@/components/orchestration/Airflow';
+import RouterViewLayout from '@/views/RouterViewLayout';
 
 export default {
   name: 'Orchestration',
   components: {
     Airflow,
-    RouterViewLayout
+    RouterViewLayout,
+  },
+  created() {
+    this.$store.dispatch('plugins/getInstalledPlugins');
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled'])
-  }
-}
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+    ]),
+  },
+};
+
 </script>
 
 <template>
   <router-view-layout>
+
     <div class="container view-header">
       <div class="content">
         <div class="level">
-          <h1 class="is-marginless">Orchestration</h1>
+          <h1 class='is-marginless'>Orchestration</h1>
         </div>
       </div>
     </div>
 
     <div class="container view-body">
-      <airflow
-        v-if="getIsPluginInstalled('orchestrators', 'airflow')"
-      ></airflow>
+      <airflow v-if='getIsPluginInstalled("orchestrators", "airflow")'></airflow>
       <section v-else>
         <div class="columns">
           <div class="column">
             <div class="content">
-              <p class="is-italic">Airflow installation is required.</p>
-              <p>
-                Until this installation is automatic please follow the
-                <a
-                  target="_blank"
-                  href="https://www.meltano.com/docs/meltano-cli.html#installing-airflow"
-                  >Installing Airflow</a
-                >
-                documentation.
-              </p>
+              <p class='is-italic'>Airflow installation is required.</p>
+              <p>Until this installation is automatic please follow the <a target='_blank' href="https://www.meltano.com/docs/meltano-cli.html#installing-airflow">Installing Airflow</a> documentation.</p>
             </div>
           </div>
         </div>
       </section>
     </div>
+
   </router-view-layout>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

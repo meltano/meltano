@@ -1,8 +1,16 @@
-// https://docs.cypress.io/api/introduction/api.html
+// For authoring Nightwatch tests, see
+// http://nightwatchjs.org/guide#usage
 
-describe('My First Test', () => {
-  it('Visits the app root url', () => {
-    cy.visit('/')
-    cy.contains('h1', 'Welcome to Your Vue.js App')
-  })
-})
+module.exports = {
+  'default e2e tests': function test(browser) {
+    // automatically uses dev Server port from /build/config.js
+    // default: http://localhost:8080
+    // see nightwatch.conf.js
+    const devServer = browser.globals.devServerUrl
+
+    browser
+      .url(devServer)
+      .waitForElementVisible('#app', 5000)
+      .end()
+  }
+}

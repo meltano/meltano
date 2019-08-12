@@ -1,7 +1,7 @@
 <script>
 export default {
-  name: 'Step'
-}
+  name: 'Step',
+};
 </script>
 
 <template>
@@ -10,4 +10,5 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+</style>

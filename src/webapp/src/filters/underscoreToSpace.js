@@ -1,5 +1,5 @@
-import utils from '@/utils/utils'
+import utils from '@/utils/utils';
 
 export default function underscoreToSpace(value) {
-  return utils.underscoreToSpace(value)
+  return utils.underscoreToSpace(value);
 }

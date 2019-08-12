@@ -1,15 +1,15 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import configuration from './modules/configuration'
-import designs from './modules/designs'
-import dashboards from './modules/dashboards'
-import plugins from './modules/plugins'
-import repos from './modules/repos'
-import settings from './modules/settings'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import configuration from './modules/configuration';
+import designs from './modules/designs';
+import dashboards from './modules/dashboards';
+import plugins from './modules/plugins';
+import repos from './modules/repos';
+import settings from './modules/settings';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
-const debug = process.env.NODE_ENV !== 'production'
+const debug = process.env.NODE_ENV !== 'production';
 
 export default new Vuex.Store({
   modules: {
@@ -18,7 +18,7 @@ export default new Vuex.Store({
     dashboards,
     plugins,
     repos,
-    settings
+    settings,
   },
-  string: debug
-})
+  string: debug,
+});

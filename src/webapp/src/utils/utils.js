@@ -2,37 +2,46 @@ const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
 
 export default {
+
   // Path Utils
   root(path = '/') {
     // window.FLASK should be injected in the template
     // either by Webpack (dev) or Flask (prod)
-    return `${FLASK.appUrl}${path}`
+    if (FLASK.appUrl) {
+      return `${FLASK.appUrl}${path}`
+    } else {
+      return `http://localhost:5000${path}`
+    }
   },
 
   apiRoot(path = '/') {
-    return this.root(`/api/v1${path}`)
+    return this.root(`/api/v1${path}`);
   },
 
   apiUrl(blueprint, location = '') {
-    const path = [blueprint, location].join('/')
-    return this.apiRoot().concat(path)
+    const path = [blueprint, location].join('/');
+    return this.apiRoot().concat(path);
   },
 
   docsUrl(path = '/', fragment) {
-    fragment = fragment ? `#${fragment}` : ''
+    fragment = fragment ? `#${fragment}` : '';
 
-    return `https://meltano.com/docs${path}.html${fragment}`
+    return `https://meltano.com/docs${path}.html${fragment}`;
   },
 
   getConnectorLogoUrl(connectorName) {
-    connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName
-    const name = regExpConnectorLogo.exec(connectorName)[1]
+    connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName;
+    const name = regExpConnectorLogo.exec(connectorName)[1];
 
-    return `/logos/${name}-logo.png`
+    return `/logos/${name}-logo.png`;
   },
 
   getIsSubRouteOf(parentPath, currentPath) {
-    return currentPath.includes(parentPath)
+    return currentPath.includes(parentPath);
+  },
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   },
 
   // Color Utils
@@ -43,7 +52,7 @@ export default {
       'rgba(255, 206, 86, 0.2)',
       'rgba(75, 192, 192, 0.2)',
       'rgba(153, 102, 255, 0.2)',
-      'rgba(255, 159, 64, 0.2)'
+      'rgba(255, 159, 64, 0.2)',
     ],
     borderColor: [
       'rgba(255,99,132,1)',
@@ -51,109 +60,145 @@ export default {
       'rgba(255, 206, 86, 1)',
       'rgba(75, 192, 192, 1)',
       'rgba(153, 102, 255, 1)',
-      'rgba(255, 159, 64, 1)'
-    ]
+      'rgba(255, 159, 64, 1)',
+    ],
   },
 
   getColor(i) {
     // assume they are the same length;
-    const colorLength = this.colors.backgroundColor.length
+    const colorLength = this.colors.backgroundColor.length;
     return {
       backgroundColor: this.colors.backgroundColor[i % colorLength],
-      borderColor: this.colors.borderColor[i % colorLength]
-    }
+      borderColor: this.colors.borderColor[i % colorLength],
+    };
   },
 
   // Collection Utils
   difference(arr1, arr2) {
-    return arr1
-      .filter(x => !arr2.includes(x))
-      .concat(arr2.filter(x => !arr1.includes(x)))
+    return arr1.filter(x => !arr2.includes(x))
+      .concat(arr2.filter(x => !arr1.includes(x)));
+  },
+
+  deepFreeze(object) {
+    // Inspired by https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+    const propNames = Object.getOwnPropertyNames(object);
+    // eslint-disable-next-line no-restricted-syntax
+    for (const name of propNames) {
+      const value = object[name];
+      // eslint-disable-next-line no-undef
+      object[name] = value && typeof value === 'object' ? this.deepFreeze(value) : value;
+    }
+    return Object.freeze(object);
   },
 
   // String Utils
   capitalize(value) {
     if (!value) {
-      return ''
+      return '';
     }
-    const capMe = value.toString()
-    return capMe.charAt(0).toUpperCase() + capMe.slice(1)
+    const capMe = value.toString();
+    return capMe.charAt(0).toUpperCase() + capMe.slice(1);
   },
   hyphenate(value, prepend) {
     if (!value) {
-      return ''
+      return '';
     }
-    let hyphenateMe = `${prepend}-` || ''
-    hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-')
-    return hyphenateMe
+    let hyphenateMe = `${prepend}-` || '';
+    hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-');
+    return hyphenateMe;
   },
   inferInputType(value, defaultType = 'text') {
-    let type = defaultType
+    let type = defaultType;
     if (regExpPrivateInput.test(value)) {
-      type = 'password'
+      type = 'password';
     }
-    return type
+    return type;
   },
   jsDashify(type, name) {
     if (!type || !name) {
-      return ''
+      return '';
     }
-    return this.hyphenate(name, `js-${type.toLowerCase()}`)
+    return this.hyphenate(name, `js-${type.toLowerCase()}`);
   },
   pretty(value) {
     try {
-      return JSON.stringify(JSON.parse(value), null, 2)
+      return JSON.stringify(JSON.parse(value), null, 2);
     } catch (e) {
-      return value
+      return value;
     }
   },
   singularize(value) {
     if (!value) {
-      return ''
+      return '';
     }
     // A more robust implementation is encouraged (currently assumes English and 's' at tail)
-    let singularizeMe = value.toString()
-    const lastChar = singularizeMe[singularizeMe.length - 1]
+    let singularizeMe = value.toString();
+    const lastChar = singularizeMe[singularizeMe.length - 1];
     if (lastChar.toLowerCase() === 's') {
-      singularizeMe = singularizeMe.slice(0, -1)
+      singularizeMe = singularizeMe.slice(0, -1);
     }
-    return singularizeMe
+    return singularizeMe;
+  },
+  snowflakeAccountParser(account) {
+    const domainFlag = 'snowflakecomputing.com';
+    const domainLocation = account.indexOf(domainFlag);
+    let accountId = '';
+
+    // If the domain exists in user input, assume URL
+    if (domainLocation > -1) {
+      let shortenedUrl = account.slice(
+        0,
+        domainLocation + domainFlag.length,
+      );
+
+      // Clean up URL if http is detected
+      if (shortenedUrl.indexOf('http') > -1) {
+        shortenedUrl = shortenedUrl.slice(shortenedUrl.indexOf('//') + 2);
+      }
+
+      // This could eventually parse data like region if needed
+      accountId = shortenedUrl.split('.')[0];
+    }
+
+    return accountId;
   },
   titleCase(value) {
-    return value.replace(
-      /\w\S*/g,
-      txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    )
+    return value
+      .replace(
+        /\w\S*/g, txt => txt
+          .charAt(0)
+          .toUpperCase() + txt.substr(1)
+          .toLowerCase());
   },
   truncate(string, max = 50) {
     if (string.length > max) {
-      return `${string.substring(0, max)}...`
+      return `${string.substring(0, max)}...`;
     }
-    return string
+    return string;
   },
   underscoreToSpace(value) {
-    return value.replace(/_/g, ' ')
+    return value.replace(/_/g, ' ');
   },
 
   // Date Utils
   getDateStringAsIso8601OrNull(dateString) {
-    return dateString ? new Date(dateString).toISOString() : null
+    return dateString ? new Date(dateString).toISOString() : null;
   },
 
   getInputDateMeta() {
     return {
       min: '2000-01-01',
       pattern: '[0-9]{4}-[0-9]{2}-[0-9]{2}',
-      today: this.formatDateStringYYYYMMDD(new Date())
-    }
+      today: this.formatDateStringYYYYMMDD(new Date()),
+    };
   },
 
   getIsDateStringInFormatYYYYMMDD(dateString) {
-    const result = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(dateString)
-    return result
+    const result = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.test(dateString);
+    return result;
   },
 
   formatDateStringYYYYMMDD(date) {
-    return new Date(date).toISOString().split('T')[0]
-  }
-}
+    return new Date(date).toISOString().split('T')[0];
+  },
+};

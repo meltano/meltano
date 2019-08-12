@@ -1,49 +1,42 @@
-import axios from 'axios'
-import utils from '@/utils/utils'
+import axios from 'axios';
+import utils from '@/utils/utils';
 
 export default {
   index() {
-    return axios.get(utils.apiUrl('settings'))
+    return axios.get(utils.apiUrl('settings'));
   },
 
   saveConnection(connection) {
-    return axios.post(utils.apiUrl('settings', 'save'), connection)
+    return axios.post(utils.apiUrl('settings', 'save'), connection);
   },
 
   deleteConnection(connection) {
-    return axios.post(utils.apiUrl('settings', 'delete'), connection)
+    return axios.post(utils.apiUrl('settings', 'delete'), connection);
   },
 
   fetchACL() {
-    return axios.get(utils.apiUrl('settings', 'acl'))
+    return axios.get(utils.apiUrl('settings', 'acl'));
   },
 
   createRole(role, user) {
-    const payload = { role, user }
-    return axios.post(utils.apiUrl('settings', 'acl/roles'), payload)
+    const payload = { role, user };
+    return axios.post(utils.apiUrl('settings', 'acl/roles'), payload);
   },
 
   deleteRole(role, user) {
-    const payload = { role, user }
+    const payload = { role, user };
 
-    return axios.delete(utils.apiUrl('settings', 'acl/roles'), {
-      data: payload
-    })
+    return axios.delete(utils.apiUrl('settings', 'acl/roles'), { data: payload });
   },
 
   addRolePermission(role, permissionType, context) {
-    const payload = { permissionType, role, context }
-    return axios.post(
-      utils.apiUrl('settings', 'acl/roles/permissions'),
-      payload
-    )
+    const payload = { permissionType, role, context };
+    return axios.post(utils.apiUrl('settings', 'acl/roles/permissions'), payload);
   },
 
   removeRolePermission(role, permissionType, context) {
-    const payload = { permissionType, role, context }
+    const payload = { permissionType, role, context };
 
-    return axios.delete(utils.apiUrl('settings', 'acl/roles/permissions'), {
-      data: payload
-    })
-  }
-}
+    return axios.delete(utils.apiUrl('settings', 'acl/roles/permissions'), { data: payload });
+  },
+};

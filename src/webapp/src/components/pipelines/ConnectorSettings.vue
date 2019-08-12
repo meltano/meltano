@@ -1,79 +1,111 @@
 <script>
-import { mapGetters } from 'vuex'
-import InputDateIso8601 from '@/components/generic/InputDateIso8601'
+import { mapGetters } from 'vuex';
+import InputDateIso8601 from '@/components/generic/InputDateIso8601';
+import TooltipCircle from '@/components/generic/TooltipCircle';
 
-import utils from '@/utils/utils'
+import utils from '@/utils/utils';
 
 export default {
   name: 'ConnectorSettings',
   components: {
-    InputDateIso8601
+    InputDateIso8601,
+    TooltipCircle,
   },
   props: {
     fieldClass: { type: String },
     configSettings: {
       type: Object,
       required: true,
-      default: () => {}
-    }
+      default: () => {},
+    },
+  },
+  watch: {
+    configSettings: {
+      handler(newVal) {
+        /**
+         * Improve account UX by auto-detecting Account ID via URL for configs that have `account`
+         * This is currently Loader-Snowflake specific and we'll need a more robust solution
+         * when/if we add UX helpers like this for more connectors
+         */
+        const accountInput = newVal.config.account;
+        if (accountInput) {
+          const parsedAccountId = utils.snowflakeAccountParser(accountInput);
+          this.configSettings.config.account = parsedAccountId || newVal.config.account;
+        }
+      },
+      deep: true,
+    },
   },
   computed: {
     ...mapGetters('configuration', ['getIsConfigSettingValid']),
     getCleanedLabel() {
-      return value => utils.titleCase(utils.underscoreToSpace(value))
+      return value => utils.titleCase(utils.underscoreToSpace(value));
     },
     getIsOfKindBoolean() {
-      return kind => kind === 'boolean'
+      return kind => kind === 'boolean';
     },
     getIsOfKindDate() {
-      return kind => kind === 'date_iso8601'
+      return kind => kind === 'date_iso8601';
+    },
+    getIsOfKindOptions() {
+      return kind => kind === 'options';
     },
     getIsOfKindTextBased() {
       return kind =>
-        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind)
+        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind);
     },
     getTextBasedInputType() {
-      let type = 'text'
-      return setting => {
+      let type = 'text';
+      return (setting) => {
         switch (setting.kind) {
           case 'password':
-            type = 'password'
-            break
+            type = 'password';
+            break;
           case 'email':
-            type = 'email'
-            break
+            type = 'email';
+            break;
           default:
-            type = utils.inferInputType(setting.name, 'text')
-            break
+            type = utils.inferInputType(setting.name, 'text');
+            break;
         }
-        return type
-      }
+        return type;
+      };
     },
     labelClass() {
-      return this.fieldClass || 'is-normal'
+      return this.fieldClass || 'is-normal';
     },
     successClass() {
       return setting =>
-        this.getIsConfigSettingValid(setting)
+        (this.getIsConfigSettingValid(setting)
           ? 'is-success has-text-success'
-          : null
-    }
-  }
-}
+          : null);
+    },
+  },
+  methods: {
+    findLabel(setting) {
+      return setting.options.find(item => item.value === setting.value).label;
+    },
+  },
+};
 </script>
 
 <template>
   <div>
     <slot name="top" />
-    <div
-      class="field is-horizontal"
-      v-for="setting in configSettings.settings"
-      :key="setting.name"
-    >
-      <div :class="['field-label', labelClass]">
+      <div
+        class="field is-horizontal"
+        v-for="setting in configSettings.settings"
+        :key="setting.name"
+      >
+      <div :class="['is-flex', 'field-label', labelClass]">
         <label class="label">{{
           setting.label || getCleanedLabel(setting.name)
         }}</label>
+        <TooltipCircle
+          v-if="setting.tooltip"
+          :text="setting.tooltip"
+          class="label-tooltip"
+        />
       </div>
       <div class="field-body">
         <div class="field">
@@ -92,7 +124,23 @@ export default {
               v-else-if="getIsOfKindDate(setting.kind)"
               v-model="configSettings.config[setting.name]"
               :name="setting.name"
+              input-classes="is-small"
             />
+
+            <!-- Dropdown -->
+            <div v-else-if="getIsOfKindOptions(setting.kind)" class="select is-small is-fullwidth">
+              <select
+                v-model="configSettings.config[setting.name]"
+                :name="`${setting.name}-options`"
+                :id="`${setting.name}-select-menu`">
+                <option v-for="(option, index) in setting.options"
+                  :key="`${option.label}-${index}`"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
 
             <!-- Text / Password / Email -->
             <input
@@ -117,4 +165,8 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.label-tooltip  {
+  margin-left: 0.25em;
+}
+</style>
