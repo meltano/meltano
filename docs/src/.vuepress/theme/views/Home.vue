@@ -271,7 +271,8 @@
     <div
       class="footer"
     >
-      <a href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">{{ $site.themeConfig.editLinkText }} <OutboundLink /></a>
+      <a style="float:left;" href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">{{ $site.themeConfig.editLinkText }} <OutboundLink /></a>
+      <p style="float:right">Meltano is a trademark of GitLab, Inc.</p>
     </div>
   </div>
 </template>
