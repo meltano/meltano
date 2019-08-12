@@ -53,7 +53,7 @@ test_meltano_ui:
   stage: test
   image: node:9.11.1
   script:
-    - cd src/analyze
+    - cd src/webapp
     - yarn
     - yarn unit # change `unit` to `test` once e2e is wired up
 

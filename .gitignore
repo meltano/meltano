@@ -143,8 +143,8 @@ venv.bak/
 meltano.log.*
 *.m5oc
 
-# analyze builds
-src/analyze/dist/
+# webapp builds
+src/webapp/dist/
 src/meltano/api/static/
 src/meltano/api/templates/analyze.html
 

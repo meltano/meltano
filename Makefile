@@ -28,7 +28,7 @@ PYTHON_RUN=${DOCKER_RUN} --name python-$(shell uuidgen) python
 DCR=docker-compose run --rm
 DCRN=${DCR} --no-deps
 
-MELTANO_ANALYZE = src/analyze
+MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
 MELTANO_CORE_BUNDLE = src/meltano/core/bundle
 
@@ -47,8 +47,8 @@ TO_CLEAN  = ./build ./dist ./*.egg-info
 # node_modules
 TO_CLEAN += ./${MELTANO_API}/static/*
 TO_CLEAN += ./${MELTANO_API}/templates/*
-TO_CLEAN += ./${MELTANO_ANALYZE}/node_modules
-TO_CLEAN += ./${MELTANO_ANALYZE}/dist
+TO_CLEAN += ./${MELTANO_WEBAPP}/node_modules
+TO_CLEAN += ./${MELTANO_WEBAPP}/dist
 
 clean:
 	rm -rf ${TO_CLEAN}
@@ -129,8 +129,8 @@ ${MELTANO_CORE_BUNDLE}/model/%:
 
 bundle_ui: ui
 	mkdir -p src/meltano/api/templates && \
-	cp src/analyze/dist/index.html src/meltano/api/templates/analyze.html && \
-	cp -r src/analyze/dist/static src/meltano/api
+	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
+	cp -r src/webapp/dist/static src/meltano/api
 
 freeze_db:
 	scripts/alembic_freeze.py
@@ -155,10 +155,10 @@ docker_sdist: base_image
 .PHONY: ui
 
 ui:
-	cd src/analyze && yarn && yarn build
+	cd src/webapp && yarn && yarn build
 
-${MELTANO_ANALYZE}/node_modules: ${MELTANO_ANALYZE}/yarn.lock
-	cd ${MELTANO_ANALYZE} && yarn install --frozen-lockfile
+${MELTANO_WEBAPP}/node_modules: ${MELTANO_WEBAPP}/yarn.lock
+	cd ${MELTANO_WEBAPP} && yarn install --frozen-lockfile
 
 
 # Docs Related Tasks
@@ -192,18 +192,18 @@ docs/serve: docs/build
 .PHONY: lint show_lint
 
 BLACK_RUN = black src/meltano tests/ 
-ESLINT_RUN = cd ${MELTANO_ANALYZE} && yarn run lint
+ESLINT_RUN = cd ${MELTANO_WEBAPP} && yarn run lint
 
 lint_black:
 	${BLACK_RUN}
 
-lint_eslint: ${MELTANO_ANALYZE}/node_modules
+lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN} --fix
 
 show_lint_black:
 	${BLACK_RUN} --check --diff
 
-show_lint_eslint: ${MELTANO_ANALYZE}/node_modules
+show_lint_eslint: ${MELTANO_WEBAPP}/node_modules
 	${ESLINT_RUN}
 
 lint: lint_black lint_eslint
