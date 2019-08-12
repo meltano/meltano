@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#855](https://gitlab.com/meltano/meltano/issues/855) Add empty state to Dashboards and cleaned up styling for consistency with Analyze's layout
 * [#856](https://gitlab.com/meltano/meltano/issues/856) Add contextual information to the Analyze Connection UI to aid user understanding
 * [#800](https://gitlab.com/meltano/meltano/issues/800) Add save success feedback for connectors, entities, and connections
+* [#817](https://gitlab.com/meltano/meltano/issues/817) Add [Meltano explainer video](https://www.youtube.com/watch?v=2Glsf89WQ5w) to the front page of Meltano.com
 
 ### Changes
 * [#794](https://gitlab.com/meltano/meltano/issues/794) Update Snowflake fields to have descriptions and utilize tooltip UI
