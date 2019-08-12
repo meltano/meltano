@@ -40,10 +40,10 @@
     <div class="feature-section-wrapper">
       <div class="feature-section">
         <div class="feature-left">
-          <img 
+          <img
             style="max-width: 100%; margin: 0 auto; display: block;"
-            src="/screenshots/meltano-queries.png" 
-            alt="Screenshot of Meltano Analyze page" 
+            src="/screenshots/meltano-queries.png"
+            alt="Screenshot of Meltano Analyze page"
           />
         </div>
         <div class="feature-right">
@@ -55,11 +55,14 @@
 
 
     <div style="background-color: #e5e4e2; padding-bottom: 6rem;">
-      <div class="content-width-wide" style="text-align:center;">
+      <div class="content-width-wide">
         <h2 class="section-title" style="text-align: center; margin-top: 0;">A single workflow for the entire data life cycle.</h2>
 
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/2Glsf89WQ5w" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
+        <div class='rich-media-container'>
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/2Glsf89WQ5w" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          </div>
+        </div>
 
         <p class="description">Meltano leverages best practices from software development such as version control, continuous integration and deployment, and a powerful command line interface so you can focus on your data.</p>
 
@@ -457,7 +460,7 @@ export default {
 }
 
 .feature-section-wrapper {
-  background-color: #e5e4e2; 
+  background-color: #e5e4e2;
   padding-bottom: 6rem;
 }
 
@@ -479,7 +482,7 @@ export default {
     max-width: $contentWidthWide;
     margin: 0 auto;
   }
-  
+
   .feature-left {
     padding-left: 30px;
   }
@@ -683,5 +686,35 @@ export default {
   .language-bash {
     padding-right: 1.5rem;
   }
+}
+
+.rich-media-container {
+  margin: 0 10%;
+}
+
+.embed-responsive {
+  position: relative;
+  display: block;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+
+  .embed-responsive-item,
+  iframe,
+  embed,
+  object,
+  video {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+}
+
+.embed-responsive-16by9 {
+  padding-bottom: 56.25%;
 }
 </style>
