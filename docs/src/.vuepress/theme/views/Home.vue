@@ -272,7 +272,7 @@
       class="footer"
     >
       <a style="float:left;" href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue" target="_blank">{{ $site.themeConfig.editLinkText }} <OutboundLink /></a>
-      <p style="float:right">Meltano is a trademark of GitLab, Inc.</p>
+      <a style="float:right" href="https://about.gitlab.com/handbook/marketing/corporate-marketing/#gitlab-trademark--logo-guidelines">Meltano is a trademark of GitLab, Inc.</a>
     </div>
   </div>
 </template>
@@ -582,8 +582,9 @@ export default {
     border-top 1px solid $borderColor
     text-align center
     color lighten($textColor, 25%)
+    background-color #3e3c8e
     a
-      color $textColor
+      color white
       font-weight 500
 
 @media (max-width: $MQMobile)
