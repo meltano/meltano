@@ -51,7 +51,7 @@ install_e2e:
 
 test_meltano_ui:
   stage: test
-  image: node:9.11.1
+  image: node:10.16.2
   script:
     - cd src/webapp
     - yarn
@@ -61,7 +61,7 @@ docs:
   variables:
     REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
   stage: docs
-  image: node:9.11.1
+  image: node:10.16.2
   cache:
     paths:
       - node_modules/
