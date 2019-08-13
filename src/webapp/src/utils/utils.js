@@ -1,11 +1,13 @@
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
+const FLASK = window.FLASK || ''
 
 export default {
   // Path Utils
   root(path = '/') {
     // window.FLASK should be injected in the template
     // either by Webpack (dev) or Flask (prod)
+
     if (FLASK.appUrl) {
       return `${FLASK.appUrl}${path}`
     } else {

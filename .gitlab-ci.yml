@@ -55,7 +55,7 @@ test_meltano_ui:
   script:
     - cd src/webapp
     - yarn
-    - yarn unit # change `unit` to `test` once e2e is wired up
+    - yarn test:unit # change `unit` to `test` once e2e is wired up
 
 docs:
   variables:
