@@ -1,5 +1,6 @@
 <script>
 import { mapState } from 'vuex'
+import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 
 export default {
@@ -129,6 +130,9 @@ export default {
     selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
+        Vue.toasted.global.success(
+          `Entities Saved - ${this.extractorNameFromRoute}`
+        )
       })
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
@@ -275,7 +279,8 @@ export default {
         <template v-if="extractorLacksEntitySelectionAndIsInstalled">
           <div class="content">
             <p>
-              There are no entities to select for {{ extractorNameFromRoute }}.
+              All entities will be extracted by default as entity selection is
+              not currently supported for {{ extractorNameFromRoute }}.
             </p>
             <ul>
               <li>Click "Next" to advance</li>

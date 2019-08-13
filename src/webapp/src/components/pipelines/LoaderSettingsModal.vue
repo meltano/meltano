@@ -1,5 +1,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
+import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
@@ -25,11 +26,6 @@ export default {
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
-    configSettings() {
-      return this.loader.config
-        ? Object.assign(this.loader.config, this.loaderInFocusConfiguration)
-        : this.loaderInFocusConfiguration
-    },
     isInstalled() {
       return this.getIsPluginInstalled('loaders', this.loaderNameFromRoute)
     },
@@ -38,12 +34,14 @@ export default {
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
-        this.configSettings,
+        this.loaderInFocusConfiguration,
         'config'
       )
     },
     isSaveable() {
-      const isValid = this.getHasValidConfigSettings(this.configSettings)
+      const isValid = this.getHasValidConfigSettings(
+        this.loaderInFocusConfiguration
+      )
       return !this.isInstalling && this.isInstalled && isValid
     },
     loader() {
@@ -68,10 +66,11 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.loader.name,
           type: 'loaders',
-          config: this.configSettings.config
+          config: this.loaderInFocusConfiguration.config
         })
         .then(() => {
           this.$router.push({ name: 'schedules' })
+          Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })
     }
   }
@@ -104,11 +103,25 @@ export default {
           </div>
         </template>
 
+        <div v-if="loader.signupUrl" class="intro-module">
+          <p>
+            This plugin requires an account. If you don't have one, you can
+            <a :href="loader.signupUrl" target="_blank">sign up here</a>.
+          </p>
+        </div>
+
         <ConnectorSettings
           v-if="!isLoadingConfigSettings"
           fieldClass="is-small"
-          :config-settings="configSettings"
+          :config-settings="loaderInFocusConfiguration"
         />
+
+        <div v-if="loader.docs" class="footnote-module">
+          <p>
+            Need help finding this information? We got you covered with our
+            <a :href="loader.docs" target="_blank">docs here</a>.
+          </p>
+        </div>
 
         <progress
           v-if="isLoadingConfigSettings && !isInstalling"
@@ -130,4 +143,12 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.intro-module {
+  margin-bottom: 1rem;
+}
+
+.footnote-module {
+  margin-top: 1rem;
+}
+</style>

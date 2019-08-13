@@ -1,5 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
@@ -25,19 +26,11 @@ export default {
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
-    configSettings() {
-      return this.extractor.config
-        ? Object.assign(
-            this.extractor.config,
-            this.extractorInFocusConfiguration
-          )
-        : this.extractorInFocusConfiguration
-    },
     extractorLacksConfigSettingsAndIsInstalled() {
       return (
         !this.isInstalling &&
-        this.configSettings.settings &&
-        this.configSettings.settings.length === 0
+        this.extractorInFocusConfiguration.settings &&
+        this.extractorInFocusConfiguration.settings.length === 0
       )
     },
     extractor() {
@@ -62,12 +55,14 @@ export default {
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
-        this.configSettings,
+        this.extractorInFocusConfiguration,
         'config'
       )
     },
     isSaveable() {
-      const isValid = this.getHasValidConfigSettings(this.configSettings)
+      const isValid = this.getHasValidConfigSettings(
+        this.extractorInFocusConfiguration
+      )
       return !this.isInstalling && this.isInstalled && isValid
     }
   },
@@ -84,13 +79,16 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
-          config: this.configSettings.config
+          config: this.extractorInFocusConfiguration.config
         })
         .then(() => {
           this.$router.push({
             name: 'extractorEntities',
             params: { extractor: this.extractor.name }
           })
+          Vue.toasted.global.success(
+            `Connection Saved - ${this.extractor.name}`
+          )
         })
     }
   }
@@ -126,7 +124,7 @@ export default {
         <ConnectorSettings
           v-if="!isLoadingConfigSettings"
           fieldClass="is-small"
-          :config-settings="configSettings"
+          :config-settings="extractorInFocusConfiguration"
         />
 
         <progress

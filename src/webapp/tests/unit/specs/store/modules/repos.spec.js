@@ -1,7 +1,7 @@
-import repos from '@/store/modules/repos';
+import repos from '@/store/modules/repos'
 
 describe('repos Vuex store', () => {
-  let initialState;
+  let initialState
 
   beforeEach(() => {
     initialState = {
@@ -11,35 +11,35 @@ describe('repos Vuex store', () => {
       models: {},
       validated: false,
       errors: [],
-      files: {},
-    };
-  });
+      files: {}
+    }
+  })
 
   it('has the correct initial state', () => {
-    expect(repos.state).toMatchObject(initialState);
-  });
+    expect(repos.state).toMatchObject(initialState)
+  })
 
   it('validates that the hasMarkdown functions properly', () => {
-    const { activeView } = repos.state;
+    const { activeView } = repos.state
 
-    activeView.is_markdown = true;
-    activeView.populated = true;
-    expect(repos.getters.hasMarkdown(repos.state)).toBe(true);
+    activeView.is_markdown = true
+    activeView.populated = true
+    expect(repos.getters.hasMarkdown(repos.state)).toBe(true)
 
-    activeView.is_markdown = false;
-    activeView.populated = true;
-    expect(repos.getters.hasMarkdown(repos.state)).toBe(false);
-  });
+    activeView.is_markdown = false
+    activeView.populated = true
+    expect(repos.getters.hasMarkdown(repos.state)).toBe(false)
+  })
 
   it('validates that the hasCode functions properly', () => {
-    const { activeView } = repos.state;
+    const { activeView } = repos.state
 
-    activeView.is_markdown = false;
-    activeView.populated = true;
-    expect(repos.getters.hasCode(repos.state)).toBe(true);
+    activeView.is_markdown = false
+    activeView.populated = true
+    expect(repos.getters.hasCode(repos.state)).toBe(true)
 
-    activeView.is_markdown = true;
-    activeView.populated = true;
-    expect(repos.getters.hasCode(repos.state)).toBe(false);
-  });
-});
+    activeView.is_markdown = true
+    activeView.populated = true
+    expect(repos.getters.hasCode(repos.state)).toBe(false)
+  })
+})

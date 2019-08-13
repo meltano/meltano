@@ -1,15 +1,17 @@
 import SSF from 'ssf'
 import Vue from 'vue'
 import sqlFormatter from 'sql-formatter'
+import lodash from 'lodash'
+
 import utils from '@/utils/utils'
 import designApi from '../../api/design'
 import reportsApi from '../../api/reports'
 import sqlApi from '../../api/sql'
 
-const state = {
+const defaultState = utils.deepFreeze({
   activeReport: {},
   design: {
-    related_table: {}
+    relatedTable: {}
   },
   hasSQLError: false,
   sqlErrorMessage: [],
@@ -17,65 +19,51 @@ const state = {
   currentDesign: '',
   results: [],
   keys: [],
-  columnHeaders: [],
-  columnNames: [],
+  queryAttributes: [],
   resultAggregates: {},
   loadingQuery: false,
-  currentDataTab: 'sql',
   currentSQL: '',
-  filtersOpen: false,
-  dataOpen: true,
-  chartsOpen: false,
   saveReportSettings: { name: null },
   reports: [],
   chartType: 'BarChart',
-  limit: 3,
-  distincts: {},
-  sortColumn: null,
-  sortDesc: false,
-  dialect: null
-}
+  limit: 50,
+  dialect: null,
+  filterOptions: [],
+  filters: {
+    columns: [],
+    aggregates: []
+  },
+  order: {
+    assigned: [],
+    unassigned: []
+  }
+})
 
 const helpers = {
-  getQueryPayloadFromDesign() {
+  getFilterTypePlural(filterType) {
+    return `${filterType}s`
+  },
+  getQueryPayloadFromDesign(state) {
+    // Inline fn helpers
     const selected = x => x.selected
     const namesOfSelected = arr => {
       if (!Array.isArray(arr)) {
         return null
       }
-
       return arr.filter(selected).map(x => x.name)
     }
 
-    const baseTable = state.design.related_table
+    const baseTable = state.design.relatedTable
     const columns = namesOfSelected(baseTable.columns)
     const aggregates = namesOfSelected(baseTable.aggregates) || []
 
-    let sortColumn = baseTable.columns.find(d => d.name === state.sortColumn)
-    if (!sortColumn) {
-      sortColumn = baseTable.aggregates.find(d => d.name === state.sortColumn)
-    }
-    let order = null
-    if (sortColumn && sortColumn.selected) {
-      order = {
-        column: sortColumn.name,
-        direction: state.sortDesc ? 'desc' : 'asc'
-      }
-    }
-
-    const filters = JSON.parse(JSON.stringify(state.distincts))
-    const filtersKeys = Object.keys(filters)
-    filtersKeys.forEach(prop => {
-      delete filters[prop].results
-      delete filters[prop].sql
-    })
-
+    // Join table(s) setup
     if (!state.design.joins) {
       state.design.joins = []
     }
     const joins = state.design.joins
       .map(j => {
-        const table = j.related_table
+        const table = j.relatedTable
         const newJoin = {}
 
         newJoin.name = j.name
@@ -107,82 +95,179 @@ const helpers = {
         }))
         .filter(tf => tf.periods.length)
 
+    // Ordering setup
+    const order = state.order.assigned
+
+    // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
+    const filters = lodash.cloneDeep(state.filters)
+    if (filters && filters.aggregates) {
+      filters.aggregates = filters.aggregates
+        .filter(aggregate => aggregate.isActive)
+        .map(aggregate => {
+          aggregate.value = Number(aggregate.value)
+          return aggregate
+        })
+    }
+
     return {
-      table: baseTable.name,
+      name: state.design.name,
       columns,
       aggregates,
       timeframes,
       joins,
       order,
       limit: state.limit,
-      filters,
-      dialect: state.dialect
+      dialect: state.dialect,
+      filters
     }
   }
 }
 
 const getters = {
-  hasResults() {
+  filtersCount(state) {
+    return state.filters.columns.length + state.filters.aggregates.length
+  },
+
+  hasResults(state) {
     if (!state.results) {
       return false
     }
     return !!state.results.length
   },
 
-  hasChartableResults() {
-    return getters.hasResults() && state.resultAggregates.length
+  // eslint-disable-next-line
+  hasChartableResults(state, getters) {
+    return getters.hasResults && state.resultAggregates.length
   },
 
-  numResults() {
+  // eslint-disable-next-line
+  hasFilters(_, getters) {
+    return getters.filtersCount > 0
+  },
+
+  getAllAttributes(state) {
+    let attributes = []
+    const joinSources = state.design.joins || []
+    const sources = [state.design].concat(joinSources)
+    const batchCollect = (table, attributeTypes) => {
+      attributeTypes.forEach(attributeType => {
+        const attributesByType = table[attributeType]
+        if (attributesByType) {
+          attributes = attributes.concat(attributesByType)
+        }
+      })
+    }
+
+    sources.forEach(source => {
+      batchCollect(source.relatedTable, ['columns', 'aggregates', 'timeframes'])
+    })
+
+    return attributes
+  },
+
+  // eslint-disable-next-line no-shadow
+  getAttributeByQueryAttribute(state, getters) {
+    return queryAttribute => {
+      const finder = attr =>
+        attr.sourceName === queryAttribute.sourceName &&
+        attr.name === queryAttribute.attributeName
+      return getters.getAllAttributes.find(finder)
+    }
+  },
+
+  getFilterAttributes(state) {
+    const sources = []
+    const design = state.design
+    const attributeFilter = attr => !attr.hidden
+    if (design.label) {
+      sources.push({
+        tableLabel: design.label,
+        sourceName: design.name,
+        columns: design.relatedTable.columns
+          ? design.relatedTable.columns.filter(attributeFilter)
+          : [],
+        aggregates: design.relatedTable.aggregates
+          ? design.relatedTable.aggregates.filter(attributeFilter)
+          : []
+      })
+    }
+    if (design.joins) {
+      design.joins.forEach(join => {
+        sources.push({
+          tableLabel: join.label,
+          sourceName: join.name,
+          columns: join.relatedTable.columns
+            ? join.relatedTable.columns.filter(attributeFilter)
+            : [],
+          aggregates: join.relatedTable.aggregates
+            ? join.relatedTable.aggregates.filter(attributeFilter)
+            : []
+        })
+      })
+    }
+    return sources
+  },
+
+  // eslint-disable-next-line no-shadow
+  getFilter(_, getters) {
+    // eslint-disable-next-line
+    return (sourceName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.sourceName === sourceName);
+  },
+
+  getFiltersByType(state) {
+    return filterType =>
+      state.filters[helpers.getFilterTypePlural(filterType)] || []
+  },
+
+  // eslint-disable-next-line no-shadow
+  getIsAttributeInFilters(_, getters) {
+    // eslint-disable-next-line
+    return (sourceName, name, filterType) => !!getters.getFilter(sourceName, name, filterType);
+  },
+
+  getIsOrderableAttributeAscending() {
+    return orderableAttribute => orderableAttribute.direction === 'asc'
+  },
+
+  // eslint-disable-next-line no-shadow
+  getQueryAttributeFromCollectionByAttribute(state) {
+    return (orderCollection, attribute) => {
+      const finder = queryAttribute =>
+        attribute.sourceName === queryAttribute.sourceName &&
+        attribute.name === queryAttribute.attributeName
+      return state.order[orderCollection].find(finder)
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributes(_, getters) {
+    const selector = attribute => attribute.selected
+    return getters.getAllAttributes.filter(selector)
+  },
+
+  // eslint-disable-next-line no-shadow
+  getSelectedAttributesCount(_, getters) {
+    return getters.getSelectedAttributes.length
+  },
+
+  resultsCount(state) {
     if (!state.results) {
       return 0
     }
     return state.results.length
   },
 
-  getDialect: () => state.dialect,
+  getDialect: state => state.dialect,
 
-  getDistinctsForField: () => field => state.distincts[field],
-
-  getResultsFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return null
-    }
-    return thisDistinct.results
-  },
-
-  hasJoins() {
+  hasJoins(state) {
     return !!(state.design.joins && state.design.joins.length)
   },
-
-  isColumnSorted: () => key => state.sortColumn === key,
 
   showJoinColumnAggregateHeader: () => obj => !!obj,
 
   joinIsExpanded: () => join => join.expanded,
 
-  getKeyFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return null
-    }
-    return thisDistinct.keys[0]
-  },
-
-  getSelectionsFromDistinct: () => field => {
-    const thisDistinct = state.distincts[field]
-    if (!thisDistinct) {
-      return []
-    }
-    const thisDistinctSelections = thisDistinct.selections
-    if (!thisDistinctSelections) {
-      return []
-    }
-    return thisDistinctSelections
-  },
-
-  getChartYAxis() {
+  getChartYAxis(state) {
     if (!state.resultAggregates) {
       return []
     }
@@ -190,53 +275,82 @@ const getters = {
     return aggregates
   },
 
-  isColumnSelectedAggregate: () => columnName =>
+  isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
   getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
-  currentModelLabel() {
+  currentModelLabel(state) {
     return utils.titleCase(state.currentModel)
   },
 
-  currentDesignLabel() {
+  currentDesignLabel(state) {
     return utils.titleCase(state.currentModel)
   },
 
-  isDataTab() {
-    return state.currentDataTab === 'data'
-  },
-
-  isResultsTab() {
-    return state.currentDataTab === 'results'
-  },
-
-  isSQLTab() {
-    return state.currentDataTab === 'sql'
-  },
-
-  currentLimit() {
+  currentLimit(state) {
     return state.limit
   },
 
-  formattedSql() {
+  formattedSql(state) {
     return sqlFormatter.format(state.currentSQL)
   }
 }
 
 const actions = {
-  getDesign({ dispatch, commit }, { model, design, slug }) {
+  checkAutoRun({ dispatch, state }) {
+    if (state.results.length > 0) {
+      dispatch('runQuery')
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  cleanFiltering({ commit, getters }, { attribute, type }) {
+    if (!attribute.selected) {
+      const filter = getters.getFilter(
+        attribute.sourceName,
+        attribute.name,
+        type
+      )
+      if (filter) {
+        commit('removeFilter', filter)
+      }
+    }
+  },
+
+  // eslint-disable-next-line no-shadow
+  cleanOrdering({ commit, getters, state }, attribute) {
+    if (!attribute.selected) {
+      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+        'assigned',
+        attribute
+      )
+      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+        'unassigned',
+        attribute
+      )
+      if (matchAssigned || matchUnassigned) {
+        commit('removeOrder', {
+          collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
+          queryAttribute: matchAssigned || matchUnassigned
+        })
+      }
+    }
+  },
+
+  resetDefaults: ({ commit }) => commit('resetDefaults'),
+
+  getDesign({ commit, dispatch, state }, { model, design, slug }) {
     state.currentSQL = ''
     state.currentModel = model
     state.currentDesign = design
 
-    // TODO: chain callbacks to keep a single Promise
-    const index = designApi.index(model, design).then(response => {
-      commit('setDesign', response.data)
-    })
-
-    reportsApi
-      .loadReports()
+    return designApi
+      .index(model, design)
+      .then(response => {
+        commit('setDesign', response.data)
+      })
+      .then(reportsApi.loadReports)
       .then(response => {
         state.reports = response.data
         if (slug) {
@@ -250,8 +364,12 @@ const actions = {
         commit('setSqlErrorMessage', e)
         state.loadingQuery = false
       })
+  },
 
-    return index
+  getFilterOptions({ commit }) {
+    sqlApi.getFilterOptions().then(response => {
+      commit('setFilterOptions', response.data)
+    })
   },
 
   expandRow({ commit }, row) {
@@ -261,10 +379,10 @@ const actions = {
   expandJoinRow({ commit }, join) {
     // already fetched columns
     commit('toggleCollapsed', join)
-    if (join.related_table.columns.length) {
+    if (join.relatedTable.columns.length) {
       return
     }
-    designApi.getTable(join.related_table.name).then(response => {
+    designApi.getTable(join.relatedTable.name).then(response => {
       commit('setJoinColumns', {
         columns: response.data.columns,
         join
@@ -280,27 +398,29 @@ const actions = {
     })
   },
 
-  removeSort({ commit }, column) {
-    if (!state.sortColumn || state.sortColumn !== column.name) {
-      return
-    }
-    commit('setRemoveSort', column)
-  },
-
-  toggleColumn({ commit }, column) {
+  toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column)
+    dispatch('cleanOrdering', column)
+    dispatch('checkAutoRun')
   },
 
-  toggleTimeframe({ commit }, timeframe) {
+  toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe)
+    dispatch('cleanOrdering', timeframe)
+    dispatch('checkAutoRun')
   },
 
-  toggleTimeframePeriod({ commit }, timeframePeriod) {
+  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod)
+    dispatch('cleanOrdering', timeframePeriod)
+    dispatch('checkAutoRun')
   },
 
-  toggleAggregate({ commit }, aggregate) {
+  toggleAggregate({ commit, dispatch }, aggregate) {
     commit('toggleSelected', aggregate)
+    dispatch('cleanOrdering', aggregate)
+    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
+    dispatch('checkAutoRun')
   },
 
   limitSet({ commit }, limit) {
@@ -312,13 +432,14 @@ const actions = {
     commit('setChartType', chartType)
   },
 
-  getSQL({ commit }, { run, load }) {
+  // eslint-disable-next-line no-shadow
+  getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage')
     state.loadingQuery = !!run
 
     const queryPayload = Object.assign(
       {},
-      helpers.getQueryPayloadFromDesign(),
+      helpers.getQueryPayloadFromDesign(state),
       load
     )
     const postData = Object.assign({ run }, queryPayload)
@@ -328,11 +449,10 @@ const actions = {
         if (run) {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          commit('setCurrentTab', 'results')
           state.loadingQuery = false
+          commit('setSorting', getters.getAllAttributes)
         } else {
           commit('setSQLResults', response.data)
-          commit('setCurrentTab', 'sql')
         }
       })
       .catch(e => {
@@ -341,7 +461,7 @@ const actions = {
       })
   },
 
-  loadReport({ commit }, { name }) {
+  loadReport({ commit, state }, { name }) {
     reportsApi
       .loadReport(name)
       .then(response => {
@@ -359,13 +479,15 @@ const actions = {
       })
   },
 
-  saveReport({ commit }, { name }) {
+  saveReport({ commit, state }, { name }) {
     const postData = {
-      name,
-      model: state.currentModel,
-      design: state.currentDesign,
       chartType: state.chartType,
-      queryPayload: helpers.getQueryPayloadFromDesign()
+      design: state.currentDesign,
+      filters: state.filters,
+      model: state.currentModel,
+      name,
+      order: state.order,
+      queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
     reportsApi
       .saveReport(postData)
@@ -380,8 +502,8 @@ const actions = {
       })
   },
 
-  updateReport({ commit }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign()
+  updateReport({ commit, state }) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
     state.activeReport.chartType = state.chartType
     reportsApi
       .updateReport(state.activeReport)
@@ -399,83 +521,132 @@ const actions = {
     commit('setErrorState')
   },
 
-  getDistinct({ commit }, field) {
-    sqlApi
-      .getDistinct(state.currentModel, state.currentDesign, field)
-      .then(response => {
-        commit('setDistincts', {
-          data: response.data,
-          field
-        })
-      })
+  resetSortAttributes({ commit, dispatch }) {
+    commit('resetSortAttributes')
+    dispatch('checkAutoRun')
   },
 
-  addDistinctSelection({ commit }, data) {
-    commit('setSelectedDistincts', data)
-  },
-
-  addDistinctModifier({ commit }, data) {
-    commit('setModifierDistincts', data)
-  },
-
-  switchCurrentTab({ commit }, tab) {
-    commit('setCurrentTab', tab)
-  },
-
-  toggleFilterOpen({ commit }) {
-    commit('setFilterToggle')
-  },
-
-  toggleDataOpen({ commit }) {
-    commit('setDataToggle')
+  runQuery() {
+    this.dispatch('designs/getSQL', {
+      run: true
+    })
   },
 
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle')
   },
 
-  toggleChartsOpen({ commit }) {
-    commit('setChartToggle')
+  // eslint-disable-next-line no-shadow
+  updateSortAttribute({ commit, getters }, queryAttribute) {
+    const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
+    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+      'assigned',
+      attribute
+    )
+    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+      'unassigned',
+      attribute
+    )
+    if (matchInAssigned) {
+      const direction = getters.getIsOrderableAttributeAscending(
+        matchInAssigned
+      )
+        ? 'desc'
+        : 'asc'
+      commit('setSortableAttributeDirection', {
+        orderableAttribute: matchInAssigned,
+        direction
+      })
+    } else if (matchInUnassigned) {
+      commit('assignSortableAttribute', attribute)
+    }
+
+    this.dispatch('designs/runQuery')
   },
 
-  sortBy({ commit }, name) {
-    commit('setSortColumn', name)
-    this.dispatch('designs/getSQL', {
-      run: true
-    })
+  // eslint-disable-next-line
+  addFilter({ commit }, { sourceName, attribute, filterType, expression = '', value = '', isActive = true }) {
+    const filter = {
+      sourceName,
+      name: attribute.name,
+      expression,
+      value,
+      attribute,
+      filterType,
+      isActive
+    }
+    commit('addFilter', filter)
+
+    const isValidToggleSelection =
+      !attribute.hasOwnProperty('selected') || !attribute.selected
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute)
+    }
+  },
+
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter)
   }
 }
 
 const mutations = {
-  setRemoveSort() {
-    state.sortColumn = null
+  assignSortableAttribute(state, attribute) {
+    const orderableAttribute = state.order.unassigned.find(
+      orderableAttr =>
+        orderableAttr.attributeName === attribute.name &&
+        orderableAttr.sourceName === attribute.sourceName
+    )
+    const idx = state.order.unassigned.indexOf(orderableAttribute)
+    state.order.unassigned.splice(idx, 1)
+    state.order.assigned.push(orderableAttribute)
   },
 
-  setChartType(context, chartType) {
+  removeOrder(state, { collection, queryAttribute }) {
+    const idx = collection.indexOf(queryAttribute)
+    collection.splice(idx, 1)
+  },
+
+  resetDefaults(state) {
+    lodash.assign(state, lodash.cloneDeep(defaultState))
+  },
+
+  resetSortAttributes(state) {
+    const assigned = state.order.assigned
+    state.order.unassigned = state.order.unassigned.concat(assigned)
+    state.order.assigned = []
+  },
+
+  setChartType(state, chartType) {
     state.chartType = chartType
   },
 
-  setCurrentReport(_, report) {
+  setCurrentReport(state, report) {
     state.activeReport = report
   },
 
-  setStateFromLoadedReport(_, report) {
+  setFilterOptions(state, options) {
+    state.filterOptions = options
+  },
+
+  setStateFromLoadedReport(state, report) {
     // General UI state updates
+    state.chartType = report.chartType
     state.currentModel = report.model
     state.currentDesign = report.design
-    state.chartType = report.chartType
-    state.limit = report.queryPayload.limit
     state.dialect = report.queryPayload.dialect
+    state.filters = report.filters
+    state.limit = report.queryPayload.limit
+    state.order = report.order
 
-    // UI selected state adornment helpers for columns, aggregates, filters, joins, & timeframes
-    const baseTable = state.design.related_table
+    // UI selected state adornment helpers for columns, aggregates, joins, & timeframes
+    const baseTable = state.design.relatedTable
     const queryPayload = report.queryPayload
     const joinColumnGroups = state.design.joins.reduce((acc, curr) => {
       acc.push({
         name: curr.name,
-        columns: curr.related_table.columns,
-        aggregates: curr.related_table.aggregates,
-        timeframes: curr.related_table.timeframes
+        columns: curr.relatedTable.columns,
+        aggregates: curr.relatedTable.aggregates,
+        timeframes: curr.relatedTable.timeframes
       })
       return acc
     }, [])
@@ -491,8 +662,6 @@ const mutations = {
     setSelected(baseTable.columns, queryPayload.columns)
     // aggregates
     setSelected(baseTable.aggregates, queryPayload.aggregates)
-    // filters
-    // TODO
     // joins, timeframes, and periods
     joinColumnGroups.forEach(joinGroup => {
       // joins - columns
@@ -519,25 +688,23 @@ const mutations = {
         })
       }
     })
-    // order
-    // TODO
-    // base_table timeframes
-    // TODO
   },
 
-  addSavedReportToReports(_, report) {
-    state.reports.push(report)
+  addFilter(state, filter) {
+    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
   },
 
-  setSortColumn(context, name) {
-    if (state.sortColumn === name) {
-      state.sortDesc = !state.sortDesc
+  removeFilter(state, filter) {
+    if (filter) {
+      const filtersByType =
+        state.filters[helpers.getFilterTypePlural(filter.filterType)]
+      const idx = filtersByType.indexOf(filter)
+      filtersByType.splice(idx, 1)
     }
-    state.sortColumn = name
   },
 
-  setDistincts(_, { data, field }) {
-    Vue.set(state.distincts, field, data)
+  addSavedReportToReports(state, report) {
+    state.reports.push(report)
   },
 
   setJoinColumns(_, { columns, join }) {
@@ -552,48 +719,46 @@ const mutations = {
     join.aggregates = aggregates
   },
 
-  setSelectedDistincts(_, { item, field }) {
-    if (!state.distincts[field].selections) {
-      Vue.set(state.distincts[field], 'selections', [])
-    }
-    if (state.distincts[field].selections.indexOf(item) === -1) {
-      state.distincts[field].selections.push(item)
-    }
-  },
-
-  setModifierDistincts(_, { item, field }) {
-    Vue.set(state.distincts[field], 'modifier', item)
-  },
-
-  setFilterToggle() {
-    state.filtersOpen = !state.filtersOpen
-  },
-
-  setDataToggle() {
-    state.dataOpen = !state.dataOpen
-  },
-
-  resetSaveReportSettings() {
+  resetSaveReportSettings(state) {
     state.saveReportSettings = { name: null }
   },
 
-  setChartToggle() {
-    state.chartsOpen = !state.chartsOpen
-  },
-
-  setSQLResults(_, results) {
+  setSQLResults(state, results) {
     state.currentSQL = results.sql
   },
 
-  setQueryResults(_, results) {
+  setQueryResults(state, results) {
     state.results = results.results
     state.keys = results.keys
-    state.columnHeaders = results.column_headers
-    state.columnNames = results.column_names
+    state.queryAttributes = results.queryAttributes
     state.resultAggregates = results.aggregates
   },
 
-  setSqlErrorMessage(_, e) {
+  setSorting(state, allAttributes) {
+    state.queryAttributes.forEach(queryAttribute => {
+      const accounted = state.order.assigned.concat(state.order.unassigned)
+      const finder = orderableAttribute =>
+        orderableAttribute.sourceName === queryAttribute.sourceName &&
+        orderableAttribute.attributeName === queryAttribute.attributeName
+      const isAccountedFor = accounted.find(finder)
+      if (!isAccountedFor) {
+        const targetAttribute = allAttributes.find(
+          attribute =>
+            attribute.sourceName === queryAttribute.sourceName &&
+            attribute.name === queryAttribute.attributeName
+        )
+        state.order.unassigned.push({
+          sourceName: targetAttribute.sourceName,
+          sourceLabel: targetAttribute.sourceLabel,
+          attributeName: targetAttribute.name,
+          attributeLabel: targetAttribute.label,
+          direction: 'asc'
+        })
+      }
+    })
+  },
+
+  setSqlErrorMessage(state, e) {
     state.hasSQLError = true
     if (!e.response) {
       state.sqlErrorMessage = [
@@ -605,32 +770,50 @@ const mutations = {
     state.sqlErrorMessage = [error.code, error.orig, error.statement]
   },
 
-  setErrorState() {
+  setErrorState(state) {
     state.hasSQLError = false
     state.sqlErrorMessage = []
   },
 
-  toggleSelected(_, selectable) {
-    Vue.set(selectable, 'selected', !selectable.selected)
+  toggleSelected(state, attribute) {
+    Vue.set(attribute, 'selected', !attribute.selected)
   },
 
-  toggleCollapsed(_, collapsable) {
+  toggleCollapsed(state, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed)
   },
 
-  setDesign(_, designData) {
+  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
+    orderableAttribute.direction = direction
+  },
+
+  setDesign(state, designData) {
+    const joinSources = designData.joins || []
+    const sources = [designData].concat(joinSources)
+    const batchSourcer = (source, attributeTypes) => {
+      const table = source.relatedTable
+      attributeTypes.forEach(attributeType => {
+        if (table[attributeType]) {
+          table[attributeType].forEach(attribute => {
+            attribute.sourceName = source.name
+            attribute.sourceLabel = source.label
+          })
+        }
+      })
+    }
+
+    sources.forEach(source => {
+      batchSourcer(source, ['columns', 'aggregates', 'timeframes'])
+    })
+
     state.design = designData
   },
 
-  setCurrentTab(_, tab) {
-    state.currentDataTab = tab
-  },
-
-  setLimit(_, limit) {
+  setLimit(state, limit) {
     state.limit = limit
   },
 
-  setDialect(_, dialect) {
+  setDialect(state, dialect) {
     state.dialect = dialect
   }
 }
@@ -638,7 +821,7 @@ const mutations = {
 export default {
   namespaced: true,
   helpers,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations

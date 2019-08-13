@@ -10,6 +10,9 @@ export default {
     Airflow,
     RouterViewLayout
   },
+  created() {
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled'])
   }

@@ -69,7 +69,7 @@ In the event you are contributing to Meltano UI and want to work with all of the
 meltano ui
 
 # Open a new terminal tab and go to your meltano directory. Then change directory to analyze
-cd src/analyze
+cd src/webapp
 
 # Install dependencies
 npm install # or yarn

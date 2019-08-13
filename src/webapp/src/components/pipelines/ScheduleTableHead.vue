@@ -68,12 +68,6 @@ export default {
 
       <th v-if="hasActions" class="has-text-right">
         <span>Actions</span>
-        <span
-          class="icon has-text-grey-light tooltip is-tooltip-left"
-          data-tooltip="Steps to take with a given ELT pipeline schedule."
-        >
-          <font-awesome-icon icon="info-circle"></font-awesome-icon>
-        </span>
       </th>
     </tr>
   </thead>

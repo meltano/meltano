@@ -1,5 +1,5 @@
 {
-  "name": "webapp",
+  "name": "meltano-webapp",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -51,7 +51,8 @@
     "sql-formatter": "^2.3.3",
     "ssf": "^0.10.2",
     "vue-template-compiler": "^2.6.10",
-    "vue-toasted": "^1.1.27"
+    "vue-toasted": "^1.1.27",
+    "vuedraggable": "^2.23.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

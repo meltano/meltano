@@ -1,6 +1,6 @@
-import Vue from 'vue';
-import FontAwesome from '@/font-awesome';
+import Vue from 'vue'
+import FontAwesome from '@/font-awesome'
 
-Vue.use(FontAwesome);
+Vue.use(FontAwesome)
 
-Vue.config.productionTip = false;
+Vue.config.productionTip = false

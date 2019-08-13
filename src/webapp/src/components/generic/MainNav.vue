@@ -1,4 +1,6 @@
 <script>
+import { mapGetters } from 'vuex'
+
 import utils from '@/utils/utils'
 
 import Logo from './Logo'
@@ -21,11 +23,15 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
     }
   },
   methods: {
+    goToSchedules() {
+      this.$router.push({ name: 'schedules' })
+    },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
     },
@@ -66,6 +72,13 @@ export default {
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           Pipelines
+          <span
+            v-if="getRunningPipelineJobsCount > 0"
+            class="tag tag-running-pipelines is-rounded is-info"
+            @click.prevent="goToSchedules"
+          >
+            {{ getRunningPipelineJobsCount }}
+          </span>
         </router-link>
 
         <router-link
@@ -157,5 +170,8 @@ export default {
 }
 .navbar-item .navbar-child {
   padding-left: 1.5rem;
+}
+.tag-running-pipelines {
+  margin-left: 0.5rem;
 }
 </style>
