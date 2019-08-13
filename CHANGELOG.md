@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 ### Fixes
+* [#872](https://gitlab.com/meltano/meltano/issues/872) Updated `tap-marketo` and `tap-stripe` to leverage password input type while also improving the input type password fallback
 
 ### Breaks
 

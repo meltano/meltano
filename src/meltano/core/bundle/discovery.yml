@@ -77,6 +77,7 @@ extractors:
       - name: client_id
         label: Client ID
       - name: client_secret
+        kind: password
       - name: endpoint
       - name: start_time
         kind: date_iso8601
@@ -117,6 +118,7 @@ extractors:
       - name: account_id
         label: Account ID
       - name: client_secret
+        kind: password
         env: STRIPE_API_KEY
       - name: start_date
         kind: date_iso8601
