@@ -208,6 +208,14 @@ export default {
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    },
+
+    visibleRelatedTableColumns() {
+      if (this.design.relatedTable.columns) {
+        return this.design.relatedTable.columns.filter(
+          column => column.hidden === false
+        )
+      }
     }
   }
 }
@@ -496,9 +504,8 @@ export default {
               </template>
               <a
                 class="panel-block space-between has-text-weight-medium"
-                v-for="column in design.relatedTable.columns"
+                v-for="column in visibleRelatedTableColumns"
                 :key="column.label"
-                v-if="!column.hidden"
                 @click="columnSelected(column)"
                 :class="{ 'is-active': column.selected }"
               >
