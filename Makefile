@@ -130,7 +130,7 @@ ${MELTANO_CORE_BUNDLE}/model/%:
 bundle_ui: ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
-	cp -r src/webapp/dist/static src/meltano/api
+	cp -r src/webapp/dist src/meltano/api
 
 freeze_db:
 	scripts/alembic_freeze.py
