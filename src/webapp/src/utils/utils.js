@@ -1,5 +1,5 @@
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
-const regExpPrivateInput = /(password|private|token)/
+const regExpPrivateInput = /(password|private|secret|token)/;
 
 export default {
   // Path Utils
