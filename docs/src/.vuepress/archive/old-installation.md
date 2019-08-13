@@ -58,11 +58,11 @@ export PG_USERNAME=warehouse
 export PG_ADDRESS=localhost
 export PG_PORT=5502
 
-export MELTANO_ANALYZE_POSTGRES_URL=localhost
-export MELTANO_ANALYZE_POSTGRES_DB=meltano
-export MELTANO_ANALYZE_POSTGRES_USER=meltano
-export MELTANO_ANALYZE_POSTGRES_PASSWORD=meltano
-export MELTANO_ANALYZE_POSTGRES_PORT=5501
+export MELTANO_WEBAPP_POSTGRES_URL=localhost
+export MELTANO_WEBAPP_POSTGRES_DB=meltano
+export MELTANO_WEBAPP_POSTGRES_USER=meltano
+export MELTANO_WEBAPP_POSTGRES_PASSWORD=meltano
+export MELTANO_WEBAPP_POSTGRES_PORT=5501
 ```
 
 Run the following in your project directory:
@@ -100,7 +100,7 @@ Lastly, let's start the web server:
 
 ```bash
 # install web server dependencies
-cd src/analyze/
+cd src/webapp/
 yarn install
 
 # run the UI

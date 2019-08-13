@@ -1,27 +1,30 @@
 import Vue from 'vue'
 
 import utils from '@/utils/utils'
+import poller from '@/utils/poller'
 import lodash from 'lodash'
 
 import orchestrationsApi from '../../api/orchestrations'
 
-const defaultState = {
+const defaultState = utils.deepFreeze({
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   connectionInFocusConfiguration: {},
   extractorInFocusEntities: {},
-  pipelines: []
-}
+  pipelines: [],
+  pipelinePollers: []
+})
 
 const getters = {
   getHasPipelines(state) {
     return state.pipelines.length > 0
   },
-  getHasValidConfigSettings(_, gettersRef) {
+  // eslint-disable-next-line
+  getHasValidConfigSettings(_, getters) {
     return configSettings => {
       const isValid = setting =>
-        gettersRef.getIsConfigSettingValid(configSettings.config[setting.name])
+        getters.getIsConfigSettingValid(configSettings.config[setting.name])
       return (
         configSettings.settings &&
         lodash.every(configSettings.settings, isValid)
@@ -30,6 +33,14 @@ const getters = {
   },
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== ''
+  },
+  getRunningPipelineJobsCount(state) {
+    return state.pipelinePollers.length
+  },
+  getRunningPipelineJobIds(state) {
+    return state.pipelinePollers.map(
+      pipelinePoller => pipelinePoller.getMetadata().jobId
+    )
   }
 }
 
@@ -43,9 +54,10 @@ const actions = {
   clearConnectionInFocusConfiguration: ({ commit }) =>
     commit('reset', 'connectionInFocusConfiguration'),
 
-  getAllPipelineSchedules({ commit }) {
+  getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
+      dispatch('rehydratePollers')
     })
   },
 
@@ -79,6 +91,7 @@ const actions = {
     )
   },
 
+  // eslint-disable-next-line no-shadow
   getConnectionConfiguration({ commit, dispatch }, connection) {
     dispatch('getPluginConfiguration', {
       name: connection,
@@ -92,10 +105,71 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload)
   },
 
-  savePluginConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload)
-    // TODO commit if values are properly saved, they are initially copied from
-    // the extractor's config and we'd have to update this
+  // eslint-disable-next-line no-shadow
+  getPolledPipelineJobStatus({ commit, getters, state }) {
+    return orchestrationsApi
+      .getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
+      .then(response => {
+        response.data.jobs.forEach(jobStatus => {
+          if (jobStatus.isComplete) {
+            const targetPoller = state.pipelinePollers.find(
+              pipelinePoller =>
+                pipelinePoller.getMetadata().jobId === jobStatus.jobId
+            )
+            commit('removePipelinePoller', targetPoller)
+
+            const targetPipeline = state.pipelines.find(
+              pipeline => pipeline.name === jobStatus.jobId.replace('job_', '')
+            )
+            commit('setPipelineIsRunning', {
+              pipeline: targetPipeline,
+              value: false
+            })
+          }
+        })
+      })
+  },
+
+  queuePipelinePoller({ commit, dispatch }, pollMetadata) {
+    const pollFn = () => dispatch('getPolledPipelineJobStatus')
+    const pipelinePoller = poller.create(pollFn, pollMetadata, 8000)
+    pipelinePoller.init()
+    commit('addPipelinePoller', pipelinePoller)
+  },
+
+  rehydratePollers({ dispatch, state }) {
+    // Handle page refresh condition resulting in jobs running but no pollers
+    const runningPipelines = state.pipelines.filter(
+      pipeline => pipeline.isRunning
+    )
+    runningPipelines.forEach(pipeline => {
+      const jobId = `job_${pipeline.name}`
+      const isMissingPoller =
+        state.pipelinePollers.find(
+          pipelinePoller => pipelinePoller.getMetadata().jobId === jobId
+        ) === undefined
+      if (isMissingPoller) {
+        dispatch('queuePipelinePoller', { jobId })
+      }
+    })
+  },
+
+  run({ commit, dispatch }, pipeline) {
+    return orchestrationsApi.run(pipeline).then(response => {
+      dispatch('queuePipelinePoller', response.data)
+      commit('setPipelineIsRunning', { pipeline, value: true })
+    })
+  },
+
+  savePluginConfiguration({ commit, state }, configPayload) {
+    orchestrationsApi.savePluginConfiguration(configPayload).then(response => {
+      const configuration = Object.assign(
+        {},
+        state.connectionInFocusConfiguration
+      )
+      configuration.config = response.data
+      commit('setConnectionInFocusConfiguration', configuration)
+    })
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
@@ -163,19 +237,33 @@ const actions = {
 }
 
 const mutations = {
+  addPipelinePoller(state, pipelinePoller) {
+    state.pipelinePollers.push(pipelinePoller)
+  },
+
+  removePipelinePoller(state, pipelinePoller) {
+    pipelinePoller.dispose()
+    const idx = state.pipelinePollers.indexOf(pipelinePoller)
+    state.pipelinePollers.splice(idx, 1)
+  },
+
   reset(state, attr) {
     if (defaultState.hasOwnProperty(attr)) {
-      state[attr] = defaultState[attr]
+      state[attr] = lodash.cloneDeep(defaultState[attr])
     }
   },
 
   setAllExtractorInFocusEntities(state, entitiesData) {
     state.extractorInFocusEntities = entitiesData
       ? {
-          extractorName: entitiesData.extractor_name,
-          entityGroups: entitiesData.entity_groups
+          extractorName: entitiesData.extractorName,
+          entityGroups: entitiesData.entityGroups
         }
       : {}
+  },
+
+  setConnectionInFocusConfiguration(state, configuration) {
+    state.connectionInFocusConfiguration = configuration
   },
 
   setExtractorInFocusConfiguration(state, configuration) {
@@ -190,8 +278,8 @@ const mutations = {
     state.loaderInFocusConfiguration = configuration
   },
 
-  setConnectionInFocusConfiguration(state, configuration) {
-    state.connectionInFocusConfiguration = configuration
+  setPipelineIsRunning(_, { pipeline, value }) {
+    Vue.set(pipeline, 'isRunning', value)
   },
 
   setPipelines(state, pipelines) {
@@ -208,7 +296,7 @@ const mutations = {
   },
 
   updatePipelines(state, pipeline) {
-    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.start_date)
+    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate)
     state.pipelines.push(pipeline)
   }
 }

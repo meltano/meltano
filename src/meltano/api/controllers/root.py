@@ -25,7 +25,7 @@ def default(path):
     try:
         return render_template("analyze.html", jsContext=g.jsContext)
     except TemplateNotFound:
-        return "Please run `make bundle` from src/analyze of the Meltano project."
+        return "Please run `make bundle` from src/webapp of the Meltano project."
 
 
 @root.route("/drop")

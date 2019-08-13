@@ -59,6 +59,20 @@ a.disabled {
 }
 
 /*
+COMPONENTS -----------------------------------------------------------------------------------------
+Component helpers related to Bulma's component classes when bulma-overrides doesn't suffice
+*/
+
+.panel-block {
+  &.is-active {
+    color: $interactive-secondary;
+    border-left-color: $interactive-secondary;
+    border-left-width: 2px;
+    @extend .has-background-white-ter;
+  }
+}
+
+/*
 LAYOUT ---------------------------------------------------------------------------------------------
 Layout helpers, often with names based on Bulma naming conventions
 */
@@ -142,4 +156,8 @@ Modifer helpers with names based on Bulma naming conventions
 
 .is-flex-column {
   flex-direction: column;
+}
+
+.is-flex-row {
+  flex-direction: row;
 }

@@ -1,8 +1,9 @@
 import lodash from 'lodash'
 
+import utils from '@/utils/utils'
 import pluginsApi from '../../api/plugins'
 
-const state = {
+const defaultState = utils.deepFreeze({
   plugins: {},
   installedPlugins: {},
   installingPlugins: {
@@ -11,10 +12,10 @@ const state = {
     models: [],
     connections: []
   }
-}
+})
 
 const getters = {
-  getHasInstalledPluginsOfType() {
+  getHasInstalledPluginsOfType(state) {
     return pluginType => {
       const hasOwns = []
       lodash.forOwn(state.installedPlugins[pluginType], val =>
@@ -23,19 +24,19 @@ const getters = {
       return hasOwns.length > 0
     }
   },
-  getIsPluginInstalled(stateRef) {
+  getIsPluginInstalled(state) {
     return (pluginType, pluginName) =>
-      stateRef.installedPlugins[pluginType]
+      state.installedPlugins[pluginType]
         ? Boolean(
-            stateRef.installedPlugins[pluginType].find(
+            state.installedPlugins[pluginType].find(
               item => item.name === pluginName
             )
           )
         : false
   },
-  getIsInstallingPlugin(stateRef) {
+  getIsInstallingPlugin(state) {
     return (pluginType, pluginName) =>
-      stateRef.installingPlugins[pluginType].includes(pluginName)
+      state.installingPlugins[pluginType].includes(pluginName)
   }
 }
 
@@ -69,22 +70,22 @@ const actions = {
 }
 
 const mutations = {
-  installPluginStart(_, installConfig) {
+  installPluginStart(state, installConfig) {
     state.installingPlugins[installConfig.pluginType].push(installConfig.name)
   },
 
-  installPluginComplete(_, installConfig) {
+  installPluginComplete(state, installConfig) {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name
     )
     state.installingPlugins[installConfig.pluginType].splice(idx, 1)
   },
 
-  setAllPlugins(_, plugins) {
+  setAllPlugins(state, plugins) {
     state.plugins = plugins
   },
 
-  setInstalledPlugins(_, projectConfig) {
+  setInstalledPlugins(state, projectConfig) {
     if (projectConfig.plugins) {
       state.installedPlugins = projectConfig.plugins
     }
@@ -93,7 +94,7 @@ const mutations = {
 
 export default {
   namespaced: true,
-  state,
+  state: lodash.cloneDeep(defaultState),
   getters,
   actions,
   mutations

@@ -156,19 +156,19 @@ const router = new Router({
         },
         {
           path: '/analyze/:model/:design/reports/report/:slug',
-          name: 'report',
+          name: 'Report',
           component: Design
         }
       ]
     },
     {
       path: '/dashboards/',
-      name: 'dashboards',
+      name: 'Dashboards',
       component: Dashboards
     },
     {
       path: '/dashboards/dashboard/:slug',
-      name: 'dashboard',
+      name: 'Dashboard',
       component: Dashboards
     }
   ]

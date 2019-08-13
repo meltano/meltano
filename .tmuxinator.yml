@@ -7,9 +7,9 @@ windows:
   - services:
       layout: main-vertical
       panes:
-        - docker-compose up warehouse_db    # start the warehouse
-        - python -m meltano.api             # start the api
-        - cd src/analyze; yarn && yarn dev  # start the ui
+        - docker-compose up warehouse_db     # start the warehouse
+        - python -m meltano.api              # start the api
+        - cd src/webapp; yarn && yarn serve  # start the ui
   - shell:
       layout: main-vertical
       panes:

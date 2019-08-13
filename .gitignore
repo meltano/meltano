@@ -111,11 +111,11 @@ celerybeat-schedule
 *.sage.py
 
 src/meltano/api/templates/analyze.html
-src/meltano/api/static/css/app.*
-src/meltano/api/static/js/app.*
-src/meltano/api/static/js/manifest.*
-src/meltano/api/static/js/vendor.*
-src/meltano/api/static/js/analytics.*
+src/meltano/api/css/app.*
+src/meltano/api/js/app.*
+src/meltano/api/js/manifest.*
+src/meltano/api/js/vendor.*
+src/meltano/api/js/analytics.*
 
 # Environments
 .env
@@ -143,8 +143,8 @@ venv.bak/
 meltano.log.*
 *.m5oc
 
-# analyze builds
-src/analyze/dist/
+# webapp builds
+src/webapp/dist/
 src/meltano/api/static/
 src/meltano/api/templates/analyze.html
 

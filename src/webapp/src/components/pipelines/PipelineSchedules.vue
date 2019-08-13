@@ -27,6 +27,9 @@ export default {
   methods: {
     createPipeline() {
       this.$router.push({ name: 'createSchedule' })
+    },
+    runELT(pipeline) {
+      this.$store.dispatch('configuration/run', pipeline)
     }
   }
 }
@@ -93,7 +96,24 @@ export default {
                 <p class="has-text-centered">{{ pipeline.transform }}</p>
               </td>
               <td>
-                <p class="has-text-centered">{{ pipeline.interval }}</p>
+                <p class="has-text-centered">
+                  <span v-if="getIsPluginInstalled('orchestrators', 'airflow')">
+                    {{ pipeline.interval }}
+                  </span>
+                  <router-link
+                    v-else
+                    class="button is-small tooltip"
+                    data-tooltip="Airflow Orchestrator must be installed for intervaled runs."
+                    :to="{ name: 'orchestration' }"
+                  >
+                    <span>{{ pipeline.interval }}</span>
+                    <span class="icon is-small has-text-warning">
+                      <font-awesome-icon
+                        icon="exclamation-triangle"
+                      ></font-awesome-icon>
+                    </span>
+                  </router-link>
+                </p>
               </td>
               <td>
                 <p class="has-text-centered">
@@ -107,10 +127,17 @@ export default {
               <td>
                 <div class="buttons is-right">
                   <router-link
-                    class="button is-interactive-primary is-outlined is-small"
                     v-if="getIsPluginInstalled('orchestrators', 'airflow')"
+                    class="button is-interactive-primary is-outlined is-small"
                     :to="{ name: 'orchestration' }"
                     >Orchestration</router-link
+                  >
+                  <a
+                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    :class="{ 'is-loading': pipeline.isRunning }"
+                    data-tooltip="Run this ELT definition once without scheduling."
+                    @click="runELT(pipeline)"
+                    >Run</a
                   >
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
@@ -118,6 +145,7 @@ export default {
                     >Analyze</router-link
                   >
                   <a
+                    :disabled="pipeline.isRunning"
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
                     data-tooltip="This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues."
                     >Edit</a

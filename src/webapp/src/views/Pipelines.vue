@@ -1,14 +1,12 @@
 <script>
 import { mapState } from 'vuex'
 
-import ClosableMessage from '@/components/generic/ClosableMessage'
 import RouterViewLayout from '@/views/RouterViewLayout'
 import Step from '@/components/generic/bulma/Step'
 
 export default {
   name: 'Pipelines',
   components: {
-    ClosableMessage,
     RouterViewLayout,
     Step
   },
@@ -91,18 +89,7 @@ export default {
     </div>
 
     <div class="container view-body">
-      <ClosableMessage title="Meltano Pipelines">
-        <p>
-          <span class="has-text-weight-bold">Meltano</span> streamlines the
-          collection, analysis, and dashboarding of data.
-        </p>
-        <p>
-          <span class="is-italic">You need to collect the data first</span>. Use
-          the steps below to set up your data pipeline(s).
-        </p>
-      </ClosableMessage>
-
-      <div class="steps is-small" id="steps-data-setup">
+      <div class="steps steps-pipelines is-small" id="steps-data-setup">
         <div
           class="step-item is-completed"
           :class="{ 'is-active': getIsActiveStep('extractors') }"
@@ -193,4 +180,8 @@ export default {
   </router-view-layout>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.steps-pipelines {
+  margin-top: 2rem;
+}
+</style>

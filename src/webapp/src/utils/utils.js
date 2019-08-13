@@ -1,12 +1,18 @@
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
+const FLASK = window.FLASK || ''
 
 export default {
   // Path Utils
   root(path = '/') {
     // window.FLASK should be injected in the template
     // either by Webpack (dev) or Flask (prod)
-    return `${FLASK.appUrl}${path}`
+
+    if (FLASK.appUrl) {
+      return `${FLASK.appUrl}${path}`
+    } else {
+      return `http://localhost:5000${path}`
+    }
   },
 
   apiRoot(path = '/') {
@@ -33,6 +39,10 @@ export default {
 
   getIsSubRouteOf(parentPath, currentPath) {
     return currentPath.includes(parentPath)
+  },
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   },
 
   // Color Utils
@@ -69,6 +79,19 @@ export default {
     return arr1
       .filter(x => !arr2.includes(x))
       .concat(arr2.filter(x => !arr1.includes(x)))
+  },
+
+  deepFreeze(object) {
+    // Inspired by https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
+    const propNames = Object.getOwnPropertyNames(object)
+    // eslint-disable-next-line no-restricted-syntax
+    for (const name of propNames) {
+      const value = object[name]
+      // eslint-disable-next-line no-undef
+      object[name] =
+        value && typeof value === 'object' ? this.deepFreeze(value) : value
+    }
+    return Object.freeze(object)
   },
 
   // String Utils
@@ -118,6 +141,26 @@ export default {
       singularizeMe = singularizeMe.slice(0, -1)
     }
     return singularizeMe
+  },
+  snowflakeAccountParser(account) {
+    const domainFlag = 'snowflakecomputing.com'
+    const domainLocation = account.indexOf(domainFlag)
+    let accountId = ''
+
+    // If the domain exists in user input, assume URL
+    if (domainLocation > -1) {
+      let shortenedUrl = account.slice(0, domainLocation + domainFlag.length)
+
+      // Clean up URL if http is detected
+      if (shortenedUrl.indexOf('http') > -1) {
+        shortenedUrl = shortenedUrl.slice(shortenedUrl.indexOf('//') + 2)
+      }
+
+      // This could eventually parse data like region if needed
+      accountId = shortenedUrl.split('.')[0]
+    }
+
+    return accountId
   },
   titleCase(value) {
     return value.replace(

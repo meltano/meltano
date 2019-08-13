@@ -82,7 +82,7 @@ export default {
     <div class="container view-body">
       <section>
         <div class="columns is-gapless">
-          <aside class="column is-one-quarter vh-scrollable">
+          <aside class="column is-one-quarter">
             <div class="level">
               <div class="level-left">
                 <div class="field has-addons">
@@ -127,7 +127,7 @@ export default {
                     <li class="level">
                       <div class="tags has-addons">
                         <span class="tag is-info">?</span>
-                        <span class="tag">{{ err.file_name }}</span>
+                        <span class="tag">{{ err.fileName }}</span>
                       </div>
                     </li>
                     <li class="error-desc-cont">
@@ -181,7 +181,7 @@ export default {
               </ul>
             </template>
           </aside>
-          <div class="column is-three-quarters vh-scrollable">
+          <div class="column is-three-quarters">
             <div v-if="!activeView.populated">
               <div
                 class="empty-state
