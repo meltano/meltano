@@ -85,12 +85,39 @@ class UIAvailableWorker(threading.Thread):
         self._terminate = True
 
 
+class AirflowAwaiterWorker(threading.Thread):
+    def __init__(self, project: Project):
+        super().__init__()
+
+        self.installed = threading.Event()
+        self.running = threading.Event()
+
+    def run(self):
+        self.installed.wait()
+        print('*** HELLO')
+        time.sleep(5)
+        self.running.set()
+
+
+class AirflowTriggerWorker(threading.Thread):
+    def __init__(self, project: Project, awaiter: AirflowAwaiterWorker):
+        super().__init__()
+
+        self.awaiter = awaiter
+
+    def run(self):
+        time.sleep(5)
+        self.awaiter.installed.set()
+        self.awaiter.running.wait()
+        print('*** INSTALLED!!!!')
+
+
 class AirflowWorker(threading.Thread):
-    def __init__(self, project: Project, airflow: PluginInstall = None):
+    def __init__(self, project: Project):
         super().__init__()
 
         self.project = project
-        self._plugin = airflow or ConfigService(project).find_plugin("airflow")
+        self._plugin = ConfigService(project).find_plugin("airflow")
         self._webserver = None
         self._scheduler = None
 

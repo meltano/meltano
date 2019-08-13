@@ -17,7 +17,7 @@ from meltano.core.plugin.settings_service import (
 )
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
-from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
+from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowAwaiterWorker, AirflowTriggerWorker, AirflowWorker
 
 
 logger = logging.getLogger(__name__)
@@ -153,11 +153,17 @@ def start(project, **kwargs):
 
 def start_workers(app, project):
     workers = []
-    try:
-        if not app.config["AIRFLOW_DISABLED"]:
+    airflowAwaiter = None;
+    airflowTrigger = None;
+    if not app.config["AIRFLOW_DISABLED"]:
+        try:
             workers.append(AirflowWorker(project))
-    except:
-        logger.info("Airflow is not installed.")
+        except:
+            airflowAwaiter = AirflowAwaiterWorker(project)
+            airflowTrigger = AirflowTriggerWorker(project, airflowAwaiter)
+            workers.append(airflowAwaiter)
+            workers.append(airflowTrigger)
+            logger.info("Airflow is not installed, await runtime installation.")
 
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(
@@ -172,5 +178,10 @@ def start_workers(app, project):
     # start all workers
     for worker in workers:
         worker.start()
+
+    # start airflow awaiter and trigger
+    if airflowAwaiter and airflowTrigger:
+        airflowAwaiter.join()
+        airflowTrigger.join()
 
     return stop_all
