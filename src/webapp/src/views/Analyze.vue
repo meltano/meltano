@@ -1,12 +1,10 @@
 <script>
 import RouterViewLayout from '@/views/RouterViewLayout'
-import DocsLink from '@/components/generic/DocsLink'
 
 export default {
   name: 'Analyze',
   components: {
-    RouterViewLayout,
-    DocsLink
+    RouterViewLayout
   },
   computed: {
     isAnalyzing() {
