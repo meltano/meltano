@@ -126,18 +126,19 @@ export default {
               </td>
               <td>
                 <div class="buttons is-right">
-                  <router-link
-                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
-                    class="button is-interactive-primary is-outlined is-small"
-                    :to="{ name: 'orchestration' }"
-                    >Orchestration</router-link
-                  >
                   <a
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
                     :class="{ 'is-loading': pipeline.isRunning }"
-                    data-tooltip="Run this ELT definition once without scheduling."
+                    data-tooltip="Run this ELT definition once without orchestration."
                     @click="runELT(pipeline)"
                     >Run</a
+                  >
+                  <router-link
+                    v-if="getIsPluginInstalled('orchestrators', 'airflow')"
+                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    data-tooltip="Automate this ELT definition with orchestration."
+                    :to="{ name: 'orchestration' }"
+                    >Orchestrate</router-link
                   >
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"

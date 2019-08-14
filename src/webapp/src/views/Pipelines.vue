@@ -101,9 +101,9 @@ export default {
               :class="{ 'is-active': getIsActiveStep('extractors') }"
               @click="setStep('extractors')"
             >
-              Extractors
+              Extract
             </button>
-            <p>Source Connectors</p>
+            <p>Connect to Data</p>
           </div>
         </div>
         <div
@@ -121,9 +121,9 @@ export default {
               :disabled="!getIsStepEntitiesMinimallyValidated"
               @click="setStep('entities')"
             >
-              Entities
+              Select
             </button>
-            <p>Source Selections</p>
+            <p>Select Specific Data</p>
           </div>
         </div>
         <div
@@ -141,9 +141,9 @@ export default {
               :disabled="!getIsStepLoadersMinimallyValidated"
               @click="setStep('loaders')"
             >
-              Loaders
+              Load
             </button>
-            <p>Target Connectors</p>
+            <p>Store Selected Data</p>
           </div>
         </div>
         <div
@@ -161,9 +161,9 @@ export default {
               :disabled="!getIsStepScheduleMinimallyValidated"
               @click="setStep('schedules')"
             >
-              Schedules
+              Run
             </button>
-            <p>Data Pipelines</p>
+            <p>Automate Data Collection</p>
           </div>
         </div>
 
