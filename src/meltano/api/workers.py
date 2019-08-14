@@ -91,10 +91,15 @@ class AirflowWorker(threading.Thread):
 
         self.project = project
         self.installed = threading.Event()
-        self.initialized = threading.Event()
         self._plugin = None
         self._webserver = None
         self._scheduler = None
+
+        try:
+            if ConfigService(self.project).find_plugin("airflow"):
+                self.installed.set()
+        except:
+            pass
 
     def kill_stale_workers(self):
         stale_workers = []
@@ -144,8 +149,6 @@ class AirflowWorker(threading.Thread):
 
             webserver_pid.write(str(self._webserver.pid))
             scheduler_pid.write(str(self._scheduler.pid))
-
-        self.initialized.set()
 
     def pid_path(self, name):
         return self.project.run_dir("airflow", f"{name}.pid")

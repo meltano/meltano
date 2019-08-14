@@ -136,7 +136,6 @@ def install():
 
     if plugin_type is PluginType.ORCHESTRATORS and plugin_name == 'airflow':
         g.airflow_context.installed.set()
-        g.airflow_context.initialized.wait()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
