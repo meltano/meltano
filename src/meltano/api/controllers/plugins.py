@@ -10,7 +10,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.tracking import GoogleAnalyticsTracker
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 
 pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
 
@@ -133,6 +133,10 @@ def install():
             compiler.compile()
         except Exception as e:
             pass
+
+    if plugin_type is PluginType.ORCHESTRATORS and plugin_name == 'airflow':
+        g.airflow_context.installed.set()
+        g.airflow_context.initialized.wait()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)

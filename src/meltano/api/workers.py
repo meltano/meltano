@@ -85,39 +85,14 @@ class UIAvailableWorker(threading.Thread):
         self._terminate = True
 
 
-class AirflowAwaiterWorker(threading.Thread):
-    def __init__(self, project: Project):
-        super().__init__()
-
-        self.installed = threading.Event()
-        self.running = threading.Event()
-
-    def run(self):
-        self.installed.wait()
-        print('*** HELLO')
-        time.sleep(5)
-        self.running.set()
-
-
-class AirflowTriggerWorker(threading.Thread):
-    def __init__(self, project: Project, awaiter: AirflowAwaiterWorker):
-        super().__init__()
-
-        self.awaiter = awaiter
-
-    def run(self):
-        time.sleep(5)
-        self.awaiter.installed.set()
-        self.awaiter.running.wait()
-        print('*** INSTALLED!!!!')
-
-
 class AirflowWorker(threading.Thread):
     def __init__(self, project: Project):
         super().__init__()
 
         self.project = project
-        self._plugin = ConfigService(project).find_plugin("airflow")
+        self.installed = threading.Event()
+        self.initialized = threading.Event()
+        self._plugin = None
         self._webserver = None
         self._scheduler = None
 
@@ -170,10 +145,14 @@ class AirflowWorker(threading.Thread):
             webserver_pid.write(str(self._webserver.pid))
             scheduler_pid.write(str(self._scheduler.pid))
 
+        self.initialized.set()
+
     def pid_path(self, name):
         return self.project.run_dir("airflow", f"{name}.pid")
 
     def run(self):
+        self.installed.wait()
+        self._plugin = ConfigService(self.project).find_plugin("airflow")
         self.kill_stale_workers()
         self.start_all()
 
