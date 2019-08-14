@@ -441,22 +441,32 @@ export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
 
 ## Loaders
 
-Meltano Loaders *load data in bulk* and are commonly prefixed with [target](/docs/architecture.html#targets). Meltano currently supports:
-- [target-csv](#csv)
-- [target-postgres](#postgres)
-- [target-snowflake](#snowflake)
-- [target-sqlite](#sqlite)
+Meltano Loaders *load data in bulk* after it has been imported from source(s) using Extractors. Meltano currently supports loading data in the follow formats:
+- [Comma Separated Values (CSV)](#csv)
+- [PostgresQL Database](#postgres)
+- [Snowflake Data Warehouse](#snowflake)
+- [SQLite](#sqlite)
 
-### CSV
+### Comma Separated Values (CSV)
 
-`target-csv` is a loader that works with other extractors in order to move data into CSV-formatted files.
+Comma Separated Values, better known as spreadsheets, are the swiss army knife of data analysis. Loading data into this format will create .CSV files that can be used with many other tools that are able to import/export this file type.
+
+
 
 #### Info
 
 - **Data Warehouse**: CSV Files
 - **Repository**: [https://gitlab.com/meltano/target-csv](https://gitlab.com/meltano/target-csv)
 
-#### Install
+#### Installing from the Meltano UI
+
+From the Meltano UI, you can (select this Loader in Step 3 of your pipeline configuration)[http://localhost:5000/pipelines/loaders].
+
+##### Configuration
+
+Once the loader has installed, a modal will appear with options for selecting the Delimiter and Quotechar you would like Meltano to use when loads your data into CSV format. The most commonly used options are selected by default.
+
+#### Installing from the Meltano CLI
 
 1. Navigate to your Meltano project in the terminal
 2. Run the following command:
@@ -467,7 +477,7 @@ meltano add loader target-csv
 
 If you are successful, you should see `Added and installed loaders 'target-csv'` in your terminal.
 
-#### Configuration
+##### Configuration
 
 If you want to customize your delimited or quote character, open `meltano.yml` for your desired project and update the configuration there.
 
