@@ -46,6 +46,7 @@ module.exports = {
         '/docs/installation',
         '/docs/quickstart',
         '/docs/plugins',
+        '/docs/loaders',
         '/docs/tutorial',
         '/docs/meltano-cli',
         '/docs/environment-variables',
