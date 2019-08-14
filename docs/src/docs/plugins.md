@@ -4,23 +4,25 @@ sidebarDepth: 1
 
 # Extractors & Loaders
 
+**E**xtracting and **L**oading data are the **E** and **L** in the term **ELT**. In this section, we provide a detailed overview of how Meltano pulls data from your sources (Extract) and puts it into a reporting database (Load) for further manipulation and analysis.
+
 ## Extractors
 
-Meltano Extractors *extract data in bulk* and are commonly prefixed with [tap](/docs/architecture.html#taps). Meltano currently supports:
-- [tap-carbon-intensity](#carbon-intensity)
-- [tap-csv](#csv)
-- [tap-fastly](#fastly)
-- [tap-gitlab](#gitlab)
-- [tap-google-analytics](#google-analytics)
-- [tap-marketo](#marketo)
-- [tap-mongodb](#mongodb)
-- [tap-salesforce](#salesforce)
-- [tap-stripe](#stripe)
-- [tap-zendesk](#zendesk)
-- [tap-zuora](#zuora)
+Meltano Extractors *extract data in bulk*, and are commonly prefixed with [tap](/docs/architecture.html#taps). Meltano currently supports importing data from the following sources:
+- [Carbon Emissions Intensity data](#carbon-intensity)
+- [Comma Separated Values (CSV)](#csv)
+- [Fastly](#fastly)
+- [GitLab](#gitlab)
+- [Google Analytics](#google-analytics)
+- [Marketo](#marketo)
+- [MongoDB](#mongodb)
+- [Salesforce](#salesforce)
+- [Stripe](#stripe)
+- [Zendesk](#zendesk)
+- [Zuora](#zuora)
 
 ::: tip
-If you can't find the extractor you need below, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
+If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
 :::
 
 ### Carbon Intensity
