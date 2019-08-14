@@ -71,7 +71,7 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Pipelines
+          Pipeline
           <span
             v-if="getRunningPipelineJobsCount > 0"
             class="tag tag-running-pipelines is-rounded is-info"
@@ -86,7 +86,7 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/orchestration') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Orchestration
+          Orchestrate
         </router-link>
 
         <router-link
@@ -98,11 +98,11 @@ export default {
         </router-link>
 
         <router-link
-          :to="{ name: 'dashboards' }"
+          :to="{ name: 'Dashboards' }"
           :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Dashboards
+          Dashboard
         </router-link>
       </div>
 
