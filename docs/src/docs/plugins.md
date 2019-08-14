@@ -1,5 +1,5 @@
 ---
-sidebarDepth: 1
+sidebarDepth: 2
 ---
 
 # Extractors & Loaders
@@ -45,7 +45,7 @@ meltano add extractor tap-carbon-intensity
 
 If you are successful, you should see `Added and installed extractors 'tap-carbon-intensity'` in your terminal.
 
-### CSV
+### Comma Separated Values (CSV)
 
 `tap-csv` is a CSV reader that is optimized for tasks where the file structure is highly predictable.
 
@@ -489,7 +489,7 @@ If you want to customize your delimited or quote character, open `meltano.yml` f
     pip_url: git+https://gitlab.com/meltano/target-csv.git
 ```
 
-### Snowflake
+### Snowflake Data Warehouse
 
 `target-snowflake` is a loader that works with other extractors in order to move data into a Snowflake database.
 
@@ -524,7 +524,7 @@ export SF_WAREHOUSE=""  # in UPPERCASE
 - **SF_DATABASE** - The name of the Snowflake database you want to use
 - **SF_WAREHOUSE** - The name of the Snowflake warehouse you want to use
 
-### Postgres
+### PostgreSQL Database
 
 `target-postgres` is a loader that works with other extractors in order to move data into a Postgres database.
 
@@ -547,7 +547,7 @@ export PG_DATABASE=""
 export PG_SCHEMA=""
 ```
 
-### Sqlite
+### SQLite Database
 
 `target-sqlite` is a loader that works with other extractors in order to move data into a SQLite database.
 
