@@ -1,5 +1,5 @@
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex';
 
 import Airflow from '@/components/orchestration/Airflow'
 import RouterViewLayout from '@/views/RouterViewLayout'
@@ -14,8 +14,27 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled'])
-  }
+    ...mapGetters('plugins', [
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin'
+    ]),
+    getIsInstallingAirflow() {
+      return this.getIsInstallingPlugin('orchestrators', 'airflow');
+    },
+  },
+  methods: {
+  ...mapActions('plugins', [
+    'addPlugin',
+    'installPlugin',
+  ]),
+  installAirflow() {
+    const payload = { pluginType: 'orchestrators', name: 'airflow' };
+    this.addPlugin(payload)
+      .then(() => {
+        this.installPlugin(payload);
+      });
+    },
+  },
 }
 </script>
 
@@ -37,16 +56,14 @@ export default {
         <div class="columns">
           <div class="column">
             <div class="content">
-              <p class="is-italic">Airflow installation is required.</p>
-              <p>
-                Until this installation is automatic please follow the
-                <a
-                  target="_blank"
-                  href="https://www.meltano.com/docs/meltano-cli.html#installing-airflow"
-                  >Installing Airflow</a
-                >
-                documentation.
-              </p>
+              <p>Airflow is Meltano's current orchestrator. Learn what's possible in the <a target='_blank' href="https://www.meltano.com/docs/meltano-cli.html#orchestration">Meltano Airflow</a> documentation.</p>
+              <p v-if='getIsInstallingAirflow' class="is-italic">Airflow installation can take a few minutes.</p>
+              <a
+                class="button is-interactive-primary"
+                :class='{ "is-loading": getIsInstallingAirflow }'
+                @click='installAirflow'>
+                Install Airflow
+              </a>
             </div>
           </div>
         </div>

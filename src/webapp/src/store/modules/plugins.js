@@ -10,7 +10,8 @@ const defaultState = utils.deepFreeze({
     extractors: [],
     loaders: [],
     models: [],
-    connections: []
+    connections: [],
+    orchestrators: []
   }
 })
 
