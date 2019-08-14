@@ -124,7 +124,7 @@ In this section, we provide a tutorial for installing Postgres and setting up a 
 
 Once you have identified a PostgreSQL database where Meltano should load the data it extracts from your source(s), go to Meltano UI and complete Step 3 of the pipeline creation process. 
 
-![Meltano UI pipeline select PostgreSQL loader](/screenshots/meltano-ui-load.png)
+![Meltano UI pipeline select PostgreSQL loader](/screenshots/meltano-ui-load-postgres.png)
 
 
 
