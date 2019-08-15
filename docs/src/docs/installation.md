@@ -44,6 +44,10 @@ If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be th
 
 ::: danger IMPORTANT
 Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
+
+**Why use a virtual environment?**
+
+Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
 :::
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
