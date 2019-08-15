@@ -127,7 +127,6 @@ Once you have identified a PostgreSQL database where Meltano should load the dat
 ![Meltano UI pipeline select PostgreSQL loader](/screenshots/meltano-ui-load-postgres.png)
 
 
-
 #### Advanced: Command Line (CLI) Configuration
 
 In this section we provide additional information for configuring Meltano to connect with your PostgreSQL databae from the Meltano command line interface (CLI).
