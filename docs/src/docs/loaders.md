@@ -118,7 +118,9 @@ In this section, we provide a tutorial for installing Postgres and setting up a 
 1. Run the pgAdmin application and follow the prompt to create a master password
 1. Back on the command line, log into your postgres user with `psql -U postgres` (by default, Postgres will log you into your username account on your machine so you will need to switch to the new user we created in the steps above)
 1. Navigate to pgAdmin in your browser (it will launch a new tab when the server starts at a URL similar to http://127.0.0.1:52991/browser/#
+1. On the left hand navigation bar, you should see your database listed under servers. If you don't, click "Add Server" to connect your database to pgAdmin.
 
+![Meltano UI pipeline select PostgreSQL loader](/screenshots/pgadmin-starter-screen.png)
 
 #### Intermediate: Connecting Meltano to an Existing PostgreSQL Database
 
