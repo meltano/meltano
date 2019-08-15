@@ -24,7 +24,7 @@ Comma Separated Values, better known as spreadsheets, are the swiss army knife o
 
 ### Installing from the Meltano UI
 
-From the Meltano UI, you can (select this Loader in Step 3 of your pipeline configuration)[http://localhost:5000/pipelines/loaders].
+From the Meltano UI, you can [select this Loader in Step 3 of your pipeline configuration](http://localhost:5000/pipelines/loaders).
 
 #### Configuration
 
