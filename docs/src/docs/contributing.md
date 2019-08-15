@@ -222,8 +222,7 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 ### Prerequisites
 Ensure you have the latest `master` branch locally before continuing.
 ```bash
-  # get latest master branch
-  $ git fetch origin
+git fetch origin
 ```
 
 ### Release process
@@ -232,34 +231,34 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install dev dependencies:
     ```bash
     # activate your virtualenv
-    $ source ./venv/bin/activate
+    source ./venv/bin/activate
 
     # pip install all the development dependencies
-    $ pip install .[dev]
+    pip install .[dev]
     ```
 1. Execute the commands below:
     ```bash
     # if you've released before, you may need to delete the last local release branch you created
-    $ git branch -D release-next
+    git branch -D release-next
 
     # create and checkout release-next branch that's based off master branch
-    $ git checkout -b release-next origin/master
+    git checkout -b release-next origin/master
 
     # view changelog (verify changes made match changes logged)
-    $ changelog view
+    changelog view
 
     # after changelog validation, build the release
-    $ make release
+    make release
 
     # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
     # occasionally the version bump can go to a version you don't expect.
-    $ changelog view
+    changelog view
 
     # validate that the tag auto increments based on semver
-    $ git push --tags
+    git push --tags
 
     # update meltano repo with release-next branch
-    $ git push origin release-next
+    git push origin release-next
     ```
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
@@ -288,17 +287,19 @@ We should be good citizen about these, and use the default workflow to contribut
 
 ### Discoverability
 
-We will maintain a curated list of taps/targets that are expected to work out of the box with Meltano.
+We maintain a curated list of taps/targets that are expected to work out of the box with Meltano. Meltano also helps the CLI user find components via a `discover` command.
 
-Meltano should help the end-user find components via a `discover` command:
-
-```
-$ meltano discover extract
+Get a list of extractors:
+```bash
+meltano discover extract
 tap-demo==...
 tap-zendesk==1.3.0
 tap-marketo==...
 ...
+```
 
+Or a list of loaders
+```bash
 $ meltano discover load
 target-demo==...
 target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
@@ -332,8 +333,8 @@ This config uses `$MELTANO_VENV` to source the virtual environment from. Set it 
 1. Run the following commands. Keep in mind that the `.venv` in line 2 refers to your virtual environment directory in Step #1.
 
 ```bash
-$ cd path/to/meltano
-$ MELTANO_VENV=.venv tmuxinator local
+cd path/to/meltano
+MELTANO_VENV=.venv tmuxinator local
 ```
 
 ### Resources
