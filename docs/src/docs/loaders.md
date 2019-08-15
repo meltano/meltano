@@ -128,6 +128,9 @@ Once you have identified a PostgreSQL database where Meltano should load the dat
 
 ![Meltano UI pipeline select PostgreSQL loader](/screenshots/meltano-ui-load-postgres.png)
 
+Fill in the configuration fields with the necessary information to connect with your PostgreSQL database and click "Save". The Schema field is optional.
+
+![Meltano UI configuring the Postgres loader](/screenshots/meltano-postgres-loader-config.png)
 
 #### Advanced: Command Line (CLI) Configuration
 
