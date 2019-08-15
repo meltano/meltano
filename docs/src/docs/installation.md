@@ -21,8 +21,7 @@ You may refer to [https://realpython.com/installing-python/](https://realpython.
 To check if you have the correct Python version, open your terminal and use the following commands to check the version:
 
 ```bash
-$ python --version
-Python 3.6.1
+python --version
 ```
 
 ### pip
@@ -31,10 +30,10 @@ Python 3.6.1
 
 ```bash
 # Check for current version of pip
-$ pip --version
+pip --version
 
 # Update pip
-$ pip install --upgrade pip
+pip install --upgrade pip
 ```
 
 ::: tip
@@ -55,22 +54,22 @@ Then create a new virtual environment inside that directory:
 
 ```bash
 # Linux, OSX
-$ mkdir ~/virtualenvs
-$ python -m venv ~/virtualenvs/meltano
+mkdir ~/virtualenvs
+python -m venv ~/virtualenvs/meltano
 
 # Windows
-$ mkdir %ALLUSERSPROFILE%\\virtualenvs
-$ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
+mkdir %ALLUSERSPROFILE%\\virtualenvs
+python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 ```
 
 Then, you will need to activate the virtual environment using:
 
 ```bash
 # Linux, OSX
-$ source ~/virtualenvs/meltano/bin/activate
+source ~/virtualenvs/meltano/bin/activate
 
 # Windows
-$ %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
+%HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
 ## Installing Meltano
@@ -78,14 +77,13 @@ $ %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
 
 ```bash
-$ pip install meltano
+pip install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
 
 ```bash
-$ meltano --version
-meltano, version X.XX.X
+meltano --version
 ```
 
 That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
@@ -118,12 +116,11 @@ We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docke
 This image contains everything you need to get started with Meltano.
 
 ```bash
-# to download or update to the latest version
-$ docker pull meltano/meltano
+# download or update to the latest version
+docker pull meltano/meltano
 
-# to look the currently installed version
-$ docker run meltano/meltano --version
-meltano, version …
+# look the currently installed version
+docker run meltano/meltano --version
 ```
 
 #### Initialize Your Project
@@ -131,7 +128,7 @@ meltano, version …
 Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our Quickstart Guide. However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```
-$ docker run -v $(pwd):/projects \
+docker run -v $(pwd):/projects \
              -w /projects \
              meltano/meltano init YOUR_PROJECT_NAME
 ```
@@ -139,14 +136,13 @@ $ docker run -v $(pwd):/projects \
 Then you can `cd` into your new project:
 
 ```
-$ cd YOUR_PROJECT_NAME
+cd YOUR_PROJECT_NAME
 ```
 
-We can then start the Meltano UI.
+We can then start the Meltano UI. Since `ui` is the default command, we can omit it.
 
 ```
-# `ui` is the default command, we can omit it.
-$ docker run -v $(pwd):/project \
+docker run -v $(pwd):/project \
              -w /project \
              -p 5000:5000 \
              meltano/meltano
@@ -165,7 +161,7 @@ Follow the steps in our [Quickstart Guide](./quickstart.html) to get started.
 To run the ELT and extract some data from the **tap-carbon-intensity** into **target-sqlite**:
 
 ```
-$ docker run -v $(pwd):/project \
+docker run -v $(pwd):/project \
              -w /project \
              meltano/meltano elt tap-carbon-intensity target-sqlite
 ```
@@ -175,7 +171,7 @@ $ docker run -v $(pwd):/project \
 Now that we have data in your database, let's add the corresponding model bundle as the basis of our analysis.
 
 ```
-$ docker run -v $(pwd):/project \
+docker run -v $(pwd):/project \
              -w /project \
              meltano/meltano add model model-carbon-intensity-sqlite
 ```
@@ -185,7 +181,7 @@ $ docker run -v $(pwd):/project \
 We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
 ```
-$ pip install --upgrade meltano
+pip install --upgrade meltano
 ```
 
 Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
