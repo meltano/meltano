@@ -50,6 +50,8 @@ Unless you are building a Docker image, It is **strongly recommended** that Melt
 Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
 :::
 
+#### Recommened Virtual Environment Setup
+
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
   - **Linux, OSX**:  `~/virtualenvs`
   - **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
@@ -66,7 +68,9 @@ mkdir %ALLUSERSPROFILE%\\virtualenvs
 python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 ```
 
-Then, you will need to activate the virtual environment using:
+#### Activating Your Virtual Environment
+
+Activate the virtual environment using:
 
 ```bash
 # Linux, OSX
