@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 * [#342](https://gitlab.com/meltano/meltano/issues/342) Swap UI app directory "webapp" and upgrade to Vue CLI 3
 * [#882](https://gitlab.com/meltano/meltano/issues/882) Update navigation and subnavigation labels to verbs vs. nouns to inspire action and productivity when using the UI
+* [#878](https://gitlab.com/meltano/meltano/issues/878) Write a [tutorial to help users get started with PostgreSQL](http://www.meltano.com/docs/loaders.html#postgresql-database)
+* [#883](https://gitlab.com/meltano/meltano/issues/883) Break Extractors and Loaders sections out in the docs
 
 ### Fixes
 * [#872](https://gitlab.com/meltano/meltano/issues/872) Updated `tap-marketo` and `tap-stripe` to leverage password input type while also improving the input type password fallback
