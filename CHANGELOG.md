@@ -9,6 +9,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* [#763](https://gitlab.com/meltano/meltano/issues/763) Add inference to auto install related plugins after a user's installs a specific extractor
 
 ### Changes
 * [#342](https://gitlab.com/meltano/meltano/issues/342) Swap UI app directory "webapp" and upgrade to Vue CLI 3
