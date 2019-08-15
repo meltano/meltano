@@ -51,8 +51,18 @@ const actions = {
     return pluginsApi.addPlugin(addConfig)
   },
 
+  installRelatedPlugins({ dispatch }, installConfig) {
+    return pluginsApi.installBatch(installConfig).then(() => {
+      dispatch('getAllPlugins')
+    })
+  },
+
   installPlugin({ commit, dispatch }, installConfig) {
     commit('installPluginStart', installConfig)
+
+    if (installConfig.pluginType == 'extractors') {
+      dispatch('installRelatedPlugins', installConfig)
+    }
 
     return pluginsApi.installPlugin(installConfig).then(() => {
       dispatch('getInstalledPlugins').then(() => {

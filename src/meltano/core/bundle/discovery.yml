@@ -82,7 +82,7 @@ extractors:
       - name: start_time
         kind: date_iso8601
   - name: tap-salesforce
-    namespace: sfdc
+    namespace: salesforce
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     settings:
       # TODO: remove, should be injected from Meltano
