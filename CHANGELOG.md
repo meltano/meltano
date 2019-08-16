@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 * [#700](https://gitlab.com/meltano/meltano/issues/700) Update documentation to remove "$" and trim spaces to make CLI command copy/paste easier
 * [#878](https://gitlab.com/meltano/meltano/issues/878) Write a [tutorial to help users get started with PostgreSQL](http://www.meltano.com/docs/loaders.html#postgresql-database)
 * [#883](https://gitlab.com/meltano/meltano/issues/883) Break Extractors and Loaders sections out in the docs
+* [#889](https://gitlab.com/meltano/meltano/issues/889) Allow for githooks to lint on commit
 
 ### Fixes
 * [#872](https://gitlab.com/meltano/meltano/issues/872) Updated `tap-marketo` and `tap-stripe` to leverage password input type while also improving the input type password fallback
