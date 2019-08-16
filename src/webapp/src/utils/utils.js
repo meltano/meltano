@@ -183,6 +183,11 @@ export default {
     return dateString ? new Date(dateString).toISOString() : null
   },
 
+  getFirstOfMonthAsIso8601() {
+    const date = new Date()
+    return new Date(date.getFullYear(), date.getMonth(), 1).toISOString()
+  },
+
   getInputDateMeta() {
     return {
       min: '2000-01-01',

@@ -38,8 +38,8 @@ extractors:
         kind: boolean
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        kind: date_iso8601
         env: GITLAB_API_START_DATE
+        kind: date_iso8601
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     namespace: zendesk
