@@ -1,0 +1,29 @@
+{
+	"name": "meltano",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"lint": "vue-cli-service lint"
+	},
+	"devDependencies": {
+		"@vue/cli-plugin-babel": "^3.9.0",
+		"@vue/cli-plugin-eslint": "^3.9.0",
+		"@vue/cli-service": "^3.9.0",
+		"@vue/eslint-config-prettier": "^4.0.1",
+		"babel-core": "7.0.0-bridge.0",
+		"babel-eslint": "^10.0.1",
+		"eslint": "^5.16.0",
+		"eslint-plugin-prettier": "^3.1.0",
+		"eslint-plugin-vue": "^5.0.0",
+		"lint-staged": "^8.1.5"
+	},
+	"gitHooks": {
+		"pre-commit": "lint-staged"
+	},
+	"lint-staged": {
+		"*.{js,vue}": [
+			"vue-cli-service lint",
+			"git add"
+		]
+	}
+}

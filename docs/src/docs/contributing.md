@@ -65,17 +65,22 @@ On a OSX, this can be solved by running `brew install yarn`.
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
 ```bash
-# Starts the Meltano API and a production build of Meltano UI that you can ignore
+# Navigate to a Meltano project that has already been initialized
+# Start the Meltano API and a production build of Meltano UI that you can ignore
 meltano ui
 
-# Open a new terminal tab and go to your meltano directory. Then change directory to analyze
+# Open a new terminal tab and go to your meltano directory
+# Install frontend infrastructure at the root directory
+yarn
+
+# Change directory to webapp source code
 cd src/webapp
 
 # Install dependencies
-npm install # or yarn
+yarn
 
 # Start local development environment
-npm run dev # or yarn dev
+yarn serve
 ```
 
 ### Meltano System Database
