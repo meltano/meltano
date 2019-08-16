@@ -79,14 +79,20 @@ const actions = {
       name: extractor,
       type: 'extractors'
     }).then(response => {
-      commit('setExtractorInFocusConfiguration', response.data)
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'extractorInFocusConfiguration'
+      })
     })
   },
 
   getLoaderConfiguration({ commit, dispatch }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' }).then(
       response => {
-        commit('setLoaderInFocusConfiguration', response.data)
+        commit('setInFocusConfiguration', {
+          configuration: response.data,
+          target: 'loaderInFocusConfiguration'
+        })
       }
     )
   },
@@ -97,7 +103,10 @@ const actions = {
       name: connection,
       type: 'connections'
     }).then(response => {
-      commit('setConnectionInFocusConfiguration', response.data)
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'connectionInFocusConfiguration'
+      })
     })
   },
 
@@ -262,20 +271,19 @@ const mutations = {
       : {}
   },
 
-  setConnectionInFocusConfiguration(state, configuration) {
-    state.connectionInFocusConfiguration = configuration
-  },
-
-  setExtractorInFocusConfiguration(state, configuration) {
-    state.extractorInFocusConfiguration = configuration
-  },
-
   setHasExtractorLoadingError(state, value) {
     state.hasExtractorLoadingError = value
   },
 
-  setLoaderInFocusConfiguration(state, configuration) {
-    state.loaderInFocusConfiguration = configuration
+  setInFocusConfiguration(state, { configuration, target }) {
+    configuration.settings.forEach(setting => {
+      const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
+      const isDefaultNeeded = !configuration.config.hasOwnProperty(setting.name)
+      if (isIso8601Date && isDefaultNeeded) {
+        configuration.config[setting.name] = utils.getFirstOfMonthAsIso8601()
+      }
+    })
+    state[target] = configuration
   },
 
   setPipelineIsRunning(_, { pipeline, value }) {

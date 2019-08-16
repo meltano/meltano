@@ -15,11 +15,9 @@ extractors:
       - name: start_date
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
       - name: end_date
         env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-gitlab
     namespace: gitlab
     pip_url: "git+https://gitlab.com/meltano/tap-gitlab.git"
@@ -42,7 +40,6 @@ extractors:
       - name: start_date
         env: GITLAB_API_START_DATE
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     namespace: zendesk
@@ -57,7 +54,6 @@ extractors:
         description: <subdomain>.zendesk.com
       - name: start_date
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-zuora
     namespace: zuora
     pip_url: "tap-zuora"
@@ -72,7 +68,6 @@ extractors:
         kind: boolean
       - name: start_date
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
     docs: https://meltano.com/docs/plugins.html#tap-zuora
   - name: tap-marketo
     namespace: marketo
@@ -86,7 +81,6 @@ extractors:
       - name: endpoint
       - name: start_time
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-salesforce
     namespace: sfdc
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
@@ -104,7 +98,6 @@ extractors:
         kind: boolean
       - name: start_date
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-mongodb
     namespace: mongodb
     pip_url: "git+https://github.com/singer-io/tap-mongodb.git"
@@ -129,7 +122,6 @@ extractors:
         env: STRIPE_API_KEY
       - name: start_date
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-fastly
     namespace: fastly
     pip_url: "git+https://gitlab.com/meltano/tap-fastly.git"
@@ -139,7 +131,6 @@ extractors:
       - name: start_date
         label: Start Date
         kind: date_iso8601
-        value: 2019-06-01T00:00:00Z
   - name: tap-carbon-intensity
     namespace: carbon
     pip_url: "git+https://gitlab.com/meltano/tap-carbon-intensity"
