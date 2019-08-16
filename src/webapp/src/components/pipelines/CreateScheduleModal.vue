@@ -70,7 +70,7 @@ export default {
     },
     prefillForm() {
       // TODO implement an intelligent prefill approach
-      this.pipeline.name = ''
+      this.pipeline.name = `pipeline-${new Date().getTime()}`
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? this.installedPlugins.extractors[0].name
         : ''
