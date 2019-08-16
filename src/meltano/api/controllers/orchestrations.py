@@ -83,15 +83,8 @@ def get_plugin_configuration() -> Response:
     settings = PluginSettingsService(db.session, project)
 
     config = flatten(
-        settings.as_config(plugin, sources=[PluginSettingValueSource.DB]), reducer="dot"
+        settings.as_config(plugin), reducer="dot"
     )
-
-    # Apply default config
-    for setting in settings.get_definition(plugin).settings:
-        key = setting["name"]
-        if not key in config:
-            if "value" in setting:
-                config[key] = setting["value"]
 
     return jsonify(
         {
