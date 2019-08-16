@@ -170,7 +170,7 @@ const actions = {
     })
   },
 
-  savePluginConfiguration({ commit, state }, configPayload) {
+  savePluginConfiguration(_, configPayload) {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
