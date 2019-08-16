@@ -171,14 +171,7 @@ const actions = {
   },
 
   savePluginConfiguration({ commit, state }, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload).then(response => {
-      const configuration = Object.assign(
-        {},
-        state.connectionInFocusConfiguration
-      )
-      configuration.config = response.data
-      commit('setConnectionInFocusConfiguration', configuration)
-    })
+    orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
