@@ -28,20 +28,29 @@ Navigate to the directory in your terminal where you want your Meltano project t
 Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
 :::
 
+Initialize a new project with a folder called carbon:
+
 ```bash
-# Initialize a new project with a folder called carbon
 meltano init carbon
+```
 
-# Change directory into your new carbon project
+Change directory into your new carbon project:
+```bash
 cd carbon
+```
 
-# Let's see what extractors and loaders are available
+Let's see what extractors and loaders are available
+```bash
 meltano discover all
+```
 
-# Run the extractor (tap) and loader (target)
+Run the extractor (tap) and loader (target)
+```bash
 meltano elt tap-carbon-intensity target-sqlite
+```
 
-# Ensure Meltano UI will know how to use data from ELT
+Ensure Meltano UI will know how to use data from ELT:
+```bash
 meltano add model model-carbon-intensity-sqlite
 ```
 
@@ -58,7 +67,6 @@ Meltano's ELT pipeline empowers you to aggregate data from various sources and t
 Now that your data is extracted and loaded, it is ready to be analyzed. Time to start up the web app! Go back into your terminal and run the following command:
 
 ```bash
-# Start up the Meltano UI web application!
 meltano ui
 ```
 
@@ -103,23 +111,33 @@ To get started, navigate to a directory, in your terminal, where you want your M
 Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
 :::
 
+Initialize a new project with a folder called sfdc-project
 ```bash
-# Initialize a new project with a folder called sfdc-project
 meltano init sfdc-project
+```
 
-# Change directory into your new sfdc-project project
+Change directory into your new sfdc-project project
+```bash
 cd sfdc-project
+```
 
-# Start docker postgres instance
+Start docker postgres instance
+```bash
 docker-compose up -d warehouse_db
+```
 
-# Let's see what extractors and loaders are available
+Let's see what extractors and loaders are available
+```bash
 meltano discover all
+```
 
-# Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
+Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
+```bash
 meltano add extractor tap-salesforce
+```
 
-# Add target-postgres - to set the credentials for your Postgres DB
+Add target-postgres - to set the credentials for your Postgres DB
+```bash
 meltano add loader target-postgres
 ```
 
@@ -179,11 +197,13 @@ Depending on your Account, the aforementioned command may take from a couple min
 
 You could also extract and load the data and then run the transformations at a later point (examples below):
 
+Only run the Extract and Load steps:
 ```bash
-# Only run the Extract and Load steps
 meltano elt tap-salesforce target-postgres
+```
 
-# Only run the Transform Step
+Only run the Transform Step:
+```bash
 meltano elt tap-salesforce target-postgres --transform only
 ```
 
@@ -192,8 +212,8 @@ When meltano elt tap-salesforce target-postgres --transform run is executed, bot
 
 In order to visualize the data with existing transformations in the UI, the final step would be to add models:
 
-```bash
-# Add existing models
+Add existing models:
+```bash 
 meltano add model model-salesforce
 ```
 
@@ -210,18 +230,15 @@ Support for incremental ELT varies from extractor to extractor.
 To enable it, Meltano must know which cursor to use for the ELT, which is set using the `--job_id` parameter on the `meltano elt` command.
 Alternatively, one can use the `MELTANO_JOB_ID` environmental variable. For each subsequent `ELT`, Meltano will look for a previous cursor to start from.
 
-```bash
-# the first run will create a cursor state
-$ meltano elt --job_id=gitlab tap-gitlab target-postgres
-No state was found, complete import.
-…
-ELT Completed …
 
-# subsequent runs will start from this cursor
-$ meltano elt --job_id=gitlab tap-gitlab target-postgres
-Found state from …
-…
-ELT Completed …
+The first run will create a cursor state:
+```bash
+meltano elt --job_id=gitlab tap-gitlab target-postgres
+```
+
+Subsequent runs will start from this cursor:
+```bash
+meltano elt --job_id=gitlab tap-gitlab target-postgres
 ```
 
 :::warning
@@ -239,8 +256,8 @@ schedules:
 
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
 
+This will start a local web server at [http://localhost:5000](http://localhost:5000)
 ```bash
-# This will start a local web server at [http://localhost:5000](http://localhost:5000)
 meltano ui
 ```
 
@@ -286,8 +303,8 @@ Meltano uses [Singer](https://singer.io) taps and targets to extract and load da
 :::
 
 ```bash
-$ pip install cookiecutter
-$ cookiecutter gh:singer-io/singer-tap-template
+pip install cookiecutter
+cookiecutter gh:singer-io/singer-tap-template
 > project_name: tap-gitlab-custom
 ```
 
@@ -300,7 +317,7 @@ Using `-e` will install the plugin as editable so any change you make is readily
 :::
 
 ```bash
-$ meltano add --custom extractor tap-gitlab-custom
+meltano add --custom extractor tap-gitlab-custom
 ...
 > namespace: gitlab 
 > pip_url: -e tap-gitlab-custom
@@ -383,15 +400,19 @@ Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521
 
 Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
 
+use `meltano invoke` to run your plugin in isolation:
+```bash 
+meltano invoke tap-gitlab-custom --discover
 ```
-;; use `meltano invoke` to run your plugin in isolation
-$ meltano invoke tap-gitlab-custom --discover
 
-;; use `meltano select` to parse your `catalog`
-$ meltano select --list tap-gitlab-custom '*' '*'
-
-;; run an ELT using your new tap
-$ meltano elt tap-gitlab-custom target-sqlite
+Use `meltano select` to parse your `catalog`:
+```bash
+meltano select --list tap-gitlab-custom '*' '*'
+```
+ 
+Run an ELT using your new tap:
+```bash
+meltano elt tap-gitlab-custom target-sqlite
 ```
 
 ### References
@@ -542,10 +563,10 @@ models:
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
 
-```bash
-# Runs transformation step only
-meltano elt tap-salesforce target-postgres --transform only
 
+Runs transformation step only
+```bash
+meltano elt tap-salesforce target-postgres --transform only
 ```
 ### Adding Custom Models
 

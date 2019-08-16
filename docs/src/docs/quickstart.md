@@ -10,10 +10,10 @@ Remember, to activate your virtual enviroment, you will need to run:
 
 ```bash
 # Linux, OSX
-$ source ~/virtualenvs/meltano/bin/activate
+source ~/virtualenvs/meltano/bin/activate
 
 # Windows
-$ %ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
+%ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
 ## Creating Your First Project
@@ -21,7 +21,7 @@ $ %ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
 Run this command in your terminal to initialize a new project:
 
 ```bash
-$ meltano init PROJECT_NAME
+meltano init PROJECT_NAME
 ```
 
 :::tip
@@ -31,8 +31,8 @@ For those new to the command line, your PROJECT_NAME should not have spaces in t
 Creating a project also creates a new directory with the name you gave it. Change to the new directory and then start Meltano with these commands:
 
 ```bash
-$ cd PROJECT_NAME
-$ meltano ui
+cd PROJECT_NAME
+meltano ui
 ```
 
 Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
@@ -82,12 +82,7 @@ Right now, Airflow can not be installed from inside Meltano's UI so you need to 
 Run the following command:
 
 ```bash
-$ meltano add orchestrator airflow
-Added 'airflow' to your Meltano project.
-Activated 'airflow' virtual environment.
-…
-Installed 'airflow'.
-Added and installed orchestrators 'airflow'.
+meltano add orchestrator airflow
 ```
 
 Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
@@ -98,9 +93,10 @@ A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created 
 To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
 :::
 
+
 ```bash
-$ control+c
-$ meltano ui
+# After installing Airflow, you will need to shut down your current instance of Meltano and restart
+meltano ui
 ```
 
 Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.

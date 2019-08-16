@@ -383,7 +383,7 @@ To run Meltano in production, we recommend using [gunicorn](http://docs.gunicorn
 First, install gunicorn:
 
 ```bash
-$ pip install gunicorn
+pip install gunicorn
 ```
 
 You can then start Meltano UI:
@@ -393,11 +393,13 @@ This is an example invocation of gunicorn, please refer to
 the [gunicorn documentation](http://docs.gunicorn.org/en/stable/settings.html) for more details.
 :::
 
+ALWAYS run Meltano UI in production mode when it is accessible externally:
 ```bash
-# ALWAYS run Meltano UI in production mode when it is accessible externally
-$ export FLASK_ENV=production
-$ export MELTANO_AUTHENTICATION=true
+export FLASK_ENV=production
+export MELTANO_AUTHENTICATION=true
+```
 
-# Start gunicorn with 4 workers, alternatively you can use `$(nproc)`
-$ gunicorn -c python:meltano.api.wsgi.config -w 4 meltano.api.wsgi:app
+Start gunicorn with 4 workers, alternatively you can use `$(nproc)`:
+```bash
+gunicorn -c python:meltano.api.wsgi.config -w 4 meltano.api.wsgi:app
 ```
