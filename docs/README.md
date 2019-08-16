@@ -31,3 +31,10 @@ To generate static assets for the `docs/` directory, run:
 npm run build:docs
 ```
 This will add the generated files in the `docs/public` directory.
+
+## FAQs
+
+**1. How do I add screenshots?**
+
+- Place the images in `/docs/.vuepress/public`.
+- Use Markdown image syntax `![imageAltText](imageUrl)`
