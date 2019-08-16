@@ -42,13 +42,13 @@ While this functionality is still in alpha, you can enable RBAC by setting the e
 
 ```bash
 # Set in your .env file
-$ export MELTANO_AUTHENTICATION=true
+export MELTANO_AUTHENTICATION=true
 ```
 
 Now you can start your Meltano installation with:
 
 ```bash
-$ meltano ui
+meltano ui
 ```
 
 ### User Authentication
