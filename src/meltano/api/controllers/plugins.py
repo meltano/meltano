@@ -74,6 +74,45 @@ def add():
     return jsonify(plugin.canonical())
 
 
+@pluginsBP.route("/install/batch", methods=["POST"])
+def install_batch():
+    payload = request.get_json()
+    plugin_type = PluginType(payload["plugin_type"])
+    plugin_name = payload["name"]
+
+    project = Project.find()
+    discovery = PluginDiscoveryService(project)
+    target_plugin = discovery.find_plugin(plugin_type, plugin_name)
+
+    config_service = ConfigService(project)
+    add_service = ProjectAddService(project)
+    install_service = PluginInstallService(project)
+    ignored_types = [target_plugin.type, PluginType.TRANSFORMS]
+    has_model = False
+    batched = []
+    for plugin in discovery.plugins():
+        if plugin.namespace == target_plugin.namespace:
+            if plugin.type not in ignored_types:
+                add_service.add(plugin.type, plugin.name)
+                plugin_install = config_service.find_plugin(
+                    plugin.name, plugin_type=plugin.type
+                )
+                batched.append(plugin_install.canonical())
+                run_venv = install_service.create_venv(plugin_install)
+                run_install_plugin = install_service.install_plugin(plugin_install)
+                if plugin.type is PluginType.MODELS:
+                    has_model = True
+
+    if has_model:
+        compiler = ProjectCompiler(project)
+        try:
+            compiler.compile()
+        except Exception as e:
+            pass
+
+    return jsonify(batched)
+
+
 @pluginsBP.route("/install", methods=["POST"])
 def install():
     payload = request.get_json()

@@ -10,6 +10,10 @@ export default {
     return axios.get(utils.apiUrl('plugins', 'installed'))
   },
 
+  installBatch(installConfig) {
+    return axios.post(utils.apiUrl('plugins', 'install/batch'), installConfig)
+  },
+
   installPlugin(installConfig) {
     return axios.post(utils.apiUrl('plugins', 'install'), installConfig)
   },

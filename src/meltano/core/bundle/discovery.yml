@@ -38,8 +38,8 @@ extractors:
         kind: boolean
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
-        kind: date_iso8601
         env: GITLAB_API_START_DATE
+        kind: date_iso8601
     docs: https://meltano.com/docs/plugins.html#gitlab
   - name: tap-zendesk
     namespace: zendesk
@@ -82,7 +82,7 @@ extractors:
       - name: start_time
         kind: date_iso8601
   - name: tap-salesforce
-    namespace: sfdc
+    namespace: salesforce
     pip_url: "git+https://gitlab.com/meltano/tap-salesforce.git"
     settings:
       # TODO: remove, should be injected from Meltano
