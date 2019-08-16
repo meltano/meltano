@@ -5,12 +5,10 @@ import logging
 import flatten_dict
 from datetime import datetime, date, time
 from copy import deepcopy
-from typing import Union, Dict, Callable, Optional
+from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
 from functools import reduce
 from pathlib import Path
-
-from .db import DB
 
 
 TRUTHY = ("true", "1", "yes", "on")
@@ -67,13 +65,6 @@ def slugify(s):
     s = s.replace(" ", "-")
 
     return s
-
-
-def setup_db(args=None):
-    if args is None:
-        DB.setup()
-    else:
-        DB.setup(**vars(args))
 
 
 def setup_logging(log_level=logging.INFO):
@@ -147,6 +138,10 @@ def flatten(d: Dict, reducer: Union[str, Callable] = "tuple", **kwargs):
     return flatten_dict.flatten(d, reducer, **kwargs)
 
 
+def compact(xs: Iterable) -> Iterable:
+    return (x for x in xs if x is not None)
+
+
 def file_has_data(file: Union[Path, str]):
     file = Path(file)  # ensure it is a Path object
     return file.exists() and file.stat().st_size > 0
@@ -192,3 +187,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         pass
 
     return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))
+
+
+def find_named(xs: Iterable[dict], name: str):
+    return next(x for x in xs if x["name"] == name)

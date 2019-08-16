@@ -1,43 +1,47 @@
 {
-    version = 1
-    name = gitflix
-    connection = runners_db
-    label = GitFlix Example
-    designs {
-        users {
-            label = HDA Example
-            from = users
-            description = Base for Hyper Dymensional Aggregates
-            joins {
-                streams {
-                    label = Streams
-                    sql_on = "users.id = streams.user_id"
-                    relationship = many_to_one
-                }
-                episodes {
-                    label = Episodes
-                    sql_on = "episodes.id = streams.episode_id"
-                    relationship = many_to_one
-                }
-            }
+  version = 1
+  name = gitflix
+  connection = runners_db
+  label = GitFlix Example
+  designs {
+    users_design {
+      label = HDA Example
+      from = users_table
+      description = Base for Hyper Dymensional Aggregates
+      joins {
+        streams_join {
+          label = Streams
+          from = streams_table
+          sql_on = "users_design.id = streams_join.user_id"
+          relationship = many_to_one
         }
-
-        streams {
-            label = Streams
-            from = streams
-            description = HDA from Streams
-            joins {
-                users {
-                    label = Users
-                    sql_on = "streams.user_id = users.id"
-                    relationship = many_to_one
-                }
-                episodes {
-                    label = Episodes
-                    sql_on = "streams.episode_id = episodes.id"
-                    relationship = many_to_one
-                }
-            }
+        episodes_join {
+          label = Episodes
+          from = episodes_table
+          sql_on = "episodes_join.id = streams_join.episode_id"
+          relationship = many_to_one
         }
+      }
     }
+
+    streams_design {
+      label = Streams
+      from = streams_table
+      description = HDA from Streams
+      joins {
+        users_join {
+          label = Users
+          from = users_table
+          sql_on = "streams_design.user_id = users_join.id"
+          relationship = many_to_one
+        }
+        episodes_join {
+          label = Episodes
+          from = episodes_table
+          sql_on = "streams_design.episode_id = episodes_join.id"
+          relationship = many_to_one
+        }
+      }
+    }
+  }
 }

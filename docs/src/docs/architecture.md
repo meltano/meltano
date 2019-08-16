@@ -1,89 +1,89 @@
 # Architecture
 
-## Concepts
-
-Below are common terms used within the Meltano ecosystem arranged alphabetically.
-
-### Aggregate
-
-An `Aggregate` relates to a calculable column, via `count`, `sum` or other (i.e., aggregate definitions). These are limited to predefined methods with no custom SQL as well since custom SQL will be handled through transforms with dbt.
-
-### Collection
-
-A `Collection` is a group of one or many `Designs` that determines how they will be mapped together.
-
-A `Collection` can be identified by the naming schema: `collection-name.collection.m5o` and should be stored in the `/collections` directory.
-
-### Column
-
-A `Column` relates directly to a column in a table of a database. Some limitations of this are that it will be limited to column only and no custom SQL.
-
-### Dashboard
-
-A `Dashboard` is a group of many `Reports`.
-
-A `Dashboard` is identified by the file naming schema: `set-name.dashboard.m5o` and should be stored in the `/dashboards` directory.
-
-### Design
-
-A `Design` maps multiple tables together via joins. It points to many tables by names and can also add filters. At a high level, it does the following:
-
-1. Takes selected columns to generate SQL from the `.m5oc` file
-1. Runs the SQL query
-1. Outputs the desired graph
-
-In addition, a `Design` is the file that you would use to do the actual analysis because it defines the relationship between the tables.
-
-A `Design` can be identified by the file naming schema: `design-name.design.m5o` and should be stored in the `/collections` directory.
-
-### M5O Files
-
-There are two types of `.m5o` files:
-
-1. `.m5o` are user defined files that model the data in your database
-2. `.m5oc` are compiled files generated from multiple `m5o` files
-
-The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano UI then leverages.
-
-### Report
-
-A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
-
-A `Report` can be identified by the file naming schema: `report-name.report.m5o` and should be stored in the `/reports` directory.
-
-### Table
-
-A `Table` relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains `columns` and `aggregates` so you can select which you want to show.
-
-A `Table` can be identified by the file naming schema: `table-name.table.m5o` and should be stored in the `/tables` directory.
-
-### Taps
-
-A `Tap` is an application that pulls data out of a data source by using the best integration for extracting bulk data.
-
-For example, it takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline.
-
-Meltano's `taps` is part of the Extractor portion of the data workflow and are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
-
-### Targets
-
-A `Target` is an application that has the responsibility of consuming data from `taps` and perform a task with it. Examples include loading it into a file (i.e., CSV), API, or database.
-
-Meltano `targets` is part of the Loader portion of the data workflow.
-
-## Meltano Schema
-
-Helper functions to manage the data warehouse. At the moment, these are PGSQL specific.
-
-### Create Schema and Roles
-
-Create and grant usage for a database schema.
-
 ## Meltano Model
 
 Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano UI.
 
 An *analysis model* is an interchangeable term for *meltano model*.
+
+### Concepts
+
+Below are definition for each concept used within a Meltano Model.
+
+#### Topic
+
+A `Topic` is a group of one or many `Designs` that determines how they will be mapped together.
+
+A `Topic` can be identified by the naming schema: `<name>.topic.m5o` and should be stored in the `/model` directory.
+
+#### Design
+
+A `Design` maps multiple `Tables` together via `Joins` and represent the query context required for the actual analysis.
+
+Each `Design` is also a `Source`, and thus can be refered to by the `Joins` it defines.
+
+```
+# defines a Design named `sample`
+sample {
+  from: table_name
+  joins {
+    # defines a Join named `join_a`
+    join_a {
+      from: table_a
+      # we refer to the `Source's name` here 
+      sql_on: "sample.a_id = join_a.a_id"
+    },
+    …
+  }
+}
+```
+
+Designs are defined inside their corresponding `Topic` file.
+
+#### Join
+
+A `Join` represent the relationship between two `Sources`.
+
+Each `Join` is also a `Source` so it can be refered to in by another `Join` defined in the same `Design`.
+
+```
+sample {
+  from: table_name
+  joins {
+    join_a {
+      from: table_a
+      sql_on: "sample.a_id = join_a.a_id"
+    },
+    join_b {
+      from: table_b
+      # we can refer to `join_a` as it is defined in the same `Design`
+      sql_on: "join_a.b_id = join_b.b_id"
+    }
+  }
+}
+```
+
+#### Source
+
+A `Source` is defined as something that refers to a `Table` in a `Design` context. It is crucial for `Designs` that refers to the same `Table` multiple times, because it serves as unique identifier for the scope of the query.
+
+#### Table
+
+A `Table` relates to a table in a database. It defines a direct link to a table in the database. In addition, it also defines and contains `columns` and `aggregates` so you can select which you want to show.
+
+A `Table` can be identified by the file naming schema: `<name>.table.m5o` and should be stored in the `/model` directory.
+
+#### Aggregate
+
+An `Aggregate` relates to a calculable column, via `count`, `sum` or other (i.e., aggregate definitions). These are limited to predefined methods with no custom SQL as well since custom SQL will be handled through transforms with dbt.
+
+An `Aggregate` can be referred as an `Attribute` in a `Design` context.
+
+#### Column
+
+A `Column` relates directly to a column in a table of a database. Some limitations of this are that it will be limited to column only and no custom SQL.
+
+A `Column` can be referred as an `Attribute` in a `Design` context.
 
 ### Discover Available Models
 
@@ -103,17 +103,18 @@ meltano add model [name_of_model]
 
 ### Create a New Model
 
-#### Model Setup
+#### Setup
+
 There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano UI:
-1. Author `my-database-setup.model.m5o` file(s)
-    - Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
-1. Author `my-table.table.m5o` file(s)
-    - Define a database table for connecting to using Meltano's CLI and/or UI
+
+  - Define each `Table` for a data source (as `<name>.table.m5o`)
+  - Define `Topics` for each analysis you want to run (as `<topic>.topic.m5o`) 
 
 #### Model Authoring (`.m5o` files)
+
 The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-Optimized Config Object Notation) format](https://github.com/lightbend/config/blob/master/HOCON.md#hocon-human-optimized-config-object-notation). Below are examples with comments to aid the authoring of your `...model.m5o` and `...table.m5o` files mentioned above.
 
-##### Example `carbon.model.m5o` file
+##### Example `carbon.topic.m5o` file
 
 ```bash
 # Define a database, connection settings, and the table relationships (further defined in each `my-table.table.m5o` file) to inform Meltano how to connect for ELT, orchestration, and interactive SQL generation using the Meltano UI
@@ -145,7 +146,7 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
           # Define table columns of interest that will be GUI selectable and subsequently used for generating SQL queries
           fields = [entry.from, entry.to]
           # Define the SQL join condition
-          sql_on = "{{ region.id }} = {{ entry.region_id }}"
+          sql_on = "region.id = entry.region_id"
           # Define join relationship
           relationship = one_to_one
         }
@@ -181,12 +182,16 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
     }
   }
   # Define time-based column(s) of interest that will be GUI selectable and subsequently used for generating SQL queries
-  column_groups {
+  timeframes {
     from {
       label = From
       description = Selected from range in carbon data
       type = time
-      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
+      # `part` refers to the DATE_PART SQL function: 
+      # https://www.postgresql.org/docs/8.1/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+      periods = [{ name = week, label = Week, part = WEEK }, 
+                 { name = month, label = Month, part = MONTH }, 
+                 { name = year, label = Year, part = YEAR }]
       convert_tz = no
       sql = "{{TABLE}}.from"
     }
@@ -194,7 +199,11 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
       label = To
       description = Selected to range in carbon data
       type = time
-      timeframes = [{ label = Date }, { label = Week }, { label = Month }, { label = Year }]
+      # `part` refers to the DATE_PART SQL function: 
+      # https://www.postgresql.org/docs/8.1/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
+      periods = [{ name = week, label = Week, part = WEEK }, 
+                 { name = month, label = Month, part = MONTH }, 
+                 { name = year, label = Year, part = YEAR }]
       convert_tz = no
       sql = "{{TABLE}}.to"
     }
@@ -204,6 +213,27 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
 
 With these files the Meltano CLI (or in conjunction with the Meltano UI) can properly extract, load, and transform your data for analysis using Meltano UI.
 
+### M5O Files
+
+There are two types of `.m5o` files:
+
+1. `.m5o` are user defined files that model the data in your database
+2. `.m5oc` are compiled files generated from multiple `m5o` files
+
+The `.m5o` files are based on the JSON-like HOCON syntax and serve as input for the compiled `.m5oc` files that Meltano then leverages.
+
+### Report
+
+A `Report` is a saved state of selecting and analyzing a `Design`. It contains a subset of fields that you select from multiple tables and is ultimately the selected analysis. It can also be generated from raw SQL.
+
+A `Report` can be identified by the file naming schema: `<name>.report.m5o` and should be stored in the `/model` directory.
+
+### Dashboard
+
+A `Dashboard` is a group of many `Reports`.
+
+A `Dashboard` is identified by the file naming schema: `<name>.dashboard.m5o` and should be stored in the `/model` directory.
+
 ## Meltano UI
 
 Meltano UI is a dashboard that allows you to interactively generate and run SQL queries to produce data visualizations, charts, and graphs based on your data.
@@ -211,6 +241,22 @@ Meltano UI is a dashboard that allows you to interactively generate and run SQL 
 ## Meltano ELT
 
 Meltano uses Singer Taps and Targets to Extract the data from various data sources and load them in raw format, i.e. as close as possible to their original format, to the Data Warehouse. Subsequently, the raw data is transformed to generate the dataset used for analysis and dashboard generation.
+
+### Taps
+
+A `Tap` is an application that pulls data out of a data source by using the best integration for extracting bulk data.
+
+For example, it takes data from sources like databases or web service APIs and converts them in a format that can be used for data integration or an ETL (Extract Transform Load) pipeline.
+
+Meltano's `taps` is part of the Extractor portion of the data workflow and are based on the [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md).
+
+### Targets
+
+A `Target` is an application that has the responsibility of consuming data from `taps` and perform a task with it. Examples include loading it into a file (i.e., CSV), API, or database.
+
+Meltano `targets` is part of the Loader portion of the data workflow.
+
+### Pipelines
 
 Meltano can be used in any ELT architecture by using the right taps and targets for the job. The strategies supported can range from dumping the source data in a data lake to keeping all historical versions for each record to storing well formatted, clean data in the target data store.
 

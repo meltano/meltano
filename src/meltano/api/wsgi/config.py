@@ -1,5 +1,9 @@
 import logging
+from sqlalchemy import create_engine
+
+import meltano.api.config as _config
 from meltano.core.project import Project
+from meltano.core.migration_service import MigrationService
 from meltano.api.workers import MeltanoBackgroundCompiler, AirflowWorker
 
 
@@ -17,6 +21,10 @@ except:
 
 
 def when_ready(server):
+    engine = create_engine(_config.SQLALCHEMY_DATABASE_URI)
+    MigrationService(engine).upgrade()
+    engine.dispose()
+
     for worker in _workers:
         worker.start()
 

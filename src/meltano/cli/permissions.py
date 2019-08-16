@@ -15,7 +15,6 @@ def permissions():
 
 
 @permissions.command()
-@project
 @click.argument("spec")
 @click.option(
     "--db",
@@ -27,6 +26,7 @@ def permissions():
 @click.option(
     "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
 )
+@project
 def grant(project, db, spec, dry, diff):
     """Grant the permissions provided in the provided specification file."""
     try:

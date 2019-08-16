@@ -18,6 +18,38 @@ For more information on the source code for the docs and running it locally, you
 
 We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/docs/contributing.html)
 
+### Metrics Preferences
+
+As you contribute to Meltano, you may want to disable metrics tracking globally rather than by project. To do this, you can do this by setting the environment variable `MELTANO_DISABLE_TRACKING=True`.
+
+#### bash
+
+1. Open your terminal
+2. Edit `~/.bashrc` with a text editor
+3. Add the following lines:
+
+```bash
+# Disable tracking across all Meltano projects
+export MELTANO_DISABLE_TRACKING=True
+```
+
+4. Restart your terminal
+5. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
+
+#### Zsh
+
+1. Open your terminal
+2. Edit `~/.zshrc` with a text editor
+3. Add the following lines:
+
+```bash
+# Disable tracking across all Meltano projects
+export MELTANO_DISABLE_TRACKING=True
+```
+
+4. Restart your terminal
+5. Run `echo $MELTANO_DISABLE_TRACKING` and you should receive `True` as your output
+
 ## License
 
 This code is distributed under the MIT license, see the [LICENSE](LICENSE) file.

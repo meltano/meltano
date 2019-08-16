@@ -109,6 +109,12 @@ Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/
 
 For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
 
+### Troubleshooting Airflow ###
+
+If you run into issues, it is possible that you could end up with multiple instances of Airflow running at the same time. This is a known issue ([#821](https://gitlab.com/meltano/meltano/issues/812)) common if you have been working with multiple Meltano projects, or have killed Meltano UI from the command line.
+
+To troubleshoot, run `sudo lsof -i -P | grep -i "listen"` from your command line. If you see multiple instances of Python running on Port 5010, kill the first instance with `kill 12345` (using the number for your instance). Then run `meltano ui` and try again.
+
 ## Analyzing Your Data
 
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!

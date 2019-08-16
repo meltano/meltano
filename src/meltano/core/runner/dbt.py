@@ -24,10 +24,10 @@ class DbtRunner(Runner):
         self.dbt_service = dbt_service or DbtService(project)
 
     def run(self, extractor: str, loader: str, dry_run=False, models=None):
-        extractor = self.config_service.get_plugin(
+        extractor = self.config_service.find_plugin(
             extractor, plugin_type=PluginType.EXTRACTORS
         )
-        loader = self.config_service.get_plugin(loader, plugin_type=PluginType.LOADERS)
+        loader = self.config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
 
         # we should probably refactor this part to have an ELTContext object already
         # filled with the each plugins' configuration so we don't have to query
@@ -40,16 +40,29 @@ class DbtRunner(Runner):
 
             # send the elt_context as ENV variables
             env = {**settings.as_env(extractor), **settings.as_env(loader)}
+            process = self.dbt_service.deps()
+
+            if process.returncode:
+                raise Exception(
+                    f"dbt deps didn't exit cleanly. Exit code: {process.returncode}"
+                )
+
+            if models is not None:
+                models = models.replace("-", "_")
+
+            if dry_run:
+                process = self.dbt_service.compile(models, env=env)
+                if process.returncode:
+                    raise Exception(
+                        f"dbt compile didn't exit cleanly. Exit code: {process.returncode}"
+                    )
+            else:
+                process = self.dbt_service.run(models, env=env)
+                if process.returncode:
+                    raise Exception(
+                        f"dbt run didn't exit cleanly. Exit code: {process.returncode}"
+                    )
         except Exception as e:
             logging.warning("Could not inject environment to dbt.")
-            logging.debug("Could not hydrate ENV from the EltContext: {str(e)}")
-
-        self.dbt_service.deps()
-
-        if models is not None:
-            models = models.replace("-", "_")
-
-        if dry_run:
-            self.dbt_service.compile(models, env=env)
-        else:
-            self.dbt_service.run(models, env=env)
+            logging.debug(f"Could not hydrate ENV from the EltContext: {str(e)}")
+            raise e

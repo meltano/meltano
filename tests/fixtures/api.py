@@ -30,7 +30,7 @@ def impersonate(app):
     return factory
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def app(create_app):
     return create_app()
 
@@ -41,16 +41,16 @@ def app_context(app):
         yield
 
 
-@pytest.fixture()
-def create_app(request, add_model, project):
+@pytest.fixture(scope="class")
+def create_app(request, project, engine_uri):
     def _factory(**kwargs):
         config = {
             "TESTING": True,
             "LOGIN_DISABLED": False,
             "ENV": "test",
-            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            "SQLALCHEMY_DATABASE_URI": engine_uri,
             **kwargs,
-        }  # in-memory
+        }
 
         app = meltano.api.app.create_app(config)
         request.addfinalizer(lambda: _cleanup(app))
@@ -65,6 +65,6 @@ def create_app(request, add_model, project):
     return _factory
 
 
-@pytest.fixture
+@pytest.fixture()
 def api(app):
     return app.test_client()

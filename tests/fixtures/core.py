@@ -35,9 +35,11 @@ def discovery():
             "settings": [{"name": "test", "value": "mock"}, {"name": "start_date"}],
         }
     )
+
     discovery[PluginType.LOADERS].append(
         {"name": "target-mock", "namespace": "pytest", "pip_url": "target-mock"}
     )
+
     discovery[PluginType.TRANSFORMERS].append(
         {
             "name": "transformer-mock",
@@ -45,6 +47,7 @@ def discovery():
             "pip_url": "transformer-mock",
         }
     )
+
     discovery[PluginType.TRANSFORMS].append(
         {
             "name": "tap-mock-transform",
@@ -69,6 +72,8 @@ def discovery():
         }
     )
 
+    discovery[PluginType.CONNECTIONS].append({"name": "pytest", "namespace": "pytest"})
+
     return discovery
 
 
@@ -77,7 +82,7 @@ def plugin_discovery_service(project, discovery):
     return PluginDiscoveryService(project, discovery=discovery)
 
 
-@pytest.fixture()
+@pytest.fixture(scope="class")
 def project_compiler(project):
     return ProjectCompiler(project)
 
@@ -150,6 +155,11 @@ def add_model(project, plugin_install_service, project_add_service):
 
 
 @pytest.fixture(scope="class")
+def add_connection(project_add_service):
+    return project_add_service.add(PluginType.CONNECTIONS, "pytest")
+
+
+@pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project)
 
@@ -183,6 +193,10 @@ def schedule_service_factory(project, plugin_settings_service_factory):
 def project(test_dir, project_init_service):
     project = project_init_service.init()
     logging.debug(f"Created new project at {project.root}")
+
+    # empty out the `plugins`
+    with project.meltano_update() as meltano:
+        meltano["plugins"] = {}
 
     # this is a test repo, let's remove the `.env`
     os.unlink(project.root_dir(".env"))

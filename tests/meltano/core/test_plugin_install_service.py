@@ -3,6 +3,7 @@ import yaml
 import os
 import shutil
 
+from unittest import mock
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.config_service import ConfigService
 
@@ -15,6 +16,7 @@ class TestPluginInstallService:
                 yaml.dump(
                     {
                         "plugins": {
+                            "connections": [{"name": "sqlite"}],
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",

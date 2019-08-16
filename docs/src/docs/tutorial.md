@@ -127,32 +127,26 @@ meltano add loader target-postgres
 Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 ```
-export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
+FLASK_ENV=development
+SQLITE_DATABASE=meltano
 
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_SCHEMA=analytics
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+PG_PASSWORD=warehouse
+PG_USERNAME=warehouse
+PG_ADDRESS=localhost
+PG_SCHEMA=analytics
+PG_PORT=5502
+PG_DATABASE=warehouse
 
-export SFDC_URL=
-export SFDC_USERNAME=''
-export SFDC_PASSWORD=''
-export SFDC_SECURITY_TOKEN=''
-export SFDC_CLIENT_ID='secret_client_id'
+SFDC_URL=
+SFDC_USERNAME=''
+SFDC_PASSWORD=''
+SFDC_SECURITY_TOKEN=''
+SFDC_CLIENT_ID='secret_client_id'
 
-export SFDC_START_DATE='2019-03-01T00:00:00Z'
+SFDC_START_DATE='2019-03-01T00:00:00Z'
 ```
 
 You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
-
-Finally, make the credentials available to Meltano by executing the following command in your terminal:
-
-```bash
-source .env
-```
 
 ### Select The Entities to Export from Salesforce
 
@@ -545,11 +539,6 @@ models:
       livemode: false
       schema: '{{ env_var(''PG_SCHEMA'') }}'
 ```
-Before we re-run the ELT process, we should update our environment variables.
-
-```bash
-source .env
-```
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
 
@@ -723,88 +712,173 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 [Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
 
 
-## Using Docker
+## Advanced - Using tap-postgres with Meltano
 
-A Docker image should be built containing all the latest curated version of the taps/targets, each isolated into its own virtualenv.
+This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltano.
 
-This way we do not run into `docker-in-docker` problems (buffering, permissions, security).
+### Intro
 
-The CI can then run the correct ELT pipeline using  `meltano elt <extractor> <loader>`.
+`tap-postgres` is not currently officially supported by Meltano, so you have to add it as a custom tap. For more details, check the [documentation on adding a custom extractor](./tutorial.html#advanced-create-a-custom-extractor).
 
-### Using pre-built Docker images
+### Project Initialization 
 
-We provide the [meltano/meltano](https://hub.docker.com/r/meltano/meltano) docker image with Meltano preinstalled and ready to use.
+Let's start by initializing a new Meltano Project and add the supported loader `target-postgres`:
 
-> Note: The **meltano/meltano** docker image is also available in GitLab's registry: `registry.gitlab.com`
+```
+meltano init tap-postgres --no_usage_stats
+cd tap-postgres
+meltano add loader target-postgres
+```
 
-This image contains everything you need to get started with Meltano.
+### Adding a Custom Extractor
+
+Next step is to add `tap-postgres` as a [custom extractor](./tutorial.html#advanced-create-a-custom-extractor). We'll use the [ tap-postgres provided by the Singer.io community](https://github.com/singer-io/tap-postgres/):
 
 ```bash
-# to download or update to the latest version
-$ docker pull meltano/meltano
+meltano add --custom extractor tap-postgres
 
-# to look the currently installed version
-$ docker run meltano/meltano --version
-meltano, version …
+  (namespace): tap-postgres
+  (pip_url): tap-postgres
+  (executable) [tap-postgres]: tap-postgres
 ```
 
-Please refer to the [docker tutorial](/docs/tutorial.html#using-docker) for more details.
+We should then update `meltano.yml` and add the configuration parameters this tap needs in order to run:
 
-### Creating your own Docker image
-
-It is possible to run Meltano as a Docker container to simplify usage, deployment, and orchestration.
-
-> This tutorial is inspired of the [Starter tutorial](#starter) but with Meltano running inside a Docker container.
-
-We will use `docker run` to execute Meltano using the pre-built docker images.
-
-#### Initialize Your Project
-
-First things first, let's create a new Meltano project named **carbon**.
-
-```
-$ docker run -v $(pwd):/projects \
-             -w /projects \
-             meltano/meltano init carbon
-```
-
-Then you can `cd` into your new project:
-
-```
-$ cd carbon
-```
-
-Now let's extract some data from the **tap-carbon-intensity** into **target-sqlite**:
-
-```
-$ docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano elt tap-carbon-intensity target-sqlite
-```
-
-#### Analyze with Meltano UI
-
-Now that we have data in ur database, let's add the corresponding model bundle as the basis of our analysis.
-
-```
-$ docker run -v $(pwd):/project \
-             -w /project \
-             meltano/meltano add model model-carbon-intensity-sqlite
+**meltano.yml**
+```yaml
+plugins:
+  connections:
+  - name: sqlite
+  - name: postgresql
+  extractors:
+  - executable: tap-postgres
+    name: tap-postgres
+    namespace: tap-postgres
+    pip_url: tap-postgres
+    settings:
+      - name: dbname
+        env: TAP_PG_DATABASE
+      - name: host
+        env: TAP_PG_ADDRESS
+      - name: password
+        env: TAP_PG_PASSWORD
+      - name: port
+        env: TAP_PG_PORT
+      - name: user
+        env: TAP_PG_USERNAME
+    config:
+      default_replication_method: FULL_TABLE
+      include_schemas_in_destination_stream_name: true
+  loaders:
+  - name: target-postgres
+    pip_url: git+https://github.com/meltano/target-postgres.git
+send_anonymous_usage_stats: false
+version: 1.0
 ```
 
-We can then start the Meltano UI.
+And finally update the project's `.env` to add the proper settings for the source and the target databases. The `TAP_PG_*` variables are used by the Tap (i.e. they define the source DB where the data are extracted from), while the `PG_*` variables are used by the Target (i.e. they define the target DB where the data will be loaded at)
 
+**.env**
+```bash
+export FLASK_ENV=development
+export SQLITE_DATABASE=meltano
+
+export TAP_PG_DATABASE=my_source_db
+export TAP_PG_ADDRESS=localhost
+export TAP_PG_PORT=5432
+export TAP_PG_USERNAME=source_username
+export TAP_PG_PASSWORD=source_password
+
+export PG_DATABASE=my_target_db
+export PG_PASSWORD=target_password
+export PG_USERNAME=target_username
+export PG_ADDRESS=localhost
+export PG_PORT=5432
+export PG_SCHEMA='test_tap_postgres'
 ```
-# `ui` is the default command, we can omit it.
-$ docker run -v $(pwd):/project \
-             -w /project \
-             -p 5000:5000 \
-             meltano/meltano
+
+Let's make sure that everything has been set correctly:
+
+```bash
+meltano config tap-postgres
+
+  {'default_replication_method': 'FULL_TABLE', 'include_schemas_in_destination_stream_name': True, 'dbname': 'my_source_db', 'host': 'localhost', 'password': '***', 'port': '5432', 'user': '***'}
+
+meltano config target-postgres
+
+  {'user': '***', 'password': '***', 'host': 'localhost', 'port': '5432', 'dbname': 'my_target_db', 'schema': 'test_tap_postgres'}
 ```
 
-You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
+### Filtering out data
 
-For furter analysis, please head to the [Analyze](#analyze) section.
+This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
+
+We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](./meltano-cli.html#select).
+
+In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
+
+For example, assume that you want to export the `users` table and selected attributes from the `issues` table that reside in the `tap_gitlab` schema in `warehouse` DB. The following `meltano select` commands will only export those two tables and data for the selected attributes:
+
+```bash
+meltano select tap-postgres "warehouse-tap_gitlab-users" "*"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "project_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "author_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "assignee_id"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "title"
+meltano select tap-postgres "warehouse-tap_gitlab-issues" "state"
+```
+
+Finally, you can use `meltano select <tap_name> --list` command to make sure that everything has been set correctly:
+
+```bash
+meltano select tap-postgres --list
+
+Enabled patterns:
+  warehouse-tap_gitlab-issues.title
+  warehouse-tap_gitlab-issues.id
+  warehouse-tap_gitlab-issues.project_id
+  warehouse-tap_gitlab-issues.state
+  warehouse-tap_gitlab-issues.assignee_id
+  warehouse-tap_gitlab-issues.author_id
+  warehouse-tap_gitlab-users.*
+
+Selected properties:
+  [selected ] warehouse-tap_gitlab-issues.title
+  [automatic] warehouse-tap_gitlab-issues.id
+  [selected ] warehouse-tap_gitlab-issues.assignee_id
+  [selected ] warehouse-tap_gitlab-issues.state
+  [selected ] warehouse-tap_gitlab-issues.project_id
+  [selected ] warehouse-tap_gitlab-issues.author_id
+  [automatic] warehouse-tap_gitlab-users.id
+  [selected ] warehouse-tap_gitlab-users.username
+  [selected ] warehouse-tap_gitlab-users.avatar_url
+  [selected ] warehouse-tap_gitlab-users.web_url
+  [selected ] warehouse-tap_gitlab-users.name
+  [selected ] warehouse-tap_gitlab-users.state
+```
+
+#### Figuring out the names of the streams
+
+In case you are not sure what the names of the streams are, you can use `meltano invoke` to run `tap-postgres` in isolation and generate a catalog file:
+
+```bash
+meltano invoke tap-postgres --discover > .meltano/run/tap-postgres/tap.properties.json
+```
+
+You can then check that file and decide which Streams (tables in this case) should be exported and use their `tap_stream_id` property when running `meltano select`.
+
+### Run Meltano ELT
+
+Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by `PG_SCHEMA` (`test_tap_postgres` in this example)
+
+```bash
+meltano elt tap-postgres target-postgres 
+```
+
+### Next Steps
+
+If you want to add custom Transforms and explore the extracted data using Meltano UI, you should check the advanced tutorial on [Adding Custom Transformations and Models](./tutorial.html#advanced-adding-custom-transformations-and-models)
 
 
 ## Using Jupyter Notebooks
@@ -850,7 +924,9 @@ Once the installation is completed, you are set to use Jupyter Notebooks with Me
 
 ```bash
 cd /path/to/my/meltano/project
+set +a
 source .env
+set -a 
 ```
 
 This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.

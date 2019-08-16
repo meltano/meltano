@@ -1,0 +1,7 @@
+# https://gitlab.com/help/user/project/code_owners
+
+# Default codeowner
+* @bencodezen @dmor @derek-knox @iroussos @mbergeron @meltano_project
+
+# Ending a path in a `/` will specify the code owners for every file
+# nested in that directory, on any level

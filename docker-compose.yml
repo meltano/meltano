@@ -4,9 +4,9 @@ services:
     image: meltano/meltano
     env_file:
     - .env.dev
-    working_dir: /analyze
+    working_dir: /webapp
     volumes:
-    - ./src/analyze:/analyze
+    - ./src/webapp:/webapp
     ports:
     - 8080:8080
     command: ['bash', '-c', 'yarn && yarn run dev']

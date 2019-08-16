@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 from meltano.core.utils import nest
 from .project import Project
-from .plugin import Plugin, PluginInstall, PluginType
+from .plugin import Plugin, PluginInstall, PluginType, PluginRef
 from .plugin.factory import plugin_factory
 from .plugin.error import PluginMissingError
 
@@ -33,23 +33,27 @@ class ConfigService:
 
     def has_plugin(self, plugin_name: str):
         try:
-            self.get_plugin(plugin_name)
+            self.find_plugin(plugin_name)
             return True
         except PluginMissingError:
             return False
 
-    def get_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
+    def find_plugin(self, plugin_name: str, plugin_type: Optional[PluginType] = None):
+        name, profile = PluginRef.parse_name(plugin_name)
         try:
-            return next(
+            plugin = next(
                 plugin
                 for plugin in self.plugins()
                 if (
-                    plugin.name == plugin_name
+                    plugin.name == name
                     and (plugin_type is None or plugin.type == plugin_type)
                 )
             )
+
+            plugin.profile = profile
+            return plugin
         except StopIteration:
-            raise PluginMissingError(plugin_name)
+            raise PluginMissingError(name)
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
@@ -65,6 +69,9 @@ class ConfigService:
 
     def get_models(self):
         return filter(lambda p: p.type == PluginType.MODELS, self.plugins())
+
+    def get_connections(self):
+        return filter(lambda p: p.type == PluginType.CONNECTIONS, self.plugins())
 
     def get_database(self, database_name):
         return yaml.load(

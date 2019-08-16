@@ -44,6 +44,10 @@ class PluginInstallWarning(Exception):
     pass
 
 
+class PluginNotInstallable(Exception):
+    pass
+
+
 def aggregate(error_cls):
     class Aggregate(error_cls):
         """Aggregate multiple sub-exceptions."""

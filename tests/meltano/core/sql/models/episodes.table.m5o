@@ -1,7 +1,7 @@
 {
   version = 1
+  name = episodes_table
   sql_table_name = episodes
-  name = episodes
   columns {
     id {
       primary_key = true

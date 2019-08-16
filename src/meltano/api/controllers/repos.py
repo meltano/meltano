@@ -22,6 +22,7 @@ from meltano.core.m5o.m5o_collection_parser import (
 from flask_principal import Need
 from meltano.api.security.resource_filter import ResourceFilter, NameFilterMixin
 from meltano.api.security.auth import permit
+from meltano.api.json import freeze_keys
 
 
 reposBP = Blueprint("repos", __name__, url_prefix="/api/v1/repos")
@@ -194,6 +195,11 @@ def models():
     path = Path(topicsFile)
     topics = json.load(open(path, "r")) if path.is_file() else {}
     topics = next(M5ocFilter().filter("view:topic", [topics]))
+
+    # for now let's freeze the keys, so the we can re-use the
+    # key name as the design's name, but this should probably
+    # return a list
+    topics = freeze_keys(topics)
     return jsonify(topics)
 
 

@@ -1,6 +1,6 @@
 import click
 from . import cli
-from .params import project, db_options
+from .params import project
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.project import Project, ProjectNotFound
@@ -22,8 +22,8 @@ def install_status_update(data):
 
 
 @cli.command()
-@db_options
 @project
+<<<<<<< HEAD
 def install(project, engine_uri):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
@@ -31,6 +31,9 @@ def install(project, engine_uri):
     """
     project_engine(project, engine_uri, default=True)
 
+=======
+def install(project):
+>>>>>>> master
     install_service = PluginInstallService(project)
     install_status = install_service.install_all_plugins(install_status_update)
     num_installed = len(install_status["installed"])

@@ -1,11 +1,13 @@
 import pytest
 from datetime import datetime
 from freezegun import freeze_time
+from unittest import mock
 
 from meltano.core.schedule_service import (
     ScheduleService,
     Schedule,
     ScheduleAlreadyExistsError,
+    PluginSettingMissingError,
 )
 
 
@@ -70,6 +72,14 @@ class TestScheduleService:
         assert schedule.start_date == datetime.utcnow()
 
         # or use the start_date in the extractor configuration
-        subject.settings_service.set(tap, "start_date", datetime(2002, 1, 1))
+        subject.plugin_settings_service.set(tap, "start_date", datetime(2002, 1, 1))
         schedule = add("with_default_start_date", None)
         assert schedule.start_date == datetime(2002, 1, 1)
+
+        # or default to `utcnow()` if the plugin exposes no config
+        with mock.patch(
+            "meltano.core.schedule_service.PluginSettingsService.get_value",
+            side_effect=PluginSettingMissingError(tap, "start_date"),
+        ):
+            schedule = add("with_no_start_date", None)
+            assert schedule.start_date == datetime.utcnow()

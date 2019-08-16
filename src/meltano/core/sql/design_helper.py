@@ -11,26 +11,9 @@ from networkx.readwrite import json_graph
 from sqlparse.sql import TokenList, Comparison
 from typing import Dict
 
-from .base import MeltanoTable
+from .base import MeltanoTable, MeltanoDesign
 from .analysis_helper import AnalysisHelper
-
-# Visitor pattern on the SQL AST
-@singledispatch
-def visit(node, executor, depth=0):
-    logging.debug(f"Visiting node {node}")
-
-
-@visit.register(TokenList)
-def _(node: TokenList, executor, depth=0):
-    logging.debug(f"Visiting node {node}")
-    for t in node.tokens:
-        visit(t, executor, depth + 1)
-
-
-@visit.register(Comparison)
-def _(node: Comparison, executor, depth=0):
-    logging.debug(f"Visiting node {node}")
-    executor.comparison(node, depth)
+from meltano.core.behavior.visitor import visit_with
 
 
 class InvalidIdentifier(Exception):
@@ -44,9 +27,29 @@ DimensionGroup = namedtuple("DimensionGroup", ("dimensions", "group"))
 ComparisonFields = namedtuple("ComparisonFields", ("left", "right"))
 
 
+# Visitor pattern on the SQL AST
+@singledispatch
+def visit(node, executor, depth=0):
+    logging.debug(f"Visiting node {node}")
+
+
+@visit.register(TokenList)
+def _(node: TokenList, executor, depth=0):
+    logging.debug(f"Visiting node {node}")
+    for t in node.tokens:
+        executor.visit(t, depth + 1)
+
+
+@visit.register(Comparison)
+def _(node: Comparison, executor, depth=0):
+    logging.debug(f"Visiting node {node}")
+    executor.comparison(node, depth)
+
+
+@visit_with(visit)
 class PypikaJoinExecutor:
     def __init__(self, design, join):
-        self.design = design
+        self.design = MeltanoDesign(design)
         self.join = join
         self.result = None
         self.comparison_fields = None
@@ -59,23 +62,23 @@ class PypikaJoinExecutor:
 
         left = self.parse_identifier(node.left)
         right = self.parse_identifier(node.right)
+
         left_alias = self.join["name"] if left.table == self.join["name"] else None
         right_alias = self.join["name"] if right.table == self.join["name"] else None
 
+        left_table = self.design.find_table(left.table)
+        right_table = self.design.find_table(right.table)
+
         left_field = getattr(
             AnalysisHelper.db_table(
-                table["sql_table_name"] if left_alias else left.table,
-                schema=left.schema,
-                alias=left_alias or left.alias or left.table,
+                left_table.sql_table_name, alias=left_table.sql_table_name
             ),
             left.field,
         )
 
         right_field = getattr(
             AnalysisHelper.db_table(
-                table["sql_table_name"] if right_alias else right.table,
-                schema=right.schema,
-                alias=right_alias or right.alias or right.table,
+                right_table.sql_table_name, alias=right_table.sql_table_name
             ),
             right.field,
         )
@@ -174,8 +177,8 @@ class DesignHelper:
         except KeyError:
             pass
 
-        join_executor = PypikaJoinExecutor(self, join)
-        visit(sqlparse.parse(join["sql_on"])[0], join_executor)
+        join_executor = PypikaJoinExecutor(self.design, join)
+        join_executor.visit(sqlparse.parse(join["sql_on"])[0])
 
         return {
             "table": table,

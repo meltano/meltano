@@ -12,6 +12,10 @@ from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
 from meltano.core.utils import setup_logging
 
+
+logger = logging.getLogger(__name__)
+
+
 LEVELS = {
     "debug": logging.DEBUG,
     "info": logging.INFO,
@@ -29,6 +33,7 @@ LEVELS = {
 @click.pass_context
 def cli(ctx, log_level, verbose):
     setup_logging(log_level=LEVELS[log_level])
+
     ctx.ensure_object(dict)
     ctx.obj["verbosity"] = verbose
 

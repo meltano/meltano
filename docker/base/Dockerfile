@@ -14,10 +14,10 @@ RUN echo "Installing node and yarn" \
     && apt-get install -y nodejs yarn \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /meltano
+WORKDIR /build
 
-# application deps
-COPY requirements.txt ./
+# meltano core deps
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 CMD ['python']

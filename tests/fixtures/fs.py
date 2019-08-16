@@ -20,12 +20,14 @@ def mkdtemp(request):
 
 @pytest.fixture(scope="session")
 def test_dir(tmp_path_factory):
+    cwd = os.getcwd()
     test_dir = tmp_path_factory.mktemp("meltano_root")
 
     try:
         os.chdir(test_dir)
         yield test_dir
     finally:
+        os.chdir(cwd)
         shutil.rmtree(test_dir)
 
 

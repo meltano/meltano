@@ -5,11 +5,9 @@
 Before you move on, make sure you have Python `3.6`, Node `8.x`, Yarn `1.2` or newer installed.
 :::
 
-## Installation from source
+## Where to start?
 
-We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions:
-
-## Installation from source
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
 
 ```bash
 # Clone the Meltano repo
@@ -26,16 +24,16 @@ pip install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
-python -m venv venv
+python -m venv ~/virtualenvs/meltano-development
 
 # Activate your virtual environment
-source ./venv/bin/activate
+source ~/virtualenvs/meltano-development/bin/activate
 
 # Install all the dependencies
 pip install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
-# Note: you may have to escape the `.[dev]` argument on some shells, like zsh
+# Note: you may have to escape the .`[dev]` argument on some shells, like zsh
 pip install -e .[dev]
 
 # Run scripts to create remaining required files
@@ -56,6 +54,12 @@ For all changes that do not involve working on Meltano UI itself, run the follow
 meltano ui
 ```
 
+:::warning Troubleshooting
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed. 
+
+On a OSX, this can be solved by running `brew install yarn`. 
+:::
+
 ### Meltano UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
@@ -65,7 +69,7 @@ In the event you are contributing to Meltano UI and want to work with all of the
 meltano ui
 
 # Open a new terminal tab and go to your meltano directory. Then change directory to analyze
-cd src/analyze
+cd src/webapp
 
 # Install dependencies
 npm install # or yarn
@@ -73,6 +77,26 @@ npm install # or yarn
 # Start local development environment
 npm run dev # or yarn dev
 ```
+
+### Meltano System Database
+
+Meltano API and CLI are both supported by a database that is managed via Alembic migrations.
+
+:::tip Note
+[Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy. 
+:::
+
+Migrations for the system database are located inside the `meltano.migrations` module.
+
+To create a new migration, use the `alembic revision -m "message"` command, then edit the created file with the necessary database changes. Make sure to implement both `upgrade` and `downgrade`, so the migration is reversible, as this will be used in migration tests in the future.
+
+Each migration should be isolated from the `meltano` module, so don't import any model definition inside a migration.
+
+:::warning
+Meltano doesn't currently support auto-generating migration from the models definition.
+:::
+
+To run the migrations, use `meltano upgrade` inside a Meltano project.
 
 ## Documentation
 
