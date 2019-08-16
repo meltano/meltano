@@ -79,17 +79,19 @@ export default {
                 </div>
               </div>
 
-              <div class="panel">
-                <a
-                  v-for="dashboard in dashboards"
-                  class="panel-block space-between has-text-weight-medium"
-                  :class="{ 'is-active': isActive(dashboard) }"
-                  :key="dashboard.id"
-                  @click="setDashboard(dashboard)"
-                >
-                  {{ dashboard.name }}
-                </a>
-              </div>
+              <template v-if="dashboards.length > 0">
+                <div class="panel">
+                  <a
+                    v-for="dashboard in dashboards"
+                    class="panel-block space-between has-text-weight-medium"
+                    :class="{ 'is-active': isActive(dashboard) }"
+                    :key="dashboard.id"
+                    @click="setDashboard(dashboard)"
+                  >
+                    {{ dashboard.name }}
+                  </a>
+                </div>
+              </template>
             </div>
           </aside>
 
