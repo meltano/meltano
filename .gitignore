@@ -146,7 +146,7 @@ meltano.log.*
 # webapp builds
 src/webapp/dist/
 src/meltano/api/static/
-src/meltano/api/templates/analyze.html
+src/meltano/api/templates/webapp.html
 
 # sqlite
 *.db
