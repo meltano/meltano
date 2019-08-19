@@ -105,7 +105,7 @@ def create_app(config={}):
 
     @app.before_request
     def setup_airflow_context():
-        g.airflow_context = airflow_context["worker"];
+        g.airflow_context = airflow_context["worker"]
 
     @app.before_request
     def setup_js_context():
@@ -160,8 +160,8 @@ def start_workers(app, project):
     workers = []
 
     if not app.config["AIRFLOW_DISABLED"]:
-        airflow_context['worker'] = AirflowWorker(project)
-        workers.append(airflow_context['worker'])
+        airflow_context["worker"] = AirflowWorker(project)
+        workers.append(airflow_context["worker"])
 
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(

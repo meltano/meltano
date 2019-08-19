@@ -134,7 +134,7 @@ def install():
         except Exception as e:
             pass
 
-    if plugin_type is PluginType.ORCHESTRATORS and plugin_name == 'airflow':
+    if plugin_type is PluginType.ORCHESTRATORS and plugin_name == "airflow":
         g.airflow_context.installed.set()
 
     tracker = GoogleAnalyticsTracker(project)
