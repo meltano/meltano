@@ -1,5 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
