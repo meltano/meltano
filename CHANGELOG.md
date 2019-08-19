@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#894](https://gitlab.com/meltano/meltano/issues/894) Fix issue with static asset paths
+
 ### Breaks
 
 
