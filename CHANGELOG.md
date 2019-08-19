@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.37.0 - (2019-08-19)
 
 ---
 
@@ -29,7 +42,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#858](https://gitlab.com/meltano/meltano/issues/858) Fix `job_state` bug so that ELT run status polling can properly resume as expected
 - [#890](https://gitlab.com/meltano/meltano/issues/890) Fix implementation of default configuration setting to use less code
 
-### Breaks
 
 ## 0.36.0 - (2019-08-12)
 
