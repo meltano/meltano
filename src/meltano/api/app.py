@@ -21,7 +21,7 @@ from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 
 
 logger = logging.getLogger(__name__)
-airflow_context = {}
+airflow_context = { "worker": None }
 
 
 def create_app(config={}):
