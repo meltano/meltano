@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#872](https://gitlab.com/meltano/meltano/issues/872) Updated `tap-marketo` and `tap-stripe` to leverage password input type while also improving the input type password fallback
 - [#882](https://gitlab.com/meltano/meltano/issues/882) Fix recent minor regression regarding `Dashboard` routing
+- [#858](https://gitlab.com/meltano/meltano/issues/858) Fix `job_state` bug so that ELT run status polling can properly resume as expected
 
 ### Breaks
 

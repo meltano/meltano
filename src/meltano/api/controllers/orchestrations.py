@@ -54,8 +54,11 @@ def job_state() -> Response:
     for job_id in job_ids:
         finder = JobFinder(job_id)
         state_job = finder.latest(db.session)
-        is_complete = state_job.state == State.SUCCESS
-        jobs.append({"job_id": job_id, "is_complete": is_complete})
+        # Validate existence first as a job may not be queued yet as a result of
+        # another prerequisite async process (dbt installation for example)
+        if state_job:
+            is_complete = state_job.state == State.SUCCESS
+            jobs.append({"job_id": job_id, "is_complete": is_complete})
 
     return jsonify({"jobs": jobs})
 
