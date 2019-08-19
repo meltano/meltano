@@ -82,9 +82,7 @@ def get_plugin_configuration() -> Response:
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(db.session, project)
 
-    config = flatten(
-        settings.as_config(plugin), reducer="dot"
-    )
+    config = flatten(settings.as_config(plugin), reducer="dot")
 
     return jsonify(
         {
