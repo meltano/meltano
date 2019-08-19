@@ -34,7 +34,7 @@ export default {
     connectorName = connectorName === 'postgresql' ? 'postgres' : connectorName
     const name = regExpConnectorLogo.exec(connectorName)[1]
 
-    return `/logos/${name}-logo.png`
+    return `/static/logos/${name}-logo.png`
   },
 
   getIsSubRouteOf(parentPath, currentPath) {
