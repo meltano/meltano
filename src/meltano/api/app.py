@@ -105,7 +105,7 @@ def create_app(config={}):
 
     @app.before_request
     def setup_airflow_context():
-        g.airflow_context = airflow_context["worker"]
+        g.airflow_worker = airflow_context["worker"]
 
     @app.before_request
     def setup_js_context():

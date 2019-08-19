@@ -150,6 +150,10 @@ class AirflowWorker(threading.Thread):
             webserver_pid.write(str(self._webserver.pid))
             scheduler_pid.write(str(self._scheduler.pid))
 
+        # Time padding for server initialization so UI iframe displays as expected
+        # (iteration potential on approach but following UIAvailableWorker sleep approach)
+        time.sleep(2)
+
     def pid_path(self, name):
         return self.project.run_dir("airflow", f"{name}.pid")
 
