@@ -42,6 +42,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#763](https://gitlab.com/meltano/meltano/issues/763) Add inference to auto install related plugins after a user installs a specific extractor
 - [#867](https://gitlab.com/meltano/meltano/issues/867) Add fallback values (if they aren't set in the `discovery.yml`) for `start date`, `start time`, and `end date` for all connectors so the user has potentially one less interaction to make per connector configuration
+- [#814](https://gitlab.com/meltano/meltano/issues/814) Install Airflow via the Orchestration UI (we may do this in the background automatically in the future)
 
 ### Changes
 
