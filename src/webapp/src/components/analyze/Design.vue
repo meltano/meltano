@@ -1,5 +1,7 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
+import Vue from 'vue'
+
 import capitalize from '@/filters/capitalize'
 import Chart from '@/components/analyze/Chart'
 import Dropdown from '@/components/generic/Dropdown'
@@ -199,11 +201,21 @@ export default {
     },
 
     saveReport() {
+      const reportName = this.saveReportSettings.name
       this.$store.dispatch('designs/saveReport', this.saveReportSettings)
+        .then(() => {
+          Vue.toasted.global.success(`Report Saved - ${reportName}`)
+        })
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
     },
 
     updateReport() {
       this.$store.dispatch('designs/updateReport')
+        .then(() => {
+          Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
+        })
     },
 
     toggleNewDashboardModal() {
@@ -276,13 +288,13 @@ export default {
                 v-if="hasActiveReport()"
                 @click="updateReport()"
               >
-                <span>Save</span>
+                <span>Update Report</span>
               </button>
             </p>
             <p class="control">
               <Dropdown
                 :disabled="!hasChartableResults"
-                :label="hasActiveReport() ? '' : 'Save'"
+                :label="hasActiveReport() ? '' : 'Save Report'"
                 is-right-aligned
               >
                 <div class="dropdown-content">
@@ -326,7 +338,6 @@ export default {
             <Dropdown
               :disabled="!reports.length"
               label="Reports"
-              button-classes="is-interactive-primary is-outlined"
               is-right-aligned
             >
               <div class="dropdown-content">

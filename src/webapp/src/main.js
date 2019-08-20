@@ -1,10 +1,13 @@
-import Vue from 'vue'
 import Router from 'vue-router'
 import Toasted from 'vue-toasted'
-import axios from 'axios'
+import Vue from 'vue'
+
 import Auth from '@/middleware/auth'
+import axios from 'axios'
 import FatalError from '@/middleware/fatalError'
 import FontAwesome from './font-awesome'
+import lodash from 'lodash'
+
 import App from './App'
 import router from './router'
 import store from './store'
@@ -68,25 +71,19 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
 Vue.toasted.register(
   'success',
   message => message,
-  Object.assign(
-    {
-      duration: 3000,
-      type: 'success'
-    },
-    toastedOptions
-  )
+  Object.assign(lodash.cloneDeep(toastedOptions), {
+    duration: 3000,
+    type: 'success'
+  })
 )
 // Register a Global error notification
 Vue.toasted.register(
   'error',
   message => message,
-  Object.assign(
-    {
-      duration: 5000,
-      type: 'error'
-    },
-    toastedOptions
-  )
+  Object.assign(lodash.cloneDeep(toastedOptions), {
+    duration: 5000,
+    type: 'error'
+  })
 )
 
 // Axios config
