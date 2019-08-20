@@ -1,7 +1,21 @@
 from flask import Blueprint, jsonify, request
-from .dashboards_helper import DashboardsHelper
+from .dashboards_helper import DashboardAlreadyExistsError, DashboardsHelper
 
 dashboardsBP = Blueprint("dashboards", __name__, url_prefix="/api/v1/dashboards")
+
+
+@dashboardsBP.errorhandler(DashboardAlreadyExistsError)
+def _handle(ex):
+    dashboard_name = ex.dashboard["name"]
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A dashboard with the name '{dashboard_name}' already exists. Try renaming the dashboard.",
+            }
+        ),
+        409,
+    )
 
 
 @dashboardsBP.route("/all", methods=["GET"])
