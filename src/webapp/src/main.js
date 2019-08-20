@@ -68,19 +68,25 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
 Vue.toasted.register(
   'success',
   message => message,
-  Object.assign(toastedOptions, {
-    duration: 3000,
-    type: 'success'
-  })
+  Object.assign(
+    {
+      duration: 3000,
+      type: 'success'
+    },
+    toastedOptions
+  )
 )
-// Register a Global success notification
+// Register a Global error notification
 Vue.toasted.register(
   'error',
   message => message,
-  Object.assign(toastedOptions, {
-    duration: 4000,
-    type: 'error'
-  })
+  Object.assign(
+    {
+      duration: 5000,
+      type: 'error'
+    },
+    toastedOptions
+  )
 )
 
 // Axios config

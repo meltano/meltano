@@ -89,6 +89,9 @@ export default {
       this.$store
         .dispatch('configuration/savePipelineSchedule', this.pipeline)
         .then(() => this.close())
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
     },
     setHasCatchupDate(val) {
       this.hasCatchupDate = val

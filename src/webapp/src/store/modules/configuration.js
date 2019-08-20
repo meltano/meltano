@@ -175,7 +175,7 @@ const actions = {
   },
 
   savePipelineSchedule({ commit }, pipelineSchedulePayload) {
-    orchestrationsApi
+    return orchestrationsApi
       .savePipelineSchedule(pipelineSchedulePayload)
       .then(response => {
         commit('updatePipelines', response.data)
