@@ -31,6 +31,9 @@ LEVELS = {
 @click.version_option(version=meltano.__version__, prog_name="meltano")
 @click.pass_context
 def cli(ctx, log_level, verbose):
+    """
+    Get help at https://www.meltano.com/docs/meltano-cli.html#commands
+    """
     setup_logging(log_level=LEVELS[log_level])
 
     ctx.ensure_object(dict)
