@@ -3,27 +3,30 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Add CTA to specific dashboard in "Add to Dashboard" sub-UI
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Add toast feedback on success, update, or error for schedules, reports, and dashboards
 
 ### Changes
 
 ### Fixes
 
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
+
 ### Breaks
 
-
 ## 0.37.2 - (2019-08-19)
+
 ---
 
 ### Fixes
 
 - [#894](https://gitlab.com/meltano/meltano/issues/894) Fix issue with static asset paths
-
 
 ## 0.37.1 - (2019-08-19)
 
@@ -32,7 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#894](https://gitlab.com/meltano/meltano/issues/894) Fix build issues with new Vue CLI 3 build process
-
 
 ## 0.37.0 - (2019-08-19)
 
