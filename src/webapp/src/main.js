@@ -73,6 +73,15 @@ Vue.toasted.register(
     type: 'success'
   })
 )
+// Register a Global success notification
+Vue.toasted.register(
+  'error',
+  message => message,
+  Object.assign(toastedOptions, {
+    duration: 4000,
+    type: 'error'
+  })
+)
 
 // Axios config
 axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'

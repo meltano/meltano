@@ -180,9 +180,6 @@ const actions = {
       .then(response => {
         commit('updatePipelines', response.data)
       })
-      .catch(error => {
-        Vue.toasted.global.success(error)
-      })
   },
 
   selectEntities({ state }) {
