@@ -281,7 +281,10 @@ export default {
                         />
                         {{ dashboard.name }}
                       </label>
-                      <button class="button is-small" @click="goToDashboard(dashboard)">
+                      <button
+                        class="button is-small tooltip is-tooltip-right"
+                        :data-tooltip="`Go to ${dashboard.name}`"
+                        @click="goToDashboard(dashboard)">
                         <span class="icon is-small panel-icon">
                           <font-awesome-icon icon="table"></font-awesome-icon>
                         </span>
