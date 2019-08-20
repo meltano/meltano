@@ -271,7 +271,9 @@ const mutations = {
   setInFocusConfiguration(state, { configuration, target }) {
     configuration.settings.forEach(setting => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
-      const isDefaultNeeded = !configuration.config.hasOwnProperty(setting.name)
+      const isDefaultNeeded =
+        configuration.config.hasOwnProperty(setting.name) &&
+        configuration.config[setting.name] === null
       if (isIso8601Date && isDefaultNeeded) {
         configuration.config[setting.name] = utils.getFirstOfMonthAsIso8601()
       }
