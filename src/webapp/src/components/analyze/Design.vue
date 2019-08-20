@@ -207,7 +207,8 @@ export default {
 
     saveReport() {
       const reportName = this.saveReportSettings.name
-      this.$store.dispatch('designs/saveReport', this.saveReportSettings)
+      this.$store
+        .dispatch('designs/saveReport', this.saveReportSettings)
         .then(() => {
           Vue.toasted.global.success(`Report Saved - ${reportName}`)
         })
@@ -217,10 +218,9 @@ export default {
     },
 
     updateReport() {
-      this.$store.dispatch('designs/updateReport')
-        .then(() => {
-          Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
-        })
+      this.$store.dispatch('designs/updateReport').then(() => {
+        Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
+      })
     },
 
     toggleNewDashboardModal() {
@@ -262,15 +262,15 @@ export default {
                 </a>
 
                 <template v-if="dashboards.length">
-                  <hr class="dropdown-divider">
+                  <hr class="dropdown-divider" />
                   <div
                     class="dropdown-item"
                     v-for="dashboard in dashboards"
                     :key="dashboard.id"
                   >
-                    <div class='row-space-between'>
+                    <div class="row-space-between">
                       <label
-                        class='row-space-between-primary has-cursor-pointer is-unselectable'
+                        class="row-space-between-primary has-cursor-pointer is-unselectable"
                         for="'checkbox-' + dashboard.id"
                         @click.stop="toggleActiveReportInDashboard(dashboard)"
                       >
@@ -284,7 +284,8 @@ export default {
                       <button
                         class="button is-small tooltip is-tooltip-right"
                         :data-tooltip="`Go to ${dashboard.name}`"
-                        @click="goToDashboard(dashboard)">
+                        @click="goToDashboard(dashboard)"
+                      >
                         <span class="icon is-small panel-icon">
                           <font-awesome-icon icon="table"></font-awesome-icon>
                         </span>
@@ -292,7 +293,6 @@ export default {
                     </div>
                   </div>
                 </template>
-
               </div>
             </Dropdown>
           </p>
