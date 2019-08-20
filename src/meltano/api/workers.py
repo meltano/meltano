@@ -86,13 +86,20 @@ class UIAvailableWorker(threading.Thread):
 
 
 class AirflowWorker(threading.Thread):
-    def __init__(self, project: Project, airflow: PluginInstall = None):
+    def __init__(self, project: Project):
         super().__init__()
 
         self.project = project
-        self._plugin = airflow or ConfigService(project).find_plugin("airflow")
+        self.installed = threading.Event()
+        self._plugin = None
         self._webserver = None
         self._scheduler = None
+
+        try:
+            if ConfigService(self.project).find_plugin("airflow"):
+                self.installed.set()
+        except:
+            pass
 
     def kill_stale_workers(self):
         stale_workers = []
@@ -143,10 +150,16 @@ class AirflowWorker(threading.Thread):
             webserver_pid.write(str(self._webserver.pid))
             scheduler_pid.write(str(self._scheduler.pid))
 
+        # Time padding for server initialization so UI iframe displays as expected
+        # (iteration potential on approach but following UIAvailableWorker sleep approach)
+        time.sleep(2)
+
     def pid_path(self, name):
         return self.project.run_dir("airflow", f"{name}.pid")
 
     def run(self):
+        self.installed.wait()
+        self._plugin = ConfigService(self.project).find_plugin("airflow")
         self.kill_stale_workers()
         self.start_all()
 
