@@ -18,15 +18,7 @@ pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
 
 @pluginsBP.errorhandler(PluginInstallError)
 def _handle(ex):
-    return (
-        jsonify(
-            {
-                "error": True,
-                "code": f"{ex}",
-            }
-        ),
-        502,
-    )
+    return (jsonify({"error": True, "code": f"{ex}"}), 502)
 
 
 @pluginsBP.route("/all", methods=["GET"])
@@ -151,7 +143,9 @@ def install():
     try:
         run_install_plugin = install_service.install_plugin(plugin)
     except PluginInstallError as e:
-        raise PluginInstallError(f"{plugin_name} has an installation issue. {e}", e.process)
+        raise PluginInstallError(
+            f"{plugin_name} has an installation issue. {e}", e.process
+        )
 
     if plugin_type is PluginType.MODELS:
         try:

@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
 - [#885](https://gitlab.com/meltano/meltano/issues/885) Add docs for all extractors and loaders
 - [#885](https://gitlab.com/meltano/meltano/issues/885) All plugin modal cards show docs text if they have docs
+- [#733](https://gitlab.com/meltano/meltano/issues/733) Improve error feedback to be more specific when plugin installation errors occur
 
 ### Fixes
 
@@ -47,6 +48,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
 - [#900](https://gitlab.com/meltano/meltano/issues/900) Fix fallback value for Iso8601 dates/times
 - [#903](https://gitlab.com/meltano/meltano/issues/903) Fix columns display issue for the base table in Analyze
+
+# <<<<<<< HEAD
+
+### Breaks
+
+> > > > > > > updated changelog and lint fix
 
 ## 0.37.2 - (2019-08-19)
 
