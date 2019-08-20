@@ -1,4 +1,5 @@
 from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
@@ -13,6 +14,19 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from flask import Blueprint, request, jsonify, g
 
 pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
+
+
+@pluginsBP.errorhandler(PluginInstallError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"{ex}",
+            }
+        ),
+        502,
+    )
 
 
 @pluginsBP.route("/all", methods=["GET"])
@@ -133,7 +147,11 @@ def install():
 
     plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
     run_venv = install_service.create_venv(plugin)
-    run_install_plugin = install_service.install_plugin(plugin)
+
+    try:
+        run_install_plugin = install_service.install_plugin(plugin)
+    except PluginInstallError as e:
+        raise PluginInstallError(f"{plugin_name} has an installation issue. {e}", e.process)
 
     if plugin_type is PluginType.MODELS:
         try:

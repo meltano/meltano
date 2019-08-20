@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 import lodash from 'lodash'
 
 import pluginsApi from '../../api/plugins'
@@ -67,12 +69,17 @@ const actions = {
       dispatch('installRelatedPlugins', installConfig)
     }
 
-    return pluginsApi.installPlugin(installConfig).then(() => {
-      dispatch('getInstalledPlugins').then(() => {
-        commit('installPluginComplete', installConfig)
-        dispatch('getAllPlugins')
+    return pluginsApi
+      .installPlugin(installConfig)
+      .then(() => {
+        dispatch('getInstalledPlugins').then(() => {
+          commit('installPluginComplete', installConfig)
+          dispatch('getAllPlugins')
+        })
       })
-    })
+      .catch(error => {
+        Vue.toasted.global.error(error.response.data.code)
+      })
   },
 
   installRelatedPlugins({ dispatch }, installConfig) {
