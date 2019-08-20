@@ -126,8 +126,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions('dashboards', ['getDashboards']),
+    ...mapActions('dashboards', ['getDashboards', 'setDashboard']),
     ...mapActions('designs', ['resetErrorMessage']),
+
+    goToDashboard(dashboard) {
+      this.setDashboard(dashboard)
+      this.$router.push({ name: 'Dashboards' })
+    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0
@@ -255,25 +260,36 @@ export default {
                 >
                   New Dashboard
                 </a>
-                <div v-if="dashboards.length">
+
+                <template v-if="dashboards.length">
+                  <hr class="dropdown-divider">
                   <div
                     class="dropdown-item"
                     v-for="dashboard in dashboards"
                     :key="dashboard.id"
                   >
-                    <label
-                      for="'checkbox-' + dashboard.id"
-                      @click.stop="toggleActiveReportInDashboard(dashboard)"
-                    >
-                      <input
-                        type="checkbox"
-                        :id="'checkbox-' + dashboard.id"
-                        :checked="isActiveReportInDashboard(dashboard)"
-                      />
-                      {{ dashboard.name }}
-                    </label>
+                    <div class='row-space-between'>
+                      <label
+                        class='row-space-between-primary has-cursor-pointer is-unselectable'
+                        for="'checkbox-' + dashboard.id"
+                        @click.stop="toggleActiveReportInDashboard(dashboard)"
+                      >
+                        <input
+                          type="checkbox"
+                          :id="'checkbox-' + dashboard.id"
+                          :checked="isActiveReportInDashboard(dashboard)"
+                        />
+                        {{ dashboard.name }}
+                      </label>
+                      <button class="button is-small" @click="goToDashboard(dashboard)">
+                        <span class="icon is-small panel-icon">
+                          <font-awesome-icon icon="table"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </template>
+
               </div>
             </Dropdown>
           </p>

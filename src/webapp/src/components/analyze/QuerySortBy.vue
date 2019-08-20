@@ -81,9 +81,9 @@ export default {
           <div
             v-for="(orderable, idx) in order.assigned"
             :key="`${orderable.sourceName}-${orderable.attributeName}`"
-            class="drag-list-item has-background-white has-text-interactive-secondary"
+            class="row-space-between drag-list-item has-background-white has-text-interactive-secondary"
           >
-            <div class="drag-handle has-text-weight-normal">
+            <div class="row-space-between-primary drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
@@ -139,8 +139,6 @@ export default {
   min-height: 32px;
 }
 .drag-list-item {
-  display: flex;
-  align-items: center;
   margin: 0.25rem;
   padding: 0.25rem;
 
