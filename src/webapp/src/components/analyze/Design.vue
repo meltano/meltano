@@ -93,20 +93,6 @@ export default {
       return !this.isConnectionDialectSqlite(this.dialect)
     },
 
-    isActiveReportInDashboard() {
-      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
-    },
-
-    limit: {
-      get() {
-        return this.$store.getters['designs/currentLimit']
-      },
-      set(value) {
-        this.$store.dispatch('designs/limitSet', value)
-        this.$store.dispatch('designs/getSQL', { run: false })
-      }
-    },
-
     dialect: {
       get() {
         return this.$store.getters['designs/getDialect']
@@ -122,6 +108,20 @@ export default {
           `dialect:${this.currentModel}:${this.currentDesign}`,
           value
         )
+      }
+    },
+
+    isActiveReportInDashboard() {
+      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
+    },
+
+    limit: {
+      get() {
+        return this.$store.getters['designs/currentLimit']
+      },
+      set(value) {
+        this.$store.dispatch('designs/limitSet', value)
+        this.$store.dispatch('designs/getSQL', { run: false })
       }
     }
   },
@@ -225,14 +225,6 @@ export default {
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
-    },
-
-    visibleRelatedTableColumns() {
-      if (this.design.relatedTable.columns) {
-        return this.design.relatedTable.columns.filter(
-          column => column.hidden === false
-        )
-      }
     }
   }
 }
@@ -532,26 +524,28 @@ export default {
                   </a>
                 </template>
               </template>
-              <a
-                class="panel-block space-between has-text-weight-medium"
-                v-for="column in visibleRelatedTableColumns"
-                :key="column.label"
-                @click="columnSelected(column)"
-                :class="{ 'is-active': column.selected }"
-              >
-                {{ column.label }}
-                <button
-                  v-if="
-                    getIsAttributeInFilters(design.name, column.name, 'column')
-                  "
-                  class="button is-small"
-                  @click.stop="jumpToFilters"
+              <template v-for="column in design.relatedTable.columns">
+                <a
+                  class="panel-block space-between has-text-weight-medium"
+                  v-if='!column.hidden'
+                  :key="column.label"
+                  @click="columnSelected(column)"
+                  :class="{ 'is-active': column.selected }"
                 >
-                  <span class="icon has-text-interactive-secondary">
-                    <font-awesome-icon icon="filter"></font-awesome-icon>
-                  </span>
-                </button>
-              </a>
+                  {{ column.label }}
+                  <button
+                    v-if="
+                      getIsAttributeInFilters(design.name, column.name, 'column')
+                    "
+                    class="button is-small"
+                    @click.stop="jumpToFilters"
+                  >
+                    <span class="icon has-text-interactive-secondary">
+                      <font-awesome-icon icon="filter"></font-awesome-icon>
+                    </span>
+                  </button>
+                </a>
+              </template>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
               <a
                 class="panel-block
