@@ -225,7 +225,7 @@ export default {
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
-    },
+    }
   }
 }
 </script>
@@ -527,7 +527,7 @@ export default {
               <template v-for="column in design.relatedTable.columns">
                 <a
                   class="panel-block space-between has-text-weight-medium"
-                  v-if='!column.hidden'
+                  v-if="!column.hidden"
                   :key="column.label"
                   @click="columnSelected(column)"
                   :class="{ 'is-active': column.selected }"
@@ -535,7 +535,11 @@ export default {
                   {{ column.label }}
                   <button
                     v-if="
-                      getIsAttributeInFilters(design.name, column.name, 'column')
+                      getIsAttributeInFilters(
+                        design.name,
+                        column.name,
+                        'column'
+                      )
                     "
                     class="button is-small"
                     @click.stop="jumpToFilters"
