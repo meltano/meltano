@@ -11,7 +11,6 @@ const defaultState = utils.deepFreeze({
   connectionInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: {},
-  hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
   pipelines: []
@@ -95,15 +94,10 @@ const actions = {
   },
 
   getExtractorInFocusEntities({ commit }, extractorName) {
-    commit('setHasExtractorLoadingError', false)
-
     return orchestrationsApi
       .getExtractorInFocusEntities(extractorName)
       .then(response => {
         commit('setAllExtractorInFocusEntities', response.data)
-      })
-      .catch(() => {
-        commit('setHasExtractorLoadingError', true)
       })
   },
 
@@ -269,10 +263,6 @@ const mutations = {
           entityGroups: entitiesData.entityGroups
         }
       : {}
-  },
-
-  setHasExtractorLoadingError(state, value) {
-    state.hasExtractorLoadingError = value
   },
 
   setInFocusConfiguration(state, { configuration, target }) {
