@@ -1,29 +1,23 @@
 import lodash from 'lodash'
 
-import utils from '@/utils/utils'
 import repoApi from '../../api/repo'
+import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeView: {
-    is_markdown: false,
     file: '',
+    is_markdown: false,
     populated: false
   },
-  loadingValidation: false,
-  loadingUpdate: false,
-  models: {},
-  validated: false,
   errors: [],
-  files: {}
+  files: {},
+  loadingUpdate: false,
+  loadingValidation: false,
+  models: {},
+  validated: false
 })
 
 const getters = {
-  hasMarkdown(state) {
-    return state.activeView.populated && state.activeView.is_markdown
-  },
-
-  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`,
-
   hasCode(state) {
     return state.activeView.populated && !state.activeView.is_markdown
   },
@@ -36,28 +30,40 @@ const getters = {
     return state.files.hasOwnProperty('topics') && state.files.topics.items
   },
 
+  hasMarkdown(state) {
+    return state.activeView.populated && state.activeView.is_markdown
+  },
+
   hasModels(state) {
     return !lodash.isEmpty(state.models)
   },
 
   passedValidation(state) {
     return state.validated && state.errors && !state.errors.length
-  }
+  },
+
+  urlForModelDesign: () => (model, design) => `/analyze/${model}/${design}`
 }
 
 const actions = {
+  getFile({ commit }, file) {
+    repoApi.file(file.id).then(response => {
+      commit('setCurrentFileTable', response.data)
+    })
+  },
+
+  getModels({ commit }) {
+    repoApi.models().then(response => {
+      commit('setModels', response.data)
+    })
+  },
+
   getRepo({ state, commit }) {
     repoApi.index().then(response => {
       const files = response.data
       commit('setValidatedState', response.data)
       state.loadingValidation = false
       commit('setRepoFiles', { files })
-    })
-  },
-
-  getFile({ commit }, file) {
-    repoApi.file(file.id).then(response => {
-      commit('setCurrentFileTable', response.data)
     })
   },
 
@@ -86,26 +92,20 @@ const actions = {
       .catch(() => {
         state.loadingUpdate = false
       })
-  },
-
-  getModels({ commit }) {
-    repoApi.models().then(response => {
-      commit('setModels', response.data)
-    })
   }
 }
 
 const mutations = {
+  setCurrentFileTable(state, file) {
+    state.activeView = file
+  },
+
   setModels(state, models) {
     state.models = models
   },
 
   setRepoFiles(state, { files }) {
     state.files = files
-  },
-
-  setCurrentFileTable(state, file) {
-    state.activeView = file
   },
 
   setValidatedState(state, validated) {

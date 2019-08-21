@@ -1,18 +1,18 @@
 import lodash from 'lodash'
 
-import utils from '@/utils/utils'
 import pluginsApi from '../../api/plugins'
+import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  plugins: {},
   installedPlugins: {},
   installingPlugins: {
+    connections: [],
     extractors: [],
     loaders: [],
     models: [],
-    connections: [],
     orchestrators: []
-  }
+  },
+  plugins: {}
 })
 
 const getters = {
@@ -25,6 +25,12 @@ const getters = {
       return hasOwns.length > 0
     }
   },
+
+  getIsInstallingPlugin(state) {
+    return (pluginType, pluginName) =>
+      state.installingPlugins[pluginType].includes(pluginName)
+  },
+
   getIsPluginInstalled(state) {
     return (pluginType, pluginName) =>
       state.installedPlugins[pluginType]
@@ -34,27 +40,23 @@ const getters = {
             )
           )
         : false
-  },
-  getIsInstallingPlugin(state) {
-    return (pluginType, pluginName) =>
-      state.installingPlugins[pluginType].includes(pluginName)
   }
 }
 
 const actions = {
+  addPlugin(_, addConfig) {
+    return pluginsApi.addPlugin(addConfig)
+  },
+
   getAllPlugins({ commit }) {
     pluginsApi.getAllPlugins().then(response => {
       commit('setAllPlugins', response.data)
     })
   },
 
-  addPlugin(_, addConfig) {
-    return pluginsApi.addPlugin(addConfig)
-  },
-
-  installRelatedPlugins({ dispatch }, installConfig) {
-    return pluginsApi.installBatch(installConfig).then(() => {
-      dispatch('getAllPlugins')
+  getInstalledPlugins({ commit }) {
+    return pluginsApi.getInstalledPlugins().then(response => {
+      commit('setInstalledPlugins', response.data)
     })
   },
 
@@ -73,23 +75,23 @@ const actions = {
     })
   },
 
-  getInstalledPlugins({ commit }) {
-    return pluginsApi.getInstalledPlugins().then(response => {
-      commit('setInstalledPlugins', response.data)
+  installRelatedPlugins({ dispatch }, installConfig) {
+    return pluginsApi.installBatch(installConfig).then(() => {
+      dispatch('getAllPlugins')
     })
   }
 }
 
 const mutations = {
-  installPluginStart(state, installConfig) {
-    state.installingPlugins[installConfig.pluginType].push(installConfig.name)
-  },
-
   installPluginComplete(state, installConfig) {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name
     )
     state.installingPlugins[installConfig.pluginType].splice(idx, 1)
+  },
+
+  installPluginStart(state, installConfig) {
+    state.installingPlugins[installConfig.pluginType].push(installConfig.name)
   },
 
   setAllPlugins(state, plugins) {

@@ -1,25 +1,27 @@
 import Vue from 'vue'
 
-import utils from '@/utils/utils'
-import poller from '@/utils/poller'
 import lodash from 'lodash'
+
+import poller from '@/utils/poller'
+import utils from '@/utils/utils'
 
 import orchestrationsApi from '../../api/orchestrations'
 
 const defaultState = utils.deepFreeze({
+  connectionInFocusConfiguration: {},
+  extractorInFocusConfiguration: {},
+  extractorInFocusEntities: {},
   hasExtractorLoadingError: false,
   loaderInFocusConfiguration: {},
-  extractorInFocusConfiguration: {},
-  connectionInFocusConfiguration: {},
-  extractorInFocusEntities: {},
-  pipelines: [],
-  pipelinePollers: []
+  pipelinePollers: [],
+  pipelines: []
 })
 
 const getters = {
   getHasPipelines(state) {
     return state.pipelines.length > 0
   },
+
   // eslint-disable-next-line
   getHasValidConfigSettings(_, getters) {
     return configSettings => {
@@ -31,12 +33,15 @@ const getters = {
       )
     }
   },
+
   getIsConfigSettingValid() {
     return value => value !== null && value !== undefined && value !== ''
   },
+
   getRunningPipelineJobsCount(state) {
     return state.pipelinePollers.length
   },
+
   getRunningPipelineJobIds(state) {
     return state.pipelinePollers.map(
       pipelinePoller => pipelinePoller.getMetadata().jobId
@@ -45,19 +50,47 @@ const getters = {
 }
 
 const actions = {
-  clearExtractorInFocusEntities: ({ commit }) =>
-    commit('reset', 'extractorInFocusEntities'),
-  clearExtractorInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'extractorInFocusConfiguration'),
-  clearLoaderInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'loaderInFocusConfiguration'),
   clearConnectionInFocusConfiguration: ({ commit }) =>
     commit('reset', 'connectionInFocusConfiguration'),
+
+  clearExtractorInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'extractorInFocusConfiguration'),
+
+  clearExtractorInFocusEntities: ({ commit }) =>
+    commit('reset', 'extractorInFocusEntities'),
+
+  clearLoaderInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'loaderInFocusConfiguration'),
 
   getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
       dispatch('rehydratePollers')
+    })
+  },
+
+  // eslint-disable-next-line no-shadow
+  getConnectionConfiguration({ commit, dispatch }, connection) {
+    dispatch('getPluginConfiguration', {
+      name: connection,
+      type: 'connections'
+    }).then(response => {
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'connectionInFocusConfiguration'
+      })
+    })
+  },
+
+  getExtractorConfiguration({ commit, dispatch }, extractor) {
+    dispatch('getPluginConfiguration', {
+      name: extractor,
+      type: 'extractors'
+    }).then(response => {
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'extractorInFocusConfiguration'
+      })
     })
   },
 
@@ -74,18 +107,6 @@ const actions = {
       })
   },
 
-  getExtractorConfiguration({ commit, dispatch }, extractor) {
-    dispatch('getPluginConfiguration', {
-      name: extractor,
-      type: 'extractors'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'extractorInFocusConfiguration'
-      })
-    })
-  },
-
   getLoaderConfiguration({ commit, dispatch }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' }).then(
       response => {
@@ -95,19 +116,6 @@ const actions = {
         })
       }
     )
-  },
-
-  // eslint-disable-next-line no-shadow
-  getConnectionConfiguration({ commit, dispatch }, connection) {
-    dispatch('getPluginConfiguration', {
-      name: connection,
-      type: 'connections'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'connectionInFocusConfiguration'
-      })
-    })
   },
 
   getPluginConfiguration(_, pluginPayload) {
@@ -170,15 +178,15 @@ const actions = {
     })
   },
 
-  savePluginConfiguration(_, configPayload) {
-    orchestrationsApi.savePluginConfiguration(configPayload)
-  },
-
   savePipelineSchedule({ commit }, pipeline) {
     return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
       pipeline = Object.assign(pipeline, response.data)
       commit('updatePipelines', pipeline)
     })
+  },
+
+  savePluginConfiguration(_, configPayload) {
+    orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
   selectEntities({ state }) {
@@ -187,14 +195,6 @@ const actions = {
       .then(() => {
         // TODO confirm success or handle error in UI
       })
-  },
-
-  toggleAllEntityGroupsOn({ dispatch, state }) {
-    state.extractorInFocusEntities.entityGroups.forEach(group => {
-      if (!group.selected) {
-        dispatch('toggleEntityGroup', group)
-      }
-    })
   },
 
   toggleAllEntityGroupsOff({ commit, dispatch, state }) {
@@ -214,12 +214,10 @@ const actions = {
     })
   },
 
-  toggleEntityGroup({ commit }, entityGroup) {
-    commit('toggleSelected', entityGroup)
-    const selected = entityGroup.selected
-    entityGroup.attributes.forEach(attribute => {
-      if (attribute.selected !== selected) {
-        commit('toggleSelected', attribute)
+  toggleAllEntityGroupsOn({ dispatch, state }) {
+    state.extractorInFocusEntities.entityGroups.forEach(group => {
+      if (!group.selected) {
+        dispatch('toggleEntityGroup', group)
       }
     })
   },
@@ -234,6 +232,16 @@ const actions = {
     if (hasDeselectedAttribute || hasAllSelectedAttributes) {
       commit('toggleSelected', entityGroup)
     }
+  },
+
+  toggleEntityGroup({ commit }, entityGroup) {
+    commit('toggleSelected', entityGroup)
+    const selected = entityGroup.selected
+    entityGroup.attributes.forEach(attribute => {
+      if (attribute.selected !== selected) {
+        commit('toggleSelected', attribute)
+      }
+    })
   }
 }
 
