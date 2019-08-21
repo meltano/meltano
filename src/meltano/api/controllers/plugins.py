@@ -27,7 +27,7 @@ def all():
 def installed():
     """Returns JSON of all installed plugins
 
-    Fuses the discovery.yml data with meltano.yml data
+    Fuses the discovery.yml data with meltano.yml data and sorts each type alphabetically by name
     """
 
     project = Project.find()
@@ -37,6 +37,7 @@ def installed():
     installedPlugins = {}
     plugins = []
 
+    # merge definitions
     for plugin in config.plugins():
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
@@ -49,6 +50,7 @@ def installed():
 
         plugins.append(merged_plugin_definition)
 
+    # merge collections
     for type in meltano_manifest["plugins"]:
         installedPlugins[type] = []
         for type_plugin in meltano_manifest["plugins"][type]:
@@ -56,6 +58,11 @@ def installed():
                 if type_plugin["name"] == complete_plugin["name"]:
                     installedPlugins[type].append(complete_plugin)
 
+    # sort collections
+    for type in installedPlugins:
+        installedPlugins[type] = sorted(installedPlugins[type], key=lambda x: x["name"])
+
+    # assign merged and sorted collections
     meltano_manifest["plugins"] = installedPlugins
 
     return jsonify(meltano_manifest)
