@@ -1,5 +1,6 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
+import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
@@ -88,6 +89,9 @@ export default {
       this.$store
         .dispatch('configuration/savePipelineSchedule', this.pipeline)
         .then(() => this.close())
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
     },
     setHasCatchupDate(val) {
       this.hasCatchupDate = val

@@ -8,28 +8,28 @@ Interactive helpers often with improved semantic names built on top of Bulma
 }
 
 .button.is-interactive-navigation {
-    background-color: $primary;
-    border-color: transparent;
-    color: $white;
-    @extend .is-outlined;
+  background-color: $primary;
+  border-color: transparent;
+  color: $white;
+  @extend .is-outlined;
+
+  &.is-active,
+  &:hover:not([disabled]) {
+    background-color: darken($primary, 2.5%);
+  }
+
+  &.is-outlined {
+    background-color: transparent;
+    border-color: $primary;
+    color: $primary;
 
     &.is-active,
     &:hover:not([disabled]) {
-      background-color: darken($primary, 2.5%);
+      background-color: $primary;
+      border-color: transparent;
+      color: $white;
     }
-
-    &.is-outlined {
-      background-color: transparent;
-      border-color: $primary;
-      color: $primary;
-
-      &.is-active,
-      &:hover:not([disabled]) {
-        background-color: $primary;
-        border-color: transparent;
-        color: $white;
-      }
-    }
+  }
 }
 
 .is-interactive-primary {
@@ -54,7 +54,7 @@ a.disabled {
 
 .disabled {
   cursor: not-allowed;
-  color: #CCC;
+  color: #ccc;
   opacity: 0.7;
 }
 
@@ -120,8 +120,18 @@ Layout helpers, often with names based on Bulma naming conventions
   }
 }
 
+.row-space-between {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  .row-space-between-primary {
+    flex-grow: 1;
+  }
+}
+
 .step-spacer {
-  margin: 0 .2rem;
+  margin: 0 0.2rem;
   font-style: italic;
 }
 
@@ -140,6 +150,10 @@ Modifer helpers with names based on Bulma naming conventions
 
 .has-background-transparent {
   background-color: transparent;
+}
+
+.has-cursor-pointer {
+  cursor: pointer;
 }
 
 .is-borderless {

@@ -13,6 +13,13 @@ from meltano.core.utils import slugify
 from .sql_helper import SqlHelper
 
 
+class DashboardAlreadyExistsError(Exception):
+    """Occurs when a dashboard already exists."""
+
+    def __init__(self, dashboard):
+        self.dashboard = dashboard
+
+
 class DashboardsHelper:
     VERSION = "1.0.0"
 
@@ -46,9 +53,21 @@ class DashboardsHelper:
         ]
         return target_dashboard[0]
 
+    def get_dashboard_by_name(self, name):
+        dashboards = self.get_dashboards()
+        dashboard = next(filter(lambda r: r["name"] == name, dashboards), None)
+        return dashboard
+
     def save_dashboard(self, data):
+        dashboard_name = data["name"]
+
+        # guard if it already exists
+        existing_dashboard = self.get_dashboard_by_name(dashboard_name)
+        if existing_dashboard:
+            raise DashboardAlreadyExistsError(existing_dashboard)
+
         project = Project.find()
-        slug = slugify(data["name"])
+        slug = slugify(dashboard_name)
         file_name = f"{slug}.dashboard.m5o"
         file_path = project.root_dir("model", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)

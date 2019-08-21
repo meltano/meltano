@@ -18,6 +18,13 @@ from meltano.core.m5o.m5o_collection_parser import (
 )
 
 
+class ReportAlreadyExistsError(Exception):
+    """Occurs when a report already exists."""
+
+    def __init__(self, report):
+        self.report = report
+
+
 class ReportsHelper:
     VERSION = "1.0.0"
 
@@ -26,10 +33,10 @@ class ReportsHelper:
         m5oc_file = project.root_dir("model", "reports.m5oc")
         return Path.is_file(m5oc_file)
 
-    def get_report_m5oc(self):
-        project = Project.find()
-        m5oc_file = project.root_dir("model", "reports.m5oc")
-        return M5ocFile.load(m5oc_file)
+    def get_report_by_name(self, name):
+        reports = self.get_reports()
+        report = next(filter(lambda r: r["name"] == name, reports), None)
+        return report
 
     def get_reports(self):
         project = Project.find()
@@ -38,13 +45,18 @@ class ReportsHelper:
         return reportsParser.contents()
 
     def load_report(self, report_name):
-        reports = self.get_reports()
-        target_report = [report for report in reports if report["name"] == report_name]
-        return target_report[0]
+        return self.get_report_by_name(report_name)
 
     def save_report(self, data):
+        report_name = data["name"]
+
+        # guard if it already exists
+        existing_report = self.get_report_by_name(report_name)
+        if existing_report:
+            raise ReportAlreadyExistsError(existing_report)
+
         project = Project.find()
-        slug = slugify(data["name"])
+        slug = slugify(report_name)
         file_name = f"{slug}.report.m5o"
         file_path = project.root_dir("model", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
