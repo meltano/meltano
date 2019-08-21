@@ -93,20 +93,6 @@ export default {
       return !this.isConnectionDialectSqlite(this.dialect)
     },
 
-    isActiveReportInDashboard() {
-      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
-    },
-
-    limit: {
-      get() {
-        return this.$store.getters['designs/currentLimit']
-      },
-      set(value) {
-        this.$store.dispatch('designs/limitSet', value)
-        this.$store.dispatch('designs/getSQL', { run: false })
-      }
-    },
-
     dialect: {
       get() {
         return this.$store.getters['designs/getDialect']
@@ -129,6 +115,20 @@ export default {
       return this.design.relatedTable.columns
         ? this.design.relatedTable.columns.filter(column => !column.hidden)
         : []
+    },
+
+    isActiveReportInDashboard() {
+      return dashboard => dashboard.reportIds.includes(this.activeReport.id)
+    },
+
+    limit: {
+      get() {
+        return this.$store.getters['designs/currentLimit']
+      },
+      set(value) {
+        this.$store.dispatch('designs/limitSet', value)
+        this.$store.dispatch('designs/getSQL', { run: false })
+      }
     }
   },
   methods: {
@@ -231,7 +231,7 @@ export default {
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
-    },
+    }
   }
 }
 </script>
