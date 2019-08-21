@@ -123,6 +123,12 @@ export default {
           value
         )
       }
+    },
+
+    getBaseTableColumns() {
+      return this.design.relatedTable.columns
+        ? this.design.relatedTable.columns.filter(column => !column.hidden)
+        : []
     }
   },
   methods: {
@@ -226,14 +232,6 @@ export default {
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
     },
-
-    visibleRelatedTableColumns() {
-      if (this.design.relatedTable.columns) {
-        return this.design.relatedTable.columns.filter(
-          column => column.hidden === false
-        )
-      }
-    }
   }
 }
 </script>
@@ -534,7 +532,7 @@ export default {
               </template>
               <a
                 class="panel-block space-between has-text-weight-medium"
-                v-for="column in visibleRelatedTableColumns"
+                v-for="column in getBaseTableColumns"
                 :key="column.label"
                 @click="columnSelected(column)"
                 :class="{ 'is-active': column.selected }"
