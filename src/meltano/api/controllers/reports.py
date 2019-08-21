@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from .reports_helper import ReportsHelper
+from .reports_helper import ReportAlreadyExistsError, ReportsHelper
 
 from meltano.api.security import api_auth_required
 from meltano.api.security.auth import permit
@@ -23,6 +23,20 @@ class ReportFilter(NameFilterMixin, ResourceFilter):
     def design_need(self, permission_type, report):
         if permission_type == "view:reports":
             return Need("view:design", report["design"])
+
+
+@reportsBP.errorhandler(ReportAlreadyExistsError)
+def _handle(ex):
+    report_name = ex.report["name"]
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A report with the name '{report_name}' already exists. Try renaming the report.",
+            }
+        ),
+        409,
+    )
 
 
 @reportsBP.route("/", methods=["GET"])

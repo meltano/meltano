@@ -46,13 +46,13 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 class="dropdown-trigger"
               >
                 <button
-                  aria-controls="dropdown-save"
+                  aria-controls="dropdown-save-report"
                   aria-haspopup="true"
                   class="button"
                   disabled="disabled"
                 >
                   <span>
-                    Save
+                    Save Report
                   </span>
                    
                   <span
@@ -67,7 +67,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                
               <div
                 class="dropdown-menu"
-                id="dropdown-save"
+                id="dropdown-save-report"
                 role="menu"
               >
                 <div
@@ -133,7 +133,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
               >
                 <span>
                   Reports
@@ -702,13 +702,13 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 class="dropdown-trigger"
               >
                 <button
-                  aria-controls="dropdown-save"
+                  aria-controls="dropdown-save-report"
                   aria-haspopup="true"
                   class="button"
                   disabled="disabled"
                 >
                   <span>
-                    Save
+                    Save Report
                   </span>
                    
                   <span
@@ -723,7 +723,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                
               <div
                 class="dropdown-menu"
-                id="dropdown-save"
+                id="dropdown-save-report"
                 role="menu"
               >
                 <div
@@ -789,7 +789,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
                 disabled="disabled"
               >
                 <span>
@@ -1350,7 +1350,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
-              label="Save"
+              label="Save Report"
             >
               <div
                 class="dropdown-content"
@@ -1406,7 +1406,6 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           class="control"
         >
           <dropdown-stub
-            buttonclasses="is-interactive-primary is-outlined"
             disabled="true"
             iconclose="caret-up"
             iconopen="caret-down"
@@ -1775,7 +1774,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
-              label="Save"
+              label="Save Report"
             >
               <div
                 class="dropdown-content"
@@ -1831,7 +1830,6 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           class="control"
         >
           <dropdown-stub
-            buttonclasses="is-interactive-primary is-outlined"
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
@@ -2208,13 +2206,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 class="dropdown-trigger"
               >
                 <button
-                  aria-controls="dropdown-save"
+                  aria-controls="dropdown-save-report"
                   aria-haspopup="true"
                   class="button"
                   disabled="disabled"
                 >
                   <span>
-                    Save
+                    Save Report
                   </span>
                    
                   <span
@@ -2229,7 +2227,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                
               <div
                 class="dropdown-menu"
-                id="dropdown-save"
+                id="dropdown-save-report"
                 role="menu"
               >
                 <div
@@ -2295,7 +2293,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <button
                 aria-controls="dropdown-reports"
                 aria-haspopup="true"
-                class="button is-interactive-primary is-outlined"
+                class="button"
                 disabled="disabled"
               >
                 <span>

@@ -211,7 +211,12 @@ const getters = {
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
     // eslint-disable-next-line
-    return (sourceName, name, filterType) => getters.getFiltersByType(filterType).find(filter => filter.name === name && filter.sourceName === sourceName);
+    return (sourceName, name, filterType) =>
+      getters
+        .getFiltersByType(filterType)
+        .find(
+          filter => filter.name === name && filter.sourceName === sourceName
+        )
   },
 
   getFiltersByType(state) {
@@ -222,7 +227,8 @@ const getters = {
   // eslint-disable-next-line no-shadow
   getIsAttributeInFilters(_, getters) {
     // eslint-disable-next-line
-    return (sourceName, name, filterType) => !!getters.getFilter(sourceName, name, filterType);
+    return (sourceName, name, filterType) =>
+      !!getters.getFilter(sourceName, name, filterType)
   },
 
   getIsOrderableAttributeAscending() {
@@ -489,32 +495,20 @@ const actions = {
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
     }
-    reportsApi
-      .saveReport(postData)
-      .then(response => {
-        commit('resetSaveReportSettings')
-        commit('setCurrentReport', response.data)
-        commit('addSavedReportToReports', response.data)
-      })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+    return reportsApi.saveReport(postData).then(response => {
+      commit('resetSaveReportSettings')
+      commit('setCurrentReport', response.data)
+      commit('addSavedReportToReports', response.data)
+    })
   },
 
   updateReport({ commit, state }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
     state.activeReport.chartType = state.chartType
-    reportsApi
-      .updateReport(state.activeReport)
-      .then(response => {
-        commit('resetSaveReportSettings')
-        commit('setCurrentReport', response.data)
-      })
-      .catch(e => {
-        commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
-      })
+    return reportsApi.updateReport(state.activeReport).then(response => {
+      commit('resetSaveReportSettings')
+      commit('setCurrentReport', response.data)
+    })
   },
 
   resetErrorMessage({ commit }) {
@@ -565,7 +559,17 @@ const actions = {
   },
 
   // eslint-disable-next-line
-  addFilter({ commit }, { sourceName, attribute, filterType, expression = '', value = '', isActive = true }) {
+  addFilter(
+    { commit },
+    {
+      sourceName,
+      attribute,
+      filterType,
+      expression = '',
+      value = '',
+      isActive = true
+    }
+  ) {
     const filter = {
       sourceName,
       name: attribute.name,

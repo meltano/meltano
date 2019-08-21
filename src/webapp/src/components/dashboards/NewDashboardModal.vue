@@ -1,4 +1,6 @@
 <script>
+import Vue from 'vue'
+
 export default {
   name: 'NewDashboardModal',
   data() {
@@ -24,7 +26,15 @@ export default {
         )
       }
 
-      action.then(this.close)
+      const dashboardName = this.saveDashboardSettings.name
+      action
+        .then(() => {
+          this.close()
+          Vue.toasted.global.success(`Dashboard Saved - ${dashboardName}`)
+        })
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
     }
   },
   props: {

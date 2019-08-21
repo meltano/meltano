@@ -1,5 +1,7 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex'
+import Vue from 'vue'
+
 import capitalize from '@/filters/capitalize'
 import Chart from '@/components/analyze/Chart'
 import Dropdown from '@/components/generic/Dropdown'
@@ -124,8 +126,13 @@ export default {
     }
   },
   methods: {
-    ...mapActions('dashboards', ['getDashboards']),
+    ...mapActions('dashboards', ['getDashboards', 'setDashboard']),
     ...mapActions('designs', ['resetErrorMessage']),
+
+    goToDashboard(dashboard) {
+      this.setDashboard(dashboard)
+      this.$router.push({ name: 'Dashboards' })
+    },
 
     hasActiveReport() {
       return Object.keys(this.activeReport).length > 0
@@ -199,11 +206,21 @@ export default {
     },
 
     saveReport() {
-      this.$store.dispatch('designs/saveReport', this.saveReportSettings)
+      const reportName = this.saveReportSettings.name
+      this.$store
+        .dispatch('designs/saveReport', this.saveReportSettings)
+        .then(() => {
+          Vue.toasted.global.success(`Report Saved - ${reportName}`)
+        })
+        .catch(error => {
+          Vue.toasted.global.error(error.response.data.code)
+        })
     },
 
     updateReport() {
-      this.$store.dispatch('designs/updateReport')
+      this.$store.dispatch('designs/updateReport').then(() => {
+        Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
+      })
     },
 
     toggleNewDashboardModal() {
@@ -243,25 +260,39 @@ export default {
                 >
                   New Dashboard
                 </a>
-                <div v-if="dashboards.length">
+
+                <template v-if="dashboards.length">
+                  <hr class="dropdown-divider" />
                   <div
                     class="dropdown-item"
                     v-for="dashboard in dashboards"
                     :key="dashboard.id"
                   >
-                    <label
-                      for="'checkbox-' + dashboard.id"
-                      @click.stop="toggleActiveReportInDashboard(dashboard)"
-                    >
-                      <input
-                        type="checkbox"
-                        :id="'checkbox-' + dashboard.id"
-                        :checked="isActiveReportInDashboard(dashboard)"
-                      />
-                      {{ dashboard.name }}
-                    </label>
+                    <div class="row-space-between">
+                      <label
+                        class="row-space-between-primary has-cursor-pointer is-unselectable"
+                        for="'checkbox-' + dashboard.id"
+                        @click.stop="toggleActiveReportInDashboard(dashboard)"
+                      >
+                        <input
+                          type="checkbox"
+                          :id="'checkbox-' + dashboard.id"
+                          :checked="isActiveReportInDashboard(dashboard)"
+                        />
+                        {{ dashboard.name }}
+                      </label>
+                      <button
+                        class="button is-small tooltip is-tooltip-right"
+                        :data-tooltip="`Go to ${dashboard.name}`"
+                        @click="goToDashboard(dashboard)"
+                      >
+                        <span class="icon is-small panel-icon">
+                          <font-awesome-icon icon="table"></font-awesome-icon>
+                        </span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </template>
               </div>
             </Dropdown>
           </p>
@@ -276,13 +307,13 @@ export default {
                 v-if="hasActiveReport()"
                 @click="updateReport()"
               >
-                <span>Save</span>
+                <span>Update Report</span>
               </button>
             </p>
             <p class="control">
               <Dropdown
                 :disabled="!hasChartableResults"
-                :label="hasActiveReport() ? '' : 'Save'"
+                :label="hasActiveReport() ? '' : 'Save Report'"
                 is-right-aligned
               >
                 <div class="dropdown-content">
@@ -326,7 +357,6 @@ export default {
             <Dropdown
               :disabled="!reports.length"
               label="Reports"
-              button-classes="is-interactive-primary is-outlined"
               is-right-aligned
             >
               <div class="dropdown-content">

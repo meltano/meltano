@@ -9,13 +9,20 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Add CTA to specific dashboard in "Add to Dashboard" sub-UI
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Add toast feedback on success, update, or error for schedules, reports, and dashboards
+
 ### Changes
 
 - [#901](https://gitlab.com/meltano/meltano/issues/901) Update entities plugins to be alphabetically sorted for consistency with extractors ordering
 
 ### Fixes
 
+- [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
+
 ### Breaks
+
+
 
 ## 0.37.2 - (2019-08-19)
 

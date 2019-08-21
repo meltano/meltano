@@ -30,6 +30,19 @@ orchestrationsBP = Blueprint(
 )
 
 
+@orchestrationsBP.errorhandler(ScheduleAlreadyExistsError)
+def _handle(ex):
+    return (
+        jsonify(
+            {
+                "error": True,
+                "code": f"A schedule with the name '{ex.schedule.name}' already exists. Try renaming the schedule.",
+            }
+        ),
+        409,
+    )
+
+
 @orchestrationsBP.route("/connection_names", methods=["GET"])
 def connection_names():
     settings = Settings.query.first()
@@ -224,4 +237,4 @@ def save_pipeline_schedule() -> Response:
         )
         return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:
-        return jsonify(e.schedule), 200
+        raise ScheduleAlreadyExistsError(e.schedule)

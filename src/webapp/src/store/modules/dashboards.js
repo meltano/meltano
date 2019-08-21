@@ -64,13 +64,13 @@ const actions = {
       })
   },
   saveDashboard({ dispatch, commit }, data) {
-    dashboardsApi.saveDashboard(data).then(response => {
+    return dashboardsApi.saveDashboard(data).then(response => {
       dispatch('updateCurrentDashboard', response.data)
       commit('addSavedDashboardToDashboards', response.data)
     })
   },
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
-    dashboardsApi.saveDashboard(data).then(response => {
+    return dashboardsApi.saveDashboard(data).then(response => {
       const dashboard = response.data
       commit('setCurrentDashboard', dashboard)
       commit('addSavedDashboardToDashboards', dashboard)
