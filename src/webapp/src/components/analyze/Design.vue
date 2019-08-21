@@ -111,12 +111,6 @@ export default {
       }
     },
 
-    getBaseTableColumns() {
-      return this.design.relatedTable.columns
-        ? this.design.relatedTable.columns.filter(column => !column.hidden)
-        : []
-    },
-
     isActiveReportInDashboard() {
       return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
@@ -530,26 +524,28 @@ export default {
                   </a>
                 </template>
               </template>
-              <a
-                class="panel-block space-between has-text-weight-medium"
-                v-for="column in getBaseTableColumns"
-                :key="column.label"
-                @click="columnSelected(column)"
-                :class="{ 'is-active': column.selected }"
-              >
-                {{ column.label }}
-                <button
-                  v-if="
-                    getIsAttributeInFilters(design.name, column.name, 'column')
-                  "
-                  class="button is-small"
-                  @click.stop="jumpToFilters"
+              <template v-for="column in design.relatedTable.columns">
+                <a
+                  class="panel-block space-between has-text-weight-medium"
+                  v-if='!column.hidden'
+                  :key="column.label"
+                  @click="columnSelected(column)"
+                  :class="{ 'is-active': column.selected }"
                 >
-                  <span class="icon has-text-interactive-secondary">
-                    <font-awesome-icon icon="filter"></font-awesome-icon>
-                  </span>
-                </button>
-              </a>
+                  {{ column.label }}
+                  <button
+                    v-if="
+                      getIsAttributeInFilters(design.name, column.name, 'column')
+                    "
+                    class="button is-small"
+                    @click.stop="jumpToFilters"
+                  >
+                    <span class="icon has-text-interactive-secondary">
+                      <font-awesome-icon icon="filter"></font-awesome-icon>
+                    </span>
+                  </button>
+                </a>
+              </template>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
               <a
                 class="panel-block
