@@ -70,4 +70,4 @@ class PluginInstallService:
                     namespace=plugin.type, name=plugin.name, pip_url=plugin.pip_url
                 )
         except SubprocessError as err:
-            raise PluginInstallError(str(err), err.process)
+            raise PluginInstallError(f"{plugin.name} has an installation issue. {err}", err.process)

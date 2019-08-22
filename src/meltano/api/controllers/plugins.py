@@ -139,13 +139,7 @@ def install():
 
     plugin = config_service.find_plugin(plugin_name, plugin_type=plugin_type)
     run_venv = install_service.create_venv(plugin)
-
-    try:
-        run_install_plugin = install_service.install_plugin(plugin)
-    except PluginInstallError as e:
-        raise PluginInstallError(
-            f"{plugin_name} has an installation issue. {e}", e.process
-        )
+    run_install_plugin = install_service.install_plugin(plugin)
 
     if plugin_type is PluginType.MODELS:
         try:
