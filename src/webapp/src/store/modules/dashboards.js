@@ -81,8 +81,8 @@ const actions = {
 
   saveDashboard({ dispatch, commit }, data) {
     return dashboardsApi.saveDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
       commit('addSavedDashboardToDashboards', response.data)
+      return dispatch('updateCurrentDashboard', response.data)
     })
   },
 
