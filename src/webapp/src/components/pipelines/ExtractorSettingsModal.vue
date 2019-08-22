@@ -27,8 +27,10 @@ export default {
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
     extractorLacksConfigSettings() {
-      return this.extractorInFocusConfiguration.settings &&
+      return (
+        this.extractorInFocusConfiguration.settings &&
         this.extractorInFocusConfiguration.settings.length === 0
+      )
     },
     extractorLacksConfigSettingsAndIsInstalled() {
       return !this.isInstalling && this.extractorLacksConfigSettings
