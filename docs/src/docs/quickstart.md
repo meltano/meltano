@@ -71,19 +71,38 @@ Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://loca
 
 ![Meltano UI pipeline schedules screen create schedule](/screenshots/meltano-ui-create-schedule.png)
 
+Once you've created your first schedule, you will see it here:
+
+![Meltano UI list of schedules](/screenshots/meltano-pipeline-schedule.png)
+
+From here, you can schedule "Run" to initiate the ELT ad hoc. This will run the process that pulls data from the target you selected into your reporting database, so you can Analyze it.
+
+## Analyzing Your Data
+
+Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!
+
+There are just three steps to take:
+1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
+2. Click the Install button of your desired analysis model
+3. Once installed, click the corresponding analysis model's Analyze button
+
+  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
+
+You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
+
+Begin exploring, querying, and visualizing your data using Meltano Analyze.
+
+![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
+
+After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
+
 ## Scheduling the ELT with Orchestration
 
 If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
 
-::: tip
-Right now, Airflow can not be installed from inside Meltano's UI so you need to return to your command line interface.
-:::
+To install airflow, navigate to the "Orchestrate" page and click "Install Airflow".
 
-Run the following command:
 
-```bash
-meltano add orchestrator airflow
-```
 
 Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
 
@@ -110,25 +129,6 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 If you run into issues, it is possible that you could end up with multiple instances of Airflow running at the same time. This is a known issue ([#821](https://gitlab.com/meltano/meltano/issues/812)) common if you have been working with multiple Meltano projects, or have killed Meltano UI from the command line.
 
 To troubleshoot, run `sudo lsof -i -P | grep -i "listen"` from your command line. If you see multiple instances of Python running on Port 5010, kill the first instance with `kill 12345` (using the number for your instance). Then run `meltano ui` and try again.
-
-## Analyzing Your Data
-
-Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!
-
-There are just three steps to take:
-1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
-2. Click the Install button of your desired analysis model
-3. Once installed, click the corresponding analysis model's Analyze button
-
-  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
-
-You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
-
-Begin exploring, querying, and visualizing your data using Meltano Analyze.
-
-![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
-
-After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
 
 
 ## Doing More With Meltano
