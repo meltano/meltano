@@ -71,12 +71,9 @@ const actions = {
 
     return pluginsApi
       .installPlugin(installConfig)
-      .then(() => {
-        dispatch('getInstalledPlugins').then(() => {
-          commit('installPluginComplete', installConfig)
-          dispatch('getAllPlugins')
-        })
-      })
+      .then(() => commit('installPluginComplete', installConfig))
+      .then(dispatch('getInstalledPlugins'))
+      .then(dispatch('getAllPlugins'))
       .catch(error => {
         Vue.toasted.global.error(error.response.data.code)
       })
