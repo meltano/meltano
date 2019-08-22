@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- Update Quickstart documentation with [instructions for installing Airflow from the UI](https://meltano.com/docs/quickstart.html#scheduling-the-elt-with-orchestration)
+- Update Quickstart documentation with [instructions for running the ELT ad hoc](https://meltano.com/docs/quickstart.html#running-the-elt)
 
 ### Fixes
 
