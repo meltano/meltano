@@ -102,7 +102,7 @@ If you're using SaaS tools to manage support, sales, marketing, revenue and othe
 
 To install airflow, navigate to the "Orchestrate" page and click "Install Airflow".
 
-
+![Meltano UI to install Airflow](/screenshots/meltano-install-airflow-from-ui.png)
 
 Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
 
