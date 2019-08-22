@@ -18,7 +18,7 @@ pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
 
 @pluginsBP.errorhandler(PluginInstallError)
 def _handle(ex):
-    return (jsonify({"error": True, "code": f"{ex}"}), 502)
+    return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
 @pluginsBP.route("/all", methods=["GET"])
