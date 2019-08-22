@@ -108,18 +108,6 @@ Once Airflow is installed, you can view the ELT pipeline schedule(s) created in 
 
 A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
-:::tip
-To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
-:::
-
-
-```bash
-# After installing Airflow, you will need to shut down your current instance of Meltano and restart
-meltano ui
-```
-
-Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
-
 ![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
 
 For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
