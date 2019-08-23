@@ -94,13 +94,7 @@ export default {
       return this.hasEntities && this.hasSelectedAttributes
     },
     selectedMode() {
-      let mode
-      if (this.getAreAllSelected) {
-        mode = this.selectionModeAll
-      } else {
-        mode = this.selectionModeCustom
-      }
-      return mode
+      return this.getAreAllSelected ? this.selectionModeAll : this.selectionModeCustom
     },
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
