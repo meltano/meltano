@@ -40,6 +40,7 @@ export default {
   },
   data() {
     return {
+      hasCatchupDate: false,
       intervalOptions: [
         '@once',
         '@hourly',
@@ -48,7 +49,7 @@ export default {
         '@monthly',
         '@yearly'
       ],
-      hasCatchupDate: false,
+      isSaving: false,
       pipeline: {
         name: '',
         extractor: '',
@@ -86,10 +87,18 @@ export default {
         : ''
     },
     save() {
+      this.isSaving = true
       this.$store
         .dispatch('configuration/savePipelineSchedule', this.pipeline)
-        .then(() => this.close())
+        .then(() => {
+          this.$store.dispatch('configuration/run', this.pipeline)
+          Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
+          Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
+          this.isSaving = false
+          this.close()
+        })
         .catch(error => {
+          this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
         })
     },
@@ -273,6 +282,7 @@ export default {
         <button class="button" @click="close">Cancel</button>
         <button
           class="button is-interactive-primary"
+          :class="{ 'is-loading': isSaving }"
           :disabled="!isSaveable"
           @click="save"
         >
