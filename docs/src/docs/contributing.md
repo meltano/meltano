@@ -268,6 +268,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    make type=patch release
 
    # after changelog validation, build the release
+   # if you only need to release a patch, use
+   make type=patch release
+   # otherwise, use
    make release
 
    # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
