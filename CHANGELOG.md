@@ -14,6 +14,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
 
 ### Changes
+- Update Quickstart documentation with [instructions for installing Airflow from the UI](https://meltano.com/docs/quickstart.html#scheduling-the-elt-with-orchestration)
+- Update Quickstart documentation with [instructions for running the ELT ad hoc](https://meltano.com/docs/quickstart.html#running-the-elt)
 
 - [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
 

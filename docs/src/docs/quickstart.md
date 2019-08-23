@@ -2,6 +2,8 @@
 
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
+## Creating Your First Project
+
 :::tip
 Before you begin, you must activate the virtual environment you created in the installation process on the command line. All the commands below should be run inside this virtual environment.
 :::
@@ -15,8 +17,6 @@ source ~/virtualenvs/meltano/bin/activate
 # Windows
 %ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
-
-## Creating Your First Project
 
 Run this command in your terminal to initialize a new project:
 
@@ -71,45 +71,11 @@ Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://loca
 
 ![Meltano UI pipeline schedules screen create schedule](/screenshots/meltano-ui-create-schedule.png)
 
-## Scheduling the ELT with Orchestration
+Once you've created your first schedule, you will see it here:
 
-If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
+![Meltano UI list of schedules](/screenshots/meltano-pipeline-schedule.png)
 
-::: tip
-Right now, Airflow can not be installed from inside Meltano's UI so you need to return to your command line interface.
-:::
-
-Run the following command:
-
-```bash
-meltano add orchestrator airflow
-```
-
-Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
-
-A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
-
-:::tip
-To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
-:::
-
-
-```bash
-# After installing Airflow, you will need to shut down your current instance of Meltano and restart
-meltano ui
-```
-
-Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
-
-![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
-
-For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
-
-### Troubleshooting Airflow ###
-
-If you run into issues, it is possible that you could end up with multiple instances of Airflow running at the same time. This is a known issue ([#821](https://gitlab.com/meltano/meltano/issues/812)) common if you have been working with multiple Meltano projects, or have killed Meltano UI from the command line.
-
-To troubleshoot, run `sudo lsof -i -P | grep -i "listen"` from your command line. If you see multiple instances of Python running on Port 5010, kill the first instance with `kill 12345` (using the number for your instance). Then run `meltano ui` and try again.
+From here, you can schedule "Run" to initiate the ELT ad hoc. This will run the process that pulls data from the target you selected into your reporting database, so you can Analyze it.
 
 ## Analyzing Your Data
 
@@ -129,6 +95,28 @@ Begin exploring, querying, and visualizing your data using Meltano Analyze.
 ![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
 
 After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
+
+## Scheduling the ELT with Orchestration
+
+If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
+
+To install airflow, navigate to the "Orchestrate" page and click "Install Airflow".
+
+![Meltano UI to install Airflow](/screenshots/meltano-install-airflow-from-ui.png)
+
+Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
+
+A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+
+![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
+
+For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
+
+### Troubleshooting Airflow ###
+
+If you run into issues, it is possible that you could end up with multiple instances of Airflow running at the same time. This is a known issue ([#821](https://gitlab.com/meltano/meltano/issues/812)) common if you have been working with multiple Meltano projects, or have killed Meltano UI from the command line.
+
+To troubleshoot, run `sudo lsof -i -P | grep -i "listen"` from your command line. If you see multiple instances of Python running on Port 5010, kill the first instance with `kill 12345` (using the number for your instance). Then run `meltano ui` and try again.
 
 
 ## Doing More With Meltano
