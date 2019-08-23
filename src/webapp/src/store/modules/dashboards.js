@@ -12,6 +12,13 @@ const defaultState = utils.deepFreeze({
 })
 
 const actions = {
+  addReportToDashboard({ commit, dispatch }, data) {
+    commit('addReportToDashboard', data)
+    dashboardsApi.addReportToDashboard(data).then(response => {
+      dispatch('updateCurrentDashboard', response.data)
+    })
+  },
+
   getActiveDashboardReportsWithQueryResults({ commit, state }) {
     const ids = state.activeDashboard.reportIds
     const activeReports = state.reports.filter(report =>
@@ -22,13 +29,6 @@ const actions = {
       .then(response => {
         commit('setActiveDashboardReports', response.data)
       })
-  },
-
-  addReportToDashboard({ commit, dispatch }, data) {
-    commit('addReportToDashboard', data)
-    dashboardsApi.addReportToDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
-    })
   },
 
   getDashboards({ commit }) {
