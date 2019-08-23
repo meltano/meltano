@@ -23,7 +23,6 @@ const toastedOptions = {
   router,
   position: 'bottom-right',
   iconPack: 'fontawesome',
-  className: 'notification',
   theme: 'outline',
   duration: 9000
 }
@@ -72,7 +71,7 @@ Vue.toasted.register(
   'success',
   message => message,
   Object.assign(lodash.cloneDeep(toastedOptions), {
-    duration: 3000,
+    duration: 4000,
     type: 'success'
   })
 )

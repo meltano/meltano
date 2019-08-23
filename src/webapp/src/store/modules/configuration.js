@@ -174,12 +174,11 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
-  savePipelineSchedule({ commit }, pipelineSchedulePayload) {
-    return orchestrationsApi
-      .savePipelineSchedule(pipelineSchedulePayload)
-      .then(response => {
-        commit('updatePipelines', response.data)
-      })
+  savePipelineSchedule({ commit }, pipeline) {
+    return orchestrationsApi.savePipelineSchedule(pipeline).then(response => {
+      pipeline = Object.assign(pipeline, response.data)
+      commit('updatePipelines', pipeline)
+    })
   },
 
   selectEntities({ state }) {
