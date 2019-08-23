@@ -1,10 +1,34 @@
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 import MainNav from './components/generic/MainNav'
 
 export default {
   name: 'App',
   components: {
     MainNav
+  },
+  created() {
+    this.autoInstallAirflowCheck()
+  },
+  computed: {
+    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin'])
+  },
+  methods: {
+    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    autoInstallAirflowCheck() {
+      this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+        const needsInstallation =
+          !this.getIsPluginInstalled('orchestrators', 'airflow') &&
+          !this.getIsInstallingPlugin('orchestrators', 'airflow')
+        if (needsInstallation) {
+          const payload = { pluginType: 'orchestrators', name: 'airflow' }
+          this.addPlugin(payload).then(() => {
+            this.installPlugin(payload)
+          })
+        }
+      })
+    }
   }
 }
 </script>
