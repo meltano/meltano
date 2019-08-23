@@ -14,7 +14,19 @@ export default {
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
-    ...mapState('plugins', ['plugins'])
+    ...mapState('plugins', ['plugins']),
+    sortedLoaders() {
+      const speedRunLoader = 'target-sqlite'
+      let loadersList = [speedRunLoader]
+
+      this.plugins.loaders.filter(plugin => {
+        if (plugin !== speedRunLoader) {
+          loadersList.push(plugin)
+        }
+      })
+
+      return loadersList
+    }
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -52,7 +64,7 @@ export default {
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
         class="tile is-parent is-3"
-        v-for="(loader, index) in plugins.loaders"
+        v-for="(loader, index) in sortedLoaders"
         :key="`${loader}-${index}`"
       >
         <div class="tile level is-child box">
