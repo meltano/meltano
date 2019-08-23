@@ -6,6 +6,7 @@ import {
   faArrowsAltV,
   faArrowRight,
   faArrowUp,
+  faBolt,
   faCaretDown,
   faCaretUp,
   faCertificate,
@@ -42,6 +43,7 @@ export default {
     library.add(faArrowDown)
     library.add(faArrowRight)
     library.add(faArrowUp)
+    library.add(faBolt)
     library.add(faCaretDown)
     library.add(faCaretUp)
     library.add(faCertificate)
