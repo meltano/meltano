@@ -15,12 +15,14 @@ export default {
       this.selectionModeCustom
     ]
     this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store.dispatch(
-      'configuration/getExtractorInFocusEntities',
-      this.extractorNameFromRoute
-    ).then(() => {
-      this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
-    })
+    this.$store
+      .dispatch(
+        'configuration/getExtractorInFocusEntities',
+        this.extractorNameFromRoute
+      )
+      .then(() => {
+        this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+      })
   },
   destroyed() {
     this.$store.dispatch('configuration/clearExtractorInFocusEntities')
@@ -94,7 +96,9 @@ export default {
       return this.hasEntities && this.hasSelectedAttributes
     },
     selectedMode() {
-      return this.getAreAllSelected ? this.selectionModeAll : this.selectionModeCustom
+      return this.getAreAllSelected
+        ? this.selectionModeAll
+        : this.selectionModeCustom
     },
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
@@ -157,7 +161,10 @@ export default {
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body" :class="{ 'is-overflow-y-scroll': isExpanded }">
+      <section
+        class="modal-card-body"
+        :class="{ 'is-overflow-y-scroll': isExpanded }"
+      >
         <div class="columns" :class="{ 'is-vcentered': isLoading }">
           <div v-if="isLoading" class="column">
             <div class="content has-text-centered">
