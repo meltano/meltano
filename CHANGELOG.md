@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
+
 ### Fixes
 
 ### Breaks
