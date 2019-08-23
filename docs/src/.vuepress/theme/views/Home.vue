@@ -366,7 +366,14 @@
         >
       </section>
     </div>
-    <GlobalFooter />
+    <GlobalFooter
+      ><a
+        href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
+        target="_blank"
+        >{{ $site.themeConfig.editLinkText }} <OutboundLink
+      /></a>
+      |
+    </GlobalFooter>
   </div>
 </template>
 

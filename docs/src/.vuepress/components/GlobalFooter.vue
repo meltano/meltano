@@ -7,10 +7,9 @@ export default {
 <template>
   <footer class="footer">
     <div>
-      <a
-        href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
-        target="_blank"
-        >{{ $site.themeConfig.editLinkText }} <OutboundLink
+      <slot></slot>
+      <a href="https://meltano.com/docs/contributing.html" target="_blank"
+        >Contribute to the project! <OutboundLink
       /></a>
     </div>
     <a
