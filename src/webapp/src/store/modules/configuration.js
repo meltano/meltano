@@ -49,18 +49,6 @@ const getters = {
 }
 
 const actions = {
-  clearConnectionInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'connectionInFocusConfiguration'),
-
-  clearExtractorInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'extractorInFocusConfiguration'),
-
-  clearExtractorInFocusEntities: ({ commit }) =>
-    commit('reset', 'extractorInFocusEntities'),
-
-  clearLoaderInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'loaderInFocusConfiguration'),
-
   getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
@@ -164,6 +152,18 @@ const actions = {
       }
     })
   },
+
+  resetConnectionInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'connectionInFocusConfiguration'),
+
+  resetExtractorInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'extractorInFocusConfiguration'),
+
+  resetExtractorInFocusEntities: ({ commit }) =>
+    commit('reset', 'extractorInFocusEntities'),
+
+  resetLoaderInFocusConfiguration: ({ commit }) =>
+    commit('reset', 'loaderInFocusConfiguration'),
 
   run({ commit, dispatch }, pipeline) {
     return orchestrationsApi.run(pipeline).then(response => {
