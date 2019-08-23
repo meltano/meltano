@@ -18,7 +18,9 @@ export default {
     this.$store.dispatch(
       'configuration/getExtractorInFocusEntities',
       this.extractorNameFromRoute
-    )
+    ).then(() => {
+      this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+    })
   },
   destroyed() {
     this.$store.dispatch('configuration/clearExtractorInFocusEntities')
@@ -92,10 +94,11 @@ export default {
       return this.hasEntities && this.hasSelectedAttributes
     },
     selectedMode() {
-      // Custom by default until/if we implement Default selections
-      let mode = this.selectionModeCustom
+      let mode
       if (this.getAreAllSelected) {
         mode = this.selectionModeAll
+      } else {
+        mode = this.selectionModeCustom
       }
       return mode
     },
@@ -160,7 +163,7 @@ export default {
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body" :class="{ 'is-overflow-y-scroll': isExpanded }">
         <div class="columns" :class="{ 'is-vcentered': isLoading }">
           <div v-if="isLoading" class="column">
             <div class="content has-text-centered">
@@ -212,26 +215,6 @@ export default {
                   {{ selectionSummary }}
                 </p>
               </div>
-            </div>
-          </div>
-
-          <div
-            class="columns"
-            v-if="this.selectedMode === this.selectionModeAll"
-          >
-            <div class="column">
-              <article class="message is-warning is-small">
-                <div class="message-header">
-                  <p>Performance Warning</p>
-                </div>
-                <div class="message-body">
-                  <p>
-                    Selecting <span class="is-italic">all</span> may negatively
-                    impact extraction performance. Consider a custom selection
-                    before saving.
-                  </p>
-                </div>
-              </article>
             </div>
           </div>
 
