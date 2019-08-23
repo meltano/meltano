@@ -64,7 +64,7 @@ const actions = {
   getExtractorInFocusEntities({ commit }, extractorName) {
     commit('setHasExtractorLoadingError', false)
 
-    orchestrationsApi
+    return orchestrationsApi
       .getExtractorInFocusEntities(extractorName)
       .then(response => {
         commit('setAllExtractorInFocusEntities', response.data)
