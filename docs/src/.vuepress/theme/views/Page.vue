@@ -68,6 +68,8 @@
     </div>
 
     <slot name="bottom"/>
+
+    <GlobalFooter />
   </div>
 </template>
 
@@ -207,9 +209,6 @@ function find (page, items, offset) {
 <style lang="stylus">
 @import '../styles/config.styl'
 @require '../styles/wrapper.styl'
-
-.page
-  padding-bottom 2rem
 
 .page-edit
   @extend $wrapper
