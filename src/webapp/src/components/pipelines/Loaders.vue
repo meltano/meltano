@@ -21,11 +21,19 @@ export default {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapState('plugins', ['plugins']),
     sortedLoaders() {
+<<<<<<< HEAD
       // This is a stop gap until we implement an eventual need for automatic text filtering for cards
       let loadersList = [this.speedRunLoader]
 
       this.plugins.loaders.filter(plugin => {
         if (plugin !== this.speedRunLoader) {
+=======
+      const speedRunLoader = 'target-sqlite'
+      let loadersList = [speedRunLoader]
+
+      this.plugins.loaders.filter(plugin => {
+        if (plugin !== speedRunLoader) {
+>>>>>>> :sparkles: (#838): Set speed run loader to top left
           loadersList.push(plugin)
         }
       })
@@ -68,7 +76,11 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
+<<<<<<< HEAD
         class="tile is-parent is-3 is-relative"
+=======
+        class="tile is-parent is-3"
+>>>>>>> :sparkles: (#838): Set speed run loader to top left
         v-for="(loader, index) in sortedLoaders"
         :key="`${loader}-${index}`"
       >
