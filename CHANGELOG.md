@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
+- [#912](https://gitlab.com/meltano/meltano/issues/912) Auto run the ELT of a saved Pipeline Schedule by default
 
 ### Changes
 
