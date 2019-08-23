@@ -9,9 +9,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#838](https://gitlab.com/meltano/meltano/issues/838) Add indicator for speed run plugins
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
 
 ### Changes
+
+- [#838](https://gitlab.com/meltano/meltano/issues/838) Speed run plugins prioritized to top of the list
 
 ### Fixes
 
