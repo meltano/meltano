@@ -1,6 +1,7 @@
 # Contributing
 
 ## Prerequisites
+
 ::: warning
 Before you move on, make sure you have Python `3.6`, Node `8.x`, Yarn `1.2` or newer installed.
 :::
@@ -44,7 +45,6 @@ Meltano is now installed and available at `meltano`.
 
 Head out to the [tutorials](/docs/tutorial.html) to create your first project.
 
-
 ### Meltano API Development
 
 For all changes that do not involve working on Meltano UI itself, run the following command:
@@ -55,9 +55,9 @@ meltano ui
 ```
 
 :::warning Troubleshooting
-If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed. 
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
 
-On a OSX, this can be solved by running `brew install yarn`. 
+On a OSX, this can be solved by running `brew install yarn`.
 :::
 
 ### Meltano UI Development
@@ -88,7 +88,7 @@ yarn serve
 Meltano API and CLI are both supported by a database that is managed via Alembic migrations.
 
 :::tip Note
-[Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy. 
+[Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy.
 :::
 
 Migrations for the system database are located inside the `meltano.migrations` module.
@@ -112,6 +112,7 @@ Follow the merge request and changelog portions of this contribution section for
 ### Images
 
 When adding supporting visuals to documentation, adhere to:
+
 - Use Chrome in "incognito mode" (we do this to have the same browser bar for consistency across screenshots)
 - Screenshot the image at 16:9 aspect ratio with minimum 1280x720px
 - Place `.png` screenshot in `src/docs/.vuepress/public/screenshots/` with a descriptive name
@@ -129,58 +130,64 @@ When testing your contributions you may need to ensure that your various `__pyca
 ### Visual Hierarchy
 
 #### Depth
+
 The below level hierarchy defines the back to front depth sorting of UI elements. Use it as a mental model to inform your UI decisions.
-- Level 1 - Primary navigation, sub-navigation, and signage - *Grey*
-- Level 2 - Task container (traditionally the page metaphor) - *White-ish Grey*
-- Level 3 - Primary task container(s) - *White w/Shadow*
-- Level 4 - Dropdowns, dialogs, pop-overs, etc. - *White w/Shadow*
-- Level 5 - Modals - *White w/Lightbox*
-- Level 6 - Toasts - *White w/Shadow + Message Color*
+
+- Level 1 - Primary navigation, sub-navigation, and signage - _Grey_
+- Level 2 - Task container (traditionally the page metaphor) - _White-ish Grey_
+- Level 3 - Primary task container(s) - _White w/Shadow_
+- Level 4 - Dropdowns, dialogs, pop-overs, etc. - _White w/Shadow_
+- Level 5 - Modals - _White w/Lightbox_
+- Level 6 - Toasts - _White w/Shadow + Message Color_
 
 #### Interactivity
+
 Within each aforementioned depth level is an interactive color hierarchy that further organizes content while communicating an order of importance for interactive elements. This interactive color hierarchy subtly influences the user's attention and nudges their focus.
 
-1. Primary - *`$interactive-primary`*
-    - Core interactive elements (typically buttons) for achieving the primary task(s) in the UI
-    - Fill - Most important
-    - Stroke - Important
-1. Secondary - *`$interactive-secondary`*
-    - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
-    - Fill - Hover only
-    - Stroke - Denotes the states of selected, active, and/or valid
-        - Grey represents the opposites: unselected, inactive, and/or invalid
-1. Tertiary - *Greyscale*
-    - Useful controls and actions that aren't core or supporting of the primary task(s) in the UI
-1. Navigation - *`$interactive-navigation`*
-    - Denotes navigation and sub-navigation interactive elements as distinct from primary and secondary task colors
+1. Primary - _`$interactive-primary`_
+   - Core interactive elements (typically buttons) for achieving the primary task(s) in the UI
+   - Fill - Most important
+   - Stroke - Important
+1. Secondary - _`$interactive-secondary`_
+   - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
+   - Fill - Hover only
+   - Stroke - Denotes the states of selected, active, and/or valid
+     - Grey represents the opposites: unselected, inactive, and/or invalid
+1. Tertiary - _Greyscale_
+   - Useful controls and actions that aren't core or supporting of the primary task(s) in the UI
+1. Navigation - _`$interactive-navigation`_
+   - Denotes navigation and sub-navigation interactive elements as distinct from primary and secondary task colors
 
 After the primary, secondary, tertiary, or navigation decision is made, the button size decision is informed by:
+
 1. Use the default button size
 1. Use the `is-small` modifier if it is within a component that can have multiple instances
 
 ### Markup Hierarchy
 
 There are three fundamental markup groups in the codebase. All three are technically VueJS single-file components but each have an intended use:
+
 1. Views (top-level "pages" and "page containers" that map to parent routes)
 2. Sub-views (nested "pages" of "page containers" that map to child routes)
 3. Components (widgets that are potentially reusable across parent and child routes)
 
 Here is a technical breakdown:
+
 1. Views - navigation, signage, and sub-navigation
-    - Use `<router-view-layout>` as root with only two children:
-      1. `<div class="container view-header">`
-          - Signage
-          - Sub-navigation
-      2. `<div class="container view-body">`
-          - Can expand based on task real-estate requirements via `is-fluid` class addition
-    - Reside in the `src/views` directory
+   - Use `<router-view-layout>` as root with only two children:
+     1. `<div class="container view-header">`
+        - Signage
+        - Sub-navigation
+     2. `<div class="container view-body">`
+        - Can expand based on task real-estate requirements via `is-fluid` class addition
+   - Reside in the `src/views` directory
 2. Sub-views - tasks
-    - Use `<section>` as root (naturally assumes a parent of `<div class="container view-body">`) with one type of child:
-        - One or more `<div class="columns">` each with their needed `<div class="column">` variations
-    - Reside in feature directory (ex. `src/components/analyze/AnalyzeModels`)
+   - Use `<section>` as root (naturally assumes a parent of `<div class="container view-body">`) with one type of child:
+     - One or more `<div class="columns">` each with their needed `<div class="column">` variations
+   - Reside in feature directory (ex. `src/components/analyze/AnalyzeModels`)
 3. Components - task helpers
-    - Use Vue component best practices
-    - Reside in feature or generic directory (ex. `src/components/analyze/ResultTable` and `src/components/generic/Dropdown`)
+   - Use Vue component best practices
+   - Reside in feature or generic directory (ex. `src/components/analyze/ResultTable` and `src/components/generic/Dropdown`)
 
 ## Merge Requests
 
@@ -225,7 +232,9 @@ Make sure to add CHANGELOG entries to your merge requests.
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
 ### Prerequisites
+
 Ensure you have the latest `master` branch locally before continuing.
+
 ```bash
 git fetch origin
 ```
@@ -233,38 +242,48 @@ git fetch origin
 ### Release process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
+
 1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install dev dependencies:
-    ```bash
-    # activate your virtualenv
-    source ./venv/bin/activate
 
-    # pip install all the development dependencies
-    pip install .[dev]
-    ```
+   ```bash
+   # activate your virtualenv
+   source ./venv/bin/activate
+
+   # pip install all the development dependencies
+   pip install .[dev]
+   ```
+
 1. Execute the commands below:
-    ```bash
-    # if you've released before, you may need to delete the last local release branch you created
-    git branch -D release-next
 
-    # create and checkout release-next branch that's based off master branch
-    git checkout -b release-next origin/master
+   ```bash
+   # if you've released before, you may need to delete the last local release branch you created
+   git branch -D release-next
 
-    # view changelog (verify changes made match changes logged)
-    changelog view
+   # create and checkout release-next branch that's based off master branch
+   git checkout -b release-next origin/master
 
-    # after changelog validation, build the release
-    make release
+   # view changelog (verify changes made match changes logged)
+   changelog view
 
-    # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-    # occasionally the version bump can go to a version you don't expect.
-    changelog view
+   make type=patch release
 
-    # validate that the tag auto increments based on semver
-    git push --tags
+   # after changelog validation, build the release
+   # if you only need to release a patch, use
+   make type=patch release
+   # otherwise, use
+   make release
 
-    # update meltano repo with release-next branch
-    git push origin release-next
-    ```
+   # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+   # occasionally the version bump can go to a version you don't expect.
+   changelog view
+
+   # validate that the tag auto increments based on semver
+   git push --tags
+
+   # update meltano repo with release-next branch
+   git push origin release-next
+   ```
+
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available.
@@ -295,6 +314,7 @@ We should be good citizen about these, and use the default workflow to contribut
 We maintain a curated list of taps/targets that are expected to work out of the box with Meltano. Meltano also helps the CLI user find components via a `discover` command.
 
 Get a list of extractors:
+
 ```bash
 meltano discover extract
 tap-demo==...
@@ -304,6 +324,7 @@ tap-marketo==...
 ```
 
 Or a list of loaders
+
 ```bash
 $ meltano discover load
 target-demo==...
@@ -330,7 +351,7 @@ It's a game changer for development and it's worth the effort!
 1. [tmux](https://github.com/tmux/tmux) - Recommended to install with brew
 1. [tmuxinator](https://github.com/tmuxinator/tmuxinator)
 
-This config uses `$MELTANO_VENV` to source the virtual environment from. Set it to the correct directory before running tmuxinator. 
+This config uses `$MELTANO_VENV` to source the virtual environment from. Set it to the correct directory before running tmuxinator.
 
 ### Instructions
 
