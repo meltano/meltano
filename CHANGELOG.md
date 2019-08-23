@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#870](https://gitlab.com/meltano/meltano/issues/870) Add global footer component in docs
+- [#871](https://gitlab.com/meltano/meltano/issues/871) Add contributing link in footer of docs
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
 
 ### Changes
