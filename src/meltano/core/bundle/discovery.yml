@@ -1,27 +1,32 @@
 version: 3.0
 extractors:
-  - name: tap-google-analytics
-    namespace: google-analytics
-    docs: 'http://meltano.com/docs/plugins.html#google-analytics'
-    pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
+  - name: tap-carbon-intensity
+    namespace: carbon
+    pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
+  - name: tap-csv
+    namespace: tap-csv
+    docs: 'http://meltano.com/docs/plugins.html#carbon-intensity'
+    pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     settings:
-      - name: key_file_location
-        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
+      - name: csv_files_definition
+        env: TAP_CSV_FILES_DEFINITION
+        label: CSV Files Definition
         kind: file
-      - name: view_id
-        env: GOOGLE_ANALYTICS_API_VIEW_ID
-        label: View ID
-      - name: reports
-        env: GOOGLE_ANALYTICS_API_REPORTS
+        documentation: https://gitlab.com/meltano/tap-csv#run
+    docs: https://meltano.com/docs/plugins.html#tap-csv
+  - name: tap-fastly
+    namespace: fastly
+    docs: 'http://meltano.com/docs/plugins.html#fastly'
+    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
+    settings:
+      - name: api_token
+        label: API Token
       - name: start_date
-        env: GOOGLE_ANALYTICS_API_START_DATE
-        kind: date_iso8601
-      - name: end_date
-        env: GOOGLE_ANALYTICS_API_END_DATE
+        label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
     namespace: gitlab
-    docs: http://meltano.com/docs/plugins.html#gitlab
+    docs: 'http://meltano.com/docs/plugins.html#gitlab'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     settings:
       - name: api_url
@@ -42,7 +47,82 @@ extractors:
       - name: start_date
         env: GITLAB_API_START_DATE
         kind: date_iso8601
-    docs: https://meltano.com/docs/plugins.html#gitlab
+  - name: tap-google-analytics
+    namespace: google-analytics
+    docs: 'http://meltano.com/docs/plugins.html#google-analytics'
+    pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
+    settings:
+      - name: key_file_location
+        env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
+        kind: file
+      - name: view_id
+        env: GOOGLE_ANALYTICS_API_VIEW_ID
+        label: View ID
+      - name: reports
+        env: GOOGLE_ANALYTICS_API_REPORTS
+      - name: start_date
+        env: GOOGLE_ANALYTICS_API_START_DATE
+        kind: date_iso8601
+      - name: end_date
+        env: GOOGLE_ANALYTICS_API_END_DATE
+        kind: date_iso8601
+  - name: tap-marketo
+    namespace: marketo
+    docs: 'http://meltano.com/docs/plugins.html#marketo'
+    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
+    settings:
+      - name: identity
+      - name: client_id
+        label: Client ID
+      - name: client_secret
+        kind: password
+      - name: endpoint
+      - name: start_time
+        kind: date_iso8601
+  - name: tap-mongodb
+    namespace: mongodb
+    docs: 'http://meltano.com/docs/plugins.html#mongodb'
+    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    settings:
+      - name: user
+        env: MONGODB_USERNAME
+      - name: password
+        kind: password
+      - name: host
+      - name: port
+        value: 27017
+      - name: dbname
+        label: Database Name
+  - name: tap-salesforce
+    namespace: salesforce
+    docs: 'http://meltano.com/docs/plugins.html#salesforce'
+    pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
+    settings:
+      # TODO: remove, should be injected from Meltano
+      - name: client_id
+        label: Client ID
+      - name: username
+      - name: password
+      - name: security_token
+      - name: api_type
+        value: REST
+      - name: select_fields_by_default
+        value: true
+        kind: boolean
+      - name: start_date
+        kind: date_iso8601
+  - name: tap-stripe
+    namespace: stripe
+    docs: 'http://meltano.com/docs/plugins.html#stripe'
+    pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
+    settings:
+      - name: account_id
+        label: Account ID
+      - name: client_secret
+        kind: password
+        env: STRIPE_API_KEY
+      - name: start_date
+        kind: date_iso8601
   - name: tap-zendesk
     namespace: zendesk
     docs: 'http://meltano.com/docs/plugins.html#zendesk'
@@ -72,88 +152,6 @@ extractors:
         kind: boolean
       - name: start_date
         kind: date_iso8601
-    docs: https://meltano.com/docs/plugins.html#tap-zuora
-  - name: tap-marketo
-    namespace: marketo
-    docs: 'http://meltano.com/docs/plugins.html#marketo'
-    pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
-    settings:
-      - name: identity
-      - name: client_id
-        label: Client ID
-      - name: client_secret
-        kind: password
-      - name: endpoint
-      - name: start_time
-        kind: date_iso8601
-  - name: tap-salesforce
-    namespace: salesforce
-    docs: 'http://meltano.com/docs/plugins.html#salesforce'
-    pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
-    settings:
-      # TODO: remove, should be injected from Meltano
-      - name: client_id
-        label: Client ID
-      - name: username
-      - name: password
-      - name: security_token
-      - name: api_type
-        value: REST
-      - name: select_fields_by_default
-        value: true
-        kind: boolean
-      - name: start_date
-        kind: date_iso8601
-  - name: tap-mongodb
-    namespace: mongodb
-    docs: 'http://meltano.com/docs/plugins.html#mongodb'
-    pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
-    settings:
-      - name: user
-        env: MONGODB_USERNAME
-      - name: password
-        kind: password
-      - name: host
-      - name: port
-        value: 27017
-      - name: dbname
-        label: Database Name
-  - name: tap-stripe
-    namespace: stripe
-    docs: 'http://meltano.com/docs/plugins.html#stripe'
-    pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
-    settings:
-      - name: account_id
-        label: Account ID
-      - name: client_secret
-        kind: password
-        env: STRIPE_API_KEY
-      - name: start_date
-        kind: date_iso8601
-  - name: tap-fastly
-    namespace: fastly
-    docs: 'http://meltano.com/docs/plugins.html#fastly'
-    pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
-    settings:
-      - name: api_token
-        label: API Token
-      - name: start_date
-        label: Start Date
-        kind: date_iso8601
-  - name: tap-carbon-intensity
-    namespace: carbon
-    pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
-  - name: tap-csv
-    namespace: tap-csv
-    docs: 'http://meltano.com/docs/plugins.html#carbon-intensity'
-    pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
-    settings:
-      - name: csv_files_definition
-        env: TAP_CSV_FILES_DEFINITION
-        label: CSV Files Definition
-        kind: file
-        documentation: https://gitlab.com/meltano/tap-csv#run
-    docs: https://meltano.com/docs/plugins.html#tap-csv
 loaders:
   - name: target-csv
     namespace: csv
