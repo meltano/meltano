@@ -49,11 +49,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#900](https://gitlab.com/meltano/meltano/issues/900) Fix fallback value for Iso8601 dates/times
 - [#903](https://gitlab.com/meltano/meltano/issues/903) Fix columns display issue for the base table in Analyze
 
-# <<<<<<< HEAD
-
 ### Breaks
-
-> > > > > > > updated changelog and lint fix
 
 ## 0.37.2 - (2019-08-19)
 
