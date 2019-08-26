@@ -27,6 +27,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#923](https://gitlab.com/meltano/meltano/issues/923) Fix contributing release docs merge conflict issue
+
 ### Breaks
 
 ## 0.38.0 - (2019-08-21)
