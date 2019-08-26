@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#838](https://gitlab.com/meltano/meltano/issues/838) Speed run plugins prioritized to top of the list
 - [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
+- [#885](https://gitlab.com/meltano/meltano/issues/885) Add docs for all extractors and loaders
+- [#885](https://gitlab.com/meltano/meltano/issues/885) All plugin modal cards show docs text if they have docs
 
 ### Fixes
 
