@@ -35,8 +35,4 @@ export default {
   display: flex;
   align-items: center;
 }
-
-.svg-inline--fa {
-  height: auto;
-}
 </style>
