@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+
 import configuration from './modules/configuration'
 import designs from './modules/designs'
 import dashboards from './modules/dashboards'

@@ -2,12 +2,8 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  getDashboards() {
-    return axios.get(utils.apiUrl('dashboards', 'all'))
-  },
-
-  getDashboard(id) {
-    return axios.get(utils.apiUrl('dashboards/dashboard', `${id}`))
+  addReportToDashboard(data) {
+    return axios.post(utils.apiUrl('dashboards/dashboard/report', 'add'), data)
   },
 
   getActiveDashboardReportsWithQueryResults(activeReports) {
@@ -17,12 +13,12 @@ export default {
     )
   },
 
-  saveDashboard(data) {
-    return axios.post(utils.apiUrl('dashboards/dashboard', 'save'), data)
+  getDashboard(id) {
+    return axios.get(utils.apiUrl('dashboards/dashboard', `${id}`))
   },
 
-  addReportToDashboard(data) {
-    return axios.post(utils.apiUrl('dashboards/dashboard/report', 'add'), data)
+  getDashboards() {
+    return axios.get(utils.apiUrl('dashboards', 'all'))
   },
 
   removeReportFromDashboard(data) {
@@ -30,5 +26,9 @@ export default {
       utils.apiUrl('dashboards/dashboard/report', 'remove'),
       data
     )
+  },
+
+  saveDashboard(data) {
+    return axios.post(utils.apiUrl('dashboards/dashboard', 'save'), data)
   }
 }

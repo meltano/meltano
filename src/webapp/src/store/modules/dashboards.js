@@ -1,8 +1,8 @@
 import lodash from 'lodash'
 
-import utils from '@/utils/utils'
 import dashboardsApi from '../../api/dashboards'
 import reportsApi from '../../api/reports'
+import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeDashboard: {},
@@ -12,6 +12,44 @@ const defaultState = utils.deepFreeze({
 })
 
 const actions = {
+  addReportToDashboard({ commit, dispatch }, data) {
+    commit('addReportToDashboard', data)
+    dashboardsApi.addReportToDashboard(data).then(response => {
+      dispatch('updateCurrentDashboard', response.data)
+    })
+  },
+
+  getActiveDashboardReportsWithQueryResults({ commit, state }) {
+    const ids = state.activeDashboard.reportIds
+    const activeReports = state.reports.filter(report =>
+      ids.includes(report.id)
+    )
+    dashboardsApi
+      .getActiveDashboardReportsWithQueryResults(activeReports)
+      .then(response => {
+        commit('setActiveDashboardReports', response.data)
+      })
+  },
+
+  getDashboards({ commit }) {
+    return new Promise(resolve => {
+      dashboardsApi.getDashboards().then(response => {
+        const dashboards = response.data
+        commit('setDashboards', dashboards)
+        resolve()
+      })
+    })
+  },
+
+  getReports({ commit }) {
+    return new Promise(resolve => {
+      reportsApi.loadReports().then(response => {
+        commit('setReports', response.data)
+        resolve()
+      })
+    })
+  },
+
   initialize({ dispatch }, slug) {
     const promiseGetReports = dispatch('getReports')
     const promiseGetDashboards = dispatch('getDashboards')
@@ -19,6 +57,7 @@ const actions = {
       dispatch('preloadDashboard', slug)
     })
   },
+
   preloadDashboard({ dispatch, state }, slug) {
     // Load from slug or refresh existing activeDashboard's reports with activeDashboardReports
     if (slug) {
@@ -32,43 +71,21 @@ const actions = {
       dispatch('getActiveDashboardReportsWithQueryResults')
     }
   },
-  getDashboards({ commit }) {
-    return new Promise(resolve => {
-      dashboardsApi.getDashboards().then(response => {
-        const dashboards = response.data
-        commit('setDashboards', dashboards)
-        resolve()
-      })
+
+  removeReportFromDashboard({ commit, dispatch }, data) {
+    commit('removeReportFromDashboard', data)
+    dashboardsApi.removeReportFromDashboard(data).then(response => {
+      dispatch('updateCurrentDashboard', response.data)
     })
   },
-  setDashboard({ dispatch }, dashboard) {
-    dispatch('updateCurrentDashboard', dashboard)
-  },
-  getReports({ commit }) {
-    return new Promise(resolve => {
-      reportsApi.loadReports().then(response => {
-        commit('setReports', response.data)
-        resolve()
-      })
-    })
-  },
-  getActiveDashboardReportsWithQueryResults({ commit, state }) {
-    const ids = state.activeDashboard.reportIds
-    const activeReports = state.reports.filter(report =>
-      ids.includes(report.id)
-    )
-    dashboardsApi
-      .getActiveDashboardReportsWithQueryResults(activeReports)
-      .then(response => {
-        commit('setActiveDashboardReports', response.data)
-      })
-  },
+
   saveDashboard({ dispatch, commit }, data) {
     return dashboardsApi.saveDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
       commit('addSavedDashboardToDashboards', response.data)
+      return dispatch('updateCurrentDashboard', response.data)
     })
   },
+
   saveNewDashboardWithReport({ commit, dispatch }, { data, report }) {
     return dashboardsApi.saveDashboard(data).then(response => {
       const dashboard = response.data
@@ -80,18 +97,11 @@ const actions = {
       })
     })
   },
-  addReportToDashboard({ commit, dispatch }, data) {
-    commit('addReportToDashboard', data)
-    dashboardsApi.addReportToDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
-    })
+
+  setDashboard({ dispatch }, dashboard) {
+    dispatch('updateCurrentDashboard', dashboard)
   },
-  removeReportFromDashboard({ commit, dispatch }, data) {
-    commit('removeReportFromDashboard', data)
-    dashboardsApi.removeReportFromDashboard(data).then(response => {
-      dispatch('updateCurrentDashboard', response.data)
-    })
-  },
+
   updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard)
   }
@@ -104,6 +114,11 @@ const mutations = {
     )
     targetDashboard.reportIds.push(idsPayload.reportId)
   },
+
+  addSavedDashboardToDashboards(state, dashboard) {
+    state.dashboards.push(dashboard)
+  },
+
   removeReportFromDashboard(state, idsPayload) {
     const targetDashboard = state.dashboards.find(
       dashboard => dashboard.id === idsPayload.dashboardId
@@ -111,18 +126,19 @@ const mutations = {
     const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId)
     targetDashboard.reportIds.splice(idx, 1)
   },
-  addSavedDashboardToDashboards(state, dashboard) {
-    state.dashboards.push(dashboard)
-  },
+
   setActiveDashboardReports(state, reports) {
     state.activeDashboardReports = reports
   },
+
   setCurrentDashboard(state, dashboard) {
     state.activeDashboard = dashboard
   },
+
   setDashboards(state, dashboards) {
     state.dashboards = dashboards
   },
+
   setReports(state, reports) {
     state.reports = reports
   }

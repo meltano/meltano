@@ -19,7 +19,7 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/clearExtractorInFocusConfiguration')
+    this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),

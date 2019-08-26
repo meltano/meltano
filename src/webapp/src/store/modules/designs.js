@@ -1,48 +1,50 @@
-import SSF from 'ssf'
 import Vue from 'vue'
-import sqlFormatter from 'sql-formatter'
-import lodash from 'lodash'
 
-import utils from '@/utils/utils'
+import lodash from 'lodash'
+import sqlFormatter from 'sql-formatter'
+import SSF from 'ssf'
+
 import designApi from '../../api/design'
 import reportsApi from '../../api/reports'
 import sqlApi from '../../api/sql'
+import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
   activeReport: {},
+  chartType: 'BarChart',
+  currentDesign: '',
+  currentModel: '',
+  currentSQL: '',
   design: {
     relatedTable: {}
   },
-  hasSQLError: false,
-  sqlErrorMessage: [],
-  currentModel: '',
-  currentDesign: '',
-  results: [],
-  keys: [],
-  queryAttributes: [],
-  resultAggregates: {},
-  loadingQuery: false,
-  currentSQL: '',
-  saveReportSettings: { name: null },
-  reports: [],
-  chartType: 'BarChart',
-  limit: 50,
   dialect: null,
   filterOptions: [],
   filters: {
-    columns: [],
-    aggregates: []
+    aggregates: [],
+    columns: []
   },
+  hasSQLError: false,
+  keys: [],
+  limit: 50,
+  loadingQuery: false,
   order: {
     assigned: [],
     unassigned: []
-  }
+  },
+  queryAttributes: [],
+  reports: [],
+  resultAggregates: {},
+  results: [],
+  saveReportSettings: { name: null },
+  sqlErrorMessage: []
 })
 
 const helpers = {
   getFilterTypePlural(filterType) {
     return `${filterType}s`
   },
+
   getQueryPayloadFromDesign(state) {
     // Inline fn helpers
     const selected = x => x.selected
@@ -124,25 +126,24 @@ const helpers = {
 }
 
 const getters = {
+  currentDesignLabel(state) {
+    return utils.titleCase(state.currentModel)
+  },
+
+  currentLimit(state) {
+    return state.limit
+  },
+
+  currentModelLabel(state) {
+    return utils.titleCase(state.currentModel)
+  },
+
   filtersCount(state) {
     return state.filters.columns.length + state.filters.aggregates.length
   },
 
-  hasResults(state) {
-    if (!state.results) {
-      return false
-    }
-    return !!state.results.length
-  },
-
-  // eslint-disable-next-line
-  hasChartableResults(state, getters) {
-    return getters.hasResults && state.resultAggregates.length
-  },
-
-  // eslint-disable-next-line
-  hasFilters(_, getters) {
-    return getters.filtersCount > 0
+  formattedSql(state) {
+    return sqlFormatter.format(state.currentSQL)
   },
 
   getAllAttributes(state) {
@@ -173,6 +174,27 @@ const getters = {
         attr.name === queryAttribute.attributeName
       return getters.getAllAttributes.find(finder)
     }
+  },
+
+  getChartYAxis(state) {
+    if (!state.resultAggregates) {
+      return []
+    }
+    const aggregates = Object.keys(state.resultAggregates)
+    return aggregates
+  },
+
+  getDialect: state => state.dialect,
+
+  // eslint-disable-next-line no-shadow
+  getFilter(_, getters) {
+    // eslint-disable-next-line
+    return (sourceName, name, filterType) =>
+      getters
+        .getFiltersByType(filterType)
+        .find(
+          filter => filter.name === name && filter.sourceName === sourceName
+        )
   },
 
   getFilterAttributes(state) {
@@ -208,21 +230,12 @@ const getters = {
     return sources
   },
 
-  // eslint-disable-next-line no-shadow
-  getFilter(_, getters) {
-    // eslint-disable-next-line
-    return (sourceName, name, filterType) =>
-      getters
-        .getFiltersByType(filterType)
-        .find(
-          filter => filter.name === name && filter.sourceName === sourceName
-        )
-  },
-
   getFiltersByType(state) {
     return filterType =>
       state.filters[helpers.getFilterTypePlural(filterType)] || []
   },
+
+  getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
 
   // eslint-disable-next-line no-shadow
   getIsAttributeInFilters(_, getters) {
@@ -256,6 +269,32 @@ const getters = {
     return getters.getSelectedAttributes.length
   },
 
+  // eslint-disable-next-line
+  hasChartableResults(state, getters) {
+    return getters.hasResults && state.resultAggregates.length
+  },
+
+  // eslint-disable-next-line
+  hasFilters(_, getters) {
+    return getters.filtersCount > 0
+  },
+
+  hasJoins(state) {
+    return !!(state.design.joins && state.design.joins.length)
+  },
+
+  hasResults(state) {
+    if (!state.results) {
+      return false
+    }
+    return !!state.results.length
+  },
+
+  isColumnSelectedAggregate: state => columnName =>
+    columnName in state.resultAggregates,
+
+  joinIsExpanded: () => join => join.expanded,
+
   resultsCount(state) {
     if (!state.results) {
       return 0
@@ -263,47 +302,40 @@ const getters = {
     return state.results.length
   },
 
-  getDialect: state => state.dialect,
-
-  hasJoins(state) {
-    return !!(state.design.joins && state.design.joins.length)
-  },
-
-  showJoinColumnAggregateHeader: () => obj => !!obj,
-
-  joinIsExpanded: () => join => join.expanded,
-
-  getChartYAxis(state) {
-    if (!state.resultAggregates) {
-      return []
-    }
-    const aggregates = Object.keys(state.resultAggregates)
-    return aggregates
-  },
-
-  isColumnSelectedAggregate: state => columnName =>
-    columnName in state.resultAggregates,
-
-  getFormattedValue: () => (fmt, value) => SSF.format(fmt, Number(value)),
-
-  currentModelLabel(state) {
-    return utils.titleCase(state.currentModel)
-  },
-
-  currentDesignLabel(state) {
-    return utils.titleCase(state.currentModel)
-  },
-
-  currentLimit(state) {
-    return state.limit
-  },
-
-  formattedSql(state) {
-    return sqlFormatter.format(state.currentSQL)
-  }
+  showJoinColumnAggregateHeader: () => obj => !!obj
 }
 
 const actions = {
+  // eslint-disable-next-line
+  addFilter(
+    { commit },
+    {
+      sourceName,
+      attribute,
+      filterType,
+      expression = '',
+      value = '',
+      isActive = true
+    }
+  ) {
+    const filter = {
+      sourceName,
+      name: attribute.name,
+      expression,
+      value,
+      attribute,
+      filterType,
+      isActive
+    }
+    commit('addFilter', filter)
+
+    const isValidToggleSelection =
+      !attribute.hasOwnProperty('selected') || !attribute.selected
+    if (filterType === 'aggregate' && isValidToggleSelection) {
+      commit('toggleSelected', attribute)
+    }
+  },
+
   checkAutoRun({ dispatch, state }) {
     if (state.results.length > 0) {
       dispatch('runQuery')
@@ -344,7 +376,31 @@ const actions = {
     }
   },
 
-  resetDefaults: ({ commit }) => commit('resetDefaults'),
+  expandJoinRow({ commit }, join) {
+    // already fetched columns
+    commit('toggleCollapsed', join)
+    if (join.relatedTable.columns.length) {
+      return
+    }
+    designApi.getTable(join.relatedTable.name).then(response => {
+      commit('setJoinColumns', {
+        columns: response.data.columns,
+        join
+      })
+      commit('setJoinTimeframes', {
+        timeframes: response.data.timeframes,
+        join
+      })
+      commit('setJoinAggregates', {
+        aggregates: response.data.aggregates,
+        join
+      })
+    })
+  },
+
+  expandRow({ commit }, row) {
+    commit('toggleCollapsed', row)
+  },
 
   getDesign({ commit, dispatch, state }, { model, design, slug }) {
     state.currentSQL = ''
@@ -376,66 +432,6 @@ const actions = {
     sqlApi.getFilterOptions().then(response => {
       commit('setFilterOptions', response.data)
     })
-  },
-
-  expandRow({ commit }, row) {
-    commit('toggleCollapsed', row)
-  },
-
-  expandJoinRow({ commit }, join) {
-    // already fetched columns
-    commit('toggleCollapsed', join)
-    if (join.relatedTable.columns.length) {
-      return
-    }
-    designApi.getTable(join.relatedTable.name).then(response => {
-      commit('setJoinColumns', {
-        columns: response.data.columns,
-        join
-      })
-      commit('setJoinTimeframes', {
-        timeframes: response.data.timeframes,
-        join
-      })
-      commit('setJoinAggregates', {
-        aggregates: response.data.aggregates,
-        join
-      })
-    })
-  },
-
-  toggleColumn({ commit, dispatch }, column) {
-    commit('toggleSelected', column)
-    dispatch('cleanOrdering', column)
-    dispatch('checkAutoRun')
-  },
-
-  toggleTimeframe({ commit, dispatch }, timeframe) {
-    commit('toggleSelected', timeframe)
-    dispatch('cleanOrdering', timeframe)
-    dispatch('checkAutoRun')
-  },
-
-  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
-    commit('toggleSelected', timeframePeriod)
-    dispatch('cleanOrdering', timeframePeriod)
-    dispatch('checkAutoRun')
-  },
-
-  toggleAggregate({ commit, dispatch }, aggregate) {
-    commit('toggleSelected', aggregate)
-    dispatch('cleanOrdering', aggregate)
-    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
-    dispatch('checkAutoRun')
-  },
-
-  limitSet({ commit }, limit) {
-    commit('setLimit', limit)
-  },
-
-  // TODO: remove and use `mapMutations`
-  setChartType({ commit }, chartType) {
-    commit('setChartType', chartType)
   },
 
   // eslint-disable-next-line no-shadow
@@ -485,6 +481,31 @@ const actions = {
       })
   },
 
+  limitSet({ commit }, limit) {
+    commit('setLimit', limit)
+  },
+
+  removeFilter({ commit }, filter) {
+    commit('removeFilter', filter)
+  },
+
+  resetDefaults: ({ commit }) => commit('resetDefaults'),
+
+  resetErrorMessage({ commit }) {
+    commit('setErrorState')
+  },
+
+  resetSortAttributes({ commit, dispatch }) {
+    commit('resetSortAttributes')
+    dispatch('checkAutoRun')
+  },
+
+  runQuery() {
+    this.dispatch('designs/getSQL', {
+      run: true
+    })
+  },
+
   saveReport({ commit, state }, { name }) {
     const postData = {
       chartType: state.chartType,
@@ -502,6 +523,40 @@ const actions = {
     })
   },
 
+  // TODO: remove and use `mapMutations`
+  setChartType({ commit }, chartType) {
+    commit('setChartType', chartType)
+  },
+
+  toggleAggregate({ commit, dispatch }, aggregate) {
+    commit('toggleSelected', aggregate)
+    dispatch('cleanOrdering', aggregate)
+    dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
+    dispatch('checkAutoRun')
+  },
+
+  toggleColumn({ commit, dispatch }, column) {
+    commit('toggleSelected', column)
+    dispatch('cleanOrdering', column)
+    dispatch('checkAutoRun')
+  },
+
+  toggleLoadReportOpen({ commit }) {
+    commit('setLoadReportToggle')
+  },
+
+  toggleTimeframe({ commit, dispatch }, timeframe) {
+    commit('toggleSelected', timeframe)
+    dispatch('cleanOrdering', timeframe)
+    dispatch('checkAutoRun')
+  },
+
+  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
+    commit('toggleSelected', timeframePeriod)
+    dispatch('cleanOrdering', timeframePeriod)
+    dispatch('checkAutoRun')
+  },
+
   updateReport({ commit, state }) {
     state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
     state.activeReport.chartType = state.chartType
@@ -509,25 +564,6 @@ const actions = {
       commit('resetSaveReportSettings')
       commit('setCurrentReport', response.data)
     })
-  },
-
-  resetErrorMessage({ commit }) {
-    commit('setErrorState')
-  },
-
-  resetSortAttributes({ commit, dispatch }) {
-    commit('resetSortAttributes')
-    dispatch('checkAutoRun')
-  },
-
-  runQuery() {
-    this.dispatch('designs/getSQL', {
-      run: true
-    })
-  },
-
-  toggleLoadReportOpen({ commit }) {
-    commit('setLoadReportToggle')
   },
 
   // eslint-disable-next-line no-shadow
@@ -556,44 +592,18 @@ const actions = {
     }
 
     this.dispatch('designs/runQuery')
-  },
-
-  // eslint-disable-next-line
-  addFilter(
-    { commit },
-    {
-      sourceName,
-      attribute,
-      filterType,
-      expression = '',
-      value = '',
-      isActive = true
-    }
-  ) {
-    const filter = {
-      sourceName,
-      name: attribute.name,
-      expression,
-      value,
-      attribute,
-      filterType,
-      isActive
-    }
-    commit('addFilter', filter)
-
-    const isValidToggleSelection =
-      !attribute.hasOwnProperty('selected') || !attribute.selected
-    if (filterType === 'aggregate' && isValidToggleSelection) {
-      commit('toggleSelected', attribute)
-    }
-  },
-
-  removeFilter({ commit }, filter) {
-    commit('removeFilter', filter)
   }
 }
 
 const mutations = {
+  addFilter(state, filter) {
+    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
+  },
+
+  addSavedReportToReports(state, report) {
+    state.reports.push(report)
+  },
+
   assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(
       orderableAttr =>
@@ -605,6 +615,15 @@ const mutations = {
     state.order.assigned.push(orderableAttribute)
   },
 
+  removeFilter(state, filter) {
+    if (filter) {
+      const filtersByType =
+        state.filters[helpers.getFilterTypePlural(filter.filterType)]
+      const idx = filtersByType.indexOf(filter)
+      filtersByType.splice(idx, 1)
+    }
+  },
+
   removeOrder(state, { collection, queryAttribute }) {
     const idx = collection.indexOf(queryAttribute)
     collection.splice(idx, 1)
@@ -612,6 +631,10 @@ const mutations = {
 
   resetDefaults(state) {
     lodash.assign(state, lodash.cloneDeep(defaultState))
+  },
+
+  resetSaveReportSettings(state) {
+    state.saveReportSettings = { name: null }
   },
 
   resetSortAttributes(state) {
@@ -628,8 +651,106 @@ const mutations = {
     state.activeReport = report
   },
 
+  setDesign(state, designData) {
+    const joinSources = designData.joins || []
+    const sources = [designData].concat(joinSources)
+    const batchSourcer = (source, attributeTypes) => {
+      const table = source.relatedTable
+      attributeTypes.forEach(attributeType => {
+        if (table[attributeType]) {
+          table[attributeType].forEach(attribute => {
+            attribute.sourceName = source.name
+            attribute.sourceLabel = source.label
+          })
+        }
+      })
+    }
+
+    sources.forEach(source => {
+      batchSourcer(source, ['columns', 'aggregates', 'timeframes'])
+    })
+
+    state.design = designData
+  },
+
+  setDialect(state, dialect) {
+    state.dialect = dialect
+  },
+
+  setErrorState(state) {
+    state.hasSQLError = false
+    state.sqlErrorMessage = []
+  },
+
   setFilterOptions(state, options) {
     state.filterOptions = options
+  },
+
+  setLimit(state, limit) {
+    state.limit = limit
+  },
+
+  setJoinAggregates(_, { aggregates, join }) {
+    join.aggregates = aggregates
+  },
+
+  setJoinColumns(_, { columns, join }) {
+    join.columns = columns
+  },
+
+  setJoinTimeframes(_, { timeframes, join }) {
+    join.timeframes = timeframes
+  },
+
+  setQueryResults(state, results) {
+    state.results = results.results
+    state.keys = results.keys
+    state.queryAttributes = results.queryAttributes
+    state.resultAggregates = results.aggregates
+  },
+
+  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
+    orderableAttribute.direction = direction
+  },
+
+  setSorting(state, allAttributes) {
+    state.queryAttributes.forEach(queryAttribute => {
+      const accounted = state.order.assigned.concat(state.order.unassigned)
+      const finder = orderableAttribute =>
+        orderableAttribute.sourceName === queryAttribute.sourceName &&
+        orderableAttribute.attributeName === queryAttribute.attributeName
+      const isAccountedFor = accounted.find(finder)
+      if (!isAccountedFor) {
+        const targetAttribute = allAttributes.find(
+          attribute =>
+            attribute.sourceName === queryAttribute.sourceName &&
+            attribute.name === queryAttribute.attributeName
+        )
+        state.order.unassigned.push({
+          sourceName: targetAttribute.sourceName,
+          sourceLabel: targetAttribute.sourceLabel,
+          attributeName: targetAttribute.name,
+          attributeLabel: targetAttribute.label,
+          direction: 'asc'
+        })
+      }
+    })
+  },
+
+  setSqlErrorMessage(state, e) {
+    state.hasSQLError = true
+    if (!e.response) {
+      state.sqlErrorMessage = [
+        "Something went wrong on our end. We'll check our error logs and get back to you."
+      ]
+      return
+    }
+    const error = e.response.data
+    state.sqlErrorMessage = [error.code, error.orig, error.statement]
+  },
+
+  setSQLResults(state, results) {
+    state.currentSQL = results.sql
   },
 
   setStateFromLoadedReport(state, report) {
@@ -694,131 +815,12 @@ const mutations = {
     })
   },
 
-  addFilter(state, filter) {
-    state.filters[helpers.getFilterTypePlural(filter.filterType)].push(filter)
-  },
-
-  removeFilter(state, filter) {
-    if (filter) {
-      const filtersByType =
-        state.filters[helpers.getFilterTypePlural(filter.filterType)]
-      const idx = filtersByType.indexOf(filter)
-      filtersByType.splice(idx, 1)
-    }
-  },
-
-  addSavedReportToReports(state, report) {
-    state.reports.push(report)
-  },
-
-  setJoinColumns(_, { columns, join }) {
-    join.columns = columns
-  },
-
-  setJoinTimeframes(_, { timeframes, join }) {
-    join.timeframes = timeframes
-  },
-
-  setJoinAggregates(_, { aggregates, join }) {
-    join.aggregates = aggregates
-  },
-
-  resetSaveReportSettings(state) {
-    state.saveReportSettings = { name: null }
-  },
-
-  setSQLResults(state, results) {
-    state.currentSQL = results.sql
-  },
-
-  setQueryResults(state, results) {
-    state.results = results.results
-    state.keys = results.keys
-    state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
-  },
-
-  setSorting(state, allAttributes) {
-    state.queryAttributes.forEach(queryAttribute => {
-      const accounted = state.order.assigned.concat(state.order.unassigned)
-      const finder = orderableAttribute =>
-        orderableAttribute.sourceName === queryAttribute.sourceName &&
-        orderableAttribute.attributeName === queryAttribute.attributeName
-      const isAccountedFor = accounted.find(finder)
-      if (!isAccountedFor) {
-        const targetAttribute = allAttributes.find(
-          attribute =>
-            attribute.sourceName === queryAttribute.sourceName &&
-            attribute.name === queryAttribute.attributeName
-        )
-        state.order.unassigned.push({
-          sourceName: targetAttribute.sourceName,
-          sourceLabel: targetAttribute.sourceLabel,
-          attributeName: targetAttribute.name,
-          attributeLabel: targetAttribute.label,
-          direction: 'asc'
-        })
-      }
-    })
-  },
-
-  setSqlErrorMessage(state, e) {
-    state.hasSQLError = true
-    if (!e.response) {
-      state.sqlErrorMessage = [
-        "Something went wrong on our end. We'll check our error logs and get back to you."
-      ]
-      return
-    }
-    const error = e.response.data
-    state.sqlErrorMessage = [error.code, error.orig, error.statement]
-  },
-
-  setErrorState(state) {
-    state.hasSQLError = false
-    state.sqlErrorMessage = []
-  },
-
-  toggleSelected(state, attribute) {
-    Vue.set(attribute, 'selected', !attribute.selected)
-  },
-
   toggleCollapsed(state, collapsable) {
     Vue.set(collapsable, 'collapsed', !collapsable.collapsed)
   },
 
-  setSortableAttributeDirection(_, { orderableAttribute, direction }) {
-    orderableAttribute.direction = direction
-  },
-
-  setDesign(state, designData) {
-    const joinSources = designData.joins || []
-    const sources = [designData].concat(joinSources)
-    const batchSourcer = (source, attributeTypes) => {
-      const table = source.relatedTable
-      attributeTypes.forEach(attributeType => {
-        if (table[attributeType]) {
-          table[attributeType].forEach(attribute => {
-            attribute.sourceName = source.name
-            attribute.sourceLabel = source.label
-          })
-        }
-      })
-    }
-
-    sources.forEach(source => {
-      batchSourcer(source, ['columns', 'aggregates', 'timeframes'])
-    })
-
-    state.design = designData
-  },
-
-  setLimit(state, limit) {
-    state.limit = limit
-  },
-
-  setDialect(state, dialect) {
-    state.dialect = dialect
+  toggleSelected(state, attribute) {
+    Vue.set(attribute, 'selected', !attribute.selected)
   }
 }
 

@@ -21,7 +21,7 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/clearConnectionInFocusConfiguration')
+    this.$store.dispatch('configuration/resetConnectionInFocusConfiguration')
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),

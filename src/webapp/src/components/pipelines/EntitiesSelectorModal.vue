@@ -25,7 +25,7 @@ export default {
       })
   },
   destroyed() {
-    this.$store.dispatch('configuration/clearExtractorInFocusEntities')
+    this.$store.dispatch('configuration/resetExtractorInFocusEntities')
   },
   data() {
     return {
@@ -109,9 +109,6 @@ export default {
     }
   },
   methods: {
-    clearSelections() {
-      this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
-    },
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -125,8 +122,8 @@ export default {
     entityGroupSelected(entityGroup) {
       this.$store.dispatch('configuration/toggleEntityGroup', entityGroup)
     },
-    toggleExpandable() {
-      this.isExpanded = !this.isExpanded
+    resetSelections() {
+      this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
     },
     selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
@@ -135,6 +132,9 @@ export default {
           `Entities Saved - ${this.extractorNameFromRoute}`
         )
       })
+    },
+    toggleExpandable() {
+      this.isExpanded = !this.isExpanded
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
@@ -199,7 +199,7 @@ export default {
                 <button
                   class="button is-text"
                   v-if="hasSelectedAttributes"
-                  @click="clearSelections"
+                  @click="resetSelections"
                 >
                   Clear Selection
                 </button>
