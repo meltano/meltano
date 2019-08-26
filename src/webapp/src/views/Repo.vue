@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import fileTypeEnums from '@/utils/fileTypeEnums'
 import pretty from '@/filters/pretty'
 import RouterViewLayout from '@/views/RouterViewLayout'

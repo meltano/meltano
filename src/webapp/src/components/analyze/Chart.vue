@@ -1,5 +1,5 @@
 <script>
-import { BarChart, LineChart, AreaChart, ScatterChart } from './charts'
+import { AreaChart, BarChart, LineChart, ScatterChart } from './charts'
 
 export default {
   name: 'Bar',

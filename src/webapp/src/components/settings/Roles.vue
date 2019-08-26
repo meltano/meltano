@@ -1,7 +1,7 @@
 <script>
 import _ from 'lodash'
 import store from '@/store'
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import RoleMembers from './RoleMembers'
 import RolePermissions from './RolePermissions'
 

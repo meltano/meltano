@@ -1,6 +1,6 @@
 import Vuex from 'vuex'
 import Router from 'vue-router'
-import { mount, createLocalVue, shallowMount } from '@vue/test-utils'
+import { createLocalVue, mount, shallowMount } from '@vue/test-utils'
 import Repo from '@/views/Repo'
 import repos from '@/store/modules/repos'
 import router from '@/router'
@@ -16,33 +16,33 @@ describe('Repo.vue', () => {
 
   const createShallowWrapper = () =>
     shallowMount(Repo, {
-      store,
       localVue,
-      router
+      router,
+      store
     })
 
   const createWrapper = () =>
     mount(Repo, {
-      store,
       localVue,
       router,
+      store,
       stubs: ['font-awesome-icon']
     })
 
   beforeEach(() => {
     state = repos.state
     actions = {
-      getRepo: jest.fn(),
       getFile: jest.fn(),
+      getRepo: jest.fn(),
       sync: jest.fn()
     }
     store = new Vuex.Store({
       modules: {
         repos: {
-          namespaced: true,
-          state,
           actions,
-          getters: repos.getters
+          getters: repos.getters,
+          namespaced: true,
+          state
         }
       }
     })
@@ -64,8 +64,8 @@ describe('Repo.vue', () => {
 
   it('renders markdown in the preview pane for markdown files', () => {
     state.activeView = {
-      is_markdown: true,
       file: '<h1>Title</h1>',
+      is_markdown: true,
       populated: true
     }
     const wrapper = createWrapper()
@@ -75,8 +75,8 @@ describe('Repo.vue', () => {
 
   it('renders code in the preview pane for code files', () => {
     state.activeView = {
-      is_markdown: false,
       file: '{ "title": "Title" }',
+      is_markdown: false,
       populated: true
     }
     const wrapper = createWrapper()
@@ -87,7 +87,6 @@ describe('Repo.vue', () => {
   it('renders the dashboard list when dashboards exist and calls getFile() when a dashboard is clicked', () => {
     state.files = {
       dashboards: {
-        label: 'Dashboards',
         items: [
           {
             createdAt: 1551459531.431577,
@@ -100,7 +99,8 @@ describe('Repo.vue', () => {
             slug: 'some',
             version: '1.0.0'
           }
-        ]
+        ],
+        label: 'Dashboards'
       }
     }
     const wrapper = createWrapper()
