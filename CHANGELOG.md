@@ -9,9 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#838](https://gitlab.com/meltano/meltano/issues/838) Add indicator for speed run plugins
 - [#870](https://gitlab.com/meltano/meltano/issues/870) Add global footer component in docs
 - [#871](https://gitlab.com/meltano/meltano/issues/871) Add contributing link in footer of docs
-- [#838](https://gitlab.com/meltano/meltano/issues/838) Add indicator for speed run plugins
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
 - [#912](https://gitlab.com/meltano/meltano/issues/912) Auto run the ELT of a saved Pipeline Schedule by default
 - [#907](https://gitlab.com/meltano/meltano/issues/907) Add auto select of "All" for Entities Selection step and removed the performance warning (a future iteration will address the "Recommended" implementation and the display of a resulting performance warning when "All" is selected and "Recommended" ignored)
@@ -19,9 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
-- [#838](https://gitlab.com/meltano/meltano/issues/838) Add indicator for speed run plugins
 - [#838](https://gitlab.com/meltano/meltano/issues/838) Speed run plugins prioritized to top of the list
+- [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
 
 ### Fixes
 
