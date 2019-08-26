@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.39.0 - (2019-08-26)
 
 ---
 
@@ -29,7 +42,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#923](https://gitlab.com/meltano/meltano/issues/923) Fix contributing release docs merge conflict issue
 
-### Breaks
 
 ## 0.38.0 - (2019-08-21)
 
