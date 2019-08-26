@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#896](https://gitlab.com/meltano/meltano/issues/896) Add documentation for how to do patch releases
+- [#910](https://gitlab.com/meltano/meltano/issues/910) Update linting rules to enforce better standards for the frontend code base
 
 ### Fixes
 
