@@ -2,6 +2,10 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  addPlugin(addConfig) {
+    return axios.post(utils.apiUrl('plugins', 'add'), addConfig)
+  },
+
   getAllPlugins() {
     return axios.get(utils.apiUrl('plugins', 'all'))
   },
@@ -16,9 +20,5 @@ export default {
 
   installPlugin(installConfig) {
     return axios.post(utils.apiUrl('plugins', 'install'), installConfig)
-  },
-
-  addPlugin(addConfig) {
-    return axios.post(utils.apiUrl('plugins', 'add'), addConfig)
   }
 }

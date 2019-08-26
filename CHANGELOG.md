@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#908](https://gitlab.com/meltano/meltano/issues/908) Add auto installation for Airflow Orchestrator for improved UX
 - [#912](https://gitlab.com/meltano/meltano/issues/912) Auto run the ELT of a saved Pipeline Schedule by default
 - [#907](https://gitlab.com/meltano/meltano/issues/907) Add auto select of "All" for Entities Selection step and removed the performance warning (a future iteration will address the "Recommended" implementation and the display of a resulting performance warning when "All" is selected and "Recommended" ignored)
+- [#799](https://gitlab.com/meltano/meltano/issues/799) Standardized code conventions on the frontend and updated related documentation (issues related to further linting enforcement will soon follow)
 
 ### Changes
 
