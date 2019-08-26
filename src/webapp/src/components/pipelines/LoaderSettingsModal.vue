@@ -103,7 +103,7 @@ export default {
           </div>
         </template>
 
-        <div v-if="loader.signupUrl" class="intro-module">
+        <div v-if="loader.signupUrl" class="mb1r">
           <p>
             This plugin requires an account. If you don't have one, you can
             <a :href="loader.signupUrl" target="_blank">sign up here</a>.
@@ -116,7 +116,7 @@ export default {
           :config-settings="loaderInFocusConfiguration"
         />
 
-        <div v-if="loader.docs" class="footnote-module">
+        <div v-if="loader.docs" class="mt1r">
           <p>
             Need help finding this information? We got you covered with our
             <a :href="loader.docs" target="_blank">docs here</a>.
@@ -143,12 +143,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss" scoped>
-.intro-module {
-  margin-bottom: 1rem;
-}
-
-.footnote-module {
-  margin-top: 1rem;
-}
-</style>
+<style lang="scss" scoped></style>

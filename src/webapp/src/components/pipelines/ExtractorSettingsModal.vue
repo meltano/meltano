@@ -127,6 +127,13 @@ export default {
           :config-settings="extractorInFocusConfiguration"
         />
 
+        <div v-if="extractor.docs" class="mt1r">
+          <p>
+            Need help finding this information? We got you covered with our
+            <a :href="extractor.docs" target="_blank">docs here</a>.
+          </p>
+        </div>
+
         <progress
           v-if="isLoadingConfigSettings && !isInstalling"
           class="progress is-small is-info"

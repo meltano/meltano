@@ -1,12 +1,17 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import SpeedRunIcon from '@/components/SpeedRunIcon'
 
 export default {
   name: 'Extractors',
   components: {
-    ConnectorLogo
+    ConnectorLogo,
+    SpeedRunIcon
   },
+  data: () => ({
+    speedRunExtractor: 'tap-carbon-intensity'
+  }),
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapState('plugins', ['plugins']),
@@ -60,8 +65,9 @@ export default {
       <div
         v-for="(extractor, index) in plugins.extractors"
         :key="`${extractor}-${index}`"
-        class="tile is-parent is-3"
+        class="tile is-parent is-3 is-relative"
       >
+        <SpeedRunIcon v-if="extractor === speedRunExtractor" />
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <ConnectorLogo
