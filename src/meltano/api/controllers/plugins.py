@@ -1,4 +1,5 @@
 from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
@@ -13,6 +14,11 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from flask import Blueprint, request, jsonify, g
 
 pluginsBP = Blueprint("plugins", __name__, url_prefix="/api/v1/plugins")
+
+
+@pluginsBP.errorhandler(PluginInstallError)
+def _handle(ex):
+    return (jsonify({"error": True, "code": str(ex)}), 502)
 
 
 @pluginsBP.route("/all", methods=["GET"])
