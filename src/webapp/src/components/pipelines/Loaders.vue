@@ -22,15 +22,16 @@ export default {
     ...mapState('plugins', ['plugins']),
     sortedLoaders() {
       // This is a stop gap until we implement an eventual need for automatic text filtering for cards
-      let loadersList = [this.speedRunLoader]
+      const currentLoaders = this.plugins.loaders || []
+      let newLoaders = []
 
-      this.plugins.loaders.filter(plugin => {
-        if (plugin !== this.speedRunLoader) {
-          loadersList.push(plugin)
-        }
-      })
+      if (currentLoaders.length > 0) {
+        newLoaders = [this.speedRunLoader].concat(
+          currentLoaders.filter(plugin => plugin !== this.speedRunLoader)
+        )
+      }
 
-      return loadersList
+      return newLoaders
     }
   },
   methods: {
