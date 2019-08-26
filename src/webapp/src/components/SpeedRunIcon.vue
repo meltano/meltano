@@ -35,4 +35,9 @@ export default {
   display: flex;
   align-items: center;
 }
+
+// Required to center align properly
+.svg-inline--fa {
+  height: auto;
+}
 </style>
