@@ -9,7 +9,20 @@ export default {
     AreaChart,
     ScatterChart
   },
-  props: ['chartType', 'results', 'resultAggregates']
+  props: {
+    chartType: {
+      type: String,
+      required: true
+    },
+    resultAggregates: {
+      type: Object,
+      required: true
+    },
+    results: {
+      type: Array,
+      required: true
+    }
+  }
 }
 </script>
 

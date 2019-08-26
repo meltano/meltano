@@ -7,10 +7,6 @@ import utils from '@/utils/utils'
 
 export default {
   name: 'Repo',
-  created() {
-    this.getRepo()
-    this.sync()
-  },
   components: {
     RouterViewLayout
   },
@@ -33,6 +29,10 @@ export default {
       'loadingUpdate',
       'errors'
     ])
+  },
+  created() {
+    this.getRepo()
+    this.sync()
   },
   methods: {
     getRepo() {
@@ -107,21 +107,21 @@ export default {
                 </div>
               </div>
               <div class="level-right">
-                <span class="tag is-success pull-right" v-if="passedValidation"
+                <span v-if="passedValidation" class="tag is-success pull-right"
                   >Passed!</span
                 >
-                <span class="tag is-warning" v-if="!validated"
+                <span v-if="!validated" class="tag is-warning"
                   >Unvalidated</span
                 >
-                <span class="tag is-danger" v-if="hasError">Errors</span>
+                <span v-if="hasError" class="tag is-danger">Errors</span>
               </div>
             </div>
             <template v-if="hasError">
               <nav class="panel">
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <div
-                  class="panel-block has-background-white"
                   v-for="err in errors"
+                  class="panel-block has-background-white"
                 >
                   <ul>
                     <li class="level">
@@ -200,8 +200,8 @@ export default {
               ></div>
             </div>
             <div
-              class="js-code-preview is-paddingless code-container"
               v-else-if="hasCode"
+              class="js-code-preview is-paddingless code-container"
             >
               <div class="has-background-white">
                 <pre>{{ activeView.file | pretty }}</pre>

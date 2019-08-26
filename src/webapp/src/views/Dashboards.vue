@@ -6,18 +6,15 @@ import RouterViewLayout from '@/views/RouterViewLayout'
 
 export default {
   name: 'Dashboards',
-  created() {
-    this.initialize(this.$route.params.slug)
+  components: {
+    Chart,
+    NewDashboardModal,
+    RouterViewLayout
   },
   data() {
     return {
       isNewDashboardModalOpen: false
     }
-  },
-  components: {
-    Chart,
-    NewDashboardModal,
-    RouterViewLayout
   },
   computed: {
     ...mapState('dashboards', [
@@ -30,6 +27,14 @@ export default {
       return dashboard => dashboard.id === this.activeDashboard.id
     }
   },
+  watch: {
+    activeDashboard() {
+      this.getActiveDashboardReportsWithQueryResults()
+    }
+  },
+  created() {
+    this.initialize(this.$route.params.slug)
+  },
   methods: {
     ...mapActions('dashboards', [
       'initialize',
@@ -38,11 +43,6 @@ export default {
     ]),
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
-    }
-  },
-  watch: {
-    activeDashboard() {
-      this.getActiveDashboardReportsWithQueryResults()
     }
   }
 }
@@ -83,9 +83,9 @@ export default {
                 <div class="panel">
                   <a
                     v-for="dashboard in dashboards"
+                    :key="dashboard.id"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': isActive(dashboard) }"
-                    :key="dashboard.id"
                     @click="setDashboard(dashboard)"
                   >
                     {{ dashboard.name }}
@@ -101,7 +101,7 @@ export default {
                 <div class="columns is-vcentered">
                   <div class="column">
                     <h2 class="title is-5">{{ activeDashboard.name }}</h2>
-                    <h3 class="subtitle" v-if="activeDashboard.description">
+                    <h3 v-if="activeDashboard.description" class="subtitle">
                       {{ activeDashboard.description }}
                     </h3>
                   </div>
@@ -117,9 +117,9 @@ export default {
                 </div>
 
                 <div
-                  class="content"
                   v-for="report in activeDashboardReports"
                   :key="report.id"
+                  class="content"
                 >
                   <h5 class="has-text-centered">{{ report.name }}</h5>
                   <chart

@@ -10,18 +10,18 @@ export default {
   components: {
     ScheduleTableHead
   },
-  created() {
-    this.$store.dispatch('configuration/getAllPipelineSchedules')
-    if (!this.getHasPipelines) {
-      this.createPipeline()
-    }
-  },
   computed: {
     ...mapState('configuration', ['pipelines']),
     ...mapGetters('configuration', ['getHasPipelines']),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
     getFormattedDateStringYYYYMMDD() {
       return val => utils.formatDateStringYYYYMMDD(val)
+    }
+  },
+  created() {
+    this.$store.dispatch('configuration/getAllPipelineSchedules')
+    if (!this.getHasPipelines) {
+      this.createPipeline()
     }
   },
   methods: {

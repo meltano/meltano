@@ -77,6 +77,7 @@ export default {
                   <span>{{ queryAttribute.attributeLabel }}</span>
                 </div>
                 <Dropdown
+                  ref="order-dropdown"
                   :label="getOrderableStatusLabel(queryAttribute)"
                   :button-classes="
                     `is-small ${
@@ -90,7 +91,6 @@ export default {
                   icon-close="caret-down"
                   is-right-aligned
                   is-up
-                  ref="order-dropdown"
                 >
                   <div class="dropdown-content is-unselectable">
                     <QuerySortBy></QuerySortBy>
@@ -104,7 +104,7 @@ export default {
           <!-- eslint-disable-next-line vue/require-v-for-key -->
           <tr v-for="(result, i) in results" :key="i">
             <template v-for="key in keys">
-              <td :key="key" v-if="isColumnSelectedAggregate(key)">
+              <td v-if="isColumnSelectedAggregate(key)" :key="key">
                 {{
                   getFormattedValue(
                     resultAggregates[key]['value_format'],
@@ -112,7 +112,7 @@ export default {
                   )
                 }}
               </td>
-              <td :key="key" v-else>
+              <td v-else :key="key">
                 {{ result[key] }}
               </td>
             </template>
@@ -121,7 +121,7 @@ export default {
       </table>
     </div>
 
-    <div class="notification is-italic" v-else>
+    <div v-else class="notification is-italic">
       No results
     </div>
   </div>

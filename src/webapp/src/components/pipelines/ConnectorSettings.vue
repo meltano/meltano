@@ -12,29 +12,14 @@ export default {
     TooltipCircle
   },
   props: {
-    fieldClass: { type: String },
+    fieldClass: {
+      type: String,
+      default: ''
+    },
     configSettings: {
       type: Object,
       required: true,
       default: () => {}
-    }
-  },
-  watch: {
-    configSettings: {
-      handler(newVal) {
-        /**
-         * Improve account UX by auto-detecting Account ID via URL for configs that have `account`
-         * This is currently Loader-Snowflake specific and we'll need a more robust solution
-         * when/if we add UX helpers like this for more connectors
-         */
-        const accountInput = newVal.config.account
-        if (accountInput) {
-          const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-          this.configSettings.config.account =
-            parsedAccountId || newVal.config.account
-        }
-      },
-      deep: true
     }
   },
   computed: {
@@ -82,6 +67,24 @@ export default {
           : null
     }
   },
+  watch: {
+    configSettings: {
+      handler(newVal) {
+        /**
+         * Improve account UX by auto-detecting Account ID via URL for configs that have `account`
+         * This is currently Loader-Snowflake specific and we'll need a more robust solution
+         * when/if we add UX helpers like this for more connectors
+         */
+        const accountInput = newVal.config.account
+        if (accountInput) {
+          const parsedAccountId = utils.snowflakeAccountParser(accountInput)
+          this.configSettings.config.account =
+            parsedAccountId || newVal.config.account
+        }
+      },
+      deep: true
+    }
+  },
   methods: {
     findLabel(setting) {
       return setting.options.find(item => item.value === setting.value).label
@@ -94,9 +97,9 @@ export default {
   <div>
     <slot name="top" />
     <div
-      class="field is-horizontal"
       v-for="setting in configSettings.settings"
       :key="setting.name"
+      class="field is-horizontal"
     >
       <div :class="['is-flex', 'field-label', labelClass]">
         <label class="label">{{
@@ -134,9 +137,9 @@ export default {
               class="select is-small is-fullwidth"
             >
               <select
+                :id="`${setting.name}-select-menu`"
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
-                :id="`${setting.name}-select-menu`"
               >
                 <option
                   v-for="(option, index) in setting.options"
@@ -153,9 +156,9 @@ export default {
               v-else-if="getIsOfKindTextBased(setting.kind)"
               v-model="configSettings.config[setting.name]"
               :class="['input', fieldClass, successClass(setting)]"
-              @focus="$event.target.select()"
               :type="getTextBasedInputType(setting)"
               :placeholder="setting.value || setting.name"
+              @focus="$event.target.select()"
             />
           </div>
           <p v-if="setting.description" class="help is-italic">

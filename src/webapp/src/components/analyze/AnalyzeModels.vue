@@ -4,10 +4,9 @@ import capitalize from '@/filters/capitalize'
 import underscoreToSpace from '@/filters/underscoreToSpace'
 
 export default {
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-    this.$store.dispatch('repos/getModels')
+  filters: {
+    capitalize,
+    underscoreToSpace
   },
   computed: {
     ...mapState('plugins', ['installedPlugins', 'plugins']),
@@ -15,9 +14,10 @@ export default {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapState('repos', ['models'])
   },
-  filters: {
-    capitalize,
-    underscoreToSpace
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.$store.dispatch('repos/getModels')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -81,16 +81,16 @@ export default {
       <div class="column is-two-thirds">
         <h2 class="title is-5">Installed</h2>
         <template v-if="hasModels">
-          <div class="box" v-for="(v, model) in models" :key="`${model}-panel`">
+          <div v-for="(v, model) in models" :key="`${model}-panel`" class="box">
             <div class="content">
               <h3 class="is-size-6">
                 {{ model | capitalize | underscoreToSpace }}
               </h3>
               <hr class="hr-tight" />
               <div
-                class="level level-tight"
                 v-for="design in v['designs']"
                 :key="design"
+                class="level level-tight"
               >
                 <div class="level-left">
                   {{ design | capitalize | underscoreToSpace }}

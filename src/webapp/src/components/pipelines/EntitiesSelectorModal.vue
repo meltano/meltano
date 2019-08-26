@@ -8,25 +8,6 @@ export default {
   components: {
     ConnectorLogo
   },
-  created() {
-    this.selectionModes = [
-      this.selectionModeAll,
-      this.selectionModeRecommended,
-      this.selectionModeCustom
-    ]
-    this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store
-      .dispatch(
-        'configuration/getExtractorInFocusEntities',
-        this.extractorNameFromRoute
-      )
-      .then(() => {
-        this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
-      })
-  },
-  destroyed() {
-    this.$store.dispatch('configuration/resetExtractorInFocusEntities')
-  },
   data() {
     return {
       isExpanded: false,
@@ -103,10 +84,31 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
+        summary = `${this.getSelectedAttributeCount} attributes from ${
+          this.getSelectedEntityCount
+        } entities selected`
       }
       return summary
     }
+  },
+  created() {
+    this.selectionModes = [
+      this.selectionModeAll,
+      this.selectionModeRecommended,
+      this.selectionModeCustom
+    ]
+    this.extractorNameFromRoute = this.$route.params.extractor
+    this.$store
+      .dispatch(
+        'configuration/getExtractorInFocusEntities',
+        this.extractorNameFromRoute
+      )
+      .then(() => {
+        this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+      })
+  },
+  destroyed() {
+    this.$store.dispatch('configuration/resetExtractorInFocusEntities')
   },
   methods: {
     close() {
@@ -183,10 +185,10 @@ export default {
               <div class="buttons are-small has-addons">
                 <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
                 <button
-                  class="button is-outlined"
                   v-for="mode in selectionModes"
-                  :disabled="mode === selectionModes[1]"
                   :key="mode.label"
+                  class="button is-outlined"
+                  :disabled="mode === selectionModes[1]"
                   :class="{
                     'is-selected is-interactive-secondary': getIsSelectedMode(
                       mode
@@ -197,8 +199,8 @@ export default {
                   {{ mode.label }}
                 </button>
                 <button
-                  class="button is-text"
                   v-if="hasSelectedAttributes"
+                  class="button is-text"
                   @click="resetSelections"
                 >
                   Clear Selection
@@ -221,9 +223,9 @@ export default {
 
           <div class="expandable" :class="{ 'is-expanded': isExpanded }">
             <div
-              class="is-unselectable"
               v-for="entityGroup in extractorInFocusEntities.entityGroups"
               :key="`${entityGroup.name}`"
+              class="is-unselectable"
             >
               <a
                 class="chip button is-rounded is-outlined entity"

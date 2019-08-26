@@ -6,22 +6,15 @@ import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
 export default {
   name: 'AnalyzeSettings',
+  components: {
+    ConnectorLogo,
+    ConnectorSettings
+  },
   data() {
     return {
       connectionName: null,
       isSavingConfiguration: false
     }
-  },
-  components: {
-    ConnectorLogo,
-    ConnectorSettings
-  },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/resetConnectionInFocusConfiguration')
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
@@ -50,6 +43,13 @@ export default {
       )
       return !isInstalling && isInstalled && isValid
     }
+  },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/resetConnectionInFocusConfiguration')
   },
   methods: {
     ...mapActions('configuration', ['getConnectionConfiguration']),
@@ -89,18 +89,18 @@ export default {
       <h2 class="title is-5">Available Connections</h2>
       <div class="tile is-ancestor is-flex is-flex-column">
         <div
+          v-for="(pluginConnection, index) in plugins.connections"
+          :key="`${pluginConnection}-${index}`"
           class="tile is-parent is-flex-no-grow"
-          v-for="(connection, index) in plugins.connections"
-          :key="`${connection}-${index}`"
         >
           <div class="tile level box">
             <div class="level-left">
               <div class="level-item is-flex-column has-text-left">
                 <ConnectorLogo
                   class="connector-logo"
-                  :connector="connection"
+                  :connector="pluginConnection"
                   :is-grayscale="
-                    !getIsPluginInstalled('connections', connection)
+                    !getIsPluginInstalled('connections', pluginConnection)
                   "
                 />
               </div>
@@ -124,14 +124,14 @@ export default {
       </div>
     </div>
 
-    <div class="column" rel="container" v-if="connectionInFocusConfiguration">
+    <div v-if="connectionInFocusConfiguration" class="column" rel="container">
       <h2 class="title is-5">Configuration</h2>
       <ConnectorSettings
         v-if="connectionName"
         class="box"
         :config-settings="connectionInFocusConfiguration"
       >
-        <section class="field buttons is-right" slot="bottom">
+        <section slot="bottom" class="field buttons is-right">
           <button
             class="button is-interactive-primary"
             :class="{ 'is-loading': isSavingConfiguration }"

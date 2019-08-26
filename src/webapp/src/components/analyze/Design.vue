@@ -12,37 +12,6 @@ import utils from '@/utils/utils'
 
 export default {
   name: 'Design',
-  data() {
-    return {
-      isNewDashboardModalOpen: false
-    }
-  },
-  beforeDestroy() {
-    this.$store.dispatch('designs/resetDefaults')
-  },
-  created() {
-    const { slug, model, design } = this.$route.params
-    const uponDesign = this.$store.dispatch('designs/getDesign', {
-      model,
-      design,
-      slug
-    })
-    const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
-
-    Promise.all([uponDesign, uponPlugins]).then(() => {
-      const defaultDialect =
-        localStorage.getItem(
-          `dialect:${this.currentModel}:${this.currentDesign}`
-        ) ||
-        localStorage.getItem('dialect') ||
-        this.installedPlugins.connections[0].name
-
-      // don't use the setter here not to update the user's preferences
-      this.$store.commit('designs/setDialect', defaultDialect)
-    })
-
-    this.$store.dispatch('designs/getFilterOptions')
-  },
   filters: {
     capitalize
   },
@@ -52,6 +21,11 @@ export default {
     NewDashboardModal,
     QueryFilters,
     ResultTable
+  },
+  data() {
+    return {
+      isNewDashboardModalOpen: false
+    }
   },
   computed: {
     ...mapState('designs', [
@@ -124,6 +98,32 @@ export default {
         )
       }
     }
+  },
+  beforeDestroy() {
+    this.$store.dispatch('designs/resetDefaults')
+  },
+  created() {
+    const { slug, model, design } = this.$route.params
+    const uponDesign = this.$store.dispatch('designs/getDesign', {
+      model,
+      design,
+      slug
+    })
+    const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
+
+    Promise.all([uponDesign, uponPlugins]).then(() => {
+      const defaultDialect =
+        localStorage.getItem(
+          `dialect:${this.currentModel}:${this.currentDesign}`
+        ) ||
+        localStorage.getItem('dialect') ||
+        this.installedPlugins.connections[0].name
+
+      // don't use the setter here not to update the user's preferences
+      this.$store.commit('designs/setDialect', defaultDialect)
+    })
+
+    this.$store.dispatch('designs/getFilterOptions')
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards', 'setDashboard']),
@@ -256,9 +256,9 @@ export default {
                 <template v-if="dashboards.length">
                   <hr class="dropdown-divider" />
                   <div
-                    class="dropdown-item"
                     v-for="dashboard in dashboards"
                     :key="dashboard.id"
+                    class="dropdown-item"
                   >
                     <div class="row-space-between">
                       <label
@@ -267,8 +267,8 @@ export default {
                         @click.stop="toggleActiveReportInDashboard(dashboard)"
                       >
                         <input
-                          type="checkbox"
                           :id="'checkbox-' + dashboard.id"
+                          type="checkbox"
                           :checked="isActiveReportInDashboard(dashboard)"
                         />
                         {{ dashboard.name }}
@@ -295,8 +295,8 @@ export default {
           >
             <p class="control">
               <button
-                class="button"
                 v-if="hasActiveReport()"
+                class="button"
                 @click="updateReport()"
               >
                 <span>Update Report</span>
@@ -311,15 +311,15 @@ export default {
                 <div class="dropdown-content">
                   <div class="dropdown-item">
                     <div class="field">
-                      <label class="label" v-if="hasActiveReport()"
+                      <label v-if="hasActiveReport()" class="label"
                         >Save as</label
                       >
                       <div class="control">
                         <input
+                          v-model="saveReportSettings.name"
                           class="input"
                           type="text"
                           placeholder="Name your report"
-                          v-model="saveReportSettings.name"
                         />
                       </div>
                     </div>
@@ -353,9 +353,9 @@ export default {
             >
               <div class="dropdown-content">
                 <a
-                  class="dropdown-item"
                   v-for="report in reports"
                   :key="report.name"
+                  class="dropdown-item"
                   data-dropdown-auto-close
                   @click="loadReport(report)"
                 >
@@ -367,10 +367,10 @@ export default {
 
           <div class="control">
             <div class="select">
-              <select name="connection" v-model="dialect">
+              <select v-model="dialect" name="connection">
                 <option
-                  :key="connection.name"
                   v-for="connection in installedPlugins.connections"
+                  :key="connection.name"
                   >{{ connection.name }}</option
                 >
               </select>
@@ -421,10 +421,10 @@ export default {
                 <label class="label">Limit</label>
                 <div class="control is-expanded">
                   <input
+                    v-model="limit"
                     class="input is-small has-text-interactive-secondary"
                     type="text"
                     placeholder="Limit"
-                    v-model="limit"
                     @focus="$event.target.select()"
                   />
                 </div>
@@ -442,6 +442,7 @@ export default {
                 </label>
                 <div class="control is-expanded">
                   <Dropdown
+                    ref="filter-dropdown"
                     :label="hasFilters ? 'Edit' : 'None'"
                     :button-classes="
                       `is-small ${
@@ -449,7 +450,6 @@ export default {
                       }`
                     "
                     :menu-classes="'dropdown-menu-600'"
-                    ref="filter-dropdown"
                     is-full-width
                   >
                     <div class="dropdown-content">
@@ -493,32 +493,32 @@ export default {
             </template>
             <template v-if="!design.relatedTable.collapsed">
               <a
-                class="panel-block
-                  panel-block-heading
-                  has-background-white"
                 v-if="
                   showJoinColumnAggregateHeader(design.relatedTable.columns)
                 "
+                class="panel-block
+                  panel-block-heading
+                  has-background-white"
               >
                 Columns
               </a>
               <template v-for="timeframe in design.relatedTable.timeframes">
                 <a
-                  class="panel-block dimension-group"
-                  :key="timeframe.label"
                   v-if="!timeframe.relatedView.hidden"
-                  @click="timeframeSelected(timeframe)"
+                  :key="timeframe.label"
+                  class="panel-block dimension-group"
                   :class="{ 'is-active': timeframe.selected }"
+                  @click="timeframeSelected(timeframe)"
                 >
                   {{ timeframe.label }}
                 </a>
                 <template v-for="period in timeframe.periods">
                   <a
-                    class="panel-block indented"
-                    :key="period.label"
-                    @click="timeframePeriodSelected(period)"
                     v-if="timeframe.selected"
+                    :key="period.label"
+                    class="panel-block indented"
                     :class="{ 'is-active': period.selected }"
+                    @click="timeframePeriodSelected(period)"
                   >
                     {{ period.label }}
                   </a>
@@ -526,11 +526,11 @@ export default {
               </template>
               <template v-for="column in design.relatedTable.columns">
                 <a
-                  class="panel-block space-between has-text-weight-medium"
                   v-if="!column.hidden"
                   :key="column.label"
-                  @click="columnSelected(column)"
+                  class="panel-block space-between has-text-weight-medium"
                   :class="{ 'is-active': column.selected }"
+                  @click="columnSelected(column)"
                 >
                   {{ column.label }}
                   <button
@@ -552,21 +552,21 @@ export default {
               </template>
               <!-- eslint-disable-next-line vue/require-v-for-key -->
               <a
-                class="panel-block
-                  panel-block-heading
-                  has-background-white"
                 v-if="
                   showJoinColumnAggregateHeader(design.relatedTable.aggregates)
                 "
+                class="panel-block
+                  panel-block-heading
+                  has-background-white"
               >
                 Aggregates
               </a>
               <a
-                class="panel-block space-between has-text-weight-medium"
                 v-for="aggregate in design.relatedTable.aggregates"
                 :key="aggregate.label"
-                @click="aggregateSelected(aggregate)"
+                class="panel-block space-between has-text-weight-medium"
                 :class="{ 'is-active': aggregate.selected }"
+                @click="aggregateSelected(aggregate)"
               >
                 {{ aggregate.label }}
                 <button
@@ -592,12 +592,12 @@ export default {
             <template v-if="hasJoins">
               <template v-for="join in design.joins">
                 <a
+                  :key="join.label"
                   class="panel-block
                     has-background-white-bis
                     has-text-grey
                     is-expandable"
                   :class="{ 'is-collapsed': join.collapsed }"
-                  :key="join.label"
                   @click="joinRowClicked(join)"
                 >
                   <span class="icon is-small panel-icon">
@@ -608,36 +608,36 @@ export default {
                 <template v-if="!join.collapsed">
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a
+                    v-if="
+                      showJoinColumnAggregateHeader(join.relatedTable.columns)
+                    "
                     class="panel-block
                     panel-block-heading
                     has-text-weight-light
                     has-background-white"
-                    v-if="
-                      showJoinColumnAggregateHeader(join.relatedTable.columns)
-                    "
                   >
                     Columns
                   </a>
                   <template v-for="timeframe in join.relatedTable.timeframes">
                     <a
-                      class="panel-block timeframe"
                       v-if="!timeframe.hidden"
-                      @click="
-                        isConnectionDialectSqlite(dialect) ||
-                          timeframeSelected(timeframe)
-                      "
                       :key="timeframe.label"
+                      class="panel-block timeframe"
                       :class="{
                         'is-active': timeframe.selected,
                         'is-sqlite-unsupported': isConnectionDialectSqlite(
                           dialect
                         )
                       }"
+                      @click="
+                        isConnectionDialectSqlite(dialect) ||
+                          timeframeSelected(timeframe)
+                      "
                     >
                       {{ timeframe.label }}
                       <div
-                        class="sqlite-unsupported-container"
                         v-if="isConnectionDialectSqlite(dialect)"
+                        class="sqlite-unsupported-container"
                       >
                         <small>Unsupported by SQLite</small>
                       </div>
@@ -645,10 +645,10 @@ export default {
                     <template v-if="timeframe.selected">
                       <template v-for="period in timeframe.periods">
                         <a
-                          class="panel-block indented"
                           :key="timeframe.label.concat('-', period.label)"
-                          @click="timeframePeriodSelected(period)"
+                          class="panel-block indented"
                           :class="{ 'is-active': period.selected }"
+                          @click="timeframePeriodSelected(period)"
                         >
                           {{ period.label }}
                         </a>
@@ -657,9 +657,9 @@ export default {
                   </template>
                   <template v-for="column in join.relatedTable.columns">
                     <a
-                      class="panel-block space-between has-text-weight-medium"
                       v-if="!column.hidden"
                       :key="column.label"
+                      class="panel-block space-between has-text-weight-medium"
                       :class="{ 'is-active': column.selected }"
                       @click="joinColumnSelected(join, column)"
                     >
@@ -683,22 +683,22 @@ export default {
                   </template>
                   <!-- eslint-disable-next-line vue/require-v-for-key -->
                   <a
-                    class="panel-block
-                    panel-block-heading
-                    has-background-white"
                     v-if="
                       showJoinColumnAggregateHeader(
                         join.relatedTable.aggregates
                       )
                     "
+                    class="panel-block
+                    panel-block-heading
+                    has-background-white"
                   >
                     Aggregates
                   </a>
                   <template v-for="aggregate in join.relatedTable.aggregates">
                     <a
-                      class="panel-block space-between has-text-weight-medium"
                       v-if="!aggregate.hidden"
                       :key="aggregate.label"
+                      class="panel-block space-between has-text-weight-medium"
                       :class="{ 'is-active': aggregate.selected }"
                       @click="joinAggregateSelected(join, aggregate)"
                     >
@@ -745,13 +745,13 @@ export default {
                 <button
                   class="button tooltip"
                   data-tooltip="Bar chart"
-                  @click.stop="setChartType('BarChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'BarChart',
                     'is-active has-text-interactive-secondary':
                       chartType === 'BarChart'
                   }"
                   :disabled="!hasChartableResults"
+                  @click.stop="setChartType('BarChart')"
                 >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-bar"></font-awesome-icon>
@@ -760,13 +760,13 @@ export default {
                 <button
                   class="button tooltip"
                   data-tooltip="Line chart"
-                  @click.stop="setChartType('LineChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'LineChart',
                     'is-active has-text-interactive-secondary':
                       chartType === 'LineChart'
                   }"
                   :disabled="!hasChartableResults"
+                  @click.stop="setChartType('LineChart')"
                 >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-line"></font-awesome-icon>
@@ -775,13 +775,13 @@ export default {
                 <button
                   class="button tooltip"
                   data-tooltip="Area chart"
-                  @click.stop="setChartType('AreaChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'AreaChart',
                     'is-active has-text-interactive-secondary':
                       chartType === 'AreaChart'
                   }"
                   :disabled="!hasChartableResults"
+                  @click.stop="setChartType('AreaChart')"
                 >
                   <span class="icon is-small">
                     <font-awesome-icon icon="chart-area"></font-awesome-icon>
@@ -790,13 +790,13 @@ export default {
                 <button
                   class="button tooltip"
                   data-tooltip="Scatter chart"
-                  @click.stop="setChartType('ScatterChart')"
                   :class="{
                     'has-text-grey-light': chartType !== 'ScatterChart',
                     'is-active has-text-interactive-secondary':
                       chartType === 'ScatterChart'
                   }"
                   :disabled="!hasChartableResults"
+                  @click.stop="setChartType('ScatterChart')"
                 >
                   <span class="icon is-small">
                     <font-awesome-icon icon="dot-circle"></font-awesome-icon>
@@ -829,7 +829,7 @@ export default {
 
           <!-- results/SQL tab -->
           <div>
-            <div class="notification is-danger" v-if="hasSQLError">
+            <div v-if="hasSQLError" class="notification is-danger">
               <button class="delete" @click="resetErrorMessage"></button>
               <ul>
                 <li v-for="(error, key) in sqlErrorMessage" :key="key">
@@ -844,8 +844,8 @@ export default {
           <!-- New Dashboard Modal -->
           <NewDashboardModal
             v-if="isNewDashboardModalOpen"
-            @close="toggleNewDashboardModal"
             :report="activeReport"
+            @close="toggleNewDashboardModal"
           >
           </NewDashboardModal>
         </div>

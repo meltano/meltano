@@ -8,13 +8,13 @@ export default {
   components: {
     ConnectorLogo
   },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapState('plugins', ['plugins'])
+  },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -51,9 +51,9 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        class="tile is-parent is-3"
         v-for="(loader, index) in plugins.loaders"
         :key="`${loader}-${index}`"
+        class="tile is-parent is-3"
       >
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">

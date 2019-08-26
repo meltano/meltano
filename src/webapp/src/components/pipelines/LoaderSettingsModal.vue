@@ -10,17 +10,6 @@ export default {
     ConnectorLogo,
     ConnectorSettings
   },
-  created() {
-    this.loaderNameFromRoute = this.$route.params.loader
-    this.$store.dispatch(
-      'configuration/getLoaderConfiguration',
-      this.loaderNameFromRoute
-    )
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
-  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
@@ -52,6 +41,17 @@ export default {
         : null
       return targetLoader || {}
     }
+  },
+  created() {
+    this.loaderNameFromRoute = this.$route.params.loader
+    this.$store.dispatch(
+      'configuration/getLoaderConfiguration',
+      this.loaderNameFromRoute
+    )
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
   },
   methods: {
     close() {
@@ -112,7 +112,7 @@ export default {
 
         <ConnectorSettings
           v-if="!isLoadingConfigSettings"
-          fieldClass="is-small"
+          field-class="is-small"
           :config-settings="loaderInFocusConfiguration"
         />
 

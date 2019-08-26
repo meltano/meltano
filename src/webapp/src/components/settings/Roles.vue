@@ -8,6 +8,11 @@ import RolePermissions from './RolePermissions'
 export default {
   name: 'Roles',
 
+  components: {
+    RoleMembers,
+    RolePermissions
+  },
+
   data() {
     return {
       permissions: [
@@ -18,11 +23,6 @@ export default {
         role: null
       }
     }
-  },
-
-  components: {
-    RoleMembers,
-    RolePermissions
   },
 
   beforeRouteEnter(to, from, next) {
@@ -65,10 +65,10 @@ export default {
           <div class="control">
             <input
               v-model="model.role"
-              @keyup.enter="has(model.role) && createRole(model)"
               type="text"
               class="input"
               placeholder="Role name"
+              @keyup.enter="has(model.role) && createRole(model)"
             />
           </div>
           <div class="control">

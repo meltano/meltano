@@ -8,11 +8,11 @@ export default {
   components: {
     ConnectorLogo
   },
-  created() {
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   computed: {
     ...mapState('plugins', ['installedPlugins'])
+  },
+  created() {
+    this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
     udpateExtractorEntities(extractor) {
@@ -42,9 +42,9 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        class="tile is-parent is-3"
         v-for="(extractor, index) in installedPlugins.extractors"
         :key="`${extractor.name}-${index}`"
+        class="tile is-parent is-3"
       >
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
