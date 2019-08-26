@@ -295,50 +295,23 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 
    # view changelog (verify changes made match changes logged)
    changelog view
+
+   # after changelog validation, build the release
+   # if you only need to release a patch, use
+   make type=patch release
+   # otherwise, use
+   make release
+
+   # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+   # occasionally the version bump can go to a version you don't expect.
+   changelog view
+
+   # validate that the tag auto increments based on semver
+   git push --tags
+
+   # update meltano repo with release-next branch
+   git push origin release-next
    ```
-
-<<<<<<< HEAD
-make type=patch release
-
-# after changelog validation, build the release
-
-# if you only need to release a patch, use
-
-make type=patch release
-
-# otherwise, use
-
-make release
-
-# after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-
-# occasionally the version bump can go to a version you don't expect.
-
-changelog view
-
-=======
-
-# after changelog validation, build the release
-
-make release
-
-# after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-
-# occasionally the version bump can go to a version you don't expect.
-
-changelog view
-
-> > > > > > > updated documentation regarding alphabeticial ordering conventions and the linter tools we use
-
-# validate that the tag auto increments based on semver
-
-git push --tags
-
-# update meltano repo with release-next branch
-
-git push origin release-next
-
-````
 
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
@@ -360,7 +333,7 @@ We should be good citizen about these, and use the default workflow to contribut
 1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
 1. For target developement please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
 1. Use a separate repo (meltano/target|tap-x) in GitLab
-e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
 1. Publish PyPI packages of these package (not for now)
 1. We could mirror this repo on GitHub if we want (not for now)
@@ -377,7 +350,7 @@ tap-demo==...
 tap-zendesk==1.3.0
 tap-marketo==...
 ...
-````
+```
 
 Or a list of loaders
 
