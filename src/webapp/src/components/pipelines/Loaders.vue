@@ -2,19 +2,37 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
+import SpeedRunIcon from '@/components/SpeedRunIcon'
 
 export default {
   name: 'Loaders',
   components: {
-    ConnectorLogo
+    ConnectorLogo,
+    SpeedRunIcon
   },
+  data: () => ({
+    speedRunLoader: 'target-sqlite'
+  }),
   created() {
     this.$store.dispatch('plugins/getAllPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
-    ...mapState('plugins', ['plugins'])
+    ...mapState('plugins', ['plugins']),
+    sortedLoaders() {
+      // This is a stop gap until we implement an eventual need for automatic text filtering for cards
+      const currentLoaders = this.plugins.loaders || []
+      let newLoaders = []
+
+      if (currentLoaders.length > 0) {
+        newLoaders = [this.speedRunLoader].concat(
+          currentLoaders.filter(plugin => plugin !== this.speedRunLoader)
+        )
+      }
+
+      return newLoaders
+    }
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -51,11 +69,12 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        class="tile is-parent is-3"
-        v-for="(loader, index) in plugins.loaders"
+        class="tile is-parent is-3 is-relative"
+        v-for="(loader, index) in sortedLoaders"
         :key="`${loader}-${index}`"
       >
         <div class="tile level is-child box">
+          <SpeedRunIcon v-if="loader === speedRunLoader" />
           <div class="image level-item is-64x64 container">
             <ConnectorLogo
               :connector="loader"
