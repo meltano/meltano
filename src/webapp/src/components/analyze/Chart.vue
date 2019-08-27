@@ -1,5 +1,5 @@
 <script>
-import { BarChart, LineChart, AreaChart, ScatterChart } from './charts'
+import { AreaChart, BarChart, LineChart, ScatterChart } from './charts'
 
 export default {
   name: 'Bar',
@@ -9,7 +9,20 @@ export default {
     AreaChart,
     ScatterChart
   },
-  props: ['chartType', 'results', 'resultAggregates']
+  props: {
+    chartType: {
+      type: String,
+      required: true
+    },
+    resultAggregates: {
+      type: Object,
+      required: true
+    },
+    results: {
+      type: Array,
+      required: true
+    }
+  }
 }
 </script>
 

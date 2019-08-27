@@ -1347,10 +1347,12 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             class="control"
           >
             <dropdown-stub
+              buttonclasses=""
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              menuclasses=""
             >
               <div
                 class="dropdown-content"
@@ -1406,11 +1408,13 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           class="control"
         >
           <dropdown-stub
+            buttonclasses=""
             disabled="true"
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            menuclasses=""
           >
             <div
               class="dropdown-content"
@@ -1467,6 +1471,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                menuclasses=""
               >
                 <div
                   class="dropdown-content"
@@ -1771,10 +1776,12 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             class="control"
           >
             <dropdown-stub
+              buttonclasses=""
               iconclose="caret-up"
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              menuclasses=""
             >
               <div
                 class="dropdown-content"
@@ -1830,10 +1837,12 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           class="control"
         >
           <dropdown-stub
+            buttonclasses=""
             iconclose="caret-up"
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            menuclasses=""
           >
             <div
               class="dropdown-content"
@@ -1900,6 +1909,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                menuclasses=""
               >
                 <div
                   class="dropdown-content"

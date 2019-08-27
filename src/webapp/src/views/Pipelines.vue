@@ -89,7 +89,7 @@ export default {
     </div>
 
     <div class="container view-body">
-      <div class="steps steps-pipelines is-small" id="steps-data-setup">
+      <div id="steps-data-setup" class="steps steps-pipelines is-small">
         <div
           class="step-item is-completed"
           :class="{ 'is-active': getIsActiveStep('extractors') }"

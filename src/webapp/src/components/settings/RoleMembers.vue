@@ -4,7 +4,20 @@ import Pill from './Pill'
 
 export default {
   name: 'RoleMember',
-  props: ['users', 'roles'],
+
+  components: {
+    'role-pill': Pill
+  },
+  props: {
+    roles: {
+      type: Array,
+      default: () => []
+    },
+    users: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       model: {
@@ -18,10 +31,6 @@ export default {
     enabled() {
       return !(_.isEmpty(this.model.role) || _.isEmpty(this.model.user))
     }
-  },
-
-  components: {
-    'role-pill': Pill
   }
 }
 </script>
@@ -43,9 +52,9 @@ export default {
               <div class="field is-grouped is-grouped-multiline">
                 <role-pill
                   v-for="role in user.roles"
-                  @delete="$emit('remove', { role, user: user.username })"
                   :key="role"
                   :name="role"
+                  @delete="$emit('remove', { role, user: user.username })"
                 />
               </div>
             </td>
@@ -76,8 +85,8 @@ export default {
       <div class="control">
         <button
           class="button is-primary"
-          @click="$emit('add', model)"
           :disabled="!enabled"
+          @click="$emit('add', model)"
         >
           Assign
         </button>

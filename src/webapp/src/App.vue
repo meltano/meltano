@@ -8,11 +8,11 @@ export default {
   components: {
     MainNav
   },
-  created() {
-    this.autoInstallAirflowCheck()
-  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin'])
+  },
+  created() {
+    this.autoInstallAirflowCheck()
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),

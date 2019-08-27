@@ -10,17 +10,6 @@ export default {
     ConnectorLogo,
     ConnectorSettings
   },
-  created() {
-    this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store.dispatch(
-      'configuration/getExtractorConfiguration',
-      this.extractorNameFromRoute
-    )
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
-  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
@@ -67,6 +56,17 @@ export default {
       )
       return !this.isInstalling && this.isInstalled && isValid
     }
+  },
+  created() {
+    this.extractorNameFromRoute = this.$route.params.extractor
+    this.$store.dispatch(
+      'configuration/getExtractorConfiguration',
+      this.extractorNameFromRoute
+    )
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
   },
   methods: {
     close() {
@@ -125,7 +125,7 @@ export default {
 
         <ConnectorSettings
           v-if="!isLoadingConfigSettings && !extractorLacksConfigSettings"
-          fieldClass="is-small"
+          field-class="is-small"
           :config-settings="extractorInFocusConfiguration"
         />
 

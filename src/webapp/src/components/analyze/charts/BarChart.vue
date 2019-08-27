@@ -12,7 +12,7 @@ export default {
 </script>
 
 <template>
-  <canvas ref="chart" height="200" v-show="results.length"></canvas>
+  <canvas v-show="results.length" ref="chart" height="200"></canvas>
 </template>
 
 <style lang="scss"></style>

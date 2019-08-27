@@ -1,13 +1,16 @@
 <script>
 export default {
   name: 'ClosableMessage',
+  props: {
+    title: {
+      type: String,
+      required: true
+    }
+  },
   data() {
     return {
       isShowNote: true
     }
-  },
-  props: {
-    title: String
   },
   methods: {
     closeNote() {

@@ -3,8 +3,20 @@ import utils from '@/utils/utils'
 
 export default {
   name: 'DocsLink',
-  props: ['page', 'fragment', 'target'],
-
+  props: {
+    fragment: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: String,
+      default: ''
+    },
+    target: {
+      type: String,
+      default: ''
+    }
+  },
   data() {
     return {
       linkPage: `/${this.page}`,

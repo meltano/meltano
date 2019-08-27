@@ -4,7 +4,19 @@ import Pill from './Pill'
 
 export default {
   name: 'RolePermissions',
-  props: ['permission', 'roles'],
+  components: {
+    'context-pill': Pill
+  },
+  props: {
+    permission: {
+      type: Object,
+      required: true
+    },
+    roles: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
       model: {
@@ -13,10 +25,6 @@ export default {
         context: null
       }
     }
-  },
-
-  components: {
-    'context-pill': Pill
   },
 
   computed: {
@@ -91,7 +99,7 @@ export default {
         />
       </div>
       <div class="control">
-        <button @click="add" class="button is-primary" :disabled="!enabled">
+        <button class="button is-primary" :disabled="!enabled" @click="add">
           Add
         </button>
       </div>

@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
@@ -9,17 +9,6 @@ export default {
   components: {
     ConnectorLogo,
     ConnectorSettings
-  },
-  created() {
-    this.loaderNameFromRoute = this.$route.params.loader
-    this.$store.dispatch(
-      'configuration/getLoaderConfiguration',
-      this.loaderNameFromRoute
-    )
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
-  beforeDestroy() {
-    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
   },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
@@ -52,6 +41,17 @@ export default {
         : null
       return targetLoader || {}
     }
+  },
+  created() {
+    this.loaderNameFromRoute = this.$route.params.loader
+    this.$store.dispatch(
+      'configuration/getLoaderConfiguration',
+      this.loaderNameFromRoute
+    )
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
+  beforeDestroy() {
+    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
   },
   methods: {
     close() {
@@ -112,7 +112,7 @@ export default {
 
         <ConnectorSettings
           v-if="!isLoadingConfigSettings"
-          fieldClass="is-small"
+          field-class="is-small"
           :config-settings="loaderInFocusConfiguration"
         />
 

@@ -196,14 +196,14 @@ export default {
           <td>
             <p class="control is-expanded">
               <input
+                v-model="addFilterModel.value"
                 class="input is-small"
                 :disabled="
                   getIsExpressionNullRelated(addFilterModel.expression)
                 "
                 :type="getFilterInputType(addFilterModel.attributeHelper.type)"
-                @focus="$event.target.select()"
-                v-model="addFilterModel.value"
                 placeholder="Filter value"
+                @focus="$event.target.select()"
               />
             </p>
           </td>
@@ -254,16 +254,16 @@ export default {
             <td>
               <p class="control has-icons-right is-expanded">
                 <input
+                  v-model="filter.value"
                   class="input is-small"
                   :class="{ 'is-danger': !getIsFilterValid(filter) }"
                   :disabled="getIsExpressionNullRelated(filter.expression)"
                   :type="getFilterInputType(filter.filterType)"
-                  @focus="$event.target.select()"
-                  @input="onChangeFilterValue(filter)"
-                  v-model="filter.value"
                   :placeholder="
                     getIsFilterValid(filter) ? 'Filter value' : 'Invalid value'
                   "
+                  @focus="$event.target.select()"
+                  @input="onChangeFilterValue(filter)"
                 />
                 <span class="icon is-small is-right">
                   <font-awesome-icon
