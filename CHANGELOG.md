@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.39.0 - (2019-08-26)
 
 ---
 
@@ -24,10 +37,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#910](https://gitlab.com/meltano/meltano/issues/910) Update linting rules to enforce better standards for the frontend code base
 - [#885](https://gitlab.com/meltano/meltano/issues/885) Add docs for all extractors and loaders
 - [#885](https://gitlab.com/meltano/meltano/issues/885) All plugin modal cards show docs text if they have docs
+- [#733](https://gitlab.com/meltano/meltano/issues/733) Improve error feedback to be more specific when plugin installation errors occur
 
 ### Fixes
 
-### Breaks
+- [#923](https://gitlab.com/meltano/meltano/issues/923) Fix contributing release docs merge conflict issue
+
 
 ## 0.38.0 - (2019-08-21)
 
@@ -48,6 +63,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
 - [#900](https://gitlab.com/meltano/meltano/issues/900) Fix fallback value for Iso8601 dates/times
 - [#903](https://gitlab.com/meltano/meltano/issues/903) Fix columns display issue for the base table in Analyze
+
+### Breaks
 
 ## 0.37.2 - (2019-08-19)
 

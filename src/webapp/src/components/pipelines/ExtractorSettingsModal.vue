@@ -15,12 +15,14 @@ export default {
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
-    extractorLacksConfigSettingsAndIsInstalled() {
+    extractorLacksConfigSettings() {
       return (
-        !this.isInstalling &&
         this.extractorInFocusConfiguration.settings &&
         this.extractorInFocusConfiguration.settings.length === 0
       )
+    },
+    extractorLacksConfigSettingsAndIsInstalled() {
+      return !this.isInstalling && this.extractorLacksConfigSettings
     },
     extractor() {
       const targetExtractor = this.installedPlugins.extractors
@@ -122,7 +124,7 @@ export default {
         </template>
 
         <ConnectorSettings
-          v-if="!isLoadingConfigSettings"
+          v-if="!isLoadingConfigSettings && !extractorLacksConfigSettings"
           field-class="is-small"
           :config-settings="extractorInFocusConfiguration"
         />
