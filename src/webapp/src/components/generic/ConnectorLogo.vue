@@ -3,14 +3,14 @@ import utils from '@/utils/utils'
 
 export default {
   name: 'ConnectorLogo',
+  props: {
+    connector: { type: String, required: true, default: '' },
+    isGrayscale: { type: Boolean, default: false }
+  },
   computed: {
     connectorLogoUrl() {
       return utils.getConnectorLogoUrl(this.connector)
     }
-  },
-  props: {
-    connector: { type: String, required: true, default: '' },
-    isGrayscale: { type: Boolean, default: false }
   }
 }
 </script>

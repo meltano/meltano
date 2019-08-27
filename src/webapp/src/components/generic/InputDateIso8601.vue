@@ -5,8 +5,8 @@ export default {
   name: 'InputDateIso8601',
   props: {
     value: { type: String, default: '' },
-    name: { type: String, required: true, default: '' },
-    inputClasses: { type: String }
+    name: { type: String, default: '' },
+    inputClasses: { type: String, default: '' }
   },
   computed: {
     getInputDateMeta() {
@@ -27,16 +27,16 @@ export default {
 <template>
   <div class="control">
     <input
+      :id="`date-${name}`"
       type="date"
       class="input"
       :class="inputClasses"
-      @input="updateValue($event.target.value)"
       :value="formatDateStringYYYYMMDD(value)"
-      :id="`date-${name}`"
       :name="`date-${name}`"
       :pattern="getInputDateMeta.pattern"
       :min="getInputDateMeta.min"
       :max="getInputDateMeta.today"
+      @input="updateValue($event.target.value)"
     />
   </div>
 </template>

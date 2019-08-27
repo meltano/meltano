@@ -3,6 +3,12 @@ import Vue from 'vue'
 
 export default {
   name: 'NewDashboardModal',
+  props: {
+    report: {
+      type: Object,
+      required: true
+    }
+  },
   data() {
     return {
       saveDashboardSettings: { name: null, description: null }
@@ -36,9 +42,6 @@ export default {
           Vue.toasted.global.error(error.response.data.code)
         })
     }
-  },
-  props: {
-    report: Object
   }
 }
 </script>
@@ -57,10 +60,10 @@ export default {
             <label class="label">Name</label>
             <div class="control">
               <input
+                v-model="saveDashboardSettings.name"
                 class="input"
                 type="text"
                 placeholder="Name your dashboard"
-                v-model="saveDashboardSettings.name"
               />
             </div>
           </div>
@@ -68,9 +71,9 @@ export default {
             <label class="label">Description</label>
             <div class="control">
               <textarea
+                v-model="saveDashboardSettings.description"
                 class="textarea"
                 placeholder="Describe your dashboard for easier reference later"
-                v-model="saveDashboardSettings.description"
               ></textarea>
             </div>
           </div>

@@ -3,35 +3,21 @@ import hyphenate from '@/filters/hyphenate'
 
 export default {
   name: 'Dropdown',
-  created() {
-    document.addEventListener('click', this.onDocumentClick)
-  },
-  beforeDestroy() {
-    document.removeEventListener('click', this.onDocumentClick)
-  },
-  data() {
-    return {
-      isOpen: false,
-      lastDropdownOpen: null
-    }
-  },
-  computed: {
-    getHyphenatedLabel() {
-      return hyphenate(this.label, 'dropdown')
-    }
-  },
   filters: {
     hyphenate
   },
   props: {
     label: {
-      type: String
+      type: String,
+      default: ''
     },
     buttonClasses: {
-      type: String
+      type: String,
+      default: ''
     },
     menuClasses: {
-      type: String
+      type: String,
+      default: ''
     },
     iconOpen: {
       type: String,
@@ -50,14 +36,34 @@ export default {
       default: false
     },
     isFullWidth: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     isRightAligned: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     isUp: {
-      type: Boolean
+      type: Boolean,
+      default: false
     }
+  },
+  data() {
+    return {
+      isOpen: false,
+      lastDropdownOpen: null
+    }
+  },
+  computed: {
+    getHyphenatedLabel() {
+      return hyphenate(this.label, 'dropdown')
+    }
+  },
+  created() {
+    document.addEventListener('click', this.onDocumentClick)
+  },
+  beforeDestroy() {
+    document.removeEventListener('click', this.onDocumentClick)
   },
   methods: {
     close() {
@@ -114,9 +120,9 @@ export default {
       </button>
     </div>
     <div
+      :id="getHyphenatedLabel"
       class="dropdown-menu"
       :class="menuClasses"
-      :id="getHyphenatedLabel"
       role="menu"
     >
       <slot></slot>

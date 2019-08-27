@@ -10,13 +10,6 @@ export default {
   components: {
     Logo
   },
-  watch: {
-    $route() {
-      if (this.isMobileMenuOpen) {
-        this.closeMobileMenu()
-      }
-    }
-  },
   data() {
     return {
       isMobileMenuOpen: false
@@ -26,6 +19,13 @@ export default {
     ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
+    }
+  },
+  watch: {
+    $route() {
+      if (this.isMobileMenuOpen) {
+        this.closeMobileMenu()
+      }
     }
   },
   methods: {

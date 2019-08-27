@@ -17,27 +17,6 @@ export default {
     InputDateIso8601,
     ScheduleTableHead
   },
-  created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
-  },
-  mounted() {
-    this.$refs.name.focus()
-  },
-  computed: {
-    ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
-    ...mapState('plugins', ['installedPlugins']),
-    getFormattedDateStringYYYYMMDD() {
-      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
-    },
-    getInputDateMeta() {
-      return utils.getInputDateMeta()
-    },
-    isSaveable() {
-      const hasOwns = []
-      _.forOwn(this.pipeline, val => hasOwns.push(val))
-      return hasOwns.find(val => val === '') === undefined
-    }
-  },
   data() {
     return {
       hasCatchupDate: false,
@@ -61,6 +40,27 @@ export default {
       },
       transformOptions: ['skip', 'run', 'only']
     }
+  },
+  computed: {
+    ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
+    ...mapState('plugins', ['installedPlugins']),
+    getFormattedDateStringYYYYMMDD() {
+      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
+    },
+    getInputDateMeta() {
+      return utils.getInputDateMeta()
+    },
+    isSaveable() {
+      const hasOwns = []
+      _.forOwn(this.pipeline, val => hasOwns.push(val))
+      return hasOwns.find(val => val === '') === undefined
+    }
+  },
+  created() {
+    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
+  },
+  mounted() {
+    this.$refs.name.focus()
   },
   methods: {
     close() {
@@ -129,15 +129,15 @@ export default {
               <td>
                 <div class="control is-expanded">
                   <input
+                    ref="name"
+                    v-model="pipeline.name"
                     class="input"
                     :class="{
                       'is-success has-text-success': pipeline.name
                     }"
                     type="text"
-                    ref="name"
-                    @focus="$event.target.select()"
-                    v-model="pipeline.name"
                     placeholder="Name"
+                    @focus="$event.target.select()"
                   />
                 </div>
               </td>
@@ -151,8 +151,8 @@ export default {
                     }"
                   >
                     <select
-                      :class="{ 'has-text-success': pipeline.extractor }"
                       v-model="pipeline.extractor"
+                      :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
                     >
                       <option
@@ -174,8 +174,8 @@ export default {
                     }"
                   >
                     <select
-                      :class="{ 'has-text-success': pipeline.loader }"
                       v-model="pipeline.loader"
+                      :class="{ 'has-text-success': pipeline.loader }"
                       :disabled="!getHasInstalledPluginsOfType('loaders')"
                     >
                       <option
@@ -197,8 +197,8 @@ export default {
                     }"
                   >
                     <select
-                      :class="{ 'has-text-success': pipeline.transform }"
                       v-model="pipeline.transform"
+                      :class="{ 'has-text-success': pipeline.transform }"
                     >
                       <option
                         v-for="transform in transformOptions"
@@ -219,8 +219,8 @@ export default {
                     }"
                   >
                     <select
-                      :class="{ 'has-text-success': pipeline.interval }"
                       v-model="pipeline.interval"
+                      :class="{ 'has-text-success': pipeline.interval }"
                     >
                       <option
                         v-for="interval in intervalOptions"

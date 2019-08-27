@@ -3,15 +3,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   assetsDir: 'static',
-  devServer: {
-    proxy: {
-      '^/api': {
-        target: 'http://localhost:5000',
-        ws: true,
-        changeOrigin: true
-      }
-    }
-  },
   configureWebpack: {
     plugins: [
       new webpack.ProvidePlugin({
@@ -23,9 +14,18 @@ module.exports = {
       }),
       new HtmlWebpackPlugin({
         filename: 'public/index.html',
-        template: 'public/index.html',
-        injectFlaskContext: false
+        injectFlaskContext: false,
+        template: 'public/index.html'
       })
     ]
+  },
+  devServer: {
+    proxy: {
+      '^/api': {
+        changeOrigin: true,
+        target: 'http://localhost:5000',
+        ws: true
+      }
+    }
   }
 }

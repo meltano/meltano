@@ -13,10 +13,6 @@ export default {
   data: () => ({
     speedRunLoader: 'target-sqlite'
   }),
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   computed: {
     ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapState('plugins', ['plugins']),
@@ -33,6 +29,10 @@ export default {
 
       return newLoaders
     }
+  },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
@@ -69,9 +69,9 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        class="tile is-parent is-3 is-relative"
         v-for="(loader, index) in sortedLoaders"
         :key="`${loader}-${index}`"
+        class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">
           <SpeedRunIcon v-if="loader === speedRunLoader" />

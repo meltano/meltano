@@ -3,9 +3,9 @@ import {
   faAngleDown,
   faAngleUp,
   faArrowDown,
-  faArrowsAltV,
   faArrowRight,
   faArrowUp,
+  faArrowsAltV,
   faBolt,
   faCaretDown,
   faCaretUp,
@@ -22,11 +22,11 @@ import {
   faGlobeAmericas,
   faHashtag,
   faInfoCircle,
-  faTable,
   faSearch,
   faSort,
   faSortAmountDown,
   faSortAmountUp,
+  faTable,
   faUser
 } from '@fortawesome/free-solid-svg-icons'
 import {

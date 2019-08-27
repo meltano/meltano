@@ -1,7 +1,12 @@
 <script>
 export default {
   name: 'Pill',
-  props: ['user', 'name']
+  props: {
+    name: {
+      type: String,
+      required: true
+    }
+  }
 }
 </script>
 
