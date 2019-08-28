@@ -94,7 +94,7 @@ export default {
                 </div>
                 <div class="column">
                   <a
-                    class="button is-interactive-primary is-small is-block"
+                    class="button is-interactive-primary is-outlined is-small is-block"
                     @click="updateExtractorEntitySelection(extractor)"
                     >Select</a
                   >
