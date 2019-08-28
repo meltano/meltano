@@ -29,6 +29,10 @@ export default {
           routeMatches: ['loaders', 'loaderSettings']
         },
         {
+          name: 'transforms',
+          routeMatches: ['transforms']
+        },
+        {
           name: 'schedules',
           subView: 'createSchedule',
           routeMatches: ['schedules', 'createSchedule']
@@ -55,9 +59,12 @@ export default {
     getIsStepLoadersMinimallyValidated() {
       return this.getIsStepEntitiesMinimallyValidated
     },
+    getIsStepTransformsMinimallyValidated() {
+      return this.getIsStepLoadersMinimallyValidated
+    },
     getIsStepScheduleMinimallyValidated() {
       return (
-        this.getIsStepLoadersMinimallyValidated &&
+        this.getIsStepTransformsMinimallyValidated &&
         this.installedPlugins.loaders &&
         this.installedPlugins.loaders.length > 0
       )
@@ -149,11 +156,31 @@ export default {
         <div
           class="step-item"
           :class="{
+            'is-active': getIsActiveStep('transforms'),
+            'is-completed': getIsStepTransformsMinimallyValidated
+          }"
+        >
+          <div class="step-marker">4</div>
+          <div class="step-details">
+            <button
+              class="step-title button is-interactive-navigation"
+              :class="{ 'is-active': getIsActiveStep('transforms') }"
+              :disabled="!getIsStepTransformsMinimallyValidated"
+              @click="setStep('transforms')"
+            >
+              Transform
+            </button>
+            <p>Transform Loaded Data</p>
+          </div>
+        </div>
+        <div
+          class="step-item"
+          :class="{
             'is-active': getIsActiveStep('schedule'),
             'is-completed': getIsStepScheduleMinimallyValidated
           }"
         >
-          <div class="step-marker">4</div>
+          <div class="step-marker">5</div>
           <div class="step-details">
             <button
               class="step-title button is-interactive-navigation is-outlined"
