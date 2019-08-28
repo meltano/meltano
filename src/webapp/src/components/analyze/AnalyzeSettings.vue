@@ -108,12 +108,12 @@ export default {
             <div class="level-right">
               <div class="level-item content is-small is-flex-column">
                 <p class="is-uppercase has-text-weight-bold">
-                  {{ connection }}
+                  {{ pluginConnection }}
                 </p>
                 <div class="buttons are-small">
                   <a
                     class="button is-interactive-primary flex-grow-1"
-                    @click="configureConnection(connection)"
+                    @click="configureConnection(pluginConnection)"
                     >Configure</a
                   >
                 </div>
