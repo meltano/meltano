@@ -31,6 +31,9 @@ export default {
         this.updateExtractorSettings(extractor)
       })
     },
+    updateExtractorEntitySelection(extractor) {
+      this.$router.push({ name: 'extractorEntities', params: { extractor } })
+    },
     updateExtractorSettings(extractor) {
       this.$router.push({ name: 'extractorSettings', params: { extractor } })
     }
@@ -81,17 +84,21 @@ export default {
             </p>
 
             <template v-if="getIsPluginInstalled('extractors', extractor)">
-              <div class="buttons are-small">
-                <a
-                  class="button is-interactive-primary flex-grow-1"
-                  @click="updateExtractorSettings(extractor)"
-                  >Configure</a
-                >
-                <a
-                  class="button tooltip is-tooltip-warning is-tooltip-multiline"
-                  data-tooltip="This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues."
-                  >Uninstall</a
-                >
+              <div class="columns is-variable is-1">
+                <div class="column">
+                  <a
+                    class="button is-interactive-primary is-small is-block"
+                    @click="updateExtractorSettings(extractor)"
+                    >Configure</a
+                  >
+                </div>
+                <div class="column">
+                  <a
+                    class="button is-interactive-primary is-small is-block"
+                    @click="updateExtractorEntitySelection(extractor)"
+                    >Select</a
+                  >
+                </div>
               </div>
             </template>
             <template v-else>
