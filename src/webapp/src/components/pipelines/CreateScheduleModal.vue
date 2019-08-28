@@ -37,11 +37,11 @@ export default {
         interval: '',
         startDate: null,
         isRunning: false
-      },
-      transformOptions: ['skip', 'run', 'only']
+      }
     }
   },
   computed: {
+    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getFormattedDateStringYYYYMMDD() {
@@ -73,14 +73,17 @@ export default {
     prefillForm() {
       // TODO implement an intelligent prefill approach
       this.pipeline.name = `pipeline-${new Date().getTime()}`
+      const defaultExtractor = this.recentELTSelections.extractor || this.installedPlugins.extractors[0]
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
-        ? this.installedPlugins.extractors[0].name
+        ? defaultExtractor.name
         : ''
+      const defaultLoader = this.recentELTSelections.loader || this.installedPlugins.loaders[0]
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
-        ? this.installedPlugins.loaders[0].name
+        ? defaultLoader.name
         : ''
+      const defaultTransform = this.recentELTSelections.transform || this.transformOptions[0]
       this.pipeline.transform = !_.isEmpty(this.transformOptions)
-        ? this.transformOptions[0]
+        ? defaultTransform.name
         : ''
       this.pipeline.interval = !_.isEmpty(this.intervalOptions)
         ? this.intervalOptions[0]
@@ -202,8 +205,8 @@ export default {
                     >
                       <option
                         v-for="transform in transformOptions"
-                        :key="transform"
-                        >{{ transform }}</option
+                        :key="transform.name"
+                        >{{ transform.name }}</option
                       >
                     </select>
                   </span>

@@ -11,9 +11,10 @@ import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModa
 import Loaders from '@/components/pipelines/Loaders'
 import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
+import Transforms from '@/components/pipelines/Transforms'
 
-import Dashboards from '@/views/Dashboards'
 import Analyze from '@/views/Analyze'
+import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
@@ -98,6 +99,16 @@ const router = new Router({
           },
           meta: {
             isModal: true
+          }
+        },
+        {
+          path: 'transforms',
+          name: 'transforms',
+          components: {
+            default: Transforms
+          },
+          meta: {
+            isModal: false
           }
         },
         {
