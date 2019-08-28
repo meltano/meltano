@@ -118,6 +118,10 @@ When you run `meltano ui` you will be prompted to view the Meltano UI at http://
 Instead, use the IP address of your DigitalOcean Droplet and port 5000. This will be something like: http://157.230.231.206:5000
 :::
 
+#### Doing More with Droplets
+
+You can also install PostgreSQL to your DigitalOcean Droplet, and then use that database when you configure the Postgres target. DigitalOcean [provides installation instructions here](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-ubuntu-18-04).
+
 ## Amazon Web Services (AWS)
 
 ::: warning Prerequisites
