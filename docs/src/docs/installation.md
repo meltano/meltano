@@ -80,7 +80,7 @@ source ~/virtualenvs/meltano/bin/activate
 %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
-## Installing Meltano Locally
+## Installing Meltano
 
 Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
 
