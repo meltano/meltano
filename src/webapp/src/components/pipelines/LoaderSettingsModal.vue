@@ -69,6 +69,10 @@ export default {
           config: this.loaderInFocusConfiguration.config
         })
         .then(() => {
+          this.$store.dispatch('configuration/updateRecentELTSelections', {
+            type: 'loader',
+            value: this.loader
+          })
           this.$router.push({ name: 'transforms' })
           Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
         })

@@ -84,6 +84,10 @@ export default {
           config: this.extractorInFocusConfiguration.config
         })
         .then(() => {
+          this.$store.dispatch('configuration/updateRecentELTSelections', {
+            type: 'extractor',
+            value: this.extractor
+          })
           this.$router.push({
             name: 'extractorEntities',
             params: { extractor: this.extractor.name }
