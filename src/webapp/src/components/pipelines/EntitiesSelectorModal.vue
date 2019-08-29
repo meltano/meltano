@@ -84,9 +84,7 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${
-          this.getSelectedEntityCount
-        } entities selected`
+        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
       }
       return summary
     }
@@ -115,7 +113,7 @@ export default {
       if (this.prevRoute) {
         this.$router.go(-1)
       } else {
-        this.$router.push({ name: 'entities' })
+        this.$router.push({ name: 'extractors' })
       }
     },
     entityAttributeSelected(payload) {

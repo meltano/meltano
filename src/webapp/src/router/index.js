@@ -5,15 +5,15 @@ import AnalyzeSettings from '@/components/analyze/AnalyzeSettings'
 import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
 import Design from '@/components/analyze/Design'
 import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal'
-import Entities from '@/components/pipelines/Entities'
 import Extractors from '@/components/pipelines/Extractors'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
 import Loaders from '@/components/pipelines/Loaders'
 import LoaderSettingsModal from '@/components/pipelines/LoaderSettingsModal'
 import PipelineSchedules from '@/components/pipelines/PipelineSchedules'
+import Transforms from '@/components/pipelines/Transforms'
 
-import Dashboards from '@/views/Dashboards'
 import Analyze from '@/views/Analyze'
+import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
@@ -48,7 +48,7 @@ const router = new Router({
           }
         },
         {
-          path: 'extractors/:extractor',
+          path: 'extractors/:extractor/configure',
           name: 'extractorSettings',
           components: {
             default: Extractors,
@@ -59,20 +59,10 @@ const router = new Router({
           }
         },
         {
-          path: 'entities',
-          name: 'entities',
-          components: {
-            default: Entities
-          },
-          meta: {
-            isModal: false
-          }
-        },
-        {
-          path: 'entities/:extractor',
+          path: 'extractors/:extractor/select',
           name: 'extractorEntities',
           components: {
-            default: Entities,
+            default: Extractors,
             extractorEntities: EntitiesSelectorModal
           },
           meta: {
@@ -98,6 +88,16 @@ const router = new Router({
           },
           meta: {
             isModal: true
+          }
+        },
+        {
+          path: 'transforms',
+          name: 'transforms',
+          components: {
+            default: Transforms
+          },
+          meta: {
+            isModal: false
           }
         },
         {

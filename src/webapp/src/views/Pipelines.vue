@@ -15,22 +15,18 @@ export default {
       steps: [
         {
           name: 'extractors',
-          subView: 'extractorSettings',
-          routeMatches: ['extractors', 'extractorSettings']
-        },
-        {
-          name: 'entities',
-          subView: 'extractorEntities',
-          routeMatches: ['entities', 'extractorEntities']
+          routeMatches: ['extractors', 'extractorSettings', 'extractorEntities']
         },
         {
           name: 'loaders',
-          subView: 'loaderSettings',
           routeMatches: ['loaders', 'loaderSettings']
         },
         {
+          name: 'transforms',
+          routeMatches: ['transforms']
+        },
+        {
           name: 'schedules',
-          subView: 'createSchedule',
           routeMatches: ['schedules', 'createSchedule']
         }
       ]
@@ -46,24 +42,27 @@ export default {
     getIsActiveStep() {
       return stepName => this.currentStep.name === stepName
     },
-    getIsStepEntitiesMinimallyValidated() {
+    getIsStepExtractorsMinimallyValidated() {
       return (
         this.installedPlugins.extractors &&
         this.installedPlugins.extractors.length > 0
       )
     },
     getIsStepLoadersMinimallyValidated() {
-      return this.getIsStepEntitiesMinimallyValidated
+      return this.getIsStepExtractorsMinimallyValidated
+    },
+    getIsStepTransformsMinimallyValidated() {
+      return this.getIsStepLoadersMinimallyValidated
     },
     getIsStepScheduleMinimallyValidated() {
       return (
-        this.getIsStepLoadersMinimallyValidated &&
+        this.getIsStepTransformsMinimallyValidated &&
         this.installedPlugins.loaders &&
         this.installedPlugins.loaders.length > 0
       )
     },
     getModalName() {
-      return this.currentStep.subView
+      return this.$route.name
     },
     isModal() {
       return this.$route.meta.isModal
@@ -109,31 +108,11 @@ export default {
         <div
           class="step-item"
           :class="{
-            'is-active': getIsActiveStep('entities'),
-            'is-completed': getIsStepEntitiesMinimallyValidated
-          }"
-        >
-          <div class="step-marker">2</div>
-          <div class="step-details">
-            <button
-              class="step-title button is-interactive-navigation"
-              :class="{ 'is-active': getIsActiveStep('entities') }"
-              :disabled="!getIsStepEntitiesMinimallyValidated"
-              @click="setStep('entities')"
-            >
-              Select
-            </button>
-            <p>Select Specific Data</p>
-          </div>
-        </div>
-        <div
-          class="step-item"
-          :class="{
             'is-active': getIsActiveStep('loaders'),
             'is-completed': getIsStepLoadersMinimallyValidated
           }"
         >
-          <div class="step-marker">3</div>
+          <div class="step-marker">2</div>
           <div class="step-details">
             <button
               class="step-title button is-interactive-navigation"
@@ -144,6 +123,26 @@ export default {
               Load
             </button>
             <p>Store Selected Data</p>
+          </div>
+        </div>
+        <div
+          class="step-item"
+          :class="{
+            'is-active': getIsActiveStep('transforms'),
+            'is-completed': getIsStepTransformsMinimallyValidated
+          }"
+        >
+          <div class="step-marker">3</div>
+          <div class="step-details">
+            <button
+              class="step-title button is-interactive-navigation"
+              :class="{ 'is-active': getIsActiveStep('transforms') }"
+              :disabled="!getIsStepTransformsMinimallyValidated"
+              @click="setStep('transforms')"
+            >
+              Transform
+            </button>
+            <p>Transform Loaded Data</p>
           </div>
         </div>
         <div
