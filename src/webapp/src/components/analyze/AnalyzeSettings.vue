@@ -19,7 +19,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsInstallingPlugin', 'getIsPluginInstalled']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['connectionInFocusConfiguration']),
     ...mapState('plugins', ['plugins', 'installedPlugins']),
