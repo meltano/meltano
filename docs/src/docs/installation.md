@@ -1,6 +1,6 @@
 # Installation
 
-In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/tutorial.html#using-docker).
+In this section, we will install Meltano as an application you can access from your browser and command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
 
 ::: warning
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
@@ -37,7 +37,7 @@ pip install --upgrade pip
 ```
 
 ::: tip
-If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ *and* 3+ installed.
+If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ _and_ 3+ installed.
 :::
 
 ### Virtual Environment
@@ -53,8 +53,9 @@ Your local environment may use a different version of Python or other dependenci
 #### Recommened Virtual Environment Setup
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
-  - **Linux, OSX**:  `~/virtualenvs`
-  - **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
+
+- **Linux, OSX**: `~/virtualenvs`
+- **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
 
 Then create a new virtual environment inside that directory:
 
@@ -99,7 +100,7 @@ That's it! Meltano is now be available for you to use. Now we can [create a Melt
 ::: tip
 Once a virtual environment is activated, it stays active until the current shell is closed.
 
-You must re-activate the virtual environment before interacting with Meltano. 
+You must re-activate the virtual environment before interacting with Meltano.
 To streamline this process, you can add the `meltano` executable directly in your `PATH`.
 
 ```bash
@@ -109,6 +110,7 @@ export PATH=$PATH:$HOME/virtualenvs/meltano/bin/meltano
 # Windows
 setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
 ```
+
 :::
 
 ### Installing on Docker
@@ -155,17 +157,19 @@ docker run -v $(pwd):/project \
              -p 5000:5000 \
              meltano/meltano
 ```
+
 You can now visit [http://localhost:5000](http://localhost:5000) to access the Meltano UI.
 
-If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point. 
+If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point.
 
 Follow the steps in our [Quickstart Guide](./quickstart.html) to get started.
 
-#### For Contributors: Example Command Line Syntax for Docker ###
+#### For Contributors: Example Command Line Syntax for Docker
 
- Here are some example of CLI commands you may need to run if you are working with Meltano as an open source contributor:
+Here are some example of CLI commands you may need to run if you are working with Meltano as an open source contributor:
 
 ##### Running the ELT from the Command Line
+
 To run the ELT and extract some data from the **tap-carbon-intensity** into **target-sqlite**:
 
 ```
@@ -211,50 +215,54 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 
 ![](/screenshots/aws-ecs.png)
 
-
 ![](/screenshots/aws-ecs-getting-started.png)
 
 1. We will create a new _Container definition_ by clicking on the `Configure` button in the **custom** card
 1. Fill out the form with the following data:
-  - **Container name**: Meltano
-  - **Image**: YOUR_DOCKER_IMAGE_URL
-    - Examples:
-      - docker.io/namespace/image-name:tag
-      - registry.gitlab.com/namespace/project/image-name:tag
-  - **Memory Limits (MiB)**: Soft limit 1024
-  - **Port mappings**: 
-    - 5000/tcp (meltano)
-    - 5010/tcp (airflow)
+
+- **Container name**: Meltano
+- **Image**: YOUR_DOCKER_IMAGE_URL
+  - Examples:
+    - docker.io/namespace/image-name:tag
+    - registry.gitlab.com/namespace/project/image-name:tag
+- **Memory Limits (MiB)**: Soft limit 1024
+- **Port mappings**:
+  - 5000/tcp (meltano)
+  - 5010/tcp (airflow)
 
 1. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the _Task defintion_ heading
 1. Update the form with the following:
-  - **Task definition name**: meltano-run
-  - **Network mode**: awsvpc
-  - **Task execution role**: ecsTaskExecutionRole
-  - **Compatibilities**: FARGATE
-  - **Task memory**: 1GB (1024)
-  - **Task CPU**: 0.25 vCPU (256)
+
+- **Task definition name**: meltano-run
+- **Network mode**: awsvpc
+- **Task execution role**: ecsTaskExecutionRole
+- **Compatibilities**: FARGATE
+- **Task memory**: 1GB (1024)
+- **Task CPU**: 0.25 vCPU (256)
+
 1. Click `Next` to move to the next step
 
-#### Review service properties 
+#### Review service properties
 
 ![](/screenshots/aws-ecs-review-service.png)
 
 1. Verify that the properties are as follows:
-  - **Service name**: meltano-service
-  - **Number of desired tasks**: 1
-  - **Security group**: Automatically create new
-  - **Load balancer type**: None
+
+- **Service name**: meltano-service
+- **Number of desired tasks**: 1
+- **Security group**: Automatically create new
+- **Load balancer type**: None
+
 1. Click `Next` to move on to the next step
 
 #### Configure your cluster
 
 The main configuration here is the **Cluster name**. We provide a suggestion below, but feel free to name it as you wish.
 
-  - **Cluster name**: meltano-cluster
-  - **VPC ID**: Automatically create new
-  - **Subnets**: Automatically create new
+- **Cluster name**: meltano-cluster
+- **VPC ID**: Automatically create new
+- **Subnets**: Automatically create new
 
 #### Review cluster configuration
 
@@ -292,15 +300,19 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 1. Click `Edit Rules`
 1. Delete any existing rules
 1. Click `Add Rule` with the following properties:
-  - **Type**: Custom TCP Rule
-  - **Protocol**: TCP
-  - **Port Range**: 5000
-  - **Source**: Custom 0.0.0.0/0
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5000
+- **Source**: Custom 0.0.0.0/0
+
 1. Click "Add Rule" with the following properties:
-  - **Type**: Custom TCP Rule
-  - **Protocol**: TCP
-  - **Port Range**: 5010
-  - **Source**: Custom 0.0.0.0/0
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5010
+- **Source**: Custom 0.0.0.0/0
+
 1. Click `Save rules`
 
 ## Troubleshooting
