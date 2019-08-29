@@ -47,6 +47,10 @@ export default {
           this.$router.push({ name: 'dashboard', params: dashboard })
         })
     },
+    goToDesign(report) {
+      const params = { design: report.design, model: report.model }
+      this.$router.push({ name: 'analyzeDesign', params })
+    },
     goToReport(report) {
       this.$router.push({ name: 'report', params: report })
     },
@@ -140,7 +144,10 @@ export default {
                     </div>
                     <div class="level-right">
                       <div class="level-item">
-                        <a class="button is-small" @click="goToReport(report)">Edit</a>
+                        <div class="buttons">
+                          <a class="button is-small" @click="goToReport(report)">Edit</a>
+                          <a class="button is-small" @click="goToDesign(report)">Explore</a>
+                        </div>
                       </div>
                     </div>
                   </div>
