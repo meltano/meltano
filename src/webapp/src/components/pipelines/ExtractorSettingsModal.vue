@@ -11,7 +11,7 @@ export default {
     ConnectorSettings
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
@@ -25,12 +25,7 @@ export default {
       return !this.isInstalling && this.extractorLacksConfigSettings
     },
     extractor() {
-      const targetExtractor = this.installedPlugins.extractors
-        ? this.installedPlugins.extractors.find(
-            item => item.name === this.extractorNameFromRoute
-          )
-        : null
-      return targetExtractor || {}
+      return this.getInstalledPlugin('extractors', this.extractorNameFromRoute)
     },
     isInstalled() {
       return this.getIsPluginInstalled(
@@ -131,6 +126,7 @@ export default {
           v-if="!isLoadingConfigSettings && !extractorLacksConfigSettings"
           field-class="is-small"
           :config-settings="extractorInFocusConfiguration"
+          :plugin="extractor"
         />
 
         <div v-if="extractor.docs" class="mt1r">

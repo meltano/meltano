@@ -12,15 +12,19 @@ export default {
     TooltipCircle
   },
   props: {
-    fieldClass: {
-      type: String,
-      default: ''
-    },
     configSettings: {
       type: Object,
       required: true,
       default: () => {}
-    }
+    },
+    fieldClass: {
+      type: String,
+      default: ''
+    },
+    plugin: {
+      type: Object,
+      required: true
+    },
   },
   computed: {
     ...mapGetters('configuration', ['getIsConfigSettingValid']),

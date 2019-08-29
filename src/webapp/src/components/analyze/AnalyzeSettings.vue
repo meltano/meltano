@@ -19,17 +19,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['connectionInFocusConfiguration']),
     ...mapState('plugins', ['plugins', 'installedPlugins']),
     connection() {
-      const targetConnection = this.installedPlugins.connections
-        ? this.installedPlugins.connections.find(
-            item => item.name === this.connectionName
-          )
-        : null
-      return targetConnection || {}
+      return this.getInstalledPlugin('connections', this.connectionName)
     },
     isSaveable() {
       const isInstalling = this.getIsInstallingPlugin(
@@ -132,6 +127,7 @@ export default {
         v-if="connectionName"
         class="box"
         :config-settings="connectionInFocusConfiguration"
+        :plugin="connection"
       >
         <section slot="bottom" class="field buttons is-right">
           <button

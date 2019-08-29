@@ -11,7 +11,7 @@ export default {
     ConnectorSettings
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled', 'getIsInstallingPlugin']),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
@@ -34,12 +34,7 @@ export default {
       return !this.isInstalling && this.isInstalled && isValid
     },
     loader() {
-      const targetLoader = this.installedPlugins.loaders
-        ? this.installedPlugins.loaders.find(
-            item => item.name === this.loaderNameFromRoute
-          )
-        : null
-      return targetLoader || {}
+      return this.getInstalledPlugin('loaders', this.loaderNameFromRoute)
     }
   },
   created() {
@@ -118,6 +113,7 @@ export default {
           v-if="!isLoadingConfigSettings"
           field-class="is-small"
           :config-settings="loaderInFocusConfiguration"
+          :plugin="loader"
         />
 
         <div v-if="loader.docs" class="mt1r">
