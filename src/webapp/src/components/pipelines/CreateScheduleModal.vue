@@ -73,15 +73,19 @@ export default {
     prefillForm() {
       // TODO implement an intelligent prefill approach
       this.pipeline.name = `pipeline-${new Date().getTime()}`
-      const defaultExtractor = this.recentELTSelections.extractor || this.installedPlugins.extractors[0]
+      const defaultExtractor =
+        this.recentELTSelections.extractor ||
+        this.installedPlugins.extractors[0]
       this.pipeline.extractor = !_.isEmpty(this.installedPlugins.extractors)
         ? defaultExtractor.name
         : ''
-      const defaultLoader = this.recentELTSelections.loader || this.installedPlugins.loaders[0]
+      const defaultLoader =
+        this.recentELTSelections.loader || this.installedPlugins.loaders[0]
       this.pipeline.loader = !_.isEmpty(this.installedPlugins.loaders)
         ? defaultLoader.name
         : ''
-      const defaultTransform = this.recentELTSelections.transform || this.transformOptions[0]
+      const defaultTransform =
+        this.recentELTSelections.transform || this.transformOptions[0]
       this.pipeline.transform = !_.isEmpty(this.transformOptions)
         ? defaultTransform.name
         : ''
