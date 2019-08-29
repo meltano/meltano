@@ -6,7 +6,7 @@ export default {
   props: {
     report: {
       type: Object,
-      required: true
+      required: false
     }
   },
   data() {

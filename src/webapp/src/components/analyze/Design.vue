@@ -126,12 +126,11 @@ export default {
     this.$store.dispatch('designs/getFilterOptions')
   },
   methods: {
-    ...mapActions('dashboards', ['getDashboards', 'setDashboard']),
+    ...mapActions('dashboards', ['getDashboards']),
     ...mapActions('designs', ['resetErrorMessage']),
 
     goToDashboard(dashboard) {
-      this.setDashboard(dashboard)
-      this.$router.push({ name: 'Dashboards' })
+      this.$router.push({ name: 'dashboard', params: dashboard })
     },
 
     hasActiveReport() {
@@ -207,6 +206,9 @@ export default {
 
     loadReport(report) {
       this.$store.dispatch('designs/loadReport', { name: report.name })
+        .then(() => {
+          this.$router.push({ name: 'report', params: report })
+        })
     },
 
     saveReport() {

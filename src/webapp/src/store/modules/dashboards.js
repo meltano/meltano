@@ -98,10 +98,6 @@ const actions = {
     })
   },
 
-  setDashboard({ dispatch }, dashboard) {
-    dispatch('updateCurrentDashboard', dashboard)
-  },
-
   updateCurrentDashboard({ commit }, dashboard) {
     commit('setCurrentDashboard', dashboard)
   }

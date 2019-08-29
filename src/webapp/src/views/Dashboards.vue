@@ -38,9 +38,18 @@ export default {
   methods: {
     ...mapActions('dashboards', [
       'initialize',
-      'setDashboard',
+      'updateCurrentDashboard',
       'getActiveDashboardReportsWithQueryResults'
     ]),
+    goToDashboard(dashboard) {
+      this.updateCurrentDashboard(dashboard)
+        .then(() => {
+          this.$router.push({ name: 'dashboard', params: dashboard })
+        })
+    },
+    goToReport(report) {
+      this.$router.push({ name: 'report', params: report })
+    },
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
     }
@@ -86,7 +95,7 @@ export default {
                     :key="dashboard.id"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': isActive(dashboard) }"
-                    @click="setDashboard(dashboard)"
+                    @click="goToDashboard(dashboard)"
                   >
                     {{ dashboard.name }}
                   </a>
@@ -119,9 +128,22 @@ export default {
                 <div
                   v-for="report in activeDashboardReports"
                   :key="report.id"
-                  class="content"
                 >
-                  <h5 class="has-text-centered">{{ report.name }}</h5>
+                  <hr>
+                  <div class="level">
+                    <div class="level-left">
+                      <div class="level-item">
+                        <div class="content">
+                          <h5 class="has-text-centered">{{ report.name }}</h5>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="level-right">
+                      <div class="level-item">
+                        <a class="button is-small" @click="goToReport(report)">Edit</a>
+                      </div>
+                    </div>
+                  </div>
                   <chart
                     :chart-type="report.chartType"
                     :results="report.queryResults"
