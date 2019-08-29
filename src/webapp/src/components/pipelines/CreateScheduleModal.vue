@@ -140,7 +140,7 @@ export default {
                     v-model="pipeline.name"
                     class="input"
                     :class="{
-                      'is-success has-text-success': pipeline.name
+                      'has-text-success': pipeline.name
                     }"
                     type="text"
                     placeholder="Name"
@@ -152,10 +152,7 @@ export default {
                 <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{
-                      'is-success': pipeline.extractor,
-                      'is-loading': !pipeline.extractor
-                    }"
+                    :class="{ 'is-loading': !pipeline.extractor }"
                   >
                     <select
                       v-model="pipeline.extractor"
@@ -175,10 +172,7 @@ export default {
                 <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{
-                      'is-success': pipeline.loader,
-                      'is-loading': !pipeline.loader
-                    }"
+                    :class="{ 'is-loading': !pipeline.loader }"
                   >
                     <select
                       v-model="pipeline.loader"
@@ -198,10 +192,7 @@ export default {
                 <div class="control">
                   <span
                     class="select is-fullwidth"
-                    :class="{
-                      'is-success': pipeline.transform,
-                      'is-loading': !pipeline.transform
-                    }"
+                    :class="{ 'is-loading': !pipeline.transform }"
                   >
                     <select
                       v-model="pipeline.transform"
@@ -220,10 +211,7 @@ export default {
                 <div class="control is-expanded">
                   <span
                     class="select is-fullwidth"
-                    :class="{
-                      'is-success': pipeline.interval,
-                      'is-loading': !pipeline.interval
-                    }"
+                    :class="{ 'is-loading': !pipeline.interval }"
                   >
                     <select
                       v-model="pipeline.interval"
@@ -246,7 +234,7 @@ export default {
                     "
                     :button-classes="
                       pipeline.startDate || !hasCatchupDate
-                        ? 'is-success is-outlined'
+                        ? 'is-outlined has-text-success'
                         : ''
                     "
                     is-right-aligned
@@ -266,7 +254,7 @@ export default {
                           <InputDateIso8601
                             v-model="pipeline.startDate"
                             name="catchup-start"
-                            input-classes="is-small"
+                            :input-classes="`is-small ${pipeline.startDate ? 'has-text-success' : ''}`"
                           />
                           <button
                             class="button is-interactive-primary is-outlined is-small is-inline"
