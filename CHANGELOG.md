@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#909](https://gitlab.com/meltano/meltano/issues/909) Default names will be generated for Reports and Dashboards
 - [#935](https://gitlab.com/meltano/meltano/issues/935) Update Entity Selection to be nested in the Extract step so each ELT step is consecutive
+- [#886](https://gitlab.com/meltano/meltano/issues/886) Add validation for grouping settings as the next iteration of improved form validation for generated connector settings
 
 ### Fixes
 
