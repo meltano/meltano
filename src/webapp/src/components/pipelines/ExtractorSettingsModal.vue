@@ -47,7 +47,7 @@ export default {
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.extractorInFocusConfiguration
+        this.extractorInFocusConfiguration, this.extractor.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
     }
@@ -126,7 +126,6 @@ export default {
           v-if="!isLoadingConfigSettings && !extractorLacksConfigSettings"
           field-class="is-small"
           :config-settings="extractorInFocusConfiguration"
-          :plugin="extractor"
         />
 
         <div v-if="extractor.docs" class="mt1r">

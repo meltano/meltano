@@ -36,7 +36,7 @@ export default {
         this.connectionName
       )
       const isValid = this.getHasValidConfigSettings(
-        this.connectionInFocusConfiguration
+        this.connectionInFocusConfiguration, this.connection.settingsGroupValidation
       )
       return !isInstalling && isInstalled && isValid
     }
@@ -127,7 +127,6 @@ export default {
         v-if="connectionName"
         class="box"
         :config-settings="connectionInFocusConfiguration"
-        :plugin="connection"
       >
         <section slot="bottom" class="field buttons is-right">
           <button

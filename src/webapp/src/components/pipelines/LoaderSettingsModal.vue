@@ -29,7 +29,7 @@ export default {
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.loaderInFocusConfiguration
+        this.loaderInFocusConfiguration, this.loader.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
     },
@@ -113,7 +113,6 @@ export default {
           v-if="!isLoadingConfigSettings"
           field-class="is-small"
           :config-settings="loaderInFocusConfiguration"
-          :plugin="loader"
         />
 
         <div v-if="loader.docs" class="mt1r">
