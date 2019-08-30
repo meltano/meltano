@@ -157,6 +157,10 @@ export default {
       this.$store.dispatch('designs/setChartType', chartType)
     },
 
+    setReportName() {
+      this.saveReportSettings.name = `report-${new Date().getTime()}`
+    },
+
     tableRowClicked(relatedTable) {
       this.$store.dispatch('designs/expandRow', relatedTable)
     },
@@ -307,6 +311,7 @@ export default {
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport() ? '' : 'Save Report'"
                 is-right-aligned
+                @dropdown:open="setReportName"
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
