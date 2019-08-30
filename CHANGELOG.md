@@ -10,11 +10,17 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 - [#927](https://gitlab.com/meltano/meltano/issues/927) Document how to manually set up a Meltano Droplet on DigitalOcean
 
+- [#916](https://gitlab.com/meltano/meltano/issues/916) Add Transform step as first-class and adjacent step to Extract and Load
+- [#916](https://gitlab.com/meltano/meltano/issues/916) Improve Create Pipeline Schedule default selection UX by leveraging "ELT recents" concept
+
 ### Changes
+
+- [#935](https://gitlab.com/meltano/meltano/issues/935) Update Entity Selection to be nested in the Extract step so each ELT step is consecutive
 
 ### Fixes
 
 - [#931](https://gitlab.com/meltano/meltano/issues/931) Fix Analyze Connections identifier mismatch resulting from recent linting refactor
+- [#937](https://gitlab.com/meltano/meltano/issues/937) Fix Chart.vue prop type error
 
 ### Breaks
 

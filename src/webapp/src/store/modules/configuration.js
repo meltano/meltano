@@ -13,7 +13,17 @@ const defaultState = utils.deepFreeze({
   extractorInFocusEntities: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
-  pipelines: []
+  pipelines: [],
+  recentELTSelections: {
+    extractor: null,
+    loader: null,
+    transform: null
+  },
+  transformOptions: [
+    { label: 'Run', name: 'run' },
+    { label: 'Skip', name: 'skip' },
+    { label: 'Only', name: 'only' }
+  ]
 })
 
 const getters = {
@@ -236,6 +246,10 @@ const actions = {
         commit('toggleSelected', attribute)
       }
     })
+  },
+
+  updateRecentELTSelections({ commit }, updatePayload) {
+    commit('setELTRecentSelection', updatePayload)
   }
 }
 
@@ -263,6 +277,10 @@ const mutations = {
           entityGroups: entitiesData.entityGroups
         }
       : {}
+  },
+
+  setELTRecentSelection(state, { type, value }) {
+    state.recentELTSelections[type] = value
   },
 
   setInFocusConfiguration(state, { configuration, target }) {

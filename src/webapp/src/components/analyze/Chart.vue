@@ -15,7 +15,7 @@ export default {
       required: true
     },
     resultAggregates: {
-      type: Object,
+      type: Array,
       required: true
     },
     results: {
