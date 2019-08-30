@@ -902,16 +902,84 @@ meltano elt tap-postgres target-postgres
 If you want to add custom Transforms and explore the extracted data using Meltano UI, you should check the advanced tutorial on [Adding Custom Transformations and Models](./tutorial.html#advanced-adding-custom-transformations-and-models)
 
 
-
 ## Advanced - Loading CSV files to a Database
 
-This tutorial explains how to load data stored in CSV files to a Postgres Database.
+This tutorial explains how to load data stored in multiple CSV files to a Postgres Database and then use Custom Transforms and Models to combine them together and analyze the results.
 
 ### Prerequisites
 
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - A Postgres Database installed and running
-- Understanding how Transforms and Models work in Meltano. (!!! Link to `Custom Transforms and Models` Tutorial !!!)
+- Understanding how Transforms and Models work in Meltano and [how to add Custom Transforms and Models]](./tutorial.html#advanced-adding-custom-transformations-and-models).
+
+### Motivation and Running example
+
+We have all the data for our very successful startup GitFlix, a git based video streaming service, in csv files.
+
+We export our user data from our CRM, the episode information from our CMS and the streaming data from our own custom streaming system.
+
+It's time for us to move everything to a Postgres Database, so that we can have everything together, run some advanced analysis and compare the results.
+
+We have a pretty simple scenario: Users stream episodes from various TV series. For each user we have their name, age and their lifetime value to GitFlix (total subscriptions until today).
+
+**[GitFlixUsers.csv](/files/GitFlixUsers.csv)**
+```
+ id |  name  | age | gender |  clv  | avg_logins | logins
+----+--------+-----+--------+-------+------------+--------
+  1 | John   |  23 | male   | 163.7 |  0.560009  | 123
+  2 | George |  42 | male   | 287.3 |  1.232155  | 147
+  3 | Mary   |  19 | female | 150.3 |  #DIV/0!   | 0
+  4 | Kate   |  52 | female | 190.1 |  0.854654  | 156
+  5 | Bill   |  35 | male   | 350.8 |  1.787454  | 205
+  6 | Fiona  |  63 | female | 278.5 |  #DIV/0!   | 0
+```
+
+**[GitFlixEpisodes.csv](/files/GitFlixEpisodes.csv)**
+```
+ id | no  |        title        |  tv_series   | rating | ad_rev
+----+-----+---------------------+--------------+--------+-----------
+  1 | 101 | Pilot               | Breaking Bad |    8.9 | $2,438.13
+  2 | 102 | Cat in the Bag...   | Breaking Bad |    8.7 | $1,718.42
+  3 | 202 | Grilled             | Breaking Bad |    9.2 | $1,946.21
+  4 | 101 | The National Anthem | Black Mirror |    7.9 | $1,198.24
+  5 | 406 | Black Museum        | Black Mirror |    8.7 | $1,256.89
+  6 | 104 | Old Cases           | The Wire     |    8.3 | $834.67
+  7 | 306 | Homecoming          | The Wire     |    8.9 | $764.37
+```
+
+**[GitFlixStreams.csv](/files/GitFlixStreams.csv)**
+```
+ id | user_id | episode_id | minutes | day | month | year 
+----+---------+------------+---------+-----+-------+------
+  1 |       1 |          1 |      40 |  10 |     1 | 2019
+  2 |       1 |          2 |      42 |  10 |     1 | 2019
+  3 |       1 |          3 |      38 |  11 |     1 | 2019
+  4 |       1 |          4 |      12 |  11 |     1 | 2019
+  5 |       1 |          5 |      27 |  11 |     1 | 2019
+  6 |       2 |          2 |      36 |  11 |     1 | 2019
+  7 |       2 |          6 |      45 |  11 |     1 | 2019
+  8 |       2 |          7 |      44 |  11 |     1 | 2019
+  9 |       3 |          4 |      40 |  10 |     1 | 2019
+ 10 |       3 |          5 |      41 |  11 |     1 | 2019
+ 11 |       3 |          1 |      11 |  11 |     1 | 2019
+ 12 |       4 |          3 |      22 |  10 |     1 | 2019
+ 13 |       4 |          3 |      18 |  11 |     1 | 2019
+ 14 |       4 |          6 |      40 |  11 |     1 | 2019
+ 15 |       5 |          2 |      34 |  11 |     1 | 2019
+ 16 |       5 |          4 |      41 |  11 |     1 | 2019
+ 17 |       5 |          5 |      39 |  12 |     1 | 2019
+ 18 |       5 |          6 |      36 |  12 |     1 | 2019
+ 19 |       6 |          1 |      19 |  11 |     1 | 2019
+ 20 |       6 |          3 |      35 |  11 |     1 | 2019
+ 21 |       6 |          7 |      48 |  11 |     1 | 2019
+ 22 |       6 |          1 |      24 |  12 |     1 | 2019
+```
+
+We'll use Meltano to:
+
+- Load the data to our Postgres DB.
+- Use custom transforms to clean and normalize the data.
+- Create a custom Meltano Model so that we can explore the transformed data and generate meaningful reports.
 
 ### Initialize Your Project
 
@@ -929,7 +997,15 @@ meltano init csv-project
 cd csv-project
 ```
 
+Finally, if you haven't done so, download the example csv files to your newly created project directory (i.e. csv-project):
+
+- [GitFlixUsers.csv](/files/GitFlixUsers.csv)
+- [GitFlixEpisodes.csv](/files/GitFlixEpisodes.csv)
+- [GitFlixStreams.csv](/files/GitFlixStreams.csv)
+
+
 ### Set Your Credentials
+
 Update the .env file in your project directory (i.e. csv-project) with your Postgres DB credentials and the file you are going to use to describe the CSV files to be loaded.
 
 **.env**
@@ -937,58 +1013,43 @@ Update the .env file in your project directory (i.e. csv-project) with your Post
 export FLASK_ENV=development
 export SQLITE_DATABASE=meltano
 
+export PG_DATABASE=warehouse
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
 export PG_ADDRESS=localhost
-export PG_PORT=5502
-export PG_DATABASE=warehouse
+export PG_PORT=5432
 
 export PG_SCHEMA='csv_imports'
 
 export TAP_CSV_FILES_DEFINITION="csv_files.json"
 ```
 
-Where PG_SCHEMA is the schema that will be used to import the raw data to and TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with all the CSV files to be loaded:
+You should replace the example `warehouse` value as the name of the database, the user and password with your own Postgres credentials and change the address and port if the Postgres is not running locally and on the default Port.
+
+PG_SCHEMA is the schema that will be used to import the raw data to and TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with all the CSV files to be loaded:
 
 **csv_files.json**
 ```json
 [   
-  { "entity" : "leads",
-    "file" : "/path/to/leads.csv",
-    "keys" : ["Id"]
+  { "entity" : "users",
+    "file" : "GitFlixUsers.csv",
+    "keys" : ["id"]
   },
-  { "entity" : "opportunities",
-    "file" : "/path/to/opportunities.csv",
-    "keys" : ["Id"]
+  { "entity" : "episodes",
+    "file" : "GitFlixEpisodes.csv",
+    "keys" : ["id"]
+  },
+  { "entity" : "streams",
+    "file" : "GitFlixStreams.csv",
+    "keys" : ["id"]
   }
 ]
 ```
 
 Description of available options:
   - entity: The entity name, used as the table name for the data loaded from that csv.
-  - file: Local path to the file to be ingested.
+  - file: Local path (relative to the project's root) to the file to be ingested.
   - keys: The names of the columns that constitute the unique keys for that entity.
-
-For example, assume that we have copied 3 csv files with data for users (`users.csv`), products (`products.csv`) and subscriptions (`subs.csv`) to the project directory we just created. `csv_files.json` would be like follows:
-
-**csv_files.json**
-```json
-[   
-  { "entity" : "users",
-    "file" : "users.csv",
-    "keys" : ["id"]
-  },
-  { "entity" : "products",
-    "file" : "products.csv",
-    "keys" : ["product_id"]
-  },
-  { "entity" : "subscriptions",
-    "file" : "subs.csv",
-    "keys" : ["id"]
-  }
-]
-```
-
 
 Finally, make the credentials available to Meltano by executing the following command in your terminal:
 
@@ -1006,12 +1067,22 @@ meltano elt tap-csv target-postgres
 
 The extracted data will be available to the Postgres schema defined by `PG_SCHEMA`.
 
-In the example above, tables `users`, `products` and `subscriptions` will be available in the `csv_imports` schema, with all the data from the original CSV files loaded as records.
+Using our running example, tables `users`, `episodes` and `streams` will be available in the `csv_imports` schema, with all the data from the original CSV files loaded as records.
+
+### Motivation for transforming the raw extracted data
+
+So all the records in our CSV files were loaded successfully to our Database, but we are still having some issues:
+
+- Everything is a string in a csv, so all values were loaded as `character varying` to our Postgres DB. Strings are not very useful for calculating aggregates, so we want to convert all numerical measures to floats or integers accordingly.
+- Similarly, we want to run more complex value transformations, like convert a value like `$2,638,765.21` to `2638765.21` by removing the `$` and commas and converting the result to a float.
+- Column names like `clv` (short for customer lifetime value), `avg_logins` (short for average logins per day) or `ad_rev` (short for expected ad revenue per minute on ad supported plans) can be part of raw formatting but are not very useful to a high level user. We want to provide proper, descriptive, names.
+- Some of our columns have errors like `#DIV/0!` (division by zero), which we want to clean and convert to NULL values or 0s (depending on the business logic).
+
+We are going to add some simple custom transforms in order to clean and normalize the data.
 
 ### Add Custom Transforms
 
 (!!! Work In Progress !!!)
-
 
 
 ## Using Jupyter Notebooks
