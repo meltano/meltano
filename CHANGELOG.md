@@ -195,6 +195,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#828](https://gitlab.com/meltano/meltano/issues/828) Docker installation instructions have been dogfooded, clarified, and moved to Installation section
+- [#944](https://gitlab.com/meltano/meltano/issues/944) Update the Transform step's default to "Skip"
 
 ### Fixes
 
