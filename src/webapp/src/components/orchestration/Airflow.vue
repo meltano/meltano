@@ -21,9 +21,8 @@ export default {
     }
   },
   beforeDestroy() {
-    if(this.airflowRefreshTimeout) {
+    if (this.airflowRefreshTimeout) {
       clearTimeout(this.airflowRefreshTimeout)
-      console.log("clear");
     }
   },
   created() {
@@ -31,7 +30,8 @@ export default {
   },
   methods: {
     refreshAirflow() {
-      this.targetUrl = this.targetUrl === this.airflowUrl ? this.refreshUrl : this.airflowUrl
+      this.targetUrl =
+        this.targetUrl === this.airflowUrl ? this.refreshUrl : this.airflowUrl
       if (this.targetUrl === this.refreshUrl) {
         this.airflowRefreshTimeout = setTimeout(this.refreshAirflow, 1000)
       }
@@ -50,7 +50,9 @@ export default {
               <a
                 class="button"
                 :class="{ 'is-loading': isRefreshing }"
-                @click="refreshAirflow">Refresh Airflow</a>
+                @click="refreshAirflow"
+                >Refresh Airflow</a
+              >
             </div>
             <div class="level-right">
               <p>
