@@ -3,12 +3,14 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import Message from '@/components/generic/Message'
 
 export default {
   name: 'AnalyzeSettings',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    Message
   },
   data() {
     return {
@@ -144,23 +146,10 @@ export default {
       </ConnectorSettings>
       <div v-else class="box">
         <div class="content">
-          <article class="message is-info">
-            <div class="message-header">
-              <a
-                class="button is-borderless has-background-transparent has-text-white"
-              >
-                <span class="icon">
-                  <font-awesome-icon icon="info-circle"></font-awesome-icon>
-                </span>
-                <span>Info</span>
-              </a>
-            </div>
-            <div class="message-body">
-              <p>
-                This manual connection requirement will soon be automated :)
-              </p>
-            </div>
-          </article>
+          <Message>
+            <p>This manual connection requirement will soon be automated :)</p>
+          </Message>
+
           <p>
             After successfully setting up a
             <router-link :to="{ name: 'schedules' }">data pipeline</router-link>

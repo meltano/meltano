@@ -11,7 +11,13 @@ export default {
     RouterViewLayout
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', ['getIsInstallingPlugin', 'getIsPluginInstalled']),
+    getIsAirflowReady() {
+      return !this.getIsInstallingAirflow && this.getIsAirflowInstalled
+    },
+    getIsAirflowInstalled() {
+      return this.getIsPluginInstalled('orchestrators', 'airflow')
+    },
     getIsInstallingAirflow() {
       return this.getIsInstallingPlugin('orchestrators', 'airflow')
     }
@@ -30,9 +36,7 @@ export default {
     </div>
 
     <div class="container view-body">
-      <airflow
-        v-if="getIsPluginInstalled('orchestrators', 'airflow')"
-      ></airflow>
+      <airflow v-if="getIsAirflowReady"></airflow>
       <section v-else>
         <div class="columns">
           <div class="column">
