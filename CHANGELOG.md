@@ -192,6 +192,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#812](https://gitlab.com/meltano/meltano/issues/812) `meltano ui` will now stop stale Airflow workers when starting
 - [#762](https://gitlab.com/meltano/meltano/issues/762) Added run ELT via the UI (manages multiple and simultaneous runs)
 - [#232](https://gitlab.com/meltano/meltano/issues/232) Meltano now bundles Alembic migrations to support graceful database upgrades
+- [#936](https://gitlab.com/meltano/meltano/issues/936) Add "Refresh Airflow" button in Orchestrate to bypass route change or full-page refresh when iframe doesn't initially inflate as expected (this will likely be automated once the root cause is determined)
 
 ### Changes
 
