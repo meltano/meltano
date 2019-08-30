@@ -1,11 +1,11 @@
 # Deployment
 
-In this section provides step-by-step guides for deploying Meltano on various environments. Currently, we provide detailed intructions for:
+This section provides step-by-step guides for deploying Meltano on various environments. Currently, we provide detailed intructions for:
 
 - [DigitalOcean](/docs/deployment.html#digitalocean-droplets)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
 
-We are working toward one-click installers, and will update this page as soon as those become available. In the meantime, Meltano can be deployed to locally or to the cloud using these instructions.
+We are working toward one-click installers, and will update this page as soon as those become available. In the meantime, Meltano can be deployed locally or to the cloud using these instructions.
 
 ## DigitalOcean Droplets
 
@@ -103,12 +103,12 @@ Now that you are inside your virtual environment, follow the [Meltano installati
 
 Initialize Meltano:
 ```bash
-meltano init meltano
+meltano init YOUR_PROJECT_NAME
 ```
 
 Launch the Meltano UI on your server:
 ```bash
-cd meltano
+cd YOUR_PROJECT_NAME
 meltano ui
 ```
 
