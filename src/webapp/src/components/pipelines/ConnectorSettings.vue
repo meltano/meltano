@@ -60,7 +60,7 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     successClass() {
-      return setting => Boolean(setting) ? 'has-text-success' : null
+      return setting => (setting ? 'has-text-success' : null)
     }
   },
   watch: {

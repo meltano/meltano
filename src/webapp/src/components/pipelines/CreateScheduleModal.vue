@@ -254,7 +254,11 @@ export default {
                           <InputDateIso8601
                             v-model="pipeline.startDate"
                             name="catchup-start"
-                            :input-classes="`is-small ${pipeline.startDate ? 'has-text-success' : ''}`"
+                            :input-classes="
+                              `is-small ${
+                                pipeline.startDate ? 'has-text-success' : ''
+                              }`
+                            "
                           />
                           <button
                             class="button is-interactive-primary is-outlined is-small is-inline"

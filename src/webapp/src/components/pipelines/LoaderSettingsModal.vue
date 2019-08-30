@@ -11,7 +11,11 @@ export default {
     ConnectorSettings
   },
   computed: {
-    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', [
+      'getInstalledPlugin',
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin'
+    ]),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
@@ -29,7 +33,8 @@ export default {
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.loaderInFocusConfiguration, this.loader.settingsGroupValidation
+        this.loaderInFocusConfiguration,
+        this.loader.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
     },

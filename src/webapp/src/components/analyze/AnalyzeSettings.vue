@@ -19,7 +19,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('plugins', ['getInstalledPlugin', 'getIsInstallingPlugin', 'getIsPluginInstalled']),
+    ...mapGetters('plugins', [
+      'getInstalledPlugin',
+      'getIsInstallingPlugin',
+      'getIsPluginInstalled'
+    ]),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['connectionInFocusConfiguration']),
     ...mapState('plugins', ['plugins', 'installedPlugins']),
@@ -36,7 +40,8 @@ export default {
         this.connectionName
       )
       const isValid = this.getHasValidConfigSettings(
-        this.connectionInFocusConfiguration, this.connection.settingsGroupValidation
+        this.connectionInFocusConfiguration,
+        this.connection.settingsGroupValidation
       )
       return !isInstalling && isInstalled && isValid
     }
