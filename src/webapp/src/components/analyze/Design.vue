@@ -205,7 +205,8 @@ export default {
     },
 
     loadReport(report) {
-      this.$store.dispatch('designs/loadReport', { name: report.name })
+      this.$store
+        .dispatch('designs/loadReport', { name: report.name })
         .then(() => {
           this.$router.push({ name: 'report', params: report })
         })

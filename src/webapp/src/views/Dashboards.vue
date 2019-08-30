@@ -32,18 +32,16 @@ export default {
   watch: {
     activeDashboard() {
       this.isActiveDashboardLoading = true
-      this.getActiveDashboardReportsWithQueryResults()
-        .then(() => {
-          this.isActiveDashboardLoading = false
-        })
+      this.getActiveDashboardReportsWithQueryResults().then(() => {
+        this.isActiveDashboardLoading = false
+      })
     }
   },
   created() {
     this.isInitializing = true
-    this.initialize(this.$route.params.slug)
-      .then(() => {
-        this.isInitializing = false
-      })
+    this.initialize(this.$route.params.slug).then(() => {
+      this.isInitializing = false
+    })
   },
   methods: {
     ...mapActions('dashboards', [
@@ -52,10 +50,9 @@ export default {
       'getActiveDashboardReportsWithQueryResults'
     ]),
     goToDashboard(dashboard) {
-      this.updateCurrentDashboard(dashboard)
-        .then(() => {
-          this.$router.push({ name: 'dashboard', params: dashboard })
-        })
+      this.updateCurrentDashboard(dashboard).then(() => {
+        this.$router.push({ name: 'dashboard', params: dashboard })
+      })
     },
     goToDesign(report) {
       const params = { design: report.design, model: report.model }
@@ -103,8 +100,9 @@ export default {
               </div>
 
               <progress
-                  v-if='isInitializing'
-                  class="progress is-small is-info"></progress>
+                v-if="isInitializing"
+                class="progress is-small is-info"
+              ></progress>
 
               <template v-if="dashboards.length > 0">
                 <div class="panel">
@@ -144,8 +142,9 @@ export default {
                 </div>
 
                 <progress
-                  v-if='isActiveDashboardLoading'
-                  class="progress is-small is-info">
+                  v-if="isActiveDashboardLoading"
+                  class="progress is-small is-info"
+                >
                 </progress>
                 <template v-else>
                   <template v-if="activeDashboardReports.length > 0">
@@ -153,20 +152,30 @@ export default {
                       v-for="report in activeDashboardReports"
                       :key="report.id"
                     >
-                      <hr>
+                      <hr />
                       <div class="level">
                         <div class="level-left">
                           <div class="level-item">
                             <div class="content">
-                              <h5 class="has-text-centered">{{ report.name }}</h5>
+                              <h5 class="has-text-centered">
+                                {{ report.name }}
+                              </h5>
                             </div>
                           </div>
                         </div>
                         <div class="level-right">
                           <div class="level-item">
                             <div class="buttons">
-                              <a class="button is-small" @click="goToReport(report)">Edit</a>
-                              <a class="button is-small" @click="goToDesign(report)">Explore</a>
+                              <a
+                                class="button is-small"
+                                @click="goToReport(report)"
+                                >Edit</a
+                              >
+                              <a
+                                class="button is-small"
+                                @click="goToDesign(report)"
+                                >Explore</a
+                              >
                             </div>
                           </div>
                         </div>
@@ -178,14 +187,13 @@ export default {
                       ></chart>
                     </div>
                   </template>
-                  <div
-                    v-else
-                    class="content">
+                  <div v-else class="content">
                     <p>There are no reports added to this dashboard yet.</p>
                     <router-link
                       class="button is-interactive-primary is-outlined"
                       :to="{ name: 'analyze' }"
-                      >Analyze Some Data First</router-link>
+                      >Analyze Some Data First</router-link
+                    >
                   </div>
                 </template>
               </template>
@@ -193,8 +201,8 @@ export default {
               <template v-else>
                 <div class="column content">
                   <p>
-                    Select a dashboard or click "New" to the left and add reports to it to view them
-                    here.
+                    Select a dashboard or click "New" to the left and add
+                    reports to it to view them here.
                   </p>
                   <p>You can add a report by:</p>
                   <ul>
