@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#909](https://gitlab.com/meltano/meltano/issues/909) Default names will be generated for Reports and Dashboards
+- [#892](https://gitlab.com/meltano/meltano/issues/892) Improve experience for parsing Snowflake URL for ID by showing processing step
 - [#935](https://gitlab.com/meltano/meltano/issues/935) Update Entity Selection to be nested in the Extract step so each ELT step is consecutive
 
 ### Fixes
