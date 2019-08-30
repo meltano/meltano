@@ -13,6 +13,8 @@ export default {
   },
   data() {
     return {
+      isActiveDashboardLoading: false,
+      isInitializing: false,
       isNewDashboardModalOpen: false
     }
   },
@@ -29,11 +31,19 @@ export default {
   },
   watch: {
     activeDashboard() {
+      this.isActiveDashboardLoading = true
       this.getActiveDashboardReportsWithQueryResults()
+        .then(() => {
+          this.isActiveDashboardLoading = false
+        })
     }
   },
   created() {
+    this.isInitializing = true
     this.initialize(this.$route.params.slug)
+      .then(() => {
+        this.isInitializing = false
+      })
   },
   methods: {
     ...mapActions('dashboards', [
@@ -92,6 +102,10 @@ export default {
                 </div>
               </div>
 
+              <progress
+                  v-if='isInitializing'
+                  class="progress is-small is-info"></progress>
+
               <template v-if="dashboards.length > 0">
                 <div class="panel">
                   <a
@@ -129,54 +143,60 @@ export default {
                   </div>
                 </div>
 
-                <template v-if="activeDashboardReports.length > 0">
-                  <div
-                    v-for="report in activeDashboardReports"
-                    :key="report.id"
-                  >
-                    <hr>
-                    <div class="level">
-                      <div class="level-left">
-                        <div class="level-item">
-                          <div class="content">
-                            <h5 class="has-text-centered">{{ report.name }}</h5>
+                <progress
+                  v-if='isActiveDashboardLoading'
+                  class="progress is-small is-info">
+                </progress>
+                <template v-else>
+                  <template v-if="activeDashboardReports.length > 0">
+                    <div
+                      v-for="report in activeDashboardReports"
+                      :key="report.id"
+                    >
+                      <hr>
+                      <div class="level">
+                        <div class="level-left">
+                          <div class="level-item">
+                            <div class="content">
+                              <h5 class="has-text-centered">{{ report.name }}</h5>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="level-right">
+                          <div class="level-item">
+                            <div class="buttons">
+                              <a class="button is-small" @click="goToReport(report)">Edit</a>
+                              <a class="button is-small" @click="goToDesign(report)">Explore</a>
+                            </div>
                           </div>
                         </div>
                       </div>
-                      <div class="level-right">
-                        <div class="level-item">
-                          <div class="buttons">
-                            <a class="button is-small" @click="goToReport(report)">Edit</a>
-                            <a class="button is-small" @click="goToDesign(report)">Explore</a>
-                          </div>
-                        </div>
-                      </div>
+                      <chart
+                        :chart-type="report.chartType"
+                        :results="report.queryResults"
+                        :result-aggregates="report.queryResultAggregates"
+                      ></chart>
                     </div>
-                    <chart
-                      :chart-type="report.chartType"
-                      :results="report.queryResults"
-                      :result-aggregates="report.queryResultAggregates"
-                    ></chart>
+                  </template>
+                  <div
+                    v-else
+                    class="content">
+                    <p>There are no reports added to this dashboard yet.</p>
+                    <router-link
+                      class="button is-interactive-primary is-outlined"
+                      :to="{ name: 'analyze' }"
+                      >Analyze Some Data First</router-link>
                   </div>
                 </template>
-                <div
-                  v-else
-                  class="content">
-                  <p>There are no reports added to this dashboard yet.</p>
-                  <router-link
-                    class="button is-interactive-primary is-outlined"
-                    :to="{ name: 'analyze' }"
-                    >Analyze Some Data First</router-link>
-                </div>
-
               </template>
 
               <template v-else>
                 <div class="column content">
                   <p>
-                    Click "New" to the left and add reports to it to view them
-                    here. You can add a report by:
+                    Select a dashboard or click "New" to the left and add reports to it to view them
+                    here.
                   </p>
+                  <p>You can add a report by:</p>
                   <ul>
                     <li>
                       In Analyze, clicking "Add to Dashboard" after creating a

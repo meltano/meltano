@@ -24,7 +24,7 @@ const actions = {
     const activeReports = state.reports.filter(report =>
       ids.includes(report.id)
     )
-    dashboardsApi
+    return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(activeReports)
       .then(response => {
         commit('setActiveDashboardReports', response.data)
@@ -53,7 +53,7 @@ const actions = {
   initialize({ dispatch }, slug) {
     const promiseGetReports = dispatch('getReports')
     const promiseGetDashboards = dispatch('getDashboards')
-    Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
+    return Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
       dispatch('preloadDashboard', slug)
     })
   },
