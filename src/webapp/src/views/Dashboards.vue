@@ -37,6 +37,10 @@ export default {
       })
     }
   },
+  beforeDestroy() {
+    this.$store.dispatch('dashboards/resetActiveDashboard')
+    this.$store.dispatch('dashboards/resetActiveDashboardReports')
+  },
   created() {
     this.isInitializing = true
     this.initialize(this.$route.params.slug).then(() => {

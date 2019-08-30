@@ -79,6 +79,11 @@ const actions = {
     })
   },
 
+  resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
+
+  resetActiveDashboardReports: ({ commit }) =>
+    commit('reset', 'activeDashboardReports'),
+
   saveDashboard({ dispatch, commit }, data) {
     return dashboardsApi.saveDashboard(data).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
@@ -121,6 +126,12 @@ const mutations = {
     )
     const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId)
     targetDashboard.reportIds.splice(idx, 1)
+  },
+
+  reset(state, attr) {
+    if (defaultState.hasOwnProperty(attr)) {
+      state[attr] = lodash.cloneDeep(defaultState[attr])
+    }
   },
 
   setActiveDashboardReports(state, reports) {
