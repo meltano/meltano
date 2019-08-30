@@ -83,18 +83,37 @@ export default {
                     href="https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models"
                     >provides more options</a
                   >. Longer term we ancipate this view supporting transform
-                  creation, editing, and selection where we'll additionally infer the correct default.
+                  creation, editing, and selection where we'll additionally
+                  infer the correct default.
                 </p>
                 <p>Current Options:</p>
                 <ul>
-                  <li :class="{ 'has-text-weight-bold': getIsSelectedTransformOption(transformOptions[0]) }">
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[0]
+                      )
+                    }"
+                  >
                     Skip (EL): do not run the default transforms with extract
                     and load
                   </li>
-                  <li :class="{ 'has-text-weight-bold': getIsSelectedTransformOption(transformOptions[1]) }">
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[1]
+                      )
+                    }"
+                  >
                     Run (ELT): run the default transforms with extract and load
                   </li>
-                  <li :class="{ 'has-text-weight-bold': getIsSelectedTransformOption(transformOptions[2]) }">
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[2]
+                      )
+                    }"
+                  >
                     Only (T): only run default transforms, do not extract and
                     load
                   </li>
