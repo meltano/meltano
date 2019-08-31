@@ -1,9 +1,9 @@
 <script>
-import ClosableMessage from '@/components/generic/ClosableMessage'
+import Message from '@/components/generic/Message'
 
 export default {
   components: {
-    ClosableMessage
+    Message
   },
   computed: {
     airflowUrl() {
@@ -17,7 +17,7 @@ export default {
   <section>
     <div class="columns">
       <div class="column">
-        <ClosableMessage title="Notice">
+        <Message>
           <p>
             You are now looking at the Airflow UI. See the
             <a target="_blank" href="https://airflow.apache.org/ui.html"
@@ -25,7 +25,7 @@ export default {
             >
             for more details.
           </p>
-        </ClosableMessage>
+        </Message>
 
         <div class="proxy-container">
           <iframe class="proxy" :src="airflowUrl" />
