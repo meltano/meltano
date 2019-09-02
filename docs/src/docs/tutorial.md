@@ -1406,11 +1406,11 @@ These files must be added as .m5o files under the `csv-project/model/` directory
       type = string
       sql = "{{table}}.title"
     }
-    no {
+    episode_number {
       label = Episode Number
       description = Episode Number
       type = string
-      sql = "{{table}}.no"
+      sql = "{{table}}.episode_number"
     }
   }
   aggregates {
@@ -1530,7 +1530,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
     gitflix_stats_per_user {
       label = GitFlix Stats Per User
       from = gitflix_users
-      description = GitFlix Stats Per User, Episode and Stream
+      description = "GitFlix Stats Per User, Episode and Stream"
       joins {
         gitflix_streams {
           label = Projects
@@ -1548,13 +1548,35 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 }
 ```
 
-
 ### Interact with Your Data in The Web App
 
 With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
 
-[Start Meltano UI and interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
+[Start Meltano UI and setup a connection to your Postgres](./tutorial.html#interact-with-your-data-in-the-web-app)
 
+You can now go to the `Analyze` tab and select one of the three Designs we have created:
+
+![](/screenshots/gitflix_analyze.png)
+
+For example, you can check the high level Gitflix stats per Gender or Age group:
+
+![](/screenshots/gitflix_stats_per_gender_series.png)
+
+Or generate in depth reports on the streaming data:
+
+![](/screenshots/gitflix_user_stats_per_gender.png)
+
+### Next steps
+
+You should now be able to follow the same steps to import your own CSV files and generate complex reports in Meltano UI:
+
+- Prepare your CSV files so that they have a header in the first line with the attribute names.
+
+- Update `csv_files.json` to link your CSV files and use the proper entity name and key(s) for each.
+
+- Import and check the raw data
+
+- Add custom Transforms and Models by following the Gitflix example or any other Transforms and Models provided by Meltano. You can check the [Meltano Group](https://gitlab.com/meltano/) for projects that define default [transforms](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=dbt-) or [models](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=model-) for various supported APIs if you want to see real world examples.
 
 
 ## Using Jupyter Notebooks
