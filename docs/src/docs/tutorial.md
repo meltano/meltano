@@ -1560,11 +1560,11 @@ You can now go to the `Analyze` tab and select one of the three Designs we have 
 
 For example, you can check the high level Gitflix stats per Gender or Age group:
 
-![](/screenshots/gitflix_stats_per_gender_series.png)
+![](/screenshots/gitflix_user_stats_per_gender.png)
 
 Or generate in depth reports on the streaming data:
 
-![](/screenshots/gitflix_user_stats_per_gender.png)
+![](/screenshots/gitflix_stats_per_gender_series.png)
 
 ### Next steps
 
