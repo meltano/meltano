@@ -1528,17 +1528,17 @@ These files must be added as .m5o files under the `csv-project/model/` directory
       description = "Info on GitFlix Episodes"
     }
     gitflix_stats_per_user {
-      label = GitFlix Stats Per User
+      label = GitFlix Users
       from = gitflix_users
       description = "GitFlix Stats Per User, Episode and Stream"
       joins {
         gitflix_streams {
-          label = Projects
+          label = GitFlix Streams
           sql_on = "gitflix_streams.user_id = gitflix_stats_per_user.user_id"
           relationship = many_to_one
         }
         gitflix_episodes {
-          label = Milestones
+          label = GitFlix Episodes
           sql_on = "gitflix_episodes.episode_id = gitflix_streams.episode_id"
           relationship = many_to_one
         }

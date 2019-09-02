@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#936](https://gitlab.com/meltano/meltano/issues/936) Add "Refresh Airflow" button in Orchestrate to bypass route change or full-page refresh when iframe doesn't initially inflate as expected (this will likely be automated once the root cause is determined)
 - [#899](https://gitlab.com/meltano/meltano/issues/899) Add deep linking improvements to reports and dashboards to better facilitate sharing
 - [#899](https://gitlab.com/meltano/meltano/issues/899) Add "Edit" and "Explore" buttons to each report instance displayed in a dashboard to enable editing said report and exploring a fresh and unselected analysis of the same model and design
+- [!546](https://gitlab.com/meltano/meltano/merge_requests/546) Add new Advanced Tutorial on how to Load CSV files to Postgres
 
 ### Changes
 
