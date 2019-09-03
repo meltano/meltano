@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#935](https://gitlab.com/meltano/meltano/issues/935) Update Entity Selection to be nested in the Extract step so each ELT step is consecutive
+- [#946](https://gitlab.com/meltano/meltano/issues/946) Update Contribution section of docs withe Release owner rotation schedule
 
 ### Fixes
 
