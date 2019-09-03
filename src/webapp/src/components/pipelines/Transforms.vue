@@ -37,7 +37,7 @@ export default {
     updateTransformTypeSelection(transformType) {
       this.selectedTransformOption = transformType
     }
-  },
+  }
 }
 </script>
 
