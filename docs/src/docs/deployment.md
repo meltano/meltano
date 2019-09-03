@@ -27,7 +27,7 @@ Click "Create Droplet" and wait until the progress bar completes. Congratulation
 
 Click on the three-dot dropdown menu to the right of your Droplet's name and select "Access console" to launch the web-based command line. You will be prompted to use your login of "root" and the password that was emailed to you (or SSH key, if you chose that option). Once you enter your username *root* and password (from the email) you will be prompted to change the password to something more secure.
 
-You can also connect to your Droplet using SSH, from the command line:
+You can also connect to your Droplet using SSH,  from the command line:
 
 ```bash
 ssh root@YOUR_DROPLET_IP_ADDRESS
@@ -121,7 +121,7 @@ meltano ui
 ::: tip
 When you run `meltano ui` you will be prompted to view the Meltano UI at http://localhost:5000, however *this will not work for DigitalOcean Droplets* because they are hosted in the cloud. 
 
-Instead, use the IP address of your DigitalOcean Droplet and port 5000. This will be something like: http://157.230.231.206:5000
+Instead, use the IP address of your DigitalOcean Droplet and port 5000.
 :::
 
 #### Doing More with Droplets
