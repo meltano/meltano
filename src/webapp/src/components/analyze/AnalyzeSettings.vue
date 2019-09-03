@@ -33,6 +33,9 @@ export default {
     hasConfigurationLoaded() {
       return this.connectionInFocusConfiguration.config
     },
+    isConfigurationLoading() {
+      return this.connectionName && !this.hasConfigurationLoaded
+    },
     isLoadingConnection() {
       return connectionName => {
         return (
@@ -64,7 +67,7 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetConnectionInFocusConfiguration')
+    this.resetConnectionInFocusConfiguration()
   },
   methods: {
     ...mapActions('configuration', [
@@ -97,57 +100,53 @@ export default {
             `Connection Saved - ${this.connection.name}`
           )
         })
+    },
+    updateConnectorSettings(connector) {
+      this.$router.push({ name: 'connectorSettings', params: { connector } })
     }
   }
 }
 </script>
 
 <template>
-  <section class="columns">
-    <div class="column is-one-third">
+    <div>
       <h2 class="title is-5">Available Connections</h2>
-      <div class="tile is-ancestor is-flex is-flex-column">
+
+      <div class="tile is-ancestor is-flex is-flex-wrap">
         <div v-if="isLoadingConnections" class="tile is-parent">
           <progress class="progress is-small is-info"></progress>
         </div>
         <div
           v-for="(pluginConnection, index) in plugins.connections"
           :key="`${pluginConnection}-${index}`"
-          class="tile is-parent is-flex-no-grow"
+          class="tile is-parent is-3 is-relative"
         >
-          <div class="tile level">
-            <div class="level-left">
-              <div class="level-item">
-                <ConnectorLogo
-                  class="connector-logo"
-                  :connector="pluginConnection"
-                  :is-grayscale="
-                    !getIsPluginInstalled('connections', pluginConnection)
-                  "
-                />
-                {{ pluginConnection }}
-              </div>
+          <div class="tile level is-child box">
+            <div class="image level-item is-64x64 container">
+              <ConnectorLogo
+                class="connector-logo"
+                :connector="pluginConnection"
+                :is-grayscale="
+                  !getIsPluginInstalled('connections', pluginConnection)
+                "
+              />
             </div>
-            <div class="level-right">
-              <div class="level-item content is-small">
-                <div class="buttons are-small">
-                  <a
-                    class="button is-interactive-primary is-outlined flex-grow-1"
-                    :class="{
-                      'is-loading': isLoadingConnection(pluginConnection)
-                    }"
-                    @click="configureConnection(pluginConnection)"
-                    >Configure</a
-                  >
-                </div>
-              </div>
+            <div class="content is-small">
+              <p class="has-text-centered">{{ pluginConnection }}</p>
+              <a
+                class="button is-interactive-primary is-outlined is-block is-small"
+                :class="{
+                  'is-loading': isLoadingConnection(pluginConnection)
+                }"
+                @click="configureConnection(pluginConnection)"
+                >Configure</a
+              >
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div v-if="connectionInFocusConfiguration" class="column" rel="container">
+      <div v-if="connectionInFocusConfiguration" class="column" rel="container">
       <h2 class="title is-5">Configuration</h2>
       <div class="box">
         <div class="content">
@@ -197,11 +196,11 @@ export default {
               </button>
             </section>
           </ConnectorSettings>
-          <progress v-else class="progress is-small is-info"></progress>
+          <progress v-if="isConfigurationLoading" class="progress is-small is-info"></progress>
         </div>
       </div>
     </div>
-  </section>
+    </div>
 </template>
 
 <style lang="scss">
