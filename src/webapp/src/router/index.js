@@ -17,7 +17,6 @@ import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
-import Repo from '@/views/Repo'
 
 const router = new Router({
   mode: 'history',
@@ -127,11 +126,6 @@ const router = new Router({
       path: '/orchestration/',
       name: 'orchestration',
       component: Orchestration
-    },
-    {
-      path: '/files/',
-      name: 'projectFiles',
-      component: Repo
     },
     {
       path: '/analyze/',

@@ -28,6 +28,9 @@ extractors:
     namespace: gitlab
     docs: 'http://meltano.com/docs/plugins.html#gitlab'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
+    settings_group_validation:
+      - ['api_url', 'private_token', 'groups', 'start_date']
+      - ['api_url', 'private_token', 'projects', 'start_date']
     settings:
       - name: api_url
         label: GitLab API URL

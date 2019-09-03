@@ -28,6 +28,17 @@ const getters = {
     }
   },
 
+  getInstalledPlugin(state) {
+    return (pluginType, pluginName) => {
+      const targetPlugin = state.installedPlugins[pluginType]
+        ? state.installedPlugins[pluginType].find(
+            plugin => plugin.name === pluginName
+          )
+        : null
+      return targetPlugin || {}
+    }
+  },
+
   getIsInstallingPlugin(state) {
     return (pluginType, pluginName) =>
       state.installingPlugins[pluginType].includes(pluginName)

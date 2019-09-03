@@ -9,6 +9,17 @@ export default {
       selectedTransformOption: null
     }
   },
+  computed: {
+    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
+    getIsSelectedTransformOption() {
+      return transformOption => transformOption === this.selectedTransformOption
+    }
+  },
+  created() {
+    const defaultTransform =
+      this.recentELTSelections.transform || this.transformOptions[0]
+    this.selectedTransformOption = defaultTransform
+  },
   methods: {
     saveTransformAndGoToSchedules() {
       this.$store
@@ -27,17 +38,6 @@ export default {
       this.selectedTransformOption = transformType
     }
   },
-  computed: {
-    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
-    getIsSelectedTransformOption() {
-      return transformOption => transformOption === this.selectedTransformOption
-    }
-  },
-  created() {
-    const defaultTransform =
-      this.recentELTSelections.transform || this.transformOptions[0]
-    this.selectedTransformOption = defaultTransform
-  }
 }
 </script>
 

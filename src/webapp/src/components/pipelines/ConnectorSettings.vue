@@ -1,5 +1,4 @@
 <script>
-import { mapGetters } from 'vuex'
 import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import TooltipCircle from '@/components/generic/TooltipCircle'
 
@@ -12,18 +11,17 @@ export default {
     TooltipCircle
   },
   props: {
-    fieldClass: {
-      type: String,
-      default: ''
-    },
     configSettings: {
       type: Object,
       required: true,
       default: () => {}
+    },
+    fieldClass: {
+      type: String,
+      default: ''
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getIsConfigSettingValid']),
     getCleanedLabel() {
       return value => utils.titleCase(utils.underscoreToSpace(value))
     },
@@ -61,10 +59,7 @@ export default {
       return this.fieldClass || 'is-normal'
     },
     successClass() {
-      return setting =>
-        this.getIsConfigSettingValid(setting)
-          ? 'is-success has-text-success'
-          : null
+      return setting => (setting ? 'has-text-success' : null)
     }
   },
   watch: {
@@ -112,7 +107,7 @@ export default {
       :key="setting.name"
       class="field is-horizontal"
     >
-      <div :class="['is-flex', 'field-label', labelClass]">
+      <div :class="['field-label', labelClass]">
         <label class="label">{{
           setting.label || getCleanedLabel(setting.name)
         }}</label>
@@ -139,7 +134,7 @@ export default {
               v-else-if="getIsOfKindDate(setting.kind)"
               v-model="configSettings.config[setting.name]"
               :name="setting.name"
-              input-classes="is-small"
+              :input-classes="`is-small ${successClass(setting)}`"
             />
 
             <!-- Dropdown -->
@@ -151,6 +146,7 @@ export default {
                 :id="`${setting.name}-select-menu`"
                 v-model="configSettings.config[setting.name]"
                 :name="`${setting.name}-options`"
+                :class="successClass(setting)"
               >
                 <option
                   v-for="(option, index) in setting.options"
