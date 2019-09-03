@@ -20,8 +20,8 @@ const defaultState = utils.deepFreeze({
     transform: null
   },
   transformOptions: [
-    { label: 'Run', name: 'run' },
     { label: 'Skip', name: 'skip' },
+    { label: 'Run', name: 'run' },
     { label: 'Only', name: 'only' }
   ]
 })
