@@ -71,15 +71,26 @@ export default {
     configSettings: {
       handler(newVal) {
         /**
-         * Improve account UX by auto-detecting Account ID via URL for configs that have `account`
-         * This is currently Loader-Snowflake specific and we'll need a more robust solution
+         * Improve account UX by auto-detecting Account ID via URL
+         * for configs that have `account`
+         * This is currently Loader-Snowflake specific
+         * and we'll need a more robust solution
          * when/if we add UX helpers like this for more connectors
+         * TODO: Need to add a loader indicator to show something is "processing"
          */
         const accountInput = newVal.config.account
         if (accountInput) {
           const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-          this.configSettings.config.account =
-            parsedAccountId || newVal.config.account
+
+          if (parsedAccountId) {
+            const vm = this
+
+            setTimeout(() => {
+              vm.configSettings.config.account = parsedAccountId
+            }, 1000)
+          } else {
+            this.configSettings.config.account = newVal.config.account
+          }
         }
       },
       deep: true
