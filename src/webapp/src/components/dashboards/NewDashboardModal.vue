@@ -14,6 +14,9 @@ export default {
       saveDashboardSettings: { name: null, description: null }
     }
   },
+  created() {
+    this.saveDashboardSettings.name = `dashboard-${new Date().getTime()}`
+  },
   methods: {
     close() {
       this.$emit('close')
