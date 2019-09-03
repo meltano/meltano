@@ -60,23 +60,18 @@ export default {
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    installLoaderAndBeginSettings(connection) {
-      // this.resetConnectionInFocusConfiguration()
-      // this.$store
-      //   .dispatch('plugins/addPlugin', {
-      //     pluginType: 'connections',
-      //     name: connection
-      //   })
-      //   .then(() => {
-      //     this.updateConnectionSettings(connection)
-      //   })
-      // this.addPlugin({ pluginType: 'connections', name: connection }).then(() => {
-      //   this.installPlugin({ pluginType: 'connections', name: connection })
-      //   this.updateConnectionSettings(connection)
-      // })
+    installConnectionAndBeginSettings(connection) {
+      this.$store
+        .dispatch('plugins/addPlugin', {
+          pluginType: 'connections',
+          name: connection
+        })
+        .then(() => {
+          this.updateConnectionSettings(connection)
+        })
     },
-    updateConnectionSettings(connection) {
-      this.$router.push({ name: 'analyzeConnectorSettings', params: { connection } })
+    updateConnectionSettings(connectionName) {
+      this.$router.push({ name: 'analyzeConnectionSettings', params: { connector: connectionName } })
     }
   }
 }
@@ -139,9 +134,9 @@ export default {
             </p>
             <a
               class="button is-interactive-primary is-small is-block"
-              @click="updateConnectionSettings(connection)"
-              >Configure</a
-              >
+              @click="installConnectionAndBeginSettings(connection)"
+              >Configure
+            </a>
           </div>
         </div>
       </div>

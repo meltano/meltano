@@ -5,7 +5,7 @@ import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
 export default {
-  name: 'AnalyzeConnectorSettingsModal',
+  name: 'AnalyzeConnectionSettingsModal',
   components: {
     ConnectorLogo,
     ConnectorSettings
@@ -25,8 +25,8 @@ export default {
       return !this.isInstalling && this.connectorLacksConfigSettings
     },
     connector() {
-      const targetConnector = this.installedPlugins.connectors
-        ? this.installedPlugins.connectors.find(
+      const targetConnector = this.installedPlugins.connections
+        ? this.installedPlugins.connections.find(
             item => item.name === this.connectorNameFromRoute
           )
         : null
@@ -34,13 +34,13 @@ export default {
     },
     isInstalled() {
       return this.getIsPluginInstalled(
-        'connectors',
+        'connections',
         this.connectorNameFromRoute
       )
     },
     isInstalling() {
       return this.getIsInstallingPlugin(
-        'connectors',
+        'connections',
         this.connectorNameFromRoute
       )
     },
@@ -77,25 +77,18 @@ export default {
       if (this.prevRoute) {
         this.$router.go(-1)
       } else {
-        this.$router.push({ name: 'connectors' })
+        this.$router.push({ name: 'analyzeSettings' })
       }
     },
-    saveConfigAndBeginEntitySelection() {
+    saveConfig() {
       this.$store
         .dispatch('configuration/savePluginConfiguration', {
           name: this.connector.name,
-          type: 'connectors',
+          type: 'connections',
           config: this.connectionInFocusConfiguration.config
         })
         .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
-            type: 'connector',
-            value: this.connector
-          })
-          this.$router.push({
-            name: 'extractorEntities',
-            params: { connector: this.connector.name }
-          })
+          this.close()
           Vue.toasted.global.success(
             `Connection Saved - ${this.connector.name}`
           )
@@ -113,7 +106,7 @@ export default {
         <div class="modal-card-head-image image is-64x64 level-item">
           <ConnectorLogo :connector="connectorNameFromRoute" />
         </div>
-        <p class="modal-card-title">Extractor Configuration</p>
+        <p class="modal-card-title">Connection Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
@@ -164,7 +157,7 @@ export default {
         <button
           v-if="connectorLacksConfigSettingsAndIsInstalled"
           class="button is-interactive-primary"
-          @click="saveConfigAndBeginEntitySelection"
+          @click="saveConfig"
         >
           Next
         </button>
@@ -172,7 +165,7 @@ export default {
           v-else
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click="saveConfigAndBeginEntitySelection"
+          @click="saveConfig"
         >
           Save
         </button>

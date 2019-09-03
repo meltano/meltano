@@ -9,12 +9,15 @@ export default {
   computed: {
     isAnalyzing() {
       return (
-        !this.isCurrentLink('/analyze/models/') &&
-        !this.isCurrentLink('/analyze/settings/')
+        !this.isCurrentLink('/analyze/models') &&
+        !this.isCurrentLink('/analyze/settings')
       )
     },
     isCurrentLink() {
       return path => this.$route.path === path
+    },
+    isModal() {
+      return this.$route.meta && this.$route.meta.isModal
     }
   }
 }
@@ -53,6 +56,9 @@ export default {
 
     <div class="container view-body" :class="{ 'is-fluid': isAnalyzing }">
       <router-view />
+      <div v-if="isModal">
+        <router-view :name="$route.name"></router-view>
+      </div>
     </div>
   </router-view-layout>
 </template>
