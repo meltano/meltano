@@ -24,7 +24,7 @@ const actions = {
     const activeReports = state.reports.filter(report =>
       ids.includes(report.id)
     )
-    dashboardsApi
+    return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(activeReports)
       .then(response => {
         commit('setActiveDashboardReports', response.data)
@@ -53,7 +53,7 @@ const actions = {
   initialize({ dispatch }, slug) {
     const promiseGetReports = dispatch('getReports')
     const promiseGetDashboards = dispatch('getDashboards')
-    Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
+    return Promise.all([promiseGetReports, promiseGetDashboards]).then(() => {
       dispatch('preloadDashboard', slug)
     })
   },
@@ -79,6 +79,11 @@ const actions = {
     })
   },
 
+  resetActiveDashboard: ({ commit }) => commit('reset', 'activeDashboard'),
+
+  resetActiveDashboardReports: ({ commit }) =>
+    commit('reset', 'activeDashboardReports'),
+
   saveDashboard({ dispatch, commit }, data) {
     return dashboardsApi.saveDashboard(data).then(response => {
       commit('addSavedDashboardToDashboards', response.data)
@@ -96,10 +101,6 @@ const actions = {
         dashboardId: dashboard.id
       })
     })
-  },
-
-  setDashboard({ dispatch }, dashboard) {
-    dispatch('updateCurrentDashboard', dashboard)
   },
 
   updateCurrentDashboard({ commit }, dashboard) {
@@ -125,6 +126,12 @@ const mutations = {
     )
     const idx = targetDashboard.reportIds.indexOf(idsPayload.reportId)
     targetDashboard.reportIds.splice(idx, 1)
+  },
+
+  reset(state, attr) {
+    if (defaultState.hasOwnProperty(attr)) {
+      state[attr] = lodash.cloneDeep(defaultState[attr])
+    }
   },
 
   setActiveDashboardReports(state, reports) {
