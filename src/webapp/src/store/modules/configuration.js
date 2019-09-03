@@ -31,11 +31,20 @@ const getters = {
     return state.pipelines.length > 0
   },
 
-  // eslint-disable-next-line
   getHasValidConfigSettings(_, getters) {
+    return (configSettings, settingsGroupValidation = null) => {
+      return settingsGroupValidation
+        ? getters.getHasGroupValidationConfigSettings(
+            configSettings,
+            settingsGroupValidation
+          )
+        : getters.getHasDefaultValidationConfigSettings(configSettings)
+    }
+  },
+
+  getHasDefaultValidationConfigSettings() {
     return configSettings => {
-      const isValid = setting =>
-        getters.getIsConfigSettingValid(configSettings.config[setting.name])
+      const isValid = setting => Boolean(configSettings.config[setting.name])
       return (
         configSettings.settings &&
         lodash.every(configSettings.settings, isValid)
@@ -43,8 +52,20 @@ const getters = {
     }
   },
 
-  getIsConfigSettingValid() {
-    return value => value !== null && value !== undefined && value !== ''
+  getHasGroupValidationConfigSettings() {
+    return (configSettings, settingsGroupValidation) => {
+      const matchGroup = settingsGroupValidation.find(group => {
+        if (configSettings.settings) {
+          const groupedSettings = configSettings.settings.filter(setting =>
+            group.includes(setting.name)
+          )
+          const isValid = setting =>
+            Boolean(configSettings.config[setting.name])
+          return lodash.every(groupedSettings, isValid)
+        }
+      })
+      return configSettings.settings && Boolean(matchGroup)
+    }
   },
 
   getRunningPipelineJobsCount(state) {

@@ -11,7 +11,11 @@ export default {
     ConnectorSettings
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', [
+      'getInstalledPlugin',
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin'
+    ]),
     ...mapGetters('configuration', ['getHasValidConfigSettings']),
     ...mapState('configuration', ['extractorInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
@@ -25,12 +29,7 @@ export default {
       return !this.isInstalling && this.extractorLacksConfigSettings
     },
     extractor() {
-      const targetExtractor = this.installedPlugins.extractors
-        ? this.installedPlugins.extractors.find(
-            item => item.name === this.extractorNameFromRoute
-          )
-        : null
-      return targetExtractor || {}
+      return this.getInstalledPlugin('extractors', this.extractorNameFromRoute)
     },
     isInstalled() {
       return this.getIsPluginInstalled(
@@ -52,7 +51,8 @@ export default {
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.extractorInFocusConfiguration
+        this.extractorInFocusConfiguration,
+        this.extractor.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
     }
