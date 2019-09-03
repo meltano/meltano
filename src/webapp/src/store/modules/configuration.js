@@ -89,7 +89,7 @@ const actions = {
 
   // eslint-disable-next-line no-shadow
   getConnectionConfiguration({ commit, dispatch }, connection) {
-    dispatch('getPluginConfiguration', {
+    return dispatch('getPluginConfiguration', {
       name: connection,
       type: 'connections'
     }).then(response => {
