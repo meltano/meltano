@@ -27,6 +27,12 @@ Click "Create Droplet" and wait until the progress bar completes. Congratulation
 
 Click on the three-dot dropdown menu to the right of your Droplet's name and select "Access console" to launch the web-based command line. You will be prompted to use your login of "root" and the password that was emailed to you (or SSH key, if you chose that option). Once you enter your username *root* and password (from the email) you will be prompted to change the password to something more secure.
 
+You can also connect to your Droplet from the command line:
+
+```bash
+ssh root@YOUR_DROPLET_IP_ADDRESS
+```
+
 ### Requirements 
 
 Your new server will not have any of [Meltano's requirements](/docs/installation.html#requirements) installed by default, so you will need to install them.
