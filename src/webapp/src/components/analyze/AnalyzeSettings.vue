@@ -108,8 +108,7 @@ export default {
             <p>
               Now Meltano needs a connection to that
               <em>analytics schema</em> so Meltano Analyze can connect and
-              query. Use the options to the left to setup the Analyze
-              connection.
+              query. Use the options below to setup the connection.
             </p>
           </Message>
         </div>
