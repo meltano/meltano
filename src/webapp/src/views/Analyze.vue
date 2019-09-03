@@ -9,12 +9,12 @@ export default {
   computed: {
     isAnalyzing() {
       return (
-        !this.isCurrentLink('/analyze/models') &&
-        !this.isCurrentLink('/analyze/settings')
+        !this.isCurrentPath('/analyze/models') &&
+        !this.isCurrentPath('/analyze/settings')
       )
     },
-    isCurrentLink() {
-      return path => this.$route.path === path
+    isCurrentPath() {
+      return path => this.$route.path.includes(path)
     },
     isModal() {
       return this.$route.meta && this.$route.meta.isModal
@@ -34,14 +34,14 @@ export default {
           <div class="level-right">
             <div class="tabs is-right">
               <ul>
-                <li :class="{ 'is-active': isCurrentLink('/analyze/models/') }">
+                <li :class="{ 'is-active': isCurrentPath('/analyze/models') }">
                   <router-link :to="{ name: 'analyzeModels' }"
                     >Models</router-link
                   >
                 </li>
                 <li
                   class="is-marginless"
-                  :class="{ 'is-active': isCurrentLink('/analyze/settings/') }"
+                  :class="{ 'is-active': isCurrentPath('/analyze/settings') }"
                 >
                   <router-link :to="{ name: 'analyzeSettings' }"
                     >Connections</router-link

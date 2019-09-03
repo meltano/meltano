@@ -114,6 +114,7 @@ export default {
         </div>
       </div>
     </div>
+    <progress v-if="!plugins.loaders" class="progress is-small is-info"></progress>
   </div>
 </template>
 

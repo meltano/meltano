@@ -60,16 +60,6 @@ export default {
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    installConnectionAndBeginSettings(connection) {
-      this.$store
-        .dispatch('plugins/addPlugin', {
-          pluginType: 'connections',
-          name: connection
-        })
-        .then(() => {
-          this.updateConnectionSettings(connection)
-        })
-    },
     updateConnectionSettings(connectionName) {
       this.$router.push({ name: 'analyzeConnectionSettings', params: { connector: connectionName } })
     }
@@ -133,13 +123,14 @@ export default {
             </p>
             <a
               class="button is-interactive-primary is-small is-block"
-              @click="installConnectionAndBeginSettings(connection)"
+              @click="updateConnectionSettings(connection)"
               >Configure
             </a>
           </div>
         </div>
       </div>
     </div>
+    <progress v-if="!plugins.connections" class="progress is-small is-info"></progress>
   </div>
 </template>
 
