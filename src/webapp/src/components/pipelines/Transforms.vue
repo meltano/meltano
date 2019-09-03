@@ -2,12 +2,17 @@
 import { mapState } from 'vuex'
 import Vue from 'vue'
 
+import Message from '@/components/generic/Message'
+
 export default {
   name: 'Transforms',
   data() {
     return {
       selectedTransformOption: null
     }
+  },
+  components: {
+    Message
   },
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
@@ -62,67 +67,50 @@ export default {
     <div class="columns">
       <div class="column is-three-fifths is-offset-one-fifth">
         <div class="box">
-          <div class="content">
-            <article class="message is-info is-small">
-              <div class="message-header">
-                <a
-                  class="button is-borderless has-background-transparent has-text-white"
-                >
-                  <span class="icon">
-                    <font-awesome-icon icon="info-circle"></font-awesome-icon>
-                  </span>
-                  <span>Info</span>
-                </a>
-              </div>
-              <div class="message-body">
-                <p>
-                  Currently, for the UI, we only support the
-                  <em>default transforms</em> that ship with Meltano. The CLI
-                  however
-                  <a
-                    href="https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models"
-                    >provides more options</a
-                  >. Longer term we ancipate this view supporting transform
-                  creation, editing, and selection where we'll additionally
-                  infer the correct default.
-                </p>
-                <p>Current Options:</p>
-                <ul>
-                  <li
-                    :class="{
-                      'has-text-weight-bold': getIsSelectedTransformOption(
-                        transformOptions[0]
-                      )
-                    }"
-                  >
-                    Skip (EL): do not run the default transforms with extract
-                    and load
-                  </li>
-                  <li
-                    :class="{
-                      'has-text-weight-bold': getIsSelectedTransformOption(
-                        transformOptions[1]
-                      )
-                    }"
-                  >
-                    Run (ELT): run the default transforms with extract and load
-                  </li>
-                  <li
-                    :class="{
-                      'has-text-weight-bold': getIsSelectedTransformOption(
-                        transformOptions[2]
-                      )
-                    }"
-                  >
-                    Only (T): only run default transforms, do not extract and
-                    load
-                  </li>
-                </ul>
-              </div>
-            </article>
-          </div>
-
-          <hr />
+          <Message>
+            <p>
+              Currently, for the UI, we only support the
+              <em>default transforms</em> that ship with Meltano. The CLI
+              however
+              <a
+                href="https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models"
+                >provides more options</a
+              >. Longer term we ancipate this view to support transform
+              creation, editing, and selection.
+            </p>
+            <p>Current Options:</p>
+            <ul>
+              <li
+                :class="{
+                  'has-text-weight-bold': getIsSelectedTransformOption(
+                    transformOptions[0]
+                  )
+                }"
+              >
+                Skip (EL): do not run the default transforms with extract
+                and load
+              </li>
+              <li
+                :class="{
+                  'has-text-weight-bold': getIsSelectedTransformOption(
+                    transformOptions[1]
+                  )
+                }"
+              >
+                Run (ELT): run the default transforms with extract and load
+              </li>
+              <li
+                :class="{
+                  'has-text-weight-bold': getIsSelectedTransformOption(
+                    transformOptions[2]
+                  )
+                }"
+              >
+                Only (T): only run default transforms, do not extract and
+                load
+              </li>
+            </ul>
+          </Message>
 
           <div class="level">
             <div class="level-left">
