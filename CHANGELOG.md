@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#916](https://gitlab.com/meltano/meltano/issues/916) Add Transform step as first-class and adjacent step to Extract and Load
 - [#916](https://gitlab.com/meltano/meltano/issues/916) Improve Create Pipeline Schedule default selection UX by leveraging "ELT recents" concept
+- [#936](https://gitlab.com/meltano/meltano/issues/936) Add "Refresh Airflow" button in Orchestrate to bypass route change or full-page refresh when iframe doesn't initially inflate as expected (this will likely be automated once the root cause is determined)
 
 ### Changes
 
@@ -23,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#931](https://gitlab.com/meltano/meltano/issues/931) Fix Analyze Connections identifier mismatch resulting from recent linting refactor
 - [#919](https://gitlab.com/meltano/meltano/issues/919) Fix Airflow iframe automatic UI refresh
 - [#937](https://gitlab.com/meltano/meltano/issues/937) Fix Chart.vue prop type error
+- [#919](https://gitlab.com/meltano/meltano/issues/919) Fix Airflow iframe automatic UI refresh
 
 ### Breaks
 
