@@ -266,7 +266,7 @@ Meltano releases weekly on Monday mornings, and you can find a list of upcoming 
 
 #### Rotation
 
-|Release Date   	|Release Owner   	|Dogfood Owner   	|Shadow   	|
+|Release Date   	|Release Owner   	|Dogfooding Owner   	|Shadow   	|
 |---	|---	|---	|---	|
 |2019-09-03   	|Derek K.   	|Derek K.   	|--  	|
 |2019-09-09   	|Ben H.   	|Ben H.   	|Douwe M.   	|
