@@ -118,8 +118,4 @@ export default {
   </div>
 </template>
 
-<style lang="scss">
-.flex-grow-1 {
-  flex-grow: 1;
-}
-</style>
+<style lang="scss"></style>

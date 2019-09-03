@@ -1,22 +1,14 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
-import Vue from 'vue'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
-import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 import Message from '@/components/generic/Message'
 
 export default {
-  name: 'AnalyzeSettings',
+  name: 'connections',
   components: {
     ConnectorLogo,
-    ConnectorSettings,
     Message
-  },
-  data() {
-    return {
-      connectionName: null,
-      isSavingConfiguration: false
-    }
   },
   computed: {
     ...mapGetters('plugins', [
@@ -66,89 +58,34 @@ export default {
     this.$store.dispatch('plugins/getAllPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
-  beforeDestroy() {
-    this.resetConnectionInFocusConfiguration()
-  },
   methods: {
-    ...mapActions('configuration', [
-      'getConnectionConfiguration',
-      'resetConnectionInFocusConfiguration'
-    ]),
-    configureConnection(connection) {
-      this.connectionName = connection
-      this.resetConnectionInFocusConfiguration()
-      this.$store
-        .dispatch('plugins/addPlugin', {
-          pluginType: 'connections',
-          name: connection
-        })
-        .then(() => {
-          this.getConnectionConfiguration(connection)
-        })
+    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    installLoaderAndBeginSettings(connection) {
+      // this.resetConnectionInFocusConfiguration()
+      // this.$store
+      //   .dispatch('plugins/addPlugin', {
+      //     pluginType: 'connections',
+      //     name: connection
+      //   })
+      //   .then(() => {
+      //     this.updateConnectionSettings(connection)
+      //   })
+      // this.addPlugin({ pluginType: 'connections', name: connection }).then(() => {
+      //   this.installPlugin({ pluginType: 'connections', name: connection })
+      //   this.updateConnectionSettings(connection)
+      // })
     },
-    saveConfig() {
-      this.isSavingConfiguration = true
-      this.$store
-        .dispatch('configuration/savePluginConfiguration', {
-          type: 'connections',
-          name: this.connection.name,
-          config: this.connectionInFocusConfiguration.config
-        })
-        .then(() => {
-          this.isSavingConfiguration = false
-          Vue.toasted.global.success(
-            `Connection Saved - ${this.connection.name}`
-          )
-        })
-    },
-    updateConnectorSettings(connector) {
-      this.$router.push({ name: 'connectorSettings', params: { connector } })
+    updateConnectionSettings(connection) {
+      this.$router.push({ name: 'analyzeConnectorSettings', params: { connection } })
     }
   }
 }
 </script>
 
 <template>
-    <div>
-      <h2 class="title is-5">Available Connections</h2>
-
-      <div class="tile is-ancestor is-flex is-flex-wrap">
-        <div v-if="isLoadingConnections" class="tile is-parent">
-          <progress class="progress is-small is-info"></progress>
-        </div>
-        <div
-          v-for="(pluginConnection, index) in plugins.connections"
-          :key="`${pluginConnection}-${index}`"
-          class="tile is-parent is-3 is-relative"
-        >
-          <div class="tile level is-child box">
-            <div class="image level-item is-64x64 container">
-              <ConnectorLogo
-                class="connector-logo"
-                :connector="pluginConnection"
-                :is-grayscale="
-                  !getIsPluginInstalled('connections', pluginConnection)
-                "
-              />
-            </div>
-            <div class="content is-small">
-              <p class="has-text-centered">{{ pluginConnection }}</p>
-              <a
-                class="button is-interactive-primary is-outlined is-block is-small"
-                :class="{
-                  'is-loading': isLoadingConnection(pluginConnection)
-                }"
-                @click="configureConnection(pluginConnection)"
-                >Configure</a
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div v-if="connectionInFocusConfiguration" class="column" rel="container">
-      <h2 class="title is-5">Configuration</h2>
-      <div class="box">
+  <div>
+    <div class="columns">
+      <div class="column">
         <div class="content">
           <Message>
             <p>This manual connection requirement will soon be automated :)</p>
@@ -180,32 +117,36 @@ export default {
               connection.
             </p>
           </Message>
-
-          <ConnectorSettings
-            v-if="hasConfigurationLoaded"
-            :config-settings="connectionInFocusConfiguration"
-          >
-            <section slot="bottom" class="field buttons is-right">
-              <button
-                class="button is-interactive-primary"
-                :class="{ 'is-loading': isSavingConfiguration }"
-                :disabled="!isSaveable"
-                @click.prevent="saveConfig"
-              >
-                Save
-              </button>
-            </section>
-          </ConnectorSettings>
-          <progress v-if="isConfigurationLoading" class="progress is-small is-info"></progress>
         </div>
       </div>
     </div>
+
+    <div class="tile is-ancestor is-flex is-flex-wrap">
+      <div
+        v-for="(connection, index) in plugins.connections"
+        :key="`${connection}-${index}`"
+        class="tile is-parent is-3 is-relative"
+      >
+        <div class="tile level is-child box">
+          <div class="image level-item is-64x64 container">
+            <ConnectorLogo
+              :connector="connection"
+            />
+          </div>
+          <div class="content is-small">
+            <p class="has-text-centered">
+              {{ connection }}
+            </p>
+            <a
+              class="button is-interactive-primary is-small is-block"
+              @click="updateConnectionSettings(connection)"
+              >Configure</a
+              >
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </template>
 
-<style lang="scss">
-.connector-logo {
-  max-height: 48px;
-  object-fit: scale-down;
-}
-</style>
+<style lang="scss"></style>

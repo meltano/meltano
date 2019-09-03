@@ -146,10 +146,10 @@ const router = new Router({
         },
         {
           path: 'settings/:connector',
-          name: 'connectorSettings',
+          name: 'analyzeConnectorSettings',
           components: {
             default: AnalyzeSettings,
-            connectorSettings: AnalyzeConnectorSettingsModal
+            analyzeConnectorSettings: AnalyzeConnectorSettingsModal
           },
           meta: {
             isModal: true
