@@ -2,6 +2,7 @@ import Router from 'vue-router'
 
 import AnalyzeModels from '@/components/analyze/AnalyzeModels'
 import AnalyzeSettings from '@/components/analyze/AnalyzeSettings'
+import AnalyzeConnectionSettingsModal from '@/components/analyze/AnalyzeConnectionSettingsModal'
 import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
 import Design from '@/components/analyze/Design'
 import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal'
@@ -142,6 +143,17 @@ const router = new Router({
           path: 'settings',
           name: 'analyzeSettings',
           component: AnalyzeSettings
+        },
+        {
+          path: 'settings/:connector',
+          name: 'analyzeConnectionSettings',
+          components: {
+            default: AnalyzeSettings,
+            analyzeConnectionSettings: AnalyzeConnectionSettingsModal
+          },
+          meta: {
+            isModal: true
+          }
         },
         {
           path: '/analyze/:model/:design',
