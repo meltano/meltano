@@ -260,6 +260,28 @@ Make sure to add CHANGELOG entries to your merge requests.
 
 ## Releases
 
+### Schedule
+
+Meltano releases weekly on Monday mornings, and you can find a list of upcoming changes in our [CHANGELOG under "Unreleased"](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased)
+
+#### Rotation
+
+|Release Date   	|Release Owner   	|Dogfooding Owner   	|Shadow   	|
+|---	|---	|---	|---	|
+|2019-09-03   	|Derek K.   	|Derek K.   	|--  	|
+|2019-09-09   	|Ben H.   	|Ben H.   	|Douwe M.   	|
+|2019-09-16   	|Yannis R.   	|Yannis R.   	|Douwe M.   	|
+|2019-09-23   	|Douwe M.   	|Douwe M.   	|Danielle M.  	|
+|2019-09-30   	|Danielle M.   	|Danielle M.   	|   	|
+|2019-10-07   	|Micael B.   	|Micael B.   	|   	|
+|2019-10-14  	|Derek K.   	|Derek K.   	|   	|
+
+:::tip Can't make your scheduled release?
+If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
+:::
+
+### Versioning
+
 Meltano uses [semver](https://semver.org/) as its version number scheme.
 
 ### Prerequisites
@@ -270,7 +292,7 @@ Ensure you have the latest `master` branch locally before continuing.
 git fetch origin
 ```
 
-### Release process
+### Release Process
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
