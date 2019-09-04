@@ -5,7 +5,7 @@ import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Message from '@/components/generic/Message'
 
 export default {
-  name: 'connections',
+  name: 'Connections',
   components: {
     ConnectorLogo,
     Message
@@ -61,7 +61,10 @@ export default {
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     updateConnectionSettings(connectionName) {
-      this.$router.push({ name: 'analyzeConnectionSettings', params: { connector: connectionName } })
+      this.$router.push({
+        name: 'analyzeConnectionSettings',
+        params: { connector: connectionName }
+      })
     }
   }
 }
@@ -107,30 +110,31 @@ export default {
 
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
-        v-for="(connection, index) in plugins.connections"
-        :key="`${connection}-${index}`"
+        v-for="(pluginConnection, index) in plugins.connections"
+        :key="`${pluginConnection}-${index}`"
         class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
-            <ConnectorLogo
-              :connector="connection"
-            />
+            <ConnectorLogo :connector="pluginConnection" />
           </div>
           <div class="content is-small">
             <p class="has-text-centered">
-              {{ connection }}
+              {{ pluginConnection }}
             </p>
             <a
               class="button is-interactive-primary is-small is-block"
-              @click="updateConnectionSettings(connection)"
+              @click="updateConnectionSettings(pluginConnection)"
               >Configure
             </a>
           </div>
         </div>
       </div>
     </div>
-    <progress v-if="!plugins.connections" class="progress is-small is-info"></progress>
+    <progress
+      v-if="!plugins.connections"
+      class="progress is-small is-info"
+    ></progress>
   </div>
 </template>
 

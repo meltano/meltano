@@ -6,13 +6,13 @@ import Message from '@/components/generic/Message'
 
 export default {
   name: 'Transforms',
+  components: {
+    Message
+  },
   data() {
     return {
       selectedTransformOption: null
     }
-  },
-  components: {
-    Message
   },
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
@@ -87,8 +87,8 @@ export default {
                   )
                 }"
               >
-                Skip (EL): do not run the default transforms with extract
-                and load
+                Skip (EL): do not run the default transforms with extract and
+                load
               </li>
               <li
                 :class="{
@@ -106,8 +106,7 @@ export default {
                   )
                 }"
               >
-                Only (T): only run default transforms, do not extract and
-                load
+                Only (T): only run default transforms, do not extract and load
               </li>
             </ul>
           </Message>

@@ -115,7 +115,10 @@ export default {
         </div>
       </div>
     </div>
-    <progress v-if="!plugins.extractors" class="progress is-small is-info"></progress>
+    <progress
+      v-if="!plugins.extractors"
+      class="progress is-small is-info"
+    ></progress>
   </div>
 </template>
 
