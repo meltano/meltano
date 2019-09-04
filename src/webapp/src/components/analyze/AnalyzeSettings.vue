@@ -11,7 +11,7 @@ export default {
     Message
   },
   computed: {
-    ...mapState('plugins', ['plugins']),
+    ...mapState('plugins', ['plugins'])
   },
   created() {
     this.$store.dispatch('plugins/getAllPlugins')
