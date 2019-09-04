@@ -77,6 +77,10 @@ export default {
             </template>
           </tbody>
         </table>
+        <progress
+          v-if="!plugins.models"
+          class="progress is-small is-info"
+        ></progress>
       </div>
       <div class="column is-two-thirds">
         <h2 class="title is-5">Installed</h2>

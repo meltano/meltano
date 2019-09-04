@@ -115,11 +115,11 @@ export default {
         </div>
       </div>
     </div>
+    <progress
+      v-if="!plugins.extractors"
+      class="progress is-small is-info"
+    ></progress>
   </div>
 </template>
 
-<style lang="scss">
-.flex-grow-1 {
-  flex-grow: 1;
-}
-</style>
+<style lang="scss"></style>
