@@ -73,6 +73,10 @@ export default {
       this.isOpen = true
     },
     toggleDropdown() {
+      if (!this.isOpen) {
+        this.$emit('dropdown:open')
+      }
+
       this.isOpen = !this.isOpen
     },
     onBubbleClose(e) {

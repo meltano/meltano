@@ -17,7 +17,6 @@ import Dashboards from '@/views/Dashboards'
 import NotFound from '@/views/NotFound'
 import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
-import Repo from '@/views/Repo'
 
 const router = new Router({
   mode: 'history',
@@ -129,11 +128,6 @@ const router = new Router({
       component: Orchestration
     },
     {
-      path: '/files/',
-      name: 'projectFiles',
-      component: Repo
-    },
-    {
       path: '/analyze/',
       redirect: '/analyze/models/',
       name: 'analyze',
@@ -156,19 +150,19 @@ const router = new Router({
         },
         {
           path: '/analyze/:model/:design/reports/report/:slug',
-          name: 'Report',
+          name: 'report',
           component: Design
         }
       ]
     },
     {
       path: '/dashboards/',
-      name: 'Dashboards',
+      name: 'dashboards',
       component: Dashboards
     },
     {
       path: '/dashboards/dashboard/:slug',
-      name: 'Dashboard',
+      name: 'dashboard',
       component: Dashboards
     }
   ]

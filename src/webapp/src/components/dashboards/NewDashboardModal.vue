@@ -6,13 +6,16 @@ export default {
   props: {
     report: {
       type: Object,
-      required: true
+      required: false
     }
   },
   data() {
     return {
       saveDashboardSettings: { name: null, description: null }
     }
+  },
+  created() {
+    this.saveDashboardSettings.name = `dashboard-${new Date().getTime()}`
   },
   methods: {
     close() {

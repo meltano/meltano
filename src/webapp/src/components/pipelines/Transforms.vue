@@ -9,6 +9,17 @@ export default {
       selectedTransformOption: null
     }
   },
+  computed: {
+    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
+    getIsSelectedTransformOption() {
+      return transformOption => transformOption === this.selectedTransformOption
+    }
+  },
+  created() {
+    const defaultTransform =
+      this.recentELTSelections.transform || this.transformOptions[0]
+    this.selectedTransformOption = defaultTransform
+  },
   methods: {
     saveTransformAndGoToSchedules() {
       this.$store
@@ -27,14 +38,6 @@ export default {
       this.selectedTransformOption = transformType
     }
   },
-  computed: {
-    ...mapState('configuration', ['recentELTSelections', 'transformOptions'])
-  },
-  created() {
-    const defaultTransform =
-      this.recentELTSelections.transform || this.transformOptions[0]
-    this.selectedTransformOption = defaultTransform
-  }
 }
 </script>
 
@@ -79,19 +82,38 @@ export default {
                   <a
                     href="https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models"
                     >provides more options</a
-                  >. Longer term we ancipate this view to support transform
-                  creation, editing, and selection.
+                  >. Longer term we ancipate this view supporting transform
+                  creation, editing, and selection where we'll additionally
+                  infer the correct default.
                 </p>
                 <p>Current Options:</p>
                 <ul>
-                  <li>
-                    Run (ELT): run the default transforms with extract and load
-                  </li>
-                  <li>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[0]
+                      )
+                    }"
+                  >
                     Skip (EL): do not run the default transforms with extract
                     and load
                   </li>
-                  <li>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[1]
+                      )
+                    }"
+                  >
+                    Run (ELT): run the default transforms with extract and load
+                  </li>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[2]
+                      )
+                    }"
+                  >
                     Only (T): only run default transforms, do not extract and
                     load
                   </li>

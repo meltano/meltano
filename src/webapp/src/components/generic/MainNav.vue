@@ -98,7 +98,7 @@ export default {
         </router-link>
 
         <router-link
-          :to="{ name: 'Dashboards' }"
+          :to="{ name: 'dashboards' }"
           :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >

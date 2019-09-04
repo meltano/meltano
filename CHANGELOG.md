@@ -3,19 +3,38 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
 
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.40.0 - (2019-09-04)
+
+---
+
+### New
+- [#927](https://gitlab.com/meltano/meltano/issues/927) Document how to manually set up a Meltano Droplet on DigitalOcean
+
 - [#916](https://gitlab.com/meltano/meltano/issues/916) Add Transform step as first-class and adjacent step to Extract and Load
 - [#916](https://gitlab.com/meltano/meltano/issues/916) Improve Create Pipeline Schedule default selection UX by leveraging "ELT recents" concept
+- [#936](https://gitlab.com/meltano/meltano/issues/936) Add "Refresh Airflow" button in Orchestrate to bypass route change or full-page refresh when iframe doesn't initially inflate as expected (this will likely be automated once the root cause is determined)
+- [#899](https://gitlab.com/meltano/meltano/issues/899) Add deep linking improvements to reports and dashboards to better facilitate sharing
+- [#899](https://gitlab.com/meltano/meltano/issues/899) Add "Edit" and "Explore" buttons to each report instance displayed in a dashboard to enable editing said report and exploring a fresh and unselected analysis of the same model and design
 
 ### Changes
 
+- [#909](https://gitlab.com/meltano/meltano/issues/909) Default names will be generated for Reports and Dashboards
+- [#892](https://gitlab.com/meltano/meltano/issues/892) Improve experience for parsing Snowflake URL for ID by showing processing step
 - [#935](https://gitlab.com/meltano/meltano/issues/935) Update Entity Selection to be nested in the Extract step so each ELT step is consecutive
-- [#946](https://gitlab.com/meltano/meltano/issues/946) Update Contribution section of docs withe Release owner rotation schedule
+- [#886](https://gitlab.com/meltano/meltano/issues/886) Add validation for grouping settings as the next iteration of improved form validation for generated connector settings
 
 ### Fixes
 
@@ -23,7 +42,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#919](https://gitlab.com/meltano/meltano/issues/919) Fix Airflow iframe automatic UI refresh
 - [#937](https://gitlab.com/meltano/meltano/issues/937) Fix Chart.vue prop type error
 
-### Breaks
 
 ## 0.39.0 - (2019-08-26)
 
@@ -196,6 +214,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#828](https://gitlab.com/meltano/meltano/issues/828) Docker installation instructions have been dogfooded, clarified, and moved to Installation section
+- [#944](https://gitlab.com/meltano/meltano/issues/944) Update the Transform step's default to "Skip"
 
 ### Fixes
 
