@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Message from '@/components/generic/Message'
@@ -11,55 +11,13 @@ export default {
     Message
   },
   computed: {
-    ...mapGetters('plugins', [
-      'getInstalledPlugin',
-      'getIsInstallingPlugin',
-      'getIsPluginInstalled'
-    ]),
-    ...mapGetters('configuration', ['getHasValidConfigSettings']),
-    ...mapState('configuration', ['connectionInFocusConfiguration']),
-    ...mapState('plugins', ['plugins', 'installedPlugins']),
-    connection() {
-      return this.getInstalledPlugin('connections', this.connectionName)
-    },
-    hasConfigurationLoaded() {
-      return this.connectionInFocusConfiguration.config
-    },
-    isConfigurationLoading() {
-      return this.connectionName && !this.hasConfigurationLoaded
-    },
-    isLoadingConnection() {
-      return connectionName => {
-        return (
-          this.connectionName === connectionName && !this.hasConfigurationLoaded
-        )
-      }
-    },
-    isLoadingConnections() {
-      return !this.installedPlugins.connections
-    },
-    isSaveable() {
-      const isInstalling = this.getIsInstallingPlugin(
-        'connections',
-        this.connectionName
-      )
-      const isInstalled = this.getIsPluginInstalled(
-        'connections',
-        this.connectionName
-      )
-      const isValid = this.getHasValidConfigSettings(
-        this.connectionInFocusConfiguration,
-        this.connection.settingsGroupValidation
-      )
-      return !isInstalling && isInstalled && isValid
-    }
+    ...mapState('plugins', ['plugins']),
   },
   created() {
     this.$store.dispatch('plugins/getAllPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     updateConnectionSettings(connectionName) {
       this.$router.push({
         name: 'analyzeConnectionSettings',
