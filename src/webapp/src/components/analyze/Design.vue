@@ -344,13 +344,13 @@ export default {
                     </div>
                     <div class="buttons is-right">
                       <button
-                        class="button is-small is-text"
+                        class="button is-text"
                         data-dropdown-auto-close
                       >
                         Cancel
                       </button>
                       <button
-                        class="button is-small"
+                        class="button"
                         :disabled="!saveReportSettings.name"
                         data-dropdown-auto-close
                         @click="saveReport"
