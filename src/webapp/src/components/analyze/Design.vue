@@ -316,7 +316,7 @@ export default {
                 class="button"
                 @click="updateReport()"
               >
-                <span>Update Report</span>
+                <span>Save Report</span>
               </button>
             </p>
             <p class="control">
