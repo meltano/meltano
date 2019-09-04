@@ -343,10 +343,7 @@ export default {
                       </div>
                     </div>
                     <div class="buttons is-right">
-                      <button
-                        class="button is-text"
-                        data-dropdown-auto-close
-                      >
+                      <button class="button is-text" data-dropdown-auto-close>
                         Cancel
                       </button>
                       <button
