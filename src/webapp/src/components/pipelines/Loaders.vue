@@ -2,7 +2,7 @@
 import { mapGetters, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
-import SpeedRunIcon from '@/components/SpeedRunIcon'
+import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
 
 export default {
   name: 'Loaders',
