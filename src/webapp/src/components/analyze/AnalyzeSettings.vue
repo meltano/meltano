@@ -5,7 +5,7 @@ import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import Message from '@/components/generic/Message'
 
 export default {
-  name: 'Connections',
+  name: 'AnalyzeSettings',
   components: {
     ConnectorLogo,
     Message
