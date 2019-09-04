@@ -117,7 +117,7 @@ ${MELTANO_API}/node_modules:
 #   as a lockfile essentially.
 
 requirements.txt: setup.py
-	${PYTHON_RUN} bash -c 'pip install -e .[dev] && pip freeze --exclude-editable > $@'
+	pip freeze --exclude-editable > $@
 
 MODELS := $(wildcard model/*.m5o)
 MODELS := $(filter-out *.m5oc, $(MODELS)) # remove compiled files

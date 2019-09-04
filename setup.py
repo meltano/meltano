@@ -12,6 +12,7 @@ requires = [
     'bcrypt==3.1.6',
     'Cerberus==1.2',
     'click==7.0',
+    'click-default-group==1.2.1',
     'colorama==0.3.9',
     'gitpython==2.1.11',
     'jsonschema==2.6.0',
