@@ -53,6 +53,29 @@ const getters = {
             )
           )
         : false
+  },
+
+  getIsStepExtractorsMinimallyValidated(state) {
+    return (
+      state.installedPlugins.extractors &&
+      state.installedPlugins.extractors.length > 0
+    )
+  },
+
+  getIsStepLoadersMinimallyValidated(_, getters) {
+    return getters.getIsStepExtractorsMinimallyValidated
+  },
+
+  getIsStepScheduleMinimallyValidated(state, getters) {
+    return (
+      getters.getIsStepTransformsMinimallyValidated &&
+      state.installedPlugins.loaders &&
+      state.installedPlugins.loaders.length > 0
+    )
+  },
+
+  getIsStepTransformsMinimallyValidated(_, getters) {
+    return getters.getIsStepLoadersMinimallyValidated
   }
 }
 

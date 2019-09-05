@@ -17,6 +17,11 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
+    ...mapGetters('plugins', [
+      'getIsStepLoadersMinimallyValidated',
+      'getIsStepTransformsMinimallyValidated',
+      'getIsStepScheduleMinimallyValidated'
+    ]),
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -79,30 +84,70 @@ export default {
       :class="{ 'is-active': isMobileMenuOpen }"
     >
       <div class="navbar-start">
-        <router-link
-          :to="{ name: 'dataSetup' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
-            }"
+        <div class="navbar-item navbar-child has-dropdown is-hoverable">
+          <router-link
+            :to="{ name: 'dataSetup' }"
+            :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
+            class="navbar-link has-text-weight-semibold"
           >
-            <span class="icon is-small" :class="getIconColor('/pipelines')">
-              <font-awesome-icon icon="th-list"></font-awesome-icon>
-            </span>
-            <span>Pipeline</span>
-            <span
-              v-if="getRunningPipelineJobsCount > 0"
-              class="tag tag-running-pipelines is-rounded is-info"
-              @click.prevent="goToSchedules"
+            <a
+              class="button has-background-transparent is-borderless is-paddingless"
+              :class="{
+                'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+              }"
             >
-              {{ getRunningPipelineJobsCount }}
-            </span>
-          </a>
-        </router-link>
+              <span class="icon is-small" :class="getIconColor('/pipelines')">
+                <font-awesome-icon icon="th-list"></font-awesome-icon>
+              </span>
+              <span>Pipeline</span>
+              <span
+                v-if="getRunningPipelineJobsCount > 0"
+                class="tag tag-running-pipelines is-rounded is-info"
+                @click.prevent="goToSchedules"
+              >
+                {{ getRunningPipelineJobsCount }}
+              </span>
+            </a>
+          </router-link>
+
+          <div class="navbar-dropdown">
+            <router-link
+              :to="{ name: 'extractors' }"
+              class="navbar-item button is-borderless"
+              :class="{
+                'is-active': getIsCurrentPath('/pipelines/extractors')
+              }"
+              tag="button"
+              >Extract</router-link
+            >
+            <router-link
+              :to="{ name: 'loaders' }"
+              class="navbar-item button is-borderless"
+              :class="{ 'is-active': getIsCurrentPath('/pipelines/loaders') }"
+              :disabled="!getIsStepLoadersMinimallyValidated"
+              tag="button"
+              >Load</router-link
+            >
+            <router-link
+              :to="{ name: 'transforms' }"
+              class="navbar-item button is-borderless"
+              :class="{
+                'is-active': getIsCurrentPath('/pipelines/transforms')
+              }"
+              :disabled="!getIsStepTransformsMinimallyValidated"
+              tag="button"
+              >Transform</router-link
+            >
+            <router-link
+              :to="{ name: 'schedules' }"
+              class="navbar-item button is-borderless"
+              :class="{ 'is-active': getIsCurrentPath('/pipelines/schedules') }"
+              :disabled="!getIsStepScheduleMinimallyValidated"
+              tag="button"
+              >Run</router-link
+            >
+          </div>
+        </div>
 
         <router-link
           :to="{ name: 'orchestration' }"
@@ -146,14 +191,16 @@ export default {
           <div class="navbar-dropdown">
             <router-link
               :to="{ name: 'analyzeModels' }"
-              class="navbar-item"
+              class="navbar-item button is-borderless"
               :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"
+              tag="button"
               >Models</router-link
             >
             <router-link
               :to="{ name: 'analyzeSettings' }"
-              class="navbar-item"
+              class="navbar-item button is-borderless"
               :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
+              tag="button"
               >Connections</router-link
             >
           </div>
