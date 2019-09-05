@@ -45,4 +45,3 @@ class TestCliSchedule:
         assert schedule.transform == "run"
         assert schedule.interval == "@eon"  # not anytime soon ;)
         assert schedule.start_date == iso8601_datetime(TEST_DATE)
-        assert res.exit_code == 0, res.stdout

@@ -6,13 +6,24 @@ import datetime
 from . import cli
 from .add import add_plugin, add_transform
 from .params import project
+from click_default_group import DefaultGroup
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.db import project_engine
 
 
-@cli.command()
+@cli.group(cls=DefaultGroup, default="add")
+@click.pass_context
+@project
+def schedule(project, ctx):
+    _, Session = project_engine(project)
+    session = Session()
+
+    ctx.obj["schedule_service"] = schedule_service = ScheduleService(session, project)
+
+
+@schedule.command(short_help="[default] Add a new schedule")
 @click.argument("name")
 @click.argument("extractor")
 @click.argument("loader")
@@ -22,23 +33,22 @@ from meltano.core.db import project_engine
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
 @click.option("--start-date", type=click.DateTime(), default=None)
-@project
-def schedule(project, name, extractor, loader, interval, transform, job_id, start_date):
+@click.pass_context
+def add(ctx, name, extractor, loader, transform, interval, job_id, start_date):
     """
-    meltano schedule SCHEDULE_NAME EXTRACTOR_NAME LOADER_NAME INTERVAL
+    Add a new schedule
 
-    extractor_name: Which extractor should be used in this extraction
-    loader_name: Which loader should be used in this extraction
-    interval: Cron-like syntax to specify the interval or scheduling
+    \b
+    NAME:\tThe schedule name, must be unique
+    EXTRACTOR:\tWhich extractor should be used
+    LOADER:\tWhich loader should be used
+    INTERVAL:\tCron-like syntax to specify the schedule interval (@daily, @hourly, etc…)
     """
-    _, Session = project_engine(project)
-    session = Session()
 
-    # install_missing_plugins(project, extractor, loader, transform)
-    schedule_service = ScheduleService(session, project)
-    tracker = GoogleAnalyticsTracker(project)
+    schedule_service = ctx.obj["schedule_service"]
 
     try:
+        tracker = GoogleAnalyticsTracker(schedule_service.project)
         schedule = schedule_service.add(
             name,
             extractor,
@@ -50,11 +60,22 @@ def schedule(project, name, extractor, loader, interval, transform, job_id, star
         )
 
         tracker.track_meltano_schedule(schedule)
-        click.echo(f"Scheduled '{name}' at {interval}")
+        click.echo(f"Scheduled '{schedule.name}' at {schedule.interval}")
     except ScheduleAlreadyExistsError as serr:
-        click.secho(f"Schedule '{name}' already exists.", fg="yellow")
+        click.secho(f"Schedule '{serr.schedule.name}' already exists.", fg="yellow")
     except Exception as err:
         click.secho(f"Scheduling failed: {err}", fg="red", err=True)
         raise click.Abort()
-    finally:
-        session.close()
+
+
+@schedule.command()
+@click.pass_context
+def list(ctx):
+    schedule_service = ctx.obj["schedule_service"]
+    transform_elt_markers = {"run": ("→", "→"), "only": ("×", "→"), "skip": ("→", "x")}
+
+    for schedule in schedule_service.schedules():
+        markers = transform_elt_markers[schedule.transform]
+        click.echo(
+            f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
+        )
