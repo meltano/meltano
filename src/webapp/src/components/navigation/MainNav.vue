@@ -38,14 +38,14 @@ export default {
     }
   },
   methods: {
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false
+    },
     goToSchedules() {
       this.$router.push({ name: 'schedules' })
     },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
-    },
-    closeMobileMenu() {
-      this.isMobileMenuOpen = false
     }
   }
 }
@@ -124,7 +124,7 @@ export default {
           </a>
         </router-link>
 
-        <div class="navbar-item has-dropdown is-hoverable">
+        <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <router-link
             :to="{ name: 'analyze' }"
             :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
@@ -209,9 +209,6 @@ export default {
 .navbar-brand .navbar-item {
   padding: 0 1rem;
 }
-.navbar-project-label {
-  padding-right: 1.2rem;
-}
 .navbar.is-transparent {
   background-color: transparent;
 
@@ -223,6 +220,11 @@ export default {
     &.router-link-active {
       color: $interactive-navigation;
       border-color: $interactive-navigation;
+    }
+  }
+  .navbar-item {
+    &.has-dropdown {
+      border-bottom: none;
     }
   }
 
@@ -240,9 +242,6 @@ export default {
     color: $interactive-navigation;
     border-bottom: 1px solid $interactive-navigation-inactive;
   }
-}
-.navbar-item .navbar-child {
-  padding-left: 1.5rem;
 }
 .tag-running-pipelines {
   margin-left: 0.5rem;

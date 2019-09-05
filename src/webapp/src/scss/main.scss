@@ -80,6 +80,18 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
+.navbar {
+  // Fixes hover dropdown auto closing in navbar via https://github.com/jgthms/bulma/issues/2514#issuecomment-510451361
+  @media screen and (min-width: 1025px) {
+    .navbar-item.is-hoverable:hover .navbar-dropdown {
+      display: block !important;
+    }
+    .navbar-item.is-hoverable:focus-within .navbar-dropdown {
+      display: none;
+    }
+  }
+}
+
 .panel-block {
   &.is-active {
     color: $interactive-secondary;

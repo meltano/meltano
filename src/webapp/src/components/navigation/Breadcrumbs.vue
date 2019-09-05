@@ -21,6 +21,9 @@ export default {
         <a class="is-capitalized">{{ crumb }}</a>
       </li>
     </ul>
+    <div class="sr-only">
+      <h1>{{crumbs.join(' ')}}</h1>
+    </div>
   </nav>
 </template>
 
