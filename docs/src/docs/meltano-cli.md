@@ -24,6 +24,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
 - `meltano invoke <plugin_name> PLUGIN_ARGS...`: Invoke the plugin manually.
 - `meltano select [--list] [--all] <tap_name> [ENTITIES_PATTERN] [ATTRIBUTE_PATTERN]`: Manage the selected entities/attributes for a specific tap.
 - `meltano schedule <schedule_name> <extractor> <loader> <interval> [--transform]`: Schedule an ELT pipeline to run using an orchestrator.
+  - `meltano schedule list`: List the project's schedules.
 - `meltano config <plugin_name>`: Displays the plugin's configuration.
   - `meltano config <plugin_name> list`: List the available settings for the plugin.
   - `meltano config <plugin_name> set <name> <value>`: Sets the configuration's setting `<name>` to `<value>`.
@@ -263,7 +264,7 @@ Its syntax is inspired by [pgbedrock](https://github.com/Squarespace/pgbedrock),
 
 All permissions are abreviated as `read` or `write` permissions, with Meltano generating the proper grants for each type of object.
 
-Tables and views are listed under `tables` and handled properly behind the scenes. 
+Tables and views are listed under `tables` and handled properly behind the scenes.
 
 If `*` is provided as the parameter for tables the grant statement will use the `ALL <object_type>S in SCHEMA` syntax. It will also grant to future tables and views. See Snowflake documenation for [`ON FUTURE`](https://docs.snowflake.net/manuals/sql-reference/sql/grant-privilege.html#optional-parameters)
 
