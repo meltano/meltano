@@ -144,11 +144,15 @@ export default {
           </router-link>
 
           <div class="navbar-dropdown">
-            <router-link :to="{ name: 'analyzeModels' }" class="navbar-item"
+            <router-link
+              :to="{ name: 'analyzeModels' }"
+              class="navbar-item"
               :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"
               >Models</router-link
             >
-            <router-link :to="{ name: 'analyzeSettings' }" class="navbar-item"
+            <router-link
+              :to="{ name: 'analyzeSettings' }"
+              class="navbar-item"
               :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
               >Connections</router-link
             >

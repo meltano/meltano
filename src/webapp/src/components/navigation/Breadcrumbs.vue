@@ -22,7 +22,7 @@ export default {
       </li>
     </ul>
     <div class="sr-only">
-      <h1>{{crumbs.join(' ')}}</h1>
+      <h1>{{ crumbs.join(' ') }}</h1>
     </div>
   </nav>
 </template>
