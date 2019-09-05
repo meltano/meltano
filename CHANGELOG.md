@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#579](https://gitlab.com/meltano/meltano/issues/579) Add `meltano schedule list` to show a project's schedules
 
 ### Changes
 

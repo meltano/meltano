@@ -72,6 +72,10 @@ def add(ctx, name, extractor, loader, transform, interval, job_id, start_date):
 @click.pass_context
 def list(ctx):
     schedule_service = ctx.obj["schedule_service"]
+    transform_elt_markers = {"run": ("→", "→"), "only": ("×", "→"), "skip": ("→", "x")}
 
     for schedule in schedule_service.schedules():
-        click.echo(f"[{schedule.interval}]\t{schedule.name}")
+        markers = transform_elt_markers[schedule.transform]
+        click.echo(
+            f"[{schedule.interval}] {schedule.name}: {schedule.extractor} {markers[0]} {schedule.loader} {markers[1]} transforms"
+        )
