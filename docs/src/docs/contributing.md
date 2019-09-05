@@ -266,15 +266,15 @@ Meltano releases weekly on Monday mornings, and you can find a list of upcoming 
 
 #### Rotation
 
-|Release Date   	|Release Owner   	|Dogfooding Owner   	|Shadow   	|
-|---	|---	|---	|---	|
-|2019-09-03   	|Derek K.   	|Derek K.   	|--  	|
-|2019-09-09   	|Ben H.   	|Ben H.   	|Douwe M.   	|
-|2019-09-16   	|Yannis R.   	|Yannis R.   	|Douwe M.   	|
-|2019-09-23   	|Douwe M.   	|Douwe M.   	|Danielle M.  	|
-|2019-09-30   	|Danielle M.   	|Danielle M.   	|   	|
-|2019-10-07   	|Micael B.   	|Micael B.   	|   	|
-|2019-10-14  	|Derek K.   	|Derek K.   	|   	|
+| Release Date | Release Owner | Dogfooding Owner | Shadow      |
+| ------------ | ------------- | ---------------- | ----------- |
+| 2019-09-03   | Derek K.      | Derek K.         | --          |
+| 2019-09-09   | Ben H.        | Ben H.           | Douwe M.    |
+| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M.    |
+| 2019-09-23   | Douwe M.      | Douwe M.         | Danielle M. |
+| 2019-09-30   | Danielle M.   | Danielle M.      |             |
+| 2019-10-07   | Micael B.     | Micael B.        |             |
+| 2019-10-14   | Derek K.      | Derek K.         |             |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
