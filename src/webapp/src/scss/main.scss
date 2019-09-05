@@ -37,7 +37,7 @@ Interactive helpers often with improved semantic names built on top of Bulma
 }
 
 .is-interactive-secondary {
-  @extend .is-link;
+  @extend .is-info;
 }
 
 .has-text-interactive-primary {
@@ -45,7 +45,7 @@ Interactive helpers often with improved semantic names built on top of Bulma
 }
 
 .has-text-interactive-secondary {
-  @extend .has-text-link;
+  @extend .has-text-info;
 }
 
 .has-text-interactive-navigation {
