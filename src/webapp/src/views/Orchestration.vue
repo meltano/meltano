@@ -27,15 +27,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-header">
-      <div class="content">
-        <div class="level">
-          <h1 class="is-marginless">Orchestration</h1>
-        </div>
-      </div>
-    </div>
-
-    <div class="container view-body">
+    <div class="container view-body is-fluid">
       <airflow v-if="getIsAirflowReady"></airflow>
       <section v-else>
         <div class="columns">

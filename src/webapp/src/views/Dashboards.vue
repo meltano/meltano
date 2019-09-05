@@ -74,14 +74,6 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-header">
-      <div class="content">
-        <div class="level">
-          <h1 class="is-marginless">Dashboards</h1>
-        </div>
-      </div>
-    </div>
-
     <div class="container view-body is-fluid">
       <section>
         <div class="columns">

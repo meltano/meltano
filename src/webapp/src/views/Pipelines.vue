@@ -79,15 +79,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-header">
-      <div class="content">
-        <div class="level">
-          <h1 class="is-marginless">Pipelines</h1>
-        </div>
-      </div>
-    </div>
-
-    <div class="container view-body">
+    <div class="container view-body is-fluid">
       <div id="steps-data-setup" class="steps steps-pipelines is-small">
         <div
           class="step-item is-completed"

@@ -7,12 +7,6 @@ export default {
     RouterViewLayout
   },
   computed: {
-    isAnalyzing() {
-      return (
-        !this.isCurrentPath('/analyze/models') &&
-        !this.isCurrentPath('/analyze/settings')
-      )
-    },
     isCurrentPath() {
       return path => this.$route.path.includes(path)
     },
@@ -54,7 +48,7 @@ export default {
       </div>
     </div>
 
-    <div class="container view-body" :class="{ 'is-fluid': isAnalyzing }">
+    <div class="container view-body is-fluid">
       <router-view />
       <div v-if="isModal">
         <router-view :name="$route.name"></router-view>
