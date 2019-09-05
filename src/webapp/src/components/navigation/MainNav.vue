@@ -23,6 +23,9 @@ export default {
           ? 'has-text-interactive-navigation'
           : 'has-text-grey-light'
     },
+    getIsCurrentPath() {
+      return path => this.$route.path.includes(path)
+    },
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
     }
@@ -121,23 +124,36 @@ export default {
           </a>
         </router-link>
 
-        <router-link
-          :to="{ name: 'analyze' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
-          <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
-            }"
+        <div class="navbar-item has-dropdown is-hoverable">
+          <router-link
+            :to="{ name: 'analyze' }"
+            :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+            class="navbar-link has-text-weight-semibold"
           >
-            <span class="icon is-small" :class="getIconColor('/analyze')">
-              <font-awesome-icon icon="chart-line"></font-awesome-icon>
-            </span>
-            <span>Analyze</span>
-          </a>
-        </router-link>
+            <a
+              class="button has-background-transparent is-borderless is-paddingless"
+              :class="{
+                'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+              }"
+            >
+              <span class="icon is-small" :class="getIconColor('/analyze')">
+                <font-awesome-icon icon="chart-line"></font-awesome-icon>
+              </span>
+              <span>Analyze</span>
+            </a>
+          </router-link>
+
+          <div class="navbar-dropdown">
+            <router-link :to="{ name: 'analyzeModels' }" class="navbar-item"
+              :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"
+              >Models</router-link
+            >
+            <router-link :to="{ name: 'analyzeSettings' }" class="navbar-item"
+              :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
+              >Connections</router-link
+            >
+          </div>
+        </div>
 
         <router-link
           :to="{ name: 'dashboards' }"
