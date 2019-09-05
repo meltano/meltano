@@ -140,12 +140,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue';
+  import Vue from 'vue'
   // third-party
-  import lodash from 'lodash';
+  import lodash from 'lodash'
   // application
-  import poller from '@/utils/poller';
-  import utils from '@/utils/utils';
+  import poller from '@/utils/poller'
+  import utils from '@/utils/utils'
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
@@ -266,15 +266,15 @@ Meltano releases weekly on Monday mornings, and you can find a list of upcoming 
 
 #### Rotation
 
-|Release Date   	|Release Owner   	|Dogfooding Owner   	|Shadow   	|
-|---	|---	|---	|---	|
-|2019-09-03   	|Derek K.   	|Derek K.   	|--  	|
-|2019-09-09   	|Ben H.   	|Ben H.   	|Douwe M.   	|
-|2019-09-16   	|Yannis R.   	|Yannis R.   	|Douwe M.   	|
-|2019-09-23   	|Douwe M.   	|Douwe M.   	|Danielle M.  	|
-|2019-09-30   	|Danielle M.   	|Danielle M.   	|   	|
-|2019-10-07   	|Micael B.   	|Micael B.   	|   	|
-|2019-10-14  	|Derek K.   	|Derek K.   	|   	|
+| Release Date | Release Owner | Dogfooding Owner | Shadow      |
+| ------------ | ------------- | ---------------- | ----------- |
+| 2019-09-03   | Derek K.      | Derek K.         | --          |
+| 2019-09-09   | Ben H.        | Ben H.           | Douwe M.    |
+| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M.    |
+| 2019-09-23   | Douwe M.      | Douwe M.         | Danielle M. |
+| 2019-09-30   | Danielle M.   | Danielle M.      |             |
+| 2019-10-07   | Micael B.     | Micael B.        |             |
+| 2019-10-14   | Derek K.      | Derek K.         |             |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
@@ -338,6 +338,89 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available.
+
+## Dogfood Workflow
+
+1. Check that Meltano does not exist on your machine
+
+```bash
+meltano --version
+# command not found: meltano
+```
+
+2. Install Meltano on your machine using distributed version
+
+```bash
+pip install meltano
+```
+
+3. Check Meltano version matches latest release
+
+```bash
+meltano --version
+```
+
+4. Create a new Meltano project
+
+```bash
+meltano init dogfood-workflow
+```
+
+5. Change directory into your new project
+
+```bash
+cd dogfood-workflow
+```
+
+6. Start Meltano application
+
+```
+meltano ui
+```
+
+7. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
+
+8. When you land on the Pipelines page, install `tap-gitlab`
+
+9. Fill out `Private Token` with your token
+
+10. Fill out `Groups` with `meltano`
+
+11. Install `target-postgres`
+
+12. Fill out Postgres configurations
+
+13. Select `Run` for Transforms and hit `Save`.
+
+14. Verify `Pipeline Schedule` configurations
+
+15. Update `Catch-up Date` with beginning of the month to minimize the data request
+
+16. Click `Save`. Pipeline should automatically be running now
+
+17. Visit `Orchestrate` link on the top nav
+
+18. Airflow UI should appear automatically with a DAG prepopulated
+
+19. Verify `Pipeline Schedule` is complete before moving onto next step
+
+20. Go to `Analyze`
+
+21. Go into `Connections` in order to update settings and click `Save`
+
+22. Click `Analyze` next to `Gitlab stats per user`
+
+23. Select "User Name" and "Total Issues Assigned" on the left
+
+24. Click `Run` to the right of Query
+
+25. Verify Chart appears
+
+26. Save as new report with automatically populated name
+
+27. Add to New Dashboard with automatically populated name
+
+28. Check `Edit` functionality on existing Report
 
 ## Taps & Targets Workflow
 
