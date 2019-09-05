@@ -13,6 +13,7 @@ _host = os.getenv("MELTANO_API_HOSTNAME", "0.0.0.0")
 
 bind = [f"{_host}:{_port}"]
 project = Project.find()
+pidfile = str(project.run_dir("gunicorn.pid"))
 
 _workers = []
 _workers.append(MeltanoBackgroundCompiler(project))
@@ -29,6 +30,8 @@ def when_ready(server):
 
     for worker in _workers:
         worker.start()
+
+    logging.info("Meltano workers started.")
 
 
 def on_exit(server):

@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 airflow_context = {"worker": None}
 
 
+def is_mainthread():
+    return os.environ.get("WERKZEUG_RUN_MAIN") == "true"
+
+
 def create_app(config={}):
     project = Project.find()
 
@@ -157,9 +161,17 @@ def start(project, **kwargs):
     # ensure we only start the workers on the via the main thread
     # this will make sure we don't start everything twice
     # when code reload is enabled
-    if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        cleanup = start_workers(app, project, **kwargs)
+    if not app.debug or is_mainthread():
+        cleanup = start_workers(app, project)
         atexit.register(cleanup)
+
+    # set the PID
+    if is_mainthread():
+        pid_file_path = project.run_dir("flask.pid")
+        with pid_file_path.open("w") as pid_file:
+            pid_file.write(str(os.getpid()))
+
+        atexit.register(pid_file_path.unlink)
 
     app.run(**kwargs)
 

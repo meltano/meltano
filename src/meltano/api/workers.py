@@ -110,7 +110,7 @@ class AirflowWorker(threading.Thread):
             try:
                 pid = int(f.open().read())
                 stale_workers.append(psutil.Process(pid))
-            except (psutil.NoSuchProcess, ValueError):
+            except (ValueError, psutil.NoSuchProcess):
                 f.unlink()
             except FileNotFoundError:
                 pass
