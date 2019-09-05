@@ -67,6 +67,14 @@ COMPONENTS ---------------------------------------------------------------------
 Component helpers related to Bulma's component classes when bulma-overrides doesn't suffice
 */
 
+.breadcrumb {
+  margin-top: 0.75rem;
+  margin-left: 1.25rem;
+  @media screen and (min-width: $tablet) {
+    margin-left: 4.75rem;
+  }
+}
+
 .panel-block {
   &.is-active {
     color: $interactive-secondary;

@@ -3,7 +3,7 @@ import { mapGetters } from 'vuex'
 
 import utils from '@/utils/utils'
 
-import Logo from './Logo'
+import Logo from '@/components/navigation/Logo'
 
 export default {
   name: 'MainNav',
@@ -50,6 +50,7 @@ export default {
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
         <Logo />
+        <span class='meltano-label is-uppercase has-text-weight-bold has-text-primary ml-half-r'>Meltano</span>
       </div>
       <div
         class="navbar-burger burger"
@@ -158,6 +159,11 @@ export default {
 <style lang="scss">
 @import '@/scss/bulma-preset-overrides.scss';
 
+.meltano-label {
+  @media screen and (min-width: $tablet) {
+    display: none;
+  }
+}
 .navbar-menu {
   background-color: transparent;
 }
@@ -176,7 +182,7 @@ export default {
   .navbar-start .navbar-link,
   .navbar-start > .navbar-item {
     color: $interactive-navigation-inactive;
-    border-bottom: 1px solid transparent;
+    border-bottom: 1px solid $grey-lighter;
 
     &.router-link-active {
       color: $interactive-navigation;
