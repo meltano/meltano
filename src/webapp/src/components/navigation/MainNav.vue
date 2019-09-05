@@ -18,7 +18,10 @@ export default {
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
     getIconColor() {
-      return parentPath => this.getIsSubRouteOf(parentPath) ? 'has-text-interactive-navigation' : 'has-text-grey-light';
+      return parentPath =>
+        this.getIsSubRouteOf(parentPath)
+          ? 'has-text-interactive-navigation'
+          : 'has-text-grey-light'
     },
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
@@ -50,7 +53,10 @@ export default {
     <div class="navbar-brand">
       <div class="navbar-item navbar-child">
         <Logo />
-        <span class='meltano-label is-uppercase has-text-weight-bold has-text-primary ml-half-r'>Meltano</span>
+        <span
+          class="meltano-label is-uppercase has-text-weight-bold has-text-primary ml-half-r"
+          >Meltano</span
+        >
       </div>
       <div
         class="navbar-burger burger"
@@ -75,10 +81,13 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          <a class="button has-background-transparent is-borderless is-paddingless"
-            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/pipelines') }">
-            <span class="icon is-small"
-              :class="getIconColor('/pipelines')">
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/pipelines')">
               <font-awesome-icon icon="th-list"></font-awesome-icon>
             </span>
             <span>Pipeline</span>
@@ -97,10 +106,15 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/orchestration') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          <a class="button has-background-transparent is-borderless is-paddingless"
-            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/orchestration') }">
-            <span class="icon is-small"
-              :class="getIconColor('/orchestration')">
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf(
+                '/orchestration'
+              )
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/orchestration')">
               <font-awesome-icon icon="project-diagram"></font-awesome-icon>
             </span>
             <span>Orchestrate</span>
@@ -112,10 +126,13 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          <a class="button has-background-transparent is-borderless is-paddingless"
-            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/analyze') }">
-            <span class="icon is-small"
-              :class="getIconColor('/analyze')">
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/analyze')">
               <font-awesome-icon icon="chart-line"></font-awesome-icon>
             </span>
             <span>Analyze</span>
@@ -127,10 +144,13 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          <a class="button has-background-transparent is-borderless is-paddingless"
-            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/dashboards') }">
-            <span class="icon is-small"
-              :class="getIconColor('/dashboards')">
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/dashboards')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/dashboards')">
               <font-awesome-icon icon="th-large"></font-awesome-icon>
             </span>
             <span>Dashboard</span>

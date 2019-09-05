@@ -286,7 +286,9 @@ export default {
                         @click="goToDashboard(dashboard)"
                       >
                         <span class="icon is-small">
-                          <font-awesome-icon icon="th-large"></font-awesome-icon>
+                          <font-awesome-icon
+                            icon="th-large"
+                          ></font-awesome-icon>
                         </span>
                       </button>
                     </div>
