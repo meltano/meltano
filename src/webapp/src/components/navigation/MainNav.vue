@@ -190,18 +190,26 @@ export default {
 
           <div class="navbar-dropdown">
             <router-link
+              :to="{ name: 'analyzeSettings' }"
+              class="navbar-item button is-borderless"
+              :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
+              tag="button"
+              >Connections</router-link
+            >
+            <hr class="navbar-divider" />
+            <router-link
               :to="{ name: 'analyzeModels' }"
               class="navbar-item button is-borderless"
               :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"
               tag="button"
               >Models</router-link
             >
-            <router-link
-              :to="{ name: 'analyzeSettings' }"
-              class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
-              tag="button"
-              >Connections</router-link
+            <a
+              class="navbar-item button is-borderless tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-right"
+              data-tooltip="This feature is queued. Click to add to or submit a new issue."
+              target="_blank"
+              href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
+              >Notebooks</a
             >
           </div>
         </div>
@@ -229,7 +237,9 @@ export default {
         <div class="navbar-item navbar-child">
           <a
             class="button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-            data-tooltip="This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues."
+            data-tooltip="This feature is queued. Click to add to or submit a new issue."
+            target="_blank"
+            href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
           >
             <font-awesome-icon
               :icon="'user'"
