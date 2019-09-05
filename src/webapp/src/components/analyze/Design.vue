@@ -285,8 +285,8 @@ export default {
                         :data-tooltip="`Go to ${dashboard.name}`"
                         @click="goToDashboard(dashboard)"
                       >
-                        <span class="icon is-small panel-icon">
-                          <font-awesome-icon icon="table"></font-awesome-icon>
+                        <span class="icon is-small">
+                          <font-awesome-icon icon="th-large"></font-awesome-icon>
                         </span>
                       </button>
                     </div>

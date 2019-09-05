@@ -17,6 +17,9 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
+    getIconColor() {
+      return parentPath => this.getIsSubRouteOf(parentPath) ? 'has-text-interactive-navigation' : 'has-text-grey-light';
+    },
     getIsSubRouteOf() {
       return parentPath => utils.getIsSubRouteOf(parentPath, this.$route.path)
     }
@@ -71,14 +74,21 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Pipeline
-          <span
-            v-if="getRunningPipelineJobsCount > 0"
-            class="tag tag-running-pipelines is-rounded is-info"
-            @click.prevent="goToSchedules"
-          >
-            {{ getRunningPipelineJobsCount }}
-          </span>
+          <a class="button has-background-transparent is-borderless is-paddingless"
+            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/pipelines') }">
+            <span class="icon is-small"
+              :class="getIconColor('/pipelines')">
+              <font-awesome-icon icon="th-list"></font-awesome-icon>
+            </span>
+            <span>Pipeline</span>
+            <span
+              v-if="getRunningPipelineJobsCount > 0"
+              class="tag tag-running-pipelines is-rounded is-info"
+              @click.prevent="goToSchedules"
+            >
+              {{ getRunningPipelineJobsCount }}
+            </span>
+          </a>
         </router-link>
 
         <router-link
@@ -86,7 +96,14 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/orchestration') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Orchestrate
+          <a class="button has-background-transparent is-borderless is-paddingless"
+            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/orchestration') }">
+            <span class="icon is-small"
+              :class="getIconColor('/orchestration')">
+              <font-awesome-icon icon="project-diagram"></font-awesome-icon>
+            </span>
+            <span>Orchestrate</span>
+          </a>
         </router-link>
 
         <router-link
@@ -94,7 +111,14 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Analyze
+          <a class="button has-background-transparent is-borderless is-paddingless"
+            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/analyze') }">
+            <span class="icon is-small"
+              :class="getIconColor('/analyze')">
+              <font-awesome-icon icon="chart-line"></font-awesome-icon>
+            </span>
+            <span>Analyze</span>
+          </a>
         </router-link>
 
         <router-link
@@ -102,7 +126,14 @@ export default {
           :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
-          Dashboard
+          <a class="button has-background-transparent is-borderless is-paddingless"
+            :class="{ 'has-text-interactive-navigation': getIsSubRouteOf('/dashboards') }">
+            <span class="icon is-small"
+              :class="getIconColor('/dashboards')">
+              <font-awesome-icon icon="th-large"></font-awesome-icon>
+            </span>
+            <span>Dashboard</span>
+          </a>
         </router-link>
       </div>
 
