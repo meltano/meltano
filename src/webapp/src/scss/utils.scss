@@ -36,10 +36,18 @@ Display-related utilities
   box-shadow: inset 0px -3px 1px -2px rgba(10, 10, 10, 0.2);
 }
 
+/*
+UTILITIES - SPACING --------------------------------------------------------------------------------
+*/
+
 .mt1r {
   margin-top: 1rem;
 }
 
 .mb1r {
   margin-bottom: 1rem;
+}
+
+.ml-05r {
+  margin-left: 0.5rem;
 }

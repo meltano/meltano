@@ -1,11 +1,13 @@
 <script>
 import { mapActions, mapGetters } from 'vuex'
 
-import MainNav from './components/generic/MainNav'
+import Breadcrumbs from '@/components/navigation/Breadcrumbs'
+import MainNav from '@/components/navigation/MainNav'
 
 export default {
   name: 'App',
   components: {
+    Breadcrumbs,
     MainNav
   },
   computed: {
@@ -36,6 +38,7 @@ export default {
 <template>
   <div id="app">
     <main-nav></main-nav>
+    <Breadcrumbs></Breadcrumbs>
     <router-view />
   </div>
 </template>

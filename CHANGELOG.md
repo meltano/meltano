@@ -11,10 +11,12 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#579](https://gitlab.com/meltano/meltano/issues/579) Add `meltano schedule list` to show a project's schedules
 
 - [#942](https://gitlab.com/meltano/meltano/issues/942) Add progress bars on various routes to improve UX feedback
+- [#779](https://gitlab.com/meltano/meltano/issues/779) Add various UI polish details regarding iconography use, preloading feedback, breadcrumbs, container styling, navigation, and sub-navigation
 
 ### Changes
 
 - [#942](https://gitlab.com/meltano/meltano/issues/942) Update Analyze Connections UI to match configuration-as-modal pattern for UX consistency regarding configuration
+- [#779](https://gitlab.com/meltano/meltano/issues/779) Update all "This feature is queued..." temporary UI buttons to link to the Meltano repo issues page with a contextual search term
 
 ### Fixes
 
@@ -25,6 +27,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
 - [#927](https://gitlab.com/meltano/meltano/issues/927) Document how to manually set up a Meltano Droplet on DigitalOcean
 
 - [#916](https://gitlab.com/meltano/meltano/issues/916) Add Transform step as first-class and adjacent step to Extract and Load
