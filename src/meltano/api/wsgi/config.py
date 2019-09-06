@@ -31,8 +31,6 @@ def when_ready(server):
     for worker in _workers:
         worker.start()
 
-    logging.info("Meltano workers started.")
-
 
 def on_exit(server):
     for worker in _workers:

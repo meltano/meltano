@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from meltano.core.project import Project
 from meltano.core.db import project_engine
 from meltano.core.migration_service import MigrationService
+from meltano.core.upgrade_service import UpgradeService
 from . import cli
 from .params import project, db_options
 
@@ -20,50 +21,22 @@ class UpgradeError(Exception):
     pass
 
 
-def restart_process(pid):
-    process = psutil.Process(pid)
-
-    command = process.cmdline()
-    process.terminate()
-    process.wait()
-
-    subprocess.Popen(command)
-
-
 @cli.command()
+@click.option("--restart/--no-restart", help="Restart running Meltano instances automatically.", default=False)
 @project
 @click.pass_context
-def upgrade(ctx, project):
-    # we need to find out if the `meltano` module is installed as editable
-    editable = meltano.__file__.endswith("src/meltano/__init__.py")
-
-    if editable:
-        logging.info(
-            f"Skipping `meltano` upgrade because Meltano is installed as editable."
-        )
-    else:
-        run = subprocess.run(
-            ["pip", "install", "-U", "meltano"],
-            # stdout=subprocess.PIPE,
-            # stderr=subprocess.PIPE,
-            universal_newlines=True,
-        )
-
-        if run.returncode != 0:
-            raise UpgradeError(f"Failed to install plugin '{name}'.", run)
-
+def upgrade(ctx, project, restart):
     # run the db migration
     engine, _ = project_engine(project)
     migration_service = MigrationService(engine)
-    migration_service.upgrade()
+    upgrade_service = UpgradeService(project)
 
-    def try_restart(pid_file_path):
-        try:
-            with pid_file_path.open("r") as pid_file:
-                pid = int(pid_file.read())
-                restart_process(pid)
-        except:
-            logging.debug(f"Cannot restart from `{pid_file_path}`.")
+    try:
+        upgrade_service.upgrade()
+        migration_service.upgrade()
 
-    try_restart(project.run_dir("flask.pid"))
-    try_restart(project.run_dir("gunicorn.pid"))
+        if restart:
+            upgrade_service.restart_server()
+    except UpgradeError as up:
+        click.secho(str(up), fg="red")
+        raise click.Abort()

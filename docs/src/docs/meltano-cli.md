@@ -38,6 +38,8 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
   - `meltano config <plugin_name> set <name> <value>`: Sets the configuration's setting `<name>` to `<value>`.
   - `meltano config <plugin_name> unset <name>`: Remove the configuration's setting `<name>`.
   - `meltano config <plugin_name> reset`: Clear the configuration (back to defaults).
+- `meltano ui`: Start the Meltano UI.
+- `meltano upgrade [--no-restart]`: Upgrade Meltano to the latest version.
 
 ### `init`
 
@@ -396,7 +398,11 @@ $PERMISSION_BOT_ACCOUNT
 $PERMISSION_BOT_DATABASE
 $PERMISSION_BOT_ROLE
 $PERMISSION_BOT_WAREHOUSE
-```
+``` 
+
+### `upgrade`
+
+Upgrade Meltano to the latest version, optionally restarting any running instance.
 
 ## How ELT Commands Fetch Dependencies
 
