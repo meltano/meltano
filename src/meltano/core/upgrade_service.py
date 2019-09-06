@@ -5,6 +5,7 @@ import meltano
 import subprocess
 
 from meltano.core.project import Project
+from meltano.core.migration_service import MigrationService
 
 
 class UpgradeError(Exception):
@@ -14,8 +15,11 @@ class UpgradeError(Exception):
 
 
 class UpgradeService:
-    def __init__(self, project: Project):
+    def __init__(
+        self, engine, project: Project, migration_service: MigrationService = None
+    ):
         self.project = project
+        self.migration_service = migration_service or MigrationService(engine)
 
     def restart_server(self):
         def try_restart(pid_file_path):
@@ -26,7 +30,7 @@ class UpgradeService:
             except Exception as ex:
                 logging.debug(f"Cannot restart from `{pid_file_path}`: {ex}")
 
-        try_restart(self.project.run_dir("flask.pid"))
+        # try_restart(self.project.run_dir("flask.pid"))
         try_restart(self.project.run_dir("gunicorn.pid"))
 
     def upgrade(self):
@@ -40,13 +44,14 @@ class UpgradeService:
         else:
             run = subprocess.run(
                 ["pip", "install", "-U", "meltano"],
-                stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
             )
 
             if run.returncode != 0:
                 raise UpgradeError(f"Failed to upgrade `meltano`.", run)
+
+        self.migration_service.upgrade()
 
     def restart_process(self, pid):
         process = psutil.Process(pid)

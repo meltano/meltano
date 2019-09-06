@@ -1,10 +1,10 @@
+import subprocess
 from urllib.parse import urlsplit
-from flask import Blueprint, render_template, request, jsonify, redirect, g
+from flask import Blueprint, render_template, request, jsonify, redirect, g, current_app
 from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
 from meltano.api.security import api_auth_required
-
 
 root = Blueprint("root", __name__)
 
@@ -28,15 +28,20 @@ def default(path):
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
 
-@root.route("/drop")
+@root.route("/upgrade")
 @roles_required("admin")
 @api_auth_required
-def drop_it():
-    from .sql_helper import SqlHelper
+def upgrade():
+    command = ["meltano", "upgrade", "--restart"]
+    subprocess.Popen(command)
+    # project = Project.find()
 
-    SqlHelper().reset_db()
+    # upgrade_service = UpgradeService(engine, project)
+    # upgrade_service.upgrade()
 
-    return "Database reset.", 200
+    # if not app.debug:
+    #     upgrade_service.restart_server()
+    return "Updating", 201
 
 
 @root.route("/echo", methods=["POST"])

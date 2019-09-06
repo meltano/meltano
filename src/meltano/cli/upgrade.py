@@ -22,18 +22,19 @@ class UpgradeError(Exception):
 
 
 @cli.command()
-@click.option("--restart/--no-restart", help="Restart running Meltano instances automatically.", default=False)
+@click.option(
+    "--restart/--no-restart",
+    help="Restart the running Meltano instance automatically.",
+    default=False,
+)
 @project
 @click.pass_context
 def upgrade(ctx, project, restart):
-    # run the db migration
     engine, _ = project_engine(project)
-    migration_service = MigrationService(engine)
-    upgrade_service = UpgradeService(project)
+    upgrade_service = UpgradeService(engine, project)
 
     try:
         upgrade_service.upgrade()
-        migration_service.upgrade()
 
         if restart:
             upgrade_service.restart_server()
