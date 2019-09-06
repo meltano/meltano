@@ -1,12 +1,14 @@
-import lodash from 'lodash'
-import poller from '@/utils/poller'
-import utils from '@/utils/utils'
-import systemApi from '@/api/system'
 import compareVersions from 'compare-versions'
+import lodash from 'lodash'
+
+import poller from '@/utils/poller'
+import systemApi from '@/api/system'
+import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  version: null,
-  latestVersion: null
+  latestVersion: null,
+  updating: false,
+  version: null
 })
 
 const getters = {
@@ -20,6 +22,12 @@ const getters = {
 }
 
 const actions = {
+  check({ commit }) {
+    return systemApi.version().then(response => {
+      commit('setVersion', response.data.version)
+      commit('setLatestVersion', response.data.latestVersion)
+    })
+  },
   upgrade({ state, commit }) {
     let upgradePoller = null
 
@@ -63,26 +71,20 @@ const actions = {
       upgradePoller.dispose()
       commit('setUpdating', false)
     })
-  },
-  check({ commit }) {
-    return systemApi.version().then(response => {
-      commit('setVersion', response.data.version)
-      commit('setLatestVersion', response.data.latestVersion)
-    })
   }
 }
 
 const mutations = {
-  setVersion(state, version) {
-    state.version = version
-  },
-
   setLatestVersion(state, version) {
     state.latestVersion = version
   },
 
   setUpdating(state, updating) {
     state.updating = updating
+  },
+
+  setVersion(state, version) {
+    state.version = version
   }
 }
 
