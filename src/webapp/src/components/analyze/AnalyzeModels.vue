@@ -11,7 +11,11 @@ export default {
   computed: {
     ...mapState('plugins', ['installedPlugins', 'plugins']),
     ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', [
+      'getIsAddingPlugin',
+      'getIsInstallingPlugin',
+      'getIsPluginInstalled'
+    ]),
     ...mapState('repos', ['models'])
   },
   created() {
@@ -53,10 +57,9 @@ export default {
                     <a
                       v-if="!getIsPluginInstalled('models', modelPlugin)"
                       :class="{
-                        'is-loading': getIsInstallingPlugin(
-                          'models',
-                          modelPlugin
-                        )
+                        'is-loading':
+                          getIsAddingPlugin('models', modelPlugin) ||
+                          getIsInstallingPlugin('models', modelPlugin)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
                       @click="installModel(modelPlugin)"
