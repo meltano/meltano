@@ -1,4 +1,3 @@
-import Vue from 'vue'
 import lodash from 'lodash'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
@@ -21,7 +20,7 @@ const getters = {
 }
 
 const actions = {
-  upgrade({ state, commit, dispatch }) {
+  upgrade({ state, commit }) {
     let upgradePoller = null
 
     const uponUpgrade = new Promise((resolve, reject) => {
