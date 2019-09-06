@@ -146,9 +146,10 @@ export default {
                     >Analyze</router-link
                   >
                   <a
-                    :disabled="pipeline.isRunning"
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-                    data-tooltip="This feature is queued. Feel free to contribute at gitlab.com/meltano/meltano/issues."
+                    data-tooltip="This feature is queued. Click to add to or submit a new issue."
+                    target="_blank"
+                    href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=schedule"
                     >Edit</a
                   >
                 </div>

@@ -37,7 +37,7 @@ Interactive helpers often with improved semantic names built on top of Bulma
 }
 
 .is-interactive-secondary {
-  @extend .is-link;
+  @extend .is-info;
 }
 
 .has-text-interactive-primary {
@@ -45,7 +45,11 @@ Interactive helpers often with improved semantic names built on top of Bulma
 }
 
 .has-text-interactive-secondary {
-  @extend .has-text-link;
+  @extend .has-text-info;
+}
+
+.has-text-interactive-navigation {
+  color: $primary;
 }
 
 a.disabled {
@@ -63,6 +67,31 @@ COMPONENTS ---------------------------------------------------------------------
 Component helpers related to Bulma's component classes when bulma-overrides doesn't suffice
 */
 
+.breadcrumb {
+  margin-top: 0.75rem;
+  margin-left: 1.25rem;
+
+  &:not(:last-child) {
+    margin-bottom: 0rem;
+  }
+
+  @media screen and (min-width: $tablet) {
+    margin-left: 4.75rem;
+  }
+}
+
+.navbar {
+  // Fixes hover dropdown auto closing in navbar via https://github.com/jgthms/bulma/issues/2514#issuecomment-510451361
+  @media screen and (min-width: 1025px) {
+    .navbar-item.is-hoverable:hover .navbar-dropdown {
+      display: block !important;
+    }
+    .navbar-item.is-hoverable:focus-within .navbar-dropdown {
+      display: none;
+    }
+  }
+}
+
 .panel-block {
   &.is-active {
     color: $interactive-secondary;
@@ -77,22 +106,14 @@ LAYOUT -------------------------------------------------------------------------
 Layout helpers, often with names based on Bulma naming conventions
 */
 
-.view-header {
-  margin-bottom: 1rem;
-  height: 45px;
-
-  .tabs {
-    ul {
-      margin: 0;
-    }
-  }
-}
-
 .view-body {
   border: 1px solid $grey-lighter;
   border-radius: $radius-large;
   background-color: $white-ter;
   padding: 1em;
+
+  // Full view height - (navbar + breadcrumbs) - (.view-body top and bottom padding + extra padding to mitigate unwanted vertical scrollbar)
+  min-height: calc(100vh - 72px - 3.25rem);
 
   &.is-fluid {
     margin-left: 0;

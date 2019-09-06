@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 import RouterViewLayout from '@/views/RouterViewLayout'
 import Step from '@/components/generic/bulma/Step'
@@ -33,7 +33,13 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('plugins', [
+      'getIsStepLoadersMinimallyValidated',
+      'getIsStepTransformsMinimallyValidated',
+      'getIsStepScheduleMinimallyValidated'
+    ]),
     ...mapState('plugins', ['installedPlugins']),
+    ...mapState('configuration', ['installedPlugins']),
     currentStep() {
       return this.steps.find(step =>
         step.routeMatches.find(match => this.$route.name === match)
@@ -41,25 +47,6 @@ export default {
     },
     getIsActiveStep() {
       return stepName => this.currentStep.name === stepName
-    },
-    getIsStepExtractorsMinimallyValidated() {
-      return (
-        this.installedPlugins.extractors &&
-        this.installedPlugins.extractors.length > 0
-      )
-    },
-    getIsStepLoadersMinimallyValidated() {
-      return this.getIsStepExtractorsMinimallyValidated
-    },
-    getIsStepTransformsMinimallyValidated() {
-      return this.getIsStepLoadersMinimallyValidated
-    },
-    getIsStepScheduleMinimallyValidated() {
-      return (
-        this.getIsStepTransformsMinimallyValidated &&
-        this.installedPlugins.loaders &&
-        this.installedPlugins.loaders.length > 0
-      )
     },
     getModalName() {
       return this.$route.name
@@ -79,15 +66,7 @@ export default {
 
 <template>
   <router-view-layout>
-    <div class="container view-header">
-      <div class="content">
-        <div class="level">
-          <h1 class="is-marginless">Pipelines</h1>
-        </div>
-      </div>
-    </div>
-
-    <div class="container view-body">
+    <div class="container view-body is-fluid">
       <div id="steps-data-setup" class="steps steps-pipelines is-small">
         <div
           class="step-item is-completed"

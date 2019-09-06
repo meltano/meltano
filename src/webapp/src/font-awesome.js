@@ -22,11 +22,14 @@ import {
   faGlobeAmericas,
   faHashtag,
   faInfoCircle,
+  faProjectDiagram,
   faSearch,
   faSort,
   faSortAmountDown,
   faSortAmountUp,
   faTable,
+  faThLarge,
+  faThList,
   faUser
 } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -59,11 +62,14 @@ export default {
     library.add(faGlobeAmericas)
     library.add(faHashtag)
     library.add(faInfoCircle)
-    library.add(faTable)
+    library.add(faProjectDiagram)
     library.add(faSearch)
     library.add(faSort)
     library.add(faSortAmountDown)
     library.add(faSortAmountUp)
+    library.add(faTable)
+    library.add(faThLarge)
+    library.add(faThList)
     library.add(faUser)
 
     Vue.component('font-awesome-icon', FontAwesomeIcon)
