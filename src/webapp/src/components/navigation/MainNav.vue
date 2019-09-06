@@ -62,7 +62,7 @@ export default {
       <div class="navbar-item navbar-child">
         <Logo />
         <span
-          class="meltano-label is-uppercase has-text-weight-bold has-text-primary ml-half-r"
+          class="meltano-label is-uppercase has-text-weight-bold has-text-primary ml-05r"
           >Meltano</span
         >
       </div>
