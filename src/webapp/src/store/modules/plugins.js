@@ -6,6 +6,13 @@ import pluginsApi from '../../api/plugins'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
+  addingPlugins: {
+    connections: [],
+    extractors: [],
+    loaders: [],
+    models: [],
+    orchestrators: []
+  },
   installedPlugins: {},
   installingPlugins: {
     connections: [],
@@ -37,6 +44,11 @@ const getters = {
         : null
       return targetPlugin || {}
     }
+  },
+
+  getIsAddingPlugin(state) {
+    return (pluginType, pluginName) =>
+      state.addingPlugins[pluginType].includes(pluginName)
   },
 
   getIsInstallingPlugin(state) {
@@ -80,8 +92,14 @@ const getters = {
 }
 
 const actions = {
-  addPlugin(_, addConfig) {
-    return pluginsApi.addPlugin(addConfig)
+  addPlugin({ commit }, addConfig) {
+    commit('addPluginStart', addConfig)
+    return pluginsApi
+      .addPlugin(addConfig)
+      .then(() => commit('addPluginComplete', addConfig))
+      .catch(error => {
+        Vue.toasted.global.error(error)
+      })
   },
 
   getAllPlugins({ commit }) {
@@ -121,6 +139,17 @@ const actions = {
 }
 
 const mutations = {
+  addPluginComplete(state, addConfig) {
+    const idx = state.addingPlugins[addConfig.pluginType].indexOf(
+      addConfig.name
+    )
+    state.addingPlugins[addConfig.pluginType].splice(idx, 1)
+  },
+
+  addPluginStart(state, addConfig) {
+    state.addingPlugins[addConfig.pluginType].push(addConfig.name)
+  },
+
   installPluginComplete(state, installConfig) {
     const idx = state.installingPlugins[installConfig.pluginType].indexOf(
       installConfig.name

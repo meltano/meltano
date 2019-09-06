@@ -14,7 +14,11 @@ export default {
     speedRunLoader: 'target-sqlite'
   }),
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', [
+      'getIsAddingPlugin',
+      'getIsInstallingPlugin',
+      'getIsPluginInstalled'
+    ]),
     ...mapState('plugins', ['plugins']),
     sortedLoaders() {
       // This is a stop gap until we implement an eventual need for automatic text filtering for cards
@@ -105,7 +109,9 @@ export default {
             <template v-else>
               <a
                 :class="{
-                  'is-loading': getIsInstallingPlugin('loaders', loader)
+                  'is-loading':
+                    getIsAddingPlugin('loaders', loader) ||
+                    getIsInstallingPlugin('loaders', loader)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
                 @click="installLoaderAndBeginSettings(loader)"

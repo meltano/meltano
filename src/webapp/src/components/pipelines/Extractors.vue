@@ -13,7 +13,11 @@ export default {
     speedRunExtractor: 'tap-carbon-intensity'
   }),
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin']),
+    ...mapGetters('plugins', [
+      'getIsAddingPlugin',
+      'getIsPluginInstalled',
+      'getIsInstallingPlugin'
+    ]),
     ...mapState('plugins', ['plugins']),
     isLoadingExtractors() {
       return this.plugins.extractors && this.plugins.extractors.length === 0
@@ -104,7 +108,9 @@ export default {
             <template v-else>
               <a
                 :class="{
-                  'is-loading': getIsInstallingPlugin('extractors', extractor)
+                  'is-loading':
+                    getIsAddingPlugin('extractors', extractor) ||
+                    getIsInstallingPlugin('extractors', extractor)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
                 @click="installExtractorAndBeginSettings(extractor)"
