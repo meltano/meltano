@@ -19,6 +19,9 @@ export default {
   },
   created() {
     this.autoInstallAirflowCheck()
+
+    // TODO: poller?
+    this.$store.dispatch('system/check')
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),

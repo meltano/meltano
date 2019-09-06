@@ -1,9 +1,11 @@
 import subprocess
+import requests
 from urllib.parse import urlsplit
 from flask import Blueprint, render_template, request, jsonify, redirect, g, current_app
 from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
+import meltano
 from meltano.api.security import api_auth_required
 
 root = Blueprint("root", __name__)
@@ -28,7 +30,7 @@ def default(path):
         return "Please run `make bundle` from src/webapp of the Meltano project."
 
 
-@root.route("/upgrade")
+@root.route("/upgrade", methods=["POST"])
 @roles_required("admin")
 @api_auth_required
 def upgrade():
@@ -42,6 +44,17 @@ def upgrade():
     # if not app.debug:
     #     upgrade_service.restart_server()
     return "Updating", 201
+
+
+@root.route("/version")
+def version():
+    # TODO: cache this value
+    res = requests.get("https://pypi.org/pypi/meltano/json")
+    payload = res.json()
+
+    return jsonify(
+        {"version": meltano.__version__, "latest_version": payload["info"]["version"]}
+    )
 
 
 @root.route("/echo", methods=["POST"])
