@@ -11,7 +11,11 @@ export default {
     MainNav
   },
   computed: {
-    ...mapGetters('plugins', ['getIsPluginInstalled', 'getIsInstallingPlugin'])
+    ...mapGetters('plugins', [
+      'getIsAddingPlugin',
+      'getIsInstallingPlugin',
+      'getIsPluginInstalled'
+    ])
   },
   created() {
     this.autoInstallAirflowCheck()
@@ -21,8 +25,9 @@ export default {
     autoInstallAirflowCheck() {
       this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
         const needsInstallation =
-          !this.getIsPluginInstalled('orchestrators', 'airflow') &&
-          !this.getIsInstallingPlugin('orchestrators', 'airflow')
+          !this.getIsAddingPlugin('orchestrators', 'airflow') &&
+          !this.getIsInstallingPlugin('orchestrators', 'airflow') &&
+          !this.getIsPluginInstalled('orchestrators', 'airflow')
         if (needsInstallation) {
           const payload = { pluginType: 'orchestrators', name: 'airflow' }
           this.addPlugin(payload).then(() => {
