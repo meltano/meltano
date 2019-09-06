@@ -1,13 +1,15 @@
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 import utils from '@/utils/utils'
 
+import Dropdown from '@/components/generic/Dropdown'
 import Logo from '@/components/navigation/Logo'
 
 export default {
   name: 'MainNav',
   components: {
+    Dropdown,
     Logo
   },
   data() {
@@ -17,11 +19,13 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelines']),
+    ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepTransformsMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
+    ...mapState('system', ['latestVersion', 'updating', 'version']),
     getIconColor() {
       return parentPath =>
         this.getIsSubRouteOf(parentPath)
@@ -51,6 +55,9 @@ export default {
     },
     mobileMenuClicked() {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
+    },
+    startUpgrade() {
+      this.$store.dispatch('system/upgrade')
     }
   }
 }
@@ -221,19 +228,95 @@ export default {
       </div>
 
       <div class="navbar-end">
-        <div class="navbar-item navbar-child">
-          <a
-            class="button has-background-light tooltip is-tooltip-warning is-tooltip-left"
-            data-tooltip="Help shape this feature by contributing your ideas"
-            target="_blank"
-            href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
-          >
-            <font-awesome-icon
-              :icon="'user'"
-              :style="{ color: '#0F3B66' }"
-              title="Login currently disabled"
-            ></font-awesome-icon>
-          </a>
+        <div class="navbar-item navbar-child level">
+          <div class="level-right">
+            <div v-if="updateAvailable" class="level-item">
+              <Dropdown
+                label="Update Available"
+                :button-classes="
+                  `is-info is-small ${updating ? 'is-loading' : ''}`
+                "
+                menu-classes="dropdown-menu-600"
+                icon-open="gift"
+                icon-close="caret-up"
+                is-right-aligned
+              >
+                <div class="dropdown-content is-unselectable">
+                  <div class="dropdown-item">
+                    <p>
+                      View the
+                      <a
+                        href="https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md"
+                        target="_blank"
+                        >CHANGELOG.md</a
+                      >
+                      to see what is updated by the version.
+                    </p>
+                    <p class="is-italic">
+                      This information will be inlined here in the future via
+                      <a
+                        href="https://gitlab.com/meltano/meltano/issues/961"
+                        target="_blank"
+                        >#961</a
+                      >
+                    </p>
+                  </div>
+                  <div class="dropdown-item">
+                    <div class="level">
+                      <div class="level-left">
+                        <div class="field is-grouped is-grouped-multiline">
+                          <div class="control">
+                            <div class="tags has-addons">
+                              <span class="tag">Current</span>
+                              <span class="tag is-warning">{{ version }}</span>
+                            </div>
+                          </div>
+                          <div class="control">
+                            <div class="tags has-addons">
+                              <span class="tag">Latest</span>
+                              <span class="tag is-success">{{
+                                latestVersion
+                              }}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="level-right">
+                        <div class="buttons is-right">
+                          <button
+                            class="button is-text"
+                            data-dropdown-auto-close
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            class="button is-interactive-primary"
+                            data-dropdown-auto-close
+                            @click="startUpgrade"
+                          >
+                            Update Meltano
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Dropdown>
+            </div>
+            <div class="level-item">
+              <a class="button has-background-light tooltip is-tooltip-warning is-tooltip-left"
+                 data-tooltip="Help shape this feature by contributing your ideas"
+                 target="_blank"
+                 href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
+              >
+                <font-awesome-icon
+                  :icon="'user'"
+                  :style="{ color: '#0F3B66' }"
+                  title="Login currently disabled"
+                ></font-awesome-icon>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
