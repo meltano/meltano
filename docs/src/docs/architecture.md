@@ -30,7 +30,7 @@ sample {
     # defines a Join named `join_a`
     join_a {
       from: table_a
-      # we refer to the `Source's name` here 
+      # we refer to the `Source's name` here
       sql_on: "sample.a_id = join_a.a_id"
     },
     …
@@ -108,7 +108,7 @@ meltano add model [name_of_model]
 There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano UI:
 
   - Define each `Table` for a data source (as `<name>.table.m5o`)
-  - Define `Topics` for each analysis you want to run (as `<topic>.topic.m5o`) 
+  - Define `Topics` for each analysis you want to run (as `<topic>.topic.m5o`)
 
 #### Model Authoring (`.m5o` files)
 
@@ -187,10 +187,10 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
       label = From
       description = Selected from range in carbon data
       type = time
-      # `part` refers to the DATE_PART SQL function: 
+      # `part` refers to the DATE_PART SQL function:
       # https://www.postgresql.org/docs/8.1/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
-      periods = [{ name = week, label = Week, part = WEEK }, 
-                 { name = month, label = Month, part = MONTH }, 
+      periods = [{ name = week, label = Week, part = WEEK },
+                 { name = month, label = Month, part = MONTH },
                  { name = year, label = Year, part = YEAR }]
       convert_tz = no
       sql = "{{TABLE}}.from"
@@ -199,10 +199,10 @@ The `.m5o` file extension is unique to Meltano but adheres to the [HOCON (Human-
       label = To
       description = Selected to range in carbon data
       type = time
-      # `part` refers to the DATE_PART SQL function: 
+      # `part` refers to the DATE_PART SQL function:
       # https://www.postgresql.org/docs/8.1/functions-datetime.html#FUNCTIONS-DATETIME-EXTRACT
-      periods = [{ name = week, label = Week, part = WEEK }, 
-                 { name = month, label = Month, part = MONTH }, 
+      periods = [{ name = week, label = Week, part = WEEK },
+                 { name = month, label = Month, part = MONTH },
                  { name = year, label = Year, part = YEAR }]
       convert_tz = no
       sql = "{{TABLE}}.to"
@@ -395,7 +395,6 @@ the [gunicorn documentation](http://docs.gunicorn.org/en/stable/settings.html) f
 
 ALWAYS run Meltano UI in production mode when it is accessible externally:
 ```bash
-export FLASK_ENV=production
 export MELTANO_AUTHENTICATION=true
 ```
 
