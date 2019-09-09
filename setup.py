@@ -67,7 +67,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="0.40.0",
+    version="0.41.0",
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",

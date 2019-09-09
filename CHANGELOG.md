@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.41.0 - (2019-09-09)
 
 ---
 
@@ -18,9 +31,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#942](https://gitlab.com/meltano/meltano/issues/942) Update Analyze Connections UI to match configuration-as-modal pattern for UX consistency regarding configuration
 - [#779](https://gitlab.com/meltano/meltano/issues/779) Update all "This feature is queued..." temporary UI buttons to link to the Meltano repo issues page with a contextual search term
 
-### Fixes
-
-### Breaks
 
 ## 0.40.0 - (2019-09-04)
 
