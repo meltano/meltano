@@ -8,12 +8,6 @@ module.exports = {
     '!**/node_modules/**'
   ],
   coverageDirectory: '<rootDir>/test/unit/coverage',
-  globals: {
-    FLASK: {
-      airflowUrl: 'http://localhost:5010',
-      appUrl: 'http://localhost:5000'
-    }
-  },
   mapCoverage: true,
   moduleFileExtensions: ['js', 'json', 'vue'],
   moduleNameMapper: {
