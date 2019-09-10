@@ -1,13 +1,14 @@
 import Router from 'vue-router'
 import Toasted from 'vue-toasted'
 import Vue from 'vue'
-
-import Auth from '@/middleware/auth'
 import axios from 'axios'
-import FatalError from '@/middleware/fatalError'
-import FontAwesome from './font-awesome'
 import lodash from 'lodash'
 
+import Auth from '@/middleware/auth'
+import FatalError from '@/middleware/fatalError'
+import flaskContext from '@/flask'
+
+import FontAwesome from './font-awesome'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -16,7 +17,6 @@ Vue.config.productionTip = false
 
 Vue.use(Router)
 Vue.use(FontAwesome)
-
 Vue.use(Router)
 
 const toastedOptions = {
@@ -66,6 +66,7 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
     }
   ]
 })
+
 // Register a Global success notification
 Vue.toasted.register(
   'success',
@@ -75,6 +76,7 @@ Vue.toasted.register(
     type: 'success'
   })
 )
+
 // Register a Global error notification
 Vue.toasted.register(
   'error',
@@ -87,6 +89,9 @@ Vue.toasted.register(
 
 // Axios config
 axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
+
+// Flask context
+Vue.prototype.$flask = flaskContext()
 
 /* eslint-disable no-new */
 new Vue({

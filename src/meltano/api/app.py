@@ -150,13 +150,14 @@ def start(project, **kwargs):
     # this will make sure we don't start everything twice
     # when code reload is enabled
     if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
-        cleanup = start_workers(app, project)
+        cleanup = start_workers(app, project, **kwargs)
         atexit.register(cleanup)
 
     app.run(**kwargs)
 
 
-def start_workers(app, project):
+def start_workers(app, project, **kwargs):
+    port = kwargs.pop("port", 5000)
     workers = []
 
     if not app.config["AIRFLOW_DISABLED"]:
@@ -165,7 +166,8 @@ def start_workers(app, project):
 
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(
-        UIAvailableWorker("http://localhost:5000", open_browser=not app.debug)
+        # the web server should always be accessible from `localhost`
+        UIAvailableWorker(f"http://localhost:{port}", open_browser=not app.debug)
     )
 
     def stop_all():

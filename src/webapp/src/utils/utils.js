@@ -1,6 +1,9 @@
+import flaskContext from '@/flask'
+
 const regExpConnectorLogo = /(?:tap-|target-)?(.*)/
 const regExpPrivateInput = /(password|private|secret|token)/
-const FLASK = window.FLASK || ''
+
+const FLASK = flaskContext()
 
 export default {
   // Path Utils
@@ -11,7 +14,7 @@ export default {
     if (FLASK.appUrl) {
       return `${FLASK.appUrl}${path}`
     } else {
-      return `http://localhost:5000${path}`
+      return path
     }
   },
 
