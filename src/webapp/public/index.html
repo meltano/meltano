@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Meltano</title>
     <link rel="shortcut icon" href="/static/favicon.ico">
-    <% if (htmlWebpackPlugin.options.injectApiURL) { %>
+    <% if (htmlWebpackPlugin.options.injectFlaskContext) { %>
         <%= "<script>window.FLASK = JSON.parse('{{ jsContext | tojson | safe }}');</script>" %>
     <% } %>
   </head>

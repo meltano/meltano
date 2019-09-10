@@ -1,4 +1,5 @@
 import logging
+import os
 from sqlalchemy import create_engine
 
 import meltano.api.config as _config
@@ -7,9 +8,10 @@ from meltano.core.migration_service import MigrationService
 from meltano.api.workers import MeltanoBackgroundCompiler, AirflowWorker
 
 
-# for now Meltano only works on :5000
-# see https://gitlab.com/meltano/meltano/issues/375
-bind = ["0.0.0.0:5000"]
+_port = os.getenv("MELTANO_API_PORT", "5000")
+_host = os.getenv("MELTANO_API_HOSTNAME", "0.0.0.0")
+
+bind = [f"{_host}:{_port}"]
 project = Project.find()
 
 _workers = []

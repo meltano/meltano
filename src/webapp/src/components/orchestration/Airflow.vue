@@ -14,7 +14,7 @@ export default {
   },
   computed: {
     airflowUrl() {
-      return FLASK.airflowUrl
+      return this.$flask.airflowUrl
     },
     isRefreshing() {
       return this.targetUrl === this.refreshUrl

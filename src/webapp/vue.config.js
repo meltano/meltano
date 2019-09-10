@@ -1,31 +1,21 @@
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
+const isProd = process.env.NODE_ENV == 'production'
+
 module.exports = {
   assetsDir: 'static',
   configureWebpack: {
     plugins: [
-      new webpack.ProvidePlugin({
-        FLASK: '@/globals'
-      }),
       new webpack.EnvironmentPlugin({
         AIRFLOW_URL: 'http://localhost:5010',
-        MELTANO_WEB_APP_URL: 'http://localhost:5000'
+        MELTANO_WEBAPP_URL: 'http://localhost:5000'
       }),
       new HtmlWebpackPlugin({
-        filename: 'public/index.html',
-        injectFlaskContext: false,
+        filename: 'index.html',
+        injectFlaskContext: isProd,
         template: 'public/index.html'
       })
     ]
-  },
-  devServer: {
-    proxy: {
-      '^/api': {
-        changeOrigin: true,
-        target: 'http://localhost:5000',
-        ws: true
-      }
-    }
   }
 }
