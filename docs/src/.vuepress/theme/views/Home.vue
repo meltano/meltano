@@ -359,7 +359,7 @@
           sell your information!
         </p>
         <a
-          href="https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link"
+          href="https://meltano.substack.com"
           class="button"
           target="_blank"
           >Subscribe</a

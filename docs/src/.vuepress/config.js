@@ -37,7 +37,7 @@ module.exports = {
     nav: [
       { text: 'Documentation', link: '/docs/' },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
-      { text: 'Newsletter', link: 'https://docs.google.com/forms/d/e/1FAIpQLSdyiKeMwO2qB4hJZnjBhVExBZwPATgz6_QTJjXKLiTNPmhW9w/viewform?usp=sf_link',  disableIcon: true },
+      { text: 'Newsletter', link: 'https://meltano.substack.com',  disableIcon: true },
       { text: 'Press', link: '/press/' }
     ],
     sidebar: {
