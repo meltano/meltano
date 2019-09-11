@@ -61,7 +61,7 @@ class MeltanoAnalysisInvalidJoinDependencyError(MeltanoAnalysisFileParserError):
 class MeltanoAnalysisFileParser:
     def __init__(self, project: Project):
         self.project = project
-        self._output_dir = self.project.root_dir("model")
+        self._output_dir = self.project.run_dir("models")
         self.topics = []
         self.tables = []
         self.packaged_topics = []
@@ -159,15 +159,32 @@ class MeltanoAnalysisFileParser:
     def compile(self, topics):
         indices = {}
         for topic in topics:
-            compiled_file_name = f"{topic['name']}.topic.m5oc"
-            compiled_file_path = self._output_dir.joinpath(compiled_file_name)
-            indices[topic["name"]] = {"designs": [e["name"] for e in topic["designs"]]}
-            topic = self.graph_topic(topic)
+            # Each topic is:
+            # - indexed using its topic['namespace']
+            #   e.g. package.name for a package
+            #   `cutom/dir1/dir2` for a custom topic defined under `project/models/dir1/dir2/`
+            # - compiled and stored under `.meltano/run/models/{topic['namespace']}`
+            #   e.g. `.meltano/run/models/custom/dir1/dir2/mytopic.topic.m5oc`
+            topic_identifier = Path(topic["namespace"]).joinpath(topic["name"])
 
+            topic = self.graph_topic(topic)
+            indices[str(topic_identifier)] = {
+                "namespace": topic["namespace"],
+                "name": topic["name"],
+                "designs": [e["name"] for e in topic["designs"]],
+            }
+
+            # Recursively create the missing directories under `.meltano/run/`
+            compiled_file_dir = self._output_dir.joinpath(topic["namespace"])
+            compiled_file_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create the m5oc file for the topic
+            compiled_file_name = f"{topic['name']}.topic.m5oc"
+            compiled_file_path = compiled_file_dir.joinpath(compiled_file_name)
             with compiled_file_path.open("w") as compiled_topic:
                 json.dump(topic, compiled_topic)
 
-        # index file
+        # Add the final index file under `.meltano/run/models/`
         index_file_path = self._output_dir.joinpath("topics.index.m5oc")
         with index_file_path.open("w") as index_file:
             index_file.write(json.dumps(indices))
@@ -187,26 +204,51 @@ class MeltanoAnalysisFileParser:
             for topic in package.topics:
                 conf = self.parse_m5o_file(topic)
                 parsed_topic = self.topic(conf, topic.name)
+                parsed_topic["namespace"] = package.name
                 self.packaged_topics.append(parsed_topic)
+
+            # Reset the tables list so that tables with the same name from
+            #  different packages are not interfearing with correctly parsing
+            #  the packages that follow
+            self.tables = []
 
         return self.packaged_topics
 
     def parse(self):
+        # Iterate through the project/models/ directory and all its subdirectories
+        # Each directory sets a namespace for the topics and tables that exist
+        #  inside it and all the tables and topics in each namespace are parsed
+        #  together (so we assume unique names and they can reference each other).
         models = self.project.root_dir("model")
-        self.m5o_tables = list(models.glob("*.table.m5o"))
-        self.m5o_topics = list(models.glob("*.topic.m5o"))
-        if not self.m5o_topics and self.m5o_tables:
-            raise MeltanoAnalysisMissingTopicFilesError("Missing topic file(s)")
+        subfolders = [f for f in models.glob("**/*") if f.is_dir()]
 
-        for table in self.m5o_tables:
-            conf = self.parse_m5o_file(table)
-            parsed_table = self.table(conf, table.name)
-            self.tables.append(parsed_table)
+        for folder in [models] + subfolders:
+            self.m5o_tables = list(folder.glob("*.table.m5o"))
+            self.m5o_topics = list(folder.glob("*.topic.m5o"))
+            if not self.m5o_topics and self.m5o_tables:
+                raise MeltanoAnalysisMissingTopicFilesError("Missing topic file(s)")
 
-        for topic in self.m5o_topics:
-            conf = self.parse_m5o_file(topic)
-            parsed_topic = self.topic(conf, topic.name)
-            self.topics.append(parsed_topic)
+            for table in self.m5o_tables:
+                conf = self.parse_m5o_file(table)
+                parsed_table = self.table(conf, table.name)
+                self.tables.append(parsed_table)
+
+            for topic in self.m5o_topics:
+                conf = self.parse_m5o_file(topic)
+                parsed_topic = self.topic(conf, topic.name)
+
+                # The namespace for a topic in a directory under project/models/
+                #   is `custom/path/to/directory`
+                # For example:
+                # `project/models/mytopic.topic.m5o` --> `cutom`
+                # `project/models/dir1/dir2/mytopic.topic.m5o` --> `cutom/dir1/dir2`
+                parsed_topic["namespace"] = str(
+                    Path("custom").joinpath(folder.relative_to(models))
+                )
+
+                self.topics.append(parsed_topic)
+
+            self.tables = []
 
         return self.topics
 
