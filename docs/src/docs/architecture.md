@@ -393,12 +393,8 @@ This is an example invocation of gunicorn, please refer to
 the [gunicorn documentation](http://docs.gunicorn.org/en/stable/settings.html) for more details.
 :::
 
-ALWAYS run Meltano UI in production mode when it is accessible externally:
-```bash
-export MELTANO_AUTHENTICATION=true
-```
-
 Start gunicorn with 4 workers, alternatively you can use `$(nproc)`:
+
 ```bash
 gunicorn -c python:meltano.api.wsgi.config -w 4 meltano.api.wsgi:app
 ```
