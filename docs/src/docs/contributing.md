@@ -466,6 +466,16 @@ target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
 target-postgres==...
 ```
 
+## DigitalOcean snapshot
+
+To build a Droplet snapshot, one should use Packer.
+
+```
+docker run --rm -e DIGITALOCEAN_TOKEN=<PERSONAL_TOKEN> -v $(pwd)/cloud/packer:/packer -w /packer hashicorp/packer:latest build marketplace-image.json
+```
+
+The snapshot should be available under `meltano-<timestamp>` on DigitalOcean.
+
 ## Tmuxinator
 
 Tmuxinator is a way for you to efficiently manage multiple services when starting up Meltano.
