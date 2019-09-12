@@ -30,7 +30,7 @@ class ReportsHelper:
 
     def has_reports(self):
         project = Project.find()
-        m5oc_file = project.root_dir("model", "reports.m5oc")
+        m5oc_file = project.run_dir("models", "reports.m5oc")
         return Path.is_file(m5oc_file)
 
     def get_report_by_name(self, name):
@@ -40,7 +40,7 @@ class ReportsHelper:
 
     def get_reports(self):
         project = Project.find()
-        path = project.root_dir("model")
+        path = project.run_dir("models")
         reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
         return reportsParser.contents()
 
@@ -58,7 +58,7 @@ class ReportsHelper:
         project = Project.find()
         slug = slugify(report_name)
         file_name = f"{slug}.report.m5o"
-        file_path = project.root_dir("model", file_name)
+        file_path = project.run_dir("models", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = ReportsHelper.VERSION
         with open(file_path, "w") as f:
@@ -68,7 +68,7 @@ class ReportsHelper:
     def update_report(self, data):
         project = Project.find()
         file_name = f"{data['slug']}.report.m5o"
-        file_path = project.root_dir("model", file_name)
+        file_path = project.run_dir("models", file_name)
         with open(file_path, "w") as f:
             json.dump(data, f)
         return data

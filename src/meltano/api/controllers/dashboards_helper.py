@@ -25,7 +25,7 @@ class DashboardsHelper:
 
     def get_dashboards(self):
         project = Project.find()
-        path = project.root_dir("model")
+        path = project.run_dir("models")
         dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
         return dashboardsParser.contents()
 
@@ -33,7 +33,17 @@ class DashboardsHelper:
         sqlHelper = SqlHelper()
         for report in reports:
             # TODO: refactor front-end `model` → `topic`
-            m5oc = sqlHelper.get_m5oc_topic(report["model"])
+
+            #
+            # PLEASE CHECK and update the "MISSING NAMESPACE"
+            # The following needs a namespace but I can not figure out what the
+            #  reports store as we just store "data" that come from the front end
+            # We need to add the namespace together with the model name
+            # I assume that this will require:
+            # - Updating ReportsHelper.save_report(self, data)
+            # - Updating the front end to send the namespace in data
+            #
+            m5oc = sqlHelper.get_m5oc_topic("MISSING NAMESPACE", report["model"])
             design = m5oc.design(report["design"])
             dialect = report["query_payload"]["dialect"]
 
@@ -69,7 +79,7 @@ class DashboardsHelper:
         project = Project.find()
         slug = slugify(dashboard_name)
         file_name = f"{slug}.dashboard.m5o"
-        file_path = project.root_dir("model", file_name)
+        file_path = project.run_dir("models", file_name)
         data = MeltanoAnalysisFileParser.fill_base_m5o_dict(file_path, slug, data)
         data["version"] = DashboardsHelper.VERSION
         data["description"] = data["description"] or ""
@@ -85,7 +95,7 @@ class DashboardsHelper:
         if data["report_id"] not in dashboard["report_ids"]:
             dashboard["report_ids"].append(data["report_id"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = project.root_dir("model", file_name)
+            file_path = project.run_dir("models", file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
 
@@ -97,7 +107,7 @@ class DashboardsHelper:
         if data["report_id"] in dashboard["report_ids"]:
             dashboard["report_ids"].remove(data["report_id"])
             file_name = f"{dashboard['slug']}.dashboard.m5o"
-            file_path = project.root_dir("model", file_name)
+            file_path = project.run_dir("models", file_name)
             with open(file_path, "w") as f:
                 json.dump(dashboard, f)
 

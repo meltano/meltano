@@ -26,17 +26,27 @@ class TestRepos:
 
         payload = res.json
 
-        # we have topic
-        assert payload.keys()
+        # we have topics
+        topic_identifiers = payload.keys()
+        assert topic_identifiers
+        assert "model-carbon-intensity-sqlite/carbon" in topic_identifiers
+        assert "model-gitlab/gitlab" in topic_identifiers
 
-        # each topics has designs
+        # each topic has a name, a namespace and designs
         for topic_def in payload.values():
+            assert topic_def["namespace"]
+            assert topic_def["name"]
             assert topic_def["designs"]
 
     def test_design_read(self, api, app):
         with app.test_request_context():
             res = api.get(
-                url_for("repos.design_read", topic_name="carbon", design_name="region")
+                url_for(
+                    "repos.design_read",
+                    namespace="model-carbon-intensity-sqlite",
+                    topic_name="carbon",
+                    design_name="region",
+                )
             )
 
         json_data = json.loads(res.data)
