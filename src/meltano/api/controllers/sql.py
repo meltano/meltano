@@ -71,7 +71,7 @@ def index():
     return jsonify({"result": True})
 
 
-@sqlBP.route("/get/<namespace>/<topic_name>/<design_name>", methods=["POST"])
+@sqlBP.route("/get/<path:namespace>/<topic_name>/<design_name>", methods=["POST"])
 def get_sql(namespace, topic_name, design_name):
     sqlHelper = SqlHelper()
     m5oc = sqlHelper.get_m5oc_topic(namespace, topic_name)

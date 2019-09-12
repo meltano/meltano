@@ -203,7 +203,7 @@ def models():
     return jsonify(topics)
 
 
-@reposBP.route("/designs/<namespace>/<topic_name>/<design_name>", methods=["GET"])
+@reposBP.route("/designs/<path:namespace>/<topic_name>/<design_name>", methods=["GET"])
 def design_read(namespace, topic_name, design_name):
     permit("view:design", design_name)
 
