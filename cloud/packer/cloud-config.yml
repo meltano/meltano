@@ -1,0 +1,5 @@
+#cloud-config
+
+users:
+  - name: meltano
+    system: true
