@@ -9,7 +9,7 @@ export default {
   cursor: pointer;
   display: inline-block;
   position: absolute;
-  z-index: 999;
+  z-index: 3;
   top: 10px;
   right: 8px;
   width: 24px;
