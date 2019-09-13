@@ -109,7 +109,7 @@ ${MELTANO_API}/node_modules:
 requirements.txt: setup.py
 	pip freeze --exclude-editable > $@
 
-bundle_ui: clean ui
+bundle: clean ui
 	mkdir -p src/meltano/api/templates && \
 	cp src/webapp/dist/index.html src/meltano/api/templates/webapp.html && \
 	cp -r src/webapp/dist/static/. src/meltano/api/static
