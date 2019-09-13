@@ -74,8 +74,8 @@ def index():
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
 
     items = reportsParser.parse()
-    dashboardFiles = dashboardsHelper.parse()
-    reportsFiles = ReportIndeFilter().filter_all("view:reports", items)
+    dashboardFiles = dashboardsParser.parse()
+    reportsFiles = ReportIndexFilter().filter_all("view:reports", items)
 
     sortedM5oFiles = {
         "dashboards": {"label": "Dashboards", "items": dashboardFiles},
