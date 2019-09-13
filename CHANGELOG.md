@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#976](https://gitlab.com/meltano/meltano/issues/976) Route changes will update page title in the web app
 
 ### Changes
 - [Marketing #48](https://gitlab.com/meltano/meltano-marketing/issues/48) Update newsletter subscription links to redirect to our new newsletter [hosted by Substack](https://meltano.substack.com)
@@ -107,7 +108,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
-- [#900](https://gitlab.com/meltano/meltano/issues/900) Fix fallback value for Iso8601 dates/times
+- [#976](https://gitlab.com/meltano/meltano/issues/900) Fix fallback v976e Route changes will update page title in the web appfor Iso8601 dates/times
 - [#903](https://gitlab.com/meltano/meltano/issues/903) Fix columns display issue for the base table in Analyze
 
 ### Breaks
