@@ -16,15 +16,15 @@ chown $MELTANO_USER:$MELTANO_USER $MELTANO_ROOT
 
 # switch to the Meltano user
 su - $MELTANO_USER
-cd $MELTANO_HOME
 
 python3 -m venv $MELTANO_VENV
 $MELTANO_VENV/bin/pip install --upgrade pip wheel
 $MELTANO_VENV/bin/pip install gunicorn meltano
-$MELTANO_VENV/bin/meltano init project
 
-cd $MELTANO_HOME/project
+# create the Meltano project
+cd $MELTANO_ROOT
+$MELTANO_VENV/bin/meltano init project
 $MELTANO_VENV/bin/meltano --version
 
 # start and enable Meltano
-systemctl enable --now meltano
+systemctl enable meltano
