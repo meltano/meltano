@@ -25,7 +25,10 @@ const router = new Router({
     {
       path: '*',
       name: '404',
-      component: NotFound
+      component: NotFound,
+      meta: {
+        title: 'Meltano: Not Found'
+      }
     },
     {
       path: '/',
@@ -44,7 +47,8 @@ const router = new Router({
             default: Extractors
           },
           meta: {
-            isModal: false
+            isModal: false,
+            title: 'Meltano: Pipelines - Extractors'
           }
         },
         {
@@ -55,7 +59,8 @@ const router = new Router({
             extractorSettings: ExtractorSettingsModal
           },
           meta: {
-            isModal: true
+            isModal: true,
+            title: 'Meltano: Pipelines - Extractor Configuration'
           }
         },
         {
@@ -66,7 +71,8 @@ const router = new Router({
             extractorEntities: EntitiesSelectorModal
           },
           meta: {
-            isModal: true
+            isModal: true,
+            title: 'Meltano: Pipelines - Extractor Entities'
           }
         },
         {
@@ -76,7 +82,8 @@ const router = new Router({
             default: Loaders
           },
           meta: {
-            isModal: false
+            isModal: false,
+            title: 'Meltano: Pipelines - Loaders'
           }
         },
         {
@@ -87,7 +94,8 @@ const router = new Router({
             loaderSettings: LoaderSettingsModal
           },
           meta: {
-            isModal: true
+            isModal: true,
+            title: 'Meltano: Pipelines - Loader Settings'
           }
         },
         {
@@ -97,7 +105,8 @@ const router = new Router({
             default: Transforms
           },
           meta: {
-            isModal: false
+            isModal: false,
+            title: 'Meltano: Pipelines - Transforms'
           }
         },
         {
@@ -107,7 +116,8 @@ const router = new Router({
             default: PipelineSchedules
           },
           meta: {
-            isModal: false
+            isModal: false,
+            title: 'Meltano: Pipelines - Schedules'
           }
         },
         {
@@ -118,7 +128,8 @@ const router = new Router({
             createSchedule: CreateScheduleModal
           },
           meta: {
-            isModal: true
+            isModal: true,
+            title: 'Meltano: Pipelines - Create Schedules'
           }
         }
       ]
@@ -126,23 +137,35 @@ const router = new Router({
     {
       path: '/orchestration/',
       name: 'orchestration',
-      component: Orchestration
+      component: Orchestration,
+      meta: {
+        title: 'Meltano: Orchestration'
+      }
     },
     {
       path: '/analyze/',
       redirect: '/analyze/models/',
       name: 'analyze',
       component: Analyze,
+      meta: {
+        title: 'Meltano: Analyze'
+      },
       children: [
         {
           path: 'models',
           name: 'analyzeModels',
-          component: AnalyzeModels
+          component: AnalyzeModels,
+          meta: {
+            title: 'Meltano: Analyze - Models'
+          }
         },
         {
           path: 'settings',
           name: 'analyzeSettings',
-          component: AnalyzeSettings
+          component: AnalyzeSettings,
+          meta: {
+            title: 'Meltano: Analyze - Settings'
+          }
         },
         {
           path: 'settings/:connector',
@@ -152,32 +175,50 @@ const router = new Router({
             analyzeConnectionSettings: AnalyzeConnectionSettingsModal
           },
           meta: {
-            isModal: true
+            isModal: true,
+            title: 'Meltano: Analyze - Connector Settings'
           }
         },
         {
           path: '/analyze/:model/:design',
           name: 'analyzeDesign',
-          component: Design
+          component: Design,
+          meta: {
+            title: 'Meltano: Analyze - Model Design'
+          }
         },
         {
           path: '/analyze/:model/:design/reports/report/:slug',
           name: 'report',
-          component: Design
+          component: Design,
+          meta: {
+            title: 'Meltano: Analyze - Reports'
+          }
         }
       ]
     },
     {
       path: '/dashboards/',
       name: 'dashboards',
-      component: Dashboards
+      component: Dashboards,
+      meta: {
+        title: 'Meltano: Dashboards'
+      }
     },
     {
       path: '/dashboards/dashboard/:slug',
       name: 'dashboard',
-      component: Dashboards
+      component: Dashboards,
+      meta: {
+        title: 'Meltano: Dashboards'
+      }
     }
   ]
+})
+
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || 'Meltano'
+  next()
 })
 
 export default router
