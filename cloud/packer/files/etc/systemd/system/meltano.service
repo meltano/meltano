@@ -1,0 +1,17 @@
+[Unit]
+Description=Meltano UI
+After=network.target
+
+[Service]
+Type=simple
+User=meltano
+WorkingDirectory=/var/meltano/project
+Environment=FLASK_ENV=production
+ExecStartPre=/var/meltano/.venv/bin/meltano upgrade
+ExecStart=/var/meltano/.venv/bin/meltano ui
+#ExecStop=/bin/kill -s TERM $MAINPID
+#ExecStopPost=/bin/rm -rf /var/meltano/project/.meltano/run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

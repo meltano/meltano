@@ -37,7 +37,7 @@ pip install -r requirements.txt
 # Note: you may have to escape the .`[dev]` argument on some shells, like zsh
 pip install -e .[dev]
 
-# Run scripts to create remaining required files
+# Bundle the Meltano UI into the `meltano` package
 make bundle
 ```
 
@@ -47,12 +47,14 @@ Head out to the [tutorials](/docs/tutorial.html) to create your first project.
 
 ### Meltano API Development
 
-For all changes that do not involve working on Meltano UI itself, run the following command:
+For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
 
 ```bash
 # Starts both Meltano API and a production build of Meltano UI
-meltano ui
+FLASK_ENV=development meltano ui
 ```
+
+The development build of the Meltano API should be available at [http://localhost:5000/]
 
 :::warning Troubleshooting
 If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
@@ -83,9 +85,11 @@ yarn
 yarn serve
 ```
 
+The developement build of the Meltano UI will be available at [http://localhost:8080/]
+
 ### Meltano System Database
 
-Meltano API and CLI are both supported by a database that is managed via Alembic migrations.
+Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
 :::tip Note
 [Alembic](https://alembic.sqlalchemy.org/en/latest/) is a full featured database migration working on top of SQLAlchemy.
@@ -95,7 +99,7 @@ Migrations for the system database are located inside the `meltano.migrations` m
 
 To create a new migration, use the `alembic revision -m "message"` command, then edit the created file with the necessary database changes. Make sure to implement both `upgrade` and `downgrade`, so the migration is reversible, as this will be used in migration tests in the future.
 
-Each migration should be isolated from the `meltano` module, so don't import any model definition inside a migration.
+Each migration should be isolated from the `meltano` module, so **don't import any model definition inside a migration**.
 
 :::warning
 Meltano doesn't currently support auto-generating migration from the models definition.
@@ -296,7 +300,7 @@ git fetch origin
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
-1. Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install dev dependencies:
+1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install all development dependencies:
 
    ```bash
    # activate your virtualenv
@@ -309,31 +313,28 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 1. Execute the commands below:
 
    ```bash
-   # if you've released before, you may need to delete the last local release branch you created
-   git branch -D release-next
-
-   # create and checkout release-next branch that's based off master branch
-   git checkout -b release-next origin/master
+   # create and checkout the `release-next` branch from `origin/master`
+   git checkout -B release-next origin/master
 
    # view changelog (verify changes made match changes logged)
    changelog view
 
-   # after changelog validation, build the release
-   # if you only need to release a patch, use
-   make type=patch release
-   # otherwise, use
+   # after the changelog has been validated, tag the release
    make release
 
-   # after building the release, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
-   # occasionally the version bump can go to a version you don't expect.
-   changelog view
+   # ensure the tag once the tag has been created, check the version we just bumped to: e.g. `0.22.0` => `0.23.0`.
+   git describe --tags --abbrev=0
 
-   # validate that the tag auto increments based on semver
-   git push --tags
+   # push the tag upstream to trigger the release pipeline
+   git push origin $(git describe --tags --abbrev=0)
 
-   # update meltano repo with release-next branch
+   # push the release branch to merge the new version, then create a merge request
    git push origin release-next
    ```
+   
+:::tip Releasing a hotfix? 
+You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
+:::
 
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
@@ -465,6 +466,16 @@ target-demo==...
 target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
 target-postgres==...
 ```
+
+## DigitalOcean snapshot
+
+To build a Droplet snapshot, one should use Packer.
+
+```
+docker run --rm -e DIGITALOCEAN_TOKEN=<PERSONAL_TOKEN> -v $(pwd)/cloud/packer:/packer -w /packer hashicorp/packer:latest build marketplace-image.json
+```
+
+The snapshot should be available under `meltano-<timestamp>` on DigitalOcean.
 
 ## Tmuxinator
 

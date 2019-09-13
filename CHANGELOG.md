@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#976](https://gitlab.com/meltano/meltano/issues/976) Route changes will update page title in the web app
+
 ### Changes
 
 - [Marketing #48](https://gitlab.com/meltano/meltano-marketing/issues/48) Update newsletter subscription links to redirect to our new newsletter [hosted by Substack](https://meltano.substack.com)
@@ -16,6 +18,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#965](https://gitlab.com/meltano/meltano/issues/965) Fix a regression that prevented the Meltano UI to reach the Meltano API when using an external hostname.
+- [#969](https://gitlab.com/meltano/meltano/issues/969) Fix an issue where the Meltano Analyze connection would not respect the `port` configuration.
+- [#964](https://gitlab.com/meltano/meltano/issues/964) Fix copy button overlap issue with top navigation
 
 ### Breaks
 
@@ -31,6 +35,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#779](https://gitlab.com/meltano/meltano/issues/779) Add various UI polish details regarding iconography use, preloading feedback, breadcrumbs, container styling, navigation, and sub-navigation
 
 ### Changes
+
+- [#906](https://gitlab.com/meltano/meltano/issues/906) `meltano ui` will now run in `production` per default
 
 - [#942](https://gitlab.com/meltano/meltano/issues/942) Update Analyze Connections UI to match configuration-as-modal pattern for UX consistency regarding configuration
 - [#779](https://gitlab.com/meltano/meltano/issues/779) Update all "This feature is queued..." temporary UI buttons to link to the Meltano repo issues page with a contextual search term
@@ -107,7 +113,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#746](https://gitlab.com/meltano/meltano/issues/746) Prevent duplicate schedule, report, and dashboard creation if there is an existing item
-- [#900](https://gitlab.com/meltano/meltano/issues/900) Fix fallback value for Iso8601 dates/times
+- [#976](https://gitlab.com/meltano/meltano/issues/900) Fix fallback v976e Route changes will update page title in the web appfor Iso8601 dates/times
 - [#903](https://gitlab.com/meltano/meltano/issues/903) Fix columns display issue for the base table in Analyze
 
 ### Breaks
