@@ -35,7 +35,9 @@ class ReportsHelper:
 
     def get_reports(self):
         project = Project.find()
-        reportsParser = M5oCollectionParser(project.analyze_dir("reports"), M5oCollectionParserTypes.Report)
+        reportsParser = M5oCollectionParser(
+            project.analyze_dir("reports"), M5oCollectionParserTypes.Report
+        )
 
         return reportsParser.parse()
 

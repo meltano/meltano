@@ -25,7 +25,9 @@ class DashboardsHelper:
 
     def get_dashboards(self):
         project = Project.find()
-        dashboardsParser = M5oCollectionParser(project.analyze_dir("dashboards"), M5oCollectionParserTypes.Dashboard)
+        dashboardsParser = M5oCollectionParser(
+            project.analyze_dir("dashboards"), M5oCollectionParserTypes.Dashboard
+        )
 
         return dashboardsParser.parse()
 
@@ -87,7 +89,9 @@ class DashboardsHelper:
 
         if data["report_id"] not in dashboard["report_ids"]:
             dashboard["report_ids"].append(data["report_id"])
-            file_path = project.analyze_dir("dashboards", f"{dashboard['slug']}.dashboard.m5o")
+            file_path = project.analyze_dir(
+                "dashboards", f"{dashboard['slug']}.dashboard.m5o"
+            )
             with file_path.open("w") as f:
                 json.dump(dashboard, f)
 
@@ -99,7 +103,9 @@ class DashboardsHelper:
 
         if data["report_id"] in dashboard["report_ids"]:
             dashboard["report_ids"].remove(data["report_id"])
-            file_path = project.analyze_dir("dashboards", f"{dashboard['slug']}.dashboard.m5o")
+            file_path = project.analyze_dir(
+                "dashboards", f"{dashboard['slug']}.dashboard.m5o"
+            )
 
             with file_path.open("w") as f:
                 json.dump(dashboard, f)
