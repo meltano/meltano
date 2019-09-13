@@ -103,8 +103,9 @@ export default {
     this.$store.dispatch('designs/resetDefaults')
   },
   created() {
-    const { slug, model, design } = this.$route.params
+    const { slug, namespace, model, design } = this.$route.params
     const uponDesign = this.$store.dispatch('designs/getDesign', {
+      namespace,
       model,
       design,
       slug

@@ -14,6 +14,7 @@ const defaultState = utils.deepFreeze({
   chartType: 'BarChart',
   currentDesign: '',
   currentModel: '',
+  currentNamespace: '',
   currentSQL: '',
   design: {
     relatedTable: {}
@@ -127,7 +128,7 @@ const helpers = {
 
 const getters = {
   currentDesignLabel(state) {
-    return utils.titleCase(state.currentModel)
+    return utils.titleCase(state.currentDesign)
   },
 
   currentLimit(state) {
@@ -402,13 +403,14 @@ const actions = {
     commit('toggleCollapsed', row)
   },
 
-  getDesign({ commit, dispatch, state }, { model, design, slug }) {
+  getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
     state.currentSQL = ''
+    state.currentNamespace = namespace
     state.currentModel = model
     state.currentDesign = design
 
     return designApi
-      .index(model, design)
+      .index(namespace, model, design)
       .then(response => {
         commit('setDesign', response.data)
       })
@@ -446,7 +448,7 @@ const actions = {
     )
     const postData = Object.assign({ run }, queryPayload)
     sqlApi
-      .getSql(state.currentModel, state.currentDesign, postData)
+      .getSql(state.currentNamespace, state.currentModel, state.currentDesign, postData)
       .then(response => {
         if (run) {
           commit('setQueryResults', response.data)
@@ -512,6 +514,7 @@ const actions = {
       design: state.currentDesign,
       filters: state.filters,
       model: state.currentModel,
+      namespace: state.currentNamespace,
       name,
       order: state.order,
       queryPayload: helpers.getQueryPayloadFromDesign(state)
@@ -756,6 +759,7 @@ const mutations = {
   setStateFromLoadedReport(state, report) {
     // General UI state updates
     state.chartType = report.chartType
+    state.currentNamespace = report.namespace
     state.currentModel = report.model
     state.currentDesign = report.design
     state.dialect = report.queryPayload.dialect

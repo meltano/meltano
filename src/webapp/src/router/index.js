@@ -180,7 +180,7 @@ const router = new Router({
           }
         },
         {
-          path: '/analyze/:model+/:design',
+          path: '/analyze/:namespace+/:model/:design',
           name: 'analyzeDesign',
           component: Design,
           meta: {
@@ -188,7 +188,7 @@ const router = new Router({
           }
         },
         {
-          path: '/analyze/:model+/:design/reports/report/:slug',
+          path: '/analyze/:namespace+/:model/:design/reports/report/:slug',
           name: 'report',
           component: Design,
           meta: {

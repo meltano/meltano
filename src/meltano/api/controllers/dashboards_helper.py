@@ -43,7 +43,7 @@ class DashboardsHelper:
             # - Updating ReportsHelper.save_report(self, data)
             # - Updating the front end to send the namespace in data
             #
-            m5oc = sqlHelper.get_m5oc_topic("MISSING NAMESPACE", report["model"])
+            m5oc = sqlHelper.get_m5oc_topic(report["namespace"], report["model"])
             design = m5oc.design(report["design"])
             dialect = report["query_payload"]["dialect"]
 
