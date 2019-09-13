@@ -92,9 +92,18 @@ export default {
         <template v-if="hasModels">
           <div v-for="(v, model) in models" :key="`${model}-panel`" class="box">
             <div class="content">
-              <h3 class="is-size-6">
-                {{ model | capitalize | underscoreToSpace }}
-              </h3>
+              <div class="level level-tight">
+                <div class="level-left">
+                  <h3 class="is-size-6">
+                    {{ v.name | capitalize | underscoreToSpace }}
+                  </h3>
+                </div>
+                <div class="level-right">
+                  <h4 class="is-size-7 has-text-grey">
+                    {{ v.namespace }}
+                  </h4>
+                </div>
+              </div>
               <hr class="hr-tight" />
               <div
                 v-for="design in v['designs']"

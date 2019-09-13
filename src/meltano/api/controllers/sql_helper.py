@@ -42,9 +42,9 @@ class SqlHelper(SqlUtils):
         inner_results = re.findall(inner_pattern, input)
         return (outer_results, inner_results)
 
-    def get_m5oc_topic(self, topic_name):
+    def get_m5oc_topic(self, namespace, topic_name):
         project = Project.find()
-        m5oc_file = project.root_dir("model", f"{topic_name}.topic.m5oc")
+        m5oc_file = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
     def get_connection(self, dialect):

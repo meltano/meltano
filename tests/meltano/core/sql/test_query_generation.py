@@ -45,7 +45,7 @@ def gitflix(project, setup_test_models):
     ProjectCompiler(project).compile()
 
     # Load the m5oc file for gitflix
-    m5oc_file = project.root_dir("model", "gitflix.topic.m5oc")
+    m5oc_file = project.run_dir("models", "custom", "gitflix.topic.m5oc")
     return M5ocFile.load(m5oc_file)
 
 
