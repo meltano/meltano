@@ -11,7 +11,7 @@ from meltano.core.utils import coerce_datetime
 project = Project.find()
 
 # I really don't like sending None here because it
-# totally breaks the encapsulation. We should uncouple
+# totally breaks the encapsulation. We should decouple
 # `Session` from the service.
 schedule_service = ScheduleService(None, project)
 
@@ -40,7 +40,7 @@ for schedule in schedule_service.schedules():
 
     elt = BashOperator(
         task_id="extract_load",
-        bash_command=f"echo $PATH; echo $VIRTUAL_ENV; cd {str(project.root)} && meltano elt {schedule.extractor} {schedule.loader} --transform={schedule.transform}",
+        bash_command=f"echo $PATH; echo $VIRTUAL_ENV; cd {str(project.root)}; .meltano/run/bin elt {schedule.extractor} {schedule.loader} --transform={schedule.transform}",
         dag=dag,
         env={
             # inherit the current env

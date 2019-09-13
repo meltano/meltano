@@ -27,4 +27,4 @@ cd $MELTANO_HOME/project
 $MELTANO_VENV/bin/meltano --version
 
 # start and enable Meltano
-systemctl enable meltano
+systemctl enable --now meltano
