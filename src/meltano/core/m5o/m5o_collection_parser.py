@@ -26,20 +26,6 @@ class M5oCollectionParser:
         self.pattern = f"*.{self.file_type.value}.m5o"
         self.files = []
 
-    def contents(self):
-        files = self.parse()
-        self.compile(files)
-        return self.files
-
-    def compile(self, files):
-        self.files = files
-        compiled_file_path = Path(self.directory).joinpath(
-            f"{self.file_type.value}s.m5oc"
-        )
-        compiled_file = open(compiled_file_path, "w")
-        compiled_file.write(json.dumps(self.files))
-        compiled_file.close()
-
     def parse(self):
         files = []
         for file in Path(self.directory).glob(self.pattern):

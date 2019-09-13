@@ -45,20 +45,10 @@ class TestTopicFilter:
         identity.provides.add(Need("view:topic", "*"))
         identity.provides.add(Need("view:design", "*"))
 
-        m5o_file = M5ocFile.load(project.root_dir("model", "carbon.topic.m5oc"))
-
-        topic_filter = TopicFilter()
-
-        with app.app_context():
-            scoped = list(topic_filter.filter("view:topic", [m5o_file.content]))
-
-        assert len(scoped[0]["designs"]) == 1
-
-    def test_filter_scope(self, project, identity, app):
-        identity.provides.add(Need("view:topic", "*"))
-        identity.provides.add(Need("view:design", "*"))
-
-        m5o_file = M5ocFile.load(project.root_dir("model", "carbon.topic.m5oc"))
+        path = project.run_dir(
+            "models", "model-carbon-intensity-sqlite", "carbon.topic.m5oc"
+        )
+        m5o_file = M5ocFile.load(path)
 
         topic_filter = TopicFilter()
 
