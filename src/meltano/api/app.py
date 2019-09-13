@@ -170,6 +170,7 @@ def start_workers(app, project, **kwargs):
         UIAvailableWorker(f"http://localhost:{port}", open_browser=not app.debug)
     )
 
+    # cleanup callback
     def stop_all():
         logger.info("Stopping all background workers...")
         for worker in workers:

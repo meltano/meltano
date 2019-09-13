@@ -8,7 +8,6 @@ meltano.yml: |
   send_anonymous_usage_stats: True
 README.md: ""
 .env: |
-  FLASK_ENV=development
   SQLITE_DATABASE=meltano
   PG_PASSWORD=warehouse
   PG_USERNAME=warehouse
