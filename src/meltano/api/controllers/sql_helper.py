@@ -68,9 +68,9 @@ class SqlHelper(SqlUtils):
         engine_hooks = []
 
         if dialect == "postgresql":
-            psql_params = ["user", "password", "host", "dbname"]
-            user, pw, host, dbname = [config[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}/{dbname}"
+            psql_params = ["user", "password", "host", "port", "dbname"]
+            user, pw, host, port, dbname = [config[param] for param in psql_params]
+            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{dbname}"
 
             def set_connection_schema(raw, conn):
                 schema = config["schema"]
