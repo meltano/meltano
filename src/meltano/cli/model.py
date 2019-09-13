@@ -15,13 +15,13 @@ def model(ctx, project):
     if ctx.invoked_subcommand is None:
         click.secho("Local", fg="green")
         for model in compiler.topics:
-            click.echo(model["name"])
+            click.echo(f'{model["namespace"]}/{model["name"]}')
 
         print()
 
         click.secho("Packaged", fg="green")
         for model in compiler.package_topics:
-            click.echo(model["name"])
+            click.echo(f'{model["namespace"]}/{model["name"]}')
 
 
 @model.command()

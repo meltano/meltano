@@ -73,17 +73,19 @@ def index():
     dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
 
-    items = reportsParser.contents()
+    items = reportsParser.parse()
+    dashboardFiles = dashboardsParser.parse()
     reportsFiles = ReportIndexFilter().filter_all("view:reports", items)
 
     sortedM5oFiles = {
-        "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
+        "dashboards": {"label": "Dashboards", "items": dashboardFiles},
         "documents": {"label": "Documents", "items": []},
         "topics": {"label": "Topics", "items": []},
         "reports": {"label": "Reports", "items": reportsFiles},
         "tables": {"label": "Tables", "items": []},
     }
     onlydocs = project.model_dir().parent.glob("*.md")
+
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
         sortedM5oFiles["documents"]["items"].append(file_dict)
@@ -191,7 +193,7 @@ def sync():
 @reposBP.route("/models", methods=["GET"])
 def models():
     project = Project.find()
-    topicsFile = project.root_dir("model", "topics.index.m5oc")
+    topicsFile = project.run_dir("models", "topics.index.m5oc")
     path = Path(topicsFile)
     topics = json.load(open(path, "r")) if path.is_file() else {}
     topics = next(M5ocFilter().filter("view:topic", [topics]))
@@ -203,21 +205,13 @@ def models():
     return jsonify(topics)
 
 
-@reposBP.route("/tables/<table_name>", methods=["GET"])
-def table_read(table_name):
-    project = Project.find()
-    file_path = project.model_dir(f"{table_name}.table.m5o")
-    m5o_parse = MeltanoAnalysisFileParser(project)
-    table = m5o_parse.parse_m5o_file(file_path)
-    return jsonify(table)
-
-
-@reposBP.route("/designs/<topic_name>/<design_name>", methods=["GET"])
-def design_read(topic_name, design_name):
+@reposBP.route("/designs/<path:namespace>/<topic_name>/<design_name>", methods=["GET"])
+def design_read(namespace, topic_name, design_name):
     permit("view:design", design_name)
 
     project = Project.find()
-    topic = project.root_dir("model", f"{topic_name}.topic.m5oc")
+    topic = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
+
     with topic.open() as f:
         topic = json.load(f)
     designs = topic["designs"]

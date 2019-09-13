@@ -34,13 +34,18 @@ class TestSqlController:
         )
         def _post(payload, engine_mock):
             with app.test_request_context():
-                return api.post(self.url(app, "carbon", "region"), json=payload)
+                return api.post(
+                    self.url(app, "model-carbon-intensity-sqlite", "carbon", "region"),
+                    json=payload,
+                )
 
         return _post
 
     @classmethod
-    def url(cls, app, topic, design):
-        return url_for("sql.get_sql", topic_name=topic, design_name=design)
+    def url(cls, app, namespace, topic, design):
+        return url_for(
+            "sql.get_sql", namespace=namespace, topic_name=topic, design_name=design
+        )
 
     def test_get_sql(self, post, payload_builder_factory):
         self.assert_empty_query(post, payload_builder_factory())
