@@ -134,6 +134,10 @@ class Project(Versioned):
         return self.root.joinpath(".meltano", *joinpaths)
 
     @makedirs
+    def analyze_dir(self, *joinpaths):
+        return self.root_dir("analyze", *joinpaths)
+
+    @makedirs
     def venvs_dir(self, *prefixes):
         return self.meltano_dir(*prefixes, "venv")
 

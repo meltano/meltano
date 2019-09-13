@@ -73,17 +73,19 @@ def index():
     dashboardsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Dashboard)
     reportsParser = M5oCollectionParser(path, M5oCollectionParserTypes.Report)
 
-    items = reportsParser.contents()
-    reportsFiles = ReportIndexFilter().filter_all("view:reports", items)
+    items = reportsParser.parse()
+    dashboardFiles = dashboardsHelper.parse()
+    reportsFiles = ReportIndeFilter().filter_all("view:reports", items)
 
     sortedM5oFiles = {
-        "dashboards": {"label": "Dashboards", "items": dashboardsParser.contents()},
+        "dashboards": {"label": "Dashboards", "items": dashboardFiles},
         "documents": {"label": "Documents", "items": []},
         "topics": {"label": "Topics", "items": []},
         "reports": {"label": "Reports", "items": reportsFiles},
         "tables": {"label": "Tables", "items": []},
     }
     onlydocs = project.model_dir().parent.glob("*.md")
+
     for d in onlydocs:
         file_dict = MeltanoAnalysisFileParser.fill_base_m5o_dict(d, str(d.name))
         sortedM5oFiles["documents"]["items"].append(file_dict)
