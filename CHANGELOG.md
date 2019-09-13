@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#965](https://gitlab.com/meltano/meltano/issues/965) Fix a regression that prevented the Meltano UI to reach the Meltano API when using an external hostname.
 - [#964](https://gitlab.com/meltano/meltano/issues/964) Fix copy button overlap issue with top navigation
+- [#969](https://gitlab.com/meltano/meltano/issues/969) Fix an issue where the Meltano Analyze connection would not respect the `port` configuration.
 
 ### Breaks
 
