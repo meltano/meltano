@@ -117,7 +117,7 @@ bundle: clean ui
 freeze_db:
 	scripts/alembic_freeze.py
 
-sdist: bundle_ui freeze_db
+sdist: freeze_db bundle
 	python setup.py sdist
 
 docker_sdist: base_image
