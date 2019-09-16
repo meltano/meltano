@@ -15,7 +15,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#989](https://gitlab.com/meltano/meltano/issues/989) Fix UI/UX documentation regarding recent removal of `view-header`
+
 ### Breaks
+
 
 ## 0.42.0 - (2019-09-16)
 
