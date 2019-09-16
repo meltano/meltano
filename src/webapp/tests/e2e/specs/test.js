@@ -1,16 +1,16 @@
-// For authoring Nightwatch tests, see
-// http://nightwatchjs.org/guide#usage
+// https://docs.cypress.io/api/introduction/api.html
 
-module.exports = {
-  'default e2e tests': function test(browser) {
-    // automatically uses dev Server port from /build/config.js
-    // default: http://localhost:8080
-    // see nightwatch.conf.js
-    const devServer = browser.globals.devServerUrl
+describe('Configuration', () => {
+  it('A user can configure an installed plugin', () => {
+    cy.server()
+    cy.route('/api/v1/plugins/installed').as('api')
 
-    browser
-      .url(devServer)
-      .waitForElementVisible('#app', 5000)
-      .end()
-  }
-}
+    cy.visit('http://localhost:8080/')
+    cy.wait('@api')
+    cy.get('.tile.is-child').within(() => {
+      cy.get('.button')
+        .contains('Configure')
+        .click()
+    })
+  })
+})

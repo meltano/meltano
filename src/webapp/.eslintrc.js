@@ -11,7 +11,8 @@ module.exports = {
   ],
   globals: {
     FLASK: false,
-    process: false
+    process: false,
+    cy: false
   },
   parserOptions: {
     parser: 'babel-eslint'
