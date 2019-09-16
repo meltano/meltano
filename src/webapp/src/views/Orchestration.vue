@@ -3,6 +3,8 @@ import { mapGetters } from 'vuex'
 
 import Airflow from '@/components/orchestration/Airflow'
 import RouterViewLayout from '@/views/RouterViewLayout'
+import flaskContext from '@/flask'
+
 
 export default {
   name: 'Orchestration',
@@ -20,6 +22,16 @@ export default {
     },
     getIsInstallingAirflow() {
       return this.getIsInstallingPlugin('orchestrators', 'airflow')
+    }
+  },
+  beforeRouteEnter: (to, from, next) => {
+    // force refresh unless the Flask context has Airflow set
+    const { airflowUrl } = flaskContext()
+
+    if (!airflowUrl && from.name !== null) {
+      window.location.href = to.path
+    } else {
+      next()
     }
   }
 }
