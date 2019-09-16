@@ -13,6 +13,7 @@ module.exports = {
       }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
+        injectAnalytics: isProd,
         injectFlaskContext: isProd,
         template: 'public/index.html'
       })
