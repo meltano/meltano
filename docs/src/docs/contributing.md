@@ -144,12 +144,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue'
+  import Vue from 'vue';
   // third-party
-  import lodash from 'lodash'
+  import lodash from 'lodash';
   // application
-  import poller from '@/utils/poller'
-  import utils from '@/utils/utils'
+  import poller from '@/utils/poller';
+  import utils from '@/utils/utils';
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
@@ -209,11 +209,9 @@ There are three fundamental markup groups in the codebase. All three are technic
 Here is a technical breakdown:
 
 1. Views - navigation, signage, and sub-navigation
-   - Use `<router-view-layout>` as root with only two children:
-     1. `<div class="container view-header">`
-        - Signage
-        - Sub-navigation
-     2. `<div class="container view-body">`
+   - Navigation and breadcrumbs are adjacent to the main view
+   - Use `<router-view-layout>` as root with only one child for the main view:
+     1. `<div class="container view-body">`
         - Can expand based on task real-estate requirements via `is-fluid` class addition
    - Reside in the `src/views` directory
 2. Sub-views - tasks
@@ -331,8 +329,8 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    # push the release branch to merge the new version, then create a merge request
    git push origin release-next
    ```
-   
-:::tip Releasing a hotfix? 
+
+:::tip Releasing a hotfix?
 You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
 :::
 
