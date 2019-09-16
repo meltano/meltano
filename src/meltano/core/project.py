@@ -45,6 +45,14 @@ class Project(Versioned):
         # helpful to refer to the current absolute project path
         os.environ["MELTANO_PROJECT_ROOT"] = str(project.root)
 
+        # create a symlink to our current binary
+        try:
+            executable = Path(os.path.dirname(sys.executable), "meltano")
+            if executable.is_file():
+                project.run_dir().joinpath("bin").symlink_to(executable)
+        except FileExistsError:
+            pass
+
         load_dotenv(dotenv_path=project.root.joinpath(".env"))
         logging.debug(f"Activated project at {project.root}")
 
