@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,14 +13,16 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#989](https://gitlab.com/meltano/meltano/issues/989) Fix UI/UX documentation regarding recent removal of `view-header`
 
+### Breaks
 
 ## 0.42.0 - (2019-09-16)
 
 ---
 
 ### New
+
 - [#976](https://gitlab.com/meltano/meltano/issues/976) Route changes will update page title in the web app
 
 ### Changes
@@ -34,7 +36,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#969](https://gitlab.com/meltano/meltano/issues/969) Fix an issue where the Meltano Analyze connection would not respect the `port` configuration.
 - [#964](https://gitlab.com/meltano/meltano/issues/964) Fix copy button overlap issue with top navigation
 - [#970](https://gitlab.com/meltano/meltano/issues/970) Fix Meltano's m5o parser and compiler to properly namespace and isolate the definitions of different custom and packaged Topics.
-
 
 ## 0.41.0 - (2019-09-09)
 
