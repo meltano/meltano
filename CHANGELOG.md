@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.42.0 - (2019-09-16)
 
 ---
 
@@ -22,7 +35,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#964](https://gitlab.com/meltano/meltano/issues/964) Fix copy button overlap issue with top navigation
 - [#970](https://gitlab.com/meltano/meltano/issues/970) Fix Meltano's m5o parser and compiler to properly namespace and isolate the definitions of different custom and packaged Topics.
 
-### Breaks
 
 ## 0.41.0 - (2019-09-09)
 
