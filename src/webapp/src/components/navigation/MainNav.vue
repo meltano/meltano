@@ -87,16 +87,16 @@ export default {
         <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <router-link
             :to="{ name: 'dataSetup' }"
-            :class="{ 'router-link-active': getIsSubRouteOf('/pipelines') }"
+            :class="{ 'router-link-active': getIsSubRouteOf('/pipeline') }"
             class="navbar-link has-text-weight-semibold"
           >
             <a
               class="button has-background-transparent is-borderless is-paddingless"
               :class="{
-                'has-text-interactive-navigation': getIsSubRouteOf('/pipelines')
+                'has-text-interactive-navigation': getIsSubRouteOf('/pipeline')
               }"
             >
-              <span class="icon is-small" :class="getIconColor('/pipelines')">
+              <span class="icon is-small" :class="getIconColor('/pipeline')">
                 <font-awesome-icon icon="th-list"></font-awesome-icon>
               </span>
               <span>Pipeline</span>
@@ -115,7 +115,7 @@ export default {
               :to="{ name: 'extractors' }"
               class="navbar-item button is-borderless"
               :class="{
-                'is-active': getIsCurrentPath('/pipelines/extractors')
+                'is-active': getIsCurrentPath('/pipeline/extract')
               }"
               tag="button"
               >Extract</router-link
@@ -123,7 +123,7 @@ export default {
             <router-link
               :to="{ name: 'loaders' }"
               class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/pipelines/loaders') }"
+              :class="{ 'is-active': getIsCurrentPath('/pipeline/load') }"
               :disabled="!getIsStepLoadersMinimallyValidated"
               tag="button"
               >Load</router-link
@@ -132,7 +132,7 @@ export default {
               :to="{ name: 'transforms' }"
               class="navbar-item button is-borderless"
               :class="{
-                'is-active': getIsCurrentPath('/pipelines/transforms')
+                'is-active': getIsCurrentPath('/pipeline/transform')
               }"
               :disabled="!getIsStepTransformsMinimallyValidated"
               tag="button"
@@ -141,7 +141,7 @@ export default {
             <router-link
               :to="{ name: 'schedules' }"
               class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/pipelines/schedules') }"
+              :class="{ 'is-active': getIsCurrentPath('/pipeline/run') }"
               :disabled="!getIsStepScheduleMinimallyValidated"
               tag="button"
               >Run</router-link
@@ -151,18 +151,18 @@ export default {
 
         <router-link
           :to="{ name: 'orchestration' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/orchestration') }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/orchestrate') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
               'has-text-interactive-navigation': getIsSubRouteOf(
-                '/orchestration'
+                '/orchestrate'
               )
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/orchestration')">
+            <span class="icon is-small" :class="getIconColor('/orchestrate')">
               <font-awesome-icon icon="project-diagram"></font-awesome-icon>
             </span>
             <span>Orchestrate</span>
@@ -216,16 +216,16 @@ export default {
 
         <router-link
           :to="{ name: 'dashboards' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/dashboards') }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/dashboard') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/dashboards')
+              'has-text-interactive-navigation': getIsSubRouteOf('/dashboard')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/dashboards')">
+            <span class="icon is-small" :class="getIconColor('/dashboard')">
               <font-awesome-icon icon="th-large"></font-awesome-icon>
             </span>
             <span>Dashboard</span>

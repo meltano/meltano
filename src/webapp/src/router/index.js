@@ -32,27 +32,27 @@ const router = new Router({
     },
     {
       path: '/',
-      redirect: '/pipelines'
+      redirect: '/pipeline'
     },
     {
-      path: '/pipelines/',
-      redirect: '/pipelines/extractors/',
+      path: '/pipeline/',
+      redirect: '/pipeline/extract/',
       name: 'dataSetup',
       component: Pipelines,
       children: [
         {
-          path: 'extractors',
+          path: 'extract',
           name: 'extractors',
           components: {
             default: Extractors
           },
           meta: {
             isModal: false,
-            title: 'Meltano: Pipelines - Extractors'
+            title: 'Meltano: Pipeline - Extract'
           }
         },
         {
-          path: 'extractors/:extractor/configure',
+          path: 'extract/:extractor/configure',
           name: 'extractorSettings',
           components: {
             default: Extractors,
@@ -60,11 +60,11 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipelines - Extractor Configuration'
+            title: 'Meltano: Pipeline - Extractor Configuration'
           }
         },
         {
-          path: 'extractors/:extractor/select',
+          path: 'extract/:extractor/select',
           name: 'extractorEntities',
           components: {
             default: Extractors,
@@ -72,22 +72,22 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipelines - Extractor Entities'
+            title: 'Meltano: Pipeline - Extractor Entities'
           }
         },
         {
-          path: 'loaders',
+          path: 'load',
           name: 'loaders',
           components: {
             default: Loaders
           },
           meta: {
             isModal: false,
-            title: 'Meltano: Pipelines - Loaders'
+            title: 'Meltano: Pipeline - Load'
           }
         },
         {
-          path: 'loaders/:loader',
+          path: 'load/:loader',
           name: 'loaderSettings',
           components: {
             default: Loaders,
@@ -95,33 +95,33 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipelines - Loader Settings'
+            title: 'Meltano: Pipeline - Loader Settings'
           }
         },
         {
-          path: 'transforms',
+          path: 'transform',
           name: 'transforms',
           components: {
             default: Transforms
           },
           meta: {
             isModal: false,
-            title: 'Meltano: Pipelines - Transforms'
+            title: 'Meltano: Pipeline - Transform'
           }
         },
         {
-          path: 'schedules',
+          path: 'schedule',
           name: 'schedules',
           components: {
             default: PipelineSchedules
           },
           meta: {
             isModal: false,
-            title: 'Meltano: Pipelines - Schedules'
+            title: 'Meltano: Pipeline - Schedule'
           }
         },
         {
-          path: 'schedules/create',
+          path: 'schedule/create',
           name: 'createSchedule',
           components: {
             default: PipelineSchedules,
@@ -129,13 +129,13 @@ const router = new Router({
           },
           meta: {
             isModal: true,
-            title: 'Meltano: Pipelines - Create Schedules'
+            title: 'Meltano: Pipeline - Create Schedule'
           }
         }
       ]
     },
     {
-      path: '/orchestration/',
+      path: '/orchestrate/',
       name: 'orchestration',
       component: Orchestration,
       meta: {
@@ -198,19 +198,19 @@ const router = new Router({
       ]
     },
     {
-      path: '/dashboards/',
+      path: '/dashboard/',
       name: 'dashboards',
       component: Dashboards,
       meta: {
-        title: 'Meltano: Dashboards'
+        title: 'Meltano: Dashboard'
       }
     },
     {
-      path: '/dashboards/dashboard/:slug',
+      path: '/dashboard/:slug',
       name: 'dashboard',
       component: Dashboards,
       meta: {
-        title: 'Meltano: Dashboards'
+        title: 'Meltano: Dashboard'
       }
     }
   ]
