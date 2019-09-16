@@ -28,7 +28,7 @@
     </div>
 
     <!-- repo link -->
-    <div 
+    <div
       class="nav-item nav-item--repo"
     >
       <a
@@ -170,7 +170,7 @@ export default {
   .nav-links a
     &:hover, &.router-link-active
       color $textColor
-  .nav-item > a:not(.external)
+  .nav-item > a
     &:hover, &.router-link-active
       margin-bottom -2px
       border-bottom 2px solid lighten($accentColor, 8%)
