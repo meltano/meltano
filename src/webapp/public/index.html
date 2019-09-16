@@ -9,7 +9,7 @@
     <% if (htmlWebpackPlugin.options.injectFlaskContext) { %>
         <%= "<script>window.FLASK = JSON.parse('{{ jsContext | tojson | safe }}');</script>" %>
     <% } %>
-    <% if (htmlWebpackPlugin.options.injectFlaskContext) { %>
+    <% if (htmlWebpackPlugin.options.injectAnalytics) { %>
       <%= `<!-- Global site tag (gtag.js) - Google Analytics -->
       <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132758957-2"></script>
       <script>
