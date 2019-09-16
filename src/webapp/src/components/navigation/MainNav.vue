@@ -141,7 +141,7 @@ export default {
             <router-link
               :to="{ name: 'schedules' }"
               class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/pipeline/run') }"
+              :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
               :disabled="!getIsStepScheduleMinimallyValidated"
               tag="button"
               >Run</router-link
