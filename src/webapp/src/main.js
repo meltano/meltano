@@ -93,7 +93,7 @@ axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 // Flask context
 Vue.prototype.$flask = flaskContext()
 
-// Conditional analytics
+// Conditional analytics using flask context
 if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
   Vue.use(VueAnalytics, { id: 'UA-132758957-2', router })
 }
@@ -104,16 +104,4 @@ new Vue({
   store,
   router,
   render: h => h(App)
-})
-
-// Analytics SPA route change hook (no initial ping as the gtag init step does this automatically)
-router.afterEach(to => {
-  if (window.gtag) {
-    window.gtag('config', 'UA-132758957-2', {
-      page_title: to.name,
-      page_path: to.path
-    })
-  } else {
-    console.log('not tracking')
-  }
 })
