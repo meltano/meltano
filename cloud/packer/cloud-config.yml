@@ -3,3 +3,4 @@
 users:
   - name: meltano
     system: true
+    homedir: /var/meltano

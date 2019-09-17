@@ -14,17 +14,14 @@ MELTANO_VENV=$MELTANO_ROOT/.venv
 mkdir -p $MELTANO_ROOT
 chown $MELTANO_USER:$MELTANO_USER $MELTANO_ROOT
 
-# switch to the Meltano user
-su - $MELTANO_USER
-
-python3 -m venv $MELTANO_VENV
-$MELTANO_VENV/bin/pip install --upgrade pip wheel
-$MELTANO_VENV/bin/pip install gunicorn meltano
+sudo -H -u $MELTANO_USER python3 -m venv $MELTANO_VENV
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install --upgrade pip wheel
+sudo -H -u $MELTANO_USER $MELTANO_VENV/bin/pip install gunicorn meltano
 
 # create the Meltano project
 cd $MELTANO_ROOT
-$MELTANO_VENV/bin/meltano init project
-$MELTANO_VENV/bin/meltano --version
+sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
+sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano --version
 
 # start and enable Meltano
 systemctl enable meltano
