@@ -41,9 +41,9 @@ pip install -e .[dev]
 make bundle
 ```
 
-Meltano is now installed and available at `meltano`.
+Meltano is now installed and available at `meltano`, as long as you remain in your `meltano-development` virtual environment!
 
-Head out to the [tutorials](/docs/tutorial.html) to create your first project.
+This means that you're ready to start Meltano CLI development. For API and UI development, read on.
 
 ### Metrics (anonymous usage data) tracking
 
@@ -59,16 +59,16 @@ export MELTANO_DISABLE_TRACKING=True
 For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
 
 ```bash
-# Starts both Meltano API and a production build of Meltano UI
+# Starts both a development build of the Meltano API and a production build of Meltano UI
 FLASK_ENV=development meltano ui
 ```
 
-The development build of the Meltano API should be available at [http://localhost:5000/]
+The development build of the Meltano API should be available at <http://localhost:5000/>.
 
 :::warning Troubleshooting
 If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
 
-On a OSX, this can be solved by running `brew install yarn`.
+On macOS, this can be solved by running `brew install yarn`.
 :::
 
 ## Meltano UI Development
@@ -94,7 +94,7 @@ yarn
 yarn serve
 ```
 
-The developement build of the Meltano UI will be available at [http://localhost:8080/]
+The development build of the Meltano UI will be available at <http://localhost:8080/>.
 
 ## Meltano System Database
 
@@ -446,7 +446,7 @@ We should be good citizen about these, and use the default workflow to contribut
 ### For taps/targets we create
 
 1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
-1. For target developement please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
 1. Use a separate repo (meltano/target|tap-x) in GitLab
    e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
 1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.

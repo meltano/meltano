@@ -19,7 +19,7 @@ meltano init PROJECT_NAME
 This will create a new directory named `PROJECT_NAME` and initialize Meltano's basic directory structure inside it.
 
 :::tip
-For those new to the command line, your PROJECT_NAME should not have spaces in the name and should use dashes instead. For example, "my project" will not work; but "my-project" will.
+For those new to the command line, your `PROJECT_NAME` should not have spaces in the name and should use dashes instead. For example, `my project` will not work; but `my-project` will.
 :::
 
 ### Anonymous usage data
@@ -58,7 +58,7 @@ meltano ui
 
 Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
 
-Open your Internet browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
+Open your web browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
 
 ## Connecting Data Sources
 

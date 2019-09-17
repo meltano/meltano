@@ -46,23 +46,23 @@ If you installed Python 3 alongside an existing Python 2 installation, you'll wa
 
 ::: danger IMPORTANT
 Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
+:::
 
 **Why use a virtual environment?**
 
 Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
-:::
 
-#### Recommened Virtual Environment Setup
+#### Recommended Virtual Environment Setup
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
 
-- **Linux, OSX**: `~/virtualenvs`
+- **Linux, macOS**: `~/virtualenvs`
 - **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-# Linux, OSX
+# Linux, macOS
 mkdir ~/virtualenvs
 python -m venv ~/virtualenvs/meltano
 
@@ -76,7 +76,7 @@ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 Activate the virtual environment using:
 
 ```bash
-# Linux, OSX
+# Linux, macOS
 source ~/virtualenvs/meltano/bin/activate
 
 # Windows
