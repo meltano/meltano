@@ -21,7 +21,6 @@ from meltano.core.plugin_install_service import (
 from meltano.core.plugin_discovery_service import PluginNotFoundError
 from meltano.core.plugin import PluginType, Plugin
 from meltano.core.project import Project
-from meltano.core.database_add_service import DatabaseAddService
 from meltano.core.transform_add_service import TransformAddService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.error import SubprocessError
@@ -46,28 +45,6 @@ def add(ctx, project, custom):
         ctx.obj["add_service"] = ProjectAddCustomService(project)
     else:
         ctx.obj["add_service"] = ProjectAddService(project)
-
-
-@add.command()
-@click.option("--name", prompt="Database connection name")
-@click.option("--host", prompt="Database host")
-@click.option("--database", prompt="Database database")
-@click.option("--schema", prompt="Database schema")
-@click.option("--username", prompt="Database username")
-@click.option(
-    "--password", prompt="Database password", hide_input=True, confirmation_prompt=True
-)
-def database(project, name, host, database, schema, username, password):
-    database_add_service = DatabaseAddService(project)
-    database_add_service.add(
-        name=name,
-        host=host,
-        database=database,
-        schema=schema,
-        username=username,
-        password=password,
-    )
-    click.secho("database yml file updated", fg="green")
 
 
 @add.command()

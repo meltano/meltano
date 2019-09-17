@@ -6,7 +6,6 @@
 #   - Build static UI artifacts
 #   - Build all docker images needed for dev
 # - `make test` runs pytest
-# - `make init_db` initializes the db schema needed to run the API
 # - `make clean` deletes all the build artifacts
 # - `make docker_images` builds all the docker images including the production
 #   image
@@ -31,15 +30,12 @@ DCRN=${DCR} --no-deps
 MELTANO_WEBAPP = src/webapp
 MELTANO_API = src/meltano/api
 
-.PHONY: build test init_db clean docker_images release
+.PHONY: build test clean docker_images release
 
 build: ui api
 
 test:
 	${DCRN} api ./setup.py test
-
-init_db:
-	${DCR} api python -m meltano.api.init_db
 
 # pip related
 TO_CLEAN  = ./build ./dist ./*.egg-info
