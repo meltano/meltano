@@ -111,7 +111,7 @@ To run the migrations, use `meltano upgrade` inside a Meltano project.
 
 ### Text
 
-Follow the merge request and changelog portions of this contribution section for text-based documentation contributions.
+Follow the [Merge Requests](#merge-requests) and [Changelog](#changelog) portions of this contribution section for text-based documentation contributions.
 
 ### Images
 
