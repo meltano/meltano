@@ -12,6 +12,7 @@ stages:
   - test
   - build-runner
   - publish
+  - distribute
   - review
 
 lint:
@@ -136,6 +137,18 @@ publish:
       - tags
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
+
+digitalocean_marketplace:
+  image:
+    name: hashicorp/packer
+    entrypoint: [""]
+  stage: distribute
+  script:
+    - cd cloud/packer
+    - packer build marketplace-image.json
+  only:
+    - tags
+  when: manual
 
 .review:
   image: silvs/kubectl:latest
