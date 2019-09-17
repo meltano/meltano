@@ -3,32 +3,53 @@
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
 :::tip
-Before you begin, you must activate the virtual environment you created in the installation process on the command line. All the commands below should be run inside this virtual environment.
+Remember, all interactions with the `meltano` command must be run inside the virtual environment you created in the installation process.
+
+If your prompt still starts with `(meltano)`, you're good. If not, please [re-activate your virtual environment](/docs/installation.html#activating-your-virtual-environment) before continuing.
 :::
-
-Remember, to activate your virtual enviroment, you will need to run:
-
-```bash
-# Linux, OSX
-source ~/virtualenvs/meltano/bin/activate
-
-# Windows
-%ALLUSERSPROFILE%\\virtualenvs\\meltano\\Scripts\\activate.bat
-```
 
 ## Creating Your First Project
 
-Run this command in your terminal to initialize a new project:
+To initialize a new project, navigate to the directory that you'd like to contain your Meltano projects, and run this command, replacing `PROJECT_NAME` with whatever you would like your new project to be called:
 
 ```bash
 meltano init PROJECT_NAME
 ```
 
+This will create a new directory named `PROJECT_NAME` and initialize Meltano's basic directory structure inside it.
+
 :::tip
-For those new to the command line, your PROJECT_NAME should not have spaces in the name and should use dashes instead. For example, "my project" will not work; but "my-project" will.
+For those new to the command line, your `PROJECT_NAME` should not have spaces in the name and should use dashes instead. For example, `my project` will not work; but `my-project` will.
 :::
 
-Creating a project also creates a new directory with the name you gave it. Change to the new directory and then start Meltano with these commands:
+### Anonymous usage data
+
+By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
+
+If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
+
+- When creating a new project, pass `--no_usage_stats` to `meltano init`: 
+
+    ```bash
+    meltano init PROJECT_NAME --no_usage_stats
+    ```
+
+- In an existing project, disable the `send_anonymous_usage_stats` setting in the `meltano.yml` file:
+
+    ```bash
+    send_anonymous_usage_stats: false
+    ```
+
+- To disable tracking in all projects in one go, set the `MELTANO_DISABLE_TRACKING` environment variable to `True`: 
+
+    ```bash
+    # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+    export MELTANO_DISABLE_TRACKING=True
+    ```
+
+## Starting the Meltano UI
+
+Now that you've created your first Meltano project, change to the new directory and start the Meltano UI:
 
 ```bash
 cd PROJECT_NAME
@@ -37,7 +58,7 @@ meltano ui
 
 Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
 
-Open your Internet browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
+Open your web browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
 
 ## Connecting Data Sources
 
@@ -73,43 +94,15 @@ Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://loca
 
 ## Scheduling the ELT with Orchestration
 
-If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
+If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow, which is automatically installed when the Meltano UI is launched for the first time.
 
-::: tip
-Right now, Airflow can not be installed from inside Meltano's UI so you need to return to your command line interface.
-:::
-
-Run the following command:
-
-```bash
-meltano add orchestrator airflow
-```
-
-Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
-
-A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
-
-:::tip
-To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
-:::
-
-
-```bash
-# After installing Airflow, you will need to shut down your current instance of Meltano and restart
-meltano ui
-```
+When a new pipeline schedule is created following the steps under [Running the ELT](#running-the-elt), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
 
 ![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
 
 For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
-
-### Troubleshooting Airflow ###
-
-If you run into issues, it is possible that you could end up with multiple instances of Airflow running at the same time. This is a known issue ([#821](https://gitlab.com/meltano/meltano/issues/812)) common if you have been working with multiple Meltano projects, or have killed Meltano UI from the command line.
-
-To troubleshoot, run `sudo lsof -i -P | grep -i "listen"` from your command line. If you see multiple instances of Python running on Port 5010, kill the first instance with `kill 12345` (using the number for your instance). Then run `meltano ui` and try again.
 
 ## Analyzing Your Data
 

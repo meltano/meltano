@@ -8,10 +8,10 @@ sidebarDepth: 1
 **L**oading data is the **L** in the term **ELT**. In this section, we provide a detailed overview of how Meltano takes the data that was pulled from your sources during **E**xtract step, and puts it into a reporting database (Load) for further manipulation and analysis.
 
 Meltano Loaders *load data in bulk* after it has been imported from source(s) using Extractors. Meltano currently supports loading data in the follow formats:
-- [Comma Separated Values (CSV)](#csv)
-- [PostgresQL Database](#postgres)
-- [Snowflake Data Warehouse](#snowflake)
-- [SQLite](#sqlite)
+- [Comma Separated Values (CSV)](#comma-separated-values-csv)
+- [Snowflake Data Warehouse](#snowflake-data-warehouse)
+- [PostgresQL Database](#postgresql-database)
+- [SQLite Database](#sqlite-database)
 
 ## Comma Separated Values (CSV)
 
@@ -67,7 +67,26 @@ You can follow the progress on this feature in this issue: [meltano/meltano#428]
 - **Data Warehouse**: [Snowflake](https://www.snowflake.com/)
 - **Repository**: [https://gitlab.com/meltano/target-snowflake](https://gitlab.com/meltano/target-snowflake)
 
-### Configuration
+### Installing from the Meltano UI
+
+From the Meltano UI, you can [select this Loader in Step 3 of your pipeline configuration](http://localhost:5000/pipelines/loaders).
+
+#### Configuration
+
+Once the loader has installed, a modal will appear that'll allow you to configure your Snowflake connection.
+
+### Installing from the Meltano CLI
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add loader target-snowflake
+```
+
+If you are successful, you should see `Added and installed loaders 'target-snowflake'` in your terminal.
+
+#### CLI Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
@@ -162,7 +181,26 @@ export PG_SCHEMA=""
 - **Data Warehouse**: [SQLite](https://sqlite.org/)
 - **Repository**: [https://gitlab.com/meltano/target-sqlite](https://gitlab.com/meltano/target-sqlite)
 
-### Configuration
+### Installing from the Meltano UI
+
+From the Meltano UI, you can [select this Loader in Step 3 of your pipeline configuration](http://localhost:5000/pipelines/loaders).
+
+#### Configuration
+
+Once the loader has installed, a modal will appear that'll allow you to configure your SQLite database connection.
+
+### Installing from the Meltano CLI
+
+1. Navigate to your Meltano project in the terminal
+2. Run the following command:
+
+```bash
+meltano add loader target-sqlite
+```
+
+If you are successful, you should see `Added and installed loaders 'target-sqlite'` in your terminal.
+
+#### CLI Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:

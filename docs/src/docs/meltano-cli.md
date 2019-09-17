@@ -242,7 +242,9 @@ schedules:
 
 ## Snowflake Permissions
 
-This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. As we improve Meltano, this may become a first level concept within user roles but that is not the case today.
+This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. 
+
+Alpha-quality [Role Based Access Control (RBAC)](/docs/security-and-privacy.html#role-based-access-control-rbac-alpha) is also available.
 
 #### `permissions`
 
@@ -397,14 +399,6 @@ When you run ELT commands on a tap or target, this is the general process for fe
 - By doing this, you ensure that packages are version controlled via `discovery.yml` and that it will live in two places:
   - in the project itself for the user to edit
   - in a global repo for meltano employees to edit
-
-
-#### Additional Resources
-
-In order to make the most out of Jupyter Notebooks, you can check the following resources:
-*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
-*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
-*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
 
 ## Orchestration
 

@@ -8,7 +8,7 @@ We do not have a double click installer at this time, but it is in our roadmap a
 
 ## Requirements
 
-Before you install meltano with `pip install meltano` make sure you have the following requirements installed and up to date.
+Before you install Meltano, make sure you have the following requirements installed and up to date.
 
 ### Python 3+
 
@@ -24,6 +24,8 @@ To check if you have the correct Python version, open your terminal and use the 
 python --version
 ```
 
+If you've installed Python 3, but are not getting the result you expect, you may have installed Python 3 alongside an existing Python 2 installation. In this case, please use `python3` and `pip3` wherever this guide refers to the `python` and `pip` commands.
+
 ### pip
 
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
@@ -37,30 +39,30 @@ pip install --upgrade pip
 ```
 
 ::: tip
-If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ _and_ 3+ installed.
+If you installed Python 3 alongside an existing Python 2 installation, you'll want to use `pip3` instead!
 :::
 
 ### Virtual Environment
 
 ::: danger IMPORTANT
 Unless you are building a Docker image, It is **strongly recommended** that Meltano be installed inside a virtual environment in order to avoid potential system conflicts that may be difficult to debug.
+:::
 
 **Why use a virtual environment?**
 
 Your local environment may use a different version of Python or other dependencies that are difficult to manage. The virtual environment provides a "clean" space to work without these issues.
-:::
 
-#### Recommened Virtual Environment Setup
+#### Recommended Virtual Environment Setup
 
 We suggest you create a directory where you want your virtual environments to be saved, e.g.:
 
-- **Linux, OSX**: `~/virtualenvs`
+- **Linux, macOS**: `~/virtualenvs`
 - **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-# Linux, OSX
+# Linux, macOS
 mkdir ~/virtualenvs
 python -m venv ~/virtualenvs/meltano
 
@@ -74,16 +76,33 @@ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 Activate the virtual environment using:
 
 ```bash
-# Linux, OSX
+# Linux, macOS
 source ~/virtualenvs/meltano/bin/activate
 
 # Windows
 %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
+If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
+
+::: tip
+Once a virtual environment is activated, it stays active until the current shell is closed. In a new shell, you must re-activate the virtual environment before interacting with the `meltano` command that will be installed in the next step.
+
+To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
+
+```bash
+# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+alias meltano!="source ~/virtualenvs/meltano/bin/activate"
+
+# Use as follows, after creating a new shell:
+meltano!
+```
+
+:::
+
 ## Installing Meltano
 
-Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
+Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
 pip install meltano
@@ -96,22 +115,6 @@ meltano --version
 ```
 
 That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
-
-::: tip
-Once a virtual environment is activated, it stays active until the current shell is closed.
-
-You must re-activate the virtual environment before interacting with Meltano.
-To streamline this process, you can add the `meltano` executable directly in your `PATH`.
-
-```bash
-# Linux, OSX
-export PATH=$PATH:$HOME/virtualenvs/meltano/bin/meltano
-
-# Windows
-setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
-```
-
-:::
 
 ### Installing on Docker
 
