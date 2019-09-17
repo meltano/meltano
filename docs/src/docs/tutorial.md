@@ -1739,3 +1739,10 @@ Or generate a bar plot:
 plt.rcParams['figure.figsize'] = [15, 8]
 result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets','one_touch_tickets','reopened_tickets'])
 ```
+
+### Additional Resources
+
+In order to make the most out of Jupyter Notebooks, you can check the following resources:
+*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
+*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
+*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
