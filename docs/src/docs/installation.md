@@ -102,7 +102,7 @@ meltano!
 
 ## Installing Meltano
 
-Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
+Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
 pip install meltano
