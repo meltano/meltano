@@ -3,7 +3,7 @@
 ## Prerequisites
 
 ::: warning
-Before you move on, make sure you have Python `3.6`, Node `8.x`, Yarn `1.2` or newer installed.
+Before you move on, make sure you have Python 3.6.1+, Node 8.11.0+, and a compatible version of Yarn installed.
 :::
 
 ## Where to start?
