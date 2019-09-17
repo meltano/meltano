@@ -16,7 +16,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
+    ...mapGetters('configuration', ['getRunningPipelines']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepTransformsMinimallyValidated',
@@ -101,11 +101,11 @@ export default {
               </span>
               <span>Pipeline</span>
               <span
-                v-if="getRunningPipelineJobsCount > 0"
+                v-if="getRunningPipelines.length > 0"
                 class="tag tag-running-pipelines is-rounded is-info"
                 @click.prevent="goToSchedules"
               >
-                {{ getRunningPipelineJobsCount }}
+                {{ getRunningPipelines.length }}
               </span>
             </a>
           </router-link>
