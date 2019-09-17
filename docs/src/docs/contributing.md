@@ -45,7 +45,7 @@ Meltano is now installed and available at `meltano`.
 
 Head out to the [tutorials](/docs/tutorial.html) to create your first project.
 
-### Meltano API Development
+## Meltano API Development
 
 For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
 
@@ -62,7 +62,7 @@ If you run into `/bin/sh: yarn: command not found`, double check that you've got
 On a OSX, this can be solved by running `brew install yarn`.
 :::
 
-### Meltano UI Development
+## Meltano UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
@@ -87,7 +87,7 @@ yarn serve
 
 The developement build of the Meltano UI will be available at [http://localhost:8080/]
 
-### Meltano System Database
+## Meltano System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
