@@ -242,7 +242,9 @@ schedules:
 
 ## Snowflake Permissions
 
-This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. As we improve Meltano, this may become a first level concept within user roles but that is not the case today.
+This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. 
+
+Alpha-quality [Role Based Access Control (RBAC)](/docs/security-and-privacy.html#role-based-access-control-rbac-alpha) is also available.
 
 #### `permissions`
 
