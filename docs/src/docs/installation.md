@@ -83,6 +83,23 @@ source ~/virtualenvs/meltano/bin/activate
 %HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
+If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
+
+::: tip
+Once a virtual environment is activated, it stays active until the current shell is closed. In a new shell, you must re-activate the virtual environment before interacting with the `meltano` command that will be installed in the next step.
+
+To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
+
+```bash
+# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+alias meltano!="source ~/virtualenvs/meltano/bin/activate"
+
+# Use as follows, after creating a new shell:
+meltano!
+```
+
+:::
+
 ## Installing Meltano
 
 Now that you have your virtual environment set up and running, navigate to the directory where you want to install Meltano and run the following command:
@@ -98,22 +115,6 @@ meltano --version
 ```
 
 That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
-
-::: tip
-Once a virtual environment is activated, it stays active until the current shell is closed.
-
-You must re-activate the virtual environment before interacting with Meltano.
-To streamline this process, you can add the `meltano` executable directly in your `PATH`.
-
-```bash
-# Linux, OSX
-export PATH=$PATH:$HOME/virtualenvs/meltano/bin/meltano
-
-# Windows
-setx PATH "%PATH%;%ALLUSERPROFILES\virtualenvs\meltano\Scripts\meltano"
-```
-
-:::
 
 ### Installing on Docker
 
