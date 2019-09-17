@@ -45,6 +45,15 @@ Meltano is now installed and available at `meltano`.
 
 Head out to the [tutorials](/docs/tutorial.html) to create your first project.
 
+### Metrics (anonymous usage data) tracking
+
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/quickstart.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+
+```bash
+# Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+export MELTANO_DISABLE_TRACKING=True
+```
+
 ## Meltano API Development
 
 For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
