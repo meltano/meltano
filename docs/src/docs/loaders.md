@@ -8,10 +8,10 @@ sidebarDepth: 1
 **L**oading data is the **L** in the term **ELT**. In this section, we provide a detailed overview of how Meltano takes the data that was pulled from your sources during **E**xtract step, and puts it into a reporting database (Load) for further manipulation and analysis.
 
 Meltano Loaders *load data in bulk* after it has been imported from source(s) using Extractors. Meltano currently supports loading data in the follow formats:
-- [Comma Separated Values (CSV)](#csv)
-- [PostgresQL Database](#postgres)
-- [Snowflake Data Warehouse](#snowflake)
-- [SQLite](#sqlite)
+- [Comma Separated Values (CSV)](#comma-separated-values-csv)
+- [Snowflake Data Warehouse](#snowflake-data-warehouse)
+- [PostgresQL Database](#postgresql-database)
+- [SQLite Database](#sqlite-database)
 
 ## Comma Separated Values (CSV)
 
