@@ -7,6 +7,8 @@ export default {
   },
 
   index(namespace, model, design) {
-    return axios.get(utils.apiUrl('repos/designs', `${namespace}/${model}/${design}`))
+    return axios.get(
+      utils.apiUrl('repos/designs', `${namespace}/${model}/${design}`)
+    )
   }
 }

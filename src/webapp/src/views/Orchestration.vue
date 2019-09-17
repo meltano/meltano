@@ -5,7 +5,6 @@ import Airflow from '@/components/orchestration/Airflow'
 import RouterViewLayout from '@/views/RouterViewLayout'
 import flaskContext from '@/flask'
 
-
 export default {
   name: 'Orchestration',
   components: {
