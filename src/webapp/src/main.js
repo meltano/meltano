@@ -1,21 +1,21 @@
 import Router from 'vue-router'
 import Toasted from 'vue-toasted'
 import Vue from 'vue'
+import VueAnalytics from 'vue-analytics'
+
 import axios from 'axios'
+import FontAwesome from './font-awesome'
 import lodash from 'lodash'
 
+import App from './App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
 import flaskContext from '@/flask'
-
-import FontAwesome from './font-awesome'
-import App from './App'
 import router from './router'
 import store from './store'
 
 Vue.config.productionTip = false
 
-Vue.use(Router)
 Vue.use(FontAwesome)
 Vue.use(Router)
 
@@ -93,6 +93,11 @@ axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 // Flask context
 Vue.prototype.$flask = flaskContext()
 
+// Conditional analytics
+if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+  Vue.use(VueAnalytics, { id: 'UA-132758957-2', router })
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
@@ -108,5 +113,7 @@ router.afterEach(to => {
       page_title: to.name,
       page_path: to.path
     })
+  } else {
+    console.log('not tracking')
   }
 })

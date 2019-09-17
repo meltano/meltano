@@ -111,10 +111,13 @@ def create_app(config={}):
     @app.before_request
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
-        isSendAnonymousUsageStats = not truthy(os.getenv("MELTANO_DISABLE_TRACKING")) and project.meltano.get("send_anonymous_usage_stats", False) == True
+        isSendAnonymousUsageStats = (
+            not truthy(os.getenv("MELTANO_DISABLE_TRACKING"))
+            and project.meltano.get("send_anonymous_usage_stats", False) == True
+        )
         g.jsContext = {
             "appUrl": appUrl.geturl()[:-1],
-            "isSendAnonymousUsageStats": isSendAnonymousUsageStats
+            "isSendAnonymousUsageStats": isSendAnonymousUsageStats,
         }
 
         try:
