@@ -16,7 +16,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelineJobsCount']),
+    ...mapGetters('configuration', ['getRunningPipelines']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepTransformsMinimallyValidated',
@@ -101,11 +101,11 @@ export default {
               </span>
               <span>Pipeline</span>
               <span
-                v-if="getRunningPipelineJobsCount > 0"
+                v-if="getRunningPipelines.length > 0"
                 class="tag tag-running-pipelines is-rounded is-info"
                 @click.prevent="goToSchedules"
               >
-                {{ getRunningPipelineJobsCount }}
+                {{ getRunningPipelines.length }}
               </span>
             </a>
           </router-link>
@@ -157,9 +157,7 @@ export default {
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf(
-                '/orchestrate'
-              )
+              'has-text-interactive-navigation': getIsSubRouteOf('/orchestrate')
             }"
           >
             <span class="icon is-small" :class="getIconColor('/orchestrate')">

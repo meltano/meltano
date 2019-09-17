@@ -448,7 +448,12 @@ const actions = {
     )
     const postData = Object.assign({ run }, queryPayload)
     sqlApi
-      .getSql(state.currentNamespace, state.currentModel, state.currentDesign, postData)
+      .getSql(
+        state.currentNamespace,
+        state.currentModel,
+        state.currentDesign,
+        postData
+      )
       .then(response => {
         if (run) {
           commit('setQueryResults', response.data)

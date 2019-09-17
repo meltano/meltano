@@ -68,8 +68,8 @@ const getters = {
     }
   },
 
-  getRunningPipelineJobsCount(state) {
-    return state.pipelinePollers.length
+  getRunningPipelines(state) {
+    return state.pipelines.filter(pipeline => pipeline.isRunning)
   },
 
   getRunningPipelineJobIds(state) {
@@ -167,12 +167,9 @@ const actions = {
     commit('addPipelinePoller', pipelinePoller)
   },
 
-  rehydratePollers({ dispatch, state }) {
+  rehydratePollers({ dispatch, getters, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
-    const runningPipelines = state.pipelines.filter(
-      pipeline => pipeline.isRunning
-    )
-    runningPipelines.forEach(pipeline => {
+    getters.getRunningPipelines.forEach(pipeline => {
       const jobId = `job_${pipeline.name}`
       const isMissingPoller =
         state.pipelinePollers.find(

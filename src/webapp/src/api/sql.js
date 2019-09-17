@@ -7,6 +7,9 @@ export default {
   },
 
   getSql(namespace, model, design, data) {
-    return axios.post(utils.apiUrl('sql/get', `${namespace}/${model}/${design}`), data)
+    return axios.post(
+      utils.apiUrl('sql/get', `${namespace}/${model}/${design}`),
+      data
+    )
   }
 }
