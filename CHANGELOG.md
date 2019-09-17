@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#992](https://gitlab.com/meltano/meltano/issues/992) Fix missing GA scripts
 - [#989](https://gitlab.com/meltano/meltano/issues/989) Fix UI/UX documentation regarding recent removal of `view-header`
 - [#994](https://gitlab.com/meltano/meltano/issues/994) Fix stale Pipelines Count in main navigation Pipeline badge
 
