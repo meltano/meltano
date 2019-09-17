@@ -131,19 +131,16 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
-        <template v-if="isInstalling">
-          <div class="content">
-            <div class="level">
-              <div class="level-item">
-                <p>
-                  Installing {{ extractorNameFromRoute }} can take up to a
-                  minute.
-                </p>
-              </div>
+        <div v-if="isLoadingConfigSettings || isInstalling" class="content">
+          <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
+            <div class="level-item">
+              <p class="is-italic">
+                Installing {{ extractorNameFromRoute }} can take up to a minute.
+              </p>
             </div>
-            <progress class="progress is-small is-info"></progress>
           </div>
-        </template>
+          <progress class="progress is-small is-info"></progress>
+        </div>
 
         <template v-if="!isLoadingConfigSettings">
           <ConnectorSettings
@@ -158,11 +155,6 @@ export default {
             </p>
           </div>
         </template>
-
-        <progress
-          v-if="isLoadingConfigSettings && !isInstalling"
-          class="progress is-small is-info"
-        ></progress>
 
         <template v-if="extractorLacksConfigSettingsAndIsInstalled">
           <div class="content">
