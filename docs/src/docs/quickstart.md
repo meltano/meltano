@@ -92,31 +92,9 @@ Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://loca
 
 ## Scheduling the ELT with Orchestration
 
-If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow.
+If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow, which is automatically installed when the Meltano UI is launched for the first time.
 
-::: tip
-Right now, Airflow can not be installed from inside Meltano's UI so you need to return to your command line interface.
-:::
-
-Run the following command:
-
-```bash
-meltano add orchestrator airflow
-```
-
-Once Airflow is installed, you can view the ELT pipeline schedule(s) created in the previous [Running the ELT](#running-the-elt) step via Meltano UI where a DAG gets created for each pipeline schedule.
-
-A [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow and "is a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
-
-:::tip
-To see a list of all your scheduled DAGs within the Meltano UI under "Orchestration" you will need to kill your terminal window running the `meltano ui` command and then restart it. You will only need to do this the first time you install Airflow.
-:::
-
-
-```bash
-# After installing Airflow, you will need to shut down your current instance of Meltano and restart
-meltano ui
-```
+When a new pipeline schedule is created following the steps under [Running the ELT](#running-the-elt), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
 Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
 
