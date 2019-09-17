@@ -10,11 +10,13 @@ If your prompt still starts with `(meltano)`, you're good. If not, please [re-ac
 
 ## Creating Your First Project
 
-Run this command in your terminal to initialize a new project:
+To initialize a new project, navigate to the directory that you'd like to contain your Meltano projects, and run this command, replacing `PROJECT_NAME` with whatever you would like your new project to be called:
 
 ```bash
 meltano init PROJECT_NAME
 ```
+
+This will create a new directory named `PROJECT_NAME` and initialize Meltano's basic directory structure inside it.
 
 :::tip
 For those new to the command line, your PROJECT_NAME should not have spaces in the name and should use dashes instead. For example, "my project" will not work; but "my-project" will.
