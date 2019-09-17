@@ -8,7 +8,7 @@ We do not have a double click installer at this time, but it is in our roadmap a
 
 ## Requirements
 
-Before you install meltano with `pip install meltano` make sure you have the following requirements installed and up to date.
+Before you install Meltano, make sure you have the following requirements installed and up to date.
 
 ### Python 3+
 
@@ -24,6 +24,8 @@ To check if you have the correct Python version, open your terminal and use the 
 python --version
 ```
 
+If you've installed Python 3, but are not getting the result you expect, you may have installed Python 3 alongside an existing Python 2 installation. In this case, please use `python3` and `pip3` wherever this guide refers to the `python` and `pip` commands.
+
 ### pip
 
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
@@ -37,7 +39,7 @@ pip install --upgrade pip
 ```
 
 ::: tip
-If `pip`/`python` is not working, try `pip3`/`python3` instead. This would be the case if you have both Python 2+ _and_ 3+ installed.
+If you installed Python 3 alongside an existing Python 2 installation, you'll want to use `pip3` instead!
 :::
 
 ### Virtual Environment
