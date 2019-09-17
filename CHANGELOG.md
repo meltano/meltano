@@ -12,13 +12,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#987](https://gitlab.com/meltano/meltano/issues/987) Update routing to match labels (verbs vs. nouns) in effort to subtly reinforce action taking vs. solely "thing" management
+- [#996](https://gitlab.com/meltano/meltano/issues/996) Update conditional UI analytics stats tracking at runtime vs. build-time by sourcing state from the same CLI-based `MELTANO_DISABLE_TRACKING` flag
 
 ### Fixes
 
 - [#989](https://gitlab.com/meltano/meltano/issues/989) Fix UI/UX documentation regarding recent removal of `view-header`
 
 ### Breaks
-
 
 ## 0.42.0 - (2019-09-16)
 
