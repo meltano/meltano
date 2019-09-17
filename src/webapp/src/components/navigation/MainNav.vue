@@ -157,9 +157,7 @@ export default {
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf(
-                '/orchestrate'
-              )
+              'has-text-interactive-navigation': getIsSubRouteOf('/orchestrate')
             }"
           >
             <span class="icon is-small" :class="getIconColor('/orchestrate')">
