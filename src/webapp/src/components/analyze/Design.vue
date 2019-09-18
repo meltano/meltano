@@ -380,7 +380,7 @@ export default {
             </Dropdown>
           </p>
 
-          <div v-if='isInitialized' class="control">
+          <div v-if="isInitialized" class="control">
             <div class="select">
               <select v-model="dialect" name="connection">
                 <option
@@ -430,7 +430,7 @@ export default {
             </div>
           </div>
 
-          <template v-if='isInitialized'>
+          <template v-if="isInitialized">
             <div class="columns is-vcentered">
               <div class="column">
                 <div class="field">
@@ -569,7 +569,9 @@ export default {
                 <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a
                   v-if="
-                    showJoinColumnAggregateHeader(design.relatedTable.aggregates)
+                    showJoinColumnAggregateHeader(
+                      design.relatedTable.aggregates
+                    )
                   "
                   class="panel-block
                     panel-block-heading
@@ -692,7 +694,9 @@ export default {
                           @click.stop="jumpToFilters"
                         >
                           <span class="icon has-text-interactive-secondary">
-                            <font-awesome-icon icon="filter"></font-awesome-icon>
+                            <font-awesome-icon
+                              icon="filter"
+                            ></font-awesome-icon>
                           </span>
                         </button>
                       </a>
@@ -731,7 +735,9 @@ export default {
                           @click.stop="jumpToFilters"
                         >
                           <span class="icon has-text-interactive-secondary">
-                            <font-awesome-icon icon="filter"></font-awesome-icon>
+                            <font-awesome-icon
+                              icon="filter"
+                            ></font-awesome-icon>
                           </span>
                         </button>
                       </a>
