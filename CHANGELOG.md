@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#987](https://gitlab.com/meltano/meltano/issues/987) Update routing to match labels (verbs vs. nouns) in effort to subtly reinforce action taking vs. solely "thing" management
+- [#960](https://gitlab.com/meltano/meltano/issues/960) Improve UX by instantly displaying extractor and loader configuration UIs based on "Install" or "Configure" interaction as opposed to the prior delay (side effect of async `addPlugin`)
 
 ### Fixes
 
