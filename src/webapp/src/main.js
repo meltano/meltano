@@ -95,7 +95,13 @@ Vue.prototype.$flask = flaskContext()
 
 // Conditional analytics using flask context
 if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
-  Vue.use(VueAnalytics, { id: 'UA-132758957-2', router })
+  Vue.use(VueAnalytics, {
+    id: 'UA-132758957-2',
+    router,
+    fields: {
+      clientId: Vue.prototype.$flask.clientId || 'None'
+    }
+  })
 }
 
 /* eslint-disable no-new */
