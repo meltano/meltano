@@ -43,7 +43,7 @@ export default {
       'results',
       'resultAggregates',
       'chartType',
-      'dialect',
+      'loader',
       'filterOptions'
     ]),
     ...mapGetters('designs', [
@@ -57,14 +57,14 @@ export default {
       'formattedSql',
       'filtersCount',
       'hasFilters',
-      'getIsAttributeInFilters'
+      'getIsAttributeInFilters',
+      'isLoaderSqlite',
     ]),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
-    ...mapGetters('settings', ['isConnectionDialectSqlite']),
 
     canToggleTimeframe() {
-      return !this.isConnectionDialectSqlite(this.dialect)
+      return !this.isLoaderSqlite
     },
 
     hasActiveReport() {
@@ -85,19 +85,19 @@ export default {
       }
     },
 
-    dialect: {
+    loader: {
       get() {
-        return this.$store.getters['designs/getDialect']
+        return this.$store.getters['designs/getLoader']
       },
       set(value) {
-        this.$store.commit('designs/setDialect', value)
+        this.$store.commit('designs/setLoader', value)
 
-        // set the default dialect for unknown designs
-        localStorage.setItem('dialect', value)
+        // set the default loader for unknown designs
+        localStorage.setItem('loader', value)
 
         // set the connection for this specific design
         localStorage.setItem(
-          `dialect:${this.currentModel}:${this.currentDesign}`,
+          `loader:${this.currentModel}:${this.currentDesign}`,
           value
         )
       }
@@ -117,15 +117,15 @@ export default {
     const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
 
     Promise.all([uponDesign, uponPlugins]).then(() => {
-      const defaultDialect =
+      const defaultLoader =
         localStorage.getItem(
-          `dialect:${this.currentModel}:${this.currentDesign}`
+          `loader:${this.currentModel}:${this.currentDesign}`
         ) ||
-        localStorage.getItem('dialect') ||
-        this.installedPlugins.connections[0].name
+        localStorage.getItem('loader') ||
+        this.installedPlugins.loaders[0].name
 
       // don't use the setter here not to update the user's preferences
-      this.$store.commit('designs/setDialect', defaultDialect)
+      this.$store.commit('designs/setLoader', defaultLoader)
 
       // validate initialization so UI can display while removing the loading bar
       this.isInitialized = true
@@ -385,11 +385,11 @@ export default {
 
           <div v-if="isInitialized" class="control">
             <div class="select">
-              <select v-model="dialect" name="connection">
+              <select v-model="loader" name="loader">
                 <option
-                  v-for="connection in installedPlugins.connections"
-                  :key="connection.name"
-                  >{{ connection.name }}</option
+                  v-for="loader in installedPlugins.loaders"
+                  :key="loader.name"
+                  >{{ loader.name }}</option
                 >
               </select>
             </div>
@@ -646,18 +646,13 @@ export default {
                         class="panel-block timeframe"
                         :class="{
                           'is-active': timeframe.selected,
-                          'is-sqlite-unsupported': isConnectionDialectSqlite(
-                            dialect
-                          )
+                          'is-sqlite-unsupported': isLoaderSqlite
                         }"
-                        @click="
-                          isConnectionDialectSqlite(dialect) ||
-                            timeframeSelected(timeframe)
-                        "
+                        @click="isLoaderSqlite || timeframeSelected(timeframe)"
                       >
                         {{ timeframe.label }}
                         <div
-                          v-if="isConnectionDialectSqlite(dialect)"
+                          v-if="isLoaderSqlite"
                           class="sqlite-unsupported-container"
                         >
                           <small>Unsupported by SQLite</small>

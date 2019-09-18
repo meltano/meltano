@@ -86,9 +86,10 @@ class UIAvailableWorker(threading.Thread):
 
 
 class AirflowWorker(threading.Thread):
-    def __init__(self, project: Project):
+    def __init__(self, app, project):
         super().__init__()
 
+        self.app = app
         self.project = project
         self.installed = threading.Event()
         self._plugin = None
@@ -109,7 +110,7 @@ class AirflowWorker(threading.Thread):
             try:
                 pid = int(f.open().read())
                 stale_workers.append(psutil.Process(pid))
-            except psutil.NoSuchProcess:
+            except (psutil.NoSuchProcess, ValueError):
                 f.unlink()
             except FileNotFoundError:
                 pass
@@ -129,21 +130,15 @@ class AirflowWorker(threading.Thread):
 
     def start_all(self):
         logs_dir = self.project.run_dir("airflow", "logs")
-        invoker = invoker_factory(db.session, self.project, self._plugin)
+        with self.app.app_context() as ctx:
+            invoker = invoker_factory(self.project, self._plugin, prepare_with_session=db.session)
 
-        with logs_dir.joinpath("webserver.log").open(
-            "w"
-        ) as webserver, logs_dir.joinpath("scheduler.log").open(
-            "w"
-        ) as scheduler, self.pid_path(
-            "webserver"
-        ).open(
-            "w"
-        ) as webserver_pid, self.pid_path(
-            "scheduler"
-        ).open(
-            "w"
-        ) as scheduler_pid:
+        # fmt: off
+        with logs_dir.joinpath("webserver.log").open("w") as webserver, \
+          logs_dir.joinpath("scheduler.log").open("w") as scheduler, \
+          self.pid_path("webserver").open("w") as webserver_pid, \
+          self.pid_path("scheduler").open("w") as scheduler_pid:
+        # fmt: on
             self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
             self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
 

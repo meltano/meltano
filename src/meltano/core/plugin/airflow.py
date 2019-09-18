@@ -8,14 +8,33 @@ from . import PluginInstall, PluginType
 
 from meltano.core.behavior.hookable import hook
 from meltano.core.plugin.config_service import PluginConfigService
+from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.db import project_engine
 from meltano.core.venv_service import VenvService
 from meltano.core.utils import nest, map_dict
 
 
+class AirflowInvoker(PluginInvoker):
+    def Popen_options(self):
+        env = os.environ.copy()
+        venv_dir = self.project.venvs_dir(self.plugin.type, self.plugin.name)
+
+        # add the Airflow virtualenv because it contains `gunicorn`
+        env["PATH"] = os.pathsep.join([str(venv_dir.joinpath("bin")), env["PATH"]])
+        env["VIRTUAL_ENV"] = str(venv_dir)
+        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
+
+        options = super().Popen_options()
+        options_env = nest(options, "env")
+        options_env.update(env)
+
+        return options
+
+
 class Airflow(PluginInstall):
     __plugin_type__ = PluginType.ORCHESTRATORS
+    __invoker_cls__ = AirflowInvoker
 
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
@@ -39,15 +58,21 @@ class Airflow(PluginInstall):
         session = Session()
 
         plugin_config_service = PluginConfigService(project, self)
+        plugin_settings_service = PluginSettingsService(project)
         invoker = invoker_factory(
-            session, project, self, config_service=plugin_config_service
+            project,
+            self,
+            prepare_with_session=session,
+            config_service=plugin_config_service,
         )
 
         try:
             airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
             stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
             handle = invoker.invoke(
-                "--help", prepare=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                "--help",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
             )
             handle.wait()
             logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
@@ -63,15 +88,15 @@ class Airflow(PluginInstall):
 
             with airflow_cfg_path.open() as cfg:
                 airflow_cfg.read_file(cfg)
-            logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
+                logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-            for section, cfg in invoker.plugin_settings.as_config(self).items():
+            for section, cfg in plugin_settings_service.as_config(session, self).items():
                 airflow_cfg[section].update(map_dict(str, cfg))
                 logging.debug(f"\tUpdated section [{section}] with {cfg}")
 
             with airflow_cfg_path.open("w") as cfg:
                 airflow_cfg.write(cfg)
-            logging.debug(f"Saved '{str(airflow_cfg_path)}'")
+                logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
             # initdb
             handle = invoker.invoke(
@@ -81,20 +106,3 @@ class Airflow(PluginInstall):
             logging.debug(f"Completed `airflow initdb`")
         finally:
             session.close()
-
-
-class AirflowInvoker(PluginInvoker):
-    def Popen_options(self):
-        env = os.environ.copy()
-        venv_dir = self.project.venvs_dir(self.plugin.type, self.plugin.name)
-
-        # add the Airflow virtualenv because it contains `gunicorn`
-        env["PATH"] = os.pathsep.join([str(venv_dir.joinpath("bin")), env["PATH"]])
-        env["VIRTUAL_ENV"] = str(venv_dir)
-        env["AIRFLOW_HOME"] = str(self.config_service.run_dir)
-
-        options = super().Popen_options()
-        options_env = nest(options, "env")
-        options_env.update(env)
-
-        return options

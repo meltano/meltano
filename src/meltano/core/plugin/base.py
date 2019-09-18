@@ -135,10 +135,6 @@ class PluginInstall(HookObject, PluginRef):
     def select(self, patterns):
         self._select = set(patterns)
 
-    def invoker(self, project, *args, **kwargs):
-        "Override to have a specialize PluginInvoker class"
-        pass
-
     def exec_args(self, files: Dict):
         return []
 
@@ -150,9 +146,6 @@ class PluginInstall(HookObject, PluginRef):
     @property
     def output_files(self):
         return dict()
-
-    def cwd(self, project):
-        return project.root
 
     def add_select_filter(self, filter: str):
         self._select.add(filter)

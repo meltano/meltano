@@ -81,9 +81,9 @@ def get_plugin_configuration() -> Response:
     project = Project.find()
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
-    settings = PluginSettingsService(db.session, project)
+    settings = PluginSettingsService(project)
 
-    config = flatten(settings.as_config(plugin), reducer="dot")
+    config = flatten(settings.as_config(db.session, plugin), reducer="dot")
 
     return jsonify(
         {
@@ -104,14 +104,14 @@ def save_plugin_configuration() -> Response:
     plugin = PluginRef(incoming["type"], incoming["name"])
     config = incoming["config"]
 
-    settings = PluginSettingsService(db.session, project)
+    settings = PluginSettingsService(project)
     for name, value in config.items():
         if value == "":
-            settings.unset(plugin, name)
+            settings.unset(db.session, plugin, name)
         else:
-            settings.set(plugin, name, value)
+            settings.set(db.session, plugin, name, value)
 
-    return jsonify(settings.as_config(plugin))
+    return jsonify(settings.as_config(db.session, plugin))
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])
@@ -186,7 +186,7 @@ def get_pipeline_schedules():
     endpoint for getting the pipeline schedules
     """
     project = Project.find()
-    schedule_service = ScheduleService(db.session, project)
+    schedule_service = ScheduleService(project)
     schedules = [s._asdict() for s in schedule_service.schedules()]
     for schedule in schedules:
         finder = JobFinder(f"job_{schedule['name']}")
@@ -210,10 +210,17 @@ def save_pipeline_schedule() -> Response:
     interval = incoming["interval"]
 
     project = Project.find()
-    schedule_service = ScheduleService(db.session, project)
+    schedule_service = ScheduleService(project)
 
     try:
-        schedule = schedule_service.add(name, extractor, loader, transform, interval)
+        schedule = schedule_service.add(
+            db.session,
+            name,
+            extractor,
+            loader,
+            transform,
+            interval,
+        )
         return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:
         raise ScheduleAlreadyExistsError(e.schedule)

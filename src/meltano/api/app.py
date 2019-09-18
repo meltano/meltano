@@ -120,8 +120,8 @@ def create_app(config={}):
 
         try:
             airflow = ConfigService(project).find_plugin("airflow")
-            settings = PluginSettingsService(db.session, project)
-            airflow_port, _ = settings.get_value(airflow, "webserver.web_server_port")
+            settings = PluginSettingsService(project)
+            airflow_port, _ = settings.get_value(db.session, airflow, "webserver.web_server_port")
             g.jsContext["airflowUrl"] = appUrl._replace(
                 netloc=f"{appUrl.hostname}:{airflow_port}"
             ).geturl()[:-1]
@@ -167,7 +167,7 @@ def start_workers(app, project, **kwargs):
     workers = []
 
     if not app.config["AIRFLOW_DISABLED"]:
-        airflow_context["worker"] = AirflowWorker(project)
+        airflow_context["worker"] = AirflowWorker(app, project)
         workers.append(airflow_context["worker"])
 
     workers.append(MeltanoBackgroundCompiler(project))

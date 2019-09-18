@@ -103,24 +103,21 @@ def project_add_service(project, plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service_factory(project, plugin_discovery_service):
-    def _factory(session, **kwargs):
-        return PluginSettingsService(
-            session, project, discovery_service=plugin_discovery_service, **kwargs
-        )
-
-    return _factory
+def plugin_settings_service(project, plugin_discovery_service):
+    return PluginSettingsService(
+        project,
+        discovery_service=plugin_discovery_service,
+        **kwargs
+    )
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(project, plugin_settings_service_factory):
-    def _factory(session, plugin, **kwargs):
+def plugin_invoker_factory(project, plugin_settings_service):
+    def _factory(plugin, **kwargs):
         return invoker_factory(
-            session,
             project,
             plugin,
-            plugin_settings_service=plugin_settings_service_factory(session),
-            **kwargs,
+            plugin_settings_service=plugin_settings_service,
         )
 
     return _factory
@@ -177,16 +174,11 @@ def target(config_service):
 
 
 @pytest.fixture(scope="class")
-def schedule_service_factory(project, plugin_settings_service_factory):
-    def _factory(session, **kwargs):
-        return ScheduleService(
-            session,
-            project,
-            plugin_settings_service=plugin_settings_service_factory(session),
-            **kwargs,
-        )
-
-    return _factory
+def schedule_service_factory(project, plugin_settings_service):
+    return ScheduleService(
+        project,
+        plugin_settings_service=plugin_settings_service,
+    )
 
 
 @pytest.fixture(scope="class")

@@ -10,14 +10,14 @@ from datetime import datetime
 from enum import IntFlag
 
 from . import Runner
-from meltano.core.db import project_engine
 from meltano.core.job import Job, JobFinder
-from meltano.core.project import Project
 from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
+from meltano.core.connection_service import ConnectionService
 from meltano.core.utils import file_has_data
 from meltano.core.logging import capture_subprocess_output
+from meltano.core.elt_context import ELTContext
 
 
 class SingerPayload(IntFlag):
@@ -26,12 +26,18 @@ class SingerPayload(IntFlag):
 
 class SingerRunner(Runner):
     def __init__(
-        self, project: Project, job_id, config_service: ConfigService = None, **config
+        self,
+        elt_context: ELTContext,
+        job_id,
+        config_service: ConfigService = None,
+        connection_service: ConnectionService = None,
+        **config
     ):
-        self.project = project
+        self.context = elt_context
         self.job_id = job_id
-        self.config_service = config_service or ConfigService(project)
         self.config = config
+        self.config_service = config_service or ConfigService(elt_context.project)
+        self.connection_service = connection_service or ConnectionService(elt_context)
 
         self.job = Job(job_id=self.job_id)
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
@@ -39,12 +45,6 @@ class SingerRunner(Runner):
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")
         )
-
-        _, self._session_cls = project_engine(project)
-
-    @property
-    def database(self):
-        return self.config.get("database", "default")
 
     def stop(self, process, **wait_args):
         while True:
@@ -55,10 +55,6 @@ class SingerRunner(Runner):
             except subprocess.TimeoutExpired:
                 process.kill()
                 logging.error(f"{process} was killed.")
-
-    def prepare(self, tap: PluginInvoker, target: PluginInvoker):
-        tap.prepare()
-        target.prepare()
 
     async def invoke(self, tap: PluginInvoker, target: PluginInvoker):
         try:
@@ -151,25 +147,27 @@ class SingerRunner(Runner):
         logging.info(f"\textractor: {extractor.name} at '{tap_exec}'")
         logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
 
-    def run(self, extractor: str, loader: str, dry_run=False):
-        tap = self.config_service.find_plugin(
-            extractor, plugin_type=PluginType.EXTRACTORS
-        )
-        target = self.config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
-
+    def run(self, session, dry_run=False):
         try:
-            session = self._session_cls()
-            extractor = invoker_factory(session, self.project, tap)
-            loader = invoker_factory(session, self.project, target)
+            tap = self.context.extractor_invoker()
+            target = self.context.loader_invoker()
 
-            self.prepare(extractor, loader)
+            # setup each invoker with the plugin configuration to
+            # use for the invokation
+            target_elt_params = self.connection_service.connection_params("load")
+
+            # Configure each tap/target from the ELTContext
+            target.plugin_config.update(target_elt_params)
+
+            tap.prepare(session)
+            target.prepare(session)
 
             if dry_run:
                 return self.dry_run(tap, target)
 
             with self.job.run(session):
-                self.restore_bookmark(session, extractor)
+                self.restore_bookmark(session, tap.plugin.name)
                 loop = asyncio.get_event_loop()
-                loop.run_until_complete(self.invoke(extractor, loader))
+                loop.run_until_complete(self.invoke(tap, target))
         finally:
             session.close()

@@ -5,7 +5,6 @@ from typing import Iterable, Dict, Tuple, List
 from copy import deepcopy
 from enum import Enum
 
-from meltano.core.db import project_engine
 from meltano.core.utils import nest
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
@@ -51,7 +50,6 @@ class SettingDefinition:
 class PluginSettingsService:
     def __init__(
         self,
-        session,
         project,
         config_service: ConfigService = None,
         discovery_service: PluginDiscoveryService = None,
@@ -59,10 +57,9 @@ class PluginSettingsService:
         self.project = project
         self.config_service = config_service or ConfigService(project)
         self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
-        self._session = session
 
     def as_config(
-        self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
+        self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
     ) -> Dict:
         # defaults to the meltano.yml for extraneous settings
         plugin_install = self.get_install(plugin)
@@ -71,7 +68,7 @@ class PluginSettingsService:
 
         # definition settings
         for setting in self.definitions(plugin):
-            value, source = self.get_value(plugin, setting["name"])
+            value, source = self.get_value(session, plugin, setting["name"])
             if sources and source not in sources:
                 continue
 
@@ -80,14 +77,14 @@ class PluginSettingsService:
         return config
 
     def as_env(
-        self, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
+        self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
     ) -> Dict[str, str]:
         # defaults to the meltano.yml for extraneous settings
         plugin_def = self.get_definition(plugin)
         env = {}
 
         for setting in self.definitions(plugin):
-            value, source = self.get_value(plugin, setting["name"])
+            value, source = self.get_value(session, plugin, setting["name"])
             if sources and source not in sources:
                 continue
 
@@ -96,7 +93,7 @@ class PluginSettingsService:
 
         return env
 
-    def set(self, plugin: PluginRef, name: str, value, enabled=True):
+    def set(self, session, plugin: PluginRef, name: str, value, enabled=True):
         try:
             plugin_def = self.get_definition(plugin)
             setting_def = self.find_setting(plugin, name)
@@ -110,18 +107,18 @@ class PluginSettingsService:
                 namespace=plugin.qualified_name, name=name, value=value, enabled=enabled
             )
 
-            self._session.merge(setting)
-            self._session.commit()
+            session.merge(setting)
+            session.commit()
 
             return setting
         except StopIteration:
             logging.warning(f"Setting `{name}` not found.")
 
-    def unset(self, plugin: PluginRef, name: str):
-        self._session.query(PluginSetting).filter_by(
+    def unset(self, session, plugin: PluginRef, name: str):
+        session.query(PluginSetting).filter_by(
             namespace=plugin.qualified_name, name=name
         ).delete()
-        self._session.commit()
+        session.commit()
 
     def get_definition(self, plugin: PluginRef) -> Plugin:
         return self.plugin_discovery.find_plugin(plugin.type, plugin.name)
@@ -169,7 +166,7 @@ class PluginSettingsService:
             return "_".join(map(process, parts))
 
     # TODO: ensure `kind` is handled
-    def get_value(self, plugin: PluginRef, name: str):
+    def get_value(self, session, plugin: PluginRef, name: str):
         plugin_install = self.get_install(plugin)
         plugin_def = self.get_definition(plugin)
         setting_def = self.find_setting(plugin, name)
@@ -194,7 +191,7 @@ class PluginSettingsService:
             # priority 3: settings database
             return (
                 (
-                    self._session.query(PluginSetting)
+                    session.query(PluginSetting)
                     .filter_by(namespace=plugin.qualified_name, name=name, enabled=True)
                     .one()
                     .value

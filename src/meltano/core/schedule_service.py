@@ -26,18 +26,17 @@ Schedule = namedtuple(
 class ScheduleService:
     def __init__(
         self,
-        session,
         project: Project,
         plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
-            session, project
+            project
         )
-        self._session = session
 
     def add(
         self,
+        session,
         name,
         extractor: str,
         loader: str,
@@ -46,14 +45,14 @@ class ScheduleService:
         start_date: Optional[datetime] = None,
         **env,
     ):
-        start_date = start_date or self.default_start_date(extractor)
+        start_date = start_date or self.default_start_date(session, extractor)
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )
 
         return self.add_schedule(schedule)
 
-    def default_start_date(self, extractor: str) -> datetime:
+    def default_start_date(self, session, extractor: str) -> datetime:
         """
         Returns the `start_date` of the extractor, or now.
         """
@@ -61,7 +60,7 @@ class ScheduleService:
         start_date = None
         try:
             start_date, _ = self.plugin_settings_service.get_value(
-                extractor_ref, "start_date"
+                session, extractor_ref, "start_date"
             )
         except PluginSettingMissingError:
             logging.debug(f"`start_date` not found in {extractor}.")

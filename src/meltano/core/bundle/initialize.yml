@@ -1,20 +1,8 @@
 requirements.txt: ""
 meltano.yml: |
-  plugins:
-    connections:
-      - name: sqlite
-      - name: postgresql
   version: 1.0
   send_anonymous_usage_stats: True
 README.md: ""
-.env: |
-  SQLITE_DATABASE=meltano
-  PG_PASSWORD=warehouse
-  PG_USERNAME=warehouse
-  PG_ADDRESS=localhost
-  PG_SCHEMA=meltano
-  PG_PORT=5502
-  PG_DATABASE=warehouse
 .gitignore: |
   /venv
   /.meltano

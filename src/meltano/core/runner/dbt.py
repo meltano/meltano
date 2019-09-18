@@ -6,40 +6,47 @@ from . import Runner
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
+from meltano.core.connection_service import ConnectionService
 from meltano.core.dbt_service import DbtService
 from meltano.core.config_service import ConfigService
 from meltano.core.db import project_engine
+from meltano.core.elt_context import ELTContext
 
 
 class DbtRunner(Runner):
     def __init__(
         self,
-        project: Project,
-        config_service: ConfigService = None,
+        elt_context: ELTContext,
         dbt_service: DbtService = None,
-        plugin_settings_service=None,
     ):
-        self.project = project
-        self.config_service = config_service or ConfigService(project)
-        self.dbt_service = dbt_service or DbtService(project)
+        self.context = elt_context
+        self.dbt_service = dbt_service or DbtService(elt_context.project)
+        self.connection_service = ConnectionService(elt_context)
 
-    def run(self, extractor: str, loader: str, dry_run=False, models=None):
-        extractor = self.config_service.find_plugin(
-            extractor, plugin_type=PluginType.EXTRACTORS
-        )
-        loader = self.config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
+    @property
+    def project(self):
+        return self.context.project
 
+    def run(self, dry_run=False, models=None):
         # we should probably refactor this part to have an ELTContext object already
         # filled with the each plugins' configuration so we don't have to query
         # multiple times for the same data.
+
+        settings_service = PluginSettingsService(self.project)
         _, Session = project_engine(self.project)
-
-        session = Session()
         try:
-            settings = PluginSettingsService(session, self.project)
-
-            # send the elt_context as ENV variables
-            env = {**settings.as_env(extractor), **settings.as_env(loader)}
+            session = Session()
+            load_connection = self.connection_service.connection_params("load")
+            analyze_connection = self.connection_service.connection_params("analyze")
+            env = {
+                # inject the inferred 'schemas' from the ELTContext
+                'MELTANO_LOAD_SCHEMA': load_connection['schema'],
+                'MELTANO_ANALYZE_SCHEMA': analyze_connection['schema'],
+                # inject the loaders current configuration as ENV variables.
+                # that means the dbt profiles should match perfectly with the
+                # target configuration settings
+                **settings_service.as_env(session, self.context.loader),
+            }
 
             # Get an asyncio event loop and use it to run the dbt commands
             loop = asyncio.get_event_loop()

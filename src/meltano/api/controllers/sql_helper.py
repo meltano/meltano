@@ -16,6 +16,8 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
+from meltano.core.elt_context import ELTContextBuilder
+from meltano.core.connection_service import ConnectionService
 from .settings_helper import SettingsHelper
 
 
@@ -47,33 +49,22 @@ class SqlHelper(SqlUtils):
         m5oc_file = project.run_dir("models", namespace, f"{topic_name}.topic.m5oc")
         return M5ocFile.load(m5oc_file)
 
-    def get_connection(self, dialect):
+    def get_db_engine(self, loader):
         project = Project.find()
-        config = ConfigService(project)
-        connections = list(config.get_connections())
+        context = ELTContextBuilder(project).with_loader(loader).context(db.session)
+        connection_service = ConnectionService(context)
 
-        # for now let's just find the first connection that
-        # match dialect-wise
-        try:
-            return next(
-                connection for connection in connections if connection.name == dialect
-            )
-        except StopIteration:
-            raise ConnectionNotFound(dialect)
-
-    def get_db_engine(self, dialect):
-        project = Project.find()
-        connection = self.get_connection(dialect)
-        config = PluginSettingsService(db.session, project).as_config(connection)
         engine_hooks = []
+        params = connection_service.connection_params("analyze")
+        engine_uri = connection_service.connection_uri("analyze")
+        dialect = params["dialect"]
 
-        if dialect == "postgresql":
-            psql_params = ["user", "password", "host", "port", "dbname"]
-            user, pw, host, port, dbname = [config[param] for param in psql_params]
-            connection_url = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{dbname}"
+        if dialect not in ["postgres", "sqlite"]:
+            raise UnsupportedConnectionDialect(dialect)
 
+        if dialect == "postgres":
             def set_connection_schema(raw, conn):
-                schema = config["schema"]
+                schema = params["schema"]
                 with raw.cursor() as cursor:
                     res = cursor.execute(f"SET search_path TO {schema};")
                     logging.debug(f"Connection schema set to {schema}")
@@ -81,14 +72,8 @@ class SqlHelper(SqlUtils):
             engine_hooks.append(
                 lambda engine: listen(engine, "first_connect", set_connection_schema)
             )
-        elif dialect == "sqlite":
-            db_path = project.root.joinpath(config["dbname"]).with_suffix(".db")
-            connection_url = f"sqlite:///{db_path}"
-        else:
-            raise UnsupportedConnectionDialect(dialect)
 
-        engine = sqlalchemy.create_engine(connection_url)
-
+        engine = sqlalchemy.create_engine(engine_uri)
         for hook in engine_hooks:
             hook(engine)
 
@@ -96,8 +81,8 @@ class SqlHelper(SqlUtils):
 
     # we need to `freeze` each result to make sure
     # the attribute name will be correct for the lookup
-    def get_query_results(self, connection_name, sql):
-        engine = self.get_db_engine(connection_name)
+    def get_query_results(self, loader, sql):
+        engine = self.get_db_engine(loader)
         results = engine.execute(sqlalchemy.text(sql))
         results = [freeze_keys(OrderedDict(row)) for row in results]
         return results
