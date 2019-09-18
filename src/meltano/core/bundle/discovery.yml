@@ -152,7 +152,6 @@ extractors:
       - name: api_token
       - name: api_type
       - name: sandbox
-        value: false
         kind: boolean
       - name: start_date
         kind: date_iso8601
