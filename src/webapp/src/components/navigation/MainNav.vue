@@ -268,13 +268,13 @@ export default {
                           <div class="control">
                             <div class="tags has-addons">
                               <span class="tag">Current</span>
-                              <span class="tag is-warning">{{ version }}</span>
+                              <span class="tag is-info">{{ version }}</span>
                             </div>
                           </div>
                           <div class="control">
                             <div class="tags has-addons">
                               <span class="tag">Latest</span>
-                              <span class="tag is-success">{{
+                              <span class="tag is-info">{{
                                 latestVersion
                               }}</span>
                             </div>
