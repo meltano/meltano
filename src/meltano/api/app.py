@@ -18,7 +18,6 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
-from meltano.core.utils import truthy
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 
 
