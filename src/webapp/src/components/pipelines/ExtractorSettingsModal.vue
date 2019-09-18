@@ -148,10 +148,16 @@ export default {
             field-class="is-small"
             :config-settings="extractorInFocusConfiguration"
           />
-          <div v-if="extractor.docs" class="mt1r">
+          <div v-if="extractor.docs" class="content has-text-centered mt1r">
             <p>
-              Need help finding this information? We got you covered with our
-              <a :href="extractor.docs" target="_blank">docs here</a>.
+              View Meltano's
+              <a
+                :href="extractor.docs"
+                target="_blank"
+                class="has-text-underlined"
+                >{{ extractorNameFromRoute }} docs</a
+              >
+              for more info.
             </p>
           </div>
         </template>
