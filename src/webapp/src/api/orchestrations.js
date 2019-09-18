@@ -2,10 +2,6 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
-  connectionNames() {
-    return axios.get(utils.apiUrl('orchestrations', 'connection_names'))
-  },
-
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
