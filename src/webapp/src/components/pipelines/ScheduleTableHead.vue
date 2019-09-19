@@ -56,11 +56,11 @@ export default {
         </span>
       </th>
       <th class="has-text-centered">
-        <span>Catch-up Date</span>
+        <span>Start Date</span>
         <span
           class="icon has-text-grey-light tooltip is-tooltip-multiline"
           :class="{ 'is-tooltip-left': !hasActions }"
-          data-tooltip="The oldest date from which to extract data as part of this scheduled ELT pipeline. 'None' uses the Extractor's default Start Date."
+          data-tooltip="The oldest date from which to extract data as part of this scheduled ELT pipeline. Currently, the extractor's Start Date value is used."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>

@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
@@ -19,7 +19,6 @@ export default {
   },
   data() {
     return {
-      hasCatchupDate: false,
       intervalOptions: [
         '@once',
         '@hourly',
@@ -45,7 +44,7 @@ export default {
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getFormattedDateStringYYYYMMDD() {
-      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
+      return val => utils.formatDateStringYYYYMMDD(val)
     },
     getInputDateMeta() {
       return utils.getInputDateMeta()
@@ -53,16 +52,19 @@ export default {
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
-      return hasOwns.find(val => val === '') === undefined
+      return hasOwns.find(val => val === '' || val === null) === undefined
     }
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
+    this.$store.dispatch('plugins/getInstalledPlugins')
+      .then(this.prefillForm)
+      .then(this.updateStartDate)
   },
   mounted() {
     this.$refs.name.focus()
   },
   methods: {
+    ...mapActions('configuration', ['getDefaultStartDate']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -111,12 +113,12 @@ export default {
           Vue.toasted.global.error(error.response.data.code)
         })
     },
-    setHasCatchupDate(val) {
-      this.hasCatchupDate = val
-      if (!this.hasCatchupDate) {
-        this.pipeline.startDate = null
-      }
-    }
+    updateStartDate() {
+      this.pipeline.startDate = null
+      this.getDefaultStartDate(this.pipeline.extractor).then((response) => {
+        this.pipeline.startDate = response.data.startDate
+      })
+    },
   }
 }
 </script>
@@ -158,6 +160,7 @@ export default {
                   >
                     <select
                       v-model="pipeline.extractor"
+                      @change='updateStartDate'
                       :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
                     >
@@ -229,50 +232,11 @@ export default {
                 </div>
               </td>
               <td>
-                <div class="control is-expanded">
-                  <Dropdown
-                    :label="
-                      hasCatchupDate ? getFormattedDateStringYYYYMMDD : 'None'
-                    "
-                    :button-classes="
-                      pipeline.startDate || !hasCatchupDate
-                        ? 'is-outlined has-text-success'
-                        : ''
-                    "
-                    is-right-aligned
-                    is-full-width
-                  >
-                    <div class="dropdown-content">
-                      <a
-                        class="dropdown-item"
-                        data-dropdown-auto-close
-                        @click="setHasCatchupDate(false)"
-                      >
-                        None
-                      </a>
-                      <hr class="dropdown-divider" />
-                      <div>
-                        <div class="dropdown-item">
-                          <InputDateIso8601
-                            v-model="pipeline.startDate"
-                            name="catchup-start"
-                            :input-classes="
-                              `is-small ${
-                                pipeline.startDate ? 'has-text-success' : ''
-                              }`
-                            "
-                          />
-                          <button
-                            class="button is-interactive-primary is-outlined is-small is-inline"
-                            data-dropdown-auto-close
-                            @click="setHasCatchupDate(true)"
-                          >
-                            Set
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Dropdown>
+                <div class="has-text-centered">
+                  <span class="button is-static"
+                    :class="{ 'is-loading': !pipeline.startDate }">
+                      {{getFormattedDateStringYYYYMMDD(pipeline.startDate)}}
+                  </span>
                 </div>
               </td>
             </tr>

@@ -103,6 +103,10 @@ const actions = {
     })
   },
 
+  getDefaultStartDate(_, extractor) {
+    return orchestrationsApi.getDefaultStartDate(extractor)
+  },
+
   getExtractorConfiguration({ commit, dispatch }, extractor) {
     dispatch('getPluginConfiguration', {
       name: extractor,
