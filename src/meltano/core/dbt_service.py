@@ -1,11 +1,13 @@
-import subprocess
+import asyncio
 import logging
+import sys
 
 from .config_service import ConfigService
 from .db import project_engine
 from .plugin import PluginType
 from .plugin_invoker import invoker_factory
 from .venv_service import VenvService
+from .logging import capture_subprocess_output
 
 
 class DbtService:
@@ -21,7 +23,7 @@ class DbtService:
     def exec_path(self):
         return self.venv_service.exec_path("dbt", namespace=PluginType.TRANSFORMERS)
 
-    def compile(self, models=None, **kwargs):
+    async def compile(self, models=None, **kwargs):
         session = self._Session()
         invoker = invoker_factory(session, self.project, self._plugin)
 
@@ -32,25 +34,63 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = invoker.invoke("compile", *params, **kwargs)
-            handle.wait()
+            handle = await invoker.invoke_async(
+                "compile",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                *params,
+                **kwargs,
+            )
 
-            return handle
+            # run the dbt compile command, capture the stdout and stderr
+            #  and send them to the stdout, stderr set by OutputLogger
+            #  so that they are also logged in a log file in real time
+            await asyncio.wait(
+                [
+                    capture_subprocess_output(handle.stdout, sys.stdout),
+                    capture_subprocess_output(handle.stderr, sys.stderr),
+                    handle.wait(),
+                ],
+                return_when=asyncio.ALL_COMPLETED,
+            )
+
+            returncode = await handle.wait()
+
+            if returncode:
+                raise Exception(
+                    f"dbt compile didn't exit cleanly. Exit code: {returncode}"
+                )
         finally:
             session.close()
 
-    def deps(self):
+    async def deps(self):
         session = self._Session()
         invoker = invoker_factory(session, self.project, self._plugin)
         try:
-            handle = invoker.invoke("deps")
-            handle.wait()
+            handle = await invoker.invoke_async(
+                "deps", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+            )
 
-            return handle
+            # run the dbt deps command and capture the stdout and stderr
+            await asyncio.wait(
+                [
+                    capture_subprocess_output(handle.stdout, sys.stdout),
+                    capture_subprocess_output(handle.stderr, sys.stderr),
+                    handle.wait(),
+                ],
+                return_when=asyncio.ALL_COMPLETED,
+            )
+
+            returncode = await handle.wait()
+
+            if returncode:
+                raise Exception(
+                    f"dbt deps didn't exit cleanly. Exit code: {returncode}"
+                )
         finally:
             session.close()
 
-    def run(self, models=None, **kwargs):
+    async def run(self, models=None, **kwargs):
         session = self._Session()
         invoker = invoker_factory(session, self.project, self._plugin)
 
@@ -61,9 +101,27 @@ class DbtService:
                 all_models = f"{models} my_meltano_project"
                 params.extend(["--models", all_models])
 
-            handle = invoker.invoke("run", *params, **kwargs)
-            handle.wait()
+            handle = await invoker.invoke_async(
+                "run",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                *params,
+                **kwargs,
+            )
 
-            return handle
+            # run the dbt run command and capture the stdout and stderr
+            await asyncio.wait(
+                [
+                    capture_subprocess_output(handle.stdout, sys.stdout),
+                    capture_subprocess_output(handle.stderr, sys.stderr),
+                    handle.wait(),
+                ],
+                return_when=asyncio.ALL_COMPLETED,
+            )
+
+            returncode = await handle.wait()
+
+            if returncode:
+                raise Exception(f"dbt run didn't exit cleanly. Exit code: {returncode}")
         finally:
             session.close()

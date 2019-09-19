@@ -3,6 +3,8 @@ import json
 import logging
 import asyncio
 import os
+import sys
+
 from pathlib import Path
 from datetime import datetime
 from enum import IntFlag
@@ -15,6 +17,7 @@ from meltano.core.plugin_invoker import invoker_factory, PluginInvoker
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin.singer import SingerTap, SingerTarget, PluginType
 from meltano.core.utils import file_has_data
+from meltano.core.logging import capture_subprocess_output
 
 
 class SingerPayload(IntFlag):
@@ -66,11 +69,15 @@ class SingerRunner(Runner):
 
             p_target, p_tap = None, None
             p_target = await target.invoke_async(
-                stdin=target_in, stdout=asyncio.subprocess.PIPE  # state log
+                stdin=target_in,
+                stdout=asyncio.subprocess.PIPE,  # state log
+                stderr=asyncio.subprocess.PIPE,  # Target err for logging it
             )
             os.close(target_in)
 
-            p_tap = await tap.invoke_async(stdout=tap_out)
+            p_tap = await tap.invoke_async(
+                stdout=tap_out, stderr=asyncio.subprocess.PIPE
+            )
             os.close(tap_out)
         except Exception as err:
             if p_tap:
@@ -80,9 +87,15 @@ class SingerRunner(Runner):
             raise Exception(f"Cannot start tap or target: {err}")
 
         # receive the target stdout and update the current job
-        # for each lines
+        # for each line
         await asyncio.wait(
-            [self.bookmark(p_target.stdout), p_target.wait(), p_tap.wait()],
+            [
+                self.bookmark(p_target.stdout),
+                capture_subprocess_output(p_tap.stderr, sys.stderr),
+                capture_subprocess_output(p_target.stderr, sys.stderr),
+                p_target.wait(),
+                p_tap.wait(),
+            ],
             return_when=asyncio.FIRST_COMPLETED,
         )
 
