@@ -82,7 +82,7 @@ class SqlHelper(SqlUtils):
                 lambda engine: listen(engine, "first_connect", set_connection_schema)
             )
         elif dialect == "sqlite":
-            db_path = project.root.joinpath(config["dbname"])
+            db_path = project.root.joinpath(config["dbname"]).with_suffix(".db")
             connection_url = f"sqlite:///{db_path}"
         else:
             raise UnsupportedConnectionDialect(dialect)

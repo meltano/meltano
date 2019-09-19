@@ -31,6 +31,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#994](https://gitlab.com/meltano/meltano/issues/994) Fix stale Pipelines Count in main navigation Pipeline badge
 - [#999](https://gitlab.com/meltano/meltano/issues/999) Update yarn dependencies to resolve peer dependency warning
 - [#1008](https://gitlab.com/meltano/meltano/issues/1008) Fix error on "Create Pipeline Schedule" modal when no plugins have been installed
+- [#1015](https://gitlab.com/meltano/meltano/issues/1008) Support SQLite database name with and without '.db' extension
 
 
 ## 0.42.0 - (2019-09-16)

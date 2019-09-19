@@ -24,7 +24,7 @@ class TestSqlHelper:
         instance = PluginSettingsServiceMock()
         instance.as_config.return_value = {"dbname": "dbname"}
 
-        engine_uri = f"sqlite:///{project.root.joinpath('dbname')}"
+        engine_uri = f"sqlite:///{project.root.joinpath('dbname')}.db"
 
         with mock.patch(
             "sqlalchemy.create_engine", return_value=None
