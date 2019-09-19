@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job_id of the run. It can be found in `.meltano/run/logs/elt_{job_id}.log`.
+
 ### Changes
 
 ### Fixes
