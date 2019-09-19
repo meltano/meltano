@@ -2,8 +2,6 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
-import Dropdown from '@/components/generic/Dropdown'
-import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 
 import utils from '@/utils/utils'
@@ -13,8 +11,6 @@ import _ from 'lodash'
 export default {
   name: 'CreateScheduleModal',
   components: {
-    Dropdown,
-    InputDateIso8601,
     ScheduleTableHead
   },
   data() {
@@ -56,7 +52,8 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.$store
+      .dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm)
       .then(this.updateStartDate)
   },
@@ -115,10 +112,10 @@ export default {
     },
     updateStartDate() {
       this.pipeline.startDate = null
-      this.getDefaultStartDate(this.pipeline.extractor).then((response) => {
+      this.getDefaultStartDate(this.pipeline.extractor).then(response => {
         this.pipeline.startDate = response.data.startDate
       })
-    },
+    }
   }
 }
 </script>
@@ -160,9 +157,9 @@ export default {
                   >
                     <select
                       v-model="pipeline.extractor"
-                      @change='updateStartDate'
                       :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
+                      @change="updateStartDate"
                     >
                       <option
                         v-for="extractor in installedPlugins.extractors"
@@ -233,9 +230,11 @@ export default {
               </td>
               <td>
                 <div class="has-text-centered">
-                  <span class="button is-static"
-                    :class="{ 'is-loading': !pipeline.startDate }">
-                      {{getFormattedDateStringYYYYMMDD(pipeline.startDate)}}
+                  <span
+                    class="button is-static"
+                    :class="{ 'is-loading': !pipeline.startDate }"
+                  >
+                    {{ getFormattedDateStringYYYYMMDD(pipeline.startDate) }}
                   </span>
                 </div>
               </td>
