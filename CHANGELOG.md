@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-## Unreleased
 
+## Unreleased
 ---
 
 ### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 0.42.1 - (2019-09-19)
+
+---
 
 ### Changes
 
@@ -21,7 +32,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#999](https://gitlab.com/meltano/meltano/issues/999) Update yarn dependencies to resolve peer dependency warning
 - [#1008](https://gitlab.com/meltano/meltano/issues/1008) Fix error on "Create Pipeline Schedule" modal when no plugins have been installed
 
-### Breaks
 
 ## 0.42.0 - (2019-09-16)
 
