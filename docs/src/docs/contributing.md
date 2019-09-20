@@ -2,9 +2,11 @@
 
 ## Prerequisites
 
-::: warning
-Before you move on, make sure you have Python 3.6.1+, Node 8.11.0+, and a compatible version of Yarn installed.
-:::
+In order to contribute to Meltano, you will need the following:
+
+1. [Python 3.6.1+](https://www.python.org/downloads/)
+2. [Node 8.11.0+](https://nodejs.org/)
+3. [Yarn](https://yarnpkg.com/)
 
 ## Where to start?
 
@@ -82,13 +84,7 @@ meltano ui
 
 # Open a new terminal tab and go to your meltano directory
 # Install frontend infrastructure at the root directory
-yarn
-
-# Change directory to webapp source code
-cd src/webapp
-
-# Install dependencies
-yarn
+yarn setup
 
 # Start local development environment
 yarn serve
