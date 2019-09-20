@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,8 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1005](https://gitlab.com/meltano/meltano/issues/1005) Fix installed plugins endpoints listing identically named plugins of different types under wrong type
 
+### Breaks
 
 ## 0.42.1 - (2019-09-19)
 
@@ -33,7 +34,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1008](https://gitlab.com/meltano/meltano/issues/1008) Fix error on "Create Pipeline Schedule" modal when no plugins have been installed
 - [#1015](https://gitlab.com/meltano/meltano/issues/1008) Support SQLite database name with and without '.db' extension
 - [#1007](https://gitlab.com/meltano/meltano/issues/1007) Fix pipeline with failed job not being regarded as having completed
-
 
 ## 0.42.0 - (2019-09-16)
 
