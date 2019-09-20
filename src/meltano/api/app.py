@@ -17,6 +17,7 @@ from meltano.core.plugin.settings_service import (
 )
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
+from meltano.core.tracking import GoogleAnalyticsTracker
 from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 
 
@@ -111,6 +112,11 @@ def create_app(config={}):
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
+
+        tracker = GoogleAnalyticsTracker(project)
+        if tracker.send_anonymous_usage_stats:
+            g.jsContext["isSendAnonymousUsageStats"] = True
+            g.jsContext["clientId"] = tracker.client_id
 
         try:
             airflow = ConfigService(project).find_plugin("airflow")
