@@ -1,5 +1,5 @@
+import asyncio
 import logging
-import subprocess
 from io import StringIO
 
 from . import Runner
@@ -40,29 +40,19 @@ class DbtRunner(Runner):
 
             # send the elt_context as ENV variables
             env = {**settings.as_env(extractor), **settings.as_env(loader)}
-            process = self.dbt_service.deps()
 
-            if process.returncode:
-                raise Exception(
-                    f"dbt deps didn't exit cleanly. Exit code: {process.returncode}"
-                )
+            # Get an asyncio event loop and use it to run the dbt commands
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.dbt_service.deps())
 
             if models is not None:
                 models = models.replace("-", "_")
 
             if dry_run:
-                process = self.dbt_service.compile(models, env=env)
-                if process.returncode:
-                    raise Exception(
-                        f"dbt compile didn't exit cleanly. Exit code: {process.returncode}"
-                    )
+                loop.run_until_complete(self.dbt_service.compile(models, env=env))
             else:
-                process = self.dbt_service.run(models, env=env)
-                if process.returncode:
-                    raise Exception(
-                        f"dbt run didn't exit cleanly. Exit code: {process.returncode}"
-                    )
+                loop.run_until_complete(self.dbt_service.run(models, env=env))
         except Exception as e:
-            logging.warning("Could not inject environment to dbt.")
+            logging.debug("Could not inject environment to dbt.")
             logging.debug(f"Could not hydrate ENV from the EltContext: {str(e)}")
             raise e

@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="psycopg2")
 import meltano
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
-from meltano.core.utils import setup_logging
+from meltano.core.logging import setup_logging
 
 
 logger = logging.getLogger(__name__)
