@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/SpeedRunIcon'
@@ -39,13 +39,6 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    installLoaderAndBeginSettings(loader) {
-      this.addPlugin({ pluginType: 'loaders', name: loader }).then(() => {
-        this.installPlugin({ pluginType: 'loaders', name: loader })
-        this.updateLoaderSettings(loader)
-      })
-    },
     updateLoaderSettings(loader) {
       this.$router.push({ name: 'loaderSettings', params: { loader } })
     }
@@ -114,7 +107,7 @@ export default {
                     getIsInstallingPlugin('loaders', loader)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
-                @click="installLoaderAndBeginSettings(loader)"
+                @click="updateLoaderSettings(loader)"
                 >Install</a
               >
             </template>

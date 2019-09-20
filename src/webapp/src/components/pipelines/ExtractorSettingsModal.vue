@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
@@ -59,22 +59,40 @@ export default {
   },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store.dispatch(
-      'configuration/getExtractorConfiguration',
-      this.extractorNameFromRoute
-    )
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+      const needsInstallation =
+        this.extractor.name !== this.extractorNameFromRoute
+      if (needsInstallation) {
+        const config = {
+          pluginType: 'extractors',
+          name: this.extractorNameFromRoute
+        }
+        this.addPlugin(config).then(() => {
+          this.prepareExtractorConfiguration()
+          this.installPlugin(config)
+        })
+      } else {
+        this.prepareExtractorConfiguration()
+      }
+    })
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
   },
   methods: {
+    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
       } else {
         this.$router.push({ name: 'extractors' })
       }
+    },
+    prepareExtractorConfiguration() {
+      this.$store.dispatch(
+        'configuration/getExtractorConfiguration',
+        this.extractorNameFromRoute
+      )
     },
     saveConfigAndBeginEntitySelection() {
       this.$store
@@ -113,37 +131,36 @@ export default {
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
-        <template v-if="isInstalling">
-          <div class="content">
-            <div class="level">
-              <div class="level-item">
-                <p>
-                  Installing {{ extractorNameFromRoute }} can take up to a
-                  minute.
-                </p>
-              </div>
+        <div v-if="isLoadingConfigSettings || isInstalling" class="content">
+          <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
+            <div class="level-item">
+              <p class="is-italic">
+                Installing {{ extractorNameFromRoute }} can take up to a minute.
+              </p>
             </div>
-            <progress class="progress is-small is-info"></progress>
           </div>
-        </template>
-
-        <ConnectorSettings
-          v-if="!isLoadingConfigSettings && !extractorLacksConfigSettings"
-          field-class="is-small"
-          :config-settings="extractorInFocusConfiguration"
-        />
-
-        <div v-if="extractor.docs" class="mt1r">
-          <p>
-            Need help finding this information? We got you covered with our
-            <a :href="extractor.docs" target="_blank">docs here</a>.
-          </p>
+          <progress class="progress is-small is-info"></progress>
         </div>
 
-        <progress
-          v-if="isLoadingConfigSettings && !isInstalling"
-          class="progress is-small is-info"
-        ></progress>
+        <template v-if="!isLoadingConfigSettings">
+          <ConnectorSettings
+            v-if="!extractorLacksConfigSettings"
+            field-class="is-small"
+            :config-settings="extractorInFocusConfiguration"
+          />
+          <div v-if="extractor.docs" class="content has-text-centered mt1r">
+            <p>
+              View Meltano's
+              <a
+                :href="extractor.docs"
+                target="_blank"
+                class="has-text-underlined"
+                >{{ extractorNameFromRoute }} docs</a
+              >
+              for more info.
+            </p>
+          </div>
+        </template>
 
         <template v-if="extractorLacksConfigSettingsAndIsInstalled">
           <div class="content">
