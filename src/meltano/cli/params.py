@@ -3,6 +3,7 @@ import functools
 import urllib
 import click
 import click.globals
+from pathlib import Path
 
 from meltano.core.project import Project
 from meltano.core.utils import pop_all
@@ -55,7 +56,8 @@ def db_options(func):
         }
 
         if not engine_uri and backend == "sqlite" and config[backend]["path"]:
-            engine_uri = "sqlite:///{path}.db".format(**config[backend])
+            path = Path(config[backend]["path"]).with_suffix(".db")
+            engine_uri = f"sqlite:///{path}"
 
         if not engine_uri and backend == "postgresql":
             pg_config = config[backend]

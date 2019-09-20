@@ -238,8 +238,8 @@ loaders:
     settings:
       - name: database
         label: Database
-        description: Path to the database, relative to the project root.
-        value: meltano.db
+        description: Path to the database, relative to the project root. If the database does not exist yet, it will be created.
+        value: meltano
 transformers:
   - name: dbt
     namespace: dbt
@@ -342,7 +342,7 @@ connections:
       - name: dbname
         label: Database
         description: Path to the database, relative to the project root.
-        value: meltano.db
+        value: meltano
   - name: postgresql
     namespace: postgresql
     settings:
