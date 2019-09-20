@@ -24,7 +24,8 @@ export default {
   },
   data() {
     return {
-      isNewDashboardModalOpen: false
+      isNewDashboardModalOpen: false,
+      isInitialized: false
     }
   },
   computed: {
@@ -122,6 +123,9 @@ export default {
 
       // don't use the setter here not to update the user's preferences
       this.$store.commit('designs/setDialect', defaultDialect)
+
+      // validate initialization so UI can display while removing the loading bar
+      this.isInitialized = true
     })
 
     this.$store.dispatch('designs/getFilterOptions')
@@ -376,7 +380,7 @@ export default {
             </Dropdown>
           </p>
 
-          <div class="control">
+          <div v-if="isInitialized" class="control">
             <div class="select">
               <select v-model="dialect" name="connection">
                 <option
@@ -426,130 +430,169 @@ export default {
             </div>
           </div>
 
-          <div class="columns is-vcentered">
-            <div class="column">
-              <div class="field">
-                <label class="label">Limit</label>
-                <div class="control is-expanded">
-                  <input
-                    v-model="limit"
-                    class="input is-small has-text-interactive-secondary"
-                    type="text"
-                    placeholder="Limit"
-                    @focus="$event.target.select()"
-                  />
+          <template v-if="isInitialized">
+            <div class="columns is-vcentered">
+              <div class="column">
+                <div class="field">
+                  <label class="label">Limit</label>
+                  <div class="control is-expanded">
+                    <input
+                      v-model="limit"
+                      class="input is-small has-text-interactive-secondary"
+                      type="text"
+                      placeholder="Limit"
+                      @focus="$event.target.select()"
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="column">
-              <div class="field">
-                <label class="label">
-                  <span>Filters</span>
-                  <span
-                    v-if="filtersCount > 0"
-                    class="has-text-weight-light has-text-grey-light is-size-7"
-                    >({{ filtersCount }})</span
-                  >
-                </label>
-                <div class="control is-expanded">
-                  <Dropdown
-                    ref="filter-dropdown"
-                    :label="hasFilters ? 'Edit' : 'None'"
-                    :button-classes="
-                      `is-small ${
-                        hasFilters ? 'has-text-interactive-secondary' : ''
-                      }`
-                    "
-                    :menu-classes="'dropdown-menu-600'"
-                    is-full-width
-                  >
-                    <div class="dropdown-content">
-                      <div class="dropdown-item">
-                        <QueryFilters></QueryFilters>
+              <div class="column">
+                <div class="field">
+                  <label class="label">
+                    <span>Filters</span>
+                    <span
+                      v-if="filtersCount > 0"
+                      class="has-text-weight-light has-text-grey-light is-size-7"
+                      >({{ filtersCount }})</span
+                    >
+                  </label>
+                  <div class="control is-expanded">
+                    <Dropdown
+                      ref="filter-dropdown"
+                      :label="hasFilters ? 'Edit' : 'None'"
+                      :button-classes="
+                        `is-small ${
+                          hasFilters ? 'has-text-interactive-secondary' : ''
+                        }`
+                      "
+                      :menu-classes="'dropdown-menu-600'"
+                      is-full-width
+                    >
+                      <div class="dropdown-content">
+                        <div class="dropdown-item">
+                          <QueryFilters></QueryFilters>
+                        </div>
                       </div>
-                    </div>
-                  </Dropdown>
+                    </Dropdown>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div class="field">
-            <label class="label">
-              <span>Attributes</span>
-              <span
-                v-if="getSelectedAttributesCount > 0"
-                class="has-text-weight-light has-text-grey-light is-size-7"
-                >({{ getSelectedAttributesCount }})</span
-              >
-            </label>
-          </div>
-
-          <nav class="panel is-unselectable">
-            <!-- Base table first followed by join tables -->
-            <template>
-              <a
-                class="panel-block
-                has-background-white-bis
-                has-text-grey
-                is-expandable"
-                :class="{ 'is-collapsed': design.relatedTable.collapsed }"
-                @click="tableRowClicked(design.relatedTable)"
-              >
-                <span class="icon is-small panel-icon">
-                  <font-awesome-icon icon="table"></font-awesome-icon>
-                </span>
-                {{ design.label }}
-              </a>
-            </template>
-            <template v-if="!design.relatedTable.collapsed">
-              <a
-                v-if="
-                  showJoinColumnAggregateHeader(design.relatedTable.columns)
-                "
-                class="panel-block
-                  panel-block-heading
-                  has-background-white"
-              >
-                Columns
-              </a>
-              <template v-for="timeframe in design.relatedTable.timeframes">
-                <a
-                  v-if="!timeframe.relatedView.hidden"
-                  :key="timeframe.label"
-                  class="panel-block dimension-group"
-                  :class="{ 'is-active': timeframe.selected }"
-                  @click="timeframeSelected(timeframe)"
+            <div class="field">
+              <label class="label">
+                <span>Attributes</span>
+                <span
+                  v-if="getSelectedAttributesCount > 0"
+                  class="has-text-weight-light has-text-grey-light is-size-7"
+                  >({{ getSelectedAttributesCount }})</span
                 >
-                  {{ timeframe.label }}
+              </label>
+            </div>
+
+            <nav class="panel is-unselectable">
+              <!-- Base table first followed by join tables -->
+              <template>
+                <a
+                  class="panel-block
+                  has-background-white-bis
+                  has-text-grey
+                  is-expandable"
+                  :class="{ 'is-collapsed': design.relatedTable.collapsed }"
+                  @click="tableRowClicked(design.relatedTable)"
+                >
+                  <span class="icon is-small panel-icon">
+                    <font-awesome-icon icon="table"></font-awesome-icon>
+                  </span>
+                  {{ design.label }}
                 </a>
-                <template v-for="period in timeframe.periods">
+              </template>
+              <template v-if="!design.relatedTable.collapsed">
+                <a
+                  v-if="
+                    showJoinColumnAggregateHeader(design.relatedTable.columns)
+                  "
+                  class="panel-block
+                    panel-block-heading
+                    has-background-white"
+                >
+                  Columns
+                </a>
+                <template v-for="timeframe in design.relatedTable.timeframes">
                   <a
-                    v-if="timeframe.selected"
-                    :key="period.label"
-                    class="panel-block indented"
-                    :class="{ 'is-active': period.selected }"
-                    @click="timeframePeriodSelected(period)"
+                    v-if="!timeframe.relatedView.hidden"
+                    :key="timeframe.label"
+                    class="panel-block dimension-group"
+                    :class="{ 'is-active': timeframe.selected }"
+                    @click="timeframeSelected(timeframe)"
                   >
-                    {{ period.label }}
+                    {{ timeframe.label }}
+                  </a>
+                  <template v-for="period in timeframe.periods">
+                    <a
+                      v-if="timeframe.selected"
+                      :key="period.label"
+                      class="panel-block indented"
+                      :class="{ 'is-active': period.selected }"
+                      @click="timeframePeriodSelected(period)"
+                    >
+                      {{ period.label }}
+                    </a>
+                  </template>
+                </template>
+                <template v-for="column in design.relatedTable.columns">
+                  <a
+                    v-if="!column.hidden"
+                    :key="column.label"
+                    class="panel-block space-between has-text-weight-medium"
+                    :class="{ 'is-active': column.selected }"
+                    @click="columnSelected(column)"
+                  >
+                    {{ column.label }}
+                    <button
+                      v-if="
+                        getIsAttributeInFilters(
+                          design.name,
+                          column.name,
+                          'column'
+                        )
+                      "
+                      class="button is-small"
+                      @click.stop="jumpToFilters"
+                    >
+                      <span class="icon has-text-interactive-secondary">
+                        <font-awesome-icon icon="filter"></font-awesome-icon>
+                      </span>
+                    </button>
                   </a>
                 </template>
-              </template>
-              <template v-for="column in design.relatedTable.columns">
+                <!-- eslint-disable-next-line vue/require-v-for-key -->
                 <a
-                  v-if="!column.hidden"
-                  :key="column.label"
-                  class="panel-block space-between has-text-weight-medium"
-                  :class="{ 'is-active': column.selected }"
-                  @click="columnSelected(column)"
+                  v-if="
+                    showJoinColumnAggregateHeader(
+                      design.relatedTable.aggregates
+                    )
+                  "
+                  class="panel-block
+                    panel-block-heading
+                    has-background-white"
                 >
-                  {{ column.label }}
+                  Aggregates
+                </a>
+                <a
+                  v-for="aggregate in design.relatedTable.aggregates"
+                  :key="aggregate.label"
+                  class="panel-block space-between has-text-weight-medium"
+                  :class="{ 'is-active': aggregate.selected }"
+                  @click="aggregateSelected(aggregate)"
+                >
+                  {{ aggregate.label }}
                   <button
                     v-if="
                       getIsAttributeInFilters(
                         design.name,
-                        column.name,
-                        'column'
+                        aggregate.name,
+                        'aggregate'
                       )
                     "
                     class="button is-small"
@@ -561,180 +604,150 @@ export default {
                   </button>
                 </a>
               </template>
-              <!-- eslint-disable-next-line vue/require-v-for-key -->
-              <a
-                v-if="
-                  showJoinColumnAggregateHeader(design.relatedTable.aggregates)
-                "
-                class="panel-block
-                  panel-block-heading
-                  has-background-white"
-              >
-                Aggregates
-              </a>
-              <a
-                v-for="aggregate in design.relatedTable.aggregates"
-                :key="aggregate.label"
-                class="panel-block space-between has-text-weight-medium"
-                :class="{ 'is-active': aggregate.selected }"
-                @click="aggregateSelected(aggregate)"
-              >
-                {{ aggregate.label }}
-                <button
-                  v-if="
-                    getIsAttributeInFilters(
-                      design.name,
-                      aggregate.name,
-                      'aggregate'
-                    )
-                  "
-                  class="button is-small"
-                  @click.stop="jumpToFilters"
-                >
-                  <span class="icon has-text-interactive-secondary">
-                    <font-awesome-icon icon="filter"></font-awesome-icon>
-                  </span>
-                </button>
-              </a>
-            </template>
 
-            <!-- Join table(s) second, preceded by the base table -->
-            <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
-            <template v-if="hasJoins">
-              <template v-for="join in design.joins">
-                <a
-                  :key="join.label"
-                  class="panel-block
-                    has-background-white-bis
-                    has-text-grey
-                    is-expandable"
-                  :class="{ 'is-collapsed': join.collapsed }"
-                  @click="joinRowClicked(join)"
-                >
-                  <span class="icon is-small panel-icon">
-                    <font-awesome-icon icon="table"></font-awesome-icon>
-                  </span>
-                  {{ join.label }}
-                </a>
-                <template v-if="!join.collapsed">
-                  <!-- eslint-disable-next-line vue/require-v-for-key -->
+              <!-- Join table(s) second, preceded by the base table -->
+              <!-- no v-ifs with v-fors https://vuejs.org/v2/guide/conditional.html#v-if-with-v-for -->
+              <template v-if="hasJoins">
+                <template v-for="join in design.joins">
                   <a
-                    v-if="
-                      showJoinColumnAggregateHeader(join.relatedTable.columns)
-                    "
+                    :key="join.label"
                     class="panel-block
-                    panel-block-heading
-                    has-text-weight-light
-                    has-background-white"
+                      has-background-white-bis
+                      has-text-grey
+                      is-expandable"
+                    :class="{ 'is-collapsed': join.collapsed }"
+                    @click="joinRowClicked(join)"
                   >
-                    Columns
+                    <span class="icon is-small panel-icon">
+                      <font-awesome-icon icon="table"></font-awesome-icon>
+                    </span>
+                    {{ join.label }}
                   </a>
-                  <template v-for="timeframe in join.relatedTable.timeframes">
+                  <template v-if="!join.collapsed">
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="!timeframe.hidden"
-                      :key="timeframe.label"
-                      class="panel-block timeframe"
-                      :class="{
-                        'is-active': timeframe.selected,
-                        'is-sqlite-unsupported': isConnectionDialectSqlite(
-                          dialect
-                        )
-                      }"
-                      @click="
-                        isConnectionDialectSqlite(dialect) ||
-                          timeframeSelected(timeframe)
+                      v-if="
+                        showJoinColumnAggregateHeader(join.relatedTable.columns)
                       "
+                      class="panel-block
+                      panel-block-heading
+                      has-text-weight-light
+                      has-background-white"
                     >
-                      {{ timeframe.label }}
-                      <div
-                        v-if="isConnectionDialectSqlite(dialect)"
-                        class="sqlite-unsupported-container"
-                      >
-                        <small>Unsupported by SQLite</small>
-                      </div>
+                      Columns
                     </a>
-                    <template v-if="timeframe.selected">
-                      <template v-for="period in timeframe.periods">
-                        <a
-                          :key="timeframe.label.concat('-', period.label)"
-                          class="panel-block indented"
-                          :class="{ 'is-active': period.selected }"
-                          @click="timeframePeriodSelected(period)"
+                    <template v-for="timeframe in join.relatedTable.timeframes">
+                      <a
+                        v-if="!timeframe.hidden"
+                        :key="timeframe.label"
+                        class="panel-block timeframe"
+                        :class="{
+                          'is-active': timeframe.selected,
+                          'is-sqlite-unsupported': isConnectionDialectSqlite(
+                            dialect
+                          )
+                        }"
+                        @click="
+                          isConnectionDialectSqlite(dialect) ||
+                            timeframeSelected(timeframe)
+                        "
+                      >
+                        {{ timeframe.label }}
+                        <div
+                          v-if="isConnectionDialectSqlite(dialect)"
+                          class="sqlite-unsupported-container"
                         >
-                          {{ period.label }}
-                        </a>
+                          <small>Unsupported by SQLite</small>
+                        </div>
+                      </a>
+                      <template v-if="timeframe.selected">
+                        <template v-for="period in timeframe.periods">
+                          <a
+                            :key="timeframe.label.concat('-', period.label)"
+                            class="panel-block indented"
+                            :class="{ 'is-active': period.selected }"
+                            @click="timeframePeriodSelected(period)"
+                          >
+                            {{ period.label }}
+                          </a>
+                        </template>
                       </template>
                     </template>
-                  </template>
-                  <template v-for="column in join.relatedTable.columns">
-                    <a
-                      v-if="!column.hidden"
-                      :key="column.label"
-                      class="panel-block space-between has-text-weight-medium"
-                      :class="{ 'is-active': column.selected }"
-                      @click="joinColumnSelected(join, column)"
-                    >
-                      {{ column.label }}
-                      <button
-                        v-if="
-                          getIsAttributeInFilters(
-                            join.name,
-                            column.name,
-                            'column'
-                          )
-                        "
-                        class="button is-small"
-                        @click.stop="jumpToFilters"
+                    <template v-for="column in join.relatedTable.columns">
+                      <a
+                        v-if="!column.hidden"
+                        :key="column.label"
+                        class="panel-block space-between has-text-weight-medium"
+                        :class="{ 'is-active': column.selected }"
+                        @click="joinColumnSelected(join, column)"
                       >
-                        <span class="icon has-text-interactive-secondary">
-                          <font-awesome-icon icon="filter"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </a>
-                  </template>
-                  <!-- eslint-disable-next-line vue/require-v-for-key -->
-                  <a
-                    v-if="
-                      showJoinColumnAggregateHeader(
-                        join.relatedTable.aggregates
-                      )
-                    "
-                    class="panel-block
-                    panel-block-heading
-                    has-background-white"
-                  >
-                    Aggregates
-                  </a>
-                  <template v-for="aggregate in join.relatedTable.aggregates">
+                        {{ column.label }}
+                        <button
+                          v-if="
+                            getIsAttributeInFilters(
+                              join.name,
+                              column.name,
+                              'column'
+                            )
+                          "
+                          class="button is-small"
+                          @click.stop="jumpToFilters"
+                        >
+                          <span class="icon has-text-interactive-secondary">
+                            <font-awesome-icon
+                              icon="filter"
+                            ></font-awesome-icon>
+                          </span>
+                        </button>
+                      </a>
+                    </template>
+                    <!-- eslint-disable-next-line vue/require-v-for-key -->
                     <a
-                      v-if="!aggregate.hidden"
-                      :key="aggregate.label"
-                      class="panel-block space-between has-text-weight-medium"
-                      :class="{ 'is-active': aggregate.selected }"
-                      @click="joinAggregateSelected(join, aggregate)"
+                      v-if="
+                        showJoinColumnAggregateHeader(
+                          join.relatedTable.aggregates
+                        )
+                      "
+                      class="panel-block
+                      panel-block-heading
+                      has-background-white"
                     >
-                      {{ aggregate.label }}
-                      <button
-                        v-if="
-                          getIsAttributeInFilters(
-                            join.name,
-                            aggregate.name,
-                            'aggregate'
-                          )
-                        "
-                        class="button is-small"
-                        @click.stop="jumpToFilters"
-                      >
-                        <span class="icon has-text-interactive-secondary">
-                          <font-awesome-icon icon="filter"></font-awesome-icon>
-                        </span>
-                      </button>
+                      Aggregates
                     </a>
+                    <template v-for="aggregate in join.relatedTable.aggregates">
+                      <a
+                        v-if="!aggregate.hidden"
+                        :key="aggregate.label"
+                        class="panel-block space-between has-text-weight-medium"
+                        :class="{ 'is-active': aggregate.selected }"
+                        @click="joinAggregateSelected(join, aggregate)"
+                      >
+                        {{ aggregate.label }}
+                        <button
+                          v-if="
+                            getIsAttributeInFilters(
+                              join.name,
+                              aggregate.name,
+                              'aggregate'
+                            )
+                          "
+                          class="button is-small"
+                          @click.stop="jumpToFilters"
+                        >
+                          <span class="icon has-text-interactive-secondary">
+                            <font-awesome-icon
+                              icon="filter"
+                            ></font-awesome-icon>
+                          </span>
+                        </button>
+                      </a>
+                    </template>
                   </template>
                 </template>
               </template>
-            </template>
-          </nav>
+            </nav>
+          </template>
+          <progress v-else class="progress is-small is-info"></progress>
         </div>
       </aside>
 
