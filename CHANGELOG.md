@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#955](https://gitlab.com/meltano/meltano/issues/955) Establish baseline for demo day and how they should be run
+
 ### Changes
 
 ### Fixes
