@@ -39,12 +39,10 @@ def installed():
     project = Project.find()
     config = ConfigService(project)
     discovery = PluginDiscoveryService(project)
-    meltano_manifest = project.meltano
-    installedPlugins = {}
-    plugins = []
+    installed_plugins = {}
 
     # merge definitions
-    for plugin in config.plugins():
+    for plugin in sorted(config.plugins(), key=lambda x: x.name):
         try:
             definition = discovery.find_plugin(plugin.type, plugin.name)
         except PluginNotFoundError:
@@ -54,24 +52,12 @@ def installed():
         merged_plugin_definition.pop("settings", None)
         merged_plugin_definition.pop("select", None)
 
-        plugins.append(merged_plugin_definition)
+        if not plugin.type in installed_plugins:
+            installed_plugins[plugin.type] = []
 
-    # merge collections
-    for type in meltano_manifest["plugins"]:
-        installedPlugins[type] = []
-        for type_plugin in meltano_manifest["plugins"][type]:
-            for complete_plugin in plugins:
-                if type_plugin["name"] == complete_plugin["name"]:
-                    installedPlugins[type].append(complete_plugin)
+        installed_plugins[plugin.type].append(merged_plugin_definition)
 
-    # sort collections
-    for type in installedPlugins:
-        installedPlugins[type] = sorted(installedPlugins[type], key=lambda x: x["name"])
-
-    # assign merged and sorted collections
-    meltano_manifest["plugins"] = installedPlugins
-
-    return jsonify(meltano_manifest)
+    return jsonify({**project.meltano, "plugins": installed_plugins})
 
 
 @pluginsBP.route("/add", methods=["POST"])
