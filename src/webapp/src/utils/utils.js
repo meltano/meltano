@@ -182,13 +182,18 @@ export default {
   },
 
   // Date Utils
-  getDateStringAsIso8601OrNull(dateString) {
-    return dateString ? new Date(dateString).toISOString() : null
+  getDateAsIso8601(dateString) {
+    return `${new Date(dateString).toISOString().split('.')[0]}Z`
   },
 
   getFirstOfMonthAsIso8601() {
     const date = new Date()
-    return new Date(date.getFullYear(), date.getMonth(), 1).toISOString()
+    const firstOfThisMonth = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    ).toString()
+    return this.getDateAsIso8601(firstOfThisMonth)
   },
 
   getInputDateMeta() {

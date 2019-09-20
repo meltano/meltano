@@ -18,7 +18,7 @@ export default {
       return val && utils.formatDateStringYYYYMMDD(val)
     },
     updateValue(val) {
-      this.$emit('input', `${new Date(val).toISOString().split('.')[0]}Z`)
+      this.$emit('input', utils.getDateAsIso8601(val))
     }
   }
 }

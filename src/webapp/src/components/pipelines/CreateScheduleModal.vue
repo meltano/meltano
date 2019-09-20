@@ -42,9 +42,6 @@ export default {
     getFormattedDateStringYYYYMMDD() {
       return val => utils.formatDateStringYYYYMMDD(val)
     },
-    getInputDateMeta() {
-      return utils.getInputDateMeta()
-    },
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
@@ -113,7 +110,7 @@ export default {
     updateStartDate() {
       this.pipeline.startDate = null
       this.getDefaultStartDate(this.pipeline.extractor).then(response => {
-        this.pipeline.startDate = response.data.startDate
+        this.pipeline.startDate = utils.getDateAsIso8601(response.data.startDate)
       })
     }
   }
@@ -231,7 +228,7 @@ export default {
               <td>
                 <div class="has-text-centered">
                   <span
-                    class="button is-static"
+                    class="button is-static has-text-success"
                     :class="{ 'is-loading': !pipeline.startDate }"
                   >
                     {{ getFormattedDateStringYYYYMMDD(pipeline.startDate) }}
