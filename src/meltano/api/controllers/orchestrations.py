@@ -43,17 +43,6 @@ def _handle(ex):
     )
 
 
-@orchestrationsBP.route("/connection_names", methods=["GET"])
-def connection_names():
-    settings = Settings.query.first()
-    if not settings:
-        settings = Settings()
-    connections = [
-        c["name"] for c in settings.serializable()["settings"]["connections"]
-    ]
-    return jsonify(connections)
-
-
 @orchestrationsBP.route("/start_date", methods=["POST"])
 def start_date() -> Response:
     project = Project.find()
