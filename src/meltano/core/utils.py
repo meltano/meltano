@@ -1,7 +1,6 @@
 import base64
 import re
 import sys
-import logging
 import flatten_dict
 from datetime import datetime, date, time
 from copy import deepcopy
@@ -65,14 +64,6 @@ def slugify(s):
     s = s.replace(" ", "-")
 
     return s
-
-
-def setup_logging(log_level=logging.INFO):
-    logging.basicConfig(
-        stream=sys.stderr,
-        format="[%(threadName)10s][%(levelname)s][%(asctime)s] %(message)s",
-        level=log_level,
-    )
 
 
 def get_basic_auth(user, token):
