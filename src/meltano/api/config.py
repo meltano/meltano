@@ -1,22 +1,21 @@
 import os
 import datetime
 
-
-TRUTHY = ("True", "true", "1", "yes", "on")
+from meltano.core.utils import truthy
 
 # Flask
 # -----------------
 THREADS_PER_PAGE = 1
-PROFILE = os.getenv("FLASK_PROFILE") in TRUTHY
+PROFILE = truthy(os.getenv("FLASK_PROFILE"))
 
 ## Change this value in production
 SECRET_KEY = "483be43cf29204e24d85cf711e36ea978a4d0ab316d8ecd7ae1ce5ecff3e29c1"
 
 # Meltano
 # -----------------
-MELTANO_AUTHENTICATION = os.getenv("MELTANO_AUTHENTICATION") in TRUTHY
+MELTANO_AUTHENTICATION = truthy(os.getenv("MELTANO_AUTHENTICATION"))
 MELTANO_UI_URL = os.getenv("MELTANO_UI_URL", "")
-AIRFLOW_DISABLED = os.getenv("MELTANO_DISABLE_AIRFLOW") in TRUTHY
+AIRFLOW_DISABLED = truthy(os.getenv("MELTANO_DISABLE_AIRFLOW"))
 
 API_ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 TEMP_FOLDER = os.path.join(API_ROOT_DIR, "static/tmp")

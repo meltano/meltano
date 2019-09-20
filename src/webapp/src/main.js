@@ -1,21 +1,21 @@
 import Router from 'vue-router'
 import Toasted from 'vue-toasted'
 import Vue from 'vue'
+import VueAnalytics from 'vue-analytics'
+
 import axios from 'axios'
+import FontAwesome from './font-awesome'
 import lodash from 'lodash'
 
+import App from './App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
 import flaskContext from '@/flask'
-
-import FontAwesome from './font-awesome'
-import App from './App'
 import router from './router'
 import store from './store'
 
 Vue.config.productionTip = false
 
-Vue.use(Router)
 Vue.use(FontAwesome)
 Vue.use(Router)
 
@@ -93,20 +93,21 @@ axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 // Flask context
 Vue.prototype.$flask = flaskContext()
 
+// Conditional analytics using flask context
+if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+  Vue.use(VueAnalytics, {
+    id: 'UA-132758957-2',
+    router,
+    fields: {
+      clientId: Vue.prototype.$flask.clientId || 'None'
+    }
+  })
+}
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   store,
   router,
   render: h => h(App)
-})
-
-// Analytics SPA route change hook (no initial ping as the gtag init step does this automatically)
-router.afterEach(to => {
-  if (window.gtag) {
-    window.gtag('config', 'UA-132758957-2', {
-      page_title: to.name,
-      page_path: to.path
-    })
-  }
 })
