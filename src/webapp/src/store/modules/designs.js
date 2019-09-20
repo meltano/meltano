@@ -714,7 +714,21 @@ const mutations = {
     state.results = results.results
     state.keys = results.keys
     state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
+    state.resultAggregates = results.queryAttributes
+      .filter(result => {
+        return result.attributeType === 'aggregate'
+      })
+      .map(aggregate => {
+        const aggregateId = `${aggregate.sourceName}.${aggregate.attributeName}`
+
+        if (results.aggregates.find(aggregate => aggregate === aggregateId)) {
+          return {
+            id: aggregateId,
+            label: aggregate.attributeLabel,
+            source: aggregate.sourceName
+          }
+        }
+      })
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
