@@ -13,7 +13,6 @@ class SingerPlugin(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-
     @hook("before_configure")
     def install_config_stub(self, invoker):
         project = invoker.project

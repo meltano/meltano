@@ -20,7 +20,8 @@ def schedule(project, ctx):
     _, Session = project_engine(project)
     session = Session()
 
-    ctx.obj["schedule_service"] = schedule_service = ScheduleService(session, project)
+    ctx.obj["schedule_service"] = schedule_service = ScheduleService(project)
+    ctx.obj["session"] = session
 
 
 @schedule.command(short_help="[default] Add a new schedule")
@@ -46,10 +47,12 @@ def add(ctx, name, extractor, loader, transform, interval, job_id, start_date):
     """
 
     schedule_service = ctx.obj["schedule_service"]
+    session = ctx.obj["session"]
 
     try:
         tracker = GoogleAnalyticsTracker(schedule_service.project)
         schedule = schedule_service.add(
+            session,
             name,
             extractor,
             loader,

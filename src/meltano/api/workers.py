@@ -131,19 +131,21 @@ class AirflowWorker(threading.Thread):
     def start_all(self):
         logs_dir = self.project.run_dir("airflow", "logs")
         with self.app.app_context() as ctx:
-            invoker = invoker_factory(self.project, self._plugin, prepare_with_session=db.session)
+            invoker = invoker_factory(
+                self.project, self._plugin, prepare_with_session=db.session
+            )
 
         # fmt: off
         with logs_dir.joinpath("webserver.log").open("w") as webserver, \
           logs_dir.joinpath("scheduler.log").open("w") as scheduler, \
           self.pid_path("webserver").open("w") as webserver_pid, \
           self.pid_path("scheduler").open("w") as scheduler_pid:
-        # fmt: on
             self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
             self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
 
             webserver_pid.write(str(self._webserver.pid))
             scheduler_pid.write(str(self._scheduler.pid))
+        # fmt: on
 
         # Time padding for server initialization so UI iframe displays as expected
         # (iteration potential on approach but following UIAvailableWorker sleep approach)

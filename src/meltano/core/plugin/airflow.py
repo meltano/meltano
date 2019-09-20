@@ -70,9 +70,7 @@ class Airflow(PluginInstall):
             airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
             stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
             handle = invoker.invoke(
-                "--help",
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                "--help", stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
             handle.wait()
             logging.debug(f"Generated default '{str(airflow_cfg_path)}'")
@@ -90,7 +88,9 @@ class Airflow(PluginInstall):
                 airflow_cfg.read_file(cfg)
                 logging.debug(f"Loaded '{str(airflow_cfg_path)}'")
 
-            for section, cfg in plugin_settings_service.as_config(session, self).items():
+            for section, cfg in plugin_settings_service.as_config(
+                session, self
+            ).items():
                 airflow_cfg[section].update(map_dict(str, cfg))
                 logging.debug(f"\tUpdated section [{section}] with {cfg}")
 

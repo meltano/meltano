@@ -31,7 +31,7 @@ class SingerRunner(Runner):
         job_id,
         config_service: ConfigService = None,
         connection_service: ConnectionService = None,
-        **config
+        **config,
     ):
         self.context = elt_context
         self.job_id = job_id

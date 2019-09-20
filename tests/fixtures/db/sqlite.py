@@ -9,7 +9,7 @@ from sqlalchemy import create_engine, MetaData
 
 @pytest.fixture(scope="session")
 def engine_uri():
-    return "sqlite://"
+    return "sqlite:///pytest.db"
 
 
 @pytest.fixture()

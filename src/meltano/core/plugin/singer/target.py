@@ -39,8 +39,10 @@ class SingerTarget(SingerPlugin):
             # we have in discovery.yml, but I wanted to find a generic approach
             # first.
             if self.name == "target-sqlite":
-                return {"database": f"{elt_context.loader_config['database']}_{load_connection['schema']}"}
+                return {
+                    "database": f"{elt_context.loader_config['database']}_{load_connection['schema']}"
+                }
             else:
-                return {"schema": load_connection['schema']}
+                return {"schema": load_connection["schema"]}
         finally:
             session.close()

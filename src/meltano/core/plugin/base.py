@@ -28,7 +28,6 @@ class PluginType(YAMLEnum):
     TRANSFORMERS = "transformers"
     TRANSFORMS = "transforms"
     ORCHESTRATORS = "orchestrators"
-    CONNECTIONS = "connections"
     ALL = "all"
 
     def __str__(self):

@@ -56,13 +56,14 @@ class SqlHelper(SqlUtils):
 
         engine_hooks = []
         params = connection_service.connection_params("analyze")
-        engine_uri = connection_service.connection_uri("analyze")
         dialect = params["dialect"]
+        engine_uri = connection_service.connection_uri("analyze")
 
         if dialect not in ["postgres", "sqlite"]:
             raise UnsupportedConnectionDialect(dialect)
 
         if dialect == "postgres":
+
             def set_connection_schema(raw, conn):
                 schema = params["schema"]
                 with raw.cursor() as cursor:

@@ -173,7 +173,6 @@ class PluginDiscoveryService(Versioned):
                 PluginType.TRANSFORMERS,
                 PluginType.MODELS,
                 PluginType.TRANSFORMS,
-                PluginType.CONNECTIONS,
                 PluginType.ORCHESTRATORS,
             )
             if plugin_type == PluginType.ALL

@@ -14,7 +14,7 @@ from .venv_service import VenvService
 from .error import SubprocessError
 
 
-def invoker_factory(project, plugin, *args, prepare_with_session = None, **kwargs):
+def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs):
     cls = PluginInvoker
 
     if hasattr(plugin.__class__, "__invoker_cls__"):
@@ -40,7 +40,7 @@ class PluginInvoker:
         config_dir=None,
         venv_service: VenvService = None,
         config_service: PluginConfigService = None,
-        plugin_settings_service: PluginSettingsService = None
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -49,7 +49,9 @@ class PluginInvoker:
         self.config_service = config_service or PluginConfigService(
             project, plugin, run_dir=run_dir, config_dir=config_dir
         )
-        self.settings_service = plugin_settings_service or PluginSettingsService(project)
+        self.settings_service = plugin_settings_service or PluginSettingsService(
+            project
+        )
         self._prepared = False
 
     @property
@@ -73,7 +75,9 @@ class PluginInvoker:
         self._prepared = False
 
     def load_plugin_config(self, session):
-        self._plugin_config = self._plugin_config or self.settings_service.as_config(session, self.plugin)
+        self._plugin_config = self._plugin_config or self.settings_service.as_config(
+            session, self.plugin
+        )
 
     def prepare(self, session):
         if not self._prepared:
@@ -110,7 +114,12 @@ class PluginInvoker:
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = [*self.exec_args(), *args]
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(popen_args, **Popen_options)
+                process = subprocess.Popen(
+                    popen_args,
+                    **Popen_options,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                )
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
             raise

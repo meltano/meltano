@@ -24,12 +24,14 @@ class DbtService:
     def exec_path(self):
         return self.venv_service.exec_path("dbt", namespace=PluginType.TRANSFORMERS)
 
-    def dbt_invoker(self) -> 'PluginInvoker':
+    def dbt_invoker(self) -> "PluginInvoker":
         _, self._Session = project_engine(self.project)
         session = self._Session()
 
         try:
-            return invoker_factory(self.project, self._plugin, prepare_with_session=session)
+            return invoker_factory(
+                self.project, self._plugin, prepare_with_session=session
+            )
         finally:
             session.close()
 

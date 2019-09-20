@@ -3,6 +3,7 @@ import logging
 from io import StringIO
 
 from . import Runner
+from meltano.core.error import SubprocessError
 from meltano.core.project import Project
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -14,11 +15,7 @@ from meltano.core.elt_context import ELTContext
 
 
 class DbtRunner(Runner):
-    def __init__(
-        self,
-        elt_context: ELTContext,
-        dbt_service: DbtService = None,
-    ):
+    def __init__(self, elt_context: ELTContext, dbt_service: DbtService = None):
         self.context = elt_context
         self.dbt_service = dbt_service or DbtService(elt_context.project)
         self.connection_service = ConnectionService(elt_context)
@@ -27,39 +24,37 @@ class DbtRunner(Runner):
     def project(self):
         return self.context.project
 
-    def run(self, dry_run=False, models=None):
+    def run(self, session, dry_run=False, models=None):
         # we should probably refactor this part to have an ELTContext object already
         # filled with the each plugins' configuration so we don't have to query
         # multiple times for the same data.
 
         settings_service = PluginSettingsService(self.project)
-        _, Session = project_engine(self.project)
         try:
-            session = Session()
             load_connection = self.connection_service.connection_params("load")
             analyze_connection = self.connection_service.connection_params("analyze")
             env = {
                 # inject the inferred 'schemas' from the ELTContext
-                'MELTANO_LOAD_SCHEMA': load_connection['schema'],
-                'MELTANO_ANALYZE_SCHEMA': analyze_connection['schema'],
+                "MELTANO_LOAD_SCHEMA": load_connection["schema"],
+                "MELTANO_ANALYZE_SCHEMA": analyze_connection["schema"],
                 # inject the loaders current configuration as ENV variables.
                 # that means the dbt profiles should match perfectly with the
                 # target configuration settings
-                **settings_service.as_env(session, self.context.loader),
+                **settings_service.as_env(session, self.context.loader.ref),
             }
-
-            # Get an asyncio event loop and use it to run the dbt commands
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.dbt_service.deps())
-
-            if models is not None:
-                models = models.replace("-", "_")
-
-            if dry_run:
-                loop.run_until_complete(self.dbt_service.compile(models, env=env))
-            else:
-                loop.run_until_complete(self.dbt_service.run(models, env=env))
         except Exception as e:
             logging.debug("Could not inject environment to dbt.")
             logging.debug(f"Could not hydrate ENV from the EltContext: {str(e)}")
             raise e
+
+        # Get an asyncio event loop and use it to run the dbt commands
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.dbt_service.deps())
+
+        if models is not None:
+            models = models.replace("-", "_")
+
+        if dry_run:
+            loop.run_until_complete(self.dbt_service.compile(models, env=env))
+        else:
+            loop.run_until_complete(self.dbt_service.run(models, env=env))

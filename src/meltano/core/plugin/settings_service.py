@@ -52,11 +52,13 @@ class PluginSettingsService:
         self,
         project,
         config_service: ConfigService = None,
-        discovery_service: PluginDiscoveryService = None,
+        plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
-        self.plugin_discovery = discovery_service or PluginDiscoveryService(project)
+        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            project
+        )
 
     def as_config(
         self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
@@ -121,7 +123,7 @@ class PluginSettingsService:
         session.commit()
 
     def get_definition(self, plugin: PluginRef) -> Plugin:
-        return self.plugin_discovery.find_plugin(plugin.type, plugin.name)
+        return self.discovery_service.find_plugin(plugin.type, plugin.name)
 
     def find_setting(self, plugin: PluginRef, name: str) -> Dict:
         try:

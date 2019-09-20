@@ -285,7 +285,7 @@ const getters = {
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
 
-  isLoaderSqlite: state => state.loader === "target-sqlite",
+  isLoaderSqlite: state => state.loader === 'target-sqlite',
 
   joinIsExpanded: () => join => join.expanded,
 

@@ -5,6 +5,7 @@ from asynctest import CoroutineMock
 
 from unittest import mock
 from meltano.core.job import Job, State
+from meltano.core.elt_context import ELTContextBuilder
 from meltano.core.plugin import Plugin, PluginType
 from meltano.core.plugin_invoker import PluginInvoker
 from meltano.core.plugin.factory import plugin_factory
@@ -25,12 +26,20 @@ def create_plugin_files(config_dir: Path, plugin: Plugin):
 
 class TestSingerRunner:
     @pytest.fixture()
-    def subject(self, session, mkdtemp, project, tap, target):
+    def elt_context(self, project, session, tap, target, elt_context_builder):
+        return (
+            elt_context_builder.with_extractor(tap.name)
+            .with_loader(target.name)
+            .context(session)
+        )
+
+    @pytest.fixture()
+    def subject(self, session, mkdtemp, elt_context):
         tap_config_dir = mkdtemp()
         target_config_dir = mkdtemp()
 
-        create_plugin_files(tap_config_dir, tap)
-        create_plugin_files(target_config_dir, target)
+        create_plugin_files(tap_config_dir, elt_context.extractor.install)
+        create_plugin_files(target_config_dir, elt_context.loader.install)
 
         Job(
             job_id=TEST_JOB_ID,
@@ -40,7 +49,7 @@ class TestSingerRunner:
         ).save(session)
 
         return SingerRunner(
-            project,
+            elt_context,
             TEST_JOB_ID,
             tap_config_dir=tap_config_dir,
             target_config_dir=target_config_dir,
@@ -69,12 +78,11 @@ class TestSingerRunner:
 
     def test_prepare_job(self, session, subject, tap, target, plugin_invoker_factory):
         tap_invoker = plugin_invoker_factory(
-            session, tap, config_dir=subject.tap_config_dir
+            tap, config_dir=subject.tap_config_dir, prepare_with_session=session
         )
         target_invoker = plugin_invoker_factory(
-            session, target, config_dir=subject.target_config_dir
+            target, config_dir=subject.target_config_dir, prepare_with_session=session
         )
-        subject.prepare(tap_invoker, target_invoker)
 
         for f in tap.config_files.values():
             assert subject.tap_config_dir.joinpath(f).exists()
@@ -94,22 +102,17 @@ class TestSingerRunner:
         plugin_invoker_factory,
     ):
         tap_invoker = plugin_invoker_factory(
-            session, tap, config_dir=subject.tap_config_dir
+            tap, config_dir=subject.tap_config_dir, prepare_with_session=session
         )
         target_invoker = plugin_invoker_factory(
-            session, target, config_dir=subject.target_config_dir
+            target, config_dir=subject.target_config_dir, prepare_with_session=session
         )
-
-        # call prepare beforehand
-        subject.prepare(tap_invoker, target_invoker)
 
         invoke_async = CoroutineMock(side_effect=(tap_process, target_process))
 
-        with mock.patch.object(
-            SingerRunner, "bookmark", new=CoroutineMock()
-        ), mock.patch.object(
-            PluginInvoker, "invoke_async", new=invoke_async
-        ) as invoke_async:
+        # fmt: off
+        with mock.patch.object(SingerRunner, "bookmark", new=CoroutineMock()), \
+          mock.patch.object(PluginInvoker, "invoke_async", new=invoke_async) as invoke_async:
             # async method
             await subject.invoke(tap_invoker, target_invoker)
 
@@ -119,6 +122,7 @@ class TestSingerRunner:
 
             tap_process.wait.assert_awaited()
             target_process.wait.assert_awaited()
+        # fmt: on
 
     @pytest.mark.asyncio
     async def test_bookmark(
@@ -139,7 +143,7 @@ class TestSingerRunner:
         assert subject.job.payload["singer_state"] == {"line": 3}
 
         # test the restore
-        tap_invoker = plugin_invoker_factory(session, tap)
+        tap_invoker = plugin_invoker_factory(tap)
         subject.restore_bookmark(session, tap_invoker)
         state_json = json.dumps(subject.job.payload["singer_state"])
         assert tap_invoker.files["state"].exists()

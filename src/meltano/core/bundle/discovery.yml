@@ -206,16 +206,21 @@ loaders:
     settings:
       - name: user
         env: PG_USERNAME
+        value: warehouse
       - name: password
         kind: password
         env: PG_PASSWORD
+        value: warehouse
       - name: host
         env: PG_ADDRESS
+        value: localhost
       - name: port
         env: PG_PORT
+        value: 5502
       - name: dbname
         label: Database Name
         env: PG_DATABASE
+        value: warehouse
   - name: target-sqlite
     namespace: sqlite
     docs: 'http://meltano.com/docs/loaders.html#sqlite-database'

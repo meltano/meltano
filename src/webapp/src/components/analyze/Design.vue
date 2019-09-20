@@ -58,7 +58,7 @@ export default {
       'filtersCount',
       'hasFilters',
       'getIsAttributeInFilters',
-      'isLoaderSqlite',
+      'isLoaderSqlite'
     ]),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
