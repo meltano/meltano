@@ -44,7 +44,10 @@ const getters = {
 
   getHasDefaultValidationConfigSettings() {
     return configSettings => {
-      const isValid = setting => Boolean(configSettings.config[setting.name])
+      const isKindBoolean = setting =>
+        setting.kind && setting.kind === 'boolean'
+      const isValid = setting =>
+        isKindBoolean(setting) || Boolean(configSettings.config[setting.name])
       return (
         configSettings.settings &&
         lodash.every(configSettings.settings, isValid)

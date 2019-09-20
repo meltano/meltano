@@ -35,6 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1015](https://gitlab.com/meltano/meltano/issues/1008) Support SQLite database name with and without '.db' extension
 - [#1007](https://gitlab.com/meltano/meltano/issues/1007) Fix pipeline with failed job not being regarded as having completed
 - [#998](https://gitlab.com/meltano/meltano/issues/998) Update Analyze UI with conditional loading indicator to prevent query generation prior to connection dialects being loaded (this solution is still useful for when inference supercedes our current manual dialect selection solution)
+- [#1009](https://gitlab.com/meltano/meltano/issues/1009) Fix default ConnectorSettings validation to account for `false` (unchecked) checkbox values
 
 ### Breaks
 
