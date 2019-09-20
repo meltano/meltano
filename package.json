@@ -37,6 +37,10 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
+    "{src/meltano,tests}/**/*.py": [
+      "black",
+      "git add"
+    ],
     "*.{js,vue}": [
       "vue-cli-service lint",
       "git add"
