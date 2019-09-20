@@ -12,7 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#987](https://gitlab.com/meltano/meltano/issues/987) Update routing to match labels (verbs vs. nouns) in effort to subtly reinforce action taking vs. solely "thing" management
-- [#996](https://gitlab.com/meltano/meltano/issues/996) Update conditional UI analytics stats tracking at runtime vs. build-time by sourcing state from the same CLI-based `send_anonymous_usage_stats` flag
+- [#996](https://gitlab.com/meltano/meltano/issues/996) Update conditional UI analytics stats tracking at runtime vs. build-time by sourcing state from the same backend `send_anonymous_usage_stats` flag
 
 ### Fixes
 
