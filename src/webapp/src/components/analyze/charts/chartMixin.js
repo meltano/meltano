@@ -70,7 +70,7 @@ const chartMixin = {
       this.updateChart()
     },
     generateChartLabel(id) {
-      let aggregate = this.resultAggregates.find(
+      const aggregate = this.resultAggregates.find(
         aggregate => aggregate.id === id
       )
       let count = 0
