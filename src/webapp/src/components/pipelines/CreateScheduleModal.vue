@@ -110,7 +110,9 @@ export default {
     updateStartDate() {
       this.pipeline.startDate = null
       this.getDefaultStartDate(this.pipeline.extractor).then(response => {
-        this.pipeline.startDate = utils.getDateAsIso8601(response.data.startDate)
+        this.pipeline.startDate = utils.getDateAsIso8601(
+          response.data.startDate
+        )
       })
     }
   }
