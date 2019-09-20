@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
@@ -44,22 +44,39 @@ export default {
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader
-    this.$store.dispatch(
-      'configuration/getLoaderConfiguration',
-      this.loaderNameFromRoute
-    )
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+      const needsInstallation = this.loader.name !== this.loaderNameFromRoute
+      if (needsInstallation) {
+        const config = {
+          pluginType: 'loaders',
+          name: this.loaderNameFromRoute
+        }
+        this.addPlugin(config).then(() => {
+          this.prepareLoaderConfiguration()
+          this.installPlugin(config)
+        })
+      } else {
+        this.prepareLoaderConfiguration()
+      }
+    })
   },
   beforeDestroy() {
     this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
   },
   methods: {
+    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
       } else {
         this.$router.push({ name: 'loaders' })
       }
+    },
+    prepareLoaderConfiguration() {
+      this.$store.dispatch(
+        'configuration/getLoaderConfiguration',
+        this.loaderNameFromRoute
+      )
     },
     saveConfigAndGoToTransforms() {
       this.$store
@@ -94,43 +111,38 @@ export default {
       </header>
 
       <section class="modal-card-body">
-        <template v-if="isInstalling">
-          <div class="content">
-            <div class="level">
-              <div class="level-item">
-                <p>
-                  Installing {{ loaderNameFromRoute }} can take up to a minute.
-                </p>
-              </div>
+        <div v-if="isLoadingConfigSettings || isInstalling" class="content">
+          <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
+            <div class="level-item">
+              <p class="is-italic">
+                Installing {{ loaderNameFromRoute }} can take up to a minute.
+              </p>
             </div>
-            <progress class="progress is-small is-info"></progress>
+          </div>
+          <progress class="progress is-small is-info"></progress>
+        </div>
+
+        <template v-if="!isLoadingConfigSettings">
+          <div v-if="loader.signupUrl" class="mb1r">
+            <p>
+              This plugin requires an account. If you don't have one, you can
+              <a :href="loader.signupUrl" target="_blank">sign up here</a>.
+            </p>
+          </div>
+          <ConnectorSettings
+            field-class="is-small"
+            :config-settings="loaderInFocusConfiguration"
+          />
+          <div v-if="loader.docs" class="content has-text-centered mt1r">
+            <p>
+              View Meltano's
+              <a :href="loader.docs" target="_blank" class="has-text-underlined"
+                >{{ loaderNameFromRoute }} docs</a
+              >
+              for more info.
+            </p>
           </div>
         </template>
-
-        <div v-if="loader.signupUrl" class="mb1r">
-          <p>
-            This plugin requires an account. If you don't have one, you can
-            <a :href="loader.signupUrl" target="_blank">sign up here</a>.
-          </p>
-        </div>
-
-        <ConnectorSettings
-          v-if="!isLoadingConfigSettings"
-          field-class="is-small"
-          :config-settings="loaderInFocusConfiguration"
-        />
-
-        <div v-if="loader.docs" class="mt1r">
-          <p>
-            Need help finding this information? We got you covered with our
-            <a :href="loader.docs" target="_blank">docs here</a>.
-          </p>
-        </div>
-
-        <progress
-          v-if="isLoadingConfigSettings && !isInstalling"
-          class="progress is-small is-info"
-        ></progress>
       </section>
 
       <footer class="modal-card-foot buttons is-right">

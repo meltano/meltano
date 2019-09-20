@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/SpeedRunIcon'
 
@@ -28,13 +28,6 @@ export default {
     this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    installExtractorAndBeginSettings(extractor) {
-      this.addPlugin({ pluginType: 'extractors', name: extractor }).then(() => {
-        this.installPlugin({ pluginType: 'extractors', name: extractor })
-        this.updateExtractorSettings(extractor)
-      })
-    },
     updateExtractorEntitySelection(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } })
     },
@@ -113,7 +106,7 @@ export default {
                     getIsInstallingPlugin('extractors', extractor)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
-                @click="installExtractorAndBeginSettings(extractor)"
+                @click="updateExtractorSettings(extractor)"
                 >Install</a
               >
             </template>
