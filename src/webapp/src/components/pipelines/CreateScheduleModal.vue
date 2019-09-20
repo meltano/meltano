@@ -40,7 +40,7 @@ export default {
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
     getFormattedDateStringYYYYMMDD() {
-      return val => utils.formatDateStringYYYYMMDD(val)
+      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
     },
     isSaveable() {
       const hasOwns = []
@@ -233,7 +233,7 @@ export default {
                     class="button is-static has-text-success"
                     :class="{ 'is-loading': !pipeline.startDate }"
                   >
-                    {{ getFormattedDateStringYYYYMMDD(pipeline.startDate) }}
+                    {{ getFormattedDateStringYYYYMMDD }}
                   </span>
                 </div>
               </td>
