@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#891](https://gitlab.com/meltano/meltano/issues/891) Contributors can run webapp from root directory
+
 ### Fixes
 
 ### Breaks
