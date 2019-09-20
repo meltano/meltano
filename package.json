@@ -3,15 +3,15 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
+		"build": "cd src/webapp && yarn build",
+		"clean": "rm -rf node_modules && cd src/webapp && yarn clean",
 		"lint": "cd src/webapp && vue-cli-service lint",
 		"serve": "cd src/webapp && yarn serve",
 		"setup": "yarn && cd src/webapp && yarn",
-		"build": "cd src/webapp && yarn build",
 		"test": "cd src/webapp && yarn test",
 		"test:e2e": "cd src/webapp && yarn test:e2e",
 		"test:unit": "cd src/webapp && yarn test:unit",
-		"test:update": "cd src/webapp && yarn test:update",
-		"clean": "rm -rf node_modules && cd src/webapp && yarn clean"
+		"test:update": "cd src/webapp && yarn test:update"
 	},
 	"devDependencies": {
 		"@vue/cli-plugin-babel": "^3.9.0",
