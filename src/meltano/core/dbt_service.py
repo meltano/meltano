@@ -54,11 +54,9 @@ class DbtService:
                 return_when=asyncio.ALL_COMPLETED,
             )
 
-            returncode = await handle.wait()
-
-            if returncode:
+            if handle.returncode:
                 raise Exception(
-                    f"dbt compile didn't exit cleanly. Exit code: {returncode}"
+                    f"dbt compile didn't exit cleanly. Exit code: {handle.returncode}"
                 )
         finally:
             session.close()
@@ -81,11 +79,9 @@ class DbtService:
                 return_when=asyncio.ALL_COMPLETED,
             )
 
-            returncode = await handle.wait()
-
-            if returncode:
+            if handle.returncode:
                 raise Exception(
-                    f"dbt deps didn't exit cleanly. Exit code: {returncode}"
+                    f"dbt deps didn't exit cleanly. Exit code: {handle.returncode}"
                 )
         finally:
             session.close()
@@ -119,9 +115,9 @@ class DbtService:
                 return_when=asyncio.ALL_COMPLETED,
             )
 
-            returncode = await handle.wait()
-
-            if returncode:
-                raise Exception(f"dbt run didn't exit cleanly. Exit code: {returncode}")
+            if handle.returncode:
+                raise Exception(
+                    f"dbt run didn't exit cleanly. Exit code: {handle.returncode}"
+                )
         finally:
             session.close()

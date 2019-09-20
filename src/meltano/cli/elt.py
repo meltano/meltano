@@ -23,16 +23,6 @@ from meltano.core.plugin_discovery_service import (
 )
 from meltano.core.logging import OutputLogger
 
-# By default, click is automatically stripping ANSI color codes if the output
-#  stream is not connected to a terminal (which is the case with OutputLogger).
-# In order to force it to use colors, we have to add a `color=True` param to secho
-# But this turns off autodetection, so we now have to be careful not to force
-#  this for Windows or other unsupported platforms. Hence the check bellow:
-if sys.platform.startswith(("linux", "darwin")):
-    FORCE_COLOR = True
-else:
-    FORCE_COLOR = None
-
 
 @cli.command()
 @click.argument("extractor")
@@ -57,38 +47,37 @@ def elt(project, extractor, loader, dry, transform, job_id):
     log_file_name = project.run_dir("logs", f"elt_{job_id}.log")
 
     with OutputLogger(log_file_name):
-        install_missing_plugins(project, extractor, loader, transform)
-
-        singer_runner = SingerRunner(
-            project,
-            job_id=job_id,
-            run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
-            target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
-            tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
-        )
-
         try:
+            install_missing_plugins(project, extractor, loader, transform)
+
+            singer_runner = SingerRunner(
+                project,
+                job_id=job_id,
+                run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
+                target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
+                tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
+            )
+
             if transform != "only":
                 click.echo("Running extract & load...")
                 singer_runner.run(extractor, loader, dry_run=dry)
-                click.secho("Extract & load complete!", fg="green", color=FORCE_COLOR)
+                click.secho("Extract & load complete!", fg="green")
             else:
-                click.secho("Extract & load skipped.", fg="yellow", color=FORCE_COLOR)
+                click.secho("Extract & load skipped.", fg="yellow")
 
             if transform != "skip":
                 dbt_runner = DbtRunner(project)
                 click.echo("Running transformation...")
                 dbt_runner.run(extractor, loader, dry_run=dry, models=extractor)
-                click.secho("Transformation complete!", fg="green", color=FORCE_COLOR)
+                click.secho("Transformation complete!", fg="green")
             else:
-                click.secho("Transformation skipped.", fg="yellow", color=FORCE_COLOR)
+                click.secho("Transformation skipped.", fg="yellow")
         except Exception as err:
             click.secho(
                 f"ELT could not complete, an error happened during the process.",
                 fg="red",
-                color=FORCE_COLOR,
             )
-            click.secho(str(err), err=True, color=FORCE_COLOR)
+            click.secho(str(err), err=True)
             raise click.Abort()
 
     tracker = GoogleAnalyticsTracker(project)
@@ -108,7 +97,6 @@ def install_missing_plugins(
             click.secho(
                 f"Extractor '{extractor}' is missing, trying to install it...",
                 fg="yellow",
-                color=FORCE_COLOR,
             )
             add_plugin(add_service, project, PluginType.EXTRACTORS, extractor)
 
@@ -116,9 +104,7 @@ def install_missing_plugins(
             config_service.find_plugin(loader, plugin_type=PluginType.LOADERS)
         except PluginMissingError:
             click.secho(
-                f"Loader '{loader}' is missing, trying to install it...",
-                fg="yellow",
-                color=FORCE_COLOR,
+                f"Loader '{loader}' is missing, trying to install it...", fg="yellow"
             )
             add_plugin(add_service, project, PluginType.LOADERS, loader)
 
@@ -127,9 +113,7 @@ def install_missing_plugins(
             config_service.find_plugin("dbt", plugin_type=PluginType.TRANSFORMERS)
         except PluginMissingError as e:
             click.secho(
-                f"Transformer 'dbt' is missing, trying to install it...",
-                fg="yellow",
-                color=FORCE_COLOR,
+                f"Transformer 'dbt' is missing, trying to install it...", fg="yellow"
             )
             add_plugin(add_service, project, PluginType.TRANSFORMERS, "dbt")
 
@@ -152,7 +136,6 @@ def install_missing_plugins(
                 click.secho(
                     f"Transform '{extractor}' is missing, trying to install it...",
                     fg="yellow",
-                    color=FORCE_COLOR,
                 )
                 add_transform(project, extractor)
             except PluginNotFoundError:
