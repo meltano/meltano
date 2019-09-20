@@ -265,6 +265,26 @@ $ git add CHANGELOG.md
 
 Make sure to add CHANGELOG entries to your merge requests.
 
+## Demo Day
+
+For each demo day, we need to ensure that the following process is followed:
+
+### Demo Day: Setup
+
+1. Document list of features to demo
+2. Document order of people demoing
+3. Ensure every person demoing has proper display size (i.e., font sizes, zoomed in enough, etc.)
+     - Font size at least 20px
+     - Browser zoom at least 125%
+
+### Demo Day: Workflow
+
+1. Record each meeting with Zoom
+2. Generate list of timestamps for each featured demo
+3. Generate list of features (from Setup section) paired with timestamps
+4. Upload recording to YouTube
+5. Add features + timestamps to YouTube description
+
 ## Releases
 
 ### Schedule
