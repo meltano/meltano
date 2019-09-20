@@ -73,9 +73,9 @@ const chartMixin = {
       let aggregate = this.resultAggregates.find(
         aggregate => aggregate.id === id
       )
-
       let count = 0
 
+      // Check if the same label exists in resultAggregates
       for (let i = 0; i < this.resultAggregates.length; i++) {
         if (this.resultAggregates[i].id === aggregate.id) {
           count++
