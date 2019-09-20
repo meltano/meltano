@@ -53,6 +53,12 @@ class Job(SystemModel):
         kwargs["payload"] = kwargs.get("payload", {})
         super().__init__(**kwargs)
 
+    def is_running(self):
+        return self.state is State.RUNNING
+
+    def is_complete(self):
+        return self.state in [State.SUCCESS, State.FAIL]
+
     def can_transit(self, state: State) -> bool:
         if self.state is state:
             return True
