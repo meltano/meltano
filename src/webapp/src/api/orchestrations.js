@@ -10,12 +10,6 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', 'get/pipeline_schedules'))
   },
 
-  getDefaultStartDate(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', 'start_date'), {
-      extractor
-    })
-  },
-
   getExtractorInFocusEntities(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
   },

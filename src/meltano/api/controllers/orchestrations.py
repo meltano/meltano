@@ -43,18 +43,6 @@ def _handle(ex):
     )
 
 
-@orchestrationsBP.route("/start_date", methods=["POST"])
-def start_date() -> Response:
-    project = Project.find()
-    payload = request.get_json()
-    extractor = payload["extractor"]
-
-    schedule_service = ScheduleService(db.session, project)
-    start_date = schedule_service.default_start_date(extractor)
-
-    return jsonify({"start_date": start_date})
-
-
 @orchestrationsBP.route("/job/state", methods=["POST"])
 def job_state() -> Response:
     """
