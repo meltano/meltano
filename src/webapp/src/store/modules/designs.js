@@ -131,20 +131,12 @@ const getters = {
     const aggregate = state.resultAggregates.find(
       aggregate => aggregate.id === id
     )
-    let count = 0
+    const hasDuplicate =
+      state.resultAggregates.filter(item => item.id === aggregate.id).length > 1
 
-    // Check if the same label exists in resultAggregates
-    for (let i = 0; i < state.resultAggregates.length; i++) {
-      if (state.resultAggregates[i].id === aggregate.id) {
-        count++
-      }
-    }
-
-    if (count > 1) {
-      return `${aggregate.label} [Source: ${aggregate.source}]`
-    } else {
-      return aggregate.label
-    }
+    return hasDuplicate
+      ? `${aggregate.label} [Source: ${aggregate.source}]`
+      : aggregate.label
   },
 
   currentDesignLabel(state) {
