@@ -14,6 +14,10 @@ class ParseError(Exception):
     pass
 
 
+class EmptyQueryError(Exception):
+    pass
+
+
 class MeltanoFilterExpressionType(str, Enum):
     Unknown = "UNKNOWN"
     LessThan = "less_than"
@@ -957,9 +961,16 @@ class MeltanoQuery(MeltanoBase):
         - aggregate_columns: The aggregate columns in the query (fuly qualified)
         """
         if self.needs_hda():
-            return self.hda_query()
+            sql, query_attributes, aggregate_columns = self.hda_query()
         else:
-            return self.single_table_query()
+            sql, query_attributes, aggregate_columns = self.single_table_query()
+
+        if sql:
+            sql = sql + ";"
+        else:
+            raise EmptyQueryError
+
+        return (sql, query_attributes, aggregate_columns)
 
     def single_table_query(self) -> Tuple:
         """
@@ -1102,9 +1113,6 @@ class MeltanoQuery(MeltanoBase):
         no_join_query = no_join_query.limit(self.limit or 50)
 
         final_query = self.add_schema_to_query(str(no_join_query))
-
-        if len(final_query) > 0:
-            final_query = final_query + ";"
 
         return (final_query, query_attributes, aggregate_columns)
 
@@ -1374,9 +1382,6 @@ class MeltanoQuery(MeltanoBase):
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_query(str(hda_query))
-
-        if len(final_query) > 0:
-            final_query = final_query + ";"
 
         return (final_query, query_attributes, aggregate_columns)
 
