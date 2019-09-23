@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#891](https://gitlab.com/meltano/meltano/issues/891) Contributors can run webapp from root directory
-- [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of "Start Date" and prevented editing of it in the Create Pipeline Schedule UI (it wasn't wired up to be used yet where the extractor's "Start Date" is what is used currently)
+- [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of default "Start Date" of extractor
 
 ### Fixes
 
