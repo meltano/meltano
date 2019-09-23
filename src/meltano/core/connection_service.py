@@ -13,68 +13,42 @@ class DialectNotSupportedError(Exception):
     pass
 
 
-class ConnectionType(str, Enum):
-    LOAD = "load"
-    ANALYZE = "analyze"
-
-
 class ConnectionService:
     def __init__(self, elt_context: ELTContext):
         self.context = elt_context
 
-    def connection_params(self, connection_type: ConnectionType) -> dict:
-        # TODO: make sure we use the namespace as the dialect for loaders
-        dialect = self.context.loader.namespace
-        strategies = {
-            ConnectionType.LOAD: self.load_dialect_params,
-            ConnectionType.ANALYZE: self.analyze_dialect_params,
-        }
+    @property
+    def dialect(self):
+        return self.context.loader.namespace
 
-        return strategies[connection_type](dialect)
-
-    def connection_uri(self, connection_type: ConnectionType) -> str:
-        """
-        Create the connection uri from an ELTContext for a certain connection type.
-
-        Returns the SQLAlchemy engine URI.
-        """
-        dialect = self.context.loader.namespace
-
-        strategies = {
-            ConnectionType.LOAD: self.load_connection_uri,
-            ConnectionType.ANALYZE: self.analyze_connection_uri,
-        }
-
-        return strategies[connection_type](dialect)
-
-    def load_dialect_params(self, dialect: str):
+    def load_params(self):
         dialect_params = {
             "postgres": lambda: {
-                "dialect": dialect,
+                "dialect": self.dialect,
                 "schema": self.context.extractor.namespace,
             },
-            "sqlite": lambda: {"dialect": dialect},
+            "sqlite": lambda: {"dialect": self.dialect},
         }
 
-        return copy.deepcopy(dialect_params[dialect]())
+        return copy.deepcopy(dialect_params[self.dialect]())
 
-    def analyze_dialect_params(self, dialect: str):
+    def analyze_params(self):
         dialect_params = {
-            "postgres": lambda: {"dialect": dialect, "schema": ANALYZE_SCHEMA},
-            "sqlite": lambda: {"dialect": dialect},
+            "postgres": lambda: {"dialect": self.dialect, "schema": ANALYZE_SCHEMA},
+            "sqlite": lambda: {"dialect": self.dialect},
         }
 
-        return copy.deepcopy(dialect_params[dialect]())
+        return copy.deepcopy(dialect_params[self.dialect]())
 
-    def load_connection_uri(self, dialect):
-        params = self.load_dialect_params(dialect)
-        return self.dialect_engine_uri(dialect, params)
+    def load_uri(self):
+        params = self.load_params()
+        return self.dialect_engine_uri(params)
 
-    def analyze_connection_uri(self, dialect):
-        params = self.analyze_dialect_params(dialect)
-        return self.dialect_engine_uri(dialect, params)
+    def analyze_uri(self):
+        params = self.analyze_params()
+        return self.dialect_engine_uri(params)
 
-    def dialect_engine_uri(self, dialect: str, params={}):
+    def dialect_engine_uri(self, params={}):
         # this part knows probably too much about the setting definition
         # for a plugin, but we have to do this if we want to infer connections
         # from the loader
@@ -90,6 +64,8 @@ class ConnectionService:
         }
 
         try:
-            return dialect_templates[dialect]({**self.context.loader.config, **params})
+            return dialect_templates[self.dialect](
+                {**self.context.loader.config, **params}
+            )
         except KeyError:
-            raise DialectNotSupportedError(dialect)
+            raise DialectNotSupportedError(self.dialect)

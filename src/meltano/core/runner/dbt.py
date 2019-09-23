@@ -31,8 +31,8 @@ class DbtRunner(Runner):
 
         settings_service = PluginSettingsService(self.project)
         try:
-            load_connection = self.connection_service.connection_params("load")
-            analyze_connection = self.connection_service.connection_params("analyze")
+            load_connection = self.connection_service.load_params()
+            analyze_connection = self.connection_service.load_uri()
             env = {
                 # inject the inferred 'schemas' from the ELTContext
                 "MELTANO_LOAD_SCHEMA": load_connection["schema"],

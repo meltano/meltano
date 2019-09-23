@@ -55,9 +55,9 @@ class SqlHelper(SqlUtils):
         connection_service = ConnectionService(context)
 
         engine_hooks = []
-        params = connection_service.connection_params("analyze")
+        params = connection_service.analyze_params()
+        engine_uri = connection_service.analyze_uri()
         dialect = params["dialect"]
-        engine_uri = connection_service.connection_uri("analyze")
 
         if dialect not in ["postgres", "sqlite"]:
             raise UnsupportedConnectionDialect(dialect)

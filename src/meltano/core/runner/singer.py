@@ -152,11 +152,8 @@ class SingerRunner(Runner):
             tap = self.context.extractor_invoker()
             target = self.context.loader_invoker()
 
-            # setup each invoker with the plugin configuration to
-            # use for the invokation
-            target_elt_params = self.connection_service.connection_params("load")
-
             # Configure each tap/target from the ELTContext
+            target_elt_params = self.connection_service.load_params()
             target.plugin_config.update(target_elt_params)
 
             tap.prepare(session)
