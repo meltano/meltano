@@ -182,7 +182,7 @@ export default {
   },
 
   // Date Utils
-  getDateAsIso8601(dateString) {
+  dateIso8601(dateString) {
     return `${new Date(dateString).toISOString().split('.')[0]}Z`
   },
 
@@ -193,7 +193,7 @@ export default {
       date.getMonth(),
       1
     ).toString()
-    return this.getDateAsIso8601(firstOfThisMonth)
+    return this.dateIso8601(firstOfThisMonth)
   },
 
   getInputDateMeta() {
