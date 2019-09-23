@@ -147,7 +147,7 @@ digitalocean_marketplace:
     - cd cloud/packer
     - packer build marketplace-image.json
   only:
-    - tags
+    - master@meltano/meltano
   when: manual
 
 .review:
