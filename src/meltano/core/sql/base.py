@@ -14,7 +14,7 @@ class ParseError(Exception):
     pass
 
 
-class EmptyQueryError(Exception):
+class EmptyQuery(Exception):
     pass
 
 
@@ -721,7 +721,7 @@ class MeltanoQuery(MeltanoBase):
 
     def validate_table_definition(self, definition: Dict) -> None:
         """
-        Validate that the table definition is properly formatted
+        Validate that the query definition for a specific table is properly formatted
         """
         if not isinstance(definition.get("name"), str):
             raise ParseError(f"Query definition property `name` must be a string")
@@ -968,7 +968,7 @@ class MeltanoQuery(MeltanoBase):
         if sql:
             sql = sql + ";"
         else:
-            raise EmptyQueryError
+            raise EmptyQuery
 
         return (sql, query_attributes, aggregate_columns)
 
