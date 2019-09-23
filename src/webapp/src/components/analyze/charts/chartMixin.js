@@ -69,25 +69,6 @@ const chartMixin = {
       this.chart = new Chart(chart, this.config)
       this.updateChart()
     },
-    generateChartLabel(id) {
-      const aggregate = this.resultAggregates.find(
-        aggregate => aggregate.id === id
-      )
-      let count = 0
-
-      // Check if the same label exists in resultAggregates
-      for (let i = 0; i < this.resultAggregates.length; i++) {
-        if (this.resultAggregates[i].id === aggregate.id) {
-          count++
-        }
-      }
-
-      if (count > 1) {
-        return `${aggregate.label} [Source: ${aggregate.source}]`
-      } else {
-        return aggregate.label
-      }
-    },
     updateChart() {
       if (!this.results.length) {
         return
@@ -106,7 +87,7 @@ const chartMixin = {
             const color = utils.getColor(i)
             if (!dataSets[k]) {
               dataSets[k] = {
-                label: this.generateChartLabel(k),
+                label: this.chartLabel(k),
                 data: [],
                 backgroundColor: color.backgroundColor,
                 borderColor: color.borderColor,
@@ -134,7 +115,7 @@ const chartMixin = {
     }
   },
   computed: {
-    ...mapGetters('designs', ['getChartYAxis'])
+    ...mapGetters('designs', ['chartLabel', 'getChartYAxis'])
   },
   watch: {
     results() {
