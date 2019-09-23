@@ -76,7 +76,7 @@ const chartMixin = {
       this.chart.data.labels = []
       this.chart.data.datasets = []
       const fields = Object.keys(this.results[0])
-      const aggregates = this.resultAggregates
+      const aggregates = this.resultAggregates.map(item => item.id)
       const columns = utils.difference(fields, aggregates)
       const dataSets = {}
       this.results.forEach(r => {
@@ -87,7 +87,7 @@ const chartMixin = {
             const color = utils.getColor(i)
             if (!dataSets[k]) {
               dataSets[k] = {
-                label: k,
+                label: this.chartLabel(k),
                 data: [],
                 backgroundColor: color.backgroundColor,
                 borderColor: color.borderColor,
@@ -115,7 +115,7 @@ const chartMixin = {
     }
   },
   computed: {
-    ...mapGetters('designs', ['getChartYAxis'])
+    ...mapGetters('designs', ['chartLabel', 'getChartYAxis'])
   },
   watch: {
     results() {

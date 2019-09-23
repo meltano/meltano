@@ -127,6 +127,18 @@ const helpers = {
 }
 
 const getters = {
+  chartLabel: state => id => {
+    const aggregate = state.resultAggregates.find(
+      aggregate => aggregate.id === id
+    )
+    const hasDuplicate =
+      state.resultAggregates.filter(item => item.id === aggregate.id).length > 1
+
+    return hasDuplicate
+      ? `${aggregate.label} [Source: ${aggregate.source}]`
+      : aggregate.label
+  },
+
   currentDesignLabel(state) {
     return utils.titleCase(state.currentDesign)
   },
@@ -714,7 +726,21 @@ const mutations = {
     state.results = results.results
     state.keys = results.keys
     state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates
+    state.resultAggregates = results.queryAttributes.reduce((list, item) => {
+      if (item.attributeType === 'aggregate') {
+        const id = `${item.sourceName}.${item.attributeName}`
+
+        if (results.aggregates.find(aggregate => aggregate === id)) {
+          list.push({
+            id: id,
+            label: item.attributeLabel,
+            source: item.sourceName
+          })
+        }
+      }
+
+      return list
+    }, [])
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
