@@ -10,8 +10,6 @@ import settings from './modules/settings'
 
 Vue.use(Vuex)
 
-const debug = process.env.NODE_ENV !== 'production'
-
 export default new Vuex.Store({
   modules: {
     configuration,
@@ -21,5 +19,5 @@ export default new Vuex.Store({
     repos,
     settings
   },
-  string: debug
+  strict: process.env.NODE_ENV !== 'production'
 })
