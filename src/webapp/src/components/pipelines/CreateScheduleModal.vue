@@ -4,8 +4,6 @@ import Vue from 'vue'
 
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 
-import utils from '@/utils/utils'
-
 import _ from 'lodash'
 
 export default {
@@ -45,9 +43,7 @@ export default {
     }
   },
   created() {
-    this.$store
-      .dispatch('plugins/getInstalledPlugins')
-      .then(this.prefillForm)
+    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
   },
   mounted() {
     this.$refs.name.focus()
