@@ -111,6 +111,7 @@ class TestSqlController:
                 {
                     "name": "entry",
                     "columns": ["forecast"],
+                    "aggregates": [],
                     "timeframes": [
                         {
                             "name": "from",
@@ -119,7 +120,12 @@ class TestSqlController:
                         {"name": "to", "periods": []},
                     ],
                 },
-                {"name": "generationmix", "columns": ["perc", "fuel"]},
+                {
+                    "name": "generationmix",
+                    "columns": ["perc", "fuel"],
+                    "aggregates": [],
+                    "timeframes": [],
+                },
             ],
             "order": None,
             "limit": 3,

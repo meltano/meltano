@@ -685,25 +685,21 @@ class MeltanoQuery(MeltanoBase):
 
     def validate_definition(self, definition: Dict) -> None:
         """
-        Validate that the definition is properly formated
+        Validate that the definition is properly formatted
         """
-        if not isinstance(definition.get("columns"), list):
-            raise ParseError(f"Query definition property `columns` must be a list")
 
-        if not isinstance(definition.get("aggregates"), list):
-            raise ParseError(f"Query definition property `aggregates` must be a list")
-
-        timeframes = definition.get("timeframes")
-        if timeframes and not isinstance(timeframes, list):
-            raise ParseError(f"Query definition property `timeframes` must be a list")
-
-        order = definition.get("order")
-        if order and not isinstance(order, list):
-            raise ParseError(f"Query definition property `order` must be a list")
+        self.validate_table_definition(definition)
 
         joins = definition.get("joins")
         if joins and not isinstance(joins, list):
             raise ParseError(f"Query definition property `joins` must be a list")
+
+        for join_definition in joins:
+            self.validate_table_definition(join_definition)
+
+        order = definition.get("order")
+        if order and not isinstance(order, list):
+            raise ParseError(f"Query definition property `order` must be a list")
 
         filters = definition.get("filters", None)
         if filters:
@@ -718,6 +714,23 @@ class MeltanoQuery(MeltanoBase):
                 raise ParseError(
                     f"Query definition property `filters[aggregates]` must be a list"
                 )
+
+    def validate_table_definition(self, definition: Dict) -> None:
+        """
+        Validate that the table definition is properly formatted
+        """
+        if not isinstance(definition.get("name"), str):
+            raise ParseError(f"Query definition property `name` must be a string")
+
+        if not isinstance(definition.get("columns"), list):
+            raise ParseError(f"Query definition property `columns` must be a list")
+
+        if not isinstance(definition.get("aggregates"), list):
+            raise ParseError(f"Query definition property `aggregates` must be a list")
+
+        timeframes = definition.get("timeframes")
+        if timeframes and not isinstance(timeframes, list):
+            raise ParseError(f"Query definition property `timeframes` must be a list")
 
     def parse_definition(self, definition: Dict) -> None:
         """
