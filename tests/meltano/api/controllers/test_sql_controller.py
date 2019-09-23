@@ -61,11 +61,10 @@ class TestSqlController:
         return _factory
 
     def assert_empty_query(self, post, payload_builder):
-        """with no columns no query should be generated"""
+        """with no columns, aggregates or timeframes the response is No Content"""
 
         res = post(payload_builder.payload)
-        assert res.status_code == 200, res.data
-        assert res.json["sql"] == ""
+        assert res.status_code == 204
 
     def assert_column_query(self, post, payload_builder):
         """with columns they should be included in the query"""
