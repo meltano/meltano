@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
@@ -49,7 +49,6 @@ export default {
     this.$refs.name.focus()
   },
   methods: {
-    ...mapActions('configuration', ['getDefaultStartDate']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
