@@ -53,10 +53,12 @@ def elt(project, extractor, loader, dry, transform, job_id):
         try:
             session = Session()
 
-            elt_context = (ELTContextBuilder(project)
-                            .with_extractor(extractor)
-                            .with_loader(loader)
-                            .context(session))
+            elt_context = (
+                ELTContextBuilder(project)
+                .with_extractor(extractor)
+                .with_loader(loader)
+                .context(session)
+            )
 
             singer_runner = SingerRunner(
                 elt_context,
@@ -76,13 +78,16 @@ def elt(project, extractor, loader, dry, transform, job_id):
             if transform != "skip":
                 dbt_runner = DbtRunner(elt_context)
                 click.echo("Running transformation...")
-                dbt_runner.run(session, dry_run=dry, models=extractor)  # TODO: models from elt_context?
+                dbt_runner.run(
+                    session, dry_run=dry, models=extractor
+                )  # TODO: models from elt_context?
                 click.secho("Transformation complete!", fg="green")
             else:
                 click.secho("Transformation skipped.", fg="yellow")
         except Exception as err:
             click.secho(
-                f"ELT could not complete, an error happened during the process.", fg="red"
+                f"ELT could not complete, an error happened during the process.",
+                fg="red",
             )
             logging.exception(err)
             click.secho(str(err), err=True)

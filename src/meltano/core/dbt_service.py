@@ -18,7 +18,7 @@ class DbtService:
         self._plugin = ConfigService(project).find_plugin(
             "dbt", PluginType.TRANSFORMERS
         )
-        self.profile_dir = f"{self.project.root}/transform/profile/"
+        self.profile_dir = self.project.root_dir("transform", "profile")
 
     @property
     def exec_path(self):
@@ -37,7 +37,7 @@ class DbtService:
 
     async def compile(self, models=None, **kwargs):
         invoker = self.dbt_invoker()
-        params = ["--profiles-dir", self.profile_dir, "--profile", "meltano"]
+        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
         if models:
             # Always include the my_meltano_project model
             all_models = f"{models} my_meltano_project"
@@ -91,6 +91,7 @@ class DbtService:
 
     async def run(self, models=None, **kwargs):
         invoker = self.dbt_invoker()
+        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
 
         if models:
             # Always include the my_meltano_project model

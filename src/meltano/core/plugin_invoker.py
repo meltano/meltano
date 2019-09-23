@@ -11,7 +11,7 @@ from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
 from .venv_service import VenvService
-from .error import SubprocessError
+from .error import Error, SubprocessError
 
 
 def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs):
@@ -26,6 +26,12 @@ def invoker_factory(project, plugin, *args, prepare_with_session=None, **kwargs)
         invoker.prepare(prepare_with_session)
 
     return invoker
+
+
+class InvokerNotPreparedError(Error):
+    """Occurs when `invoke` is called before `prepare`"""
+
+    pass
 
 
 class PluginInvoker:
@@ -114,12 +120,7 @@ class PluginInvoker:
             with self.plugin.trigger_hooks("invoke", self, args):
                 popen_args = [*self.exec_args(), *args]
                 logging.debug(f"Invoking: {popen_args}")
-                process = subprocess.Popen(
-                    popen_args,
-                    **Popen_options,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
+                process = subprocess.Popen(popen_args, **Popen_options)
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")
             raise
