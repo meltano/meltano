@@ -31,12 +31,12 @@ class DbtRunner(Runner):
 
         settings_service = PluginSettingsService(self.project)
         try:
-            load_connection = self.connection_service.load_params()
-            analyze_connection = self.connection_service.load_uri()
+            load = self.connection_service.load_params()
+            analyze = self.connection_service.analyze_params()
             env = {
                 # inject the inferred 'schemas' from the ELTContext
-                "MELTANO_LOAD_SCHEMA": load_connection["schema"],
-                "MELTANO_ANALYZE_SCHEMA": analyze_connection["schema"],
+                "MELTANO_LOAD_SCHEMA": load["schema"],
+                "MELTANO_ANALYZE_SCHEMA": analyze["schema"],
                 # inject the loaders current configuration as ENV variables.
                 # that means the dbt profiles should match perfectly with the
                 # target configuration settings
