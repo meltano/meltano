@@ -220,7 +220,6 @@ def save_pipeline_schedule() -> Response:
     loader = incoming["loader"]
     transform = incoming["transform"]
     interval = incoming["interval"]
-    start_date = incoming["start_date"]
 
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)
@@ -232,7 +231,6 @@ def save_pipeline_schedule() -> Response:
             loader,
             transform,
             interval,
-            start_date=iso8601_datetime(start_date),
         )
         return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:

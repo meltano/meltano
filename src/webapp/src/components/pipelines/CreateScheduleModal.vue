@@ -30,7 +30,6 @@ export default {
         loader: '',
         transform: '',
         interval: '',
-        startDate: null,
         isRunning: false
       }
     }
@@ -39,9 +38,6 @@ export default {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
-    getFormattedDateStringYYYYMMDD() {
-      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
-    },
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
@@ -52,7 +48,6 @@ export default {
     this.$store
       .dispatch('plugins/getInstalledPlugins')
       .then(this.prefillForm)
-      .then(this.updateStartDate)
   },
   mounted() {
     this.$refs.name.focus()
@@ -106,14 +101,6 @@ export default {
           this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
         })
-    },
-    updateStartDate() {
-      this.pipeline.startDate = null
-      this.getDefaultStartDate(this.pipeline.extractor).then(response => {
-        this.pipeline.startDate = utils.dateIso8601(
-          response.data.startDate
-        )
-      })
     }
   }
 }
@@ -158,7 +145,6 @@ export default {
                       v-model="pipeline.extractor"
                       :class="{ 'has-text-success': pipeline.extractor }"
                       :disabled="!getHasInstalledPluginsOfType('extractors')"
-                      @change="updateStartDate"
                     >
                       <option
                         v-for="extractor in installedPlugins.extractors"
@@ -224,16 +210,6 @@ export default {
                         >{{ interval }}</option
                       >
                     </select>
-                  </span>
-                </div>
-              </td>
-              <td>
-                <div class="has-text-centered">
-                  <span
-                    class="button is-static has-text-success"
-                    :class="{ 'is-loading': !pipeline.startDate }"
-                  >
-                    {{ getFormattedDateStringYYYYMMDD }}
                   </span>
                 </div>
               </td>
