@@ -23,11 +23,6 @@
       "destination": "/etc/"
     },
     {
-      "type": "file",
-      "source": "files/var/",
-      "destination": "/var/"
-    },
-    {
       "type": "shell",
       "inline": [
         "cloud-init status --wait",
