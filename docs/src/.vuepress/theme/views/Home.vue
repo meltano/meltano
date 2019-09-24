@@ -280,6 +280,7 @@
           <img src="../assets/logo-fastly.png" alt="Fastly Logo" />
           <img src="../assets/logo-mongodb.png" alt="MongoDB Logo" />
           <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
+          <img src="../assets/logo-googleanalytics.png" alt="Google Analytics Logo" />
         </div>
 
         <p class="description ta-c">
