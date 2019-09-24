@@ -108,12 +108,7 @@ def get_sql(namespace, topic_name, design_name):
 
     results = sqlHelper.get_query_results(dialect, outgoing_sql)
     base_dict["results"] = results
-
-    if not len(results):
-        base_dict["empty"] = True
-    else:
-        base_dict["empty"] = False
-        base_dict["keys"] = list(results[0].keys())
+    base_dict["empty"] = len(results) == 0
 
     return jsonify(base_dict)
 

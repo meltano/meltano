@@ -15,8 +15,7 @@ export default {
       'resultAggregates',
       'queryAttributes',
       'order',
-      'results',
-      'keys'
+      'results'
     ]),
     ...mapGetters('designs', [
       'hasResults',
@@ -41,6 +40,9 @@ export default {
         const idx = this.order.assigned.indexOf(match)
         return match ? `${idx + 1}. ${match.direction}` : ''
       }
+    },
+    keys() {
+      return this.queryAttributes.map(attr => attr.key)
     }
   },
   methods: {

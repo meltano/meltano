@@ -26,7 +26,6 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
-  keys: [],
   limit: 50,
   loadingQuery: false,
   order: {
@@ -640,9 +639,8 @@ const mutations = {
 
   resetQueryResults(state) {
     state.results = []
-    state.keys = []
     state.queryAttributes = []
-    state.resultAggregates = {}
+    state.resultAggregates = []
   },
 
   resetSaveReportSettings(state) {
@@ -720,7 +718,6 @@ const mutations = {
 
   setQueryResults(state, results) {
     state.results = results.results
-    state.keys = results.keys
     state.queryAttributes = results.queryAttributes
     state.resultAggregates = results.aggregates
   },

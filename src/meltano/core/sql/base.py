@@ -1021,6 +1021,7 @@ class MeltanoQuery(MeltanoBase):
 
                 query_attributes.append(
                     {
+                        "key": c.alias(),
                         "table_name": table.name,
                         "source_name": table.find_source_name(),
                         "attribute_name": c.name,
@@ -1046,6 +1047,7 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
+                            "key": t.alias(),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
                             "attribute_name": t.period_alias(period),
@@ -1063,6 +1065,7 @@ class MeltanoQuery(MeltanoBase):
                 )
                 query_attributes.append(
                     {
+                        "key": a.alias(),
                         "table_name": table.name,
                         "source_name": table.find_source_name(),
                         "attribute_name": a.name,
@@ -1220,6 +1223,7 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
+                            "key": t.alias(),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
                             "attribute_name": t.period_alias(period),
@@ -1321,6 +1325,7 @@ class MeltanoQuery(MeltanoBase):
                     for c in t.columns():
                         query_attributes.append(
                             {
+                                "key": c.alias(),
                                 "table_name": t.name,
                                 "source_name": t.find_source_name(),
                                 "attribute_name": c.name,
@@ -1344,6 +1349,7 @@ class MeltanoQuery(MeltanoBase):
 
                 query_attributes.append(
                     {
+                        "key": a.alias(),
                         "table_name": table.name,
                         "source_name": table.find_source_name(),
                         "attribute_name": a.name,
