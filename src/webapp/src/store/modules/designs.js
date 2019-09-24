@@ -132,7 +132,8 @@ const getters = {
       aggregate => aggregate.id === id
     )
     const hasDuplicate =
-      state.resultAggregates.filter(item => item.id === aggregate.id).length > 1
+      state.resultAggregates.filter(item => item.label === aggregate.label)
+        .length > 1
 
     return hasDuplicate
       ? `${aggregate.label} [Source: ${aggregate.source}]`
