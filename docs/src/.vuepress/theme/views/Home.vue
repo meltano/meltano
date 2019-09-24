@@ -275,7 +275,6 @@
           <img src="../assets/logo-salesforce.png" alt="Salesforce Logo" />
           <img src="../assets/logo-sqlite.png" alt="SQLite Logo" />
           <img src="../assets/logo-zendesk.png" alt="Zendesk Logo" />
-          <img src="../assets/logo-zuora.png" alt="Zuora Logo" />
           <img src="../assets/logo-marketo.png" alt="Marketo Logo" />
           <img src="../assets/logo-nationalgrid.png" alt="National Grid ESO" />
           <img src="../assets/logo-fastly.png" alt="Fastly Logo" />
