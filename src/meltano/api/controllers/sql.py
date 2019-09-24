@@ -12,6 +12,7 @@ from .sql_helper import SqlHelper, ConnectionNotFound, UnsupportedConnectionDial
 from meltano.api.security import api_auth_required
 from meltano.core.project import Project
 from meltano.core.sql.filter import FilterOptions
+from meltano.core.sql.base import ParseError, EmptyQuery
 
 sqlBP = Blueprint("sql", __name__, url_prefix="/api/v1/sql")
 
@@ -50,6 +51,16 @@ def _handle(ex):
         ),
         500,
     )
+
+
+@sqlBP.errorhandler(ParseError)
+def _handle(ex):
+    return (jsonify({"error": True, "code": str(ex)}), 400)
+
+
+@sqlBP.errorhandler(EmptyQuery)
+def _handle(ex):
+    return ("", 204)
 
 
 def default(obj):

@@ -467,7 +467,12 @@ const actions = {
         postData
       )
       .then(response => {
-        if (run) {
+        // No response means empty query
+        if (response.status === 204) {
+          commit('resetQueryResults')
+          commit('resetSQLResults')
+          state.loadingQuery = false
+        } else if (run) {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
           state.loadingQuery = false
@@ -653,6 +658,13 @@ const mutations = {
     lodash.assign(state, lodash.cloneDeep(defaultState))
   },
 
+  resetQueryResults(state) {
+    state.results = []
+    state.keys = []
+    state.queryAttributes = []
+    state.resultAggregates = {}
+  },
+
   resetSaveReportSettings(state) {
     state.saveReportSettings = { name: null }
   },
@@ -661,6 +673,10 @@ const mutations = {
     const assigned = state.order.assigned
     state.order.unassigned = state.order.unassigned.concat(assigned)
     state.order.assigned = []
+  },
+
+  resetSQLResults(state) {
+    state.currentSQL = ''
   },
 
   setChartType(state, chartType) {

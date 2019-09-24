@@ -14,6 +14,10 @@ class ParseError(Exception):
     pass
 
 
+class EmptyQuery(Exception):
+    pass
+
+
 class MeltanoFilterExpressionType(str, Enum):
     Unknown = "UNKNOWN"
     LessThan = "less_than"
@@ -685,25 +689,21 @@ class MeltanoQuery(MeltanoBase):
 
     def validate_definition(self, definition: Dict) -> None:
         """
-        Validate that the definition is properly formated
+        Validate that the definition is properly formatted
         """
-        if not isinstance(definition.get("columns"), list):
-            raise ParseError(f"Query definition property `columns` must be a list")
 
-        if not isinstance(definition.get("aggregates"), list):
-            raise ParseError(f"Query definition property `aggregates` must be a list")
-
-        timeframes = definition.get("timeframes")
-        if timeframes and not isinstance(timeframes, list):
-            raise ParseError(f"Query definition property `timeframes` must be a list")
-
-        order = definition.get("order")
-        if order and not isinstance(order, list):
-            raise ParseError(f"Query definition property `order` must be a list")
+        self.validate_table_definition(definition)
 
         joins = definition.get("joins")
         if joins and not isinstance(joins, list):
             raise ParseError(f"Query definition property `joins` must be a list")
+
+        for join_definition in joins:
+            self.validate_table_definition(join_definition)
+
+        order = definition.get("order")
+        if order and not isinstance(order, list):
+            raise ParseError(f"Query definition property `order` must be a list")
 
         filters = definition.get("filters", None)
         if filters:
@@ -718,6 +718,23 @@ class MeltanoQuery(MeltanoBase):
                 raise ParseError(
                     f"Query definition property `filters[aggregates]` must be a list"
                 )
+
+    def validate_table_definition(self, definition: Dict) -> None:
+        """
+        Validate that the query definition for a specific table is properly formatted
+        """
+        if not isinstance(definition.get("name"), str):
+            raise ParseError(f"Query definition property `name` must be a string")
+
+        if not isinstance(definition.get("columns"), list):
+            raise ParseError(f"Query definition property `columns` must be a list")
+
+        if not isinstance(definition.get("aggregates"), list):
+            raise ParseError(f"Query definition property `aggregates` must be a list")
+
+        timeframes = definition.get("timeframes")
+        if timeframes and not isinstance(timeframes, list):
+            raise ParseError(f"Query definition property `timeframes` must be a list")
 
     def parse_definition(self, definition: Dict) -> None:
         """
@@ -944,9 +961,16 @@ class MeltanoQuery(MeltanoBase):
         - aggregate_columns: The aggregate columns in the query (fuly qualified)
         """
         if self.needs_hda():
-            return self.hda_query()
+            sql, query_attributes, aggregate_columns = self.hda_query()
         else:
-            return self.single_table_query()
+            sql, query_attributes, aggregate_columns = self.single_table_query()
+
+        if sql:
+            sql = sql + ";"
+        else:
+            raise EmptyQuery
+
+        return (sql, query_attributes, aggregate_columns)
 
     def single_table_query(self) -> Tuple:
         """
@@ -1089,9 +1113,6 @@ class MeltanoQuery(MeltanoBase):
         no_join_query = no_join_query.limit(self.limit or 50)
 
         final_query = self.add_schema_to_query(str(no_join_query))
-
-        if len(final_query) > 0:
-            final_query = final_query + ";"
 
         return (final_query, query_attributes, aggregate_columns)
 
@@ -1361,9 +1382,6 @@ class MeltanoQuery(MeltanoBase):
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_query(str(hda_query))
-
-        if len(final_query) > 0:
-            final_query = final_query + ";"
 
         return (final_query, query_attributes, aggregate_columns)
 
