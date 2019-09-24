@@ -18,7 +18,7 @@ stages:
 lint:
   stage: test
   image:
-    name: registry.gitlab.com/meltano/meltano
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
   script:
     - pip install black
@@ -85,7 +85,7 @@ docs:
 .test: &test
   stage: test
   image:
-    name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_SHA
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
   before_script:
     - pip install '.[dev]'
@@ -125,7 +125,7 @@ test_sqlite:
 
 publish:
   image:
-    name: registry.gitlab.com/meltano/meltano:$CI_COMMIT_TAG
+    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
     entrypoint: [""]
   stage: publish
   before_script:
@@ -134,7 +134,7 @@ publish:
     - twine upload /meltano/dist/*
   only:
     refs:
-      - tags
+      - tags@meltano/meltano
     variables:
       - $CI_COMMIT_TAG =~ /^v*/
 
