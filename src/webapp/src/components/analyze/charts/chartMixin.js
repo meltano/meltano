@@ -1,4 +1,3 @@
-import { mapGetters } from 'vuex'
 import Chart from 'chart.js'
 import utils from '../../../utils/utils'
 
@@ -69,6 +68,18 @@ const chartMixin = {
       this.chart = new Chart(chart, this.config)
       this.updateChart()
     },
+    chartLabel(id) {
+      const aggregate = this.resultAggregates.find(
+        aggregate => aggregate.id === id
+      )
+      const hasDuplicate =
+        this.resultAggregates.filter(item => item.label === aggregate.label)
+          .length > 1
+
+      return hasDuplicate
+        ? `${aggregate.label} [Source: ${aggregate.source}]`
+        : aggregate.label
+    },
     updateChart() {
       if (!this.results.length) {
         return
@@ -113,9 +124,6 @@ const chartMixin = {
       })
       this.chart.update()
     }
-  },
-  computed: {
-    ...mapGetters('designs', ['chartLabel', 'getChartYAxis'])
   },
   watch: {
     results() {

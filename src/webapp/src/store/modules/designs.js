@@ -26,7 +26,6 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
-  keys: [],
   limit: 50,
   loadingQuery: false,
   order: {
@@ -35,7 +34,7 @@ const defaultState = utils.deepFreeze({
   },
   queryAttributes: [],
   reports: [],
-  resultAggregates: {},
+  resultAggregates: [],
   results: [],
   saveReportSettings: { name: null },
   sqlErrorMessage: []
@@ -127,18 +126,6 @@ const helpers = {
 }
 
 const getters = {
-  chartLabel: state => id => {
-    const aggregate = state.resultAggregates.find(
-      aggregate => aggregate.id === id
-    )
-    const hasDuplicate =
-      state.resultAggregates.filter(item => item.id === aggregate.id).length > 1
-
-    return hasDuplicate
-      ? `${aggregate.label} [Source: ${aggregate.source}]`
-      : aggregate.label
-  },
-
   currentDesignLabel(state) {
     return utils.titleCase(state.currentDesign)
   },
@@ -187,14 +174,6 @@ const getters = {
         attr.name === queryAttribute.attributeName
       return getters.getAllAttributes.find(finder)
     }
-  },
-
-  getChartYAxis(state) {
-    if (!state.resultAggregates) {
-      return []
-    }
-    const aggregates = Object.keys(state.resultAggregates)
-    return aggregates
   },
 
   getDialect: state => state.dialect,
@@ -660,9 +639,8 @@ const mutations = {
 
   resetQueryResults(state) {
     state.results = []
-    state.keys = []
     state.queryAttributes = []
-    state.resultAggregates = {}
+    state.resultAggregates = []
   },
 
   resetSaveReportSettings(state) {
@@ -740,23 +718,8 @@ const mutations = {
 
   setQueryResults(state, results) {
     state.results = results.results
-    state.keys = results.keys
     state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.queryAttributes.reduce((list, item) => {
-      if (item.attributeType === 'aggregate') {
-        const id = `${item.sourceName}.${item.attributeName}`
-
-        if (results.aggregates.find(aggregate => aggregate === id)) {
-          list.push({
-            id: id,
-            label: item.attributeLabel,
-            source: item.sourceName
-          })
-        }
-      }
-
-      return list
-    }, [])
+    state.resultAggregates = results.aggregates
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
