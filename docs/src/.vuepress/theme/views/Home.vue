@@ -268,7 +268,7 @@
           database formats.
         </p>
 
-        <div class="el-logos">
+        <div class="plugin-logos">
           <img src="../assets/logo-gitlab.png" alt="GitLab Logo" />
           <img src="../assets/logo-stripe.png" alt="Stripe Logo" />
           <img src="../assets/logo-csv.png" alt="CSV Logo" />
@@ -704,7 +704,7 @@ export default {
   margin-bottom: 0;
 }
 
-.el-logos {
+.plugin-logos {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: minmax(120px, 1fr);
@@ -723,13 +723,13 @@ export default {
 }
 
 @media (min-width: 425px) {
-  .el-logos {
+  .plugin-logos {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (min-width: 768px) {
-  .el-logos {
+  .plugin-logos {
     grid-template-columns: 1fr 1fr 1fr 1fr;
 
     img {
