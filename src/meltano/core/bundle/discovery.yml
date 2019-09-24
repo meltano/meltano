@@ -140,22 +140,6 @@ extractors:
         description: <subdomain>.zendesk.com
       - name: start_date
         kind: date_iso8601
-  - name: tap-zuora
-    namespace: zuora
-    docs: 'http://meltano.com/docs/plugins.html#zuora'
-    pip_url: 'tap-zuora'
-    settings:
-      - name: username
-      - name: password
-        kind: password
-      - name: partner_id
-      - name: api_token
-      - name: api_type
-      - name: sandbox
-        value: false
-        kind: boolean
-      - name: start_date
-        kind: date_iso8601
 loaders:
   - name: target-csv
     namespace: csv
@@ -270,11 +254,6 @@ transforms:
     vars:
       livemode: false
       schema: "{{ env_var('PG_SCHEMA') }}"
-  - name: tap-zuora
-    namespace: zuora
-    pip_url: 'https://gitlab.com/meltano/dbt-tap-zuora.git'
-    vars:
-      schema: "{{ env_var('PG_SCHEMA') }}"
   - name: tap-zendesk
     namespace: zendesk
     pip_url: 'https://gitlab.com/meltano/dbt-tap-zendesk.git'
@@ -310,9 +289,6 @@ models:
   - name: model-stripe
     namespace: stripe
     pip_url: 'git+https://gitlab.com/meltano/model-stripe.git'
-  - name: model-zuora
-    namespace: zuora
-    pip_url: 'git+https://gitlab.com/meltano/model-zuora.git'
   - name: model-google-analytics
     namespace: google-analytics
     pip_url: 'git+https://gitlab.com/meltano/model-google-analytics.git'

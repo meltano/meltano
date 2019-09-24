@@ -275,7 +275,6 @@
           <img src="../assets/salesforce-logo.png" alt="Salesforce Logo" />
           <img src="../assets/sqlite-logo.png" alt="SQLite Logo" />
           <img src="../assets/zendesk-logo.png" alt="Zendesk Logo" />
-          <img src="../assets/zuora-logo.png" alt="Zuora Logo" />
           <img src="../assets/marketo-logo.png" alt="Marketo Logo" />
           <div class="carbon-intensity-logo">
             <img
