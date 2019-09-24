@@ -127,19 +127,6 @@ const helpers = {
 }
 
 const getters = {
-  chartLabel: state => id => {
-    const aggregate = state.resultAggregates.find(
-      aggregate => aggregate.id === id
-    )
-    const hasDuplicate =
-      state.resultAggregates.filter(item => item.label === aggregate.label)
-        .length > 1
-
-    return hasDuplicate
-      ? `${aggregate.label} [Source: ${aggregate.source}]`
-      : aggregate.label
-  },
-
   currentDesignLabel(state) {
     return utils.titleCase(state.currentDesign)
   },
