@@ -21,6 +21,7 @@ extractors:
     settings:
       - name: api_token
         label: API Token
+        kind: password
       - name: start_date
         label: Start Date
         kind: date_iso8601
@@ -36,6 +37,7 @@ extractors:
         label: GitLab API URL
         value: 'https://gitlab.com/api/v4'
       - name: private_token
+        kind: password
         env: GITLAB_API_TOKEN
       - name: groups
         value: ''
@@ -106,7 +108,9 @@ extractors:
         label: Client ID
       - name: username
       - name: password
+        kind: password
       - name: security_token
+        kind: password
       - name: api_type
         value: REST
       - name: select_fields_by_default
@@ -135,6 +139,7 @@ extractors:
         kind: email
       - name: api_token
         label: Zendesk API Token
+        kind: password
       - name: subdomain
         label: Zendesk Domain
         description: <subdomain>.zendesk.com
