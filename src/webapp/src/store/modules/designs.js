@@ -177,14 +177,6 @@ const getters = {
     }
   },
 
-  getChartYAxis(state) {
-    if (!state.resultAggregates) {
-      return []
-    }
-    const aggregates = Object.keys(state.resultAggregates)
-    return aggregates
-  },
-
   getDialect: state => state.dialect,
 
   // eslint-disable-next-line no-shadow

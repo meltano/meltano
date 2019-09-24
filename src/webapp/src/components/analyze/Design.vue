@@ -52,7 +52,6 @@ export default {
       'currentDesignLabel',
       'hasChartableResults',
       'resultsCount',
-      'getChartYAxis',
       'hasJoins',
       'showJoinColumnAggregateHeader',
       'formattedSql',
