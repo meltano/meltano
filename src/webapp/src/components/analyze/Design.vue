@@ -248,11 +248,14 @@ export default {
       <div class="column">
         <div class="is-grouped is-pulled-left">
           <div
-            class='has-text-weight-bold'
-            :class="{ 'is-italic': !hasActiveReport }">
-            <span>{{hasActiveReport ? activeReport.name : 'Untitled Report'}}</span>
+            class="has-text-weight-bold"
+            :class="{ 'is-italic': !hasActiveReport }"
+          >
+            <span>{{
+              hasActiveReport ? activeReport.name : 'Untitled Report'
+            }}</span>
           </div>
-          <div v-if='design.description'>{{design.description}}</div>
+          <div v-if="design.description">{{ design.description }}</div>
         </div>
       </div>
 
@@ -307,10 +310,7 @@ export default {
             </Dropdown>
           </p>
 
-          <div
-            class="control field"
-            :class="{ 'has-addons': hasActiveReport }"
-          >
+          <div class="control field" :class="{ 'has-addons': hasActiveReport }">
             <p class="control">
               <button
                 v-if="hasActiveReport"
