@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1002](https://gitlab.com/meltano/meltano/issues/1002) Analyze UI now displays the Topic's (analysis model's) description text if applicable
+
 ### Changes
 
 - [#854](https://gitlab.com/meltano/meltano/issues/854) Charts now use pretty labels rather than the ID

@@ -6,16 +6,20 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
     class="columns is-vcentered"
   >
     <div
-      class="column is-one-quarter"
+      class="column"
     >
       <div
         class="is-grouped is-pulled-left"
       >
-        <div>
-          <em>
+        <div
+          class="has-text-weight-bold is-italic"
+        >
+          <span>
             Untitled Report
-          </em>
+          </span>
         </div>
+         
+        <!---->
       </div>
     </div>
      
@@ -400,16 +404,20 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
     class="columns is-vcentered"
   >
     <div
-      class="column is-one-quarter"
+      class="column"
     >
       <div
         class="is-grouped is-pulled-left"
       >
-        <div>
-          <em>
+        <div
+          class="has-text-weight-bold is-italic"
+        >
+          <span>
             Untitled Report
-          </em>
+          </span>
         </div>
+         
+        <!---->
       </div>
     </div>
      
@@ -789,16 +797,20 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
     class="columns is-vcentered"
   >
     <div
-      class="column is-one-quarter"
+      class="column"
     >
       <div
         class="is-grouped is-pulled-left"
       >
-        <div>
-          <em>
+        <div
+          class="has-text-weight-bold is-italic"
+        >
+          <span>
             Untitled Report
-          </em>
+          </span>
         </div>
+         
+        <!---->
       </div>
     </div>
      
@@ -1101,16 +1113,20 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
     class="columns is-vcentered"
   >
     <div
-      class="column is-one-quarter"
+      class="column"
     >
       <div
         class="is-grouped is-pulled-left"
       >
-        <div>
-          <em>
+        <div
+          class="has-text-weight-bold is-italic"
+        >
+          <span>
             Untitled Report
-          </em>
+          </span>
         </div>
+         
+        <!---->
       </div>
     </div>
      
@@ -1418,16 +1434,20 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
     class="columns is-vcentered"
   >
     <div
-      class="column is-one-quarter"
+      class="column"
     >
       <div
         class="is-grouped is-pulled-left"
       >
-        <div>
-          <em>
+        <div
+          class="has-text-weight-bold is-italic"
+        >
+          <span>
             Untitled Report
-          </em>
+          </span>
         </div>
+         
+        <!---->
       </div>
     </div>
      

@@ -67,6 +67,10 @@ export default {
       return !this.isConnectionDialectSqlite(this.dialect)
     },
 
+    hasActiveReport() {
+      return Object.keys(this.activeReport).length > 0
+    },
+
     isActiveReportInDashboard() {
       return dashboard => dashboard.reportIds.includes(this.activeReport.id)
     },
@@ -135,10 +139,6 @@ export default {
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
-    },
-
-    hasActiveReport() {
-      return Object.keys(this.activeReport).length > 0
     },
 
     toggleActiveReportInDashboard(dashboard) {
@@ -244,16 +244,23 @@ export default {
 <template>
   <section>
     <div class="columns is-vcentered">
-      <div class="column is-one-quarter">
+      <div class="column">
         <div class="is-grouped is-pulled-left">
-          <div v-if="hasActiveReport()">{{ activeReport.name }}</div>
-          <div v-else><em>Untitled Report</em></div>
+          <div
+            class="has-text-weight-bold"
+            :class="{ 'is-italic': !hasActiveReport }"
+          >
+            <span>{{
+              hasActiveReport ? activeReport.name : 'Untitled Report'
+            }}</span>
+          </div>
+          <div v-if="design.description">{{ design.description }}</div>
         </div>
       </div>
 
       <div class="column">
         <div class="field is-grouped is-pulled-right">
-          <p v-if="hasActiveReport()" class="control" @click="getDashboards">
+          <p v-if="hasActiveReport" class="control" @click="getDashboards">
             <Dropdown label="Add to Dashboard" is-right-aligned>
               <div class="dropdown-content">
                 <a
@@ -302,13 +309,10 @@ export default {
             </Dropdown>
           </p>
 
-          <div
-            class="control field"
-            :class="{ 'has-addons': hasActiveReport() }"
-          >
+          <div class="control field" :class="{ 'has-addons': hasActiveReport }">
             <p class="control">
               <button
-                v-if="hasActiveReport()"
+                v-if="hasActiveReport"
                 class="button"
                 @click="updateReport()"
               >
@@ -318,14 +322,14 @@ export default {
             <p class="control">
               <Dropdown
                 :disabled="!hasChartableResults"
-                :label="hasActiveReport() ? '' : 'Save Report'"
+                :label="hasActiveReport ? '' : 'Save Report'"
                 is-right-aligned
                 @dropdown:open="setReportName"
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
                     <div class="field">
-                      <label v-if="hasActiveReport()" class="label"
+                      <label v-if="hasActiveReport" class="label"
                         >Save as</label
                       >
                       <div class="control">
