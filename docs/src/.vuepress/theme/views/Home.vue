@@ -706,13 +706,12 @@ export default {
 
 .el-logos {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(120px, 1fr);
   grid-column-gap: 30px;
-  grid-template-rows: repeat(4, 150px);
+  grid-row-gap: 30px;
   align-items: center;
   justify-content: center;
-  grid-row-gap: 30px;
-  text-align: center;
   padding: 30px;
 
   img {
@@ -721,17 +720,6 @@ export default {
     -webkit-filter: grayscale(1);
     filter: grayscale(1);
   }
-}
-
-.el-logos {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: minmax(120px, 1fr);
-  grid-column-gap: 30px;
-  grid-row-gap: 30px;
-  align-items: center;
-  justify-content: center;
-  padding: 30px;
 }
 
 @media (min-width: 425px) {
