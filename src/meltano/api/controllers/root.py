@@ -1,5 +1,6 @@
 import subprocess
 import requests
+import logging
 from urllib.parse import urlsplit
 from flask import Blueprint, render_template, request, jsonify, redirect, g, current_app
 from flask_security import login_required, roles_required
@@ -8,12 +9,13 @@ from jinja2 import TemplateNotFound
 import meltano
 from meltano.api.security import api_auth_required
 
+logger = logging.getLogger(__name__)
 root = Blueprint("root", __name__)
 
 
 @root.errorhandler(500)
 def internal_error(exception):
-    logger.info(f"[{request.remote_addr}] request: {now}, error: {exception}")
+    logger.info(f"[{request.remote_addr}], error: {exception}")
     return jsonify({"error": str(exception)}), 500
 
 
@@ -34,21 +36,12 @@ def default(path):
 @roles_required("admin")
 @api_auth_required
 def upgrade():
-    command = ["meltano", "upgrade", "--restart"]
-    subprocess.Popen(command)
-    # project = Project.find()
-
-    # upgrade_service = UpgradeService(engine, project)
-    # upgrade_service.upgrade()
-
-    # if not app.debug:
-    #     upgrade_service.restart_server()
+    meltano.api.executor.upgrade()
     return "Updating", 201
 
 
 @root.route("/version")
 def version():
-    # TODO: cache this value
     res = requests.get("https://pypi.org/pypi/meltano/json")
     payload = res.json()
 

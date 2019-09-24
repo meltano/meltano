@@ -18,11 +18,10 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
-from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
+from .workers import airflow_context
 
 
 logger = logging.getLogger(__name__)
-airflow_context = {"worker": None}
 
 
 def is_mainthread():
@@ -158,13 +157,6 @@ def start(project, **kwargs):
         # TODO: alembic migration
         create_dev_user()
 
-    # ensure we only start the workers on the via the main thread
-    # this will make sure we don't start everything twice
-    # when code reload is enabled
-    if not app.debug or is_mainthread():
-        cleanup = start_workers(app, project)
-        atexit.register(cleanup)
-
     # set the PID
     if is_mainthread():
         pid_file_path = project.run_dir("flask.pid")
@@ -174,30 +166,3 @@ def start(project, **kwargs):
         atexit.register(pid_file_path.unlink)
 
     app.run(**kwargs)
-
-
-def start_workers(app, project, **kwargs):
-    port = kwargs.pop("port", 5000)
-    workers = []
-
-    if not app.config["AIRFLOW_DISABLED"]:
-        airflow_context["worker"] = AirflowWorker(app, project)
-        workers.append(airflow_context["worker"])
-
-    workers.append(MeltanoBackgroundCompiler(project))
-    workers.append(
-        # the web server should always be accessible from `localhost`
-        UIAvailableWorker(f"http://localhost:{port}", open_browser=not app.debug)
-    )
-
-    # cleanup callback
-    def stop_all():
-        logger.info("Stopping all background workers...")
-        for worker in workers:
-            worker.stop()
-
-    # start all workers
-    for worker in workers:
-        worker.start()
-
-    return stop_all

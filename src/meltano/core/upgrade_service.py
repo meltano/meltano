@@ -3,6 +3,7 @@ import logging
 import psutil
 import meltano
 import subprocess
+import signal
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService
@@ -21,17 +22,16 @@ class UpgradeService:
         self.project = project
         self.migration_service = migration_service or MigrationService(engine)
 
-    def restart_server(self):
-        def try_restart(pid_file_path):
-            try:
-                with pid_file_path.open("r") as pid_file:
-                    pid = int(pid_file.read())
-                    self.restart_process(pid)
-            except Exception as ex:
-                logging.debug(f"Cannot restart from `{pid_file_path}`: {ex}")
+    def reload(self):
+        pid_file_path = self.project.run_dir("gunicorn.pid")
+        try:
+            with pid_file_path.open("r") as pid_file:
+                pid = int(pid_file.read())
 
-        # try_restart(self.project.run_dir("flask.pid"))
-        try_restart(self.project.run_dir("gunicorn.pid"))
+                process = psutil.Process(pid)
+                process.send_signal(signal.SIGHUP)
+        except Exception as ex:
+            logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
     def upgrade(self):
         # we need to find out if the `meltano` module is installed as editable
@@ -52,13 +52,3 @@ class UpgradeService:
                 raise UpgradeError(f"Failed to upgrade `meltano`.", run)
 
         self.migration_service.upgrade()
-
-    def restart_process(self, pid):
-        process = psutil.Process(pid)
-        logging.info(f"Restarting process {process.name}({pid})...")
-
-        command = process.cmdline()
-        process.terminate()
-        process.wait()
-
-        subprocess.Popen(command)

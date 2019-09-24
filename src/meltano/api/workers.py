@@ -1,9 +1,11 @@
+import os
 import logging
 import requests
 import threading
 import time
 import webbrowser
 import psutil
+import subprocess
 from colorama import Fore
 
 from watchdog.observers import Observer
@@ -13,7 +15,11 @@ from meltano.core.plugin import PluginInstall
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
+from meltano.core.db import project_engine
 from meltano.api.models import db
+
+
+airflow_context = {"worker": None}
 
 
 class CompileEventHandler(PatternMatchingEventHandler):
@@ -61,8 +67,8 @@ class MeltanoBackgroundCompiler:
 class UIAvailableWorker(threading.Thread):
     def __init__(self, url, open_browser=False):
         super().__init__()
-
         self._terminate = False
+
         self.url = url
         self.open_browser = open_browser
 
@@ -85,11 +91,45 @@ class UIAvailableWorker(threading.Thread):
         self._terminate = True
 
 
-class AirflowWorker(threading.Thread):
-    def __init__(self, app, project):
+class APIWorker(threading.Thread):
+    def __init__(self, project: Project, reload=False):
         super().__init__()
+        self.project = project
+        self.reload = reload
 
-        self.app = app
+    def run(self):
+        cmd = ["gunicorn", "-c", "python:meltano.api.wsgi"]
+
+        if self.reload:
+            cmd += ["--reload"]
+
+        cmd += ["meltano.api.app:create_app()"]
+
+        try:
+            engine, _ = project_engine(self.project)
+            subprocess.run(cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)})
+        finally:
+            engine.close()
+
+    def pid_path(self):
+        return self.project.run_dir(f"gunicorn.pid")
+
+    def stop(self):
+        try:
+            pid = int(self.pid_path().open().read())
+            process = psutil.Process(pid)
+
+            process.terminate()
+        except (ValueError, psutil.NoSuchProcess):
+            f.unlink()
+        except FileNotFoundError:
+            pass
+
+
+class AirflowWorker(threading.Thread):
+    def __init__(self, project: Project):
+        super().__init__(name="AirflowWorker")
+
         self.project = project
         self.installed = threading.Event()
         self._plugin = None
@@ -129,27 +169,32 @@ class AirflowWorker(threading.Thread):
             p.kill()
 
     def start_all(self):
+        _, Session = project_engine(self.project)
         logs_dir = self.project.run_dir("airflow", "logs")
-        with self.app.app_context() as ctx:
+
+        try:
+            session = Session()
             invoker = invoker_factory(
-                self.project, self._plugin, prepare_with_session=db.session
+                self.project, self._plugin, prepare_with_session=session
             )
 
-        # fmt: off
-        with logs_dir.joinpath("webserver.log").open("w") as webserver, \
-          logs_dir.joinpath("scheduler.log").open("w") as scheduler, \
-          self.pid_path("webserver").open("w") as webserver_pid, \
-          self.pid_path("scheduler").open("w") as scheduler_pid:
-            self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
-            self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
+            # fmt: off
+            with logs_dir.joinpath("webserver.log").open("w") as webserver, \
+            logs_dir.joinpath("scheduler.log").open("w") as scheduler, \
+            self.pid_path("webserver").open("w") as webserver_pid, \
+            self.pid_path("scheduler").open("w") as scheduler_pid:
+                self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
+                self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
 
-            webserver_pid.write(str(self._webserver.pid))
-            scheduler_pid.write(str(self._scheduler.pid))
-        # fmt: on
+                webserver_pid.write(str(self._webserver.pid))
+                scheduler_pid.write(str(self._scheduler.pid))
+            # fmt: on
 
-        # Time padding for server initialization so UI iframe displays as expected
-        # (iteration potential on approach but following UIAvailableWorker sleep approach)
-        time.sleep(2)
+            # Time padding for server initialization so UI iframe displays as expected
+            # (iteration potential on approach but following UIAvailableWorker sleep approach)
+            time.sleep(2)
+        finally:
+            session.close()
 
     def pid_path(self, name):
         return self.project.run_dir("airflow", f"{name}.pid")
