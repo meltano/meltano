@@ -12,15 +12,14 @@ export default {
   },
   computed: {
     ...mapState('designs', [
-      'resultAggregates',
       'queryAttributes',
-      'order',
       'results',
-      'keys'
+      'resultAggregates',
+      'order'
     ]),
     ...mapGetters('designs', [
-      'hasResults',
       'getFormattedValue',
+      'hasResults',
       'isColumnSelectedAggregate'
     ]),
     getAssignedOrderable() {
@@ -41,6 +40,9 @@ export default {
         const idx = this.order.assigned.indexOf(match)
         return match ? `${idx + 1}. ${match.direction}` : ''
       }
+    },
+    keys() {
+      return this.queryAttributes.map(attr => attr.key)
     }
   },
   methods: {

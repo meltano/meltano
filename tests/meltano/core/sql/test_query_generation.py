@@ -184,7 +184,7 @@ class TestQueryGeneration:
             attr["attribute_label"] == "Average Age" for attr in query_attributes
         )
         assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
-        assert "users.sum_clv" in aggregate_columns
+        assert any(attr["id"] == "users.sum_clv" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
         assert "base_streams_table AS (SELECT DISTINCT" in sql
@@ -221,7 +221,7 @@ class TestQueryGeneration:
             attr["attribute_label"] == "Average Age" for attr in query_attributes
         )
         assert any(attr["attribute_name"] == "sum_minutes" for attr in query_attributes)
-        assert "users.sum_clv" in aggregate_columns
+        assert any(attr["id"] == "users.sum_clv" for attr in aggregate_columns)
 
         assert "WITH base_join AS (SELECT" in sql
         assert "base_streams_table AS (SELECT DISTINCT" in sql
