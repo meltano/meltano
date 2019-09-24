@@ -15,6 +15,7 @@ requires = [
     'click-default-group==1.2.1',
     'colorama==0.3.9',
     'gitpython==2.1.11',
+    'gunicorn==19.9.0',
     'jsonschema==2.6.0',
     'markdown==3.0.1',
     'networkx==2.2',
