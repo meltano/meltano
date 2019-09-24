@@ -10,6 +10,7 @@ from importlib import reload
 from urllib.parse import urlsplit
 
 from meltano.core.project import Project
+from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
@@ -22,10 +23,6 @@ from .workers import airflow_context
 
 
 logger = logging.getLogger(__name__)
-
-
-def is_mainthread():
-    return os.environ.get("WERKZEUG_RUN_MAIN") == "true"
 
 
 def create_app(config={}):
@@ -147,8 +144,6 @@ def create_app(config={}):
 
 
 def start(project, **kwargs):
-    """Start Meltano UI as a single-threaded web server."""
-
     app_config = kwargs.pop("app_config", {})
     app = create_app(app_config)
     from .security.identity import create_dev_user
@@ -156,13 +151,5 @@ def start(project, **kwargs):
     with app.app_context():
         # TODO: alembic migration
         create_dev_user()
-
-    # set the PID
-    if is_mainthread():
-        pid_file_path = project.run_dir("flask.pid")
-        with pid_file_path.open("w") as pid_file:
-            pid_file.write(str(os.getpid()))
-
-        atexit.register(pid_file_path.unlink)
 
     app.run(**kwargs)

@@ -11,8 +11,10 @@ from colorama import Fore
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 from meltano.core.project import Project
-from meltano.core.plugin import PluginInstall
-from meltano.core.config_service import ConfigService
+from meltano.core.plugin import PluginInstall, PluginType
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.config_service import ConfigService, PluginMissingError
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.db import project_engine
@@ -133,16 +135,11 @@ class AirflowWorker(threading.Thread):
         super().__init__(name="AirflowWorker")
 
         self.project = project
-        self.installed = threading.Event()
+        self.add_service = ProjectAddService(project)
+        self.install_service = PluginInstallService(project)
         self._plugin = None
         self._webserver = None
         self._scheduler = None
-
-        try:
-            if ConfigService(self.project).find_plugin("airflow"):
-                self.installed.set()
-        except:
-            pass
 
     def kill_stale_workers(self):
         stale_workers = []
@@ -202,8 +199,12 @@ class AirflowWorker(threading.Thread):
         return self.project.run_dir("airflow", f"{name}.pid")
 
     def run(self):
-        self.installed.wait()
-        self._plugin = ConfigService(self.project).find_plugin("airflow")
+        try:
+            self._plugin = ConfigService(self.project).find_plugin("airflow")
+        except PluginMissingError as err:
+            self._plugin = self.add_service.add(PluginType.ORCHESTRATORS, "airflow")
+            self.install_service.install_plugin(self._plugin)
+
         self.kill_stale_workers()
         self.start_all()
 

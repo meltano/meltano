@@ -65,7 +65,7 @@ class Project(Versioned):
 
     def reload(self):
         """Force a reload from `meltano.yml`"""
-        self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
+        pass
 
     @classmethod
     @fasteners.locked(lock="_find_lock")
@@ -88,10 +88,7 @@ class Project(Versioned):
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
-        if not self._meltano:
-            self.reload()
-
-        return deepcopy(self._meltano)
+        return yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
 
     @contextmanager
     def meltano_update(self):
