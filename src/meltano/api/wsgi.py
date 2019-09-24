@@ -3,5 +3,5 @@
 # from meltano.api.workers import MeltanoBackgroundCompiler, AirflowWorker
 
 bind = ["0.0.0.0:5000"]
-pidfile = ".meltano/run/gunicorn.pid"
+#pidfile = ".meltano/run/gunicorn.pid"
 workers = 4

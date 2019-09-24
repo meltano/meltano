@@ -98,7 +98,9 @@ class APIWorker(threading.Thread):
         self.reload = reload
 
     def run(self):
-        cmd = ["gunicorn", "-c", "python:meltano.api.wsgi"]
+        cmd = ["gunicorn",
+                   "-c", "python:meltano.api.wsgi",
+                   "--pid", str(self.project.run_dir("gunicorn.pid"))]
 
         if self.reload:
             cmd += ["--reload"]
