@@ -1268,9 +1268,7 @@ renamed as (
 select * from renamed
 ```
 
-In the transforms above we could have defined more complicated transformations, additional filters, etc. If you are interested to check more examples, you can check more advanced transformations on [Meltano's default transforms for Zuora](https://gitlab.com/meltano/dbt-tap-zuora) .
-
-Also, we could have hard coded the schema the raw tables reside in (in this example `csv_imports`), but we make use of the fact that it is defined by using the environmental variable `PG_SCHEMA` and use that instead. That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
+In the transforms above we could have hard coded the schema the raw tables reside inside (in this example `csv_imports`), but we make use of the fact that it is defined by the environmental variable `PG_SCHEMA` and use that instead. That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
 
 ### Run the Custom Transforms
 
