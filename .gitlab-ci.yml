@@ -116,12 +116,16 @@ test_postgres:
     PYTEST_BACKEND: postgresql
   services:
     - postgres:latest
+  only:
+    - branches@metlano/meltano
 
 test_sqlite:
   <<: *test
   variables:
     PYTEST_BACKEND: sqlite
     SQLITE_DATABASE: pytest
+  only:
+    - branches@metlano/meltano
 
 publish:
   image:
