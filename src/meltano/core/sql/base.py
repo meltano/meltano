@@ -954,11 +954,12 @@ class MeltanoQuery(MeltanoBase):
 
         Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the SQL:1999 compatible query
-        - query_attributes: Hash with the attributes in the the final result
-           in the same order as the one defined by the query.
+        - query_attributes: Array of hashes describing the attributes in the
+           final result in the same order as the one defined by the query.
            Keys included in the hash:
            {table_name, source_name, attribute_name, attribute_label, attribute_type}
-        - aggregate_columns: The aggregate columns in the query (fuly qualified)
+        - aggregate_columns: Array of hashes describing the aggregate columns.
+           Keys included in the hash: {id, label, source}
         """
         if self.needs_hda():
             sql, query_attributes, aggregate_columns = self.hda_query()
@@ -978,11 +979,12 @@ class MeltanoQuery(MeltanoBase):
 
         Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the SQL:1999 compatible query
-        - query_attributes: Hash with the attributes in the the final result
-           in the same order as the one defined by the query.
+        - query_attributes: Array of hashes describing the attributes in the
+           final result in the same order as the one defined by the query.
            Keys included in the hash:
            {table_name, source_name, attribute_name, attribute_label, attribute_type}
-        - aggregate_columns: The aggregate columns in the query (fuly qualified)
+        - aggregate_columns: Array of hashes describing the aggregate columns.
+           Keys included in the hash: {id, label, source}
         """
 
         # Lists with the column names and headers of the final result when the
@@ -1056,7 +1058,9 @@ class MeltanoQuery(MeltanoBase):
             for a in table.aggregates():
                 select_aggregates.append(a.qualified_sql(pika_table=pika_table))
 
-                aggregate_columns.append(a.alias())
+                aggregate_columns.append(
+                    {"id": a.alias(), "label": a.label, "source": table.name}
+                )
                 query_attributes.append(
                     {
                         "table_name": table.name,
@@ -1126,11 +1130,12 @@ class MeltanoQuery(MeltanoBase):
 
         Returns a Tuple (sql, query_attributes, aggregate_columns)
         - sql: A string with the hda_query as a SQL:1999 compatible query
-        - query_attributes: Hash with the attributes in the the final result
-           in the same order as the one defined by the query.
+        - query_attributes: Array of hashes describing the attributes in the
+           final result in the same order as the one defined by the query.
            Keys included in the hash:
            {table_name, source_name, attribute_name, attribute_label, attribute_type}
-        - aggregate_columns: The aggregate columns in the query
+        - aggregate_columns: Array of hashes describing the aggregate columns.
+           Keys included in the hash: {id, label, source}
         """
 
         # Lists with the column names and headers of the final result when the
@@ -1198,8 +1203,6 @@ class MeltanoQuery(MeltanoBase):
                 groupby_columns_selected.add(c.column_name())
 
             for a in table.aggregates():
-                aggregate_columns.append(a.alias())
-
                 if (a.column_name() in groupby_columns_selected) or (
                     a.column_name() in aggregate_columns_selected
                 ):
@@ -1333,6 +1336,10 @@ class MeltanoQuery(MeltanoBase):
             for a in table.aggregates():
                 table_aggregates.append(
                     Field(a.alias(), table=stats_pika_table, alias=a.alias())
+                )
+
+                aggregate_columns.append(
+                    {"id": a.alias(), "label": a.label, "source": table.name}
                 )
 
                 query_attributes.append(

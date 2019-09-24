@@ -35,7 +35,7 @@ const defaultState = utils.deepFreeze({
   },
   queryAttributes: [],
   reports: [],
-  resultAggregates: {},
+  resultAggregates: [],
   results: [],
   saveReportSettings: { name: null },
   sqlErrorMessage: []
@@ -743,15 +743,7 @@ const mutations = {
     state.results = results.results
     state.keys = results.keys
     state.queryAttributes = results.queryAttributes
-    state.resultAggregates = results.aggregates.map(key => {
-      const keyIndex = results.keys.indexOf(key)
-      const attribute = results.queryAttributes[keyIndex]
-      return {
-        id: key,
-        label: attribute.attributeLabel,
-        source: attribute.sourceName
-      }
-    })
+    state.resultAggregates = results.aggregates
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
