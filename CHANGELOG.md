@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#578](https://gitlab.com/meltano/meltano/issues/578) Remove support for `tap-zuora`.
+
 ### Fixes
 
 ### Breaks

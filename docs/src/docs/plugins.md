@@ -17,7 +17,6 @@ Meltano Extractors *extract data in bulk*, and are commonly prefixed with [tap](
 - [Salesforce](#salesforce)
 - [Stripe](#stripe)
 - [Zendesk](#zendesk)
-- [Zuora](#zuora)
 
 ::: tip
 If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
@@ -400,39 +399,4 @@ export ZENDESK_API_TOKEN="yourZendeskApiToken"
 export ZENDESK_SUBDOMAIN="yourZendeskSubdomain"
 # The date uses ISO-8601 and supports time if desired
 export ZENDESK_START_DATE="yourZendeskStartDate"
-```
-
-## Zuora
-
-`tap-zuora` is an extractor that pulls data from a Zuora REST API and produces JSON-formatted data following the [Singer spec](https://github.com/singer-io/getting-started/blob/master/SPEC.md).
-
-### Info
-
-- **Data Source**: [Zuora REST API](https://www.zuora.com/developer/API-Reference/)
-- **Repository**: [https://github.com/singer-io/tap-zuora](https://github.com/singer-io/tap-zuora)
-
-### Install
-
-1. Navigate to your Meltano project in the terminal
-2. Run the following command:
-
-```bash
-meltano add extractor tap-zuora
-```
-
-If you are successful, you should see `Added and installed extractors 'tap-zuora'` in your terminal.
-
-### Configuration
-
-1. Open your project's `.env` file in a text editor
-1. Add the following variables to your file:
-
-```bash
-export ZUORA_USERNAME=""
-export ZUORA_PASSWORD=""
-export ZUORA_API_TOKEN=""   # preferred to ZUORA_PASSWORD
-export ZUORA_API_TYPE=""    # specifically 'REST' or 'AQuA'
-export ZUORA_PARTNER_ID=""  # optional, only for the 'AQuA` API type
-export ZUORA_START_DATE=""
-export ZUORA_SANDBOX=""     # specifically 'true' or 'false'
 ```
