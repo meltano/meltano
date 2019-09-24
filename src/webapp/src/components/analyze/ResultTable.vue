@@ -12,14 +12,14 @@ export default {
   },
   computed: {
     ...mapState('designs', [
-      'resultAggregates',
       'queryAttributes',
-      'order',
-      'results'
+      'results',
+      'resultAggregates',
+      'order'
     ]),
     ...mapGetters('designs', [
-      'hasResults',
       'getFormattedValue',
+      'hasResults',
       'isColumnSelectedAggregate'
     ]),
     getAssignedOrderable() {
