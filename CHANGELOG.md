@@ -36,6 +36,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1005](https://gitlab.com/meltano/meltano/issues/1005) Fix installed plugins endpoints listing identically named plugins of different types under wrong type
+- [#1004](https://gitlab.com/meltano/meltano/issues/1004) Fix error when deselecting last attribute in Analyze
 
 
 ## 0.42.1 - (2019-09-19)
