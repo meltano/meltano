@@ -323,9 +323,7 @@ const mutations = {
 
   setPipelines(state, pipelines) {
     pipelines.forEach(pipeline => {
-      pipeline.startDate = utils.getDateStringAsIso8601OrNull(
-        pipeline.startDate
-      )
+      pipeline.startDate = utils.dateIso8601(pipeline.startDate)
     })
     state.pipelines = pipelines
   },
@@ -335,7 +333,7 @@ const mutations = {
   },
 
   updatePipelines(state, pipeline) {
-    pipeline.startDate = utils.getDateStringAsIso8601OrNull(pipeline.startDate)
+    pipeline.startDate = utils.dateIso8601(pipeline.startDate)
     state.pipelines.push(pipeline)
   }
 }

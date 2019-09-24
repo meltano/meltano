@@ -2,7 +2,8 @@
 export default {
   name: 'ScheduleTableHead',
   props: {
-    hasActions: { type: Boolean, default: false }
+    hasActions: { type: Boolean, default: false },
+    hasStartDate: { type: Boolean, default: false }
   }
 }
 </script>
@@ -55,12 +56,12 @@ export default {
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>
       </th>
-      <th class="has-text-centered">
-        <span>Catch-up Date</span>
+      <th v-if="hasStartDate" class="has-text-centered">
+        <span>Start Date</span>
         <span
           class="icon has-text-grey-light tooltip is-tooltip-multiline"
           :class="{ 'is-tooltip-left': !hasActions }"
-          data-tooltip="The oldest date from which to extract data as part of this scheduled ELT pipeline. 'None' uses the Extractor's default Start Date."
+          data-tooltip="The oldest date from which to extract data as part of this scheduled ELT pipeline. Currently, the extractor's Start Date value is used."
         >
           <font-awesome-icon icon="info-circle"></font-awesome-icon>
         </span>

@@ -2,24 +2,17 @@
 import { mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
-import Dropdown from '@/components/generic/Dropdown'
-import InputDateIso8601 from '@/components/generic/InputDateIso8601'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-
-import utils from '@/utils/utils'
 
 import _ from 'lodash'
 
 export default {
   name: 'CreateScheduleModal',
   components: {
-    Dropdown,
-    InputDateIso8601,
     ScheduleTableHead
   },
   data() {
     return {
-      hasCatchupDate: false,
       intervalOptions: [
         '@once',
         '@hourly',
@@ -35,7 +28,6 @@ export default {
         loader: '',
         transform: '',
         interval: '',
-        startDate: null,
         isRunning: false
       }
     }
@@ -44,16 +36,10 @@ export default {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
     ...mapState('plugins', ['installedPlugins']),
-    getFormattedDateStringYYYYMMDD() {
-      return utils.formatDateStringYYYYMMDD(this.pipeline.startDate)
-    },
-    getInputDateMeta() {
-      return utils.getInputDateMeta()
-    },
     isSaveable() {
       const hasOwns = []
       _.forOwn(this.pipeline, val => hasOwns.push(val))
-      return hasOwns.find(val => val === '') === undefined
+      return hasOwns.find(val => val === '' || val === null) === undefined
     }
   },
   created() {
@@ -110,12 +96,6 @@ export default {
           this.isSaving = false
           Vue.toasted.global.error(error.response.data.code)
         })
-    },
-    setHasCatchupDate(val) {
-      this.hasCatchupDate = val
-      if (!this.hasCatchupDate) {
-        this.pipeline.startDate = null
-      }
     }
   }
 }
@@ -226,53 +206,6 @@ export default {
                       >
                     </select>
                   </span>
-                </div>
-              </td>
-              <td>
-                <div class="control is-expanded">
-                  <Dropdown
-                    :label="
-                      hasCatchupDate ? getFormattedDateStringYYYYMMDD : 'None'
-                    "
-                    :button-classes="
-                      pipeline.startDate || !hasCatchupDate
-                        ? 'is-outlined has-text-success'
-                        : ''
-                    "
-                    is-right-aligned
-                    is-full-width
-                  >
-                    <div class="dropdown-content">
-                      <a
-                        class="dropdown-item"
-                        data-dropdown-auto-close
-                        @click="setHasCatchupDate(false)"
-                      >
-                        None
-                      </a>
-                      <hr class="dropdown-divider" />
-                      <div>
-                        <div class="dropdown-item">
-                          <InputDateIso8601
-                            v-model="pipeline.startDate"
-                            name="catchup-start"
-                            :input-classes="
-                              `is-small ${
-                                pipeline.startDate ? 'has-text-success' : ''
-                              }`
-                            "
-                          />
-                          <button
-                            class="button is-interactive-primary is-outlined is-small is-inline"
-                            data-dropdown-auto-close
-                            @click="setHasCatchupDate(true)"
-                          >
-                            Set
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </Dropdown>
                 </div>
               </td>
             </tr>
