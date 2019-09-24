@@ -269,23 +269,18 @@
         </p>
 
         <div class="el-logos">
-          <img src="../assets/gitlab-logo.png" alt="GitLab Logo" />
-          <img src="../assets/stripe-logo.png" alt="Stripe Logo" />
-          <img src="../assets/csv-logo.png" alt="CSV Logo" />
-          <img src="../assets/salesforce-logo.png" alt="Salesforce Logo" />
-          <img src="../assets/sqlite-logo.png" alt="SQLite Logo" />
-          <img src="../assets/zendesk-logo.png" alt="Zendesk Logo" />
-          <img src="../assets/marketo-logo.png" alt="Marketo Logo" />
-          <div class="carbon-intensity-logo">
-            <img
-              src="../assets/carbon-intensity-logo.png"
-              alt="Carbon Intensity Favicon"
-            />
-            Carbon Intensity API
-          </div>
-          <img src="../assets/fastly-logo.png" alt="Fastly Logo" />
-          <img src="../assets/mongodb-logo.png" alt="MongoDB Logo" />
-          <img src="../assets/snowflake-logo.png" alt="Snowflake Logo" />
+          <img src="../assets/logo-gitlab.png" alt="GitLab Logo" />
+          <img src="../assets/logo-stripe.png" alt="Stripe Logo" />
+          <img src="../assets/logo-csv.png" alt="CSV Logo" />
+          <img src="../assets/logo-salesforce.png" alt="Salesforce Logo" />
+          <img src="../assets/logo-sqlite.png" alt="SQLite Logo" />
+          <img src="../assets/logo-zendesk.png" alt="Zendesk Logo" />
+          <img src="../assets/logo-zuora.png" alt="Zuora Logo" />
+          <img src="../assets/logo-marketo.png" alt="Marketo Logo" />
+          <img src="../assets/logo-nationalgrid.png" alt="National Grid ESO" />
+          <img src="../assets/logo-fastly.png" alt="Fastly Logo" />
+          <img src="../assets/logo-mongodb.png" alt="MongoDB Logo" />
+          <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
         </div>
 
         <p class="description ta-c">
@@ -723,6 +718,8 @@ export default {
   img {
     max-width: 200px;
     margin: 0 auto;
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
   }
 }
 
@@ -737,7 +734,6 @@ export default {
   padding: 30px;
 }
 
-
 @media (min-width: 425px) {
   .el-logos {
     grid-template-columns: 1fr 1fr;
@@ -746,7 +742,7 @@ export default {
 
 @media (min-width: 768px) {
   .el-logos {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 
     img {
       max-width: 200px;
