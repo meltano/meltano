@@ -78,7 +78,7 @@ export default {
 
     <div v-if="getHasPipelines" class="box">
       <table class="table is-fullwidth is-narrow is-hoverable">
-        <ScheduleTableHead has-actions />
+        <ScheduleTableHead has-actions has-start-date />
 
         <tbody>
           <template v-for="pipeline in pipelines">

@@ -208,20 +208,12 @@ def save_pipeline_schedule() -> Response:
     loader = incoming["loader"]
     transform = incoming["transform"]
     interval = incoming["interval"]
-    start_date = incoming["start_date"]
 
     project = Project.find()
     schedule_service = ScheduleService(db.session, project)
 
     try:
-        schedule = schedule_service.add(
-            name,
-            extractor,
-            loader,
-            transform,
-            interval,
-            start_date=iso8601_datetime(start_date),
-        )
+        schedule = schedule_service.add(name, extractor, loader, transform, interval)
         return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:
         raise ScheduleAlreadyExistsError(e.schedule)
