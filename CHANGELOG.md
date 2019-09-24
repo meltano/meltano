@@ -3,20 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#854](https://gitlab.com/meltano/meltano/issues/854) Charts now use pretty labels rather than the ID
+- [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of default "Start Date" of extractor
 - [#578](https://gitlab.com/meltano/meltano/issues/578) Remove support for `tap-zuora`.
 
 ### Fixes
 
-### Breaks
+- [#1004](https://gitlab.com/meltano/meltano/issues/1004) Fix error when deselecting last attribute in Analyze
 
+### Breaks
 
 ## 0.43.0 - (2019-09-23)
 
@@ -30,14 +33,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#891](https://gitlab.com/meltano/meltano/issues/891) Contributors can run webapp from root directory
-- [#854](https://gitlab.com/meltano/meltano/issues/854) Charts now use pretty labels rather than the ID
-- [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of default "Start Date" of extractor
 
 ### Fixes
 
 - [#1005](https://gitlab.com/meltano/meltano/issues/1005) Fix installed plugins endpoints listing identically named plugins of different types under wrong type
-- [#1004](https://gitlab.com/meltano/meltano/issues/1004) Fix error when deselecting last attribute in Analyze
-
 
 ## 0.42.1 - (2019-09-19)
 
