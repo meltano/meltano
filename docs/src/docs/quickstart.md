@@ -22,31 +22,6 @@ This will create a new directory named `PROJECT_NAME` and initialize Meltano's b
 For those new to the command line, your `PROJECT_NAME` should not have spaces in the name and should use dashes instead. For example, `my project` will not work; but `my-project` will.
 :::
 
-### Anonymous usage data
-
-By default, Meltano shares anonymous usage data with the Meltano team using Google Analytics. We use this data to learn about the size of our user base and the specific Meltano features they are (not yet) using, which helps us determine the highest impact changes we can make in each weekly release to make Meltano even more useful for you and others like you.
-
-If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
-
-- When creating a new project, pass `--no_usage_stats` to `meltano init`:
-
-  ```bash
-  meltano init PROJECT_NAME --no_usage_stats
-  ```
-
-- In an existing project, disable the `send_anonymous_usage_stats` setting in the `meltano.yml` file:
-
-  ```bash
-  send_anonymous_usage_stats: false
-  ```
-
-- To disable tracking in all projects in one go, set the `MELTANO_DISABLE_TRACKING` environment variable to `True`:
-
-  ```bash
-  # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-  export MELTANO_DISABLE_TRACKING=True
-  ```
-
 ## Starting the Meltano UI
 
 Now that you've created your first Meltano project, change to the new directory and start the Meltano UI:

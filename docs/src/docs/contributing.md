@@ -92,6 +92,15 @@ yarn serve
 
 The development build of the Meltano UI will be available at <http://localhost:8080/>.
 
+If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
+
+```bash
+# The URL where the web app will be located when working locally in development
+# since it provides the redirect after authentication.
+# Not require for production
+export MELTANO_UI_URL = ""
+```
+
 ## Meltano System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
