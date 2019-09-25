@@ -1,18 +1,24 @@
 <script>
 export default {
-  name: 'TutorialTable',
-}
+  name: "TutorialTable"
+};
 </script>
 
 <template>
-  <div class='tutorial-container'>
+  <div class="tutorial-container">
     <div class="tutorial-item">
       <h2 class="tutorial-header">Table of Content</h2>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#starter-carbon-emissions">Starter - Carbon Emissions</a></div>
+      <div class="tutorial-header">
+        <a href="#starter-carbon-emissions">Starter - Carbon Emissions</a>
+      </div>
       <div>
-        <p>Experience a taste of data extraction and loading using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
+        <p>
+          Experience a taste of data extraction and loading using Meltano CLI
+          followed by analysis using Meltano UI with its automatic SQL
+          generation.
+        </p>
         <ul>
           <li>SQLite database</li>
           <li>No authentication</li>
@@ -21,9 +27,15 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#intermediate-salesforce">Intermediate - Salesforce</a></div>
+      <div class="tutorial-header">
+        <a href="#intermediate-salesforce">Intermediate - Salesforce</a>
+      </div>
       <div>
-        <p>Experience the full extract, load, and transorm pipeline with authentication using Meltano CLI followed by analysis using Meltano UI with its automatic SQL generation.</p>
+        <p>
+          Experience the full extract, load, and transorm pipeline with
+          authentication using Meltano CLI followed by analysis using Meltano UI
+          with its automatic SQL generation.
+        </p>
         <ul>
           <li>Postgres database</li>
           <li>Authentication</li>
@@ -32,7 +44,28 @@ export default {
       </div>
     </div>
     <div class="tutorial-item">
-      <div class='tutorial-header'><a href="#advanced-adding-custom-transformations-and-models">Advanced - Adding Custom Transformations and Models</a></div>
+      <div class="tutorial-header">
+        <a href="#intermediate-gitlab">Intermediate - GitLab</a>
+      </div>
+      <div>
+        <p>
+          Experience the full extract, load, and transorm pipeline with
+          authentication using Meltano CLI followed by analysis using Meltano UI
+          with its automatic SQL generation.
+        </p>
+        <ul>
+          <li>Postgres database</li>
+          <li>Authentication</li>
+          <li>Your private GitLab dataset</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#advanced-adding-custom-transformations-and-models">
+          Advanced - Adding Custom Transformations and Models
+        </a>
+      </div>
       <div>
         <p>Experience building custom transforms and models.</p>
         <ul>
@@ -44,7 +77,44 @@ export default {
         </ul>
       </div>
     </div>
-
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#advanced-using-tap-postgres-with-meltano">
+          Advanced - Using tap-postgres with Meltano
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to run <code>tap-postgres</code> with
+          <code>target-postgres</code> in Meltano.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#advanced-loading-csv-files-to-a-database">
+          Advanced - Loading CSV files to a Database
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to load data stored in multiple CSV files to a Postgres
+          Database and then use Custom Transforms and Models to combine them
+          together and analyze the results.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#using-jupyter-notebooks">Using Jupyter Notebooks</a>
+      </div>
+      <div>
+        <p>
+          Learn how to connect Jupyter Notebook to a Meltano Project that uses
+          Postgres to store the transformed data.
+        </p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -58,19 +128,19 @@ export default {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  padding-left: .5rem;
-  padding-right: .5rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 .tutorial-header {
   font-weight: bold;
-  padding-bottom: .75rem;
-  margin-right: .75rem;
+  padding-bottom: 0.75rem;
+  margin-right: 0.75rem;
   border-bottom: 1px solid #eaecef;
 }
 
 @media screen and (min-width: 768px) {
-	.tutorial-item {
+  .tutorial-item {
     padding-left: 0;
-	}
+  }
 }
 </style>
