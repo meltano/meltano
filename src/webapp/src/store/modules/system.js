@@ -45,8 +45,6 @@ const actions = {
 
               if (compareVersions.compare(version, state.version, '>')) {
                 commit('setVersion', version)
-
-                // refresh the page?
                 resolve(version)
               }
             })

@@ -10,6 +10,7 @@ import lodash from 'lodash'
 import App from './App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
+import Upgrade from '@/middleware/upgrade'
 import flaskContext from '@/flask'
 import router from './router'
 import store from './store'
@@ -34,6 +35,11 @@ Vue.use(Auth, {
 })
 
 Vue.use(FatalError, {
+  router,
+  toasted: Vue.toasted
+})
+
+Vue.use(Upgrade, {
   router,
   toasted: Vue.toasted
 })
@@ -85,6 +91,18 @@ Vue.toasted.register(
     duration: 5000,
     type: 'error'
   })
+)
+
+// Register a Global error notification
+Vue.toasted.register(
+  'upgrade',
+  "A new version of this application is available, please refresh.",
+  {
+    action: [{ text: "Refresh!", onClick: () => document.location.reload() }],
+    duration: null,
+    singleton: true,
+    type: 'warning'
+  }
 )
 
 // Axios config

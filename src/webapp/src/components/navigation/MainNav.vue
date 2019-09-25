@@ -57,7 +57,9 @@ export default {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
     },
     startUpgrade() {
-      this.$store.dispatch('system/upgrade')
+      this.$store.dispatch('system/upgrade').then(() => {
+        document.location.reload()
+      })
     }
   }
 }

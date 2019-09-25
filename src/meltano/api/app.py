@@ -9,6 +9,7 @@ from flask_cors import CORS
 from importlib import reload
 from urllib.parse import urlsplit
 
+import meltano
 from meltano.core.project import Project
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.plugin.error import PluginMissingError
@@ -118,6 +119,8 @@ def create_app(config={}):
             g.jsContext["isSendAnonymousUsageStats"] = True
             g.jsContext["clientId"] = tracker.client_id
 
+        g.jsContext["version"] = meltano.__version__
+
         try:
             airflow = ConfigService(project).find_plugin("airflow")
             settings = PluginSettingsService(project)
@@ -138,6 +141,8 @@ def create_app(config={}):
             request_message += f" as {current_user}"
 
         logger.info(request_message)
+
+        res.headers["X-Meltano-Version"] = meltano.__version__
         return res
 
     return app

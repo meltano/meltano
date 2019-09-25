@@ -78,3 +78,9 @@ RESTFUL_JSON = {}
 # -----------------
 
 EXECUTOR_PROPAGATE_EXCEPTIONS = True
+
+
+# Flask-CORS
+# -----------------
+
+CORS_EXPOSE_HEADERS = ["X-Meltano-Version"]
