@@ -45,6 +45,23 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
+        <a href="#intermediate-gitlab">Intermediate - GitLab</a>
+      </div>
+      <div>
+        <p>
+          Experience the full extract, load, and transorm pipeline with
+          authentication using Meltano CLI followed by analysis using Meltano UI
+          with its automatic SQL generation.
+        </p>
+        <ul>
+          <li>Postgres database</li>
+          <li>Authentication</li>
+          <li>Your private GitLab dataset</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
         <a href="#advanced-adding-custom-transformations-and-models">
           Advanced - Adding Custom Transformations and Models
         </a>
@@ -58,6 +75,44 @@ export default {
           <li>Custom transforms</li>
           <li>Custom models</li>
         </ul>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#advanced-using-tap-postgres-with-meltano">
+          Advanced - Using tap-postgres with Meltano
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to run <code>tap-postgres</code> with
+          <code>target-postgres</code> in Meltano.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#advanced-loading-csv-files-to-a-database">
+          Advanced - Loading CSV files to a Database
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to load data stored in multiple CSV files to a Postgres
+          Database and then use Custom Transforms and Models to combine them
+          together and analyze the results.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="#using-jupyter-notebooks">Using Jupyter Notebooks</a>
+      </div>
+      <div>
+        <p>
+          Learn how to connect Jupyter Notebook to a Meltano Project that uses
+          Postgres to store the transformed data.
+        </p>
       </div>
     </div>
   </div>
