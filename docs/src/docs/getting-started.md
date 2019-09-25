@@ -31,7 +31,7 @@ You should see now see the Extractors page, which contains various options for c
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/getting-started-01.png)
 
-For this guide, let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. Once it is complete, you should be greeted with the following modal:
+For this guide, we will be following the "Fast Path" to get you up and running as quickly as possible. So let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. Once it is complete, you should be greeted with the following modal:
 
 ![Modal confirmation that tap-carbon-intensity is installed, doesn't require configuration and allow you to progress to the next step](/images/getting-started-guide/getting-started-02.png)
 
