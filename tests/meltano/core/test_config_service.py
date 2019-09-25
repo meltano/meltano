@@ -54,7 +54,6 @@ class TestConfigService:
     def subject(self, project):
         make_meltano_yml(project)
         make_database_yml(project)
-        project.reload()
 
         return ConfigService(project)
 

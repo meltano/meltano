@@ -141,15 +141,3 @@ def create_app(config={}):
         return res
 
     return app
-
-
-def start(project, **kwargs):
-    app_config = kwargs.pop("app_config", {})
-    app = create_app(app_config)
-    from .security.identity import create_dev_user
-
-    with app.app_context():
-        # TODO: alembic migration
-        create_dev_user()
-
-    app.run(**kwargs)

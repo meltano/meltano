@@ -36,12 +36,10 @@ class TestCliAdd:
         assert res.exit_code == 0, res.stdout
         assert f"Installed '{plugin_name}'." in res.stdout
 
-        project.reload()
         plugin = config_service.find_plugin(plugin_name, plugin_type)
 
     def test_add_missing(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-unknown"])
-        project.reload()
 
         assert res.exit_code == 1
         assert "'tap-unknown' is not supported" in res.stdout
@@ -54,7 +52,6 @@ class TestCliAdd:
     @pytest.mark.xfail(reason="Uninstall not implemented yet.")
     def test_add_fails(self, project, cli_runner, config_service):
         res = cli_runner.invoke(cli, ["add", "extractor", "tap-mock"])
-        project.reload()
 
         assert res.exit_code == 1, res.stdout
         assert "Failed to install plugin 'tap-mock'" in res.stdout
@@ -83,7 +80,6 @@ class TestCliAdd:
             cli, ["add", "--custom", "extractor", "tap-custom"], input=stdin
         )
 
-        project.reload()
         plugin = config_service.find_plugin("tap-custom", PluginType.EXTRACTORS)
         assert plugin.name == "tap-custom"
         assert plugin.executable == "tap-custom-bin"

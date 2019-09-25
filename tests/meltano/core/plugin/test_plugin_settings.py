@@ -48,12 +48,18 @@ class TestPluginSettingsService:
         )
 
         # overriden via the `meltano.yml` configuration
-        project._meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
+        original_meltano = project.meltano
+        with project.meltano_update() as meltano:
+            meltano["plugins"]["extractors"][0]["config"] = {"test": 42}
+
         assert subject.get_value(session, tap, "test") == (
             42,
             PluginSettingValueSource.MELTANO_YML,
         )
-        project.reload()
+
+        # revert back to the original
+        with project.meltano_update() as meltano:
+            meltano.update(original_meltano)
 
         # overriden via ENV
         monkeypatch.setenv("PYTEST_TEST", "N33DC0F33")

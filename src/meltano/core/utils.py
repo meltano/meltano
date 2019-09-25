@@ -159,8 +159,10 @@ def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-def coerce_datetime(d: Union[date, datetime]) -> datetime:
+def coerce_datetime(d: Union[date, datetime]) -> Optional[datetime]:
     """Adds a `time` component to `d` if such a component is missing."""
+    if d is None:
+        return None
 
     if isinstance(d, datetime):
         return d
@@ -173,7 +175,7 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
         return None
 
     try:
-        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%SZ")
+        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%S")
     except:
         pass
 

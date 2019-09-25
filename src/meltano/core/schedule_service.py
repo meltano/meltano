@@ -7,7 +7,7 @@ from .plugin.settings_service import PluginSettingsService, PluginSettingMissing
 from .project import Project
 from .plugin import PluginType, PluginRef
 from .db import project_engine
-from .utils import nest, iso8601_datetime
+from .utils import nest, iso8601_datetime, coerce_datetime
 
 
 class ScheduleAlreadyExistsError(Exception):
@@ -43,7 +43,7 @@ class ScheduleService:
         start_date: Optional[datetime] = None,
         **env,
     ):
-        start_date = start_date or self.default_start_date(session, extractor)
+        start_date = coerce_datetime(start_date) or self.default_start_date(session, extractor)
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )
@@ -65,11 +65,11 @@ class ScheduleService:
 
         # TODO: this coercion should be handled by the `kind` attribute
         # on the actual setting
-        if isinstance(start_date, datetime):
-            return start_date
-
         if isinstance(start_date, date):
             return coerce_datetime(start_date)
+
+        if isinstance(start_date, datetime):
+            return start_date
 
         return iso8601_datetime(start_date) or datetime.utcnow()
 
@@ -81,7 +81,7 @@ class ScheduleService:
         with self.project.meltano_update() as meltano:
             # find the orchestrator plugin config
             schedules = nest(meltano, "schedules", value=[])
-            schedules.append(dict(schedule._asdict()))
+            schedules.append(self.schedule_definition(schedule))
 
         return schedule
 
@@ -92,5 +92,15 @@ class ScheduleService:
         )
 
     @classmethod
+    def schedule_definition(cls, schedule: Schedule) -> dict:
+        definition = schedule._asdict()
+
+        if schedule.start_date:
+            definition["start_date"] = schedule.start_date.isoformat()
+
+        return dict(definition)
+
+    @classmethod
     def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
-        return Schedule(**schedule_definition)
+        start_date = iso8601_datetime(schedule_definition.pop("start_date"))
+        return Schedule(start_date=start_date, **schedule_definition)
