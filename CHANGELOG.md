@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1045](https://gitlab.com/meltano/meltano/issues/1045) Make it clear that 'meltano add' is not hanging while installing plugins
+- [#1000](https://gitlab.com/meltano/meltano/issues/1000) Update Getting Started guide with updated screenshots and content
 - [#854](https://gitlab.com/meltano/meltano/issues/854) Charts now use pretty labels rather than the ID
 - [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of default "Start Date" of extractor
 - [#578](https://gitlab.com/meltano/meltano/issues/578) Remove support for `tap-zuora`.
