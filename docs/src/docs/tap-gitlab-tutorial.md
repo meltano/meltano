@@ -153,3 +153,17 @@ meltano elt tap-gitlab target-postgres --transform run
 Depending on the group(s) and project(s) you chose, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `GITLAB_API_START_DATE` not too far in the past for your first test.
 
 You should now see the data being fetched and your Postgres database properly populated once it is complete. Congratulations!
+
+## Add Model
+
+Now, you can add the model so that you'll be able to visualize the transformed data in the UI:
+
+```bash 
+meltano add model model-gitlab
+```
+
+## Interact with Your Data in The Web App
+
+With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
+
+Follow [these instructions](./tutorial.html#interact-with-your-data-in-the-web-app) to start Meltano UI, set up a connection to your Postgres, and start exploring!
