@@ -1,9 +1,8 @@
 config:
-    send_anonymous_usage_stats: False
-    use_colors: True
-
+  send_anonymous_usage_stats: False
+  use_colors: True
 meltano:
-  target: meltano_webapp
+  target: postgres
   outputs:
     postgres:
       type: postgres
@@ -13,4 +12,4 @@ meltano:
       user: "{{ env_var('PG_USERNAME') }}"
       pass: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: "{{ env_var('PG_SCHEMA') }}"
+      schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
