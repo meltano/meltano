@@ -28,24 +28,24 @@ By default, Meltano shares anonymous usage data with the Meltano team using Goog
 
 If you'd prefer to use Meltano _without_ sending the team this kind of data, you can disable tracking entirely using one of these methods:
 
-- When creating a new project, pass `--no_usage_stats` to `meltano init`: 
+- When creating a new project, pass `--no_usage_stats` to `meltano init`:
 
-    ```bash
-    meltano init PROJECT_NAME --no_usage_stats
-    ```
+  ```bash
+  meltano init PROJECT_NAME --no_usage_stats
+  ```
 
 - In an existing project, disable the `send_anonymous_usage_stats` setting in the `meltano.yml` file:
 
-    ```bash
-    send_anonymous_usage_stats: false
-    ```
+  ```bash
+  send_anonymous_usage_stats: false
+  ```
 
-- To disable tracking in all projects in one go, set the `MELTANO_DISABLE_TRACKING` environment variable to `True`: 
+- To disable tracking in all projects in one go, set the `MELTANO_DISABLE_TRACKING` environment variable to `True`:
 
-    ```bash
-    # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-    export MELTANO_DISABLE_TRACKING=True
-    ```
+  ```bash
+  # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
+  export MELTANO_DISABLE_TRACKING=True
+  ```
 
 ## Starting the Meltano UI
 
@@ -58,13 +58,13 @@ meltano ui
 
 Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
 
-Open your web browser and visit  [http://localhost:5000](http://localhost:5000) to get started.
+Open your web browser and visit [http://localhost:5000](http://localhost:5000) to get started.
 
 ## Connecting Data Sources
 
 When you visit [http://localhost:5000](http://localhost:5000), you should see:
 
-Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
+Do this in the Meltano UI under "Pipelines" in _Step 1, Extractors_. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
 
 ![Meltano UI with all extractors not installed initial loading screen](/screenshots/meltano-extractors-newinstall.png)
 
@@ -72,7 +72,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 1, Extractors*. [http://loc
 
 Data sources can contain a LOT of different entities, and you might not want Meltano to pull every data source into your dashboard. In this step, you can choose which to include by clicking the "Edit Selections" button of an installed extractor.
 
-Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
+Do this in the Meltano UI under "Pipelines" in _Step 2, Entities_. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
 
 ![Meltano UI pipeline entities screen new install](/screenshots/meltano-pipeline-entities-quickstart.png)
 
@@ -80,7 +80,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 2, Entities*. [http://local
 
 Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored.
 
-Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
+Do this in the Meltano UI under "Pipelines" in _Step 3, Loaders_. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
 
 ![Meltano UI pipeline targets new install](/screenshots/meltano-pipelines-targets-quickstart.png)
 
@@ -88,7 +88,7 @@ Do this in the Meltano UI under "Pipelines" in *Step 3, Loaders*. [http://localh
 
 Now that you've selected your reporting database, you can schedule and run your ELT pipeline.
 
-Do this in the Meltano UI under "Pipelines" in *Step 4, Schedules*. [http://localhost:5000/pipelines/schedules](http://localhost:5000/pipelines/schedules)
+Do this in the Meltano UI under "Pipelines" in _Step 4, Schedules_. [http://localhost:5000/pipelines/schedules](http://localhost:5000/pipelines/schedules)
 
 ![Meltano UI pipeline schedules screen create schedule](/screenshots/meltano-ui-create-schedule.png)
 
@@ -109,11 +109,12 @@ For a deeper explanation of how to use Meltano Orchestration with Airflow, visit
 Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!
 
 There are just three steps to take:
+
 1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
 2. Click the Install button of your desired analysis model
 3. Once installed, click the corresponding analysis model's Analyze button
 
-  ![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
+![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
 
 You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
 
@@ -122,7 +123,6 @@ Begin exploring, querying, and visualizing your data using Meltano Analyze.
 ![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
 
 After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
-
 
 ## Doing More With Meltano
 
