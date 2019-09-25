@@ -108,7 +108,7 @@ Meltano Models determine how the data is defined and assists us with interactive
 
 Let's move on to the next step by clicking `Analyze` in the `model-carbon-intensity-sqlite` card to move on to the next step.
 
-## Analyze your data
+## Analyze the data
 
 The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
 
@@ -135,7 +135,7 @@ And with that, the big moment is upon us, it's time to click `Run` to run our qu
 
 You should now see a beautiful data visualization and a table below to see the data in detail!
 
-## Save the report
+## Save a report
 
 When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
 
@@ -147,7 +147,7 @@ Once we click `Save`, we should see the upper left "Untitled Report" change to o
 
 And with that, our analysis has been saved!
 
-## Add it to a dashboard
+## Add a report to a dashboard
 
 As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
 
