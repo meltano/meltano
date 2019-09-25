@@ -117,7 +117,7 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(f"Added '{plugin_name}' to your Meltano project.")
+        click.secho(f"Added '{plugin_name}' to your Meltano project.", fg="green")
     except PluginAlreadyAddedException as err:
         click.secho(
             f"'{plugin_name}' was found in your Meltano project. Use `meltano install` to install it.",
