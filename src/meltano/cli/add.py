@@ -130,6 +130,7 @@ def add_plugin(
         raise click.Abort()
 
     try:
+        click.secho(f"Installing '{plugin_name}'...")
         install_service = PluginInstallService(project)
         run = install_service.install_plugin(plugin)
         click.secho(run.stdout)
