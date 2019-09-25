@@ -96,7 +96,7 @@ export GITLAB_API_TOKEN=I8vxHsiVAaDnAX3hA
 ...
 ```
 
-### Gitlab API Projects
+### Projects
 
 This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
 
@@ -113,7 +113,7 @@ export GITLAB_API_PROJECTS=meltano/meltano
 ...
 ```
 
-### GitLab API Groups
+### Groups
 
 This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repo URL. If this is left blank, the extractor will try to fetch all groups within GitLab.
 
@@ -129,7 +129,7 @@ export GITLAB_API_GROUPS=meltano
 ...
 ```
 
-### GitLab API Start Date
+### Start Date
 
 This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try fetch the entire history of the groups or projects if they are defined.
 
@@ -142,16 +142,28 @@ export GITLAB_API_START_DATE=2019-05-01T00:00:00Z
 ...
 ```
 
-## Running tap-gitlab
+## Run ELT (extract, load, transform)
 
-Now that everything is setup, we can run our extractor with the following command:
+Now that everything is setup, we can run the full Extract > Load > Transform pipeline with the following command:
 
 ```bash
-PG_SCHEMA='tap_gitlab' meltano elt tap-gitlab target-postgres
+meltano elt tap-gitlab target-postgres --transform run
 ```
 
-::: tip
-You might notice that we are declaring a specific Postgres schema at the beginning of the command. This is to ensure that the data tables do not collide with other data sources and is considered a best practice.
-:::
+Depending on the group(s) and project(s) you chose, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `GITLAB_API_START_DATE` not too far in the past for your first test.
 
 You should now see the data being fetched and your Postgres database properly populated once it is complete. Congratulations!
+
+## Add Model
+
+Now, you can add the model so that you'll be able to visualize the transformed data in the UI:
+
+```bash 
+meltano add model model-gitlab
+```
+
+## Interact with Your Data in The Web App
+
+With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
+
+Follow [these instructions](./tutorial.html#interact-with-your-data-in-the-web-app) to start Meltano UI, set up a connection to your Postgres, and start exploring!
