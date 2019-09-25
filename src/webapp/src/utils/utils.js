@@ -113,8 +113,8 @@ export default {
     hyphenateMe += value.toLowerCase().replace(/\s\s*/g, '-')
     return hyphenateMe
   },
-  inferInputType(value, defaultType) {
-    return regExpPrivateInput.test(value) ? 'password' : defaultType
+  inferInputType(value) {
+    return regExpPrivateInput.test(value) ? 'password' : 'text'
   },
   jsDashify(type, name) {
     if (!type || !name) {
