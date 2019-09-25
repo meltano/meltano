@@ -149,12 +149,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue';
+  import Vue from 'vue'
   // third-party
-  import lodash from 'lodash';
+  import lodash from 'lodash'
   // application
-  import poller from '@/utils/poller';
-  import utils from '@/utils/utils';
+  import poller from '@/utils/poller'
+  import utils from '@/utils/utils'
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
@@ -274,8 +274,8 @@ For each demo day, we need to ensure that the following process is followed:
 1. Document list of features to demo
 2. Document order of people demoing
 3. Ensure every person demoing has proper display size (i.e., font sizes, zoomed in enough, etc.)
-     - Font size at least 20px
-     - Browser zoom at least 125%
+   - Font size at least 20px
+   - Browser zoom at least 125%
 
 ### Demo Day: Workflow
 
