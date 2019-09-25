@@ -149,12 +149,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue';
+  import Vue from 'vue'
   // third-party
-  import lodash from 'lodash';
+  import lodash from 'lodash'
   // application
-  import poller from '@/utils/poller';
-  import utils from '@/utils/utils';
+  import poller from '@/utils/poller'
+  import utils from '@/utils/utils'
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
@@ -274,8 +274,8 @@ For each demo day, we need to ensure that the following process is followed:
 1. Document list of features to demo
 2. Document order of people demoing
 3. Ensure every person demoing has proper display size (i.e., font sizes, zoomed in enough, etc.)
-     - Font size at least 20px
-     - Browser zoom at least 125%
+   - Font size at least 20px
+   - Browser zoom at least 125%
 
 ### Demo Day: Workflow
 
@@ -365,86 +365,94 @@ You can use `make type=patch release` to force a patch release. This is useful w
 
 ## Dogfood Workflow
 
-1. Check that Meltano does not exist on your machine
+1. Introduce Meltano to new users:
+
+```
+Meltano is an open source data toolkit that makes it easy to go from data source to dashboard.
+
+For more information, check us out at meltano.com!
+```
+
+2. Check that Meltano does not exist on your machine
 
 ```bash
 meltano --version
 # command not found: meltano
 ```
 
-2. Install Meltano on your machine using distributed version
+3. Install Meltano on your machine using distributed version
 
 ```bash
 pip install meltano
 ```
 
-3. Check Meltano version matches latest release
+4. Check Meltano version matches latest release
 
 ```bash
 meltano --version
 ```
 
-4. Create a new Meltano project
+5. Create a new Meltano project
 
 ```bash
 meltano init dogfood-workflow
 ```
 
-5. Change directory into your new project
+6. Change directory into your new project
 
 ```bash
 cd dogfood-workflow
 ```
 
-6. Start Meltano application
+7. Start Meltano application
 
 ```
 meltano ui
 ```
 
-7. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
+8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
 
-8. When you land on the Pipelines page, install `tap-gitlab`
+9. When you land on the Pipelines page, install `tap-gitlab`
 
-9. Fill out `Private Token` with your token
+10. Fill out `Private Token` with your token
 
-10. Fill out `Groups` with `meltano`
+11. Fill out `Groups` with `meltano`
 
-11. Install `target-postgres`
+12. Install `target-postgres`
 
-12. Fill out Postgres configurations
+13. Fill out Postgres configurations
 
-13. Select `Run` for Transforms and hit `Save`.
+14. Select `Run` for Transforms and hit `Save`
 
-14. Verify `Pipeline Schedule` configurations
+15. Verify `Pipeline Schedule` configurations
 
-15. Update `Catch-up Date` with beginning of the month to minimize the data request
+16. Update `Catch-up Date` with beginning of the month to minimize the data request
 
-16. Click `Save`. Pipeline should automatically be running now
+17. Click `Save`. Pipeline should automatically be running now
 
-17. Visit `Orchestrate` link on the top nav
+18. Visit `Orchestrate` link on the top nav
 
-18. Airflow UI should appear automatically with a DAG prepopulated
+19. Airflow UI should appear automatically with a DAG prepopulated
 
-19. Verify `Pipeline Schedule` is complete before moving onto next step
+20. Verify `Pipeline Schedule` is complete before moving onto next step
 
-20. Go to `Analyze`
+21. Go to `Analyze`
 
-21. Go into `Connections` in order to update settings and click `Save`
+22. Go into `Connections` in order to update settings and click `Save`
 
-22. Click `Analyze` next to `Gitlab stats per user`
+23. Click `Analyze` next to `Gitlab stats per user`
 
-23. Select "User Name" and "Total Issues Assigned" on the left
+24. Select "User Name" and "Total Issues Assigned" on the left
 
-24. Click `Run` to the right of Query
+25. Click `Run` to the right of Query
 
-25. Verify Chart appears
+26. Verify Chart appears
 
-26. Save as new report with automatically populated name
+27. Save as new report with automatically populated name
 
-27. Add to New Dashboard with automatically populated name
+28. Add to New Dashboard with automatically populated name
 
-28. Check `Edit` functionality on existing Report
+29. Check `Edit` functionality on existing Report
 
 ## Taps & Targets Workflow
 
