@@ -44,22 +44,25 @@ meltano init [project_name] [--no_usage_stats]
 
 #### Parameters
 
-* **project_name** - This determines the folder name for the project
+- **project_name** - This determines the folder name for the project
 
 #### Options
 
-* **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project.
+- **no_usage_stats** - This flag disables sending anonymous usage data when creating a new project.
 
 ::: tip
 To disable tracking manually, you can add the following to the `meltano.yml` file:
+
 ```yaml
 send_anonymous_usage_stats: false
 ```
 
 Or you can set the following Environment variable to True and disable tracking for all your projects:
+
 ```bash
 export MELTANO_DISABLE_TRACKING=True
 ```
+
 :::
 
 ### `version`
@@ -85,12 +88,12 @@ Use the `select` command to add select patterns to a specific extractor in your 
 
 #### Select Pattern
 
-Meltano select patterns are inspired by the [glob](https://en.wikipedia.org/wiki/Glob_(programming)) syntax you might find in your operating system.
+Meltano select patterns are inspired by the [glob](<https://en.wikipedia.org/wiki/Glob_(programming)>) syntax you might find in your operating system.
 
-  - `*`: matches any sequence of characters
-  - `?`: matches one character
-  - `[abc]`: matches either `a`, `b`, or `c`
-  - `[!abc]`: matches any character **but** `a`, `b`, or `c`
+- `*`: matches any sequence of characters
+- `?`: matches one character
+- `[abc]`: matches either `a`, `b`, or `c`
+- `[!abc]`: matches any character **but** `a`, `b`, or `c`
 
 ##### Examples
 
@@ -139,10 +142,10 @@ Manipulate a plugin's configuration.
 
 Meltano uses configuration layers to resolve a plugin's configuration:
 
-  1. Environments variables
-  1. Plugin definition's `config:` attribute in **meltano.yml**
-  1. Settings set via `meltano config` or the in the UI (stored in the meltano database)
-  1. Default values set in the setting definition in **discovery.yml**
+1. Environments variables
+1. Plugin definition's `config:` attribute in **meltano.yml**
+1. Settings set via `meltano config` or the in the UI (stored in the meltano database)
+1. Default values set in the setting definition in **discovery.yml**
 
 This way, a Meltano project can stay secure in production, where environment variables shall be used for sensible settings (such as _passwords_ or _keys_) or use the settings database.
 
@@ -190,7 +193,6 @@ Transforms are basically dbt packages that reside in their own repositories. If 
 
 When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
 
-
 The format of the `meltano.yml` entries for transforms can have additional parameters. For example, the `tap-carbon-intensity` dbt package requires three variables, which are used for finding the tables where the raw Carbon Intensity data have been loaded during the Extract-Load phase:
 
 ```
@@ -231,18 +233,18 @@ Meltano provides a `schedule` method to run specified ELT pipelines at regular i
 
 ```yaml
 schedules:
-- name: test
-  interval: '@daily'
-  extractor: tap-mock
-  loader: target-mock
-  transform: skip
-  env:
-    MELTANO_JOB_ID: ''
+  - name: test
+    interval: '@daily'
+    extractor: tap-mock
+    loader: target-mock
+    transform: skip
+    env:
+      MELTANO_JOB_ID: ''
 ```
 
 ## Snowflake Permissions
 
-This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level. 
+This is an optional tool for users who want to configure permissions if they're using Snowflake as the data warehouse and want to granularly set who has access to which data at the warehouse level.
 
 Alpha-quality [Role Based Access Control (RBAC)](/docs/security-and-privacy.html#role-based-access-control-rbac-alpha) is also available.
 
@@ -402,7 +404,11 @@ When you run ELT commands on a tap or target, this is the general process for fe
 
 ## Orchestration
 
-Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs. Please find below documentation on how it can be used.
+If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow, which is automatically installed when the Meltano UI is launched for the first time.
+
+When a new pipeline schedule is created following the steps under [Running the ELT](#running-the-elt), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+
+Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs.
 
 ### Installing Airflow
 
@@ -427,6 +433,7 @@ meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
 ```
 
 Example:
+
 ```bash
 meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
@@ -439,34 +446,36 @@ IMPORTANT: Your schedule is now created, but it will not be enabled until you to
 
 To learn more about orchestration functionality, check out the [Apache Airflow documentation](https://apache.airflow.org).
 
-
-
 #### Other Things You Can Do With Airflow
 
 Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
 
-
 View 'meltano' dags:
+
 ```bash
 meltano invoke airflow list_dags
 ```
 
 Manually trigger a task to run:
+
 ```bash
 meltano invoke airflow run --raw meltano extract_load $(date -I)
 ```
 
 Start the airflow ui - currently starts in a separate browser:
+
 ```bash
 meltano invoke airflow webserver -D
 ```
 
 Start the airflow scheduler, enabling background job processing:
+
 ```bash
 meltano invoke airflow scheduler -D
 ```
 
 Trigger a dag run:
+
 ```bash
 meltano invoke airflow trigger_dag meltano
 ```

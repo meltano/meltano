@@ -2,13 +2,7 @@
 
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
-:::tip
-Remember, all interactions with the `meltano` command must be run inside the virtual environment you created in the installation process.
-
-If your prompt still starts with `(meltano)`, you're good. If not, please [re-activate your virtual environment](/docs/installation.html#activating-your-virtual-environment) before continuing.
-:::
-
-## Creating Your First Project
+## Create your first project
 
 To initialize a new project, navigate to the directory that you'd like to contain your Meltano projects, and run this command, replacing `PROJECT_NAME` with whatever you would like your new project to be called:
 
@@ -18,11 +12,7 @@ meltano init PROJECT_NAME
 
 This will create a new directory named `PROJECT_NAME` and initialize Meltano's basic directory structure inside it.
 
-:::tip
-For those new to the command line, your `PROJECT_NAME` should not have spaces in the name and should use dashes instead. For example, `my project` will not work; but `my-project` will.
-:::
-
-## Starting the Meltano UI
+## Start the application
 
 Now that you've created your first Meltano project, change to the new directory and start the Meltano UI:
 
@@ -31,74 +21,152 @@ cd PROJECT_NAME
 meltano ui
 ```
 
-Meltano is now running, so you can start adding data sources, configuring reporting databases, scheduling updates and building dashboards.
+Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
 
-Open your web browser and visit [http://localhost:5000](http://localhost:5000) to get started.
+You are now ready to add data sources, configure reporting databases, schedule updates and build dashboards!
 
-## Connecting Data Sources
+## Connect a data source
 
-When you visit [http://localhost:5000](http://localhost:5000), you should see:
+You should see now see the Extractors page, which contains various options for connecting your data source.
 
-Do this in the Meltano UI under "Pipelines" in _Step 1, Extractors_. [http://localhost:5000/pipelines/extractors](http://localhost:5000/pipelines/extractors)
+![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-01.png)
 
-![Meltano UI with all extractors not installed initial loading screen](/screenshots/meltano-extractors-newinstall.png)
+For this guide, let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. Once it is complete, you should be greeted with the following modal:
 
-## Selecting Entities
+![Modal confirmation that tap-carbon-intensity is installed, doesn't require configuration and allow you to progress to the next step](/images/getting-started-02.png)
 
-Data sources can contain a LOT of different entities, and you might not want Meltano to pull every data source into your dashboard. In this step, you can choose which to include by clicking the "Edit Selections" button of an installed extractor.
+Click `Next` to move on to the next step: "Entity Selection."
 
-Do this in the Meltano UI under "Pipelines" in _Step 2, Entities_. [http://localhost:5000/pipelines/entities](http://localhost:5000/pipelines/entities)
+## Select entities
 
-![Meltano UI pipeline entities screen new install](/screenshots/meltano-pipeline-entities-quickstart.png)
+Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. Currently, as you can see on your screen:
 
-## Selecting a Reporting Database
+![Entity Selection Modal for tap-carbon-intensity](/images/getting-started-03.png)
+
+All of the entities are currently selected by default for "tap-carbon-intensity." Since there are only a few available entities, let's leave it as is and click `Save` to finish configuring our extractor.
+
+## Determine where the data will live
+
+Once you save your entities, you should be greeted with the Loaders page:
+
+![Loader page for Meltano project](/images/getting-started-04.png)
 
 Now that Meltano is pulling data in from your data source(s), you need to choose where and in what format you would like that data stored.
 
-Do this in the Meltano UI under "Pipelines" in _Step 3, Loaders_. [http://localhost:5000/pipelines/loaders](http://localhost:5000/pipelines/loaders)
+Let's use `target-sqlite` for this project by clicking `Install` in its card.
 
-![Meltano UI pipeline targets new install](/screenshots/meltano-pipelines-targets-quickstart.png)
+Once it is finished installing, you will see that the following modal:
 
-## Running the ELT
+![Modal dialogue for successful SQLite installation](/images/getting-started-05.png)
 
-Now that you've selected your reporting database, you can schedule and run your ELT pipeline.
+By default, `target-sqlite` is configured with a database named `meltano` that can be customized if desired. For this guide however, let's just use the default name and click `Save`.
 
-Do this in the Meltano UI under "Pipelines" in _Step 4, Schedules_. [http://localhost:5000/pipelines/schedules](http://localhost:5000/pipelines/schedules)
+## Apply transformations as desired
 
-![Meltano UI pipeline schedules screen create schedule](/screenshots/meltano-ui-create-schedule.png)
+With our extractor and loader configured, you should now see the following page:
 
-## Scheduling the ELT with Orchestration
+![Screenshot of Transform page on Meltano webapp](/images/getting-started-06.png)
 
-If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow, which is automatically installed when the Meltano UI is launched for the first time.
+This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
 
-When a new pipeline schedule is created following the steps under [Running the ELT](#running-the-elt), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+By default, the Transform step is set to `Skip`, so all we need to is click `Save`.
 
-Now click "Orchestration" in the navigation bar or visit [http://localhost:5000/orchestration](http://localhost:5000/orchestration) and you will see your schedule listed within the Airflow UI.
+## Create a pipeline schedule
 
-![Meltano UI first scheduled ELT in Airflow](/screenshots/meltano-ui-first-schedule.png)
+You should now be greeted with the Schedules page with a modal to create your first pipeline!
 
-For a deeper explanation of how to use Meltano Orchestration with Airflow, visit Meltano's [Orchestration documentation](/docs/meltano-cli.html#orchestration.html).
+![Create pipeline modal](/images/getting-started-07.png)
 
-## Analyzing Your Data
+Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
 
-Congratulations! Now that you've ingested data into Meltano, created a reporting database, and scheduled regular updates to your dataset you're ready to analyze!
+In the current form, you will see:
 
-There are just three steps to take:
+- A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
+- The **extractor** the pipeline will use, which should be `tap-carbon-intensity`
+- The **loader** the pipeline will use, which should be `target-sqlite`
+- Whether the **transform** step should be applied, which should be `skip`
+- The **interval** at which the pipeline should be run, which is set by default to be `@once`
+- Finally, there is a **catch-up date** to determine how far back to extract data, which should be `None` by default
 
-1. Go to [http://localhost:5000/analyze](http://localhost:5000/analyze)
-2. Click the Install button of your desired analysis model
-3. Once installed, click the corresponding analysis model's Analyze button
+All we need to do is click `Save` to start our new pipeline! You should see a spinning icon as well as a badge next to the "Pipeline" navigation element in the header.
 
-![Meltano UI - Models Analyze](/screenshots/meltano-ui-analyze-models.png)
+![Screenshot of pipeline being run](/images/getting-started-08.png)
 
-You're Analyze page contains links for viewing corresponding analyses. Each manifests as an interactive query builder and data visualizer. Start exploring and analyzing your data and then build savable and shareable dashboards.
+Once it's complete, these indicators will disappear and you should see:
 
-Begin exploring, querying, and visualizing your data using Meltano Analyze.
+![Screenshot of complete pipeline run](/images/getting-started-09.png)
 
-![Meltano UI analyze example carbon emissions data explorer](/screenshots/meltano-ui-analyze-example.png)
+Congratulations! Now that you have connected a data source, configured a target database, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
-After you "Run Query" you can view charts and graphs, and save interesting query results to your dashboards.
+## Select a data model
 
-## Doing More With Meltano
+Let's start by clicking on the `Analyze` button in our pipeline. This should bring us to the "Analyze: Models" page:
 
-Learn about more Meltano recipes and functionality with [Advanced Tutorials](/docs/tutorial.html).
+![Screenshot of Analyze: Model page](/images/getting-started-10.png)
+
+Meltano Models determine how the data is defined and assists us with interactively generating SQL so that you can easily analyze and visualize your data. As you can see in the right column, `tap-carbon-intensity` already has the required models installed.
+
+Let's move on to the next step by clicking `Analyze` in the `model-carbon-intensity-sqlite` card to move on to the next step.
+
+## Analyze your data
+
+The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
+
+![Screenshot of Analyze page for Carbon Region](/images/getting-started-11.png)
+
+::: warning
+Before we can analyze our data, let's confirm that the database being used is correct via the dropdown in the upper right. If it says `postgresql`, switch it to `sqlite`. This will eventually be detected automatically, but a necessity at the moment.
+:::
+
+Now, let's explore and analyze our `tap-carbon-intensity` data by selecting the following attributes in the left column:
+
+- **Geographical Region**
+  - Columns: Name
+  - Aggregates: Count
+- **Electricity Generation Sources**
+  - Columns: ID
+  - Aggregates: Average Percent (%)
+
+![Screenshot of selected attributes for tap-carbon-intensity](/images/getting-started-12.png)
+
+And with that, the big moment is upon us, it's time to click `Run` to run our query!
+
+![Our query visualized as a bar graph!](/images/getting-started-13.png)
+
+You should now see a beautiful data visualization and a table below to see the data in detail!
+
+## Save the report
+
+When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
+
+![Save Report dialogue for naming the report you want to save](/images/getting-started-14.png)
+
+Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
+
+![Saved report with a designated report name](/images/getting-started-15.png)
+
+And with that, our analysis has been saved!
+
+## Add it to a dashboard
+
+As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
+
+![Dropdown menu for adding report to dashboard](/images/getting-started-16.png)
+
+Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
+
+![New dashboard dialog for configuring the dashboard](/images/getting-started-17.png)
+
+Once we click `Create`, we can now verify that the our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu.
+
+![Confirmation that our report is added to the dashboard](/images/getting-started-18.png)
+
+We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard and the associated Report.
+
+![Dashboard page with new dashboard and the associated Report](/images/getting-started-19.png)
+
+## Next steps
+
+And with that, you have now setup a complete end-to-end data solution with Meltano! 🎉
+
+To learn about more Meltano recipes and functionality with [Advanced Tutorials](/docs/tutorial.html).
