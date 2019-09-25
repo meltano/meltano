@@ -44,7 +44,7 @@ def _handle(ex):
     )
 
 
-@sqlBP.errorhandler(MissingJobLogException)
+@orchestrationsBP.errorhandler(MissingJobLogException)
 def _handle(ex):
     return (jsonify({"error": True, "code": str(ex)}), 500)
 
