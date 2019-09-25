@@ -147,12 +147,8 @@ export GITLAB_API_START_DATE=2019-05-01T00:00:00Z
 Now that everything is setup, we can run the full Extract > Load > Transform pipeline with the following command:
 
 ```bash
-PG_SCHEMA='tap_gitlab' meltano elt tap-gitlab target-postgres --transform run
+meltano elt tap-gitlab target-postgres --transform run
 ```
-
-::: tip
-You might notice that we are declaring a specific Postgres schema at the beginning of the command. This is to ensure that the data tables do not collide with other data sources and is considered a best practice.
-:::
 
 Depending on the group(s) and project(s) you chose, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `GITLAB_API_START_DATE` not too far in the past for your first test.
 
