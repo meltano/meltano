@@ -208,7 +208,7 @@ meltano elt tap-salesforce target-postgres --transform only
 ```
 
 The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
-When meltano elt tap-salesforce target-postgres --transform run is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
+When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
 
 In order to visualize the data with existing transformations in the UI, the final step would be to add models:
 
@@ -279,6 +279,10 @@ You can now query and explore the extracted data:
 - Toggle Columns and Aggregates buttons to generate the SQL query.
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data.
+
+## Intermediate - GitLab
+
+The GitLab API and Postgres database tutorial guides you through data extraction from your GitLab account, loading extracted entities to a Postgres DB, transforming the raw data, and analyzing the results. [Check it out here](/docs/tutorials/tap-gitlab.html).
 
 ## Advanced - Create a Custom Extractor
 
