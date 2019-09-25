@@ -49,7 +49,7 @@ export default {
             type = 'email'
             break
           default:
-            type = utils.inferInputType(setting.name, 'text')
+            type = utils.inferInputType(setting.name)
             break
         }
         return type

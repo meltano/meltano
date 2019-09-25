@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#854](https://gitlab.com/meltano/meltano/issues/854) Charts now use pretty labels rather than the ID
 - [#1011](https://gitlab.com/meltano/meltano/issues/1011) Removed "Catch-up Date" in favor of default "Start Date" of extractor
 - [#578](https://gitlab.com/meltano/meltano/issues/578) Remove support for `tap-zuora`.
+- [#1002](https://gitlab.com/meltano/meltano/issues/1002) Update `discovery.yml` with explicit `kind: password` metadata (we infer and set input types of `password` as a safeguard, but the explicit setting is preferred)
 
 ### Fixes
 
