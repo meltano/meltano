@@ -18,6 +18,7 @@ from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExists
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import flatten, iso8601_datetime, slugify
+from meltano.core.logging import JobLoggingService, MissingJobLogException
 from meltano.cli.add import extractor
 from meltano.api.models import db
 from meltano.api.json import freeze_keys
@@ -41,6 +42,11 @@ def _handle(ex):
         ),
         409,
     )
+
+
+@sqlBP.errorhandler(MissingJobLogException)
+def _handle(ex):
+    return (jsonify({"error": True, "code": str(ex)}), 500)
 
 
 @orchestrationsBP.route("/job/state", methods=["POST"])

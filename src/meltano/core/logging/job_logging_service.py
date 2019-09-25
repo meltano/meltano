@@ -73,7 +73,9 @@ class JobLoggingService:
 
             return log
         except FileNotFoundError:
-            raise MissingJobLogException(f"Log File {latest_log} not found")
+            raise MissingJobLogException(
+                f"Log File {latest_log} for job with id {job_id} not found"
+            )
 
     def get_all_logs(self, job_id: str):
         """

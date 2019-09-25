@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Update `discovery.yml` with explicit `kind: password` metadata (we infer and set input types of `password` as a safeguard, but the explicit setting is preferred)
 - [#1049](https://gitlab.com/meltano/meltano/issues/1049) Change default `target-sqlite` database name to `warehouse` to not conflict with system database
 - [#949](https://gitlab.com/meltano/meltano/issues/949) Update the way Meltano handles logs for ELT runs: Every elt run is logged in `.meltano/run/logs/{job_id}/elt_{timestamp}.log`. That allows Meltano to keep logs for multiple, or even concurent, elt runs with the same `job_id`.
+- [#949](https://gitlab.com/meltano/meltano/issues/949) Update the way Meltano handles logs for ELT runs: Every elt run is logged in `.meltano/run/logs/{job_id}/elt_{timestamp}.log`. That allows Meltano to keep logs for multiple, or even concurrent, elt runs with the same `job_id`.
 
 ### Fixes
 
