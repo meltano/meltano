@@ -1,0 +1,14 @@
+name: 'my_meltano_project'
+version: '1.0'
+profile: 'meltano'
+source-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+data-paths: ["data"]
+macro-paths: ["macros"]
+target-path: "../.meltano/transformers/dbt/target"  # directory which will store compiled SQL files
+clean-targets:                                      # directories to be removed by `dbt clean`
+  - "../.meltano/transformers/dbt/target"
+  - "dbt_modules"
+models:
+  my_meltano_project: null
