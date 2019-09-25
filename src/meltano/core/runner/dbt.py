@@ -37,9 +37,10 @@ class DbtRunner(Runner):
                 # inject the inferred 'schemas' from the ELTContext
                 "MELTANO_LOAD_SCHEMA": load["schema"],
                 "MELTANO_ANALYZE_SCHEMA": analyze["schema"],
-                # inject the loaders current configuration as ENV variables.
-                # that means the dbt profiles should match perfectly with the
-                # target configuration settings
+                # inject the extractor & loader configuration as ENV variables.
+                # that means dbt will have access to all the configuration of
+                # the extractor and loader
+                **settings_service.as_env(session, self.context.extractor.ref),
                 **settings_service.as_env(session, self.context.loader.ref),
             }
         except Exception as e:
