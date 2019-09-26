@@ -18,6 +18,8 @@ Meltano Extractors *extract data in bulk*, and are commonly prefixed with [tap](
 - [Stripe](#stripe)
 - [Zendesk](#zendesk)
 
+**Please note, all trademarks and logos are owned by their respective owners.**
+
 ::: tip
 If you don't see the extractor you need here, we have a [tutorial for creating your extractor](/docs/tutorial.html#advanced-create-a-custom-extractor). We are constantly working to build new extractors, and our current roadmap includes: Google Ads and Facebook Ads as next up on the list.
 :::
