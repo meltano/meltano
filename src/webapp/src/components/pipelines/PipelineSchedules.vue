@@ -18,14 +18,18 @@ export default {
       return val => utils.formatDateStringYYYYMMDD(val)
     }
   },
+  beforeRouteEnter(to, from, next) {
+    next(vm => {
+      if(from.name === 'transforms') {
+        vm.goToCreatePipeline()
+      }
+    })
+  },
   created() {
     this.$store.dispatch('configuration/getAllPipelineSchedules')
-    if (!this.getHasPipelines) {
-      this.createPipeline()
-    }
   },
   methods: {
-    createPipeline() {
+    goToCreatePipeline() {
       this.$router.push({ name: 'createSchedule' })
     },
     goToLog(jobId) {
@@ -71,7 +75,7 @@ export default {
           <div class="control">
             <button
               class="button is-interactive-primary"
-              @click="createPipeline()"
+              @click="goToCreatePipeline()"
             >
               <span>Create</span>
             </button>
@@ -149,12 +153,12 @@ export default {
                     :to="{ name: 'analyze' }"
                     >Analyze</router-link
                   >
-                  <a
+                  <button
                     class="button is-outlined is-small tooltip is-tooltip-left"
                     data-tooltip="View this ELT Pipeline's last run log."
                     :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"
-                    >Log</a
+                    >Log</button
                   >
                   <a
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"

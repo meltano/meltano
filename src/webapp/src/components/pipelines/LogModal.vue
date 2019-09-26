@@ -5,13 +5,16 @@ export default {
   name: 'LogModal',
   data() {
     return {
-      jobLog: null
+      jobLog: ''
     }
   },
   created() {
     this.jobIdFromRoute = this.$route.params.jobId
     this.getJobLog(this.jobIdFromRoute).then(
-      response => (this.jobLog = response.data)
+      response => (this.jobLog = response.data.log)
+    ).catch(error => {
+      this.jobLog = error.response.data.code
+    }
     )
   },
   methods: {
@@ -39,8 +42,9 @@ export default {
         <div class="content">
           <p>{{ jobIdFromRoute }}</p>
           <div v-if="jobLog">
-            <pre><code>{{jobLog.log}}</code></pre>
+            <pre><code>{{jobLog}}</code></pre>
           </div>
+          <progress v-else class="progress is-small is-info"></progress>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
