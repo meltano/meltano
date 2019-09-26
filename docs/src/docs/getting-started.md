@@ -39,7 +39,7 @@ Click `Next` to move on to the next step: "Entity Selection."
 
 ## Select entities
 
-Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. Currently, as you can see on your screen:
+Data sources can contain a lot of different entities. Since these may not all be relevant to the report(s) you mean to generate, you might not want Meltano to pull every single entity into your dashboard. Currently, as you can see on your screen:
 
 ![Entity Selection Modal for tap-carbon-intensity](/images/getting-started-guide/getting-started-03.png)
 
