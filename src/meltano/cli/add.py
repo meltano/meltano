@@ -117,7 +117,7 @@ def add_plugin(
 ):
     try:
         plugin = add_service.add(plugin_type, plugin_name)
-        click.secho(f"Added '{plugin_name}' to your Meltano project.")
+        click.secho(f"Added '{plugin_name}' to your Meltano project.", fg="green")
     except PluginAlreadyAddedException as err:
         click.secho(
             f"'{plugin_name}' was found in your Meltano project. Use `meltano install` to install it.",
@@ -130,6 +130,7 @@ def add_plugin(
         raise click.Abort()
 
     try:
+        click.secho(f"Installing '{plugin_name}'...")
         install_service = PluginInstallService(project)
         run = install_service.install_plugin(plugin)
         click.secho(run.stdout)
@@ -152,19 +153,23 @@ def add_transform(project: Project, plugin_name: str):
     try:
         project_add_service = ProjectAddService(project)
         plugin = project_add_service.add(PluginType.TRANSFORMS, plugin_name)
-        click.secho(f"Added transform '{plugin_name}' to your Meltano project.")
+        click.secho(
+            f"Added transform '{plugin_name}' to your Meltano project.", fg="green"
+        )
 
         # Add repo to my-test-project/transform/packages.yml
         transform_add_service = TransformAddService(project)
         transform_add_service.add_to_packages(plugin)
-        click.secho(f"Added transform '{plugin_name}' to your dbt packages", fg="green")
+        click.secho(
+            f"Added transform '{plugin_name}' to your dbt packages.", fg="green"
+        )
 
         # Add model and vars to my-test-project/transform/dbt_project.yml
         transform_add_service.update_dbt_project(plugin)
         click.secho(
-            f"Added transform '{plugin_name}' to your dbt_project.yml", fg="green"
+            f"Added transform '{plugin_name}' to your dbt_project.yml.", fg="green"
         )
         click.secho(f"Installed '{plugin_name}'.", fg="green")
     except (PluginNotSupportedException, PluginNotFoundError):
-        click.secho(f"Error: transform '{plugin_name}' is not supported", fg="red")
+        click.secho(f"Error: transform '{plugin_name}' is not supported.", fg="red")
         raise click.Abort()
