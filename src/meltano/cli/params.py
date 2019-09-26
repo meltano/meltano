@@ -1,4 +1,3 @@
-import os
 import functools
 import urllib
 import click
@@ -18,34 +17,57 @@ def db_options(func):
         envvar="MELTANO_BACKEND",
         default="sqlite",
         type=click.Choice(["sqlite", "postgresql"]),
-        help="Database backend for Meltano.",
+        help="System database backend",
     )
-    @click.option("--path", envvar="SQLITE_DATABASE", default="meltano")
+    @click.option(
+        "--path",
+        envvar="SQLITE_DATABASE",
+        default="meltano",
+        help="With database backend 'sqlite': system database path",
+    )
     @click.option(
         "-H",
         "--host",
         envvar="PG_ADDRESS",
         default="localhost",
-        help="Database address.",
+        help="With database backend 'postgresql': system database address",
     )
-    @click.option("-p", "--port", type=int, envvar="PG_PORT", default=5432)
+    @click.option(
+        "-p",
+        "--port",
+        type=int,
+        envvar="PG_PORT",
+        default=5432,
+        help="With database backend 'postgresql': system database port",
+    )
     @click.option(
         "-d",
         "-db",
         "database",
         envvar="PG_DATABASE",
-        help="Database to import the data to.",
+        help="With database backend 'postgresql': system database name",
     )
     @click.option(
         "-u",
         "--username",
         envvar="PG_USERNAME",
         default=lambda: os.getenv("USER", ""),
-        help="Specifies the user to connect to the database with.",
+        help="With database backend 'postgresql': system database user",
     )
-    @click.password_option(prompt=False, envvar="PG_PASSWORD")
+    @click.password_option(
+        prompt=False,
+        envvar="PG_PASSWORD",
+        help="With database backend 'postgresql': system database password",
+    )
+    @click.option(
+        "-U",
+        "--uri",
+        "database_uri",
+        envvar="MELTANO_DATABASE_URI",
+        help="System database URI (takes priority over other database options if set)",
+    )
     def decorate(*args, **kwargs):
-        engine_uri = os.getenv("SQL_ENGINE_URI")
+        engine_uri = kwargs.pop("database_uri")
         backend = kwargs.pop("backend")
 
         config = {

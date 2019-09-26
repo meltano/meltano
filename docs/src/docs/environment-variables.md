@@ -27,6 +27,19 @@ If you'd prefer to use Meltano _without_ sending the team this kind of data, you
   export MELTANO_DISABLE_TRACKING=True
   ```
 
+## System Database
+
+By default, Meltano uses a SQLite database named `meltano.db` as its system database.
+
+You can choose to use a different system database backend or configuration using the `--uri` option of the `meltano` command, or the `MELTANO_DATABASE_URI` environment variable:
+
+```bash
+# SQLite:
+export MELTANO_DATABASE_URI=sqlite:///system_database.db
+# PostgreSQL:
+export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
+```
+
 ## Flask
 
 The following are the environment variables currently available for customization for Flask.

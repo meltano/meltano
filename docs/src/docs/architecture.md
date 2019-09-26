@@ -306,11 +306,7 @@ For now, Meltano will try to implement concurrent taps when possible.
 
 Every time `meltano elt ...` runs, Meltano will keep track of the job and its success state in a log.
 
-This log is stored the Meltano system database.
-
-> Note: Out of the box, Meltano uses a SQLite database named `meltano.db` as its system database.
-> However this is customizable using the `MELTANO_BACKEND=sqlite|postgresql` environment variable, or
-> using the (-B|--backend) switch at invocation.
+This log is stored the [Meltano system database](/docs/environment-variables.html#system-database).
 
 
 ## Meltano Transform
