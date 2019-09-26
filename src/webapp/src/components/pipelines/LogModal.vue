@@ -1,10 +1,21 @@
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   name: 'LogModal',
+  data() {
+    return {
+      log: ''
+    }
+  },
   created() {
     this.jobIdFromRoute = this.$route.params.jobId
+    this.getJobLog(this.jobIdFromRoute).then(
+      response => (this.log = response.data)
+    )
   },
   methods: {
+    ...mapActions('configuration', ['getJobLog']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -27,6 +38,13 @@ export default {
       <section class="modal-card-body">
         <div class="content">
           <p>{{ jobIdFromRoute }}</p>
+          <div v-if="log">
+            <pre>
+              <code>
+                {{log}}
+              </code>
+            </pre>
+          </div>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
