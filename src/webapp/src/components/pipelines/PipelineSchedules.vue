@@ -133,6 +133,19 @@ export default {
                 </p>
               </td>
               <td>
+                <p class="has-text-centered">
+                  <button
+                    class="button is-outlined is-small"
+                    :class="{ 'tooltip is-tooltip-left': pipeline.jobId }"
+                    data-tooltip="View this ELT Pipeline's last run logging status."
+                    :disabled="!pipeline.jobId"
+                    @click="goToLog(pipeline.jobId)"
+                  >
+                    {{ pipeline.isRunning ? 'Running...' : 'Log' }}
+                  </button>
+                </p>
+              </td>
+              <td>
                 <div class="buttons is-right">
                   <a
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
@@ -153,14 +166,6 @@ export default {
                     :to="{ name: 'analyze' }"
                     >Analyze</router-link
                   >
-                  <button
-                    class="button is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="View this ELT Pipeline's last run log."
-                    :disabled="!pipeline.jobId"
-                    @click="goToLog(pipeline.jobId)"
-                  >
-                    Log
-                  </button>
                   <a
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
                     data-tooltip="This feature is queued. Click to add to or submit a new issue."

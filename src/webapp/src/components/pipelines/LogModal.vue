@@ -34,12 +34,13 @@ export default {
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-wide">
       <header class="modal-card-head">
-        <p class="modal-card-title">Run Log</p>
+        <p class="modal-card-title">
+          Run Log: <span class="is-family-code">{{ jobIdFromRoute }}</span>
+        </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
         <div class="content">
-          <p>{{ jobIdFromRoute }}</p>
           <div v-if="jobLog">
             <pre><code>{{jobLog}}</code></pre>
           </div>
