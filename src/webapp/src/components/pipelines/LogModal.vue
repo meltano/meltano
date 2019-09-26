@@ -5,16 +5,13 @@ export default {
   name: 'LogModal',
   data() {
     return {
-      jobLog: ''
+      jobLog: '',
+      isRefreshing: false
     }
   },
   created() {
     this.jobIdFromRoute = this.$route.params.jobId
-    this.getJobLog(this.jobIdFromRoute)
-      .then(response => (this.jobLog = response.data.log))
-      .catch(error => {
-        this.jobLog = error.response.data.code
-      })
+    this.updateJobLog()
   },
   methods: {
     ...mapActions('configuration', ['getJobLog']),
@@ -24,6 +21,18 @@ export default {
       } else {
         this.$router.push({ name: 'schedules' })
       }
+    },
+    refresh() {
+      this.isRefreshing = true
+      this.updateJobLog()
+    },
+    updateJobLog() {
+      this.getJobLog(this.jobIdFromRoute)
+        .then(response => (this.jobLog = response.data.log))
+        .catch(error => {
+          this.jobLog = error.response.data.code
+        })
+        .finally(() => (this.isRefreshing = false))
     }
   }
 }
@@ -43,6 +52,14 @@ export default {
         <div class="content">
           <div v-if="jobLog">
             <pre><code>{{jobLog}}</code></pre>
+            <button
+              class="button"
+              :class="{ 'is-loading': isRefreshing }"
+              aria-label="refresh"
+              @click="refresh"
+            >
+              Refresh
+            </button>
           </div>
           <progress v-else class="progress is-small is-info"></progress>
         </div>
