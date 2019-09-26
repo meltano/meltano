@@ -17,6 +17,7 @@ export default {
   content: url(../public/copy-to-clipboard-icon.svg);
   background-color: #282c34;
   transition: transform 0.2s;
+  user-select: none;
 }
 
 .code-block-copy-button:active {
