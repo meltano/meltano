@@ -50,7 +50,8 @@ export default {
             <span class="step-spacer">then</span>
             <a class="button is-small is-static is-marginless is-borderless">
               <span
-                >Click <span class="is-italic">Run</span> to start data collection</span
+                >Click <span class="is-italic">Run</span> to start data
+                collection</span
               >
             </a>
           </p>
@@ -151,8 +152,8 @@ export default {
                   <a
                     class="button is-outlined is-small tooltip is-tooltip-left"
                     data-tooltip="View this ELT Pipeline's last run log."
+                    :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"
-                    :disabled='!pipeline.jobId'
                     >Log</a
                   >
                   <a

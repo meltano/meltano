@@ -1,9 +1,7 @@
 <script>
-
 export default {
   name: 'LogModal',
   created() {
-    console.log('properly ping for log with id on hard refresh');
     this.jobIdFromRoute = this.$route.params.jobId
   },
   methods: {
@@ -13,7 +11,7 @@ export default {
       } else {
         this.$router.push({ name: 'schedules' })
       }
-    },
+    }
   }
 }
 </script>
@@ -28,7 +26,7 @@ export default {
       </header>
       <section class="modal-card-body">
         <div class="content">
-          <p>{{jobIdFromRoute}}</p>
+          <p>{{ jobIdFromRoute }}</p>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">

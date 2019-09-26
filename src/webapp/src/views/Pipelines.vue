@@ -149,7 +149,6 @@ export default {
           <Step>
             <router-view></router-view>
             <div v-if="isModal">
-              {{getModalName}}
               <router-view :name="getModalName"></router-view>
             </div>
           </Step>
