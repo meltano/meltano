@@ -80,6 +80,14 @@ module.exports = {
       {
         ga: "UA-132758957-1"
       }
+    ],
+    [
+      "container",
+      {
+        type: "info",
+        before: '<div class="custom-block info">',
+        after: "</div>"
+      }
     ]
   ]
 };
