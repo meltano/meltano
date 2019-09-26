@@ -504,7 +504,7 @@ Meltano is deployed as a DigitalOcean Marketplace 1-Click install, available at 
 
 ### Build the snapshot
 
-The `distribute` step in the CI/CD pipeline has a manual action named *digitalocean_marketplace* that will used Packer to create a snapshot with the latest version of Meltano installed and ready.
+The `distribute` step in the CI/CD pipeline has a manual action named *digitalocean_marketplace* that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
 
 :::tip Master only
 The *digitalocean_marketplace* job is only available on pipelines running off `master`.
