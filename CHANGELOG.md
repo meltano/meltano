@@ -9,7 +9,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 - [#950](https://gitlab.com/meltano/meltano/issues/950) Removed the Analyze connection configuration: Meltano will now infer connections out of each loader configuration.
-
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Analyze UI now displays the Topic's (analysis model's) description text if applicable
 
 ### Changes
