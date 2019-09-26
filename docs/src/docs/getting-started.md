@@ -122,10 +122,6 @@ The Analyze page contains an interactive user interface to allow you to dynamica
 
 ![Screenshot of Analyze page for Carbon Region](/images/getting-started-guide/gsg-11.png)
 
-::: warning
-Before we can analyze our data, let's confirm that the database being used is correct via the dropdown in the upper right. If it says `postgresql`, switch it to `sqlite`. This will eventually be detected automatically, but a necessity at the moment.
-:::
-
 Now, let's explore and analyze our `tap-carbon-intensity` data by selecting the following attributes in the left column:
 
 - **Geographical Region**
