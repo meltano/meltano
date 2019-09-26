@@ -5,13 +5,13 @@ export default {
   name: 'LogModal',
   data() {
     return {
-      log: ''
+      jobLog: null
     }
   },
   created() {
     this.jobIdFromRoute = this.$route.params.jobId
     this.getJobLog(this.jobIdFromRoute).then(
-      response => (this.log = response.data)
+      response => (this.jobLog = response.data)
     )
   },
   methods: {
@@ -35,15 +35,11 @@ export default {
         <p class="modal-card-title">Run Log</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body">
+      <section class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <p>{{ jobIdFromRoute }}</p>
-          <div v-if="log">
-            <pre>
-              <code>
-                {{log}}
-              </code>
-            </pre>
+          <div v-if="jobLog">
+            <pre><code>{{jobLog.log}}</code></pre>
           </div>
         </div>
       </section>
