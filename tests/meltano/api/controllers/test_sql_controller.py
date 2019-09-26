@@ -12,10 +12,9 @@ def compile_models(api):
 
 
 def assertIsSQL(value: str) -> bool:
-    assert (
-        re.match(r"SELECT.*FROM.*(JOIN.*)*(GROUP BY.*)?(LIMIT \d+)?", value),
-        f"{value} is not a SQL query.",
-    )
+    assert re.match(
+        r"SELECT.*FROM.*(JOIN.*)*(GROUP BY.*)?(LIMIT \d+)?", value
+    ), f"{value} is not a SQL query."
 
 
 def assertListEquivalence(xs: list, ys: list):
