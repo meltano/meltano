@@ -8,6 +8,12 @@ To initialize a new project, open your terminal and navigate to the directory th
 
 Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "meltano-carbon."
 
+::: info
+Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
+
+If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-varibales.html#anonymous-usage-data).
+:::
+
 ```bash
 meltano init meltano-carbon
 ```
