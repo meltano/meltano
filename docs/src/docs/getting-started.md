@@ -94,7 +94,6 @@ In the current form, you will see:
 - The **loader** the pipeline will use, which should be `target-sqlite`
 - Whether the **transform** step should be applied, which should be `skip`
 - The **interval** at which the pipeline should be run, which is set by default to be `@once`
-- Finally, there is a **catch-up date** to determine how far back to extract data, which should be `None` by default
 
 All we need to do is click `Save` to start our new pipeline! You should see a spinning icon as well as a badge next to the "Pipeline" navigation element in the header.
 
