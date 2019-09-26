@@ -61,16 +61,3 @@ To change the directory where Meltano logs will be generated, update your `.env`
 # The directory where the Meltano logs will be generated
 export MELTANO_LOG_PATH = ""
 ```
-
-## SQL Alchemy Database
-
-The following are the environment variables currently available for customization for Flask.
-
-Update your `.env` file in your project directory with the desired customizations.
-
-```bash
-# This is the system database URI that stores
-# 1. Job logs
-# 2. RBAC users
-export MELTANO_API_DATABASE_URI = "YOUR_DATABASE_URI"
-```
