@@ -241,9 +241,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       <div
                         class="level-item"
                       >
-                        <code>
-                          
-                        </code>
+                        <pre>
+                          <code>
+                            
+                          </code>
+                        </pre>
                       </div>
                     </div>
                   </div>
@@ -630,14 +632,16 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       <div
                         class="level-item"
                       >
-                        <code>
-                          SELECT
+                        <pre>
+                          <code>
+                            SELECT
   COALESCE(COUNT("region"."id"), 0) "region.count"
 FROM
   "region" "region"
 LIMIT
   3;
-                        </code>
+                          </code>
+                        </pre>
                       </div>
                     </div>
                   </div>
@@ -960,14 +964,16 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     <div
                       class="level-item"
                     >
-                      <code>
-                        SELECT
+                      <pre>
+                        <code>
+                          SELECT
   COALESCE(COUNT("region"."id"), 0) "region.count"
 FROM
   "region" "region"
 LIMIT
   3;
-                      </code>
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </div>
@@ -1285,9 +1291,11 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     <div
                       class="level-item"
                     >
-                      <code>
-                        
-                      </code>
+                      <pre>
+                        <code>
+                          
+                        </code>
+                      </pre>
                     </div>
                   </div>
                 </div>
@@ -1661,9 +1669,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       <div
                         class="level-item"
                       >
-                        <code>
-                          
-                        </code>
+                        <pre>
+                          <code>
+                            
+                          </code>
+                        </pre>
                       </div>
                     </div>
                   </div>
