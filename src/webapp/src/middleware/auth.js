@@ -1,5 +1,3 @@
-import axios from 'axios'
-import { Service } from 'axios-middleware'
 import utils from '@/utils/utils'
 import jwtDecode from 'jwt-decode'
 
@@ -97,8 +95,7 @@ class AuthHandler {
 }
 
 export default {
-  install(Vue, options) {
-    const service = new Service(axios)
+  install(Vue, { service, router, toasted }) {
     const handler = new AuthHandler()
 
     Vue.mixin({
@@ -117,8 +114,8 @@ export default {
     service.register(
       new AuthMiddleware({
         handler,
-        router: options.router,
-        toasted: options.toasted
+        router,
+        toasted
       })
     )
   }

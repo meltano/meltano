@@ -6,7 +6,8 @@ from meltano.cli import cli
 from asserts import assert_cli_runner
 
 
-def test_ga_tracker(project, cli_runner):
+def test_ui(project, cli_runner):
+    # fmt: off
     with mock.patch("meltano.cli.ui.APIWorker.start") as start_api_worker, \
       mock.patch("meltano.cli.ui.MeltanoBackgroundCompiler.start") as start_compiler, \
       mock.patch("meltano.cli.ui.UIAvailableWorker.start") as start_ui_available_worker, \
@@ -19,5 +20,4 @@ def test_ga_tracker(project, cli_runner):
         assert start_compiler.called
         assert start_airflow_worker.called
         assert track.called
-
-    assert_cli_runner(res)
+    # fmt: on

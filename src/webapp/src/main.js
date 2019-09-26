@@ -4,6 +4,7 @@ import Vue from 'vue'
 import VueAnalytics from 'vue-analytics'
 
 import axios from 'axios'
+import { Service } from 'axios-middleware'
 import FontAwesome from './font-awesome'
 import lodash from 'lodash'
 
@@ -29,17 +30,22 @@ const toastedOptions = {
 }
 Vue.use(Toasted, toastedOptions)
 
-Vue.use(Auth, {
+const service = new Service(axios)
+
+Vue.use(Upgrade, {
+  service,
   router,
   toasted: Vue.toasted
 })
 
 Vue.use(FatalError, {
+  service,
   router,
   toasted: Vue.toasted
 })
 
-Vue.use(Upgrade, {
+Vue.use(Auth, {
+  service,
   router,
   toasted: Vue.toasted
 })
@@ -96,10 +102,11 @@ Vue.toasted.register(
 // Register a Global error notification
 Vue.toasted.register(
   'upgrade',
-  "A new version of this application is available, please refresh.",
+  'A new version of Meltano is available, please refresh.',
   {
-    action: [{ text: "Refresh!", onClick: () => document.location.reload() }],
+    action: [{ text: 'Refresh!', onClick: () => document.location.reload() }],
     duration: null,
+    closeOnSwipe: false,
     singleton: true,
     type: 'warning'
   }
