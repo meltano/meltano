@@ -17,9 +17,6 @@ export default {
   content: url(../public/copy-to-clipboard-icon.svg);
   background-color: #282c34;
   transition: transform 0.2s;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
