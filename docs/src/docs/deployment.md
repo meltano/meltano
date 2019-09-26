@@ -1,6 +1,6 @@
-# Deployment
+# Cloud Installation
 
-This section provides step-by-step guides for deploying Meltano on various environments. Currently, we provide detailed intructions for:
+This section provides step-by-step guides for deploying Meltano on various cloud environments. Currently, we provide detailed intructions for:
 
 - [DigitalOcean](/docs/deployment.html#digitalocean-droplets)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
