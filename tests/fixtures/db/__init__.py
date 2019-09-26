@@ -5,7 +5,7 @@ from meltano.core.migration_service import MigrationService
 
 @pytest.fixture(autouse=True)
 def engine_uri_env(monkeypatch, engine_uri):
-    monkeypatch.setenv("SQL_ENGINE_URI", engine_uri)
+    monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
 
 
 @pytest.fixture(scope="session", autouse=True)
