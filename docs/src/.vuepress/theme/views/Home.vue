@@ -296,14 +296,14 @@
 
         <p class="description">
           <em
-            >"The Meltano project out of GitLab is stitching together fragmented
+            >“The Meltano project out of GitLab is stitching together fragmented
             open-source data analytics projects into a single end-to-end
-            platform. Meltano describes itself as “an open source
+            platform. Meltano describes itself as ‘an open source
             convention-over-configuration product for the whole data lifecycle,
-            all the way from loading data to analyzing it.” Based on the success
+            all the way from loading data to analyzing it.’ Based on the success
             that GitLab has had with other projects, we predict that Meltano
             could eventually give the big, proprietary platforms a run for their
-            money."</em
+            money.”</em
           >
           --
           <a
