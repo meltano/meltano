@@ -4,20 +4,22 @@ Now that you have successfully [installed Meltano](/docs/installation.html) and 
 
 ## Create your first project
 
-To initialize a new project, navigate to the directory that you'd like to contain your Meltano projects, and run this command, replacing `PROJECT_NAME` with whatever you would like your new project to be called:
+To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
+
+Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "meltano-carbon."
 
 ```bash
-meltano init PROJECT_NAME
+meltano init meltano-carbon
 ```
 
-This will create a new directory named `PROJECT_NAME` and initialize Meltano's basic directory structure inside it.
+This will create a new directory named `meltano-carbon` and initialize Meltano's basic directory structure inside it.
 
 ## Start the application
 
-Now that you've created your first Meltano project, change to the new directory and start the Meltano UI:
+Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
 ```bash
-cd PROJECT_NAME
+cd meltano-carbon
 meltano ui
 ```
 
