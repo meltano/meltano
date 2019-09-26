@@ -34,7 +34,7 @@ MELTANO_DISCOVERY_URL = "https://www.meltano.com/discovery.yml"
 
 
 class PluginDiscoveryService(Versioned):
-    __version__ = 3
+    __version__ = 4
 
     def __init__(
         self,
