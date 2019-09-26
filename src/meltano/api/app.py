@@ -106,10 +106,6 @@ def create_app(config={}):
         init(app)
 
     @app.before_request
-    def setup_airflow_context():
-        g.airflow_worker = airflow_context["worker"]
-
-    @app.before_request
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}

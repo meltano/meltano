@@ -39,7 +39,7 @@ Meltano provides a CLI to kick start and help you manage the configuration and o
   - `meltano config <plugin_name> unset <name>`: Remove the configuration's setting `<name>`.
   - `meltano config <plugin_name> reset`: Clear the configuration (back to defaults).
 - `meltano ui`: Start the Meltano UI.
-- `meltano upgrade [--no-restart]`: Upgrade Meltano to the latest version.
+- `meltano upgrade`: Upgrade Meltano to the latest version.
 
 ### `init`
 
@@ -402,7 +402,14 @@ $PERMISSION_BOT_WAREHOUSE
 
 ### `upgrade`
 
-Upgrade Meltano to the latest version, optionally restarting any running instance.
+Upgrade Meltano to the latest version.
+
+This function will following process to upgrade Meltano:
+
+  - Run `pip install --upgrade meltano`
+  - Run the database migrations
+  - Send a [SIGHUP](http://docs.gunicorn.org/en/stable/signals.html#reload-the-configuration) to the process running under the `.meltano/run/gunicorn.pid`, thus restarting the workers
+  
 
 ## How ELT Commands Fetch Dependencies
 

@@ -43,7 +43,9 @@ class ScheduleService:
         start_date: Optional[datetime] = None,
         **env,
     ):
-        start_date = coerce_datetime(start_date) or self.default_start_date(session, extractor)
+        start_date = coerce_datetime(start_date) or self.default_start_date(
+            session, extractor
+        )
         schedule = Schedule(
             name, extractor, loader, transform, interval, start_date, env=env
         )

@@ -11,7 +11,6 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
 from meltano.api.workers import (
-    airflow_context,
     MeltanoBackgroundCompiler,
     AirflowWorker,
     APIWorker,
@@ -62,11 +61,8 @@ def ui(project, reload, bind_port, bind):
     migration_service.upgrade()
 
     workers = []
-
     if not truthy(os.getenv("AIRFLOW_DISABLED", False)):
-        # TODO: move to the class
-        airflow_context["worker"] = AirflowWorker(project)
-        workers.append(airflow_context["worker"])
+        workers.append(AirflowWorker(project))
 
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))

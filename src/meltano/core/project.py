@@ -97,7 +97,7 @@ class Project(Versioned):
             finally:
                 meltano_lock.release()
 
-        return self._meltano
+        return deepcopy(self._meltano)
 
     @contextmanager
     def meltano_update(self):

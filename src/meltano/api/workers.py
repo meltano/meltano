@@ -139,6 +139,7 @@ class AirflowWorker(threading.Thread):
         self.project = project
         self.add_service = ProjectAddService(project)
         self.install_service = PluginInstallService(project)
+        self.config_service = ConfigService(project)
         self._plugin = None
         self._webserver = None
         self._scheduler = None
@@ -202,7 +203,7 @@ class AirflowWorker(threading.Thread):
 
     def run(self):
         try:
-            self._plugin = ConfigService(self.project).find_plugin("airflow")
+            self._plugin = self.config_service.find_plugin("airflow")
         except PluginMissingError as err:
             self._plugin = self.add_service.add(PluginType.ORCHESTRATORS, "airflow")
             self.install_service.install_plugin(self._plugin)

@@ -32,7 +32,7 @@ def run_elt(project: Project, schedule_payload: dict):
         "--transform",
         transform,
     ]
-    executor_elt.submit(
+    executor.submit(
         subprocess.run, cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
     )
     logging.debug(f"Defered `{' '.join(cmd)}` to the executor.")
@@ -42,4 +42,6 @@ def run_elt(project: Project, schedule_payload: dict):
 
 def upgrade():
     cmd = ["meltano", "upgrade"]
-    executor.submit(subprocess.run, cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    executor.submit(
+        subprocess.run, cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
