@@ -1,5 +1,8 @@
 from typing import Dict
 
+from meltano.core.behavior.hookable import hook
+from meltano.core.connection_service import ConnectionService
+from meltano.core.db import project_engine
 from . import SingerPlugin, PluginType
 
 

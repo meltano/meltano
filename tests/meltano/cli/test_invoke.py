@@ -42,11 +42,15 @@ class TestCliInvoke:
 
             assert invoke.called_with(["--discover"])
 
-    def test_invoke_exit_code(self, cli_runner, process_mock):
+    def test_invoke_exit_code(self, cli_runner, tap, process_mock):
         process_mock.wait.return_value = 2
 
-        with patch.object(
-            GoogleAnalyticsTracker, "track_data", return_value=None
-        ), patch.object(PluginInvoker, "invoke", return_value=process_mock) as invoke:
-            basic = cli_runner.invoke(cli, ["invoke", "tap-mock"])
+        invoker_mock = Mock()
+        invoker_mock.invoke.return_value = process_mock
+
+        # fmt: off
+        with patch.object(GoogleAnalyticsTracker, "track_data", return_value=None), \
+          patch("meltano.cli.invoke.invoker_factory", return_value=invoker_mock):
+        # fmt: on
+            basic = cli_runner.invoke(cli, ["invoke", tap.name])
             assert basic.exit_code == 2

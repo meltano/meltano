@@ -16,12 +16,12 @@ from meltano.core.db import project_engine
 @project
 def invoke(project, plugin_name, plugin_args):
     _, Session = project_engine(project)
-    session = Session()
 
     try:
+        session = Session()
         config_service = ConfigService(project)
         plugin = config_service.find_plugin(plugin_name)
-        service = invoker_factory(session, project, plugin)
+        service = invoker_factory(project, plugin, prepare_with_session=session)
         handle = service.invoke(*plugin_args)
 
         exit_code = handle.wait()

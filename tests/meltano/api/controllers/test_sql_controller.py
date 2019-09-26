@@ -23,7 +23,7 @@ def assertListEquivalence(xs: list, ys: list):
     assert set(xs) == set(ys)
 
 
-@pytest.mark.usefixtures("project", "add_model", "add_connection")
+@pytest.mark.usefixtures("project", "add_model")
 class TestSqlController:
     @pytest.fixture
     def post(self, app, api, engine_sessionmaker):
@@ -56,7 +56,7 @@ class TestSqlController:
     @pytest.fixture
     def payload_builder_factory(self):
         def _factory():
-            return PayloadBuilder("region", run=False, dialect="pytest")
+            return PayloadBuilder("region", run=False, loader="target-mock")
 
         return _factory
 
@@ -130,7 +130,7 @@ class TestSqlController:
             "limit": 3,
             "filters": {},
             "run": False,
-            "dialect": "pytest",
+            "loader": "target-mock",
         }
 
         res = post(payload)

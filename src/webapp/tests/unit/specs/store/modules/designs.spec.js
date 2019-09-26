@@ -22,7 +22,7 @@ describe('designs Vuex store', () => {
       reports: [],
       chartType: 'BarChart',
       limit: 50,
-      dialect: null,
+      loader: null,
       filterOptions: [],
       filters: {
         columns: [],

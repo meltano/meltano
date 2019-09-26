@@ -12,8 +12,8 @@ from meltano.core.schedule_service import (
 
 
 @pytest.fixture
-def subject(session, schedule_service_factory):
-    return schedule_service_factory(session)
+def subject(schedule_service):
+    return schedule_service
 
 
 @pytest.fixture
@@ -49,10 +49,10 @@ class TestScheduleService:
         with pytest.raises(ScheduleAlreadyExistsError):
             subject.add_schedule(schedules[0])
 
-    def test_schedule_start_date(self, subject, tap, target):
+    def test_schedule_start_date(self, subject, session, tap, target):
         # curry the `add` method to remove some arguments
         add = lambda name, start_date: subject.add(
-            name, tap.name, target.name, "run", "@daily", start_date=start_date
+            session, name, tap.name, target.name, "run", "@daily", start_date=start_date
         )
 
         # when a start_date is set, the schedule should use it
@@ -61,6 +61,7 @@ class TestScheduleService:
 
         # or use datetime.utcnow()
         schedule = subject.add(
+            session,
             "without_start_date",
             tap.name,
             target.name,
@@ -72,7 +73,9 @@ class TestScheduleService:
         assert schedule.start_date == datetime.utcnow()
 
         # or use the start_date in the extractor configuration
-        subject.plugin_settings_service.set(tap, "start_date", datetime(2002, 1, 1))
+        subject.plugin_settings_service.set(
+            session, tap, "start_date", datetime(2002, 1, 1)
+        )
         schedule = add("with_default_start_date", None)
         assert schedule.start_date == datetime(2002, 1, 1)
 

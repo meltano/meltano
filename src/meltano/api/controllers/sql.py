@@ -89,12 +89,9 @@ def get_sql(namespace, topic_name, design_name):
     design = m5oc.design(design_name)
     incoming_json = request.get_json()
 
-    # for now let's stick to the first connection that fits
-    # the dialect
-    dialect = incoming_json["dialect"]
-    connection = sqlHelper.get_connection(dialect)
-
+    loader = incoming_json["loader"]
     sql_dict = sqlHelper.get_sql(design, incoming_json)
+
     outgoing_sql = sql_dict["sql"]
     aggregates = sql_dict["aggregates"]
     query_attributes = sql_dict["query_attributes"]
@@ -106,7 +103,7 @@ def get_sql(namespace, topic_name, design_name):
     if not incoming_json["run"]:
         return jsonify(base_dict)
 
-    results = sqlHelper.get_query_results(dialect, outgoing_sql)
+    results = sqlHelper.get_query_results(loader, outgoing_sql)
     base_dict["results"] = results
     base_dict["empty"] = len(results) == 0
 
