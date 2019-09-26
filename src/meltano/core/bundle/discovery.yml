@@ -229,7 +229,7 @@ loaders:
       - name: database
         label: Database
         description: Path to the database, relative to the project root. If the database does not exist yet, it will be created.
-        value: meltano
+        value: warehouse
 transformers:
   - name: dbt
     namespace: dbt
