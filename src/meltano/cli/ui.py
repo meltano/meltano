@@ -28,5 +28,13 @@ def ui(project, bind_port, bind):
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
 
+    engine, _ = project_engine(project)
+    database_uri = str(engine.url)
+
     # todo: run gunicorn if not in debug mode
-    start(project, port=bind_port, host=bind)
+    start(
+        project,
+        port=bind_port,
+        host=bind,
+        app_config={"SQLALCHEMY_DATABASE_URI": database_uri},
+    )
