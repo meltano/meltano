@@ -55,7 +55,7 @@ Now that Meltano is pulling data in from your data source(s), you need to choose
 
 Let's use `target-sqlite` for this project by clicking `Install` in its card.
 
-Once it is finished installing, you will see that the following modal:
+Once it is finished installing, you will see the following modal:
 
 ![Modal dialogue for successful SQLite installation](/images/getting-started-guide/getting-started-05.png)
 
