@@ -268,24 +268,19 @@
           database formats.
         </p>
 
-        <div class="el-logos">
-          <img src="../assets/gitlab-logo.png" alt="GitLab Logo" />
-          <img src="../assets/stripe-logo.png" alt="Stripe Logo" />
-          <img src="../assets/csv-logo.png" alt="CSV Logo" />
-          <img src="../assets/salesforce-logo.png" alt="Salesforce Logo" />
-          <img src="../assets/sqlite-logo.png" alt="SQLite Logo" />
-          <img src="../assets/zendesk-logo.png" alt="Zendesk Logo" />
-          <img src="../assets/marketo-logo.png" alt="Marketo Logo" />
-          <div class="carbon-intensity-logo">
-            <img
-              src="../assets/carbon-intensity-logo.png"
-              alt="Carbon Intensity Favicon"
-            />
-            Carbon Intensity API
-          </div>
-          <img src="../assets/fastly-logo.png" alt="Fastly Logo" />
-          <img src="../assets/mongodb-logo.png" alt="MongoDB Logo" />
-          <img src="../assets/snowflake-logo.png" alt="Snowflake Logo" />
+        <div class="plugin-logos">
+          <img src="../assets/logo-gitlab.png" alt="GitLab Logo" />
+          <img src="../assets/logo-stripe.png" alt="Stripe Logo" />
+          <img src="../assets/logo-csv.png" alt="CSV Logo" />
+          <img src="../assets/logo-salesforce.png" alt="Salesforce Logo" />
+          <img src="../assets/logo-sqlite.png" alt="SQLite Logo" />
+          <img src="../assets/logo-zendesk.png" alt="Zendesk Logo" />
+          <img src="../assets/logo-marketo.png" alt="Marketo Logo" />
+          <img src="../assets/logo-nationalgrid.png" alt="National Grid ESO" />
+          <img src="../assets/logo-fastly.png" alt="Fastly Logo" />
+          <img src="../assets/logo-mongodb.png" alt="MongoDB Logo" />
+          <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
+          <img src="../assets/logo-googleanalytics.png" alt="Google Analytics Logo" />
         </div>
 
         <p class="description ta-c">
@@ -709,24 +704,7 @@ export default {
   margin-bottom: 0;
 }
 
-.el-logos {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-column-gap: 30px;
-  grid-template-rows: repeat(4, 150px);
-  align-items: center;
-  justify-content: center;
-  grid-row-gap: 30px;
-  text-align: center;
-  padding: 30px;
-
-  img {
-    max-width: 200px;
-    margin: 0 auto;
-  }
-}
-
-.el-logos {
+.plugin-logos {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: minmax(120px, 1fr);
@@ -735,18 +713,24 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 30px;
+
+  img {
+    max-width: 200px;
+    margin: 0 auto;
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+  }
 }
 
-
 @media (min-width: 425px) {
-  .el-logos {
+  .plugin-logos {
     grid-template-columns: 1fr 1fr;
   }
 }
 
 @media (min-width: 768px) {
-  .el-logos {
-    grid-template-columns: 1fr 1fr 1fr;
+  .plugin-logos {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 
     img {
       max-width: 200px;
