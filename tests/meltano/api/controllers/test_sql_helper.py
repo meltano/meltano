@@ -5,11 +5,13 @@ from meltano.core.plugin import PluginType
 from meltano.api.controllers.sql_helper import SqlHelper
 
 
+@pytest.mark.usefixtures("session")
 class TestSqlHelper:
     @pytest.fixture(scope="class")
     def project(self, project, project_add_service):
-        postgresql = project_add_service.add(PluginType.CONNECTIONS, "postgresql")
-        sqlite = project_add_service.add(PluginType.CONNECTIONS, "sqlite")
+        # we have to use `postgres` because we only support two dialects
+        project_add_service.add(PluginType.LOADERS, "target-postgres")
+        project_add_service.add(PluginType.LOADERS, "target-sqlite")
 
         return project
 
@@ -17,28 +19,40 @@ class TestSqlHelper:
     def subject(self):
         return SqlHelper()
 
-    @mock.patch("meltano.api.controllers.sql_helper.PluginSettingsService")
     def test_get_db_engine_sqlite(
-        self, PluginSettingsServiceMock, app_context, subject, project
+        self,
+        app_context,
+        subject,
+        project,
+        plugin_settings_service,
+        elt_context_builder,
     ):
-        instance = PluginSettingsServiceMock()
-        instance.as_config.return_value = {"dbname": "dbname"}
+        sample_config = {"database": "pytest"}
 
-        engine_uri = f"sqlite:///{project.root.joinpath('dbname')}.db"
+        engine_uri = f"sqlite:///pytest.db"
 
         with mock.patch(
             "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock:
-            subject.get_db_engine("sqlite")
+        ) as create_engine_mock, mock.patch.object(
+            plugin_settings_service, "as_config", return_value=sample_config
+        ), mock.patch(
+            "meltano.api.controllers.sql_helper.ELTContextBuilder",
+            return_value=elt_context_builder,
+        ):
+            subject.get_db_engine("target-sqlite")
             create_engine_mock.assert_called_with(engine_uri)
 
-    @mock.patch("meltano.api.controllers.sql_helper.PluginSettingsService")
     @mock.patch("meltano.api.controllers.sql_helper.listen")
     def test_get_db_engine_postgres(
-        self, listen_mock, PluginSettingsServiceMock, app_context, subject
+        self,
+        listen_mock,
+        session,
+        app_context,
+        subject,
+        plugin_settings_service,
+        elt_context_builder,
     ):
-        instance = PluginSettingsServiceMock()
-        instance.as_config.return_value = {
+        sample_config = {
             "user": "user",
             "password": "password",
             "host": "host",
@@ -46,12 +60,17 @@ class TestSqlHelper:
             "dbname": "dbname",
         }
 
-        engine_uri = "postgresql+psycopg2://user:password@host:port/dbname"
+        engine_uri = "postgresql://user:password@host:port/dbname"
 
         with mock.patch(
             "sqlalchemy.create_engine", return_value=None
-        ) as create_engine_mock:
-            subject.get_db_engine("postgresql")
+        ) as create_engine_mock, mock.patch.object(
+            plugin_settings_service, "as_config", return_value=sample_config
+        ), mock.patch(
+            "meltano.api.controllers.sql_helper.ELTContextBuilder",
+            return_value=elt_context_builder,
+        ):
+            subject.get_db_engine("target-postgres")
 
             assert listen_mock.called
             create_engine_mock.assert_called_with(engine_uri)

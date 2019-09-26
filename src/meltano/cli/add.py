@@ -112,17 +112,6 @@ def transform(project, plugin_name):
     tracker.track_meltano_add(plugin_type="transform", plugin_name=plugin_name)
 
 
-@add.command()
-@click.argument("plugin_name")
-@project
-@click.pass_context
-def connection(ctx, project, plugin_name):
-    add_plugin(ctx.obj["add_service"], project, PluginType.CONNECTIONS, plugin_name)
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type="connection", plugin_name=plugin_name)
-
-
 def add_plugin(
     add_service, project: Project, plugin_type: PluginType, plugin_name: str
 ):

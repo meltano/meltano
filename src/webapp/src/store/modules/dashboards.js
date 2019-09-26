@@ -24,6 +24,7 @@ const actions = {
     const activeReports = state.reports.filter(report =>
       ids.includes(report.id)
     )
+
     return dashboardsApi
       .getActiveDashboardReportsWithQueryResults(activeReports)
       .then(response => {

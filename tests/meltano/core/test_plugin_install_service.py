@@ -16,7 +16,6 @@ class TestPluginInstallService:
                 yaml.dump(
                     {
                         "plugins": {
-                            "connections": [{"name": "sqlite"}],
                             "extractors": [
                                 {
                                     "name": "tap-gitlab",

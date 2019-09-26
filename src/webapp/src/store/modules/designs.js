@@ -19,7 +19,7 @@ const defaultState = utils.deepFreeze({
   design: {
     relatedTable: {}
   },
-  dialect: null,
+  loader: null,
   filterOptions: [],
   filters: {
     aggregates: [],
@@ -119,7 +119,7 @@ const helpers = {
       joins,
       order,
       limit: state.limit,
-      dialect: state.dialect,
+      loader: state.loader,
       filters
     }
   }
@@ -176,7 +176,7 @@ const getters = {
     }
   },
 
-  getDialect: state => state.dialect,
+  getLoader: state => state.loader,
 
   // eslint-disable-next-line no-shadow
   getFilter(_, getters) {
@@ -284,6 +284,8 @@ const getters = {
 
   isColumnSelectedAggregate: state => columnName =>
     columnName in state.resultAggregates,
+
+  isLoaderSqlite: state => state.loader === 'target-sqlite',
 
   joinIsExpanded: () => join => join.expanded,
 
@@ -687,8 +689,8 @@ const mutations = {
     state.design = designData
   },
 
-  setDialect(state, dialect) {
-    state.dialect = dialect
+  setLoader(state, loader) {
+    state.loader = loader
   },
 
   setErrorState(state) {
@@ -772,7 +774,7 @@ const mutations = {
     state.currentNamespace = report.namespace
     state.currentModel = report.model
     state.currentDesign = report.design
-    state.dialect = report.queryPayload.dialect
+    state.loader = report.queryPayload.loader
     state.filters = report.filters
     state.limit = report.queryPayload.limit
     state.order = report.order

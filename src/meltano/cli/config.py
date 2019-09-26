@@ -18,13 +18,14 @@ def config(ctx, project, plugin_name):
 
     _, Session = project_engine(project)
     session = Session()
-    settings = PluginSettingsService(session, project)
+    settings = PluginSettingsService(project)
 
     ctx.obj["settings"] = settings
     ctx.obj["plugin"] = plugin
+    ctx.obj["session"] = session
 
     if ctx.invoked_subcommand is None:
-        print(settings.as_config(plugin))
+        print(settings.as_config(session, plugin))
 
 
 @config.command()
@@ -34,8 +35,9 @@ def config(ctx, project, plugin_name):
 def set(ctx, setting_name, value):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
+    session = ctx.obj["session"]
 
-    settings.set(plugin, setting_name, value)
+    settings.set(session, plugin, setting_name, value)
 
 
 @config.command()
@@ -44,8 +46,9 @@ def set(ctx, setting_name, value):
 def unset(ctx, setting_name):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
+    session = ctx.obj["session"]
 
-    settings.unset(plugin, setting_name)
+    settings.unset(session, plugin, setting_name)
 
 
 @config.command()
@@ -53,9 +56,10 @@ def unset(ctx, setting_name):
 def reset(ctx):
     settings = ctx.obj["settings"]
     plugin = ctx.obj["plugin"]
+    session = ctx.obj["session"]
 
     for setting in settings.definitions(plugin):
-        settings.unset(plugin, setting.name)
+        settings.unset(session, plugin, setting.name)
 
 
 @config.command()

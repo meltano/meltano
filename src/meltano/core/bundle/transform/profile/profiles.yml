@@ -12,4 +12,4 @@ meltano:
       user: "{{ env_var('PG_USERNAME') }}"
       pass: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DATABASE') }}"
-      schema: "{{ env_var('DBT_SCHEMA', 'analytics') }}"
+      schema: "{{ env_var('MELTANO_ANALYZE_SCHEMA', 'analytics') }}"

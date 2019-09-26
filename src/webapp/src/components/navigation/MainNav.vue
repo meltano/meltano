@@ -188,14 +188,6 @@ export default {
 
           <div class="navbar-dropdown">
             <router-link
-              :to="{ name: 'analyzeSettings' }"
-              class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/analyze/settings') }"
-              tag="button"
-              >Connections</router-link
-            >
-            <hr class="navbar-divider" />
-            <router-link
               :to="{ name: 'analyzeModels' }"
               class="navbar-item button is-borderless"
               :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"

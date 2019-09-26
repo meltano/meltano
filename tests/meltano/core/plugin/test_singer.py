@@ -431,8 +431,7 @@ class TestSingerTap:
         ]
 
     def test_run_discovery(self, session, plugin_invoker_factory, subject):
-        invoker = plugin_invoker_factory(session, subject)
-        invoker.prepare()
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
         def mock_discovery():
             invoker.files["catalog"].open("w").write(CATALOG)
@@ -452,8 +451,7 @@ class TestSingerTap:
         process_mock = mock.Mock()
         process_mock.wait.return_value = 1  # something went wrong
 
-        invoker = plugin_invoker_factory(session, subject)
-        invoker.prepare()
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
         with mock.patch.object(
             PluginInvoker, "invoke", return_value=process_mock
@@ -470,8 +468,7 @@ class TestSingerTap:
         process_mock = mock.Mock()
         process_mock.wait.return_value = 0
 
-        invoker = plugin_invoker_factory(session, subject)
-        invoker.prepare()
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
         def corrupt_catalog(*_, **__):
             invoker.files["catalog"].open("w").write("this is invalid json")

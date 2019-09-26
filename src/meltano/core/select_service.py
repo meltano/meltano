@@ -21,7 +21,9 @@ class SelectService:
     def load_schema(self):
         _, Session = project_engine(self.project)
         session = Session()
-        invoker = invoker_factory(session, self.project, self.extractor)
+        invoker = invoker_factory(
+            self.project, self.extractor, prepare_with_session=session
+        )
 
         try:
             if not invoker.files["catalog"].exists():

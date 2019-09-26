@@ -17,6 +17,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin import PluginRef, PluginType, PluginInstall
+from meltano.core.elt_context import ELTContextBuilder
 
 
 PROJECT_NAME = "a_meltano_project"
@@ -72,8 +73,6 @@ def discovery():
         }
     )
 
-    discovery[PluginType.CONNECTIONS].append({"name": "pytest", "namespace": "pytest"})
-
     return discovery
 
 
@@ -103,24 +102,17 @@ def project_add_service(project, plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service_factory(project, plugin_discovery_service):
-    def _factory(session, **kwargs):
-        return PluginSettingsService(
-            session, project, discovery_service=plugin_discovery_service, **kwargs
-        )
-
-    return _factory
+def plugin_settings_service(project, plugin_discovery_service):
+    return PluginSettingsService(
+        project, plugin_discovery_service=plugin_discovery_service
+    )
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(project, plugin_settings_service_factory):
-    def _factory(session, plugin, **kwargs):
+def plugin_invoker_factory(project, plugin_settings_service):
+    def _factory(plugin, **kwargs):
         return invoker_factory(
-            session,
-            project,
-            plugin,
-            plugin_settings_service=plugin_settings_service_factory(session),
-            **kwargs,
+            project, plugin, plugin_settings_service=plugin_settings_service, **kwargs
         )
 
     return _factory
@@ -155,11 +147,6 @@ def add_model(project, plugin_install_service, project_add_service):
 
 
 @pytest.fixture(scope="class")
-def add_connection(project_add_service):
-    return project_add_service.add(PluginType.CONNECTIONS, "pytest")
-
-
-@pytest.fixture(scope="class")
 def config_service(project):
     return ConfigService(project)
 
@@ -177,16 +164,17 @@ def target(config_service):
 
 
 @pytest.fixture(scope="class")
-def schedule_service_factory(project, plugin_settings_service_factory):
-    def _factory(session, **kwargs):
-        return ScheduleService(
-            session,
-            project,
-            plugin_settings_service=plugin_settings_service_factory(session),
-            **kwargs,
-        )
+def schedule_service(project, plugin_settings_service):
+    return ScheduleService(project, plugin_settings_service=plugin_settings_service)
 
-    return _factory
+
+@pytest.fixture(scope="class")
+def elt_context_builder(project, plugin_settings_service, plugin_discovery_service):
+    return ELTContextBuilder(
+        project,
+        plugin_settings_service=plugin_settings_service,
+        plugin_discovery_service=plugin_discovery_service,
+    )
 
 
 @pytest.fixture(scope="class")
@@ -197,9 +185,6 @@ def project(test_dir, project_init_service):
     # empty out the `plugins`
     with project.meltano_update() as meltano:
         meltano["plugins"] = {}
-
-    # this is a test repo, let's remove the `.env`
-    os.unlink(project.root_dir(".env"))
 
     # not setting the project as default to limit
     # the side effect in tests

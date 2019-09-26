@@ -8,21 +8,10 @@ const defaultState = utils.deepFreeze({
     permissions: [],
     roles: [],
     users: []
-  },
-  settings: {
-    connections: []
   }
 })
 
 const getters = {
-  hasConnections(state) {
-    return state.settings.connections && state.settings.connections.length
-  },
-
-  isConnectionDialectSqlite() {
-    return connectionDialect => connectionDialect === 'sqlite'
-  },
-
   rolesContexts(state) {
     return type =>
       lodash.map(state.acl.roles, r => {
@@ -68,15 +57,6 @@ const actions = {
     })
   },
 
-  deleteConnection({ commit, state }, connection) {
-    const connectionToRemove = state.settings.connections.find(
-      item => item === connection
-    )
-    settingsApi.deleteConnection(connectionToRemove).then(response => {
-      commit('setSettings', response.data.settings)
-    })
-  },
-
   deleteRole({ commit, state }, { role }) {
     settingsApi.deleteRole({ name: role }).then(() => {
       commit('removeRole', role)
@@ -107,12 +87,6 @@ const actions = {
       .then(response => {
         commit('updateRole', response.data)
       })
-  },
-
-  saveConnection({ commit }, connection) {
-    settingsApi.saveConnection(connection).then(response => {
-      commit('setSettings', response.data.settings)
-    })
   },
 
   unassignRoleUser({ commit }, { role, user }) {
