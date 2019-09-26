@@ -2,16 +2,18 @@ import datetime
 import glob
 import logging
 import os
-
 from contextlib import contextmanager
 
 from meltano.core.project import Project
 from meltano.core.utils import slugify
 
+
 MAX_LOGS_PER_JOB_ID = 10
 
 
 class MissingJobLogException(Exception):
+    """Occurs when JobLoggingService can not find a requested log."""
+
     pass
 
 
@@ -51,30 +53,35 @@ class JobLoggingService:
             )
             log_file = open(os.devnull, "w")
 
-        yield log_file
+        try:
+            yield log_file
+        except Exception as err:
+            raise err
+        finally:
+            log_file.close()
 
-        log_file.close()
-
-        # When we are done, clean old logs so that we do not keep
-        # too many logs for the same job_id
-        self.clean_old_logs(job_id)
+            # When we are done, clean old logs so that we do not keep
+            # too many logs for the same job_id
+            self.clean_old_logs(job_id)
 
     def get_latest_log(self, job_id: str):
         """
         Get the contents of the most recent log for any ELT job
          that run with the provided job_id
         """
-        log_files = self.project.run_dir("logs", slugify(job_id)).glob("*.log")
-        latest_log = max(log_files, key=os.path.getctime)
-
         try:
-            with open(latest_log, "r") as f:
+            latest_log = next(iter(self.get_all_logs(job_id)))
+            with latest_log.open() as f:
                 log = f.read()
 
             return log
         except FileNotFoundError:
             raise MissingJobLogException(
                 f"Log File {latest_log} for job with id {job_id} not found"
+            )
+        except StopIteration:
+            raise MissingJobLogException(
+                f"Could not find a log File for job with id {job_id}"
             )
 
     def get_all_logs(self, job_id: str):
@@ -96,6 +103,6 @@ class JobLoggingService:
 
         for log in all_logs[self.max_logs_per_job_id :]:
             try:
-                os.remove(log)
+                log.unlink()
             except OSError:
                 pass
