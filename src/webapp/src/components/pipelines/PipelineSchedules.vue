@@ -28,6 +28,9 @@ export default {
     createPipeline() {
       this.$router.push({ name: 'createSchedule' })
     },
+    goToLog(jobId) {
+      this.$router.push({ name: 'runLog', params: { jobId } })
+    },
     runELT(pipeline) {
       this.$store.dispatch('configuration/run', pipeline)
     }
@@ -47,7 +50,7 @@ export default {
             <span class="step-spacer">then</span>
             <a class="button is-small is-static is-marginless is-borderless">
               <span
-                >Click <span class="is-italic">Run</span> to schedule it</span
+                >Click <span class="is-italic">Run</span> to start data collection</span
               >
             </a>
           </p>
@@ -59,7 +62,7 @@ export default {
 
     <div class="columns is-vcentered">
       <div class="column">
-        <h2 class="title is-5">Existing</h2>
+        <h2 class="title is-5">Pipelines</h2>
       </div>
 
       <div class="column">
@@ -146,8 +149,15 @@ export default {
                     >Analyze</router-link
                   >
                   <a
-                    class="button is-small tooltip is-tooltip-warning is-tooltip-left"
-                    data-tooltip="Help shape this feature by contributing your ideas"
+                    class="button is-outlined is-small tooltip is-tooltip-left"
+                    data-tooltip="View this ELT Pipeline's last run log."
+                    @click="goToLog(pipeline.jobId)"
+                    :disabled='!pipeline.jobId'
+                    >Log</a
+                  >
+                  <a
+                    class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
+                    data-tooltip="This feature is queued. Click to add to or submit a new issue."
                     target="_blank"
                     href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=schedule"
                     >Edit</a

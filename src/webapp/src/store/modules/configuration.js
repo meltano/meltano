@@ -200,6 +200,7 @@ const actions = {
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
       commit('setPipelineIsRunning', { pipeline, value: true })
+      commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
     })
   },
 
@@ -319,6 +320,10 @@ const mutations = {
 
   setPipelineIsRunning(_, { pipeline, value }) {
     Vue.set(pipeline, 'isRunning', value)
+  },
+
+  setPipelineJobId(_, { pipeline, jobId }) {
+    Vue.set(pipeline, 'jobId', jobId)
   },
 
   setPipelines(state, pipelines) {

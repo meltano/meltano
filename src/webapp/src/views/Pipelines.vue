@@ -27,7 +27,7 @@ export default {
         },
         {
           name: 'schedules',
-          routeMatches: ['schedules', 'createSchedule']
+          routeMatches: ['schedules', 'createSchedule', 'runLog']
         }
       ]
     }
@@ -141,7 +141,7 @@ export default {
             >
               Run
             </button>
-            <p>Automate Data Collection</p>
+            <p>Start Data Collection</p>
           </div>
         </div>
 
@@ -149,6 +149,7 @@ export default {
           <Step>
             <router-view></router-view>
             <div v-if="isModal">
+              {{getModalName}}
               <router-view :name="getModalName"></router-view>
             </div>
           </Step>

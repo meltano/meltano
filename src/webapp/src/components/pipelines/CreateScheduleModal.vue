@@ -106,7 +106,7 @@ export default {
     <div class="modal-background" @click="close"></div>
     <div class="modal-card is-wide">
       <header class="modal-card-head">
-        <p class="modal-card-title">Create Pipeline Schedule</p>
+        <p class="modal-card-title">Create Pipeline</p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body">
