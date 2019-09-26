@@ -498,15 +498,36 @@ target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
 target-postgres==...
 ```
 
-## DigitalOcean snapshot
+## DigitalOcean Marketplace
 
-To build a Droplet snapshot, one should use Packer.
+Meltano is deployed as a DigitalOcean Marketplace 1-Click install, available at <https://marketplace.digitalocean.com/apps/meltano>.
 
-```
-docker run --rm -e DIGITALOCEAN_TOKEN=<PERSONAL_TOKEN> -v $(pwd)/cloud/packer:/packer -w /packer hashicorp/packer:latest build marketplace-image.json
-```
+### Build the snapshot
 
-The snapshot should be available under `meltano-<timestamp>` on DigitalOcean.
+The `distribute` step in the CI/CD pipeline has a manual action named *digitalocean_marketplace* that will used Packer to create a snapshot with the latest version of Meltano installed and ready.
+
+:::tip Master only
+The *digitalocean_marketplace* job is only available on pipelines running off `master`.
+:::
+
+The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the *digitalocean_marketplace* job.
+
+### Update the DigitalOcean listing
+
+Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
+
+:::tip Don't see the Meltano listing?
+You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
+:::
+
+Once inside the listing, update the following entries:
+
+  - **System Image** to the new image
+  - **Version** to the latest Meltano version
+  - **Meltano Package Version** inside the _Software Included Entry_
+  
+
+Submit it for review to finish the process.
 
 ## Tmuxinator
 
