@@ -10,12 +10,11 @@ export default {
   },
   created() {
     this.jobIdFromRoute = this.$route.params.jobId
-    this.getJobLog(this.jobIdFromRoute).then(
-      response => (this.jobLog = response.data.log)
-    ).catch(error => {
-      this.jobLog = error.response.data.code
-    }
-    )
+    this.getJobLog(this.jobIdFromRoute)
+      .then(response => (this.jobLog = response.data.log))
+      .catch(error => {
+        this.jobLog = error.response.data.code
+      })
   },
   methods: {
     ...mapActions('configuration', ['getJobLog']),

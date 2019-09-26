@@ -20,7 +20,7 @@ export default {
   },
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      if(from.name === 'transforms') {
+      if (from.name === 'transforms') {
         vm.goToCreatePipeline()
       }
     })
@@ -158,8 +158,9 @@ export default {
                     data-tooltip="View this ELT Pipeline's last run log."
                     :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"
-                    >Log</button
                   >
+                    Log
+                  </button>
                   <a
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
                     data-tooltip="This feature is queued. Click to add to or submit a new issue."
