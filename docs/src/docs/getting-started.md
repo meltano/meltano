@@ -39,11 +39,11 @@ Click `Next` to move on to the next step: "Entity Selection."
 
 ## Select entities
 
-Data sources can contain a lot of different entities. Since these may not all be relevant to the report(s) you mean to generate, you might not want Meltano to pull every single entity into your dashboard. Currently, as you can see on your screen:
+Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. As you can see on your screen, all of the entities are currently selected by default for `tap-carbon-intensity`.
 
 ![Entity Selection Modal for tap-carbon-intensity](/images/getting-started-guide/getting-started-03.png)
 
-All of the entities are currently selected by default for "tap-carbon-intensity." Since there are only a few available entities, let's leave it as is and click `Save` to finish configuring our extractor.
+Since there are only a few available entities, let's leave it as is and click `Save` to finish configuring our extractor.
 
 ## Determine where the data will live
 
