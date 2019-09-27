@@ -397,10 +397,8 @@ const actions = {
   },
 
   getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
-    state.currentSQL = ''
-    state.currentNamespace = namespace
-    state.currentModel = model
-    state.currentDesign = design
+    commit('resetSQLResults')
+    commit('setCurrentMetadata', { namespace, model, design })
 
     return designApi
       .index(namespace, model, design)
@@ -661,6 +659,12 @@ const mutations = {
 
   setChartType(state, chartType) {
     state.chartType = chartType
+  },
+
+  setCurrentMetadata(state, { namespace, model, design }) {
+    state.currentNamespace = namespace
+    state.currentModel = model
+    state.currentDesign = design
   },
 
   setCurrentReport(state, report) {
