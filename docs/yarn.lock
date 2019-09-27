@@ -7058,6 +7058,13 @@ vuepress-html-webpack-plugin@^3.2.0:
     toposort "^1.0.0"
     util.promisify "1.0.0"
 
+vuepress-plugin-container@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vuepress-plugin-container/-/vuepress-plugin-container-2.0.2.tgz#3489cc732c7a210b31f202556e1346125dffeb73"
+  integrity sha512-SrGYYT7lkie7xlIlAVhn+9sDW42MytNCoxWL/2uDr+q9wZA4h1uYlQvfc2DVjy+FsM9PPPSslkeo/zCpYVY82g==
+  dependencies:
+    markdown-it-container "^2.0.0"
+
 vuepress@^1.0.0-alpha.30:
   version "1.0.0-alpha.30"
   resolved "https://registry.yarnpkg.com/vuepress/-/vuepress-1.0.0-alpha.30.tgz#6f615fb568fef04ea0bb4231e33b2cb87f4c0eee"
