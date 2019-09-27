@@ -31,7 +31,9 @@ def run_elt(project: Project, schedule_payload: dict):
         "--transform",
         transform,
     ]
-    executor_elt.submit(subprocess.run, cmd, capture_output=True)
+    executor_elt.submit(
+        subprocess.run, cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
     logging.debug(f"Defered `{' '.join(cmd)}` to the executor.")
 
     return job_id
