@@ -39,7 +39,7 @@ export default {
       'filterOptions',
       'hasSQLError',
       'loader',
-      'loadingQuery',
+      'isLoadingQuery',
       'reports',
       'resultAggregates',
       'results',
@@ -423,7 +423,7 @@ export default {
                 </Dropdown>
                 <button
                   class="button is-success"
-                  :class="{ 'is-loading': loadingQuery }"
+                  :class="{ 'is-loading': isLoadingQuery }"
                   :disabled="!currentSQL"
                   @click="runQuery"
                 >

@@ -26,8 +26,8 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
+  isLoadingQuery: false,
   limit: 50,
-  loadingQuery: false,
   order: {
     assigned: [],
     unassigned: []
@@ -417,7 +417,7 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
@@ -427,10 +427,9 @@ const actions = {
     })
   },
 
-  // eslint-disable-next-line no-shadow
   getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage')
-    state.loadingQuery = !!run
+    commit('setIsLoadingQuery', !!run)
 
     const queryPayload = Object.assign(
       {},
@@ -450,11 +449,11 @@ const actions = {
         if (response.status === 204) {
           commit('resetQueryResults')
           commit('resetSQLResults')
-          state.loadingQuery = false
+          commit('setIsLoadingQuery', false)
         } else if (run) {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          state.loadingQuery = false
+          commit('setIsLoadingQuery', false)
           commit('setSorting', getters.getAllAttributes)
         } else {
           commit('setSQLResults', response.data)
@@ -462,7 +461,7 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
@@ -480,7 +479,7 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
@@ -720,6 +719,10 @@ const mutations = {
 
   setJoinTimeframes(_, { timeframes, join }) {
     join.timeframes = timeframes
+  },
+
+  setIsLoadingQuery(state, value) {
+    state.isLoadingQuery = value
   },
 
   setQueryResults(state, results) {
