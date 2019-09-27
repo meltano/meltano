@@ -24,41 +24,41 @@ export default {
   },
   data() {
     return {
-      isNewDashboardModalOpen: false,
-      isInitialized: false
+      isInitialized: false,
+      isNewDashboardModalOpen: false
     }
   },
   computed: {
     ...mapState('designs', [
       'activeReport',
-      'design',
-      'currentModel',
-      'currentDesign',
-      'currentSQL',
-      'loadingQuery',
-      'saveReportSettings',
-      'reports',
-      'hasSQLError',
-      'sqlErrorMessage',
-      'results',
-      'resultAggregates',
       'chartType',
+      'currentDesign',
+      'currentModel',
+      'currentSQL',
+      'design',
+      'filterOptions',
+      'hasSQLError',
       'loader',
-      'filterOptions'
+      'loadingQuery',
+      'reports',
+      'resultAggregates',
+      'results',
+      'saveReportSettings',
+      'sqlErrorMessage'
     ]),
     ...mapGetters('designs', [
-      'getSelectedAttributesCount',
-      'currentModelLabel',
       'currentDesignLabel',
-      'hasChartableResults',
-      'resultsCount',
-      'hasJoins',
-      'showJoinColumnAggregateHeader',
-      'formattedSql',
+      'currentModelLabel',
       'filtersCount',
-      'hasFilters',
+      'formattedSql',
       'getIsAttributeInFilters',
-      'isLoaderSqlite'
+      'getSelectedAttributesCount',
+      'hasChartableResults',
+      'hasFilters',
+      'hasJoins',
+      'isLoaderSqlite',
+      'resultsCount',
+      'showJoinColumnAggregateHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
