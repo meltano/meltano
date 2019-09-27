@@ -728,6 +728,14 @@ const mutations = {
     state.isLoadingQuery = value
   },
 
+  setOrderAssigned(state, value) {
+    state.order.assigned = value
+  },
+
+  setOrderUnassigned(state, value) {
+    state.order.unassigned = value
+  },
+
   setQueryResults(state, results) {
     state.results = results.results
     state.queryAttributes = results.queryAttributes

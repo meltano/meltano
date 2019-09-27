@@ -11,6 +11,14 @@ export default {
   computed: {
     ...mapState('designs', ['order']),
     ...mapGetters('designs', ['getIsOrderableAttributeAscending']),
+    assigned: {
+      get () {
+        return this.order.assigned
+      },
+      set(value) {
+        this.$store.commit('designs/setOrderAssigned', value)
+      }
+    },
     draggableOptions() {
       return {
         animation: 100,
@@ -18,7 +26,15 @@ export default {
         ghostClass: 'drag-ghost',
         group: 'sortBy'
       }
-    }
+    },
+    unassigned: {
+      get () {
+        return this.order.unassigned
+      },
+      set(value) {
+        this.$store.commit('designs/setOrderUnassigned', value)
+      }
+    },
   },
   methods: {
     ...mapActions('designs', [
@@ -34,14 +50,14 @@ export default {
   <div>
     <div class="dropdown-item">
       <draggable
-        v-model="order.unassigned"
+        v-model="unassigned"
         v-bind="draggableOptions"
         class="drag-list is-flex is-flex-column has-background-white-bis"
         @end="runQuery"
       >
         <transition-group>
           <div
-            v-for="orderable in order.unassigned"
+            v-for="orderable in unassigned"
             :key="`${orderable.sourceName}-${orderable.attributeName}`"
             class="drag-list-item has-background-white"
           >
@@ -56,7 +72,7 @@ export default {
       </draggable>
 
       <div
-        v-if="order.unassigned.length === 0"
+        v-if="unassigned.length === 0"
         class="drag-list-item drag-target-description"
       >
         <div class="drag-handle">
@@ -72,14 +88,14 @@ export default {
     <hr class="dropdown-divider" />
     <div class="dropdown-item">
       <draggable
-        v-model="order.assigned"
+        v-model="assigned"
         v-bind="draggableOptions"
         class="drag-list is-flex is-flex-column has-background-white-bis"
         @end="runQuery"
       >
         <transition-group>
           <div
-            v-for="(orderable, idx) in order.assigned"
+            v-for="(orderable, idx) in assigned"
             :key="`${orderable.sourceName}-${orderable.attributeName}`"
             class="row-space-between drag-list-item has-background-white has-text-interactive-secondary"
           >
@@ -110,7 +126,7 @@ export default {
       </draggable>
 
       <div
-        v-if="order.assigned.length === 0"
+        v-if="assigned.length === 0"
         class="drag-list-item drag-target-description"
       >
         <div class="drag-handle">
@@ -123,7 +139,7 @@ export default {
         </div>
       </div>
     </div>
-    <template v-if="order.assigned.length > 0">
+    <template v-if="assigned.length > 0">
       <hr class="dropdown-divider" />
       <div class="dropdown-item">
         <a
