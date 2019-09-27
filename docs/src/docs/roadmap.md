@@ -19,7 +19,7 @@ Meltano develops powerful open source software enabling the creation of data pip
 
 ## Strategy
 
-### Path to V1.0
+### Path to v1.0
 
 Meltano is approaching its v1 release. The criteria we have chosen for validating that we have achieved v1 are:
 
@@ -28,7 +28,7 @@ Meltano is approaching its v1 release. The criteria we have chosen for validatin
 - Users have clear documentation, including indication of all limitations to existing taps and targets
 - Meltano core team is prepared to support backward compatibility to v1 (no breaking changes to architecture) until v2 version  
 
-### Beyond V1.0
+### Beyond v1.0
 
 There is a lot more to build. A few key areas we know we need to invest more time after V1 are:
 - Data Analysis: adopt open source solution so we can bring in many more features without building from scratch
