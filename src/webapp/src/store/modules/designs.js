@@ -407,7 +407,7 @@ const actions = {
       })
       .then(reportsApi.loadReports)
       .then(response => {
-        state.reports = response.data
+        commit('setReports', response.data)
         if (slug) {
           const reportMatch = state.reports.find(report => report.slug === slug)
           if (reportMatch) {
@@ -729,6 +729,10 @@ const mutations = {
     state.results = results.results
     state.queryAttributes = results.queryAttributes
     state.resultAggregates = results.aggregates
+  },
+
+  setReports(state, reports) {
+    state.reports = reports
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
