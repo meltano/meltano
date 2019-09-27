@@ -21,17 +21,18 @@ def recreate_database(engine, db_name):
 
 @pytest.fixture(scope="session")
 def engine_uri():
-    host = os.getenv("PG_ADDRESS")
-    port = os.getenv("PG_PORT", 5432)
-    user = os.getenv("PG_USERNAME")
-    password = os.getenv("PG_PASSWORD")
+    host = os.getenv("POSTGRES_ADDRESS")
+    port = os.getenv("POSTGRES_PORT", 5432)
+    user = os.getenv("POSTGRES_USERNAME")
+    password = os.getenv("POSTGRES_PASSWORD")
+    database = os.getenv("POSTGRES_DATABASE")
 
     # create the database
     engine_uri = f"postgresql://{user}:{password}@{host}:{port}/postgres"
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
-    recreate_database(engine, "pytest")
+    recreate_database(engine, database)
 
-    return f"postgresql://{user}:{password}@{host}:{port}/pytest"
+    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
 
 
 @pytest.fixture()

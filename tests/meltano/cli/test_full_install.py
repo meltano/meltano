@@ -18,8 +18,6 @@ class TestFullInstall:
         elt_context_builder,
         project_add_service,
     ):
-        monkeypatch.setenv("MELTANO_BACKEND", "postgresql")
-
         with mock.patch(
             "meltano.cli.add.ProjectAddService", return_value=project_add_service
         ), mock.patch(
