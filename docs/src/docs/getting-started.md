@@ -67,7 +67,7 @@ Once it is finished installing, you will see the following modal:
 
 ![Modal dialogue for successful SQLite installation](/images/getting-started-guide/gsg-05.png)
 
-By default, `target-sqlite` is configured with a database named `meltano` that can be customized if desired. For this guide however, let's just use the default name and click `Save`.
+By default, `target-sqlite` is configured with a database named `warehouse` that can be customized if desired. For this guide however, let's just use the default name and click `Save`.
 
 ## Apply transformations as desired
 
