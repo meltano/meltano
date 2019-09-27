@@ -71,5 +71,11 @@ GITLAB_CLIENT_ID = os.getenv("OAUTH_GITLAB_APPLICATION_ID")
 GITLAB_CLIENT_SECRET = os.getenv("OAUTH_GITLAB_SECRET")
 
 # Flask-RESTful
+# -----------------
 
 RESTFUL_JSON = {}
+
+# Flask-Executor
+# -----------------
+
+EXECUTOR_PROPAGATE_EXCEPTIONS = True
