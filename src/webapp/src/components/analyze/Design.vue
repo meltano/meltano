@@ -335,10 +335,10 @@ export default {
                       <div class="control">
                         <input
                           :value="saveReportSettings.name"
-                          @input="setReportName($event.target.value)"
                           class="input"
                           type="text"
                           placeholder="Name your report"
+                          @input="setReportName($event.target.value)"
                         />
                       </div>
                     </div>
