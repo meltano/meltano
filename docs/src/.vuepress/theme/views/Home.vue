@@ -323,7 +323,7 @@
           preferred channel.
         </p>
         <a
-          href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLWI1N2EyZjA1N2FiNDBlNDE2OTg4YmI1N2I3OWVjOWI2MzIyYmJmMDQwMTY2MmUwZjNkMTBiYzhiZTI2M2IxMDc"
+          href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLTZhY2QzYzkwNjYzNWY5Zjk5ZTE1ZGExNzE1NTFmMWJiM2E2ODVhMDFlYjc5YzVjMjllZTZlZDVjNWU2ZjNjNzQ"
           class="button"
           target="_blank"
           >Slack</a
