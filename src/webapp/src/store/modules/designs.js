@@ -465,7 +465,7 @@ const actions = {
       })
   },
 
-  loadReport({ commit, state }, { name }) {
+  loadReport({ commit }, { name }) {
     reportsApi
       .loadReport(name)
       .then(response => {
