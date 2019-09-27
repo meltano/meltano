@@ -160,8 +160,8 @@ export default {
       this.$store.dispatch('designs/setChartType', chartType)
     },
 
-    setReportName() {
-      this.saveReportSettings.name = `report-${new Date().getTime()}`
+    setReportName(name) {
+      this.$store.dispatch('designs/updateSaveReportSettings', name)
     },
 
     tableRowClicked(relatedTable) {
@@ -324,7 +324,7 @@ export default {
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport ? '' : 'Save Report'"
                 is-right-aligned
-                @dropdown:open="setReportName"
+                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
@@ -334,7 +334,8 @@ export default {
                       >
                       <div class="control">
                         <input
-                          v-model="saveReportSettings.name"
+                          :value="saveReportSettings.name"
+                          @input="setReportName($event.target.value)"
                           class="input"
                           type="text"
                           placeholder="Name your report"

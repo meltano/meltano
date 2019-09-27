@@ -561,12 +561,15 @@ const actions = {
   },
 
   updateReport({ commit, state }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
-    state.activeReport.chartType = state.chartType
+    commit('updateActiveReport')
     return reportsApi.updateReport(state.activeReport).then(response => {
       commit('resetSaveReportSettings')
       commit('setCurrentReport', response.data)
     })
+  },
+
+  updateSaveReportSettings({ commit }, name) {
+    commit('setSaveReportSettingsName', name)
   },
 
   // eslint-disable-next-line no-shadow
@@ -735,6 +738,10 @@ const mutations = {
     state.reports = reports
   },
 
+  setSaveReportSettingsName(state, name) {
+    state.saveReportSettings.name = name
+  },
+
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
     orderableAttribute.direction = direction
   },
@@ -848,6 +855,11 @@ const mutations = {
 
   toggleSelected(state, attribute) {
     Vue.set(attribute, 'selected', !attribute.selected)
+  },
+
+  updateActiveReport(state) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
+    state.activeReport.chartType = state.chartType
   }
 }
 
