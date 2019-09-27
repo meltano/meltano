@@ -167,42 +167,23 @@ export default {
           </a>
         </router-link>
 
-        <div class="navbar-item navbar-child has-dropdown is-hoverable">
-          <router-link
-            :to="{ name: 'analyze' }"
-            :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
-            class="navbar-link has-text-weight-semibold"
+        <router-link
+          :to="{ name: 'analyze' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+            }"
           >
-            <a
-              class="button has-background-transparent is-borderless is-paddingless"
-              :class="{
-                'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
-              }"
-            >
-              <span class="icon is-small" :class="getIconColor('/analyze')">
-                <font-awesome-icon icon="chart-line"></font-awesome-icon>
-              </span>
-              <span>Analyze</span>
-            </a>
-          </router-link>
-
-          <div class="navbar-dropdown">
-            <router-link
-              :to="{ name: 'analyzeModels' }"
-              class="navbar-item button is-borderless"
-              :class="{ 'is-active': getIsCurrentPath('/analyze/models') }"
-              tag="button"
-              >Models</router-link
-            >
-            <a
-              class="navbar-item button is-borderless tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-right"
-              data-tooltip="This feature is queued. Click to add to or submit a new issue."
-              target="_blank"
-              href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
-              >Notebooks</a
-            >
-          </div>
-        </div>
+            <span class="icon is-small" :class="getIconColor('/analyze')">
+              <font-awesome-icon icon="chart-line"></font-awesome-icon>
+            </span>
+            <span>Analyze</span>
+          </a>
+        </router-link>
 
         <router-link
           :to="{ name: 'dashboards' }"
@@ -221,13 +202,29 @@ export default {
             <span>Dashboard</span>
           </a>
         </router-link>
+
+        <a
+          class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
+          data-tooltip="Help shape this feature by contributing your ideas"
+          target="_blank"
+          href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=model"
+          >Model</a
+        >
+
+        <a
+          class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
+          data-tooltip="Help shape this feature by contributing your ideas"
+          target="_blank"
+          href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
+          >Notebook</a
+        >
       </div>
 
       <div class="navbar-end">
         <div class="navbar-item navbar-child">
           <a
-            class="button has-background-light tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-            data-tooltip="This feature is queued. Click to add to or submit a new issue."
+            class="button has-background-light tooltip is-tooltip-warning is-tooltip-left"
+            data-tooltip="Help shape this feature by contributing your ideas"
             target="_blank"
             href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
           >
