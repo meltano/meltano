@@ -66,7 +66,9 @@ def elt(project, extractor, loader, dry, transform, job_id):
                     job_id=job_id,
                     run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
                     target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
-                    tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
+                    tap_config_dir=project.meltano_dir(
+                        PluginType.EXTRACTORS, extractor
+                    ),
                 )
 
                 if transform != "only":
