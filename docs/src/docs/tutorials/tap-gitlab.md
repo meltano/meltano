@@ -166,4 +166,4 @@ meltano add model model-gitlab
 
 With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
 
-Follow [these instructions](./tutorial.html#interact-with-your-data-in-the-web-app) to start Meltano UI, set up a connection to your Postgres, and start exploring!
+Follow [these instructions](./../tutorial.html#interact-with-your-data-in-the-web-app) to start Meltano UI, set up a connection to your Postgres, and start exploring!
