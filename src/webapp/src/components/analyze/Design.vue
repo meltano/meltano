@@ -387,9 +387,9 @@ export default {
             <div class="select">
               <select v-model="loader" name="loader">
                 <option
-                  v-for="loader in installedPlugins.loaders"
-                  :key="loader.name"
-                  >{{ loader.name }}</option
+                  v-for="loaderPlugin in installedPlugins.loaders"
+                  :key="loaderPlugin.name"
+                  >{{ loaderPlugin.name }}</option
                 >
               </select>
             </div>

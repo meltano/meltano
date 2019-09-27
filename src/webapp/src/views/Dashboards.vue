@@ -129,8 +129,8 @@ export default {
                   <div v-if="activeDashboard.name" class="column">
                     <div class="buttons is-right">
                       <a
-                        class="button tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-                        data-tooltip="This feature is queued. Click to add to or submit a new issue."
+                        class="button tooltip is-tooltip-warning is-tooltip-left"
+                        data-tooltip="Help shape this feature by contributing your ideas"
                         target="_blank"
                         href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=dashboard"
                         >Add Report</a
