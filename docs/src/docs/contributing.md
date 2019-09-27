@@ -49,7 +49,7 @@ This means that you're ready to start Meltano CLI development. For API and UI de
 
 ### Metrics (anonymous usage data) tracking
 
-As you contribute to Meltano, you may want to disable [metrics tracking](/docs/quickstart.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
@@ -91,6 +91,15 @@ yarn serve
 ```
 
 The development build of the Meltano UI will be available at <http://localhost:8080/>.
+
+If you need to change the URL of your development environment, you can do this by updating your `.env` in your project directory with the following configuration:
+
+```bash
+# The URL where the web app will be located when working locally in development
+# since it provides the redirect after authentication.
+# Not require for production
+export MELTANO_UI_URL = ""
+```
 
 ## Meltano System Database
 

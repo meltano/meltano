@@ -114,7 +114,7 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/quickstart.html).
+That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/getting-started.html).
 
 ### Installing on Docker
 
@@ -138,7 +138,7 @@ docker run meltano/meltano --version
 
 #### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our Quickstart Guide. However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```
 docker run -v $(pwd):/projects \
@@ -165,7 +165,7 @@ You can now visit [http://localhost:5000](http://localhost:5000) to access the M
 
 If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point.
 
-Follow the steps in our [Quickstart Guide](./quickstart.html) to get started.
+Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
 
 #### For Contributors: Example Command Line Syntax for Docker
 
