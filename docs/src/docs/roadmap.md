@@ -46,7 +46,7 @@ You can track our weekly progress and forward-looking plans in greater detail th
 
 ## MAUI
 
-The focus of our team is to grow [MAUI](#maui) by 10% every week. We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
+We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
 1. [Meltano.com Website](https://meltano.com)
 2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/meltano-cli.html)
