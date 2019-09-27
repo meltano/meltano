@@ -86,12 +86,11 @@ class PluginInvoker:
         )
 
     def prepare(self, session):
-        if not self._prepared:
-            self.load_plugin_config(session)
+        self.load_plugin_config(session)
 
-            with self.plugin.trigger_hooks("configure", self):
-                self.config_service.configure()
-                self._prepared = True
+        with self.plugin.trigger_hooks("configure", self):
+            self.config_service.configure()
+            self._prepared = True
 
     def exec_path(self):
         return self.venv_service.exec_path(
