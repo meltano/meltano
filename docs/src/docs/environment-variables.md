@@ -29,7 +29,7 @@ If you'd prefer to use Meltano _without_ sending the team this kind of data, you
 
 ## System Database
 
-By default, Meltano uses a SQLite database named `meltano.db` as its system database.
+By default, Meltano uses a SQLite database named `./meltano/meltano.db` as its system database.
 
 You can choose to use a different system database backend or configuration using the `--database-uri`
 option of the `meltano` command, or the `MELTANO_DATABASE_URI` environment variable:
