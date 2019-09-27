@@ -228,6 +228,7 @@ loaders:
     settings:
       - name: database
         label: Database
+        env: SQLITE_DATABASE
         description: Path to the database, relative to the project root. If the database does not exist yet, it will be created.
         value: warehouse
 transformers:

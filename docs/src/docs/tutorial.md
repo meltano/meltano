@@ -146,7 +146,6 @@ Update the .env file in your project directory (i.e. sfdc-project) with the SFDC
 
 ```
 FLASK_ENV=development
-SQLITE_DATABASE=meltano
 
 PG_PASSWORD=warehouse
 PG_USERNAME=warehouse
@@ -806,7 +805,6 @@ And finally update the project's `.env` to add the proper settings for the sourc
 **.env**
 ```bash
 export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
 
 export TAP_PG_DATABASE=my_source_db
 export TAP_PG_ADDRESS=localhost
@@ -1026,7 +1024,6 @@ Update the .env file in your project directory (i.e. csv-project) with your Post
 **.env**
 ```bash
 export FLASK_ENV=development
-export SQLITE_DATABASE=meltano
 
 export PG_DATABASE=warehouse
 export PG_PASSWORD=warehouse
