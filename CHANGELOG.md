@@ -32,6 +32,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1051](https://gitlab.com/meltano/meltano/issues/1051) Remove MELTANO_BACKEND e.a. in favor of --uri CLI option and MELTANO_DATABASE_URI env var
 - [#1051](https://gitlab.com/meltano/meltano/issues/1051) Use SQLITE_DATABASE for target-sqlite database rather than system database
+- [#1052](https://gitlab.com/meltano/meltano/issues/1052) Move system database into `.meltano` directory to indicate it is owned by the app and not supposed to be messed with directly by users
 
 ## 0.43.0 - (2019-09-23)
 

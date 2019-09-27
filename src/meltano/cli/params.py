@@ -16,7 +16,7 @@ def db_options(func):
         "--uri",
         "database_uri",
         envvar="MELTANO_DATABASE_URI",
-        default="sqlite:///meltano.db",
+        default="sqlite:///.meltano/meltano.db",
         help="System database URI",
     )
     def decorate(*args, **kwargs):
