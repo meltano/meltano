@@ -8,8 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+
 - [#950](https://gitlab.com/meltano/meltano/issues/950) Removed the Analyze connection configuration: Meltano will now infer connections out of each loader configuration.
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Analyze UI now displays the Topic's (analysis model's) description text if applicable
+- [#1032](https://gitlab.com/meltano/meltano/issues/1032) Add 'Model' and 'Notebook' to main navigation to communicate that Meltano plans to empower users with modeling and notebooking functionality
 
 ### Changes
 
@@ -33,7 +35,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job*id of the run. It can be found in `.meltano/run/logs/elt*{job_id}.log`.
-- [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job_id of the run. It can be found in `.meltano/run/logs/elt_{job_id}.log`.
+- [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job*id of the run. It can be found in `.meltano/run/logs/elt*{job_id}.log`.
 - [#955](https://gitlab.com/meltano/meltano/issues/955) Establish baseline for demo day and how they should be run
 
 ### Changes
