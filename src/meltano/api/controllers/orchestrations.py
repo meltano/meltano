@@ -46,7 +46,7 @@ def _handle(ex):
 
 @orchestrationsBP.errorhandler(MissingJobLogException)
 def _handle(ex):
-    return (jsonify({"error": True, "code": str(ex)}), 500)
+    return (jsonify({"error": False, "code": str(ex)}), 204)
 
 
 @orchestrationsBP.route("/job/state", methods=["POST"])
