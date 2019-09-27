@@ -12,7 +12,7 @@ export default {
     ...mapState('designs', ['order']),
     ...mapGetters('designs', ['getIsOrderableAttributeAscending']),
     assigned: {
-      get () {
+      get() {
         return this.order.assigned
       },
       set(value) {
@@ -28,13 +28,13 @@ export default {
       }
     },
     unassigned: {
-      get () {
+      get() {
         return this.order.unassigned
       },
       set(value) {
         this.$store.commit('designs/setOrderUnassigned', value)
       }
-    },
+    }
   },
   methods: {
     ...mapActions('designs', [
