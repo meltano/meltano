@@ -39,9 +39,6 @@ class Airflow(PluginInstall):
     def __init__(self, *args, **kwargs):
         super().__init__(self.__class__.__plugin_type__, *args, **kwargs)
 
-    def invoker(self, session, project, *args, **kwargs):
-        return AirflowInvoker(session, project, self, *args, **kwargs)
-
     @property
     def config_files(self):
         return {"config": "airflow.cfg"}
@@ -50,7 +47,6 @@ class Airflow(PluginInstall):
     def setup_env(self, project, args=[]):
         # to make airflow installables without GPL dependency
         os.environ["SLUGIFY_USES_TEXT_UNIDECODE"] = "yes"
-        os.environ["AIRFLOW_HOME"] = str(project.run_dir(self.name))
 
     @hook("after_install")
     def after_install(self, project, args=[]):
@@ -59,6 +55,8 @@ class Airflow(PluginInstall):
 
         plugin_config_service = PluginConfigService(project, self)
         plugin_settings_service = PluginSettingsService(project)
+        airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
+        stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
         invoker = invoker_factory(
             project,
             self,
@@ -67,8 +65,7 @@ class Airflow(PluginInstall):
         )
 
         try:
-            airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
-            stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
+            # generate the default `airflow.cfg`
             handle = invoker.invoke(
                 "--help", stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
@@ -98,11 +95,18 @@ class Airflow(PluginInstall):
                 airflow_cfg.write(cfg)
                 logging.debug(f"Saved '{str(airflow_cfg_path)}'")
 
-            # initdb
+            # we've changed the configuration here, so we need to call
+            # prepare again on the invoker so it re-reads the configuration
+            # for the Airflow plugin
+            invoker.prepare(session)
             handle = invoker.invoke(
                 "initdb", stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            handle.wait()
+            initdb = handle.wait()
+
+            if initdb:
+                raise SubprocessError("airflow initdb failed", handle)
+
             logging.debug(f"Completed `airflow initdb`")
         finally:
             session.close()
