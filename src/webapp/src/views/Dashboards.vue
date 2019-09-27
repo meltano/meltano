@@ -59,7 +59,11 @@ export default {
       })
     },
     goToDesign(report) {
-      const params = { design: report.design, model: report.model }
+      const params = {
+        design: report.design,
+        model: report.model,
+        namespace: report.namespace
+      }
       this.$router.push({ name: 'analyzeDesign', params })
     },
     goToReport(report) {
