@@ -18,6 +18,7 @@ from meltano.core.config_service import ConfigService, PluginMissingError
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.db import project_engine
+from meltano.core.utils.pidfile import PIDFile
 from meltano.api.models import db
 
 
@@ -98,12 +99,13 @@ class APIWorker(threading.Thread):
         super().__init__()
         self.project = project
         self.reload = reload
+        self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
         # fmt: off
         cmd = ["gunicorn",
                "--config", "python:meltano.api.wsgi",
-               "--pid", str(self.project.run_dir("gunicorn.pid"))]
+               "--pid", str(self.pid_file)]
         # fmt: on
 
         if self.reload:
@@ -111,27 +113,14 @@ class APIWorker(threading.Thread):
 
         cmd += ["meltano.api.app:create_app()"]
 
-        try:
-            engine, _ = project_engine(self.project)
-            subprocess.run(
-                cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)}
-            )
-        finally:
-            engine.close()
+        engine, _ = project_engine(self.project)
+        subprocess.run(cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)})
 
     def pid_path(self):
         return self.project.run_dir(f"gunicorn.pid")
 
     def stop(self):
-        try:
-            pid = int(self.pid_path().open().read())
-            process = psutil.Process(pid)
-
-            process.terminate()
-        except (ValueError, psutil.NoSuchProcess):
-            f.unlink()
-        except FileNotFoundError:
-            pass
+        self.pid.process.terminate()
 
 
 class AirflowWorker(threading.Thread):
@@ -148,29 +137,29 @@ class AirflowWorker(threading.Thread):
 
     def kill_stale_workers(self):
         stale_workers = []
-        workers_pid = map(self.pid_path, ("webserver", "scheduler"))
+        workers_pid_files = map(self.pid_file, ("webserver", "scheduler"))
 
-        for f in workers_pid:
+        for pid_file in workers_pid_files:
             try:
-                pid = int(f.open().read())
-                stale_workers.append(psutil.Process(pid))
-            except (ValueError, psutil.NoSuchProcess):
-                f.unlink()
-            except FileNotFoundError:
+                stale_workers.append(pid_file.process)
+            except psutil.NoSuchProcess:
                 pass
 
         def on_terminate(proc):
             logging.info(f"Process {proc} ended with exit code {proc.returncode}")
 
-        for p in stale_workers:
-            logging.debug(f"Process {p} is stale, terminating it.")
-            p.terminate()
+        for process in stale_workers:
+            logging.debug(f"Process {process} is stale, terminating it.")
+            process.terminate()
 
         gone, alive = psutil.wait_procs(stale_workers, timeout=5, callback=on_terminate)
 
         # kill the rest
-        for p in alive:
-            p.kill()
+        for process in alive:
+            process.kill()
+
+        for pid_file in workers_pid_files:
+            pid_file.unlink()
 
     def start_all(self):
         _, Session = project_engine(self.project)
@@ -184,14 +173,12 @@ class AirflowWorker(threading.Thread):
 
             # fmt: off
             with logs_dir.joinpath("webserver.log").open("w") as webserver, \
-            logs_dir.joinpath("scheduler.log").open("w") as scheduler, \
-            self.pid_path("webserver").open("w") as webserver_pid, \
-            self.pid_path("scheduler").open("w") as scheduler_pid:
+              logs_dir.joinpath("scheduler.log").open("w") as scheduler:
                 self._webserver = invoker.invoke("webserver", "-w", "1", stdout=webserver)
                 self._scheduler = invoker.invoke("scheduler", stdout=scheduler)
 
-                webserver_pid.write(str(self._webserver.pid))
-                scheduler_pid.write(str(self._scheduler.pid))
+                self.pid_file("webserver").write_pid(self._webserver.pid)
+                self.pid_file("scheduler").write_pid(self._scheduler.pid)
             # fmt: on
 
             # Time padding for server initialization so UI iframe displays as expected
@@ -200,8 +187,8 @@ class AirflowWorker(threading.Thread):
         finally:
             session.close()
 
-    def pid_path(self, name):
-        return self.project.run_dir("airflow", f"{name}.pid")
+    def pid_file(self, name) -> PIDFile:
+        return PIDFile(self.project.run_dir("airflow", f"{name}.pid"))
 
     def run(self):
         try:

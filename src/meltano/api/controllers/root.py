@@ -8,6 +8,7 @@ from jinja2 import TemplateNotFound
 
 import meltano
 from meltano.api.security import api_auth_required
+from meltano.core.utils import truthy
 
 logger = logging.getLogger(__name__)
 root = Blueprint("root", __name__)
@@ -40,12 +41,14 @@ def upgrade():
 
 @root.route("/version")
 def version():
-    res = requests.get("https://pypi.org/pypi/meltano/json")
-    payload = res.json()
+    response_payload = {"version": meltano.__version__}
 
-    return jsonify(
-        {"version": meltano.__version__, "latest_version": payload["info"]["version"]}
-    )
+    if truthy(request.args.get("include_latest")):
+        res = requests.get("https://pypi.org/pypi/meltano/json")
+        pypi_payload = res.json()
+        response_payload["latest_version"] = pypi_payload["info"]["version"]
+
+    return jsonify(response_payload)
 
 
 @root.route("/echo", methods=["POST"])

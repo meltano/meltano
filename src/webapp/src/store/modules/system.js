@@ -23,7 +23,7 @@ const getters = {
 
 const actions = {
   check({ commit }) {
-    return systemApi.version().then(response => {
+    return systemApi.version({ include_latest: true }).then(response => {
       commit('setVersion', response.data.version)
       commit('setLatestVersion', response.data.latestVersion)
     })
@@ -37,13 +37,8 @@ const actions = {
           systemApi
             .version()
             .then(response => {
-              const { latestVersion, version } = response.data
-              if (compareVersions.compare(state.version, latestVersion, '=')) {
-                commit('setLatestVersion', latestVersion)
-                reject(version)
-              }
-
-              if (compareVersions.compare(version, state.version, '>')) {
+              const { version } = response.data
+              if (compareVersions.compare(version, state.latestVersion, '>=')) {
                 commit('setVersion', version)
                 resolve(version)
               }

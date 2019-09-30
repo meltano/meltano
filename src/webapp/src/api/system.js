@@ -6,7 +6,7 @@ export default {
     return axios.post(utils.root('/upgrade'))
   },
 
-  version() {
-    return axios.get(utils.root('/version'))
+  version(params) {
+    return axios.get(utils.root('/version'), { params })
   }
 }
