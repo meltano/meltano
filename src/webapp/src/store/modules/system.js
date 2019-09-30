@@ -43,10 +43,7 @@ const actions = {
                 resolve(version)
               }
             })
-            .catch(() => {
-              // the host might be down for a while during the update process.
-              console.info('Waiting for API to restart...')
-            })
+            .catch(reject)
         },
         null,
         5000

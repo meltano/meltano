@@ -55,8 +55,6 @@ def ui(project, reload, bind_port, bind):
     tracker.track_meltano_ui()
 
     engine, _ = project_engine(project)
-    # TODO: move to `project_engine`
-    os.environ["MELTANO_DATABASE_URI"] = str(engine.url)
     migration_service = MigrationService(engine)
     migration_service.upgrade()
 

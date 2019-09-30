@@ -95,7 +95,7 @@ class AuthHandler {
 }
 
 export default {
-  install(Vue, { service, router, toasted }) {
+  install(Vue, { router, service, toasted }) {
     const handler = new AuthHandler()
 
     Vue.mixin({

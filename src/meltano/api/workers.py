@@ -22,9 +22,6 @@ from meltano.core.utils.pidfile import PIDFile
 from meltano.api.models import db
 
 
-airflow_context = {"worker": None}
-
-
 class CompileEventHandler(PatternMatchingEventHandler):
     def __init__(self, compiler):
         self.compiler = compiler

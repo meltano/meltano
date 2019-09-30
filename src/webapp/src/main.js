@@ -2,19 +2,18 @@ import Router from 'vue-router'
 import Toasted from 'vue-toasted'
 import Vue from 'vue'
 import VueAnalytics from 'vue-analytics'
-
 import axios from 'axios'
-import { Service } from 'axios-middleware'
-import FontAwesome from './font-awesome'
 import lodash from 'lodash'
+import { Service } from 'axios-middleware'
 
 import App from './App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
-import Upgrade from '@/middleware/upgrade'
+import FontAwesome from './font-awesome'
 import flaskContext from '@/flask'
 import router from './router'
 import store from './store'
+import Upgrade from '@/middleware/upgrade'
 
 Vue.config.productionTip = false
 
@@ -108,7 +107,7 @@ Vue.toasted.register(
     duration: null,
     closeOnSwipe: false,
     singleton: true,
-    type: 'warning'
+    type: 'info'
   }
 )
 
