@@ -18,6 +18,7 @@ export default {
   background-color: #282c34;
   transition: transform 0.2s;
   user-select: none;
+  padding: 10px;
 }
 
 .code-block-copy-button:active {
