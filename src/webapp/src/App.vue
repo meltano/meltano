@@ -27,9 +27,11 @@ export default {
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     acknowledgeAnalyticsTracking() {
-      if(Vue.prototype.$flask.isSendAnonymousUsageStats) {
-        const hasAcknowledgedTracking = 'hasAcknowledgedTracking' in localStorage && localStorage.getItem('hasAcknowledgedTracking') === 'true'
-        if(!hasAcknowledgedTracking) {
+      if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+        const hasAcknowledgedTracking =
+          'hasAcknowledgedTracking' in localStorage &&
+          localStorage.getItem('hasAcknowledgedTracking') === 'true'
+        if (!hasAcknowledgedTracking) {
           Vue.toasted.global.acknowledgeAnalyticsTracking()
         }
       }
