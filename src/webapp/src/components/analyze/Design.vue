@@ -24,41 +24,41 @@ export default {
   },
   data() {
     return {
-      isNewDashboardModalOpen: false,
-      isInitialized: false
+      isInitialized: false,
+      isNewDashboardModalOpen: false
     }
   },
   computed: {
     ...mapState('designs', [
       'activeReport',
-      'design',
-      'currentModel',
-      'currentDesign',
-      'currentSQL',
-      'loadingQuery',
-      'saveReportSettings',
-      'reports',
-      'hasSQLError',
-      'sqlErrorMessage',
-      'results',
-      'resultAggregates',
       'chartType',
+      'currentDesign',
+      'currentModel',
+      'currentSQL',
+      'design',
+      'filterOptions',
+      'hasSQLError',
       'loader',
-      'filterOptions'
+      'isLoadingQuery',
+      'reports',
+      'resultAggregates',
+      'results',
+      'saveReportSettings',
+      'sqlErrorMessage'
     ]),
     ...mapGetters('designs', [
-      'getSelectedAttributesCount',
-      'currentModelLabel',
       'currentDesignLabel',
-      'hasChartableResults',
-      'resultsCount',
-      'hasJoins',
-      'showJoinColumnAggregateHeader',
-      'formattedSql',
+      'currentModelLabel',
       'filtersCount',
-      'hasFilters',
+      'formattedSql',
       'getIsAttributeInFilters',
-      'isLoaderSqlite'
+      'getSelectedAttributesCount',
+      'hasChartableResults',
+      'hasFilters',
+      'hasJoins',
+      'isLoaderSqlite',
+      'resultsCount',
+      'showJoinColumnAggregateHeader'
     ]),
     ...mapState('dashboards', ['dashboards']),
     ...mapState('plugins', ['installedPlugins']),
@@ -160,8 +160,8 @@ export default {
       this.$store.dispatch('designs/setChartType', chartType)
     },
 
-    setReportName() {
-      this.saveReportSettings.name = `report-${new Date().getTime()}`
+    setReportName(name) {
+      this.$store.dispatch('designs/updateSaveReportSettings', name)
     },
 
     tableRowClicked(relatedTable) {
@@ -324,7 +324,7 @@ export default {
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport ? '' : 'Save Report'"
                 is-right-aligned
-                @dropdown:open="setReportName"
+                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
@@ -334,10 +334,11 @@ export default {
                       >
                       <div class="control">
                         <input
-                          v-model="saveReportSettings.name"
+                          :value="saveReportSettings.name"
                           class="input"
                           type="text"
                           placeholder="Name your report"
+                          @input="setReportName($event.target.value)"
                         />
                       </div>
                     </div>
@@ -423,7 +424,7 @@ export default {
                 </Dropdown>
                 <button
                   class="button is-success"
-                  :class="{ 'is-loading': loadingQuery }"
+                  :class="{ 'is-loading': isLoadingQuery }"
                   :disabled="!currentSQL"
                   @click="runQuery"
                 >

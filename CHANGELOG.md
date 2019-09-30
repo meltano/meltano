@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1004](https://gitlab.com/meltano/meltano/issues/1004) Fix error when deselecting last attribute in Analyze
+- [#1048](https://gitlab.com/meltano/meltano/issues/1048) Fix various actions that should have been mutations and did minor code convention cleanup
 
 ### Breaks
 
