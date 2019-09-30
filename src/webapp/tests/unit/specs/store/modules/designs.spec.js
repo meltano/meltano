@@ -6,32 +6,33 @@ describe('designs Vuex store', () => {
   beforeEach(() => {
     state = {
       activeReport: {},
+      chartType: 'BarChart',
+      currentDesign: '',
+      currentModel: '',
+      currentNamespace: '',
+      currentSQL: '',
       design: {
         relatedTable: {}
       },
-      hasSQLError: false,
-      sqlErrorMessage: [],
-      currentModel: '',
-      currentDesign: '',
-      results: [],
-      queryAttributes: [],
-      resultAggregates: [],
-      loadingQuery: false,
-      currentSQL: '',
-      saveReportSettings: { name: null },
-      reports: [],
-      chartType: 'BarChart',
-      limit: 50,
       loader: null,
       filterOptions: [],
       filters: {
-        columns: [],
-        aggregates: []
+        aggregates: [],
+        columns: []
       },
+      hasSQLError: false,
+      isLoadingQuery: false,
+      limit: 50,
       order: {
         assigned: [],
         unassigned: []
-      }
+      },
+      queryAttributes: [],
+      reports: [],
+      resultAggregates: [],
+      results: [],
+      saveReportSettings: { name: null },
+      sqlErrorMessage: []
     }
   })
 
