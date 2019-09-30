@@ -117,7 +117,7 @@ class APIWorker(threading.Thread):
         return self.project.run_dir(f"gunicorn.pid")
 
     def stop(self):
-        self.pid.process.terminate()
+        self.pid_file.process.terminate()
 
 
 class AirflowWorker(threading.Thread):
