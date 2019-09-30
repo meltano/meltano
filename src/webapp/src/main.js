@@ -70,7 +70,7 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
 // Register an analytics tracking notification Toast.
 Vue.toasted.register(
   'acknowledgeAnalyticsTracking',
-  'Meltano has anonymous product usage tracking turned on.',
+  'Meltano has anonymous usage tracking on.',
   {
     type: 'info',
     action: [
