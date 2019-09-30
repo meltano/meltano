@@ -36,7 +36,7 @@ for schedule in schedule_service.schedules():
 
     elt = BashOperator(
         task_id="extract_load",
-        bash_command=f"echo $PATH; echo $VIRTUAL_ENV; cd {str(project.root)}; .meltano/run/bin elt {schedule.extractor} {schedule.loader} --transform={schedule.transform}",
+        bash_command=f"echo $PATH; echo $VIRTUAL_ENV; cd {str(project.root)}; .meltano/run/bin elt {schedule.extractor} {schedule.loader} --job_id={schedule.name} --transform={schedule.transform}",
         dag=dag,
         env={
             # inherit the current env

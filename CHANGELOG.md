@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 ### Changes
+- [#1069](https://gitlab.com/meltano/meltano/issues/1069) Meltano will now use the schedule's name to run incremental jobs
 
 ### Fixes
 

@@ -30,12 +30,9 @@ def schedule(project, ctx):
 @click.argument("loader")
 @click.argument("interval")
 @click.option("--transform", type=click.Choice(["skip", "only", "run"]), default="skip")
-@click.option(
-    "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
-)
 @click.option("--start-date", type=click.DateTime(), default=None)
 @click.pass_context
-def add(ctx, name, extractor, loader, transform, interval, job_id, start_date):
+def add(ctx, name, extractor, loader, transform, interval, start_date):
     """
     Add a new schedule
 
@@ -52,14 +49,7 @@ def add(ctx, name, extractor, loader, transform, interval, job_id, start_date):
     try:
         tracker = GoogleAnalyticsTracker(schedule_service.project)
         schedule = schedule_service.add(
-            session,
-            name,
-            extractor,
-            loader,
-            transform,
-            interval,
-            start_date,
-            MELTANO_JOB_ID=job_id or "",
+            session, name, extractor, loader, transform, interval, start_date
         )
 
         tracker.track_meltano_schedule(schedule)
