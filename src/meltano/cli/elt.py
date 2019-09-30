@@ -21,7 +21,7 @@ from meltano.core.plugin_discovery_service import (
     PluginDiscoveryService,
     PluginNotFoundError,
 )
-from meltano.core.logging import OutputLogger
+from meltano.core.logging import OutputLogger, JobLoggingService
 from meltano.core.elt_context import ELTContextBuilder
 
 
@@ -43,57 +43,60 @@ def elt(project, extractor, loader, dry, transform, job_id):
     """
 
     _, Session = project_engine(project)
-    install_missing_plugins(project, extractor, loader, transform)
 
     if job_id is None:
         # Autogenerate a job_id if it is not provided by the user
         job_id = f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
 
-    with OutputLogger(project.run_dir("logs", f"elt_{job_id}.log")):
-        try:
-            session = Session()
+    with JobLoggingService(project).create_log(job_id) as log_file:
+        with OutputLogger(log_file):
+            try:
+                install_missing_plugins(project, extractor, loader, transform)
+                session = Session()
 
-            elt_context = (
-                ELTContextBuilder(project)
-                .with_extractor(extractor)
-                .with_loader(loader)
-                .context(session)
-            )
+                elt_context = (
+                    ELTContextBuilder(project)
+                    .with_extractor(extractor)
+                    .with_loader(loader)
+                    .context(session)
+                )
 
-            singer_runner = SingerRunner(
-                elt_context,
-                job_id=job_id,
-                run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
-                target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
-                tap_config_dir=project.meltano_dir(PluginType.EXTRACTORS, extractor),
-            )
+                singer_runner = SingerRunner(
+                    elt_context,
+                    job_id=job_id,
+                    run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
+                    target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
+                    tap_config_dir=project.meltano_dir(
+                        PluginType.EXTRACTORS, extractor
+                    ),
+                )
 
-            if transform != "only":
-                click.echo("Running extract & load...")
-                singer_runner.run(session, dry_run=dry)
-                click.secho("Extract & load complete!", fg="green")
-            else:
-                click.secho("Extract & load skipped.", fg="yellow")
+                if transform != "only":
+                    click.echo("Running extract & load...")
+                    singer_runner.run(session, dry_run=dry)
+                    click.secho("Extract & load complete!", fg="green")
+                else:
+                    click.secho("Extract & load skipped.", fg="yellow")
 
-            if transform != "skip":
-                dbt_runner = DbtRunner(elt_context)
-                click.echo("Running transformation...")
-                dbt_runner.run(
-                    session, dry_run=dry, models=extractor
-                )  # TODO: models from elt_context?
-                click.secho("Transformation complete!", fg="green")
-            else:
-                click.secho("Transformation skipped.", fg="yellow")
-        except Exception as err:
-            click.secho(
-                f"ELT could not complete, an error happened during the process.",
-                fg="red",
-            )
-            logging.exception(err)
-            click.secho(str(err), err=True)
-            raise click.Abort()
-        finally:
-            session.close()
+                if transform != "skip":
+                    dbt_runner = DbtRunner(elt_context)
+                    click.echo("Running transformation...")
+                    dbt_runner.run(
+                        session, dry_run=dry, models=extractor
+                    )  # TODO: models from elt_context?
+                    click.secho("Transformation complete!", fg="green")
+                else:
+                    click.secho("Transformation skipped.", fg="yellow")
+            except Exception as err:
+                click.secho(
+                    f"ELT could not complete, an error happened during the process.",
+                    fg="red",
+                )
+                logging.exception(err)
+                click.secho(str(err), err=True)
+                raise click.Abort()
+            finally:
+                session.close()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)

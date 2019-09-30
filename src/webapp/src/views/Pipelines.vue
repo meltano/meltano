@@ -27,7 +27,7 @@ export default {
         },
         {
           name: 'schedules',
-          routeMatches: ['schedules', 'createSchedule']
+          routeMatches: ['schedules', 'createSchedule', 'runLog']
         }
       ]
     }
@@ -141,7 +141,7 @@ export default {
             >
               Run
             </button>
-            <p>Automate Data Collection</p>
+            <p>Start Data Collection</p>
           </div>
         </div>
 

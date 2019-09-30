@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#950](https://gitlab.com/meltano/meltano/issues/950) Removed the Analyze connection configuration: Meltano will now infer connections out of each loader configuration.
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Analyze UI now displays the Topic's (analysis model's) description text if applicable
 - [#1032](https://gitlab.com/meltano/meltano/issues/1032) Add 'Model' and 'Notebook' to main navigation to communicate that Meltano plans to empower users with modeling and notebooking functionality
+- [#949](https://gitlab.com/meltano/meltano/issues/949) Add "Log" button and dedicated sub-UI for tracking an ELT run's status more granularly
 
 ### Changes
 
@@ -22,6 +23,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#578](https://gitlab.com/meltano/meltano/issues/578) Remove support for `tap-zuora`.
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Update `discovery.yml` with explicit `kind: password` metadata (we infer and set input types of `password` as a safeguard, but the explicit setting is preferred)
 - [#1049](https://gitlab.com/meltano/meltano/issues/1049) Change default `target-sqlite` database name to `warehouse` to not conflict with system database
+- [#949](https://gitlab.com/meltano/meltano/issues/949) Update the way Meltano handles logs for ELT runs: Every elt run is logged in `.meltano/run/logs/{job_id}/elt_{timestamp}.log`. That allows Meltano to keep logs for multiple, or even concurrent, elt runs with the same `job_id`.
+- [#949](https://gitlab.com/meltano/meltano/issues/949) Update "Create Pipeline" redirect logic based on the previous route being 'transforms' (this is a UX win setting up the user with the sub-UI for the next logical step vs. requiring a manual "Create" click)
 
 ### Fixes
 
@@ -38,6 +41,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job*id of the run. It can be found in `.meltano/run/logs/elt*{job_id}.log`.
 - [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique job*id of the run. It can be found in `.meltano/run/logs/elt*{job_id}.log`.
+- [#1014](https://gitlab.com/meltano/meltano/issues/1014) Meltano now logs all output from each `meltano elt` run in a log file that uses the unique `job_id` of the run. It can be found in `.meltano/run/logs/elt*{job_id}.log`.
 - [#955](https://gitlab.com/meltano/meltano/issues/955) Establish baseline for demo day and how they should be run
 
 ### Changes
