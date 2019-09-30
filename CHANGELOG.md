@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Add Google Analytics tracking acknowledgment in the UI
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 0.44.0 - (2019-09-30)
 
