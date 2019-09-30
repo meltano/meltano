@@ -417,7 +417,7 @@ export default {
                   <div class="dropdown-content">
                     <div class="level">
                       <div class="level-item">
-                        <code>{{ formattedSql }}</code>
+                        <pre><code>{{ formattedSql }}</code></pre>
                       </div>
                     </div>
                   </div>

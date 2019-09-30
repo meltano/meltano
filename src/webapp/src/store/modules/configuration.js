@@ -123,6 +123,10 @@ const actions = {
       })
   },
 
+  getJobLog(_, jobId) {
+    return orchestrationsApi.getJobLog({ jobId })
+  },
+
   getLoaderConfiguration({ commit, dispatch }, loader) {
     dispatch('getPluginConfiguration', { name: loader, type: 'loaders' }).then(
       response => {
@@ -138,7 +142,6 @@ const actions = {
     return orchestrationsApi.getPluginConfiguration(pluginPayload)
   },
 
-  // eslint-disable-next-line no-shadow
   getPolledPipelineJobStatus({ commit, getters, state }) {
     return orchestrationsApi
       .getPolledPipelineJobStatus({ jobIds: getters.getRunningPipelineJobIds })
@@ -200,6 +203,7 @@ const actions = {
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
       commit('setPipelineIsRunning', { pipeline, value: true })
+      commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
     })
   },
 
@@ -319,6 +323,10 @@ const mutations = {
 
   setPipelineIsRunning(_, { pipeline, value }) {
     Vue.set(pipeline, 'isRunning', value)
+  },
+
+  setPipelineJobId(_, { pipeline, jobId }) {
+    Vue.set(pipeline, 'jobId', jobId)
   },
 
   setPipelines(state, pipelines) {

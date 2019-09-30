@@ -67,9 +67,20 @@ export default {
         </span>
       </th>
 
-      <th v-if="hasActions" class="has-text-right">
-        <span>Actions</span>
-      </th>
+      <template v-if="hasActions">
+        <th class="has-text-centered">
+          <span>Status</span>
+          <span
+            class="icon has-text-grey-light tooltip is-tooltip-multiline"
+            data-tooltip="The logging status of the last ELT run for this pipeline."
+          >
+            <font-awesome-icon icon="info-circle"></font-awesome-icon>
+          </span>
+        </th>
+        <th class="has-text-right">
+          <span>Actions</span>
+        </th>
+      </template>
     </tr>
   </thead>
 </template>

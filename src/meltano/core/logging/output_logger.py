@@ -28,9 +28,9 @@ class OutputLogger(object):
      even if it is not specified by the logger of a particular module.
     """
 
-    def __init__(self, filename):
+    def __init__(self, file):
         # Don't append, just log the last run for the same job_id
-        self.file = open(filename, "w")
+        self.file = file
         self.stdout = sys.stdout
         self.stderr = sys.stderr
 
@@ -54,8 +54,6 @@ class OutputLogger(object):
         sys.stdout = self.stdout
         sys.stderr = self.stderr
         logging.getLogger().handlers = self.log_handlers
-
-        self.file.close()
 
         # revert back to the `click` implementation
         importlib.reload(click)

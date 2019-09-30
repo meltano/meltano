@@ -14,6 +14,10 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
   },
 
+  getJobLog(jobId) {
+    return axios.post(utils.apiUrl('orchestrations', 'job/log'), jobId)
+  },
+
   getPluginConfiguration(pluginPayload) {
     return axios.post(
       utils.apiUrl('orchestrations', 'get/configuration'),
