@@ -26,8 +26,8 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
+  isLoadingQuery: false,
   limit: 50,
-  loadingQuery: false,
   order: {
     assigned: [],
     unassigned: []
@@ -397,10 +397,8 @@ const actions = {
   },
 
   getDesign({ commit, dispatch, state }, { namespace, model, design, slug }) {
-    state.currentSQL = ''
-    state.currentNamespace = namespace
-    state.currentModel = model
-    state.currentDesign = design
+    commit('resetSQLResults')
+    commit('setCurrentMetadata', { namespace, model, design })
 
     return designApi
       .index(namespace, model, design)
@@ -409,7 +407,7 @@ const actions = {
       })
       .then(reportsApi.loadReports)
       .then(response => {
-        state.reports = response.data
+        commit('setReports', response.data)
         if (slug) {
           const reportMatch = state.reports.find(report => report.slug === slug)
           if (reportMatch) {
@@ -419,7 +417,7 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
@@ -429,10 +427,9 @@ const actions = {
     })
   },
 
-  // eslint-disable-next-line no-shadow
   getSQL({ commit, getters, state }, { run, load }) {
     this.dispatch('designs/resetErrorMessage')
-    state.loadingQuery = !!run
+    commit('setIsLoadingQuery', !!run)
 
     const queryPayload = Object.assign(
       {},
@@ -452,11 +449,11 @@ const actions = {
         if (response.status === 204) {
           commit('resetQueryResults')
           commit('resetSQLResults')
-          state.loadingQuery = false
+          commit('setIsLoadingQuery', false)
         } else if (run) {
           commit('setQueryResults', response.data)
           commit('setSQLResults', response.data)
-          state.loadingQuery = false
+          commit('setIsLoadingQuery', false)
           commit('setSorting', getters.getAllAttributes)
         } else {
           commit('setSQLResults', response.data)
@@ -464,11 +461,11 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
-  loadReport({ commit, state }, { name }) {
+  loadReport({ commit }, { name }) {
     reportsApi
       .loadReport(name)
       .then(response => {
@@ -482,7 +479,7 @@ const actions = {
       })
       .catch(e => {
         commit('setSqlErrorMessage', e)
-        state.loadingQuery = false
+        commit('setIsLoadingQuery', false)
       })
   },
 
@@ -564,12 +561,15 @@ const actions = {
   },
 
   updateReport({ commit, state }) {
-    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
-    state.activeReport.chartType = state.chartType
+    commit('updateActiveReport')
     return reportsApi.updateReport(state.activeReport).then(response => {
       commit('resetSaveReportSettings')
       commit('setCurrentReport', response.data)
     })
+  },
+
+  updateSaveReportSettings({ commit }, name) {
+    commit('setSaveReportSettingsName', name)
   },
 
   // eslint-disable-next-line no-shadow
@@ -663,6 +663,12 @@ const mutations = {
     state.chartType = chartType
   },
 
+  setCurrentMetadata(state, { namespace, model, design }) {
+    state.currentNamespace = namespace
+    state.currentModel = model
+    state.currentDesign = design
+  },
+
   setCurrentReport(state, report) {
     state.activeReport = report
   },
@@ -718,10 +724,30 @@ const mutations = {
     join.timeframes = timeframes
   },
 
+  setIsLoadingQuery(state, value) {
+    state.isLoadingQuery = value
+  },
+
+  setOrderAssigned(state, value) {
+    state.order.assigned = value
+  },
+
+  setOrderUnassigned(state, value) {
+    state.order.unassigned = value
+  },
+
   setQueryResults(state, results) {
     state.results = results.results
     state.queryAttributes = results.queryAttributes
     state.resultAggregates = results.aggregates
+  },
+
+  setReports(state, reports) {
+    state.reports = reports
+  },
+
+  setSaveReportSettingsName(state, name) {
+    state.saveReportSettings.name = name
   },
 
   setSortableAttributeDirection(_, { orderableAttribute, direction }) {
@@ -837,6 +863,11 @@ const mutations = {
 
   toggleSelected(state, attribute) {
     Vue.set(attribute, 'selected', !attribute.selected)
+  },
+
+  updateActiveReport(state) {
+    state.activeReport.queryPayload = helpers.getQueryPayloadFromDesign(state)
+    state.activeReport.chartType = state.chartType
   }
 }
 
