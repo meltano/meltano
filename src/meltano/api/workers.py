@@ -113,7 +113,9 @@ class APIWorker(threading.Thread):
 
         try:
             engine, _ = project_engine(self.project)
-            subprocess.run(cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)})
+            subprocess.run(
+                cmd, env={**os.environ, "MELTANO_DATABASE_URI": str(engine.url)}
+            )
         finally:
             engine.close()
 
