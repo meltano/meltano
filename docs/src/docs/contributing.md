@@ -304,12 +304,12 @@ Meltano releases weekly on Monday mornings, and you can find a list of upcoming 
 
 | Release Date | Release Owner | Dogfooding Owner | Shadow   |
 | ------------ | ------------- | ---------------- | -------- |
-| 2019-09-03   | Derek K.      | Derek K.         | --       |
+| 2019-09-03   | Derek K.      | Derek K.         |          |
 | 2019-09-09   | Ben H.        | Ben H.           | Douwe M. |
 | 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M. |
 | 2019-09-23   | Ben H.        | Ben H.           |          |
-| 2019-09-30   | Danielle M.   | Danielle M.      |          |
-| 2019-10-07   | Micael B.     | Micael B.        |          |
+| 2019-09-30   | Micael B.     | Micael B.        |          |
+| 2019-10-07   | Ben H.        | Ben H.           |          |
 | 2019-10-14   | Derek K.      | Derek K.         |          |
 
 :::tip Can't make your scheduled release?
