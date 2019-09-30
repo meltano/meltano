@@ -67,7 +67,7 @@ docs:
     paths:
       - node_modules/
   before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
     - mkdir -p ~/.ssh
@@ -102,18 +102,21 @@ docs:
 test_postgres:
   <<: *test
   variables:
+    PYTEST_BACKEND: postgresql
+
+    # `postgres` service configuration
     POSTGRES_ADDRESS: postgres
-    POSTGRES_USER: runner
-    POSTGRES_DB: pytest
-    POSTGRES_PASSWORD: ""
     POSTGRES_PORT: 5432
-    # these are the Meltano specific config
+    POSTGRES_USER: runner
+    POSTGRES_PASSWORD: ""
+    POSTGRES_DB: pytest_warehouse
+
+    # `target-postgres` configuration
     PG_ADDRESS: $POSTGRES_ADDRESS
+    PG_PORT: $POSTGRES_PORT
     PG_USERNAME: $POSTGRES_USER
     PG_PASSWORD: $POSTGRES_PASSWORD
     PG_DATABASE: $POSTGRES_DB
-    PG_PORT: $POSTGRES_PORT
-    PYTEST_BACKEND: postgresql
   services:
     - postgres:latest
 
@@ -121,7 +124,9 @@ test_sqlite:
   <<: *test
   variables:
     PYTEST_BACKEND: sqlite
-    SQLITE_DATABASE: pytest
+
+    # `target-sqlite` configuration
+    SQLITE_DATABASE: pytest_warehouse
 
 publish:
   image:
@@ -159,7 +164,6 @@ digitalocean_marketplace:
     - branches
   except:
     - master
-
 
 #############
 # Publish   #
