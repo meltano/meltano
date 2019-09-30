@@ -2,8 +2,6 @@
 import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 
-import Toasted from 'vue-toasted'
-
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
 
