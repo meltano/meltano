@@ -1,4 +1,3 @@
-import os
 import functools
 import urllib
 import click
@@ -13,58 +12,13 @@ from meltano.core.db import project_engine
 
 def db_options(func):
     @click.option(
-        "-B",
-        "--backend",
-        envvar="MELTANO_BACKEND",
-        default="sqlite",
-        type=click.Choice(["sqlite", "postgresql"]),
-        help="Database backend for Meltano.",
+        "--database-uri",
+        envvar="MELTANO_DATABASE_URI",
+        default="sqlite:///.meltano/meltano.db",
+        help="System database URI",
     )
-    @click.option("--path", envvar="SQLITE_DATABASE", default="meltano")
-    @click.option(
-        "-H",
-        "--host",
-        envvar="PG_ADDRESS",
-        default="localhost",
-        help="Database address.",
-    )
-    @click.option("-p", "--port", type=int, envvar="PG_PORT", default=5432)
-    @click.option(
-        "-d",
-        "-db",
-        "database",
-        envvar="PG_DATABASE",
-        help="Database to import the data to.",
-    )
-    @click.option(
-        "-u",
-        "--username",
-        envvar="PG_USERNAME",
-        default=lambda: os.getenv("USER", ""),
-        help="Specifies the user to connect to the database with.",
-    )
-    @click.password_option(prompt=False, envvar="PG_PASSWORD")
     def decorate(*args, **kwargs):
-        engine_uri = os.getenv("SQL_ENGINE_URI")
-        backend = kwargs.pop("backend")
-
-        config = {
-            "sqlite": pop_all(("path",), kwargs),
-            "postgresql": pop_all(
-                ("host", "port", "database", "username", "password"), kwargs
-            ),
-        }
-
-        if not engine_uri and backend == "sqlite" and config[backend]["path"]:
-            path = Path(config[backend]["path"]).with_suffix(".db")
-            engine_uri = f"sqlite:///{path}"
-
-        if not engine_uri and backend == "postgresql":
-            pg_config = config[backend]
-            pg_config["password"] = urllib.parse.quote(pg_config["password"])
-            engine_uri = "postgresql://{username}:{password}@{host}:{port}/{database}".format(
-                **pg_config
-            )
+        engine_uri = kwargs.pop("database_uri")
 
         return func(engine_uri, *args, **kwargs)
 

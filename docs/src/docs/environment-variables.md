@@ -27,6 +27,20 @@ If you'd prefer to use Meltano _without_ sending the team this kind of data, you
   export MELTANO_DISABLE_TRACKING=True
   ```
 
+## System Database
+
+By default, Meltano uses a SQLite database named `./meltano/meltano.db` as its system database.
+
+You can choose to use a different system database backend or configuration using the `--database-uri`
+option of the `meltano` command, or the `MELTANO_DATABASE_URI` environment variable:
+
+```bash
+# SQLite:
+export MELTANO_DATABASE_URI=sqlite:///system_database.db
+# PostgreSQL:
+export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
+```
+
 ## Flask
 
 The following are the environment variables currently available for customization for Flask.
@@ -60,17 +74,4 @@ To change the directory where Meltano logs will be generated, update your `.env`
 ```bash
 # The directory where the Meltano logs will be generated
 export MELTANO_LOG_PATH = ""
-```
-
-## SQL Alchemy Database
-
-The following are the environment variables currently available for customization for Flask.
-
-Update your `.env` file in your project directory with the desired customizations.
-
-```bash
-# This is the system database URI that stores
-# 1. Job logs
-# 2. RBAC users
-export MELTANO_API_DATABASE_URI = "YOUR_DATABASE_URI"
 ```
