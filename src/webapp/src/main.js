@@ -67,6 +67,33 @@ Vue.toasted.register('oops', 'Oops! Something went wrong.', {
   ]
 })
 
+// Register an analytics tracking notification Toast.
+Vue.toasted.register(
+  'acknowledgeAnalyticsTracking',
+  'Meltano has anonymous product usage tracking turned on.',
+  {
+    type: 'info',
+    action: [
+      {
+        text: 'Learn more',
+        onClick: () => {
+          window.open(
+            'https://www.meltano.com/docs/environment-variables.html#anonymous-usage-data'
+          )
+        }
+      },
+      {
+        text: 'Got it',
+        onClick: (e, toastObject) => {
+          toastObject.goAway(0)
+          localStorage.setItem('hasAcknowledgedTracking', true)
+        }
+      }
+    ],
+    duration: null
+  }
+)
+
 // Register a Global success notification
 Vue.toasted.register(
   'success',
