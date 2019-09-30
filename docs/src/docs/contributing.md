@@ -302,15 +302,15 @@ Meltano releases weekly on Monday mornings, and you can find a list of upcoming 
 
 #### Rotation
 
-| Release Date | Release Owner | Dogfooding Owner | Shadow      |
-| ------------ | ------------- | ---------------- | ----------- |
-| 2019-09-03   | Derek K.      | Derek K.         | --          |
-| 2019-09-09   | Ben H.        | Ben H.           | Douwe M.    |
-| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M.    |
-| 2019-09-23   | Ben H.        | Ben H.           |             |
-| 2019-09-30   | Danielle M.   | Danielle M.      |             |
-| 2019-10-07   | Micael B.     | Micael B.        |             |
-| 2019-10-14   | Derek K.      | Derek K.         |             |
+| Release Date | Release Owner | Dogfooding Owner | Shadow   |
+| ------------ | ------------- | ---------------- | -------- |
+| 2019-09-03   | Derek K.      | Derek K.         |          |
+| 2019-09-09   | Ben H.        | Ben H.           | Douwe M. |
+| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M. |
+| 2019-09-23   | Ben H.        | Ben H.           |          |
+| 2019-09-30   | Micael B.     | Micael B.        |          |
+| 2019-10-07   | Ben H.        | Ben H.           |          |
+| 2019-10-14   | Derek K.      | Derek K.         |          |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
@@ -513,13 +513,13 @@ Meltano is deployed as a DigitalOcean Marketplace 1-Click install, available at 
 
 ### Build the snapshot
 
-The `distribute` step in the CI/CD pipeline has a manual action named *digitalocean_marketplace* that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
+The `distribute` step in the CI/CD pipeline has a manual action named _digitalocean_marketplace_ that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
 
 :::tip Master only
-The *digitalocean_marketplace* job is only available on pipelines running off `master`.
+The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
 :::
 
-The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the *digitalocean_marketplace* job.
+The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job.
 
 ### Update the DigitalOcean listing
 
@@ -531,10 +531,9 @@ You'll have to be granted access to the DigitalOcean vendor portal. Please ask a
 
 Once inside the listing, update the following entries:
 
-  - **System Image** to the new image
-  - **Version** to the latest Meltano version
-  - **Meltano Package Version** inside the _Software Included Entry_
-  
+- **System Image** to the new image
+- **Version** to the latest Meltano version
+- **Meltano Package Version** inside the _Software Included Entry_
 
 Submit it for review to finish the process.
 
