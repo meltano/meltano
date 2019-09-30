@@ -14,24 +14,19 @@ class PIDFile:
 
     def load_pid(self) -> int:
         try:
-            raw = self.path.open("r")
-            self._pid = int(raw.read())
-        except (ValueError):
+            with self.path.open("r") as raw:
+                self._pid = int(raw.read())
+        except ValueError:
             self.path.unlink()
         except FileNotFoundError:
             pass
-        finally:
-            raw.close()
 
         return self._pid
 
     def write_pid(self, pid: int):
-        try:
-            raw = self.path.open("w")
+        with self.path.open("w") as raw:
             raw.write(str(pid))
             self._pid = pid
-        finally:
-            raw.close()
 
     @property
     def process(self) -> psutil.Process:
