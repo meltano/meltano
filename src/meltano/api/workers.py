@@ -18,7 +18,7 @@ from meltano.core.config_service import ConfigService, PluginMissingError
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.db import project_engine
-from meltano.core.utils.pidfile import PIDFile
+from meltano.core.utils.pidfile import PIDFile, UnknownProcessError
 from meltano.api.models import db
 
 
@@ -139,11 +139,11 @@ class AirflowWorker(threading.Thread):
         for pid_file in workers_pid_files:
             try:
                 stale_workers.append(pid_file.process)
-            except psutil.NoSuchProcess:
+            except UnknownProcessError:
                 pass
 
-        def on_terminate(proc):
-            logging.info(f"Process {proc} ended with exit code {proc.returncode}")
+        def on_terminate(process):
+            logging.info(f"Process {process} ended with exit code {process.returncode}")
 
         for process in stale_workers:
             logging.debug(f"Process {process} is stale, terminating it.")
@@ -156,7 +156,10 @@ class AirflowWorker(threading.Thread):
             process.kill()
 
         for pid_file in workers_pid_files:
-            pid_file.unlink()
+            try:
+                pid_file.unlink()
+            except:
+                pass
 
     def start_all(self):
         _, Session = project_engine(self.project)

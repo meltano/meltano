@@ -60,9 +60,6 @@ def create_app(config={}):
     logger.addHandler(file_handler)
     logger.addHandler(stdout_handler)
 
-    now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
-    logger.warning(f"Meltano UI started at: {now}")
-
     # Extensions
     security_options = {}
 
