@@ -18,7 +18,7 @@ def engine_sessionmaker(project, engine_uri):
 
 
 @pytest.fixture()
-def session(request, engine_sessionmaker):
+def session(request, engine_sessionmaker, vacuum):
     """Creates a new database session for a test."""
     engine, create_session = engine_sessionmaker
     session = create_session()
@@ -27,9 +27,4 @@ def session(request, engine_sessionmaker):
 
     # teardown
     session.close()
-    meta = MetaData(bind=engine)
-    meta.reflect()
-
-    with engine.connect() as con:
-        for table in reversed(meta.sorted_tables):
-            con.execute(table.delete())
+    vacuum()

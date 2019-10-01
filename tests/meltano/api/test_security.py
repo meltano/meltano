@@ -16,7 +16,7 @@ from flask_security import login_user, logout_user, AnonymousUser
 def gitlab_client():
     client_mock = mock.Mock()
     client_mock.auth.return_value = None
-    user = mock.Mock(username="gitlabfan", email="valid@test.com", state="active", id=1)
+    user = mock.Mock(username="gitlabfan", email="gitlabfan@test.com", state="active", id=1)
 
     type(client_mock).user = mock.PropertyMock(return_value=user)
 
@@ -60,6 +60,7 @@ class TestSecurity:
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     def test_gitlab_token_identity_maps_user(self, gitlab, app):
+        import pdb; pdb.set_trace()
         token = {
             "access_token": "thisisavalidtoken",
             "id_token": "thisisavalidJWT",

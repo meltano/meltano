@@ -3,15 +3,12 @@ from unittest import mock
 from contextlib import contextmanager
 from flask import request_started
 from flask_security.utils import login_user, logout_user
+from sqlalchemy import MetaData
 
 import meltano.api.app
+from meltano.core.migration_service import MigrationService
 from meltano.api.security.identity import create_dev_user
 from meltano.api.models import db
-
-
-def _cleanup(app):
-    with app.app_context():
-        db.drop_all()
 
 
 @pytest.fixture
@@ -42,7 +39,7 @@ def app_context(app):
 
 
 @pytest.fixture(scope="class")
-def create_app(request, project, engine_uri):
+def create_app(request, project, engine_uri, vacuum):
     def _factory(**kwargs):
         config = {
             "TESTING": True,
@@ -52,12 +49,16 @@ def create_app(request, project, engine_uri):
             **kwargs,
         }
 
+        def _cleanup():
+            vacuum()
+            with app.app_context():
+                db.session.expire_all()
+
         app = meltano.api.app.create_app(config)
-        request.addfinalizer(lambda: _cleanup(app))
+        request.addfinalizer(_cleanup)
 
         with app.app_context():
-            db.drop_all()
-            db.create_all()
+            vacuum()
             create_dev_user()
 
         return app

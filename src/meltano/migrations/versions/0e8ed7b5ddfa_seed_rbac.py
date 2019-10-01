@@ -19,14 +19,14 @@ depends_on = None
 def upgrade():
     Role = sa.table(
         "role",
-        sa.Column("id", sa.Integer, nullable=False),
+        sa.Column("id", sa.Integer, nullable=False, primary_key=True),
         sa.Column("name", sa.String(80)),
         sa.Column("description", sa.String, nullable=True),
     )
 
     RolePermissions = sa.table(
         "role_permissions",
-        sa.Column("id", sa.Integer, nullable=False),
+        sa.Column("id", sa.Integer, nullable=False, primary_key=True),
         sa.Column("role_id", sa.Integer),
         sa.Column("type", sa.String),
         sa.Column("context", sa.String, nullable=True),

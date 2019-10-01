@@ -5,6 +5,7 @@ import contextlib
 import logging
 
 from meltano.core.db import DB, project_engine
+from meltano.core.migration_service import MigrationService
 from sqlalchemy import text, create_engine, MetaData
 
 
@@ -32,7 +33,14 @@ def engine_uri():
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
     recreate_database(engine, database)
 
-    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
+    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/{database}"
+    engine = create_engine(engine_uri)
+
+    # migrate the database up
+    migration_service = MigrationService(engine)
+    migration_service.upgrade()
+
+    return str(engine.url)
 
 
 @pytest.fixture()
@@ -44,37 +52,16 @@ def engine_sessionmaker(project, engine_uri):
 
 
 @pytest.fixture()
-def session(request, engine_sessionmaker):
+def session(request, engine_sessionmaker, vacuum):
     """Creates a new database session for a test."""
     engine, sessionmaker = engine_sessionmaker
-    truncate_tables(engine)
-
     session = sessionmaker()
 
     yield session
 
     # teardown
     session.close()
-    logging.debug("Session closed.")
-    truncate_tables(engine)
-
-
-def truncate_tables(engine, schema=None):
-    with engine.connect() as con:
-        con.execute("SET session_replication_role TO 'replica';")
-
-        with con.begin():
-            meta = MetaData(bind=engine, schema=schema)
-            meta.reflect()
-
-            for table in meta.sorted_tables:
-                if table.name == "alembic_version":
-                    continue
-
-                logging.debug(f"table {table} truncated.")
-                con.execute(table.delete())
-
-        con.execute("SET session_replication_role TO 'origin';")
+    vacuum()
 
 
 @pytest.fixture()

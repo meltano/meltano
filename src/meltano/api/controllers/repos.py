@@ -195,6 +195,7 @@ def models():
     project = Project.find()
     topicsFile = project.run_dir("models", "topics.index.m5oc")
     path = Path(topicsFile)
+
     topics = json.load(open(path, "r")) if path.is_file() else {}
     topics = next(M5ocFilter().filter("view:topic", [topics]))
 
