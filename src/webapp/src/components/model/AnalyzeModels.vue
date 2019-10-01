@@ -64,6 +64,12 @@ export default {
           </div>
         </div>
         <h2 class="title is-5">Available</h2>
+        <div class="content">
+          <p>
+            Below are the models that Meltano ships with in addition to any
+            custom models Meltano recognizes in your project.
+          </p>
+        </div>
         <table
           class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent"
         >
@@ -116,6 +122,13 @@ export default {
       <div class="column is-two-thirds">
         <h2 class="title is-5">Installed</h2>
         <template v-if="hasModels">
+          <div class="content">
+            <p>
+              Below are the currently installed models that enable click-to-code
+              SQL generation and interactive analysis. Click an Analyze button
+              below.
+            </p>
+          </div>
           <div v-for="(v, model) in models" :key="`${model}-panel`" class="box">
             <div class="content">
               <div class="level level-tight">
