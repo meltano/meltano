@@ -1,6 +1,5 @@
 <script>
 import Vue from 'vue'
-import { mapActions, mapGetters } from 'vuex'
 
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
@@ -11,19 +10,12 @@ export default {
     Breadcrumbs,
     MainNav
   },
-  computed: {
-    ...mapGetters('plugins', [
-      'getIsAddingPlugin',
-      'getIsInstallingPlugin',
-      'getIsPluginInstalled'
-    ])
-  },
   created() {
-    this.autoInstallAirflowCheck()
+    // TODO: poller?
+    this.$store.dispatch('system/check')
     this.acknowledgeAnalyticsTracking()
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     acknowledgeAnalyticsTracking() {
       if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
         const hasAcknowledgedTracking =
@@ -34,20 +26,6 @@ export default {
         }
       }
     },
-    autoInstallAirflowCheck() {
-      this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-        const needsInstallation =
-          !this.getIsAddingPlugin('orchestrators', 'airflow') &&
-          !this.getIsInstallingPlugin('orchestrators', 'airflow') &&
-          !this.getIsPluginInstalled('orchestrators', 'airflow')
-        if (needsInstallation) {
-          const payload = { pluginType: 'orchestrators', name: 'airflow' }
-          this.addPlugin(payload).then(() => {
-            this.installPlugin(payload)
-          })
-        }
-      })
-    }
   }
 }
 </script>
