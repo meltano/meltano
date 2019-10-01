@@ -1,6 +1,8 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 
+import capitalize from '@/filters/capitalize'
+import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
 
 import Dropdown from '@/components/generic/Dropdown'
@@ -12,6 +14,10 @@ export default {
     Dropdown,
     Logo
   },
+  filters: {
+    capitalize,
+    underscoreToSpace
+  },
   data() {
     return {
       isMobileMenuOpen: false
@@ -19,12 +25,14 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelines']),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepTransformsMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
+    ...mapState('repos', ['models']),
     ...mapState('system', ['latestVersion', 'updating', 'version']),
     getIconColor() {
       return parentPath =>
@@ -45,6 +53,9 @@ export default {
         this.closeMobileMenu()
       }
     }
+  },
+  created() {
+    this.$store.dispatch('repos/getModels')
   },
   methods: {
     closeMobileMenu() {
@@ -178,13 +189,13 @@ export default {
 
         <router-link
           :to="{ name: 'model' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/model') }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/model/') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/model')
+              'has-text-interactive-navigation': getIsSubRouteOf('/model/')
             }"
           >
             <span class="icon is-small" :class="getIconColor('/model')">
@@ -194,23 +205,57 @@ export default {
           </a>
         </router-link>
 
-        <router-link
-          :to="{ name: 'analyze' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
-          class="navbar-item navbar-child has-text-weight-semibold"
-        >
+        <div class="navbar-item navbar-child has-dropdown is-hoverable">
           <a
-            class="button has-background-transparent is-borderless is-paddingless"
-            :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
-            }"
+            :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+            class="navbar-link has-text-weight-semibold"
           >
-            <span class="icon is-small" :class="getIconColor('/analyze')">
-              <font-awesome-icon icon="chart-line"></font-awesome-icon>
-            </span>
-            <span>Analyze</span>
+            <a
+              class="button has-background-transparent is-borderless is-paddingless"
+              :class="{
+                'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+              }"
+            >
+              <span class="icon is-small" :class="getIconColor('/analyze')">
+                <font-awesome-icon icon="chart-line"></font-awesome-icon>
+              </span>
+              <span>Analyze</span>
+            </a>
           </a>
-        </router-link>
+
+          <div class="navbar-dropdown">
+            <template v-if="hasModels">
+              <div
+                v-for="(v, model) in models"
+                :key="`${model}-panel`"
+                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+              >
+                <div class="content">
+                  <h3 class="is-size-6">
+                    {{ v.name | capitalize | underscoreToSpace }}
+                  </h3>
+                  <h4 class="is-size-7 has-text-grey">
+                    {{ v.namespace }}
+                  </h4>
+                </div>
+                <div
+                  v-for="design in v['designs']"
+                  :key="design"
+                  class="buttons"
+                >
+                  <router-link
+                    class="button is-small is-interactive-primary"
+                    :to="urlForModelDesign(model, design)"
+                    >{{ design | capitalize | underscoreToSpace }}</router-link
+                  >
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              No Analysis...
+            </template>
+          </div>
+        </div>
 
         <router-link
           :to="{ name: 'dashboards' }"
@@ -349,6 +394,10 @@ export default {
 
 <style lang="scss">
 @import '@/scss/bulma-preset-overrides.scss';
+
+.box-analyze-nav {
+  min-width: 240px;
+}
 
 .meltano-label {
   @media screen and (min-width: $tablet) {
