@@ -114,7 +114,40 @@ Once the installation completes, you can check if it was successful by running:
 meltano --version
 ```
 
-That's it! Meltano is now be available for you to use. Now we can [create a Meltano project](/docs/getting-started.html).
+That's it! Meltano is now be available for you to use.
+
+Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
+
+## Create your first project
+
+To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
+
+Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "meltano-carbon."
+
+::: info
+Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
+
+If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-variables.html#anonymous-usage-data).
+:::
+
+```bash
+meltano init meltano-carbon
+```
+
+This will create a new directory named `meltano-carbon` and initialize Meltano's basic directory structure inside it.
+
+## Start the application
+
+Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
+
+```bash
+cd meltano-carbon
+meltano ui
+```
+
+Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
+
+You are now ready to add data sources, configure reporting databases, schedule updates and build dashboards!
 
 ### Installing on Docker
 
