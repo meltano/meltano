@@ -20,6 +20,7 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.db import project_engine
 
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,11 @@ def create_app(config={}):
         app.config["SQLALCHEMY_DATABASE_URI"] = (
             scheme + ":///" + app.instance_path + path
         )
+
+    # register
+    project_engine(
+        project, engine_uri=app.config["SQLALCHEMY_DATABASE_URI"], default=True
+    )
 
     # Initial compilation
     compiler = ProjectCompiler(project)
