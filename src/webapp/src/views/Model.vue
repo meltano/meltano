@@ -7,7 +7,7 @@ export default {
   components: {
     AnalyzeModels,
     RouterViewLayout
-  },
+  }
 }
 </script>
 

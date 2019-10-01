@@ -38,12 +38,25 @@ export default {
   <section>
     <div class="columns">
       <div class="column is-one-third">
-      <h2 class="title is-5">Custom</h2>
+        <h2 class="title is-5">Custom</h2>
         <div class="content">
-          <p>Learn more about Meltano Model and how to create custom models so Meltano Analyze can interactively generate SQL queries in real-time.</p>
+          <p>
+            Learn more about Meltano Model and how to create custom models so
+            Meltano Analyze can interactively generate SQL queries in real-time.
+          </p>
           <div class="buttons">
-            <a href="https://www.meltano.com/docs/architecture.html#meltano-model" target="_blank" class="button">Meltano Model</a>
-            <a href="https://www.meltano.com/docs/tutorial.html#adding-custom-models" target="_blank" class="button">Custom Models</a>
+            <a
+              href="https://www.meltano.com/docs/architecture.html#meltano-model"
+              target="_blank"
+              class="button"
+              >Meltano Model</a
+            >
+            <a
+              href="https://www.meltano.com/docs/tutorial.html#adding-custom-models"
+              target="_blank"
+              class="button"
+              >Custom Models</a
+            >
           </div>
         </div>
         <h2 class="title is-5">Available</h2>
@@ -134,9 +147,15 @@ export default {
         <template v-else>
           <div class="content">
             <p>
-              There are no models installed yet: you may install them using the
-              panel on the left.
+              Models are inferred and automatically installed for you based off
+              the installed Extractors from your data pipeline setup. Set up a
+              pipeline first.
             </p>
+            <router-link
+              class="button is-interactive-primary"
+              :to="{ name: 'dataSetup' }"
+              >Create Data Pipeline</router-link
+            >
           </div>
         </template>
       </div>

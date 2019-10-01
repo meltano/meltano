@@ -235,20 +235,19 @@ export default {
           data-tooltip="Help shape this feature by contributing your ideas"
           target="_blank"
           href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
-          >
-            <a
-              class="button has-background-transparent is-borderless is-paddingless"
-              :class="{
-                'has-text-interactive-navigation': getIsSubRouteOf('/notebook')
-              }"
-            >
-              <span class="icon is-small" :class="getIconColor('/notebook')">
-                <font-awesome-icon icon="book-open"></font-awesome-icon>
-              </span>
-              <span>Notebook</span>
-            </a>
-          </a
         >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/notebook')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/notebook')">
+              <font-awesome-icon icon="book-open"></font-awesome-icon>
+            </span>
+            <span>Notebook</span>
+          </a>
+        </a>
       </div>
 
       <div class="navbar-end">
