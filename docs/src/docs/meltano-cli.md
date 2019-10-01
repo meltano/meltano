@@ -246,8 +246,7 @@ schedules:
     extractor: tap-mock
     loader: target-mock
     transform: skip
-    env:
-      MELTANO_JOB_ID: ''
+    env: {}
 ```
 
 ## Snowflake Permissions
