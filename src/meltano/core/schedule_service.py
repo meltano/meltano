@@ -96,13 +96,8 @@ class ScheduleService:
     @classmethod
     def schedule_definition(cls, schedule: Schedule) -> dict:
         definition = schedule._asdict()
-
-        if schedule.start_date:
-            definition["start_date"] = schedule.start_date.isoformat()
-
         return dict(definition)
 
     @classmethod
     def yaml_schedule(cls, schedule_definition: dict) -> Schedule:
-        start_date = iso8601_datetime(schedule_definition.pop("start_date"))
-        return Schedule(start_date=start_date, **schedule_definition)
+        return Schedule(**schedule_definition)

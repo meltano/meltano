@@ -34,7 +34,6 @@ def create_schedule():
     return make
 
 
-@freeze_time("2000-01-01")
 class TestScheduleService:
     def test_add_schedule(self, subject, create_schedule):
         COUNT = 10
@@ -72,4 +71,4 @@ class TestScheduleService:
             side_effect=PluginSettingMissingError(tap, "start_date"),
         ):
             schedule = add("with_no_start_date", None)
-            assert schedule.start_date == datetime.utcnow()
+            assert schedule.start_date
