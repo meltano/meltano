@@ -252,7 +252,23 @@ export default {
               </div>
             </template>
             <template v-else>
-              No Analysis...
+              <div class="box is-borderless is-shadowless is-marginless">
+                <div class="content">
+                  <h3 class="is-size-6">
+                    No Models Installed
+                  </h3>
+                  <p>
+                    Models are inferred and automatically installed for you
+                    based off the installed Extractors from your data pipelines.
+                    Set up a pipeline first.
+                  </p>
+                  <router-link
+                    class="button is-interactive-primary"
+                    :to="{ name: 'dataSetup' }"
+                    >Create Data Pipeline</router-link
+                  >
+                </div>
+              </div>
             </template>
           </div>
         </div>
