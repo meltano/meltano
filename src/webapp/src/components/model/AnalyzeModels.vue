@@ -38,8 +38,15 @@ export default {
   <section>
     <div class="columns">
       <div class="column is-one-third">
+      <h2 class="title is-5">Custom</h2>
+        <div class="content">
+          <p>Learn more about Meltano Model and how to create custom models so Meltano Analyze can interactively generate SQL queries in real-time.</p>
+          <div class="buttons">
+            <a href="https://www.meltano.com/docs/architecture.html#meltano-model" target="_blank" class="button">Meltano Model</a>
+            <a href="https://www.meltano.com/docs/tutorial.html#adding-custom-models" target="_blank" class="button">Custom Models</a>
+          </div>
+        </div>
         <h2 class="title is-5">Available</h2>
-
         <table
           class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent"
         >

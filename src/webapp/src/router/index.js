@@ -1,6 +1,5 @@
 import Router from 'vue-router'
 
-import AnalyzeModels from '@/components/analyze/AnalyzeModels'
 import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
 import Design from '@/components/analyze/Design'
 import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal'
@@ -14,6 +13,7 @@ import Transforms from '@/components/pipelines/Transforms'
 
 import Analyze from '@/views/Analyze'
 import Dashboards from '@/views/Dashboards'
+import Model from '@/views/Model'
 import NotFound from '@/views/NotFound'
 import Orchestration from '@/views/Orchestration'
 import Pipelines from '@/views/Pipelines'
@@ -154,6 +154,14 @@ const router = new Router({
       }
     },
     {
+      path: '/model/',
+      name: 'model',
+      component: Model,
+      meta: {
+        title: 'Meltano: Model'
+      }
+    },
+    {
       path: '/analyze/',
       redirect: '/analyze/models/',
       name: 'analyze',
@@ -162,14 +170,6 @@ const router = new Router({
         title: 'Meltano: Analyze'
       },
       children: [
-        {
-          path: 'models',
-          name: 'analyzeModels',
-          component: AnalyzeModels,
-          meta: {
-            title: 'Meltano: Analyze - Models'
-          }
-        },
         {
           path: '/analyze/:namespace+/:model/:design',
           name: 'analyzeDesign',

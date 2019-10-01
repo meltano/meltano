@@ -106,7 +106,7 @@ export default {
               }"
             >
               <span class="icon is-small" :class="getIconColor('/pipeline')">
-                <font-awesome-icon icon="th-list"></font-awesome-icon>
+                <font-awesome-icon icon="stream"></font-awesome-icon>
               </span>
               <span>Pipeline</span>
               <span
@@ -177,6 +177,24 @@ export default {
         </router-link>
 
         <router-link
+          :to="{ name: 'model' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/model') }"
+          class="navbar-item navbar-child has-text-weight-semibold"
+        >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/model')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/model')">
+              <font-awesome-icon icon="file-alt"></font-awesome-icon>
+            </span>
+            <span>Model</span>
+          </a>
+        </router-link>
+
+        <router-link
           :to="{ name: 'analyze' }"
           :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
           class="navbar-item navbar-child has-text-weight-semibold"
@@ -216,16 +234,20 @@ export default {
           class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
           data-tooltip="Help shape this feature by contributing your ideas"
           target="_blank"
-          href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=model"
-          >Model</a
-        >
-
-        <a
-          class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
-          data-tooltip="Help shape this feature by contributing your ideas"
-          target="_blank"
           href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
-          >Notebook</a
+          >
+            <a
+              class="button has-background-transparent is-borderless is-paddingless"
+              :class="{
+                'has-text-interactive-navigation': getIsSubRouteOf('/notebook')
+              }"
+            >
+              <span class="icon is-small" :class="getIconColor('/notebook')">
+                <font-awesome-icon icon="book-open"></font-awesome-icon>
+              </span>
+              <span>Notebook</span>
+            </a>
+          </a
         >
       </div>
 
