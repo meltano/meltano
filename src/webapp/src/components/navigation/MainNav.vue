@@ -238,13 +238,11 @@ export default {
                     {{ v.namespace }}
                   </h4>
                 </div>
-                <div
-                  v-for="design in v['designs']"
-                  :key="design"
-                  class="buttons"
-                >
+                <div class="buttons">
                   <router-link
-                    class="button is-small is-interactive-primary"
+                    v-for="design in v['designs']"
+                    :key="design"
+                    class="button is-small is-interactive-primary is-outlined"
                     :to="urlForModelDesign(model, design)"
                     >{{ design | capitalize | underscoreToSpace }}</router-link
                   >
