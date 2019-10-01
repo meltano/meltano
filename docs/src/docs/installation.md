@@ -118,7 +118,7 @@ That's it! Meltano is now be available for you to use. Now we can [create a Melt
 
 ### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](http://localhost:8080/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 #### Using Pre-built Docker Images
 
