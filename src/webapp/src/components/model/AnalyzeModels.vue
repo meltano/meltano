@@ -74,7 +74,7 @@ export default {
               <tr :key="`${modelPlugin}-${index}`">
                 <td>
                   <div class="buttons">
-                    <a
+                    <button
                       v-if="!getIsPluginInstalled('models', modelPlugin)"
                       :class="{
                         'is-loading':
@@ -82,9 +82,11 @@ export default {
                           getIsInstallingPlugin('models', modelPlugin)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
+                      disabled
                       @click="installModel(modelPlugin)"
-                      >Install</a
                     >
+                      Install
+                    </button>
                     <a
                       v-else
                       class="button is-small tooltip is-tooltip-warning is-tooltip-right"
