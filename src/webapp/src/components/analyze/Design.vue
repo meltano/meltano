@@ -316,7 +316,7 @@ export default {
                 class="button"
                 @click="updateReport()"
               >
-                <span>Save Report</span>
+                <span>Update Report</span>
               </button>
             </p>
             <p class="control">
@@ -343,11 +343,14 @@ export default {
                       </div>
                     </div>
                     <div class="buttons is-right">
-                      <button class="button is-text" data-dropdown-auto-close>
+                      <button
+                        class="button is-small is-text"
+                        data-dropdown-auto-close
+                      >
                         Cancel
                       </button>
                       <button
-                        class="button"
+                        class="button is-small"
                         :disabled="!saveReportSettings.name"
                         data-dropdown-auto-close
                         @click="saveReport"

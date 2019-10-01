@@ -133,6 +133,10 @@ def install():
         except Exception as e:
             pass
 
+    if plugin_type is PluginType.ORCHESTRATORS and plugin_name == "airflow":
+        g.airflow_worker.installed.set()
+        g.airflow_worker.join()
+
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 

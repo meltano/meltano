@@ -9,8 +9,7 @@ module.exports = function() {
     window.FLASK || {
       airflowUrl: process.env.AIRFLOW_URL,
       appUrl: process.env.MELTANO_WEBAPP_URL,
-      isSendAnonymousUsageStats: false,
-      version: 'source'
+      isSendAnonymousUsageStats: false
     }
   )
 }
