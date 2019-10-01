@@ -49,14 +49,10 @@ def start_workers(workers):
     help="The hostname (or IP address) to bind on",
     envvar="MELTANO_API_HOSTNAME",
 )
-@project
+@project(migrate=True)
 def ui(project, reload, bind_port, bind):
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
-
-    engine, _ = project_engine(project)
-    migration_service = MigrationService(engine)
-    migration_service.upgrade()
 
     workers = []
     if not truthy(os.getenv("AIRFLOW_DISABLED", False)):

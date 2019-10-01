@@ -22,7 +22,7 @@ class UpgradeError(Exception):
 
 
 @cli.command()
-@project
+@project()
 @click.pass_context
 def upgrade(ctx, project):
     engine, _ = project_engine(project)
