@@ -154,7 +154,7 @@ export default {
           <div class="content">
             <p>
               Models are inferred and automatically installed for you based off
-              the installed Extractors from your data pipeline setup. Set up a
+              the installed Extractors from your data pipelines. Set up a
               pipeline first.
             </p>
             <router-link
