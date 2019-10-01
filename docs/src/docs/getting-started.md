@@ -1,37 +1,10 @@
 # Getting Started
 
-Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
+Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start connecting data soures, building pipelines, performing analysis and dashboarding.
 
-## Create your first project
-
-To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
-
-Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "meltano-carbon."
-
-::: info
-Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
-
-If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-variables.html#anonymous-usage-data).
+::: tip
+The following instructions assume you are able to access Meltano's user interface locally from `http://localhost:5000` or at `http://YOUR_CLOUD_IP_ADDRESS:5000`.
 :::
-
-```bash
-meltano init meltano-carbon
-```
-
-This will create a new directory named `meltano-carbon` and initialize Meltano's basic directory structure inside it.
-
-## Start the application
-
-Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
-
-```bash
-cd meltano-carbon
-meltano ui
-```
-
-Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
-
-You are now ready to add data sources, configure reporting databases, schedule updates and build dashboards!
 
 ## Connect a data source
 
