@@ -19,7 +19,6 @@ import {
   faDraftingCompass,
   faExclamationTriangle,
   faFilter,
-  faGift,
   faGlobeAmericas,
   faHashtag,
   faInfoCircle,
@@ -60,7 +59,6 @@ export default {
     library.add(faDraftingCompass)
     library.add(faExclamationTriangle)
     library.add(faFilter)
-    library.add(faGift)
     library.add(faGlobeAmericas)
     library.add(faHashtag)
     library.add(faInfoCircle)

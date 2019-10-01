@@ -9,9 +9,7 @@ from flask_cors import CORS
 from importlib import reload
 from urllib.parse import urlsplit
 
-import meltano
 from meltano.core.project import Project
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
@@ -20,9 +18,11 @@ from meltano.core.plugin.settings_service import (
 from meltano.core.config_service import ConfigService
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.tracking import GoogleAnalyticsTracker
+from .workers import MeltanoBackgroundCompiler, UIAvailableWorker, AirflowWorker
 
 
 logger = logging.getLogger(__name__)
+airflow_context = {"worker": None}
 
 
 def create_app(config={}):
@@ -59,6 +59,9 @@ def create_app(config={}):
     logger.setLevel(logging.DEBUG)
     logger.addHandler(file_handler)
     logger.addHandler(stdout_handler)
+
+    now = str(datetime.datetime.utcnow().strftime("%b %d %Y %I:%M:%S:%f"))
+    logger.warning(f"Meltano UI started at: {now}")
 
     # Extensions
     security_options = {}
@@ -102,6 +105,10 @@ def create_app(config={}):
         init(app)
 
     @app.before_request
+    def setup_airflow_context():
+        g.airflow_worker = airflow_context["worker"]
+
+    @app.before_request
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
@@ -110,8 +117,6 @@ def create_app(config={}):
         if tracker.send_anonymous_usage_stats:
             g.jsContext["isSendAnonymousUsageStats"] = True
             g.jsContext["clientId"] = tracker.client_id
-
-        g.jsContext["version"] = meltano.__version__
 
         try:
             airflow = ConfigService(project).find_plugin("airflow")
@@ -133,8 +138,54 @@ def create_app(config={}):
             request_message += f" as {current_user}"
 
         logger.info(request_message)
-
-        res.headers["X-Meltano-Version"] = meltano.__version__
         return res
 
     return app
+
+
+def start(project, **kwargs):
+    """Start Meltano UI as a single-threaded web server."""
+
+    app_config = kwargs.pop("app_config", {})
+    app = create_app(app_config)
+    from .security.identity import create_dev_user
+
+    with app.app_context():
+        # TODO: alembic migration
+        create_dev_user()
+
+    # ensure we only start the workers on the via the main thread
+    # this will make sure we don't start everything twice
+    # when code reload is enabled
+    if not app.debug or os.environ.get("WERKZEUG_RUN_MAIN") == "true":
+        cleanup = start_workers(app, project, **kwargs)
+        atexit.register(cleanup)
+
+    app.run(**kwargs)
+
+
+def start_workers(app, project, **kwargs):
+    port = kwargs.pop("port", 5000)
+    workers = []
+
+    if not app.config["AIRFLOW_DISABLED"]:
+        airflow_context["worker"] = AirflowWorker(app, project)
+        workers.append(airflow_context["worker"])
+
+    workers.append(MeltanoBackgroundCompiler(project))
+    workers.append(
+        # the web server should always be accessible from `localhost`
+        UIAvailableWorker(f"http://localhost:{port}", open_browser=not app.debug)
+    )
+
+    # cleanup callback
+    def stop_all():
+        logger.info("Stopping all background workers...")
+        for worker in workers:
+            worker.stop()
+
+    # start all workers
+    for worker in workers:
+        worker.start()
+
+    return stop_all

@@ -25,7 +25,6 @@ PROJECT_ROOT_DIR = os.path.dirname(API_ROOT_DIR)
 # -----------------
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_TRACK_MODIFICATIONS = False
-SQLALCHEMY_DATABASE_URI = os.getenv("MELTANO_DATABASE_URI")
 
 # Flask-security
 # -----------------
@@ -63,6 +62,7 @@ MAIL_SERVER = "localhost"
 MAIL_PORT = 587
 MAIL_DEFAULT_SENDER = '"Meltano" <bot@metlano.com>'
 
+
 # Flask-Authlib
 # -----------------
 
@@ -78,9 +78,3 @@ RESTFUL_JSON = {}
 # -----------------
 
 EXECUTOR_PROPAGATE_EXCEPTIONS = True
-
-
-# Flask-CORS
-# -----------------
-
-CORS_EXPOSE_HEADERS = ["X-Meltano-Version"]

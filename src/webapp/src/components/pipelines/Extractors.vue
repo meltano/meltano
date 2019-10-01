@@ -1,7 +1,7 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
-import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
+import SpeedRunIcon from '@/components/SpeedRunIcon'
 
 export default {
   name: 'Extractors',
