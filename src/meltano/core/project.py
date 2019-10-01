@@ -32,7 +32,6 @@ class Project(Versioned):
     __version__ = 1
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
-    _meltano_lock = fasteners.ReaderWriterLock()
     _default = None
 
     def __init__(self, root: Union[Path, str] = None):
@@ -64,6 +63,10 @@ class Project(Versioned):
     def backend_version(self):
         return int(self.meltano.get("version", 1))
 
+    def reload(self):
+        """Force a reload from `meltano.yml`"""
+        self._meltano = yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
+
     @classmethod
     @fasteners.locked(lock="_find_lock")
     def find(cls, from_dir: Union[Path, str] = None, activate=True):
@@ -85,17 +88,8 @@ class Project(Versioned):
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
-        meltano_lock = fasteners.InterProcessLock(self.run_dir("meltano.yml.lock"))
-
-        if meltano_lock.acquire(blocking=False):
-            try:
-                # update the process cache to the latest version
-                with self._meltano_lock.read_lock():
-                    self._meltano = (
-                        yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
-                    )
-            finally:
-                meltano_lock.release()
+        if not self._meltano:
+            self.reload()
 
         return deepcopy(self._meltano)
 
@@ -106,19 +100,15 @@ class Project(Versioned):
         if the context ends gracefully.
         """
         try:
-            with fasteners.InterProcessLock(
-                self.run_dir("meltano.yml.lock")
-            ), self._meltano_lock.write_lock():
-                meltano_update = self.meltano
-                yield meltano_update
+            meltano_update = self.meltano
+            yield meltano_update
 
-                # save it
-                with self.meltanofile.open("w") as meltanofile:
-                    meltanofile.write(
-                        yaml.dump(meltano_update, default_flow_style=False)
-                    )
+            # save it
+            with self.meltanofile.open("w") as meltanofile:
+                meltanofile.write(yaml.dump(meltano_update, default_flow_style=False))
 
-                self._meltano = meltano_update
+            # update the cache
+            self._meltano = meltano_update
         except Exception as err:
             logging.error(f"Could not update meltano.yml: {err}")
             raise

@@ -1,3 +1,6 @@
+import axios from 'axios'
+import { Service } from 'axios-middleware'
+
 export class FatalErrorMiddleware {
   constructor({ toasted }) {
     this.toasted = toasted
@@ -14,10 +17,12 @@ export class FatalErrorMiddleware {
 }
 
 export default {
-  install(Vue, { service, toasted }) {
+  install(Vue, options) {
+    const service = new Service(axios)
+
     service.register(
       new FatalErrorMiddleware({
-        toasted
+        toasted: options.toasted
       })
     )
   }

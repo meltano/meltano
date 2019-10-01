@@ -2,18 +2,17 @@ import Router from 'vue-router'
 import Toasted from 'vue-toasted'
 import Vue from 'vue'
 import VueAnalytics from 'vue-analytics'
+
 import axios from 'axios'
+import FontAwesome from './font-awesome'
 import lodash from 'lodash'
-import { Service } from 'axios-middleware'
 
 import App from './App'
 import Auth from '@/middleware/auth'
 import FatalError from '@/middleware/fatalError'
-import FontAwesome from './font-awesome'
 import flaskContext from '@/flask'
 import router from './router'
 import store from './store'
-import Upgrade from '@/middleware/upgrade'
 
 Vue.config.productionTip = false
 
@@ -29,22 +28,12 @@ const toastedOptions = {
 }
 Vue.use(Toasted, toastedOptions)
 
-const service = new Service(axios)
-
-Vue.use(Upgrade, {
-  service,
+Vue.use(Auth, {
   router,
   toasted: Vue.toasted
 })
 
 Vue.use(FatalError, {
-  service,
-  router,
-  toasted: Vue.toasted
-})
-
-Vue.use(Auth, {
-  service,
   router,
   toasted: Vue.toasted
 })
@@ -123,19 +112,6 @@ Vue.toasted.register(
     duration: 5000,
     type: 'error'
   })
-)
-
-// Register a Global error notification
-Vue.toasted.register(
-  'upgrade',
-  'A new version of Meltano is available, please refresh.',
-  {
-    action: [{ text: 'Refresh!', onClick: () => document.location.reload() }],
-    duration: null,
-    closeOnSwipe: false,
-    singleton: true,
-    type: 'info'
-  }
 )
 
 // Axios config

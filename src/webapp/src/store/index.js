@@ -7,7 +7,6 @@ import dashboards from './modules/dashboards'
 import plugins from './modules/plugins'
 import repos from './modules/repos'
 import settings from './modules/settings'
-import system from './modules/system'
 
 Vue.use(Vuex)
 
@@ -18,8 +17,7 @@ export default new Vuex.Store({
     dashboards,
     plugins,
     repos,
-    settings,
-    system
+    settings
   },
   strict: process.env.NODE_ENV !== 'production'
 })
