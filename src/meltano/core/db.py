@@ -40,7 +40,6 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     engine = create_engine(engine_uri)
 
     init_hook(engine)
-    seed(engine)
 
     create_session = sessionmaker(bind=engine)
     engine_session = (engine, create_session)
@@ -69,10 +68,6 @@ def init_hook(engine):
 def init_sqlite_hook(engine):
     # enable the WAL
     engine.execute("PRAGMA journal_mode=WAL")
-
-
-def seed(engine):
-    MigrationService(engine).upgrade()
 
 
 class DB:
