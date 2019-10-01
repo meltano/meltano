@@ -9,6 +9,21 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Add Google Analytics tracking acknowledgment in the UI
+
+### Changes
+- [#1069](https://gitlab.com/meltano/meltano/issues/1069) Meltano will now use the schedule's name to run incremental jobs
+
+### Fixes
+
+### Breaks
+
+## 0.44.0 - (2019-09-30)
+
+---
+
+### New
+
 - [#950](https://gitlab.com/meltano/meltano/issues/950) Removed the Analyze connection configuration: Meltano will now infer connections out of each loader configuration.
 - [#1002](https://gitlab.com/meltano/meltano/issues/1002) Analyze UI now displays the Topic's (analysis model's) description text if applicable
 - [#1032](https://gitlab.com/meltano/meltano/issues/1032) Add 'Model' and 'Notebook' to main navigation to communicate that Meltano plans to empower users with modeling and notebooking functionality
@@ -33,6 +48,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1004](https://gitlab.com/meltano/meltano/issues/1004) Fix error when deselecting last attribute in Analyze
 - [#1048](https://gitlab.com/meltano/meltano/issues/1048) Fix various actions that should have been mutations and did minor code convention cleanup
+- [#1063](https://gitlab.com/meltano/meltano/issues/1063) Fix the "Explore" button link in Dashboards to properly account for the `namespace`
 
 ### Breaks
 

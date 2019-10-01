@@ -1,4 +1,6 @@
 <script>
+import Vue from 'vue'
+
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
 
@@ -11,6 +13,19 @@ export default {
   created() {
     // TODO: poller?
     this.$store.dispatch('system/check')
+    this.acknowledgeAnalyticsTracking()
+  },
+  methods: {
+    acknowledgeAnalyticsTracking() {
+      if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+        const hasAcknowledgedTracking =
+          'hasAcknowledgedTracking' in localStorage &&
+          localStorage.getItem('hasAcknowledgedTracking') === 'true'
+        if (!hasAcknowledgedTracking) {
+          Vue.toasted.global.acknowledgeAnalyticsTracking()
+        }
+      }
+    },
   }
 }
 </script>
