@@ -41,6 +41,10 @@ export default {
         <h2 class="title is-5">Custom</h2>
         <div class="content">
           <p>
+            Meltano Model is the glue between your data and click-to-code
+            analysis.
+          </p>
+          <p>
             Learn more about Meltano Model and how to create custom models so
             Meltano Analyze can interactively generate SQL queries in real-time.
           </p>

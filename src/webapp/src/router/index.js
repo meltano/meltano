@@ -163,7 +163,6 @@ const router = new Router({
     },
     {
       path: '/analyze/',
-      redirect: '/analyze/models/',
       name: 'analyze',
       component: Analyze,
       meta: {
