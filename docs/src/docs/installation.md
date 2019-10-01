@@ -118,7 +118,7 @@ That's it! Meltano is now be available for you to use.
 
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
-## Create your first project
+### Create your first project
 
 To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
 
@@ -136,7 +136,7 @@ meltano init meltano-carbon
 
 This will create a new directory named `meltano-carbon` and initialize Meltano's basic directory structure inside it.
 
-## Start the application
+### Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
