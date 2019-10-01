@@ -34,6 +34,7 @@ def default(path):
 
 
 @root.route("/upgrade", methods=["POST"])
+@roles_required("admin")
 def upgrade():
     meltano.api.executor.upgrade()
     return "Meltano update in progress.", 201
