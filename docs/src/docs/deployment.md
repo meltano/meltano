@@ -23,6 +23,8 @@ Select "Create Meltano Droplet"
 
 You will be prompted to login, or create a new DigitalOcean account.
 
+#### Configure Your Droplet
+
 Once you are logged in, Meltano will be selected from the Marketplace automatically and your Droplet will be configured with the following defaults:
 *  Standard Plan
 *  $40/mo (8GB / 4 CPUs, 160 GB / SSD disk, 5 TB transfer)
@@ -31,7 +33,16 @@ Once you are logged in, Meltano will be selected from the Marketplace automatica
 *  1 Droplet
 *  Backups not enabled by default
 
+#### Create Your Droplet
 To complete the creation of your Droplet select the SSH key(s) that can be used to authenticate to your droplet, or create a new one, and then scroll to the bottom and click "Create Droplet".
+
+Once your Droplet is created, it will have it's own IP address displayed in the DigitalOcean user interface.
+
+#### Start Using Meltano
+
+Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
+
+Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](http://localhost:8080/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
 ## Amazon Web Services (AWS)
 
