@@ -1,4 +1,5 @@
 <script>
+import Vue from 'vue'
 import { mapActions, mapGetters } from 'vuex'
 
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
@@ -19,9 +20,20 @@ export default {
   },
   created() {
     this.autoInstallAirflowCheck()
+    this.acknowledgeAnalyticsTracking()
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    acknowledgeAnalyticsTracking() {
+      if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+        const hasAcknowledgedTracking =
+          'hasAcknowledgedTracking' in localStorage &&
+          localStorage.getItem('hasAcknowledgedTracking') === 'true'
+        if (!hasAcknowledgedTracking) {
+          Vue.toasted.global.acknowledgeAnalyticsTracking()
+        }
+      }
+    },
     autoInstallAirflowCheck() {
       this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
         const needsInstallation =
