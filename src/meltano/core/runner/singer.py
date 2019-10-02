@@ -139,32 +139,26 @@ class SingerRunner(Runner):
 
             self.bookmark_state(last_state)
 
-    def dry_run(self, extractor: SingerTap, loader: SingerTarget):
-        tap_exec = extractor.exec_path()
-        target_exec = loader.exec_path()
-
+    def dry_run(self, tap: PluginInvoker, target: PluginInvoker):
         logging.info("Dry run:")
-        logging.info(f"\textractor: {extractor.name} at '{tap_exec}'")
-        logging.info(f"\tloader: {extractor.name} at '{target_exec}'")
+        logging.info(f"\textractor: {tap.plugin.name} at '{tap.exec_path()}'")
+        logging.info(f"\tloader: {target.plugin.name} at '{target.exec_path()}'")
 
     def run(self, session, dry_run=False):
-        try:
-            tap = self.context.extractor_invoker()
-            target = self.context.loader_invoker()
+        tap = self.context.extractor_invoker()
+        target = self.context.loader_invoker()
 
-            # Configure each tap/target from the ELTContext
-            target_elt_params = self.connection_service.load_params()
-            target.plugin_config.update(target_elt_params)
+        if dry_run:
+            return self.dry_run(tap, target)
 
-            tap.prepare(session)
-            target.prepare(session)
+        # Sets the proper `schema` for the target from the ELTContext
+        target_elt_params = self.connection_service.load_params()
+        target.plugin_config.update(target_elt_params)
 
-            if dry_run:
-                return self.dry_run(tap, target)
+        tap.prepare(session)
+        target.prepare(session)
 
-            with self.job.run(session):
-                self.restore_bookmark(session, tap.plugin.name)
-                loop = asyncio.get_event_loop()
-                loop.run_until_complete(self.invoke(tap, target))
-        finally:
-            session.close()
+        with self.job.run(session):
+            self.restore_bookmark(session, tap)
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.invoke(tap, target))
