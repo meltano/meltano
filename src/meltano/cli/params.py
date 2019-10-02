@@ -2,6 +2,7 @@ import functools
 import urllib
 import click
 import click.globals
+import os
 from pathlib import Path
 
 from meltano.core.project import Project
@@ -14,7 +15,7 @@ def db_options(func):
     @click.option(
         "--database-uri",
         envvar="MELTANO_DATABASE_URI",
-        default="sqlite:///.meltano/meltano.db",
+        default=lambda: f"sqlite:///{os.getcwd()}/.meltano/meltano.db",
         help="System database URI",
     )
     def decorate(*args, **kwargs):

@@ -1,5 +1,6 @@
 import os
 import click
+import logging
 from pathlib import Path
 from alembic.config import Config
 from alembic.script import ScriptDirectory

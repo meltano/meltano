@@ -37,13 +37,6 @@ def create_app(config={}):
     app.config.from_pyfile("ui.cfg", silent=True)
     app.config.update(**config)
 
-    # the database should be instance_relative if we are using `sqlite`
-    scheme, netloc, path, *parts = urlsplit(app.config["SQLALCHEMY_DATABASE_URI"])
-    if scheme == "sqlite" and path:
-        app.config["SQLALCHEMY_DATABASE_URI"] = (
-            scheme + ":///" + app.instance_path + path
-        )
-
     # register
     project_engine(
         project, engine_uri=app.config["SQLALCHEMY_DATABASE_URI"], default=True

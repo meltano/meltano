@@ -4,9 +4,7 @@ import sqlalchemy
 import contextlib
 import logging
 
-from meltano.core.db import DB, project_engine
-from meltano.core.migration_service import MigrationService
-from sqlalchemy import text, create_engine, MetaData
+from sqlalchemy import text, create_engine
 
 
 def recreate_database(engine, db_name):
@@ -33,36 +31,7 @@ def engine_uri():
     engine = create_engine(engine_uri, isolation_level="AUTOCOMMIT")
     recreate_database(engine, database)
 
-    engine_uri = f"postgresql://{user}:{password}@{host}:{port}/{database}"
-    engine = create_engine(engine_uri)
-
-    # migrate the database up
-    migration_service = MigrationService(engine)
-    migration_service.upgrade()
-
-    return str(engine.url)
-
-
-@pytest.fixture()
-def engine_sessionmaker(project, engine_uri):
-    # create the engine
-    engine, sessionmaker = project_engine(project, engine_uri, default=True)
-
-    return (engine, sessionmaker)
-
-
-@pytest.fixture()
-def session(engine_sessionmaker, vacuum_db):
-    """Creates a new database session for a test."""
-    engine, sessionmaker = engine_sessionmaker
-    session = sessionmaker()
-
-    try:
-        yield session
-    finally:
-        # teardown
-        session.close()
-        vacuum_db()
+    return f"postgresql://{user}:{password}@{host}:{port}/{database}"
 
 
 @pytest.fixture()
