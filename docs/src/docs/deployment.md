@@ -7,42 +7,44 @@ This section provides step-by-step guides for deploying Meltano on various cloud
 
 We are working toward one-click installers, and will update this page as soon as those become available. In the meantime, Meltano can be deployed locally or to the cloud using these instructions.
 
-## One-Click Install with DigitalOcean
+## DigitalOcean Marketplace
 
-DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. To get started, [install Meltano from the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano).
+DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud.
 
-::: tip
+<iframe width="560" height="315" src="https://www.youtube.com/embed/cfegedH8_VE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+### Instructions
+
+1. Go to [Meltano in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano)
+
+2. Select `Create Meltano Droplet`
+
+3. If you are not logged in already, you will be asked to login, or create a new DigitalOcean account
+
+4. By default, your droplet will come with the following settings that you can customize if desired
+
+- **Image:** Meltano
+- **Plan:** Starter - Standard
+  - \$40/mo (8GB / 4 CPUs, 160 GB / SSD disk, 5 TB transfer)
+- **Datacenter:** A default datacenter region (depending your location)
+- **Number of Droplets:** 1 Droplet
+- **Backups:** Not enabled by default
+
+5. Add authentication to your droplet via SSH
+
+6. Click `Create Droplet`
+
+Once your Droplet is created, it will have its own IP address displayed in the DigitalOcean user interface.
+
+![Screenshot showing IP address](/images/digitalocean-one-click/01-dooc.jpeg)
+
+7. Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
+
+Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
+
+::: info
 Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/docs/tutorial.html#advanced-manually-creating-a-digitalocean-droplet).
 :::
-
-### Step-by-Step Instructions for DigitalOcean One-Click Install
-
-Go to [Meltano in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano)
-
-Select "Create Meltano Droplet"
-
-You will be prompted to login, or create a new DigitalOcean account.
-
-#### Configure Your Droplet
-
-Once you are logged in, Meltano will be selected from the Marketplace automatically and your Droplet will be configured with the following defaults:
-*  Standard Plan
-*  $40/mo (8GB / 4 CPUs, 160 GB / SSD disk, 5 TB transfer)
-*  New York datacenter region
-*  Authentication via SSH
-*  1 Droplet
-*  Backups not enabled by default
-
-#### Create Your Droplet
-To complete the creation of your Droplet select the SSH key(s) that can be used to authenticate to your droplet, or create a new one, and then scroll to the bottom and click "Create Droplet".
-
-Once your Droplet is created, it will have it's own IP address displayed in the DigitalOcean user interface.
-
-#### Start Using Meltano
-
-Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
-
-Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](http://localhost:8080/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
 ## Amazon Web Services (AWS)
 
@@ -59,50 +61,54 @@ In this section, we will be going over how you can deploy a Meltano Docker image
 
 ![](/screenshots/aws-ecs.png)
 
-
 ![](/screenshots/aws-ecs-getting-started.png)
 
 1. We will create a new _Container definition_ by clicking on the `Configure` button in the **custom** card
 1. Fill out the form with the following data:
-  - **Container name**: Meltano
-  - **Image**: YOUR_DOCKER_IMAGE_URL
-    - Examples:
-      - docker.io/namespace/image-name:tag
-      - registry.gitlab.com/namespace/project/image-name:tag
-  - **Memory Limits (MiB)**: Soft limit 1024
-  - **Port mappings**: 
-    - 5000/tcp (meltano)
-    - 5010/tcp (airflow)
+
+- **Container name**: Meltano
+- **Image**: YOUR_DOCKER_IMAGE_URL
+  - Examples:
+    - docker.io/namespace/image-name:tag
+    - registry.gitlab.com/namespace/project/image-name:tag
+- **Memory Limits (MiB)**: Soft limit 1024
+- **Port mappings**:
+  - 5000/tcp (meltano)
+  - 5010/tcp (airflow)
 
 1. Click `Update` button to finish setting up your container defintion
 1. Click `Edit` next to the _Task defintion_ heading
 1. Update the form with the following:
-  - **Task definition name**: meltano-run
-  - **Network mode**: awsvpc
-  - **Task execution role**: ecsTaskExecutionRole
-  - **Compatibilities**: FARGATE
-  - **Task memory**: 1GB (1024)
-  - **Task CPU**: 0.25 vCPU (256)
+
+- **Task definition name**: meltano-run
+- **Network mode**: awsvpc
+- **Task execution role**: ecsTaskExecutionRole
+- **Compatibilities**: FARGATE
+- **Task memory**: 1GB (1024)
+- **Task CPU**: 0.25 vCPU (256)
+
 1. Click `Next` to move to the next step
 
-### Review service properties 
+### Review service properties
 
 ![](/screenshots/aws-ecs-review-service.png)
 
 1. Verify that the properties are as follows:
-  - **Service name**: meltano-service
-  - **Number of desired tasks**: 1
-  - **Security group**: Automatically create new
-  - **Load balancer type**: None
+
+- **Service name**: meltano-service
+- **Number of desired tasks**: 1
+- **Security group**: Automatically create new
+- **Load balancer type**: None
+
 1. Click `Next` to move on to the next step
 
 ### Configure Your Cluster
 
 The main configuration here is the **Cluster name**. We provide a suggestion below, but feel free to name it as you wish.
 
-  - **Cluster name**: meltano-cluster
-  - **VPC ID**: Automatically create new
-  - **Subnets**: Automatically create new
+- **Cluster name**: meltano-cluster
+- **VPC ID**: Automatically create new
+- **Subnets**: Automatically create new
 
 ### Review Cluster Configuration
 
@@ -140,13 +146,17 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 1. Click `Edit Rules`
 1. Delete any existing rules
 1. Click `Add Rule` with the following properties:
-  - **Type**: Custom TCP Rule
-  - **Protocol**: TCP
-  - **Port Range**: 5000
-  - **Source**: Custom 0.0.0.0/0
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5000
+- **Source**: Custom 0.0.0.0/0
+
 1. Click "Add Rule" with the following properties:
-  - **Type**: Custom TCP Rule
-  - **Protocol**: TCP
-  - **Port Range**: 5010
-  - **Source**: Custom 0.0.0.0/0
+
+- **Type**: Custom TCP Rule
+- **Protocol**: TCP
+- **Port Range**: 5010
+- **Source**: Custom 0.0.0.0/0
+
 1. Click `Save rules`
