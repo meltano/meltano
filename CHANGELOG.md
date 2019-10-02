@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Add Google Analytics tracking acknowledgment in the UI
 - [#926](https://gitlab.com/meltano/meltano/issues/926) Add step-by-step intructions for using the DigitalOcean one-click installer
+- [#1076](https://gitlab.com/meltano/meltano/issues/1076) Enable Log button in pipelines UI after route change or hard refresh if a matching log exists
 
 ### Changes
 
