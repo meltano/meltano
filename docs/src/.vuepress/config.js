@@ -47,7 +47,6 @@ module.exports = {
     sidebar: {
       "/docs": [
         "/docs/",
-        "/docs/deployment",
         "/docs/installation",
         "/docs/getting-started",
         "/docs/plugins",
