@@ -52,14 +52,21 @@ export default {
         <div class="content">
           <div v-if="jobLog">
             <pre><code>{{jobLog}}</code></pre>
-            <button
-              class="button"
-              :class="{ 'is-loading': isRefreshing }"
-              aria-label="refresh"
-              @click="refresh"
-            >
-              Refresh
-            </button>
+            <div class='buttons'>
+              <button
+                class="button"
+                :class="{ 'is-loading': isRefreshing }"
+                aria-label="refresh"
+                @click="refresh"
+              >
+                Refresh
+              </button>
+              <a
+                class='button is-text tooltip is-tooltip-warning is-tooltip-up'
+                data-tooltip="Help shape this feature by contributing your ideas"
+                target='_blank'
+                href='https://gitlab.com/meltano/meltano/issues/1060'>Log streaming and more are planned</a>
+            </div>
           </div>
           <progress v-else class="progress is-small is-info"></progress>
         </div>
