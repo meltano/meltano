@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1069](https://gitlab.com/meltano/meltano/issues/1069) Meltano will now use the schedule's name to run incremental jobs
 - [#926](https://gitlab.com/meltano/meltano/issues/926) Move manual DigitalOcean Droplet configuration instructions to advanced tutorials
+- Collapse Installation docs into a single section
 
 ### Fixes
 
