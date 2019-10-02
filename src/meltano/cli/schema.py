@@ -17,7 +17,7 @@ def schema():
 @schema.command()
 @click.argument("schema")
 @click.argument("roles", nargs=-1, required=True)
-@project
+@project()
 def create(project, schema, roles):
     engine, _ = project_engine(project)
 

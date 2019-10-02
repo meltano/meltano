@@ -13,7 +13,7 @@ from meltano.core.db import project_engine
 @cli.command(context_settings=dict(ignore_unknown_options=True))
 @click.argument("plugin_name")
 @click.argument("plugin_args", nargs=-1, type=click.UNPROCESSED)
-@project
+@project(migrate=True)
 def invoke(project, plugin_name, plugin_args):
     _, Session = project_engine(project)
 

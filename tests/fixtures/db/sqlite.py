@@ -3,33 +3,14 @@ import os
 import sqlalchemy
 import contextlib
 
-from meltano.core.db import DB, project_engine
-from sqlalchemy import create_engine, MetaData
-
 
 @pytest.fixture(scope="session")
-def engine_uri():
-    return "sqlite:///pytest_meltano.db"
+def engine_uri(test_dir):
+    database_path = test_dir.joinpath("pytest_meltano.db")
 
+    try:
+        database_path.unlink()
+    except FileNotFoundError:
+        pass
 
-@pytest.fixture()
-def engine_sessionmaker(project, engine_uri):
-    return project_engine(project, engine_uri, default=True)
-
-
-@pytest.fixture()
-def session(request, engine_sessionmaker):
-    """Creates a new database session for a test."""
-    engine, create_session = engine_sessionmaker
-    session = create_session()
-
-    yield session
-
-    # teardown
-    session.close()
-    meta = MetaData(bind=engine)
-    meta.reflect()
-
-    with engine.connect() as con:
-        for table in reversed(meta.sorted_tables):
-            con.execute(table.delete())
+    return f"sqlite:///{database_path}"

@@ -6,7 +6,7 @@ from meltano.core.compiler.project_compiler import ProjectCompiler
 
 
 @cli.group(hidden=True, invoke_without_command=True)
-@project
+@project()
 @click.pass_context
 def model(ctx, project):
     compiler = ctx.obj["compiler"] = ProjectCompiler(project)

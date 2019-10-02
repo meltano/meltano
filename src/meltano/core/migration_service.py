@@ -1,12 +1,13 @@
 import os
 import click
+import logging
 from pathlib import Path
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 from alembic.runtime.migration import MigrationContext
 from alembic import command
 
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH
+from meltano.migrations import MIGRATION_DIR, LOCK_PATH, seed
 
 
 class MigrationUneededException(Exception):
@@ -50,10 +51,14 @@ class MigrationService:
             )
         except MigrationUneededException:
             click.secho(f"System database up-to-date.")
-        except Exception:
+        except Exception as err:
             click.secho(
                 f"Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
                 fg="yellow",
             )
+            logging.exception(err)
         finally:
             conn.close()
+
+    def seed(self, project):
+        return seed(project)

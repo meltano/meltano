@@ -159,8 +159,10 @@ def truthy(val: str) -> bool:
     return str(val).lower() in TRUTHY
 
 
-def coerce_datetime(d: Union[date, datetime]) -> datetime:
+def coerce_datetime(d: Union[date, datetime]) -> Optional[datetime]:
     """Adds a `time` component to `d` if such a component is missing."""
+    if d is None:
+        return None
 
     if isinstance(d, datetime):
         return d
@@ -172,12 +174,20 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
     if d is None:
         return None
 
-    try:
-        return datetime.strptime(d, "%Y-%m-%dT%H:%M:%SZ")
-    except:
-        pass
+    isoformats = [
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%d",
+    ]
 
-    return coerce_datetime(datetime.strptime(d, "%Y-%m-%d"))
+    for format in isoformats:
+        try:
+            return coerce_datetime(datetime.strptime(d, format))
+        except ValueError:
+            pass
+
+    raise ValueError(f"{d} is not a valid UTC date.")
 
 
 def find_named(xs: Iterable[dict], name: str):

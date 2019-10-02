@@ -15,7 +15,7 @@ from meltano.core.db import project_engine
 
 @cli.group(cls=DefaultGroup, default="add")
 @click.pass_context
-@project
+@project(migrate=True)
 def schedule(project, ctx):
     _, Session = project_engine(project)
     session = Session()

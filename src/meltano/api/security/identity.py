@@ -7,17 +7,6 @@ from meltano.api.models.security import db, User, Role, RolePermissions
 
 users = SQLAlchemyUserDatastore(db, User, Role)
 
-SEED_ROLES = [
-    {
-        "name": "admin",
-        "_permissions": [
-            {"type": "view:design", "context": "*"},
-            {"type": "view:reports", "context": "*"},
-            {"type": "modify:acl", "context": "*"},
-        ],
-    },
-    {"name": "regular", "_permissions": []},
-]
 
 SEED_USERS = [
     {
@@ -81,13 +70,6 @@ class FreeUser:
 
 
 def create_dev_user():
-    for role in SEED_ROLES:
-        role = role.copy()
-        role_name = role.pop("name")
-        permissions = [RolePermissions(**perm) for perm in role.pop("_permissions")]
-
-        role = users.find_or_create_role(role_name, **role, permissions=permissions)
-
     for user in SEED_USERS:
         user = user.copy()
         if users.get_user(user["email"]):

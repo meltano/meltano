@@ -29,7 +29,7 @@ from meltano.core.tracking import GoogleAnalyticsTracker
         ]
     ),
 )
-@project
+@project()
 def discover(project, plugin_type):
     discover_service = PluginDiscoveryService(project)
     try:

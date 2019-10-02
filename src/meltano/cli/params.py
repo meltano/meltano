@@ -2,6 +2,7 @@ import functools
 import urllib
 import click
 import click.globals
+import os
 from pathlib import Path
 
 from meltano.core.project import Project
@@ -14,7 +15,7 @@ def db_options(func):
     @click.option(
         "--database-uri",
         envvar="MELTANO_DATABASE_URI",
-        default="sqlite:///.meltano/meltano.db",
+        default=lambda: f"sqlite:///{os.getcwd()}/.meltano/meltano.db",
         help="System database URI",
     )
     def decorate(*args, **kwargs):
@@ -25,21 +26,32 @@ def db_options(func):
     return functools.update_wrapper(decorate, func)
 
 
-def project(func):
-    @db_options
-    def decorate(engine_uri, *args, **kwargs):
-        ctx = click.globals.get_current_context()
+class project:
+    __name__ = "project"
 
-        project = ctx.obj["project"]
-        if not project:
-            raise click.ClickException(
-                f"`{ctx.command_path}` must be run inside a Meltano project."
-                "\nUse `meltano init <project_name>` to create one."
-            )
+    def __init__(self, migrate=False):
+        self.migrate = migrate
 
-        # register the system database connection
-        project_engine(project, engine_uri, default=True)
+    def __call__(self, func):
+        @db_options
+        def decorate(engine_uri, *args, **kwargs):
+            ctx = click.globals.get_current_context()
 
-        func(project, *args, **kwargs)
+            project = ctx.obj["project"]
+            if not project:
+                raise click.ClickException(
+                    f"`{ctx.command_path}` must be run inside a Meltano project."
+                    "\nUse `meltano init <project_name>` to create one."
+                )
 
-    return functools.update_wrapper(decorate, func)
+            # register the system database connection
+            engine, _ = project_engine(project, engine_uri, default=True)
+
+            if self.migrate:
+                migration_service = MigrationService(engine)
+                migration_service.upgrade()
+                migration_service.seed(project)
+
+            func(project, *args, **kwargs)
+
+        return functools.update_wrapper(decorate, func)

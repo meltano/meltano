@@ -29,7 +29,7 @@ from meltano.core.db import project_engine
 
 @cli.group()
 @click.option("--custom", is_flag=True)
-@project
+@project()
 @click.pass_context
 def add(ctx, project, custom):
     if custom:
@@ -49,7 +49,7 @@ def add(ctx, project, custom):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 @click.pass_context
 def extractor(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.EXTRACTORS, plugin_name)
@@ -60,7 +60,7 @@ def extractor(ctx, project, plugin_name):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 @click.pass_context
 def model(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.MODELS, plugin_name)
@@ -71,7 +71,7 @@ def model(ctx, project, plugin_name):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 @click.pass_context
 def loader(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.LOADERS, plugin_name)
@@ -82,7 +82,7 @@ def loader(ctx, project, plugin_name):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 @click.pass_context
 def transformer(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.TRANSFORMERS, plugin_name)
@@ -93,7 +93,7 @@ def transformer(ctx, project, plugin_name):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 @click.pass_context
 def orchestrator(ctx, project, plugin_name):
     add_plugin(ctx.obj["add_service"], project, PluginType.ORCHESTRATORS, plugin_name)
@@ -104,7 +104,7 @@ def orchestrator(ctx, project, plugin_name):
 
 @add.command()
 @click.argument("plugin_name")
-@project
+@project()
 def transform(project, plugin_name):
     add_transform(project, plugin_name)
 

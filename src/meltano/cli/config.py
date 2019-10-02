@@ -10,7 +10,7 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 
 @cli.group(invoke_without_command=True)
 @click.argument("plugin_name")
-@project
+@project(migrate=True)
 @click.pass_context
 def config(ctx, project, plugin_name):
     config = ConfigService(project)

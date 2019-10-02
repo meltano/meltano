@@ -37,6 +37,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1032](https://gitlab.com/meltano/meltano/issues/1032) Add 'Model' and 'Notebook' to main navigation to communicate that Meltano plans to empower users with modeling and notebooking functionality
 - [#949](https://gitlab.com/meltano/meltano/issues/949) Add "Log" button and dedicated sub-UI for tracking an ELT run's status more granularly
 
+- [#932](https://gitlab.com/meltano/meltano/issues/932) Meltano can now be upgraded from the UI directly.
+
 ### Changes
 
 - [#1045](https://gitlab.com/meltano/meltano/issues/1045) Make it clear that 'meltano add' is not hanging while installing plugins

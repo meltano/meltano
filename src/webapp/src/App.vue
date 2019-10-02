@@ -1,7 +1,4 @@
 <script>
-import Vue from 'vue'
-import { mapActions, mapGetters } from 'vuex'
-
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
 
@@ -11,42 +8,20 @@ export default {
     Breadcrumbs,
     MainNav
   },
-  computed: {
-    ...mapGetters('plugins', [
-      'getIsAddingPlugin',
-      'getIsInstallingPlugin',
-      'getIsPluginInstalled'
-    ])
-  },
   created() {
-    this.autoInstallAirflowCheck()
+    this.$store.dispatch('system/check')
     this.acknowledgeAnalyticsTracking()
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     acknowledgeAnalyticsTracking() {
-      if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
+      if (this.$flask.isSendAnonymousUsageStats) {
         const hasAcknowledgedTracking =
           'hasAcknowledgedTracking' in localStorage &&
           localStorage.getItem('hasAcknowledgedTracking') === 'true'
         if (!hasAcknowledgedTracking) {
-          Vue.toasted.global.acknowledgeAnalyticsTracking()
+          this.$toasted.global.acknowledgeAnalyticsTracking()
         }
       }
-    },
-    autoInstallAirflowCheck() {
-      this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-        const needsInstallation =
-          !this.getIsAddingPlugin('orchestrators', 'airflow') &&
-          !this.getIsInstallingPlugin('orchestrators', 'airflow') &&
-          !this.getIsPluginInstalled('orchestrators', 'airflow')
-        if (needsInstallation) {
-          const payload = { pluginType: 'orchestrators', name: 'airflow' }
-          this.addPlugin(payload).then(() => {
-            this.installPlugin(payload)
-          })
-        }
-      })
     }
   }
 }

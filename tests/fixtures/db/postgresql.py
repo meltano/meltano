@@ -4,8 +4,7 @@ import sqlalchemy
 import contextlib
 import logging
 
-from meltano.core.db import DB, project_engine
-from sqlalchemy import text, create_engine, MetaData
+from sqlalchemy import text, create_engine
 
 
 def recreate_database(engine, db_name):
@@ -33,48 +32,6 @@ def engine_uri():
     recreate_database(engine, database)
 
     return f"postgresql://{user}:{password}@{host}:{port}/{database}"
-
-
-@pytest.fixture()
-def engine_sessionmaker(project, engine_uri):
-    # create the engine
-    engine, sessionmaker = project_engine(project, engine_uri, default=True)
-
-    return (engine, sessionmaker)
-
-
-@pytest.fixture()
-def session(request, engine_sessionmaker):
-    """Creates a new database session for a test."""
-    engine, sessionmaker = engine_sessionmaker
-    truncate_tables(engine)
-
-    session = sessionmaker()
-
-    yield session
-
-    # teardown
-    session.close()
-    logging.debug("Session closed.")
-    truncate_tables(engine)
-
-
-def truncate_tables(engine, schema=None):
-    with engine.connect() as con:
-        con.execute("SET session_replication_role TO 'replica';")
-
-        with con.begin():
-            meta = MetaData(bind=engine, schema=schema)
-            meta.reflect()
-
-            for table in meta.sorted_tables:
-                if table.name == "alembic_version":
-                    continue
-
-                logging.debug(f"table {table} truncated.")
-                con.execute(table.delete())
-
-        con.execute("SET session_replication_role TO 'origin';")
 
 
 @pytest.fixture()

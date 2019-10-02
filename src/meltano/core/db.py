@@ -12,8 +12,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 
-from meltano.core.migration_service import MigrationService
-
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)
@@ -40,7 +38,6 @@ def project_engine(project, engine_uri=None, default=False) -> ("Engine", sessio
     engine = create_engine(engine_uri)
 
     init_hook(engine)
-    seed(engine)
 
     create_session = sessionmaker(bind=engine)
     engine_session = (engine, create_session)
@@ -69,10 +66,6 @@ def init_hook(engine):
 def init_sqlite_hook(engine):
     # enable the WAL
     engine.execute("PRAGMA journal_mode=WAL")
-
-
-def seed(engine):
-    MigrationService(engine).upgrade()
 
 
 class DB:
