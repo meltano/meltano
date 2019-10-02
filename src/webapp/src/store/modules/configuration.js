@@ -155,7 +155,7 @@ const actions = {
             commit('removePipelinePoller', targetPoller)
 
             const targetPipeline = state.pipelines.find(
-              pipeline => pipeline.name === jobStatus.jobId.replace('job_', '')
+              pipeline => pipeline.name === jobStatus.jobId
             )
             commit('setPipelineIsRunning', {
               pipeline: targetPipeline,
@@ -176,7 +176,7 @@ const actions = {
   rehydratePollers({ dispatch, getters, state }) {
     // Handle page refresh condition resulting in jobs running but no pollers
     getters.getRunningPipelines.forEach(pipeline => {
-      const jobId = `job_${pipeline.name}`
+      const jobId = pipeline.name
       const isMissingPoller =
         state.pipelinePollers.find(
           pipelinePoller => pipelinePoller.getMetadata().jobId === jobId

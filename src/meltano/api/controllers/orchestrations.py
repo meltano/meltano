@@ -213,7 +213,7 @@ def get_pipeline_schedules():
     schedule_service = ScheduleService(project)
     schedules = [s._asdict() for s in schedule_service.schedules()]
     for schedule in schedules:
-        finder = JobFinder(f"job_{schedule['name']}")
+        finder = JobFinder(schedule["name"])
         state_job = finder.latest(db.session)
         schedule["is_running"] = state_job.is_running() if state_job else False
 
