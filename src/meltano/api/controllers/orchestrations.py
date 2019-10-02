@@ -216,6 +216,7 @@ def get_pipeline_schedules():
         finder = JobFinder(schedule["name"])
         state_job = finder.latest(db.session)
         schedule["is_running"] = state_job.is_running() if state_job else False
+        schedule["job_id"] = state_job.job_id if state_job else None
 
     return jsonify(schedules)
 
