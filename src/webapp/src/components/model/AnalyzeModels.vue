@@ -1,5 +1,6 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
+
 import capitalize from '@/filters/capitalize'
 import underscoreToSpace from '@/filters/underscoreToSpace'
 
@@ -38,8 +39,36 @@ export default {
   <section>
     <div class="columns">
       <div class="column is-one-third">
+        <h2 class="title is-5">Custom</h2>
+        <div class="content">
+          <p>
+            <a
+              class="has-text-underlined"
+              href="https://www.meltano.com/docs/architecture.html#meltano-model"
+              target="_blank"
+              >Meltano Model</a
+            >
+            is the glue between your data and click-to-code analysis.
+          </p>
+          <p>
+            Learn more about Meltano Model and how to create
+            <a
+              class="has-text-underlined"
+              href="https://www.meltano.com/docs/tutorial.html#adding-custom-models"
+              target="_blank"
+              >custom models</a
+            >
+            so Meltano Analyze can interactively generate SQL queries in
+            real-time.
+          </p>
+        </div>
         <h2 class="title is-5">Available</h2>
-
+        <div class="content">
+          <p>
+            Below are the models that Meltano ships with in addition to any
+            custom models Meltano recognizes in your project.
+          </p>
+        </div>
         <table
           class="table is-fullwidth is-narrow is-hoverable is-size-7 has-background-transparent"
         >
@@ -54,7 +83,7 @@ export default {
               <tr :key="`${modelPlugin}-${index}`">
                 <td>
                   <div class="buttons">
-                    <a
+                    <button
                       v-if="!getIsPluginInstalled('models', modelPlugin)"
                       :class="{
                         'is-loading':
@@ -62,9 +91,11 @@ export default {
                           getIsInstallingPlugin('models', modelPlugin)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
+                      disabled
                       @click="installModel(modelPlugin)"
-                      >Install</a
                     >
+                      Install
+                    </button>
                     <a
                       v-else
                       class="button is-small tooltip is-tooltip-warning is-tooltip-right"
@@ -90,6 +121,13 @@ export default {
       <div class="column is-two-thirds">
         <h2 class="title is-5">Installed</h2>
         <template v-if="hasModels">
+          <div class="content">
+            <p>
+              Below are the currently installed models that enable click-to-code
+              SQL generation and interactive analysis. Click an Analyze button
+              below.
+            </p>
+          </div>
           <div v-for="(v, model) in models" :key="`${model}-panel`" class="box">
             <div class="content">
               <div class="level level-tight">
@@ -127,9 +165,15 @@ export default {
         <template v-else>
           <div class="content">
             <p>
-              There are no models installed yet: you may install them using the
-              panel on the left.
+              Models are inferred and automatically installed for you based off
+              the installed Extractors from your data pipelines. Set up a
+              pipeline first.
             </p>
+            <router-link
+              class="button is-interactive-primary"
+              :to="{ name: 'dataSetup' }"
+              >Create Data Pipeline</router-link
+            >
           </div>
         </template>
       </div>

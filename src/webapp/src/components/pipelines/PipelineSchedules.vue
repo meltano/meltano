@@ -163,8 +163,8 @@ export default {
                   >
                   <router-link
                     class="button is-interactive-primary is-outlined is-small"
-                    :to="{ name: 'analyze' }"
-                    >Analyze</router-link
+                    :to="{ name: 'model' }"
+                    >Model</router-link
                   >
                   <a
                     class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"

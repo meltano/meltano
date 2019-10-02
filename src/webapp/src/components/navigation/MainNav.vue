@@ -1,6 +1,8 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 
+import capitalize from '@/filters/capitalize'
+import underscoreToSpace from '@/filters/underscoreToSpace'
 import utils from '@/utils/utils'
 
 import Dropdown from '@/components/generic/Dropdown'
@@ -12,6 +14,10 @@ export default {
     Dropdown,
     Logo
   },
+  filters: {
+    capitalize,
+    underscoreToSpace
+  },
   data() {
     return {
       isMobileMenuOpen: false
@@ -19,12 +25,14 @@ export default {
   },
   computed: {
     ...mapGetters('configuration', ['getRunningPipelines']),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapGetters('system', ['updateAvailable']),
     ...mapGetters('plugins', [
       'getIsStepLoadersMinimallyValidated',
       'getIsStepTransformsMinimallyValidated',
       'getIsStepScheduleMinimallyValidated'
     ]),
+    ...mapState('repos', ['models']),
     ...mapState('system', ['latestVersion', 'updating', 'version']),
     getIconColor() {
       return parentPath =>
@@ -45,6 +53,9 @@ export default {
         this.closeMobileMenu()
       }
     }
+  },
+  created() {
+    this.$store.dispatch('repos/getModels')
   },
   methods: {
     closeMobileMenu() {
@@ -106,7 +117,7 @@ export default {
               }"
             >
               <span class="icon is-small" :class="getIconColor('/pipeline')">
-                <font-awesome-icon icon="th-list"></font-awesome-icon>
+                <font-awesome-icon icon="stream"></font-awesome-icon>
               </span>
               <span>Pipeline</span>
               <span
@@ -177,22 +188,88 @@ export default {
         </router-link>
 
         <router-link
-          :to="{ name: 'analyze' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+          :to="{ name: 'model' }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/model/') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+              'has-text-interactive-navigation': getIsSubRouteOf('/model/')
             }"
           >
-            <span class="icon is-small" :class="getIconColor('/analyze')">
-              <font-awesome-icon icon="chart-line"></font-awesome-icon>
+            <span class="icon is-small" :class="getIconColor('/model')">
+              <font-awesome-icon icon="file-alt"></font-awesome-icon>
             </span>
-            <span>Analyze</span>
+            <span>Model</span>
           </a>
         </router-link>
+
+        <div class="navbar-item navbar-child has-dropdown is-hoverable">
+          <a
+            :class="{ 'router-link-active': getIsSubRouteOf('/analyze') }"
+            class="navbar-link has-text-weight-semibold"
+          >
+            <a
+              class="button has-background-transparent is-borderless is-paddingless"
+              :class="{
+                'has-text-interactive-navigation': getIsSubRouteOf('/analyze')
+              }"
+            >
+              <span class="icon is-small" :class="getIconColor('/analyze')">
+                <font-awesome-icon icon="chart-line"></font-awesome-icon>
+              </span>
+              <span>Analyze</span>
+            </a>
+          </a>
+
+          <div class="navbar-dropdown">
+            <template v-if="hasModels">
+              <div
+                v-for="(v, model) in models"
+                :key="`${model}-panel`"
+                class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+              >
+                <div class="content">
+                  <h3 class="is-size-6">
+                    {{ v.name | capitalize | underscoreToSpace }}
+                  </h3>
+                  <h4 class="is-size-7 has-text-grey">
+                    {{ v.namespace }}
+                  </h4>
+                </div>
+                <div class="buttons">
+                  <router-link
+                    v-for="design in v['designs']"
+                    :key="design"
+                    class="button is-small is-interactive-primary is-outlined"
+                    :to="urlForModelDesign(model, design)"
+                    >{{ design | capitalize | underscoreToSpace }}</router-link
+                  >
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <div class="box is-borderless is-shadowless is-marginless">
+                <div class="content">
+                  <h3 class="is-size-6">
+                    No Models Installed
+                  </h3>
+                  <p>
+                    Models are inferred and automatically installed for you
+                    based off the installed Extractors from your data pipelines.
+                    Set up a pipeline first.
+                  </p>
+                  <router-link
+                    class="button is-interactive-primary"
+                    :to="{ name: 'dataSetup' }"
+                    >Create Data Pipeline</router-link
+                  >
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
 
         <router-link
           :to="{ name: 'dashboards' }"
@@ -216,17 +293,20 @@ export default {
           class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
           data-tooltip="Help shape this feature by contributing your ideas"
           target="_blank"
-          href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=model"
-          >Model</a
-        >
-
-        <a
-          class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
-          data-tooltip="Help shape this feature by contributing your ideas"
-          target="_blank"
           href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
-          >Notebook</a
         >
+          <a
+            class="button has-background-transparent is-borderless is-paddingless"
+            :class="{
+              'has-text-interactive-navigation': getIsSubRouteOf('/notebook')
+            }"
+          >
+            <span class="icon is-small" :class="getIconColor('/notebook')">
+              <font-awesome-icon icon="book-open"></font-awesome-icon>
+            </span>
+            <span>Notebook</span>
+          </a>
+        </a>
       </div>
 
       <div class="navbar-end">
@@ -328,6 +408,10 @@ export default {
 
 <style lang="scss">
 @import '@/scss/bulma-preset-overrides.scss';
+
+.box-analyze-nav {
+  min-width: 240px;
+}
 
 .meltano-label {
   @media screen and (min-width: $tablet) {
