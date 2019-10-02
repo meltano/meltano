@@ -17,6 +17,17 @@ from pathlib import Path
 TEST_JOB_ID = "test_job"
 
 
+class AnyInstanceOf:
+    def __init__(self, cls):
+        self._cls = cls
+
+    def __eq__(self, other):
+        return isinstance(other, self._cls)
+
+    def __repr__(self):
+        return f"<Any({self._cls}>"
+
+
 def create_plugin_files(config_dir: Path, plugin: Plugin):
     for file in plugin.config_files.values():
         Path(os.path.join(config_dir, file)).touch()
@@ -148,3 +159,23 @@ class TestSingerRunner:
         state_json = json.dumps(subject.job.payload["singer_state"])
         assert tap_invoker.files["state"].exists()
         assert tap_invoker.files["state"].open().read() == state_json
+
+    def test_run(self, subject, session):
+        async def invoke_mock(*args):
+            pass
+
+        with mock.patch.object(
+            SingerRunner, "restore_bookmark"
+        ) as restore_bookmark, mock.patch.object(
+            SingerRunner, "invoke", side_effect=invoke_mock
+        ) as invoke:
+            subject.run(session, dry_run=True)
+
+            assert not restore_bookmark.called
+            assert not invoke.called
+
+            subject.run(session)
+            AnyPluginInvoker = AnyInstanceOf(PluginInvoker)
+
+            restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
+            invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker)
