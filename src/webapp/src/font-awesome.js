@@ -7,6 +7,7 @@ import {
   faArrowUp,
   faArrowsAltV,
   faBolt,
+  faBookOpen,
   faCaretDown,
   faCaretUp,
   faCertificate,
@@ -18,6 +19,7 @@ import {
   faDotCircle,
   faDraftingCompass,
   faExclamationTriangle,
+  faFileAlt,
   faFilter,
   faGift,
   faGlobeAmericas,
@@ -28,6 +30,7 @@ import {
   faSort,
   faSortAmountDown,
   faSortAmountUp,
+  faStream,
   faTable,
   faThLarge,
   faThList,
@@ -48,6 +51,7 @@ export default {
     library.add(faArrowRight)
     library.add(faArrowUp)
     library.add(faBolt)
+    library.add(faBookOpen)
     library.add(faCaretDown)
     library.add(faCaretUp)
     library.add(faCertificate)
@@ -59,6 +63,7 @@ export default {
     library.add(faDotCircle)
     library.add(faDraftingCompass)
     library.add(faExclamationTriangle)
+    library.add(faFileAlt)
     library.add(faFilter)
     library.add(faGift)
     library.add(faGlobeAmericas)
@@ -69,6 +74,7 @@ export default {
     library.add(faSort)
     library.add(faSortAmountDown)
     library.add(faSortAmountUp)
+    library.add(faStream)
     library.add(faTable)
     library.add(faThLarge)
     library.add(faThList)
