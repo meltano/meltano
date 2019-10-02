@@ -20,7 +20,7 @@ def migrate(engine_uri):
 
 @pytest.fixture(scope="session")
 def vacuum_db(engine_uri):
-    def _vacuum():
+    def _vacuum(project):
         engine = create_engine(engine_uri)
 
         # ensure we delete all the tables
@@ -31,6 +31,7 @@ def vacuum_db(engine_uri):
         # migrate back up
         migration_service = MigrationService(engine)
         migration_service.upgrade()
+        migration_service.seed(project)
 
     return _vacuum
 
@@ -44,7 +45,7 @@ def engine_sessionmaker(project, engine_uri):
 
 
 @pytest.fixture()
-def session(engine_sessionmaker, vacuum_db):
+def session(project, engine_sessionmaker, vacuum_db):
     """Creates a new database session for a test."""
     engine, sessionmaker = engine_sessionmaker
     session = sessionmaker()
@@ -54,4 +55,4 @@ def session(engine_sessionmaker, vacuum_db):
     finally:
         # teardown
         session.close()
-        vacuum_db()
+        vacuum_db(project)

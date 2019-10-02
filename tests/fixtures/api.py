@@ -56,7 +56,7 @@ def create_app(request, project, engine_uri, vacuum_db):
         app.teardown_request(_cleanup)
 
         with app.app_context():
-            vacuum_db()
+            vacuum_db(project)
             create_dev_user()
 
         return app

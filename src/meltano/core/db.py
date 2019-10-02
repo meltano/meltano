@@ -12,8 +12,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine import Engine
 from psycopg2.sql import Identifier, SQL
 
-from meltano.core.migration_service import MigrationService
-
 
 SystemMetadata = MetaData()
 SystemModel = declarative_base(metadata=SystemMetadata)

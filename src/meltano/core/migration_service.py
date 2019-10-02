@@ -7,7 +7,7 @@ from alembic.script import ScriptDirectory
 from alembic.runtime.migration import MigrationContext
 from alembic import command
 
-from meltano.migrations import MIGRATION_DIR, LOCK_PATH
+from meltano.migrations import MIGRATION_DIR, LOCK_PATH, seed
 
 
 class MigrationUneededException(Exception):
@@ -59,3 +59,6 @@ class MigrationService:
             logging.exception(err)
         finally:
             conn.close()
+
+    def seed(self, project):
+        return seed(project)

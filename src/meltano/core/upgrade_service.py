@@ -52,3 +52,4 @@ class UpgradeService:
                 raise UpgradeError(f"Failed to upgrade `meltano`.", run)
 
         self.migration_service.upgrade()
+        self.migration_service.seed(self.project)

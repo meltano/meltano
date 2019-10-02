@@ -50,6 +50,7 @@ class project:
             if self.migrate:
                 migration_service = MigrationService(engine)
                 migration_service.upgrade()
+                migration_service.seed(project)
 
             func(project, *args, **kwargs)
 
