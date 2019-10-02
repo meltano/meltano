@@ -38,7 +38,7 @@ def discovery():
     )
 
     discovery[PluginType.LOADERS].append(
-        {"name": "target-mock", "namespace": "pytest", "pip_url": "target-mock"}
+        {"name": "target-mock", "namespace": "sqlite", "pip_url": "target-mock"}
     )
 
     discovery[PluginType.TRANSFORMERS].append(

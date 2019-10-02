@@ -13,10 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#926](https://gitlab.com/meltano/meltano/issues/926) Add step-by-step intructions for using the DigitalOcean one-click installer
 
 ### Changes
+
 - [#1069](https://gitlab.com/meltano/meltano/issues/1069) Meltano will now use the schedule's name to run incremental jobs
 - [#926](https://gitlab.com/meltano/meltano/issues/926) Move manual DigitalOcean Droplet configuration instructions to advanced tutorials
 
 ### Fixes
+
+- [#1075](https://gitlab.com/meltano/meltano/issues/1075) Fix an issue where `meltano elt` would fail when a previous job was found
 
 ### Breaks
 
