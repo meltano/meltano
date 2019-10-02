@@ -42,27 +42,25 @@ export default {
         <h2 class="title is-5">Custom</h2>
         <div class="content">
           <p>
-            Meltano Model is the glue between your data and click-to-code
-            analysis.
-          </p>
-          <p>
-            Learn more about Meltano Model and how to create custom models so
-            Meltano Analyze can interactively generate SQL queries in real-time.
-          </p>
-          <div class="buttons">
             <a
+              class="has-text-underlined"
               href="https://www.meltano.com/docs/architecture.html#meltano-model"
               target="_blank"
-              class="button"
               >Meltano Model</a
             >
+            is the glue between your data and click-to-code analysis.
+          </p>
+          <p>
+            Learn more about Meltano Model and how to create
             <a
+              class="has-text-underlined"
               href="https://www.meltano.com/docs/tutorial.html#adding-custom-models"
               target="_blank"
-              class="button"
-              >Custom Models</a
+              >custom models</a
             >
-          </div>
+            so Meltano Analyze can interactively generate SQL queries in
+            real-time.
+          </p>
         </div>
         <h2 class="title is-5">Available</h2>
         <div class="content">
