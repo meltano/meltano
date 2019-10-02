@@ -16,7 +16,7 @@ def migrate(engine_uri):
 
 
 @pytest.fixture(scope="session")
-def vacuum(engine_uri):
+def vacuum_db(engine_uri):
     def _vacuum():
         engine = create_engine(engine_uri)
 

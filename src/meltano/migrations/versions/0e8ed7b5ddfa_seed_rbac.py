@@ -19,14 +19,14 @@ depends_on = None
 def upgrade():
     Role = sa.table(
         "role",
-        sa.Column("id", sa.Integer, nullable=False, primary_key=True),
+        sa.Column("id", sa.Integer, autoincrement=True, primary_key=True),
         sa.Column("name", sa.String(80)),
         sa.Column("description", sa.String, nullable=True),
     )
 
     RolePermissions = sa.table(
         "role_permissions",
-        sa.Column("id", sa.Integer, nullable=False, primary_key=True),
+        sa.Column("id", sa.Integer, autoincrement=True, primary_key=True),
         sa.Column("role_id", sa.Integer),
         sa.Column("type", sa.String),
         sa.Column("context", sa.String, nullable=True),
@@ -35,17 +35,17 @@ def upgrade():
     op.bulk_insert(
         Role,
         [
-            {"id": 0, "name": "admin", "description": "Meltano Admin"},
-            {"id": 1, "name": "regular", "description": "Meltano User"},
+            {"name": "admin", "description": "Meltano Admin"},
+            {"name": "regular", "description": "Meltano User"},
         ],
     )
 
     op.bulk_insert(
         RolePermissions,
         [
-            {"role_id": 0, "type": "view:design", "context": "*"},
-            {"role_id": 0, "type": "view:reports", "context": "*"},
-            {"role_id": 0, "type": "modify:acl", "context": "*"},
+            {"role_id": 1, "type": "view:design", "context": "*"},
+            {"role_id": 1, "type": "view:reports", "context": "*"},
+            {"role_id": 1, "type": "modify:acl", "context": "*"},
         ],
     )
 

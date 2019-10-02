@@ -39,7 +39,7 @@ def app_context(app):
 
 
 @pytest.fixture(scope="class")
-def create_app(request, project, engine_uri, vacuum):
+def create_app(request, project, engine_uri, vacuum_db):
     def _factory(**kwargs):
         config = {
             "TESTING": True,
@@ -49,16 +49,14 @@ def create_app(request, project, engine_uri, vacuum):
             **kwargs,
         }
 
-        def _cleanup():
-            vacuum()
-            with app.app_context():
-                db.session.expire_all()
+        def _cleanup(ctx):
+            db.session.rollback()
 
         app = meltano.api.app.create_app(config)
-        request.addfinalizer(_cleanup)
+        app.teardown_request(_cleanup)
 
         with app.app_context():
-            vacuum()
+            vacuum_db()
             create_dev_user()
 
         return app
