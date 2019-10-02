@@ -32,7 +32,6 @@ class TestCliSchedule:
         )
 
         assert_cli_runner(res)
-        project.reload()
 
         schedule = next(schedule_service.schedules())
 

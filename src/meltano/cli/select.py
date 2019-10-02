@@ -45,7 +45,7 @@ def selection_mark(selection):
 @click.option("--list", is_flag=True)
 @click.option("--all", is_flag=True)
 @click.option("--exclude", is_flag=True)
-@project
+@project()
 def select(project, extractor, entities_filter, attributes_filter, **flags):
     try:
         if flags["list"]:

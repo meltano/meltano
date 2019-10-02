@@ -1,22 +1,36 @@
 import os
 import click
+import subprocess
+import psutil
+import meltano
+import logging
 from pathlib import Path
 from sqlalchemy import create_engine
-from alembic.config import Config
-from alembic.script import ScriptDirectory
-from alembic import command
 
-from meltano.core.migration_service import MigrationService
+from meltano.core.project import Project
 from meltano.core.db import project_engine
+from meltano.core.migration_service import MigrationService
+from meltano.core.upgrade_service import UpgradeService
 from . import cli
 from .params import project, db_options
 
 
-@cli.command()
-@db_options
-@click.pass_context
-def upgrade(ctx, engine_uri):
-    engine = create_engine(engine_uri)
+class UpgradeError(Exception):
+    """Occurs when the Meltano upgrade fails"""
 
-    migration_service = MigrationService(engine)
-    migration_service.upgrade()
+    pass
+
+
+@cli.command()
+@project()
+@click.pass_context
+def upgrade(ctx, project):
+    engine, _ = project_engine(project)
+    upgrade_service = UpgradeService(engine, project)
+
+    try:
+        upgrade_service.upgrade()
+        upgrade_service.reload()
+    except UpgradeError as up:
+        click.secho(str(up), fg="red")
+        raise click.Abort()

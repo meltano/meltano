@@ -34,7 +34,6 @@ def create_schedule():
     return make
 
 
-@freeze_time("2000-01-01")
 class TestScheduleService:
     def test_add_schedule(self, subject, create_schedule):
         COUNT = 10
@@ -59,19 +58,6 @@ class TestScheduleService:
         schedule = add("with_start_date", datetime(2001, 1, 1))
         assert schedule.start_date == datetime(2001, 1, 1)
 
-        # or use datetime.utcnow()
-        schedule = subject.add(
-            session,
-            "without_start_date",
-            tap.name,
-            target.name,
-            "run",
-            "@daily",
-            start_date=None,
-        )
-
-        assert schedule.start_date == datetime.utcnow()
-
         # or use the start_date in the extractor configuration
         subject.plugin_settings_service.set(
             session, tap, "start_date", datetime(2002, 1, 1)
@@ -85,4 +71,4 @@ class TestScheduleService:
             side_effect=PluginSettingMissingError(tap, "start_date"),
         ):
             schedule = add("with_no_start_date", None)
-            assert schedule.start_date == datetime.utcnow()
+            assert schedule.start_date

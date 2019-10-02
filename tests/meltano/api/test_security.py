@@ -24,7 +24,7 @@ def gitlab_client():
 
 
 class TestSecurity:
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def app(self, create_app):
         return create_app(MELTANO_AUTHENTICATION=True)
 
@@ -56,7 +56,6 @@ class TestSecurity:
                 )
                 .first()
             )
-            db.session.rollback()
 
     @mock.patch("gitlab.Gitlab", return_value=gitlab_client())
     def test_gitlab_token_identity_maps_user(self, gitlab, app):
@@ -103,7 +102,7 @@ class TestSecurity:
 
 
 class TestSingleUser:
-    @pytest.fixture
+    @pytest.fixture(scope="class")
     def app(self, create_app):
         return create_app(MELTANO_AUTHENTICATION=False)
 

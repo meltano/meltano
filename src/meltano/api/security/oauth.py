@@ -116,5 +116,4 @@ def gitlab_token_identity(token):
     else:
         raise OAuthError("This identity is already claimed by another user.")
 
-    db.session.commit()
     return identity

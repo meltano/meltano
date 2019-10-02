@@ -35,8 +35,8 @@ You can choose to use a different system database backend or configuration using
 option of the `meltano` command, or the `MELTANO_DATABASE_URI` environment variable:
 
 ```bash
-# SQLite:
-export MELTANO_DATABASE_URI=sqlite:///system_database.db
+# SQLite (absolute path required, notice the `3` slashes before the path)
+export MELTANO_DATABASE_URI=sqlite:////path/to/system_database.db
 # PostgreSQL:
 export MELTANO_DATABASE_URI=postgresql://username:password@host:port/database
 ```

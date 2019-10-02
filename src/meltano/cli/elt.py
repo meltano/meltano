@@ -33,7 +33,7 @@ from meltano.core.elt_context import ELTContextBuilder
 @click.option(
     "--job_id", envvar="MELTANO_JOB_ID", help="A custom string to identify the job."
 )
-@project
+@project(migrate=True)
 def elt(project, extractor, loader, dry, transform, job_id):
     """
     meltano elt EXTRACTOR_NAME LOADER_NAME

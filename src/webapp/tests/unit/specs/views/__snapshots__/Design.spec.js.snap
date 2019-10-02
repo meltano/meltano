@@ -100,7 +100,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       class="buttons is-right"
                     >
                       <button
-                        class="button is-small is-text"
+                        class="button is-text"
                         data-dropdown-auto-close=""
                       >
                         
@@ -109,7 +109,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       </button>
                        
                       <button
-                        class="button is-small"
+                        class="button"
                         data-dropdown-auto-close=""
                         disabled="disabled"
                       >
@@ -500,7 +500,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       class="buttons is-right"
                     >
                       <button
-                        class="button is-small is-text"
+                        class="button is-text"
                         data-dropdown-auto-close=""
                       >
                         
@@ -509,7 +509,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       </button>
                        
                       <button
-                        class="button is-small"
+                        class="button"
                         data-dropdown-auto-close=""
                         disabled="disabled"
                       >
@@ -872,7 +872,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     class="buttons is-right"
                   >
                     <button
-                      class="button is-small is-text"
+                      class="button is-text"
                       data-dropdown-auto-close=""
                     >
                       
@@ -881,7 +881,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     </button>
                      
                     <button
-                      class="button is-small"
+                      class="button"
                       data-dropdown-auto-close=""
                       disabled="disabled"
                     >
@@ -1190,7 +1190,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     class="buttons is-right"
                   >
                     <button
-                      class="button is-small is-text"
+                      class="button is-text"
                       data-dropdown-auto-close=""
                     >
                       
@@ -1199,7 +1199,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     </button>
                      
                     <button
-                      class="button is-small"
+                      class="button"
                       data-dropdown-auto-close=""
                       disabled="disabled"
                     >
@@ -1536,7 +1536,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       class="buttons is-right"
                     >
                       <button
-                        class="button is-small is-text"
+                        class="button is-text"
                         data-dropdown-auto-close=""
                       >
                         
@@ -1545,7 +1545,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       </button>
                        
                       <button
-                        class="button is-small"
+                        class="button"
                         data-dropdown-auto-close=""
                         disabled="disabled"
                       >
