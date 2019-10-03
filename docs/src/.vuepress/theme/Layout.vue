@@ -77,8 +77,8 @@ export default {
       isSidebarOpen: false,
       swUpdateEvent: null,
       userId: 1,
-      name: 'Foo Bar',
-      email: 'foo@bar.com',
+      name: '',
+      email: '',
     }
   },
 
@@ -140,7 +140,6 @@ export default {
       name: this.name,
       email: this.email,
     });
-    
 
     window.addEventListener('scroll', this.onScroll)
 
