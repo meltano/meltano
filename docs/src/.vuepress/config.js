@@ -81,6 +81,15 @@ module.exports = {
       }
     ],
     [
+      module.exports = {
+        // ...
+        plugins: [
+            [require('vuepress-intercom'), { appId: 'your-app-id' }]
+        ],
+        // ...
+      }
+    ],
+    [
       "container",
       {
         type: "info",
