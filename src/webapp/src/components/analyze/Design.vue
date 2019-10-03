@@ -705,7 +705,7 @@ export default {
                           'is-active': timeframe.selected,
                           'is-sqlite-unsupported': isLoaderSqlite
                         }"
-                        @click="isLoaderSqlite || timeframeSelected(timeframe)"
+                        @click="timeframeSelected(timeframe)"
                       >
                         {{ timeframe.label }}
                         <div

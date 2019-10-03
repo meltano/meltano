@@ -555,7 +555,6 @@ const actions = {
   toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe)
     dispatch('cleanOrdering', timeframe)
-    dispatch('tryAutoRun')
   },
 
   toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
