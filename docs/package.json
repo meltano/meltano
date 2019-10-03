@@ -29,5 +29,9 @@
     "@vuepress/plugin-google-analytics": "^1.0.0-alpha.0",
     "vuepress": "^1.0.0-alpha.30",
     "vuepress-plugin-container": "^2.0.2"
+  },
+  "dependencies": {
+    "vue-intercom": "^1.0.14",
+    "vuepress-intercom": "^1.0.3"
   }
 }

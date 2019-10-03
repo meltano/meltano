@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#926](https://gitlab.com/meltano/meltano/issues/926) Add step-by-step intructions for using the DigitalOcean one-click installer
 - [#1076](https://gitlab.com/meltano/meltano/issues/1076) Enable Log button in pipelines UI after route change or hard refresh if a matching log exists
 - [#1067](https://gitlab.com/meltano/meltano/issues/1067) Add Model landing page and update Analyze main navigation to a dropdown displaying the various analysis CTAs associated with each model
+- [#1080](https://gitlab.com/meltano/meltano/issues/1080) Add live chat support on Meltano.com website using Intercom.io
 
 ### Changes
 
