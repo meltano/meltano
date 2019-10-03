@@ -31,6 +31,7 @@
     "vuepress-plugin-container": "^2.0.2"
   },
   "dependencies": {
+    "vue-intercom": "^1.0.14",
     "vuepress-intercom": "^1.0.3"
   }
 }
