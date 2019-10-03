@@ -4,7 +4,7 @@ sidebar: auto
 
 # tap-gitlab Tutorial
 
-For this tutorial, our goal will be to get [tap-gitlab](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project. 
+For this tutorial, our goal will be to get [tap-gitlab](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project.
 
 ## Prerequisites
 
@@ -26,23 +26,30 @@ cd tutorial-tap-gitlab
 
 ### Add Loader
 
-Next, we will be configuring the warehouse where your data will live. In this tutorial, we will use Postgres; but you can substitute this for another loader if desired.
+Next, we will be configuring the warehouse where your data will live.
 
 ```bash
 # Add target-postgres to your project
-meltano add loader target-postgres 
+meltano add loader target-postgres
 ```
 
 If you check your `.env` file, you should see the following configuration already populated:
+
+:::tip Looking for a database?
+To quickly get started, you can use `docker-compose up warehouse_db` to spin up a PostgreSQL instance ready for Meltano.
+:::
 
 ```bash
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
 export PG_ADDRESS=localhost
-export PG_SCHEMA=meltano
 export PG_PORT=5502
 export PG_DATABASE=warehouse
 ```
+
+:::tip Let's validate!
+You can use `meltano config target-postgres` to validate the current configuration.
+:::
 
 Once you verify that your database is setup correctly, it's time to start working with `tap-gitlab`!
 
@@ -79,9 +86,9 @@ In order to access GitLab's API to fetch data, we must get a personal access tok
 1. Navigate to your [profile's access tokens](https://gitlab.com/profile/personal_access_tokens).
 
 2. Fill out the personal access token form with the following properties:
-  - **Name:** tap-gitlab-tutorial 
+  - **Name:** tap-gitlab-tutorial
   - **Expires:** _leave blank unless you have a specific reason to expire the token_
-  - **Scopes:** 
+  - **Scopes:**
     - api
 
 3. Click on `Create personal access token` to submit your request.
@@ -142,6 +149,10 @@ export GITLAB_API_START_DATE=2019-05-01T00:00:00Z
 ...
 ```
 
+:::tip Let's validate!
+You can use `meltano config tap-gitlab` to validate the current configuration.
+:::
+
 ## Run ELT (extract, load, transform)
 
 Now that everything is setup, we can run the full Extract > Load > Transform pipeline with the following command:
@@ -158,7 +169,7 @@ You should now see the data being fetched and your Postgres database properly po
 
 Now, you can add the model so that you'll be able to visualize the transformed data in the UI:
 
-```bash 
+```bash
 meltano add model model-gitlab
 ```
 
