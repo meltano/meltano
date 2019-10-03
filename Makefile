@@ -199,7 +199,7 @@ ifdef type
 endif
 
 release:
-	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; } && \
-	changelog release $(type) --yes && \
-	git add CHANGELOG.md && \
+	git diff --quiet || { echo "Working directory is dirty, please commit or stash your changes."; exit 1; }
+	yes | changelog release $(type)
+	git add CHANGELOG.md
 	bumpversion --tag --allow-dirty --new-version `changelog current` minor
