@@ -10,6 +10,7 @@ module.exports = function() {
       airflowUrl: process.env.AIRFLOW_URL,
       appUrl: process.env.MELTANO_WEBAPP_URL,
       isSendAnonymousUsageStats: false,
+      projectId: 'none',
       version: 'source'
     }
   )

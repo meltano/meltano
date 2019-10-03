@@ -108,7 +108,7 @@ def create_app(config={}):
         tracker = GoogleAnalyticsTracker(project)
         if tracker.send_anonymous_usage_stats:
             g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["clientId"] = tracker.client_id
+            g.jsContext["projectId"] = tracker.client_id
 
         g.jsContext["version"] = meltano.__version__
 
