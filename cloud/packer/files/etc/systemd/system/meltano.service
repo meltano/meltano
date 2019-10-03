@@ -7,6 +7,7 @@ Type=simple
 User=meltano
 WorkingDirectory=/var/meltano/project
 Environment=FLASK_ENV=production
+Environment=PATH=/var/meltano/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
 ExecStartPre=/var/meltano/.venv/bin/meltano upgrade
 ExecStart=/var/meltano/.venv/bin/meltano ui
 #ExecStop=/bin/kill -s TERM $MAINPID
