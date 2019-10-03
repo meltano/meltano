@@ -22,14 +22,16 @@ class UpgradeError(Exception):
 
 
 @cli.command()
+@click.option("--pip_url", type=str)
+@click.option("--force", is_flag=True, default=False)
 @project()
 @click.pass_context
-def upgrade(ctx, project):
+def upgrade(ctx, project, **kwargs):
     engine, _ = project_engine(project)
     upgrade_service = UpgradeService(engine, project)
 
     try:
-        upgrade_service.upgrade()
+        upgrade_service.upgrade(**kwargs)
         upgrade_service.reload()
     except UpgradeError as up:
         click.secho(str(up), fg="red")
