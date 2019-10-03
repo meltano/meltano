@@ -81,6 +81,9 @@ module.exports = {
       }
     ],
     [
+      [require('vuepress-intercom'), { appId: 'ir946q00' }]
+    ],
+    [
       "container",
       {
         type: "info",
