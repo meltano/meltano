@@ -4,6 +4,7 @@ import psutil
 import meltano
 import subprocess
 import signal
+from typing import Optional
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService
@@ -33,17 +34,19 @@ class UpgradeService:
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
-    def upgrade(self):
+    def upgrade(self, pip_url: Optional[str] = None, force=False):
         # we need to find out if the `meltano` module is installed as editable
         editable = meltano.__file__.endswith("src/meltano/__init__.py")
+        editable = editable and not force
 
         if editable:
             logging.info(
                 f"Skipping `meltano` upgrade because Meltano is installed as editable."
             )
         else:
+            pip_url = pip_url or "meltano"
             run = subprocess.run(
-                ["pip", "install", "-U", "meltano"],
+                ["pip", "install", "--upgrade", pip_url],
                 stderr=subprocess.PIPE,
                 universal_newlines=True,
             )
