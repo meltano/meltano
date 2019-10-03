@@ -80,7 +80,7 @@ module.exports = {
         ga: 'UA-132758957-1'
       }
     ],
-    [[require('vuepress-intercom'), { appId: 'ir946q00' }]],
+    [require('vuepress-intercom'), { appId: 'ir946q00' }],
     [
       'container',
       {
