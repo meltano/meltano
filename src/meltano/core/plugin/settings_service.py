@@ -10,7 +10,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
 from . import PluginRef, PluginType, Plugin, PluginInstall
-from .setting import PluginSetting
+from .setting import PluginSetting, REDACTED_VALUE
 
 
 class PluginSettingMissingError(Error):
@@ -61,7 +61,11 @@ class PluginSettingsService:
         )
 
     def as_config(
-        self, session, plugin: PluginRef, sources: List[PluginSettingValueSource] = None
+        self,
+        session,
+        plugin: PluginRef,
+        sources: List[PluginSettingValueSource] = None,
+        redacted=False,
     ) -> Dict:
         # defaults to the meltano.yml for extraneous settings
         plugin_install = self.get_install(plugin)
@@ -73,6 +77,11 @@ class PluginSettingsService:
             value, source = self.get_value(session, plugin, setting["name"])
             if sources and source not in sources:
                 continue
+
+            # we don't want to leak secure informations
+            # so we redact all `passwords`
+            if redacted and value and setting.get("kind") == "password":
+                value = REDACTED_VALUE
 
             nest(config, setting["name"], value)
 
@@ -103,6 +112,9 @@ class PluginSettingsService:
 
             if env_key in os.environ:
                 logging.warning(f"Setting `{name}` is currently set via ${env_key}.")
+                return
+
+            if value == REDACTED_VALUE:
                 return
 
             setting = PluginSetting(

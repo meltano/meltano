@@ -107,13 +107,16 @@ def get_plugin_configuration() -> Response:
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(project)
 
-    config = flatten(settings.as_config(db.session, plugin), reducer="dot")
+    config = flatten(
+        settings.as_config(db.session, plugin, redacted=True), reducer="dot"
+    )
+    settings = settings.get_definition(plugin).settings
 
     return jsonify(
         {
             # freeze the keys because they are used for lookups
             "config": freeze_keys(config),
-            "settings": settings.get_definition(plugin).settings,
+            "settings": settings,
         }
     )
 
@@ -135,7 +138,7 @@ def save_plugin_configuration() -> Response:
         else:
             settings.set(db.session, plugin, name, value)
 
-    return jsonify(settings.as_config(db.session, plugin))
+    return jsonify(settings.as_config(db.session, plugin, redacted=True))
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])

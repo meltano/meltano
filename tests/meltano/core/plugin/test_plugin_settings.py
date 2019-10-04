@@ -1,7 +1,10 @@
 import pytest
 
 from meltano.core.plugin.setting import PluginSetting
-from meltano.core.plugin.settings_service import PluginSettingValueSource
+from meltano.core.plugin.settings_service import (
+    PluginSettingValueSource,
+    REDACTED_VALUE,
+)
 
 
 def test_create(session):
@@ -69,12 +72,27 @@ class TestPluginSettingsService:
         )
 
     def test_as_config(self, subject, session, tap):
-        assert subject.as_config(session, tap) == {"test": "mock", "start_date": None}
+        EXPECTED = {"test": "mock", "start_date": None, "secure": None}
+        assert subject.as_config(session, tap) == EXPECTED
+        assert subject.as_config(session, tap, redacted=True) == EXPECTED
+
+    def test_as_config_redacted(self, subject, session, tap):
+        # ensure values are redacted when they are set
+        subject.set(session, tap, "secure", "thisisatest")
+        config = subject.as_config(session, tap, redacted=True)
+
+        assert config["secure"] == REDACTED_VALUE
+
+        # although setting the REDACTED_VALUE does nothing
+        subject.set(session, tap, "secure", REDACTED_VALUE)
+        config = subject.as_config(session, tap)
+        assert config["secure"] == "thisisatest"
 
     def test_as_env(self, subject, session, tap):
         assert subject.as_env(session, tap) == {
             "PYTEST_TEST": "mock",
             "PYTEST_START_DATE": "None",
+            "PYTEST_SECURE": "None",
         }
 
     def test_unset(self, session, subject, tap):

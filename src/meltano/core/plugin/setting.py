@@ -8,6 +8,10 @@ from meltano.core.utils import nest
 from meltano.core.db import SystemModel
 
 
+# sentinel value to use to prevent leaking sensitive data
+REDACTED_VALUE = "(redacted)"
+
+
 class PluginSetting(SystemModel):
     __tablename__ = "plugin_settings"
 
