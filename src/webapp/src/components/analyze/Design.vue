@@ -106,32 +106,13 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('designs/resetDefaults')
   },
+  beforeRouteUpdate(to, from, next) {
+    this.$store.dispatch('designs/resetDefaults')
+    this.initializeDesign()
+    next()
+  },
   created() {
-    const { slug, namespace, model, design } = this.$route.params
-    const uponDesign = this.$store.dispatch('designs/getDesign', {
-      namespace,
-      model,
-      design,
-      slug
-    })
-    const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
-
-    Promise.all([uponDesign, uponPlugins]).then(() => {
-      const defaultLoader =
-        localStorage.getItem(
-          `loader:${this.currentModel}:${this.currentDesign}`
-        ) ||
-        localStorage.getItem('loader') ||
-        this.installedPlugins.loaders[0].name
-
-      // don't use the setter here not to update the user's preferences
-      this.$store.commit('designs/setLoader', defaultLoader)
-
-      // validate initialization so UI can display while removing the loading bar
-      this.isInitialized = true
-    })
-
-    this.$store.dispatch('designs/getFilterOptions')
+    this.initializeDesign()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -139,6 +120,36 @@ export default {
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
+    },
+
+    initializeDesign() {
+      this.isInitialized = false
+
+      const { slug, namespace, model, design } = this.$route.params
+      const uponDesign = this.$store.dispatch('designs/getDesign', {
+        namespace,
+        model,
+        design,
+        slug
+      })
+      const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
+
+      Promise.all([uponDesign, uponPlugins]).then(() => {
+        const defaultLoader =
+          localStorage.getItem(
+            `loader:${this.currentModel}:${this.currentDesign}`
+          ) ||
+          localStorage.getItem('loader') ||
+          this.installedPlugins.loaders[0].name
+
+        // don't use the setter here not to update the user's preferences
+        this.$store.commit('designs/setLoader', defaultLoader)
+
+        // validate initialization so UI can display while removing the loading bar
+        this.isInitialized = true
+      })
+
+      this.$store.dispatch('designs/getFilterOptions')
     },
 
     toggleActiveReportInDashboard(dashboard) {
