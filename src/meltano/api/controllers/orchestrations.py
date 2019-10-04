@@ -106,17 +106,15 @@ def get_plugin_configuration() -> Response:
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(project)
-
     config = flatten(
         settings.as_config(db.session, plugin, redacted=True), reducer="dot"
     )
-    settings = settings.get_definition(plugin).settings
 
     return jsonify(
         {
             # freeze the keys because they are used for lookups
             "config": freeze_keys(config),
-            "settings": settings,
+            "settings": settings.get_definition(plugin).settings,
         }
     )
 
