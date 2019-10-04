@@ -2,10 +2,9 @@ import Vue from 'vue'
 
 import lodash from 'lodash'
 
+import orchestrationsApi from '../../api/orchestrations'
 import poller from '@/utils/poller'
 import utils from '@/utils/utils'
-
-import orchestrationsApi from '../../api/orchestrations'
 
 const defaultState = utils.deepFreeze({
   connectionInFocusConfiguration: {},
