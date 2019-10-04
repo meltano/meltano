@@ -134,6 +134,7 @@ const actions = {
   installRelatedPlugins({ dispatch }, installConfig) {
     return pluginsApi.installBatch(installConfig).then(() => {
       dispatch('getAllPlugins')
+      dispatch('repos/getModels', null, { root: true })
     })
   }
 }
