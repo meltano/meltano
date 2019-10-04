@@ -12,7 +12,7 @@ services:
     command: ['bash', '-c', 'yarn && yarn run dev']
 
   warehouse_db:
-    image: postgres
+    image: postgres:11
     environment:
       POSTGRES_DB: warehouse
       POSTGRES_PASSWORD: warehouse

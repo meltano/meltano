@@ -118,7 +118,7 @@ test_postgres:
     PG_PASSWORD: $POSTGRES_PASSWORD
     PG_DATABASE: $POSTGRES_DB
   services:
-    - postgres:latest
+    - postgres:11
 
 test_sqlite:
   <<: *test
