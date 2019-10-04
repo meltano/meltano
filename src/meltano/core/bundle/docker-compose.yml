@@ -9,7 +9,7 @@ services:
     - '5000:5000'
     - '5010:5010'
   warehouse_db:
-    image: postgres
+    image: postgres:11
     environment:
       POSTGRES_DB: warehouse
       POSTGRES_PASSWORD: warehouse
