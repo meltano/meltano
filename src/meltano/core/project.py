@@ -86,8 +86,9 @@ class Project(Versioned):
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
         # update the process cache to the latest version
-        with self._meltano_lock.read_lock(), \
-            fasteners.InterProcessLock(self.run_dir("meltano.yml.lock")):
+        with self._meltano_lock.read_lock(), fasteners.InterProcessLock(
+            self.run_dir("meltano.yml.lock")
+        ):
             self._meltano = (
                 yaml.load(self.meltanofile.open(), Loader=yaml.SafeLoader) or {}
             )
@@ -101,8 +102,9 @@ class Project(Versioned):
         if the context ends gracefully.
         """
         try:
-            with self._meltano_lock.write_lock(), \
-              fasteners.InterProcessLock(self.run_dir("meltano.yml.lock")):
+            with self._meltano_lock.write_lock(), fasteners.InterProcessLock(
+                self.run_dir("meltano.yml.lock")
+            ):
                 meltano_update = self.meltano
                 yield meltano_update
 
