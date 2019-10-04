@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,8 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
 
+### Breaks
 
 ## 0.44.1 - (2019-10-03)
 
@@ -38,7 +39,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1071](https://gitlab.com/meltano/meltano/issues/1071) Fix `rehydratePollers` so the UI reflects running jobs after a hard refresh or route change (this surfaced from the recent [!963](https://gitlab.com/meltano/meltano/merge_requests/963) change)
 - [#1075](https://gitlab.com/meltano/meltano/issues/1075) Fix an issue where `meltano elt` would fail when a previous job was found
-
 
 ## 0.44.0 - (2019-09-30)
 
