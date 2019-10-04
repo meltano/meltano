@@ -8,6 +8,9 @@ describe('Configuration', () => {
     cy.route('/api/v1/orchestrations/get/pipeline_schedules').as(
       'pipelineSchedulesApi'
     )
+    cy.route('/api/v1/repos/models').as('modelsApi')
+    cy.route('/api/v1/reports').as('reportsApi')
+
     cy.route('POST', '/api/v1/plugins/add').as('addApi')
     cy.route('POST', '/api/v1/plugins/install').as('installApi')
     cy.route('POST', '/api/v1/orchestrations/entities/tap-carbon-intensity').as(
@@ -18,19 +21,37 @@ describe('Configuration', () => {
     )
     cy.route('POST', '/api/v1/orchestrations/job/state').as('jobStateApi')
     cy.route('POST', '/api/v1/orchestrations/run').as('runApi')
+    cy.route(
+      'POST',
+      '/api/v1/sql/get/model-carbon-intensity-sqlite/carbon/region'
+    ).as('getChartApi')
+    cy.route('POST', '/api/v1/dashboards/dashboard/save').as('saveDashboard')
+    cy.route('POST', '//api/v1/dashboards/dashboard/report/add').as('addReport')
 
     cy.visit('http://localhost:8080/pipeline/schedule')
-    cy.wait('@pipelineSchedulesApi')
-    cy.get('.buttons.is-right').within(() => {
+    cy.wait('@modelsApi')
+    cy.get('.tag-running-pipelines').should('have.length', 0)
+    cy.visit('http://localhost:8080/model')
+    cy.wait('@modelsApi')
+    cy.get('#model-carbon-intensity-sqlite-carbon-model-card').within(() => {
       cy.get('.button')
-        .contains('Run')
+        .contains('Analyze')
         .click()
     })
-    cy.wait('@runApi')
-    cy.get('.tag-running-pipelines').should('have.length', 1)
-    cy.wait('@jobStateApi', {
-      timeout: 10000
-    })
-    cy.get('.tag-running-pipelines').should('have.length', 0)
+    cy.wait('@reportsApi')
+    cy.get('#column-name').click()
+    cy.get('#aggregate-count').click()
+    cy.get('#run-query-button').click()
+    cy.wait('@getChartApi')
+    cy.get('canvas').should('be.visible')
+    cy.get('#dropdown-save-report').click()
+    cy.get('#button-save-report').click()
+    cy.wait('@addReport')
+    cy.get('#dropdown-add-to-dashboard').click()
+    cy.get('#button-new-dashboard').click()
+    cy.get('#button-create-dashboard').click()
+    cy.wait('@saveDashboard')
+    cy.visit('http://localhost:8080/dashboard')
+    cy.get('canvas').should('be.visible')
   })
 })

@@ -128,7 +128,12 @@ export default {
               below.
             </p>
           </div>
-          <div v-for="(v, model) in models" :key="`${model}-panel`" class="box">
+          <div
+            v-for="(v, model) in models"
+            :id="`${model}-model-card`.replace('/', '-')"
+            :key="`${model}-panel`"
+            class="box"
+          >
             <div class="content">
               <div class="level level-tight">
                 <div class="level-left">

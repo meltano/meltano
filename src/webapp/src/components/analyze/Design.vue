@@ -276,10 +276,16 @@ export default {
 
       <div class="column">
         <div class="field is-grouped is-pulled-right">
-          <p v-if="hasActiveReport" class="control" @click="getDashboards">
+          <p
+            v-if="hasActiveReport"
+            id="dropdown-add-to-dashboard"
+            class="control"
+            @click="getDashboards"
+          >
             <Dropdown label="Add to Dashboard" is-right-aligned>
               <div class="dropdown-content">
                 <a
+                  id="button-new-dashboard"
                   class="dropdown-item"
                   data-dropdown-auto-close
                   @click="toggleNewDashboardModal()"
@@ -325,7 +331,11 @@ export default {
             </Dropdown>
           </p>
 
-          <div class="control field" :class="{ 'has-addons': hasActiveReport }">
+          <div
+            id="dropdown-save-report"
+            class="control field"
+            :class="{ 'has-addons': hasActiveReport }"
+          >
             <p class="control">
               <button
                 v-if="hasActiveReport"
@@ -363,6 +373,7 @@ export default {
                         Cancel
                       </button>
                       <button
+                        id="button-save-report"
                         class="button"
                         :disabled="!saveReportSettings.name"
                         data-dropdown-auto-close
@@ -419,59 +430,31 @@ export default {
             <div class="level-left">
               <h2 class="title is-5">Query</h2>
             </div>
-            <div class="level-right">
-              <div class="level-item field is-grouped">
-                <div class="control">
-                  <Dropdown
-                    label="SQL"
-                    button-classes="button is-text is-small"
-                    :disabled="!currentSQL"
-                    is-icon-removed
-                  >
-                    <div class="dropdown-content">
-                      <div class="level">
-                        <div class="level-item">
-                          <pre><code>{{ formattedSql }}</code></pre>
-                        </div>
+            <div class="column is-three-fifths">
+              <div class="field has-addons is-pulled-right is-vcentered">
+                <Dropdown
+                  label="SQL"
+                  button-classes="is-text is-thin is-small"
+                  :disabled="!currentSQL"
+                  is-icon-removed
+                >
+                  <div class="dropdown-content">
+                    <div class="level">
+                      <div class="level-item">
+                        <pre><code>{{ formattedSql }}</code></pre>
                       </div>
                     </div>
-                  </Dropdown>
-                </div>
-
-                <div class="control">
-                  <div class="field has-addons">
-                    <div class="control">
-                      <button
-                        class="button is-success"
-                        :class="{ 'is-loading': isLoadingQuery }"
-                        :disabled="!currentSQL"
-                        @click="runQuery"
-                      >
-                        Run
-                      </button>
-                    </div>
-                    <div class="control">
-                      <button
-                        class="button tooltip"
-                        :data-tooltip="
-                          `Toggle autorun queries ${
-                            isAutoRunQuery ? 'off' : 'on'
-                          }`
-                        "
-                        :class="{
-                          'has-text-grey-light': !isAutoRunQuery,
-                          'is-active has-text-interactive-primary': isAutoRunQuery
-                        }"
-                        :disabled="!currentSQL"
-                        @click="toggleIsAutoRunQuery"
-                      >
-                        <span class="icon is-small is-size-7">
-                          <font-awesome-icon icon="sync"></font-awesome-icon>
-                        </span>
-                      </button>
-                    </div>
                   </div>
-                </div>
+                </Dropdown>
+                <button
+                  id="run-query-button"
+                  class="button is-success"
+                  :class="{ 'is-loading': isLoadingQuery }"
+                  :disabled="!currentSQL"
+                  @click="runQuery"
+                >
+                  Run
+                </button>
               </div>
             </div>
           </div>
@@ -589,6 +572,7 @@ export default {
                 <template v-for="column in design.relatedTable.columns">
                   <a
                     v-if="!column.hidden"
+                    :id="`column-${column.label}`.toLowerCase()"
                     :key="column.label"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': column.selected }"
@@ -627,6 +611,7 @@ export default {
                 </a>
                 <a
                   v-for="aggregate in design.relatedTable.aggregates"
+                  :id="`aggregate-${aggregate.label}`.toLowerCase()"
                   :key="aggregate.label"
                   class="panel-block space-between has-text-weight-medium"
                   :class="{ 'is-active': aggregate.selected }"

@@ -70,7 +70,5 @@ describe('Configuration', () => {
     })
     cy.wait('@runApi')
     cy.get('.tag-running-pipelines').should('have.length', 1)
-    cy.wait('@jobStateApi')
-    cy.get('.tag-running-pipelines').should('have.length', 0)
   })
 })
