@@ -14,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1087](https://gitlab.com/meltano/meltano/issues/1087) Fix `meltano select` not seeding the database when run as the first command.
+- [#1090](https://gitlab.com/meltano/meltano/issues/1090) Update the namespace for all plugins. Also the default schema used will go back to including the `tap_` prefix to avoid conflicts with existing schemas (e.g. a local `gitlab` or `salesforce` schema). This also fixes `tap-csv` and `tap-google-analytics` not properly working after the latest Meltano release.
 
 ### Breaks
 - [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
