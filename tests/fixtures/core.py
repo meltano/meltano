@@ -33,7 +33,11 @@ def discovery():
             "name": "tap-mock",
             "namespace": "pytest",
             "pip_url": "tap-mock",
-            "settings": [{"name": "test", "value": "mock"}, {"name": "start_date"}],
+            "settings": [
+                {"name": "test", "value": "mock"},
+                {"name": "start_date"},
+                {"name": "secure", "kind": "password"},
+            ],
         }
     )
 

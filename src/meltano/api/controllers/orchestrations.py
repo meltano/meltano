@@ -106,8 +106,9 @@ def get_plugin_configuration() -> Response:
     payload = request.get_json()
     plugin = PluginRef(payload["type"], payload["name"])
     settings = PluginSettingsService(project)
-
-    config = flatten(settings.as_config(db.session, plugin), reducer="dot")
+    config = flatten(
+        settings.as_config(db.session, plugin, redacted=True), reducer="dot"
+    )
 
     return jsonify(
         {
@@ -135,7 +136,7 @@ def save_plugin_configuration() -> Response:
         else:
             settings.set(db.session, plugin, name, value)
 
-    return jsonify(settings.as_config(db.session, plugin))
+    return jsonify(settings.as_config(db.session, plugin, redacted=True))
 
 
 @orchestrationsBP.route("/select-entities", methods=["POST"])
