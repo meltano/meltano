@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1087](https://gitlab.com/meltano/meltano/issues/1087) Fix `meltano select` not seeding the database when run as the first command.
+
 ### Breaks
 
 
