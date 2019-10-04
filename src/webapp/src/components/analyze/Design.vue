@@ -107,8 +107,7 @@ export default {
     this.$store.dispatch('designs/resetDefaults')
   },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/resetDefaults')
-    this.initializeDesign()
+    this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
     next()
   },
   created() {
