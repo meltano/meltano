@@ -15,6 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1087](https://gitlab.com/meltano/meltano/issues/1087) Fix `meltano select` not seeding the database when run as the first command.
 - [#1090](https://gitlab.com/meltano/meltano/issues/1090) Update the namespace for all plugins. Also the default schema used will go back to including the `tap_` prefix to avoid conflicts with existing schemas (e.g. a local `gitlab` or `salesforce` schema). This also fixes `tap-csv` and `tap-google-analytics` not properly working after the latest Meltano release.
+- [#1047](https://gitlab.com/meltano/meltano-marketing/issues/1047) Fix a bug where some configuration values were not redacted
+
+### Breaks
 - [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
 - [#1089](https://gitlab.com/meltano/meltano/issues/1089) Properly re-initialize the Analyze page after a new analysis is selected during an existing analysis (this issue surfaced due to the recent Analyze dropdown CTAs addition which enables an analysis change during an existing one)
 - [#1092](https://gitlab.com/meltano/meltano/issues/1092) Fix async condition so the design store's `defaultState` is properly applied before loading a new design via `initializeDesign`
