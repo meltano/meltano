@@ -80,6 +80,12 @@ module.exports = {
         ga: 'UA-132758957-1'
       }
     ],
+    [
+      'vuepress-plugin-google-tag-manager',
+      {
+        id: 'GTM-NGTFLR7'
+      }
+    ],
     [require('vuepress-intercom'), { appId: 'ir946q00' }],
     [
       'container',
