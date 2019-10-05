@@ -1,8 +1,8 @@
 <template>
   <div class="home">
     <div style="background-color: #e5e4e2">
-      <div class="promobar" style="width:100%; background-color:blue; color:white; text-align:center; padding:6px;">
-        <span>Meltano is now available as a DigitalOcean 1-Click App</span>
+      <div class="promobar" style="width:100%; background-color:#0168ff; color:white; text-align:center; padding:6px; font-size:14px;">
+        <span>Meltano is now available as a <a style="color:white; text-decoration:underline;" href="https://marketplace.digitalocean.com/apps/meltano">1-Click App in the DigitalOcean Marketplace</a></span>
       </div>
       <div class="hero homepage-cta">
         <div class="hero-left">
