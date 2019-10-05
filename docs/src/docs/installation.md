@@ -8,11 +8,18 @@ This section provides step-by-step guides for installing Meltano in various envi
 
 ## DigitalOcean Marketplace
 
-DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano)
+DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://meltano.com/docs/installation.html#digitalocean-marketplace)
 
+:::tip Get $50 Worth of DigitalOcean Credits for Free
+When you create a new DigitalOcean account using [this link](https://meltano.com/docs/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
+:::
+
+### Video Walkthrough 
+
+<p></p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cfegedH8_VE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-### Instructions
+### Step-by-Step Instructions
 
 1. Go to [Meltano in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano)
 
@@ -41,7 +48,7 @@ Once your Droplet is created, it will have its own IP address displayed in the D
 
 Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
-::: info
+:::tip Build a Custom Meltano Droplet on DigitalOcean
 Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/docs/tutorial.html#advanced-manually-creating-a-digitalocean-droplet).
 :::
 
