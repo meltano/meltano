@@ -64,7 +64,7 @@ meltano add extractor tap-gitlab
 Once the installation is successful, you need to open your `.env` file and add the following to it:
 
 ```bash
-export GITLAB_API_URL=https://gitlab.com/api/v4
+export GITLAB_API_URL='https://gitlab.com/api/v4'
 export GITLAB_API_TOKEN=
 export GITLAB_API_PROJECTS=
 export GITLAB_API_GROUPS=
@@ -99,7 +99,7 @@ In order to access GitLab's API to fetch data, we must get a personal access tok
 
 ```bash
 ...
-export GITLAB_API_TOKEN=I8vxHsiVAaDnAX3hA
+export GITLAB_API_TOKEN='I8vxHsiVAaDnAX3hA'
 ...
 ```
 
@@ -116,7 +116,7 @@ For this tutorial, we will scope our data sample to only include the Meltano pro
 
 ```bash
 ...
-export GITLAB_API_PROJECTS=meltano/meltano
+export GITLAB_API_PROJECTS='meltano/meltano'
 ...
 ```
 
@@ -132,7 +132,7 @@ For this tutorial, we will also scope the data to reduce the size of data being 
 
 ```bash
 ...
-export GITLAB_API_GROUPS=meltano
+export GITLAB_API_GROUPS='meltano'
 ...
 ```
 
@@ -145,7 +145,7 @@ Similar to the previous examples, we will limit the scope of data being fetched 
 ```bash
 ...
 # The date format is ISO-8601
-export GITLAB_API_START_DATE=2019-05-01T00:00:00Z
+export GITLAB_API_START_DATE='2019-05-01T00:00:00Z'
 ...
 ```
 
