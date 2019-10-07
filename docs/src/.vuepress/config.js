@@ -64,7 +64,6 @@ module.exports = {
         '/docs/',
         '/docs/installation',
         '/docs/getting-started',
-        '/docs/plugins',
         '/docs/loaders',
         '/docs/tutorial',
         '/docs/command-line-interface',

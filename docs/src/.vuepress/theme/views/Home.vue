@@ -304,7 +304,7 @@
 
         <p class="description ta-c">
           For more information, check out our
-          <a href="/docs/plugins.html">plugins documentation</a>
+          <a href="/plugins/">plugins documentation</a>
         </p>
       </div>
     </div>
