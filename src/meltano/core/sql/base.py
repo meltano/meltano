@@ -1050,7 +1050,7 @@ class MeltanoQuery(MeltanoBase):
                             "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
-                            "attribute_name": t.period_alias(period),
+                            "attribute_name": period["name"],
                             "attribute_label": t.period_label(period),
                             "attribute_type": "timeframe",
                         }
@@ -1226,7 +1226,7 @@ class MeltanoQuery(MeltanoBase):
                             "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
-                            "attribute_name": t.period_alias(period),
+                            "attribute_name": period["name"],
                             "attribute_label": t.period_label(period),
                             "attribute_type": "timeframe",
                         }
