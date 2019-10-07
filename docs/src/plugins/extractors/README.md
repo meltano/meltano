@@ -1,3 +1,7 @@
+---
+prev: /plugins/
+---
+
 # Extractors
 
 **E**xtracting data is the **E** in the term **ELT**. In this section, we provide a detailed overview of how Meltano pulls data from your sources.

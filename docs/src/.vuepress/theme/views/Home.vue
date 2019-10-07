@@ -3,7 +3,7 @@
     <div style="background-color: #e5e4e2">
       <div
         class="promobar"
-        style="width:100%; background-color:#6567ad; color:white; text-align:center; padding: 10px; font-size:14px;"
+        style="width:100%; background-color:#0168ff; color:white; text-align:center; padding: 10px; font-size:14px;"
       >
         <span
           >Meltano is now available as a

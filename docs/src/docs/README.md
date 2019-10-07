@@ -1,15 +1,41 @@
 # Introduction
 
-This section contains technical documentation on Meltano.
+Meltano is an open source convention over configuration product for the whole data life cycle, all the way from loading data to analyzing it. To learn more about our progress, check out the [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md) and our weekly [milestones and roadmap](https://gitlab.com/groups/meltano/-/milestones).
 
-## Table of Contents
+We leverage open source and software development best practices including:
 
-- [Command Line Interface](/docs/command-line-interface.html)
-- [Environment Variables](/docs/environment-variables.html)
-- [Security & Privacy](/docs/security-and-privacy.html)
-- [Architecture](/docs/architecture.html)
-- [Roadmap](/docs/roadmap.html)
+- Version control
+- Consistent primitives and naming schema
+- Clear and powerful command line interface
+- Continuous integration and deployment
+- Making it easy to get started with up to date documentation
 
-::: tip Feedback welcome
-If you have any suggestions for how we can improve this to make your life easier, please open a new issue or submit your own merge request!
-:::
+[![Meltano Diagram](/meltano-diagram.png)](/meltano-diagram.png)
+
+Meltano stands for the steps of the data life cycle:
+
+- Model
+- Extract
+- Load
+- Transform
+- Analyze
+- Notebook
+- Orchestrate
+
+## Ways to use
+
+To empower you and your team in this life cycle, Meltano manifests as two tools:
+
+1. command line interface (CLI)
+1. web app (GUI)
+
+These two tools enable you and your team to use Meltano in a few different ways:
+
+1. Meltano as a **Project** (CLI + GUI)
+   - From data extraction to analysis and visualization with orchestration for automating the process
+1. Meltano as a **Framework** (CLI)
+   - Helps you create and test extractors, loaders, and transformers
+1. Meltano as an **ELT** only (CLI)
+   - Runtime for extracting, loading, and transforming data
+1. Meltano as a **UI** only (GUI)
+   - Interactively query, explore, and visualize data using various charts, reports, and dashboards
