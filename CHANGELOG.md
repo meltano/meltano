@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1020](https://gitlab.com/meltano/meltano/issues/1020) Update Command Line Tools documentation to reflect a standard format with opportunities for improvement in the future
+- [#524](https://gitlab.com/meltano/meltano/issues/524) There is a new Plugins section on the site to contain all ecosystem related libraries (i.e., extractors, loaders, etc.)
 
 ### Fixes
 
