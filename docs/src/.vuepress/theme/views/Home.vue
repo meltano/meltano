@@ -773,8 +773,12 @@ export default {
   img {
     max-width: 200px;
     margin: 0 auto;
-    -webkit-filter: grayscale(1);
     filter: grayscale(1);
+    transition: filter 0.2s ease-in-out;
+
+    &:hover {
+      filter: grayscale(0);
+    }
   }
 }
 
