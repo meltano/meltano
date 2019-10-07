@@ -1,6 +1,6 @@
 # Getting Started
 
-Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start connecting data soures, building pipelines, performing analysis and dashboarding.
+Now that you have successfully installed Meltano [locally](/guide/installation.html) or [in the cloud](/guide/deployment.html), you're ready to start connecting data soures, building pipelines, performing analysis and dashboarding.
 
 ::: tip
 The following instructions assume you are able to access Meltano's user interface locally from `http://localhost:5000` or at `http://YOUR_CLOUD_IP_ADDRESS:5000`.
@@ -145,4 +145,4 @@ We can also visit the Dashboard directly by clicking on the `Dashboard` navigati
 
 And with that, you have now setup a complete end-to-end data solution with Meltano! 🎉
 
-To learn about more Meltano recipes and functionality with [Advanced Tutorials](/docs/tutorial.html).
+To learn about more Meltano recipes and functionality with our [tutorials](/tutorials/).

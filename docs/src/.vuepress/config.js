@@ -43,7 +43,21 @@ module.exports = {
   dest: 'public',
   themeConfig: {
     nav: [
-      { text: 'Documentation', link: '/docs/' },
+      {
+        text: 'Learn',
+        items: [
+          { text: 'Guide', link: '/guide/' },
+          { text: 'Documentation', link: '/docs/' },
+          { text: 'Tutorials', link: '/tutorials/' }
+        ]
+      },
+      {
+        text: 'Plugins',
+        items: [
+          { text: 'Extractors', link: '/plugins/extractors/' },
+          { text: 'Loaders', link: '/plugins/loaders/' }
+        ]
+      },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
         text: 'Newsletter',
@@ -55,17 +69,18 @@ module.exports = {
     sidebar: {
       '/docs': [
         '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
-        '/docs/plugins',
-        '/docs/loaders',
-        '/docs/tutorial',
         '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
-        '/docs/roadmap',
         '/docs/architecture',
-        '/docs/contributing'
+        '/docs/roadmap'
+      ],
+      '/guide': [
+        '/guide/',
+        '/guide/installation',
+        '/guide/getting-started',
+        '/guide/orchestration',
+        '/guide/contributing'
       ]
     },
     logo: '/meltano-logo.svg',
