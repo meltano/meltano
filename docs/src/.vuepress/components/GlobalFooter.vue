@@ -8,7 +8,7 @@ export default {
   <footer class="footer">
     <div>
       <slot></slot>
-      <a href="https://meltano.com/docs/contributing.html" target="_blank"
+      <a href="https://meltano.com/guide/contributing.html" target="_blank"
         >Contribute to the project! <OutboundLink
       /></a>
     </div>
