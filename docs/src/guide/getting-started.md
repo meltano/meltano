@@ -145,4 +145,4 @@ We can also visit the Dashboard directly by clicking on the `Dashboard` navigati
 
 And with that, you have now setup a complete end-to-end data solution with Meltano! 🎉
 
-To learn about more Meltano recipes and functionality with [Advanced Tutorials](/docs/tutorial.html).
+To learn about more Meltano recipes and functionality with our [tutorials](/tutorials/).

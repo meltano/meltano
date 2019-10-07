@@ -11,7 +11,7 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/docs/getting-started.html">Carbon Emissions + SQLite</a>
+        <a href="/guide/getting-started.html">Carbon Emissions + SQLite</a>
       </div>
       <div>
         <p>

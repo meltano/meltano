@@ -40,10 +40,10 @@ Once your Droplet is created, it will have its own IP address displayed in the D
 
 7. Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
 
-Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
+Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/guide/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
 ::: info
-Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/docs/tutorial.html#advanced-manually-creating-a-digitalocean-droplet).
+Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/tutorials/manual-digitalocean-droplet.html).
 :::
 
 ## Amazon Web Services (AWS)

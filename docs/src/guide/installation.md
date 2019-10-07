@@ -14,7 +14,7 @@ DigitalOcean provides a simple container for spinning up a server where Meltano 
 When you create a new DigitalOcean account using [this link](https://meltano.com/docs/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
-### Video Walkthrough 
+### Video Walkthrough
 
 <p></p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/cfegedH8_VE" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -46,10 +46,10 @@ Once your Droplet is created, it will have its own IP address displayed in the D
 
 7. Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
 
-Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
+Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/guide/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
 :::tip Build a Custom Meltano Droplet on DigitalOcean
-Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/docs/tutorial.html#advanced-manually-creating-a-digitalocean-droplet).
+Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/tutorials/manual-digitalocean-droplet.html).
 :::
 
 ## Amazon Web Services (AWS)
@@ -166,7 +166,6 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 - **Source**: Custom 0.0.0.0/0
 
 1. Click `Save rules`
-
 
 ## Local Installation
 
@@ -341,7 +340,7 @@ docker run meltano/meltano --version
 
 ##### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/guide/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```
 docker run -v $(pwd):/projects \
@@ -368,7 +367,7 @@ You can now visit [http://localhost:5000](http://localhost:5000) to access the M
 
 If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point.
 
-Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
+Follow the steps in our [Getting Started Guide](/guide/getting-started.html) to get started.
 
 #### For Contributors: Example Command Line Syntax for Docker
 
