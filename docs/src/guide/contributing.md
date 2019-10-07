@@ -294,28 +294,6 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
-## Releases
-
-### Schedule
-
-Meltano releases weekly on Monday mornings, and you can find a list of upcoming changes in our [CHANGELOG under "Unreleased"](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased)
-
-#### Rotation
-
-| Release Date | Release Owner | Dogfooding Owner | Shadow   |
-| ------------ | ------------- | ---------------- | -------- |
-| 2019-09-03   | Derek K.      | Derek K.         |          |
-| 2019-09-09   | Ben H.        | Ben H.           | Douwe M. |
-| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M. |
-| 2019-09-23   | Ben H.        | Ben H.           |          |
-| 2019-09-30   | Micael B.     | Micael B.        |          |
-| 2019-10-07   | Ben H.        | Ben H.           |          |
-| 2019-10-14   | Derek K.      | Derek K.         |          |
-
-:::tip Can't make your scheduled release?
-If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
-:::
-
 ### Versioning
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.

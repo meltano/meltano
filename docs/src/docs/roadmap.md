@@ -40,9 +40,25 @@ There is a lot more to build. A few key areas we know we need to invest more tim
 
 Meltano currently follows a weekly release schedule on Mondays.
 
-For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
+For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
 
-You can track our weekly progress and forward-looking plans in greater detail through [ our milestones](https://gitlab.com/groups/meltano/-/milestones).
+You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
+
+### Schedule
+
+| Release Date | Release Owner | Dogfooding Owner | Shadow   |
+| ------------ | ------------- | ---------------- | -------- |
+| 2019-09-03   | Derek K.      | Derek K.         |          |
+| 2019-09-09   | Ben H.        | Ben H.           | Douwe M. |
+| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M. |
+| 2019-09-23   | Ben H.        | Ben H.           |          |
+| 2019-09-30   | Micael B.     | Micael B.        |          |
+| 2019-10-07   | Ben H.        | Ben H.           |          |
+| 2019-10-14   | Derek K.      | Derek K.         |          |
+
+:::tip Can't make your scheduled release?
+If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
+:::
 
 ## MAUI
 
