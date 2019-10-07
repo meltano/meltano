@@ -44,6 +44,13 @@ module.exports = {
   themeConfig: {
     nav: [
       { text: 'Documentation', link: '/docs/' },
+      {
+        text: 'Plugins',
+        items: [
+          { text: 'Extractors', link: '/plugins/extractors/' },
+          { text: 'Loaders', link: '/plugins/loaders/' }
+        ]
+      },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
         text: 'Newsletter',
