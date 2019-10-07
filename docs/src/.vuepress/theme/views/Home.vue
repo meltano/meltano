@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <div style="background-color: #e5e4e2">
+    <div>
       <div
         class="promobar"
         style="width:100%; background-color:#0168ff; color:white; text-align:center; padding: 10px; font-size:14px;"
@@ -14,7 +14,7 @@
           >
         </span>
       </div>
-      <div class="hero homepage-cta">
+      <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
           <h2 class="hero-header">Open source data dashboarding</h2>
           <p class="hero-tagline">
@@ -30,7 +30,7 @@
 
         <div class="hero-right">
           <img
-            src="../assets/happy-meltano-user.jpg"
+            src="../assets/happy-meltano-user-transparent.png"
             alt="Happy Meltano User Says Hi"
           />
         </div>
@@ -70,10 +70,7 @@
       </div>
     </div>
 
-    <div
-      class="feature-section-wrapper"
-      style="background-color: #e5e4e2; padding-bottom: 6rem;"
-    >
+    <div class="feature-section-wrapper">
       <div class="content-width-wide">
         <h2 class="section-title" style="text-align: center; margin-top: 0;">
           A single workflow for the entire data life cycle.
@@ -342,10 +339,7 @@
       </div>
     </div>
 
-    <div
-      class="feature-section-wrapper"
-      style="padding-top: 5rem; background-color: #e5e4e2;"
-    >
+    <div class="feature-section-wrapper">
       <div class="content-width-wide">
         <h2 class="section-title ta-c">What People Are Saying</h2>
 
@@ -388,7 +382,7 @@
       </div>
     </div>
 
-    <div class="featured-section-wrapper" style="background-color: #e5e4e2;">
+    <div class="feature-section-wrapper is-shorter">
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">
@@ -500,7 +494,7 @@ export default {
 
 .description {
   margin-bottom: 0;
-  font-size: 17px;
+  font-size: 1.25rem;
   padding-left: 10%;
   padding-right: 10%;
   text-align: center;
@@ -566,7 +560,6 @@ export default {
   td:first-child {
     background: #eee;
     font-weight: bold;
-
   }
 }
 
@@ -602,7 +595,6 @@ export default {
 
 .homepage-cta {
   min-height: 500px;
-  max-width: $contentWidthWide;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -627,8 +619,12 @@ export default {
 }
 
 .feature-section-wrapper {
-  background-color: #e5e4e2;
+  background-color: #eee;
   padding: 6rem 0;
+
+  &.is-shorter {
+    padding: 3rem 0;
+  }
 
   &.is-white {
     background-color: #fff;
@@ -701,9 +697,9 @@ export default {
   padding $navbarHeight 0 0
   margin 0px auto
   .hero
+    width 100%
     text-align center
-    margin 0 auto
-    padding-bottom 4rem
+    padding 0 0 3rem
     img
       max-width 100%
     h1
