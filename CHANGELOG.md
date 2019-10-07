@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#963](https://gitlab.com/meltano/meltano/issues/963) Split up documentation into smaller sections for improved scaling in the near future 
+
 ### Changes
 
 - [#1020](https://gitlab.com/meltano/meltano/issues/1020) Update Command Line Tools documentation to reflect a standard format with opportunities for improvement in the future
