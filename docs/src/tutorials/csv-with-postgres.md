@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Tutorial: Loading CSV Files to a Postgres Database
 
 This tutorial explains how to load data stored in multiple CSV files to a Postgres Database and then use Custom Transforms and Models to combine them together and analyze the results.
@@ -6,7 +10,7 @@ We are going to use [tap-csv](https://gitlab.com/meltano/tap-csv) to extract the
 
 ## Prerequisites
 
-- Meltano's minimum and [optional requirements](./installation.html#requirements) installed
+- Meltano's minimum and [optional requirements](/guide/installation.html#requirements) installed
 - A Postgres Database installed and running
 - Understanding how Transforms and Models work in Meltano and [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html).
 

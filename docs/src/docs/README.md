@@ -2,7 +2,7 @@
 
 This section contains technical documentation on Meltano.
 
-## Table of Content
+## Table of Contents
 
 - [Command Line Interface](/docs/command-line-interface.html)
 - [Environment Variables](/docs/environment-variables.html)

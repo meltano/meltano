@@ -21,7 +21,7 @@ When you create a new DigitalOcean account using [this link](https://meltano.com
 
 ### Step-by-Step Instructions
 
-1. Go to [Meltano in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano)
+1. Go to <a :href="$site.themeConfig.data.digitalOceanUrl">Meltano in the DigitalOcean Marketplace</a>
 
 2. Select `Create Meltano Droplet`
 

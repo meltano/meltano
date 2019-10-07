@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Manually Creating a DigitalOcean Droplet
 
 From the "Create" dropdown menu in DigitalOcean, choose "Droplets"

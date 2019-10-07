@@ -94,6 +94,10 @@ module.exports = {
     algolia: {
       apiKey: '6da0449ca46dc108fd88ca828f613ea9',
       indexName: 'meltano'
+    },
+    data: {
+      digitalOceanUrl:
+        'https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322'
     }
   },
   plugins: [
