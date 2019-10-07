@@ -122,7 +122,7 @@ Only run the Transform Step:
 meltano elt tap-salesforce target-postgres --transform only
 ```
 
-The transform step uses the dbt [transforms](/docs/command-line-interface.html#transform) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
+The transform step uses the dbt [transforms](/docs/transforms.html) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
 When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
 
 In order to visualize the data with existing transformations in the UI, the final step would be to add models:
