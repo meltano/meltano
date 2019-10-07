@@ -369,7 +369,26 @@
       </div>
     </div>
 
-    <div class="content-width-wide">
+    <div class="feature-section-wrapper is-white content-width-wide">
+      <h2 class="section-title" style="text-align: center; margin-top: 0;">
+        Take a tour of Meltano
+      </h2>
+
+      <div class="rich-media-container">
+        <div class="embed-responsive embed-responsive-16by9">
+          <iframe
+            width="560"
+            height="315"
+            src="https://www.youtube.com/embed/tf_EIbwDmXk"
+            frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="featured-section-wrapper" style="background-color: #e5e4e2;">
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">
@@ -399,7 +418,9 @@
           >Repo</a
         >
       </section>
+    </div>
 
+    <div class="content-width-wide">
       <section class="section">
         <h2 class="section__title">Sign up for our newsletter!</h2>
         <p class="section__text">
@@ -454,6 +475,7 @@ export default {
     padding: 0.8rem 1.6rem 0.9rem;
     border-radius: 4px;
     transition: background-color 0.1s ease;
+    background-color: white;
     box-sizing: border-box;
     border: 2px solid $accentColor;
     transition: all 0.2s ease-in;l
