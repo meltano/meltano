@@ -47,6 +47,7 @@ module.exports = {
         text: 'Learn',
         items: [
           { text: 'Guide', link: '/guide/' },
+          { text: 'Documentation', link: '/docs/' },
           { text: 'Tutorials', link: '/tutorials/' }
         ]
       },
@@ -68,14 +69,18 @@ module.exports = {
     sidebar: {
       '/docs': [
         '/docs/',
-        '/docs/installation',
-        '/docs/getting-started',
         '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
-        '/docs/roadmap',
         '/docs/architecture',
-        '/docs/contributing'
+        '/docs/roadmap'
+      ],
+      '/guide': [
+        '/guide/',
+        '/guide/installation',
+        '/guide/getting-started',
+        '/guide/orchestration',
+        '/guide/contributing'
       ]
     },
     logo: '/meltano-logo.svg',
