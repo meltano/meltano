@@ -60,7 +60,7 @@ module.exports = {
         '/docs/plugins',
         '/docs/loaders',
         '/docs/tutorial',
-        '/docs/meltano-cli',
+        '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/roadmap',

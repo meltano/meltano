@@ -376,7 +376,7 @@ $PERMISSION_BOT_WAREHOUSE
 ## `schedule`
 
 ::: tip
-An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/command-line-tools.html#orchestration) documentation to get started with Meltano orchestration.
+An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/tutorials/orchestration.md) documentation to get started with Meltano orchestration.
 :::
 
 Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:

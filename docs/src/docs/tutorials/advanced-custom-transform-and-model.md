@@ -18,10 +18,10 @@ In this example, we would like to focus on closed opportunities only (i.e. actua
 
 Please see example table outputs below.
 
-Size and number of won opportunities by country and company size. 
+Size and number of won opportunities by country and company size.
 
 ```
-  company_country   |      company_size      | total_contract_value | average_contract_value | total_contracts 
+  company_country   |      company_size      | total_contract_value | average_contract_value | total_contracts
 --------------------+------------------------+----------------------+------------------------+-----------------
  France             | 1 - Small (<100)       |              1008.00 |                 504.00 |               2
  France             | 2 - Medium (100 - 999) |                48.00 |                  48.00 |               1
@@ -40,7 +40,7 @@ Size and number of won opportunities by country and company size.
 Number of won opportunities by quarter, year and industry segment:
 
 ```
- closed_quarter | closed_year |               industry                | total_contracts 
+ closed_quarter | closed_year |               industry                | total_contracts
 ----------------+-------------+---------------------------------------+-----------------
               4 |        2018 | Financial Services                    |               1
               4 |        2018 | Integrated Telecommunication Services |               2
@@ -62,7 +62,7 @@ Number of won opportunities by quarter, year and industry segment:
 Number of won opportunities by quarter, year, deal type, deal size and company size:
 
 ```
- closed_quarter | closed_year | opportunity_type |       deal_size       |      company_size      | total_contracts 
+ closed_quarter | closed_year | opportunity_type |       deal_size       |      company_size      | total_contracts
 ----------------+-------------+------------------+-----------------------+------------------------+-----------------
               1 |        2018 | Add-On Business  | 1 - Small (<5k)       | 5 - Unknown            |               1
               1 |        2018 | New Business     | 1 - Small (<5k)       | 1 - Small (<100)       |              11
@@ -87,16 +87,16 @@ Number of won opportunities by quarter, year, deal type, deal size and company s
 
 ## Adding Custom Transforms
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations (i.e. `sfdc-project/transform`). When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the `transform/` directory are being performed. 
+Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations (i.e. `sfdc-project/transform`). When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the `transform/` directory are being performed.
 
-If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](https://www.meltano.com/docs/meltano-cli.html#transforms) for more details.
+If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](/docs/command-line-interface.html#transform) for more details.
 
 Let's generate two additional transformations, which will produce:
 
 - A table that includes won opportunities only and a custom category column for deal_size.
-- A table that includes account categories, clients' countries, industries and a custom category column for company_size. 
+- A table that includes account categories, clients' countries, industries and a custom category column for company_size.
 
-These tables must be added as `dbt models`, i.e. `.sql` files under the `sfdc-project/transform/models/my_meltano_project/` directory or any of its subdirectories. This will allow Meltano to discover the new transformations and execute. 
+These tables must be added as `dbt models`, i.e. `.sql` files under the `sfdc-project/transform/models/my_meltano_project/` directory or any of its subdirectories. This will allow Meltano to discover the new transformations and execute.
 
 In this case, we'll create a new `sfdc/transform` subdirectory and save the sql files there.
 
@@ -112,8 +112,8 @@ cd transform
 
 ```
 with source as (
-    
-    -- Use the base sf_opportunity model defined by Meltano's 
+
+    -- Use the base sf_opportunity model defined by Meltano's
     --  prepackaged tap_salesforce model
     select * from {{ref('sf_opportunity')}}
 
@@ -147,10 +147,10 @@ opportunity_won as (
         END                         AS deal_size,
 
         -- Add Closed Date, Month, Quarter and Year columns
-        CAST(closed_date AS DATE) as closed_date, 
+        CAST(closed_date AS DATE) as closed_date,
         EXTRACT(MONTH FROM closed_date) closed_month,
-        EXTRACT(QUARTER FROM closed_date) closed_quarter, 
-        EXTRACT(YEAR FROM closed_date) closed_year  
+        EXTRACT(QUARTER FROM closed_date) closed_quarter,
+        EXTRACT(YEAR FROM closed_date) closed_year
 
     from source
 
@@ -160,13 +160,12 @@ opportunity_won as (
 select * from opportunity_won
 ```
 
-
 `sfdc-project/transform/models/my_meltano_project/sfdc/transform/account_category.sql`:
 
 ```
 with source as (
-    
-    -- Use the base sf_opportunity model defined by Meltano's 
+
+    -- Use the base sf_opportunity model defined by Meltano's
     --  prepackaged tap_salesforce model
     select * from {{ref('sf_account')}}
 
@@ -183,7 +182,7 @@ account_category as (
 
         -- Set NULL values to 'Unknown'
         COALESCE(industry, 'Unknown') as industry,
-        
+
         -- Add a company size categorical dimension
         CASE WHEN
           number_of_employees < 100
@@ -207,7 +206,8 @@ Before we execute the transformation, we need to update `my_meltano_project` in 
 
 Update the `my_meltano_project: null` in `sfdc-project/transform/dbt_project.yml` to:
 
-`sfdc-project/transform/dbt_project.yml` 
+`sfdc-project/transform/dbt_project.yml`
+
 ```
 ... ... ...
 
@@ -233,7 +233,8 @@ meltano elt tap-salesforce target-postgres --transform only
 In order to access the newly transformed data from the Analyze Section in Meltano UI, a `table.m5o` file, which defines the available columns and aggregates for each table should be created. A `model.m5o` file for representing how the tables are connected is also required. The files will be stored in the `model/` directory. For more details on how `.m5o` files are structured, please refer to [Meltano Models](https://www.meltano.com/docs/architecture.html#meltano-model) and [concepts related to Meltano Models](https://www.meltano.com/docs/concepts.html).
 
 Account Category Table
-`sfdc-project/model/account_category.table.m5o` 
+`sfdc-project/model/account_category.table.m5o`
+
 ```
 {
   version = 1
@@ -269,7 +270,8 @@ Account Category Table
 ```
 
 Opportunities Won Table
-`sfdc-project/model/opportunity_won.table.m5o` 
+`sfdc-project/model/opportunity_won.table.m5o`
+
 ```
 {
   version = 1
@@ -362,7 +364,8 @@ Opportunities Won Table
 
 Please note, the name this model will be `custom_sfdc` in order to differentiate it from the sfdc model that comes by default with Meltano:
 
-`sfdc-project/model/custom_sfdc.model.m5o` 
+`sfdc-project/model/custom_sfdc.model.m5o`
+
 ```
 {
   version = 1
@@ -395,7 +398,7 @@ In order to start the Meltano UI, please go back into your terminal and run the 
 $ meltano ui
 ```
 
-This will start a local web server at [http://localhost:5000](http://localhost:5000). 
+This will start a local web server at [http://localhost:5000](http://localhost:5000).
 
 As we have properly set the connection to our Postgres Database in the Salesforce Tutorial, we can now query and explore the extracted data:
 
@@ -403,7 +406,6 @@ As we have properly set the connection to our Postgres Database in the Salesforc
 - Toggle Columns and Aggregates buttons to generate the SQL query.
 - Click the Run button to query the transformed tables in the `analytics` schema.
 - Check the Results or Open the Charts accordion and explore the data!
-
 
 ## Closing Remarks
 
@@ -426,7 +428,6 @@ meltano select tap-salesforce --list --all
 (2) Follow the steps above to add custom transformations and models for the new Entities.
 
 (3) Run meltano elt to extract and transform the data.
-
 
 ```bash
 meltano elt tap-salesforce target-postgres --transform run
