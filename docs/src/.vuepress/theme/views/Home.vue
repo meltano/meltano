@@ -853,4 +853,11 @@ export default {
 .embed-responsive-16by9 {
   padding-bottom: 56.25%;
 }
+
+// Really hacky selector and
+// yes I feel sad that I had to use
+// the forbidden technique...
+.intercom-launcher-frame[name="intercom-launcher-frame"] {
+  bottom: 12px !important;
+}
 </style>
