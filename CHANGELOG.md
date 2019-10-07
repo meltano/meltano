@@ -3,18 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1101](https://gitlab.com/meltano/meltano/issues/1101) Add new tour video to home page
+- [#1101](https://gitlab.com/meltano/meltano/issues/1101) Update design to improve readability and contrast
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.0.1 - (2019-10-07)
 
@@ -23,7 +25,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - Patch technicality due to PyPi limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
-
 
 ## 1.0.0 - (2019-10-07)
 
