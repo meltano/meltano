@@ -38,9 +38,6 @@ import Navbar from './components/Navbar.vue'
 import Sidebar from './components/Sidebar.vue'
 import SWUpdatePopup from './components/SWUpdatePopup.vue'
 import { resolveSidebarItems } from './util'
-import VueIntercom from 'vue-intercom'
-
-Vue.use(VueIntercom, { appId: 'ir946q00' })
 
 export default {
   components: { Home, Page, Sidebar, Navbar, SWUpdatePopup },
@@ -105,11 +102,11 @@ export default {
 
   mounted() {
     // Intercom.io chat
-    this.$intercom.boot({
-      user_id: this.userId,
-      name: this.name,
-      email: this.email
-    })
+    // this.$intercom.boot({
+    //   user_id: this.userId,
+    //   name: this.name,
+    //   email: this.email
+    // })
 
     window.addEventListener('scroll', this.onScroll)
 
