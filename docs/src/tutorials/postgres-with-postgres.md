@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Tutorial: Postgres Extractor with Postgres Loader
 
 This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltano.

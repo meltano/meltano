@@ -1,3 +1,7 @@
+---
+sidebar: auto
+---
+
 # Tutorial: Loading CSV Files to a Postgres Database
 
 This tutorial explains how to load data stored in multiple CSV files to a Postgres Database and then use Custom Transforms and Models to combine them together and analyze the results.
