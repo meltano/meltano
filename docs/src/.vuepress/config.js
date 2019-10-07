@@ -29,6 +29,14 @@ module.exports = {
       }
     ],
     ['link', { rel: 'manifest', href: '/site.webmanifest' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
+      }
+    ],
     ['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }]
   ],
@@ -52,7 +60,7 @@ module.exports = {
         '/docs/plugins',
         '/docs/loaders',
         '/docs/tutorial',
-        '/docs/meltano-cli',
+        '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/roadmap',

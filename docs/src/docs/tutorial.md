@@ -35,21 +35,25 @@ meltano init carbon
 ```
 
 Change directory into your new carbon project:
+
 ```bash
 cd carbon
 ```
 
 Let's see what extractors and loaders are available
+
 ```bash
 meltano discover all
 ```
 
 Run the extractor (tap) and loader (target)
+
 ```bash
 meltano elt tap-carbon-intensity target-sqlite
 ```
 
 Ensure Meltano UI will know how to use data from ELT:
+
 ```bash
 meltano add model model-carbon-intensity-sqlite
 ```
@@ -81,13 +85,14 @@ Having issues with Meltano? Help us help you. Here is a [pre-baked form to strea
 :::
 
 ---
+
 #### Analyze
 
 With Meltano UI up and running, we can automatically generate queries with as little as a single click and then explore the query results:
 
 - In the top navigation, hover over `Analyze` and click on **Region**
 - Under the `Region` section on the left navigation:
-  - Toggle *at least one* aggregate button to generate SQL
+  - Toggle _at least one_ aggregate button to generate SQL
   - Toggle any number of column buttons to generate SQL
   - Click the **Run Query** button in the upper right to query using the generated SQL
 - Open the Charts accordion to visualize the data!
@@ -112,39 +117,47 @@ Run `source venv/bin/activate` to leverage the `meltano` installed in your virtu
 :::
 
 Initialize a new project with a folder called sfdc-project
+
 ```bash
 meltano init sfdc-project
 ```
 
 Change directory into your new sfdc-project project
+
 ```bash
 cd sfdc-project
 ```
 
 Start docker postgres instance
+
 ```bash
 docker-compose up -d warehouse_db
 ```
 
 Let's see what extractors and loaders are available
+
 ```bash
 meltano discover all
 ```
 
 Add tap-salesforce - to `select` which Salesforce entities will be extracted before running the meltano `elt` command and set the credentials for your Salesforce instance
+
 ```bash
 meltano add extractor tap-salesforce
 ```
 
 Add target-postgres - to set the credentials for your Postgres DB
+
 ```bash
 meltano add loader target-postgres
 ```
 
 ### Set Your Credentials
+
 Create a .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 **.env**
+
 ```
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
@@ -171,7 +184,7 @@ A Salesforce account may have more than 100 different entities. In order to see 
 meltano select tap-salesforce --list --all
 ```
 
-In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](/docs/meltano-cli.html#select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
+In this tutorial, we are going to work with a couple of the most common ones and show you how to [select](/docs/command-line-interface.html#select) entities to extract from a specific API: Account, Contact, Lead, User, Opportunity and Opportunity History:
 
 ```bash
 meltano select tap-salesforce "User" "*"
@@ -195,22 +208,25 @@ Depending on your Account, the aforementioned command may take from a couple min
 You could also extract and load the data and then run the transformations at a later point (examples below):
 
 Only run the Extract and Load steps:
+
 ```bash
 meltano elt tap-salesforce target-postgres
 ```
 
 Only run the Transform Step:
+
 ```bash
 meltano elt tap-salesforce target-postgres --transform only
 ```
 
-The transform step uses the dbt [transforms](/docs/meltano-cli.html#transforms) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
+The transform step uses the dbt [transforms](/docs/command-line-interface.html#transform) defined by [Mavatar's Salesforce dbt package](https://gitlab.com/meltano/dbt-tap-salesforce).
 When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the transform/ directory (a folder created upon project initilization) are being performed.
 
 In order to visualize the data with existing transformations in the UI, the final step would be to add models:
 
 Add existing models:
-```bash 
+
+```bash
 meltano add model model-salesforce
 ```
 
@@ -227,19 +243,21 @@ Support for incremental ELT varies from extractor to extractor.
 To enable it, Meltano must know which cursor to use for the ELT, which is set using the `--job_id` parameter on the `meltano elt` command.
 Alternatively, one can use the `MELTANO_JOB_ID` environmental variable. For each subsequent `ELT`, Meltano will look for a previous cursor to start from.
 
-
 The first run will create a cursor state:
+
 ```bash
 meltano elt --job_id=gitlab tap-gitlab target-postgres
 ```
 
 Subsequent runs will start from this cursor:
+
 ```bash
 meltano elt --job_id=gitlab tap-gitlab target-postgres
 ```
 
 :::warning
 Schedules currently only support the `MELTANO_JOB_ID` environment variable, which need to be set manually in the **meltano.yml**.
+
 ```yaml
 schedules:
   - name: gitlab_postgres
@@ -247,6 +265,7 @@ schedules:
     env:
       MELTANO_JOB_ID=gitlab
 ```
+
 :::
 
 ### Interact with Your Data in The Web App
@@ -254,6 +273,7 @@ schedules:
 In order to start the UI, where you can interact with the transformed data, please go back to your terminal and execute the following command:
 
 This will start a local web server at [http://localhost:5000](http://localhost:5000)
+
 ```bash
 meltano ui
 ```
@@ -262,12 +282,14 @@ When you visit the URL, you will be using the default connection to Meltano's SQ
 
 1. Navigate to the Postgres Loader Configuration (Configuration > Loaders > target-postgres > Configure)
 2. Enter connection settings
-  - Name = `postgres_db` (important to use that name if you are following the tutorial)
-  - Dialect = `PostgresSQl`
-  - Host = `localhost`
-  - Port = `5502`
-  - Database, Username, Password = `warehouse`
-  - Schema = `tap_salesforce` (or whatever the namespace of the tap is, by default the name of the tap with underscores instead of `-`s)
+
+- Name = `postgres_db` (important to use that name if you are following the tutorial)
+- Dialect = `PostgresSQl`
+- Host = `localhost`
+- Port = `5502`
+- Database, Username, Password = `warehouse`
+- Schema = `tap_salesforce` (or whatever the namespace of the tap is, by default the name of the tap with underscores instead of `-`s)
+
 3. Click "Save Connection"
 
 You can now query and explore the extracted data:
@@ -320,7 +342,7 @@ Using `-e` will install the plugin as editable so any change you make is readily
 ```bash
 meltano add --custom extractor tap-gitlab-custom
 ...
-> namespace: gitlab 
+> namespace: gitlab
 > pip_url: -e tap-gitlab-custom
 > executable: tap-gitlab-custom
 ```
@@ -334,33 +356,33 @@ Meltano manages converting the plugin's configuration to the appropriate definit
 Looking at the `tap-gitlab-custom` definition, we should see the following (notice the `settings` section is missing):
 
 **meltano.yml**
+
 ```yaml
 plugins:
   extractors:
-  - executable: tap-gitlab-custom
-    name: tap-gitlab-custom
-    namespace: gitlab
-    pip_url: -e tap-gitlab-custom
-...
+    - executable: tap-gitlab-custom
+      name: tap-gitlab-custom
+      namespace: gitlab
+      pip_url: -e tap-gitlab-custom
 ```
 
 Let's include the default configuration for a sample tap:
 
 **meltano.yml**
+
 ```yaml
 plugins:
   extractors:
-  - executable: tap-gitlab-custom
-    name: tap-gitlab-custom
-    namespace: gitlab
-    pip_url: -e tap-gitlab-custom
-    settings:
-    - name: username
-    - name: password
-      kind: password
-    - name: start_date
-      value: "2015-09-21T04:00:00Z"
-...
+    - executable: tap-gitlab-custom
+      name: tap-gitlab-custom
+      namespace: gitlab
+      pip_url: -e tap-gitlab-custom
+      settings:
+        - name: username
+        - name: password
+          kind: password
+        - name: start_date
+          value: '2015-09-21T04:00:00Z'
 ```
 
 #### Plugin Setting
@@ -369,29 +391,28 @@ When creating a new plugin, you'll often have to expose some settings to the use
 
 To expose such a setting, you'll need to define it as such
 
- - **name**: Identifier of this setting in the configuration.  
- The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.  
- Nesting can be represented using the `.` separator.  
+- **name**: Identifier of this setting in the configuration.  
+  The name is the most important field of a setting, as it defines how the value will be passed down to the underlying component.  
+  Nesting can be represented using the `.` separator.
 
-    - `foo` represents the `{ foo: VALUE }` in the output configuration.  
-    - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.  
+  - `foo` represents the `{ foo: VALUE }` in the output configuration.
+  - `foo.a` represents the `{ foo: { a: VALUE } }` in the output configuration.
 
-  - **kind**: Represent the type of value this should be, (e.g. `password` or `date_iso8601`). 
-  
+- **kind**: Represent the type of value this should be, (e.g. `password` or `date_iso8601`).
+
 ::: warning WIP
 We are currently working on defining the complete list of setting's kind. See [issue (#739)](https://gitlab.com/meltano/meltano/issues/739) for more details.
 :::
 
-  - **env** (optional): Define the environment variable name used to set this value at runtime. *Defaults to `NAMESPACE_NAME`*.
-  - **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
-
+- **env** (optional): Define the environment variable name used to set this value at runtime. _Defaults to `NAMESPACE_NAME`_.
+- **value** (optional): Define the default value for this variable. It should also be used as a placeholder for UX purposes.
 
 Once the settings are exposed, you can use any of the following to set the proper values (in order of precedence):
 
-  - Environment variables
-  - `config` section in the plugin
-  - Meltano UI 
-  - `value` of the setting's definition
+- Environment variables
+- `config` section in the plugin
+- Meltano UI
+- `value` of the setting's definition
 
 ::: warning
 Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521) you must run `meltano install` after modifying the `settings` section of a plugin.
@@ -402,28 +423,30 @@ Due to an outstanding [bug (#521)](https://gitlab.com/meltano/meltano/issues/521
 Now that your plugin is installed and configured, you are ready to interact with it using Meltano.
 
 use `meltano invoke` to run your plugin in isolation:
-```bash 
+
+```bash
 meltano invoke tap-gitlab-custom --discover
 ```
 
 Use `meltano select` to parse your `catalog`:
+
 ```bash
 meltano select --list tap-gitlab-custom '*' '*'
 ```
- 
+
 Run an ELT using your new tap:
+
 ```bash
 meltano elt tap-gitlab-custom target-sqlite
 ```
 
 ### References
 
-  - [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
-  - [tap-gitlab](https://gitlab.com/meltano/tap-gitlab)
-  - [target-sqlite](https://gitlab.com/meltano/target-sqlite)
-  - [cookiecutter](https://github.com/audreyr/cookiecutter)
-  - [singer-tap-template](https://github.com/singer-io/singer-tap-template)
-
+- [Singer specification](https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#singer-specification)
+- [tap-gitlab](https://gitlab.com/meltano/tap-gitlab)
+- [target-sqlite](https://gitlab.com/meltano/target-sqlite)
+- [cookiecutter](https://github.com/audreyr/cookiecutter)
+- [singer-tap-template](https://github.com/singer-io/singer-tap-template)
 
 ## Advanced - Adding Custom Transformations and Models
 
@@ -432,7 +455,7 @@ meltano elt tap-gitlab-custom target-sqlite
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 - Meltano SalesForce [project](./tutorial.html#initialize-your-project-2) is initialized and [credentials](./tutorial.html#set-your-credentials) set.
-- Meltano SalesForce [entities](./tutorial.html#select-the-entities-to-export-from-salesforce) are selected. 
+- Meltano SalesForce [entities](./tutorial.html#select-the-entities-to-export-from-salesforce) are selected.
 
 We assume that you have also run the [ELT steps](./tutorial.html#run-elt-extract-load-transform) in the SalesForce tutorial.
 Nothwithstanding, you can follow this tutorial in order to create entirely new transformations and run the whole ELT process in the end.
@@ -457,10 +480,11 @@ Let's create two additional tables:
 These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories.
 
 **opportunity_won.sql**
+
 ```bash
 with source as (
-    
-    -- Use the base sf_opportunity model defined by Meltano's 
+
+    -- Use the base sf_opportunity model defined by Meltano's
     --  prepackaged tap_salesforce model
     select * from {{ref('sf_opportunity')}}
 
@@ -494,10 +518,10 @@ opportunity_won as (
         END                         AS deal_size,
 
         -- Add Closed Date, Month, Quarter and Year columns
-        CAST(closed_date AS DATE) as closed_date, 
+        CAST(closed_date AS DATE) as closed_date,
         EXTRACT(MONTH FROM closed_date) closed_month,
-        EXTRACT(QUARTER FROM closed_date) closed_quarter, 
-        EXTRACT(YEAR FROM closed_date) closed_year  
+        EXTRACT(QUARTER FROM closed_date) closed_quarter,
+        EXTRACT(YEAR FROM closed_date) closed_year
 
     from source
 
@@ -508,10 +532,11 @@ select * from opportunity_won
 ```
 
 **account_category.sql**
+
 ```bash
 with source as (
-    
-    -- Use the base sf_opportunity model defined by Meltano's 
+
+    -- Use the base sf_opportunity model defined by Meltano's
     --  prepackaged tap_salesforce model
     select * from {{ref('sf_account')}}
 
@@ -528,7 +553,7 @@ account_category as (
 
         -- Set NULL values to 'Unknown'
         COALESCE(industry, 'Unknown') as industry,
-        
+
         -- Add a company size categorical dimension
         CASE WHEN
           number_of_employees < 100
@@ -563,8 +588,8 @@ models:
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
 
-
 Runs transformation step only
+
 ```bash
 meltano elt tap-salesforce target-postgres --transform only
 ```
@@ -579,6 +604,7 @@ In order to access the newly transformed data in the UI, 2 additional types of f
 These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/model/ directory.
 
 **opportunity_won.table.m5o**
+
 ```bash
 {
   version = 1
@@ -670,6 +696,7 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 ```
 
 **account_category.table.m5o**
+
 ```bash
 {
   version = 1
@@ -705,6 +732,7 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 ```
 
 **custom_sfdc.topic.m5o**
+
 ```bash
 {
   version = 1
@@ -739,7 +767,6 @@ meltano ui
 
 You can now go to the `Analyze` tab and select one of the design we have created under `Salesforce (Custom)`.
 
-
 ## Advanced - Using tap-postgres with Meltano
 
 This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltano.
@@ -748,7 +775,7 @@ This is a tutorial on how to run `tap-postgres` with `target-postgres` in Meltan
 
 `tap-postgres` is not currently officially supported by Meltano, so you have to add it as a custom tap. For more details, check the [documentation on adding a custom extractor](./tutorial.html#advanced-create-a-custom-extractor).
 
-### Project Initialization 
+### Project Initialization
 
 Let's start by initializing a new Meltano Project and add the supported loader `target-postgres`:
 
@@ -773,6 +800,7 @@ meltano add --custom extractor tap-postgres
 We should then update `meltano.yml` and add the configuration parameters this tap needs in order to run:
 
 **meltano.yml**
+
 ```yaml
 plugins:
   extractors:
@@ -798,10 +826,10 @@ plugins:
  ... ... ...
 ```
 
-
 And finally create a .env file in your project directory (i.e. tap-postgres). We are going to add the proper settings for the source and the target databases. The `TAP_PG_*` variables are used by the Tap (i.e. they define the source DB where the data are extracted from), while the `PG_*` variables are used by the Target (i.e. they define the target DB where the data will be loaded at)
 
 **.env**
+
 ```bash
 export TAP_PG_DATABASE=my_source_db
 export TAP_PG_ADDRESS=localhost
@@ -832,7 +860,7 @@ meltano config target-postgres
 
 This step is required if you don't want to export everything from the source db. You can skip it if you just want to export all tables.
 
-We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](./meltano-cli.html#select).
+We can use `meltano select` to select which entities will be exported by the Tap from the Source DB. You can find more info on how meltano select works on [the Meltano cli commands Documentation](/docs/command-line-interface.html#select).
 
 In the case of `tap-postgres`, the names of the Entities (or streams as they are called in the Singer.io Specification) are the same as the table names in the Source DB, prefixed by the DB name and the schema they are defined into: `{DB NAME}-{SCHEMA NAME}-{TABLE NAME}`.
 
@@ -891,15 +919,13 @@ You can then check that file and decide which Streams (tables in this case) shou
 
 Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by the custom tap's namespace (`tap-postgres` in this example)
 
-
 ```bash
-meltano elt tap-postgres target-postgres 
+meltano elt tap-postgres target-postgres
 ```
 
 ### Next Steps
 
 If you want to add custom Transforms and explore the extracted data using Meltano UI, you should check the advanced tutorial on [Adding Custom Transformations and Models](./tutorial.html#advanced-adding-custom-transformations-and-models)
-
 
 ## Advanced - Loading CSV files to a Database
 
@@ -921,11 +947,12 @@ We export our user data from our CRM, the episode information from our CMS and t
 
 It's time for us to move all our data to a Postgres Database, so that we can have everything together, run some advanced analysis and compare the results.
 
-We have a pretty simple scenario: Users stream episodes from various TV series. 
+We have a pretty simple scenario: Users stream episodes from various TV series.
 
 For each user we have their name, age, their lifetime value to GitFlix (total subscriptions until today) and some additional data on how often they login to GitFlix and their total logins since they subscribed.
 
 **[GitFlixUsers.csv](/files/GitFlixUsers.csv)**
+
 ```
  id |  name  | age | gender |  clv  | avg_logins | logins
 ----+--------+-----+--------+-------+------------+--------
@@ -940,6 +967,7 @@ For each user we have their name, age, their lifetime value to GitFlix (total su
 For episodes, we store their number (e.g. '304' for episode 4 of season 3), title, the TV series they belong to (e.g. 'Star Trek TNG'), the rating the episode got in IMDb and the expected ad revenue per minute on ad supported plans (the streaming wars have forced GitFlix to offer both a paid and an ad supported free subscription).
 
 **[GitFlixEpisodes.csv](/files/GitFlixEpisodes.csv)**
+
 ```
  id | no  |        title        |  tv_series   | rating | ad_rev
 ----+-----+---------------------+--------------+--------+-----------
@@ -955,8 +983,9 @@ For episodes, we store their number (e.g. '304' for episode 4 of season 3), titl
 Finally, for each episode streamed by each user, we keep track how many minutes the user has streamed each day (not all users view the full length of all episodes at one sitting).
 
 **[GitFlixStreams.csv](/files/GitFlixStreams.csv)**
+
 ```
- id | user_id | episode_id | minutes | day | month | year 
+ id | user_id | episode_id | minutes | day | month | year
 ----+---------+------------+---------+-----+-------+------
   1 |       1 |          1 |      40 |  10 |     1 | 2019
   2 |       1 |          2 |      42 |  10 |     1 | 2019
@@ -1019,6 +1048,7 @@ Each input CSV file used with [tap-csv](https://gitlab.com/meltano/tap-csv) must
 Create a .env file in your project directory (i.e. csv-project) with your Postgres DB credentials and the file you are going to use to describe the CSV files to be loaded.
 
 **.env**
+
 ```bash
 export PG_DATABASE=warehouse
 export PG_PASSWORD=warehouse
@@ -1036,27 +1066,20 @@ TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with a
 Finally, create the `csv_files.json` file in your project directory:
 
 **csv_files.json**
+
 ```json
-[   
-  { "entity" : "users",
-    "file" : "GitFlixUsers.csv",
-    "keys" : ["id"]
-  },
-  { "entity" : "episodes",
-    "file" : "GitFlixEpisodes.csv",
-    "keys" : ["id"]
-  },
-  { "entity" : "streams",
-    "file" : "GitFlixStreams.csv",
-    "keys" : ["id"]
-  }
+[
+  { "entity": "users", "file": "GitFlixUsers.csv", "keys": ["id"] },
+  { "entity": "episodes", "file": "GitFlixEpisodes.csv", "keys": ["id"] },
+  { "entity": "streams", "file": "GitFlixStreams.csv", "keys": ["id"] }
 ]
 ```
 
 Description of available options:
-  - entity: The entity name, used as the table name for the data loaded from that CSV.
-  - file: Local path (relative to the project's root) to the file to be ingested.
-  - keys: The names of the columns that constitute the unique keys for that entity.
+
+- entity: The entity name, used as the table name for the data loaded from that CSV.
+- file: Local path (relative to the project's root) to the file to be ingested.
+- keys: The names of the columns that constitute the unique keys for that entity.
 
 ### Load the CSV files to Postgres
 
@@ -1088,6 +1111,7 @@ Let's start by adding the base transforms that will clean the loaded data and fi
 First step is to enable the option to run Custom Transforms for our project and set the results of the transforms to be stored as materialized tables:
 
 **transform/dbt_project.yml**
+
 ```bash
 ... ... ...
 models:
@@ -1099,11 +1123,13 @@ models:
 The Transforms must be added as dbt models (.sql files) under the `csv-project/transform/models/my_meltano_project/` directory or any of its subdirectories.
 
 The name of each Transform's file will be the name of the final table in the `analytics` schema, so we choose to name them:
+
 - `gitflix_users.sql`
 - `gitflix_episodes.sql`
 - `gitflix_streams.sql`
 
 **transform/models/my_meltano_project/gitflix_users.sql**
+
 ```sql
 with source as (
 
@@ -1127,10 +1153,10 @@ renamed as (
         case
             when CAST(nullif(age, '') as integer) < 18
                 then '1 - Under 18'
-            when CAST(nullif(age, '') as integer) >= 18 
+            when CAST(nullif(age, '') as integer) >= 18
               and CAST(nullif(age, '') as integer) < 40
                 then '2 - 20 to 40'
-            when CAST(nullif(age, '') as integer) >= 40 
+            when CAST(nullif(age, '') as integer) >= 40
               and CAST(nullif(age, '') as integer) < 60
                 then '3 - 40 to 60'
             when CAST(nullif(age, '') as integer) >= 60
@@ -1149,9 +1175,9 @@ renamed as (
                 then NULL
             when avg_logins like '%#DIV/0%'
                 then NULL
-            else 
-                round( 
-                   CAST(nullif( avg_logins , '') as numeric), 
+            else
+                round(
+                   CAST(nullif( avg_logins , '') as numeric),
                    2
                 )
         end as avg_logins_per_day,
@@ -1160,7 +1186,7 @@ renamed as (
 
     from source
 
-    where 
+    where
       -- Make sure that we keep only users with valid IDs
       id is NOT NULL
 
@@ -1173,6 +1199,7 @@ select * from renamed
 ```
 
 **transform/models/my_meltano_project/gitflix_episodes.sql**
+
 ```sql
 with source as (
 
@@ -1196,14 +1223,14 @@ renamed as (
 
         -- Remove the $ from the start and the commas
         --  and then cast to float
-        CAST( 
-            nullif( replace( substring(ad_rev from 2), ',', ''),'' ) 
+        CAST(
+            nullif( replace( substring(ad_rev from 2), ',', ''),'' )
             AS float
         ) as ad_revenue_per_minute
 
     from source
 
-    where 
+    where
       -- Make sure that we keep only episodes with valid IDs
       id is NOT NULL
 
@@ -1216,6 +1243,7 @@ select * from renamed
 ```
 
 **transform/models/my_meltano_project/gitflix_streams.sql**
+
 ```sql
 with source as (
 
@@ -1242,10 +1270,10 @@ renamed as (
 
     from source
 
-    where 
+    where
       -- Make sure that we keep only streams with valid IDs
-      id is NOT NULL 
-      and user_id is NOT NULL 
+      id is NOT NULL
+      and user_id is NOT NULL
       and episode_id is NOT NULL
 
 )
@@ -1275,7 +1303,6 @@ The result will be three new tables in your `analytics` schema with the transfor
 - `analytics.gitflix_episodes`
 - `analytics.gitflix_streams`
 
-
 ### Add Custom Meltano Models
 
 In order to access the newly transformed data in Meltano UI, 2 additional types of files must be created:
@@ -1286,6 +1313,7 @@ In order to access the newly transformed data in Meltano UI, 2 additional types 
 These files must be added as .m5o files under the `csv-project/model/` directory.
 
 **gitflix_users.table.m5o**
+
 ```bash
 {
   version = 1
@@ -1365,6 +1393,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 ```
 
 **gitflix_episodes.table.m5o**
+
 ```bash
 {
   version = 1
@@ -1426,6 +1455,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 ```
 
 **gitflix_streams.table.m5o**
+
 ```bash
 {
   version = 1
@@ -1493,6 +1523,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 ```
 
 **gitflix.topic.m5o**
+
 ```bash
 {
   version = 1
@@ -1565,20 +1596,17 @@ You should now be able to follow the same steps to import your own CSV files and
 
 - Add custom Transforms and Models by following the Gitflix example or any other Transforms and Models provided by Meltano. You can check the [Meltano Group](https://gitlab.com/meltano/) for projects that define default [transforms](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=dbt-) or [models](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=model-) for various supported APIs if you want to see real world examples.
 
-
 ## Using Jupyter Notebooks
 
 Once the `meltano elt` pipeline has successfully completed and data extracted from an API or a Data Source have been transformed and loaded to the `analytics` schema of your Data Warehouse, you can use Meltano UI or any data exploration tool to analyze and generate reports.
 
 In this tutorial, we are going to present how to connect [Jupyter Notebook](https://jupyter.org/) to a Meltano Project that uses Postgres to store the transformed data.
 
-
 ### Prerequisites
 
 - Meltano's minimum and [optional requirements](./installation.html#requirements) installed
 - Docker started
 - You have successfully extracted and loaded data from an API by following the steps described in the previous Tutorials.
-
 
 ### Jupyter Notebook Installation
 
@@ -1604,9 +1632,11 @@ pip install matplotlib
 Once the installation is completed, you are set to use Jupyter Notebooks with Meltano.
 
 ### Set Your Credentials
+
 Create a .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
 **.env**
+
 ```
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
@@ -1617,7 +1647,7 @@ export PG_DATABASE=warehouse
 
 This is an optional step, but allows us to use the same credentials from inside all Jupyter Notebooks without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.
 
-### Running Jupyter Notebook 
+### Running Jupyter Notebook
 
 You can now navigate to Meltano's directory for storing your notebooks and [start Jupyter Notebook](https://jupyter.readthedocs.io/en/latest/running.html#running):
 
@@ -1638,7 +1668,7 @@ $ jupyter notebook
 
 It will then open your default web browser to this URL.
 
-When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories in the directory where the notebook server was started. 
+When the notebook opens in your browser, you will see the Notebook Dashboard, which will show a list of the notebooks, files, and subdirectories in the directory where the notebook server was started.
 
 If this is the first time you start `jupyter notebook` from the `notebook` directory of your Meltano project, the list will be empty. Let's start a new Python notebook!
 
@@ -1651,12 +1681,13 @@ We are going to showcase the most simple and straightforward way to connect to y
 The first step for a data exploration Notebook is to import the proper libraries required for data exploration and manipulation and then setup the connection to the Database (Postgres in our case) so that we can fetch data:
 
 **Cell 1**
+
 ```python
 # Import required libraries
 import pandas as pd
 import psycopg2
 import sqlalchemy
-import matplotlib as plt 
+import matplotlib as plt
 import os
 
 from sqlalchemy import create_engine
@@ -1677,7 +1708,7 @@ PG_SCHEMA = 'analytics'
 
 # A long string that contains the necessary Postgres login information
 postgres_str = ('postgresql://{username}:{password}@{ipaddress}:{port}/{dbname}'
-                .format(username=POSTGRES_USERNAME, 
+                .format(username=POSTGRES_USERNAME,
                         password=POSTGRES_PASSWORD,
                         ipaddress=POSTGRES_ADDRESS,
                         port=POSTGRES_PORT,
@@ -1694,11 +1725,12 @@ You can then write queries and generate plots at will.
 As an example, assume that you have loaded data from your Zendesk Account by using `tap_zendesk`. You can then check the most important Ticket statistics by month:
 
 **Cell 2**
+
 ```python
 # Query to send to the Database
 sql_query = f'''
-SELECT 
-  created_year || '-' || created_month as month, 
+SELECT
+  created_year || '-' || created_month as month,
   COUNT(*) as total_tickets,
   SUM(ticket_unsolved_counter) as unsolved_tickets,
   SUM(ticket_solved_counter) as solved_tickets,
@@ -1707,7 +1739,7 @@ SELECT
   SUM(replies) as total_replies,
   ROUND(AVG(replies), 2) as avg_replies,
   ROUND(AVG(full_resolution_time_in_minutes_business), 2) as avg_res_time_mins
-    
+
 FROM {PG_SCHEMA}.zendesk_tickets_xf
 
 GROUP BY created_year, created_month
@@ -1725,6 +1757,7 @@ result
 Or generate a bar plot:
 
 **Cell 3**
+
 ```python
 plt.rcParams['figure.figsize'] = [15, 8]
 result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets','one_touch_tickets','reopened_tickets'])
@@ -1733,9 +1766,10 @@ result.plot.bar(x='month', y=['total_tickets','unsolved_tickets','solved_tickets
 ### Additional Resources
 
 In order to make the most out of Jupyter Notebooks, you can check the following resources:
-*  [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
-*  [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
-*  [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
+
+- [Documentation for pandas](https://pandas.pydata.org/), the Python Data Analysis Library that provides high-performance, easy-to-use data structures and data analysis tools for the Python programming language.
+- [Pandas Tutorial using Jupyter Notebooks](https://data36.com/pandas-tutorial-1-basics-reading-data-files-dataframes-data-selection/)
+- [Jupyter Notebook for Beginners: A Tutorial](https://www.dataquest.io/blog/jupyter-notebook-tutorial/)
 
 ## Advanced: Manually Creating a DigitalOcean Droplet
 
@@ -1749,15 +1783,15 @@ Click "Create Droplet" and wait until the progress bar completes. Congratulation
 
 ### Logging Into Your Droplet
 
-Click on the three-dot dropdown menu to the right of your Droplet's name and select "Access console" to launch the web-based command line. You will be prompted to use your login of "root" and the password that was emailed to you (or SSH key, if you chose that option). Once you enter your username *root* and password (from the email) you will be prompted to change the password to something more secure.
+Click on the three-dot dropdown menu to the right of your Droplet's name and select "Access console" to launch the web-based command line. You will be prompted to use your login of "root" and the password that was emailed to you (or SSH key, if you chose that option). Once you enter your username _root_ and password (from the email) you will be prompted to change the password to something more secure.
 
-You can also connect to your Droplet using SSH,  from the command line:
+You can also connect to your Droplet using SSH, from the command line:
 
 ```bash
 ssh root@YOUR_DROPLET_IP_ADDRESS
 ```
 
-### Requirements 
+### Requirements
 
 Your new server will not have any of [Meltano's requirements](/docs/installation.html#requirements) installed by default, so you will need to install them.
 
@@ -1766,22 +1800,25 @@ Your new server will not have any of [Meltano's requirements](/docs/installation
 Your Ubuntu image will not come with Python 3.6+ set as the sysyem wide version by default, so you will need to complete the following steps.
 
 Get the most updated version of all packages:
+
 ```bash
 apt-get update
 ```
 
 And then install Python:
+
 ```bash
 apt install python
 ```
 
-Now, if you run `python --version`, you will see the system wide version is 2.7.15+ but Meltano requires 3.6+. Now we need to update the system wide version we want to be using with the command: 
+Now, if you run `python --version`, you will see the system wide version is 2.7.15+ but Meltano requires 3.6+. Now we need to update the system wide version we want to be using with the command:
 
 ```bash
 update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1
 ```
 
 To confirm the version is now correct, run `python --version` again
+
 ```bash
 python --version
 #Python 3.6.8
@@ -1800,29 +1837,33 @@ apt install python3-pip
 Now that you have Python configured system wide and pip installed, we'll use pip to install your virtual environment management tools:
 
 ```bash
-pip3 install virtualenv 
+pip3 install virtualenv
 ```
 
 And then install it with:
+
 ```bash
 apt-get install python3-venv
 ```
 
 ::: warning
-You may be tempted to create your DigitalOcean Droplet without a virtual environment, but due to Python-related installation issues and locked down dependencies for Meltano we *highly recommend* that you take advantage of the virtual environment.
+You may be tempted to create your DigitalOcean Droplet without a virtual environment, but due to Python-related installation issues and locked down dependencies for Meltano we _highly recommend_ that you take advantage of the virtual environment.
 :::
 
 Create a directory where you want your virtual environments to be saved:
+
 ```bash
 mkdir virtualenvs
 ```
 
 Then create a new virtual environment inside that directory:
+
 ```bash
 python -m venv ~/virtualenvs/meltano
 ```
 
 Activate the virtual environment using:
+
 ```bash
 source ~/virtualenvs/meltano/bin/activate
 ```
@@ -1832,18 +1873,20 @@ source ~/virtualenvs/meltano/bin/activate
 Now that you are inside your virtual environment, follow the [Meltano installation instructions](/docs/installation.html#installing-meltano)
 
 Initialize Meltano:
+
 ```bash
 meltano init YOUR_PROJECT_NAME
 ```
 
 Launch the Meltano UI on your server:
+
 ```bash
 cd YOUR_PROJECT_NAME
 meltano ui
 ```
 
 ::: tip
-When you run `meltano ui` you will be prompted to view the Meltano UI at http://localhost:5000, however *this will not work for DigitalOcean Droplets* because they are hosted in the cloud. 
+When you run `meltano ui` you will be prompted to view the Meltano UI at http://localhost:5000, however _this will not work for DigitalOcean Droplets_ because they are hosted in the cloud.
 
 Instead, use the IP address of your DigitalOcean Droplet and port 5000.
 :::

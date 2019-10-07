@@ -1,8 +1,18 @@
 <template>
   <div class="home">
     <div style="background-color: #e5e4e2">
-      <div class="promobar" style="width:100%; background-color:#0168ff; color:white; text-align:center; padding:6px; font-size:14px;">
-        <span>Meltano is now available as a <a style="color:white; text-decoration:underline;" href="https://marketplace.digitalocean.com/apps/meltano">1-Click App in the DigitalOcean Marketplace</a></span>
+      <div
+        class="promobar"
+        style="width:100%; background-color:#6567ad; color:white; text-align:center; padding: 10px; font-size:14px;"
+      >
+        <span
+          >Meltano is now available as a
+          <a
+            style="color:white; text-decoration:underline;"
+            href="https://marketplace.digitalocean.com/apps/meltano"
+            >1-Click App in the DigitalOcean Marketplace</a
+          ></span
+        >
       </div>
       <div class="hero homepage-cta">
         <div class="hero-left">
@@ -38,7 +48,7 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper">
+    <div class="feature-section-wrapper is-white">
       <div class="feature-section">
         <div class="feature-left">
           <img
@@ -60,7 +70,10 @@
       </div>
     </div>
 
-    <div style="background-color: #e5e4e2; padding-bottom: 6rem;">
+    <div
+      class="feature-section-wrapper"
+      style="background-color: #e5e4e2; padding-bottom: 6rem;"
+    >
       <div class="content-width-wide">
         <h2 class="section-title" style="text-align: center; margin-top: 0;">
           A single workflow for the entire data life cycle.
@@ -262,7 +275,7 @@
       </div>
     </div>
 
-    <div style="padding-top: 5rem;">
+    <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
         <h2 class="section-title ta-c">Plugins to Extract & Load Data</h2>
 
@@ -283,7 +296,10 @@
           <img src="../assets/logo-fastly.png" alt="Fastly Logo" />
           <img src="../assets/logo-mongodb.png" alt="MongoDB Logo" />
           <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
-          <img src="../assets/logo-googleanalytics.png" alt="Google Analytics Logo" />
+          <img
+            src="../assets/logo-googleanalytics.png"
+            alt="Google Analytics Logo"
+          />
         </div>
 
         <p class="description ta-c">
@@ -293,7 +309,10 @@
       </div>
     </div>
 
-    <div style="padding-top: 5rem;">
+    <div
+      class="feature-section-wrapper"
+      style="padding-top: 5rem; background-color: #e5e4e2;"
+    >
       <div class="content-width-wide">
         <h2 class="section-title ta-c">What People Are Saying</h2>
 
@@ -355,10 +374,7 @@
           will only use your email to provide you with updates and will never
           sell your information!
         </p>
-        <a
-          href="https://meltano.substack.com"
-          class="button"
-          target="_blank"
+        <a href="https://meltano.substack.com" class="button" target="_blank"
           >Subscribe</a
         >
       </section>
@@ -434,7 +450,6 @@ export default {
   padding-right: 10%;
   text-align: center;
   padding-top: 10px;
-  padding-bottom: 30px;
 }
 
 .meltano-stages-table {
@@ -554,17 +569,19 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 6rem;
 }
 
 .feature-section-wrapper {
   background-color: #e5e4e2;
-  padding-bottom: 6rem;
+  padding: 6rem 0;
+
+  &.is-white {
+    background-color: #fff;
+  }
 }
 
 .feature-left {
   max-width: 80%;
-  padding-bottom: 2rem;
 }
 
 .feature-right {
@@ -593,12 +610,14 @@ export default {
 }
 
 .hero-tagline {
+  font-size: 1.2rem;
   padding-right: 20px;
+  padding-bottom: 15px;
 }
 
 .hero-header {
   padding-right: 40px;
-  font-weight: bold;
+  font-weight: 700;
   font-size: 36px;
 }
 
@@ -629,6 +648,7 @@ export default {
   .hero
     text-align center
     margin 0 auto
+    padding-bottom 4rem
     img
       max-width 100%
     h1
