@@ -1,7 +1,7 @@
 <script>
 export default {
-  name: "TutorialTable"
-};
+  name: 'TutorialTable'
+}
 </script>
 
 <template>
@@ -11,7 +11,7 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#starter-carbon-emissions">Starter - Carbon Emissions</a>
+        <a href="/guide/getting-started.html">Carbon Emissions + SQLite</a>
       </div>
       <div>
         <p>
@@ -28,7 +28,9 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#intermediate-salesforce">Intermediate - Salesforce</a>
+        <a href="/tutorials/salesforce-and-postgres.html"
+          >Salesforce API + Postgres</a
+        >
       </div>
       <div>
         <p>
@@ -45,7 +47,7 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#intermediate-gitlab">Intermediate - GitLab</a>
+        <a href="/tutorials/gitlab-and-postgres.html">GitLab API + Postgres</a>
       </div>
       <div>
         <p>
@@ -62,8 +64,8 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#advanced-adding-custom-transformations-and-models">
-          Advanced - Adding Custom Transformations and Models
+        <a href="/tutorials/create-custom-transforms-and-models.html">
+          Create Custom Transformations and Models
         </a>
       </div>
       <div>
@@ -79,8 +81,8 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#advanced-using-tap-postgres-with-meltano">
-          Advanced - Using tap-postgres with Meltano
+        <a href="/tutorials/postgres-with-postgres.html">
+          Use Postgres as a Loader and Extractor
         </a>
       </div>
       <div>
@@ -92,8 +94,8 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#advanced-loading-csv-files-to-a-database">
-          Advanced - Loading CSV files to a Database
+        <a href="/tutorials/csv-with-postgres.html">
+          Loading CSV files into a Postgres Database
         </a>
       </div>
       <div>
@@ -106,12 +108,39 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="#using-jupyter-notebooks">Using Jupyter Notebooks</a>
+        <a href="/tutorials/using-jupyter-notebooks.html"
+          >Using Jupyter Notebooks</a
+        >
       </div>
       <div>
         <p>
           Learn how to connect Jupyter Notebook to a Meltano Project that uses
           Postgres to store the transformed data.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="/tutorials/manual-digitalocean-droplet.html"
+          >Manually Create a DigitalOcean Droplet for Meltano</a
+        >
+      </div>
+      <div>
+        <p>
+          Learn how to manually configure a DigitalOcean Droplet for use with
+          Meltano.
+        </p>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="/tutorials/create-custom-extractor.html">
+          Create a Custom Extractor
+        </a>
+      </div>
+      <div>
+        <p>
+          Learn how to create a custom extractor!
         </p>
       </div>
     </div>
