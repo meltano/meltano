@@ -509,7 +509,7 @@ target-postgres==...
 
 ## DigitalOcean Marketplace
 
-Meltano is deployed as a DigitalOcean Marketplace 1-Click install, available at <https://marketplace.digitalocean.com/apps/meltano>.
+Meltano is deployed and available as a <a :href="$site.themeConfig.data.digitalOceanUrl">DigitalOcean Marketplace 1-Click install</a>.
 
 ### Build the snapshot
 
