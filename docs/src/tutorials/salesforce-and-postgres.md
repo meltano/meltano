@@ -8,7 +8,7 @@ This is the Salesforce API and Postgres database tutorial. It guides you through
 
 ## Prerequisites
 
-- Meltano's minimum and [optional requirements](/guide/installation.html#requirements) installed
+- Meltano's minimum and [optional requirements](/docs/installation.html#requirements) installed
 - Docker started
 
 ## Initialize Your Project

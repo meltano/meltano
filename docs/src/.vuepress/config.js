@@ -45,22 +45,7 @@ module.exports = {
     nav: [
       {
         text: 'Documentation',
-        items: [
-          {
-            text: 'Learn',
-            items: [
-              { text: 'Install', link: '/guide/installation.html' },
-              { text: 'Get Started', link: '/guide/getting-started.html' }
-            ]
-          },
-          {
-            text: 'Plugins',
-            items: [
-              { text: 'Extractors', link: '/plugins/extractors/' },
-              { text: 'Loaders', link: '/plugins/loaders/' }
-            ]
-          }
-        ]
+        link: '/docs/installation.html'
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
       {
@@ -73,18 +58,27 @@ module.exports = {
     sidebar: {
       '/docs': [
         '/docs/',
+        '/docs/installation',
+        '/docs/getting-started',
+        '/tutorials/',
         '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',
         '/docs/architecture',
+        '/docs/contributing',
         '/docs/roadmap'
       ],
-      '/guide': [
-        '/guide/',
-        '/guide/installation',
-        '/guide/getting-started',
-        '/guide/orchestration',
-        '/guide/contributing'
+      '/tutorials': [
+        '/docs/',
+        '/docs/installation',
+        '/docs/getting-started',
+        '/tutorials/',
+        '/docs/command-line-interface',
+        '/docs/environment-variables',
+        '/docs/security-and-privacy',
+        '/docs/architecture',
+        '/docs/contributing',
+        '/docs/roadmap'
       ]
     },
     logo: '/meltano-logo.svg',
