@@ -11,6 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1020](https://gitlab.com/meltano/meltano/issues/1020) Update Command Line Tools documentation to reflect a standard format with opportunities for improvement in the future
+
 ### Fixes
 
 - [#1087](https://gitlab.com/meltano/meltano/issues/1087) Fix `meltano select` not seeding the database when run as the first command.
@@ -18,11 +20,10 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1047](https://gitlab.com/meltano/meltano-marketing/issues/1047) Fix a bug where some configuration values were not redacted
 
 ### Breaks
+
 - [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
 - [#1089](https://gitlab.com/meltano/meltano/issues/1089) Properly re-initialize the Analyze page after a new analysis is selected during an existing analysis (this issue surfaced due to the recent Analyze dropdown CTAs addition which enables an analysis change during an existing one)
 - [#1092](https://gitlab.com/meltano/meltano/issues/1092) Fix async condition so the design store's `defaultState` is properly applied before loading a new design via `initializeDesign`
-
-### Breaks
 
 ## 0.44.1 - (2019-10-03)
 
