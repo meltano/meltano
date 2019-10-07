@@ -29,6 +29,14 @@ module.exports = {
       }
     ],
     ['link', { rel: 'manifest', href: '/site.webmanifest' }],
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=IBM+Plex+Sans&display=swap'
+      }
+    ],
     ['meta', { name: 'msapplication-TileColor', content: '#da532c' }],
     ['meta', { name: 'theme-color', content: '#ffffff' }]
   ],
