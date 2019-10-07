@@ -6,5 +6,5 @@ Meltano Loaders _load data in bulk_ after it has been imported from source(s) us
 
 - [Comma Separated Values (CSV)](/plugins/loaders/csv.html)
 - [Snowflake Data Warehouse](/plugins/loaders/snowflake.html)
-- [PostgresQL Database](/plugins/loaders/postgresql.html)
+- [PostgresQL Database](/plugins/loaders/postgres.html)
 - [SQLite Database](/plugins/loaders/sqlite.html)
