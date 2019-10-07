@@ -2,16 +2,16 @@
 
 This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
 
-- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-droplets)
-- [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
-- [Local Installation](/docs/installation.html#local-installation)
+- [DigitalOcean One-Click Installer](/guide/deployment.html#digitalocean-droplets)
+- [Amazon Web Services (AWS)](/guide/deployment.html#amazon-web-services-aws)
+- [Local Installation](/guide/installation.html#local-installation)
 
 ## DigitalOcean Marketplace
 
-DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://meltano.com/docs/installation.html#digitalocean-marketplace)
+DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://meltano.com/guide/installation.html#digitalocean-marketplace)
 
 :::tip Get $50 Worth of DigitalOcean Credits for Free
-When you create a new DigitalOcean account using [this link](https://meltano.com/docs/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
+When you create a new DigitalOcean account using [this link](https://meltano.com/guide/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
 ### Video Walkthrough
@@ -169,7 +169,7 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 
 ## Local Installation
 
-In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
+In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/guide/installation.html#installing-on-docker).
 
 ::: tip
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
@@ -285,7 +285,7 @@ meltano --version
 
 That's it! Meltano is now be available for you to use.
 
-Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
+Now that you have successfully [installed Meltano](/guide/installation.html) and its requirements, you can create your first project.
 
 #### Create your first project
 
@@ -320,7 +320,7 @@ You are now ready to add data sources, configure reporting databases, schedule u
 
 #### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/guide/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ##### Using Pre-built Docker Images
 

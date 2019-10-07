@@ -2,8 +2,8 @@
 
 This section provides step-by-step guides for deploying Meltano on various cloud environments. Currently, we provide detailed intructions for:
 
-- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-droplets)
-- [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
+- [DigitalOcean One-Click Installer](/guide/deployment.html#digitalocean-droplets)
+- [Amazon Web Services (AWS)](/guide/deployment.html#amazon-web-services-aws)
 
 We are working toward one-click installers, and will update this page as soon as those become available. In the meantime, Meltano can be deployed locally or to the cloud using these instructions.
 
