@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
@@ -13,25 +13,26 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-### Breaks
+- Patch technicality due to PyPi limitation (v1 already existed from a publish mistake seven+ months ago) with needed changelog New/Changes/Fixes section headers
 
+### Breaks
 
 ## 1.0.0 - (2019-10-07)
 
 ---
 
-### Changes
+### New
 
 - [#1020](https://gitlab.com/meltano/meltano/issues/1020) Update Command Line Tools documentation to reflect a standard format with opportunities for improvement in the future
 - [#524](https://gitlab.com/meltano/meltano/issues/524) There is a new Plugins section on the site to contain all ecosystem related libraries (i.e., extractors, loaders, etc.)
 
-### Fixes
+### Changes
 
 - [#1087](https://gitlab.com/meltano/meltano/issues/1087) Fix `meltano select` not seeding the database when run as the first command.
 - [#1090](https://gitlab.com/meltano/meltano/issues/1090) Update the namespace for all plugins. Also the default schema used will go back to including the `tap_` prefix to avoid conflicts with existing schemas (e.g. a local `gitlab` or `salesforce` schema). This also fixes `tap-csv` and `tap-google-analytics` not properly working after the latest Meltano release.
 - [#1047](https://gitlab.com/meltano/meltano-marketing/issues/1047) Fix a bug where some configuration values were not redacted
 
-### Breaks
+### Fixes
 
 - [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
 - [#1089](https://gitlab.com/meltano/meltano/issues/1089) Properly re-initialize the Analyze page after a new analysis is selected during an existing analysis (this issue surfaced due to the recent Analyze dropdown CTAs addition which enables an analysis change during an existing one)
