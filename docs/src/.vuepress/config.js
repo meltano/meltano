@@ -44,18 +44,22 @@ module.exports = {
   themeConfig: {
     nav: [
       {
-        text: 'Learn',
+        text: 'Documentation',
         items: [
-          { text: 'Guide', link: '/guide/' },
-          { text: 'Documentation', link: '/docs/' },
-          { text: 'Tutorials', link: '/tutorials/' }
-        ]
-      },
-      {
-        text: 'Plugins',
-        items: [
-          { text: 'Extractors', link: '/plugins/extractors/' },
-          { text: 'Loaders', link: '/plugins/loaders/' }
+          {
+            text: 'Learn',
+            items: [
+              { text: 'Install', link: '/guide/installation.html' },
+              { text: 'Get Started', link: '/guide/getting-started.html' }
+            ]
+          },
+          {
+            text: 'Plugins',
+            items: [
+              { text: 'Extractors', link: '/plugins/extractors/' },
+              { text: 'Loaders', link: '/plugins/loaders/' }
+            ]
+          }
         ]
       },
       { text: 'Blog', link: 'https://www.meltano.com/blog', disableIcon: true },
