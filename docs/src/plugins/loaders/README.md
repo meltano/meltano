@@ -1,3 +1,7 @@
+---
+prev: /plugins/
+---
+
 # Loaders
 
 **L**oading data is the **L** in the term **ELT**. In this section, we provide a detailed overview of how Meltano takes the data that was pulled from your sources during **E**xtract step, and puts it into a reporting database (Load) for further manipulation and analysis.
