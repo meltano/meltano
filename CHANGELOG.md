@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1080](https://gitlab.com/meltano/meltano/issues/1080) Intercom button will no longer override trademark message 
+
 ### Breaks
 
 
