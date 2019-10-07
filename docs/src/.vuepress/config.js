@@ -43,7 +43,13 @@ module.exports = {
   dest: 'public',
   themeConfig: {
     nav: [
-      { text: 'Documentation', link: '/docs/' },
+      {
+        text: 'Learn',
+        items: [
+          { text: 'Guide', link: '/guide/' },
+          { text: 'Tutorials', link: '/tutorials/' }
+        ]
+      },
       {
         text: 'Plugins',
         items: [
@@ -64,7 +70,6 @@ module.exports = {
         '/docs/',
         '/docs/installation',
         '/docs/getting-started',
-        '/docs/tutorial',
         '/docs/command-line-interface',
         '/docs/environment-variables',
         '/docs/security-and-privacy',

@@ -1,4 +1,4 @@
-# Custom Transforms and Models
+# Creating Custom Transforms and Models
 
 This tutorial explains how to add custom data transformations and Meltano models.
 

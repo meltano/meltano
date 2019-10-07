@@ -2,7 +2,7 @@
 sidebar: auto
 ---
 
-# tap-gitlab Tutorial
+# Tutorial: GitLab API + Postgres
 
 For this tutorial, our goal will be to get [tap-gitlab](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project.
 
@@ -86,10 +86,11 @@ In order to access GitLab's API to fetch data, we must get a personal access tok
 1. Navigate to your [profile's access tokens](https://gitlab.com/profile/personal_access_tokens).
 
 2. Fill out the personal access token form with the following properties:
-  - **Name:** tap-gitlab-tutorial
-  - **Expires:** _leave blank unless you have a specific reason to expire the token_
-  - **Scopes:**
-    - api
+
+- **Name:** tap-gitlab-tutorial
+- **Expires:** _leave blank unless you have a specific reason to expire the token_
+- **Scopes:**
+  - api
 
 3. Click on `Create personal access token` to submit your request.
 
@@ -177,4 +178,4 @@ meltano add model model-gitlab
 
 With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
 
-Follow [these instructions](./../tutorial.html#interact-with-your-data-in-the-web-app) to start Meltano UI, set up a connection to your Postgres, and start exploring!
+All you need to do is start Meltano UI, set up a connection to your Postgres, and start exploring!
