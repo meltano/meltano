@@ -4,7 +4,7 @@
 
 Meltano Models allow you to define your data model and interactively generate SQL so that you can easily analyze and visualize it in Meltano UI.
 
-An *analysis model* is an interchangeable term for *meltano model*.
+An _analysis model_ is an interchangeable term for _meltano model_.
 
 ### Concepts
 
@@ -107,8 +107,8 @@ meltano add model [name_of_model]
 
 There are two foundational steps required for Meltano to extract, load, and transform your data for analysis in Meltano UI:
 
-  - Define each `Table` for a data source (as `<name>.table.m5o`)
-  - Define `Topics` for each analysis you want to run (as `<topic>.topic.m5o`)
+- Define each `Table` for a data source (as `<name>.table.m5o`)
+- Define `Topics` for each analysis you want to run (as `<topic>.topic.m5o`)
 
 #### Model Authoring (`.m5o` files)
 
@@ -261,35 +261,38 @@ Meltano `targets` is part of the Loader portion of the data workflow.
 Meltano can be used in any ELT architecture by using the right taps and targets for the job. The strategies supported can range from dumping the source data in a data lake to keeping all historical versions for each record to storing well formatted, clean data in the target data store.
 
 When considering which taps and targets Meltano will maintain, some assumptions are followed concerning how source data is stored in the target data store:
-*  All extracted data is stored in the same Target Database, e.g., we use a Database named `RAW` for storing all extracted data to Snowflake.
 
-*  For each tap's data source, a schema is created for storing all the data that is extracted through a tap. E.g., The `RAW.SALESFORCE` schema is used for data extracted from Salesforce, and the `RAW.ZENDESK` schema is used for data extracted from Zendesk.
+- All extracted data is stored in the same Target Database, e.g., we use a Database named `RAW` for storing all extracted data to Snowflake.
 
-*  Every stream generated from a tap will result in a table with the same name. That table will be created in the schema from that tap based on the information sent in the `SCHEMA` message.
+- For each tap's data source, a schema is created for storing all the data that is extracted through a tap. E.g., The `RAW.SALESFORCE` schema is used for data extracted from Salesforce, and the `RAW.ZENDESK` schema is used for data extracted from Zendesk.
 
-*  Meltano supports schema updates for when a schema of an entity changes during an extraction. This is enacted when Meltano receives more than one `SCHEMA` message for a specific stream in the same extract load run.
+- Every stream generated from a tap will result in a table with the same name. That table will be created in the schema from that tap based on the information sent in the `SCHEMA` message.
 
-    When a SCHEMA message for a stream is received, our Targets check whether there is already a table for the entity defined by the stream.
-    * If the schema for the tap does not exist, it is created.
-    * If the table for the stream does not exist, it is created.
-    * If a table does exist, our Targets create a diff to check if new attributes must be added to the table or already defined attributes should have their data type updated. Based on that diff, the Targets make the appropriate schema changes.
+- Meltano supports schema updates for when a schema of an entity changes during an extraction. This is enacted when Meltano receives more than one `SCHEMA` message for a specific stream in the same extract load run.
 
-    Rules followed:
-    1. Only support type upgrades (e.g., STRING -> VARCHAR) for existing columns.
-    2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
-    3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
+  When a SCHEMA message for a stream is received, our Targets check whether there is already a table for the entity defined by the stream.
 
-*  Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same composite key (combination of key_properties) then the new record updates the existing one.
+  - If the schema for the tap does not exist, it is created.
+  - If the table for the stream does not exist, it is created.
+  - If a table does exist, our Targets create a diff to check if new attributes must be added to the table or already defined attributes should have their data type updated. Based on that diff, the Targets make the appropriate schema changes.
 
-    No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
+  Rules followed:
 
-*  If a timestamp_column attribute is not defined in the SCHEMA sent to the target for a specific stream, it is added explicitly. Each RECORD has the timestamp of when the target receives it as a value. As an example, `target-snowflake` sets the name of that attribute to `__loaded_at` when an explicit name is not provided in the target's configuration file.
+  1. Only support type upgrades (e.g., STRING -> VARCHAR) for existing columns.
+  2. If an unsupported type update is requested (e.g., float --> int), then an exception is raised.
+  3. Columns are never dropped. Only UPDATE existing columns or ADD new columns.
 
-    When a target is set to work on append-only mode (i.e. no primary keys defined for the streams), the timestamp_column's value can be used to get the most recent information for each record.
+- Data is upserted when an entity has at least one primary key (key_properties not empty). If there is already a row with the same composite key (combination of key_properties) then the new record updates the existing one.
 
-*  For targets loading data to Relational Data Stores (e.g., Postgres, Snowflake, etc.), we unnest nested JSON data structures and follow a `[object_name]__[property_name]` approach similar to [what Stitch platform also does](https://www.stitchdata.com/docs/data-structure/nested-data-structures-row-count-impact).
+  No key_properties must be defined for a target to work on append-only mode. In that case, the target tables will store historical information with entries for the same key differentiated by their `__loaded_at` timestamp.
 
-*  At the moment we do not deconstruct nested arrays. Arrays are stored as JSON or STRING data types (depending on the support provided by the target Data Store) with the relevant JSON representation stored as is. e.g. "['banana','apple']". It can then be extracted and used in the Transform Step.
+- If a timestamp_column attribute is not defined in the SCHEMA sent to the target for a specific stream, it is added explicitly. Each RECORD has the timestamp of when the target receives it as a value. As an example, `target-snowflake` sets the name of that attribute to `__loaded_at` when an explicit name is not provided in the target's configuration file.
+
+  When a target is set to work on append-only mode (i.e. no primary keys defined for the streams), the timestamp_column's value can be used to get the most recent information for each record.
+
+- For targets loading data to Relational Data Stores (e.g., Postgres, Snowflake, etc.), we unnest nested JSON data structures and follow a `[object_name]__[property_name]` approach similar to [what Stitch platform also does](https://www.stitchdata.com/docs/data-structure/nested-data-structures-row-count-impact).
+
+- At the moment we do not deconstruct nested arrays. Arrays are stored as JSON or STRING data types (depending on the support provided by the target Data Store) with the relevant JSON representation stored as is. e.g. "['banana','apple']". It can then be extracted and used in the Transform Step.
 
 ### Concurrency
 
@@ -306,6 +309,17 @@ For now, Meltano will try to implement concurrent taps when possible.
 
 Every time `meltano elt ...` runs, Meltano will keep track of the job and its success state in a log.
 
+### How ELT Commands Fetch Dependencies
+
+When you run ELT commands on a tap or target, this is the general process for fetching dependencies:
+
+- First, the CLI looks in the project directory that you initialized
+- Then it looks in the global file (`discovery.yml`) for urls of a package or repo
+  - Note: This will eventually be moved into its own repository to prevent confusion since you cannot have local references for dependencies
+- If this is the first time that the dependencies are requested, it will download to a local directory (if it is a package) or cloned (if it is a repo)
+- By doing this, you ensure that packages are version controlled via `discovery.yml` and that it will live in two places:
+  - in the project itself for the user to edit
+  - in a global repo for meltano employees to edit
 
 ## Meltano Transform
 
@@ -363,8 +377,8 @@ python3 elt/util/spreadsheet_loader.py sheet FILES...
 
 Meltano manages authorization using a role based access control scheme.
 
-  * Users have multiple roles;
-  * Roles have multiple permissions;
+- Users have multiple roles;
+- Roles have multiple permissions;
 
 A Permission has a context for with it is valid: anything that matches the context is permitted.
 
