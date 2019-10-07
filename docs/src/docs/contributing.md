@@ -68,7 +68,7 @@ FLASK_ENV=development meltano ui
 The development build of the Meltano API should be available at <http://localhost:5000/>.
 
 :::warning Troubleshooting
-If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/guide/contributing.html#prerequisites) installed.
+If you run into `/bin/sh: yarn: command not found`, double check that you've got [the prerequisites](https://www.meltano.com/docs/contributing.html#prerequisites) installed.
 
 On macOS, this can be solved by running `brew install yarn`.
 :::

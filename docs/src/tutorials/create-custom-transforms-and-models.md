@@ -93,7 +93,7 @@ Number of won opportunities by quarter, year, deal type, deal size and company s
 
 Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations (i.e. `sfdc-project/transform`). When `meltano elt tap-salesforce target-postgres --transform run` is executed, both default and custom dbt transformations in the `transform/` directory are being performed.
 
-If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](/docs/command-line-interface.html#transform) for more details.
+If you are not familiar with dbt, please visit [dbt's documentation](https://docs.getdbt.com/). You can also check the section in Meltano's documentation on [Transforms](/docs/transforms.html) for more details.
 
 Let's generate two additional transformations, which will produce:
 

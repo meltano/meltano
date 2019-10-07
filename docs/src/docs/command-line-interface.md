@@ -156,14 +156,6 @@ meltano elt <extractor> <loader> [--job_id TEXT] [--transform run] [--dry]
   - `skip`: skip the Transforms (Default)
   - `only`: only run the Transforms (skip the Extract and Load steps)
 
-## `exclude`
-
-Use `--exclude` to exclude all attributes that match the filter.
-
-::: info
-Exclusion has precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first.
-:::
-
 ### Examples
 
 ```bash
@@ -376,7 +368,7 @@ $PERMISSION_BOT_WAREHOUSE
 ## `schedule`
 
 ::: tip
-An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/guide/orchestration.html) documentation to get started with Meltano orchestration.
+An `orchestrator` plugin is required to use `meltano schedule`: refer to the [Orchestration](/docs/orchestration.html) documentation to get started with Meltano orchestration.
 :::
 
 Meltano provides a `schedule` method to run specified ELT pipelines at regular intervals. Schedules are defined inside the `meltano.yml` project as such:
@@ -431,67 +423,13 @@ This will select all attributes of the `region` entity.
 Most shells parse glob syntax: you must escape the special characters in the select pattern by quoting the pattern.
 :::
 
-## `transform`
+### Exclude Parameter
 
-Transforms in Meltano are implemented by using [dbt](https://www.getdbt.com/). All Meltano generated projects have a `transform/` directory, which is populated with the required configuration, models, packages, etc in order to run the transformations.
+Use `--exclude` to exclude all attributes that match the filter.
 
-When Meltano elt runs with the `--transform run` option, the default dbt transformations for the extractor used are run.
-
-As an example, assume that the following command runs:
-
-```
-meltano elt tap-carbon-intensity target-postgres --transform run
-```
-
-After the Extract and Load steps are successfuly completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs.
-
-Meltano uses the convention that the transform has the same name as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
-
-```
-(venv) $ meltano discover transforms
-
-transforms
-tap-carbon-intensity
-
-(venv) $ meltano add transform tap-carbon-intensity
-Transform tap-carbon-intensity added to your meltano.yml config
-Transform tap-carbon-intensity added to your dbt packages
-Transform tap-carbon-intensity added to your dbt_project.yml
-```
-
-Transforms are basically dbt packages that reside in their own repositories. If you want to see in more details how such a package can be defined, you can check the dbt documentation on [Package Management](https://docs.getdbt.com/docs/package-management) and [dbt-tap-carbon-intensity](https://gitlab.com/meltano/dbt-tap-carbon-intensity), the project used for defining the default transforms for `tap-carbon-intensity`.
-
-When a transform is added to a project, it is added as a dbt package in `transform/packages.yml`, enabled in `transform/dbt_project.yml`, and loaded for usage the next time dbt runs.
-
-The format of the `meltano.yml` entries for transforms can have additional parameters. For example, the `tap-carbon-intensity` dbt package requires three variables, which are used for finding the tables where the raw Carbon Intensity data have been loaded during the Extract-Load phase:
-
-```
-transforms:
-- name: tap-carbon-intensity
-  pip_url: https://gitlab.com/meltano/dbt-tap-carbon-intensity.git
-  vars:
-    entry_table: "{{ env_var('PG_SCHEMA') }}.entry"
-    generationmix_table: "{{ env_var('PG_SCHEMA') }}.generationmix"
-    region_table: "{{ env_var('PG_SCHEMA') }}.region"
-```
-
-Those entries may follow dbt's syntax in order to fetch values from environment variables. In this case, $PG_SCHEMA must be available in order for the transformations to know in which Postgres schema to find the tables with the Carbon Intensity data. Meltano uses $PG_SCHEMA by default as it is the same default schema also used by the Postgres Loader.
-
-You can keep those parameters as they are and provide the schema as an environment variable or set the schema manually in `meltano.yml`:
-
-```
-transforms:
-- name: tap-carbon-intensity
-  pip_url: https://gitlab.com/meltano/dbt-tap-carbon-intensity.git
-  vars:
-    entry_table: "my_raw_schema.entry"
-    generationmix_table: "my_raw_schema.generationmix"
-    region_table: "my_raw_schema.region"
-```
-
-When Meltano runs a new transformation, `transform/dbt_project.yml` is always kept up to date with whatever is provided in `meltano.yml`.
-
-Finally, dbt can be configured by updating `transform/profile/profiles.yml`. By default, Meltano sets up dbt to use the same database and user as the Postgres Loader and store the results of the transformations in the `analytics` schema.
+::: info
+Exclusion has precedence over inclusion. If an attribute is excluded, there is no way to include it back without removing the exclusion pattern first.
+:::
 
 ## `ui`
 

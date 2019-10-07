@@ -76,14 +76,15 @@ export default {
       color inherit
       line-height 1.7rem
       h4
-        margin 0.45rem 0 0
+        margin 0.45rem 0 5px
         border-top 1px solid #eee
         padding 0.45rem 1.5rem 0 1.25rem
+        font-size 0.8rem
       .dropdown-subitem-wrapper
         padding 0
         list-style none
         .dropdown-subitem
-          font-size 0.9em
+          font-size 0.9rem
       a
         display block
         line-height 1.7rem

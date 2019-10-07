@@ -2,16 +2,16 @@
 
 This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
 
-- [DigitalOcean One-Click Installer](/guide/deployment.html#digitalocean-droplets)
-- [Amazon Web Services (AWS)](/guide/deployment.html#amazon-web-services-aws)
-- [Local Installation](/guide/installation.html#local-installation)
+- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-droplets)
+- [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
+- [Local Installation](/docs/installation.html#local-installation)
 
 ## DigitalOcean Marketplace
 
-DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://meltano.com/guide/installation.html#digitalocean-marketplace)
+DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](/docs/installation.html#digitalocean-marketplace)
 
 :::tip Get $50 Worth of DigitalOcean Credits for Free
-When you create a new DigitalOcean account using [this link](https://meltano.com/guide/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
+When you create a new DigitalOcean account using [this link](/docs/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
 ### Video Walkthrough
@@ -46,7 +46,7 @@ Once your Droplet is created, it will have its own IP address displayed in the D
 
 7. Visit your Meltano instance at port 5000, like so: `http://{YOUR_IP_ADDRESS}:5000`
 
-Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/guide/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
+Now that you've got your Meltano instance up and running, visit our [Getting Started Guide](/docs/getting-started.html#connect-a-data-source) to connect some data sources and start building your data pipelines and dashboards!
 
 :::tip Build a Custom Meltano Droplet on DigitalOcean
 Looking to customize your DigitalOcean Droplet build and configuration? Please follow the instructions in our [Advanced Tutorial: Manually Creating a DigitalOcean Droplet](/tutorials/manual-digitalocean-droplet.html).
@@ -169,7 +169,7 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 
 ## Local Installation
 
-In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/guide/installation.html#installing-on-docker).
+In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
 
 ::: tip
 We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
@@ -285,7 +285,7 @@ meltano --version
 
 That's it! Meltano is now be available for you to use.
 
-Now that you have successfully [installed Meltano](/guide/installation.html) and its requirements, you can create your first project.
+Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
 #### Create your first project
 
@@ -320,7 +320,7 @@ You are now ready to add data sources, configure reporting databases, schedule u
 
 #### Installing on Docker
 
-[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/guide/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
+[Docker](https://www.docker.com/) is an alternative installation option to [using a virtual environment to run Meltano](/docs/installation.html#virtual-environment). To use these instructions you will need to [install Docker](https://docs.docker.com/install/) onto your computer and have it running when you execute the commands below.
 
 ##### Using Pre-built Docker Images
 
@@ -340,7 +340,7 @@ docker run meltano/meltano --version
 
 ##### Initialize Your Project
 
-Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/guide/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
+Once you have Docker installed, running, and have pulled the pre-built image you can use Meltano just as you would in our [Getting Started Guide](/docs/getting-started.html). However, the command line syntax is slightly different. For example, let's create a new Meltano project:
 
 ```
 docker run -v $(pwd):/projects \
@@ -367,7 +367,7 @@ You can now visit [http://localhost:5000](http://localhost:5000) to access the M
 
 If you are a Meltano end-user who is not going to be contributing code to our open source repository, you should be able to use Meltano entirely from the UI at this point.
 
-Follow the steps in our [Getting Started Guide](/guide/getting-started.html) to get started.
+Follow the steps in our [Getting Started Guide](/docs/getting-started.html) to get started.
 
 #### For Contributors: Example Command Line Syntax for Docker
 
