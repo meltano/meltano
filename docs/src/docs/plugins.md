@@ -119,9 +119,9 @@ If you are successful, you should see `Added and installed extractors 'tap-fastl
 1. Add the following variables to your file:
 
 ```bash
-export FASTLY_API_TOKEN="yourFastlyApiToken"
+export TAP_FASTLY_API_TOKEN="yourFastlyApiToken"
 # The date uses ISO-8601 and supports time if desired
-export FASTLY_START_DATE="YYYY-MM-DD"
+export TAP_FASTLY_START_DATE="YYYY-MM-DD"
 ```
 
 ## GitLab
@@ -257,11 +257,11 @@ If you are successful, you should see `Added and installed extractors 'tap-marke
 1. Add the following variables to your file:
 
 ```bash
-export MARKETO_CLIENT_ID="yourClientId"
-export MARKETO_CLIENT_SECRET="yourClientSecret"
-export MARKETO_ENDPOINT="yourEndpointUrl"
-export MARKETO_IDENTITY="yourIdentity"
-export MARKETO_START_TIME="yourStartTime"
+export TAP_MARKETO_CLIENT_ID="yourClientId"
+export TAP_MARKETO_CLIENT_SECRET="yourClientSecret"
+export TAP_MARKETO_ENDPOINT="yourEndpointUrl"
+export TAP_MARKETO_IDENTITY="yourIdentity"
+export TAP_MARKETO_START_TIME="yourStartTime"
 ```
 
 ## MongoDB
@@ -295,15 +295,15 @@ If you are successful, you should see `Added and installed extractors 'tap-mongo
 
 ```bash
 # MongoDB databse host URI
-export MONGODB_HOST=""
+export TAP_MONGODB_HOST=""
 # MongoDB database port
-export MONGODB_PORT=""
+export TAP_MONGODB_PORT=""
 # MongoDB database username
 export MONGODB_USERNAME=""
 # MongoDB database password
-export MONGODB_PASSWORD=""
+export TAP_MONGODB_PASSWORD=""
 # MongoDB database name
-export MONGODB_DBNAME=""
+export TAP_MONGODB_DBNAME=""
 ```
 
 ## Salesforce
@@ -332,11 +332,11 @@ If you are successful, you should see `Added and installed extractors 'tap-sales
 1. Add the following variables to your file:
 
 ```bash
-export SFDC_CLIENT_ID="yourSalesforceClientId"
-export SFDC_PASSWORD="yourSalesforcePassword"
-export SFDC_SECURITY_TOKEN="yourSalesforceSecurityToken"
-export SFDC_START_DATE="yourSalesforceStartDate"
-export SFDC_USERNAME="yourSalesforceUsername"
+export TAP_SALESFORCE_CLIENT_ID="yourSalesforceClientId"
+export TAP_SALESFORCE_PASSWORD="yourSalesforcePassword"
+export TAP_SALESFORCE_SECURITY_TOKEN="yourSalesforceSecurityToken"
+export TAP_SALESFORCE_START_DATE="yourSalesforceStartDate"
+export TAP_SALESFORCE_USERNAME="yourSalesforceUsername"
 ```
 
 ## Stripe
@@ -367,7 +367,7 @@ If you are successful, you should see `Added and installed extractors 'tap-strip
 ```bash
 export STRIPE_API_KEY="yourStripeApiKey"
 # The date uses ISO-8601 and supports time if desired
-export STRIPE_START_DATE="YYYY-MM-DD"
+export TAP_STRIPE_START_DATE="YYYY-MM-DD"
 ```
 
 ## Zendesk
@@ -396,9 +396,9 @@ If you are successful, you should see `Added and installed extractors 'tap-zende
 1. Add the following variables to your file:
 
 ```bash
-export ZENDESK_EMAIL="yourZendeskEmail"
-export ZENDESK_API_TOKEN="yourZendeskApiToken"
-export ZENDESK_SUBDOMAIN="yourZendeskSubdomain"
+export TAP_ZENDESK_EMAIL="yourZendeskEmail"
+export TAP_ZENDESK_API_TOKEN="yourZendeskApiToken"
+export TAP_ZENDESK_SUBDOMAIN="yourZendeskSubdomain"
 # The date uses ISO-8601 and supports time if desired
-export ZENDESK_START_DATE="yourZendeskStartDate"
+export TAP_ZENDESK_START_DATE="yourZendeskStartDate"
 ```

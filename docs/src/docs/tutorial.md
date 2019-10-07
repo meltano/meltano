@@ -142,28 +142,26 @@ meltano add loader target-postgres
 ```
 
 ### Set Your Credentials
-Update the .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
+Create a .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
+**.env**
 ```
-FLASK_ENV=development
+export PG_PASSWORD=warehouse
+export PG_USERNAME=warehouse
+export PG_ADDRESS=localhost
+export PG_PORT=5502
+export PG_DATABASE=warehouse
 
-PG_PASSWORD=warehouse
-PG_USERNAME=warehouse
-PG_ADDRESS=localhost
-PG_SCHEMA=analytics
-PG_PORT=5502
-PG_DATABASE=warehouse
+export TAP_SALESFORCE_URL=
+export TAP_SALESFORCE_USERNAME=''
+export TAP_SALESFORCE_PASSWORD=''
+export TAP_SALESFORCE_SECURITY_TOKEN=''
+export TAP_SALESFORCE_CLIENT_ID='secret_client_id'
 
-SFDC_URL=
-SFDC_USERNAME=''
-SFDC_PASSWORD=''
-SFDC_SECURITY_TOKEN=''
-SFDC_CLIENT_ID='secret_client_id'
-
-SFDC_START_DATE='2019-03-01T00:00:00Z'
+export TAP_SALESFORCE_START_DATE='2019-03-01T00:00:00Z'
 ```
 
-You can leave `SFDC_URL` and `SFDC_CLIENT_ID` as they are in the example above, but you have to set `SFDC_USERNAME`, `SFDC_PASSWORD` and `SFDC_SECURITY_TOKEN` and `SFDC_START_DATE` according to your instance and preferences.
+You can leave `TAP_SALESFORCE_URL` and `TAP_SALESFORCE_CLIENT_ID` as they are in the example above, but you have to set `TAP_SALESFORCE_USERNAME`, `TAP_SALESFORCE_PASSWORD` and `TAP_SALESFORCE_SECURITY_TOKEN` and `TAP_SALESFORCE_START_DATE` according to your instance and preferences.
 
 ### Select The Entities to Export from Salesforce
 
@@ -192,7 +190,7 @@ Run the full Extract > Load > Transform pipeline:
 meltano elt tap-salesforce target-postgres --transform run
 ```
 
-Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `SFDC_START_DATE` not too far in the past for your first test.
+Depending on your Account, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `TAP_SALESFORCE_START_DATE` not too far in the past for your first test.
 
 You could also extract and load the data and then run the transformations at a later point (examples below):
 
@@ -269,7 +267,7 @@ When you visit the URL, you will be using the default connection to Meltano's SQ
   - Host = `localhost`
   - Port = `5502`
   - Database, Username, Password = `warehouse`
-  - Schema = `analytics`
+  - Schema = `tap_salesforce` (or whatever the namespace of the tap is, by default the name of the tap with underscores instead of `-`s)
 3. Click "Save Connection"
 
 You can now query and explore the extracted data:
@@ -458,8 +456,8 @@ Let's create two additional tables:
 
 These tables must be added as dbt models (`.sql` files) under the sfdc-project/transform/models/my_meltano_project/ directory or any of its subdirectories.
 
+**opportunity_won.sql**
 ```bash
-# opportunity_won.sql
 with source as (
     
     -- Use the base sf_opportunity model defined by Meltano's 
@@ -509,8 +507,8 @@ opportunity_won as (
 select * from opportunity_won
 ```
 
+**account_category.sql**
 ```bash
-# account_category.sql
 with source as (
     
     -- Use the base sf_opportunity model defined by Meltano's 
@@ -560,8 +558,7 @@ models:
     materialized: table
   tap_salesforce:
     vars:
-      livemode: false
-      schema: '{{ env_var(''PG_SCHEMA'') }}'
+      schema: '{{ env_var(''MELTANO_LOAD_SCHEMA'') }}'
 ```
 
 We are now ready to run the required [ELT steps](./tutorial.html#run-elt-extract-load-transform) again.
@@ -571,6 +568,7 @@ Runs transformation step only
 ```bash
 meltano elt tap-salesforce target-postgres --transform only
 ```
+
 ### Adding Custom Models
 
 In order to access the newly transformed data in the UI, 2 additional types of files must be created:
@@ -580,8 +578,8 @@ In order to access the newly transformed data in the UI, 2 additional types of f
 
 These files must be added as [.m5o](./architecture.html#meltano-model) files under the sfdc-project/model/ directory.
 
+**opportunity_won.table.m5o**
 ```bash
-# opportunity_won.table.m5o
 {
   version = 1
   sql_table_name = opportunity_won
@@ -671,8 +669,8 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 }
 ```
 
+**account_category.table.m5o**
 ```bash
-# account_category.table.m5o
 {
   version = 1
   sql_table_name = account_category
@@ -706,8 +704,8 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 }
 ```
 
+**custom_sfdc.topic.m5o**
 ```bash
-# custom_sfdc.topic.m5o
 {
   version = 1
   name = custom_sfdc
@@ -733,7 +731,13 @@ These files must be added as [.m5o](./architecture.html#meltano-model) files und
 
 ### Interact with Your Data in The Web App
 
-[Interact with Your Data in The Web App](./tutorial.html#interact-with-your-data-in-the-web-app)
+Start Meltano UI:
+
+```
+meltano ui
+```
+
+You can now go to the `Analyze` tab and select one of the design we have created under `Salesforce (Custom)`.
 
 
 ## Advanced - Using tap-postgres with Meltano
@@ -761,7 +765,7 @@ Next step is to add `tap-postgres` as a [custom extractor](./tutorial.html#advan
 ```bash
 meltano add --custom extractor tap-postgres
 
-  (namespace): tap-postgres
+  (namespace): tap_postgres
   (pip_url): tap-postgres
   (executable) [tap-postgres]: tap-postgres
 ```
@@ -771,13 +775,10 @@ We should then update `meltano.yml` and add the configuration parameters this ta
 **meltano.yml**
 ```yaml
 plugins:
-  connections:
-  - name: sqlite
-  - name: postgresql
   extractors:
   - executable: tap-postgres
     name: tap-postgres
-    namespace: tap-postgres
+    namespace: tap_postgres
     pip_url: tap-postgres
     settings:
       - name: dbname
@@ -794,18 +795,14 @@ plugins:
       default_replication_method: FULL_TABLE
       include_schemas_in_destination_stream_name: true
   loaders:
-  - name: target-postgres
-    pip_url: git+https://github.com/meltano/target-postgres.git
-send_anonymous_usage_stats: false
-version: 1.0
+ ... ... ...
 ```
 
-And finally update the project's `.env` to add the proper settings for the source and the target databases. The `TAP_PG_*` variables are used by the Tap (i.e. they define the source DB where the data are extracted from), while the `PG_*` variables are used by the Target (i.e. they define the target DB where the data will be loaded at)
+
+And finally create a .env file in your project directory (i.e. tap-postgres). We are going to add the proper settings for the source and the target databases. The `TAP_PG_*` variables are used by the Tap (i.e. they define the source DB where the data are extracted from), while the `PG_*` variables are used by the Target (i.e. they define the target DB where the data will be loaded at)
 
 **.env**
 ```bash
-export FLASK_ENV=development
-
 export TAP_PG_DATABASE=my_source_db
 export TAP_PG_ADDRESS=localhost
 export TAP_PG_PORT=5432
@@ -817,7 +814,6 @@ export PG_PASSWORD=target_password
 export PG_USERNAME=target_username
 export PG_ADDRESS=localhost
 export PG_PORT=5432
-export PG_SCHEMA='test_tap_postgres'
 ```
 
 Let's make sure that everything has been set correctly:
@@ -829,7 +825,7 @@ meltano config tap-postgres
 
 meltano config target-postgres
 
-  {'user': '***', 'password': '***', 'host': 'localhost', 'port': '5432', 'dbname': 'my_target_db', 'schema': 'test_tap_postgres'}
+  {'user': '***', 'password': '***', 'host': 'localhost', 'port': '5432', 'dbname': 'my_target_db'}
 ```
 
 ### Filtering out data
@@ -893,7 +889,8 @@ You can then check that file and decide which Streams (tables in this case) shou
 
 ### Run Meltano ELT
 
-Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by `PG_SCHEMA` (`test_tap_postgres` in this example)
+Finally run `meltano elt` to export all the selected Entities and load them to the schema of the target DB defined by the custom tap's namespace (`tap-postgres` in this example)
+
 
 ```bash
 meltano elt tap-postgres target-postgres 
@@ -1019,26 +1016,22 @@ Each input CSV file used with [tap-csv](https://gitlab.com/meltano/tap-csv) must
 
 ### Set Your Credentials
 
-Update the .env file in your project directory (i.e. csv-project) with your Postgres DB credentials and the file you are going to use to describe the CSV files to be loaded.
+Create a .env file in your project directory (i.e. csv-project) with your Postgres DB credentials and the file you are going to use to describe the CSV files to be loaded.
 
 **.env**
 ```bash
-export FLASK_ENV=development
-
 export PG_DATABASE=warehouse
 export PG_PASSWORD=warehouse
 export PG_USERNAME=warehouse
 export PG_ADDRESS=localhost
 export PG_PORT=5432
 
-export PG_SCHEMA='csv_imports'
-
 export TAP_CSV_FILES_DEFINITION="csv_files.json"
 ```
 
 You should replace the example `warehouse` value as the name of the database, the user and password with your own Postgres credentials and change the address and port if the Postgres is not running locally and on the default Port.
 
-PG_SCHEMA is the schema that will be used to import the raw data to and TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with all the CSV files to be loaded.
+TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with all the CSV files to be loaded.
 
 Finally, create the `csv_files.json` file in your project directory:
 
@@ -1065,12 +1058,6 @@ Description of available options:
   - file: Local path (relative to the project's root) to the file to be ingested.
   - keys: The names of the columns that constitute the unique keys for that entity.
 
-Finally, make the credentials available to Meltano by executing the following command in your terminal:
-
-```bash
-source .env
-```
-
 ### Load the CSV files to Postgres
 
 Run the Extract > Load pipeline:
@@ -1079,9 +1066,9 @@ Run the Extract > Load pipeline:
 meltano elt tap-csv target-postgres
 ```
 
-The extracted data will be available to the Postgres schema defined by `PG_SCHEMA`.
+The extracted data will be available to the `tap_csv` Postgres schema.
 
-Using our running example, tables `users`, `episodes` and `streams` will be available in the `csv_imports` schema, with all the data from the original CSV files loaded as records.
+Using our running example, tables `users`, `episodes` and `streams` will be available in the `tap_csv` schema, with all the data from the original CSV files loaded as records.
 
 ### Motivation for transforming the raw extracted data
 
@@ -1117,11 +1104,10 @@ The name of each Transform's file will be the name of the final table in the `an
 - `gitflix_streams.sql`
 
 **transform/models/my_meltano_project/gitflix_users.sql**
-
 ```sql
 with source as (
 
-    select * from {{ env_var('PG_SCHEMA') }}.users
+    select * from {{ env_var('MELTANO_LOAD_SCHEMA') }}.users
 
 ),
 
@@ -1187,11 +1173,10 @@ select * from renamed
 ```
 
 **transform/models/my_meltano_project/gitflix_episodes.sql**
-
 ```sql
 with source as (
 
-    select * from {{ env_var('PG_SCHEMA') }}.episodes
+    select * from {{ env_var('MELTANO_LOAD_SCHEMA') }}.episodes
 
 ),
 
@@ -1231,11 +1216,10 @@ select * from renamed
 ```
 
 **transform/models/my_meltano_project/gitflix_streams.sql**
-
 ```sql
 with source as (
 
-    select * from {{ env_var('PG_SCHEMA') }}.streams
+    select * from {{ env_var('MELTANO_LOAD_SCHEMA') }}.streams
 
 ),
 
@@ -1269,7 +1253,7 @@ renamed as (
 select * from renamed
 ```
 
-In the transforms above we could have hard coded the schema the raw tables reside inside (in this example `csv_imports`), but we make use of the fact that it is defined by the environmental variable `PG_SCHEMA` and use that instead. That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
+In the transforms above we could have hard coded the schema the raw tables reside inside (in this example `tap_csv`), but we make use of the fact that it is defined by the environmental variable `MELTANO_LOAD_SCHEMA` and use that instead. That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
 
 ### Run the Custom Transforms
 
@@ -1551,7 +1535,11 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 
 With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
 
-[Start Meltano UI and setup a connection to your Postgres](./tutorial.html#interact-with-your-data-in-the-web-app)
+Start Meltano UI:
+
+```
+meltano ui
+```
 
 You can now go to the `Analyze` tab and select one of the three Designs we have created:
 
@@ -1615,18 +1603,21 @@ pip install matplotlib
 
 Once the installation is completed, you are set to use Jupyter Notebooks with Meltano.
 
-### Running Jupyter Notebook 
+### Set Your Credentials
+Create a .env file in your project directory (i.e. sfdc-project) with the SFDC and Postgres DB credentials.
 
-(**Optional**) Navigate to your Meltano Project and make the credentials you used with Meltano available to the environment the Jupyter Notebook will run:
-
-```bash
-cd /path/to/my/meltano/project
-set +a
-source .env
-set -a 
+**.env**
+```
+export PG_PASSWORD=warehouse
+export PG_USERNAME=warehouse
+export PG_ADDRESS=localhost
+export PG_PORT=5502
+export PG_DATABASE=warehouse
 ```
 
-This is an optional step, but allows us to use the same credentials (e.g. for connecting to Postgres) from inside Jupyter Notebook without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.
+This is an optional step, but allows us to use the same credentials from inside all Jupyter Notebooks without entering them again and, more importantly, without exposing any sensitive information inside the Notebook in case you want to share the Notebook with others.
+
+### Running Jupyter Notebook 
 
 You can now navigate to Meltano's directory for storing your notebooks and [start Jupyter Notebook](https://jupyter.readthedocs.io/en/latest/running.html#running):
 
