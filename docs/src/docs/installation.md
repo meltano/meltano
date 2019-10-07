@@ -8,10 +8,10 @@ This section provides step-by-step guides for installing Meltano in various envi
 
 ## DigitalOcean Marketplace
 
-DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](/docs/installation.html#digitalocean-marketplace)
+DigitalOcean provides a simple container for spinning up a server where Meltano can be deployed to the Cloud. [Install the Meltano 1-Click App in the DigitalOcean Marketplace](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322)
 
 :::tip Get $50 Worth of DigitalOcean Credits for Free
-When you create a new DigitalOcean account using [this link](/docs/installation.html#digitalocean-marketplace) (which contains our referral code) you will receive $50 of free credit over 30 days.
+When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
 ### Video Walkthrough
