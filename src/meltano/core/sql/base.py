@@ -414,8 +414,8 @@ class MeltanoTimeframe(MeltanoBase):
         (table, column) = self.sql.split(".")
         return column
 
-    def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}"
+    def alias(self, period) -> str:
+        return self.period_alias(period)
 
     def period_column_name(self, period) -> str:
         period_name = period.get("name", None)
@@ -1047,7 +1047,7 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
-                            "key": t.alias(),
+                            "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
                             "attribute_name": t.period_alias(period),
@@ -1223,7 +1223,7 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
-                            "key": t.alias(),
+                            "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
                             "attribute_name": t.period_alias(period),
