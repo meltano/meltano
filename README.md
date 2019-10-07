@@ -16,7 +16,7 @@ For more information on the source code for the docs and running it locally, you
 
 ## Contributing to Meltano
 
-We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/docs/contributing.html)
+We welcome contributions and improvements, please see the [contribution guidelines](https://meltano.com/guide/contributing.html)
 
 ## License
 
