@@ -770,11 +770,21 @@ const mutations = {
         orderableAttribute.attributeName === queryAttribute.attributeName
       const isAccountedFor = accounted.find(finder)
       if (!isAccountedFor) {
-        const targetAttribute = allAttributes.find(
-          attribute =>
+        const targetAttribute = allAttributes.find(attribute => {
+          // Account for timeframes matching
+          let period = null
+          if (attribute.periods) {
+            period = attribute.periods.find(
+              period => period.name === queryAttribute.attributeName
+            )
+          }
+
+          const targetName = period ? period.name : attribute.name
+          return (
             attribute.sourceName === queryAttribute.sourceName &&
-            attribute.name === queryAttribute.attributeName
-        )
+            targetName === queryAttribute.attributeName
+          )
+        })
         state.order.unassigned.push({
           sourceName: targetAttribute.sourceName,
           sourceLabel: targetAttribute.sourceLabel,

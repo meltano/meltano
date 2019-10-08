@@ -57,8 +57,8 @@ export default {
       >
         <transition-group>
           <div
-            v-for="orderable in unassigned"
-            :key="`${orderable.sourceName}-${orderable.attributeName}`"
+            v-for="(orderable, index) in unassigned"
+            :key="`${orderable.sourceName}-${orderable.attributeName}-${index}`"
             class="drag-list-item has-background-white"
           >
             <div class="drag-handle has-text-weight-normal">
