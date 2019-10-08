@@ -434,7 +434,7 @@ class MeltanoTimeframe(MeltanoBase):
         if not label:
             raise ParseError(f"Requested period {period} has no name.")
 
-        return f"{label}"
+        return f"{label} ({self.table.find_source_name()}.{self.column_name()})"
 
     def period_sql(
         self, period, base_table: str = None, pika_table=None
