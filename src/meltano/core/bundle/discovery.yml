@@ -48,6 +48,7 @@ extractors:
       - name: ultimate_license
         value: false
         kind: boolean
+        description: Provides additional data only available for GitLab Ultimate and GitLab.com Gold accounts
         env: GITLAB_API_ULTIMATE_LICENSE
       - name: start_date
         env: GITLAB_API_START_DATE
