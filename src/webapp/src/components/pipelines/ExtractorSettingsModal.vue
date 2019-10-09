@@ -25,9 +25,6 @@ export default {
         this.extractorInFocusConfiguration.settings.length === 0
       )
     },
-    extractorLacksConfigSettingsAndIsInstalled() {
-      return !this.isInstalling && this.extractorLacksConfigSettings
-    },
     extractor() {
       return this.getInstalledPlugin('extractors', this.extractorNameFromRoute)
     },
@@ -89,10 +86,16 @@ export default {
       }
     },
     prepareExtractorConfiguration() {
-      this.$store.dispatch(
-        'configuration/getExtractorConfiguration',
-        this.extractorNameFromRoute
-      )
+      this.$store
+        .dispatch(
+          'configuration/getExtractorConfiguration',
+          this.extractorNameFromRoute
+        )
+        .then(() => {
+          if (this.extractorLacksConfigSettings) {
+            this.saveConfigAndBeginEntitySelection()
+          }
+        })
     },
     saveConfigAndBeginEntitySelection() {
       this.$store
@@ -161,28 +164,10 @@ export default {
             </p>
           </div>
         </template>
-
-        <template v-if="extractorLacksConfigSettingsAndIsInstalled">
-          <div class="content">
-            <p>{{ extractorNameFromRoute }} doesn't require configuration.</p>
-            <ul>
-              <li>Click "Next" to advance</li>
-              <li>Click "Cancel" to install other extractors</li>
-            </ul>
-          </div>
-        </template>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Cancel</button>
         <button
-          v-if="extractorLacksConfigSettingsAndIsInstalled"
-          class="button is-interactive-primary"
-          @click="saveConfigAndBeginEntitySelection"
-        >
-          Next
-        </button>
-        <button
-          v-else
           class="button is-interactive-primary"
           :disabled="!isSaveable"
           @click="saveConfigAndBeginEntitySelection"
