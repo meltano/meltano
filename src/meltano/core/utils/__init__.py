@@ -23,7 +23,7 @@ def compose(*fs):
         f(g(x))``.
     :return: I{callable} taking 1 argument.
     """
-    return reduce(lambda f, g: lambda x: f(g(x)), fs, lambda x: x)
+    return reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
