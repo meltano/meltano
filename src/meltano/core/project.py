@@ -36,7 +36,6 @@ class Project(Versioned):
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
-        self._meltano = {}
         self._meltano_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
@@ -88,14 +87,15 @@ class Project(Versioned):
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
-        # update the process cache to the latest version
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-            self.meltanofile.open() as meltanofile:
-            self._meltano = yaml.load(meltanofile, Loader=yaml.SafeLoader)
+            self._meltano_lock:
+            return self._load_meltano()
         # fmt: on
 
-        return deepcopy(self._meltano)
+    def _load_meltano(self):
+        with self.meltanofile.open() as meltanofile:
+            return yaml.load(meltanofile, Loader=yaml.SafeLoader)
 
     @contextmanager
     def meltano_update(self):
@@ -103,25 +103,23 @@ class Project(Versioned):
         Yield the current meltano configuration and update the meltanofile
         if the context ends gracefully.
         """
-        try:
-            with self._meltano_rw_lock.write_lock(), self._meltano_lock:
-                meltano_update = self.meltano
+        # fmt: off
+        with self._meltano_rw_lock.write_lock(), \
+            self._meltano_lock:
+            # read the latest version
+            meltano_update = self._load_meltano()
+            yield meltano_update
 
-                if meltano_update is None:
-                    logging.critical(f"self.meltano returned None!")
-
-                yield meltano_update
-
-                # save it
-                with self.meltanofile.open("w") as meltanofile:
+            # save it
+            with self.meltanofile.open("w") as meltanofile:
+                try:
                     meltanofile.write(
                         yaml.dump(meltano_update, default_flow_style=False)
                     )
-
-                self._meltano = meltano_update
-        except Exception as err:
-            logging.error(f"Could not update meltano.yml: {err}")
-            raise
+                except Exception as err:
+                    logging.error(f"Could not update meltano.yml: {err}")
+                    raise
+        # fmt: on
 
     def makedirs(func):
         @wraps(func)
