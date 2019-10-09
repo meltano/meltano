@@ -28,15 +28,18 @@ class Project(Versioned):
     perspective.
     """
 
-    _meltano = {}
     __version__ = 1
     _activate_lock = threading.Lock()
     _find_lock = threading.Lock()
-    _meltano_lock = fasteners.ReaderWriterLock()
+    _meltano_rw_lock = fasteners.ReaderWriterLock()
     _default = None
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
+        self._meltano = {}
+        self._meltano_lock = fasteners.InterProcessLock(
+            self.run_dir("meltano.yml.lock")
+        )
 
     @classmethod
     @fasteners.locked(lock="_activate_lock")
@@ -87,9 +90,8 @@ class Project(Versioned):
         """Return a copy of the current meltano config"""
         # update the process cache to the latest version
         # fmt: off
-        with self._meltano_lock.read_lock(), \
-          fasteners.InterProcessLock(self.run_dir("meltano.yml.lock")), \
-          self.meltanofile.open() as meltanofile:
+        with self._meltano_rw_lock.read_lock(), \
+            self.meltanofile.open() as meltanofile:
             self._meltano = yaml.load(meltanofile, Loader=yaml.SafeLoader)
         # fmt: on
 
@@ -102,10 +104,12 @@ class Project(Versioned):
         if the context ends gracefully.
         """
         try:
-            with self._meltano_lock.write_lock(), fasteners.InterProcessLock(
-                self.run_dir("meltano.yml.lock")
-            ):
+            with self._meltano_rw_lock.write_lock(), self._meltano_lock:
                 meltano_update = self.meltano
+
+                if meltano_update is None:
+                    logging.critical(f"self.meltano returned None!")
+
                 yield meltano_update
 
                 # save it
