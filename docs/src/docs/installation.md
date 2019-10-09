@@ -14,6 +14,8 @@ DigitalOcean provides a simple container for spinning up a server where Meltano 
 When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
+Please note, at times the Meltano version on DigitalOcean may be slightly behind the [current PyPi version](https://pypi.org/project/meltano/).
+
 ### Video Walkthrough
 
 <p></p>
