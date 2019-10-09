@@ -14,6 +14,8 @@ DigitalOcean provides a simple container for spinning up a server where Meltano 
 When you create a new DigitalOcean account using [this link](https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322) (which contains our referral code) you will receive $50 of free credit over 30 days.
 :::
 
+Please note, at times the Meltano version on DigitalOcean may be slightly behind the [current PyPi version](https://pypi.org/project/meltano/).
+
 ### Video Walkthrough
 
 <p></p>
@@ -172,7 +174,7 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
 
 ::: tip
-We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
+We do not have a double click installer at this time, but [it is in our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
 :::
 
 ### Requirements
