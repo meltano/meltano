@@ -91,9 +91,19 @@ export default {
       deep: true
     }
   },
+  mounted() {
+    this.$nextTick(this.focusFirstEmptyInput)
+  },
   methods: {
     findLabel(setting) {
       return setting.options.find(item => item.value === setting.value).label
+    },
+    focusFirstEmptyInput() {
+      const inputs = Array.from(this.$el.getElementsByTagName('input'))
+      const firstEmptyInput = inputs.find(el => !el.value)
+      if (firstEmptyInput) {
+        firstEmptyInput.focus()
+      }
     }
   }
 }
@@ -102,81 +112,85 @@ export default {
 <template>
   <div>
     <slot name="top" />
-    <div
-      v-for="setting in configSettings.settings"
-      :key="setting.name"
-      class="field is-horizontal"
-    >
-      <div :class="['field-label', labelClass]">
-        <label class="label">{{
-          setting.label || getCleanedLabel(setting.name)
-        }}</label>
-        <TooltipCircle
-          v-if="setting.tooltip"
-          :text="setting.tooltip"
-          class="label-tooltip"
-        />
-      </div>
-      <div class="field-body">
-        <div class="field">
-          <div class="control is-expanded">
-            <!-- Boolean -->
-            <label v-if="getIsOfKindBoolean(setting.kind)" class="checkbox">
-              <input
+
+    <form>
+      <div
+        v-for="setting in configSettings.settings"
+        :key="setting.name"
+        class="field is-horizontal"
+      >
+        <div :class="['field-label', labelClass]">
+          <label class="label">{{
+            setting.label || getCleanedLabel(setting.name)
+          }}</label>
+          <TooltipCircle
+            v-if="setting.tooltip"
+            :text="setting.tooltip"
+            class="label-tooltip"
+          />
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control is-expanded">
+              <!-- Boolean -->
+              <label v-if="getIsOfKindBoolean(setting.kind)" class="checkbox">
+                <input
+                  v-model="configSettings.config[setting.name]"
+                  :class="successClass(setting)"
+                  type="checkbox"
+                />
+              </label>
+
+              <!-- Date -->
+              <InputDateIso8601
+                v-else-if="getIsOfKindDate(setting.kind)"
                 v-model="configSettings.config[setting.name]"
-                :class="successClass(setting)"
-                type="checkbox"
+                :name="setting.name"
+                :input-classes="`is-small ${successClass(setting)}`"
               />
-            </label>
 
-            <!-- Date -->
-            <InputDateIso8601
-              v-else-if="getIsOfKindDate(setting.kind)"
-              v-model="configSettings.config[setting.name]"
-              :name="setting.name"
-              :input-classes="`is-small ${successClass(setting)}`"
-            />
-
-            <!-- Dropdown -->
-            <div
-              v-else-if="getIsOfKindOptions(setting.kind)"
-              class="select is-small is-fullwidth"
-            >
-              <select
-                :id="`${setting.name}-select-menu`"
-                v-model="configSettings.config[setting.name]"
-                :name="`${setting.name}-options`"
-                :class="successClass(setting)"
+              <!-- Dropdown -->
+              <div
+                v-else-if="getIsOfKindOptions(setting.kind)"
+                class="select is-small is-fullwidth"
               >
-                <option
-                  v-for="(option, index) in setting.options"
-                  :key="`${option.label}-${index}`"
-                  :value="option.value"
+                <select
+                  :id="`${setting.name}-select-menu`"
+                  v-model="configSettings.config[setting.name]"
+                  :name="`${setting.name}-options`"
+                  :class="successClass(setting)"
                 >
-                  {{ option.label }}
-                </option>
-              </select>
-            </div>
+                  <option
+                    v-for="(option, index) in setting.options"
+                    :key="`${option.label}-${index}`"
+                    :value="option.value"
+                  >
+                    {{ option.label }}
+                  </option>
+                </select>
+              </div>
 
-            <!-- Text / Password / Email -->
-            <input
-              v-else-if="getIsOfKindTextBased(setting.kind)"
-              v-model="configSettings.config[setting.name]"
-              :class="['input', fieldClass, successClass(setting)]"
-              :type="getTextBasedInputType(setting)"
-              :placeholder="setting.value || setting.name"
-              @focus="$event.target.select()"
-            />
+              <!-- Text / Password / Email -->
+              <input
+                v-else-if="getIsOfKindTextBased(setting.kind)"
+                v-model="configSettings.config[setting.name]"
+                :class="['input', fieldClass, successClass(setting)]"
+                :type="getTextBasedInputType(setting)"
+                :placeholder="setting.value || setting.name"
+                @focus="$event.target.select()"
+              />
+            </div>
+            <p v-if="setting.description" class="help is-italic">
+              {{ setting.description }}
+            </p>
+            <p v-if="setting.documentation" class="help">
+              <a :href="setting.documentation">More Info.</a>
+            </p>
           </div>
-          <p v-if="setting.description" class="help is-italic">
-            {{ setting.description }}
-          </p>
-          <p v-if="setting.documentation" class="help">
-            <a :href="setting.documentation">More Info.</a>
-          </p>
         </div>
       </div>
-    </div>
+    </form>
+
     <slot name="bottom" />
   </div>
 </template>
