@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1080](https://gitlab.com/meltano/meltano/issues/1080) Temporarily disable Intercom until userId strategy is determined
+- [#1058](https://gitlab.com/meltano/meltano/issues/1058) Updated the selected state of grouped buttons to fill vs. stroke. Updated the docs to reflect the reasoning to ensure consistency in Meltano's UI visual language
 
 ### Fixes
 
