@@ -10,6 +10,7 @@ from meltano.core.permissions.utils.error import SpecLoadingError
 from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnector
 from meltano.core.permissions.spec_schemas.snowflake import *
 from meltano.core.permissions.utils.snowflake_grants import SnowflakeGrantsGenerator
+from meltano.core.permissions.utils.snowflake_revoke import SnowflakeRevokesGenerator
 
 
 VALIDATION_ERR_MSG = 'Spec error: {} "{}", field "{}": {}'
@@ -18,19 +19,19 @@ VALIDATION_ERR_MSG = 'Spec error: {} "{}", field "{}": {}'
 class SnowflakeSpecLoader:
     def __init__(self, spec_path: str) -> None:
         # Load the specification file and check for (syntactical) errors
-        click.secho("(1/5) Loading spec file", fg="green")
+        click.secho("Loading spec file", fg="green")
         self.spec = self.load_spec(spec_path)
 
         # Generate the entities (e.g databases, schemas, users, etc) referenced
         #  by the spec file and make sure that no syntatical or refernce errors
         #  exist (all referenced entities are also defined by the spec)
-        click.secho("(2/5) Checking spec file for errors", fg="green")
+        click.secho("Checking spec file for errors", fg="green")
         self.entities = self.inspect_spec()
 
         # Connect to Snowflake to make sure that all entities defined in the
         #  spec file are also defined in Snowflake (no missing databases, etc)
         click.secho(
-            "(3/5) Checking that all entities in the spec file are defined in Snowflake",
+            "Checking that all entities in the spec file are defined in Snowflake",
             fg="green",
         )
         self.check_entities_on_snowflake_server()
@@ -38,7 +39,7 @@ class SnowflakeSpecLoader:
         # Get the privileges granted to users and roles in the Snowflake account
         # Used in order to figure out which permissions in the spec file are
         #  new ones and which already exist (and there is no need to re-grant them)
-        click.secho("(4/5) Fetching granted privileges from Snowflake", fg="green")
+        click.secho("Fetching granted privileges from Snowflake", fg="green")
         self.grants_to_role = {}
         self.roles_granted_to_user = {}
         self.get_privileges_from_snowflake_server()
@@ -559,6 +560,49 @@ class SnowflakeSpecLoader:
         for user in self.entities["users"]:
             self.roles_granted_to_user[user] = conn.show_roles_granted_to_user(user)
 
+    def generate_revoke_queries(self) -> List[Dict]:
+        sql_commands = []
+
+        generator = SnowflakeRevokesGenerator(
+            self.grants_to_role, self.roles_granted_to_user
+        )
+        
+        click.secho("Generating revoke statements for Snowflake", fg="green")
+
+        
+        # fake_command = {"sql": "REVOKE THIS", "already_granted": False}
+        
+        for entity_type, entry in self.spec.items():
+            if entity_type in ["databases", "warehouses", "version"]:
+                continue
+
+            for entity_dict in entry:
+                entity_configs = [
+                    (entity_name, config)
+                    for entity_name, config in entity_dict.items()
+                    if config
+                ]
+
+                for entity_name, config in entity_configs:
+                    if entity_type == "roles":
+                        click.secho(f"     Processing role {entity_name}", fg="green")
+                        sql_commands.extend(
+                            generator.generate_revoke_roles("ROLE", entity_name, config)
+                        )
+
+                        sql_commands.extend(
+                            generator.generate_revoke_privileges_to_role(
+                                entity_name, config, self.entities["shared_databases"]
+                            )
+                        )
+                    elif entity_type == "users":
+                        click.secho(f"     Processing user {entity_name}", fg="green")
+                        sql_commands.extend(
+                            generator.generate_revoke_roles("USER", entity_name, config)
+                        )
+
+        return self.remove_duplicate_queries(sql_commands)
+
     def generate_permission_queries(self) -> List[Dict]:
         """
         Starting point to generate all the permission queries.
@@ -574,7 +618,7 @@ class SnowflakeSpecLoader:
             self.grants_to_role, self.roles_granted_to_user
         )
 
-        click.secho("(5/5) Generating permission Queries:", fg="green")
+        click.secho("Generating permission Queries:", fg="green")
 
         # For each permission in the spec, check if we have to generate an
         #  SQL command granting that permission
@@ -619,6 +663,7 @@ class SnowflakeSpecLoader:
 
     def remove_duplicate_queries(self, sql_commands: Dict) -> List[Dict]:
         grants = []
+        revokes = []
 
         for i, command in reversed(list(enumerate(sql_commands))):
             # Find all "GRANT OWNERSHIP commands"
@@ -632,5 +677,15 @@ class SnowflakeSpecLoader:
                     del sql_commands[i]
                 else:
                     grants.append(grant)
+            
+            if command["sql"].startswith("REVOKE ALL"):
+                revoke = command["sql"].upper()
+                if revoke in revokes:
+                    # If there is already a GRANT OWNERSHIP for the same
+                    #  DB/SCHEMA/TABLE --> remove the one before it
+                    #  (only keep the last one)
+                    del sql_commands[i]
+                else:
+                    revokes.append(revoke)
 
         return sql_commands
