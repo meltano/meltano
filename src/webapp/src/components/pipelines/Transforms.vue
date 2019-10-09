@@ -117,7 +117,7 @@ export default {
                 <button
                   v-for="transformOption in transformOptions"
                   :key="transformOption.label"
-                  class="button is-outlined"
+                  class="button"
                   :class="{
                     'is-selected is-interactive-secondary':
                       transformOption === selectedTransformOption
