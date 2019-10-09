@@ -194,9 +194,18 @@ class SnowflakeSpecLoader:
                 for entity_name, config in entity_dict.items():
                     if entity_type == "databases":
                         entities["databases"].add(entity_name)
-
-                        if "shared" in config and config["shared"]:
-                            entities["shared_databases"].add(entity_name)
+                        
+                        if "shared" in config:
+                            if type(config["shared"]) == bool:
+                                if config["shared"]:
+                                    entities["shared_databases"].add(entity_name)
+                            else:
+                                logging.debug(
+                                "`shared` for database {} must be boolean, skipping Role Reference generation.".format(
+                                    entity_name
+                                )
+                            )
+                                
 
                     elif entity_type == "roles":
                         entities["roles"].add(entity_name)
