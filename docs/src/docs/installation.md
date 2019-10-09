@@ -174,7 +174,7 @@ Once you complete the cluster setup, you should be brought to the detail page fo
 In this section, we will install Meltano as an application you can access locally from your browser and on the command line. If you prefer to install to Docker, please view the installation instructions [here](/docs/installation.html#installing-on-docker).
 
 ::: tip
-We do not have a double click installer at this time, but it is in our roadmap and we will be sure to update this page when we do!
+We do not have a double click installer at this time, but [it is in our roadmap](https://gitlab.com/meltano/meltano/issues/1107) and we will be sure to update this page when we do!
 :::
 
 ### Requirements
