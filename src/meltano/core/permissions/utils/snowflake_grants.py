@@ -128,7 +128,11 @@ class SnowflakeGrantsGenerator:
 
         try:
             for warehouse in config["warehouses"]:
-                sql_commands.append(self.generate_warehouse_grants(role, warehouse))
+                new_commands = self.generate_warehouse_grants(
+                    role=role, 
+                    warehouse=warehouse,
+                )
+                sql_commands.extend(new_commands)
         except KeyError:
             logging.debug(
                 "`warehouses` not found for role {}, skipping generation of Warehouse GRANT statements.".format(
@@ -240,7 +244,7 @@ class SnowflakeGrantsGenerator:
 
         return sql_commands
 
-    def generate_warehouse_grants(self, role: str, warehouse: str) -> str:
+    def generate_warehouse_grants(self, role: str, warehouse: str) -> List[str]:
         """
         Generate the GRANT statements for Warehouse usage (only one type at the moment).
 
@@ -249,22 +253,43 @@ class SnowflakeGrantsGenerator:
 
         Returns the SQL command generated
         """
+        sql_commands = []
+
         if self.check_grant_to_role(role, "USAGE", "WAREHOUSE", warehouse):
             already_granted = True
         else:
             already_granted = False
 
-        sql_grant = {
-            "already_granted": already_granted,
-            "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                privileges="USAGE",
-                resource_type="WAREHOUSE",
-                resource_name=SnowflakeConnector.snowflaky(warehouse),
-                role=SnowflakeConnector.snowflaky(role),
-            ),
-        }
+        if self.check_grant_to_role(role, "OPERATE", "WAREHOUSE", warehouse):
+            already_granted = True
+        else:
+            already_granted = False
 
-        return sql_grant
+        sql_commands.append(
+            {
+                "already_granted": already_granted,
+                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                    privileges="USAGE",
+                    resource_type="WAREHOUSE",
+                    resource_name=SnowflakeConnector.snowflaky(warehouse),
+                    role=SnowflakeConnector.snowflaky(role),
+                ),
+            }
+        )
+
+        sql_commands.append(
+            {
+                "already_granted": already_granted,
+                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                    privileges="OPERATE",
+                    resource_type="WAREHOUSE",
+                    resource_name=SnowflakeConnector.snowflaky(warehouse),
+                    role=SnowflakeConnector.snowflaky(role),
+                ),
+            }
+        )
+
+        return sql_commands
 
     def generate_database_grants(
         self,
