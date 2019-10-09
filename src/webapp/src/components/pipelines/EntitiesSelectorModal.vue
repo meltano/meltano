@@ -180,12 +180,12 @@ export default {
         <template v-if="!isLoading && hasEntities">
           <div class="columns is-vcentered">
             <div class="column">
-              <div class="buttons are-small has-addons">
+              <div class="buttons has-addons">
                 <!-- TODO remove :disabled attribute when/if we implement a 'Default' feature -->
                 <button
                   v-for="mode in selectionModes"
                   :key="mode.label"
-                  class="button is-outlined"
+                  class="button"
                   :disabled="mode === selectionModes[1]"
                   :class="{
                     'is-selected is-interactive-secondary': getIsSelectedMode(
