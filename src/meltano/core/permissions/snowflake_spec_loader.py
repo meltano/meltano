@@ -166,7 +166,7 @@ class SnowflakeSpecLoader:
                          or in owns entries
 
         Returns a tuple (entities, error_messages) with all the entities defined
-        in the spec and any errors found (e.g. a user not assigned her user role)
+        in the spec and any errors found (e.g. a user not assigned their user role)
         """
         error_messages = []
 
@@ -321,7 +321,7 @@ class SnowflakeSpecLoader:
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
 
-                                if member_role == entity_name:
+                                if member_role == entity_name or member_role == f"{entity_name}_role":
                                     is_member_of_user_role = True
                         except KeyError:
                             logging.debug(
@@ -332,7 +332,7 @@ class SnowflakeSpecLoader:
 
                         if is_member_of_user_role == False:
                             error_messages.append(
-                                f"Role error: User {entity_name} in not a member of her "
+                                f"Role error: User {entity_name} in not a member of their "
                                 f"user role (role with the same name as the user)"
                             )
 
