@@ -199,9 +199,10 @@ Within each aforementioned depth level is an interactive color hierarchy that fu
    - Stroke - Important
 1. Secondary - _`$interactive-secondary`_
    - Supporting interactive elements (various controls) that assist the primary task(s) in the UI
-   - Fill - Hover only
-   - Stroke - Denotes the states of selected, active, and/or valid
-     - Grey represents the opposites: unselected, inactive, and/or invalid
+   - Fill - Most important
+     - Can be used for selected state (typically delegated to stroke) for grouped buttons (examples usage seen in Entity Selection and Transform defaults)
+   - Stroke - Important
+     - Denotes the states of selected, active, and/or valid where grey represents the opposites unselected, inactive, and/or invalid
 1. Tertiary - _Greyscale_
    - Typically white buttons and other useful controls that aren't core or are in support of the primary task(s) in the UI
 1. Navigation - _`$interactive-navigation`_
