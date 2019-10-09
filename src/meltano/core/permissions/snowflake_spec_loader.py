@@ -406,7 +406,7 @@ class SnowflakeSpecLoader:
         """
         error_messages = []
 
-        for db in entities["databases"] | entities["database_refs"]:
+        for db in entities["databases"].union(entities["database_refs"]):
             name_parts = db.split(".")
             if not len(name_parts) == 1:
                 error_messages.append(
