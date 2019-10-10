@@ -331,9 +331,7 @@ const actions = {
   },
 
   checkAutoRun({ dispatch, state }) {
-    if (state.results.length > 0) {
-      dispatch('runQuery')
-    }
+    dispatch('runQuery', state.results.length > 0)
   },
 
   // eslint-disable-next-line no-shadow
@@ -502,9 +500,9 @@ const actions = {
     dispatch('checkAutoRun')
   },
 
-  runQuery() {
+  runQuery(_, isRun = true) {
     this.dispatch('designs/getSQL', {
-      run: true
+      run: isRun
     })
   },
 

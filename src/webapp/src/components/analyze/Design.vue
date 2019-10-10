@@ -115,7 +115,7 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
-    ...mapActions('designs', ['resetErrorMessage']),
+    ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -184,7 +184,6 @@ export default {
 
     columnSelected(column) {
       this.$store.dispatch('designs/toggleColumn', column)
-      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     timeframeSelected(timeframe) {
@@ -196,26 +195,18 @@ export default {
 
     timeframePeriodSelected(period) {
       this.$store.dispatch('designs/toggleTimeframePeriod', period)
-      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     aggregateSelected(aggregate) {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
-      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     joinColumnSelected(join, column) {
       this.$store.dispatch('designs/toggleColumn', column)
-      this.$store.dispatch('designs/getSQL', { run: false })
     },
 
     joinAggregateSelected(join, aggregate) {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
-      this.$store.dispatch('designs/getSQL', { run: false })
-    },
-
-    runQuery() {
-      this.$store.dispatch('designs/getSQL', { run: true })
     },
 
     loadReport(report) {
