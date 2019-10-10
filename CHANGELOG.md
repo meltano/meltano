@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
-- [#1112](https://gitlab.com/meltano/meltano/issues/1112) Fix the "Run" button to improve UX by properly reflect the running state when auto-running queries
+- [#1112](https://gitlab.com/meltano/meltano/issues/1112) Fix the "Run" button to improve UX by properly reflecting the running state for auto-running queries
 
 ### Breaks
 
