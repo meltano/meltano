@@ -10,6 +10,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
 from meltano.core.error import Error
 from . import PluginRef, PluginType, Plugin, PluginInstall
+from .error import PluginMissingError
 from .setting import PluginSetting, REDACTED_VALUE
 
 
