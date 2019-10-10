@@ -2,6 +2,7 @@ from typing import Optional
 from collections import namedtuple
 
 from meltano.core.project import Project
+from meltano.core.job import Job
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import Plugin, PluginType, PluginRef
 from meltano.core.plugin.settings_service import PluginSettingsService
@@ -21,9 +22,14 @@ class PluginContext(namedtuple("PluginContext", "ref install definition config")
 
 class ELTContext:
     def __init__(
-        self, project, loader: PluginContext, extractor: Optional[PluginContext] = None
+        self,
+        project,
+        loader: PluginContext,
+        job: Optional[Job] = None,
+        extractor: Optional[PluginContext] = None,
     ):
         self.project = project
+        self.job = job
         self.loader = loader
         self.extractor = extractor
 
@@ -45,6 +51,7 @@ class ELTContextBuilder:
         config_service: ConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
+        job_id: str = None,
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
@@ -56,6 +63,7 @@ class ELTContextBuilder:
         )
         self._extractor = None
         self._loader = None
+        self._job = None
 
     def with_extractor(self, extractor_name: str):
         self._extractor = PluginRef(PluginType.EXTRACTORS, extractor_name)
@@ -64,6 +72,11 @@ class ELTContextBuilder:
 
     def with_loader(self, loader_name: str):
         self._loader = PluginRef(PluginType.LOADERS, loader_name)
+
+        return self
+
+    def with_job(self, job: Job):
+        self._job = job
 
         return self
 
@@ -83,6 +96,7 @@ class ELTContextBuilder:
         return ELTContext(
             self.project,
             self.plugin_context(session, self._loader),
+            job=self._job,
             extractor=self.plugin_context(session, self._extractor)
             if self._extractor
             else None,

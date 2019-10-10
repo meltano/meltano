@@ -28,18 +28,15 @@ class SingerRunner(Runner):
     def __init__(
         self,
         elt_context: ELTContext,
-        job_id,
         config_service: ConfigService = None,
         connection_service: ConnectionService = None,
         **config,
     ):
         self.context = elt_context
-        self.job_id = job_id
         self.config = config
         self.config_service = config_service or ConfigService(elt_context.project)
         self.connection_service = connection_service or ConnectionService(elt_context)
 
-        self.job = Job(job_id=self.job_id)
         self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
@@ -106,8 +103,14 @@ class SingerRunner(Runner):
             )
 
     def restore_bookmark(self, session, tap: PluginInvoker):
+        if self.context.job is None:
+            logging.info(
+                f"Running outside a Job context: incremental state could not be loaded."
+            )
+            return
+
         # the `state.json` is stored in the database
-        finder = JobFinder(self.job_id)
+        finder = JobFinder(self.context.job.job_id)
         state_job = finder.latest_with_payload(session, flags=SingerPayload.STATE)
 
         if state_job and "singer_state" in state_job.payload:
@@ -118,13 +121,20 @@ class SingerRunner(Runner):
             logging.warning("No state was found, complete import.")
 
     def bookmark_state(self, new_state: str):
+        if self.context.job is None:
+            logging.info(
+                f"Running outside a Job context: incremental state could not be updated."
+            )
+            return
+
         try:
             new_state = json.loads(new_state)
+            job = self.context.job
 
-            self.job.payload["singer_state"] = new_state
-            self.job.payload_flags |= SingerPayload.STATE
-            self.job.ended_at = datetime.utcnow()
-            logging.info(f"Incremental state has been updated at {self.job.ended_at}.")
+            job.payload["singer_state"] = new_state
+            job.payload_flags |= SingerPayload.STATE
+            job.ended_at = datetime.utcnow()
+            logging.info(f"Incremental state has been updated at {job.ended_at}.")
             logging.debug(f"Incremental state: {new_state}")
         except Exception as err:
             logging.warning(
@@ -158,7 +168,6 @@ class SingerRunner(Runner):
         tap.prepare(session)
         target.prepare(session)
 
-        with self.job.run(session):
-            self.restore_bookmark(session, tap)
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(self.invoke(tap, target))
+        self.restore_bookmark(session, tap)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.invoke(tap, target))
