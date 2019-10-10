@@ -115,7 +115,7 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
-    ...mapActions('designs', ['resetErrorMessage']),
+    ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -207,10 +207,6 @@ export default {
 
     joinAggregateSelected(join, aggregate) {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
-    },
-
-    runQuery() {
-      this.$store.dispatch('designs/runQuery')
     },
 
     loadReport(report) {
