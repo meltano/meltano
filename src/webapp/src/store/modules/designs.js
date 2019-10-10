@@ -331,9 +331,7 @@ const actions = {
   },
 
   checkAutoRun({ dispatch, state }) {
-    if (state.results.length > 0) {
-      dispatch('runQuery')
-    }
+    dispatch('runQuery', { run: state.results.length > 0 })
   },
 
   // eslint-disable-next-line no-shadow
