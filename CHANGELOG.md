@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1120](https://gitlab.com/meltano/meltano/issues/1120) Fix a concurrency bug causing `meltano select` to crash.
 - [#758](https://gitlab.com/meltano/meltano/issues/758) Update 'meltano permissions' to add --full-refresh command to revoke all privileges prior to granting
 - [#1113](https://gitlab.com/meltano/meltano/issues/1113) Update 'meltano permissions' to have the ability to find all schemas matching a partial name such as `snowplow_*`
+- [#1114](https://gitlab.com/meltano/meltano/issues/1114) Update 'meltano permissions' to include the OPERATE privilege for Snowflake warehouse
 
 ### Changes
 
