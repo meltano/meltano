@@ -154,11 +154,13 @@ roles:
             schemas:
                 read:
                     - raw.*
+                    - analytics.partial_*
                 write:
                     - analytics.*
             tables:
                 read:
                     - raw.*.*
+                    - analytics.partial_*.*
                 write:
                     - analytics.*.*
 
