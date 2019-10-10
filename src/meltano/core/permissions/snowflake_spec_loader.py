@@ -195,18 +195,17 @@ class SnowflakeSpecLoader:
                 for entity_name, config in entity_dict.items():
                     if entity_type == "databases":
                         entities["databases"].add(entity_name)
-                        
+
                         if "shared" in config:
                             if type(config["shared"]) == bool:
                                 if config["shared"]:
                                     entities["shared_databases"].add(entity_name)
                             else:
                                 logging.debug(
-                                "`shared` for database {} must be boolean, skipping Role Reference generation.".format(
-                                    entity_name
+                                    "`shared` for database {} must be boolean, skipping Role Reference generation.".format(
+                                        entity_name
+                                    )
                                 )
-                            )
-                                
 
                     elif entity_type == "roles":
                         entities["roles"].add(entity_name)
@@ -331,7 +330,10 @@ class SnowflakeSpecLoader:
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
 
-                                if member_role == entity_name or member_role == f"{entity_name}_role":
+                                if (
+                                    member_role == entity_name
+                                    or member_role == f"{entity_name}_role"
+                                ):
                                     is_member_of_user_role = True
                         except KeyError:
                             logging.debug(
@@ -566,12 +568,11 @@ class SnowflakeSpecLoader:
         generator = SnowflakeRevokesGenerator(
             self.grants_to_role, self.roles_granted_to_user
         )
-        
+
         click.secho("Generating revoke statements for Snowflake", fg="green")
 
-        
         # fake_command = {"sql": "REVOKE THIS", "already_granted": False}
-        
+
         for entity_type, entry in self.spec.items():
             if entity_type in ["databases", "warehouses", "version"]:
                 continue
@@ -677,7 +678,7 @@ class SnowflakeSpecLoader:
                     del sql_commands[i]
                 else:
                     grants.append(grant)
-            
+
             if command["sql"].startswith("REVOKE ALL"):
                 revoke = command["sql"].upper()
                 if revoke in revokes:

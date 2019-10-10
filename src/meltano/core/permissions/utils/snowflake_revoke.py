@@ -6,7 +6,9 @@ from meltano.core.permissions.utils.snowflake_connector import SnowflakeConnecto
 
 REVOKE_ROLE_TEMPLATE = "REVOKE ROLE {role_name} FROM {type} {entity_name}"
 
-REVOKE_ALL_PRIVILEGES_ACCOUNTOBJECT_TEMPLATE = "REVOKE {privileges} PRIVILEGES ON {resource_type} {resource_name} FROM ROLE {role}"
+REVOKE_ALL_PRIVILEGES_ACCOUNTOBJECT_TEMPLATE = (
+    "REVOKE {privileges} PRIVILEGES ON {resource_type} {resource_name} FROM ROLE {role}"
+)
 
 REVOKE_ALL_PRIVILEGES_OBJECT_TEMPLATE = "REVOKE {privileges} PRIVILEGES ON ALL {resource_type}S IN {parent_resource_type} {parent_resource_name} FROM ROLE {role}"
 
@@ -88,8 +90,8 @@ class SnowflakeRevokesGenerator:
         try:
             for warehouse in config["warehouses"]:
                 new_commands = self.generate_warehouse_revokes(
-                    role=role, 
-                    warehouse=warehouse)
+                    role=role, warehouse=warehouse
+                )
                 sql_commands.extend(new_commands)
         except KeyError:
             logging.debug(
@@ -100,9 +102,7 @@ class SnowflakeRevokesGenerator:
         try:
             for database in config["privileges"]["databases"]["read"]:
                 new_commands = self.generate_database_revokes(
-                    role=role,
-                    database=database,
-                    shared_dbs=shared_dbs,
+                    role=role, database=database, shared_dbs=shared_dbs
                 )
                 sql_commands.extend(new_commands)
         except KeyError:
@@ -115,9 +115,7 @@ class SnowflakeRevokesGenerator:
         try:
             for database in config["privileges"]["databases"]["write"]:
                 new_commands = self.generate_database_revokes(
-                    role=role,
-                    database=database,
-                    shared_dbs=shared_dbs,
+                    role=role, database=database, shared_dbs=shared_dbs
                 )
                 sql_commands.extend(new_commands)
         except KeyError:
@@ -130,9 +128,7 @@ class SnowflakeRevokesGenerator:
         try:
             for table in config["privileges"]["tables"]["read"]:
                 new_commands = self.generate_table_and_view_revokes(
-                    role=role,
-                    table=table,
-                    shared_dbs=shared_dbs,
+                    role=role, table=table, shared_dbs=shared_dbs
                 )
                 sql_commands.extend(new_commands)
         except KeyError:
@@ -145,9 +141,7 @@ class SnowflakeRevokesGenerator:
         try:
             for table in config["privileges"]["tables"]["write"]:
                 new_commands = self.generate_table_and_view_revokes(
-                    role=role,
-                    table=table,
-                    shared_dbs=shared_dbs,
+                    role=role, table=table, shared_dbs=shared_dbs
                 )
                 sql_commands.extend(new_commands)
         except KeyError:
@@ -185,10 +179,7 @@ class SnowflakeRevokesGenerator:
         return sql_commands
 
     def generate_database_revokes(
-        self,
-        role: str,
-        database: str,
-        shared_dbs: Set,
+        self, role: str, database: str, shared_dbs: Set
     ) -> List[str]:
         """
         Generate the REVOKE statements for Databases and Schemas.
@@ -250,12 +241,8 @@ class SnowflakeRevokesGenerator:
         )
         return sql_commands
 
-
     def generate_table_and_view_revokes(
-        self,
-        role: str,
-        table: str,
-        shared_dbs: Set,
+        self, role: str, table: str, shared_dbs: Set
     ) -> List[str]:
         """
         Generate the REVOKE statements for TABLEs and VIEWs.
@@ -294,14 +281,14 @@ class SnowflakeRevokesGenerator:
             for schema in db_schemas:
                 if schema != info_schema:
                     schemas.append(schema)
-        elif '*' in name_parts[1]:
+        elif "*" in name_parts[1]:
             # Similar to above, if {DB_NAME}.partial_*.* was provided,
             #  we need to find each of the schemas that match the pattern.
             conn = SnowflakeConnector()
             db_schemas = conn.show_schemas(name_parts[0])
             for db_schema in db_schemas:
-                schema_name = db_schema.split('.',1)[1].lower()
-                if schema_name.startswith(name_parts[1].split('*', 1)[0]):
+                schema_name = db_schema.split(".", 1)[1].lower()
+                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
                     schemas.append(db_schema)
         else:
             schemas = [f"{name_parts[0]}.{name_parts[1]}"]
