@@ -36,6 +36,15 @@ def pytest_runtest_setup(item):
         pytest.skip()
 
 
+@pytest.fixture(scope="session")
+def concurrency():
+    return {
+        "threads": int(os.getenv("PYTEST_CONCURRENCY_THREADS", 8)),
+        "processes": int(os.getenv("PYTEST_CONCURRENCY_PROCESSES", 8)),
+        "cases": int(os.getenv("PYTEST_CONCURRENCY_CASES", 64)),
+    }
+
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_env():
     monkeypatch = MonkeyPatch()

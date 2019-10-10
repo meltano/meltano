@@ -6,6 +6,8 @@ import threading
 
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
+from multiprocessing import Pool
+from multiprocessing.pool import ThreadPool
 
 
 @pytest.fixture
@@ -13,6 +15,13 @@ def deactivate_project(project):
     Project._default = None
     yield
     Project._default = project
+
+
+def update(payload):
+    project = Project.find()
+
+    with project.meltano_update() as meltano:
+        meltano.update(payload)
 
 
 class TestProject:
@@ -50,23 +59,21 @@ class TestProject:
         assert os.getenv("MELTANO_PROJECT") == str(project.root)
         assert Project.find() is project
 
-    def test_threadsafe(self, project):
-        class ProjectFinderThread(threading.Thread):
-            def __init__(self):
-                super().__init__()
-                self._project = None
+    def test_find_threadsafe(self, project, concurrency):
+        workers = ThreadPool(concurrency["threads"])
+        projects = workers.map(Project.find, range(concurrency["cases"]))
 
-            def run(self):
-                self._project = Project.find()
+        assert all(map(lambda x: x is project, projects))
 
-        concurrent = ProjectFinderThread()
-        concurrent.start()
+    def test_meltano_concurrency(self, project, concurrency):
+        payloads = [{f"test_{i}": i} for i in range(concurrency["cases"])]
 
-        project = Project.find()
+        workers = Pool(concurrency["processes"])
+        workers.map(update, payloads)
 
-        concurrent.join()
-
-        assert project is concurrent._project
+        for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
+            print(project.meltano)
+            assert project.meltano[key] == val, str(project.meltano)
 
 
 class TestIncompatibleProject:
