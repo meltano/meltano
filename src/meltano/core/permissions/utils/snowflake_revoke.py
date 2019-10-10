@@ -130,39 +130,39 @@ class SnowflakeRevokesGenerator:
                 )
             )
 
-        # try:
-        #     for table in config["privileges"]["tables"]["read"]:
-        #         new_commands, usage_granted = self.generate_table_and_view_revokes(
-        #             role=role,
-        #             table=table,
-        #             grant_type="read",
-        #             usage_granted=usage_granted,
-        #             shared_dbs=shared_dbs,
-        #         )
-        #         sql_commands.extend(new_commands)
-        # except KeyError:
-        #     logging.debug(
-        #         "`privileges.tables.read` not found for role {}, skipping generation of TABLE read level GRANT statements.".format(
-        #             role
-        #         )
-        #     )
+        try:
+            for table in config["privileges"]["tables"]["read"]:
+                new_commands, usage_granted = self.generate_table_and_view_revokes(
+                    role=role,
+                    table=table,
+                    grant_type="read",
+                    usage_granted=usage_granted,
+                    shared_dbs=shared_dbs,
+                )
+                sql_commands.extend(new_commands)
+        except KeyError:
+            logging.debug(
+                "`privileges.tables.read` not found for role {}, skipping generation of TABLE read level REVOKE statements.".format(
+                    role
+                )
+            )
 
-        # try:
-        #     for table in config["privileges"]["tables"]["write"]:
-        #         new_commands, usage_granted = self.generate_table_and_view_revokes(
-        #             role=role,
-        #             table=table,
-        #             grant_type="write",
-        #             usage_granted=usage_granted,
-        #             shared_dbs=shared_dbs,
-        #         )
-        #         sql_commands.extend(new_commands)
-        # except KeyError:
-        #     logging.debug(
-        #         "`privileges.tables.write` not found for role {}, skipping generation of TABLE write level GRANT statements.".format(
-        #             role
-        #         )
-        #     )
+        try:
+            for table in config["privileges"]["tables"]["write"]:
+                new_commands, usage_granted = self.generate_table_and_view_revokes(
+                    role=role,
+                    table=table,
+                    grant_type="write",
+                    usage_granted=usage_granted,
+                    shared_dbs=shared_dbs,
+                )
+                sql_commands.extend(new_commands)
+        except KeyError:
+            logging.debug(
+                "`privileges.tables.write` not found for role {}, skipping generation of TABLE write level REVOKE statements.".format(
+                    role
+                )
+            )
 
         return sql_commands
 
@@ -307,5 +307,97 @@ class SnowflakeRevokesGenerator:
         )
 
         usage_granted["schemas"].add(schema.upper())
+
+        return (sql_commands, usage_granted)
+
+
+    def generate_table_and_view_revokes(
+        self,
+        role: str,
+        table: str,
+        grant_type: str,
+        usage_granted: Dict,
+        shared_dbs: Set,
+    ) -> Tuple[List[str], Dict]:
+        """
+        Generate the GRANT statements for TABLEs and VIEWs.
+
+        role: the name of the role the privileges are GRANTed to
+        table: the name of the TABLE/VIEW (e.g. "RAW.PUBLIC.MY_TABLE")
+        grant_type: What type of privileges are granted? One of {"read", "write"}
+        usage_granted: Passed by generate_grant_privileges_to_role() to track all
+            all the entities a role has been granted access (USAGE) to.
+        shared_dbs: a set of all the shared databases defined in the spec.
+
+        Returns the SQL commands generated and the updated usage_granted as a Tuple
+        """
+        sql_commands = []
+
+        # Split the table identifier into parts {DB_NAME}.{SCHEMA_NAME}.{TABLE_NAME}
+        #  so that we can check and use each one
+        name_parts = table.split(".")
+
+        # Do nothing if this is a table inside a shared database:
+        #  "Granting individual privileges on imported databases is not allowed."
+        if name_parts[0] in shared_dbs:
+            return (sql_commands, usage_granted)
+
+        # Generate the INFORMATION_SCHEMA identifier for that database
+        #  in order to be able to filter it out
+        info_schema = f"{name_parts[0].upper()}.INFORMATION_SCHEMA"
+
+        schemas = []
+
+        conn = SnowflakeConnector()
+
+        if name_parts[1] == "*":
+            # If {DB_NAME}.*.* was provided as the identifier, we have to fetch
+            #  each schema in database DB_NAME, so that we can grant privileges
+            #  for all tables in that schema
+            # (You can not GRANT to all table with a wild card for the schema name)
+            db_schemas = conn.show_schemas(name_parts[0])
+            for schema in db_schemas:
+                if schema != info_schema:
+                    schemas.append(schema)
+        elif '*' in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split('.',1)[1].lower()
+                if schema_name.startswith(name_parts[1].split('*', 1)[0]):
+                    schemas.append(db_schema)
+        else:
+            schemas = [f"{name_parts[0]}.{name_parts[1]}"]
+
+
+        # If *.* then you can grant all, grant future, and exit
+        for schema in schemas:
+            # Revoke on ALL tables
+            sql_commands.append(
+                {
+                    "already_granted": False,
+                    "sql": REVOKE_ALL_PRIVILEGES_OBJECT_TEMPLATE.format(
+                        privileges="ALL",
+                        resource_type="TABLE",
+                        parent_resource_type="SCHEMA",
+                        parent_resource_name=SnowflakeConnector.snowflaky(schema),
+                        role=SnowflakeConnector.snowflaky(role),
+                    ),
+                }
+            )
+
+            # Revoke on ALL views
+            sql_commands.append(
+                {
+                    "already_granted": False,
+                    "sql": REVOKE_ALL_PRIVILEGES_OBJECT_TEMPLATE.format(
+                        privileges="ALL",
+                        resource_type="VIEW",
+                        parent_resource_type="SCHEMA",
+                        parent_resource_name=SnowflakeConnector.snowflaky(schema),
+                        role=SnowflakeConnector.snowflaky(role),
+                    ),
+                }
+            )
 
         return (sql_commands, usage_granted)
