@@ -445,6 +445,13 @@ class SnowflakeGrantsGenerator:
             for db_schema in db_schemas:
                 if db_schema != info_schema:
                     schemas.append(db_schema)
+        elif '*' in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split('.',1)[1].lower()
+                if schema_name.startswith(name_parts[1].split('*', 1)[0]):
+                    schemas.append(db_schema)
         else:
             schemas = [schema]
 
@@ -569,6 +576,13 @@ class SnowflakeGrantsGenerator:
             for schema in db_schemas:
                 if schema != info_schema:
                     schemas.append(schema)
+        elif '*' in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split('.',1)[1].lower()
+                if schema_name.startswith(name_parts[1].split('*', 1)[0]):
+                    schemas.append(db_schema)
         else:
             schemas = [f"{name_parts[0]}.{name_parts[1]}"]
 
