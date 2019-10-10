@@ -36,7 +36,7 @@ class Project(Versioned):
 
     def __init__(self, root: Union[Path, str] = None):
         self.root = Path(root or os.getcwd()).resolve()
-        self._meltano_lock = fasteners.InterProcessLock(
+        self._meltano_ip_lock = fasteners.InterProcessLock(
             self.run_dir("meltano.yml.lock")
         )
 
@@ -89,7 +89,7 @@ class Project(Versioned):
         """Return a copy of the current meltano config"""
         # fmt: off
         with self._meltano_rw_lock.read_lock(), \
-            self._meltano_lock:
+            self._meltano_ip_lock:
             return self._load_meltano()
         # fmt: on
 
@@ -105,7 +105,7 @@ class Project(Versioned):
         """
         # fmt: off
         with self._meltano_rw_lock.write_lock(), \
-            self._meltano_lock:
+            self._meltano_ip_lock:
             # read the latest version
             meltano_update = self._load_meltano()
             yield meltano_update
