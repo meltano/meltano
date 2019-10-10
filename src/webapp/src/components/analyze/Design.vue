@@ -210,7 +210,7 @@ export default {
     },
 
     runQuery() {
-      this.$store.dispatch('designs/getSQL', { run: true })
+      this.$store.dispatch('designs/runQuery')
     },
 
     loadReport(report) {
