@@ -100,15 +100,17 @@ def create_app(config={}):
 
         init(app)
 
+    # Google Analytics setup
+    tracker = GoogleAnalyticsTracker(project)
+
     @app.before_request
     def setup_js_context():
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
-        tracker = GoogleAnalyticsTracker(project)
         if tracker.send_anonymous_usage_stats:
             g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["projectId"] = tracker.client_id
+            g.jsContext["projectId"] = tracker.project_id
 
         g.jsContext["version"] = meltano.__version__
 

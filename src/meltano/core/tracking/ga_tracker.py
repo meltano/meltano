@@ -3,6 +3,7 @@ import requests
 import uuid
 import yaml
 import os
+import json
 
 from typing import Dict
 
@@ -15,13 +16,7 @@ DEBUG_MEASUREMENT_PROTOCOL_URI = "https://www.google-analytics.com/debug/collect
 
 
 class GoogleAnalyticsTracker:
-    def __init__(
-        self,
-        project,
-        tracking_id: str = None,
-        client_id: str = None,
-        request_timeout: float = None,
-    ):
+    def __init__(self, project, tracking_id: str = None, request_timeout: float = None):
         self.project = project
         self.tracking_id = tracking_id or MELTANO_TRACKING_ID
         self.request_timeout = request_timeout or REQUEST_TIMEOUT
@@ -30,14 +25,15 @@ class GoogleAnalyticsTracker:
             not truthy(os.getenv("MELTANO_DISABLE_TRACKING"))
             and self.project.meltano.get("send_anonymous_usage_stats", False) == True
         )
-        self.client_id = client_id or self.project_id()
+        self.project_id = self.load_project_id()
+        self.client_id = self.load_client_id()
 
     def update_permission_to_track(self, send_anonymous_usage_stats: bool) -> None:
         """Update the send_anonymous_usage_stats in meltano.yml."""
         with self.project.meltano_update() as meltano_yml:
             meltano_yml["send_anonymous_usage_stats"] = send_anonymous_usage_stats
 
-    def project_id(self) -> None:
+    def load_project_id(self) -> None:
         """
         Fetch the project_id from the project config file.
 
@@ -59,6 +55,32 @@ class GoogleAnalyticsTracker:
 
         return project_id
 
+    def load_client_id(self) -> None:
+        """
+        Fetch the client_id from the non-versioned analytics.json.
+
+        If it is not found (e.g. first time run), generate a valid uuid4 and
+        store it in analytics.json.
+        """
+        file_path = self.project.meltano_dir().joinpath("analytics.json")
+        try:
+            with open(file_path) as file:
+                file_data = json.load(file)
+            client_id_str = file_data["client_id"]
+            client_id = uuid.UUID(client_id_str, version=4)
+        except FileNotFoundError:
+            client_id = uuid.uuid4()
+
+            if self.send_anonymous_usage_stats:
+                # If we are set to track Anonymous Usage stats, also store
+                #  the generated client_id in a non-versioned analytics.json file
+                #  so that it persists between meltano runs.
+                with open(file_path, "w") as file:
+                    data = {"client_id": str(client_id)}
+                    json.dump(data, file)
+
+        return client_id
+
     def event(self, category: str, action: str) -> Dict:
         """Constract a GA event with all the required parameters."""
         event = {
@@ -69,7 +91,8 @@ class GoogleAnalyticsTracker:
             "t": "event",
             "ec": category,
             "ea": action,
-            "el": self.client_id,
+            "el": self.project_id,
+            "cd1": self.project_id,  # maps to the custom dimension 1 of the UI
         }
         return event
 
