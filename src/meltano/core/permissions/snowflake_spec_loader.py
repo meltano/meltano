@@ -321,31 +321,16 @@ class SnowflakeSpecLoader:
                             )
 
                     elif entity_type == "users":
-                        # Check if this user is member of the user role
-                        is_member_of_user_role = False
-
                         entities["users"].add(entity_name)
 
                         try:
                             for member_role in config["member_of"]:
                                 entities["role_refs"].add(member_role)
-
-                                if (
-                                    member_role == entity_name
-                                    or member_role == f"{entity_name}_role"
-                                ):
-                                    is_member_of_user_role = True
                         except KeyError:
                             logging.debug(
                                 "`member_of` not found for user {}, skipping Role Reference generation.".format(
                                     entity_name
                                 )
-                            )
-
-                        if is_member_of_user_role == False:
-                            error_messages.append(
-                                f"Role error: User {entity_name} in not a member of their "
-                                f"user role (role with the same name as the user)"
                             )
 
                         try:
@@ -469,15 +454,6 @@ class SnowflakeSpecLoader:
                 error_messages.append(
                     f"Reference error: Warehouse {warehouse} is referenced "
                     "in the spec but not defined"
-                )
-
-        # Check that all users have a same name role defined
-        for user in entities["users"]:
-            if user not in entities["roles"]:
-                error_messages.append(
-                    f"Missing user role for user {user}. All users must "
-                    "have a role of the same name defined in order to assign "
-                    "user specific permissions."
                 )
 
         return error_messages
