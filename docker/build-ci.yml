@@ -45,10 +45,7 @@ meltano_base: &meltano_base
     - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
     - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build \
-      --cache-from $DOCKER_IMAGE_NAME:$BASE_SHA \
-      --cache-from registry.gitlab.com/meltano/meltano/base:$BASE_SHA \
-      -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
+    - docker build --cache-from $DOCKER_IMAGE_NAME:$BASE_SHA --cache-from registry.gitlab.com/meltano/meltano/base:$BASE_SHA -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
     - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
 
 #############
