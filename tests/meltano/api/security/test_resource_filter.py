@@ -49,7 +49,6 @@ class TestTopicFilter:
             "models", "model-carbon-intensity-sqlite", "carbon.topic.m5oc"
         )
         m5o_file = M5ocFile.load(path)
-
         topic_filter = TopicFilter()
 
         with app.app_context():

@@ -21,14 +21,13 @@ class TestSqlHelper:
 
     def test_get_db_engine_sqlite(
         self,
-        app_context,
+        app,
         subject,
         project,
         plugin_settings_service,
         elt_context_builder,
     ):
         sample_config = {"database": "pytest"}
-
         engine_uri = f"sqlite:///pytest.db"
 
         with mock.patch(
@@ -46,8 +45,7 @@ class TestSqlHelper:
     def test_get_db_engine_postgres(
         self,
         listen_mock,
-        session,
-        app_context,
+        app,
         subject,
         plugin_settings_service,
         elt_context_builder,

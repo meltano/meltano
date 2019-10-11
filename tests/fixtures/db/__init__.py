@@ -9,15 +9,6 @@ def engine_uri_env(monkeypatch, engine_uri):
     monkeypatch.setenv("MELTANO_DATABASE_URI", engine_uri)
 
 
-@pytest.fixture(scope="session", autouse=True)
-def migrate(engine_uri):
-    engine = create_engine(engine_uri)
-
-    # migrate the database up
-    MigrationService(engine).upgrade()
-    engine.dispose()
-
-
 @pytest.fixture(scope="class", autouse=True)
 def vacuum_db(engine_sessionmaker, project):
     engine, _ = engine_sessionmaker

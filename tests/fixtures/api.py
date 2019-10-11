@@ -32,12 +32,6 @@ def app(create_app):
     return create_app()
 
 
-@pytest.fixture(autouse=True)
-def app_context(app):
-    with app.app_context():
-        yield
-
-
 @pytest.fixture(scope="class")
 def create_app(request, project, engine_uri, vacuum_db):
     def _factory(**kwargs):
@@ -49,7 +43,17 @@ def create_app(request, project, engine_uri, vacuum_db):
             **kwargs,
         }
 
-        return meltano.api.app.create_app(config)
+        app = meltano.api.app.create_app(config)
+
+        # let's push an application context so the
+        # `current_app` is ready in each test
+        ctx = app.app_context()
+        ctx.push()
+
+        # let's make sure to pop the context at the end
+        request.addfinalizer(lambda: ctx.pop())
+
+        return app
 
     return _factory
 
@@ -60,5 +64,5 @@ def api(app):
 
 
 @pytest.fixture()
-def seed_users(app_context, session):
+def seed_users(app, session):
     create_dev_user()

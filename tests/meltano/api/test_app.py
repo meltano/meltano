@@ -1,12 +1,18 @@
+import pytest
 from meltano.core.db import project_engine
 from meltano.api.models import db
 
 
 class TestApp:
-    def test_core_registered(self, app, project):
-        engine, _ = project_engine(project)
+    @pytest.fixture
+    def session(self):
+        # disable the `session` fixture not to override
+        # the `db.session`
+        pass
+
+    def test_core_registered(self, engine_sessionmaker, app):
+        engine, _ = engine_sessionmaker
 
         # ensure both the API and the meltano.core
         # are on the same database
-        with app.app_context():
-            assert engine.url == db.engine.url
+        assert engine.url == db.engine.url
