@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+* Compress meltano-logo.png
 
 ### Changes
 
