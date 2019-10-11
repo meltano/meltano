@@ -61,7 +61,11 @@ def ui(project, reload, bind_port, bind):
     workers.append(MeltanoBackgroundCompiler(project))
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
-        APIWorker(project, reload=reload or os.getenv("FLASK_ENV") == "development")
+        APIWorker(
+            project,
+            f"{bind}:{bind_port}",
+            reload=reload or os.getenv("FLASK_ENV") == "development",
+        )
     )
 
     cleanup = start_workers(workers)
