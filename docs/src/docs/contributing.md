@@ -295,6 +295,8 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
+## Releases
+
 ### Versioning
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
