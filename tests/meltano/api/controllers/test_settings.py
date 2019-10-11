@@ -4,6 +4,7 @@ from meltano.api.security import users
 from meltano.api.models.security import db, Role
 
 
+@pytest.mark.usefixtures("seed_users")
 class TestRoles:
     @pytest.fixture
     def app(self, create_app):

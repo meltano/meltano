@@ -7,7 +7,7 @@ def assert_has_items(entry, count):
     return len(entry["items"]) == count
 
 
-@pytest.mark.usefixtures("add_model")
+@pytest.mark.usefixtures("add_model", "seed_users")
 class TestRepos:
     def test_index(self, api, app):
         with app.test_request_context():

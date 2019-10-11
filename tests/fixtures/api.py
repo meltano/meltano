@@ -8,7 +8,7 @@ from sqlalchemy import MetaData
 import meltano.api.app
 from meltano.core.migration_service import MigrationService
 from meltano.api.security.identity import create_dev_user
-from meltano.api.models import db
+from meltano.api.models import db as _db
 
 
 @pytest.fixture
@@ -32,7 +32,7 @@ def app(create_app):
     return create_app()
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def app_context(app):
     with app.app_context():
         yield
@@ -49,17 +49,7 @@ def create_app(request, project, engine_uri, vacuum_db):
             **kwargs,
         }
 
-        def _cleanup(ctx):
-            db.session.rollback()
-
-        app = meltano.api.app.create_app(config)
-        app.teardown_request(_cleanup)
-
-        with app.app_context():
-            vacuum_db(project)
-            create_dev_user()
-
-        return app
+        return meltano.api.app.create_app(config)
 
     return _factory
 
@@ -67,3 +57,8 @@ def create_app(request, project, engine_uri, vacuum_db):
 @pytest.fixture()
 def api(app):
     return app.test_client()
+
+
+@pytest.fixture()
+def seed_users(app_context, session):
+    create_dev_user()

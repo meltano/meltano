@@ -23,6 +23,7 @@ def gitlab_client():
     return client_mock
 
 
+@pytest.mark.usefixtures("seed_users")
 class TestSecurity:
     @pytest.fixture(scope="class")
     def app(self, create_app):
@@ -101,6 +102,7 @@ class TestSecurity:
             assert res.location.startswith(url_for("security.login", _external=True))
 
 
+@pytest.mark.usefixtures("seed_users")
 class TestSingleUser:
     @pytest.fixture(scope="class")
     def app(self, create_app):
