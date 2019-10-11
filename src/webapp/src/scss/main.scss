@@ -79,6 +79,18 @@ Component helpers related to Bulma's component classes when bulma-overrides does
   }
 }
 
+.field {
+  &.is-horizontal {
+    .field-body {
+      // Bulma's default of 5 prevents its corresponding .field-label's `flex-grow: 1` to carry more weight for our potentially long labels.
+      // Lowering this value both increases the horizontal space for the label's content while also decreasing the `<input>` horizontal space.
+      // This is better UX as `<input>` dimensions should better reflect the expected amount of input the user will provide.
+      // Mobile is a non-issue with this change as a media query enforces vertical layout of `<label>`s and `<input>`s.
+      flex-grow: 2.5;
+    }
+  }
+}
+
 .navbar {
   // Fixes hover dropdown auto closing in navbar via https://github.com/jgthms/bulma/issues/2514#issuecomment-510451361
   @media screen and (min-width: 1025px) {
