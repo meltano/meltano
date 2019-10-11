@@ -295,6 +295,8 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
+## Releases
+
 ### Versioning
 
 Meltano uses [semver](https://semver.org/) as its version number scheme.
@@ -351,12 +353,43 @@ You can use `make type=patch release` to force a patch release. This is useful w
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available.
 
-## Dogfood Workflow
+## Speedruns
+
+::: info
+🏆 Current Record: 1:35 (Ben Hong)
+:::
+
+::: tip
+Remember to leave each screen up for at least 2 seconds so users have a chance to notice that something actually happened.
+:::
+
+### Requirements
+
+1. Keep keystrokes to a minimum (ideally zero)
+1. You do not have to explain every step
+1. Do not need to stop and explain new features
+1. Time starts from when the webapp is loaded on the browser
+1. Must complete the following tasks
+   - Install an extractor
+   - Select entities
+   - Install and configure loader
+   - Configure transform
+   - Configure and run pipeline
+   - Open Model
+   - Generate SQL query with data model
+   - Render chart based on query
+   - Save query as a report with auto-populated name
+   - Create new dashboard with auto-populated name
+   - Add saved report to new dashboard
+   - Verify dashboard contains report
+
+### Workflow
 
 1. Introduce Meltano to new users:
 
 ```
-Meltano is an open source data toolkit that makes it easy to go from data source to dashboard.
+Meltano is an open source data toolkit
+that makes it easy to go from data source to dashboard.
 
 For more information, check us out at meltano.com!
 ```
@@ -383,13 +416,13 @@ meltano --version
 5. Create a new Meltano project
 
 ```bash
-meltano init dogfood-workflow
+meltano init speedrun-workflow
 ```
 
 6. Change directory into your new project
 
 ```bash
-cd dogfood-workflow
+cd speedrun-workflow
 ```
 
 7. Start Meltano application
@@ -400,47 +433,7 @@ meltano ui
 
 8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
 
-9. When you land on the Pipelines page, install `tap-gitlab`
-
-10. Fill out `Private Token` with your token
-
-11. Fill out `Groups` with `meltano`
-
-12. Install `target-postgres`
-
-13. Fill out Postgres configurations
-
-14. Select `Run` for Transforms and hit `Save`
-
-15. Verify `Pipeline Schedule` configurations
-
-16. Update `Catch-up Date` with beginning of the month to minimize the data request
-
-17. Click `Save`. Pipeline should automatically be running now
-
-18. Visit `Orchestrate` link on the top nav
-
-19. Airflow UI should appear automatically with a DAG prepopulated
-
-20. Verify `Pipeline Schedule` is complete before moving onto next step
-
-21. Go to `Analyze`
-
-22. Go into `Connections` in order to update settings and click `Save`
-
-23. Click `Analyze` next to `Gitlab stats per user`
-
-24. Select "User Name" and "Total Issues Assigned" on the left
-
-25. Click `Run` to the right of Query
-
-26. Verify Chart appears
-
-27. Save as new report with automatically populated name
-
-28. Add to New Dashboard with automatically populated name
-
-29. Check `Edit` functionality on existing Report
+9. Run through [Getting Started Guide](/docs/getting-started.html) as quickly as possible with some narration, but don't pause mid-action to explain something.
 
 ## Taps & Targets Workflow
 
