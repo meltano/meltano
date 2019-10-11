@@ -31,11 +31,6 @@ describe('Configuration', () => {
     cy.wait('@installApi', {
       timeout: 60000
     })
-    cy.get('.modal-card-foot').within(() => {
-      cy.get('.button')
-        .contains('Next')
-        .click()
-    })
     cy.wait('@carbonEntitiesApi')
     cy.get('.modal-card-foot').within(() => {
       cy.get('.button')

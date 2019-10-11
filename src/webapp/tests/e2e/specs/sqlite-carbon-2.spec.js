@@ -26,7 +26,11 @@ describe('Configuration', () => {
       '/api/v1/sql/get/model-carbon-intensity-sqlite/carbon/region'
     ).as('getChartApi')
     cy.route('POST', '/api/v1/dashboards/dashboard/save').as('saveDashboard')
-    cy.route('POST', '//api/v1/dashboards/dashboard/report/add').as('addReport')
+    cy.route('POST', '/api/v1/dashboards/dashboard/report/add').as('addReport')
+    cy.route('POST', '/api/v1/reports/save').as('saveReportsApi')
+    cy.route('POST', '/api/v1/dashboards/dashboard/reports').as(
+      'dashboardReportsApi'
+    )
 
     cy.visit('http://localhost:8080/pipeline/schedule')
     cy.wait('@modelsApi')
@@ -46,12 +50,15 @@ describe('Configuration', () => {
     cy.get('canvas').should('be.visible')
     cy.get('#dropdown-save-report').click()
     cy.get('#button-save-report').click()
-    cy.wait('@addReport')
+    cy.wait('@saveReportsApi')
     cy.get('#dropdown-add-to-dashboard').click()
     cy.get('#button-new-dashboard').click()
     cy.get('#button-create-dashboard').click()
     cy.wait('@saveDashboard')
+    cy.wait('@addReport')
     cy.visit('http://localhost:8080/dashboard')
+    cy.get('.dashboard-link:first-child').click()
+    cy.wait('@dashboardReportsApi')
     cy.get('canvas').should('be.visible')
   })
 })
