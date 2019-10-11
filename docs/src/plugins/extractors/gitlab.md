@@ -20,8 +20,8 @@ sidebar: auto
 - [Releases](https://docs.gitlab.com/ee/api/releases/index.html)
 - [Group Labels](https://docs.gitlab.com/ee/api/group_labels.html)
 - [Project Labels](https://docs.gitlab.com/ee/api/labels.html)
-- [Epics](https://docs.gitlab.com/ee/api/epics.html) (only available for Gitlab Ultimate and Gitlab.com Gold accounts)
-- [Epic Issues](https://docs.gitlab.com/ee/api/epic_issues.html) (only available for Gitlab Ultimate and Gitlab.com Gold accounts)
+- [Epics](https://docs.gitlab.com/ee/api/epics.html) (only available for GitLab Ultimate and GitLab.com Gold accounts)
+- [Epic Issues](https://docs.gitlab.com/ee/api/epic_issues.html) (only available for GitLab Ultimate and GitLab.com Gold accounts)
 
 It incrementally pulls data based on the input state and then outputs the schema for each resource and the extracted data. For more information you can check [the documentation for tap-gitlab](https://gitlab.com/meltano/tap-gitlab).
 
