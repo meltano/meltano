@@ -364,9 +364,10 @@ Remember to leave each screen up for at least 2 seconds so users have a chance t
 ### Requirements
 
 1. Keep keystrokes to a minimum (ideally zero)
-2. You do not have to explain every step
-3. Time starts from when the webapp is loaded on the browser
-4. Must complete the following tasks
+1. You do not have to explain every step
+1. Do not need to stop and explain new features
+1. Time starts from when the webapp is loaded on the browser
+1. Must complete the following tasks
    - Install an extractor
    - Select entities
    - Install and configure loader
