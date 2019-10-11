@@ -42,6 +42,8 @@ meltano_base: &meltano_base
     - *docker_build_before_script
     - export IMAGE_TAG=$BASE_SHA
   only:
+    refs:
+      - merge_requests
     changes:
       - docker/base/Dockerfile
       - requirements.txt
