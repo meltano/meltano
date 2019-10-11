@@ -51,7 +51,6 @@ class ELTContextBuilder:
         config_service: ConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
         plugin_discovery_service: PluginDiscoveryService = None,
-        job_id: str = None,
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
