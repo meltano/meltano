@@ -1,5 +1,6 @@
 import logging
 import sqlalchemy.types as types
+import uuid
 from datetime import datetime
 from contextlib import contextmanager
 from enum import Enum
@@ -8,7 +9,7 @@ from sqlalchemy.ext.mutable import MutableDict
 
 from meltano.core.db import SystemModel
 from meltano.core.error import Error
-from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag
+from meltano.core.sqlalchemy import JSONEncodedDict, IntFlag, GUID
 
 
 class InconsistentStateError(Error):
@@ -42,6 +43,7 @@ class Job(SystemModel):
 
     id = Column(types.Integer, primary_key=True)
     job_id = Column(types.String)
+    run_id = Column(GUID, nullable=False, default=uuid.uuid4)
     state = Column(types.Enum(State, name="job_state"))
     started_at = Column(types.DateTime)
     ended_at = Column(types.DateTime)

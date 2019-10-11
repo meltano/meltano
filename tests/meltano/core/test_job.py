@@ -1,7 +1,9 @@
 import pytest
+import uuid
+from datetime import datetime
+from unittest import mock
 
 from meltano.core.job import Job, State
-from datetime import datetime
 
 
 class TestJob:
@@ -59,3 +61,13 @@ class TestJob:
         assert subject.ended_at is not None
         assert subject.payload["original_state"] == 1
         assert subject.payload["error"] == "This is a test."
+
+    def test_run_id(self, session):
+        expected_uuid = uuid.uuid4()
+        job = Job()
+
+        with mock.patch("uuid.uuid4", return_value=expected_uuid):
+            assert job.run_id is None
+            job.save(session)
+
+            assert isinstance(job.run_id, uuid.UUID)
