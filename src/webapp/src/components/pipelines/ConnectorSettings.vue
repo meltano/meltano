@@ -25,6 +25,9 @@ export default {
     getCleanedLabel() {
       return value => utils.titleCase(utils.underscoreToSpace(value))
     },
+    getFormFieldForId() {
+      return setting => `setting-${setting.name}`
+    },
     getIsOfKindBoolean() {
       return kind => kind === 'boolean'
     },
@@ -120,7 +123,7 @@ export default {
         class="field is-horizontal"
       >
         <div :class="['field-label', labelClass]">
-          <label class="label">{{
+          <label class="label" :for="getFormFieldForId(setting)">{{
             setting.label || getCleanedLabel(setting.name)
           }}</label>
           <TooltipCircle
@@ -133,19 +136,21 @@ export default {
           <div class="field">
             <div class="control is-expanded">
               <!-- Boolean -->
-              <label v-if="getIsOfKindBoolean(setting.kind)" class="checkbox">
-                <input
-                  v-model="configSettings.config[setting.name]"
-                  :class="successClass(setting)"
-                  type="checkbox"
-                />
-              </label>
+              <input
+                v-if="getIsOfKindBoolean(setting.kind)"
+                :id="getFormFieldForId(setting)"
+                v-model="configSettings.config[setting.name]"
+                class="checkbox"
+                :class="successClass(setting)"
+                type="checkbox"
+              />
 
               <!-- Date -->
               <InputDateIso8601
                 v-else-if="getIsOfKindDate(setting.kind)"
                 v-model="configSettings.config[setting.name]"
                 :name="setting.name"
+                :for-id="getFormFieldForId(setting)"
                 :input-classes="`is-small ${successClass(setting)}`"
               />
 
@@ -162,6 +167,7 @@ export default {
                 >
                   <option
                     v-for="(option, index) in setting.options"
+                    :id="getFormFieldForId(setting)"
                     :key="`${option.label}-${index}`"
                     :value="option.value"
                   >
@@ -173,6 +179,7 @@ export default {
               <!-- Text / Password / Email -->
               <input
                 v-else-if="getIsOfKindTextBased(setting.kind)"
+                :id="getFormFieldForId(setting)"
                 v-model="configSettings.config[setting.name]"
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
