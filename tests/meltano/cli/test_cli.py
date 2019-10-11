@@ -7,7 +7,7 @@ import meltano
 from meltano.cli import cli
 
 
-@pytest.fixture
+@pytest.fixture(scope="class")
 def project(test_dir, project_init_service):
     """This fixture returns the non-activated project."""
     project = project_init_service.init()
