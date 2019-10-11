@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1057](https://gitlab.com/meltano/meltano/issues/1057) Auto advance to Entity Selection when an extractor lacks configuration settings
 - [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Update Google Analytics to track `appVersion`, custom `projectId`, and to properly use the default `clientId`. The CLI also now uses `client_id` to differentiate between a CLI client id (not versioned) and the project id (versioned).
 
+- [#1012](https://gitlab.com/meltano/meltano/issues/1012) Add intelligent autofocus for improved UX in both Extractor and Loader configuration
+
 ### Changes
 
 - [#1080](https://gitlab.com/meltano/meltano/issues/1080) Temporarily disable Intercom until userId strategy is determined
