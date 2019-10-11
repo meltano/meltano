@@ -38,8 +38,11 @@ def create_plugin_files(config_dir: Path, plugin: Plugin):
 class TestSingerRunner:
     @pytest.fixture()
     def elt_context(self, project, session, tap, target, elt_context_builder):
+        job = Job(job_id="pytest_test_runner")
+
         return (
             elt_context_builder.with_extractor(tap.name)
+            .with_job(job)
             .with_loader(target.name)
             .context(session)
         )
@@ -147,16 +150,16 @@ class TestSingerRunner:
         target_process.stdout.at_eof.side_effect = (False, False, False, True)
         target_process.stdout.readline = CoroutineMock(side_effect=lines)
 
-        with subject.job.run(session):
+        with subject.context.job.run(session):
             await subject.bookmark(target_process.stdout)
 
         # assert the STATE's `value` was saved
-        assert subject.job.payload["singer_state"] == {"line": 3}
+        assert subject.context.job.payload["singer_state"] == {"line": 3}
 
         # test the restore
         tap_invoker = plugin_invoker_factory(tap)
         subject.restore_bookmark(session, tap_invoker)
-        state_json = json.dumps(subject.job.payload["singer_state"])
+        state_json = json.dumps(subject.context.job.payload["singer_state"])
         assert tap_invoker.files["state"].exists()
         assert tap_invoker.files["state"].open().read() == state_json
 
