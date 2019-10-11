@@ -33,7 +33,7 @@ class GoogleAnalyticsTracker:
         with self.project.meltano_update() as meltano_yml:
             meltano_yml["send_anonymous_usage_stats"] = send_anonymous_usage_stats
 
-    def load_project_id(self) -> None:
+    def load_project_id(self) -> uuid.UUID:
         """
         Fetch the project_id from the project config file.
 
@@ -55,7 +55,7 @@ class GoogleAnalyticsTracker:
 
         return project_id
 
-    def load_client_id(self) -> None:
+    def load_client_id(self) -> uuid.UUID:
         """
         Fetch the client_id from the non-versioned analytics.json.
 
