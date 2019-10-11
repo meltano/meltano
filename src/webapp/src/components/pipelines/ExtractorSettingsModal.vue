@@ -66,10 +66,10 @@ export default {
         }
         this.addPlugin(config).then(() => {
           this.prepareExtractorConfiguration()
-          this.installPlugin(config)
+          this.installPlugin(config).then(this.checkAutoAdvance)
         })
       } else {
-        this.prepareExtractorConfiguration()
+        this.prepareExtractorConfiguration().then(this.checkAutoAdvance)
       }
     })
   },
@@ -85,17 +85,16 @@ export default {
         this.$router.push({ name: 'extractors' })
       }
     },
+    checkAutoAdvance() {
+      if (this.extractorLacksConfigSettings) {
+        this.saveConfigAndBeginEntitySelection()
+      }
+    },
     prepareExtractorConfiguration() {
-      this.$store
-        .dispatch(
-          'configuration/getExtractorConfiguration',
-          this.extractorNameFromRoute
-        )
-        .then(() => {
-          if (this.extractorLacksConfigSettings) {
-            this.saveConfigAndBeginEntitySelection()
-          }
-        })
+      return this.$store.dispatch(
+        'configuration/getExtractorConfiguration',
+        this.extractorNameFromRoute
+      )
     },
     saveConfigAndBeginEntitySelection() {
       this.$store
