@@ -54,7 +54,8 @@ You can track our weekly progress and forward-looking plans in greater detail th
 | 2019-09-23   | Ben H.        | Ben H.           |          |
 | 2019-09-30   | Micael B.     | Micael B.        |          |
 | 2019-10-07   | Ben H.        | Ben H.           |          |
-| 2019-10-14   | Derek K.      | Derek K.         |          |
+| 2019-10-14   | Ben H.        | Ben H.           |          |
+| 2019-10-21   | Derek K.      | Derek K.         |          |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
