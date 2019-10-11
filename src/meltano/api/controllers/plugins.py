@@ -9,7 +9,6 @@ from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_install_service import PluginInstallService
-from meltano.core.tracking import GoogleAnalyticsTracker
 
 from flask import Blueprint, request, jsonify, g
 
@@ -132,8 +131,5 @@ def install():
             compiler.compile()
         except Exception as e:
             pass
-
-    tracker = GoogleAnalyticsTracker(project)
-    tracker.track_meltano_add(plugin_type=plugin_type, plugin_name=plugin_name)
 
     return jsonify(plugin.canonical())

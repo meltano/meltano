@@ -149,9 +149,17 @@ if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
   Vue.use(VueAnalytics, {
     id: 'UA-132758957-2',
     router,
-    fields: {
-      clientId: Vue.prototype.$flask.clientId || 'None'
-    }
+    set: [
+      {
+        field: 'appVersion',
+        value: Vue.prototype.$flask.version
+      },
+      {
+        // Unfortunately custom dimensions don't allow a useful alias, dimension1 is projectId
+        field: 'dimension1',
+        value: Vue.prototype.$flask.projectId
+      }
+    ]
   })
 }
 

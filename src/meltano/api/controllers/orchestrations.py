@@ -16,7 +16,6 @@ from meltano.core.project_add_service import ProjectAddService
 from meltano.core.config_service import ConfigService
 from meltano.core.schedule_service import ScheduleService, ScheduleAlreadyExistsError
 from meltano.core.select_service import SelectService
-from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import flatten, iso8601_datetime, slugify
 from meltano.core.logging import JobLoggingService, MissingJobLogException
 from meltano.cli.add import extractor
