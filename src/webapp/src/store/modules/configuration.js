@@ -103,7 +103,7 @@ const actions = {
   },
 
   getExtractorConfiguration({ commit, dispatch }, extractor) {
-    dispatch('getPluginConfiguration', {
+    return dispatch('getPluginConfiguration', {
       name: extractor,
       type: 'extractors'
     }).then(response => {
