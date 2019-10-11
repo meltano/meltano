@@ -14,8 +14,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1057](https://gitlab.com/meltano/meltano/issues/1057) Auto advance to Entity Selection when an extractor lacks configuration settings
 
-- [#1068](https://gitlab.com/meltano/meltano/issues/1068) Add more guidance to speedrun docs
-
 ### Changes
 
 - [#1080](https://gitlab.com/meltano/meltano/issues/1080) Temporarily disable Intercom until userId strategy is determined
