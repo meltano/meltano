@@ -25,7 +25,7 @@ ALL = "all"
 )
 def init(ctx, project_name, no_usage_stats):
     if ctx.obj["project"]:
-        logging.warn(f"Found meltano project at: {ctx.obj['project'].root}")
+        logging.warning(f"Found meltano project at: {ctx.obj['project'].root}")
         raise click.ClickException(
             "`meltano init` cannot run inside a Meltano project."
         )

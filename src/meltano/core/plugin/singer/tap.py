@@ -65,7 +65,7 @@ class SingerTap(SingerPlugin):
             with properties_file.open("r") as catalog:
                 schema_valid = Draft4Validator.check_schema(json.load(catalog))
         except:
-            logging.warn("Invalid catalog output by --discovery.")
+            logging.warning("Invalid catalog output by --discovery.")
             properties_file.unlink()
 
     @hook("before_invoke", can_fail=True)
@@ -88,7 +88,7 @@ class SingerTap(SingerPlugin):
             with properties_file.open("w") as catalog:
                 json.dump(schema, catalog)
         except FileNotFoundError:
-            logging.warn(f"Could not select stream, catalog file is missing.")
+            logging.warning(f"Could not select stream, catalog file is missing.")
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
