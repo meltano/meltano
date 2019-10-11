@@ -4,9 +4,10 @@ import utils from '@/utils/utils'
 export default {
   name: 'InputDateIso8601',
   props: {
-    value: { type: String, default: '' },
+    forId: { type: String, default: '' },
+    inputClasses: { type: String, default: '' },
     name: { type: String, default: '' },
-    inputClasses: { type: String, default: '' }
+    value: { type: String, default: '' }
   },
   computed: {
     getInputDateMeta() {
@@ -27,12 +28,12 @@ export default {
 <template>
   <div class="control">
     <input
-      :id="`date-${name}`"
+      :id="forId || `date-${name}`"
       type="date"
       class="input"
       :class="inputClasses"
       :value="formatDateStringYYYYMMDD(value)"
-      :name="`date-${name}`"
+      :name="forId || `date-${name}`"
       :pattern="getInputDateMeta.pattern"
       :min="getInputDateMeta.min"
       :max="getInputDateMeta.today"
