@@ -47,12 +47,14 @@ def engine_sessionmaker(project, engine_uri):
 @pytest.fixture()
 def session(project, engine_sessionmaker, vacuum_db):
     """Creates a new database session for a test."""
-    engine, sessionmaker = engine_sessionmaker
-    session = sessionmaker()
+    engine, Session = engine_sessionmaker
+    connection = engine.connect()
+    transaction = connection.begin()
 
     try:
+        session = Session(bind=connection)
         yield session
     finally:
         # teardown
         session.close()
-        vacuum_db(project)
+        transaction.rollback()
