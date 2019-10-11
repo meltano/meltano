@@ -318,3 +318,6 @@ orchestrators:
       - name: webserver.web_server_port
         value: 5010
         env: AIRFLOW__WEBSERVER__WEB_SERVER_PORT
+      - name: webserver.web_server_host
+        value: '0.0.0.0'
+        env: AIRFLOW__WEBSERVER__WEB_SERVER_HOST
