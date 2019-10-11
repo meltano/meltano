@@ -420,7 +420,7 @@ meltano init speedrun-workflow
 6. Change directory into your new project
 
 ```bash
-cd dogfood-workflow
+cd speedrun-workflow
 ```
 
 7. Start Meltano application
