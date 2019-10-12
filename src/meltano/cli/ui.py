@@ -55,7 +55,7 @@ def ui(project, reload, bind_port, bind):
     tracker.track_meltano_ui()
 
     workers = []
-    if not truthy(os.getenv("AIRFLOW_DISABLED", False)):
+    if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
         workers.append(AirflowWorker(project))
 
     workers.append(MeltanoBackgroundCompiler(project))

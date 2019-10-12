@@ -10,39 +10,39 @@ from .db import project_engine
 
 
 class SelectService:
-    def __init__(self, project: Project, extractor: str):
+    def __init__(
+        self, project: Project, extractor: str, config_service: ConfigService = None
+    ):
         self.project = project
-        self.config = ConfigService(project)
-        self.extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
+        self.config = config_service or ConfigService(project)
+        self._extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
 
-    def get_extractor(self):
-        return self.extractor
+    @property
+    def extractor(self):
+        return self._extractor
 
-    def load_schema(self):
-        _, Session = project_engine(self.project)
-        session = Session()
+    def load_schema(self, session):
         invoker = invoker_factory(
             self.project, self.extractor, prepare_with_session=session
         )
 
-        try:
-            if not invoker.files["catalog"].exists():
-                logging.info(
-                    "Catalog not found, trying to run the tap with --discover."
-                )
-                self.extractor.run_discovery(invoker)
+        # ensure we already have the discovery run at least once
+        if not invoker.files["catalog"].exists():
+            logging.info("Catalog not found, trying to run the tap with --discover.")
+            self.extractor.run_discovery(invoker)
 
-            self.extractor.apply_select(invoker)
-            with invoker.files["catalog"].open() as catalog:
-                return json.load(catalog)
-        finally:
-            session.close()
+        # update the catalog accordingly
+        self.extractor.apply_select(invoker)
 
-    def get_extractor_entities(self):
+        # return the updated catalog
+        with invoker.files["catalog"].open() as catalog:
+            return json.load(catalog)
+
+    def list_all(self, session) -> ListSelectedExecutor:
         list_all = ListSelectedExecutor()
 
         try:
-            schema = self.load_schema()
+            schema = self.load_schema(session)
             list_all.visit(schema)
         except FileNotFoundError as e:
             logging.error(
