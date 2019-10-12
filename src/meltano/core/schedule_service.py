@@ -76,11 +76,11 @@ class ScheduleService:
         return iso8601_datetime(start_date) or datetime.utcnow()
 
     def add_schedule(self, schedule: Schedule):
-        # guard if it already exists
-        if any(map(lambda s: s.name == schedule.name, self.schedules())):
-            raise ScheduleAlreadyExistsError(schedule)
-
         with self.project.meltano_update() as meltano:
+            # guard if it already exists
+            if any(map(lambda s: s.name == schedule.name, self.schedules())):
+                raise ScheduleAlreadyExistsError(schedule)
+
             # find the orchestrator plugin config
             schedules = nest(meltano, "schedules", value=[])
             schedules.append(self.schedule_definition(schedule))

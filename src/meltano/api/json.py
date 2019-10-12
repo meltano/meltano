@@ -4,6 +4,8 @@ from enum import Enum
 from collections.abc import Mapping, Iterable
 from flask import request, json
 
+from meltano.core.utils import compose
+
 
 class KeyFrozenDict(dict):
     pass
@@ -50,7 +52,9 @@ class JSONSchemeDecoder(json.JSONDecoder):
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs, object_hook=self.hook)
+        hooks = compose(kwargs.pop("object_hook", None), self.hook)
+
+        super().__init__(*args, **kwargs, object_hook=hooks)
 
     def hook(self, obj):
         # transform to snakecase

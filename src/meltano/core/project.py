@@ -87,11 +87,8 @@ class Project(Versioned):
     @property
     def meltano(self) -> Dict:
         """Return a copy of the current meltano config"""
-        # fmt: off
-        with self._meltano_rw_lock.read_lock(), \
-            self._meltano_ip_lock:
+        with self._meltano_rw_lock.read_lock():
             return self._load_meltano()
-        # fmt: on
 
     def _load_meltano(self):
         with self.meltanofile.open() as meltanofile:

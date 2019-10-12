@@ -85,9 +85,14 @@ def add(project, extractor, entities_filter, attributes_filter, exclude=False):
 
 
 def show(project, extractor, show_all=False):
+    _, Session = project_engine(project)
     select_service = SelectService(project, extractor)
-    extractor = select_service.get_extractor()
-    list_all = select_service.get_extractor_entities()
+
+    try:
+        session = Session()
+        list_all = select_service.list_all(session)
+    finally:
+        session.close()
 
     # legend
     click.secho("Legend:")
@@ -96,7 +101,7 @@ def show(project, extractor, show_all=False):
 
     # report
     click.secho("\nEnabled patterns:")
-    for select in map(parse_select_pattern, extractor.select):
+    for select in map(parse_select_pattern, select_service.extractor.select):
         click.secho(
             f"\t{select.property_pattern}", fg="red" if select.negated else "white"
         )
