@@ -10,7 +10,9 @@ from .db import project_engine
 
 
 class SelectService:
-    def __init__(self, project: Project, extractor: str, config_service: ConfigService = None):
+    def __init__(
+        self, project: Project, extractor: str, config_service: ConfigService = None
+    ):
         self.project = project
         self.config = config_service or ConfigService(project)
         self._extractor = self.config.find_plugin(extractor, PluginType.EXTRACTORS)
@@ -26,9 +28,7 @@ class SelectService:
 
         # ensure we already have the discovery run at least once
         if not invoker.files["catalog"].exists():
-            logging.info(
-                "Catalog not found, trying to run the tap with --discover."
-            )
+            logging.info("Catalog not found, trying to run the tap with --discover.")
             self.extractor.run_discovery(invoker)
 
         # update the catalog accordingly
