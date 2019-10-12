@@ -78,7 +78,7 @@ export MELTANO_LOG_PATH = ""
 
 ## Service Listen Configuration
 
-By default, the API and Airflow services with listen on the following host/port combinations.
+By default, the API and Airflow services listen with following host/port combinations.
 
 API: `http://0.0.0.0:5000`
 Airflow: `http://0.0.0.0:5010`
