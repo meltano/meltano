@@ -20,14 +20,14 @@ class ConfigService:
     def add_to_file(self, plugin: PluginInstall):
         installed_def = plugin.canonical()
 
-        if not plugin in self.plugins():
-            with self.project.meltano_update() as meltano_yml:
+        with self.project.meltano_update() as meltano_yml:
+            if not plugin in self.plugins():
                 plugins = nest(meltano_yml, f"plugins.{plugin.type}", value=[])
                 plugins.append(installed_def)
-        else:
-            logging.warning(
-                f"{plugin.name} is already present, use `meltano install` to install it."
-            )
+            else:
+                logging.warning(
+                    f"{plugin.name} is already present, use `meltano install` to install it."
+                )
 
         return plugin_factory(plugin.type, installed_def)
 

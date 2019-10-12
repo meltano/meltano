@@ -171,7 +171,7 @@ def entities(extractor_name: str) -> Response:
 
     entity_groups = []
     try:
-        list_all = select_service.get_extractor_entities()
+        list_all = select_service.list_all(db.session)
 
         for stream, prop in (
             (stream, prop)
