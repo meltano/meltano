@@ -94,7 +94,7 @@ class ProjectInitService:
         )
 
         click.echo(
-            "\nMeltano sends anonymous usage data that helps us improve the product.\nFor more information, see https://meltano.com/docs/meltano-cli.html#init"
+            "\nMeltano sends anonymous usage data that helps us improve the product.\nFor more information, see https://www.meltano.com/docs/environment-variables.html#anonymous-usage-data"
         )
 
     def join_with_project_base(self, filename):
