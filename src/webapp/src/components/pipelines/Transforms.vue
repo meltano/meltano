@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 
 import Message from '@/components/generic/Message'
@@ -26,18 +26,17 @@ export default {
     this.selectedTransformOption = defaultTransform
   },
   methods: {
+    ...mapActions('configuration', ['updateRecentELTSelections']),
     saveTransformAndGoToSchedules() {
-      this.$store
-        .dispatch('configuration/updateRecentELTSelections', {
-          type: 'transform',
-          value: this.selectedTransformOption
-        })
-        .then(() => {
-          this.$router.push({ name: 'schedules' })
-          Vue.toasted.global.success(
-            `Transform Saved - ${this.selectedTransformOption.label}`
-          )
-        })
+      this.updateRecentELTSelections({
+        type: 'transform',
+        value: this.selectedTransformOption
+      }).then(() => {
+        this.$router.push({ name: 'schedules' })
+        Vue.toasted.global.success(
+          `Transform Saved - ${this.selectedTransformOption.label}`
+        )
+      })
     },
     updateTransformTypeSelection(transformType) {
       this.selectedTransformOption = transformType
