@@ -770,6 +770,10 @@ export default {
   justify-content: center;
   padding: 30px;
 
+  a {
+    margin: 0 auto;
+  }
+
   img {
     max-width: 200px;
     margin: 0 auto;
