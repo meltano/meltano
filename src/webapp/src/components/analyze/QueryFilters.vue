@@ -65,10 +65,10 @@ export default {
     }
   },
   methods: {
-    ...mapActions('designs', ['removeFilter']),
-    addFilter() {
+    ...mapActions('designs', ['addFilter', 'removeFilter']),
+    addFilterAndClear() {
       const vm = this.addFilterModel
-      this.$store.dispatch('designs/addFilter', {
+      this.addFilter({
         sourceName: vm.attributeHelper.sourceName,
         attribute: vm.attributeHelper.attribute,
         filterType: vm.attributeHelper.type,
@@ -212,7 +212,7 @@ export default {
               <button
                 class="button is-small is-fullwidth is-interactive-primary is-outlined"
                 :disabled="!isValidAdd"
-                @click="addFilter"
+                @click="addFilterAndClear"
               >
                 Add
               </button>
