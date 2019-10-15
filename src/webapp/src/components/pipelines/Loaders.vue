@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import SpeedRunIcon from '@/components/pipelines/SpeedRunIcon'
@@ -35,10 +35,11 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.getAllPlugins()
+    this.getInstalledPlugins()
   },
   methods: {
+    ...mapActions('plugins', ['getAllPlugins', 'getInstalledPlugins']),
     updateLoaderSettings(loader) {
       this.$router.push({ name: 'loaderSettings', params: { loader } })
     }
