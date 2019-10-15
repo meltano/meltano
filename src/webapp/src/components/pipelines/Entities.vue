@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 
@@ -12,9 +12,10 @@ export default {
     ...mapState('plugins', ['installedPlugins'])
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins')
+    this.getInstalledPlugins()
   },
   methods: {
+    ...mapActions('plugins', ['getInstalledPlugins']),
     udpateExtractorEntities(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } })
     }
