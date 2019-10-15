@@ -1,4 +1,6 @@
 <script>
+import { mapActions } from 'vuex'
+
 import Breadcrumbs from '@/components/navigation/Breadcrumbs'
 import MainNav from '@/components/navigation/MainNav'
 
@@ -9,10 +11,11 @@ export default {
     MainNav
   },
   created() {
-    this.$store.dispatch('system/check')
+    this.check()
     this.acknowledgeAnalyticsTracking()
   },
   methods: {
+    ...mapActions('system', ['check']),
     acknowledgeAnalyticsTracking() {
       if (this.$flask.isSendAnonymousUsageStats) {
         const hasAcknowledgedTracking =
