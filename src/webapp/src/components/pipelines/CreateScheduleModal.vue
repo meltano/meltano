@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
@@ -33,8 +33,8 @@ export default {
     }
   },
   computed: {
-    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapGetters('plugins', ['getHasInstalledPluginsOfType']),
+    ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     ...mapState('plugins', ['installedPlugins']),
     isSaveable() {
       const hasOwns = []
@@ -43,12 +43,14 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('plugins/getInstalledPlugins').then(this.prefillForm)
+    this.getInstalledPlugins().then(this.prefillForm)
   },
   mounted() {
     this.$refs.name.focus()
   },
   methods: {
+    ...mapActions('configuration', ['run', 'savePipelineSchedule']),
+    ...mapActions('plugins', ['getInstalledPlugins']),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -83,10 +85,9 @@ export default {
     },
     save() {
       this.isSaving = true
-      this.$store
-        .dispatch('configuration/savePipelineSchedule', this.pipeline)
+      this.savePipelineSchedule(this.pipeline)
         .then(() => {
-          this.$store.dispatch('configuration/run', this.pipeline)
+          this.run(this.pipeline)
           Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
           Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
           this.isSaving = false
