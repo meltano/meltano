@@ -1,4 +1,5 @@
 <script>
+import { mapActions } from 'vuex'
 import Vue from 'vue'
 
 export default {
@@ -18,21 +19,22 @@ export default {
     this.saveDashboardSettings.name = `dashboard-${new Date().getTime()}`
   },
   methods: {
+    ...mapActions('dashboards', [
+      'saveDashboard',
+      'saveNewDashboardWithReport'
+    ]),
     close() {
       this.$emit('close')
     },
-    saveDashboard() {
+    saveDashboardIntelligently() {
       let action = null
       if (this.report) {
-        action = this.$store.dispatch('dashboards/saveNewDashboardWithReport', {
+        action = this.saveNewDashboardWithReport({
           data: this.saveDashboardSettings,
           report: this.report
         })
       } else {
-        action = this.$store.dispatch(
-          'dashboards/saveDashboard',
-          this.saveDashboardSettings
-        )
+        action = this.saveDashboard(this.saveDashboardSettings)
       }
 
       const dashboardName = this.saveDashboardSettings.name
@@ -87,7 +89,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!saveDashboardSettings.name"
-          @click="saveDashboard"
+          @click="saveDashboardIntelligently"
         >
           Create
         </button>
