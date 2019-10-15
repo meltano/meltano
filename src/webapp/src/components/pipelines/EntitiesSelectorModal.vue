@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import Vue from 'vue'
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 
@@ -84,7 +84,9 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
+        summary = `${this.getSelectedAttributeCount} attributes from ${
+          this.getSelectedEntityCount
+        } entities selected`
       }
       return summary
     }
@@ -96,19 +98,23 @@ export default {
       this.selectionModeCustom
     ]
     this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store
-      .dispatch(
-        'configuration/getExtractorInFocusEntities',
-        this.extractorNameFromRoute
-      )
-      .then(() => {
-        this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
-      })
+    this.getExtractorInFocusEntities(this.extractorNameFromRoute).then(() => {
+      this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+    })
   },
   destroyed() {
-    this.$store.dispatch('configuration/resetExtractorInFocusEntities')
+    this.resetExtractorInFocusEntities()
   },
   methods: {
+    ...mapActions('configuration', [
+      'getExtractorInFocusEntities',
+      'resetExtractorInFocusEntities',
+      'selectEntities',
+      'toggleAllEntityGroupsOff',
+      'toggleAllEntityGroupsOn',
+      'toggleEntityAttribute',
+      'toggleEntityGroup'
+    ]),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -116,17 +122,8 @@ export default {
         this.$router.push({ name: 'extractors' })
       }
     },
-    entityAttributeSelected(payload) {
-      this.$store.dispatch('configuration/toggleEntityAttribute', payload)
-    },
-    entityGroupSelected(entityGroup) {
-      this.$store.dispatch('configuration/toggleEntityGroup', entityGroup)
-    },
-    resetSelections() {
-      this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
-    },
     selectEntitiesAndBeginLoaderInstall() {
-      this.$store.dispatch('configuration/selectEntities').then(() => {
+      this.selectEntities().then(() => {
         this.$router.push({ name: 'loaders' })
         Vue.toasted.global.success(
           `Entities Saved - ${this.extractorNameFromRoute}`
@@ -138,12 +135,12 @@ export default {
     },
     updateSelectionsBasedOnTargetSelectionMode(targetMode) {
       if (targetMode === this.selectionModeAll) {
-        this.$store.dispatch('configuration/toggleAllEntityGroupsOn')
+        this.toggleAllEntityGroupsOn()
       } else if (
         targetMode === this.selectionModeCustom &&
         this.getAreAllSelected
       ) {
-        this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
+        this.toggleAllEntityGroupsOff()
       }
     }
   }
@@ -199,7 +196,7 @@ export default {
                 <button
                   v-if="hasSelectedAttributes"
                   class="button is-text"
-                  @click="resetSelections"
+                  @click="toggleAllEntityGroupsOff"
                 >
                   Clear Selection
                 </button>
@@ -230,7 +227,7 @@ export default {
                 :class="{
                   'is-interactive-secondary is-outlined': entityGroup.selected
                 }"
-                @click.stop="entityGroupSelected(entityGroup)"
+                @click.stop="toggleEntityGroup(entityGroup)"
                 >{{ entityGroup.name }}</a
               >
               <div class="entity-group">
@@ -242,7 +239,7 @@ export default {
                   }"
                   class="chip button is-rounded is-outlined is-small attribute"
                   @click.stop="
-                    entityAttributeSelected({ entityGroup, attribute })
+                    toggleEntityAttribute({ entityGroup, attribute })
                   "
                 >
                   {{ attribute.name }}
