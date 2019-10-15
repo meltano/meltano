@@ -56,7 +56,7 @@ export default {
   },
   created() {
     this.extractorNameFromRoute = this.$route.params.extractor
-    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+    this.getInstalledPlugins().then(() => {
       const needsInstallation =
         this.extractor.name !== this.extractorNameFromRoute
       if (needsInstallation) {
@@ -74,10 +74,20 @@ export default {
     })
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetExtractorInFocusConfiguration')
+    this.resetExtractorInFocusConfiguration()
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    ...mapActions('configuration', [
+      'getExtractorConfiguration',
+      'resetExtractorInFocusConfiguration',
+      'savePluginConfiguration',
+      'updateRecentELTSelections'
+    ]),
+    ...mapActions('plugins', [
+      'addPlugin',
+      'getInstalledPlugins',
+      'installPlugin'
+    ]),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -91,31 +101,24 @@ export default {
       }
     },
     prepareExtractorConfiguration() {
-      return this.$store.dispatch(
-        'configuration/getExtractorConfiguration',
-        this.extractorNameFromRoute
-      )
+      return this.getExtractorConfiguration(this.extractorNameFromRoute)
     },
     saveConfigAndBeginEntitySelection() {
-      this.$store
-        .dispatch('configuration/savePluginConfiguration', {
-          name: this.extractor.name,
-          type: 'extractors',
-          config: this.extractorInFocusConfiguration.config
+      this.savePluginConfiguration({
+        name: this.extractor.name,
+        type: 'extractors',
+        config: this.extractorInFocusConfiguration.config
+      }).then(() => {
+        this.updateRecentELTSelections({
+          type: 'extractor',
+          value: this.extractor
         })
-        .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
-            type: 'extractor',
-            value: this.extractor
-          })
-          this.$router.push({
-            name: 'extractorEntities',
-            params: { extractor: this.extractor.name }
-          })
-          Vue.toasted.global.success(
-            `Connection Saved - ${this.extractor.name}`
-          )
+        this.$router.push({
+          name: 'extractorEntities',
+          params: { extractor: this.extractor.name }
         })
+        Vue.toasted.global.success(`Connection Saved - ${this.extractor.name}`)
+      })
     }
   }
 }
