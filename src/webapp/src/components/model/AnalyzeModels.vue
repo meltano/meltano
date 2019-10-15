@@ -20,16 +20,22 @@ export default {
     ...mapState('repos', ['models'])
   },
   created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-    this.$store.dispatch('repos/getModels')
+    this.getAllPlugins()
+    this.getInstalledPlugins()
+    this.getModels()
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    ...mapActions('plugins', [
+      'addPlugin',
+      'getAllPlugins',
+      'getInstalledPlugins',
+      'installPlugin'
+    ]),
+    ...mapActions('repos', ['getModels']),
     installModel(model) {
       this.addPlugin({ pluginType: 'models', name: model })
         .then(() => this.installPlugin({ pluginType: 'models', name: model }))
-        .then(() => this.$store.dispatch('repos/getModels'))
+        .then(() => this.getModels())
     }
   }
 }
