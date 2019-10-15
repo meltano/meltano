@@ -539,6 +539,14 @@ class SnowflakeSpecLoader:
             self.roles_granted_to_user[user] = conn.show_roles_granted_to_user(user)
 
     def generate_revoke_queries(self) -> List[Dict]:
+        """
+        Starting point to generate all the revoke queries.
+
+        For each entity type (e.g. user or role) that is affected by the spec,
+        the proper sql revoke queries are generated.
+
+        Returns all the SQL commands as a list.
+        """
         sql_commands = []
 
         generator = SnowflakeRevokesGenerator(
@@ -546,8 +554,6 @@ class SnowflakeSpecLoader:
         )
 
         click.secho("Generating revoke statements for Snowflake", fg="green")
-
-        # fake_command = {"sql": "REVOKE THIS", "already_granted": False}
 
         for entity_type, entry in self.spec.items():
             if entity_type in ["databases", "warehouses", "version"]:
@@ -658,7 +664,7 @@ class SnowflakeSpecLoader:
             if command["sql"].startswith("REVOKE ALL"):
                 revoke = command["sql"].upper()
                 if revoke in revokes:
-                    # If there is already a GRANT OWNERSHIP for the same
+                    # If there is already a REVOKE ALL for the same
                     #  DB/SCHEMA/TABLE --> remove the one before it
                     #  (only keep the last one)
                     del sql_commands[i]

@@ -245,7 +245,7 @@ class SnowflakeGrantsGenerator:
 
     def generate_warehouse_grants(self, role: str, warehouse: str) -> List[str]:
         """
-        Generate the GRANT statements for Warehouse usage (only one type at the moment).
+        Generate the GRANT statements for Warehouse usage and operation.
 
         role: the name of the role the privileges are GRANTed to
         warehouse: the name of the warehouse (e.g. "transforming")
@@ -255,11 +255,6 @@ class SnowflakeGrantsGenerator:
         sql_commands = []
 
         if self.check_grant_to_role(role, "USAGE", "WAREHOUSE", warehouse):
-            already_granted = True
-        else:
-            already_granted = False
-
-        if self.check_grant_to_role(role, "OPERATE", "WAREHOUSE", warehouse):
             already_granted = True
         else:
             already_granted = False
@@ -275,6 +270,11 @@ class SnowflakeGrantsGenerator:
                 ),
             }
         )
+
+        if self.check_grant_to_role(role, "OPERATE", "WAREHOUSE", warehouse):
+            already_granted = True
+        else:
+            already_granted = False
 
         sql_commands.append(
             {

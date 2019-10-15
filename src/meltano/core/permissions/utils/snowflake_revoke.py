@@ -75,18 +75,6 @@ class SnowflakeRevokesGenerator:
         """
         sql_commands = []
 
-        # Track all the DBs and schemas that have been given access to (GRANT USAGE)
-        # the given role. Used in order to recursively grant the required access
-        # to DBs or schemas implicitly referenced when permissions are GRANTED for a
-        # child Schema or Table.
-        # Example: A role is given read access to table MY_DB.MY_SCHEMA.MY_TABLE
-        # 1. In order to access MY_TABLE, the role has to be able to access MY_DB.MY_SCHEMA
-        # 2. The script checks if USAGE on MY_DB has been granted to the role and
-        #    assigns it to the role if not (and adds the DB to usage_granted["databases"])
-        # 3. The same for the schema MY_SCHEMA
-        # 4. Finaly the requested permissions are GRANTED to role for MY_TABLE
-        usage_granted = {"databases": set(), "schemas": set()}
-
         try:
             for warehouse in config["warehouses"]:
                 new_commands = self.generate_warehouse_revokes(
@@ -157,7 +145,7 @@ class SnowflakeRevokesGenerator:
         """
         Generate the REVOKE statements for Warehouse usage (only one type at the moment).
 
-        role: the name of the role the privileges are GRANTed to
+        role: the name of the role the privileges are REVOKEd to
         warehouse: the name of the warehouse (e.g. "transforming")
 
         Returns the SQL command generated
