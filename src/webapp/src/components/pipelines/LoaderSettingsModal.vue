@@ -1,6 +1,9 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
+
+import lodash from 'lodash'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
@@ -9,6 +12,11 @@ export default {
   components: {
     ConnectorLogo,
     ConnectorSettings
+  },
+  data() {
+    return {
+      localConfiguration: {}
+    }
   },
   computed: {
     ...mapGetters('plugins', [
@@ -27,13 +35,13 @@ export default {
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
-        this.loaderInFocusConfiguration,
+        this.localConfiguration,
         'config'
       )
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.loaderInFocusConfiguration,
+        this.localConfiguration,
         this.loader.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
@@ -52,11 +60,11 @@ export default {
           name: this.loaderNameFromRoute
         }
         this.addPlugin(config).then(() => {
-          this.prepareLoaderConfiguration()
+          this.getLoaderConfiguration().then(this.createEditableConfiguration)
           this.installPlugin(config)
         })
       } else {
-        this.prepareLoaderConfiguration()
+        this.getLoaderConfiguration().then(this.createEditableConfiguration)
       }
     })
   },
@@ -72,8 +80,14 @@ export default {
         this.$router.push({ name: 'loaders' })
       }
     },
-    prepareLoaderConfiguration() {
-      this.$store.dispatch(
+    createEditableConfiguration() {
+      this.localConfiguration = Object.assign(
+        {},
+        lodash.cloneDeep(this.loaderInFocusConfiguration)
+      )
+    },
+    getLoaderConfiguration() {
+      return this.$store.dispatch(
         'configuration/getLoaderConfiguration',
         this.loaderNameFromRoute
       )
@@ -83,7 +97,7 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.loader.name,
           type: 'loaders',
-          config: this.loaderInFocusConfiguration.config
+          config: this.localConfiguration.config
         })
         .then(() => {
           this.$store.dispatch('configuration/updateRecentELTSelections', {
@@ -131,7 +145,7 @@ export default {
           </div>
           <ConnectorSettings
             field-class="is-small"
-            :config-settings="loaderInFocusConfiguration"
+            :config-settings="localConfiguration"
           />
           <div v-if="loader.docs" class="content has-text-centered mt1r">
             <p>
