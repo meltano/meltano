@@ -37,6 +37,7 @@ class DbtRunner(Runner):
                 # inject the inferred 'schemas' from the ELTContext
                 "MELTANO_LOAD_SCHEMA": load["schema"],
                 "MELTANO_ANALYZE_SCHEMA": analyze["schema"],
+                "DBT_TARGET": analyze["dialect"],
                 # inject the extractor & loader configuration as ENV variables.
                 # that means dbt will have access to all the configuration of
                 # the extractor and loader

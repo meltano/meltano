@@ -2,8 +2,18 @@ config:
   send_anonymous_usage_stats: False
   use_colors: True
 meltano:
-  target: postgres
+  target: "{{ env_var('DBT_TARGET') }}"
   outputs:
+    snowflake:
+      type: snowflake
+      threads: 2
+      account: "{{ env_var('SF_ACCOUNT') }}"
+      user: "{{ env_var('SF_USER') }}"
+      password: "{{ env_var('SF_PASSWORD') }}"
+      role: "{{ env_var('SF_ROLE') }}"
+      database: "{{ env_var('SF_DATABASE') }}"
+      warehouse: "{{ env_var('SF_WAREHOUSE') }}"
+      schema: "{{ env_var('MELTANO_ANALYZE_SCHEMA', 'ANALYTICS') }}"
     postgres:
       type: postgres
       threads: 2
