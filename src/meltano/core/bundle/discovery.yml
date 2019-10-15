@@ -2,10 +2,11 @@ version: 4
 extractors:
   - name: tap-carbon-intensity
     namespace: tap_carbon
+    docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
   - name: tap-csv
     namespace: tap_csv
-    docs: 'http://meltano.com/docs/plugins.html#carbon-intensity'
+    docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
     settings:
       - name: csv_files_definition
@@ -13,10 +14,9 @@ extractors:
         label: CSV Files Definition
         kind: file
         documentation: https://gitlab.com/meltano/tap-csv#run
-    docs: https://meltano.com/docs/plugins.html#tap-csv
   - name: tap-fastly
     namespace: tap_fastly
-    docs: 'http://meltano.com/docs/plugins.html#fastly'
+    docs: 'https://meltano.com/plugins/extractors/fastly.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
     settings:
       - name: api_token
@@ -27,7 +27,7 @@ extractors:
         kind: date_iso8601
   - name: tap-gitlab
     namespace: tap_gitlab
-    docs: 'http://meltano.com/docs/plugins.html#gitlab'
+    docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
     settings_group_validation:
       - ['api_url', 'private_token', 'groups', 'start_date']
@@ -55,7 +55,7 @@ extractors:
         kind: date_iso8601
   - name: tap-google-analytics
     namespace: tap_google_analytics
-    docs: 'http://meltano.com/docs/plugins.html#google-analytics'
+    docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
     settings:
       - name: key_file_location
@@ -74,7 +74,7 @@ extractors:
         kind: date_iso8601
   - name: tap-marketo
     namespace: tap_marketo
-    docs: 'http://meltano.com/docs/plugins.html#marketo'
+    docs: 'https://meltano.com/plugins/extractors/marketo.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
     settings:
       - name: identity
@@ -87,7 +87,7 @@ extractors:
         kind: date_iso8601
   - name: tap-mongodb
     namespace: tap_mongodb
-    docs: 'http://meltano.com/docs/plugins.html#mongodb'
+    docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     settings:
       - name: user
@@ -101,7 +101,7 @@ extractors:
         label: Database Name
   - name: tap-salesforce
     namespace: tap_salesforce
-    docs: 'http://meltano.com/docs/plugins.html#salesforce'
+    docs: 'https://meltano.com/plugins/extractors/salesforce.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
     settings:
       # TODO: remove, should be injected from Meltano
@@ -121,7 +121,7 @@ extractors:
         kind: date_iso8601
   - name: tap-stripe
     namespace: tap_stripe
-    docs: 'http://meltano.com/docs/plugins.html#stripe'
+    docs: 'https://meltano.com/plugins/extractors/stripe.html'
     pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
     settings:
       - name: account_id
@@ -133,7 +133,7 @@ extractors:
         kind: date_iso8601
   - name: tap-zendesk
     namespace: tap_zendesk
-    docs: 'http://meltano.com/docs/plugins.html#zendesk'
+    docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     pip_url: 'tap-zendesk'
     settings:
       - name: email
@@ -149,7 +149,7 @@ extractors:
 loaders:
   - name: target-csv
     namespace: target_csv
-    docs: http://meltano.com/docs/loaders.html#comma-separated-values-csv
+    docs: 'https://meltano.com/plugins/loaders/csv.html'
     pip_url: git+https://gitlab.com/meltano/target-csv.git
     settings:
       - name: delimiter
@@ -176,7 +176,7 @@ loaders:
         description: A one-character string used to quote fields containing special characters, such as the delimiter or quotechar, or which contain new-line characters. It defaults to single quote (').
   - name: target-snowflake
     namespace: snowflake
-    docs: 'https://www.meltano.com/docs/plugins.html#snowflake'
+    docs: 'https://meltano.com/plugins/loaders/snowflake.html'
     pip_url: 'git+https://gitlab.com/meltano/target-snowflake.git'
     signup_url: 'https://trial.snowflake.com?referrer=meltano'
     settings:
@@ -202,7 +202,7 @@ loaders:
         description: The name of the Snowflake warehouse you want to use
   - name: target-postgres
     namespace: postgres
-    docs: 'http://meltano.com/docs/loaders.html#postgresql-database'
+    docs: 'https://meltano.com/plugins/loaders/postgres.html'
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
     settings:
       - name: user
@@ -224,7 +224,7 @@ loaders:
         value: warehouse
   - name: target-sqlite
     namespace: sqlite
-    docs: 'http://meltano.com/docs/loaders.html#sqlite-database'
+    docs: 'https://meltano.com/plugins/loaders/sqlite.html'
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     settings:
       - name: database
