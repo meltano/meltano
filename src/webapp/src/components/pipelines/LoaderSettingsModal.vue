@@ -44,7 +44,7 @@ export default {
   },
   created() {
     this.loaderNameFromRoute = this.$route.params.loader
-    this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
+    this.getInstalledPlugins().then(() => {
       const needsInstallation = this.loader.name !== this.loaderNameFromRoute
       if (needsInstallation) {
         const config = {
@@ -61,10 +61,20 @@ export default {
     })
   },
   beforeDestroy() {
-    this.$store.dispatch('configuration/resetLoaderInFocusConfiguration')
+    this.resetLoaderInFocusConfiguration()
   },
   methods: {
-    ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    ...mapActions('configuration', [
+      'getLoaderConfiguration',
+      'resetLoaderInFocusConfiguration',
+      'savePluginConfiguration',
+      'updateRecentELTSelections'
+    ]),
+    ...mapActions('plugins', [
+      'addPlugin',
+      'getInstalledPlugins',
+      'installPlugin'
+    ]),
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -73,26 +83,21 @@ export default {
       }
     },
     prepareLoaderConfiguration() {
-      this.$store.dispatch(
-        'configuration/getLoaderConfiguration',
-        this.loaderNameFromRoute
-      )
+      this.getLoaderConfiguration(this.loaderNameFromRoute)
     },
     saveConfigAndGoToTransforms() {
-      this.$store
-        .dispatch('configuration/savePluginConfiguration', {
-          name: this.loader.name,
-          type: 'loaders',
-          config: this.loaderInFocusConfiguration.config
+      this.savePluginConfiguration({
+        name: this.loader.name,
+        type: 'loaders',
+        config: this.loaderInFocusConfiguration.config
+      }).then(() => {
+        this.updateRecentELTSelections({
+          type: 'loader',
+          value: this.loader
         })
-        .then(() => {
-          this.$store.dispatch('configuration/updateRecentELTSelections', {
-            type: 'loader',
-            value: this.loader
-          })
-          this.$router.push({ name: 'transforms' })
-          Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
-        })
+        this.$router.push({ name: 'transforms' })
+        Vue.toasted.global.success(`Connector Saved - ${this.loader.name}`)
+      })
     }
   }
 }
