@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 import draggable from 'vuedraggable'
 
@@ -16,7 +16,7 @@ export default {
         return this.order.assigned
       },
       set(value) {
-        this.$store.commit('designs/setOrderAssigned', value)
+        this.setOrderAssigned(value)
       }
     },
     draggableOptions() {
@@ -32,7 +32,7 @@ export default {
         return this.order.unassigned
       },
       set(value) {
-        this.$store.commit('designs/setOrderUnassigned', value)
+        this.setOrderUnassigned(value)
       }
     }
   },
@@ -41,7 +41,8 @@ export default {
       'resetSortAttributes',
       'runQuery',
       'updateSortAttribute'
-    ])
+    ]),
+    ...mapMutations('designs', ['setOrderAssigned', 'setOrderUnassigned'])
   }
 }
 </script>
