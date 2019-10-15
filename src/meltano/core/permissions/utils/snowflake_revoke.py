@@ -87,6 +87,7 @@ class SnowflakeRevokesGenerator:
                     role
                 )
             )
+
         try:
             for database in config["privileges"]["databases"]["read"]:
                 new_commands = self.generate_database_revokes(
@@ -109,6 +110,34 @@ class SnowflakeRevokesGenerator:
         except KeyError:
             logging.debug(
                 "`privileges.databases.write` not found for role {}, skipping generation of DATABASE write level REVOKE statements.".format(
+                    role
+                )
+            )
+
+        try:
+            for schema in config["privileges"]["schemas"]["read"]:
+                database = schema.split(".")[0]
+                new_commands = self.generate_database_revokes(
+                    role=role, database=database, shared_dbs=shared_dbs
+                )
+                sql_commands.extend(new_commands)
+        except KeyError:
+            logging.debug(
+                "`privileges.schemas.read` not found for role {}, skipping generation of DATABASE, via schema, read level REVOKE statements.".format(
+                    role
+                )
+            )
+
+        try:
+            for schema in config["privileges"]["schemas"]["write"]:
+                database = schema.split(".")[0]
+                new_commands = self.generate_database_revokes(
+                    role=role, database=database, shared_dbs=shared_dbs
+                )
+                sql_commands.extend(new_commands)
+        except KeyError:
+            logging.debug(
+                "`privileges.schemas.write` not found for role {}, skipping generation of DATABASE, via schema, write level REVOKE statements.".format(
                     role
                 )
             )
