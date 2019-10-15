@@ -863,6 +863,13 @@
   dependencies:
     lodash.throttle "^4.1.1"
 
+"@vuepress/plugin-active-header-links@^1.0.0-rc.1":
+  version "1.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@vuepress/plugin-active-header-links/-/plugin-active-header-links-1.0.0-rc.1.tgz#46dc6f2efe6aef10c36f870e02b6d7af473de0cc"
+  integrity sha512-EC1SrnWHIsbpIzfjCumTTiXnKXxKayM6YJJ6cPZHVVaP5BdEIiJdRuecs5hM44u4LigDqFbXbvwWN769Ygn65Q==
+  dependencies:
+    lodash.throttle "^4.1.1"
+
 "@vuepress/plugin-google-analytics@^1.0.0-alpha.0":
   version "1.0.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@vuepress/plugin-google-analytics/-/plugin-google-analytics-1.0.0-alpha.0.tgz#97acb3a512dca9b2b6e4014fa2d58da38e2a01b9"
@@ -7076,6 +7083,11 @@ vuepress-plugin-container@^2.0.2:
   integrity sha512-SrGYYT7lkie7xlIlAVhn+9sDW42MytNCoxWL/2uDr+q9wZA4h1uYlQvfc2DVjy+FsM9PPPSslkeo/zCpYVY82g==
   dependencies:
     markdown-it-container "^2.0.0"
+
+vuepress-plugin-google-tag-manager@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/vuepress-plugin-google-tag-manager/-/vuepress-plugin-google-tag-manager-0.0.3.tgz#94d0ff671e78e564c2777322df224083f34409ed"
+  integrity sha512-BjhvRVmPqeWnG6JojLjs4ZUTtzxE423KaT2D6llTxfUrDsFhhNTNO2myQpoQp6Buo9/wc8pLDDDyJxY5XWWdsA==
 
 vuepress@^1.0.0-alpha.30:
   version "1.0.0-alpha.30"
