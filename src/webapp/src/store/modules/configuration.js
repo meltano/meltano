@@ -127,14 +127,15 @@ const actions = {
   },
 
   getLoaderConfiguration({ commit, dispatch }, loader) {
-    dispatch('getPluginConfiguration', { name: loader, type: 'loaders' }).then(
-      response => {
-        commit('setInFocusConfiguration', {
-          configuration: response.data,
-          target: 'loaderInFocusConfiguration'
-        })
-      }
-    )
+    return dispatch('getPluginConfiguration', {
+      name: loader,
+      type: 'loaders'
+    }).then(response => {
+      commit('setInFocusConfiguration', {
+        configuration: response.data,
+        target: 'loaderInFocusConfiguration'
+      })
+    })
   },
 
   getPluginConfiguration(_, pluginPayload) {

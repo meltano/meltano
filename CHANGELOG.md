@@ -8,8 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-* Compress meltano-logo.png
 
+- Compress meltano-logo.png
 - [#1106](https://gitlab.com/meltano/meltano/issues/1106) Add description metadata to the GitLab extractor's Ultimate License configuration setting
 - [#1057](https://gitlab.com/meltano/meltano/issues/1057) Auto advance to Entity Selection when an extractor lacks configuration settings
 - [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Update Google Analytics to track `appVersion`, custom `projectId`, and to properly use the default `clientId`. The CLI also now uses `client_id` to differentiate between a CLI client id (not versioned) and the project id (versioned).
@@ -28,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1086](https://gitlab.com/meltano/meltano/issues/1086) Fix a concurrency issue when the `meltano.yml` file was updated.
 - [#1112](https://gitlab.com/meltano/meltano/issues/1112) Fix the "Run" button to improve UX by properly reflecting the running state for auto-running queries
+- [#1023](https://gitlab.com/meltano/meltano/issues/1023) Fix last vuex mutation warning with editable `localConfiguration` clone approach
 
 ### Breaks
 
@@ -55,6 +56,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1047](https://gitlab.com/meltano/meltano-marketing/issues/1047) Fix a bug where some configuration values were not redacted
 
 ### Fixes
+
 ### Breaks
 
 - [#1085](https://gitlab.com/meltano/meltano/issues/1085) Fix Analyze model dropdown to properly reflect installed `models`
