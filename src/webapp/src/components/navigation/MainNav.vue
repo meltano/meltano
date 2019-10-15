@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import capitalize from '@/filters/capitalize'
 import underscoreToSpace from '@/filters/underscoreToSpace'
@@ -55,9 +55,11 @@ export default {
     }
   },
   created() {
-    this.$store.dispatch('repos/getModels')
+    this.getModels()
   },
   methods: {
+    ...mapActions('repos', ['getModels']),
+    ...mapActions('system', ['upgrade']),
     closeMobileMenu() {
       this.isMobileMenuOpen = false
     },
@@ -68,7 +70,7 @@ export default {
       this.isMobileMenuOpen = !this.isMobileMenuOpen
     },
     startUpgrade() {
-      this.$store.dispatch('system/upgrade').then(() => {
+      this.upgrade().then(() => {
         document.location.reload()
       })
     }
