@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -33,12 +33,12 @@ export default {
       'activeReport',
       'chartType',
       'currentDesign',
+      'currentLimit',
       'currentModel',
       'currentSQL',
       'design',
       'filterOptions',
       'hasSQLError',
-      'loader',
       'isLoadingQuery',
       'reports',
       'resultAggregates',
@@ -52,6 +52,7 @@ export default {
       'filtersCount',
       'formattedSql',
       'getIsAttributeInFilters',
+      'getLoader',
       'getSelectedAttributesCount',
       'hasChartableResults',
       'hasFilters',
@@ -77,20 +78,20 @@ export default {
 
     limit: {
       get() {
-        return this.$store.getters['designs/currentLimit']
+        return this.currentLimit
       },
       set(value) {
-        this.$store.dispatch('designs/limitSet', value)
-        this.$store.dispatch('designs/getSQL', { run: false })
+        this.limitSet(value)
+        this.getSQL({ run: false })
       }
     },
 
     loader: {
       get() {
-        return this.$store.getters['designs/getLoader']
+        return this.getLoader
       },
       set(value) {
-        this.$store.commit('designs/setLoader', value)
+        this.setLoader(value)
 
         // set the default loader for unknown designs
         localStorage.setItem('loader', value)
@@ -104,18 +105,43 @@ export default {
     }
   },
   beforeDestroy() {
-    this.$store.dispatch('designs/resetDefaults')
+    this.resetDefaults()
   },
   beforeRouteUpdate(to, from, next) {
-    this.$store.dispatch('designs/resetDefaults').then(this.initializeDesign)
+    this.resetDefaults().then(this.initializeDesign)
     next()
   },
   created() {
     this.initializeDesign()
   },
   methods: {
-    ...mapActions('dashboards', ['getDashboards']),
-    ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
+    ...mapActions('dashboards', [
+      'addReportToDashboard',
+      'getDashboards',
+      'removeReportFromDashboard'
+    ]),
+    ...mapActions('designs', [
+      'expandJoinRow',
+      'expandRow',
+      'getDesign',
+      'getFilterOptions',
+      'getSQL',
+      'limitSet',
+      'loadReport',
+      'resetDefaults',
+      'resetErrorMessage',
+      'runQuery',
+      'saveReport',
+      'setChartType',
+      'toggleAggregate',
+      'toggleColumn',
+      'toggleTimeframe',
+      'toggleTimeframePeriod',
+      'updateReport',
+      'updateSaveReportSettings'
+    ]),
+    ...mapActions('plugins', ['getInstalledPlugins']),
+    ...mapMutations('designs', ['setLoader']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -125,13 +151,13 @@ export default {
       this.isInitialized = false
 
       const { slug, namespace, model, design } = this.$route.params
-      const uponDesign = this.$store.dispatch('designs/getDesign', {
+      const uponDesign = this.getDesign({
         namespace,
         model,
         design,
         slug
       })
-      const uponPlugins = this.$store.dispatch('plugins/getInstalledPlugins')
+      const uponPlugins = this.getInstalledPlugins()
 
       Promise.all([uponDesign, uponPlugins]).then(() => {
         const defaultLoader =
@@ -142,20 +168,20 @@ export default {
           this.installedPlugins.loaders[0].name
 
         // don't use the setter here not to update the user's preferences
-        this.$store.commit('designs/setLoader', defaultLoader)
+        this.setLoader(defaultLoader)
 
         // validate initialization so UI can display while removing the loading bar
         this.isInitialized = true
       })
 
-      this.$store.dispatch('designs/getFilterOptions')
+      this.getFilterOptions()
     },
 
     toggleActiveReportInDashboard(dashboard) {
       const methodName = this.isActiveReportInDashboard(dashboard)
         ? 'removeReportFromDashboard'
         : 'addReportToDashboard'
-      this.$store.dispatch(`dashboards/${methodName}`, {
+      this[methodName]({
         reportId: this.activeReport.id,
         dashboardId: dashboard.id
       })
@@ -166,61 +192,30 @@ export default {
       this.$refs['filter-dropdown'].open()
     },
 
-    setChartType(chartType) {
-      this.$store.dispatch('designs/setChartType', chartType)
-    },
-
-    setReportName(name) {
-      this.$store.dispatch('designs/updateSaveReportSettings', name)
-    },
-
-    tableRowClicked(relatedTable) {
-      this.$store.dispatch('designs/expandRow', relatedTable)
-    },
-
     joinRowClicked(join) {
-      this.$store.dispatch('designs/expandJoinRow', join)
-    },
-
-    columnSelected(column) {
-      this.$store.dispatch('designs/toggleColumn', column)
+      this.expandJoinRow(join)
     },
 
     timeframeSelected(timeframe) {
       if (!this.canToggleTimeframe) {
         return
       }
-      this.$store.dispatch('designs/toggleTimeframe', timeframe)
-    },
-
-    timeframePeriodSelected(period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', period)
+      this.toggleTimeframe(timeframe)
     },
 
     aggregateSelected(aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate)
+      this.toggleAggregate(aggregate)
     },
 
-    joinColumnSelected(join, column) {
-      this.$store.dispatch('designs/toggleColumn', column)
+    loadReportThenToast(report) {
+      this.loadReport({ name: report.name }).then(() => {
+        this.$router.push({ name: 'report', params: report })
+      })
     },
 
-    joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate)
-    },
-
-    loadReport(report) {
-      this.$store
-        .dispatch('designs/loadReport', { name: report.name })
-        .then(() => {
-          this.$router.push({ name: 'report', params: report })
-        })
-    },
-
-    saveReport() {
+    saveReportThenToast() {
       const reportName = this.saveReportSettings.name
-      this.$store
-        .dispatch('designs/saveReport', this.saveReportSettings)
+      this.saveReport(this.saveReportSettings)
         .then(() => {
           Vue.toasted.global.success(`Report Saved - ${reportName}`)
         })
@@ -229,8 +224,8 @@ export default {
         })
     },
 
-    updateReport() {
-      this.$store.dispatch('designs/updateReport').then(() => {
+    updateReportThenToast() {
+      this.updateReport().then(() => {
         Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
       })
     },
@@ -267,7 +262,7 @@ export default {
                 <a
                   class="dropdown-item"
                   data-dropdown-auto-close
-                  @click="toggleNewDashboardModal()"
+                  @click="toggleNewDashboardModal"
                 >
                   New Dashboard
                 </a>
@@ -315,7 +310,7 @@ export default {
               <button
                 v-if="hasActiveReport"
                 class="button"
-                @click="updateReport()"
+                @click="updateReportThenToast"
               >
                 <span>Save Report</span>
               </button>
@@ -325,7 +320,9 @@ export default {
                 :disabled="!hasChartableResults"
                 :label="hasActiveReport ? '' : 'Save Report'"
                 is-right-aligned
-                @dropdown:open="setReportName(`report-${new Date().getTime()}`)"
+                @dropdown:open="
+                  updateSaveReportSettings(`report-${new Date().getTime()}`)
+                "
               >
                 <div class="dropdown-content">
                   <div class="dropdown-item">
@@ -339,7 +336,7 @@ export default {
                           class="input"
                           type="text"
                           placeholder="Name your report"
-                          @input="setReportName($event.target.value)"
+                          @input="updateSaveReportSettings($event.target.value)"
                         />
                       </div>
                     </div>
@@ -351,7 +348,7 @@ export default {
                         class="button"
                         :disabled="!saveReportSettings.name"
                         data-dropdown-auto-close
-                        @click="saveReport"
+                        @click="saveReportThenToast"
                       >
                         Save
                       </button>
@@ -374,7 +371,7 @@ export default {
                   :key="report.name"
                   class="dropdown-item"
                   data-dropdown-auto-close
-                  @click="loadReport(report)"
+                  @click="loadReportThenToast(report)"
                 >
                   {{ report.name }}
                 </a>
@@ -501,7 +498,7 @@ export default {
                   has-text-grey
                   is-expandable"
                   :class="{ 'is-collapsed': design.relatedTable.collapsed }"
-                  @click="tableRowClicked(design.relatedTable)"
+                  @click="expandRow(design.relatedTable)"
                 >
                   <span class="icon is-small panel-icon">
                     <font-awesome-icon icon="table"></font-awesome-icon>
@@ -536,7 +533,7 @@ export default {
                       :key="period.label"
                       class="panel-block indented"
                       :class="{ 'is-active': period.selected }"
-                      @click="timeframePeriodSelected(period)"
+                      @click="toggleTimeframePeriod(period)"
                     >
                       {{ period.label }}
                     </a>
@@ -548,7 +545,7 @@ export default {
                     :key="column.label"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': column.selected }"
-                    @click="columnSelected(column)"
+                    @click="toggleColumn(column)"
                   >
                     {{ column.label }}
                     <button
@@ -663,7 +660,7 @@ export default {
                             :key="timeframe.label.concat('-', period.label)"
                             class="panel-block indented"
                             :class="{ 'is-active': period.selected }"
-                            @click="timeframePeriodSelected(period)"
+                            @click="toggleTimeframePeriod(period)"
                           >
                             {{ period.label }}
                           </a>
@@ -676,7 +673,7 @@ export default {
                         :key="column.label"
                         class="panel-block space-between has-text-weight-medium"
                         :class="{ 'is-active': column.selected }"
-                        @click="joinColumnSelected(join, column)"
+                        @click="toggleColumn(column)"
                       >
                         {{ column.label }}
                         <button
@@ -717,7 +714,7 @@ export default {
                         :key="aggregate.label"
                         class="panel-block space-between has-text-weight-medium"
                         :class="{ 'is-active': aggregate.selected }"
-                        @click="joinAggregateSelected(join, aggregate)"
+                        @click="toggleAggregate(aggregate)"
                       >
                         {{ aggregate.label }}
                         <button
