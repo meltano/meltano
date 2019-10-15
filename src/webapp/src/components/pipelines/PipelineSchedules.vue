@@ -1,5 +1,5 @@
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
 
@@ -11,9 +11,9 @@ export default {
     ScheduleTableHead
   },
   computed: {
-    ...mapState('configuration', ['pipelines']),
     ...mapGetters('configuration', ['getHasPipelines']),
     ...mapGetters('plugins', ['getIsPluginInstalled']),
+    ...mapState('configuration', ['pipelines']),
     getFormattedDateStringYYYYMMDD() {
       return val => utils.formatDateStringYYYYMMDD(val)
     }
@@ -26,9 +26,10 @@ export default {
     })
   },
   created() {
-    this.$store.dispatch('configuration/getAllPipelineSchedules')
+    this.getAllPipelineSchedules()
   },
   methods: {
+    ...mapActions('configuration', ['getAllPipelineSchedules', 'run']),
     goToCreatePipeline() {
       this.$router.push({ name: 'createSchedule' })
     },
@@ -36,7 +37,7 @@ export default {
       this.$router.push({ name: 'runLog', params: { jobId } })
     },
     runELT(pipeline) {
-      this.$store.dispatch('configuration/run', pipeline)
+      this.run(pipeline)
     }
   }
 }
