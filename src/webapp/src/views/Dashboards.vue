@@ -38,8 +38,8 @@ export default {
     }
   },
   beforeDestroy() {
-    this.$store.dispatch('dashboards/resetActiveDashboard')
-    this.$store.dispatch('dashboards/resetActiveDashboardReports')
+    this.resetActiveDashboard()
+    this.resetActiveDashboardReports()
   },
   created() {
     this.isInitializing = true
@@ -51,7 +51,9 @@ export default {
     ...mapActions('dashboards', [
       'initialize',
       'updateCurrentDashboard',
-      'getActiveDashboardReportsWithQueryResults'
+      'getActiveDashboardReportsWithQueryResults',
+      'resetActiveDashboard',
+      'resetActiveDashboardReports'
     ]),
     goToDashboard(dashboard) {
       this.updateCurrentDashboard(dashboard).then(() => {
