@@ -42,7 +42,7 @@ meltano_base: &meltano_base
     - *docker_build_before_script
     - export IMAGE_TAG=$BASE_SHA
   only:
-    - changes:
+    changes:
       - docker/base/Dockerfile
       - requirements.txt
 
@@ -57,7 +57,7 @@ meltano_base_forks: &meltano_base
   before_script:
     - *docker_build_before_script
     - export IMAGE_TAG=$BASE_SHA
-  except: 
+  except:
     - branches@meltano/meltano
 
 #############
