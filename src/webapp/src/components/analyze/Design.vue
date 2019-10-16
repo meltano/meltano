@@ -24,6 +24,7 @@ export default {
   },
   data() {
     return {
+      isAutorunQuery: true,
       isInitialized: false,
       isNewDashboardModalOpen: false
     }
@@ -112,6 +113,7 @@ export default {
   },
   created() {
     this.initializeDesign()
+    this.initializeSettings()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -149,6 +151,19 @@ export default {
       })
 
       this.$store.dispatch('designs/getFilterOptions')
+    },
+
+    initializeSettings() {
+      const hasAutorunQuerySetting = 'isAutorunQuery' in localStorage
+      if (hasAutorunQuerySetting) {
+        this.isAutorunQuery = localStorage.getItem('isAutorunQuery') === 'true'
+      } else {
+        this.persistSettingsChange()
+      }
+    },
+
+    persistSettingsChange() {
+      localStorage.setItem('isAutorunQuery', this.isAutorunQuery)
     },
 
     toggleActiveReportInDashboard(dashboard) {
@@ -405,7 +420,7 @@ export default {
               <h2 class="title is-5">Query</h2>
             </div>
             <div class="column is-three-fifths">
-              <div class="field has-addons is-pulled-right">
+              <div class="field has-addons is-pulled-right is-vcentered">
                 <Dropdown
                   label="SQL"
                   button-classes="is-text is-thin is-small"
@@ -434,8 +449,13 @@ export default {
                   <Dropdown is-right-aligned button-classes="is-thin">
                     <div class="dropdown-content is-unselectable">
                       <div class="dropdown-item">
-                        <label class="checkbox">
-                          <input type="checkbox" />
+                        <label class="checkbox" for="checkbox-autorun">
+                          <input
+                            id="checkbox-autorun"
+                            v-model="isAutorunQuery"
+                            type="checkbox"
+                            @change="persistSettingsChange"
+                          />
                           Autorun queries
                         </label>
                       </div>
