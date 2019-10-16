@@ -27,7 +27,10 @@ def permissions():
     "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
 )
 @click.option(
-    "--full-refresh", "refresh", help="Revoke all existing permissions before granting.", is_flag=True
+    "--full-refresh",
+    "refresh",
+    help="Revoke all existing permissions before granting.",
+    is_flag=True,
 )
 @project()
 def grant(project, db, spec, dry, diff, refresh):
