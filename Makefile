@@ -38,7 +38,7 @@ test:
 	${DCRN} api ./setup.py test
 
 # pip related
-TO_CLEAN  = ./build ./dist src/*.egg-info
+TO_CLEAN  = ./build ./dist
 # built UI
 TO_CLEAN += ./${MELTANO_API}/static/js
 TO_CLEAN += ./${MELTANO_API}/static/css

@@ -60,7 +60,7 @@ install_e2e:
     - python -m venv venv
     - python --version
     - source ./venv/bin/activate
-    - pip install .
+    - pip install -e .
   script:
     - apt-get update
     - curl -sL https://deb.nodesource.com/setup_10.x | bash -
