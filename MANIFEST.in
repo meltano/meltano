@@ -1,6 +1,7 @@
 include *.py
 include *.m5o
 include LICENSE
+include VERSION
 
 graft src/meltano
 graft tests

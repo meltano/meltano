@@ -15,49 +15,6 @@ stages:
   - distribute
   - review
 
-lint:
-  stage: test
-  image:
-    name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-    entrypoint: [""]
-  script:
-    - pip install black
-    - make show_lint
-
-install_e2e:
-  stage: test
-  script:
-    - python -m venv venv
-    - python --version
-    - source ./venv/bin/activate
-    - pip install -e .
-    - apt-get update
-    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
-    - apt-get -y install nodejs
-    - apt-get -y install gcc g++ make
-    - node -v
-    - npm -v
-    - npm install -g yarn
-    - make bundle
-    - meltano --version
-    - pip list
-    - mkdir -p /home/projects
-    - cd /home/projects
-    - meltano init --no_usage_stats test_project
-    - cd test_project
-    - meltano discover all
-    - meltano add extractor tap-carbon-intensity
-    - meltano add loader target-sqlite
-    - meltano elt tap-carbon-intensity target-sqlite
-
-test_meltano_ui:
-  stage: test
-  image: node:10.16.2
-  script:
-    - cd src/webapp
-    - yarn
-    - yarn test:unit # change `unit` to `test` once e2e is wired up
-
 docs:
   variables:
     REMOTE_EXEC: ssh -o StrictHostKeyChecking=no $SSH_USER_DOMAIN -p$SSH_PORT
@@ -89,6 +46,51 @@ docs:
     entrypoint: [""]
   before_script:
     - pip install '.[dev]'
+
+lint:
+  <<: *test
+  before_script:
+    - pip install black
+  script:
+    - make show_lint
+
+install_e2e:
+  <<: *test
+  before_script:
+    - python -m venv venv
+    - python --version
+    - source ./venv/bin/activate
+    - pip install -e .
+  script:
+    - apt-get update
+    - curl -sL https://deb.nodesource.com/setup_10.x | bash -
+    - apt-get -y install nodejs
+    - apt-get -y install gcc g++ make
+    - node -v
+    - npm -v
+    - npm install -g yarn
+    - make bundle
+    - meltano --version
+    - pip list
+    - mkdir -p /home/projects
+    - cd /home/projects
+    - meltano init --no_usage_stats test_project
+    - cd test_project
+    - meltano discover all
+    - meltano add extractor tap-carbon-intensity
+    - meltano add loader target-sqlite
+    - meltano elt tap-carbon-intensity target-sqlite
+
+test_meltano_ui:
+  stage: test
+  image: node:10.16.2
+  script:
+    - cd src/webapp
+    - yarn
+    - yarn test:unit # change `unit` to `test` once e2e is wired up
+
+.pytest: &pytest
+  <<: *test
   script:
     - pytest -v --cov-report= --cov meltano
     - coverage combine .coverage
@@ -99,8 +101,8 @@ docs:
       - htmlcov/
     when: on_success
 
-test_postgres:
-  <<: *test
+pytest_postgres:
+  <<: *pytest
   variables:
     PYTEST_BACKEND: postgresql
 
@@ -120,8 +122,8 @@ test_postgres:
   services:
     - postgres:11
 
-test_sqlite:
-  <<: *test
+pytest_sqlite:
+  <<: *pytest
   variables:
     PYTEST_BACKEND: sqlite
 

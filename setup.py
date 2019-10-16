@@ -4,6 +4,9 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("VERSION") as version_file:
+    version = version_file.read().strip()
+
 requires = [
     'aiohttp==3.4.4',
     'alembic==1.0.11',
@@ -68,7 +71,7 @@ dev_requires = [
 
 setup(
     name="meltano",
-    version="1.0.1",
+    version=version,
     author='Meltano Team & Contributors',
     author_email="meltano@gitlab.com",
     description="Meltano",
