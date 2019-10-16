@@ -48,7 +48,6 @@ meltano_base: &meltano_base
       when: always
     - if: '$BUILD_MELTANO_BASE == "1"'
       when: always
-    - when: on_success # default to manual
 
 #############
 # Build     #
