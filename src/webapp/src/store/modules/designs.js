@@ -26,6 +26,10 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
+  isAutorunQuery:
+    'isAutorunQuery' in localStorage
+      ? localStorage.getItem('isAutorunQuery') === 'true'
+      : true,
   isLoadingQuery: false,
   limit: 50,
   order: {
@@ -617,6 +621,11 @@ const mutations = {
     const idx = state.order.unassigned.indexOf(orderableAttribute)
     state.order.unassigned.splice(idx, 1)
     state.order.assigned.push(orderableAttribute)
+  },
+
+  toggleIsAutorunQuery(state) {
+    state.isAutorunQuery = !state.isAutorunQuery
+    localStorage.setItem('isAutorunQuery', state.isAutorunQuery)
   },
 
   removeFilter(state, filter) {

@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -24,7 +24,6 @@ export default {
   },
   data() {
     return {
-      isAutorunQuery: true,
       isInitialized: false,
       isNewDashboardModalOpen: false
     }
@@ -40,6 +39,7 @@ export default {
       'filterOptions',
       'hasSQLError',
       'loader',
+      'isAutorunQuery',
       'isLoadingQuery',
       'reports',
       'resultAggregates',
@@ -113,11 +113,11 @@ export default {
   },
   created() {
     this.initializeDesign()
-    this.initializeSettings()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
     ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
+    ...mapMutations('designs', ['toggleIsAutorunQuery']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -151,19 +151,6 @@ export default {
       })
 
       this.$store.dispatch('designs/getFilterOptions')
-    },
-
-    initializeSettings() {
-      const hasAutorunQuerySetting = 'isAutorunQuery' in localStorage
-      if (hasAutorunQuerySetting) {
-        this.isAutorunQuery = localStorage.getItem('isAutorunQuery') === 'true'
-      } else {
-        this.persistSettingsChange()
-      }
-    },
-
-    persistSettingsChange() {
-      localStorage.setItem('isAutorunQuery', this.isAutorunQuery)
     },
 
     toggleActiveReportInDashboard(dashboard) {
@@ -452,9 +439,10 @@ export default {
                         <label class="checkbox" for="checkbox-autorun">
                           <input
                             id="checkbox-autorun"
-                            v-model="isAutorunQuery"
                             type="checkbox"
-                            @change="persistSettingsChange"
+                            :value="isAutorunQuery"
+                            :checked="isAutorunQuery"
+                            @change="toggleIsAutorunQuery"
                           />
                           Autorun queries
                         </label>
