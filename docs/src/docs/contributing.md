@@ -49,7 +49,7 @@ This means that you're ready to start Meltano CLI development. For API and UI de
 
 ### Metrics (anonymous usage data) tracking
 
-As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
+As you contribute to Meltano, you may want to disable [metrics tracking](/docs/environment-variables.html#anonymous-usage-data) globally rather than by project. You can do this by setting the environment variable `MELTANO_DISABLE_TRACKING` to `True`:
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
