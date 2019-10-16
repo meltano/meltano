@@ -15,6 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Update Google Analytics to track `appVersion`, custom `projectId`, and to properly use the default `clientId`. The CLI also now uses `client_id` to differentiate between a CLI client id (not versioned) and the project id (versioned).
 - [#1012](https://gitlab.com/meltano/meltano/issues/1012) Add intelligent autofocus for improved UX in both Extractor and Loader configuration
 - [#1120](https://gitlab.com/meltano/meltano/issues/1120) Fix a concurrency bug causing `meltano select` to crash.
+- [#758](https://gitlab.com/meltano/meltano/issues/758) Update 'meltano permissions' to add --full-refresh command to revoke all privileges prior to granting
+- [#1113](https://gitlab.com/meltano/meltano/issues/1113) Update 'meltano permissions' to have the ability to find all schemas matching a partial name such as `snowplow_*`
+- [#1114](https://gitlab.com/meltano/meltano/issues/1114) Update 'meltano permissions' to include the OPERATE privilege for Snowflake warehouse
 
 ### Changes
 
@@ -23,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1068](https://gitlab.com/meltano/meltano/issues/1068) Replace dogfooding term in docs to speedrun
 - [#1101](https://gitlab.com/meltano/meltano/issues/1101) Add new tour video to home page
 - [#1101](https://gitlab.com/meltano/meltano/issues/1101) Update design to improve readability and contrast
+- [#1115](https://gitlab.com/meltano/meltano/issues/1115) Update 'meltano permissions' to not require an identially named role for a given user
 
 ### Fixes
 

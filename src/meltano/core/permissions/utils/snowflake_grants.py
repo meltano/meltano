@@ -128,7 +128,10 @@ class SnowflakeGrantsGenerator:
 
         try:
             for warehouse in config["warehouses"]:
-                sql_commands.append(self.generate_warehouse_grants(role, warehouse))
+                new_commands = self.generate_warehouse_grants(
+                    role=role, warehouse=warehouse
+                )
+                sql_commands.extend(new_commands)
         except KeyError:
             logging.debug(
                 "`warehouses` not found for role {}, skipping generation of Warehouse GRANT statements.".format(
@@ -240,31 +243,52 @@ class SnowflakeGrantsGenerator:
 
         return sql_commands
 
-    def generate_warehouse_grants(self, role: str, warehouse: str) -> str:
+    def generate_warehouse_grants(self, role: str, warehouse: str) -> List[str]:
         """
-        Generate the GRANT statements for Warehouse usage (only one type at the moment).
+        Generate the GRANT statements for Warehouse usage and operation.
 
         role: the name of the role the privileges are GRANTed to
         warehouse: the name of the warehouse (e.g. "transforming")
 
         Returns the SQL command generated
         """
+        sql_commands = []
+
         if self.check_grant_to_role(role, "USAGE", "WAREHOUSE", warehouse):
             already_granted = True
         else:
             already_granted = False
 
-        sql_grant = {
-            "already_granted": already_granted,
-            "sql": GRANT_PRIVILEGES_TEMPLATE.format(
-                privileges="USAGE",
-                resource_type="WAREHOUSE",
-                resource_name=SnowflakeConnector.snowflaky(warehouse),
-                role=SnowflakeConnector.snowflaky(role),
-            ),
-        }
+        sql_commands.append(
+            {
+                "already_granted": already_granted,
+                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                    privileges="USAGE",
+                    resource_type="WAREHOUSE",
+                    resource_name=SnowflakeConnector.snowflaky(warehouse),
+                    role=SnowflakeConnector.snowflaky(role),
+                ),
+            }
+        )
 
-        return sql_grant
+        if self.check_grant_to_role(role, "OPERATE", "WAREHOUSE", warehouse):
+            already_granted = True
+        else:
+            already_granted = False
+
+        sql_commands.append(
+            {
+                "already_granted": already_granted,
+                "sql": GRANT_PRIVILEGES_TEMPLATE.format(
+                    privileges="OPERATE",
+                    resource_type="WAREHOUSE",
+                    resource_name=SnowflakeConnector.snowflaky(warehouse),
+                    role=SnowflakeConnector.snowflaky(role),
+                ),
+            }
+        )
+
+        return sql_commands
 
     def generate_database_grants(
         self,
@@ -420,6 +444,13 @@ class SnowflakeGrantsGenerator:
             for db_schema in db_schemas:
                 if db_schema != info_schema:
                     schemas.append(db_schema)
+        elif "*" in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split(".", 1)[1].lower()
+                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
+                    schemas.append(db_schema)
         else:
             schemas = [schema]
 
@@ -544,6 +575,13 @@ class SnowflakeGrantsGenerator:
             for schema in db_schemas:
                 if schema != info_schema:
                     schemas.append(schema)
+        elif "*" in name_parts[1]:
+            conn = SnowflakeConnector()
+            db_schemas = conn.show_schemas(name_parts[0])
+            for db_schema in db_schemas:
+                schema_name = db_schema.split(".", 1)[1].lower()
+                if schema_name.startswith(name_parts[1].split("*", 1)[0]):
+                    schemas.append(db_schema)
         else:
             schemas = [f"{name_parts[0]}.{name_parts[1]}"]
 

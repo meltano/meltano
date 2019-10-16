@@ -156,7 +156,7 @@ class SnowflakeConnector:
     def snowflaky(name: str) -> str:
         """
         Convert an entity name to an object identifier that will most probably be
-        the proper name for Snoflake.
+        the proper name for Snowflake.
 
         e.g. gitlab-ci --> "gitlab-ci"
              527-INVESTIGATE$ISSUES.ANALYTICS.COUNTRY_CODES -->
