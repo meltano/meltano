@@ -405,10 +405,10 @@ export default {
               <h2 class="title is-5">Query</h2>
             </div>
             <div class="column is-three-fifths">
-              <div class="buttons is-right">
+              <div class="field has-addons is-pulled-right">
                 <Dropdown
                   label="SQL"
-                  button-classes="is-text is-small"
+                  button-classes="is-text is-thin is-small"
                   :disabled="!currentSQL"
                   is-icon-removed
                 >
@@ -420,14 +420,28 @@ export default {
                     </div>
                   </div>
                 </Dropdown>
-                <button
-                  class="button is-success"
-                  :class="{ 'is-loading': isLoadingQuery }"
-                  :disabled="!currentSQL"
-                  @click="runQuery"
-                >
-                  Run
-                </button>
+                <div class="control">
+                  <button
+                    class="button is-success"
+                    :class="{ 'is-loading': isLoadingQuery }"
+                    :disabled="!currentSQL"
+                    @click="runQuery"
+                  >
+                    Run
+                  </button>
+                </div>
+                <div class="control">
+                  <Dropdown is-right-aligned button-classes="is-thin">
+                    <div class="dropdown-content is-unselectable">
+                      <div class="dropdown-item">
+                        <label class="checkbox">
+                          <input type="checkbox" />
+                          Autorun queries
+                        </label>
+                      </div>
+                    </div>
+                  </Dropdown>
+                </div>
               </div>
             </div>
           </div>

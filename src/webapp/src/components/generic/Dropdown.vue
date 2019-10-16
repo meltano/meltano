@@ -106,7 +106,7 @@ export default {
     }"
     @click="onBubbleClose"
   >
-    <div class="dropdown-trigger">
+    <div class="dropdown-trigger is-flex is-vcentered">
       <button
         class="button"
         :class="buttonClasses"
