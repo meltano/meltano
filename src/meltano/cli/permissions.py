@@ -26,15 +26,21 @@ def permissions():
 @click.option(
     "--diff", help="Show full diff, both new and existing permissions.", is_flag=True
 )
+@click.option(
+    "--full-refresh",
+    "refresh",
+    help="Revoke all existing permissions before granting.",
+    is_flag=True,
+)
 @project()
-def grant(project, db, spec, dry, diff):
+def grant(project, db, spec, dry, diff, refresh):
     """Grant the permissions provided in the provided specification file."""
     try:
         if not dry:
             click.secho("Error: Only dry runs are supported at the moment", fg="red")
             sys.exit(1)
 
-        sql_commands = grant_permissions(db, spec, dry_run=dry)
+        sql_commands = grant_permissions(db, spec, dry_run=dry, refresh=refresh)
         tracker = GoogleAnalyticsTracker(project)
         tracker.track_meltano_permissions_grant(db=db, dry=dry)
 
@@ -49,7 +55,7 @@ def grant(project, db, spec, dry, diff):
 
         diff_prefix = ""
         for command in sql_commands:
-            if command["already_granted"]:
+            if command["already_granted"] and not refresh:
                 if diff:
                     fg = "cyan"
                     diff_prefix = "  "
