@@ -113,6 +113,7 @@ export default {
   },
   created() {
     this.initializeDesign()
+    this.initializeSettings()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
@@ -151,6 +152,12 @@ export default {
       })
 
       this.$store.dispatch('designs/getFilterOptions')
+    },
+
+    initializeSettings() {
+      if ('isAutorunQuery' in localStorage) {
+        this.isAutorunQuery = localStorage.getItem('isAutorunQuery') === 'true'
+      }
     },
 
     toggleActiveReportInDashboard(dashboard) {
