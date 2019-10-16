@@ -7,7 +7,7 @@ export default {
 <template>
   <div class="tutorial-container">
     <div class="tutorial-item">
-      <h2 class="tutorial-header">Table of Content</h2>
+      <h2 class="tutorial-header">Table of Contents</h2>
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
@@ -134,7 +134,7 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
-        <a href="/tutorials/create-custom-extractor.html">
+        <a href="/tutorials/create-a-custom-extractor.html">
           Create a Custom Extractor
         </a>
       </div>
