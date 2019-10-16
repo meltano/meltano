@@ -41,12 +41,12 @@ meltano_base: &meltano_base
   before_script:
     - *docker_build_before_script
     - export IMAGE_TAG=$BASE_SHA
-  script:
-    - export DOCKER_IMAGE_NAME=${IMAGE_NAME:-$CI_REGISTRY_IMAGE}
-    - export DOCKER_IMAGE_TAG=${IMAGE_TAG:-$CI_COMMIT_SHA}
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build --cache-from $DOCKER_IMAGE_NAME:$BASE_SHA --cache-from registry.gitlab.com/meltano/meltano/base:$BASE_SHA -t $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG -f $DOCKERFILE .
-    - docker push $DOCKER_IMAGE_NAME:$DOCKER_IMAGE_TAG
+  rules:
+    - changes:
+      - docker/base/Dockerfile
+      - requirements.txt
+      when: always
+    - when: manual # default to manual
 
 #############
 # Build     #
