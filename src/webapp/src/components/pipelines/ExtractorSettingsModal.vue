@@ -1,6 +1,9 @@
 <script>
 import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
+
+import lodash from 'lodash'
+
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
 
@@ -9,6 +12,11 @@ export default {
   components: {
     ConnectorLogo,
     ConnectorSettings
+  },
+  data() {
+    return {
+      localConfiguration: {}
+    }
   },
   computed: {
     ...mapGetters('plugins', [
@@ -21,8 +29,8 @@ export default {
     ...mapState('plugins', ['installedPlugins']),
     extractorLacksConfigSettings() {
       return (
-        this.extractorInFocusConfiguration.settings &&
-        this.extractorInFocusConfiguration.settings.length === 0
+        this.localConfiguration.settings &&
+        this.localConfiguration.settings.length === 0
       )
     },
     extractor() {
@@ -42,13 +50,13 @@ export default {
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
-        this.extractorInFocusConfiguration,
+        this.localConfiguration,
         'config'
       )
     },
     isSaveable() {
       const isValid = this.getHasValidConfigSettings(
-        this.extractorInFocusConfiguration,
+        this.localConfiguration,
         this.extractor.settingsGroupValidation
       )
       return !this.isInstalling && this.isInstalled && isValid
@@ -65,11 +73,16 @@ export default {
           name: this.extractorNameFromRoute
         }
         this.addPlugin(config).then(() => {
-          this.prepareExtractorConfiguration()
+          this.getExtractorConfiguration().then(
+            this.createEditableConfiguration
+          )
           this.installPlugin(config).then(this.checkAutoAdvance)
         })
       } else {
-        this.prepareExtractorConfiguration().then(this.checkAutoAdvance)
+        this.getExtractorConfiguration().then(() => {
+          this.createEditableConfiguration()
+          this.checkAutoAdvance()
+        })
       }
     })
   },
@@ -78,6 +91,11 @@ export default {
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    checkAutoAdvance() {
+      if (this.extractorLacksConfigSettings) {
+        this.saveConfigAndBeginEntitySelection()
+      }
+    },
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -85,12 +103,13 @@ export default {
         this.$router.push({ name: 'extractors' })
       }
     },
-    checkAutoAdvance() {
-      if (this.extractorLacksConfigSettings) {
-        this.saveConfigAndBeginEntitySelection()
-      }
+    createEditableConfiguration() {
+      this.localConfiguration = Object.assign(
+        {},
+        lodash.cloneDeep(this.extractorInFocusConfiguration)
+      )
     },
-    prepareExtractorConfiguration() {
+    getExtractorConfiguration() {
       return this.$store.dispatch(
         'configuration/getExtractorConfiguration',
         this.extractorNameFromRoute
@@ -101,7 +120,7 @@ export default {
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
           type: 'extractors',
-          config: this.extractorInFocusConfiguration.config
+          config: this.localConfiguration.config
         })
         .then(() => {
           this.$store.dispatch('configuration/updateRecentELTSelections', {
@@ -148,7 +167,7 @@ export default {
           <ConnectorSettings
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"
-            :config-settings="extractorInFocusConfiguration"
+            :config-settings="localConfiguration"
           />
           <div v-if="extractor.docs" class="content has-text-centered mt1r">
             <p>

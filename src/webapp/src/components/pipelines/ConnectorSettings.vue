@@ -95,17 +95,18 @@ export default {
     }
   },
   mounted() {
-    this.$nextTick(this.focusFirstEmptyInput)
+    this.$nextTick(this.focusInputIntelligently)
   },
   methods: {
     findLabel(setting) {
       return setting.options.find(item => item.value === setting.value).label
     },
-    focusFirstEmptyInput() {
+    focusInputIntelligently() {
       const inputs = Array.from(this.$el.getElementsByTagName('input'))
-      const firstEmptyInput = inputs.find(el => !el.value)
-      if (firstEmptyInput) {
-        firstEmptyInput.focus()
+      if (inputs.length) {
+        const firstEmptyInput = inputs.find(el => !el.value)
+        const targetInput = firstEmptyInput || inputs[0]
+        targetInput.focus()
       }
     }
   }
