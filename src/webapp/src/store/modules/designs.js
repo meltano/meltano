@@ -26,7 +26,7 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
-  isAutorunQuery: true,
+  isAutoRunQuery: true,
   isLoadingQuery: false,
   limit: 50,
   order: {
@@ -332,7 +332,8 @@ const actions = {
   },
 
   checkAutoRun({ dispatch, state }) {
-    dispatch('runQuery', state.results.length > 0)
+    const hasRan = state.results.length > 0
+    dispatch('runQuery', hasRan && state.isAutoRunQuery)
   },
 
   // eslint-disable-next-line no-shadow
@@ -543,6 +544,10 @@ const actions = {
     dispatch('checkAutoRun')
   },
 
+  toggleIsAutoRunQuery({ commit, state }) {
+    commit('setIsAutoRunQuery', !state.isAutoRunQuery)
+  },
+
   toggleLoadReportOpen({ commit }) {
     commit('setLoadReportToggle')
   },
@@ -620,11 +625,6 @@ const mutations = {
     state.order.assigned.push(orderableAttribute)
   },
 
-  toggleIsAutorunQuery(state) {
-    state.isAutorunQuery = !state.isAutorunQuery
-    localStorage.setItem('isAutorunQuery', state.isAutorunQuery)
-  },
-
   removeFilter(state, filter) {
     if (filter) {
       const filtersByType =
@@ -697,6 +697,11 @@ const mutations = {
     })
 
     state.design = designData
+  },
+
+  setIsAutoRunQuery(state, value) {
+    state.isAutoRunQuery = value
+    localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
   },
 
   setLoader(state, loader) {

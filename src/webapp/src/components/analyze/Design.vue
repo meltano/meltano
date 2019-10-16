@@ -39,7 +39,7 @@ export default {
       'filterOptions',
       'hasSQLError',
       'loader',
-      'isAutorunQuery',
+      'isAutoRunQuery',
       'isLoadingQuery',
       'reports',
       'resultAggregates',
@@ -117,8 +117,12 @@ export default {
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
-    ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
-    ...mapMutations('designs', ['toggleIsAutorunQuery']),
+    ...mapActions('designs', [
+      'resetErrorMessage',
+      'runQuery',
+      'toggleIsAutoRunQuery'
+    ]),
+    ...mapMutations('designs', ['setIsAutoRunQuery']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -155,8 +159,10 @@ export default {
     },
 
     initializeSettings() {
-      if ('isAutorunQuery' in localStorage) {
-        this.isAutorunQuery = localStorage.getItem('isAutorunQuery') === 'true'
+      if ('isAutoRunQuery' in localStorage) {
+        this.setIsAutoRunQuery(
+          localStorage.getItem('isAutoRunQuery') === 'true'
+        )
       }
     },
 
@@ -447,9 +453,9 @@ export default {
                           <input
                             id="checkbox-autorun"
                             type="checkbox"
-                            :value="isAutorunQuery"
-                            :checked="isAutorunQuery"
-                            @change="toggleIsAutorunQuery"
+                            :value="isAutoRunQuery"
+                            :checked="isAutoRunQuery"
+                            @change="toggleIsAutoRunQuery"
                           />
                           Autorun queries
                         </label>
