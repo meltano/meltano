@@ -46,7 +46,9 @@ meltano_base: &meltano_base
       - docker/base/Dockerfile
       - requirements.txt
       when: always
-    - when: manual # default to manual
+    - if: '$BUILD_MELTANO_BASE == "1"'
+      when: always
+    - when: on_success # default to manual
 
 #############
 # Build     #
