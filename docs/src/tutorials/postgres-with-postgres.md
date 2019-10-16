@@ -22,13 +22,13 @@ meltano add loader target-postgres
 
 ## Adding a Custom Extractor
 
-Next step is to add `tap-postgres` as a [custom extractor](/tutorials/create-a-custom-extractor.html). We'll use the [ tap-postgres provided by the Singer.io community](https://github.com/singer-io/tap-postgres/):
+Next step is to add `tap-postgres` as a [custom extractor](/tutorials/create-a-custom-extractor.html). We'll use the [tap-postgres provided by the Singer.io community](https://github.com/singer-io/tap-postgres/) and fix its version to `0.0.61`, which has been tested and runs without issues with Meltano:
 
 ```bash
 meltano add --custom extractor tap-postgres
 
   (namespace): tap_postgres
-  (pip_url): tap-postgres
+  (pip_url): tap-postgres==0.0.61
   (executable) [tap-postgres]: tap-postgres
 ```
 
@@ -42,7 +42,7 @@ plugins:
   - executable: tap-postgres
     name: tap-postgres
     namespace: tap_postgres
-    pip_url: tap-postgres
+    pip_url: tap-postgres==0.0.61
     settings:
       - name: dbname
         env: TAP_PG_DATABASE
