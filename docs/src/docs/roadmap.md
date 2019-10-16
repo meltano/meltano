@@ -18,7 +18,7 @@ Meltano develops powerful open source software enabling the creation of data pip
 
 ## Strategy
 
-### Path to V1.0
+### Path to v1.0
 
 Meltano is approaching its v1 release. The criteria we have chosen for validating that we have achieved v1 are:
 
@@ -27,7 +27,7 @@ Meltano is approaching its v1 release. The criteria we have chosen for validatin
 - Users have clear documentation, including indication of all limitations to existing taps and targets
 - Meltano core team is prepared to support backward compatibility to v1 (no breaking changes to architecture) until v2 version
 
-### Beyond V1.0
+### Beyond v1.0
 
 There is a lot more to build. A few key areas we know we need to invest more time after V1 are:
 
@@ -61,21 +61,6 @@ You can track our weekly progress and forward-looking plans in greater detail th
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
 :::
 
-## MAUI
-
-The focus of our team is to grow [MAUI](#maui) by 10% every week. We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
-
-1. [Meltano.com Website](https://meltano.com)
-2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
-3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
-
-The MAU of the UI are called MAUI, this is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
-
-Internal metrics:
-
-1. [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
-2. [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
-3. [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
 
 ## Focus
 
@@ -83,6 +68,30 @@ The focus of our team is to grow [MAUI](#maui) by 10% every week.
 A week is measured from Sunday to Saturday.
 Every improvement we make should be optimized by that.
 This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
+
+## Metrics
+
+### MAU
+
+We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
+
+1. [Meltano.com Website](https://meltano.com)
+2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
+3. [Meltano UI](https://meltano.com/docs/architecture.html#meltano-ui)
+
+Internal metrics:
+
+- [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
+- [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
+
+
+### MAUI
+
+We also track the Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
+
+Internal metrics:
+
+- [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 
 ## Monetization
 
