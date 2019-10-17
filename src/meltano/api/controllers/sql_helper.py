@@ -30,7 +30,7 @@ class ConnectionNotFound(Exception):
 class UnsupportedConnectionDialect(Exception):
     def __init__(self, connection_dialect: str):
         self.connection_dialect = connection_dialect
-        super().__init__("Dialect {connection_dialect} is not supprted.")
+        super().__init__("Dialect {connection_dialect} is not supported.")
 
 
 class SqlHelper(SqlUtils):
@@ -59,7 +59,7 @@ class SqlHelper(SqlUtils):
         engine_uri = connection_service.analyze_uri()
         dialect = params["dialect"]
 
-        if dialect not in ["postgres", "sqlite", "snowflake"]:
+        if dialect not in ["postgres", "sqlite"]:
             raise UnsupportedConnectionDialect(dialect)
 
         if dialect == "postgres":

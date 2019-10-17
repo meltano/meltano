@@ -43,24 +43,7 @@ class MeltanoFilterExpressionType(str, Enum):
             return cls.Unknown
 
 
-class SnowflakeTable(Table):
-    """Snowflake lives in the 80s"""
-
-    def get_sql(self, **kwargs):
-        return super().get_sql(**kwargs).upper()
-
-
-class SnowflakeField(Field):
-    """Snowflake lives in the 80s"""
-
-    def get_sql(self, **kwargs):
-        return super().get_sql(**kwargs).upper()
-
-
 class MeltanoBase:
-    Table = Table
-    Field = Field
-
     def __init__(self, definition: Dict = {}):
         self._definition = definition
 
@@ -159,7 +142,7 @@ class MeltanoTable(MeltanoBase):
         # Those are the PK columns of the table that have not been directly
         #  requested in the Query
         self.optional_pkeys = []
-        self._sql_table_name = definition.get("sql_table_name", None)
+        self.sql_table_name = definition.get("sql_table_name", None)
 
         # When a MeltanoTable is used as part of a MeltanoQuery,
         #  we also need to store the column definitions for not selected columns
@@ -167,31 +150,6 @@ class MeltanoTable(MeltanoBase):
         self._unselected_columns_with_filters = []
 
         super().__init__(definition)
-
-    @property
-    def name(self):
-        return super().upper()
-
-    @property
-    def sql_table_name(self):
-        return self._sql_table_name.upper()
-
-    @sql_table_name.setter
-    def sql_table_name(self, value):
-        if value is not None:
-            try:
-                schema, name = value.upper().split(".")
-                self._attributes["schema"] = schema
-                self._attributes["sql_table_name"] = name
-            except ValueError:
-                self._attributes["schema"] = None
-                self._attributes["sql_table_name"] = value
-
-        self._sql_table_name = value
-
-    @property
-    def alias(self):
-        return self._sql_table_name.lower()
 
     def columns(self) -> List[MeltanoBase]:
         return [
@@ -278,7 +236,16 @@ class MeltanoTable(MeltanoBase):
             return super().__getattr__(attr)
 
     def __setattr__(self, name, value):
-        if name in ["name", "schema", "source_name"]:
+        if name == "sql_table_name":
+            if value is not None:
+                try:
+                    schema, name = value.split(".")
+                    self._attributes["schema"] = schema
+                    self._attributes["sql_table_name"] = name
+                except ValueError:
+                    self._attributes["schema"] = None
+                    self._attributes["sql_table_name"] = value
+        elif name in ["name", "schema", "source_name"]:
             self._attributes[name] = value
         else:
             super(MeltanoTable, self).__setattr__(name, value)
@@ -303,7 +270,7 @@ class MeltanoColumn(MeltanoBase):
         super().__init__(definition)
 
     def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}".lower()
+        return f"{self.table.sql_table_name}.{self.column_name()}"
 
     def column_name(self) -> str:
         if self.sql:
@@ -311,7 +278,7 @@ class MeltanoColumn(MeltanoBase):
         else:
             column = self.name
 
-        return column.upper()
+        return column
 
     def copy_metadata(self, other_column) -> None:
         self.label = other_column.label
@@ -379,7 +346,7 @@ class MeltanoAggregate(MeltanoBase):
           so we have to first replace {{TABLE}} with its own table name
         """
         if pika_table:
-            field = self.Field(self.column_name(), table=pika_table)
+            field = Field(self.column_name(), table=pika_table)
         elif base_table and base_table != self.table.sql_table_name:
             sql = re.sub(
                 "\{\{TABLE\}\}",
@@ -387,10 +354,10 @@ class MeltanoAggregate(MeltanoBase):
                 self.sql,
                 flags=re.IGNORECASE,
             )
-            field = self.Field(sql, table=self.Table(base_table))
+            field = Field(sql, table=Table(base_table))
         else:
-            table = self.Table(self.table.sql_table_name)
-            field = self.Field(self.column_name(), table=table)
+            table = Table(self.table.sql_table_name)
+            field = Field(self.column_name(), table=table)
 
         if self.type == "sum":
             return fn.Coalesce(fn.Sum(field), 0, alias=self.alias())
@@ -481,7 +448,7 @@ class MeltanoTimeframe(MeltanoBase):
         Check MeltanoAggregate.qualified_sql() for more details
         """
         if pika_table:
-            field = self.Field(self.column_name(), table=pika_table)
+            field = Field(self.column_name(), table=pika_table)
         elif base_table and base_table != self.table.sql_table_name:
             sql = re.sub(
                 "\{\{TABLE\}\}",
@@ -489,10 +456,10 @@ class MeltanoTimeframe(MeltanoBase):
                 self.sql,
                 flags=re.IGNORECASE,
             )
-            field = self.Field(sql, table=self.Table(base_table))
+            field = Field(sql, table=Table(base_table))
         else:
-            table = self.Table(self.table.sql_table_name)
-            field = self.Field(self.column_name(), table=table)
+            table = Table(self.table.sql_table_name)
+            field = Field(self.column_name(), table=table)
 
         return fn.Extract(period["part"], field, alias=self.period_alias(period))
 
@@ -1040,7 +1007,7 @@ class MeltanoQuery(MeltanoBase):
                 iter([t for t in self.tables if t.name == join["table"]]), None
             )
             # Create a pypika Table based on the Table's name
-            pika_table = self.Table(table.sql_table_name, alias=table.alias)
+            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
 
             if join["on"] is None:
                 base_query = base_query.from_(pika_table)
@@ -1049,8 +1016,8 @@ class MeltanoQuery(MeltanoBase):
 
             # Add all columns in the SELECT clause and as group_by attributes
             for c in table.columns():
-                select.append(self.Field(c.column_name(), table=pika_table, alias=c.alias()))
-                group_by_attributes.append(self.Field(c.alias()))
+                select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
+                group_by_attributes.append(Field(c.alias()))
 
                 query_attributes.append(
                     {
@@ -1066,7 +1033,7 @@ class MeltanoQuery(MeltanoBase):
             # Add the WHERE clauses using the column filters for this table
             for c in table.columns() + table.unselected_columns_with_filters():
                 matching_criteria = [
-                    f.criterion(self.Field(c.column_name(), table=pika_table))
+                    f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
                     if f.match(table.find_source_name(), c.name)
                 ]
@@ -1076,7 +1043,7 @@ class MeltanoQuery(MeltanoBase):
             for t in table.timeframes():
                 for period in t.periods:
                     select.append(t.period_sql(period, pika_table=pika_table))
-                    group_by_attributes.append(self.Field(t.period_alias(period)))
+                    group_by_attributes.append(Field(t.period_alias(period)))
 
                     query_attributes.append(
                         {
@@ -1140,7 +1107,7 @@ class MeltanoQuery(MeltanoBase):
                     order = Order.asc
 
                 table_def = self.design.find_table(source_name)
-                orderby_field = self.Field(table_def.get_attribute(attribute_name).alias())
+                orderby_field = Field(table_def.get_attribute(attribute_name).alias())
 
                 no_join_query = no_join_query.orderby(orderby_field, order=order)
         else:
@@ -1191,7 +1158,7 @@ class MeltanoQuery(MeltanoBase):
             )
 
             # Create a pypika Table based on the Table's name
-            db_table = self.Table(table.sql_table_name, alias=table.alias)
+            db_table = Table(table.sql_table_name, alias=table.sql_table_name)
 
             if join["on"] is None:
                 base_join_query = base_join_query.from_(db_table)
@@ -1207,12 +1174,12 @@ class MeltanoQuery(MeltanoBase):
         #  timeframes and the primary keys in case they are not already included
         select = []
         for table in self.tables:
-            pika_table = self.Table(table.sql_table_name, alias=table.alias)
+            pika_table = Table(table.sql_table_name, alias=table.sql_table_name)
 
             # Add the WHERE clauses using the column filters for this table
             for c in table.columns() + table.unselected_columns_with_filters():
                 matching_criteria = [
-                    f.criterion(self.Field(c.column_name(), table=pika_table))
+                    f.criterion(Field(c.column_name(), table=pika_table))
                     for f in self.column_filters
                     if f.match(table.find_source_name(), c.name)
                 ]
@@ -1235,7 +1202,7 @@ class MeltanoQuery(MeltanoBase):
             aggregate_columns_selected = set()
 
             for c in table.columns() + table.optional_pkeys:
-                select.append(self.Field(c.column_name(), table=pika_table, alias=c.alias()))
+                select.append(Field(c.column_name(), table=pika_table, alias=c.alias()))
                 groupby_columns_selected.add(c.column_name())
 
             for a in table.aggregates():
@@ -1245,7 +1212,7 @@ class MeltanoQuery(MeltanoBase):
                     continue
 
                 select.append(
-                    self.Field(a.column_name(), table=pika_table, alias=a.column_alias())
+                    Field(a.column_name(), table=pika_table, alias=a.column_alias())
                 )
                 aggregate_columns_selected.add(a.column_name())
 
@@ -1332,7 +1299,7 @@ class MeltanoQuery(MeltanoBase):
             # Add the Stats with clause to the hda query
             hda_query = hda_query.with_(stats_query, stats_db_table)
 
-            stats_pika_table = self.Table(stats_db_table, alias=stats_db_table)
+            stats_pika_table = Table(stats_db_table, alias=stats_db_table)
 
             if result_query_base_table:
                 if group_by_attributes:
@@ -1349,7 +1316,7 @@ class MeltanoQuery(MeltanoBase):
                 result_group_by_attributes = []
                 for a in group_by_attributes:
                     result_group_by_attributes.append(
-                        self.Field(a, table=stats_pika_table, alias=a)
+                        Field(a, table=stats_pika_table, alias=a)
                     )
 
                 result_query = result_query.select(*result_group_by_attributes)
@@ -1373,7 +1340,7 @@ class MeltanoQuery(MeltanoBase):
             table_aggregates = []
             for a in table.aggregates():
                 table_aggregates.append(
-                    self.Field(a.alias(), table=stats_pika_table, alias=a.alias())
+                    Field(a.alias(), table=stats_pika_table, alias=a.alias())
                 )
 
                 aggregate_columns.append(
@@ -1394,7 +1361,7 @@ class MeltanoQuery(MeltanoBase):
             result_query = result_query.select(*table_aggregates)
 
         # Add the result and the Limit, Order By clauses to the final Query
-        results_pika_table = self.Table("result", alias="result")
+        results_pika_table = Table("result", alias="result")
 
         hda_query = (
             hda_query.with_(result_query, "result")
@@ -1414,7 +1381,7 @@ class MeltanoQuery(MeltanoBase):
                     order = Order.asc
 
                 table_def = self.design.find_table(source_name)
-                orderby_field = self.Field(
+                orderby_field = Field(
                     table_def.get_attribute(attribute_name).alias(),
                     table=results_pika_table,
                 )
@@ -1424,7 +1391,7 @@ class MeltanoQuery(MeltanoBase):
             # By default order by all the Group By attributes asc
             order = Order.asc
             for attr in group_by_attributes:
-                field = self.Field(attr, table=results_pika_table)
+                field = Field(attr, table=results_pika_table)
                 hda_query = hda_query.orderby(field, order=order)
 
         final_query = self.add_schema_to_query(str(hda_query))

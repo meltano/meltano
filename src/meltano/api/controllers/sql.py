@@ -36,7 +36,7 @@ def _handle(ex):
         jsonify(
             {
                 "error": True,
-                "code": f"The dialect ('{ex.connection_dialect}') for the connection provided is not supported.",
+                "code": f"The dialect '{ex.connection_dialect}' is not yet supported by Meltano Analyze.",
             }
         ),
         500,
