@@ -84,9 +84,9 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${
-          this.getSelectedEntityCount
-        } entities selected`
+        const attributeCount = this.getSelectedAttributeCount
+        const entityCount = this.getSelectedEntityCount
+        summary = `${attributeCount} attributes from ${entityCount} entities selected`
       }
       return summary
     }
