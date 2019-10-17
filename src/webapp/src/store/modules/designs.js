@@ -331,7 +331,7 @@ const actions = {
     }
   },
 
-  checkAutoRun({ dispatch, state }) {
+  tryAutoRun({ dispatch, state }) {
     const hasRan = state.results.length > 0
     dispatch('runQuery', hasRan && state.isAutoRunQuery)
   },
@@ -499,7 +499,7 @@ const actions = {
 
   resetSortAttributes({ commit, dispatch }) {
     commit('resetSortAttributes')
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   runQuery(_, isRun = true) {
@@ -535,13 +535,13 @@ const actions = {
     commit('toggleSelected', aggregate)
     dispatch('cleanOrdering', aggregate)
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column)
     dispatch('cleanOrdering', column)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   toggleIsAutoRunQuery({ commit, state }) {
@@ -555,13 +555,13 @@ const actions = {
   toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe)
     dispatch('cleanOrdering', timeframe)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod)
     dispatch('cleanOrdering', timeframePeriod)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   updateReport({ commit, state }) {

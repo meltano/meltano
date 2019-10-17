@@ -423,8 +423,7 @@ export default {
               <div class="field has-addons is-pulled-right is-vcentered">
                 <Dropdown
                   label="SQL"
-                  label-classes="is-size-7"
-                  button-classes="is-text is-thin"
+                  button-classes="is-text is-thin is-small"
                   :disabled="!currentSQL"
                   is-icon-removed
                 >
@@ -448,16 +447,20 @@ export default {
                 </div>
                 <div class="control">
                   <button
-                    class="button is-toggle is-thin is-success"
-                    :class="{ 'toggle-on': isAutoRunQuery }"
-                    :value="isAutoRunQuery"
-                    :checked="isAutoRunQuery"
+                    class="button tooltip"
+                    :data-tooltip="
+                      `Toggle autorun queries ${isAutoRunQuery ? 'off' : 'on'}`
+                    "
+                    :class="{
+                      'has-text-grey-light': !isAutoRunQuery,
+                      'is-active has-text-interactive-primary': isAutoRunQuery
+                    }"
+                    :disabled="!currentSQL"
                     @click="toggleIsAutoRunQuery"
                   >
-                    <font-awesome-icon
-                      class="is-size-7"
-                      icon="sync"
-                    ></font-awesome-icon>
+                    <span class="icon is-small is-size-7">
+                      <font-awesome-icon icon="sync"></font-awesome-icon>
+                    </span>
                   </button>
                 </div>
               </div>
@@ -971,12 +974,6 @@ export default {
         transform: rotate(-45deg);
       }
     }
-  }
-}
-
-.button {
-  &.is-toggle:not(.toggle-on) {
-    color: rgba(255, 255, 255, 0.5);
   }
 }
 </style>
