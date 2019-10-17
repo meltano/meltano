@@ -136,9 +136,10 @@ export default {
     selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
-        Vue.toasted.global.success(
-          `Entities Saved - ${this.extractorNameFromRoute}`
-        )
+        const message = this.extractorLacksEntitySelectionAndIsInstalled
+          ? `Auto Advance - No Entities for ${this.extractorNameFromRoute}`
+          : `Entities Saved - ${this.extractorNameFromRoute}`
+        Vue.toasted.global.success(message)
       })
     },
     toggleExpandable() {

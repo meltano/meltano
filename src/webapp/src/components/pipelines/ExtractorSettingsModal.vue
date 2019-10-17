@@ -131,9 +131,10 @@ export default {
             name: 'extractorEntities',
             params: { extractor: this.extractor.name }
           })
-          Vue.toasted.global.success(
-            `Connection Saved - ${this.extractor.name}`
-          )
+          const message = this.extractorLacksConfigSettings
+            ? `Auto Advance - No Configuration for ${this.extractor.name}`
+            : `Connection Saved - ${this.extractor.name}`
+          Vue.toasted.global.success(message)
         })
     }
   }
