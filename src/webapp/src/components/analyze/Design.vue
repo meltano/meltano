@@ -423,7 +423,8 @@ export default {
               <div class="field has-addons is-pulled-right is-vcentered">
                 <Dropdown
                   label="SQL"
-                  button-classes="is-text is-thin is-small"
+                  label-classes="is-size-7"
+                  button-classes="is-text is-thin"
                   :disabled="!currentSQL"
                   is-icon-removed
                 >
@@ -446,22 +447,18 @@ export default {
                   </button>
                 </div>
                 <div class="control">
-                  <Dropdown is-right-aligned button-classes="is-thin">
-                    <div class="dropdown-content is-unselectable">
-                      <div class="dropdown-item">
-                        <label class="checkbox" for="checkbox-autorun">
-                          <input
-                            id="checkbox-autorun"
-                            type="checkbox"
-                            :value="isAutoRunQuery"
-                            :checked="isAutoRunQuery"
-                            @change="toggleIsAutoRunQuery"
-                          />
-                          Autorun queries
-                        </label>
-                      </div>
-                    </div>
-                  </Dropdown>
+                  <button
+                    class="button is-toggle is-thin is-success"
+                    :class="{ 'toggle-on': isAutoRunQuery }"
+                    :value="isAutoRunQuery"
+                    :checked="isAutoRunQuery"
+                    @click="toggleIsAutoRunQuery"
+                  >
+                    <font-awesome-icon
+                      class="is-size-7"
+                      icon="sync"
+                    ></font-awesome-icon>
+                  </button>
                 </div>
               </div>
             </div>
@@ -974,6 +971,12 @@ export default {
         transform: rotate(-45deg);
       }
     }
+  }
+}
+
+.button {
+  &.is-toggle:not(.toggle-on) {
+    color: rgba(255, 255, 255, 0.5);
   }
 }
 </style>

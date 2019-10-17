@@ -26,6 +26,7 @@ import {
   faHashtag,
   faInfoCircle,
   faProjectDiagram,
+  faSync,
   faSearch,
   faSort,
   faSortAmountDown,
@@ -70,6 +71,7 @@ export default {
     library.add(faHashtag)
     library.add(faInfoCircle)
     library.add(faProjectDiagram)
+    library.add(faSync)
     library.add(faSearch)
     library.add(faSort)
     library.add(faSortAmountDown)
