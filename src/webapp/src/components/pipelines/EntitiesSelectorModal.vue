@@ -84,7 +84,9 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
+        summary = `${this.getSelectedAttributeCount} attributes from ${
+          this.getSelectedEntityCount
+        } entities selected`
       }
       return summary
     }
@@ -103,12 +105,18 @@ export default {
       )
       .then(() => {
         this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+        this.checkAutoAdvance()
       })
   },
   destroyed() {
     this.$store.dispatch('configuration/resetExtractorInFocusEntities')
   },
   methods: {
+    checkAutoAdvance() {
+      if (this.extractorLacksEntitySelectionAndIsInstalled) {
+        this.selectEntitiesAndBeginLoaderInstall()
+      }
+    },
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -259,31 +267,10 @@ export default {
             }}</a>
           </div>
         </template>
-
-        <template v-if="extractorLacksEntitySelectionAndIsInstalled">
-          <div class="content">
-            <p>
-              All entities will be extracted by default as entity selection is
-              not currently supported for {{ extractorNameFromRoute }}.
-            </p>
-            <ul>
-              <li>Click "Next" to advance</li>
-              <li>Click "Cancel" to select another extractor's entities</li>
-            </ul>
-          </div>
-        </template>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Cancel</button>
         <button
-          v-if="extractorLacksEntitySelectionAndIsInstalled"
-          class="button is-interactive-primary"
-          @click="selectEntitiesAndBeginLoaderInstall"
-        >
-          Next
-        </button>
-        <button
-          v-else
           class="button is-interactive-primary"
           :disabled="!isSaveable"
           @click="selectEntitiesAndBeginLoaderInstall"
