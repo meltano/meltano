@@ -94,12 +94,9 @@ export default {
       this.selectionModeRecommended,
       this.selectionModeCustom
     ]
-    this.extractorNameFromRoute = this.$route.params.extractor
+    this.extractorName = this.$route.params.extractor
     this.$store
-      .dispatch(
-        'configuration/getExtractorInFocusEntities',
-        this.extractorNameFromRoute
-      )
+      .dispatch('configuration/getExtractorInFocusEntities', this.extractorName)
       .then(() => {
         this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
         this.tryAutoAdvance()
@@ -134,8 +131,8 @@ export default {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
         const message = !this.hasEntities
-          ? `Auto Advance - No Entities for ${this.extractorNameFromRoute}`
-          : `Entities Saved - ${this.extractorNameFromRoute}`
+          ? `Auto Advance - No Entities for ${this.extractorName}`
+          : `Entities Saved - ${this.extractorName}`
         Vue.toasted.global.success(message)
       })
     },
@@ -162,7 +159,7 @@ export default {
     <div class="modal-card is-wide">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="extractorNameFromRoute" />
+          <ConnectorLogo :connector="extractorName" />
         </div>
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
