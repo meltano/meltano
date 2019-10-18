@@ -1,17 +1,23 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
+
+import poller from '@/utils/poller'
 
 export default {
   name: 'LogModal',
   data() {
     return {
-      jobLog: '',
-      isRefreshing: false
+      isPolling: true,
+      jobLog: null,
+      jobPoller: null
     }
   },
+  computed: {
+    ...mapGetters('configuration', ['getRunningPipelineJobIds'])
+  },
   created() {
-    this.jobIdFromRoute = this.$route.params.jobId
-    this.updateJobLog()
+    this.jobId = this.$route.params.jobId
+    this.initJobPoller()
   },
   methods: {
     ...mapActions('configuration', ['getJobLog']),
@@ -22,18 +28,28 @@ export default {
         this.$router.push({ name: 'schedules' })
       }
     },
-    refresh() {
-      this.isRefreshing = true
-      this.updateJobLog()
-    },
-    updateJobLog() {
-      this.getJobLog(this.jobIdFromRoute)
-        .then(response => (this.jobLog = response.data.log))
-        .catch(error => {
-          this.jobLog = error.response.data.code
-        })
-        .finally(() => (this.isRefreshing = false))
+    initJobPoller() {
+      const pollFn = () => {
+        this.getJobLog(this.jobId)
+          .then(response => {
+            this.jobLog = response.data.log
+          })
+          .catch(error => {
+            this.jobLog = error.response.data.code
+          })
+          .finally(() => {
+            if (this.getRunningPipelineJobIds.indexOf(this.jobId) === -1) {
+              this.isPolling = false
+              this.jobPoller.dispose()
+            }
+          })
+      }
+      this.jobPoller = poller.create(pollFn, null, 1200)
+      this.jobPoller.init()
     }
+  },
+  beforeDestroy() {
+    this.jobPoller.dispose()
   }
 }
 </script>
@@ -44,37 +60,27 @@ export default {
     <div class="modal-card is-wide">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          Run Log: <span class="is-family-code">{{ jobIdFromRoute }}</span>
+          Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <div v-if="jobLog">
-            <pre><code>{{jobLog}}</code></pre>
-            <div class="buttons">
-              <button
-                class="button"
-                :class="{ 'is-loading': isRefreshing }"
-                aria-label="refresh"
-                @click="refresh"
-              >
-                Refresh
-              </button>
-              <a
-                class="button is-text tooltip is-tooltip-warning is-tooltip-up"
-                data-tooltip="Help shape this feature by contributing your ideas"
-                target="_blank"
-                href="https://gitlab.com/meltano/meltano/issues/1060"
-                >Log streaming and more are planned</a
-              >
-            </div>
+            <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
           </div>
           <progress v-else class="progress is-small is-info"></progress>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Close</button>
+        <button
+          class="button is-interactive-primary"
+          :class="{ 'is-loading': isPolling }"
+          :disabled="isPolling"
+        >
+          Analyze
+        </button>
       </footer>
     </div>
   </div>
