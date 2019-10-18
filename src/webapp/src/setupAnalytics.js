@@ -4,7 +4,7 @@ import VueAnalytics from 'vue-analytics'
 
 import router from './router'
 
-export default function setupAnalytics() {
+export default function setup() {
   Vue.use(VueAnalytics, {
     id: 'UA-132758957-2',
     router,

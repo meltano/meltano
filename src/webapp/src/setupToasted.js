@@ -5,7 +5,7 @@ import Toasted from 'vue-toasted'
 
 import router from './router'
 
-export default function setupToasted() {
+export default function setup() {
   const toastedOptions = {
     router,
     position: 'bottom-right',
