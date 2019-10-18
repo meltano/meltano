@@ -54,6 +54,7 @@ requires = [
 conflicts = [
     'aenum==2.1.2',
     'idna==2.7',
+    'asn1crypto==0.24.0',
 ]
 
 dev_requires = [
@@ -89,7 +90,10 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=dev_requires,
     # run `make requirements.txt` after editing
-    install_requires=requires,
+    install_requires=[
+        *conflicts,
+        *requires
+    ],
     extras_require={
         'dev': dev_requires
     },
