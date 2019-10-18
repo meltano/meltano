@@ -105,14 +105,14 @@ export default {
       )
       .then(() => {
         this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
-        this.checkAutoAdvance()
+        this.tryAutoAdvance()
       })
   },
   destroyed() {
     this.$store.dispatch('configuration/resetExtractorInFocusEntities')
   },
   methods: {
-    checkAutoAdvance() {
+    tryAutoAdvance() {
       if (this.extractorLacksEntitySelectionAndIsInstalled) {
         this.selectEntitiesAndBeginLoaderInstall()
       }

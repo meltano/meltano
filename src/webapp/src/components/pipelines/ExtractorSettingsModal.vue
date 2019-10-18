@@ -76,12 +76,12 @@ export default {
           this.getExtractorConfiguration().then(
             this.createEditableConfiguration
           )
-          this.installPlugin(config).then(this.checkAutoAdvance)
+          this.installPlugin(config).then(this.tryAutoAdvance)
         })
       } else {
         this.getExtractorConfiguration().then(() => {
           this.createEditableConfiguration()
-          this.checkAutoAdvance()
+          this.tryAutoAdvance()
         })
       }
     })
@@ -91,7 +91,7 @@ export default {
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
-    checkAutoAdvance() {
+    tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
         this.saveConfigAndBeginEntitySelection()
       }
