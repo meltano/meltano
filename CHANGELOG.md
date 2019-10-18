@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1013](https://gitlab.com/meltano/meltano/issues/1013) Toast initialization and analytics initialization cleanup
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.1.0 - (2019-10-16)
 
@@ -46,7 +47,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1086](https://gitlab.com/meltano/meltano/issues/1086) Fix a concurrency issue when the `meltano.yml` file was updated.
 - [#1112](https://gitlab.com/meltano/meltano/issues/1112) Fix the "Run" button to improve UX by properly reflecting the running state for auto-running queries
 - [#1023](https://gitlab.com/meltano/meltano/issues/1023) Fix last vuex mutation warning with editable `localConfiguration` clone approach
-
 
 ## 1.0.1 - (2019-10-07)
 
