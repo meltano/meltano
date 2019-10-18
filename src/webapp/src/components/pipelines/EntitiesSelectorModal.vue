@@ -111,7 +111,7 @@ export default {
   methods: {
     tryAutoAdvance() {
       if (!this.hasEntities) {
-        this.selectEntitiesAndBeginLoaderInstall()
+        this.saveAndAdvance()
       }
     },
     close() {
@@ -130,7 +130,7 @@ export default {
     resetSelections() {
       this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
     },
-    selectEntitiesAndBeginLoaderInstall() {
+    saveAndAdvance() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
         const message = !this.hasEntities
@@ -271,7 +271,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click="selectEntitiesAndBeginLoaderInstall"
+          @click="saveAndAdvance"
         >
           Save
         </button>
