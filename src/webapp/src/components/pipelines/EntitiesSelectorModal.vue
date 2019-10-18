@@ -53,14 +53,11 @@ export default {
         0
       )
     },
-    getTotalEntityCount() {
-      return this.entities.entityGroups ? this.entities.entityGroups.length : 0
-    },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount
     },
     hasEntities() {
-      return this.getTotalEntityCount > 0
+      return this.entities.entityGroups.length > 0
     },
     hasSelectedAttributes() {
       return this.getSelectedAttributeCount > 0
