@@ -1,4 +1,5 @@
 import copy
+import logging
 from enum import Enum
 from pathlib import Path
 
@@ -27,6 +28,10 @@ class ConnectionService:
                 "dialect": self.dialect,
                 "schema": self.context.extractor.namespace,
             },
+            "snowflake": lambda: {
+                "dialect": self.dialect,
+                "schema": self.context.extractor.namespace.upper(),
+            },
             "sqlite": lambda: {"dialect": self.dialect},
         }
 
@@ -35,6 +40,10 @@ class ConnectionService:
     def analyze_params(self):
         dialect_params = {
             "postgres": lambda: {"dialect": self.dialect, "schema": ANALYZE_SCHEMA},
+            "snowflake": lambda: {
+                "dialect": self.dialect,
+                "schema": ANALYZE_SCHEMA.upper(),
+            },
             "sqlite": lambda: {"dialect": self.dialect},
         }
 
@@ -58,14 +67,19 @@ class ConnectionService:
             "postgres": lambda params: "postgresql://{user}:{password}@{host}:{port}/{dbname}".format(
                 **params
             ),
+            "snowflake": lambda params: "snowflake://{username}:{password}@{account}/{database}/{schema}?warehouse={warehouse}&role={role}".format(
+                **params
+            ),
             "sqlite": lambda params: "sqlite:///{database}".format(
                 database=db_suffix(params.pop("database")), **params
             ),
         }
 
         try:
-            return dialect_templates[self.dialect](
+            url = dialect_templates[self.dialect](
                 {**self.context.loader.config, **params}
             )
+
+            return url
         except KeyError:
             raise DialectNotSupportedError(self.dialect)

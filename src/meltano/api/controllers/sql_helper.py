@@ -30,7 +30,7 @@ class ConnectionNotFound(Exception):
 class UnsupportedConnectionDialect(Exception):
     def __init__(self, connection_dialect: str):
         self.connection_dialect = connection_dialect
-        super().__init__("Dialect {connection_dialect} is not supprted.")
+        super().__init__("Dialect {connection_dialect} is not supported.")
 
 
 class SqlHelper(SqlUtils):
