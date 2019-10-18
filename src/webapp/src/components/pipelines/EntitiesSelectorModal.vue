@@ -25,9 +25,6 @@ export default {
         : `Show all ${this.extractorInFocusEntities.entityGroups.length}`
       return `${prefix} entities`
     },
-    extractorLacksEntitySelectionAndIsInstalled() {
-      return !this.isLoading && !this.hasEntities
-    },
     getIsSelectedMode() {
       return mode => mode === this.selectedMode
     },
@@ -71,10 +68,10 @@ export default {
       return this.getSelectedAttributeCount > 0
     },
     isLoading() {
-      return !this.extractorInFocusEntities.hasOwnProperty('entityGroups')
+      return !this.extractorInFocusEntities
     },
     isSaveable() {
-      return this.hasEntities && this.hasSelectedAttributes
+      return !this.isLoading && this.hasEntities && this.hasSelectedAttributes
     },
     selectedMode() {
       return this.getAreAllSelected
@@ -113,7 +110,7 @@ export default {
   },
   methods: {
     tryAutoAdvance() {
-      if (this.extractorLacksEntitySelectionAndIsInstalled) {
+      if (!this.hasEntities) {
         this.selectEntitiesAndBeginLoaderInstall()
       }
     },
@@ -136,7 +133,7 @@ export default {
     selectEntitiesAndBeginLoaderInstall() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
-        const message = this.extractorLacksEntitySelectionAndIsInstalled
+        const message = !this.hasEntities
           ? `Auto Advance - No Entities for ${this.extractorNameFromRoute}`
           : `Entities Saved - ${this.extractorNameFromRoute}`
         Vue.toasted.global.success(message)
