@@ -54,7 +54,7 @@ export default {
       )
     },
     getTotalEntityCount() {
-      return this.entities.entityGroups ? this.entities.entityGroups.length : -1
+      return this.entities.entityGroups ? this.entities.entityGroups.length : 0
     },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount
