@@ -18,11 +18,11 @@ export default {
     }
   },
   computed: {
-    ...mapState('configuration', ['extractorInFocusEntities']),
+    ...mapState('configuration', { entities: 'extractorInFocusEntities' }),
     expandableToggleLabel() {
       const prefix = this.isExpanded
         ? 'Hide'
-        : `Show all ${this.extractorInFocusEntities.entityGroups.length}`
+        : `Show all ${this.entities.entityGroups.length}`
       return `${prefix} entities`
     },
     getIsSelectedMode() {
@@ -30,14 +30,14 @@ export default {
     },
     getSelectedAttributeCount() {
       let count = 0
-      this.extractorInFocusEntities.entityGroups.forEach(group => {
+      this.entities.entityGroups.forEach(group => {
         count += group.attributes.filter(attibute => attibute.selected).length
       })
       return count
     },
     getSelectedEntityCount() {
       let count = 0
-      this.extractorInFocusEntities.entityGroups.forEach(group => {
+      this.entities.entityGroups.forEach(group => {
         const hasSelectedAttribute = group.attributes.find(
           attribute => attribute.selected
         )
@@ -48,15 +48,13 @@ export default {
       return count
     },
     getTotalAttributeCount() {
-      return this.extractorInFocusEntities.entityGroups.reduce(
+      return this.entities.entityGroups.reduce(
         (acc, curr) => acc + curr.attributes.length,
         0
       )
     },
     getTotalEntityCount() {
-      return this.extractorInFocusEntities.entityGroups
-        ? this.extractorInFocusEntities.entityGroups.length
-        : -1
+      return this.entities.entityGroups ? this.entities.entityGroups.length : -1
     },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount
@@ -68,7 +66,7 @@ export default {
       return this.getSelectedAttributeCount > 0
     },
     isLoading() {
-      return !this.extractorInFocusEntities
+      return !this.entities
     },
     isSaveable() {
       return !this.isLoading && this.hasEntities && this.hasSelectedAttributes
@@ -224,7 +222,7 @@ export default {
 
           <div class="expandable" :class="{ 'is-expanded': isExpanded }">
             <div
-              v-for="entityGroup in extractorInFocusEntities.entityGroups"
+              v-for="entityGroup in entities.entityGroups"
               :key="`${entityGroup.name}`"
               class="is-unselectable"
             >
