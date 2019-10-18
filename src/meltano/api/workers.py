@@ -92,15 +92,17 @@ class UIAvailableWorker(threading.Thread):
 
 
 class APIWorker(threading.Thread):
-    def __init__(self, project: Project, reload=False):
+    def __init__(self, project: Project, bind_addr, reload=False):
         super().__init__()
         self.project = project
+        self.bind_addr = bind_addr
         self.reload = reload
         self.pid_file = PIDFile(self.project.run_dir("gunicorn.pid"))
 
     def run(self):
         # fmt: off
         cmd = ["gunicorn",
+               "--bind", self.bind_addr,
                "--config", "python:meltano.api.wsgi",
                "--pid", str(self.pid_file)]
         # fmt: on
