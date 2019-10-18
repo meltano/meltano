@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1122](https://gitlab.com/meltano/meltano/issues/1122) `meltano elt` will now properly run when using `target-snowflake`.
+
 ### Breaks
 
 ## 1.1.0 - (2019-10-16)
