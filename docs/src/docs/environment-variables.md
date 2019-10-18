@@ -75,3 +75,28 @@ To change the directory where Meltano logs will be generated, update your `.env`
 # The directory where the Meltano logs will be generated
 export MELTANO_LOG_PATH = ""
 ```
+
+## Service Listen Configuration
+
+By default, the API and Airflow services listen with following host/port combinations.
+
+API: `http://0.0.0.0:5000`
+Airflow: `http://0.0.0.0:5010`
+
+To change the host/port configuration on which the API or Airflow server listen, update your `.env` in your project directory with the following configuration:
+
+:::warning Airflow integration
+Meltano expects Airflow to be available on the **same host** it is currently exposed from.
+
+Meltano doesn't support connecting to a remote Airflow instance.
+:::
+
+```bash
+# Meltano API configuration
+export MELTANO_API_HOSTNAME="0.0.0.0"
+export MELTANO_API_PORT="5000"
+
+# Airflow configuration
+export AIRFLOW__WEBSERVER__WEB_SERVER_HOST="0.0.0.0"
+export AIRFLOW__WEBSERVER__WEB_SERVER_PORT="5010"
+```
