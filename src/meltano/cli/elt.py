@@ -11,6 +11,7 @@ from meltano.core.config_service import ConfigService
 from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.project import Project, ProjectNotFound
+from meltano.core.job import Job
 from meltano.core.plugin import PluginType
 from meltano.core.plugin.error import PluginMissingError
 from meltano.core.project_add_service import ProjectAddService
@@ -43,63 +44,72 @@ def elt(project, extractor, loader, dry, transform, job_id):
     """
 
     _, Session = project_engine(project)
+    job = Job(
+        job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
+    )
 
-    if job_id is None:
-        # Autogenerate a job_id if it is not provided by the user
-        job_id = f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
+    with JobLoggingService(project).create_log(job.job_id) as log_file, OutputLogger(
+        log_file
+    ):
+        try:
+            session = Session()
+            install_missing_plugins(project, extractor, loader, transform)
 
-    with JobLoggingService(project).create_log(job_id) as log_file:
-        with OutputLogger(log_file):
-            try:
-                install_missing_plugins(project, extractor, loader, transform)
-                session = Session()
+            elt_context = (
+                ELTContextBuilder(project)
+                .with_job(job)
+                .with_extractor(extractor)
+                .with_loader(loader)
+                .context(session)
+            )
 
-                elt_context = (
-                    ELTContextBuilder(project)
-                    .with_extractor(extractor)
-                    .with_loader(loader)
-                    .context(session)
-                )
-
-                singer_runner = SingerRunner(
-                    elt_context,
-                    job_id=job_id,
-                    run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
-                    target_config_dir=project.meltano_dir(PluginType.LOADERS, loader),
-                    tap_config_dir=project.meltano_dir(
-                        PluginType.EXTRACTORS, extractor
-                    ),
-                )
-
+            with job.run(session):
                 if transform != "only":
-                    click.echo("Running extract & load...")
-                    singer_runner.run(session, dry_run=dry)
-                    click.secho("Extract & load complete!", fg="green")
+                    run_extract_load(elt_context, session, dry_run=dry)
                 else:
                     click.secho("Extract & load skipped.", fg="yellow")
 
                 if transform != "skip":
-                    dbt_runner = DbtRunner(elt_context)
-                    click.echo("Running transformation...")
-                    dbt_runner.run(
-                        session, dry_run=dry, models=extractor
-                    )  # TODO: models from elt_context?
-                    click.secho("Transformation complete!", fg="green")
+                    run_transform(elt_context, session, dry_run=dry, models=extractor)
                 else:
                     click.secho("Transformation skipped.", fg="yellow")
-            except Exception as err:
-                click.secho(
-                    f"ELT could not complete, an error happened during the process.",
-                    fg="red",
-                )
-                logging.exception(err)
-                click.secho(str(err), err=True)
-                raise click.Abort()
-            finally:
-                session.close()
+        except Exception as err:
+            click.secho(
+                f"ELT could not complete, an error happened during the process.",
+                fg="red",
+            )
+            logging.exception(err)
+            click.secho(str(err), err=True)
+            raise click.Abort()
+        finally:
+            session.close()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
+
+
+def run_extract_load(elt_context, session, **kwargs):
+    project = elt_context.project
+    loader = elt_context.loader.ref
+    extractor = elt_context.extractor.ref
+
+    singer_runner = SingerRunner(
+        elt_context,
+        run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
+        target_config_dir=project.meltano_dir(loader.type, loader.name),
+        tap_config_dir=project.meltano_dir(extractor.type, extractor.name),
+    )
+
+    click.echo("Running extract & load...")
+    singer_runner.run(session, **kwargs)
+    click.secho("Extract & load complete!", fg="green")
+
+
+def run_transform(elt_context, session, **kwargs):
+    dbt_runner = DbtRunner(elt_context)
+    click.echo("Running transformation...")
+    dbt_runner.run(session, **kwargs)  # TODO: models from elt_context?
+    click.secho("Transformation complete!", fg="green")
 
 
 def install_missing_plugins(
