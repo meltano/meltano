@@ -11,6 +11,10 @@ export default {
       type: String,
       default: ''
     },
+    labelClasses: {
+      type: String,
+      default: ''
+    },
     buttonClasses: {
       type: String,
       default: ''
@@ -115,7 +119,7 @@ export default {
         aria-haspopup="true"
         @click="toggleDropdown"
       >
-        <span v-if="label">{{ label }}</span>
+        <span v-if="label" :class="labelClasses">{{ label }}</span>
         <span v-if="!isIconRemoved" class="icon is-small">
           <font-awesome-icon
             :icon="isOpen ? iconClose : iconOpen"

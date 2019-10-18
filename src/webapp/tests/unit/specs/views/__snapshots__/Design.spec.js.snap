@@ -55,7 +55,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -139,7 +141,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 aria-haspopup="true"
                 class="button"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -205,7 +209,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
             class="column is-three-fifths"
           >
             <div
-              class="buttons is-right"
+              class="field has-addons is-pulled-right is-vcentered"
             >
               <div
                 class="dropdown"
@@ -216,10 +220,12 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   <button
                     aria-controls="dropdown-sql"
                     aria-haspopup="true"
-                    class="button is-text is-small"
+                    class="button is-text is-thin is-small"
                     disabled="disabled"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -252,14 +258,36 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 </div>
               </div>
                
-              <button
-                class="button is-success"
-                disabled="disabled"
+              <div
+                class="control"
               >
+                <button
+                  class="button is-success"
+                  disabled="disabled"
+                >
+                  
+                  Run
                 
-                Run
-              
-              </button>
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
+                >
+                  <span
+                    class="icon is-small is-size-7"
+                  >
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -455,7 +483,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -540,7 +570,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 class="button"
                 disabled="disabled"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -597,7 +629,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
             class="column is-three-fifths"
           >
             <div
-              class="buttons is-right"
+              class="field has-addons is-pulled-right is-vcentered"
             >
               <div
                 class="dropdown"
@@ -608,9 +640,11 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   <button
                     aria-controls="dropdown-sql"
                     aria-haspopup="true"
-                    class="button is-text is-small"
+                    class="button is-text is-thin is-small"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -648,13 +682,34 @@ LIMIT
                 </div>
               </div>
                
-              <button
-                class="button is-success"
+              <div
+                class="control"
               >
+                <button
+                  class="button is-success"
+                >
+                  
+                  Run
                 
-                Run
-              
-              </button>
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                >
+                  <span
+                    class="icon is-small is-size-7"
+                  >
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -844,6 +899,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              labelclasses=""
               menuclasses=""
             >
               <div
@@ -906,6 +962,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            labelclasses=""
             menuclasses=""
           >
             <div
@@ -945,14 +1002,15 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             class="column is-three-fifths"
           >
             <div
-              class="buttons is-right"
+              class="field has-addons is-pulled-right is-vcentered"
             >
               <dropdown-stub
-                buttonclasses="is-text is-small"
+                buttonclasses="is-text is-thin is-small"
                 iconclose="caret-up"
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                labelclasses=""
                 menuclasses=""
               >
                 <div
@@ -979,13 +1037,34 @@ LIMIT
                 </div>
               </dropdown-stub>
                
-              <button
-                class="button is-success"
+              <div
+                class="control"
               >
+                <button
+                  class="button is-success"
+                >
+                  
+                  Run
                 
-                Run
-              
-              </button>
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                >
+                  <span
+                    class="icon is-small is-size-7"
+                  >
+                    <font-awesome-icon
+                      icon="sync"
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1162,6 +1241,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              labelclasses=""
               menuclasses=""
             >
               <div
@@ -1223,6 +1303,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            labelclasses=""
             menuclasses=""
           >
             <div
@@ -1271,15 +1352,16 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             class="column is-three-fifths"
           >
             <div
-              class="buttons is-right"
+              class="field has-addons is-pulled-right is-vcentered"
             >
               <dropdown-stub
-                buttonclasses="is-text is-small"
+                buttonclasses="is-text is-thin is-small"
                 disabled="true"
                 iconclose="caret-up"
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                labelclasses=""
                 menuclasses=""
               >
                 <div
@@ -1301,14 +1383,36 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 </div>
               </dropdown-stub>
                
-              <button
-                class="button is-success"
-                disabled="disabled"
+              <div
+                class="control"
               >
+                <button
+                  class="button is-success"
+                  disabled="disabled"
+                >
+                  
+                  Run
                 
-                Run
-              
-              </button>
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
+                >
+                  <span
+                    class="icon is-small is-size-7"
+                  >
+                    <font-awesome-icon
+                      icon="sync"
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1491,7 +1595,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -1576,7 +1682,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 class="button"
                 disabled="disabled"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -1633,7 +1741,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
             class="column is-three-fifths"
           >
             <div
-              class="buttons is-right"
+              class="field has-addons is-pulled-right is-vcentered"
             >
               <div
                 class="dropdown"
@@ -1644,10 +1752,12 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   <button
                     aria-controls="dropdown-sql"
                     aria-haspopup="true"
-                    class="button is-text is-small"
+                    class="button is-text is-thin is-small"
                     disabled="disabled"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -1680,14 +1790,36 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 </div>
               </div>
                
-              <button
-                class="button is-success"
-                disabled="disabled"
+              <div
+                class="control"
               >
+                <button
+                  class="button is-success"
+                  disabled="disabled"
+                >
+                  
+                  Run
                 
-                Run
-              
-              </button>
+                </button>
+              </div>
+               
+              <div
+                class="control"
+              >
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
+                >
+                  <span
+                    class="icon is-small is-size-7"
+                  >
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

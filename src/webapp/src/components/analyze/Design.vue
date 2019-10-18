@@ -1,5 +1,5 @@
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import Vue from 'vue'
 
 import capitalize from '@/filters/capitalize'
@@ -39,6 +39,7 @@ export default {
       'filterOptions',
       'hasSQLError',
       'loader',
+      'isAutoRunQuery',
       'isLoadingQuery',
       'reports',
       'resultAggregates',
@@ -112,10 +113,16 @@ export default {
   },
   created() {
     this.initializeDesign()
+    this.initializeSettings()
   },
   methods: {
     ...mapActions('dashboards', ['getDashboards']),
-    ...mapActions('designs', ['resetErrorMessage', 'runQuery']),
+    ...mapActions('designs', [
+      'resetErrorMessage',
+      'runQuery',
+      'toggleIsAutoRunQuery'
+    ]),
+    ...mapMutations('designs', ['setIsAutoRunQuery']),
 
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
@@ -149,6 +156,14 @@ export default {
       })
 
       this.$store.dispatch('designs/getFilterOptions')
+    },
+
+    initializeSettings() {
+      if ('isAutoRunQuery' in localStorage) {
+        this.setIsAutoRunQuery(
+          localStorage.getItem('isAutoRunQuery') === 'true'
+        )
+      }
     },
 
     toggleActiveReportInDashboard(dashboard) {
@@ -405,10 +420,10 @@ export default {
               <h2 class="title is-5">Query</h2>
             </div>
             <div class="column is-three-fifths">
-              <div class="buttons is-right">
+              <div class="field has-addons is-pulled-right is-vcentered">
                 <Dropdown
                   label="SQL"
-                  button-classes="is-text is-small"
+                  button-classes="is-text is-thin is-small"
                   :disabled="!currentSQL"
                   is-icon-removed
                 >
@@ -420,14 +435,34 @@ export default {
                     </div>
                   </div>
                 </Dropdown>
-                <button
-                  class="button is-success"
-                  :class="{ 'is-loading': isLoadingQuery }"
-                  :disabled="!currentSQL"
-                  @click="runQuery"
-                >
-                  Run
-                </button>
+                <div class="control">
+                  <button
+                    class="button is-success"
+                    :class="{ 'is-loading': isLoadingQuery }"
+                    :disabled="!currentSQL"
+                    @click="runQuery"
+                  >
+                    Run
+                  </button>
+                </div>
+                <div class="control">
+                  <button
+                    class="button tooltip"
+                    :data-tooltip="
+                      `Toggle autorun queries ${isAutoRunQuery ? 'off' : 'on'}`
+                    "
+                    :class="{
+                      'has-text-grey-light': !isAutoRunQuery,
+                      'is-active has-text-interactive-primary': isAutoRunQuery
+                    }"
+                    :disabled="!currentSQL"
+                    @click="toggleIsAutoRunQuery"
+                  >
+                    <span class="icon is-small is-size-7">
+                      <font-awesome-icon icon="sync"></font-awesome-icon>
+                    </span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

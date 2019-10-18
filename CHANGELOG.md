@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1022](https://gitlab.com/meltano/meltano/issues/1022) Add "Autorun Query" toggle and persist the user's choice across sessions
+
 ### Changes
 
 - [#1013](https://gitlab.com/meltano/meltano/issues/1013) Toast initialization and analytics initialization cleanup

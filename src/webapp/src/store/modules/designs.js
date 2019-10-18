@@ -26,6 +26,7 @@ const defaultState = utils.deepFreeze({
     columns: []
   },
   hasSQLError: false,
+  isAutoRunQuery: true,
   isLoadingQuery: false,
   limit: 50,
   order: {
@@ -330,8 +331,9 @@ const actions = {
     }
   },
 
-  checkAutoRun({ dispatch, state }) {
-    dispatch('runQuery', state.results.length > 0)
+  tryAutoRun({ dispatch, state }) {
+    const hasRan = state.results.length > 0
+    dispatch('runQuery', hasRan && state.isAutoRunQuery)
   },
 
   // eslint-disable-next-line no-shadow
@@ -497,7 +499,7 @@ const actions = {
 
   resetSortAttributes({ commit, dispatch }) {
     commit('resetSortAttributes')
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   runQuery(_, isRun = true) {
@@ -533,13 +535,17 @@ const actions = {
     commit('toggleSelected', aggregate)
     dispatch('cleanOrdering', aggregate)
     dispatch('cleanFiltering', { attribute: aggregate, type: 'aggregate' })
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   toggleColumn({ commit, dispatch }, column) {
     commit('toggleSelected', column)
     dispatch('cleanOrdering', column)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
+  },
+
+  toggleIsAutoRunQuery({ commit, state }) {
+    commit('setIsAutoRunQuery', !state.isAutoRunQuery)
   },
 
   toggleLoadReportOpen({ commit }) {
@@ -549,13 +555,13 @@ const actions = {
   toggleTimeframe({ commit, dispatch }, timeframe) {
     commit('toggleSelected', timeframe)
     dispatch('cleanOrdering', timeframe)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
     commit('toggleSelected', timeframePeriod)
     dispatch('cleanOrdering', timeframePeriod)
-    dispatch('checkAutoRun')
+    dispatch('tryAutoRun')
   },
 
   updateReport({ commit, state }) {
@@ -691,6 +697,11 @@ const mutations = {
     })
 
     state.design = designData
+  },
+
+  setIsAutoRunQuery(state, value) {
+    state.isAutoRunQuery = value
+    localStorage.setItem('isAutoRunQuery', state.isAutoRunQuery)
   },
 
   setLoader(state, loader) {
