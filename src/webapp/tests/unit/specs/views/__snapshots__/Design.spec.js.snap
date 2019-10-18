@@ -55,7 +55,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -139,7 +141,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 aria-haspopup="true"
                 class="button"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -219,7 +223,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     class="button is-text is-thin is-small"
                     disabled="disabled"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -268,57 +274,19 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <div
                 class="control"
               >
-                <div
-                  class="dropdown is-right"
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
                 >
-                  <div
-                    class="dropdown-trigger"
+                  <span
+                    class="icon is-small is-size-7"
                   >
-                    <button
-                      aria-controls=""
-                      aria-haspopup="true"
-                      class="button is-thin"
-                    >
-                      <!---->
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id=""
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content is-unselectable"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <label
-                          class="checkbox"
-                          for="checkbox-autorun"
-                        >
-                          <input
-                            id="checkbox-autorun"
-                            type="checkbox"
-                            value="true"
-                          />
-                          
-                        Autorun queries
-                      
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -515,7 +483,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -600,7 +570,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 class="button"
                 disabled="disabled"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -670,7 +642,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     aria-haspopup="true"
                     class="button is-text is-thin is-small"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -723,57 +697,18 @@ LIMIT
               <div
                 class="control"
               >
-                <div
-                  class="dropdown is-right"
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
                 >
-                  <div
-                    class="dropdown-trigger"
+                  <span
+                    class="icon is-small is-size-7"
                   >
-                    <button
-                      aria-controls=""
-                      aria-haspopup="true"
-                      class="button is-thin"
-                    >
-                      <!---->
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id=""
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content is-unselectable"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <label
-                          class="checkbox"
-                          for="checkbox-autorun"
-                        >
-                          <input
-                            id="checkbox-autorun"
-                            type="checkbox"
-                            value="true"
-                          />
-                          
-                        Autorun queries
-                      
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -964,6 +899,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              labelclasses=""
               menuclasses=""
             >
               <div
@@ -1026,6 +962,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            labelclasses=""
             menuclasses=""
           >
             <div
@@ -1073,6 +1010,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                labelclasses=""
                 menuclasses=""
               >
                 <div
@@ -1114,36 +1052,18 @@ LIMIT
               <div
                 class="control"
               >
-                <dropdown-stub
-                  buttonclasses="is-thin"
-                  iconclose="caret-up"
-                  iconopen="caret-down"
-                  isrightaligned="true"
-                  label=""
-                  menuclasses=""
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
                 >
-                  <div
-                    class="dropdown-content is-unselectable"
+                  <span
+                    class="icon is-small is-size-7"
                   >
-                    <div
-                      class="dropdown-item"
-                    >
-                      <label
-                        class="checkbox"
-                        for="checkbox-autorun"
-                      >
-                        <input
-                          id="checkbox-autorun"
-                          type="checkbox"
-                          value="true"
-                        />
-                        
-                        Autorun queries
-                      
-                      </label>
-                    </div>
-                  </div>
-                </dropdown-stub>
+                    <font-awesome-icon
+                      icon="sync"
+                    />
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -1321,6 +1241,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               iconopen="caret-down"
               isrightaligned="true"
               label="Save Report"
+              labelclasses=""
               menuclasses=""
             >
               <div
@@ -1382,6 +1303,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
             iconopen="caret-down"
             isrightaligned="true"
             label="Reports"
+            labelclasses=""
             menuclasses=""
           >
             <div
@@ -1439,6 +1361,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 iconopen="caret-down"
                 isiconremoved="true"
                 label="SQL"
+                labelclasses=""
                 menuclasses=""
               >
                 <div
@@ -1476,36 +1399,19 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               <div
                 class="control"
               >
-                <dropdown-stub
-                  buttonclasses="is-thin"
-                  iconclose="caret-up"
-                  iconopen="caret-down"
-                  isrightaligned="true"
-                  label=""
-                  menuclasses=""
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
                 >
-                  <div
-                    class="dropdown-content is-unselectable"
+                  <span
+                    class="icon is-small is-size-7"
                   >
-                    <div
-                      class="dropdown-item"
-                    >
-                      <label
-                        class="checkbox"
-                        for="checkbox-autorun"
-                      >
-                        <input
-                          id="checkbox-autorun"
-                          type="checkbox"
-                          value="true"
-                        />
-                        
-                        Autorun queries
-                      
-                      </label>
-                    </div>
-                  </div>
-                </dropdown-stub>
+                    <font-awesome-icon
+                      icon="sync"
+                    />
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -1689,7 +1595,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   class="button"
                   disabled="disabled"
                 >
-                  <span>
+                  <span
+                    class=""
+                  >
                     Save Report
                   </span>
                    
@@ -1774,7 +1682,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 class="button"
                 disabled="disabled"
               >
-                <span>
+                <span
+                  class=""
+                >
                   Reports
                 </span>
                  
@@ -1845,7 +1755,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     class="button is-text is-thin is-small"
                     disabled="disabled"
                   >
-                    <span>
+                    <span
+                      class=""
+                    >
                       SQL
                     </span>
                      
@@ -1894,57 +1806,19 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <div
                 class="control"
               >
-                <div
-                  class="dropdown is-right"
+                <button
+                  class="button tooltip is-active has-text-interactive-primary"
+                  data-tooltip="Toggle autorun queries off"
+                  disabled="disabled"
                 >
-                  <div
-                    class="dropdown-trigger"
+                  <span
+                    class="icon is-small is-size-7"
                   >
-                    <button
-                      aria-controls=""
-                      aria-haspopup="true"
-                      class="button is-thin"
-                    >
-                      <!---->
-                       
-                      <span
-                        class="icon is-small"
-                      >
-                        <font-awesome-icon-stub
-                          icon="caret-down"
-                        />
-                      </span>
-                    </button>
-                  </div>
-                   
-                  <div
-                    class="dropdown-menu"
-                    id=""
-                    role="menu"
-                  >
-                    <div
-                      class="dropdown-content is-unselectable"
-                    >
-                      <div
-                        class="dropdown-item"
-                      >
-                        <label
-                          class="checkbox"
-                          for="checkbox-autorun"
-                        >
-                          <input
-                            id="checkbox-autorun"
-                            type="checkbox"
-                            value="true"
-                          />
-                          
-                        Autorun queries
-                      
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                    <font-awesome-icon-stub
+                      icon="sync"
+                    />
+                  </span>
+                </button>
               </div>
             </div>
           </div>
