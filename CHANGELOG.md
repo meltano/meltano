@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
+- [#1121](https://gitlab.com/meltano/meltano/issues/1121) Add ability to configure listen address of Meltano and Airflow
 
 ### Changes
 
@@ -21,8 +22,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-- [#1121](https://gitlab.com/meltano/meltano/issues/1121) Add ability to configure listen address of airflow
-* Compress meltano-logo.png
 
 - Compress meltano-logo.png
 - [#1106](https://gitlab.com/meltano/meltano/issues/1106) Add description metadata to the GitLab extractor's Ultimate License configuration setting
@@ -43,7 +42,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1115](https://gitlab.com/meltano/meltano/issues/1115) Update 'meltano permissions' to not require an identially named role for a given user
 
 ### Fixes
-* [#1121](https://gitlab.com/meltano/meltano/issues/1121) Bind variables configure hostname/port for api instance of gunicorn
 
 - [#1120](https://gitlab.com/meltano/meltano/issues/1120) Fix a concurrency bug causing `meltano select` to crash.
 - [#1086](https://gitlab.com/meltano/meltano/issues/1086) Fix a concurrency issue when the `meltano.yml` file was updated.
