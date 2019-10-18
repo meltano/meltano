@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1050](https://gitlab.com/meltano/meltano/issues/1050) Fix a bug where the Job log would be created before the `transform` are run.
 - [#1122](https://gitlab.com/meltano/meltano/issues/1122) `meltano elt` will now properly run when using `target-snowflake`.
+- [#1159](https://gitlab.com/meltano/meltano/issues/1159) Minor UI fixes (proper `MainNav` Model icon active color during Analyze route match & "Run" auto query related cleanup) and `...NameFromRoute` refactor renaming cleanup
 
 ### Breaks
 
