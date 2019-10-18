@@ -189,13 +189,13 @@ export default {
 
         <router-link
           :to="{ name: 'model' }"
-          :class="{ 'router-link-active': getIsSubRouteOf('/model/') }"
+          :class="{ 'router-link-active': getIsSubRouteOf('/model') }"
           class="navbar-item navbar-child has-text-weight-semibold"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
             :class="{
-              'has-text-interactive-navigation': getIsSubRouteOf('/model/')
+              'has-text-interactive-navigation': getIsSubRouteOf('/model')
             }"
           >
             <span class="icon is-small" :class="getIconColor('/model')">
