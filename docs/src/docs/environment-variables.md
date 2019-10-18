@@ -85,11 +85,18 @@ Airflow: `http://0.0.0.0:5010`
 
 To change the host/port configuration on which the API or Airflow server listen, update your `.env` in your project directory with the following configuration:
 
+:::warning Airflow integration
+Meltano expects Airflow to be available on the **same host** it is currently exposed from.
+
+Meltano doesn't support connecting to a remote Airflow instance.
+:::
+
 ```bash
-# Configuration for API service
-export MELTANO_API_HOSTNAME=""
-export MELTANO_API_PORT=""
-# Configuration for Airflow service
-export AIRFLOW__WEBSERVER__WEB_SERVER_HOST=""
-export AIRFLOW__WEBSERVER__WEB_SERVER_PORT=""
+# Meltano API configuration
+export MELTANO_API_HOSTNAME="0.0.0.0"
+export MELTANO_API_PORT="5000"
+
+# Airflow configuration
+export AIRFLOW__WEBSERVER__WEB_SERVER_HOST="0.0.0.0"
+export AIRFLOW__WEBSERVER__WEB_SERVER_PORT="5010"
 ```
