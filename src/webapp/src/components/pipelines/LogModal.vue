@@ -93,6 +93,8 @@ export default {
             `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
           "
           :menu-classes="'dropdown-menu-300'"
+          icon-open="chart-line"
+          icon-close="caret-down"
           is-right-aligned
           is-up
         >
