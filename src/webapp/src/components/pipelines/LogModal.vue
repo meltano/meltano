@@ -1,10 +1,20 @@
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 
+import capitalize from '@/filters/capitalize'
+import Dropdown from '@/components/generic/Dropdown'
 import poller from '@/utils/poller'
+import underscoreToSpace from '@/filters/underscoreToSpace'
 
 export default {
   name: 'LogModal',
+  components: {
+    Dropdown
+  },
+  filters: {
+    capitalize,
+    underscoreToSpace
+  },
   data() {
     return {
       isPolling: true,
@@ -13,7 +23,9 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('configuration', ['getRunningPipelineJobIds'])
+    ...mapGetters('configuration', ['getRunningPipelineJobIds']),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
+    ...mapState('repos', ['models'])
   },
   created() {
     this.jobId = this.$route.params.jobId
@@ -74,13 +86,42 @@ export default {
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Close</button>
-        <button
-          class="button is-interactive-primary"
-          :class="{ 'is-loading': isPolling }"
+        <Dropdown
+          label="Analyze"
           :disabled="isPolling"
+          :button-classes="
+            `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
+          "
+          :menu-classes="'dropdown-menu-300'"
+          is-right-aligned
+          is-up
         >
-          Analyze
-        </button>
+          <div class="dropdown-content is-unselectable">
+            <div
+              v-for="(v, model) in models"
+              :key="`${model}-panel`"
+              class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+            >
+              <div class="content">
+                <h3 class="is-size-6">
+                  {{ v.name | capitalize | underscoreToSpace }}
+                </h3>
+                <h4 class="is-size-7 has-text-grey">
+                  {{ v.namespace }}
+                </h4>
+              </div>
+              <div class="buttons">
+                <router-link
+                  v-for="design in v['designs']"
+                  :key="design"
+                  class="button is-small is-interactive-primary is-outlined"
+                  :to="urlForModelDesign(model, design)"
+                  >{{ design | capitalize | underscoreToSpace }}</router-link
+                >
+              </div>
+            </div>
+          </div>
+        </Dropdown>
       </footer>
     </div>
   </div>
