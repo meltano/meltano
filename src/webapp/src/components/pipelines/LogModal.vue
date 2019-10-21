@@ -1,17 +1,35 @@
 <script>
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
+
+import capitalize from '@/filters/capitalize'
+import Dropdown from '@/components/generic/Dropdown'
+import poller from '@/utils/poller'
+import underscoreToSpace from '@/filters/underscoreToSpace'
 
 export default {
   name: 'LogModal',
+  components: {
+    Dropdown
+  },
+  filters: {
+    capitalize,
+    underscoreToSpace
+  },
   data() {
     return {
-      jobLog: '',
-      isRefreshing: false
+      isPolling: true,
+      jobLog: null,
+      jobPoller: null
     }
   },
+  computed: {
+    ...mapGetters('configuration', ['getRunningPipelineJobIds']),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
+    ...mapState('repos', ['models'])
+  },
   created() {
-    this.jobIdFromRoute = this.$route.params.jobId
-    this.updateJobLog()
+    this.jobId = this.$route.params.jobId
+    this.initJobPoller()
   },
   methods: {
     ...mapActions('configuration', ['getJobLog']),
@@ -22,18 +40,28 @@ export default {
         this.$router.push({ name: 'schedules' })
       }
     },
-    refresh() {
-      this.isRefreshing = true
-      this.updateJobLog()
-    },
-    updateJobLog() {
-      this.getJobLog(this.jobIdFromRoute)
-        .then(response => (this.jobLog = response.data.log))
-        .catch(error => {
-          this.jobLog = error.response.data.code
-        })
-        .finally(() => (this.isRefreshing = false))
+    initJobPoller() {
+      const pollFn = () => {
+        this.getJobLog(this.jobId)
+          .then(response => {
+            this.jobLog = response.data.log
+          })
+          .catch(error => {
+            this.jobLog = error.response.data.code
+          })
+          .finally(() => {
+            if (this.getRunningPipelineJobIds.indexOf(this.jobId) === -1) {
+              this.isPolling = false
+              this.jobPoller.dispose()
+            }
+          })
+      }
+      this.jobPoller = poller.create(pollFn, null, 1200)
+      this.jobPoller.init()
     }
+  },
+  beforeDestroy() {
+    this.jobPoller.dispose()
   }
 }
 </script>
@@ -44,37 +72,58 @@ export default {
     <div class="modal-card is-wide">
       <header class="modal-card-head">
         <p class="modal-card-title">
-          Run Log: <span class="is-family-code">{{ jobIdFromRoute }}</span>
+          Run Log: <span class="is-family-code">{{ jobId }}</span>
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
       <section class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <div v-if="jobLog">
-            <pre><code>{{jobLog}}</code></pre>
-            <div class="buttons">
-              <button
-                class="button"
-                :class="{ 'is-loading': isRefreshing }"
-                aria-label="refresh"
-                @click="refresh"
-              >
-                Refresh
-              </button>
-              <a
-                class="button is-text tooltip is-tooltip-warning is-tooltip-up"
-                data-tooltip="Help shape this feature by contributing your ideas"
-                target="_blank"
-                href="https://gitlab.com/meltano/meltano/issues/1060"
-                >Log streaming and more are planned</a
-              >
-            </div>
+            <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
           </div>
           <progress v-else class="progress is-small is-info"></progress>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Close</button>
+        <Dropdown
+          label="Analyze"
+          :disabled="isPolling"
+          :button-classes="
+            `is-interactive-primary ${isPolling ? 'is-loading' : ''}`
+          "
+          :menu-classes="'dropdown-menu-300'"
+          icon-open="chart-line"
+          icon-close="caret-down"
+          is-right-aligned
+          is-up
+        >
+          <div class="dropdown-content is-unselectable">
+            <div
+              v-for="(v, model) in models"
+              :key="`${model}-panel`"
+              class="box box-analyze-nav is-borderless is-shadowless is-marginless"
+            >
+              <div class="content">
+                <h3 class="is-size-6">
+                  {{ v.name | capitalize | underscoreToSpace }}
+                </h3>
+                <h4 class="is-size-7 has-text-grey">
+                  {{ v.namespace }}
+                </h4>
+              </div>
+              <div class="buttons">
+                <router-link
+                  v-for="design in v['designs']"
+                  :key="design"
+                  class="button is-small is-interactive-primary is-outlined"
+                  :to="urlForModelDesign(model, design)"
+                  >{{ design | capitalize | underscoreToSpace }}</router-link
+                >
+              </div>
+            </div>
+          </div>
+        </Dropdown>
       </footer>
     </div>
   </div>
