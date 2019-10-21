@@ -1,5 +1,3 @@
-// https://docs.cypress.io/api/introduction/api.html
-
 describe('Configuration', () => {
   it('A user can configure an installed plugin', () => {
     cy.server()
@@ -17,10 +15,10 @@ describe('Configuration', () => {
       'dashboardReportsApi'
     )
 
-    cy.visit('http://localhost:8081/pipeline/schedule')
+    cy.visit('/pipeline/schedule')
     cy.wait('@modelsApi')
     cy.get('.tag-running-pipelines').should('have.length', 0)
-    cy.visit('http://localhost:8081/model')
+    cy.visit('/model')
     cy.wait('@modelsApi')
     cy.get(
       '[data-test-id="model-carbon-intensity-sqlite-carbon-model-card"]'
@@ -43,7 +41,7 @@ describe('Configuration', () => {
     cy.get('[data-test-id="button-create-dashboard"]').click()
     cy.wait('@saveDashboard')
     cy.wait('@addReport')
-    cy.visit('http://localhost:8081/dashboard')
+    cy.visit('/dashboard')
     cy.get('.dashboard-link:first-child').click()
     cy.wait('@dashboardReportsApi')
     cy.get('canvas').should('be.visible')

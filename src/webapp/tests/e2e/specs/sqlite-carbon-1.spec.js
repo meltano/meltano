@@ -1,5 +1,3 @@
-// https://docs.cypress.io/api/introduction/api.html
-
 describe('Configuration', () => {
   it('A user can configure an installed plugin', () => {
     cy.server()
@@ -19,7 +17,7 @@ describe('Configuration', () => {
     cy.route('POST', '/api/v1/orchestrations/job/state').as('jobStateApi')
     cy.route('POST', '/api/v1/orchestrations/run').as('runApi')
 
-    cy.visit('http://localhost:8081/')
+    cy.visit('/')
     cy.wait('@installedApi')
     cy.get('[data-test-id="tap-carbon-intensity-extractor-card"]').within(
       () => {
