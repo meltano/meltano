@@ -3,24 +3,9 @@
 describe('Configuration', () => {
   it('A user can configure an installed plugin', () => {
     cy.server()
-    cy.route('/pipeline/schedule').as('pipelineSchedulePage')
-    cy.route('/api/v1/plugins/installed').as('installedApi')
-    cy.route('/api/v1/orchestrations/get/pipeline_schedules').as(
-      'pipelineSchedulesApi'
-    )
     cy.route('/api/v1/repos/models').as('modelsApi')
     cy.route('/api/v1/reports').as('reportsApi')
 
-    cy.route('POST', '/api/v1/plugins/add').as('addApi')
-    cy.route('POST', '/api/v1/plugins/install').as('installApi')
-    cy.route('POST', '/api/v1/orchestrations/entities/tap-carbon-intensity').as(
-      'carbonEntitiesApi'
-    )
-    cy.route('POST', '/api/v1/orchestrations/save/configuration').as(
-      'saveConfigurationApi'
-    )
-    cy.route('POST', '/api/v1/orchestrations/job/state').as('jobStateApi')
-    cy.route('POST', '/api/v1/orchestrations/run').as('runApi')
     cy.route(
       'POST',
       '/api/v1/sql/get/model-carbon-intensity-sqlite/carbon/region'
