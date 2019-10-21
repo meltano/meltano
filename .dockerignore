@@ -15,6 +15,7 @@
 !/Makefile
 !/src
 !/scripts
+!/docker
 
 !/transform
 !/.pyre_configuration
