@@ -2,7 +2,7 @@
 
 This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
 
-- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-droplets)
+- [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
 - [Amazon Web Services (AWS)](/docs/deployment.html#amazon-web-services-aws)
 - [Local Installation](/docs/installation.html#local-installation)
 

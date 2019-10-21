@@ -26,7 +26,7 @@ def install_status_update(data):
 def install(project):
     """
     Installs all the dependencies of your project based on the meltano.yml file.
-    Read more at https://www.meltano.com/docs/meltano-cli.html#commands.
+    Read more at https://www.meltano.com/docs/command-line-interface.html#command-line-interface.
     """
     install_service = PluginInstallService(project)
     install_status = install_service.install_all_plugins(install_status_update)

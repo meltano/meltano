@@ -763,7 +763,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - Remove Snowflake references from advanced tutorial.
 - [#2 dbt-tap-zuora](https://gitlab.com/meltano/dbt-tap-zuora/issues/2) Remove custom SFDC related attributes from Zuora Account and Subscription Models
-- Update [Contributing - Code Style](https://meltano.com/guide/contributing.html#code-style) documentation to including **pycache** troubleshooting
+- Update [Contributing - Code Style](https://meltano.com/docs/contributing.html#code-style) documentation to including **pycache** troubleshooting
 
 ### Fixes
 
