@@ -28,10 +28,10 @@ export default {
     ...mapState('configuration', ['loaderInFocusConfiguration']),
     ...mapState('plugins', ['installedPlugins']),
     isInstalled() {
-      return this.getIsPluginInstalled('loaders', this.loaderNameFromRoute)
+      return this.getIsPluginInstalled('loaders', this.loaderName)
     },
     isInstalling() {
-      return this.getIsInstallingPlugin('loaders', this.loaderNameFromRoute)
+      return this.getIsInstallingPlugin('loaders', this.loaderName)
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
@@ -47,17 +47,17 @@ export default {
       return !this.isInstalling && this.isInstalled && isValid
     },
     loader() {
-      return this.getInstalledPlugin('loaders', this.loaderNameFromRoute)
+      return this.getInstalledPlugin('loaders', this.loaderName)
     }
   },
   created() {
-    this.loaderNameFromRoute = this.$route.params.loader
+    this.loaderName = this.$route.params.loader
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-      const needsInstallation = this.loader.name !== this.loaderNameFromRoute
+      const needsInstallation = this.loader.name !== this.loaderName
       if (needsInstallation) {
         const config = {
           pluginType: 'loaders',
-          name: this.loaderNameFromRoute
+          name: this.loaderName
         }
         this.addPlugin(config).then(() => {
           this.getLoaderConfiguration().then(this.createEditableConfiguration)
@@ -89,7 +89,7 @@ export default {
     getLoaderConfiguration() {
       return this.$store.dispatch(
         'configuration/getLoaderConfiguration',
-        this.loaderNameFromRoute
+        this.loaderName
       )
     },
     saveConfigAndGoToTransforms() {
@@ -118,7 +118,7 @@ export default {
     <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="loaderNameFromRoute" />
+          <ConnectorLogo :connector="loaderName" />
         </div>
         <p class="modal-card-title">Loader Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
@@ -129,7 +129,7 @@ export default {
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ loaderNameFromRoute }} can take up to a minute.
+                Installing {{ loaderName }} can take up to a minute.
               </p>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default {
             <p>
               View Meltano's
               <a :href="loader.docs" target="_blank" class="has-text-underlined"
-                >{{ loaderNameFromRoute }} docs</a
+                >{{ loaderName }} docs</a
               >
               for more info.
             </p>
