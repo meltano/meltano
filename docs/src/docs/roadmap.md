@@ -54,13 +54,12 @@ You can track our weekly progress and forward-looking plans in greater detail th
 | 2019-09-23   | Ben H.        | Ben H.           |          |
 | 2019-09-30   | Micael B.     | Micael B.        |          |
 | 2019-10-07   | Ben H.        | Ben H.           |          |
-| 2019-10-14   | Ben H.        | Ben H.           |          |
-| 2019-10-21   | Derek K.      | Derek K.         |          |
+| 2019-10-14   | Derek K.      | Derek K.         |          |
+| 2019-10-21   | Ben H.        | Ben H.           |          |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
 :::
-
 
 ## Focus
 
@@ -83,7 +82,6 @@ Internal metrics:
 
 - [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 - [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
-
 
 ### MAUI
 
