@@ -157,9 +157,11 @@ const actions = {
             const targetPipeline = state.pipelines.find(
               pipeline => pipeline.name === jobStatus.jobId
             )
-            commit('setPipelineIsRunning', {
+
+            commit('setPipelineStatus', {
               pipeline: targetPipeline,
-              value: false
+              hasError: jobStatus.hasError,
+              isRunning: !jobStatus.isComplete
             })
           }
         })
@@ -202,7 +204,7 @@ const actions = {
   run({ commit, dispatch }, pipeline) {
     return orchestrationsApi.run(pipeline).then(response => {
       dispatch('queuePipelinePoller', response.data)
-      commit('setPipelineIsRunning', { pipeline, value: true })
+      commit('setPipelineStatus', { pipeline, isRunning: true })
       commit('setPipelineJobId', { pipeline, jobId: response.data.jobId })
     })
   },
@@ -321,8 +323,9 @@ const mutations = {
     state[target] = configuration
   },
 
-  setPipelineIsRunning(_, { pipeline, value }) {
-    Vue.set(pipeline, 'isRunning', value)
+  setPipelineStatus(_, { pipeline, isRunning, hasError = false }) {
+    Vue.set(pipeline, 'isRunning', isRunning)
+    Vue.set(pipeline, 'hasError', hasError)
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {

@@ -64,7 +64,13 @@ def job_state() -> Response:
         # Validate existence first as a job may not be queued yet as a result of
         # another prerequisite async process (dbt installation for example)
         if state_job:
-            jobs.append({"job_id": job_id, "is_complete": state_job.is_complete()})
+            jobs.append(
+                {
+                    "job_id": job_id,
+                    "is_complete": state_job.is_complete(),
+                    "has_error": state_job.has_error(),
+                }
+            )
 
     return jsonify({"jobs": jobs})
 
@@ -86,7 +92,7 @@ def job_log() -> Response:
         state_job = finder.latest(db.session)
 
         return jsonify(
-            {"job_id": job_id, "log": log, "has_error": state_job.state == State.FAIL}
+            {"job_id": job_id, "log": log, "has_error": state_job.has_error()}
         )
     else:
         return jsonify({"error": True, "code": "job/log: No job_id provided"}), 500
@@ -220,6 +226,7 @@ def get_pipeline_schedules():
     for schedule in schedules:
         finder = JobFinder(schedule["name"])
         state_job = finder.latest(db.session)
+        schedule["has_error"] = state_job.has_error() if state_job else False
         schedule["is_running"] = state_job.is_running() if state_job else False
         schedule["job_id"] = state_job.job_id if state_job else None
 
