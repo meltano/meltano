@@ -131,6 +131,7 @@ export default {
 
             <div class="level-right">
               <a
+                data-test-id="save-transform"
                 class="button is-interactive-primary"
                 @click="saveTransformAndGoToSchedules"
                 >Save</a

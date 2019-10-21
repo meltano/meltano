@@ -67,8 +67,8 @@ export default {
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
         v-for="(loader, index) in sortedLoaders"
-        :id="`${loader}-loader-card`"
         :key="`${loader}-${index}`"
+        :data-test-id="`${loader}-loader-card`"
         class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">

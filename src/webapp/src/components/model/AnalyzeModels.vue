@@ -130,8 +130,8 @@ export default {
           </div>
           <div
             v-for="(v, model) in models"
-            :id="`${model}-model-card`.replace('/', '-')"
             :key="`${model}-panel`"
+            :data-test-id="`${model}-model-card`.replace('/', '-')"
             class="box"
           >
             <div class="content">

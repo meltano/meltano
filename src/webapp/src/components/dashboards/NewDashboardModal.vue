@@ -85,7 +85,7 @@ export default {
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Cancel</button>
         <button
-          id="button-create-dashboard"
+          data-test-id="button-create-dashboard"
           class="button is-interactive-primary"
           :disabled="!saveDashboardSettings.name"
           @click="saveDashboard"

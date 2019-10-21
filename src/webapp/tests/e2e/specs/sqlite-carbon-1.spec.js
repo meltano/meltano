@@ -19,13 +19,15 @@ describe('Configuration', () => {
     cy.route('POST', '/api/v1/orchestrations/job/state').as('jobStateApi')
     cy.route('POST', '/api/v1/orchestrations/run').as('runApi')
 
-    cy.visit('http://localhost:8080/')
+    cy.visit('http://localhost:8081/')
     cy.wait('@installedApi')
-    cy.get('#tap-carbon-intensity-extractor-card').within(() => {
-      cy.get('.button')
-        .contains('Install')
-        .click()
-    })
+    cy.get('[data-test-id="tap-carbon-intensity-extractor-card"]').within(
+      () => {
+        cy.get('.button')
+          .contains('Install')
+          .click()
+      }
+    )
     cy.wait('@installedApi')
     cy.wait('@addApi')
     cy.wait('@installApi', {
@@ -38,7 +40,7 @@ describe('Configuration', () => {
         .click()
     })
     cy.wait('@installedApi')
-    cy.get('#target-sqlite-loader-card').within(() => {
+    cy.get('[data-test-id="target-sqlite-loader-card"]').within(() => {
       cy.get('.button')
         .contains('Install')
         .click()
@@ -54,9 +56,9 @@ describe('Configuration', () => {
         .click()
     })
     cy.wait('@saveConfigurationApi')
-    cy.get('.button')
+    cy.get('[data-test-id="save-transform"]')
       .contains('Save')
-      .click()
+      .click({ force: true })
     cy.wait('@pipelineSchedulesApi')
     cy.get('.modal-card-foot').within(() => {
       cy.get('.button')
