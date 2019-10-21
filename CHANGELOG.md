@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1022](https://gitlab.com/meltano/meltano/issues/1022) Add "Autorun Query" toggle and persist the user's choice across sessions
 - [#1060](https://gitlab.com/meltano/meltano/issues/1060) Auto advance to Job Log from Pipeline Schedule creation
 
+- [#1111](https://gitlab.com/meltano/meltano/issues/1111) Auto advance to Loader installation step when an extractor lacks entity selection
+
 ### Changes
 
 - [#1013](https://gitlab.com/meltano/meltano/issues/1013) Toast initialization and analytics initialization cleanup

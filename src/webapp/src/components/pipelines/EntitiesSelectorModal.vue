@@ -18,29 +18,26 @@ export default {
     }
   },
   computed: {
-    ...mapState('configuration', ['extractorInFocusEntities']),
+    ...mapState('configuration', { entities: 'extractorInFocusEntities' }),
     expandableToggleLabel() {
       const prefix = this.isExpanded
         ? 'Hide'
-        : `Show all ${this.extractorInFocusEntities.entityGroups.length}`
+        : `Show all ${this.entities.entityGroups.length}`
       return `${prefix} entities`
-    },
-    extractorLacksEntitySelectionAndIsInstalled() {
-      return !this.isLoading && !this.hasEntities
     },
     getIsSelectedMode() {
       return mode => mode === this.selectedMode
     },
     getSelectedAttributeCount() {
       let count = 0
-      this.extractorInFocusEntities.entityGroups.forEach(group => {
+      this.entities.entityGroups.forEach(group => {
         count += group.attributes.filter(attibute => attibute.selected).length
       })
       return count
     },
     getSelectedEntityCount() {
       let count = 0
-      this.extractorInFocusEntities.entityGroups.forEach(group => {
+      this.entities.entityGroups.forEach(group => {
         const hasSelectedAttribute = group.attributes.find(
           attribute => attribute.selected
         )
@@ -51,30 +48,25 @@ export default {
       return count
     },
     getTotalAttributeCount() {
-      return this.extractorInFocusEntities.entityGroups.reduce(
+      return this.entities.entityGroups.reduce(
         (acc, curr) => acc + curr.attributes.length,
         0
       )
-    },
-    getTotalEntityCount() {
-      return this.extractorInFocusEntities.entityGroups
-        ? this.extractorInFocusEntities.entityGroups.length
-        : -1
     },
     getAreAllSelected() {
       return this.getTotalAttributeCount === this.getSelectedAttributeCount
     },
     hasEntities() {
-      return this.getTotalEntityCount > 0
+      return this.entities.entityGroups.length > 0
     },
     hasSelectedAttributes() {
       return this.getSelectedAttributeCount > 0
     },
     isLoading() {
-      return !this.extractorInFocusEntities.hasOwnProperty('entityGroups')
+      return !this.entities
     },
     isSaveable() {
-      return this.hasEntities && this.hasSelectedAttributes
+      return !this.isLoading && this.hasEntities && this.hasSelectedAttributes
     },
     selectedMode() {
       return this.getAreAllSelected
@@ -84,7 +76,9 @@ export default {
     selectionSummary() {
       let summary = 'Make at least one selection below to save.'
       if (this.hasSelectedAttributes) {
-        summary = `${this.getSelectedAttributeCount} attributes from ${this.getSelectedEntityCount} entities selected`
+        const attributeCount = this.getSelectedAttributeCount
+        const entityCount = this.getSelectedEntityCount
+        summary = `${attributeCount} attributes from ${entityCount} entities selected`
       }
       return summary
     }
@@ -95,20 +89,23 @@ export default {
       this.selectionModeRecommended,
       this.selectionModeCustom
     ]
-    this.extractorNameFromRoute = this.$route.params.extractor
+    this.extractorName = this.$route.params.extractor
     this.$store
-      .dispatch(
-        'configuration/getExtractorInFocusEntities',
-        this.extractorNameFromRoute
-      )
+      .dispatch('configuration/getExtractorInFocusEntities', this.extractorName)
       .then(() => {
         this.updateSelectionsBasedOnTargetSelectionMode(this.selectionModeAll)
+        this.tryAutoAdvance()
       })
   },
   destroyed() {
     this.$store.dispatch('configuration/resetExtractorInFocusEntities')
   },
   methods: {
+    tryAutoAdvance() {
+      if (!this.hasEntities) {
+        this.saveAndAdvance()
+      }
+    },
     close() {
       if (this.prevRoute) {
         this.$router.go(-1)
@@ -125,12 +122,13 @@ export default {
     resetSelections() {
       this.$store.dispatch('configuration/toggleAllEntityGroupsOff')
     },
-    selectEntitiesAndBeginLoaderInstall() {
+    saveAndAdvance() {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
-        Vue.toasted.global.success(
-          `Entities Saved - ${this.extractorNameFromRoute}`
-        )
+        const message = !this.hasEntities
+          ? `Auto Advance - No Entities for ${this.extractorName}`
+          : `Entities Saved - ${this.extractorName}`
+        Vue.toasted.global.success(message)
       })
     },
     toggleExpandable() {
@@ -156,7 +154,7 @@ export default {
     <div class="modal-card is-wide">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="extractorNameFromRoute" />
+          <ConnectorLogo :connector="extractorName" />
         </div>
         <p class="modal-card-title">Entity Selection</p>
         <button class="delete" aria-label="close" @click="close"></button>
@@ -221,7 +219,7 @@ export default {
 
           <div class="expandable" :class="{ 'is-expanded': isExpanded }">
             <div
-              v-for="entityGroup in extractorInFocusEntities.entityGroups"
+              v-for="entityGroup in entities.entityGroups"
               :key="`${entityGroup.name}`"
               class="is-unselectable"
             >
@@ -259,34 +257,13 @@ export default {
             }}</a>
           </div>
         </template>
-
-        <template v-if="extractorLacksEntitySelectionAndIsInstalled">
-          <div class="content">
-            <p>
-              All entities will be extracted by default as entity selection is
-              not currently supported for {{ extractorNameFromRoute }}.
-            </p>
-            <ul>
-              <li>Click "Next" to advance</li>
-              <li>Click "Cancel" to select another extractor's entities</li>
-            </ul>
-          </div>
-        </template>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Cancel</button>
         <button
-          v-if="extractorLacksEntitySelectionAndIsInstalled"
-          class="button is-interactive-primary"
-          @click="selectEntitiesAndBeginLoaderInstall"
-        >
-          Next
-        </button>
-        <button
-          v-else
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click="selectEntitiesAndBeginLoaderInstall"
+          @click="saveAndAdvance"
         >
           Save
         </button>

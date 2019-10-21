@@ -9,7 +9,7 @@ import utils from '@/utils/utils'
 const defaultState = utils.deepFreeze({
   connectionInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
-  extractorInFocusEntities: {},
+  extractorInFocusEntities: null,
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
   pipelines: [],
