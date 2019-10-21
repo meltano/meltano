@@ -33,6 +33,9 @@ export default {
     this.jobId = this.$route.params.jobId
     this.initJobPoller()
   },
+  beforeDestroy() {
+    this.jobPoller.dispose()
+  },
   methods: {
     ...mapActions('configuration', ['getJobLog']),
     close() {
@@ -68,9 +71,6 @@ export default {
         'https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs'
       )
     }
-  },
-  beforeDestroy() {
-    this.jobPoller.dispose()
   }
 }
 </script>
