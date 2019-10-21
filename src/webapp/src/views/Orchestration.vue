@@ -50,7 +50,7 @@ export default {
                   possible in the
                   <a
                     target="_blank"
-                    href="https://www.meltano.com/docs/meltano-cli.html#orchestration"
+                    href="https://www.meltano.com/docs/command-line-interface.html#orchestration"
                     >Meltano Airflow</a
                   >
                   documentation.
