@@ -122,7 +122,7 @@ cypress:
     paths:
       - tests/e2e/videos
       - tests/e2e/screenshots
-    when: on_success
+    when: always
     expire_in: 1 week
 
 .pytest: &pytest
@@ -135,7 +135,7 @@ cypress:
   artifacts:
     paths:
       - htmlcov/
-    when: on_success
+    when: always
     expire_in: 1 week
 
 pytest_postgres:
