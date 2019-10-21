@@ -193,10 +193,10 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
         class="box"
       >
         <div
-          class="columns is-vcentered"
+          class="level"
         >
           <div
-            class="column is-two-fifths"
+            class="level-left"
           >
             <h2
               class="title is-5"
@@ -206,52 +206,56 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
           </div>
            
           <div
-            class="column is-three-fifths"
+            class="level-right"
           >
             <div
-              class="field has-addons is-pulled-right is-vcentered"
+              class="level-item field is-grouped"
             >
               <div
-                class="dropdown"
+                class="control"
               >
                 <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-sql"
-                    aria-haspopup="true"
-                    class="button is-text is-thin is-small"
-                    disabled="disabled"
-                  >
-                    <span
-                      class=""
-                    >
-                      SQL
-                    </span>
-                     
-                    <!---->
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-sql"
-                  role="menu"
+                  class="dropdown"
                 >
                   <div
-                    class="dropdown-content"
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-sql"
+                      aria-haspopup="true"
+                      class="button button is-text is-small"
+                      disabled="disabled"
+                    >
+                      <span
+                        class=""
+                      >
+                        SQL
+                      </span>
+                       
+                      <!---->
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-sql"
+                    role="menu"
                   >
                     <div
-                      class="level"
+                      class="dropdown-content"
                     >
                       <div
-                        class="level-item"
+                        class="level"
                       >
-                        <pre>
-                          <code>
-                            
-                          </code>
-                        </pre>
+                        <div
+                          class="level-item"
+                        >
+                          <pre>
+                            <code>
+                              
+                            </code>
+                          </pre>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -261,32 +265,40 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
               <div
                 class="control"
               >
-                <button
-                  class="button is-success"
-                  disabled="disabled"
+                <div
+                  class="field has-addons"
                 >
-                  
-                  Run
-                
-                </button>
-              </div>
-               
-              <div
-                class="control"
-              >
-                <button
-                  class="button tooltip is-active has-text-interactive-primary"
-                  data-tooltip="Toggle autorun queries off"
-                  disabled="disabled"
-                >
-                  <span
-                    class="icon is-small is-size-7"
+                  <div
+                    class="control"
                   >
-                    <font-awesome-icon-stub
-                      icon="sync"
-                    />
-                  </span>
-                </button>
+                    <button
+                      class="button is-success"
+                      disabled="disabled"
+                    >
+                      
+                      Run
+                    
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="control"
+                  >
+                    <button
+                      class="button tooltip is-active has-text-interactive-primary"
+                      data-tooltip="Toggle autorun queries off"
+                      disabled="disabled"
+                    >
+                      <span
+                        class="icon is-small is-size-7"
+                      >
+                        <font-awesome-icon-stub
+                          icon="sync"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -613,10 +625,10 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
         class="box"
       >
         <div
-          class="columns is-vcentered"
+          class="level"
         >
           <div
-            class="column is-two-fifths"
+            class="level-left"
           >
             <h2
               class="title is-5"
@@ -626,56 +638,60 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
           </div>
            
           <div
-            class="column is-three-fifths"
+            class="level-right"
           >
             <div
-              class="field has-addons is-pulled-right is-vcentered"
+              class="level-item field is-grouped"
             >
               <div
-                class="dropdown"
+                class="control"
               >
                 <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-sql"
-                    aria-haspopup="true"
-                    class="button is-text is-thin is-small"
-                  >
-                    <span
-                      class=""
-                    >
-                      SQL
-                    </span>
-                     
-                    <!---->
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-sql"
-                  role="menu"
+                  class="dropdown"
                 >
                   <div
-                    class="dropdown-content"
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-sql"
+                      aria-haspopup="true"
+                      class="button button is-text is-small"
+                    >
+                      <span
+                        class=""
+                      >
+                        SQL
+                      </span>
+                       
+                      <!---->
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-sql"
+                    role="menu"
                   >
                     <div
-                      class="level"
+                      class="dropdown-content"
                     >
                       <div
-                        class="level-item"
+                        class="level"
                       >
-                        <pre>
-                          <code>
-                            SELECT
+                        <div
+                          class="level-item"
+                        >
+                          <pre>
+                            <code>
+                              SELECT
   COALESCE(COUNT("region"."id"), 0) "region.count"
 FROM
   "region" "region"
 LIMIT
   3;
-                          </code>
-                        </pre>
+                            </code>
+                          </pre>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -685,30 +701,38 @@ LIMIT
               <div
                 class="control"
               >
-                <button
-                  class="button is-success"
+                <div
+                  class="field has-addons"
                 >
-                  
-                  Run
-                
-                </button>
-              </div>
-               
-              <div
-                class="control"
-              >
-                <button
-                  class="button tooltip is-active has-text-interactive-primary"
-                  data-tooltip="Toggle autorun queries off"
-                >
-                  <span
-                    class="icon is-small is-size-7"
+                  <div
+                    class="control"
                   >
-                    <font-awesome-icon-stub
-                      icon="sync"
-                    />
-                  </span>
-                </button>
+                    <button
+                      class="button is-success"
+                    >
+                      
+                      Run
+                    
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="control"
+                  >
+                    <button
+                      class="button tooltip is-active has-text-interactive-primary"
+                      data-tooltip="Toggle autorun queries off"
+                    >
+                      <span
+                        class="icon is-small is-size-7"
+                      >
+                        <font-awesome-icon-stub
+                          icon="sync"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -986,10 +1010,10 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
         class="box"
       >
         <div
-          class="columns is-vcentered"
+          class="level"
         >
           <div
-            class="column is-two-fifths"
+            class="level-left"
           >
             <h2
               class="title is-5"
@@ -999,71 +1023,83 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
           </div>
            
           <div
-            class="column is-three-fifths"
+            class="level-right"
           >
             <div
-              class="field has-addons is-pulled-right is-vcentered"
+              class="level-item field is-grouped"
             >
-              <dropdown-stub
-                buttonclasses="is-text is-thin is-small"
-                iconclose="caret-up"
-                iconopen="caret-down"
-                isiconremoved="true"
-                label="SQL"
-                labelclasses=""
-                menuclasses=""
+              <div
+                class="control"
               >
-                <div
-                  class="dropdown-content"
+                <dropdown-stub
+                  buttonclasses="button is-text is-small"
+                  iconclose="caret-up"
+                  iconopen="caret-down"
+                  isiconremoved="true"
+                  label="SQL"
+                  labelclasses=""
+                  menuclasses=""
                 >
                   <div
-                    class="level"
+                    class="dropdown-content"
                   >
                     <div
-                      class="level-item"
+                      class="level"
                     >
-                      <pre>
-                        <code>
-                          SELECT
+                      <div
+                        class="level-item"
+                      >
+                        <pre>
+                          <code>
+                            SELECT
   COALESCE(COUNT("region"."id"), 0) "region.count"
 FROM
   "region" "region"
 LIMIT
   3;
-                        </code>
-                      </pre>
+                          </code>
+                        </pre>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </dropdown-stub>
-               
-              <div
-                class="control"
-              >
-                <button
-                  class="button is-success"
-                >
-                  
-                  Run
-                
-                </button>
+                </dropdown-stub>
               </div>
                
               <div
                 class="control"
               >
-                <button
-                  class="button tooltip is-active has-text-interactive-primary"
-                  data-tooltip="Toggle autorun queries off"
+                <div
+                  class="field has-addons"
                 >
-                  <span
-                    class="icon is-small is-size-7"
+                  <div
+                    class="control"
                   >
-                    <font-awesome-icon
-                      icon="sync"
-                    />
-                  </span>
-                </button>
+                    <button
+                      class="button is-success"
+                    >
+                      
+                      Run
+                    
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="control"
+                  >
+                    <button
+                      class="button tooltip is-active has-text-interactive-primary"
+                      data-tooltip="Toggle autorun queries off"
+                    >
+                      <span
+                        class="icon is-small is-size-7"
+                      >
+                        <font-awesome-icon
+                          icon="sync"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1336,10 +1372,10 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
         class="box"
       >
         <div
-          class="columns is-vcentered"
+          class="level"
         >
           <div
-            class="column is-two-fifths"
+            class="level-left"
           >
             <h2
               class="title is-5"
@@ -1349,69 +1385,81 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
           </div>
            
           <div
-            class="column is-three-fifths"
+            class="level-right"
           >
             <div
-              class="field has-addons is-pulled-right is-vcentered"
+              class="level-item field is-grouped"
             >
-              <dropdown-stub
-                buttonclasses="is-text is-thin is-small"
-                disabled="true"
-                iconclose="caret-up"
-                iconopen="caret-down"
-                isiconremoved="true"
-                label="SQL"
-                labelclasses=""
-                menuclasses=""
-              >
-                <div
-                  class="dropdown-content"
-                >
-                  <div
-                    class="level"
-                  >
-                    <div
-                      class="level-item"
-                    >
-                      <pre>
-                        <code>
-                          
-                        </code>
-                      </pre>
-                    </div>
-                  </div>
-                </div>
-              </dropdown-stub>
-               
               <div
                 class="control"
               >
-                <button
-                  class="button is-success"
-                  disabled="disabled"
+                <dropdown-stub
+                  buttonclasses="button is-text is-small"
+                  disabled="true"
+                  iconclose="caret-up"
+                  iconopen="caret-down"
+                  isiconremoved="true"
+                  label="SQL"
+                  labelclasses=""
+                  menuclasses=""
                 >
-                  
-                  Run
-                
-                </button>
+                  <div
+                    class="dropdown-content"
+                  >
+                    <div
+                      class="level"
+                    >
+                      <div
+                        class="level-item"
+                      >
+                        <pre>
+                          <code>
+                            
+                          </code>
+                        </pre>
+                      </div>
+                    </div>
+                  </div>
+                </dropdown-stub>
               </div>
                
               <div
                 class="control"
               >
-                <button
-                  class="button tooltip is-active has-text-interactive-primary"
-                  data-tooltip="Toggle autorun queries off"
-                  disabled="disabled"
+                <div
+                  class="field has-addons"
                 >
-                  <span
-                    class="icon is-small is-size-7"
+                  <div
+                    class="control"
                   >
-                    <font-awesome-icon
-                      icon="sync"
-                    />
-                  </span>
-                </button>
+                    <button
+                      class="button is-success"
+                      disabled="disabled"
+                    >
+                      
+                      Run
+                    
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="control"
+                  >
+                    <button
+                      class="button tooltip is-active has-text-interactive-primary"
+                      data-tooltip="Toggle autorun queries off"
+                      disabled="disabled"
+                    >
+                      <span
+                        class="icon is-small is-size-7"
+                      >
+                        <font-awesome-icon
+                          icon="sync"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1725,10 +1773,10 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
         class="box"
       >
         <div
-          class="columns is-vcentered"
+          class="level"
         >
           <div
-            class="column is-two-fifths"
+            class="level-left"
           >
             <h2
               class="title is-5"
@@ -1738,52 +1786,56 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
           </div>
            
           <div
-            class="column is-three-fifths"
+            class="level-right"
           >
             <div
-              class="field has-addons is-pulled-right is-vcentered"
+              class="level-item field is-grouped"
             >
               <div
-                class="dropdown"
+                class="control"
               >
                 <div
-                  class="dropdown-trigger"
-                >
-                  <button
-                    aria-controls="dropdown-sql"
-                    aria-haspopup="true"
-                    class="button is-text is-thin is-small"
-                    disabled="disabled"
-                  >
-                    <span
-                      class=""
-                    >
-                      SQL
-                    </span>
-                     
-                    <!---->
-                  </button>
-                </div>
-                 
-                <div
-                  class="dropdown-menu"
-                  id="dropdown-sql"
-                  role="menu"
+                  class="dropdown"
                 >
                   <div
-                    class="dropdown-content"
+                    class="dropdown-trigger"
+                  >
+                    <button
+                      aria-controls="dropdown-sql"
+                      aria-haspopup="true"
+                      class="button button is-text is-small"
+                      disabled="disabled"
+                    >
+                      <span
+                        class=""
+                      >
+                        SQL
+                      </span>
+                       
+                      <!---->
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="dropdown-menu"
+                    id="dropdown-sql"
+                    role="menu"
                   >
                     <div
-                      class="level"
+                      class="dropdown-content"
                     >
                       <div
-                        class="level-item"
+                        class="level"
                       >
-                        <pre>
-                          <code>
-                            
-                          </code>
-                        </pre>
+                        <div
+                          class="level-item"
+                        >
+                          <pre>
+                            <code>
+                              
+                            </code>
+                          </pre>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1793,32 +1845,40 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
               <div
                 class="control"
               >
-                <button
-                  class="button is-success"
-                  disabled="disabled"
+                <div
+                  class="field has-addons"
                 >
-                  
-                  Run
-                
-                </button>
-              </div>
-               
-              <div
-                class="control"
-              >
-                <button
-                  class="button tooltip is-active has-text-interactive-primary"
-                  data-tooltip="Toggle autorun queries off"
-                  disabled="disabled"
-                >
-                  <span
-                    class="icon is-small is-size-7"
+                  <div
+                    class="control"
                   >
-                    <font-awesome-icon-stub
-                      icon="sync"
-                    />
-                  </span>
-                </button>
+                    <button
+                      class="button is-success"
+                      disabled="disabled"
+                    >
+                      
+                      Run
+                    
+                    </button>
+                  </div>
+                   
+                  <div
+                    class="control"
+                  >
+                    <button
+                      class="button tooltip is-active has-text-interactive-primary"
+                      data-tooltip="Toggle autorun queries off"
+                      disabled="disabled"
+                    >
+                      <span
+                        class="icon is-small is-size-7"
+                      >
+                        <font-awesome-icon-stub
+                          icon="sync"
+                        />
+                      </span>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
