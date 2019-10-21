@@ -86,11 +86,15 @@ export default {
       this.$store
         .dispatch('configuration/savePipelineSchedule', this.pipeline)
         .then(() => {
-          this.$store.dispatch('configuration/run', this.pipeline)
-          Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
-          Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
-          this.isSaving = false
-          this.close()
+          this.$store.dispatch('configuration/run', this.pipeline).then(() => {
+            Vue.toasted.global.success(`Schedule Saved - ${this.pipeline.name}`)
+            Vue.toasted.global.success(`Auto Running - ${this.pipeline.name}`)
+            this.isSaving = false
+            this.$router.push({
+              name: 'runLog',
+              params: { jobId: this.pipeline.jobId }
+            })
+          })
         })
         .catch(error => {
           this.isSaving = false
