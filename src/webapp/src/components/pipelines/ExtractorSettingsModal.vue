@@ -34,19 +34,13 @@ export default {
       )
     },
     extractor() {
-      return this.getInstalledPlugin('extractors', this.extractorNameFromRoute)
+      return this.getInstalledPlugin('extractors', this.extractorName)
     },
     isInstalled() {
-      return this.getIsPluginInstalled(
-        'extractors',
-        this.extractorNameFromRoute
-      )
+      return this.getIsPluginInstalled('extractors', this.extractorName)
     },
     isInstalling() {
-      return this.getIsInstallingPlugin(
-        'extractors',
-        this.extractorNameFromRoute
-      )
+      return this.getIsInstallingPlugin('extractors', this.extractorName)
     },
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
@@ -63,14 +57,13 @@ export default {
     }
   },
   created() {
-    this.extractorNameFromRoute = this.$route.params.extractor
+    this.extractorName = this.$route.params.extractor
     this.$store.dispatch('plugins/getInstalledPlugins').then(() => {
-      const needsInstallation =
-        this.extractor.name !== this.extractorNameFromRoute
+      const needsInstallation = this.extractor.name !== this.extractorName
       if (needsInstallation) {
         const config = {
           pluginType: 'extractors',
-          name: this.extractorNameFromRoute
+          name: this.extractorName
         }
         this.addPlugin(config).then(() => {
           this.getExtractorConfiguration().then(
@@ -112,7 +105,7 @@ export default {
     getExtractorConfiguration() {
       return this.$store.dispatch(
         'configuration/getExtractorConfiguration',
-        this.extractorNameFromRoute
+        this.extractorName
       )
     },
     saveConfigAndBeginEntitySelection() {
@@ -147,7 +140,7 @@ export default {
     <div class="modal-card is-narrow">
       <header class="modal-card-head">
         <div class="modal-card-head-image image is-64x64 level-item">
-          <ConnectorLogo :connector="extractorNameFromRoute" />
+          <ConnectorLogo :connector="extractorName" />
         </div>
         <p class="modal-card-title">Extractor Configuration</p>
         <button class="delete" aria-label="close" @click="close"></button>
@@ -157,7 +150,7 @@ export default {
           <div v-if="!isLoadingConfigSettings && isInstalling" class="level">
             <div class="level-item">
               <p class="is-italic">
-                Installing {{ extractorNameFromRoute }} can take up to a minute.
+                Installing {{ extractorName }} can take up to a minute.
               </p>
             </div>
           </div>
@@ -177,7 +170,7 @@ export default {
                 :href="extractor.docs"
                 target="_blank"
                 class="has-text-underlined"
-                >{{ extractorNameFromRoute }} docs</a
+                >{{ extractorName }} docs</a
               >
               for more info.
             </p>

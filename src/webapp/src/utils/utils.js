@@ -41,7 +41,7 @@ export default {
   },
 
   getIsSubRouteOf(parentPath, currentPath) {
-    return currentPath.includes(parentPath)
+    return currentPath.indexOf(parentPath) === 0
   },
 
   scrollToTop() {
