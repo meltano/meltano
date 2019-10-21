@@ -44,8 +44,16 @@ export default {
     return currentPath.includes(parentPath)
   },
 
-  scrollToTop() {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+  scrollToBottom(element = window) {
+    this.scrollToTarget(element, Number.MAX_SAFE_INTEGER)
+  },
+
+  scrollToTarget(element, top) {
+    element.scrollTo({ top, left: 0, behavior: 'smooth' })
+  },
+
+  scrollToTop(element = window) {
+    this.scrollToTarget(element, 0)
   },
 
   // Color Utils

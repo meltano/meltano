@@ -5,6 +5,7 @@ import capitalize from '@/filters/capitalize'
 import Dropdown from '@/components/generic/Dropdown'
 import poller from '@/utils/poller'
 import underscoreToSpace from '@/filters/underscoreToSpace'
+import utils from '@/utils/utils'
 
 export default {
   name: 'LogModal',
@@ -56,6 +57,7 @@ export default {
               this.isPolling = false
               this.jobPoller.dispose()
             }
+            utils.scrollToBottom(this.$refs['log-view'])
           })
       }
       this.jobPoller = poller.create(pollFn, null, 1200)
@@ -83,7 +85,7 @@ export default {
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body is-overflow-y-scroll">
+      <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <div v-if="jobLog">
             <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
