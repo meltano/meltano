@@ -17,6 +17,7 @@ export default {
   },
   data() {
     return {
+      hasError: false,
       isPolling: true,
       jobLog: null,
       jobPoller: null
@@ -45,6 +46,7 @@ export default {
         this.getJobLog(this.jobId)
           .then(response => {
             this.jobLog = response.data.log
+            this.hasError = response.data.hasError
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -58,6 +60,11 @@ export default {
       }
       this.jobPoller = poller.create(pollFn, null, 1200)
       this.jobPoller.init()
+    },
+    submitIssue() {
+      window.open(
+        'https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs'
+      )
     }
   },
   beforeDestroy() {
@@ -86,7 +93,12 @@ export default {
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Close</button>
+
+        <button v-if="hasError" class="button is-danger" @click="submitIssue">
+          Submit Issue
+        </button>
         <Dropdown
+          v-else
           label="Analyze"
           :disabled="isPolling"
           :button-classes="

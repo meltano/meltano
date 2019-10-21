@@ -82,7 +82,12 @@ def job_log() -> Response:
         log_service = JobLoggingService(project)
         log = log_service.get_latest_log(job_id)
 
-        return jsonify({"job_id": job_id, "log": log})
+        finder = JobFinder(job_id)
+        state_job = finder.latest(db.session)
+
+        return jsonify(
+            {"job_id": job_id, "log": log, "has_error": state_job.state == State.FAIL}
+        )
     else:
         return jsonify({"error": True, "code": "job/log: No job_id provided"}), 500
 
