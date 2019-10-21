@@ -95,6 +95,27 @@ test_meltano_ui:
     - yarn
     # add e2e once ci is wired up for it
 
+cypress:
+  <<: *test
+  variables:
+    CYPRESS_baseUrl: http://meltano:5000/
+  before_script:
+    - yarn
+  script:
+    - cd src/webapp
+    - yarn run cypress run
+  services:
+    - name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+      alias: meltano
+      variables:
+        MELTANO_PROJECT_INIT=cypress
+  artifacts:
+    paths:
+      - tests/e2e/videos
+      - tests/e2e/screenshots
+    when: on_success
+    expire_in: 1 week
+
 .pytest: &pytest
   <<: *test
   script:
@@ -106,6 +127,7 @@ test_meltano_ui:
     paths:
       - htmlcov/
     when: on_success
+    expire_in: 1 week
 
 pytest_postgres:
   <<: *pytest

@@ -16,6 +16,9 @@ COPY --from=builder /meltano/dist /meltano/dist
 # do when using PyPI
 RUN pip install /meltano/dist/meltano-*.tar.gz
 
+# copy the entrypoint
+COPY docker/prod/entrypoint.sh /usr/local/bin/
+
 # meltano project directory, this is where you should
 # mount your Meltano project
 WORKDIR /project
@@ -26,5 +29,5 @@ EXPOSE 5000
 # airflow ui
 EXPOSE 5010
 
-ENTRYPOINT ["meltano"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["ui"]
