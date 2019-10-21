@@ -96,7 +96,7 @@ test_meltano_ui:
     # add e2e once ci is wired up for it
 
 cypress:
-  <<: *test
+  stage: test
   image:
     name: cypress/included:3.4.1
     entrypoint: [""]

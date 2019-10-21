@@ -23,6 +23,10 @@ COPY docker/prod/entrypoint.sh /usr/local/bin/
 # mount your Meltano project
 WORKDIR /project
 
+# make sure the webserver is online
+HEALTHCHECK --interval=1m --timeout=1s \
+  CMD kill -0 $(< .meltano/run/gunicorn.pid)
+
 # meltano ui
 EXPOSE 5000
 
