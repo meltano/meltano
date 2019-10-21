@@ -98,6 +98,7 @@ test_meltano_ui:
 cypress:
   <<: *test
   variables:
+    MELTANO_PROJECT_INIT: cypress
     CYPRESS_baseUrl: http://meltano:5000/
   before_script:
     - yarn
@@ -107,8 +108,6 @@ cypress:
   services:
     - name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
       alias: meltano
-      variables:
-        MELTANO_PROJECT_INIT=cypress
   artifacts:
     paths:
       - tests/e2e/videos
