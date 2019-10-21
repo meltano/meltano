@@ -97,16 +97,10 @@ test_meltano_ui:
 
 cypress:
   <<: *test
-  image: cypress/base:10
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - .npm
-      - cache/Cypress
-      - node_modules
+  image:
+    name: cypress/included:3.4.1
+    entrypoint: [""]
   variables:
-    npm_config_cache: "$CI_PROJECT_DIR/.npm"
-    CYPRESS_CACHE_FOLDER: "$CI_PROJECT_DIR/cache/Cypress"
     CYPRESS_baseUrl: http://meltano:5000/
     MELTANO_PROJECT_INIT: cypress
   script:
