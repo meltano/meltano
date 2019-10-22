@@ -138,7 +138,10 @@ export default {
                 <p class="has-text-centered">
                   <button
                     class="button is-outlined is-small"
-                    :class="{ 'tooltip is-tooltip-left': pipeline.jobId }"
+                    :class="{
+                      'tooltip is-tooltip-left': pipeline.jobId,
+                      'is-danger': pipeline.hasError
+                    }"
                     data-tooltip="View this ELT Pipeline's last run logging status."
                     :disabled="!pipeline.jobId"
                     @click="goToLog(pipeline.jobId)"

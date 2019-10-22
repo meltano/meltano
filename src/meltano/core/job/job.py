@@ -56,6 +56,9 @@ class Job(SystemModel):
     def is_running(self):
         return self.state is State.RUNNING
 
+    def has_error(self):
+        return self.state is State.FAIL
+
     def is_complete(self):
         return self.state in [State.SUCCESS, State.FAIL]
 
