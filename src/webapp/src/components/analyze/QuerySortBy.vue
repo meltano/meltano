@@ -39,7 +39,7 @@ export default {
   methods: {
     ...mapActions('designs', [
       'resetSortAttributes',
-      'runQuery',
+      'tryAutoRun',
       'updateSortAttribute'
     ])
   }
@@ -53,7 +53,7 @@ export default {
         v-model="unassigned"
         v-bind="draggableOptions"
         class="drag-list is-flex is-flex-column has-background-white-bis"
-        @end="runQuery"
+        @end="tryAutoRun"
       >
         <transition-group>
           <div
@@ -91,7 +91,7 @@ export default {
         v-model="assigned"
         v-bind="draggableOptions"
         class="drag-list is-flex is-flex-column has-background-white-bis"
-        @end="runQuery"
+        @end="tryAutoRun"
       >
         <transition-group>
           <div
