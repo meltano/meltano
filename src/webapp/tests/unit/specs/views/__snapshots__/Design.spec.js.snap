@@ -216,7 +216,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -224,7 +225,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text is-small"
+                      class="button button is-text"
                       disabled="disabled"
                     >
                       <span
@@ -233,7 +234,13 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -251,11 +258,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              
-                            </code>
-                          </pre>
+                          <textarea
+                            readonly="readonly"
+                          />
                         </div>
                       </div>
                     </div>
@@ -648,7 +653,8 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -656,7 +662,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text is-small"
+                      class="button button is-text"
                     >
                       <span
                         class=""
@@ -664,7 +670,13 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -1033,10 +1045,11 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                 class="control"
               >
                 <dropdown-stub
-                  buttonclasses="button is-text is-small"
+                  buttonclasses="button is-text"
+                  class="tooltip"
+                  data-tooltip="Show generated SQL query"
                   iconclose="caret-up"
                   iconopen="caret-down"
-                  isiconremoved="true"
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
@@ -1395,11 +1408,12 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 class="control"
               >
                 <dropdown-stub
-                  buttonclasses="button is-text is-small"
+                  buttonclasses="button is-text"
+                  class="tooltip"
+                  data-tooltip="Show generated SQL query"
                   disabled="true"
                   iconclose="caret-up"
                   iconopen="caret-down"
-                  isiconremoved="true"
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
@@ -1413,11 +1427,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                       <div
                         class="level-item"
                       >
-                        <pre>
-                          <code>
-                            
-                          </code>
-                        </pre>
+                        <textarea
+                          readonly="readonly"
+                        />
                       </div>
                     </div>
                   </div>
@@ -1796,7 +1808,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -1804,7 +1817,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text is-small"
+                      class="button button is-text"
                       disabled="disabled"
                     >
                       <span
@@ -1813,7 +1826,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -1831,11 +1850,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              
-                            </code>
-                          </pre>
+                          <textarea
+                            readonly="readonly"
+                          />
                         </div>
                       </div>
                     </div>
