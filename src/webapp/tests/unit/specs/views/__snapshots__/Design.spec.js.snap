@@ -694,16 +694,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              SELECT
-  COALESCE(COUNT("region"."id"), 0) "region.count"
-FROM
-  "region" "region"
-LIMIT
-  3;
-                            </code>
-                          </pre>
+                          <textarea
+                            readonly="readonly"
+                          />
                         </div>
                       </div>
                     </div>
@@ -1063,16 +1056,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                       <div
                         class="level-item"
                       >
-                        <pre>
-                          <code>
-                            SELECT
-  COALESCE(COUNT("region"."id"), 0) "region.count"
-FROM
-  "region" "region"
-LIMIT
-  3;
-                          </code>
-                        </pre>
+                        <textarea
+                          readonly="readonly"
+                        />
                       </div>
                     </div>
                   </div>
