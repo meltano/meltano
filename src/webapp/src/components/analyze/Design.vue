@@ -437,7 +437,7 @@ export default {
                     class="tooltip"
                     data-tooltip="Show generated SQL query"
                     label="SQL"
-                    button-classes="button is-text"
+                    button-classes="button is-text is-small"
                     :disabled="!currentSQL"
                   >
                     <div class="dropdown-content">
