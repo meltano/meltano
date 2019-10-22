@@ -5,6 +5,7 @@ import capitalize from '@/filters/capitalize'
 import Dropdown from '@/components/generic/Dropdown'
 import poller from '@/utils/poller'
 import underscoreToSpace from '@/filters/underscoreToSpace'
+import utils from '@/utils/utils'
 
 export default {
   name: 'LogModal',
@@ -17,6 +18,7 @@ export default {
   },
   data() {
     return {
+      hasError: false,
       isPolling: true,
       jobLog: null,
       jobPoller: null
@@ -30,6 +32,9 @@ export default {
   created() {
     this.jobId = this.$route.params.jobId
     this.initJobPoller()
+  },
+  beforeDestroy() {
+    this.jobPoller.dispose()
   },
   methods: {
     ...mapActions('configuration', ['getJobLog']),
@@ -45,6 +50,7 @@ export default {
         this.getJobLog(this.jobId)
           .then(response => {
             this.jobLog = response.data.log
+            this.hasError = response.data.hasError
           })
           .catch(error => {
             this.jobLog = error.response.data.code
@@ -54,14 +60,17 @@ export default {
               this.isPolling = false
               this.jobPoller.dispose()
             }
+            utils.scrollToBottom(this.$refs['log-view'])
           })
       }
       this.jobPoller = poller.create(pollFn, null, 1200)
       this.jobPoller.init()
+    },
+    submitIssue() {
+      window.open(
+        'https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs'
+      )
     }
-  },
-  beforeDestroy() {
-    this.jobPoller.dispose()
   }
 }
 </script>
@@ -76,7 +85,7 @@ export default {
         </p>
         <button class="delete" aria-label="close" @click="close"></button>
       </header>
-      <section class="modal-card-body is-overflow-y-scroll">
+      <section ref="log-view" class="modal-card-body is-overflow-y-scroll">
         <div class="content">
           <div v-if="jobLog">
             <pre><code>{{jobLog}}{{isPolling ? '...' : ''}}</code></pre>
@@ -86,7 +95,12 @@ export default {
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button class="button" @click="close">Close</button>
+
+        <button v-if="hasError" class="button is-danger" @click="submitIssue">
+          Submit Issue
+        </button>
         <Dropdown
+          v-else
           label="Analyze"
           :disabled="isPolling"
           :button-classes="
