@@ -225,7 +225,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text"
+                      class="button button is-text is-small"
                       disabled="disabled"
                     >
                       <span
@@ -662,7 +662,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text"
+                      class="button button is-text is-small"
                     >
                       <span
                         class=""
@@ -1038,7 +1038,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                 class="control"
               >
                 <dropdown-stub
-                  buttonclasses="button is-text"
+                  buttonclasses="button is-text is-small"
                   class="tooltip"
                   data-tooltip="Show generated SQL query"
                   iconclose="caret-up"
@@ -1394,7 +1394,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                 class="control"
               >
                 <dropdown-stub
-                  buttonclasses="button is-text"
+                  buttonclasses="button is-text is-small"
                   class="tooltip"
                   data-tooltip="Show generated SQL query"
                   disabled="true"
@@ -1803,7 +1803,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                     <button
                       aria-controls="dropdown-sql"
                       aria-haspopup="true"
-                      class="button button is-text"
+                      class="button button is-text is-small"
                       disabled="disabled"
                     >
                       <span
