@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.2.1 - (2019-10-22)
 
 ---
 
@@ -11,13 +24,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1123](https://gitlab.com/meltano/meltano/issues/1123) Add first-class "Submit Issue" CTA to help expedite resolution when a running job fails. Also updated the "Log" CTA in the Pipelines UI to reflect a failed state.
 
-### Changes
 
 ### Fixes
 
 - [#1172](https://gitlab.com/meltano/meltano/issues/1172) Fix analytics issue related to app version
 
-### Breaks
 
 ## 1.2.0 - (2019-10-21)
 
