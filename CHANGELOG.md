@@ -15,6 +15,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1172](https://gitlab.com/meltano/meltano/issues/1172) Fix analytics issue related to app version
+
 ### Breaks
 
 ## 1.2.0 - (2019-10-21)
