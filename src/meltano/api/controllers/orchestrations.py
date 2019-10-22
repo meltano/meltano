@@ -79,8 +79,8 @@ def job_log() -> Response:
     job_id = request_payload.get("job_id")
 
     if job_id:
-        log_service = JobLoggingService(project)
-        log = log_service.get_latest_log(job_id)
+        log_service = JobLoggingService(project, logs_dir=project.job_dir(job_id))
+        log = log_service.get_latest_log()
 
         return jsonify({"job_id": job_id, "log": log})
     else:

@@ -53,6 +53,7 @@ class Job(SystemModel):
     def __init__(self, **kwargs):
         kwargs["state"] = kwargs.get("state", State.IDLE)
         kwargs["payload"] = kwargs.get("payload", {})
+        # kwargs["run_id"] = kwargs.get("run_id", uuid.uuid4())
         super().__init__(**kwargs)
 
     def is_running(self):

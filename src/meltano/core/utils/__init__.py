@@ -2,11 +2,12 @@ import base64
 import re
 import sys
 import flatten_dict
+import os
+import functools
 from datetime import datetime, date, time
 from copy import deepcopy
 from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
-from functools import reduce
 from pathlib import Path
 
 
@@ -192,3 +193,21 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
 
 def find_named(xs: Iterable[dict], name: str):
     return next(x for x in xs if x["name"] == name)
+
+
+def makedirs(func):
+    @functools.wraps(func)
+    def decorate(*args, **kwargs):
+        path = func(*args, **kwargs)
+
+        # if there is an extension, only create the base dir
+        _, ext = os.path.splitext(path)
+        if ext:
+            dir = os.path.dirname(path)
+        else:
+            dir = path
+
+        os.makedirs(dir, exist_ok=True)
+        return path
+
+    return decorate
