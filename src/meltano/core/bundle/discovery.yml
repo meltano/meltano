@@ -61,11 +61,13 @@ extractors:
       - name: key_file_location
         env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
         kind: file
+        value: 'client_secrets.json'
       - name: view_id
         env: GOOGLE_ANALYTICS_API_VIEW_ID
         label: View ID
       - name: reports
         env: GOOGLE_ANALYTICS_API_REPORTS
+        value: ''
       - name: start_date
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
