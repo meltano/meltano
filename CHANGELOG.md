@@ -9,9 +9,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- [#991] Add e2e tests for simple sqlite-carbon workflow
+- [#991](https://gitlab.com/meltano/meltano/issues/991) Add e2e tests for simple sqlite-carbon workflow
+- [#1103](https://gitlab.com/meltano/meltano/issues/1103) Add Intercom to website with custom chats per session
 
 ### Changes
+
 - [!1061](https://gitlab.com/meltano/meltano/merge_requests/1061) Update the Getting Started Guide and the Meltano.com documentation with the new UI and information about job logging and how to find the most recent run log of a pipeline.
 
 ### Fixes
