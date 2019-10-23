@@ -764,32 +764,31 @@ const mutations = {
 
   setSorting(state, allAttributes) {
     state.queryAttributes.forEach(queryAttribute => {
-      const accounted = state.order.assigned.concat(state.order.unassigned)
+      const getName = attribute => {
+        // Account for timeframes matching
+        let period = null
+        if (attribute.periods) {
+          period = attribute.periods.find(
+            period => period.name === queryAttribute.attributeName
+          )
+        }
+        return period ? period.name : attribute.name
+      }
       const finder = orderableAttribute =>
-        orderableAttribute.sourceName === queryAttribute.sourceName &&
-        orderableAttribute.attributeName === queryAttribute.attributeName
+        orderableAttribute.attribute.sourceName === queryAttribute.sourceName &&
+        getName(orderableAttribute.attribute) === queryAttribute.attributeName
+
+      const accounted = state.order.assigned.concat(state.order.unassigned)
       const isAccountedFor = accounted.find(finder)
       if (!isAccountedFor) {
         const targetAttribute = allAttributes.find(attribute => {
-          // Account for timeframes matching
-          let period = null
-          if (attribute.periods) {
-            period = attribute.periods.find(
-              period => period.name === queryAttribute.attributeName
-            )
-          }
-
-          const targetName = period ? period.name : attribute.name
           return (
             attribute.sourceName === queryAttribute.sourceName &&
-            targetName === queryAttribute.attributeName
+            getName(attribute) === queryAttribute.attributeName
           )
         })
         state.order.unassigned.push({
-          sourceName: targetAttribute.sourceName,
-          sourceLabel: targetAttribute.sourceLabel,
-          attributeName: targetAttribute.name,
-          attributeLabel: targetAttribute.label,
+          attribute: targetAttribute,
           direction: 'asc'
         })
       }

@@ -58,14 +58,18 @@ export default {
         <transition-group>
           <div
             v-for="(orderable, idx) in unassigned"
-            :key="`${orderable.sourceName}-${orderable.attributeName}-${idx}`"
+            :key="
+              `${orderable.attribute.sourceName}-${
+                orderable.attribute.name
+              }-${idx}`
+            "
             class="drag-list-item has-background-white"
           >
             <div class="drag-handle has-text-weight-normal">
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ orderable.attributeLabel }}</span>
+              <span>{{ orderable.attribute.label }}</span>
             </div>
           </div>
         </transition-group>
@@ -96,7 +100,11 @@ export default {
         <transition-group>
           <div
             v-for="(orderable, idx) in assigned"
-            :key="`${orderable.sourceName}-${orderable.attributeName}-${idx}`"
+            :key="
+              `${orderable.attribute.sourceName}-${
+                orderable.attribute.name
+              }-${idx}`
+            "
             class="row-space-between drag-list-item has-background-white has-text-interactive-secondary"
           >
             <div
@@ -105,7 +113,7 @@ export default {
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ idx + 1 }}. {{ orderable.attributeLabel }}</span>
+              <span>{{ idx + 1 }}. {{ orderable.attribute.label }}</span>
             </div>
             <button
               class="button is-small"
