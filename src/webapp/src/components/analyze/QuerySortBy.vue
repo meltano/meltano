@@ -27,6 +27,17 @@ export default {
         group: 'sortBy'
       }
     },
+    label() {
+      return attribute => {
+        let label = attribute.label
+        if (attribute.periods) {
+          label += ` - ${
+            attribute.periods.find(period => period.selected).label
+          }`
+        }
+        return label
+      }
+    },
     unassigned: {
       get() {
         return this.order.unassigned
@@ -69,7 +80,7 @@ export default {
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ orderable.attribute.label }}</span>
+              <span>{{ label(orderable.attribute) }}</span>
             </div>
           </div>
         </transition-group>
@@ -113,7 +124,7 @@ export default {
               <span class="icon is-small">
                 <font-awesome-icon icon="arrows-alt-v"></font-awesome-icon>
               </span>
-              <span>{{ idx + 1 }}. {{ orderable.attribute.label }}</span>
+              <span>{{ idx + 1 }}. {{ label(orderable.attribute) }}</span>
             </div>
             <button
               class="button is-small"

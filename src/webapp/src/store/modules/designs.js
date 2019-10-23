@@ -242,11 +242,18 @@ const getters = {
   },
 
   // eslint-disable-next-line no-shadow
-  getQueryAttributeFromCollectionByAttribute(state) {
+  getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
-      const finder = queryAttribute =>
-        attribute.sourceName === queryAttribute.sourceName &&
-        attribute.name === queryAttribute.attributeName
+      const finder = orderableAttribute => {
+        console.log(
+          'clear:',
+          attribute,
+          orderableAttribute,
+          orderableAttribute.attribute === attribute
+        )
+
+        return orderableAttribute.attribute === attribute
+      }
       return state.order[orderCollection].find(finder)
     }
   },
@@ -353,14 +360,20 @@ const actions = {
   // eslint-disable-next-line no-shadow
   cleanOrdering({ commit, getters, state }, attribute) {
     if (!attribute.selected) {
-      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+      const matchAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
         'assigned',
         attribute
       )
-      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+      const matchUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
         'unassigned',
         attribute
       )
+      console.log(
+        'cleanOrdering',
+        matchAssigned || matchUnassigned,
+        'TODO: pretty sure I need to account for the period too'
+      )
+
       if (matchAssigned || matchUnassigned) {
         commit('removeOrder', {
           collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
@@ -552,14 +565,13 @@ const actions = {
     commit('setLoadReportToggle')
   },
 
-  toggleTimeframe({ commit, dispatch }, timeframe) {
+  toggleTimeframe({ commit }, timeframe) {
     commit('toggleSelected', timeframe)
-    dispatch('cleanOrdering', timeframe)
   },
 
-  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
-    commit('toggleSelected', timeframePeriod)
-    dispatch('cleanOrdering', timeframePeriod)
+  toggleTimeframePeriod({ commit, dispatch }, { timeframe, period }) {
+    commit('toggleSelected', period)
+    dispatch('cleanOrdering', timeframe)
     dispatch('tryAutoRun')
   },
 
@@ -578,11 +590,11 @@ const actions = {
   // eslint-disable-next-line no-shadow
   updateSortAttribute({ commit, getters }, queryAttribute) {
     const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
-    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+    const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'assigned',
       attribute
     )
-    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+    const matchInUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'unassigned',
       attribute
     )
