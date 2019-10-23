@@ -245,13 +245,6 @@ const getters = {
   getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
       const finder = orderableAttribute => {
-        console.log(
-          'clear:',
-          attribute,
-          orderableAttribute,
-          orderableAttribute.attribute === attribute
-        )
-
         return orderableAttribute.attribute === attribute
       }
       return state.order[orderCollection].find(finder)
@@ -367,11 +360,6 @@ const actions = {
       const matchUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
         'unassigned',
         attribute
-      )
-      console.log(
-        'cleanOrdering',
-        matchAssigned || matchUnassigned,
-        'TODO: pretty sure I need to account for the period too'
       )
 
       if (matchAssigned || matchUnassigned) {
