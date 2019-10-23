@@ -38,7 +38,7 @@ class ELTContext:
             self.project,
             self.extractor.install,
             run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
-            plugin_config=self.extractor.config
+            plugin_config=self.extractor.config,
         )
 
     def loader_invoker(self):
@@ -46,7 +46,7 @@ class ELTContext:
             self.project,
             self.loader.install,
             run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
-            plugin_config=self.loader.config
+            plugin_config=self.loader.config,
         )
 
 

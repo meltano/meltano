@@ -16,7 +16,10 @@ class PluginConfigService:
     """
 
     def __init__(
-        self, plugin: PluginInstall, config_dir: Union[str, Path], run_dir: Union[str, Path]
+        self,
+        plugin: PluginInstall,
+        config_dir: Union[str, Path],
+        run_dir: Union[str, Path],
     ):
         self.plugin = plugin
         self.config_dir = Path(config_dir)

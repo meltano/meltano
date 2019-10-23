@@ -104,7 +104,7 @@ class JobLoggingService:
         """
         all_logs = self.get_all_logs()
 
-        for log in all_logs[self.max_logs_per_job_id:]:
+        for log in all_logs[self.max_logs_per_job_id :]:
             try:
                 log.unlink()
             except OSError:

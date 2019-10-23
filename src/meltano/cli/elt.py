@@ -60,7 +60,9 @@ def elt(project, extractor, loader, dry, transform, job_id):
             .context(session)
         )
 
-        job_logging_service = JobLoggingService(project, logs_dir=project.job_dir(job.job_id))
+        job_logging_service = JobLoggingService(
+            project, logs_dir=project.job_dir(job.job_id)
+        )
 
         # fmt: off
         with job.run(session), \
@@ -78,8 +80,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
         # fmt: on
     except Exception as err:
         click.secho(
-            f"ELT could not complete, an error happened during the process.",
-            fg="red",
+            f"ELT could not complete, an error happened during the process.", fg="red"
         )
         logging.exception(err)
         click.secho(str(err), err=True)

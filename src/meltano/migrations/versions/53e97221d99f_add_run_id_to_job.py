@@ -52,8 +52,8 @@ class GUID(types.TypeDecorator):
 
 
 # revision identifiers, used by Alembic.
-revision = '53e97221d99f'
-down_revision = '6ef30ab7b8e5'
+revision = "53e97221d99f"
+down_revision = "6ef30ab7b8e5"
 branch_labels = None
 depends_on = None
 Session = sa.orm.sessionmaker()
@@ -70,6 +70,7 @@ def upgrade():
         job.run_id = uuid.uuid4()
 
     session.commit()
+
 
 def downgrade():
     op.drop_column("job", "run_id")
