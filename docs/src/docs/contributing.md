@@ -135,6 +135,30 @@ When adding supporting visuals to documentation, adhere to:
 - Screenshot the image at 16:9 aspect ratio with minimum 1280x720px
 - Place `.png` screenshot in `src/docs/.vuepress/public/screenshots/` with a descriptive name
 
+## Testing
+
+### End-to-End Testing with Cypress
+
+Our end-to-end tests are currently being built with [Cypress](https://www.cypress.io/).
+
+#### How to Run Tests
+
+1. Initialize a new meltano project with `meltano init $PROJECT_NAME`
+1. Change directory into `$PROJECT_NAME`
+1. Start up project with `meltano ui`
+1. Clone Meltano repo
+1. Open Meltano repo in Terminal
+1. Run `yarn setup`
+1. Run `yarn test:e2e`
+
+This will kick off a Cypress application that will allow you to run tests as desired by clicking each test suite (which can be found in `/src/tests/e2e/specs/*.spec.js`)
+
+![Preview of Cypres app running](/images/cypress-tests/cypTest-01.png)
+
+::: info
+In the near future, all tests can flow automatically; but there are some complications that require manual triggering due to an inability to read pipeline completion.
+:::
+
 ## Code style
 
 ### Tools

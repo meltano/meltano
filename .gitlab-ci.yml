@@ -87,7 +87,7 @@ test_meltano_ui:
   script:
     - cd src/webapp
     - yarn
-    - yarn test:unit # change `unit` to `test` once e2e is wired up
+    # add e2e once ci is wired up for it
 
 .pytest: &pytest
   <<: *test

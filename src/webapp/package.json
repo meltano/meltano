@@ -9,7 +9,7 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "test": "npm run test:unit && npm run test:e2e",
-    "test:e2e": "vue-cli-service test:e2e",
+    "test:e2e": "vue-cli-service test:e2e --url http://localhost:5000",
     "test:unit": "vue-cli-service test:unit",
     "test:update": "vue-cli-service test:unit -u",
     "clean": "rm -rf node_modules dist"

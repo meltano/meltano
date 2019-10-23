@@ -54,6 +54,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   aria-haspopup="true"
                   class="button"
                   disabled="disabled"
+                  id="dropdown-save-report"
                 >
                   <span
                     class=""
