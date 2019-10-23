@@ -445,7 +445,9 @@ export default {
                         <div class="level-item">
                           <textarea
                             v-model="formattedSql"
-                            readonly="true"
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                            readonly
+                            rows="20"
                             @focus="$event.target.select()"
                           >
                           </textarea>
@@ -1008,13 +1010,8 @@ export default {
 
 textarea {
   width: 400px;
-  height: 300px;
-  border: 0;
   padding: 8px 16px;
-  font-family: courier;
   outline: 0;
   resize: none;
-  font-size: 0.8em;
-  color: #444;
 }
 </style>
