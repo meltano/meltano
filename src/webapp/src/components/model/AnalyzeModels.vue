@@ -54,7 +54,7 @@ export default {
             Learn more about Meltano Model and how to create
             <a
               class="has-text-underlined"
-              href="https://www.meltano.com/docs/tutorial.html#adding-custom-models"
+              href="https://www.meltano.com/tutorials/create-custom-transforms-and-models.html#adding-custom-models"
               target="_blank"
               >custom models</a
             >

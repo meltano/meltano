@@ -73,7 +73,7 @@ export default {
               <em>default transforms</em> that ship with Meltano. The CLI
               however
               <a
-                href="https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models"
+                href="https://www.meltano.com/tutorials/create-custom-transforms-and-models.html"
                 >provides more options</a
               >. Longer term we ancipate this view to support transform
               creation, editing, and selection.
