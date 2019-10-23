@@ -53,7 +53,12 @@ class Airflow(PluginInstall):
         _, Session = project_engine(project)
         session = Session()
 
-        plugin_config_service = PluginConfigService(project, self)
+        plugin_config_service = PluginConfigService(
+            self,
+            config_dir=project.plugin_dir(self),
+            run_dir=project.run_dir(self.name),
+        )
+
         plugin_settings_service = PluginSettingsService(project)
         airflow_cfg_path = plugin_config_service.run_dir.joinpath("airflow.cfg")
         stub_path = plugin_config_service.config_dir.joinpath("airflow.cfg")
