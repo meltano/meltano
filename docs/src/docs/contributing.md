@@ -158,12 +158,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue'
+  import Vue from 'vue';
   // third-party
-  import lodash from 'lodash'
+  import lodash from 'lodash';
   // application
-  import poller from '@/utils/poller'
-  import utils from '@/utils/utils'
+  import poller from '@/utils/poller';
+  import utils from '@/utils/utils';
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
@@ -351,7 +351,39 @@ You can use `make type=patch release` to force a patch release. This is useful w
 
 1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
-1. When the **publish** pipeline succeeds, the release is publicly available.
+1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
+1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
+1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns)
+
+## DigitalOcean Marketplace
+
+Meltano is deployed and available as a <a :href="$site.themeConfig.data.digitalOceanUrl">DigitalOcean Marketplace 1-Click install</a>.
+
+### Build the snapshot
+
+The `distribute` step in the CI/CD pipeline has a manual action named _digitalocean_marketplace_ that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
+
+:::tip Master only
+The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
+:::
+
+The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job.
+
+### Update the DigitalOcean listing
+
+Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
+
+:::tip Don't see the Meltano listing?
+You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
+:::
+
+Once inside the listing, update the following entries:
+
+- **System Image** to the new image
+- **Version** to the latest Meltano version
+- **Meltano Package Version** inside the _Software Included Entry_
+
+Submit it for review to finish the process.
 
 ## Speedruns
 
@@ -478,36 +510,6 @@ target-demo==...
 target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
 target-postgres==...
 ```
-
-## DigitalOcean Marketplace
-
-Meltano is deployed and available as a <a :href="$site.themeConfig.data.digitalOceanUrl">DigitalOcean Marketplace 1-Click install</a>.
-
-### Build the snapshot
-
-The `distribute` step in the CI/CD pipeline has a manual action named _digitalocean_marketplace_ that will use Packer to create a snapshot with the latest version of Meltano installed and ready.
-
-:::tip Master only
-The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
-:::
-
-The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job.
-
-### Update the DigitalOcean listing
-
-Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
-
-:::tip Don't see the Meltano listing?
-You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
-:::
-
-Once inside the listing, update the following entries:
-
-- **System Image** to the new image
-- **Version** to the latest Meltano version
-- **Meltano Package Version** inside the _Software Included Entry_
-
-Submit it for review to finish the process.
 
 ## Tmuxinator
 
