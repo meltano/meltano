@@ -13,7 +13,7 @@ from typing import Union, Dict
 
 from .error import Error
 from .behavior.versioned import Versioned
-from .utils import makedirs
+from .utils import makedirs, slugify
 
 
 class ProjectNotFound(Error):
@@ -144,7 +144,7 @@ class Project(Versioned):
 
     @makedirs
     def job_dir(self, job_id, *joinpaths):
-        return self.run_dir("elt", job_id, *joinpaths)
+        return self.run_dir("elt", slugify(job_id), *joinpaths)
 
     @makedirs
     def model_dir(self, *joinpaths):
