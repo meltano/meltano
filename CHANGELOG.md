@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#991] Add e2e tests for simple sqlite-carbon workflow
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.2.1 - (2019-10-22)
 
@@ -24,11 +25,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1123](https://gitlab.com/meltano/meltano/issues/1123) Add first-class "Submit Issue" CTA to help expedite resolution when a running job fails. Also updated the "Log" CTA in the Pipelines UI to reflect a failed state.
 
-
 ### Fixes
 
 - [#1172](https://gitlab.com/meltano/meltano/issues/1172) Fix analytics issue related to app version
-
 
 ## 1.2.0 - (2019-10-21)
 
@@ -36,12 +35,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- Compress meltano-logo.png
-
 - [#1121](https://gitlab.com/meltano/meltano/issues/1121) Add ability to configure listen address of Meltano and Airflow
 - [#1022](https://gitlab.com/meltano/meltano/issues/1022) Add "Autorun Query" toggle and persist the user's choice across sessions
 - [#1060](https://gitlab.com/meltano/meltano/issues/1060) Auto advance to Job Log from Pipeline Schedule creation
-
 - [#1111](https://gitlab.com/meltano/meltano/issues/1111) Auto advance to Loader installation step when an extractor lacks entity selection
 
 ### Changes
@@ -60,7 +56,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- Compress meltano-logo.png
 - [#1106](https://gitlab.com/meltano/meltano/issues/1106) Add description metadata to the GitLab extractor's Ultimate License configuration setting
 - [#1057](https://gitlab.com/meltano/meltano/issues/1057) Auto advance to Entity Selection when an extractor lacks configuration settings
 - [#51](https://gitlab.com/meltano/meltano-marketing/issues/51) Update Google Analytics to track `appVersion`, custom `projectId`, and to properly use the default `clientId`. The CLI also now uses `client_id` to differentiate between a CLI client id (not versioned) and the project id (versioned).
@@ -72,7 +67,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - Compress meltano-logo.png
-- [#991] Add e2e tests for simple sqlite-carbon workflow
 - [#1080](https://gitlab.com/meltano/meltano/issues/1080) Temporarily disable Intercom until userId strategy is determined
 - [#1058](https://gitlab.com/meltano/meltano/issues/1058) Updated the selected state of grouped buttons to fill vs. stroke. Updated the docs to reflect the reasoning to ensure consistency in Meltano's UI visual language
 - [#1068](https://gitlab.com/meltano/meltano/issues/1068) Replace dogfooding term in docs to speedrun
