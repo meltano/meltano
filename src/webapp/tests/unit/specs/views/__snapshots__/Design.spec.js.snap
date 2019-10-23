@@ -259,7 +259,9 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                           class="level-item"
                         >
                           <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
                             readonly="readonly"
+                            rows="20"
                           />
                         </div>
                       </div>
@@ -695,7 +697,9 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                           class="level-item"
                         >
                           <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
                             readonly="readonly"
+                            rows="20"
                           />
                         </div>
                       </div>
@@ -1057,7 +1061,9 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                         class="level-item"
                       >
                         <textarea
+                          class="has-text-grey-dark is-size-7 is-family-code is-borderless"
                           readonly="readonly"
+                          rows="20"
                         />
                       </div>
                     </div>
@@ -1414,7 +1420,9 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                         class="level-item"
                       >
                         <textarea
+                          class="has-text-grey-dark is-size-7 is-family-code is-borderless"
                           readonly="readonly"
+                          rows="20"
                         />
                       </div>
                     </div>
@@ -1837,7 +1845,9 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                           class="level-item"
                         >
                           <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
                             readonly="readonly"
+                            rows="20"
                           />
                         </div>
                       </div>
