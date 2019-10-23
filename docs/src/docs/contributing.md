@@ -158,12 +158,12 @@ In the spirit of GitLab's "boring solutions" with the above tools and mantra, th
 
   ```js
   // core
-  import Vue from 'vue';
+  import Vue from 'vue'
   // third-party
-  import lodash from 'lodash';
+  import lodash from 'lodash'
   // application
-  import poller from '@/utils/poller';
-  import utils from '@/utils/utils';
+  import poller from '@/utils/poller'
+  import utils from '@/utils/utils'
   ```
 
 - object properties and methods are alphabetical where `Vuex` stores are the exception (`defaultState` -> `getters` -> `actions` -> `mutations`)
