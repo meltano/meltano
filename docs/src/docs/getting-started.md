@@ -12,11 +12,11 @@ You should see now see the Extractors page, which contains various options for c
 
 ![Meltano UI with all extractors not installed initial loading screen](/images/getting-started-guide/gsg-01.png)
 
-For this guide, we will be following the "Fast Path" to get you up and running as quickly as possible. So let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. Once it is complete, you should be greeted with the following modal:
+For this guide, we will be following the "Fast Path" to get you up and running as quickly as possible. So let's install `tap-carbon-intensity` by clicking on the `Install` button inside its card. While an Extractor is installed, you are presented with the following modal:
 
-![Modal confirmation that tap-carbon-intensity is installed, doesn't require configuration and allow you to progress to the next step](/images/getting-started-guide/gsg-02.png)
+![Modal Information about tap-carbon-intensity being installed, doesn't require configuration and will progress to the next step when the installation is done](/images/getting-started-guide/gsg-02.png)
 
-Click `Next` to move on to the next step: "Entity Selection."
+The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Entity Selection."
 
 ## Select entities
 
@@ -68,13 +68,17 @@ In the current form, you will see:
 - Whether the **transform** step should be applied, which should be `skip`
 - The **interval** at which the pipeline should be run, which is set by default to be `@once`
 
-All we need to do is click `Save` to start our new pipeline! You should see a spinning icon as well as a badge next to the "Pipeline" navigation element in the header.
+All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. You should see a spinning icon that indicates that the pipeline is not completed:
 
-![Screenshot of pipeline being run](/images/getting-started-guide/gsg-08.png)
+![Screenshot of run log of a pipeline being run](/images/getting-started-guide/gsg-08.png)
 
-Once it's complete, these indicators will disappear and you should see:
+Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
-![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-09.png)
+![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-09.png)
+
+You can click the `Analyze` button or close the log and go back to the Pipelines page. In the Pipelines page, you can check the log of any past pipeline by clicking the `Log` button next to it: 
+
+![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-09b.png)
 
 Congratulations! Now that you have connected a data source, configured a target database, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
