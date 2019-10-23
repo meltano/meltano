@@ -80,7 +80,7 @@ const helpers = {
               name,
               periods: periods.filter(selected)
             }))
-            .filter(periods => periods.length)
+            .filter(tf => tf.periods.length)
         }
 
         return newJoin
@@ -93,11 +93,11 @@ const helpers = {
     const timeframes =
       baseTable.timeframes ||
       []
-        .map(({ name, periods }) => ({
-          name,
-          periods: periods.filter(selected)
+        .map(tf => ({
+          name: tf.name,
+          periods: tf.periods.filter(selected)
         }))
-        .filter(periods => periods.length)
+        .filter(tf => tf.periods.length)
 
     // Ordering setup
     const order = state.order.assigned
