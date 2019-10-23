@@ -616,9 +616,7 @@ const mutations = {
 
   assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(
-      orderableAttr =>
-        orderableAttr.attributeName === attribute.name &&
-        orderableAttr.sourceName === attribute.sourceName
+      orderableAttr => orderableAttr.attribute === attribute
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
     state.order.unassigned.splice(idx, 1)
