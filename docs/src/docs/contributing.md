@@ -367,7 +367,8 @@ The `distribute` step in the CI/CD pipeline has a manual action named _digitaloc
 The _digitalocean_marketplace_ job is only available on pipelines running off `master`.
 :::
 
-The snapshot should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job.
+1. Click the "Play" button associated with this _digitalocean_marketplace_ `distribute` step
+1. The snapshot string should be available under `meltano-<timestamp>` on DigitalOcean, which you will find at the bottom of the _digitalocean_marketplace_ job. Take note of this snapshot string as you'll use it in the next step.
 
 ### Update the DigitalOcean listing
 
@@ -377,13 +378,11 @@ Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocea
 You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
 :::
 
-Once inside the listing, update the following entries:
-
-- **System Image** to the new image
-- **Version** to the latest Meltano version
-- **Meltano Package Version** inside the _Software Included Entry_
-
-Submit it for review to finish the process.
+1. Once inside the listing, update the following entries:
+    - **System Image** to the new image (match the aforementioned snapshot string)
+    - **Version** to the latest Meltano version
+    - **Meltano Package Version** inside the _Software Included Entry_
+1. Submit it for review to finish the process.
 
 ## Speedruns
 
@@ -397,6 +396,7 @@ Remember to leave each screen up for at least 2 seconds so users have a chance t
 
 ### Requirements
 
+1. Use `tap-gitlab` and `target-postgres` (real example, not Carbon Intensity)
 1. Keep keystrokes to a minimum (ideally zero)
 1. You do not have to explain every step
 1. Do not need to stop and explain new features
