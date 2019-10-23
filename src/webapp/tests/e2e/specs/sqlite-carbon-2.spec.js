@@ -42,7 +42,7 @@ describe('Configuration', () => {
     cy.wait('@saveDashboard')
     cy.wait('@addReport')
     cy.visit('/dashboard')
-    cy.get('.dashboard-link:first-child').click()
+    cy.get('[data-test-id="dashboard-link"]:first-child').click()
     cy.wait('@dashboardReportsApi')
     cy.get('canvas').should('be.visible')
   })
