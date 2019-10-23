@@ -46,21 +46,25 @@ You can track our weekly progress and forward-looking plans in greater detail th
 
 ### Schedule
 
-| Release Date | Release Owner | Dogfooding Owner | Shadow   |
-| ------------ | ------------- | ---------------- | -------- |
-| 2019-09-03   | Derek K.      | Derek K.         |          |
-| 2019-09-09   | Ben H.        | Ben H.           | Douwe M. |
-| 2019-09-16   | Yannis R.     | Yannis R.        | Douwe M. |
-| 2019-09-23   | Ben H.        | Ben H.           |          |
-| 2019-09-30   | Micael B.     | Micael B.        |          |
-| 2019-10-07   | Ben H.        | Ben H.           |          |
-| 2019-10-14   | Ben H.        | Ben H.           |          |
-| 2019-10-21   | Derek K.      | Derek K.         |          |
+| Release Date | Release Owner | Speedrun Owner | Shadow |
+| ------------ | ------------- | -------------- | ------ |
+| 2019-10-07   | Ben H.        | Ben H.         |        |
+| 2019-10-14   | Derek K.      | Derek K.       |        |
+| 2019-10-21   | Ben H.        | Ben H.         |        |
+| 2019-10-28   | Micael B.     | Micael B.      |        |
+| 2019-11-04   | Derek K.      | Derek K.       |        |
+| 2019-11-11   | Yannis R.     | Yannis R.      |        |
+| 2019-11-18   | Douwe M.      | Douwe M.       |        |
+| 2019-11-25   | Ben H.        | Ben H.         |        |
+| 2019-12-02   | Micael B.     | Micael B.      |        |
+| 2019-12-09   | Derek K.      | Derek K.       |        |
+| 2019-12-16   | Yannis R.     | Yannis R.      |        |
+| 2019-12-23   | Ben H.        | Ben H.         |        |
+| 2019-12-30   | Ben H.        | Ben H.         |        |
 
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
 :::
-
 
 ## Focus
 
@@ -83,7 +87,6 @@ Internal metrics:
 
 - [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 - [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
-
 
 ### MAUI
 
