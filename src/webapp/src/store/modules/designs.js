@@ -100,7 +100,13 @@ const helpers = {
         .filter(tf => tf.periods.length)
 
     // Ordering setup
-    const order = state.order.assigned
+    const order = state.order.assigned.map(orderable => {
+      return {
+        direction: orderable.direction,
+        sourceName: orderable.attribute.sourceName,
+        attributeName: orderable.attribute.name
+      }
+    })
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters)
