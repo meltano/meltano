@@ -60,13 +60,11 @@ def elt(project, extractor, loader, dry, transform, job_id):
             .context(session)
         )
 
-        job_logging_service = JobLoggingService(
-            project, logs_dir=project.job_dir(job.job_id)
-        )
+        job_logging_service = JobLoggingService(project)
 
         # fmt: off
         with job.run(session), \
-            job_logging_service.create_log(job.run_id) as log_file, \
+            job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
             OutputLogger(log_file):
             if transform != "only":
                 run_extract_load(elt_context, session, dry_run=dry)
