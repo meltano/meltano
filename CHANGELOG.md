@@ -727,7 +727,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
-- Add documentation on custom transformations and models. Link to Tutorial: https://www.meltano.com/docs/tutorial.html#advanced-adding-custom-transformations-and-models
+- Add documentation on custom transformations and models. Link to Tutorial: https://www.meltano.com/tutorials/create-custom-transforms-and-models.html
 
 ## 0.19.1 - (2019-04-10)
 
