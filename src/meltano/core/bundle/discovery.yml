@@ -57,6 +57,8 @@ extractors:
     namespace: tap_google_analytics
     docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
+    settings_group_validation:
+      - ['key_file_location', 'view_id', 'start_date']
     settings:
       - name: key_file_location
         env: GOOGLE_ANALYTICS_API_CLIENT_SECRETS
@@ -67,7 +69,6 @@ extractors:
         label: View ID
       - name: reports
         env: GOOGLE_ANALYTICS_API_REPORTS
-        value: ''
       - name: start_date
         env: GOOGLE_ANALYTICS_API_START_DATE
         kind: date_iso8601
