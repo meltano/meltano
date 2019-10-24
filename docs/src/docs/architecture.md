@@ -377,6 +377,8 @@ To get started using [dbt](https://docs.getdbt.com/docs/introduction), you need 
 
 For more information on how to use dbt, check out the [official dbt documentation site for how it works](https://docs.getdbt.com/docs/introduction).
 
+And for a guided tutorial on how to create custom transforms, check out our [Create Custom Transforms and Models tutorial](https://www.meltano.com/tutorials/create-custom-transforms-and-models.html)!
+
 #### Python scripts
 
 In certain circumstances transformations cannot be done in dbt (like API calls), so we use python scripts for these cases.
