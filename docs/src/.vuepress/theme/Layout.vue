@@ -45,7 +45,10 @@ export default {
   data() {
     return {
       isSidebarOpen: false,
-      swUpdateEvent: null
+      swUpdateEvent: null,
+      userId: 1,
+      name: '',
+      email: ''
     }
   },
 
@@ -99,7 +102,11 @@ export default {
 
   mounted() {
     // Intercom.io chat
-    this.$intercom.boot()
+    // this.$intercom.boot({
+    //   user_id: this.userId,
+    //   name: this.name,
+    //   email: this.email
+    // })
 
     window.addEventListener('scroll', this.onScroll)
 
