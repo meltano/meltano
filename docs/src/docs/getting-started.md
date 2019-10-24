@@ -1,6 +1,6 @@
 # Getting Started
 
-Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start connecting data soures, building pipelines, performing analysis and dashboarding.
+Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start connecting data sources, building pipelines, performing analysis and dashboarding.
 
 ::: tip
 The following instructions assume you are able to access Meltano's user interface locally from `http://localhost:5000` or at `http://YOUR_CLOUD_IP_ADDRESS:5000`.
@@ -16,7 +16,7 @@ For this guide, we will be following the "Fast Path" to get you up and running a
 
 ![Modal Information about tap-carbon-intensity being installed, doesn't require configuration and will progress to the next step when the installation is done](/images/getting-started-guide/gsg-02.png)
 
-The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Entity Selection."
+The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Entity Selection".
 
 ## Select entities
 
@@ -137,7 +137,7 @@ Since we have never created a dashboard, click on `New Dashboard`, which will tr
 
 ![New dashboard dialog for configuring the dashboard](/images/getting-started-guide/gsg-17.png)
 
-Once we click `Create`, we can now verify that the our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu.
+Once we click `Create`, we can now verify that our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu.
 
 ![Confirmation that our report is added to the dashboard](/images/getting-started-guide/gsg-18.png)
 

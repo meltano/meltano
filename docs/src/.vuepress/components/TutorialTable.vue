@@ -28,6 +28,40 @@ export default {
     </div>
     <div class="tutorial-item">
       <div class="tutorial-header">
+        <a href="/tutorials/gitlab-and-postgres.html">GitLab API + Postgres</a>
+      </div>
+      <div>
+        <p>
+          Experience the full extract, load, and transorm pipeline with
+          authentication using Meltano CLI followed by analysis using Meltano UI
+          with its automatic SQL generation.
+        </p>
+        <ul>
+          <li>Postgres database</li>
+          <li>Authentication</li>
+          <li>Your private GitLab dataset</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
+        <a href="/tutorials/google-analytics-with-postgres.html">Google Analytics API + Postgres</a>
+      </div>
+      <div>
+        <p>
+          Experience the full extract, load, and transorm pipeline with
+          authentication using Meltano CLI followed by analysis using Meltano UI
+          with its automatic SQL generation.
+        </p>
+        <ul>
+          <li>Postgres database</li>
+          <li>Authentication</li>
+          <li>Your private Google Analytics dataset</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tutorial-item">
+      <div class="tutorial-header">
         <a href="/tutorials/salesforce-and-postgres.html"
           >Salesforce API + Postgres</a
         >
@@ -42,23 +76,6 @@ export default {
           <li>Postgres database</li>
           <li>Authentication</li>
           <li>Your private Salesforce dataset</li>
-        </ul>
-      </div>
-    </div>
-    <div class="tutorial-item">
-      <div class="tutorial-header">
-        <a href="/tutorials/gitlab-and-postgres.html">GitLab API + Postgres</a>
-      </div>
-      <div>
-        <p>
-          Experience the full extract, load, and transorm pipeline with
-          authentication using Meltano CLI followed by analysis using Meltano UI
-          with its automatic SQL generation.
-        </p>
-        <ul>
-          <li>Postgres database</li>
-          <li>Authentication</li>
-          <li>Your private GitLab dataset</li>
         </ul>
       </div>
     </div>
