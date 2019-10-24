@@ -403,9 +403,9 @@ You'll have to be granted access to the DigitalOcean vendor portal. Please ask a
 :::
 
 1. Once inside the listing, update the following entries:
-    - **System Image** to the new image (match the aforementioned snapshot string)
-    - **Version** to the latest Meltano version
-    - **Meltano Package Version** inside the _Software Included Entry_
+   - **System Image** to the new image (match the aforementioned snapshot string)
+   - **Version** to the latest Meltano version
+   - **Meltano Package Version** inside the _Software Included Entry_
 1. Submit it for review to finish the process.
 
 ## Speedruns
@@ -420,24 +420,11 @@ Remember to leave each screen up for at least 2 seconds so users have a chance t
 
 ### Requirements
 
-1. Use `tap-gitlab` and `target-postgres` (real example, not Carbon Intensity)
 1. Keep keystrokes to a minimum (ideally zero)
 1. You do not have to explain every step
 1. Do not need to stop and explain new features
 1. Time starts from when the webapp is loaded on the browser
-1. Must complete the following tasks
-   - Install an extractor
-   - Select entities
-   - Install and configure loader
-   - Configure transform
-   - Configure and run pipeline
-   - Open Model
-   - Generate SQL query with data model
-   - Render chart based on query
-   - Save query as a report with auto-populated name
-   - Create new dashboard with auto-populated name
-   - Add saved report to new dashboard
-   - Verify dashboard contains report
+1. Make sure to pause between screens so user has a chance to register that a change is happening
 
 ### Workflow
 
@@ -489,7 +476,7 @@ meltano ui
 
 8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
 
-9. Run through [Getting Started Guide](/docs/getting-started.html) as quickly as possible with some narration, but don't pause mid-action to explain something.
+9. Run through `tap-gitlab` + `tap-postgres` workflow as quickly as possible with some narration, but don't pause mid-action to explain something.
 
 ## Taps & Targets Workflow
 
