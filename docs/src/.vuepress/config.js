@@ -126,8 +126,10 @@ module.exports = {
         id: 'GTM-NGTFLR7'
       }
     ],
-    ['@vuepress/active-header-links'],
-    [require('vuepress-intercom'), { appId: 'ir946q00' }],
+    [
+      '@vuepress/active-header-links'
+    ],
+    // [require('vuepress-intercom'), { appId: 'ir946q00' }],
     [
       'container',
       {
