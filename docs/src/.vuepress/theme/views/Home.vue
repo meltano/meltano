@@ -23,8 +23,9 @@
           <p class="hero-tagline">
             Meltano is an open source <strong>data toolkit</strong>
             that allows to create, run, and analyze
-            <strong>custom data transformations</strong>.
-            Quickly analyze data locally and schedule data pipelines for <strong>continuous data transformations</strong>.
+            <strong>custom data transformations</strong>
+            in a <strong>single integrated workflow</strong>.
+            Quickly analyze data, share insights, and schedule data pipelines for <strong>continuous data transformations</strong>.
           </p>
 
           <p class="action" v-if="data.actionText && data.actionLink">
