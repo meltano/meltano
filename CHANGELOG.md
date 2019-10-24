@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1173](https://gitlab.com/meltano/meltano/issues/1173) Fix `sortBy` drag-and-drop bug in Analyze by properly using `tryAutoRun` vs. `runQuery`
 - [#1079](https://gitlab.com/meltano/meltano/issues/1079) `meltano elt` will now run in isolation under `.meltano/run/elt`
+- [#1204](https://gitlab.com/meltano/meltano/issues/1204) move project creation steps out of the local installation section of the docs and into the Getting Started Guide
 
 ### Breaks
 
