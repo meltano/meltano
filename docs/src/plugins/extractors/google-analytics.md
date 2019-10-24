@@ -43,3 +43,68 @@ export GOOGLE_ANALYTICS_API_END_DATE="2019-06-01T00:00:00Z"
 ```
 
 Check the [README](https://gitlab.com/meltano/tap-google-analytics#tap-google-analytics) for details.
+
+## Google Analytics Setup
+
+In order to access your Google Analytics data, `tap-google-analytics` needs:
+
+1. The ID for the Google Analytics View you want to fetch data from.
+
+   You can easily find it by using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/).
+
+   ![Screenshot of Google Analytics Account Explorer](/images/tap-google-analytics/01-ga-account-explorer.png)
+
+2. Authorization to access your Google Analytics account.
+
+   At the moment, `tap-google-analytics` supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
+
+   In order for `tap-google-analytics` to access your Google Analytics Account, it needs the Analytics Reporting API *and* the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
+
+3. A way to authenticate when accessing the Analytics APIs
+
+   When you create a service account Google gives you a json file with that service account's credentials called the `client_secrets.json`, and that's all you need to pass to this tap.
+
+#### Creating service account credentials
+
+If you already have a valid `client_secrets.json` for a service account, you can skip the rest of this section.
+
+As a first step, you need to create or use an existing project in the Google Developers Console:
+
+1. Sign in to the Google Account you are using for managing Google Analytics (you must have Manage Users permission at the account, property, or view level).
+
+2. Open the [Service accounts page](https://console.developers.google.com/iam-admin/serviceaccounts). If prompted, select a project or create a new one to use for accessing Google Analytics.
+
+3. Click Create service account.
+
+   In the Create service account window, type a name for the service account, and select Furnish a new private key. Then click Save and store it locally in your `google-analytics-tutorial` directory as `client_secrets.json`.
+
+   If you already have a service account, you can generate a key by selecting 'Edit' for the account and then selecting the option to generate a key.
+
+![Screenshot of Google Service Account Configuration](/images/tap-google-analytics/02-ga-service-account-configuration.png)
+
+Your new public/private key pair is generated and downloaded to your machine; it serves as the only copy of this key. You are responsible for storing it securely.
+
+#### Add service account to the Google Analytics account
+
+The newly created service account will have an email address that looks similar to:
+
+```
+quickstart@PROJECT-ID.iam.gserviceaccount.com
+```
+
+Use this email address to [add a user](https://support.google.com/analytics/answer/1009702) to the Google analytics view you want to access via the API. For using `tap-google-analytics` only [Read & Analyze permissions](https://support.google.com/analytics/answer/2884495) are needed.
+
+![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
+
+
+#### Enable the APIs
+
+1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the `Create credentials` step is selected.
+
+   From this dashboard, you can enable/disable the API for your account, set Quotas and check usage stats for the service account you are using with `tap-google-analytics`.
+
+   ![Screenshot of Google Analytics Reporting API](/images/tap-google-analytics/04-ga-reporting-api.png)
+
+2. Visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the `Create credentials` step is selected and enable the API for your account.
+
+   ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
