@@ -2,13 +2,8 @@
 import { mapState } from 'vuex'
 import Vue from 'vue'
 
-import Message from '@/components/generic/Message'
-
 export default {
   name: 'Transforms',
-  components: {
-    Message
-  },
   data() {
     return {
       selectedTransformOption: null
@@ -65,82 +60,102 @@ export default {
     </div>
 
     <div class="columns">
-      <div class="column is-three-fifths is-offset-one-fifth">
+      <div class="column">
         <div class="box">
-          <Message>
-            <p>
-              Currently, for the UI, we only support the
-              <em>default transforms</em> that ship with Meltano. The CLI
-              however
-              <a
-                href="https://www.meltano.com/tutorials/create-custom-transforms-and-models.html"
-                >provides more options</a
-              >. Longer term we ancipate this view to support transform
-              creation, editing, and selection.
-            </p>
-            <p>Current Options:</p>
-            <ul>
-              <li
-                :class="{
-                  'has-text-weight-bold': getIsSelectedTransformOption(
-                    transformOptions[0]
-                  )
-                }"
-              >
-                Skip (EL): do not run the default transforms with extract and
-                load
-              </li>
-              <li
-                :class="{
-                  'has-text-weight-bold': getIsSelectedTransformOption(
-                    transformOptions[1]
-                  )
-                }"
-              >
-                Run (ELT): run the default transforms with extract and load
-              </li>
-              <li
-                :class="{
-                  'has-text-weight-bold': getIsSelectedTransformOption(
-                    transformOptions[2]
-                  )
-                }"
-              >
-                Only (T): only run default transforms, do not extract and load
-              </li>
-            </ul>
-          </Message>
-
-          <div class="level">
-            <div class="level-left">
-              <div class="buttons has-addons">
-                <button
-                  v-for="transformOption in transformOptions"
-                  :key="transformOption.label"
-                  class="button"
-                  :class="{
-                    'is-selected is-interactive-secondary':
-                      transformOption === selectedTransformOption
-                  }"
-                  @click="updateTransformTypeSelection(transformOption)"
-                >
-                  {{ transformOption.label }}
-                </button>
+          <div class="columns">
+            <div class="column">
+              <div class="content">
+                <p>
+                  Below, you'll find the transformation documentation for the
+                  following:
+                </p>
+                <ol>
+                  <li>
+                    <a
+                      class="has-text-underlined"
+                      target="_blank"
+                      href="https://www.meltano.com/tutorials/create-custom-transforms-and-models.html#adding-custom-transforms"
+                      >Custom transformations</a
+                    >
+                  </li>
+                  <li>
+                    <a
+                      class="has-text-underlined"
+                      target="_blank"
+                      href="https://www.meltano.com/docs/transforms.html#transform"
+                      >Default transformations</a
+                    >
+                    that ship with Meltano
+                  </li>
+                </ol>
               </div>
             </div>
 
-            <div class="level-right">
-              <a
-                data-test-id="save-transform"
-                class="button is-interactive-primary"
-                @click="saveTransformAndGoToSchedules"
-                >Save</a
-              >
+            <div class="column">
+              <div class="content">
+                <p>Current Options:</p>
+                <ul>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[0]
+                      )
+                    }"
+                  >
+                    Skip (EL): do not run the default transforms with extract
+                    and load
+                  </li>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[1]
+                      )
+                    }"
+                  >
+                    Run (ELT): run the default transforms with extract and load
+                  </li>
+                  <li
+                    :class="{
+                      'has-text-weight-bold': getIsSelectedTransformOption(
+                        transformOptions[2]
+                      )
+                    }"
+                  >
+                    Only (T): only run default transforms, do not extract and
+                    load
+                  </li>
+                </ul>
+              </div>
+
+              <div class="field is-grouped is-pulled-right">
+                <div class="control buttons has-addons">
+                  <button
+                    v-for="transformOption in transformOptions"
+                    :key="transformOption.label"
+                    class="button"
+                    :class="{
+                      'is-selected is-interactive-secondary':
+                        transformOption === selectedTransformOption
+                    }"
+                    @click="updateTransformTypeSelection(transformOption)"
+                  >
+                    {{ transformOption.label }}
+                  </button>
+                </div>
+                <div class="control">
+                  <a
+                    data-test-id="save-transform"
+                    class="button is-interactive-primary"
+                    @click="saveTransformAndGoToSchedules"
+                    >Save</a
+                  >
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="is-flex">
-            <iframe style="flex-grow: 1;" :src="this.$flask.airflowUrl" />
+            <iframe class="dbt-docs-iframe" :src="this.$flask.airflowUrl" />
           </div>
         </div>
       </div>
@@ -148,4 +163,9 @@ export default {
   </div>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.dbt-docs-iframe {
+  flex-grow: 1;
+  min-height: 100vh;
+}
+</style>
