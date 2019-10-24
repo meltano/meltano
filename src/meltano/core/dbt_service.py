@@ -35,62 +35,44 @@ class DbtService:
         finally:
             session.close()
 
-    async def compile(self, models=None, **kwargs):
+    async def invoke(self, cmd, *args, **kwargs):
         invoker = self.dbt_invoker()
-        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
-        if models:
-            # Always include the my_meltano_project model
-            all_models = f"{models} my_meltano_project"
-            params.extend(["--models", all_models])
-
         handle = await invoker.invoke_async(
-            "compile",
+            cmd,
+            *args,
+            **kwargs,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.PIPE,
-            *params,
-            **kwargs,
         )
 
-        # run the dbt compile command, capture the stdout and stderr
-        #  and send them to the stdout, stderr set by OutputLogger
-        #  so that they are also logged in a log file in real time
-        await asyncio.wait(
-            [
+        await asyncio.wait([
                 capture_subprocess_output(handle.stdout, sys.stdout),
                 capture_subprocess_output(handle.stderr, sys.stderr),
                 handle.wait(),
             ],
-            return_when=asyncio.ALL_COMPLETED,
-        )
+            return_when=asyncio.ALL_COMPLETED)
 
         if handle.returncode:
             raise Exception(
-                f"dbt compile didn't exit cleanly. Exit code: {handle.returncode}"
+                f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
             )
+
+    async def docs(self, *args, **kwargs):
+        await self.invoke("docs", *args, env={'MELTANO_LOAD_SCHEMA': "<meltano>"})
 
     async def deps(self):
-        invoker = self.dbt_invoker()
-        handle = await invoker.invoke_async(
-            "deps", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-        )
+        await self.invoke("deps")
 
-        # run the dbt deps command and capture the stdout and stderr
-        await asyncio.wait(
-            [
-                capture_subprocess_output(handle.stdout, sys.stdout),
-                capture_subprocess_output(handle.stderr, sys.stderr),
-                handle.wait(),
-            ],
-            return_when=asyncio.ALL_COMPLETED,
-        )
+    async def compile(self, models=None, **kwargs):
+        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
+        if models:
+            # Always include the my_meltano_project model
+            all_models = f"{models} my_meltano_project"
+            params.extend(["--models", all_models])
 
-        if handle.returncode:
-            raise Exception(
-                f"dbt deps didn't exit cleanly. Exit code: {handle.returncode}"
-            )
+        await self.invoke("compile", *params, **kwargs)
 
     async def run(self, models=None, **kwargs):
-        invoker = self.dbt_invoker()
         params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
 
         if models:
@@ -98,25 +80,4 @@ class DbtService:
             all_models = f"{models} my_meltano_project"
             params.extend(["--models", all_models])
 
-        handle = await invoker.invoke_async(
-            "run",
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
-            *params,
-            **kwargs,
-        )
-
-        # run the dbt run command and capture the stdout and stderr
-        await asyncio.wait(
-            [
-                capture_subprocess_output(handle.stdout, sys.stdout),
-                capture_subprocess_output(handle.stderr, sys.stderr),
-                handle.wait(),
-            ],
-            return_when=asyncio.ALL_COMPLETED,
-        )
-
-        if handle.returncode:
-            raise Exception(
-                f"dbt run didn't exit cleanly. Exit code: {handle.returncode}"
-            )
+        await self.invoke("run", *params, **kwargs)

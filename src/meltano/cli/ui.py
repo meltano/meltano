@@ -11,10 +11,11 @@ from meltano.core.tracking import GoogleAnalyticsTracker
 from meltano.core.utils import truthy
 from meltano.core.migration_service import MigrationService
 from meltano.api.workers import (
-    MeltanoBackgroundCompiler,
+    MeltanoCompilerWorker,
     AirflowWorker,
     APIWorker,
     UIAvailableWorker,
+    DbtWorker
 )
 
 
@@ -58,7 +59,8 @@ def ui(project, reload, bind_port, bind):
     if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
         workers.append(AirflowWorker(project))
 
-    workers.append(MeltanoBackgroundCompiler(project))
+    workers.append(MeltanoCompilerWorker(project))
+    workers.append(DbtWorker(project))
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
         APIWorker(
