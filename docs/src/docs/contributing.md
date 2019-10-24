@@ -319,7 +319,7 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
-## Releases
+## Release Process
 
 ### Versioning
 
@@ -333,7 +333,7 @@ Ensure you have the latest `master` branch locally before continuing.
 git fetch origin
 ```
 
-### Release Process
+### Workflow
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
