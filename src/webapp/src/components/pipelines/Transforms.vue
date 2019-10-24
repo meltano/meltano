@@ -138,6 +138,10 @@ export default {
               >
             </div>
           </div>
+
+          <div class="is-flex">
+            <iframe style="flex-grow: 1;" :src="this.$flask.airflowUrl" />
+          </div>
         </div>
       </div>
     </div>
