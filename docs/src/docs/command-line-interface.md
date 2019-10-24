@@ -177,7 +177,7 @@ meltano extract [name of extractor] --to [name of loader]`
 
 ## `init`
 
-Used to create a new meltano project with a basic infrastructure in place.
+Used to create a new meltano project with a basic infrastructure in place in the current directory that the user is in.
 
 ### How to use
 

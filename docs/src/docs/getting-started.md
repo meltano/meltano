@@ -22,7 +22,7 @@ If you would prefer to use Meltano without sending the team this data, learn how
 meltano init carbon
 ```
 
-This will create a new directory named `carbon` and initialize Meltano's basic directory structure inside it.
+This will create a new directory named `carbon` in the current directory and initialize Meltano's basic directory structure inside it.
 
 ## Start the application
 
@@ -105,7 +105,7 @@ Once it's complete, the indicator will disappear and you should be able to see t
 
 ![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-09.png)
 
-You can click the `Analyze` button or close the log and go back to the Pipelines page. In the Pipelines page, you can check the log of any past pipeline by clicking the `Log` button next to it: 
+You can click the `Analyze` button or close the log and go back to the Pipelines page. In the Pipelines page, you can check the log of any past pipeline by clicking the `Log` button next to it:
 
 ![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-09b.png)
 
