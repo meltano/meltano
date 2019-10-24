@@ -163,13 +163,13 @@ Congratulations! Now that you have connected to Google Analytics, configured the
 
 ## Select a data model
 
-Let's start by clicking on the `Analyze` button in our pipeline. This should bring us to the "Analyze: Models" page:
+Let's start by closing the Run Log for the pipeline and click on the `Model` option on the header of the page. This should bring us to the "Analyze: Models" page:
 
 ![Screenshot of Analyze: Model page for Google Analytics](/images/google-analytics-tutorial/06-ga-model-page.png)
 
 Meltano Models provide a starting point to explore and analyze data for specific use cases. They are similar to templates with only what is relevant for each use case included. As you can see in the right column, `tap-google-analytics` already has the required models installed.
 
-Let's move on to the next step by clicking `Analyze` in the `Website Overview` card to move on to the next step.
+Let's move on to the next step by clicking `Analyze` in the `Google analytics website overview` card to move on to the next step.
 
 ## Analyze the data
 
@@ -195,13 +195,13 @@ And with that, the big moment is upon us, it's time to click `Run` to run our qu
 
 You should now see a beautiful data visualization and a table below to see the data in detail!
 
-Let's order the data by Year, Month and Day ascending:
+Let's remove the Day so that we can see aggregate stats per month and order the data by Year and Month ascending:
 
 ![Screenshot of data and ordering for Google Analytics Website data](/images/google-analytics-tutorial/10-ga-website-overview-ordering.png)
 
-And, finally, switch the graph to an area diagram:
+And, finally, switch the graph to an area chart:
 
-![Screenshot of area diagram for Google Analytics Website data](/images/google-analytics-tutorial/11-ga-website-overview-area-diagram.png)
+![Screenshot of area chart for Google Analytics Website data](/images/google-analytics-tutorial/11-ga-website-overview-area-diagram.png)
 
 
 ## Save a report
