@@ -10,9 +10,10 @@ from meltano.core.plugin.settings_service import PluginSettingsService
 
 @cli.group(invoke_without_command=True)
 @click.argument("plugin_name")
+@click.option("--format", default="json")
 @project(migrate=True)
 @click.pass_context
-def config(ctx, project, plugin_name):
+def config(ctx, project, plugin_name, format):
     config = ConfigService(project)
     plugin = config.find_plugin(plugin_name)
 
@@ -25,7 +26,12 @@ def config(ctx, project, plugin_name):
     ctx.obj["session"] = session
 
     if ctx.invoked_subcommand is None:
-        print(settings.as_config(session, plugin))
+        if format == "json":
+            print(settings.as_config(session, plugin))
+
+        if format == "env":
+            for env, value in settings.as_env(session, plugin).items():
+                print(f"{env}={value}")
 
 
 @config.command()
