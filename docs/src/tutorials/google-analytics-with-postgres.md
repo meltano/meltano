@@ -12,7 +12,7 @@ For this tutorial, our goal will be to get [https://gitlab.com/meltano/tap-googl
 - GitLab account
 - Basic command line knowledge
 
-### Video Walkthrough
+## Video Walkthrough
 
 <p></p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/AwZ5rRvqzf8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
