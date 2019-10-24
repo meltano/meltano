@@ -64,10 +64,11 @@ export default {
         <div class="box">
           <div class="columns">
             <div class="column">
+              <h2 class="title is-5">Documentation</h2>
               <div class="content">
                 <p>
-                  Below, you'll find the transformation documentation for the
-                  following:
+                  Below, you'll find the documentation for transformations in
+                  this Meltano project. The documentation includes:
                 </p>
                 <ol>
                   <li>
@@ -92,8 +93,9 @@ export default {
             </div>
 
             <div class="column">
+              <h2 class="title is-5">Options</h2>
               <div class="content">
-                <p>Current Options:</p>
+                <p>Transformation options:</p>
                 <ul>
                   <li
                     :class="{
