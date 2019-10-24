@@ -373,7 +373,9 @@ sales
 
 Meltano uses [dbt](https://docs.getdbt.com/) to transform the source data into the `analytics` schema, ready to be consumed by models.
 
-[Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
+To get started using [dbt](https://docs.getdbt.com/docs/introduction), you need to have some knowledge of [SQL](https://en.m.wikipedia.org/wiki/SQL) since this is how you will write your transformations to take raw data into data that's ready for analytics.
+
+For more information on how to use dbt, check out the [official dbt documentation site for how it works](https://docs.getdbt.com/docs/introduction).
 
 #### Python scripts
 
