@@ -206,16 +206,13 @@ If you've installed Python 3, but are not getting the result you expect, you may
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check for current version of pip
-pip --version
+# Check for current version of pip using pip3
+# to ensure that it is using the Python3 pip
+pip3 --version
 
 # Update pip
 pip3 install --upgrade pip
 ```
-
-::: tip
-If you installed Python 3 alongside an existing Python 2 installation, you'll want to use `pip3` instead!
-:::
 
 #### Virtual Environment
 
