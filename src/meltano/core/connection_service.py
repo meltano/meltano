@@ -9,7 +9,6 @@ from .plugin_discovery_service import PluginDiscoveryService
 
 
 DEFAULT_ANALYZE_SCHEMA = "analytics"
-
 MELTANO_SCHEMA_SUFFIX = os.getenv("MELTANO_SCHEMA_SUFFIX", "")
 MELTANO_LOAD_SCHEMA_SUFFIX = os.getenv(
     "MELTANO_LOAD_SCHEMA_SUFFIX", MELTANO_SCHEMA_SUFFIX
