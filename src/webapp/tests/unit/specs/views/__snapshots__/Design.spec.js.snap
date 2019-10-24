@@ -216,7 +216,8 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -233,7 +234,13 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -251,11 +258,11 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              
-                            </code>
-                          </pre>
+                          <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                            readonly="readonly"
+                            rows="20"
+                          />
                         </div>
                       </div>
                     </div>
@@ -648,7 +655,8 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -664,7 +672,13 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -682,16 +696,11 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              SELECT
-  COALESCE(COUNT("region"."id"), 0) "region.count"
-FROM
-  "region" "region"
-LIMIT
-  3;
-                            </code>
-                          </pre>
+                          <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                            readonly="readonly"
+                            rows="20"
+                          />
                         </div>
                       </div>
                     </div>
@@ -1034,9 +1043,10 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
               >
                 <dropdown-stub
                   buttonclasses="button is-text is-small"
+                  class="tooltip"
+                  data-tooltip="Show generated SQL query"
                   iconclose="caret-up"
                   iconopen="caret-down"
-                  isiconremoved="true"
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
@@ -1050,16 +1060,11 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                       <div
                         class="level-item"
                       >
-                        <pre>
-                          <code>
-                            SELECT
-  COALESCE(COUNT("region"."id"), 0) "region.count"
-FROM
-  "region" "region"
-LIMIT
-  3;
-                          </code>
-                        </pre>
+                        <textarea
+                          class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                          readonly="readonly"
+                          rows="20"
+                        />
                       </div>
                     </div>
                   </div>
@@ -1396,10 +1401,11 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
               >
                 <dropdown-stub
                   buttonclasses="button is-text is-small"
+                  class="tooltip"
+                  data-tooltip="Show generated SQL query"
                   disabled="true"
                   iconclose="caret-up"
                   iconopen="caret-down"
-                  isiconremoved="true"
                   label="SQL"
                   labelclasses=""
                   menuclasses=""
@@ -1413,11 +1419,11 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                       <div
                         class="level-item"
                       >
-                        <pre>
-                          <code>
-                            
-                          </code>
-                        </pre>
+                        <textarea
+                          class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                          readonly="readonly"
+                          rows="20"
+                        />
                       </div>
                     </div>
                   </div>
@@ -1796,7 +1802,8 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                 class="control"
               >
                 <div
-                  class="dropdown"
+                  class="dropdown tooltip"
+                  data-tooltip="Show generated SQL query"
                 >
                   <div
                     class="dropdown-trigger"
@@ -1813,7 +1820,13 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         SQL
                       </span>
                        
-                      <!---->
+                      <span
+                        class="icon is-small"
+                      >
+                        <font-awesome-icon-stub
+                          icon="caret-down"
+                        />
+                      </span>
                     </button>
                   </div>
                    
@@ -1831,11 +1844,11 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                         <div
                           class="level-item"
                         >
-                          <pre>
-                            <code>
-                              
-                            </code>
-                          </pre>
+                          <textarea
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                            readonly="readonly"
+                            rows="20"
+                          />
                         </div>
                       </div>
                     </div>

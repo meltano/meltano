@@ -434,15 +434,23 @@ export default {
               <div class="level-item field is-grouped">
                 <div class="control">
                   <Dropdown
+                    class="tooltip"
+                    data-tooltip="Show generated SQL query"
                     label="SQL"
                     button-classes="button is-text is-small"
                     :disabled="!currentSQL"
-                    is-icon-removed
                   >
                     <div class="dropdown-content">
                       <div class="level">
                         <div class="level-item">
-                          <pre><code>{{ formattedSql }}</code></pre>
+                          <textarea
+                            v-model="formattedSql"
+                            class="has-text-grey-dark is-size-7 is-family-code is-borderless"
+                            readonly
+                            rows="20"
+                            @focus="$event.target.select()"
+                          >
+                          </textarea>
                         </div>
                       </div>
                     </div>
@@ -998,5 +1006,12 @@ export default {
       }
     }
   }
+}
+
+textarea {
+  width: 400px;
+  padding: 8px 16px;
+  outline: 0;
+  resize: none;
 }
 </style>
