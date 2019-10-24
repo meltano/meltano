@@ -31,7 +31,7 @@ def discovery():
     discovery[PluginType.EXTRACTORS].append(
         {
             "name": "tap-mock",
-            "namespace": "pytest",
+            "namespace": "tap_mock",
             "pip_url": "tap-mock",
             "settings": [
                 {"name": "test", "value": "mock"},
@@ -42,13 +42,13 @@ def discovery():
     )
 
     discovery[PluginType.LOADERS].append(
-        {"name": "target-mock", "namespace": "sqlite", "pip_url": "target-mock"}
+        {"name": "target-mock", "namespace": "target_mock", "pip_url": "target-mock"}
     )
 
     discovery[PluginType.TRANSFORMERS].append(
         {
             "name": "transformer-mock",
-            "namespace": "pytest",
+            "namespace": "transformer_mock",
             "pip_url": "transformer-mock",
         }
     )
@@ -56,7 +56,7 @@ def discovery():
     discovery[PluginType.TRANSFORMS].append(
         {
             "name": "tap-mock-transform",
-            "namespace": "pytest",
+            "namespace": "tap_mock",
             "pip_url": "tap-mock-transform",
         }
     )
