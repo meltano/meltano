@@ -410,6 +410,8 @@ You'll have to be granted access to the DigitalOcean vendor portal. Please ask a
 
 ## Speedruns
 
+As part of Meltano's [Release process](/docs/contributing.html#release-process), speedruns allow the team to ensure that every release is stable.
+
 ::: info
 🏆 Current Record: 1:35 (Ben Hong)
 :::
