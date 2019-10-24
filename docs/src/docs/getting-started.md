@@ -10,7 +10,7 @@ The following instructions assume you are able to access Meltano's user interfac
 
 To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
 
-Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "meltano-carbon."
+Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "carbon."
 
 ::: info
 Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
@@ -19,17 +19,17 @@ If you would prefer to use Meltano without sending the team this data, learn how
 :::
 
 ```bash
-meltano init meltano-carbon
+meltano init carbon
 ```
 
-This will create a new directory named `meltano-carbon` and initialize Meltano's basic directory structure inside it.
+This will create a new directory named `carbon` and initialize Meltano's basic directory structure inside it.
 
 ## Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
 
 ```bash
-cd meltano-carbon
+cd carbon
 meltano ui
 ```
 
