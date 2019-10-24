@@ -35,12 +35,18 @@ class ELTContext:
 
     def extractor_invoker(self):
         return invoker_factory(
-            self.project, self.extractor.install, plugin_config=self.extractor.config
+            self.project,
+            self.extractor.install,
+            run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
+            plugin_config=self.extractor.config,
         )
 
     def loader_invoker(self):
         return invoker_factory(
-            self.project, self.loader.install, plugin_config=self.loader.config
+            self.project,
+            self.loader.install,
+            run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
+            plugin_config=self.loader.config,
         )
 
 

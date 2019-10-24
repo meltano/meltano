@@ -3,6 +3,7 @@ import subprocess
 import logging
 import re
 from pathlib import Path
+from typing import Union
 
 from meltano.core.project import Project
 from meltano.core.plugin import PluginInstall
@@ -15,14 +16,14 @@ class PluginConfigService:
     """
 
     def __init__(
-        self, project: Project, plugin: PluginInstall, config_dir=None, run_dir=None
+        self,
+        plugin: PluginInstall,
+        config_dir: Union[str, Path],
+        run_dir: Union[str, Path],
     ):
-        self.project = project
         self.plugin = plugin
-
-        # delegate to project
-        self.config_dir = config_dir or project.plugin_dir(plugin)
-        self.run_dir = run_dir or project.run_dir(plugin.name)
+        self.config_dir = Path(config_dir)
+        self.run_dir = Path(run_dir)
 
     @classmethod
     def envsubst(cls, src: Path, dst: Path, env={}):

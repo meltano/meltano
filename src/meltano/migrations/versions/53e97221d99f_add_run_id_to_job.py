@@ -1,40 +1,20 @@
-from sqlalchemy.types import TypeDecorator, CHAR, VARCHAR, INTEGER
+"""Add run_id to Job
+
+Revision ID: 53e97221d99f
+Revises: 6ef30ab7b8e5
+Create Date: 2019-10-10 13:12:55.147164
+
+"""
+from alembic import op
+import sqlalchemy as sa
+import sqlalchemy.types as types
+from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-import json
 
 
-class JSONEncodedDict(TypeDecorator):
-    """Represents an immutable structure as a json-encoded string.
-
-    Usage::
-        JSONEncodedDict(255)
-    """
-
-    impl = VARCHAR
-
-    def process_bind_param(self, value, dialect):
-        if value is not None:
-            value = json.dumps(value)
-
-        return value
-
-    def process_result_value(self, value, dialect):
-        if value is not None:
-            value = json.loads(value)
-        return value
-
-
-class IntFlag(TypeDecorator):
-    impl = INTEGER
-
-    # force the cast to INTEGER
-    def process_bind_param(self, value, dialect):
-        return int(value)
-
-
-class GUID(TypeDecorator):
-    """Platform-independent GUID type.
+class GUID(types.TypeDecorator):
+    """Platform-independent GUID type
 
     Uses PostgreSQL's UUID type, otherwise uses
     CHAR(32), storing as stringified hex values.
@@ -42,13 +22,13 @@ class GUID(TypeDecorator):
     Reference: https://docs.sqlalchemy.org/en/13/core/custom_types.html#backend-agnostic-guid-type
     """
 
-    impl = CHAR
+    impl = types.CHAR
 
     def load_dialect_impl(self, dialect):
         if dialect.name == "postgresql":
             return dialect.type_descriptor(UUID())
         else:
-            return dialect.type_descriptor(CHAR(32))
+            return dialect.type_descriptor(types.CHAR(32))
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -69,3 +49,28 @@ class GUID(TypeDecorator):
             if not isinstance(value, uuid.UUID):
                 value = uuid.UUID(value)
             return value
+
+
+# revision identifiers, used by Alembic.
+revision = "53e97221d99f"
+down_revision = "6ef30ab7b8e5"
+branch_labels = None
+depends_on = None
+Session = sa.orm.sessionmaker()
+
+
+def upgrade():
+    op.add_column("job", sa.Column("run_id", GUID))
+
+    metadata = sa.MetaData(bind=op.get_bind())
+    session = Session(bind=op.get_bind())
+    Job = sa.Table("job", metadata, autoload=True)
+
+    for job in session.query(Job):
+        job.run_id = uuid.uuid4()
+
+    session.commit()
+
+
+def downgrade():
+    op.drop_column("job", "run_id")

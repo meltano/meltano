@@ -37,7 +37,6 @@ class SingerRunner(Runner):
         self.config_service = config_service or ConfigService(elt_context.project)
         self.connection_service = connection_service or ConnectionService(elt_context)
 
-        self.run_dir = Path(config.get("run_dir", "/run/singer"))
         self.tap_config_dir = Path(config.get("tap_config_dir", "/etc/singer/tap"))
         self.target_config_dir = Path(
             config.get("target_config_dir", "/etc/singer/target")

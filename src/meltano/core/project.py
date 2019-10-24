@@ -13,6 +13,7 @@ from typing import Union, Dict
 
 from .error import Error
 from .behavior.versioned import Versioned
+from .utils import makedirs, slugify
 
 
 class ProjectNotFound(Error):
@@ -118,23 +119,6 @@ class Project(Versioned):
                     raise
         # fmt: on
 
-    def makedirs(func):
-        @wraps(func)
-        def decorate(*args, **kwargs):
-            path = func(*args, **kwargs)
-
-            # if there is an extension, only create the base dir
-            _, ext = os.path.splitext(path)
-            if ext:
-                dir = os.path.dirname(path)
-            else:
-                dir = path
-
-            os.makedirs(dir, exist_ok=True)
-            return path
-
-        return decorate
-
     def root_dir(self, *joinpaths):
         return self.root.joinpath(*joinpaths)
 
@@ -157,6 +141,10 @@ class Project(Versioned):
     @makedirs
     def run_dir(self, *joinpaths):
         return self.meltano_dir("run", *joinpaths)
+
+    @makedirs
+    def job_dir(self, job_id, *joinpaths):
+        return self.run_dir("elt", slugify(job_id), *joinpaths)
 
     @makedirs
     def model_dir(self, *joinpaths):
