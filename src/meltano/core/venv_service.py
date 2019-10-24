@@ -87,16 +87,35 @@ class VenvService:
         return run
 
     def install(self, pip_url, namespace="", name=""):
-        pip_install_path = self.exec_path("pip", namespace=namespace, name=name)
-        run = subprocess.run(
-            [str(pip_install_path), "install", *pip_url.split(" ")],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            universal_newlines=True,
-        )
+        """
+        Install a package using `pip` in the proper virtual environment.
 
-        if run.returncode != 0:
-            raise SubprocessError(f"Failed to install plugin '{name}'.", run)
+        This method is not threadsafe.
+        """
+
+        venv = VirtualEnv(self.project.venvs_dir(namespace, name))
+        pip_install_path = venv.bin_dir.joinpath("pip")
+        meltano_pth_path = venv.site_packages_dir.joinpath("meltano_venv.pth")
+        meltano_pth_disable_path = meltano_pth_path.with_suffix(".pth.disable")
+
+        try:
+            # disable the `meltano venv`
+            if meltano_pth_path.exists():
+                meltano_pth_path.rename(meltano_pth_disable_path)
+
+            run = subprocess.run(
+                [str(pip_install_path), "install", *pip_url.split(" ")],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+            )
+
+            if run.returncode != 0:
+                raise SubprocessError(f"Failed to install plugin '{name}'.", run)
+        finally:
+            # re-enable the `meltano venv`
+            if meltano_pth_disable_path.exists():
+                meltano_pth_disable_path.rename(meltano_pth_path)
 
         return run
 
