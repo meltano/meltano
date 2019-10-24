@@ -20,10 +20,10 @@ git clone git@gitlab.com:meltano/meltano.git
 cd meltano
 
 # Optional, but it's best to have the latest pip
-pip install --upgrade pip
+pip3 install --upgrade pip
 
 # Optional, but it's best to have the latest setuptools
-pip install --upgrade setuptools
+pip3 install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
@@ -33,11 +33,11 @@ python -m venv ~/virtualenvs/meltano-development
 source ~/virtualenvs/meltano-development/bin/activate
 
 # Install all the dependencies
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
 # Note: you may have to escape the .`[dev]` argument on some shells, like zsh
-pip install -e .[dev]
+pip3 install -e .[dev]
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -343,8 +343,8 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    # activate your virtualenv
    source ./venv/bin/activate
 
-   # pip install all the development dependencies
-   pip install .[dev]
+   # pip3 install all the development dependencies
+   pip3 install .[dev]
    ```
 
 1. Execute the commands below:
@@ -449,7 +449,7 @@ meltano --version
 3. Install Meltano on your machine using distributed version
 
 ```bash
-pip install meltano
+pip3 install meltano
 ```
 
 4. Check Meltano version matches latest release

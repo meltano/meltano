@@ -411,7 +411,7 @@ To run Meltano in production, we recommend using [gunicorn](http://docs.gunicorn
 First, install gunicorn:
 
 ```bash
-pip install gunicorn
+pip3 install gunicorn
 ```
 
 You can then start Meltano UI:
