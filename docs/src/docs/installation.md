@@ -1,5 +1,9 @@
 # Installation
 
+::: info
+Meltano officially released its first major version (v1)! Make sure to install the latest if you're still on an older version of Meltano.
+:::
+
 This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
