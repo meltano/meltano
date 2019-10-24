@@ -15,7 +15,9 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1130](https://gitlab.com/meltano/meltano/issues/1130) Add Tutorial for extracting data from Google Analytics and loading the extracted data to Postgres
 
 ### Changes
+
 - [!1061](https://gitlab.com/meltano/meltano/merge_requests/1061) Update the Getting Started Guide and the Meltano.com documentation with the new UI and information about job logging and how to find the most recent run log of a pipeline.
+- [#1167](https://gitlab.com/meltano/meltano/issues/1167) Iterate on docs to improve readability and content updates
 
 ### Fixes
 
