@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1173](https://gitlab.com/meltano/meltano/issues/1173) Fix `sortBy` drag-and-drop bug in Analyze by properly using `tryAutoRun` vs. `runQuery`
+- [#1079](https://gitlab.com/meltano/meltano/issues/1079) `meltano elt` will now run in isolation under `.meltano/run/elt`
 
 ### Breaks
 

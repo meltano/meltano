@@ -43,46 +43,48 @@ def elt(project, extractor, loader, dry, transform, job_id):
     loader_name: Which loader should be used in this extraction
     """
 
+    install_missing_plugins(project, extractor, loader, transform)
+
     _, Session = project_engine(project)
     job = Job(
         job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
     )
 
-    with JobLoggingService(project).create_log(job.job_id) as log_file, OutputLogger(
-        log_file
-    ):
-        try:
-            session = Session()
-            install_missing_plugins(project, extractor, loader, transform)
+    try:
+        session = Session()
+        elt_context = (
+            ELTContextBuilder(project)
+            .with_job(job)
+            .with_extractor(extractor)
+            .with_loader(loader)
+            .context(session)
+        )
 
-            elt_context = (
-                ELTContextBuilder(project)
-                .with_job(job)
-                .with_extractor(extractor)
-                .with_loader(loader)
-                .context(session)
-            )
+        job_logging_service = JobLoggingService(project)
 
-            with job.run(session):
-                if transform != "only":
-                    run_extract_load(elt_context, session, dry_run=dry)
-                else:
-                    click.secho("Extract & load skipped.", fg="yellow")
+        # fmt: off
+        with job.run(session), \
+            job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
+            OutputLogger(log_file):
+            if transform != "only":
+                run_extract_load(elt_context, session, dry_run=dry)
+            else:
+                click.secho("Extract & load skipped.", fg="yellow")
 
-                if transform != "skip":
-                    run_transform(elt_context, session, dry_run=dry, models=extractor)
-                else:
-                    click.secho("Transformation skipped.", fg="yellow")
-        except Exception as err:
-            click.secho(
-                f"ELT could not complete, an error happened during the process.",
-                fg="red",
-            )
-            logging.exception(err)
-            click.secho(str(err), err=True)
-            raise click.Abort()
-        finally:
-            session.close()
+            if transform != "skip":
+                run_transform(elt_context, session, dry_run=dry, models=extractor)
+            else:
+                click.secho("Transformation skipped.", fg="yellow")
+        # fmt: on
+    except Exception as err:
+        click.secho(
+            f"ELT could not complete, an error happened during the process.", fg="red"
+        )
+        logging.exception(err)
+        click.secho(str(err), err=True)
+        raise click.Abort()
+    finally:
+        session.close()
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
@@ -95,7 +97,6 @@ def run_extract_load(elt_context, session, **kwargs):
 
     singer_runner = SingerRunner(
         elt_context,
-        run_dir=os.getenv("SINGER_RUN_DIR", project.meltano_dir("run")),
         target_config_dir=project.meltano_dir(loader.type, loader.name),
         tap_config_dir=project.meltano_dir(extractor.type, extractor.name),
     )

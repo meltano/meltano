@@ -2,11 +2,12 @@ import base64
 import re
 import sys
 import flatten_dict
+import os
+import functools
 from datetime import datetime, date, time
 from copy import deepcopy
 from typing import Union, Dict, Callable, Optional, Iterable
 from requests.auth import HTTPBasicAuth
-from functools import reduce
 from pathlib import Path
 
 
@@ -23,7 +24,7 @@ def compose(*fs):
         f(g(x))``.
     :return: I{callable} taking 1 argument.
     """
-    return reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
+    return functools.reduce(lambda f, g: lambda x: f(g(x)), compact(fs), lambda x: x)
 
 
 # from http://www.dolphmathews.com/2012/09/slugify-string-in-python.html
@@ -192,3 +193,21 @@ def iso8601_datetime(d: str) -> Optional[datetime]:
 
 def find_named(xs: Iterable[dict], name: str):
     return next(x for x in xs if x["name"] == name)
+
+
+def makedirs(func):
+    @functools.wraps(func)
+    def decorate(*args, **kwargs):
+        path = func(*args, **kwargs)
+
+        # if there is an extension, only create the base dir
+        _, ext = os.path.splitext(path)
+        if ext:
+            dir = os.path.dirname(path)
+        else:
+            dir = path
+
+        os.makedirs(dir, exist_ok=True)
+        return path
+
+    return decorate
