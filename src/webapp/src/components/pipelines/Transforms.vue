@@ -1,6 +1,5 @@
 <script>
 import { mapState } from 'vuex'
-import utils from '@/utils/utils'
 import Vue from 'vue'
 
 export default {
@@ -12,11 +11,11 @@ export default {
   },
   computed: {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
+    dbtDocsUrl() {
+      return this.$flask.dbtDocsUrl
+    },
     getIsSelectedTransformOption() {
       return transformOption => transformOption === this.selectedTransformOption
-    },
-    dbtDocsUrl() {
-      return utils.root('/-/dbt/')
     }
   },
   created() {
@@ -160,12 +159,10 @@ export default {
             </div>
           </div>
 
-          <div class="is-flex">
-            <iframe
-              class="dbt-docs-iframe"
-              :src="dbtDocsUrl"
-            />
+          <div v-if="dbtDocsUrl" class="is-flex">
+            <iframe class="dbt-docs-iframe" :src="dbtDocsUrl" />
           </div>
+          <p v-else>dbt docs are disabled</p>
         </div>
       </div>
     </div>

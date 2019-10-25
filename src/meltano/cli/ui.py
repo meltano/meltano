@@ -70,7 +70,17 @@ def ui(project, reload, bind_port, bind):
         workers.append(AirflowWorker(project))
 
     workers.append(MeltanoCompilerWorker(project))
-    workers.append(DbtWorker(project, loop=loop))
+
+    # we need to whitelist the loaders here because not
+    # all the loaders support dbt in the first place
+    dbt_docs_loader = os.getenv("MELTANO_DBT_DOCS_LOADER")
+    if dbt_docs_loader:
+        workers.append(DbtWorker(project, dbt_docs_loader, loop=loop))
+    else:
+        logging.info(
+            "No loader enabled for dbt docs generation, set the MELTANO_DBT_DOCS_LOADER variable to enable one."
+        )
+
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
         APIWorker(

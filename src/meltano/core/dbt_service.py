@@ -1,11 +1,14 @@
 import asyncio
 import logging
 import sys
+import os
 from typing import Optional
 
 from .config_service import ConfigService
 from .db import project_engine
-from .plugin import PluginType
+from .plugin import PluginType, PluginRef
+from .plugin_discovery_service import PluginDiscoveryService
+from .plugin.settings_service import PluginSettingsService
 from .plugin_invoker import invoker_factory
 from .venv_service import VenvService
 from .logging import capture_subprocess_output
@@ -13,16 +16,40 @@ from .elt_context import ELTContext
 
 
 class DbtService:
-    def __init__(self, project):
+    def __init__(self, project, config_service=None):
         self.project = project
-        self._plugin = ConfigService(project).find_plugin(
-            "dbt", PluginType.TRANSFORMERS
+        self.config_service = config_service or ConfigService(project)
+        self.project_dir = self.project.root_dir("transform")
+        self.profile_dir = self.project_dir.joinpath("profile")
+        self.plugin_settings_service = PluginSettingsService(
+            project, config_service=config_service
         )
-        self.profile_dir = self.project.root_dir("transform", "profile")
+        self.discovery_service = PluginDiscoveryService(
+            project, config_service=config_service
+        )
+
+        self._plugin = None
 
     @property
     def exec_path(self):
         return self.venv_service.exec_path("dbt", namespace=PluginType.TRANSFORMERS)
+
+    @property
+    def plugin(self):
+        if not self._plugin:
+            self._plugin = self.config_service.find_plugin("dbt")
+
+        return self._plugin
+
+    def project_args(self):
+        return [
+            "--project-dir",
+            str(self.project_dir),
+            "--profiles-dir",
+            str(self.profile_dir),
+            "--profile",
+            "meltano",
+        ]
 
     def dbt_invoker(self) -> "PluginInvoker":
         _, self._Session = project_engine(self.project)
@@ -30,7 +57,7 @@ class DbtService:
 
         try:
             return invoker_factory(
-                self.project, self._plugin, prepare_with_session=session
+                self.project, self.plugin, prepare_with_session=session
             )
         finally:
             session.close()
@@ -59,14 +86,29 @@ class DbtService:
                 f"dbt {cmd} didn't exit cleanly. Exit code: {handle.returncode}"
             )
 
-    async def docs(self, *args, **kwargs):
-        await self.invoke("docs", *args, env={"MELTANO_LOAD_SCHEMA": "<meltano>"})
+    async def docs(self, session, loader: PluginRef, *args, **kwargs):
+        params = self.project_args()
+        loader_install = self.config_service.find_plugin(loader.name)
+        loader_def = self.discovery_service.find_plugin(PluginType.LOADERS, loader.name)
+
+        loader_env = self.plugin_settings_service.as_env(session, loader_install)
+
+        await self.invoke(
+            "docs",
+            *args,
+            *params,
+            env={
+                "DBT_TARGET": os.getenv("DBT_TARGET", loader_def.namespace),
+                "MELTANO_LOAD_SCHEMA": "<meltano>",
+                **loader_env,
+            },
+        )
 
     async def deps(self):
         await self.invoke("deps")
 
     async def compile(self, models=None, **kwargs):
-        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
+        params = self.project_args()
         if models:
             # Always include the my_meltano_project model
             all_models = f"{models} my_meltano_project"
@@ -75,7 +117,7 @@ class DbtService:
         await self.invoke("compile", *params, **kwargs)
 
     async def run(self, models=None, **kwargs):
-        params = ["--profiles-dir", str(self.profile_dir), "--profile", "meltano"]
+        params = self.project_args()
 
         if models:
             # Always include the my_meltano_project model

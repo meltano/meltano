@@ -1,3 +1,4 @@
+import os
 import logging
 import threading
 import subprocess
@@ -11,6 +12,7 @@ from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.config_service import ConfigService, PluginMissingError
 from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.dbt_service import DbtService
+from meltano.core.db import project_engine
 
 
 class DbtEventHandler(PatternMatchingEventHandler):
@@ -32,9 +34,10 @@ class DbtEventHandler(PatternMatchingEventHandler):
 
 
 class DbtWorker(threading.Thread):
-    def __init__(self, project: Project, loop=None):
+    def __init__(self, project: Project, loader: str, loop=None):
         super().__init__()
         self.project = project
+        self.loader = loader
         self.config_service = ConfigService(project)
         self.add_service = ProjectAddService(
             project, config_service=self.config_service
@@ -59,7 +62,7 @@ class DbtWorker(threading.Thread):
 
         return observer
 
-    async def process(self):
+    async def process(self, session):
         dbt_service = DbtService(self.project)
 
         while True:
@@ -69,7 +72,11 @@ class DbtWorker(threading.Thread):
                 self._queue.task_done()
 
             # trigger the task
-            await dbt_service.docs("generate")
+            loader = self.config_service.find_plugin(self.loader)
+            try:
+                await dbt_service.docs(session, loader, "generate")
+            except:
+                pass
 
             # wait for the next trigger
             logging.info("Awaiting task")
@@ -98,12 +105,21 @@ class DbtWorker(threading.Thread):
             self._plugin = self.add_service.add(PluginType.TRANSFORMERS, "dbt")
             self.install_service.install_plugin(self._plugin)
 
-        # TODO: this blocks the loop, we should probaly return a `Task` instance from
-        # this function and let the caller schedule it on the loop
-        # This class would not have to be a Thread an thus it could simplify the
-        # handling of such cases in the future
-        logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
-        self._loop.run_until_complete(self.process())
+        _, Session = project_engine(self.project)
+
+        try:
+            session = Session()
+
+            # TODO: this blocks the loop, we should probaly return a `Task` instance from
+            # this function and let the caller schedule it on the loop
+            # This class would not have to be a Thread an thus it could simplify the
+            # handling of such cases in the future
+            logging.info(
+                f"Auto-generating dbt docs for in '{self.transform_dir}' for {self.loader}"
+            )
+            self._loop.run_until_complete(self.process(session))
+        finally:
+            session.close()
 
     def stop(self):
         self.observer.stop()
