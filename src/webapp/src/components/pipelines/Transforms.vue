@@ -2,6 +2,8 @@
 import { mapState } from 'vuex'
 import Vue from 'vue'
 
+import utils from '@/utils/utils'
+
 export default {
   name: 'Transforms',
   data() {
