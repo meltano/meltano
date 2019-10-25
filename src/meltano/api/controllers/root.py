@@ -2,11 +2,21 @@ import subprocess
 import requests
 import logging
 from urllib.parse import urlsplit
-from flask import Blueprint, render_template, request, jsonify, redirect, g, current_app
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    g,
+    current_app,
+    send_from_directory,
+)
 from flask_security import login_required, roles_required
 from jinja2 import TemplateNotFound
 
 import meltano
+from meltano.core.project import Project
 from meltano.api.security import api_auth_required
 from meltano.core.utils import truthy
 
@@ -18,6 +28,15 @@ root = Blueprint("root", __name__)
 def internal_error(exception):
     logger.info(f"[{request.remote_addr}], error: {exception}")
     return jsonify({"error": str(exception)}), 500
+
+
+@root.route("/-/dbt/", defaults={"path": "index.html"})
+@root.route("/-/dbt/<path:path>")
+def dbt_docs(path):
+    project = Project.find()
+    return send_from_directory(
+        project.meltano_dir("transformers", "dbt", "target"), path
+    )
 
 
 # this route is a catch-all route to forward

@@ -11,7 +11,7 @@ from meltano.core.dbt_service import DbtService
 
 class DbtEventHandler(PatternMatchingEventHandler):
     def __init__(self, queue):
-        super().__init__()
+        super().__init__(ignore_patterns=["*.log"])
 
         self._queue = queue
 
@@ -44,14 +44,7 @@ class DbtWorker(threading.Thread):
         event_handler = DbtEventHandler(queue)
 
         observer = Observer()
-        observer.schedule(
-            event_handler, str(self.transform_dir.joinpath("models")), recursive=True
-        )
-        observer.schedule(
-            event_handler,
-            str(self.transform_dir.joinpath("dbt_modules")),
-            recursive=True,
-        )
+        observer.schedule(event_handler, str(self.transform_dir), recursive=True)
 
         return observer
 
@@ -85,16 +78,18 @@ class DbtWorker(threading.Thread):
             # TODO: remove when running on Python 3.8
             asyncio.get_child_watcher()
 
+            logging.info(
+                f"Auto-generating dbt docs for in '{self.transform_dir}/models'"
+            )
             self.observer = self.setup_observer(self._queue)
             self.observer.start()
 
             super().start()
-        except OSError:
+        except OSError as err:
             # most probably INotify being full
-            logging.warn(f"DbtWorker failed: INotify limit reached.")
+            logging.warn(f"DbtWorker failed: INotify limit reached: {err}")
 
     def run(self):
-        logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
         self._loop.run_until_complete(self.process())
 
     def stop(self):
