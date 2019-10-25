@@ -45,12 +45,14 @@ class DbtService:
             stderr=asyncio.subprocess.PIPE,
         )
 
-        await asyncio.wait([
+        await asyncio.wait(
+            [
                 capture_subprocess_output(handle.stdout, sys.stdout),
                 capture_subprocess_output(handle.stderr, sys.stderr),
                 handle.wait(),
             ],
-            return_when=asyncio.ALL_COMPLETED)
+            return_when=asyncio.ALL_COMPLETED,
+        )
 
         if handle.returncode:
             raise Exception(
@@ -58,7 +60,7 @@ class DbtService:
             )
 
     async def docs(self, *args, **kwargs):
-        await self.invoke("docs", *args, env={'MELTANO_LOAD_SCHEMA': "<meltano>"})
+        await self.invoke("docs", *args, env={"MELTANO_LOAD_SCHEMA": "<meltano>"})
 
     async def deps(self):
         await self.invoke("deps")

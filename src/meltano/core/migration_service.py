@@ -55,7 +55,7 @@ class MigrationService:
             click.secho(
                 f"Cannot upgrade the system database. It might be corrupted or was created before database migrations where introduced (v0.34.0)",
                 fg="yellow",
-                err=True
+                err=True,
             )
             logging.exception(err)
         finally:

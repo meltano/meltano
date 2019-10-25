@@ -15,7 +15,7 @@ from meltano.api.workers import (
     AirflowWorker,
     APIWorker,
     UIAvailableWorker,
-    DbtWorker
+    DbtWorker,
 )
 
 

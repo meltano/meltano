@@ -10,24 +10,26 @@ from meltano.core.dbt_service import DbtService
 
 
 class DbtEventHandler(PatternMatchingEventHandler):
-    def __init__(self, dbt_service, queue):
-        self.dbt_service = dbt_service
-        self._queue = queue
-
+    def __init__(self, queue):
         super().__init__()
+
+        self._queue = queue
 
     def on_any_event(self, event):
         try:
             self._queue.put_nowait(event)
+            self._queue._loop._write_to_self()
+
             logging.debug(f"Put {event} in the queue.")
         except asyncio.QueueFull:
             logging.debug(f"Discard {event} in the queue.")
         except Exception as e:
-           logging.error(f"DbtWorker failed: {str(e)}")
+            logging.error(f"DbtWorker failed: {str(e)}")
 
 
-class DbtWorker:
+class DbtWorker(threading.Thread):
     def __init__(self, project: Project, dbt_service: DbtService = None):
+        super().__init__()
         self.project = project
         self.dbt_service = dbt_service or DbtService(project)
         self.observer = None
@@ -38,22 +40,43 @@ class DbtWorker:
         return self.project.root_dir("transform")
 
     def setup_observer(self, queue):
-        event_handler = DbtEventHandler(self.dbt_service, queue)
+        # write every FS events in the Queue
+        event_handler = DbtEventHandler(queue)
+
         observer = Observer()
-        observer.schedule(event_handler, str(self.transform_dir.joinpath("models")), recursive=True)
-        observer.schedule(event_handler, str(self.transform_dir.joinpath("dbt_modules")), recursive=True)
+        observer.schedule(
+            event_handler, str(self.transform_dir.joinpath("models")), recursive=True
+        )
+        observer.schedule(
+            event_handler,
+            str(self.transform_dir.joinpath("dbt_modules")),
+            recursive=True,
+        )
 
         return observer
 
-    async def process(self, queue):
+    async def process(self):
         while True:
-            await queue.get()
+            logging.info("Awaiting task")
+
+            await self._queue.get()
+            self._queue.task_done()
+
+            # wait for debounce
+            await asyncio.sleep(5)
+
+            # drain the queue
+            while not self._queue.empty():
+                self._queue.get_nowait()
+                self._queue.task_done()
+
+            # trigger the task
             await self.dbt_service.docs("generate")
-            await asyncio.sleep(60)
 
     def start(self):
         try:
             self._loop = asyncio.get_event_loop()
+            self._queue = asyncio.Queue(maxsize=1, loop=self._loop)
 
             # we need to prime the ChildWatcher here so we can
             # call subprocesses asynchronously from threads
@@ -62,17 +85,17 @@ class DbtWorker:
             # TODO: remove when running on Python 3.8
             asyncio.get_child_watcher()
 
-            queue = asyncio.Queue(maxsize=1, loop=self._loop)
-            self.observer = self.setup_observer(queue)
+            self.observer = self.setup_observer(self._queue)
             self.observer.start()
 
-            self._loop.run_until_complete(
-                self.process(queue)
-            )
-            logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
+            super().start()
         except OSError:
             # most probably INotify being full
             logging.warn(f"DbtWorker failed: INotify limit reached.")
+
+    def run(self):
+        logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
+        self._loop.run_until_complete(self.process())
 
     def stop(self):
         self.observer.stop()
