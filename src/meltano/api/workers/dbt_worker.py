@@ -50,14 +50,6 @@ class DbtWorker(threading.Thread):
 
     async def process(self):
         while True:
-            logging.info("Awaiting task")
-
-            await self._queue.get()
-            self._queue.task_done()
-
-            # wait for debounce
-            await asyncio.sleep(5)
-
             # drain the queue
             while not self._queue.empty():
                 self._queue.get_nowait()
@@ -65,6 +57,14 @@ class DbtWorker(threading.Thread):
 
             # trigger the task
             await self.dbt_service.docs("generate")
+
+            # wait for the next trigger
+            logging.info("Awaiting task")
+            await self._queue.get()
+            self._queue.task_done()
+
+            # wait for debounce
+            await asyncio.sleep(5)
 
     def start(self):
         try:
@@ -78,9 +78,7 @@ class DbtWorker(threading.Thread):
             # TODO: remove when running on Python 3.8
             asyncio.get_child_watcher()
 
-            logging.info(
-                f"Auto-generating dbt docs for in '{self.transform_dir}/models'"
-            )
+            logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
             self.observer = self.setup_observer(self._queue)
             self.observer.start()
 
