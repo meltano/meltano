@@ -382,7 +382,9 @@ You can use `make type=patch release` to force a patch release. This is useful w
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
 1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
 1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
-1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns)
+1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns):
+   - Meltano YouTube channel
+   - Meltano Slack `@channel` in `#general`
 
 ## DigitalOcean Marketplace
 
