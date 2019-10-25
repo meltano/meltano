@@ -157,7 +157,10 @@ export default {
           </div>
 
           <div class="is-flex">
-            <iframe class="dbt-docs-iframe" :src="this.$flask.airflowUrl" />
+            <iframe
+              class="dbt-docs-iframe"
+              src="http://localhost:5000/-/dbt/"
+            />
           </div>
         </div>
       </div>
