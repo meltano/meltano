@@ -16,16 +16,11 @@
       </div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header">
-            One <strong>data toolkit</strong>.<br/>
-            Create, run, and analyze <strong>data transformations</strong>.
-          </h2>
+          <h2 class="hero-header">Open source data dashboarding</h2>
           <p class="hero-tagline">
-            Meltano is an open source <strong>data toolkit</strong>
-            that allows to create, run, and analyze
-            <strong>custom data transformations</strong>
-            in a single <strong>integrated workflow</strong>.
-            Quickly analyze data locally and schedule data pipelines  for <strong>continuous data transformations</strong>.
+            Meltano is a free alternative to expensive SaaS tools. We provide an
+            integrated workflow for modeling, extracting, loading, transforming,
+            analyzing, notebooking, and orchestrating your data.
           </p>
 
           <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
