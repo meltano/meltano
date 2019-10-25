@@ -3,6 +3,7 @@ import subprocess
 import click
 import signal
 import logging
+import asyncio
 
 from . import cli
 from .params import project
@@ -55,12 +56,21 @@ def ui(project, reload, bind_port, bind):
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_ui()
 
+    loop = asyncio.get_event_loop()
+
+    # we need to prime the ChildWatcher here so we can
+    # call subprocesses asynchronously from threads
+    #
+    # see https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
+    # TODO: remove when running on Python 3.8
+    asyncio.get_child_watcher()
+
     workers = []
     if not truthy(os.getenv("MELTANO_DISABLE_AIRFLOW", False)):
         workers.append(AirflowWorker(project))
 
     workers.append(MeltanoCompilerWorker(project))
-    workers.append(DbtWorker(project))
+    workers.append(DbtWorker(project, loop=loop))
     workers.append(UIAvailableWorker("http://localhost:{bind_port}"))
     workers.append(
         APIWorker(
@@ -71,7 +81,9 @@ def ui(project, reload, bind_port, bind):
     )
 
     cleanup = start_workers(workers)
-    handle_terminate = lambda signal, frame: cleanup()
-    signal.signal(signal.SIGTERM, handle_terminate)
 
+    def handle_terminate(signal, frame):
+        cleanup()
+
+    signal.signal(signal.SIGTERM, handle_terminate)
     logger.info("All workers started.")

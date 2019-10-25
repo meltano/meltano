@@ -18,9 +18,13 @@ class AirflowWorker(threading.Thread):
         super().__init__(name="AirflowWorker")
 
         self.project = project
-        self.add_service = ProjectAddService(project)
-        self.install_service = PluginInstallService(project)
         self.config_service = ConfigService(project)
+        self.add_service = ProjectAddService(
+            project, config_service=self.config_service
+        )
+        self.install_service = PluginInstallService(
+            project, config_service=self.config_service
+        )
         self._plugin = None
         self._webserver = None
         self._scheduler = None

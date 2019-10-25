@@ -6,6 +6,10 @@ import asyncio
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler, EVENT_TYPE_MODIFIED
 from meltano.core.project import Project
+from meltano.core.project_add_service import ProjectAddService
+from meltano.core.plugin_install_service import PluginInstallService
+from meltano.core.config_service import ConfigService, PluginMissingError
+from meltano.core.plugin import PluginInstall, PluginType
 from meltano.core.dbt_service import DbtService
 
 
@@ -28,12 +32,19 @@ class DbtEventHandler(PatternMatchingEventHandler):
 
 
 class DbtWorker(threading.Thread):
-    def __init__(self, project: Project, dbt_service: DbtService = None):
+    def __init__(self, project: Project, loop=None):
         super().__init__()
         self.project = project
-        self.dbt_service = dbt_service or DbtService(project)
+        self.config_service = ConfigService(project)
+        self.add_service = ProjectAddService(
+            project, config_service=self.config_service
+        )
+        self.install_service = PluginInstallService(
+            project, config_service=self.config_service
+        )
         self.observer = None
-        self._loop = None
+        self._plugin = None
+        self._loop = loop or asyncio.get_event_loop()
 
     @property
     def transform_dir(self):
@@ -49,6 +60,8 @@ class DbtWorker(threading.Thread):
         return observer
 
     async def process(self):
+        dbt_service = DbtService(self.project)
+
         while True:
             # drain the queue
             while not self._queue.empty():
@@ -56,7 +69,7 @@ class DbtWorker(threading.Thread):
                 self._queue.task_done()
 
             # trigger the task
-            await self.dbt_service.docs("generate")
+            await dbt_service.docs("generate")
 
             # wait for the next trigger
             logging.info("Awaiting task")
@@ -68,17 +81,8 @@ class DbtWorker(threading.Thread):
 
     def start(self):
         try:
-            self._loop = asyncio.get_event_loop()
             self._queue = asyncio.Queue(maxsize=1, loop=self._loop)
 
-            # we need to prime the ChildWatcher here so we can
-            # call subprocesses asynchronously from threads
-            #
-            # see https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads
-            # TODO: remove when running on Python 3.8
-            asyncio.get_child_watcher()
-
-            logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
             self.observer = self.setup_observer(self._queue)
             self.observer.start()
 
@@ -88,8 +92,18 @@ class DbtWorker(threading.Thread):
             logging.warn(f"DbtWorker failed: INotify limit reached: {err}")
 
     def run(self):
+        try:
+            self._plugin = self.config_service.find_plugin("dbt")
+        except PluginMissingError as err:
+            self._plugin = self.add_service.add(PluginType.TRANSFORMERS, "dbt")
+            self.install_service.install_plugin(self._plugin)
+
+        # TODO: this blocks the loop, we should probaly return a `Task` instance from
+        # this function and let the caller schedule it on the loop
+        # This class would not have to be a Thread an thus it could simplify the
+        # handling of such cases in the future
+        logging.info(f"Auto-generating dbt docs for in '{self.transform_dir}'")
         self._loop.run_until_complete(self.process())
 
     def stop(self):
         self.observer.stop()
-        self._loop.close()
