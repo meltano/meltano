@@ -19,6 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [!1061](https://gitlab.com/meltano/meltano/merge_requests/1061) Update the Getting Started Guide and the Meltano.com documentation with the new UI and information about job logging and how to find the most recent run log of a pipeline.
+- [#1213](https://gitlab.com/meltano/meltano/issues/1213) Add VuePress use and benefits to documentation
 
 ### Fixes
 

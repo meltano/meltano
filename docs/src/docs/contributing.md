@@ -123,6 +123,11 @@ To run the migrations, use `meltano upgrade` inside a Meltano project.
 
 ## Documentation
 
+Meltano uses [VuePress](https://vuepress.vuejs.org/) to manage its documentation site. Some of the benefits it provides us includes:
+
+- Enhanced Markdown authoring experience
+- Automatic check for broken relative links
+
 ### Text
 
 Follow the [Merge Requests](#merge-requests) and [Changelog](#changelog) portions of this contribution section for text-based documentation contributions.
@@ -403,9 +408,9 @@ You'll have to be granted access to the DigitalOcean vendor portal. Please ask a
 :::
 
 1. Once inside the listing, update the following entries:
-    - **System Image** to the new image (match the aforementioned snapshot string)
-    - **Version** to the latest Meltano version
-    - **Meltano Package Version** inside the _Software Included Entry_
+   - **System Image** to the new image (match the aforementioned snapshot string)
+   - **Version** to the latest Meltano version
+   - **Meltano Package Version** inside the _Software Included Entry_
 1. Submit it for review to finish the process.
 
 ## Speedruns
