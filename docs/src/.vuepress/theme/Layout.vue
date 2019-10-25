@@ -102,11 +102,7 @@ export default {
 
   mounted() {
     // Intercom.io chat
-    // this.$intercom.boot({
-    //   user_id: this.userId,
-    //   name: this.name,
-    //   email: this.email
-    // })
+    this.$intercom.boot()
 
     window.addEventListener('scroll', this.onScroll)
 
