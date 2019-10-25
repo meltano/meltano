@@ -36,15 +36,13 @@ There is a lot more to build. A few key areas we know we need to invest more tim
 - Creating and managing databases and warehouses
 - Ongoing inclusion of more pre-built taps, targets, and default transforms for popular data sources
 
-## Releases
+## Release Schedule
 
 Meltano currently follows a weekly release schedule on Mondays.
 
 For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
 
 You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
-
-### Schedule
 
 | Release Date | Release Owner | Speedrun Owner | Shadow |
 | ------------ | ------------- | -------------- | ------ |
@@ -138,7 +136,7 @@ I am responsible for designing, constructing, installing, testing, and maintaini
 
 ### Allie (Data Analyst)
 
-Alternative Job Titles:  Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst, Business Analyst
+Alternative Job Titles: Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst, Business Analyst
 
 #### Demographics
 
@@ -148,7 +146,7 @@ Alternative Job Titles:  Data Scientist - Analytics, Business Intelligence Engin
 
 #### Job Summary
 
-I am responsible for retrieving and gathering data from the data warehouse, organizing it and making the data collected insightful and easy to understand.  My goal is to help stakeholders make informed decisions for their business.
+I am responsible for retrieving and gathering data from the data warehouse, organizing it and making the data collected insightful and easy to understand. My goal is to help stakeholders make informed decisions for their business.
 
 #### Motivations
 

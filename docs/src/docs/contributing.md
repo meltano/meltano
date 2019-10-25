@@ -20,10 +20,10 @@ git clone git@gitlab.com:meltano/meltano.git
 cd meltano
 
 # Optional, but it's best to have the latest pip
-pip install --upgrade pip
+pip3 install --upgrade pip
 
 # Optional, but it's best to have the latest setuptools
-pip install --upgrade setuptools
+pip3 install --upgrade setuptools
 
 # Optional, but it's recommended to create a virtual environment
 # in order to minimize side effects from unknown environment variable
@@ -33,11 +33,11 @@ python -m venv ~/virtualenvs/meltano-development
 source ~/virtualenvs/meltano-development/bin/activate
 
 # Install all the dependencies
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # Install dev dependencies with the edit flag on to detect changes
 # Note: you may have to escape the .`[dev]` argument on some shells, like zsh
-pip install -e .[dev]
+pip3 install -e .[dev]
 
 # Bundle the Meltano UI into the `meltano` package
 make bundle
@@ -324,7 +324,7 @@ For each demo day, we need to ensure that the following process is followed:
 4. Upload recording to YouTube
 5. Add features + timestamps to YouTube description
 
-## Releases
+## Release Process
 
 ### Versioning
 
@@ -338,7 +338,7 @@ Ensure you have the latest `master` branch locally before continuing.
 git fetch origin
 ```
 
-### Release Process
+### Workflow
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
@@ -348,8 +348,8 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
    # activate your virtualenv
    source ./venv/bin/activate
 
-   # pip install all the development dependencies
-   pip install .[dev]
+   # pip3 install all the development dependencies
+   pip3 install .[dev]
    ```
 
 1. Execute the commands below:
@@ -415,6 +415,8 @@ You'll have to be granted access to the DigitalOcean vendor portal. Please ask a
 
 ## Speedruns
 
+As part of Meltano's [Release process](/docs/contributing.html#release-process), speedruns allow the team to ensure that every release is stable.
+
 ::: info
 🏆 Current Record: 1:35 (Ben Hong)
 :::
@@ -425,24 +427,11 @@ Remember to leave each screen up for at least 2 seconds so users have a chance t
 
 ### Requirements
 
-1. Use `tap-gitlab` and `target-postgres` (real example, not Carbon Intensity)
 1. Keep keystrokes to a minimum (ideally zero)
 1. You do not have to explain every step
 1. Do not need to stop and explain new features
 1. Time starts from when the webapp is loaded on the browser
-1. Must complete the following tasks
-   - Install an extractor
-   - Select entities
-   - Install and configure loader
-   - Configure transform
-   - Configure and run pipeline
-   - Open Model
-   - Generate SQL query with data model
-   - Render chart based on query
-   - Save query as a report with auto-populated name
-   - Create new dashboard with auto-populated name
-   - Add saved report to new dashboard
-   - Verify dashboard contains report
+1. Make sure to pause between screens so user has a chance to register that a change is happening
 
 ### Workflow
 
@@ -465,7 +454,7 @@ meltano --version
 3. Install Meltano on your machine using distributed version
 
 ```bash
-pip install meltano
+pip3 install meltano
 ```
 
 4. Check Meltano version matches latest release
@@ -494,7 +483,7 @@ meltano ui
 
 8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
 
-9. Run through [Getting Started Guide](/docs/getting-started.html) as quickly as possible with some narration, but don't pause mid-action to explain something.
+9. Run through `tap-gitlab` + `tap-postgres` workflow as quickly as possible with some narration, but don't pause mid-action to explain something.
 
 ## Taps & Targets Workflow
 

@@ -1,5 +1,9 @@
 # Installation
 
+::: info
+Meltano officially released its first major version (v1)! Make sure to install the latest if you're still on an older version of Meltano.
+:::
+
 This section provides step-by-step guides for installing Meltano in various environments. Currently, we provide detailed intructions for:
 
 - [DigitalOcean One-Click Installer](/docs/deployment.html#digitalocean-marketplace)
@@ -202,16 +206,13 @@ If you've installed Python 3, but are not getting the result you expect, you may
 `pip` is a package installer that comes automatically with Python 3+. This is also what we will be using to install Meltano. Here are some commands related to `pip` that may be of interest:
 
 ```bash
-# Check for current version of pip
-pip --version
+# Check for current version of pip using pip3
+# to ensure that it is using the Python3 pip
+pip3 --version
 
 # Update pip
-pip install --upgrade pip
+pip3 install --upgrade pip
 ```
-
-::: tip
-If you installed Python 3 alongside an existing Python 2 installation, you'll want to use `pip3` instead!
-:::
 
 #### Virtual Environment
 
@@ -271,12 +272,12 @@ meltano!
 
 :::
 
-### Installing Meltano
+### Install Meltano
 
 Now that you have your virtual environment set up and running, run the following command to install the Meltano package:
 
 ```bash
-pip install meltano
+pip3 install meltano
 ```
 
 Once the installation completes, you can check if it was successful by running:
@@ -289,7 +290,36 @@ That's it! Meltano is now be available for you to use.
 
 Now that you have successfully [installed Meltano](/docs/installation.html) and its requirements, you can create your first project.
 
-To learn how to create your first project, use our [Getting Started Guide](/docs/getting-started.html)
+### Create your first project
+
+To initialize a new project, open your terminal and navigate to the directory that you'd like to store your Meltano projects in.
+
+Next, to create your project, you will use the `meltano init` command which takes a `PROJECT_NAME` that is of your own choosing. For this guide, let's create a project called "carbon."
+
+::: info
+Meltano shares anonymous usage data with the team through Google Analytics. This is used to help us learn about how Meltano is being used to ensure that we are making Meltano even more useful to our users.
+
+If you would prefer to use Meltano without sending the team this data, learn how to configure this through our [environment variables docs](/docs/environment-variables.html#anonymous-usage-data).
+:::
+
+```bash
+meltano init carbon
+```
+
+This will create a new directory named `carbon` and initialize Meltano's basic directory structure inside it.
+
+### Start the application
+
+Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
+
+```bash
+cd carbon
+meltano ui
+```
+
+Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
+
+You are now ready to add data sources, configure reporting databases, schedule updates and build dashboards!
 
 #### Installing on Docker
 
@@ -366,12 +396,12 @@ docker run -v $(pwd):/project \
              meltano/meltano add model model-carbon-intensity-sqlite
 ```
 
-## Upgrading Version
+## Upgrading Meltano
 
 We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
 
 ```
-pip install --upgrade meltano
+pip3 install --upgrade meltano
 ```
 
 Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
