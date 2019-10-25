@@ -274,6 +274,23 @@
 
     <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
+        <h2 class="section-title ta-c">See Meltano in action!</h2>
+        <div class="rich-media-container">
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe
+              class="embed-responsive-item"
+              src="https://www.youtube.com/embed/_fq9N_LI8S0"
+              frameborder="0"
+              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="feature-section-wrapper">
+      <div class="content-width-wide">
         <h2 class="section-title ta-c">Plugins to Extract & Load Data</h2>
 
         <p class="description">
@@ -339,7 +356,7 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper">
+    <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
         <h2 class="section-title ta-c">What People Are Saying</h2>
 
@@ -363,7 +380,7 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper is-white content-width-wide">
+    <div class="feature-section-wrapper">
       <h2 class="section-title" style="text-align: center; margin-top: 0;">
         Take a tour of Meltano
       </h2>
@@ -382,7 +399,7 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper is-shorter">
+    <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">
@@ -414,19 +431,22 @@
       </section>
     </div>
 
-    <div class="content-width-wide">
-      <section class="section">
-        <h2 class="section__title">Sign up for our newsletter!</h2>
-        <p class="section__text">
-          Get the latest updates on Meltano delivered right to your inbox! We
-          will only use your email to provide you with updates and will never
-          sell your information!
-        </p>
-        <a href="https://meltano.substack.com" class="button" target="_blank"
-          >Subscribe</a
-        >
-      </section>
+    <div class="feature-section-wrapper is-shorter">
+      <div class="content-width-wide">
+        <section class="section">
+          <h2 class="section__title">Sign up for our newsletter!</h2>
+          <p class="section__text">
+            Get the latest updates on Meltano delivered right to your inbox! We
+            will only use your email to provide you with updates and will never
+            sell your information!
+          </p>
+          <a href="https://meltano.substack.com" class="button" target="_blank"
+            >Subscribe</a
+          >
+        </section>
+      </div>
     </div>
+
     <GlobalFooter
       ><a
         href="https://gitlab.com/meltano/meltano/edit/master/docs/src/.vuepress/theme/views/Home.vue"
@@ -564,7 +584,6 @@ export default {
 }
 
 .section {
-  border-top: 1px solid #eaecef;
   padding: 6rem 0;
   text-align: center;
 
