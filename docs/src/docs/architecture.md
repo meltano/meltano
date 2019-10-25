@@ -309,7 +309,7 @@ For now, Meltano will try to implement concurrent taps when possible.
 
 Every time `meltano elt ...` runs, Meltano will keep track of the job and its success state in a log.
 
-In Meltano UI, you can visit the Pipelines page and check the log of any past pipeline by clicking the `Log` button next to it. You can check the logs generated for running pipelines by clicking the `Running...` button: 
+In Meltano UI, you can visit the Pipelines page and check the log of any past pipeline by clicking the `Log` button next to it. You can check the logs generated for running pipelines by clicking the `Running...` button:
 
 ![Screenshot of pipelines in the Schedules page](/images/getting-started-guide/gsg-09c.png)
 
@@ -341,13 +341,43 @@ When you run ELT commands on a tap or target, this is the general process for fe
   - in the project itself for the user to edit
   - in a global repo for meltano employees to edit
 
-## Meltano Transform
+## Meltano Transformations
 
-### dbt
+In order for data to be in a state where it can be used for generating reports and analyses, it is critical that they are standardized in order for calculations to be run on them. As a result, the data world has a concept of **transformations** which allow us to take a set of data and ensure that they are ready for analysis.
+
+For example, if we have a simple CSV with a column of data for the sale amount for the day.
+
+```
+sales
+-----
+$21.00
+$42.48
+$100
+$96.28
+```
+
+It may not be immediately obvious, but when this data is migrated to a database, it is typically converted as a string in order to include the dollar symbol. However, while the formatting is useful for knowing that field represents a currency, this prevents us from performing calculations like average, median, or mean.
+
+As a result, we need to run transformations on our data to the proper data type while also ensuring the data is clean. In other words, we'd like our data to look like this:
+
+```
+sales
+-----
+21
+42.48
+100
+96.28
+```
+
+### Transformation Methodology: dbt
 
 Meltano uses [dbt](https://docs.getdbt.com/) to transform the source data into the `analytics` schema, ready to be consumed by models.
 
-[Fishtown wrote a good article about what to model dynamically and what to do in dbt transformations](https://blog.fishtownanalytics.com/how-do-you-decide-what-to-model-in-dbt-vs-lookml-dca4c79e2304).
+To get started using [dbt](https://docs.getdbt.com/docs/introduction), you need to have some knowledge of [SQL](https://en.m.wikipedia.org/wiki/SQL) since this is how you will write your transformations to take raw data into data that's ready for analytics.
+
+For more information on how to use dbt, check out the [official dbt documentation site for how it works](https://docs.getdbt.com/docs/introduction).
+
+And for a guided tutorial on how to create custom transforms, check out our [Create Custom Transforms and Models tutorial](https://www.meltano.com/tutorials/create-custom-transforms-and-models.html)!
 
 #### Python scripts
 
