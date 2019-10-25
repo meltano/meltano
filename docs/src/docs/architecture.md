@@ -356,7 +356,7 @@ $100
 $96.28
 ```
 
-It may not be immediately obvious, but when this data is converted literally to a database, it is typically converted as a string in order to include the dollar symbol. However, this is not useful for performing calculations like average, median, or mean.
+It may not be immediately obvious, but when this data is migrated to a database, it is typically converted as a string in order to include the dollar symbol. However, while the formatting is useful for knowing that field represents a currency, this prevents us from performing calculations like average, median, or mean.
 
 As a result, we need to run transformations on our data to the proper data type while also ensuring the data is clean. In other words, we'd like our data to look like this:
 
