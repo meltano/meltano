@@ -27,12 +27,12 @@ If you used a virtual environment (`venv`) to install and run Meltano, don't for
 The following commands will install Jupyter Notebook and the most common python libraries required to connect to a Database (psycopg2, sqlalchemy), manipulate data (pandas) and generate some ad hoc plots (matplotlib):
 
 ```bash
-pip install jupyter
-pip install numpy
-pip install pandas
-pip install psycopg2
-pip install sqlalchemy
-pip install matplotlib
+pip3 install jupyter
+pip3 install numpy
+pip3 install pandas
+pip3 install psycopg2
+pip3 install sqlalchemy
+pip3 install matplotlib
 ```
 
 Once the installation is completed, you are set to use Jupyter Notebooks with Meltano.

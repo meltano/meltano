@@ -25,7 +25,7 @@ Meltano uses [Singer](https://singer.io) taps and targets to extract and load da
 :::
 
 ```bash
-pip install cookiecutter
+pip3 install cookiecutter
 cookiecutter gh:singer-io/singer-tap-template
 > project_name: tap-gitlab-custom
 ```

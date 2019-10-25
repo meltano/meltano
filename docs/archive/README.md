@@ -36,8 +36,8 @@ Run the following in your project directory:
 ```bash
 python -m venv ~/path/to/melt_venv
 source ~/path/to/melt_venv/bin/activate
-pip install -r requirements.txt
-pip install -e '.[all]'
+pip3 install -r requirements.txt
+pip3 install -e '.[all]'
 python -m meltano.api
 ```
 
@@ -340,7 +340,7 @@ Meltano uses [semver](https://semver.org/) as its version number scheme.
 Meltano has a number of dependencies for the deployment toolchain that are required when performing a release. If you haven't already, please run the following command to install everything:
 
 ```bash
-pip install '.[dev]'
+pip3 install '.[dev]'
 ```
 
 ### Release process

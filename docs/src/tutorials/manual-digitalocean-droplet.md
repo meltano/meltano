@@ -65,7 +65,7 @@ apt install python3-pip
 
 ### Virtual Environment
 
-Now that you have Python configured system wide and pip installed, we'll use pip to install your virtual environment management tools:
+Now that you have Python configured system wide and pip3 installed, we'll use pip to install your virtual environment management tools:
 
 ```bash
 pip3 install virtualenv
