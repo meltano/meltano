@@ -1,5 +1,6 @@
 <script>
 import { mapState } from 'vuex'
+import utils from '@/utils/utils'
 import Vue from 'vue'
 
 export default {
@@ -13,6 +14,9 @@ export default {
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     getIsSelectedTransformOption() {
       return transformOption => transformOption === this.selectedTransformOption
+    },
+    dbtDocsUrl() {
+      return utils.root('/-/dbt/')
     }
   },
   created() {
@@ -159,7 +163,7 @@ export default {
           <div class="is-flex">
             <iframe
               class="dbt-docs-iframe"
-              src="http://localhost:5000/-/dbt/"
+              :src="dbtDocsUrl"
             />
           </div>
         </div>
