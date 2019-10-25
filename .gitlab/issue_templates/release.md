@@ -1,10 +1,18 @@
 ## Release To Do Items
 
-- [ ] Run through [Release Process](https://www.meltano.com/docs/contributing.html#release-process) to kick off pipelines
+### Publish
+
+- [ ] Record [Release Process](https://www.meltano.com/docs/contributing.html#release-process) to kick off pipelines
 - [ ] Verify users can successfully install new version on local machine
 - [ ] Deploy to DigitalOcean
-- [ ] Generate video showing release process
+
+### Marketing
+
 - [ ] Write blog post about release
-- [ ] Tweet out release
-- [ ] Record and publish going through [Speedrun Workflow](https://www.meltano.com/docs/contributing.html#speedruns)
-- [ ] Update home page in docs to have the latest speedrun embed
+- [ ] Add release video to blog post
+  - [ ] Tweet out release blog post
+  - [ ] Publish blog post to on Meltano Slack channel
+- [ ] Record [Speedrun Workflow](https://www.meltano.com/docs/contributing.html#speedruns)
+  - [ ] Tweet out speedrun
+  - [ ] Publish speedrun to on Meltano Slack channel
+  - [ ] Update home page in docs to have the latest speedrun embed
