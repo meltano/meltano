@@ -87,34 +87,23 @@ export default {
               {{ loader.description }}
             </p>
 
-            <template v-if="getIsPluginInstalled('loaders', loader.name)">
-              <div class="buttons are-small">
-                <a
-                  class="button is-interactive-primary flex-grow-1"
-                  @click="updateLoaderSettings(loader.name)"
-                  >Configure</a
-                >
-                <a
-                  class="button tooltip is-tooltip-warning"
-                  data-tooltip="Help shape this feature by contributing your ideas"
-                  target="_blank"
-                  href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=uninstall"
-                  >Uninstall</a
-                >
-              </div>
-            </template>
-            <template v-else>
-              <a
-                :class="{
-                  'is-loading':
-                    getIsAddingPlugin('loaders', loader.name) ||
-                    getIsInstallingPlugin('loaders', loader.name)
-                }"
-                class="button is-interactive-primary is-outlined is-block is-small"
-                @click="updateLoaderSettings(loader.name)"
-                >Install</a
-              >
-            </template>
+            <a
+              v-if="getIsPluginInstalled('loaders', loader)"
+              class="button is-interactive-primary is-block is-small"
+              @click="updateLoaderSettings(loader)"
+              >Configure</a
+            >
+            <a
+              v-else
+              :class="{
+                'is-loading':
+                  getIsAddingPlugin('loaders', loader) ||
+                  getIsInstallingPlugin('loaders', loader)
+              }"
+              class="button is-interactive-primary is-outlined is-block is-small"
+              @click="updateLoaderSettings(loader)"
+              >Install</a
+            >
           </div>
         </div>
       </div>

@@ -165,16 +165,10 @@ export default {
                     >Orchestrate</router-link
                   >
                   <router-link
-                    class="button is-interactive-primary is-outlined is-small"
+                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    data-tooltip="Analyze associated models."
                     :to="{ name: 'model' }"
                     >Model</router-link
-                  >
-                  <a
-                    class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-                    data-tooltip="This feature is queued. Click to add to or submit a new issue."
-                    target="_blank"
-                    href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=schedule"
-                    >Edit</a
                   >
                 </div>
               </td>

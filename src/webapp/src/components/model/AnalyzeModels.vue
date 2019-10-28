@@ -88,26 +88,21 @@ export default {
                 <td>
                   <div class="buttons">
                     <button
-                      v-if="!getIsPluginInstalled('models', modelPlugin.name)"
                       :class="{
                         'is-loading':
                           getIsAddingPlugin('models', modelPlugin.name) ||
                           getIsInstallingPlugin('models', modelPlugin.name)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
-                      disabled
-                      @click="installModel(modelPlugin.name)"
+                      :disabled="getIsPluginInstalled('models', modelPlugin)"
+                      @click="installModel(modelPlugin)"
                     >
-                      Install
+                      {{
+                        getIsPluginInstalled('models', modelPlugin)
+                          ? 'Installed'
+                          : 'Install'
+                      }}
                     </button>
-                    <a
-                      v-else
-                      class="button is-small tooltip is-tooltip-warning is-tooltip-right"
-                      data-tooltip="Help shape this feature by contributing your ideas"
-                      target="_blank"
-                      href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=uninstall"
-                      >Uninstall</a
-                    >
                   </div>
                 </td>
                 <td>
