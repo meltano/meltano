@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#991](https://gitlab.com/meltano/meltano/issues/991) Add e2e tests for simple sqlite-carbon workflow
 - [#1103](https://gitlab.com/meltano/meltano/issues/1103) Add Intercom to website with custom chats per session
+- [#1169](https://gitlab.com/meltano/meltano/issues/1169) Meltano now generates the dbt documentation automatically
 
 ### Changes
 
