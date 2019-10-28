@@ -129,8 +129,7 @@ def create_app(config={}):
             pass
 
         # setup the dbtDocsUrl
-        if os.getenv("MELTANO_DBT_DOCS_LOADER"):
-            g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
+        g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
 
     @app.after_request
     def after_request(res):
