@@ -23,10 +23,6 @@ export default {
       return this.plugins.extractors && this.plugins.extractors.length === 0
     }
   },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   methods: {
     updateExtractorEntitySelection(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } })

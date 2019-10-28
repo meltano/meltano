@@ -84,19 +84,19 @@ export default {
           </thead>
           <tbody>
             <template v-for="(modelPlugin, index) in plugins.models">
-              <tr :key="`${modelPlugin}-${index}`">
+              <tr :key="`${modelPlugin.name}-${index}`">
                 <td>
                   <div class="buttons">
                     <button
-                      v-if="!getIsPluginInstalled('models', modelPlugin)"
+                      v-if="!getIsPluginInstalled('models', modelPlugin.name)"
                       :class="{
                         'is-loading':
-                          getIsAddingPlugin('models', modelPlugin) ||
-                          getIsInstallingPlugin('models', modelPlugin)
+                          getIsAddingPlugin('models', modelPlugin.name) ||
+                          getIsInstallingPlugin('models', modelPlugin.name)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
                       disabled
-                      @click="installModel(modelPlugin)"
+                      @click="installModel(modelPlugin.name)"
                     >
                       Install
                     </button>
@@ -111,7 +111,7 @@ export default {
                   </div>
                 </td>
                 <td>
-                  <p>{{ modelPlugin }}</p>
+                  <p>{{ modelPlugin.name }}</p>
                 </td>
               </tr>
             </template>

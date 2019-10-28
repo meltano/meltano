@@ -38,10 +38,6 @@ export default {
       return orderedForSpeedRunLoaders
     }
   },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   methods: {
     updateLoaderSettings(loader) {
       this.$router.push({ name: 'loaderSettings', params: { loader } })
