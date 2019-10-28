@@ -2,8 +2,6 @@
 import { mapState } from 'vuex'
 import Vue from 'vue'
 
-import utils from '@/utils/utils'
-
 export default {
   name: 'Transforms',
   data() {
@@ -75,7 +73,7 @@ export default {
                   Meltano uses
                   <a
                     class="has-text-underlined"
-                    href="https://getdbt.com"
+                    href="https://www.meltano.com/docs/architecture.html#transformation-methodology-dbt"
                     target="_blank"
                     >dbt</a
                   >
@@ -83,31 +81,14 @@ export default {
                   consistent representation called <strong>Model</strong>.
                 </p>
                 <p>
-                  Below, you'll find the documentation for transformations in
-                  this Meltano project.
+                  An ELT run is <em>required before</em> you can view the
+                  <a
+                    class="has-text-underlined"
+                    :href="dbtDocsUrl"
+                    target="_blank"
+                    >dbt generated transform model documentation</a
+                  >.
                 </p>
-                <p>
-                  The documentation includes:
-                </p>
-                <ol>
-                  <li>
-                    <a
-                      class="has-text-underlined"
-                      target="_blank"
-                      href="https://www.meltano.com/tutorials/create-custom-transforms-and-models.html#adding-custom-transforms"
-                      >Custom transformations</a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      class="has-text-underlined"
-                      target="_blank"
-                      href="https://www.meltano.com/docs/transforms.html#transform"
-                      >Default transformations</a
-                    >
-                    that ship with Meltano
-                  </li>
-                </ol>
               </div>
             </div>
 
