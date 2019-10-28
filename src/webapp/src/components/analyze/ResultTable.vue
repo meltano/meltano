@@ -25,7 +25,7 @@ export default {
     getAssignedOrderable() {
       return attributeName =>
         this.order.assigned.find(
-          orderable => orderable.attributeName === attributeName
+          orderable => orderable.attribute.name === attributeName
         )
     },
     getIsOrderableAssigned() {
@@ -66,9 +66,11 @@ export default {
         <thead>
           <tr>
             <th
-              v-for="queryAttribute in queryAttributes"
+              v-for="(queryAttribute, idx) in queryAttributes"
               :key="
-                `${queryAttribute.sourceName}-${queryAttribute.attributeName}`
+                `${queryAttribute.sourceName}-${
+                  queryAttribute.attributeName
+                }-${idx}`
               "
             >
               <div class="is-flex">

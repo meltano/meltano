@@ -208,8 +208,11 @@ export default {
       this.$store.dispatch('designs/toggleTimeframe', timeframe)
     },
 
-    timeframePeriodSelected(period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', period)
+    timeframePeriodSelected(timeframe, period) {
+      this.$store.dispatch('designs/toggleTimeframePeriod', {
+        timeframe,
+        period
+      })
     },
 
     aggregateSelected(aggregate) {
@@ -600,7 +603,7 @@ export default {
                       :key="period.label"
                       class="panel-block indented"
                       :class="{ 'is-active': period.selected }"
-                      @click="timeframePeriodSelected(period)"
+                      @click="timeframePeriodSelected(timeframe, period)"
                     >
                       {{ period.label }}
                     </a>
@@ -713,7 +716,7 @@ export default {
                           'is-active': timeframe.selected,
                           'is-sqlite-unsupported': isLoaderSqlite
                         }"
-                        @click="isLoaderSqlite || timeframeSelected(timeframe)"
+                        @click="timeframeSelected(timeframe)"
                       >
                         {{ timeframe.label }}
                         <div
@@ -729,7 +732,7 @@ export default {
                             :key="timeframe.label.concat('-', period.label)"
                             class="panel-block indented"
                             :class="{ 'is-active': period.selected }"
-                            @click="timeframePeriodSelected(period)"
+                            @click="timeframePeriodSelected(timeframe, period)"
                           >
                             {{ period.label }}
                           </a>

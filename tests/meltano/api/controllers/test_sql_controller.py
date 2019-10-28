@@ -136,11 +136,12 @@ class TestSqlController:
 
         assert res.status_code == 200, res.data
         assertIsSQL(res.json["sql"])
+
         assertListEquivalence(
             [attr["attribute_label"] for attr in res.json["query_attributes"]],
-            ["Name", "Forecast", "entry.From (Week)", "Percent (%)", "Fuel Type"],
+            ["Name", "Forecast", "Week (entry.from)", "Percent (%)", "Fuel Type"],
         )
         assertListEquivalence(
             [attr["attribute_name"] for attr in res.json["query_attributes"]],
-            ["name", "forecast", "entry.from.week", "perc", "fuel"],
+            ["name", "forecast", "week", "perc", "fuel"],
         )
