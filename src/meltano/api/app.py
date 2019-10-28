@@ -105,6 +105,7 @@ def create_app(config={}):
 
     @app.before_request
     def setup_js_context():
+        # setup the appUrl
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
@@ -114,6 +115,7 @@ def create_app(config={}):
 
         g.jsContext["version"] = meltano.__version__
 
+        # setup the airflowUrl
         try:
             airflow = ConfigService(project).find_plugin("airflow")
             settings = PluginSettingsService(project)
@@ -125,6 +127,10 @@ def create_app(config={}):
             ).geturl()[:-1]
         except (PluginMissingError, PluginSettingMissingError):
             pass
+
+        # setup the dbtDocsUrl
+        if os.getenv("MELTANO_DBT_DOCS_LOADER"):
+            g.jsContext["dbtDocsUrl"] = appUrl._replace(path="/-/dbt/").geturl()[:-1]
 
     @app.after_request
     def after_request(res):
