@@ -80,6 +80,7 @@ const helpers = {
               name,
               periods: periods.filter(selected)
             }))
+            .filter(tf => tf.periods.length)
         }
 
         return newJoin
@@ -99,7 +100,13 @@ const helpers = {
         .filter(tf => tf.periods.length)
 
     // Ordering setup
-    const order = state.order.assigned
+    const order = state.order.assigned.map(orderable => {
+      return {
+        direction: orderable.direction,
+        sourceName: orderable.attribute.sourceName,
+        attributeName: orderable.attribute.name
+      }
+    })
 
     // Filtering setup - Enforce number type for aggregates as v-model approach overwrites as string
     const filters = lodash.cloneDeep(state.filters)
@@ -242,11 +249,11 @@ const getters = {
   },
 
   // eslint-disable-next-line no-shadow
-  getQueryAttributeFromCollectionByAttribute(state) {
+  getOrderableAttributeFromCollectionByAttribute(state) {
     return (orderCollection, attribute) => {
-      const finder = queryAttribute =>
-        attribute.sourceName === queryAttribute.sourceName &&
-        attribute.name === queryAttribute.attributeName
+      const finder = orderableAttribute => {
+        return orderableAttribute.attribute === attribute
+      }
       return state.order[orderCollection].find(finder)
     }
   },
@@ -353,14 +360,15 @@ const actions = {
   // eslint-disable-next-line no-shadow
   cleanOrdering({ commit, getters, state }, attribute) {
     if (!attribute.selected) {
-      const matchAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+      const matchAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
         'assigned',
         attribute
       )
-      const matchUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+      const matchUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
         'unassigned',
         attribute
       )
+
       if (matchAssigned || matchUnassigned) {
         commit('removeOrder', {
           collection: state.order[matchAssigned ? 'assigned' : 'unassigned'],
@@ -552,15 +560,13 @@ const actions = {
     commit('setLoadReportToggle')
   },
 
-  toggleTimeframe({ commit, dispatch }, timeframe) {
+  toggleTimeframe({ commit }, timeframe) {
     commit('toggleSelected', timeframe)
-    dispatch('cleanOrdering', timeframe)
-    dispatch('tryAutoRun')
   },
 
-  toggleTimeframePeriod({ commit, dispatch }, timeframePeriod) {
-    commit('toggleSelected', timeframePeriod)
-    dispatch('cleanOrdering', timeframePeriod)
+  toggleTimeframePeriod({ commit, dispatch }, { timeframe, period }) {
+    commit('toggleSelected', period)
+    dispatch('cleanOrdering', timeframe)
     dispatch('tryAutoRun')
   },
 
@@ -579,11 +585,11 @@ const actions = {
   // eslint-disable-next-line no-shadow
   updateSortAttribute({ commit, getters }, queryAttribute) {
     const attribute = getters.getAttributeByQueryAttribute(queryAttribute)
-    const matchInAssigned = getters.getQueryAttributeFromCollectionByAttribute(
+    const matchInAssigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'assigned',
       attribute
     )
-    const matchInUnassigned = getters.getQueryAttributeFromCollectionByAttribute(
+    const matchInUnassigned = getters.getOrderableAttributeFromCollectionByAttribute(
       'unassigned',
       attribute
     )
@@ -616,9 +622,7 @@ const mutations = {
 
   assignSortableAttribute(state, attribute) {
     const orderableAttribute = state.order.unassigned.find(
-      orderableAttr =>
-        orderableAttr.attributeName === attribute.name &&
-        orderableAttr.sourceName === attribute.sourceName
+      orderableAttr => orderableAttr.attribute === attribute
     )
     const idx = state.order.unassigned.indexOf(orderableAttribute)
     state.order.unassigned.splice(idx, 1)
@@ -765,22 +769,31 @@ const mutations = {
 
   setSorting(state, allAttributes) {
     state.queryAttributes.forEach(queryAttribute => {
-      const accounted = state.order.assigned.concat(state.order.unassigned)
+      const getName = attribute => {
+        // Account for timeframes matching
+        let period = null
+        if (attribute.periods) {
+          period = attribute.periods.find(
+            period => period.name === queryAttribute.attributeName
+          )
+        }
+        return period ? period.name : attribute.name
+      }
       const finder = orderableAttribute =>
-        orderableAttribute.sourceName === queryAttribute.sourceName &&
-        orderableAttribute.attributeName === queryAttribute.attributeName
+        orderableAttribute.attribute.sourceName === queryAttribute.sourceName &&
+        getName(orderableAttribute.attribute) === queryAttribute.attributeName
+
+      const accounted = state.order.assigned.concat(state.order.unassigned)
       const isAccountedFor = accounted.find(finder)
       if (!isAccountedFor) {
-        const targetAttribute = allAttributes.find(
-          attribute =>
+        const targetAttribute = allAttributes.find(attribute => {
+          return (
             attribute.sourceName === queryAttribute.sourceName &&
-            attribute.name === queryAttribute.attributeName
-        )
+            getName(attribute) === queryAttribute.attributeName
+          )
+        })
         state.order.unassigned.push({
-          sourceName: targetAttribute.sourceName,
-          sourceLabel: targetAttribute.sourceLabel,
-          attributeName: targetAttribute.name,
-          attributeLabel: targetAttribute.label,
+          attribute: targetAttribute,
           direction: 'asc'
         })
       }

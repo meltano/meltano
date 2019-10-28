@@ -414,8 +414,8 @@ class MeltanoTimeframe(MeltanoBase):
         (table, column) = self.sql.split(".")
         return column
 
-    def alias(self) -> str:
-        return f"{self.table.sql_table_name}.{self.column_name()}"
+    def alias(self, period) -> str:
+        return self.period_alias(period)
 
     def period_column_name(self, period) -> str:
         period_name = period.get("name", None)
@@ -434,7 +434,7 @@ class MeltanoTimeframe(MeltanoBase):
         if not label:
             raise ParseError(f"Requested period {period} has no name.")
 
-        return f"{self.table.name}.{self.label} ({label})"
+        return f"{label} ({self.table.find_source_name()}.{self.column_name()})"
 
     def period_sql(
         self, period, base_table: str = None, pika_table=None
@@ -1047,10 +1047,10 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
-                            "key": t.alias(),
+                            "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
-                            "attribute_name": t.period_alias(period),
+                            "attribute_name": period["name"],
                             "attribute_label": t.period_label(period),
                             "attribute_type": "timeframe",
                         }
@@ -1223,10 +1223,10 @@ class MeltanoQuery(MeltanoBase):
 
                     query_attributes.append(
                         {
-                            "key": t.alias(),
+                            "key": t.alias(period),
                             "table_name": table.name,
                             "source_name": table.find_source_name(),
-                            "attribute_name": t.period_alias(period),
+                            "attribute_name": period["name"],
                             "attribute_label": t.period_label(period),
                             "attribute_type": "timeframe",
                         }
