@@ -33,6 +33,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
          
         <div
           class="control field"
+          data-test-id="dropdown-save-report"
         >
           <p
             class="control"
@@ -54,7 +55,6 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   aria-haspopup="true"
                   class="button"
                   disabled="disabled"
-                  id="dropdown-save-report"
                 >
                   <span
                     class=""
@@ -114,6 +114,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                       <button
                         class="button"
                         data-dropdown-auto-close=""
+                        data-test-id="button-save-report"
                         disabled="disabled"
                       >
                         
@@ -281,6 +282,7 @@ exports[`Design.vue Load report button enabled if reports exist 1`] = `
                   >
                     <button
                       class="button is-success"
+                      data-test-id="run-query-button"
                       disabled="disabled"
                     >
                       
@@ -481,6 +483,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
          
         <div
           class="control field"
+          data-test-id="dropdown-save-report"
         >
           <p
             class="control"
@@ -561,6 +564,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                       <button
                         class="button"
                         data-dropdown-auto-close=""
+                        data-test-id="button-save-report"
                         disabled="disabled"
                       >
                         
@@ -719,6 +723,7 @@ exports[`Design.vue Run Query button enabled and SQL tab focused and displayed i
                   >
                     <button
                       class="button is-success"
+                      data-test-id="run-query-button"
                     >
                       
                       Run
@@ -917,6 +922,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
          
         <div
           class="control field"
+          data-test-id="dropdown-save-report"
         >
           <p
             class="control"
@@ -973,6 +979,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                     <button
                       class="button"
                       data-dropdown-auto-close=""
+                      data-test-id="button-save-report"
                       disabled="disabled"
                     >
                       
@@ -1082,6 +1089,7 @@ exports[`Design.vue Save report button enabled if query has ran 1`] = `
                   >
                     <button
                       class="button is-success"
+                      data-test-id="run-query-button"
                     >
                       
                       Run
@@ -1267,6 +1275,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
          
         <div
           class="control field"
+          data-test-id="dropdown-save-report"
         >
           <p
             class="control"
@@ -1323,6 +1332,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                     <button
                       class="button"
                       data-dropdown-auto-close=""
+                      data-test-id="button-save-report"
                       disabled="disabled"
                     >
                       
@@ -1441,6 +1451,7 @@ exports[`Design.vue a loaded report renders report name, selections, chart, SQL,
                   >
                     <button
                       class="button is-success"
+                      data-test-id="run-query-button"
                       disabled="disabled"
                     >
                       
@@ -1628,6 +1639,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
          
         <div
           class="control field"
+          data-test-id="dropdown-save-report"
         >
           <p
             class="control"
@@ -1708,6 +1720,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                       <button
                         class="button"
                         data-dropdown-auto-close=""
+                        data-test-id="button-save-report"
                         disabled="disabled"
                       >
                         
@@ -1867,6 +1880,7 @@ exports[`Design.vue no selections, chart, SQL, or results where the Save, Load, 
                   >
                     <button
                       class="button is-success"
+                      data-test-id="run-query-button"
                       disabled="disabled"
                     >
                       
