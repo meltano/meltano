@@ -80,8 +80,11 @@ export default {
             />
           </div>
           <div class="content is-small">
-            <p class="has-text-centered">
+            <p class="has-text-centered has-text-weight-semibold">
               {{ loader.name }}
+            </p>
+            <p class="has-text-centered">
+              {{ loader.description }}
             </p>
 
             <template v-if="getIsPluginInstalled('loaders', loader.name)">
