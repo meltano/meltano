@@ -190,6 +190,10 @@ export default {
     return `${new Date(dateString).toISOString().split('.')[0]}Z`
   },
 
+  dateIso8601Nullable(dateString) {
+    return dateString ? this.dateIso8601(dateString) : null
+  },
+
   getFirstOfMonthAsIso8601() {
     const date = new Date()
     const firstOfThisMonth = new Date(
