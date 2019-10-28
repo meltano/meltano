@@ -72,9 +72,13 @@ class DbtWorker(threading.Thread):
                 self._queue.task_done()
 
             # trigger the task
-            loader = self.config_service.find_plugin(self.loader)
             try:
+                loader = self.config_service.find_plugin(self.loader)
                 await dbt_service.docs(session, loader, "generate")
+            except PluginMissingError as err:
+                logging.warning(
+                    f"Could not generate dbt docs: '{str(err)}' is missing."
+                )
             except:
                 pass
 

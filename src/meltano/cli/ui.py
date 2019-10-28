@@ -73,7 +73,7 @@ def ui(project, reload, bind_port, bind):
 
     # we need to whitelist the loaders here because not
     # all the loaders support dbt in the first place
-    dbt_docs_loader = os.getenv("MELTANO_DBT_DOCS_LOADER")
+    dbt_docs_loader = os.getenv("MELTANO_DBT_DOCS_LOADER", "target-postgres")
     if dbt_docs_loader:
         workers.append(DbtWorker(project, dbt_docs_loader, loop=loop))
     else:

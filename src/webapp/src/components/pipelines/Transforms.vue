@@ -72,8 +72,22 @@ export default {
               <h2 class="title is-5">Documentation</h2>
               <div class="content">
                 <p>
+                  Meltano uses
+                  <a
+                    class="has-text-underlined"
+                    href="https://getdbt.com"
+                    target="_blank"
+                    >dbt</a
+                  >
+                  to transform the data extracted from the data sources into a
+                  consistent representation called <strong>Model</strong>.
+                </p>
+                <p>
                   Below, you'll find the documentation for transformations in
-                  this Meltano project. The documentation includes:
+                  this Meltano project.
+                </p>
+                <p>
+                  The documentation includes:
                 </p>
                 <ol>
                   <li>
@@ -160,11 +174,6 @@ export default {
               </div>
             </div>
           </div>
-
-          <div v-if="dbtDocsUrl" class="is-flex">
-            <iframe class="dbt-docs-iframe" :src="dbtDocsUrl" />
-          </div>
-          <p v-else>dbt docs are disabled</p>
         </div>
       </div>
     </div>
