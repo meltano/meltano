@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1103](https://gitlab.com/meltano/meltano/issues/1103) Our site now has Intercom to interact with users
 - [#1168](https://gitlab.com/meltano/meltano/issues/1168) Speedrun video added to home page and new release issue template
 - [#1182](https://gitlab.com/meltano/meltano/issues/1182) Add `null`able date inputs so optional dates aren't incorrectly required in validation
+- [#1169](https://gitlab.com/meltano/meltano/issues/1169) Meltano now generates the dbt documentation automatically
 
 ### Changes
 

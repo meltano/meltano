@@ -17,7 +17,10 @@ export default {
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
     ]),
-    ...mapState('repos', ['models'])
+    ...mapState('repos', ['models']),
+    dbtDocsUrl() {
+      return this.$flask.dbtDocsUrl
+    }
   },
   created() {
     this.$store.dispatch('plugins/getAllPlugins')
@@ -62,6 +65,17 @@ export default {
             real-time.
           </p>
         </div>
+
+        <h2 class="title is-5">Transforms</h2>
+        <div class="content">
+          <p>
+            An ELT run is <em>required before</em> you can view the
+            <a class="has-text-underlined" :href="dbtDocsUrl" target="_blank"
+              >dbt generated transform model documentation</a
+            >.
+          </p>
+        </div>
+
         <h2 class="title is-5">Available</h2>
         <div class="content">
           <p>
