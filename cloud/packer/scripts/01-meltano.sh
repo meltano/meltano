@@ -24,7 +24,7 @@ sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano init project
 sudo -u $MELTANO_USER $MELTANO_VENV/bin/meltano --version
 
 # remove the project id so a new one is generated
-sudo -u $MELTANO_USER sed -i 's/project_id:.*$/project_id:/' meltano.yml
+sudo -u $MELTANO_USER sed -i 's/project_id:.*$/project_id:/' project/meltano.yml
 
 # start and enable Meltano
 systemctl enable meltano
