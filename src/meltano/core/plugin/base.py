@@ -166,6 +166,7 @@ class Plugin(PluginRef):
         pip_url: Optional[str] = None,
         settings: list = [],
         docs=None,
+        description=None,
         **extras
     ):
         super().__init__(plugin_type, name)
@@ -174,6 +175,7 @@ class Plugin(PluginRef):
         self.pip_url = pip_url
         self.settings = settings
         self.docs = docs
+        self.description = description
         self._extras = extras or {}
 
     def canonical(self):
@@ -184,6 +186,9 @@ class Plugin(PluginRef):
 
         if self.docs:
             canonical.update({"docs": self.docs})
+
+        if self.description:
+            canonical.update({"description": self.description})
 
         if self.settings:
             canonical.update({"settings": self.settings})

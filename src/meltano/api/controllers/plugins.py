@@ -23,9 +23,23 @@ def _handle(ex):
 @pluginsBP.route("/all", methods=["GET"])
 def all():
     new_project = Project()
-    new_plugin_discovery_service = PluginDiscoveryService(new_project)
-    result = new_plugin_discovery_service.discover(PluginType.ALL)
-    return jsonify(result)
+    discovery = PluginDiscoveryService(new_project)
+    plugins = discovery.plugins()
+    ordered_plugins = {}
+
+    for plugin in plugins:
+        try:
+            definition = discovery.find_plugin(plugin.type, plugin.name)
+        except PluginNotFoundError:
+            definition = {}
+
+        if not plugin.type in ordered_plugins:
+            ordered_plugins[plugin.type] = []
+
+        merged_plugin_definition = {**definition.canonical(), **plugin.canonical()}
+        ordered_plugins[plugin.type].append(merged_plugin_definition)
+
+    return jsonify(ordered_plugins)
 
 
 @pluginsBP.route("/installed", methods=["GET"])
