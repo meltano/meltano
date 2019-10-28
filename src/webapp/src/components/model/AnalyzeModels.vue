@@ -66,16 +66,6 @@ export default {
           </p>
         </div>
 
-        <h2 class="title is-5">Transforms</h2>
-        <div class="content">
-          <p>
-            An ELT run is <em>required before</em> you can view the
-            <a class="has-text-underlined" :href="dbtDocsUrl" target="_blank"
-              >dbt generated transform model documentation</a
-            >.
-          </p>
-        </div>
-
         <h2 class="title is-5">Available</h2>
         <div class="content">
           <p>
@@ -136,6 +126,13 @@ export default {
         <h2 class="title is-5">Installed</h2>
         <template v-if="hasModels">
           <div class="content">
+            <p class="is-italic">
+              Meltano generates the installed
+              <a class="has-text-underlined" :href="dbtDocsUrl" target="_blank"
+                >transforms documentation</a
+              >
+              after each ELT run.
+            </p>
             <p>
               Below are the currently installed models that enable click-to-code
               SQL generation and interactive analysis. Click an Analyze button
