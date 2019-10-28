@@ -10,10 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#991](https://gitlab.com/meltano/meltano/issues/991) Add e2e tests for simple sqlite-carbon workflow
-- [#1103](https://gitlab.com/meltano/meltano/issues/1103) Add Intercom to website with custom chats per session
+- [#1103](https://gitlab.com/meltano/meltano/issues/1103) Add Intercom to Meltano.com to interact with our users in real-time
 - [#1130](https://gitlab.com/meltano/meltano/issues/1130) Add Tutorial for extracting data from Google Analytics and loading the extracted data to Postgres
-- [#991](https://gitlab.com/meltano/meltano/issues/991) Add e2e tests for simple sqlite-carbon workflow
-- [#1103](https://gitlab.com/meltano/meltano/issues/1103) Our site now has Intercom to interact with users
 - [#1168](https://gitlab.com/meltano/meltano/issues/1168) Speedrun video added to home page and new release issue template
 - [#1182](https://gitlab.com/meltano/meltano/issues/1182) Add `null`able date inputs so optional dates aren't incorrectly required in validation
 - [#1169](https://gitlab.com/meltano/meltano/issues/1169) Meltano now generates the dbt documentation automatically
