@@ -155,14 +155,14 @@ export default {
                   <a
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
                     :class="{ 'is-loading': pipeline.isRunning }"
-                    data-tooltip="Run this ELT definition once without orchestration."
+                    data-tooltip="Run this ELT pipeline once."
                     @click="runELT(pipeline)"
-                    >Run</a
+                    >Manual Run</a
                   >
                   <router-link
                     v-if="getIsPluginInstalled('orchestrators', 'airflow')"
                     class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
-                    data-tooltip="Automate this ELT definition with orchestration."
+                    data-tooltip="Automate this ELT pipeline with orchestration."
                     :to="{ name: 'orchestration' }"
                     >Orchestrate</router-link
                   >
@@ -170,13 +170,6 @@ export default {
                     class="button is-interactive-primary is-outlined is-small"
                     :to="{ name: 'model' }"
                     >Model</router-link
-                  >
-                  <a
-                    class="button is-small tooltip is-tooltip-warning is-tooltip-multiline is-tooltip-left"
-                    data-tooltip="This feature is queued. Click to add to or submit a new issue."
-                    target="_blank"
-                    href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=schedule"
-                    >Edit</a
                   >
                 </div>
               </td>
