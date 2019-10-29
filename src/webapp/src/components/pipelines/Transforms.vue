@@ -127,6 +127,17 @@ export default {
                     load
                   </li>
                 </ul>
+
+                <p>
+                  Current transform limititations:
+                </p>
+                <ul>
+                  <li>"Run" requires <code>target-postgres</code></li>
+                  <li>
+                    "Skip" is required for <code>target-snowflake</code> and
+                    <code>target-csv</code>
+                  </li>
+                </ul>
               </div>
 
               <div class="field is-grouped is-pulled-right">
