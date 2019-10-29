@@ -1,12 +1,12 @@
 version: 4
 extractors:
   - name: tap-carbon-intensity
-    description: Carbon emissions
+    description: National Grid ESO's Carbon Emissions Intensity API
     namespace: tap_carbon
     docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
   - name: tap-csv
-    description: CSV Files
+    description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
@@ -17,7 +17,7 @@ extractors:
         kind: file
         documentation: https://gitlab.com/meltano/tap-csv#run
   - name: tap-fastly
-    description: Cloud computing services provider
+    description: Edge cloud computing services provider
     namespace: tap_fastly
     docs: 'https://meltano.com/plugins/extractors/fastly.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
@@ -29,7 +29,7 @@ extractors:
         label: Start Date
         kind: date_iso8601
   - name: tap-gitlab
-    description: Devops lifecycle application
+    description: Single application for the entire DevOps lifecycle
     namespace: tap_gitlab
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
@@ -58,7 +58,7 @@ extractors:
         env: GITLAB_API_START_DATE
         kind: date_iso8601
   - name: tap-google-analytics
-    description: App and site analytics
+    description: App and website analytics platform hosted by Google
     namespace: tap_google_analytics
     docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
@@ -81,7 +81,7 @@ extractors:
         env: GOOGLE_ANALYTICS_API_END_DATE
         kind: date_iso8601
   - name: tap-marketo
-    description: Marketing automation
+    description: Marketing automation for account-based marketing
     namespace: tap_marketo
     docs: 'https://meltano.com/plugins/extractors/marketo.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
@@ -95,7 +95,7 @@ extractors:
       - name: start_time
         kind: date_iso8601
   - name: tap-mongodb
-    description: Document-based database
+    description: General purpose, document-based, distributed database
     namespace: tap_mongodb
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
@@ -110,7 +110,7 @@ extractors:
       - name: dbname
         label: Database Name
   - name: tap-salesforce
-    description: Customer success platform
+    description: Customer-relationship management & customer success platform
     namespace: tap_salesforce
     docs: 'https://meltano.com/plugins/extractors/salesforce.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
@@ -131,7 +131,7 @@ extractors:
       - name: start_date
         kind: date_iso8601
   - name: tap-stripe
-    description: Payment processing platform
+    description: Online payment processing for internet businesses
     namespace: tap_stripe
     docs: 'https://meltano.com/plugins/extractors/stripe.html'
     pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
@@ -144,7 +144,7 @@ extractors:
       - name: start_date
         kind: date_iso8601
   - name: tap-zendesk
-    description: Customer service platform
+    description: Support ticketing system & customer service platform
     namespace: tap_zendesk
     docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     pip_url: 'tap-zendesk'
