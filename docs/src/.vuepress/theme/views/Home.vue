@@ -16,7 +16,7 @@
       </div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header">Open source data dashboarding</h2>
+          <h2 class="hero-header">Open source<br/><strong>data dashboarding</strong></h2>
           <p class="hero-tagline">
             Meltano is a free alternative to expensive SaaS tools. We provide an
             integrated workflow for modeling, extracting, loading, transforming,
@@ -696,7 +696,7 @@ export default {
 
 .hero-header {
   padding-right: 40px;
-  font-weight: 300;
+  font-weight: 400;
   font-size: 36px;
   color: #1D1D1D;
 }
