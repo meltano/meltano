@@ -43,6 +43,7 @@ def pushd(request):
     return _pushd
 
 
+@pytest.mark.meta
 def test_pushd(mkdtemp, pushd):
     temp = mkdtemp()
     cwd = os.getcwd()

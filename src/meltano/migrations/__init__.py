@@ -1,4 +1,5 @@
 from pathlib import Path
+import sqlalchemy
 
 # the `scripts/alembic_freeze.py` refers to these paths
 # we need to make sure they match
@@ -31,6 +32,15 @@ def seed(project):
 
         if not session.query(Role).filter_by(name="regular").first():
             session.merge(Role(name="regular", description="Meltano User"))
+
+        # add the universal permissions to Admin
+        admin = session.query(Role).filter_by(name="admin").one()
+        try:
+            session.query(RolePermissions).filter_by(
+                role=admin, type="*", context="*"
+            ).one()
+        except sqlalchemy.orm.exc.NoResultFound:
+            admin.permissions.append(RolePermissions(type="*", context="*"))
 
         session.commit()
     finally:

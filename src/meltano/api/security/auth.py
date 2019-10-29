@@ -24,8 +24,11 @@ class ResourcePermission(Permission):
         for need in self.needs:
             # included
             scopes = (
-                scope for scope in identity.provides if scope.method == need.method
+                scope
+                for scope in identity.provides
+                if fnmatch(need.method, scope.method)
             )
+            logging.debug(f"Found include scope {scopes} in {identity}")
 
             scoped = self.in_scope(need, scopes)
             needs_scoped.append(scoped)
@@ -33,8 +36,11 @@ class ResourcePermission(Permission):
         for excluded in self.excludes:
             # excluded
             scopes = (
-                scope for scope in identity.provides if scope.method == excluded.method
+                scope
+                for scope in identity.provides
+                if fnmatch(excluded.method, scope.method)
             )
+            logging.debug(f"Found exclude scope {scopes} in {identity}")
 
             if self.in_scope(need, scopes):
                 return False

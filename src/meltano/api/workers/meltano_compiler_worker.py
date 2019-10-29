@@ -42,7 +42,9 @@ class MeltanoCompilerWorker:
             logging.info(f"Auto-compiling models in '{self.model_dir}'")
         except OSError:
             # most probably INotify being full
-            logging.warn(f"Model auto-compilation is disabled: INotify limit reached.")
+            logging.warning(
+                f"Model auto-compilation is disabled: INotify limit reached."
+            )
 
     def stop(self):
         self.observer.stop()

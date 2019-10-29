@@ -35,7 +35,7 @@ class ProjectCompiler:
             self.package_topics = self.parser.parse_packages()
             self._parsed = True
         except MeltanoAnalysisFileParserError as e:
-            logging.warn(f"Failed to compile topics: {e}")
+            logging.warning(f"Failed to compile topics: {e}")
             raise e
 
     @fasteners.locked
@@ -49,5 +49,5 @@ class ProjectCompiler:
 
             logging.debug(f"Successfully compiled topics")
         except MeltanoAnalysisFileParserError as e:
-            logging.warn(f"Failed to compile topics: {e}")
+            logging.warning(f"Failed to compile topics: {e}")
             raise e

@@ -23,6 +23,7 @@ def gitlab_client():
     return client_mock
 
 
+@pytest.mark.usefixtures("seed_users")
 class TestSecurity:
     @pytest.fixture(scope="class")
     def app(self, create_app):
@@ -79,7 +80,6 @@ class TestSecurity:
             identity = gitlab_token_identity(token)
             assert identity.user == user
 
-    @pytest.mark.usefixtures("app_context")
     def test_bootstrap(self, app, api, impersonate):
         with app.test_request_context():
             with impersonate(users.get_user("alice")):
@@ -91,7 +91,6 @@ class TestSecurity:
                 assert url.netloc == "localhost"
                 assert query["auth_token"]
 
-    @pytest.mark.usefixtures("app_context")
     def test_bootstrap_unauthenticated(self, app, api):
         with app.test_request_context():
             res = api.get(url_for("security.bootstrap_app"))
@@ -101,12 +100,12 @@ class TestSecurity:
             assert res.location.startswith(url_for("security.login", _external=True))
 
 
+@pytest.mark.usefixtures("seed_users")
 class TestSingleUser:
     @pytest.fixture(scope="class")
     def app(self, create_app):
         return create_app(MELTANO_AUTHENTICATION=False)
 
-    @pytest.mark.usefixtures("app_context")
     def test_free_user_all_roles(self):
         assert len(FreeUser().roles) == 2
 
@@ -118,7 +117,6 @@ class TestSingleUser:
         with app.test_request_context("/"):
             assert isinstance(current_user._get_current_object(), FreeUser)
 
-    @pytest.mark.usefixtures("app_context")
     def test_bootstrap(self, app, api):
         with app.test_request_context():
             res = api.get(url_for("security.bootstrap_app"))
