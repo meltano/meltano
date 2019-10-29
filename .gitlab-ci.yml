@@ -4,6 +4,7 @@ variables:
 
 include:
   - "/docker/build-ci.yml"
+  - template: SAST.gitlab-ci.yml
 
 stages:
   - docs
