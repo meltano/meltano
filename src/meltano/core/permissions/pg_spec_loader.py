@@ -26,7 +26,7 @@ class PGSpecLoader:
         """
         try:
             with open(spec_path, "r") as stream:
-                spec = yaml.load(stream)
+                spec = yaml.safe_load(stream)
         except FileNotFoundError:
             raise SpecLoadingError(f"Spec File {spec_path} not found")
 
@@ -44,7 +44,7 @@ class PGSpecLoader:
         """
         error_messages = []
 
-        schema = yaml.load(PG_SPEC_SCHEMA_YAML)
+        schema = yaml.safe_load(PG_SPEC_SCHEMA_YAML)
         v = cerberus.Validator(schema)
 
         role_configs = [(role, config) for role, config in spec.items() if config]

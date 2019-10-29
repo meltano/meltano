@@ -20,7 +20,7 @@ class TransformAddService:
             with open(self.packages_file, "w"):
                 pass
 
-        package_yaml = yaml.load(self.packages_file.open()) or {"packages": []}
+        package_yaml = yaml.safe_load(self.packages_file.open()) or {"packages": []}
 
         for package in package_yaml["packages"]:
             if package.get("git", "") == plugin.pip_url:
@@ -33,7 +33,7 @@ class TransformAddService:
 
     def update_dbt_project(self, plugin: PluginInstall):
         transform_name = plugin.name.replace("-", "_")
-        dbt_project_yaml = yaml.load(self.dbt_project_file.open())
+        dbt_project_yaml = yaml.safe_load(self.dbt_project_file.open())
 
         dbt_project_yaml["models"][transform_name] = plugin._extras
 

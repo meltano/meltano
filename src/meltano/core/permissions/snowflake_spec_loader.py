@@ -61,7 +61,7 @@ class SnowflakeSpecLoader:
         """
         try:
             with open(spec_path, "r") as stream:
-                spec = yaml.load(stream)
+                spec = yaml.safe_load(stream)
         except FileNotFoundError:
             raise SpecLoadingError(f"Spec File {spec_path} not found")
 
@@ -91,7 +91,7 @@ class SnowflakeSpecLoader:
         """
         error_messages = []
 
-        validator = cerberus.Validator(yaml.load(SNOWFLAKE_SPEC_SCHEMA))
+        validator = cerberus.Validator(yaml.safe_load(SNOWFLAKE_SPEC_SCHEMA))
         validator.validate(spec)
         for entity_type, err_msg in validator.errors.items():
             if isinstance(err_msg[0], str):
@@ -105,10 +105,10 @@ class SnowflakeSpecLoader:
             return error_messages
 
         schema = {
-            "databases": yaml.load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
-            "roles": yaml.load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
-            "users": yaml.load(SNOWFLAKE_SPEC_USER_SCHEMA),
-            "warehouses": yaml.load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
+            "databases": yaml.safe_load(SNOWFLAKE_SPEC_DATABASE_SCHEMA),
+            "roles": yaml.safe_load(SNOWFLAKE_SPEC_ROLE_SCHEMA),
+            "users": yaml.safe_load(SNOWFLAKE_SPEC_USER_SCHEMA),
+            "warehouses": yaml.safe_load(SNOWFLAKE_SPEC_WAREHOUSE_SCHEMA),
         }
 
         validators = {
