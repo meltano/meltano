@@ -45,17 +45,17 @@ class PluginInvoker:
         run_dir=None,
         config_dir=None,
         venv_service: VenvService = None,
-        config_service: PluginConfigService = None,
+        plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.plugin = plugin
         self._plugin_config = plugin_config
         self.venv_service = venv_service or VenvService(project)
-        self.config_service = config_service or PluginConfigService(
+        self.config_service = plugin_config_service or PluginConfigService(
             plugin,
-            run_dir=run_dir or project.run_dir(plugin.name),
-            config_dir=config_dir or project.plugin_dir(plugin),
+            config_dir or self.project.plugin_dir(plugin),
+            run_dir or self.project.run_dir(plugin.name)
         )
         self.settings_service = plugin_settings_service or PluginSettingsService(
             project

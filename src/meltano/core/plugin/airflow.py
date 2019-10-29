@@ -66,7 +66,7 @@ class Airflow(PluginInstall):
             project,
             self,
             prepare_with_session=session,
-            config_service=plugin_config_service,
+            plugin_config_service=plugin_config_service,
         )
 
         try:

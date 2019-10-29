@@ -81,8 +81,10 @@ def discovery():
 
 
 @pytest.fixture(scope="class")
-def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(project, discovery=discovery)
+def plugin_discovery_service(project, discovery, config_service):
+    return PluginDiscoveryService(
+        project, discovery=discovery, config_service=config_service
+    )
 
 
 @pytest.fixture(scope="class")
@@ -96,19 +98,25 @@ def project_init_service():
 
 
 @pytest.fixture(scope="class")
-def plugin_install_service(project):
-    return PluginInstallService(project)
+def plugin_install_service(project, config_service):
+    return PluginInstallService(project, config_service=config_service)
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project, plugin_discovery_service):
-    return ProjectAddService(project, plugin_discovery_service=plugin_discovery_service)
+def project_add_service(project, config_service, plugin_discovery_service):
+    return ProjectAddService(
+        project,
+        config_service=config_service,
+        plugin_discovery_service=plugin_discovery_service,
+    )
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service(project, plugin_discovery_service):
+def plugin_settings_service(project, config_service, plugin_discovery_service):
     return PluginSettingsService(
-        project, plugin_discovery_service=plugin_discovery_service
+        project,
+        config_service=config_service,
+        plugin_discovery_service=plugin_discovery_service,
     )
 
 
