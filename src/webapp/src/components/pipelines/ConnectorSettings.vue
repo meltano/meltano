@@ -37,9 +37,14 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
+    getIsOfKindReadonly() {
+      return kind => kind === 'readonly'
+    },
     getIsOfKindTextBased() {
       return kind =>
-        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind)
+        !this.getIsOfKindBoolean(kind) &&
+        !this.getIsOfKindDate(kind) &&
+        !this.getIsOfKindOptions(kind)
     },
     getTextBasedInputType() {
       let type = 'text'
@@ -185,6 +190,8 @@ export default {
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="setting.value || setting.name"
+                :disabled="getIsOfKindReadonly(setting.kind)"
+                :readonly="getIsOfKindReadonly(setting.kind)"
                 @focus="$event.target.select()"
               />
             </div>
