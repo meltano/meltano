@@ -100,7 +100,7 @@ class DbtWorker(threading.Thread):
             super().start()
         except OSError as err:
             # most probably INotify being full
-            logging.warn(f"DbtWorker failed: INotify limit reached: {err}")
+            logging.warning(f"DbtWorker failed: INotify limit reached: {err}")
 
     def run(self):
         try:
