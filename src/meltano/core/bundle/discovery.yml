@@ -216,7 +216,7 @@ loaders:
         env: SF_WAREHOUSE
         description: The name of the Snowflake warehouse you want to use
   - name: target-postgres
-    description: Postgresql database loader
+    description: PostgreSQL database loader
     namespace: postgres
     docs: 'https://meltano.com/plugins/loaders/postgres.html'
     pip_url: 'git+https://github.com/meltano/target-postgres.git'
