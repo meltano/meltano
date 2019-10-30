@@ -88,20 +88,20 @@ export default {
             </p>
 
             <a
-              v-if="getIsPluginInstalled('loaders', loader)"
+              v-if="getIsPluginInstalled('loaders', loader.name)"
               class="button is-interactive-primary is-block is-small"
-              @click="updateLoaderSettings(loader)"
+              @click="updateLoaderSettings(loader.name)"
               >Configure</a
             >
             <a
               v-else
               :class="{
                 'is-loading':
-                  getIsAddingPlugin('loaders', loader) ||
-                  getIsInstallingPlugin('loaders', loader)
+                  getIsAddingPlugin('loaders', loader.name) ||
+                  getIsInstallingPlugin('loaders', loader.name)
               }"
               class="button is-interactive-primary is-outlined is-block is-small"
-              @click="updateLoaderSettings(loader)"
+              @click="updateLoaderSettings(loader.name)"
               >Install</a
             >
           </div>

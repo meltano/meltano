@@ -94,11 +94,13 @@ export default {
                           getIsInstallingPlugin('models', modelPlugin.name)
                       }"
                       class="button is-interactive-primary is-outlined is-block is-small"
-                      :disabled="getIsPluginInstalled('models', modelPlugin)"
-                      @click="installModel(modelPlugin)"
+                      :disabled="
+                        getIsPluginInstalled('models', modelPlugin.name)
+                      "
+                      @click="installModel(modelPlugin.name)"
                     >
                       {{
-                        getIsPluginInstalled('models', modelPlugin)
+                        getIsPluginInstalled('models', modelPlugin.name)
                           ? 'Installed'
                           : 'Install'
                       }}
