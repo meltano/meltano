@@ -55,6 +55,10 @@ export default {
       return this.$route.meta.isModal
     }
   },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
   methods: {
     setStep(stepName) {
       const targetStep = this.steps.find(step => step.name === stepName)

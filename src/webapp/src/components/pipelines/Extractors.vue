@@ -23,10 +23,6 @@ export default {
       return this.plugins.extractors && this.plugins.extractors.length === 0
     }
   },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
-  },
   methods: {
     updateExtractorEntitySelection(extractor) {
       this.$router.push({ name: 'extractorEntities', params: { extractor } })
@@ -64,36 +60,41 @@ export default {
     <div v-else class="tile is-ancestor is-flex is-flex-wrap">
       <div
         v-for="(extractor, index) in plugins.extractors"
-        :key="`${extractor}-${index}`"
-        :data-test-id="`${extractor}-extractor-card`"
+        :key="`${extractor.name}-${index}`"
+        :data-test-id="`${extractor.name}-extractor-card`"
         class="tile is-parent is-3 is-relative"
       >
-        <SpeedRunIcon v-if="extractor === speedRunExtractor" />
+        <SpeedRunIcon v-if="extractor.name === speedRunExtractor" />
         <div class="tile level is-child box">
           <div class="image level-item is-64x64 container">
             <ConnectorLogo
-              :connector="extractor"
-              :is-grayscale="!getIsPluginInstalled('extractors', extractor)"
+              :connector="extractor.name"
+              :is-grayscale="
+                !getIsPluginInstalled('extractors', extractor.name)
+              "
             />
           </div>
           <div class="content is-small">
+            <p class="has-text-centered has-text-weight-semibold">
+              {{ extractor.name }}
+            </p>
             <p class="has-text-centered">
-              {{ extractor }}
+              {{ extractor.description }}
             </p>
 
-            <template v-if="getIsPluginInstalled('extractors', extractor)">
+            <template v-if="getIsPluginInstalled('extractors', extractor.name)">
               <div class="columns is-variable is-1">
                 <div class="column">
                   <a
                     class="button is-interactive-primary is-small is-block"
-                    @click="updateExtractorSettings(extractor)"
+                    @click="updateExtractorSettings(extractor.name)"
                     >Configure</a
                   >
                 </div>
                 <div class="column">
                   <a
                     class="button is-interactive-primary is-outlined is-small is-block"
-                    @click="updateExtractorEntitySelection(extractor)"
+                    @click="updateExtractorEntitySelection(extractor.name)"
                     >Select</a
                   >
                 </div>
@@ -103,11 +104,11 @@ export default {
               <a
                 :class="{
                   'is-loading':
-                    getIsAddingPlugin('extractors', extractor) ||
-                    getIsInstallingPlugin('extractors', extractor)
+                    getIsAddingPlugin('extractors', extractor.name) ||
+                    getIsInstallingPlugin('extractors', extractor.name)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
-                @click="updateExtractorSettings(extractor)"
+                @click="updateExtractorSettings(extractor.name)"
                 >Install</a
               >
             </template>

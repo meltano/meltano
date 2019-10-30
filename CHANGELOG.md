@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
+
+- [#1208](https://gitlab.com/meltano/meltano/issues/1208) Add description to `Plugin` definition and updated `discovery.yml` and UI to consume it
 
 ### Changes
 
 ### Fixes
 
 ### Breaks
-
 
 ## 1.3.0 - (2019-10-28)
 
@@ -42,7 +43,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1079](https://gitlab.com/meltano/meltano/issues/1079) `meltano elt` will now run in isolation under `.meltano/run/elt`
 - [#1204](https://gitlab.com/meltano/meltano/issues/1204) move project creation steps out of the local installation section of the docs and into the Getting Started Guide
 - [#782](https://gitlab.com/meltano/meltano/issues/782) Update timeframe label and fix timeframe attributes to properly display in the Result Table
-
 
 ## 1.2.1 - (2019-10-22)
 
