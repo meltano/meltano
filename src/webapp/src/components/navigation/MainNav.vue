@@ -290,10 +290,9 @@ export default {
         </router-link>
 
         <a
-          class="navbar-item navbar-child has-text-weight-semibold tooltip is-tooltip-warning is-tooltip-bottom"
-          data-tooltip="Help shape this feature by contributing your ideas"
+          class="navbar-item navbar-child has-text-weight-semibold"
           target="_blank"
-          href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=notebook"
+          href="https://www.meltano.com/tutorials/using-jupyter-notebooks.html#using-jupyter-notebooks"
         >
           <a
             class="button has-background-transparent is-borderless is-paddingless"
