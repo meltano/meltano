@@ -104,15 +104,16 @@ extractors:
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     settings:
+      - name: host
+        kind: readonly
+        tooltip: This value can only be changed using the Meltano CLI.
+        value: localhost
+      - name: port
+        value: 27017
       - name: user
         env: MONGODB_USERNAME
       - name: password
         kind: password
-      - name: host
-        kind: readonly
-        tooltip: This value can only be changed using the Meltano CLI.
-      - name: port
-        value: 27017
       - name: dbname
         label: Database Name
   - name: tap-salesforce

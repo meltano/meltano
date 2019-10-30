@@ -59,7 +59,7 @@ def create_app(config={}):
     logger.addHandler(file_handler)
     logger.addHandler(stdout_handler)
 
-    # Extensions
+    # 1) Extensions
     security_options = {}
 
     from .models import db
@@ -77,6 +77,12 @@ def create_app(config={}):
     setup_json(app)
     CORS(app, origins="*")
 
+    # 2) Register the URL Converters
+    from .url_converters import PluginRefConverter
+
+    app.url_map.converters["plugin_ref"] = PluginRefConverter
+
+    # 3) Register the controllers
     from .controllers.root import root
     from .controllers.dashboards import dashboardsBP
     from .controllers.reports import reportsBP

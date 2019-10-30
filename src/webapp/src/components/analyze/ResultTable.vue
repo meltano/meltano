@@ -68,9 +68,7 @@ export default {
             <th
               v-for="(queryAttribute, idx) in queryAttributes"
               :key="
-                `${queryAttribute.sourceName}-${
-                  queryAttribute.attributeName
-                }-${idx}`
+                `${queryAttribute.sourceName}-${queryAttribute.attributeName}-${idx}`
               "
             >
               <div class="is-flex">

@@ -6,51 +6,50 @@ export default {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },
 
-  getAllPipelineSchedules() {
-    return axios.get(utils.apiUrl('orchestrations', 'get/pipeline_schedules'))
+  run(eltPayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'run'), eltPayload)
   },
 
   getExtractorInFocusEntities(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
   },
 
-  getJobLog(jobId) {
-    return axios.post(utils.apiUrl('orchestrations', 'job/log'), jobId)
-  },
-
-  getPluginConfiguration(pluginPayload) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'get/configuration'),
-      pluginPayload
-    )
-  },
-
-  getPolledPipelineJobStatus(pollPayload) {
-    return axios.post(utils.apiUrl('orchestrations', 'job/state'), pollPayload)
-  },
-
-  run(eltPayload) {
-    return axios.post(utils.apiUrl('orchestrations', 'run'), eltPayload)
-  },
-
-  savePipelineSchedule(schedulePayload) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'save/pipeline_schedule'),
-      schedulePayload
-    )
-  },
-
-  savePluginConfiguration(configPayload) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'save/configuration'),
-      configPayload
-    )
-  },
-
   selectEntities(extractorEntities) {
     return axios.post(
       utils.apiUrl('orchestrations', 'select-entities'),
       extractorEntities
+    )
+  },
+
+  getJobLog({ jobId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
+  },
+
+  getPolledPipelineJobStatus(pollPayload) {
+    return axios.post(utils.apiUrl('orchestrations', 'jobs/state'), pollPayload)
+  },
+
+  getAllPipelineSchedules() {
+    return axios.get(utils.apiUrl('orchestrations', 'pipeline_schedules'))
+  },
+
+  savePipelineSchedule(schedulePayload) {
+    return axios.post(
+      utils.apiUrl('orchestrations', 'pipeline_schedules'),
+      schedulePayload
+    )
+  },
+
+  getPluginConfiguration({ type, name }) {
+    return axios.get(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration`)
+    )
+  },
+
+  savePluginConfiguration({ type, name, config }) {
+    return axios.put(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
+      config
     )
   }
 }
