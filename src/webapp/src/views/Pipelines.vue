@@ -143,9 +143,9 @@ export default {
               :disabled="!getIsStepScheduleMinimallyValidated"
               @click="setStep('schedules')"
             >
-              Run
+              Schedule
             </button>
-            <p>Start Data Collection</p>
+            <p>Schedule Data Pipelines</p>
           </div>
         </div>
 
