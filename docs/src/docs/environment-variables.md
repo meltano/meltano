@@ -27,6 +27,10 @@ If you'd prefer to use Meltano _without_ sending the team this kind of data, you
   export MELTANO_DISABLE_TRACKING=True
   ```
 
+## Connector Settings Configuration
+
+Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
+
 ## System Database
 
 By default, Meltano uses a SQLite database named `./meltano/meltano.db` as its system database.

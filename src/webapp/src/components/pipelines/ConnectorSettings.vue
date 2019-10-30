@@ -208,7 +208,7 @@ export default {
             </div>
             <div v-if="getIsOfKindReadonly(setting.kind)" class="control">
               <a
-                href="http://www.google.com"
+                href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
                 target="_blank"
                 class="button is-small"
               >
