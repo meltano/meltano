@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1233](https://gitlab.com/meltano/meltano/issues/1233) Fix the Design page failing to load a Design that has timeframes on the base table
 - [#1187](https://gitlab.com/meltano/meltano/issues/1187) Updated configuration to support `readonly` kind to prevent unwanted editing
 - [#1187](https://gitlab.com/meltano/meltano/issues/1187) Updated configuration to setting resets to prevent unwanted editing
+- [#1187](https://gitlab.com/meltano/meltano/issues/1187) Updated configuration to conditionally reset certain settings to prevent unwanted editing
 
 ### Breaks
 
