@@ -42,9 +42,6 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
-    getIsOfKindReadonly() {
-      return kind => kind === 'readonly'
-    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
@@ -205,8 +202,6 @@ export default {
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="setting.value || setting.name"
-                :disabled="getIsOfKindReadonly(setting.kind)"
-                :readonly="getIsOfKindReadonly(setting.kind)"
                 @focus="$event.target.select()"
                 @input="trySecureResets(setting.name)"
               />
