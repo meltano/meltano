@@ -42,6 +42,9 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
+    getIsOfKindReadonly() {
+      return kind => kind === 'readonly'
+    },
     getIsOfKindTextBased() {
       return kind =>
         !this.getIsOfKindBoolean(kind) &&
@@ -118,13 +121,6 @@ export default {
           this.configSettings.config.account = newVal.config.account
         }
       }
-    },
-    trySecureResets(settingName) {
-      this.settingsSecureResets.forEach(reset => {
-        if (settingName === reset.source) {
-          this.configSettings.config[reset.target] = ''
-        }
-      })
     }
   }
 }
@@ -151,8 +147,11 @@ export default {
           </label>
         </div>
         <div class="field-body">
-          <div class="field">
-            <div class="control is-expanded">
+          <div
+            class="field"
+            :class="{ 'has-addons': getIsOfKindReadonly(setting.kind) }"
+          >
+            <div class="control is-expanded has-icons-right">
               <!-- Boolean -->
               <input
                 v-if="getIsOfKindBoolean(setting.kind)"
@@ -202,10 +201,26 @@ export default {
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="setting.value || setting.name"
+                :disabled="getIsOfKindReadonly(setting.kind)"
+                :readonly="getIsOfKindReadonly(setting.kind)"
                 @focus="$event.target.select()"
-                @input="trySecureResets(setting.name)"
               />
             </div>
+            <div v-if="getIsOfKindReadonly(setting.kind)" class="control">
+              <a
+                href="http://www.google.com"
+                target="_blank"
+                class="button is-small"
+              >
+                <span
+                  class="icon has-text-grey-dark tooltip is-tooltip-multiline"
+                  data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                >
+                  <font-awesome-icon icon="lock"></font-awesome-icon>
+                </span>
+              </a>
+            </div>
+
             <p v-if="setting.description" class="help is-italic">
               {{ setting.description }}
             </p>

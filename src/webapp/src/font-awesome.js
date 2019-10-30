@@ -25,6 +25,7 @@ import {
   faGlobeAmericas,
   faHashtag,
   faInfoCircle,
+  faLock,
   faProjectDiagram,
   faSync,
   faSearch,
@@ -70,6 +71,7 @@ export default {
     library.add(faGlobeAmericas)
     library.add(faHashtag)
     library.add(faInfoCircle)
+    library.add(faLock)
     library.add(faProjectDiagram)
     library.add(faSync)
     library.add(faSearch)

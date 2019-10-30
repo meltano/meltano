@@ -162,7 +162,6 @@ export default {
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"
             :config-settings="localConfiguration"
-            :settings-secure-resets="extractor.settingsSecureResets"
           />
           <div v-if="extractor.docs" class="content has-text-centered mt1r">
             <p>
