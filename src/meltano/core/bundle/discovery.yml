@@ -38,12 +38,13 @@ extractors:
     settings_group_validation:
       - ['api_url', 'private_token', 'groups', 'start_date']
       - ['api_url', 'private_token', 'projects', 'start_date']
+    settings_secure_resets:
+      - source: api_url
+        target: private_token
     settings:
       - name: api_url
         label: GitLab API
         value: 'https://gitlab.com/api/v4'
-        kind: readonly
-        tooltip: This value can only be changed using the Meltano CLI.
       - name: private_token
         kind: password
         env: GITLAB_API_TOKEN
@@ -103,10 +104,12 @@ extractors:
     namespace: tap_mongodb
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    settings_secure_resets:
+      - source: host
+        target: password
     settings:
       - name: host
-        kind: readonly
-        tooltip: This value can only be changed using the Meltano CLI.
+        label: Host URL
         value: localhost
       - name: port
         value: 27017
