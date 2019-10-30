@@ -19,11 +19,6 @@ export default {
     fieldClass: {
       type: String,
       default: ''
-    },
-    settingsSecureResets: {
-      type: Array,
-      required: false,
-      default: () => []
     }
   },
   computed: {
