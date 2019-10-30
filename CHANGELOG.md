@@ -13,6 +13,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1126](https://gitlab.com/meltano/meltano/issues/1126) Minor UI updates to improve clarity around Schedule step and Manual vs Orchestrated runs
+
 ### Fixes
 
 ### Breaks
