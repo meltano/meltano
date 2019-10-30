@@ -23,20 +23,20 @@ export default {
     sortedLoaders() {
       // This is a stop gap until we implement an eventual need for automatic text filtering for cards
       const currentLoaders = this.plugins.loaders || []
-      let newLoaders = []
+      let orderedForSpeedRunLoaders = []
 
       if (currentLoaders.length > 0) {
-        newLoaders = [this.speedRunLoader].concat(
-          currentLoaders.filter(plugin => plugin !== this.speedRunLoader)
+        const start = [
+          currentLoaders.find(plugin => plugin.name === this.speedRunLoader)
+        ]
+        const end = currentLoaders.filter(
+          plugin => plugin.name !== this.speedRunLoader
         )
+        orderedForSpeedRunLoaders = start.concat(end)
       }
 
-      return newLoaders
+      return orderedForSpeedRunLoaders
     }
-  },
-  created() {
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
     updateLoaderSettings(loader) {
@@ -67,28 +67,31 @@ export default {
     <div class="tile is-ancestor is-flex is-flex-wrap">
       <div
         v-for="(loader, index) in sortedLoaders"
-        :key="`${loader}-${index}`"
-        :data-test-id="`${loader}-loader-card`"
+        :key="`${loader.name}-${index}`"
+        :data-test-id="`${loader.name}-loader-card`"
         class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">
-          <SpeedRunIcon v-if="loader === speedRunLoader" />
+          <SpeedRunIcon v-if="loader.name === speedRunLoader" />
           <div class="image level-item is-64x64 container">
             <ConnectorLogo
-              :connector="loader"
-              :is-grayscale="!getIsPluginInstalled('loaders', loader)"
+              :connector="loader.name"
+              :is-grayscale="!getIsPluginInstalled('loaders', loader.name)"
             />
           </div>
           <div class="content is-small">
+            <p class="has-text-centered has-text-weight-semibold">
+              {{ loader.name }}
+            </p>
             <p class="has-text-centered">
-              {{ loader }}
+              {{ loader.description }}
             </p>
 
-            <template v-if="getIsPluginInstalled('loaders', loader)">
+            <template v-if="getIsPluginInstalled('loaders', loader.name)">
               <div class="buttons are-small">
                 <a
                   class="button is-interactive-primary flex-grow-1"
-                  @click="updateLoaderSettings(loader)"
+                  @click="updateLoaderSettings(loader.name)"
                   >Configure</a
                 >
                 <a
@@ -104,11 +107,11 @@ export default {
               <a
                 :class="{
                   'is-loading':
-                    getIsAddingPlugin('loaders', loader) ||
-                    getIsInstallingPlugin('loaders', loader)
+                    getIsAddingPlugin('loaders', loader.name) ||
+                    getIsInstallingPlugin('loaders', loader.name)
                 }"
                 class="button is-interactive-primary is-outlined is-block is-small"
-                @click="updateLoaderSettings(loader)"
+                @click="updateLoaderSettings(loader.name)"
                 >Install</a
               >
             </template>

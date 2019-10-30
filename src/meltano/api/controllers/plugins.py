@@ -1,3 +1,5 @@
+from itertools import groupby
+
 from meltano.core.compiler.project_compiler import ProjectCompiler
 from meltano.core.error import PluginInstallError
 from meltano.core.plugin_discovery_service import (
@@ -22,10 +24,14 @@ def _handle(ex):
 
 @pluginsBP.route("/all", methods=["GET"])
 def all():
-    new_project = Project()
-    new_plugin_discovery_service = PluginDiscoveryService(new_project)
-    result = new_plugin_discovery_service.discover(PluginType.ALL)
-    return jsonify(result)
+    project = Project.find()
+    discovery = PluginDiscoveryService(project)
+    ordered_plugins = {}
+
+    for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
+        ordered_plugins[type] = [plugin.canonical() for plugin in plugins]
+
+    return jsonify(ordered_plugins)
 
 
 @pluginsBP.route("/installed", methods=["GET"])

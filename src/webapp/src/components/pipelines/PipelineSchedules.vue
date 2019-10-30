@@ -27,8 +27,6 @@ export default {
   },
   created() {
     this.$store.dispatch('configuration/getAllPipelineSchedules')
-    this.$store.dispatch('plugins/getAllPlugins')
-    this.$store.dispatch('plugins/getInstalledPlugins')
   },
   methods: {
     goToCreatePipeline() {
