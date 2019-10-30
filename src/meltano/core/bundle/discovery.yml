@@ -245,8 +245,8 @@ loaders:
     pip_url: 'git+https://gitlab.com/meltano/target-sqlite.git'
     settings:
       - name: database
-        label: Database
-        description: Path to the database, relative to the project root. If the database does not exist yet, it will be created.
+        label: Database Name
+        description: '"warehouse" is the default name of the SQLite loader database generated at the project root. Feel free to rename it.'
         value: warehouse
 transformers:
   - name: dbt
