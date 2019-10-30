@@ -19,6 +19,11 @@ export default {
     fieldClass: {
       type: String,
       default: ''
+    },
+    settingsSecureResets: {
+      type: Array,
+      required: false,
+      default: () => []
     }
   },
   computed: {
@@ -73,28 +78,7 @@ export default {
   watch: {
     configSettings: {
       handler(newVal) {
-        /**
-         * Improve account UX by auto-detecting Account ID via URL
-         * for configs that have `account`
-         * This is currently Loader-Snowflake specific
-         * and we'll need a more robust solution
-         * when/if we add UX helpers like this for more connectors
-         * TODO: Need to add a loader indicator to show something is "processing"
-         */
-        const accountInput = newVal.config.account
-        if (accountInput) {
-          const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-
-          if (parsedAccountId) {
-            const vm = this
-
-            setTimeout(() => {
-              vm.configSettings.config.account = parsedAccountId
-            }, 1000)
-          } else {
-            this.configSettings.config.account = newVal.config.account
-          }
-        }
+        this.snowflakeHelper(newVal)
       },
       deep: true
     }
@@ -113,6 +97,37 @@ export default {
         const targetInput = firstEmptyInput || inputs[0]
         targetInput.focus()
       }
+    },
+    snowflakeHelper(newVal) {
+      /**
+       * Improve account UX by auto-detecting Account ID via URL
+       * for configs that have `account`
+       * This is currently Loader-Snowflake specific
+       * and we'll need a more robust solution
+       * when/if we add UX helpers like this for more connectors
+       * TODO: Need to add a loader indicator to show something is "processing"
+       */
+      const accountInput = newVal.config.account
+      if (accountInput) {
+        const parsedAccountId = utils.snowflakeAccountParser(accountInput)
+
+        if (parsedAccountId) {
+          const vm = this
+
+          setTimeout(() => {
+            vm.configSettings.config.account = parsedAccountId
+          }, 1000)
+        } else {
+          this.configSettings.config.account = newVal.config.account
+        }
+      }
+    },
+    trySecureResets(settingName) {
+      this.settingsSecureResets.forEach(reset => {
+        if (settingName === reset.source) {
+          this.configSettings.config[reset.target] = ''
+        }
+      })
     }
   }
 }
@@ -193,6 +208,7 @@ export default {
                 :disabled="getIsOfKindReadonly(setting.kind)"
                 :readonly="getIsOfKindReadonly(setting.kind)"
                 @focus="$event.target.select()"
+                @input="trySecureResets(setting.name)"
               />
             </div>
             <p v-if="setting.description" class="help is-italic">
