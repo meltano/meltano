@@ -165,7 +165,8 @@ export default {
                     >Orchestrate</router-link
                   >
                   <router-link
-                    class="button is-interactive-primary is-outlined is-small"
+                    class="button is-interactive-primary is-outlined is-small tooltip is-tooltip-left"
+                    data-tooltip="Analyze associated models."
                     :to="{ name: 'model' }"
                     >Model</router-link
                   >
