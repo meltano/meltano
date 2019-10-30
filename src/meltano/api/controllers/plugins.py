@@ -26,7 +26,6 @@ def _handle(ex):
 def all():
     project = Project.find()
     discovery = PluginDiscoveryService(project)
-    plugins = discovery.plugins()
     ordered_plugins = {}
 
     for type, plugins in groupby(discovery.plugins(), key=lambda p: p.type):
