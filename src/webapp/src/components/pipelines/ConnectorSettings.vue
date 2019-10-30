@@ -129,14 +129,14 @@ export default {
         class="field is-horizontal"
       >
         <div :class="['field-label', labelClass]">
-          <label class="label" :for="getFormFieldForId(setting)">{{
-            setting.label || getCleanedLabel(setting.name)
-          }}</label>
-          <TooltipCircle
-            v-if="setting.tooltip"
-            :text="setting.tooltip"
-            class="label-tooltip"
-          />
+          <label class="label" :for="getFormFieldForId(setting)"
+            >{{ setting.label || getCleanedLabel(setting.name) }}
+            <TooltipCircle
+              v-if="setting.tooltip"
+              :text="setting.tooltip"
+              class="label-tooltip"
+            />
+          </label>
         </div>
         <div class="field-body">
           <div class="field">

@@ -40,8 +40,10 @@ extractors:
       - ['api_url', 'private_token', 'projects', 'start_date']
     settings:
       - name: api_url
-        label: GitLab API URL
+        label: GitLab API
         value: 'https://gitlab.com/api/v4'
+        kind: readonly
+        tooltip: This value can only be changed using the Meltano CLI.
       - name: private_token
         kind: password
         env: GITLAB_API_TOKEN
@@ -107,6 +109,8 @@ extractors:
       - name: password
         kind: password
       - name: host
+        kind: readonly
+        tooltip: This value can only be changed using the Meltano CLI.
       - name: port
         value: 27017
       - name: dbname
