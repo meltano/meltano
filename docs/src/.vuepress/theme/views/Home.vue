@@ -699,6 +699,7 @@ export default {
   font-weight: 400;
   font-size: 36px;
   color: #1D1D1D;
+  margin: 0;
 }
 
 @media (min-width: $MQNarrow) {
