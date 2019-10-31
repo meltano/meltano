@@ -1,3 +1,4 @@
+import os
 import copy
 import logging
 from enum import Enum
@@ -7,7 +8,14 @@ from .elt_context import ELTContext
 from .plugin_discovery_service import PluginDiscoveryService
 
 
-ANALYZE_SCHEMA = "analytics"
+DEFAULT_ANALYZE_SCHEMA = "analytics"
+MELTANO_SCHEMA_SUFFIX = os.getenv("MELTANO_SCHEMA_SUFFIX", "")
+MELTANO_LOAD_SCHEMA_SUFFIX = os.getenv(
+    "MELTANO_LOAD_SCHEMA_SUFFIX", MELTANO_SCHEMA_SUFFIX
+)
+MELTANO_ANALYZE_SCHEMA_SUFFIX = os.getenv(
+    "MELTANO_ANALYZE_SCHEMA_SUFFIX", MELTANO_SCHEMA_SUFFIX
+)
 
 
 class DialectNotSupportedError(Exception):
@@ -23,31 +31,30 @@ class ConnectionService:
         return self.context.loader.namespace
 
     def load_params(self):
+        schema = (
+            os.getenv("MELTANO_LOAD_SCHEMA", self.context.extractor.namespace)
+            + MELTANO_LOAD_SCHEMA_SUFFIX
+        )
+
         dialect_params = {
-            "postgres": lambda: {
-                "dialect": self.dialect,
-                "schema": self.context.extractor.namespace,
-            },
-            "snowflake": lambda: {
-                "dialect": self.dialect,
-                "schema": self.context.extractor.namespace.upper(),
-            },
-            "sqlite": lambda: {"dialect": self.dialect},
+            "postgres": {"schema": schema},
+            "snowflake": {"schema": schema.upper()},
         }
 
-        return copy.deepcopy(dialect_params[self.dialect]())
+        return dialect_params.get(self.dialect, {})
 
     def analyze_params(self):
+        schema = (
+            os.getenv("MELTANO_ANALYZE_SCHEMA", DEFAULT_ANALYZE_SCHEMA)
+            + MELTANO_ANALYZE_SCHEMA_SUFFIX
+        )
+
         dialect_params = {
-            "postgres": lambda: {"dialect": self.dialect, "schema": ANALYZE_SCHEMA},
-            "snowflake": lambda: {
-                "dialect": self.dialect,
-                "schema": ANALYZE_SCHEMA.upper(),
-            },
-            "sqlite": lambda: {"dialect": self.dialect},
+            "postgres": {"schema": schema},
+            "snowflake": {"schema": schema.upper()},
         }
 
-        return copy.deepcopy(dialect_params[self.dialect]())
+        return dialect_params.get(self.dialect, {})
 
     def load_uri(self):
         params = self.load_params()
