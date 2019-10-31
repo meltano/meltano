@@ -131,17 +131,6 @@ export default {
                       {{ activeDashboard.description }}
                     </h3>
                   </div>
-                  <div v-if="activeDashboard.name" class="column">
-                    <div class="buttons is-right">
-                      <a
-                        class="button tooltip is-tooltip-warning is-tooltip-left"
-                        data-tooltip="Help shape this feature by contributing your ideas"
-                        target="_blank"
-                        href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=dashboard"
-                        >Add Report</a
-                      >
-                    </div>
-                  </div>
                 </div>
 
                 <progress
@@ -194,7 +183,7 @@ export default {
                     <p>There are no reports added to this dashboard yet.</p>
                     <router-link
                       class="button is-interactive-primary is-outlined"
-                      :to="{ name: 'analyze' }"
+                      :to="{ name: 'model' }"
                       >Analyze Some Data First</router-link
                     >
                   </div>
