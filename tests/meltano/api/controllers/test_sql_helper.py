@@ -66,6 +66,6 @@ class TestSqlHelper:
             create_engine_mock.assert_called_with(engine_uri)
 
     @pytest.mark.parametrize("loader", ["target-csv", "target-snowflake"])
-    def test_get_db_engine_unsupported(self, app_context, subject, loader):
+    def test_get_db_engine_unsupported(self, app, subject, loader):
         with pytest.raises(UnsupportedConnectionDialect):
             subject.get_db_engine(loader)
