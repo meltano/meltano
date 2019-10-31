@@ -35,6 +35,7 @@ extractors:
     namespace: tap_gitlab
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
+    autodiscover: false
     settings_group_validation:
       - ['api_url', 'private_token', 'groups', 'start_date']
       - ['api_url', 'private_token', 'projects', 'start_date']
