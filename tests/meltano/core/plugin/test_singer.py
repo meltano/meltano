@@ -455,7 +455,7 @@ class TestSingerTap:
 
         with mock.patch.object(
             PluginInvoker, "invoke", return_value=process_mock
-        ) as invoke, pytest.raises(PluginExecutionError):
+        ) as invoke, pytest.raises(PluginExecutionError, match="returned 1"):
             subject.run_discovery(invoker, [])
 
             assert not invoker.files[
@@ -465,24 +465,12 @@ class TestSingerTap:
     def test_apply_select_catalog_invalid(
         self, session, plugin_invoker_factory, subject
     ):
-        process_mock = mock.Mock()
-        process_mock.wait.return_value = 0
-
         invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
-        def corrupt_catalog(*_, **__):
-            invoker.files["catalog"].open("w").write("this is invalid json")
+        invoker.files["catalog"].open("w").write("this is invalid json")
 
-            return process_mock
-
-        with mock.patch.object(
-            PluginInvoker, "invoke", side_effect=corrupt_catalog
-        ) as invoke:
+        with pytest.raises(PluginExecutionError, match=r"invalid"):
             subject.apply_select(invoker, [])
-
-            assert not invoker.files[
-                "catalog"
-            ].exists(), "Catalog should not be present."
 
 
 class TestLegacyCatalogSelectVisitor:
