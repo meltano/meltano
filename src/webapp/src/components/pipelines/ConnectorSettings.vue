@@ -38,7 +38,7 @@ export default {
       return kind => kind === 'options'
     },
     getIsProtected() {
-      return setting => setting.readonly === true
+      return setting => setting.protected === true
     },
     getIsOfKindTextBased() {
       return kind =>
