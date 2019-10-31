@@ -55,7 +55,7 @@ class PluginInvoker:
         self.config_service = plugin_config_service or PluginConfigService(
             plugin,
             config_dir or self.project.plugin_dir(plugin),
-            run_dir or self.project.run_dir(plugin.name)
+            run_dir or self.project.run_dir(plugin.name),
         )
         self.settings_service = plugin_settings_service or PluginSettingsService(
             project
