@@ -136,7 +136,7 @@ def save_plugin_configuration(plugin_ref) -> Response:
     settings = PluginSettingsService(project)
     for name, value in payload.items():
         # we want to prevent the edition of readonly settings from the UI
-        if settings.find_setting(plugin_ref, name).get("kind") == "readonly":
+        if settings.find_setting(plugin_ref, name).get("readonly"):
             logging.warning("Cannot set a 'readonly' configuration externally.")
             continue
 
