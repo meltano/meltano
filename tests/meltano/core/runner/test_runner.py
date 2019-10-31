@@ -167,11 +167,9 @@ class TestSingerRunner:
         async def invoke_mock(*args):
             pass
 
-        with mock.patch.object(
-            SingerRunner, "restore_bookmark"
-        ) as restore_bookmark, mock.patch.object(
-            SingerRunner, "invoke", side_effect=invoke_mock
-        ) as invoke:
+        # fmt: off
+        with mock.patch.object(SingerRunner, "restore_bookmark") as restore_bookmark, \
+          mock.patch.object(SingerRunner, "invoke", side_effect=invoke_mock) as invoke:
             subject.run(session, dry_run=True)
 
             assert not restore_bookmark.called
@@ -182,3 +180,4 @@ class TestSingerRunner:
 
             restore_bookmark.assert_called_once_with(session, AnyPluginInvoker)
             invoke.assert_called_once_with(AnyPluginInvoker, AnyPluginInvoker)
+        # fmt: on

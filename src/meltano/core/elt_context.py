@@ -27,26 +27,35 @@ class ELTContext:
         loader: PluginContext,
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
+        plugin_settings_service: PluginSettingsService = None,
     ):
         self.project = project
         self.job = job
         self.loader = loader
         self.extractor = extractor
+        self.plugin_settings_service = plugin_settings_service
+
+    @property
+    def elt_run_dir(self):
+        if self.job:
+            self.project.job_dir(self.job.job_id, str(self.job.run_id))
 
     def extractor_invoker(self):
         return invoker_factory(
             self.project,
             self.extractor.install,
-            run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
+            run_dir=self.elt_run_dir,
             plugin_config=self.extractor.config,
+            plugin_settings_service=self.plugin_settings_service,
         )
 
     def loader_invoker(self):
         return invoker_factory(
             self.project,
             self.loader.install,
-            run_dir=self.project.job_dir(self.job.job_id, str(self.job.run_id)),
+            run_dir=self.elt_run_dir,
             plugin_config=self.loader.config,
+            plugin_settings_service=self.plugin_settings_service,
         )
 
 
@@ -60,11 +69,14 @@ class ELTContextBuilder:
     ):
         self.project = project
         self.config_service = config_service or ConfigService(project)
-        self.settings_service = plugin_settings_service or PluginSettingsService(
-            project
+        self.plugin_discovery_service = (
+            plugin_discovery_service
+            or PluginDiscoveryService(project, config_service=config_service)
         )
-        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
-            project
+        self.plugin_settings_service = plugin_settings_service or PluginSettingsService(
+            project,
+            config_service=config_service,
+            plugin_discovery_service=plugin_discovery_service,
         )
         self._extractor = None
         self._loader = None
@@ -91,10 +103,10 @@ class ELTContextBuilder:
             install=self.config_service.find_plugin(
                 plugin_name=plugin.name, plugin_type=plugin.type
             ),
-            definition=self.discovery_service.find_plugin(
+            definition=self.plugin_discovery_service.find_plugin(
                 plugin_name=plugin.name, plugin_type=plugin.type
             ),
-            config=self.settings_service.as_config(session, plugin),
+            config=self.plugin_settings_service.as_config(session, plugin),
         )
 
     def context(self, session) -> ELTContext:
@@ -105,4 +117,5 @@ class ELTContextBuilder:
             extractor=self.plugin_context(session, self._extractor)
             if self._extractor
             else None,
+            plugin_settings_service=self.plugin_settings_service,
         )

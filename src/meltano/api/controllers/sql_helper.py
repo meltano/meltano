@@ -17,8 +17,11 @@ from meltano.core.m5o.m5oc_file import M5ocFile
 from meltano.core.sql.analysis_helper import AnalysisHelper
 from meltano.core.sql.sql_utils import SqlUtils
 from meltano.core.elt_context import ELTContextBuilder
-from meltano.core.connection_service import ConnectionService
+from meltano.core.connection_service import ConnectionService, DialectNotSupportedError
 from .settings_helper import SettingsHelper
+
+
+ENABLED_DIALECTS = ["postgres", "sqlite"]
 
 
 class ConnectionNotFound(Exception):
@@ -55,11 +58,17 @@ class SqlHelper(SqlUtils):
         connection_service = ConnectionService(context)
 
         engine_hooks = []
-        params = connection_service.analyze_params()
-        engine_uri = connection_service.analyze_uri()
-        dialect = params["dialect"]
+        dialect = connection_service.dialect
+        engine_uri = None
+        params = None
 
-        if dialect not in ["postgres", "sqlite"]:
+        try:
+            params = connection_service.analyze_params()
+            engine_uri = connection_service.analyze_uri()
+
+            if dialect not in ENABLED_DIALECTS:
+                raise UnsupportedConnectionDialect(dialect)
+        except DialectNotSupportedError:
             raise UnsupportedConnectionDialect(dialect)
 
         if dialect == "postgres":

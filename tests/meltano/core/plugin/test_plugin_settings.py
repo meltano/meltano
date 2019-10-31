@@ -1,5 +1,6 @@
 import pytest
 
+from meltano.core.plugin import PluginRef
 from meltano.core.plugin.setting import PluginSetting
 from meltano.core.plugin.settings_service import (
     PluginSettingValueSource,
@@ -19,6 +20,16 @@ def test_create(session):
     assert setting == fetched
 
 
+@pytest.fixture(scope="class")
+def env_var(plugin_discovery_service, plugin_settings_service):
+    def _wrapper(plugin: PluginRef, setting_name):
+        plugin_def = plugin_discovery_service.find_plugin(plugin.type, plugin.name)
+
+        return plugin_settings_service.setting_env({"name": setting_name}, plugin_def)
+
+    return _wrapper
+
+
 @pytest.fixture
 def subject(session, project_add_service, tap, plugin_settings_service):
     plugin = project_add_service.add("extractors", tap.name)
@@ -27,7 +38,7 @@ def subject(session, project_add_service, tap, plugin_settings_service):
 
 
 class TestPluginSettingsService:
-    def test_get_value(self, session, subject, project, tap, monkeypatch):
+    def test_get_value(self, session, subject, project, tap, env_var, monkeypatch):
         # returns the default value when unset
         assert subject.get_value(session, tap, "test") == (
             "mock",
@@ -65,7 +76,7 @@ class TestPluginSettingsService:
             meltano.update(original_meltano)
 
         # overriden via ENV
-        monkeypatch.setenv("PYTEST_TEST", "N33DC0F33")
+        monkeypatch.setenv(env_var(tap, "test"), "N33DC0F33")
         assert subject.get_value(session, tap, "test") == (
             "N33DC0F33",
             PluginSettingValueSource.ENV,
@@ -88,11 +99,11 @@ class TestPluginSettingsService:
         config = subject.as_config(session, tap)
         assert config["secure"] == "thisisatest"
 
-    def test_as_env(self, subject, session, tap):
+    def test_as_env(self, subject, session, tap, env_var):
         assert subject.as_env(session, tap) == {
-            "PYTEST_TEST": "mock",
-            "PYTEST_START_DATE": "None",
-            "PYTEST_SECURE": "None",
+            env_var(tap, "test"): "mock",
+            env_var(tap, "start_date"): "None",
+            env_var(tap, "secure"): "None",
         }
 
     def test_unset(self, session, subject, tap):

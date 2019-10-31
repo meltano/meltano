@@ -31,7 +31,7 @@ def discovery():
     discovery[PluginType.EXTRACTORS].append(
         {
             "name": "tap-mock",
-            "namespace": "pytest",
+            "namespace": "tap_mock",
             "pip_url": "tap-mock",
             "settings": [
                 {"name": "test", "value": "mock"},
@@ -42,13 +42,13 @@ def discovery():
     )
 
     discovery[PluginType.LOADERS].append(
-        {"name": "target-mock", "namespace": "sqlite", "pip_url": "target-mock"}
+        {"name": "target-mock", "namespace": "target_mock", "pip_url": "target-mock"}
     )
 
     discovery[PluginType.TRANSFORMERS].append(
         {
             "name": "transformer-mock",
-            "namespace": "pytest",
+            "namespace": "transformer_mock",
             "pip_url": "transformer-mock",
         }
     )
@@ -56,7 +56,7 @@ def discovery():
     discovery[PluginType.TRANSFORMS].append(
         {
             "name": "tap-mock-transform",
-            "namespace": "pytest",
+            "namespace": "tap_mock",
             "pip_url": "tap-mock-transform",
         }
     )
@@ -81,8 +81,10 @@ def discovery():
 
 
 @pytest.fixture(scope="class")
-def plugin_discovery_service(project, discovery):
-    return PluginDiscoveryService(project, discovery=discovery)
+def plugin_discovery_service(project, discovery, config_service):
+    return PluginDiscoveryService(
+        project, discovery=discovery, config_service=config_service
+    )
 
 
 @pytest.fixture(scope="class")
@@ -96,19 +98,25 @@ def project_init_service():
 
 
 @pytest.fixture(scope="class")
-def plugin_install_service(project):
-    return PluginInstallService(project)
+def plugin_install_service(project, config_service):
+    return PluginInstallService(project, config_service=config_service)
 
 
 @pytest.fixture(scope="class")
-def project_add_service(project, plugin_discovery_service):
-    return ProjectAddService(project, plugin_discovery_service=plugin_discovery_service)
+def project_add_service(project, config_service, plugin_discovery_service):
+    return ProjectAddService(
+        project,
+        config_service=config_service,
+        plugin_discovery_service=plugin_discovery_service,
+    )
 
 
 @pytest.fixture(scope="class")
-def plugin_settings_service(project, plugin_discovery_service):
+def plugin_settings_service(project, config_service, plugin_discovery_service):
     return PluginSettingsService(
-        project, plugin_discovery_service=plugin_discovery_service
+        project,
+        config_service=config_service,
+        plugin_discovery_service=plugin_discovery_service,
     )
 
 

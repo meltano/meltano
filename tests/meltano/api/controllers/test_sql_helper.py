@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 
 from meltano.core.plugin import PluginType
-from meltano.api.controllers.sql_helper import SqlHelper
+from meltano.api.controllers.sql_helper import SqlHelper, UnsupportedConnectionDialect
 
 
 @pytest.mark.usefixtures("session")
@@ -12,6 +12,8 @@ class TestSqlHelper:
         # we have to use `postgres` because we only support two dialects
         project_add_service.add(PluginType.LOADERS, "target-postgres")
         project_add_service.add(PluginType.LOADERS, "target-sqlite")
+        project_add_service.add(PluginType.LOADERS, "target-snowflake")
+        project_add_service.add(PluginType.LOADERS, "target-csv")
 
         return project
 
@@ -62,3 +64,8 @@ class TestSqlHelper:
 
             assert listen_mock.called
             create_engine_mock.assert_called_with(engine_uri)
+
+    @pytest.mark.parametrize("loader", ["target-csv", "target-snowflake"])
+    def test_get_db_engine_unsupported(self, app, subject, loader):
+        with pytest.raises(UnsupportedConnectionDialect):
+            subject.get_db_engine(loader)
