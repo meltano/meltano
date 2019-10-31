@@ -589,7 +589,6 @@ export default {
                 </a>
                 <template v-for="timeframe in design.relatedTable.timeframes">
                   <a
-                    v-if="!timeframe.relatedView.hidden"
                     :key="timeframe.label"
                     class="panel-block dimension-group"
                     :class="{ 'is-active': timeframe.selected }"
@@ -709,7 +708,6 @@ export default {
                     </a>
                     <template v-for="timeframe in join.relatedTable.timeframes">
                       <a
-                        v-if="!timeframe.hidden"
                         :key="timeframe.label"
                         class="panel-block timeframe"
                         :class="{
@@ -782,7 +780,6 @@ export default {
                     </a>
                     <template v-for="aggregate in join.relatedTable.aggregates">
                       <a
-                        v-if="!aggregate.hidden"
                         :key="aggregate.label"
                         class="panel-block space-between has-text-weight-medium"
                         :class="{ 'is-active': aggregate.selected }"
