@@ -20,6 +20,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Fixes
 
 - [#1075](https://gitlab.com/meltano/meltano/issues/1075) Fix a bug that caused `target-csv` to fail.
+- [#1233](https://gitlab.com/meltano/meltano/issues/1233) Fix the Design page failing to load a Design that has timeframes on the base table
 
 ### Breaks
 
