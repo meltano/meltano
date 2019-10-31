@@ -1,6 +1,8 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Install Meltano
+actionText: Get started
 actionLink: /docs/installation.html
+contributeText: Contribute
+contributeLink: /docs/contributing.html
 ---

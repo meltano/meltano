@@ -16,22 +16,24 @@
       </div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header">Open source data dashboarding</h2>
+          <h2 class="hero-header">Open source<br/><strong>data dashboarding</strong></h2>
           <p class="hero-tagline">
             Meltano is a free alternative to expensive SaaS tools. We provide an
             integrated workflow for modeling, extracting, loading, transforming,
             analyzing, notebooking, and orchestrating your data.
           </p>
 
-          <p class="action" v-if="data.actionText && data.actionLink">
+          <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
             <NavLink class="action-button" :item="actionLink" />
+            <NavLink class="action-button secondary" :item="contributeLink" />
           </p>
         </div>
 
         <div class="hero-right">
           <img
-            src="../assets/happy-meltano-user-transparent.png"
+            src="../assets/meltano-sketch.svg"
             alt="Happy Meltano User Says Hi"
+            width="500px"
           />
         </div>
       </div>
@@ -474,6 +476,12 @@ export default {
         link: this.data.actionLink,
         text: this.data.actionText
       }
+    },
+    contributeLink() {
+      return {
+        link: this.data.contributeLink,
+        text: this.data.contributeText
+      }
     }
   }
 }
@@ -682,18 +690,21 @@ export default {
 .hero-tagline {
   font-size: 1.2rem;
   padding-right: 20px;
-  padding-bottom: 15px;
+  padding-bottom: 10px;
+  color: #474C4F; 
 }
 
 .hero-header {
   padding-right: 40px;
-  font-weight: 700;
+  font-weight: 400;
   font-size: 36px;
+  color: #1D1D1D;
+  margin: 0;
 }
 
 @media (min-width: $MQNarrow) {
   .hero-header {
-    font-size: 36px;
+    font-size: 54px;
     text-align: left;
     padding-top: 40px;
     line-height: 1.2em;
@@ -718,7 +729,7 @@ export default {
   .hero
     width 100%
     text-align center
-    padding 0 0 3rem
+    padding 0 0 4rem
     img
       max-width 100%
     h1
@@ -734,15 +745,24 @@ export default {
     .action-button
       display inline-block
       font-size 1.2rem
+      font-weight bold
       color #fff
-      background-color:#42706d;
-      border-bottom: 1px solid #42706d;
+      background-color #464ACB;
       padding 0.8rem 1.6rem
       border-radius 4px
       transition background-color .1s ease
+      letter-spacing 0.1rem
       box-sizing border-box
+      margin-right: 0.4rem;
+      &.secondary
+        background none
+        box-shadow inset 0 0 0 2px #464ACB
+        color #464ACB
+        &:hover
+          background-color lighten(#fff, 10%)
       &:hover
-        background-color lighten($accentColor, 10%)
+        background-color lighten(#464ACB, 10%)
+
   .features
     border-top 1px solid $borderColor
     padding 1.2rem 0
