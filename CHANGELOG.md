@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1233](https://gitlab.com/meltano/meltano/issues/1233) Fix the Design page failing to load a Design that has timeframes on the base table
+
 ### Breaks
 
 ## 1.3.0 - (2019-10-28)
