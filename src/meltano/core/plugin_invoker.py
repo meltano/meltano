@@ -101,10 +101,10 @@ class PluginInvoker:
             namespace=self.plugin.type,
         )
 
-    def exec_args(self):
+    def exec_args(self, *args):
         plugin_args = self.plugin.exec_args(self.files)
 
-        return [str(arg) for arg in (self.exec_path(), *plugin_args)]
+        return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 
     def Popen_options(self):
         return {}
@@ -119,7 +119,7 @@ class PluginInvoker:
         process = None
         try:
             with self.plugin.trigger_hooks("invoke", self, args):
-                popen_args = [*self.exec_args(), *args]
+                popen_args = self.exec_args(*args)
                 logging.debug(f"Invoking: {popen_args}")
                 process = subprocess.Popen(popen_args, **Popen_options)
         except SubprocessError as perr:
@@ -142,7 +142,7 @@ class PluginInvoker:
         try:
             with self.plugin.trigger_hooks("invoke", self, args):
                 process = await asyncio.create_subprocess_exec(
-                    *self.exec_args(), *args, **Popen_options
+                    *self.exec_args(*args), **Popen_options
                 )
         except SubprocessError as perr:
             logging.error(f"{self.plugin.name} has failed: {str(perr)}")

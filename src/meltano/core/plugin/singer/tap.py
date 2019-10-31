@@ -1,5 +1,6 @@
 import json
 import logging
+import subprocess
 from typing import Dict
 from jsonschema import Draft4Validator
 
@@ -51,13 +52,15 @@ class SingerTap(SingerPlugin):
         properties_file = plugin_invoker.files["catalog"]
 
         with properties_file.open("w") as catalog:
-            result = plugin_invoker.invoke("--discover", stdout=catalog)
+            result = plugin_invoker.invoke(
+                "--discover", stdout=catalog, stderr=subprocess.PIPE, text=True
+            )
             exit_code = result.wait()
 
         if exit_code != 0:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Command {plugin_invoker.exec_path()} {plugin_invoker.exec_args()} returned {exit_code}"
+                f"Schema discovery failed: command {plugin_invoker.exec_args('--discover')} returned {exit_code}: {result.stderr.read().rstrip()}"
             )
 
         # test for the schema to be a valid catalog
