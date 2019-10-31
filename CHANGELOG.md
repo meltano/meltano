@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ---
 
 ### New
-
+- [#1232](https://gitlab.com/meltano/meltano/issues/1232) Add package downloads section in roadmap focus
 - [#1208](https://gitlab.com/meltano/meltano/issues/1208) Add description to `Plugin` definition and updated `discovery.yml` and UI to consume it
 
 ### Changes
