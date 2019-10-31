@@ -70,6 +70,7 @@ The focus of our team is to grow [MAUI](#maui) by 10% every week.
 A week is measured from Sunday to Saturday.
 Every improvement we make should be optimized by that.
 This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
+Besides [MAUI](#maui) we keep an eye on the [package downloads](#package-downloads) per month.
 
 ## Metrics
 
@@ -93,6 +94,10 @@ We also track the Monthly Active UI Users (MAUI). MAUI is pronounced like [the i
 Internal metrics:
 
 - [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
+
+### Package downloads
+
+Besides the internal tracking of [MAU](#mau) and [MAUI](#maui) we keep track of the [`meltano`](https://pypi.org/project/meltano/) package downloads from [`PyPI`](https://pypi.org/), where the package is released, using the public `PyPI` download statistics [dataset](https://console.cloud.google.com/bigquery?p=the-psf&d=pypi&page=dataset) stored in [Google BigQuery](https://cloud.google.com/bigquery/).
 
 ## Monetization
 
