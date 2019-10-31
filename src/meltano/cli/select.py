@@ -8,7 +8,7 @@ from . import cli
 from .params import project
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin_invoker import invoker_factory
-from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.singer.catalog import parse_select_pattern, SelectionType
 from meltano.core.select_service import SelectService
 from meltano.core.tracking import GoogleAnalyticsTracker
@@ -66,6 +66,12 @@ def select(project, extractor, entities_filter, attributes_filter, **flags):
             attributes_filter=attributes_filter,
             flags=flags,
         )
+    except PluginLacksCapabilityError as e:
+        logging.exception(e)
+        raise click.ClickException(
+            f"Cannot list the selected properties: "
+            "the tap does not support schema discovery or selection."
+        ) from e
     except PluginExecutionError as e:
         logging.exception(e)
         raise click.ClickException(

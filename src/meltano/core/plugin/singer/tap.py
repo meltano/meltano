@@ -6,7 +6,7 @@ from jsonschema import Draft4Validator
 
 from meltano.core.utils import file_has_data
 from meltano.core.behavior.hookable import hook
-from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 
 from . import SingerPlugin, PluginType
 from .catalog import SelectExecutor
@@ -21,13 +21,28 @@ class SingerTap(SingerPlugin):
         """
         args = ["--config", files["config"]]
 
-        if file_has_data(files["catalog"]):
-            args += ["--catalog", files["catalog"]]
+        if self.supports_selection and file_has_data(files["catalog"]):
+            args += [self.catalog_flag, files["catalog"]]
 
-        if file_has_data(files["state"]):
+        if "state" in self.capabilities and file_has_data(files["state"]):
             args += ["--state", files["state"]]
 
         return args
+
+    @property
+    def supports_discovery(self):
+        return "discover" in self.capabilities
+
+    @property
+    def supports_selection(self):
+        return "catalog" in self.capabilities or "properties" in self.capabilities
+
+    @property
+    def catalog_flag(self):
+        if "catalog" in self.capabilities:
+            return "--catalog"
+        if "properties" in self.capabilities:
+            return "--properties"
 
     @property
     def config_files(self):
@@ -42,12 +57,20 @@ class SingerTap(SingerPlugin):
         return {"output": "tap.out"}
 
     @hook("before_invoke", can_fail=True)
-    def run_discovery(self, plugin_invoker, exec_args=[]):
-        if not self._extras.get("autodiscover", True):
-            return
-
+    def run_discovery_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
             return
+
+        try:
+            self.run_discovery(plugin_invoker, exec_args)
+        except PluginLacksCapabilityError:
+            return
+
+    def run_discovery(self, plugin_invoker, exec_args=[]):
+        if not self.supports_discovery:
+            raise PluginLacksCapabilityError(
+                f"Extractor '{self.name}' does not support schema discovery"
+            )
 
         properties_file = plugin_invoker.files["catalog"]
 
@@ -74,12 +97,20 @@ class SingerTap(SingerPlugin):
             ) from err
 
     @hook("before_invoke", can_fail=True)
-    def apply_select(self, plugin_invoker, exec_args=[]):
-        if not self._extras.get("autodiscover", True):
-            return
-
+    def apply_select_hook(self, plugin_invoker, exec_args=[]):
         if "--discover" in exec_args:
             return
+
+        try:
+            self.apply_select(plugin_invoker, exec_args)
+        except PluginLacksCapabilityError:
+            return
+
+    def apply_select(self, plugin_invoker, exec_args=[]):
+        if not self.supports_selection:
+            raise PluginLacksCapabilityError(
+                f"Extractor '{self.name}' does not support selection"
+            )
 
         properties_file = plugin_invoker.files["catalog"]
 
@@ -97,10 +128,10 @@ class SingerTap(SingerPlugin):
                 json.dump(schema, catalog)
         except FileNotFoundError as err:
             raise PluginExecutionError(
-                f"Stream selection failed: catalog file is missing."
+                f"Selection failed: catalog file is missing."
             ) from err
         except Exception as err:
             properties_file.unlink()
             raise PluginExecutionError(
-                f"Stream selection failed: catalog file is invalid: {properties_file}"
+                f"Selection failed: catalog file is invalid: {properties_file}"
             ) from err

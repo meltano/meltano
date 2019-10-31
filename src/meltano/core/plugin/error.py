@@ -20,3 +20,11 @@ class PluginExecutionError(Exception):
     """
 
     pass
+
+
+class PluginLacksCapabilityError(Exception):
+    """
+    Base exception when a plugin lacks a requested capability
+    """
+
+    pass

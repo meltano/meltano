@@ -33,6 +33,7 @@ def discovery():
             "name": "tap-mock",
             "namespace": "tap_mock",
             "pip_url": "tap-mock",
+            "capabilities": ["discover", "catalog", "state"],
             "settings": [
                 {"name": "test", "value": "mock"},
                 {"name": "start_date"},

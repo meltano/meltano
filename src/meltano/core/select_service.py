@@ -3,6 +3,7 @@ import logging
 
 from meltano.core.config_service import ConfigService
 from meltano.core.plugin import PluginType
+from meltano.core.plugin.error import PluginLacksCapabilityError
 from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin.singer.catalog import ListSelectedExecutor
 from .project import Project

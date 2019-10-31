@@ -5,11 +5,16 @@ extractors:
     namespace: tap_carbon
     docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
+    capabilities:
+      - discover
   - name: tap-csv
     description: Generic data extractor of CSV (comma separated value) files
     namespace: tap_csv
     docs: 'https://meltano.com/plugins/extractors/csv.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-csv.git'
+    capabilities:
+      - discover
+      - state
     settings:
       - name: csv_files_definition
         env: TAP_CSV_FILES_DEFINITION
@@ -23,6 +28,10 @@ extractors:
     namespace: tap_fastly
     docs: 'https://meltano.com/plugins/extractors/fastly.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-fastly.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
     settings:
       - name: api_token
         label: API Token
@@ -35,7 +44,9 @@ extractors:
     namespace: tap_gitlab
     docs: 'https://meltano.com/plugins/extractors/gitlab.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-gitlab.git'
-    autodiscover: false
+    capabilities:
+      - discover
+      - state
     settings_group_validation:
       - ['api_url', 'private_token', 'groups', 'start_date']
       - ['api_url', 'private_token', 'projects', 'start_date']
@@ -66,6 +77,10 @@ extractors:
     namespace: tap_google_analytics
     docs: 'https://meltano.com/plugins/extractors/google-analytics.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-google-analytics.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
     settings_group_validation:
       - ['key_file_location', 'view_id', 'start_date']
     settings:
@@ -89,6 +104,7 @@ extractors:
     namespace: tap_marketo
     docs: 'https://meltano.com/plugins/extractors/marketo.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-marketo.git'
+    capabilities: []
     settings:
       - name: identity
       - name: client_id
@@ -103,6 +119,10 @@ extractors:
     namespace: tap_mongodb
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
+    capabilities:
+      - catalog
+      - discover
+      - state
     settings:
       - name: host
         label: Host URL
@@ -121,6 +141,10 @@ extractors:
     namespace: tap_salesforce
     docs: 'https://meltano.com/plugins/extractors/salesforce.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-salesforce.git'
+    capabilities:
+      - properties
+      - discover
+      - state
     settings:
       # TODO: remove, should be injected from Meltano
       - name: client_id
@@ -142,6 +166,10 @@ extractors:
     namespace: tap_stripe
     docs: 'https://meltano.com/plugins/extractors/stripe.html'
     pip_url: 'git+https://github.com/meltano/tap-stripe.git@v0.2.4'
+    capabilities:
+      - catalog
+      - discover
+      - state
     settings:
       - name: account_id
         label: Account ID
@@ -155,6 +183,10 @@ extractors:
     namespace: tap_zendesk
     docs: 'https://meltano.com/plugins/extractors/zendesk.html'
     pip_url: 'tap-zendesk'
+    capabilities:
+      - catalog
+      - discover
+      - state
     settings:
       - name: email
         kind: email

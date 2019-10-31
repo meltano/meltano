@@ -4,7 +4,7 @@ from flask import Blueprint, request, url_for, jsonify, make_response, Response
 
 from meltano.core.job import JobFinder, State
 from meltano.core.plugin import PluginRef
-from meltano.core.plugin.error import PluginExecutionError
+from meltano.core.plugin.error import PluginExecutionError, PluginLacksCapabilityError
 from meltano.core.plugin.settings_service import (
     PluginSettingsService,
     PluginSettingValueSource,
@@ -208,7 +208,7 @@ def entities(extractor_name: str) -> Response:
             entityGroup["attributes"] = sorted(
                 entityGroup["attributes"], key=lambda k: k["name"]
             )
-    except PluginExecutionError as e:
+    except (PluginExecutionError, PluginLacksCapabilityError) as e:
         logging.warning(str(e))
 
     return jsonify({"extractor_name": extractor_name, "entity_groups": entity_groups})
