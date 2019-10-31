@@ -42,7 +42,7 @@ extractors:
       - name: api_url
         label: GitLab API
         value: 'https://gitlab.com/api/v4'
-        readonly: true
+        protected: true
       - name: private_token
         kind: password
         env: GITLAB_API_TOKEN
@@ -106,7 +106,7 @@ extractors:
       - name: host
         label: Host URL
         value: localhost
-        readonly: true
+        protected: true
       - name: port
         value: 27017
       - name: user
@@ -237,7 +237,7 @@ loaders:
       - name: host
         env: PG_ADDRESS
         value: localhost
-        readonly: true
+        protected: true
       - name: port
         env: PG_PORT
         value: 5502

@@ -11,9 +11,10 @@ describe('Configuration', () => {
     cy.route('POST', '/api/v1/orchestrations/entities/tap-carbon-intensity').as(
       'carbonEntitiesApi'
     )
-    cy.route('POST', '/api/v1/orchestrations/extractors/tap-carbon-intensity/configuration').as(
-      'saveConfigurationApi'
-    )
+    cy.route(
+      'PUT',
+      '/api/v1/orchestrations/extractors/tap-carbon-intensity/configuration'
+    ).as('saveConfigurationApi')
     cy.route('POST', '/api/v1/orchestrations/jobs/state').as('jobStateApi')
     cy.route('POST', '/api/v1/orchestrations/run').as('runApi')
 

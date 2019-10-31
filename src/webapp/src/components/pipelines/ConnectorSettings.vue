@@ -37,8 +37,8 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
-    getIsOfKindReadonly() {
-      return kind => kind === 'readonly'
+    getIsProtected() {
+      return setting => setting.readonly === true
     },
     getIsOfKindTextBased() {
       return kind =>
@@ -142,10 +142,7 @@ export default {
           </label>
         </div>
         <div class="field-body">
-          <div
-            class="field"
-            :class="{ 'has-addons': getIsOfKindReadonly(setting.kind) }"
-          >
+          <div class="field" :class="{ 'has-addons': getIsProtected(setting) }">
             <div class="control is-expanded has-icons-right">
               <!-- Boolean -->
               <input
@@ -196,12 +193,12 @@ export default {
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="setting.value || setting.name"
-                :disabled="getIsOfKindReadonly(setting.kind)"
-                :readonly="getIsOfKindReadonly(setting.kind)"
+                :disabled="getIsProtected(setting)"
+                :readonly="getIsProtected(setting)"
                 @focus="$event.target.select()"
               />
             </div>
-            <div v-if="getIsOfKindReadonly(setting.kind)" class="control">
+            <div v-if="getIsProtected(setting)" class="control">
               <a
                 href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
                 target="_blank"

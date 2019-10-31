@@ -36,6 +36,7 @@ def discovery():
             "settings": [
                 {"name": "test", "value": "mock"},
                 {"name": "start_date"},
+                {"name": "protected", "protected": True},
                 {"name": "secure", "kind": "password"},
             ],
         }
