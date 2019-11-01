@@ -160,7 +160,7 @@ export default {
         this.$store.commit('designs/setLoader', defaultLoader)
 
         // preselect if not loading a report
-        if (!slug) {
+        if (!slug && this.isAutoRunQuery) {
           this.preselectAttributes()
         }
 
