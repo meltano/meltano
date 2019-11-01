@@ -170,30 +170,34 @@ Let's move on to the next step by clicking `Analyze` in the `Gitlab Issues` card
 
 The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
 
-![Screenshot of Analyze page for GitLab](/images/gitlab-tutorial/06-gitlab-issues-analyze-page.png)
+![Screenshot of Analyze page for GitLab Issues](/images/gitlab-tutorial/06-gitlab-issues-analyze-page.png)
 
 Now, let's explore and analyze our GitLab Issues data by selecting the following attributes in the left column:
 
 - **Columns**
   - Created Year
-  - Created Month
+  - Created Quarter
 - **Aggregates**
   - Total Issues
   - Average Days to Close
 
-![Screenshot of selected attributes for GitLab](/images/gitlab-tutorial/07-gitlab-issues-selected-attributes.png)
+![Screenshot of selected attributes for GitLab Issues](/images/gitlab-tutorial/07-gitlab-issues-selected-attributes.png)
 
 And with that, the big moment is upon us, it's time to click `Run` to run our query!
 
 ![Screenshot of bar graph for GitLab Issues data](/images/gitlab-tutorial/08-gitlab-issues-bar-graph.png)
 
-You should now see a beautiful data visualization and a table below to see the data in detail!
+You should now see a bar chart visualization and a table below to see the data in detail!
 
-Let's order the data by Year and Month ascending:
+Let's order the data by Year and Quarter ascending:
 
 ![Screenshot of data and ordering for GitLab Issues data](/images/gitlab-tutorial/09-gitlab-issues-ordering.png)
 
-And filter the results to only include bugs:
+We can also filter the results to only include bugs. Select the `Filters` dropdown menu at the top of the Query pane and add a filter to only keep issues with the `bug` label:
+
+`Labels (for filtering)` --> `Like` --> `%bug%`
+
+We add the percentages around the `bug` cause issues may have multiple labels and the `bug` label can be anywhere in that field.
 
 ![Screenshot of data and ordering for GitLab Issues data](/images/gitlab-tutorial/10-gitlab-issues-filter.png)
 
