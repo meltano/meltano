@@ -205,18 +205,19 @@ export default {
     },
 
     preselectAttributes() {
-      const column = this.design.relatedTable.columns.find(
-        column => !column.hidden
-      )
+      const finder = collectionName =>
+        this.design.relatedTable[collectionName].find(
+          attribute => !attribute.hidden
+        )
+      const column = finder('columns')
       if (column) {
         this.columnSelected(column)
       }
-      const aggregate = this.design.relatedTable.aggregates.find(
-        aggregate => !aggregate.hidden
-      )
+      const aggregate = finder('aggregates')
       if (aggregate) {
         this.columnSelected(aggregate)
       }
+
       if (column || aggregate) {
         this.runQuery()
       }
