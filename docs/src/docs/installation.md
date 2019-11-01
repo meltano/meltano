@@ -308,6 +308,9 @@ meltano init carbon
 
 This will create a new directory named `carbon` and initialize Meltano's basic directory structure inside it.
 
+Inside the Meltano project directory, all plugin configuration (which may include tokens and passwords) is stored inside the `.meltano` directory,
+which is automatically added to the project's `.gitignore` file to prevent this potentially sensitive information from accidentally being pushed up to a hosted Git repository.
+
 ### Start the application
 
 Now that you've created your first Meltano project, let's change directory to our new project and start Meltano UI:
