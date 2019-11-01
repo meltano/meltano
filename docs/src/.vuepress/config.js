@@ -113,7 +113,9 @@ module.exports = {
     },
     data: {
       digitalOceanUrl:
-        'https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322'
+        'https://marketplace.digitalocean.com/apps/meltano?action=deploy&refcode=1c4623f89322',
+      slackChannelUrl:
+        'https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLTZhY2QzYzkwNjYzNWY5Zjk5ZTE1ZGExNzE1NTFmMWJiM2E2ODVhMDFlYjc5YzVjMjllZTZlZDVjNWU2ZjNjNzQ'
     }
   },
   plugins: [
