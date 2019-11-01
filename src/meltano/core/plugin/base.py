@@ -167,6 +167,7 @@ class Plugin(PluginRef):
         settings: list = [],
         docs=None,
         description=None,
+        capabilities=set(),
         **extras
     ):
         super().__init__(plugin_type, name)
@@ -176,6 +177,7 @@ class Plugin(PluginRef):
         self.settings = settings
         self.docs = docs
         self.description = description
+        self.capabilities = set(capabilities)
         self._extras = extras or {}
 
     def canonical(self):
@@ -192,6 +194,9 @@ class Plugin(PluginRef):
 
         if self.settings:
             canonical.update({"settings": self.settings})
+
+        if self.capabilities:
+            canonical.update({"capabilities": list(self.capabilities)})
 
         return canonical
 

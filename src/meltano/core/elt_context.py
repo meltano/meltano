@@ -28,12 +28,16 @@ class ELTContext:
         job: Optional[Job] = None,
         extractor: Optional[PluginContext] = None,
         plugin_settings_service: PluginSettingsService = None,
+        plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.job = job
         self.loader = loader
         self.extractor = extractor
         self.plugin_settings_service = plugin_settings_service
+        self.plugin_discovery_service = (
+            plugin_discovery_service or PluginDiscoveryService(project)
+        )
 
     @property
     def elt_run_dir(self):
@@ -47,6 +51,7 @@ class ELTContext:
             run_dir=self.elt_run_dir,
             plugin_config=self.extractor.config,
             plugin_settings_service=self.plugin_settings_service,
+            plugin_discovery_service=self.plugin_discovery_service,
         )
 
     def loader_invoker(self):
@@ -56,6 +61,7 @@ class ELTContext:
             run_dir=self.elt_run_dir,
             plugin_config=self.loader.config,
             plugin_settings_service=self.plugin_settings_service,
+            plugin_discovery_service=self.plugin_discovery_service,
         )
 
 
@@ -118,4 +124,5 @@ class ELTContextBuilder:
             if self._extractor
             else None,
             plugin_settings_service=self.plugin_settings_service,
+            plugin_discovery_service=self.plugin_discovery_service,
         )

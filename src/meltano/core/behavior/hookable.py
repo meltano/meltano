@@ -69,10 +69,12 @@ class HookObject(metaclass=Hookable):
             for hook in hook_cls.__hooks__.get(hook_name, [])
         ]
 
-        for hook in hooks:
+        for hook_func in hooks:
             try:
-                hook(target, *args, **kwargs)
+                hook_func(target, *args, **kwargs)
             except Exception as err:
-                logging.warning(f"{hook_name} has failed: {err}")
-                if not hook.__hook__.can_fail:
+                logging.warning(
+                    f"{hook_name} hook '{hook_func.__name__}' has failed: {err}"
+                )
+                if not hook_func.__hook__.can_fail:
                     raise err
