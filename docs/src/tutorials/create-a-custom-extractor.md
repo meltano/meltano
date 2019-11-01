@@ -44,6 +44,7 @@ meltano add --custom extractor tap-gitlab-custom
 > namespace: gitlab
 > pip_url: -e tap-gitlab-custom
 > executable: tap-gitlab-custom
+> capabilities: catalog,discover,state
 ```
 
 Meltano exposes each plugin configuration in the plugin definition, located in the `meltano.yml` file.
@@ -59,7 +60,11 @@ Looking at the `tap-gitlab-custom` definition, we should see the following (noti
 ```yaml
 plugins:
   extractors:
-    - executable: tap-gitlab-custom
+    - capabilities:
+      - catalog
+      - discover
+      - state
+      executable: tap-gitlab-custom
       name: tap-gitlab-custom
       namespace: gitlab
       pip_url: -e tap-gitlab-custom
@@ -72,7 +77,11 @@ Let's include the default configuration for a sample tap:
 ```yaml
 plugins:
   extractors:
-    - executable: tap-gitlab-custom
+    - capabilities:
+      - catalog
+      - discover
+      - state
+      executable: tap-gitlab-custom
       name: tap-gitlab-custom
       namespace: gitlab
       pip_url: -e tap-gitlab-custom

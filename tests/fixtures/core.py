@@ -33,6 +33,7 @@ def discovery():
             "name": "tap-mock",
             "namespace": "tap_mock",
             "pip_url": "tap-mock",
+            "capabilities": ["discover", "catalog", "state"],
             "settings": [
                 {"name": "test", "value": "mock"},
                 {"name": "start_date"},
@@ -122,10 +123,14 @@ def plugin_settings_service(project, config_service, plugin_discovery_service):
 
 
 @pytest.fixture(scope="class")
-def plugin_invoker_factory(project, plugin_settings_service):
+def plugin_invoker_factory(project, plugin_settings_service, plugin_discovery_service):
     def _factory(plugin, **kwargs):
         return invoker_factory(
-            project, plugin, plugin_settings_service=plugin_settings_service, **kwargs
+            project,
+            plugin,
+            plugin_settings_service=plugin_settings_service,
+            plugin_discovery_service=plugin_discovery_service,
+            **kwargs,
         )
 
     return _factory

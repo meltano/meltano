@@ -18,7 +18,7 @@ class ProjectAddCustomService:
     def add(self, plugin_type: PluginType, plugin_name: str):
         namespace = click.prompt(
             "The `namespace` refers to the data source name.\n"
-            "It is used to infer compatibilty between components.\n"
+            "It is used to infer compatibilty between components.\n\n"
             "(namespace)",
             type=str,
         )
@@ -39,6 +39,19 @@ class ProjectAddCustomService:
             "(executable)",
             default=plugin_name,
         )
+        capabilities = click.prompt(
+            "The `capabilities` refer to the optional features the executable supports.\n"
+            "Possible capabilities of extractors (taps) are:\n"
+            "\t`catalog`: supports the `--catalog` flag\n"
+            "\t`discover`: supports the `--discover` flag\n"
+            "\t`properties`: supports the `--properties` flag\n"
+            "\t`state`: supports the `--state` flag\n"
+            "Multiple capabilities can be specified using a comma-separated string.\n\n"
+            "(capabilities)",
+            type=set,
+            default=set(),
+            value_proc=lambda value: set(c.strip() for c in value.split(",")),
+        )
 
         # manually create the generic PluginInstall to save it
         # as a custom plugin
@@ -46,6 +59,7 @@ class ProjectAddCustomService:
             plugin_type,
             plugin_name,
             pip_url,
+            capabilities=capabilities,
             namespace=namespace,
             executable=executable,
         )

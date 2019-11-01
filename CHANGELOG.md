@@ -29,6 +29,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1187](https://gitlab.com/meltano/meltano/issues/1187) Updated configuration to prevent unwanted editing until we handle this properly with role-based access control
 - [#1187](https://gitlab.com/meltano/meltano/issues/1187) Updated certain connector configuration settings with a `readonly` flag to prevent unwanted editing in the UI. This is temporary and will be removed when we handle this properly with role-based access control.
 
+- [#1229](https://gitlab.com/meltano/meltano/issues/1229) Improve extractor schema autodiscovery error messages and don't attempt autodiscovery when it is known to not be supported, like in the case of tap-gitlab
+
 ### Breaks
 
 ## 1.3.0 - (2019-10-28)

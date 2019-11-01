@@ -30,6 +30,7 @@ meltano add --custom extractor tap-postgres
   (namespace): tap_postgres
   (pip_url): tap-postgres==0.0.61
   (executable) [tap-postgres]: tap-postgres
+  (capabilities): discover,properties,state
 ```
 
 We should then update `meltano.yml` and add the configuration parameters this tap needs in order to run:
@@ -39,7 +40,11 @@ We should then update `meltano.yml` and add the configuration parameters this ta
 ```yaml
 plugins:
   extractors:
-  - executable: tap-postgres
+  - capabilities:
+    - discover
+    - properties
+    - state
+    executable: tap-postgres
     name: tap-postgres
     namespace: tap_postgres
     pip_url: tap-postgres==0.0.61
