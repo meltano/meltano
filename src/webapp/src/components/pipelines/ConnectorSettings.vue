@@ -217,7 +217,10 @@ export default {
               {{ setting.description }}
             </p>
             <p v-if="setting.documentation" class="help">
-              <a :href="setting.documentation" class="has-text-underlined"
+              <a
+                :href="setting.documentation"
+                target="_blank"
+                class="has-text-underlined"
                 >More Info.</a
               >
             </p>
