@@ -28,11 +28,9 @@ export default function setup() {
     type: 'error',
     action: [
       {
-        text: 'Submit Bug',
+        text: 'Get Help',
         onClick: () => {
-          window.open(
-            'https://gitlab.com/meltano/meltano/issues/new?issue%5Bassignee_id%5D=&issue%5Bmilestone_id%5D=&issuable_template=bugs'
-          )
+          window.open('https://meltano.com/docs/getting-help.html')
         }
       },
       {

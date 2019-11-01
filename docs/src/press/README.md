@@ -20,8 +20,4 @@ Meltano related news, logos, and how to get in touch.
 
 For press inquiries, please email [hello@meltano.com](mailto:hello@meltano.com).
 
-You can also follow us on: 
-
-- [YouTube](https://www.youtube.com/meltano)
-- [Twitter](https://twitter.com/meltanodata)
-- [Slack](https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLTZhY2QzYzkwNjYzNWY5Zjk5ZTE1ZGExNzE1NTFmMWJiM2E2ODVhMDFlYjc5YzVjMjllZTZlZDVjNWU2ZjNjNzQ)
+If you're looking to get in touch with the team for help with Meltano, check out [Getting Help](/docs/getting-help.md).
