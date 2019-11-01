@@ -84,8 +84,12 @@ class TestPluginSettingsService:
 
     def test_as_config(self, subject, session, tap):
         EXPECTED = {"test": "mock", "start_date": None, "secure": None}
-        assert subject.as_config(session, tap) == EXPECTED
-        assert subject.as_config(session, tap, redacted=True) == EXPECTED
+        full_config = subject.as_config(session, tap)
+        redacted_config = subject.as_config(session, tap, redacted=True)
+
+        for k, v in EXPECTED.items():
+            assert full_config.get(k) == v
+            assert redacted_config.get(k) == v
 
     def test_as_config_redacted(self, subject, session, tap):
         # ensure values are redacted when they are set
@@ -100,11 +104,11 @@ class TestPluginSettingsService:
         assert config["secure"] == "thisisatest"
 
     def test_as_env(self, subject, session, tap, env_var):
-        assert subject.as_env(session, tap) == {
-            env_var(tap, "test"): "mock",
-            env_var(tap, "start_date"): "None",
-            env_var(tap, "secure"): "None",
-        }
+        config = subject.as_env(session, tap)
+
+        assert config.get(env_var(tap, "test")) == "mock"
+        assert config.get(env_var(tap, "start_date")) == "None"
+        assert config.get(env_var(tap, "secure")) == "None"
 
     def test_unset(self, session, subject, tap):
         # overriden by an PluginSetting db value when set

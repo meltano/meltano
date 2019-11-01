@@ -70,9 +70,7 @@ export default {
           <div
             v-for="(orderable, idx) in unassigned"
             :key="
-              `${orderable.attribute.sourceName}-${
-                orderable.attribute.name
-              }-${idx}`
+              `${orderable.attribute.sourceName}-${orderable.attribute.name}-${idx}`
             "
             class="drag-list-item has-background-white"
           >
@@ -112,9 +110,7 @@ export default {
           <div
             v-for="(orderable, idx) in assigned"
             :key="
-              `${orderable.attribute.sourceName}-${
-                orderable.attribute.name
-              }-${idx}`
+              `${orderable.attribute.sourceName}-${orderable.attribute.name}-${idx}`
             "
             class="row-space-between drag-list-item has-background-white has-text-interactive-secondary"
           >

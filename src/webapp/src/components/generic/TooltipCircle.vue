@@ -11,13 +11,15 @@ export default {
 </script>
 
 <template>
-  <button
-    class="button tooltip is-tooltip-multiline"
-    :class="$style['tooltip-circle']"
-    :data-tooltip="text"
-  >
-    <span :class="$style.tooltipText">?</span>
-  </button>
+  <div class="is-inline-block">
+    <a
+      class="button tooltip is-tooltip-multiline"
+      :class="$style['tooltip-circle']"
+      :data-tooltip="text"
+    >
+      <span>?</span>
+    </a>
+  </div>
 </template>
 
 <style lang="scss" module>
@@ -32,9 +34,5 @@ export default {
   justify-content: center;
   background-color: #bbb;
   color: #fff;
-}
-
-.tooltipText {
-  margin-top: -2px;
 }
 </style>

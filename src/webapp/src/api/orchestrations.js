@@ -7,26 +7,25 @@ export default {
   },
 
   getAllPipelineSchedules() {
-    return axios.get(utils.apiUrl('orchestrations', 'get/pipeline_schedules'))
+    return axios.get(utils.apiUrl('orchestrations', 'pipeline_schedules'))
   },
 
   getExtractorInFocusEntities(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
   },
 
-  getJobLog(jobId) {
-    return axios.post(utils.apiUrl('orchestrations', 'job/log'), jobId)
+  getJobLog({ jobId }) {
+    return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
   },
 
-  getPluginConfiguration(pluginPayload) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'get/configuration'),
-      pluginPayload
+  getPluginConfiguration({ type, name }) {
+    return axios.get(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration`)
     )
   },
 
   getPolledPipelineJobStatus(pollPayload) {
-    return axios.post(utils.apiUrl('orchestrations', 'job/state'), pollPayload)
+    return axios.post(utils.apiUrl('orchestrations', 'jobs/state'), pollPayload)
   },
 
   run(eltPayload) {
@@ -35,15 +34,15 @@ export default {
 
   savePipelineSchedule(schedulePayload) {
     return axios.post(
-      utils.apiUrl('orchestrations', 'save/pipeline_schedule'),
+      utils.apiUrl('orchestrations', 'pipeline_schedules'),
       schedulePayload
     )
   },
 
-  savePluginConfiguration(configPayload) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'save/configuration'),
-      configPayload
+  savePluginConfiguration({ type, name, config }) {
+    return axios.put(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
+      config
     )
   },
 

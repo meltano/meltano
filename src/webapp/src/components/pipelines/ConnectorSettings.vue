@@ -37,9 +37,14 @@ export default {
     getIsOfKindOptions() {
       return kind => kind === 'options'
     },
+    getIsProtected() {
+      return setting => setting.protected === true
+    },
     getIsOfKindTextBased() {
       return kind =>
-        !this.getIsOfKindBoolean(kind) && !this.getIsOfKindDate(kind)
+        !this.getIsOfKindBoolean(kind) &&
+        !this.getIsOfKindDate(kind) &&
+        !this.getIsOfKindOptions(kind)
     },
     getTextBasedInputType() {
       let type = 'text'
@@ -68,28 +73,7 @@ export default {
   watch: {
     configSettings: {
       handler(newVal) {
-        /**
-         * Improve account UX by auto-detecting Account ID via URL
-         * for configs that have `account`
-         * This is currently Loader-Snowflake specific
-         * and we'll need a more robust solution
-         * when/if we add UX helpers like this for more connectors
-         * TODO: Need to add a loader indicator to show something is "processing"
-         */
-        const accountInput = newVal.config.account
-        if (accountInput) {
-          const parsedAccountId = utils.snowflakeAccountParser(accountInput)
-
-          if (parsedAccountId) {
-            const vm = this
-
-            setTimeout(() => {
-              vm.configSettings.config.account = parsedAccountId
-            }, 1000)
-          } else {
-            this.configSettings.config.account = newVal.config.account
-          }
-        }
+        this.snowflakeHelper(newVal)
       },
       deep: true
     }
@@ -108,6 +92,30 @@ export default {
         const targetInput = firstEmptyInput || inputs[0]
         targetInput.focus()
       }
+    },
+    snowflakeHelper(newVal) {
+      /**
+       * Improve account UX by auto-detecting Account ID via URL
+       * for configs that have `account`
+       * This is currently Loader-Snowflake specific
+       * and we'll need a more robust solution
+       * when/if we add UX helpers like this for more connectors
+       * TODO: Need to add a loader indicator to show something is "processing"
+       */
+      const accountInput = newVal.config.account
+      if (accountInput) {
+        const parsedAccountId = utils.snowflakeAccountParser(accountInput)
+
+        if (parsedAccountId) {
+          const vm = this
+
+          setTimeout(() => {
+            vm.configSettings.config.account = parsedAccountId
+          }, 1000)
+        } else {
+          this.configSettings.config.account = newVal.config.account
+        }
+      }
     }
   }
 }
@@ -124,18 +132,18 @@ export default {
         class="field is-horizontal"
       >
         <div :class="['field-label', labelClass]">
-          <label class="label" :for="getFormFieldForId(setting)">{{
-            setting.label || getCleanedLabel(setting.name)
-          }}</label>
-          <TooltipCircle
-            v-if="setting.tooltip"
-            :text="setting.tooltip"
-            class="label-tooltip"
-          />
+          <label class="label" :for="getFormFieldForId(setting)"
+            >{{ setting.label || getCleanedLabel(setting.name) }}
+            <TooltipCircle
+              v-if="setting.tooltip"
+              :text="setting.tooltip"
+              class="label-tooltip"
+            />
+          </label>
         </div>
         <div class="field-body">
-          <div class="field">
-            <div class="control is-expanded">
+          <div class="field" :class="{ 'has-addons': getIsProtected(setting) }">
+            <div class="control is-expanded has-icons-right">
               <!-- Boolean -->
               <input
                 v-if="getIsOfKindBoolean(setting.kind)"
@@ -185,9 +193,26 @@ export default {
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
                 :placeholder="setting.value || setting.name"
+                :disabled="getIsProtected(setting)"
+                :readonly="getIsProtected(setting)"
                 @focus="$event.target.select()"
               />
             </div>
+            <div v-if="getIsProtected(setting)" class="control">
+              <a
+                href="https://meltano.com/docs/environment-variables.html#connector-settings-configuration"
+                target="_blank"
+                class="button is-small"
+              >
+                <span
+                  class="icon has-text-grey-dark tooltip is-tooltip-multiline"
+                  data-tooltip="This setting is temporarily locked for added security until role-based access control is enabled. Click to learn more."
+                >
+                  <font-awesome-icon icon="lock"></font-awesome-icon>
+                </span>
+              </a>
+            </div>
+
             <p v-if="setting.description" class="help is-italic">
               {{ setting.description }}
             </p>
