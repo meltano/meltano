@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1208](https://gitlab.com/meltano/meltano/issues/1208) Add description to `Plugin` definition and updated `discovery.yml` and UI to consume it
+- [#1228](https://gitlab.com/meltano/meltano/issues/1228) Add preselections of the first column and aggregate of base table to initialize Analyze with data by default.
 
 ### Changes
 
