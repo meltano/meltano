@@ -40,8 +40,9 @@ extractors:
       - ['api_url', 'private_token', 'projects', 'start_date']
     settings:
       - name: api_url
-        label: GitLab API URL
+        label: GitLab API
         value: 'https://gitlab.com/api/v4'
+        protected: true
       - name: private_token
         kind: password
         env: GITLAB_API_TOKEN
@@ -102,13 +103,16 @@ extractors:
     docs: 'https://meltano.com/plugins/extractors/mongodb.html'
     pip_url: 'git+https://github.com/singer-io/tap-mongodb.git'
     settings:
+      - name: host
+        label: Host URL
+        value: localhost
+        protected: true
+      - name: port
+        value: 27017
       - name: user
         env: MONGODB_USERNAME
       - name: password
         kind: password
-      - name: host
-      - name: port
-        value: 27017
       - name: dbname
         label: Database Name
   - name: tap-salesforce
@@ -233,6 +237,7 @@ loaders:
       - name: host
         env: PG_ADDRESS
         value: localhost
+        protected: true
       - name: port
         env: PG_PORT
         value: 5502
