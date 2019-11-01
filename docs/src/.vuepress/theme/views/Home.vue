@@ -355,6 +355,10 @@
           For more information, check out our
           <a href="/plugins/">plugins documentation</a>
         </p>
+
+        <p style="text-align:center; font-size:12px;">
+          <em>All trademarks and logos are owned by their respective owners.</em>
+        </p>
       </div>
     </div>
 
