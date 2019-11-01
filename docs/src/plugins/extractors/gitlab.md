@@ -43,22 +43,17 @@ meltano add extractor tap-gitlab
 
 If you are successful, you should see `Added and installed extractors 'tap-gitlab'` in your terminal.
 
-3. Get your GitLab access token
-   - Login to your GitLab account
-   - Navigate to your profile page
-   - Create an access token
-
 ## Configuration
 
 1. Open your project's `.env` file in a text editor
 1. Add the following variables to your file:
 
 ```bash
-export GITLAB_API_TOKEN="access token from step 3"
+export GITLAB_API_TOKEN="private access token"
 export GITLAB_API_GROUPS="myorg mygroup"
 export GITLAB_API_PROJECTS="myorg/repo-a myorg-repo-b"
 # The date uses ISO-8601 and supports time if desired
-export GITLAB_API_START_DATE="YYYY-MM-DD"
+export GITLAB_API_START_DATE="YYYY-MM-DDTHH:MM:SSZ" # e.g. 2019-10-31T00:00:00Z
 export GITLAB_API_ULTIMATE_LICENSE="true"
 ```
 
@@ -67,9 +62,60 @@ If `ultimate_license` is true (defaults to false), then the GitLab account used 
 ::: warning
 
 - Either groups or projects need to be provided
-- Filling in 'groups' but leaving 'projects' empty will sync all group projects.
+- Filling in 'groups' but leaving 'projects' empty will sync all the projects for the provided group(s).
 - Filling in 'projects' but leaving 'groups' empty will sync selected projects.
 - Filling in 'groups' and 'projects' will sync selected projects of those groups.
 
-Currently, groups don't have a date field which can be tracked
 :::
+
+The following sections explain how to obtain and fill the rest of the required properties.
+
+### GitLab API Token
+
+In order to access GitLab's API to fetch data, we must get a personal access token that will authenticate you with the server. This is very simple to do:
+
+<video controls style="max-width: 100%">
+  <source src="/screenshots/personal-access-token.mov">
+</video>
+
+1. Navigate to your [profile's access tokens](https://gitlab.com/profile/personal_access_tokens).
+
+2. Fill out the personal access token form with the following properties:
+
+- **Name:** meltano-gitlab-tutorial
+- **Expires:** _leave blank unless you have a specific reason to expire the token_
+- **Scopes:**
+  - api
+
+3. Click on `Create personal access token` to submit your request.
+
+4. You should see your token appear at the top of your screen.
+
+5. Copy and paste the token into the `GITLAB_API_TOKEN` property. It should look something like this: `I8vxHsiVAaDnAX3hA`
+
+:::tip Advanced Use Case
+You can set the `GITLAB_API_TOKEN` to " " (a single space) if you want to extract data from a public project and don't have an account for GitLab.
+
+But you are not going to be able to fetch everything supported by the GitLab Extractor: members, milestones, labels and other entities that we may reference in this Tutorial require an authenticated user to be fetched.
+:::
+
+### Projects
+
+This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
+
+If you want to configure this, the format for it is `group/project`. Here are a couple examples:
+
+- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/)
+- `meltano/tap-gitlab` - The project for the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab)
+
+### Groups
+
+This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
+
+For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `Meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
+
+![Group ID verification example](/screenshots/group-header-example.png)
+
+### Start Date
+
+This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
