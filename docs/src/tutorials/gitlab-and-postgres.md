@@ -19,7 +19,7 @@ We'll use [tap-gitlab](/plugins/extractors/gitlab.html) and demonstrate how to i
 ## Video Walkthrough
 
 <p></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/AwZ5rRvqzf8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/QLETNl_9bpc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Setup Meltano
 
