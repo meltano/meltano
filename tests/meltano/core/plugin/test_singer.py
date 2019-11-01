@@ -403,31 +403,29 @@ class TestSingerTap:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.EXTRACTORS, "tap-mock")
 
-    def config_files(self, subject, dir: Path):
-        return {key: dir.join(file) for key, file in subject.config_files.items()}
+    def test_exec_args(self, subject, session, plugin_invoker_factory, tmpdir):
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
 
-    def test_exec_args(self, subject, tmpdir):
-        base_files = self.config_files(subject, tmpdir.mkdir("base"))
-        assert subject.exec_args(base_files) == ["--config", base_files["config"]]
+        assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]
 
         # when `catalog` has data
-        base_files = self.config_files(subject, tmpdir.mkdir("catalog"))
-        base_files["catalog"].open("w").write("...")
-        assert subject.exec_args(base_files) == [
+        invoker.files["catalog"].open("w").write("...")
+        assert subject.exec_args(invoker) == [
             "--config",
-            base_files["config"],
+            invoker.files["config"],
             "--catalog",
-            base_files["catalog"],
+            invoker.files["catalog"],
         ]
 
         # when `state` has data
-        base_files = self.config_files(subject, tmpdir.mkdir("state"))
-        base_files["state"].open("w").write("...")
-        assert subject.exec_args(base_files) == [
+        invoker.files["state"].open("w").write("...")
+        assert subject.exec_args(invoker) == [
             "--config",
-            base_files["config"],
+            invoker.files["config"],
+            "--catalog",
+            invoker.files["catalog"],
             "--state",
-            base_files["state"],
+            invoker.files["state"],
         ]
 
     def test_run_discovery(self, session, plugin_invoker_factory, subject):
@@ -665,6 +663,7 @@ class TestSingerTarget:
     def subject(self, project_add_service):
         return project_add_service.add(PluginType.LOADERS, "target-mock")
 
-    def test_exec_args(self, subject):
-        base_files = subject.config_files
-        assert subject.exec_args(base_files) == ["--config", base_files["config"]]
+    def test_exec_args(self, subject, session, plugin_invoker_factory):
+        invoker = plugin_invoker_factory(subject, prepare_with_session=session)
+
+        assert subject.exec_args(invoker) == ["--config", invoker.files["config"]]

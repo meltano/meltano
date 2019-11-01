@@ -15,34 +15,24 @@ from .catalog import SelectExecutor
 class SingerTap(SingerPlugin):
     __plugin_type__ = PluginType.EXTRACTORS
 
-    def exec_args(self, files: Dict):
+    def exec_args(self, plugin_invoker):
         """
         Return the arguments list with the complete runtime paths.
         """
-        args = ["--config", files["config"]]
+        args = ["--config", plugin_invoker.files["config"]]
 
-        if self.supports_selection and file_has_data(files["catalog"]):
-            args += [self.catalog_flag, files["catalog"]]
+        catalog_path = plugin_invoker.files["catalog"]
+        if file_has_data(catalog_path):
+            if "catalog" in plugin_invoker.capabilities:
+                args += ["--catalog", catalog_path]
+            if "properties" in plugin_invoker.capabilities:
+                args += ["--properties", catalog_path]
 
-        if "state" in self.capabilities and file_has_data(files["state"]):
-            args += ["--state", files["state"]]
+        state_path = plugin_invoker.files["state"]
+        if "state" in plugin_invoker.capabilities and file_has_data(state_path):
+            args += ["--state", state_path]
 
         return args
-
-    @property
-    def supports_discovery(self):
-        return "discover" in self.capabilities
-
-    @property
-    def supports_selection(self):
-        return "catalog" in self.capabilities or "properties" in self.capabilities
-
-    @property
-    def catalog_flag(self):
-        if "catalog" in self.capabilities:
-            return "--catalog"
-        if "properties" in self.capabilities:
-            return "--properties"
 
     @property
     def config_files(self):
@@ -67,7 +57,7 @@ class SingerTap(SingerPlugin):
             return
 
     def run_discovery(self, plugin_invoker, exec_args=[]):
-        if not self.supports_discovery:
+        if not "discover" in plugin_invoker.capabilities:
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support schema discovery"
             )
@@ -107,7 +97,10 @@ class SingerTap(SingerPlugin):
             return
 
     def apply_select(self, plugin_invoker, exec_args=[]):
-        if not self.supports_selection:
+        if (
+            not "catalog" in plugin_invoker.capabilities
+            and not "properties" in plugin_invoker.capabilities
+        ):
             raise PluginLacksCapabilityError(
                 f"Extractor '{self.name}' does not support selection"
             )

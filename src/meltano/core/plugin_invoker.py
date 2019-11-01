@@ -10,6 +10,7 @@ from .plugin import PluginInstall
 from .plugin.error import PluginMissingError, PluginExecutionError
 from .plugin.config_service import PluginConfigService
 from .plugin.settings_service import PluginSettingsService
+from .plugin_discovery_service import PluginDiscoveryService
 from .venv_service import VenvService
 from .error import Error, SubprocessError
 
@@ -47,6 +48,7 @@ class PluginInvoker:
         venv_service: VenvService = None,
         plugin_config_service: PluginConfigService = None,
         plugin_settings_service: PluginSettingsService = None,
+        plugin_discovery_service: PluginDiscoveryService = None,
     ):
         self.project = project
         self.plugin = plugin
@@ -60,7 +62,18 @@ class PluginInvoker:
         self.settings_service = plugin_settings_service or PluginSettingsService(
             project
         )
+        self.discovery_service = plugin_discovery_service or PluginDiscoveryService(
+            project
+        )
+        self.plugin_def = self.discovery_service.find_plugin(
+            self.plugin.type, self.plugin.name
+        )
         self._prepared = False
+
+    @property
+    def capabilities(self):
+        # we want to make sure the capabilites are immutable from the `PluginInvoker` interface
+        return frozenset(self.plugin_def.capabilities)
 
     @property
     def files(self):
@@ -102,7 +115,7 @@ class PluginInvoker:
         )
 
     def exec_args(self, *args):
-        plugin_args = self.plugin.exec_args(self.files)
+        plugin_args = self.plugin.exec_args(self)
 
         return [str(arg) for arg in (self.exec_path(), *plugin_args, *args)]
 

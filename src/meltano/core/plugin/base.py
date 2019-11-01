@@ -87,7 +87,6 @@ class PluginInstall(HookObject, PluginRef):
         plugin_type: PluginType,
         name: str,
         pip_url: Optional[str] = None,
-        capabilities=set(),
         select=set(),
         config={},
         **extras
@@ -96,7 +95,6 @@ class PluginInstall(HookObject, PluginRef):
 
         self.pip_url = pip_url
         self._config = config
-        self._capabilities = set(capabilities)
         self._select = set(select)
         self._extras = extras or {}
 
@@ -111,9 +109,6 @@ class PluginInstall(HookObject, PluginRef):
 
         if self._config:
             canonical.update({"config": self._config})
-
-        if self.capabilities:
-            canonical.update({"capabilities": list(self.capabilities)})
 
         return canonical
 
@@ -130,10 +125,6 @@ class PluginInstall(HookObject, PluginRef):
     @property
     def executable(self):
         return self._extras.get("executable", self.canonical_name)
-
-    @property
-    def capabilities(self):
-        return self._capabilities or set()
 
     @property
     def select(self):
@@ -210,10 +201,4 @@ class Plugin(PluginRef):
         return canonical
 
     def as_installed(self) -> PluginInstall:
-        return PluginInstall(
-            self.type,
-            self.name,
-            pip_url=self.pip_url,
-            capabilities=self.capabilities,
-            **self._extras
-        )
+        return PluginInstall(self.type, self.name, pip_url=self.pip_url, **self._extras)

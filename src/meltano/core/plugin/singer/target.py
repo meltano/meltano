@@ -9,8 +9,8 @@ from . import SingerPlugin, PluginType
 class SingerTarget(SingerPlugin):
     __plugin_type__ = PluginType.LOADERS
 
-    def exec_args(self, files: Dict):
-        args = ["--config", files["config"]]
+    def exec_args(self, plugin_invoker):
+        args = ["--config", plugin_invoker.files["config"]]
 
         return args
 
