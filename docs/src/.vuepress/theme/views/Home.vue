@@ -405,12 +405,12 @@
       <section class="section">
         <h2 class="section__title">Communicate with the team!</h2>
         <p class="section__text">
-          Got questions or want to chat with the team? You can find us in the
-          Meltano Slack channel, watch our videos on YouTube, or use another
-          preferred channel.
+          Got questions, want to chat with the team, or learn more about what
+          we're up to? You can find us in the Meltano Slack channel, watch our
+          videos on YouTube, and more:
         </p>
         <a
-          href="https://join.slack.com/t/meltano/shared_invite/enQtNTM2NjEzNDY2MDgyLTZhY2QzYzkwNjYzNWY5Zjk5ZTE1ZGExNzE1NTFmMWJiM2E2ODVhMDFlYjc5YzVjMjllZTZlZDVjNWU2ZjNjNzQ"
+          :href="$site.themeConfig.data.slackChannelUrl"
           class="button"
           target="_blank"
           >Slack</a
@@ -430,6 +430,11 @@
           target="_blank"
           >Repo</a
         >
+
+        <p class="description ta-c">
+          If you're looking for help with a problem, check out
+          <a href="/docs/getting-help.html">Getting Help</a>!
+        </p>
       </section>
     </div>
 

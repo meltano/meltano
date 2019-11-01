@@ -67,6 +67,7 @@ module.exports = {
         '/docs/security-and-privacy',
         '/docs/architecture',
         '/docs/contributing',
+        '/docs/getting-help',
         '/docs/roadmap'
       ],
       '/plugins': [
@@ -80,6 +81,7 @@ module.exports = {
         '/docs/security-and-privacy',
         '/docs/architecture',
         '/docs/contributing',
+        '/docs/getting-help',
         '/docs/roadmap'
       ],
       '/tutorials': [
@@ -93,6 +95,7 @@ module.exports = {
         '/docs/security-and-privacy',
         '/docs/architecture',
         '/docs/contributing',
+        '/docs/getting-help',
         '/docs/roadmap'
       ]
     },
