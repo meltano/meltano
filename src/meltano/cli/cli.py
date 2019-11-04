@@ -25,7 +25,7 @@ LEVELS = {
 }
 
 
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command=False)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
 @click.option("-v", "--verbose", count=True)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
