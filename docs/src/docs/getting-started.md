@@ -48,19 +48,11 @@ For this guide, we will be following the "Fast Path" to get you up and running a
 
 ![Modal Information about tap-carbon-intensity being installed, doesn't require configuration and will progress to the next step when the installation is done](/images/getting-started-guide/gsg-02.png)
 
-The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Entity Selection".
-
-## Select entities
-
-Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. As you can see on your screen, all of the entities are currently selected by default for `tap-carbon-intensity`.
-
-![Entity Selection Modal for tap-carbon-intensity](/images/getting-started-guide/gsg-03.png)
-
-Since there are only a few available entities, let's leave it as is and click `Save` to finish configuring our extractor.
+The `tap-carbon-intensity` Extractor does not require any configuration (like a username or password). Once the installation is complete, you will progress to the next step: "Load".
 
 ## Determine where the data will live
 
-Once you save your entities, you should be greeted with the Loaders page:
+Once you've setup your Extractor, you will be greeted with the Loaders page:
 
 ![Loader page for Meltano project](/images/getting-started-guide/gsg-04.png)
 
