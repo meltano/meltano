@@ -27,6 +27,26 @@ If you'd prefer to use Meltano _without_ sending the team this kind of data, you
   export MELTANO_DISABLE_TRACKING=True
   ```
 
+When anonymous usage tracking is enabled, Meltano tracks the following events:
+
+- `meltano init {project name}`
+- `meltano ui`
+- `meltano elt {extractor} {loader} --transform {skip, only, run}`
+- `meltano add {extractor, loader, transform, model, transformer, orchestrator}`
+- `meltano discover {all, extractors, loaders, transforms, models, transformers, orchestrators}`
+- `meltano install`
+- `meltano invoke {plugin_name} {plugin_args}`
+- `meltano select {extractor} {entities_filter} {attributes_filter}`
+- `meltano schedule add {name} {extractor} {loader} {interval}`
+- `meltano permissions grant --db {postgres, snowflake} --dry`
+
+Beyond the invocation of these commands and the identified command line arguments, Meltano does not track any other event metadata, plugin configuration, or processed data.
+
+Finally, Meltano also tracks anonymous web metrics when browsing the Meltano UI pages.
+
+If you want to evaluate Meltano's anonymous usage tracking strategy for yourself, you can check [meltano.core.tracking.GoogleAnalyticsTracker](https://gitlab.com/meltano/meltano/blob/master/src/meltano/core/tracking/ga_tracker.py) and all the places that it is used.
+
+
 ## Connector Settings Configuration
 
 Until role-based access control is implemented in Meltano, we need to prevent user editing of certain settings from the UI. View this [`tap-gitlab` environment variable setup example](/tutorials/gitlab-and-postgres.html#add-extractor) to learn how to work with this current limitation.
