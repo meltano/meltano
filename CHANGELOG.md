@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1166](https://gitlab.com/meltano/meltano/issues/1166) Clarify in documentation that plugin configuration is stored in the `.meltano` directory, which is in `.gitignore`.
 - [#1200](https://gitlab.com/meltano/meltano/issues/1200) Link to new Getting Help documentation section instead of issue tracker where appropriate
 
+- [#1227](https://gitlab.com/meltano/meltano/issues/1227) Update Notebook `MainNav` link to jump to our Jupyter Notebook docs
+
 ### Fixes
 
 - [#1075](https://gitlab.com/meltano/meltano/issues/1075) Fix a bug that caused `target-csv` to fail.
