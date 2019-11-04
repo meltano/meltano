@@ -10,13 +10,14 @@ export default {
     underscoreToSpace
   },
   computed: {
-    ...mapState('plugins', ['installedPlugins', 'plugins']),
-    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
     ...mapGetters('plugins', [
       'getIsAddingPlugin',
       'getIsInstallingPlugin',
       'getIsPluginInstalled'
     ]),
+    ...mapGetters('repos', ['hasModels', 'urlForModelDesign']),
+    ...mapGetters('system', ['hasDbtDocs']),
+    ...mapState('plugins', ['installedPlugins', 'plugins']),
     ...mapState('repos', ['models']),
     dbtDocsUrl() {
       return this.$flask.dbtDocsUrl
@@ -26,9 +27,11 @@ export default {
     this.$store.dispatch('plugins/getAllPlugins')
     this.$store.dispatch('plugins/getInstalledPlugins')
     this.$store.dispatch('repos/getModels')
+    this.checkHasDbtDocs()
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    ...mapActions('system', ['checkHasDbtDocs']),
     installModel(model) {
       this.addPlugin({ pluginType: 'models', name: model })
         .then(() => this.installPlugin({ pluginType: 'models', name: model }))
@@ -123,7 +126,7 @@ export default {
         <h2 class="title is-5">Installed</h2>
         <template v-if="hasModels">
           <div class="content">
-            <p class="is-italic">
+            <p v-if="hasDbtDocs" class="is-italic">
               Meltano generates the installed
               <a class="has-text-underlined" :href="dbtDocsUrl" target="_blank"
                 >transforms documentation</a

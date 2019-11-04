@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'vuex'
+import { mapActions, mapGetters, mapState } from 'vuex'
 import Vue from 'vue'
 
 export default {
@@ -10,6 +10,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('system', ['hasDbtDocs']),
     ...mapState('configuration', ['recentELTSelections', 'transformOptions']),
     dbtDocsUrl() {
       return this.$flask.dbtDocsUrl
@@ -22,8 +23,10 @@ export default {
     const defaultTransform =
       this.recentELTSelections.transform || this.transformOptions[0]
     this.selectedTransformOption = defaultTransform
+    this.checkHasDbtDocs()
   },
   methods: {
+    ...mapActions('system', ['checkHasDbtDocs']),
     saveTransformAndGoToSchedules() {
       this.$store
         .dispatch('configuration/updateRecentELTSelections', {
@@ -82,7 +85,7 @@ export default {
                   Meltano will <strong>never</strong> manipulate the source data
                   file.
                 </p>
-                <p>
+                <p v-if="hasDbtDocs">
                   An ELT run is <em>required before</em> you can view the
                   <a
                     class="has-text-underlined"
