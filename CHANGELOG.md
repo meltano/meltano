@@ -3,18 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
-
 ## Unreleased
+
 ---
 
 ### New
 
 ### Changes
 
+- [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each step
+
 ### Fixes
 
 ### Breaks
-
 
 ## 1.4.0 - (2019-11-04)
 
@@ -27,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1245](https://gitlab.com/meltano/meltano/issues/1245) Add detailed information on the documentation about events tracked by Meltano when Anonymous Usage Data tracking is enabled.
 
 ### Changes
+
 - [#1244](https://gitlab.com/meltano/meltano/issues/1244) Add instructions on how to deactivate a virtual environment
 - [#1126](https://gitlab.com/meltano/meltano/issues/1126) Minor UI updates to improve clarity around Schedule step and Manual vs Orchestrated runs
 - [#1210](https://gitlab.com/meltano/meltano/issues/1210) Improved SQLite loader configuration context (name and description)
@@ -49,7 +51,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1229](https://gitlab.com/meltano/meltano/issues/1229) Improve extractor schema autodiscovery error messages and don't attempt autodiscovery when it is known to not be supported, like in the case of tap-gitlab
 - [#1207](https://gitlab.com/meltano/meltano/issues/1207) Updated all screenshots in Getting Started Guide to reflect the most current UI
-
 
 ## 1.3.0 - (2019-10-28)
 
