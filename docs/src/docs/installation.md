@@ -270,6 +270,8 @@ alias meltano!="source ~/virtualenvs/meltano/bin/activate"
 meltano!
 ```
 
+You can deactivate a virtual environment by typing `deactivate` in your shell.
+
 :::
 
 ### Install Meltano
