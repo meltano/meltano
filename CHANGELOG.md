@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
-- [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each step
+- [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
 
 ### Fixes
 
