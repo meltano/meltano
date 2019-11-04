@@ -125,6 +125,18 @@ export default {
   <div>
     <slot name="top" />
 
+    <div class="content has-text-centered">
+      <em
+        >This configuration is global until we support
+        <a
+          class="has-text-underlined"
+          href="https://gitlab.com/meltano/meltano/issues/764"
+          target="_blank"
+          >Profiles</a
+        >.</em
+      >
+    </div>
+
     <form>
       <div
         v-for="setting in configSettings.settings"

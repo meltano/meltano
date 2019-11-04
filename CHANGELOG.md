@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1208](https://gitlab.com/meltano/meltano/issues/1208) Add description to `Plugin` definition and updated `discovery.yml` and UI to consume it
+- [#1195](https://gitlab.com/meltano/meltano/issues/1195) Add temporary message in configuration communicating their global nature until "Profiles" are implemented
 
 ### Changes
 
