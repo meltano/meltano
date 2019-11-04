@@ -34,6 +34,10 @@ def cli(ctx, log_level, verbose):
     """
     Get help at https://www.meltano.com/docs/command-line-interface.html#command-line-interface
     """
+
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
+
     setup_logging(log_level=LEVELS[log_level])
 
     ctx.ensure_object(dict)
