@@ -14,7 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1245](https://gitlab.com/meltano/meltano/issues/1245) Add detailed information on the documentation about events tracked by Meltano when Anonymous Usage Data tracking is enabled.
 
 ### Changes
-
+- [#1244](https://gitlab.com/meltano/meltano/issues/1244) Add instructions on how to deactivate a virtual environment
 - [#1126](https://gitlab.com/meltano/meltano/issues/1126) Minor UI updates to improve clarity around Schedule step and Manual vs Orchestrated runs
 - [#1210](https://gitlab.com/meltano/meltano/issues/1210) Improved SQLite loader configuration context (name and description)
 - [#1185](https://gitlab.com/meltano/meltano/issues/1185) Remove majority of unimplemented placeholder UI buttons
