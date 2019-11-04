@@ -108,7 +108,7 @@ Once it's complete, the indicator will disappear and you should be able to see t
 
 ![Screenshot of run log of a completed pipeline](/images/getting-started-guide/gsg-09.png)
 
-You can click the `Analyze` button or close the log and go back to the Pipelines page. In the Pipelines page, you can check the log of any past pipeline by clicking the `Log` button next to it:
+You can click the `Analyze` button to [select a model to analyze](#analyze-the-data) or view the same models with more context in the Model page. If you close the log and go back to the Pipelines page you can check the log of any past pipeline by clicking the `Log` button next to it:
 
 ![Screenshot of complete pipeline run](/images/getting-started-guide/gsg-09b.png)
 
@@ -116,7 +116,7 @@ Congratulations! Now that you have connected a data source, configured a target 
 
 ## Select a data model
 
-Let's start by clicking on the `Analyze` button in our pipeline. This should bring us to the "Analyze: Models" page:
+Let's start by clicking on `Model` in the main navigation:
 
 ![Screenshot of Analyze: Model page](/images/getting-started-guide/gsg-10.png)
 
