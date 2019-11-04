@@ -3,7 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Changelog](http://keepachangelog.com/).
 
+
 ## Unreleased
+---
+
+### New
+
+### Changes
+
+### Fixes
+
+### Breaks
+
+
+## 1.4.0 - (2019-11-04)
 
 ---
 
@@ -37,7 +50,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1229](https://gitlab.com/meltano/meltano/issues/1229) Improve extractor schema autodiscovery error messages and don't attempt autodiscovery when it is known to not be supported, like in the case of tap-gitlab
 - [#1207](https://gitlab.com/meltano/meltano/issues/1207) Updated all screenshots in Getting Started Guide to reflect the most current UI
 
-### Breaks
 
 ## 1.3.0 - (2019-10-28)
 
