@@ -262,8 +262,6 @@ Once a virtual environment is activated, it stays active until the current shell
 
 To streamline this process, you can define a [shell alias](https://shapeshed.com/unix-alias/) that'll be easier to remember than the entire activation invocation:
 
-You can deactivate a virtual environment by typing `deactivate` in your shell.
-
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
 alias meltano!="source ~/virtualenvs/meltano/bin/activate"
@@ -271,6 +269,8 @@ alias meltano!="source ~/virtualenvs/meltano/bin/activate"
 # Use as follows, after creating a new shell:
 meltano!
 ```
+
+You can deactivate a virtual environment by typing `deactivate` in your shell.
 
 :::
 
