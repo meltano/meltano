@@ -6,6 +6,7 @@ extractors:
     docs: 'https://meltano.com/plugins/extractors/carbon-intensity.html'
     pip_url: 'git+https://gitlab.com/meltano/tap-carbon-intensity'
     capabilities:
+      - catalog
       - discover
   - name: tap-csv
     description: Generic data extractor of CSV (comma separated value) files
