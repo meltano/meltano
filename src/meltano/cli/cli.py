@@ -25,7 +25,7 @@ LEVELS = {
 }
 
 
-@click.group(invoke_without_command=True)
+@click.group(invoke_without_command=True, no_args_is_help=True)
 @click.option("--log-level", type=click.Choice(LEVELS.keys()), default="info")
 @click.option("-v", "--verbose", count=True)
 @click.version_option(version=meltano.__version__, prog_name="meltano")
@@ -34,9 +34,6 @@ def cli(ctx, log_level, verbose):
     """
     Get help at https://www.meltano.com/docs/command-line-interface.html#command-line-interface
     """
-
-    if ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
 
     setup_logging(log_level=LEVELS[log_level])
 
