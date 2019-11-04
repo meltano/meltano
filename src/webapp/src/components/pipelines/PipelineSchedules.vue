@@ -54,7 +54,7 @@ export default {
             <span class="step-spacer">then</span>
             <a class="button is-small is-static is-marginless is-borderless">
               <span
-                >Click <span class="is-italic">Run</span> to start data
+                >Click <span class="is-italic">Manual Run</span> to start data
                 collection</span
               >
             </a>
