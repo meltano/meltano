@@ -50,3 +50,25 @@ Description of available options:
 - **entity**: The entity name to be passed to singer (i.e. the table name).
 - **file**: Local path to the file to be ingested. Note that this may be a directory, in which case all files in that directory and any of its subdirectories will be recursively processed.
 - **keys**: The names of the columns that constitute the unique keys for that entity.
+
+## Example
+
+Initialize a new Meltano project:
+
+```bash
+# Initialize a new project with a folder called csv-project
+meltano init csv-project
+# Change directory into your new csv-project project
+cd csv-project
+```
+
+Download the definition file and the example CSV files to the `extract/` directory of your newly created project (i.e. `csv-project/extract/`):
+
+- [files-def.json](/files/files-def.json)
+- [GitFlixUsers.csv](/files/GitFlixUsers.csv)
+- [GitFlixEpisodes.csv](/files/GitFlixEpisodes.csv)
+- [GitFlixStreams.csv](/files/GitFlixStreams.csv)
+
+You can now use `tap-csv` with Meltano and load the example CSV files to SQLite or a Postgres database.
+
+For more details, check the [Loading CSV files into a Postgres Database Tutorial](/tutorials/csv-with-postgres.html).
