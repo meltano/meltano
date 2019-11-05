@@ -30,6 +30,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1208](https://gitlab.com/meltano/meltano/issues/1208) Add description to `Plugin` definition and updated `discovery.yml` and UI to consume it
 - [#1195](https://gitlab.com/meltano/meltano/issues/1195) Add temporary message in configuration communicating their global nature until "Profiles" are implemented
 - [#1245](https://gitlab.com/meltano/meltano/issues/1245) Add detailed information on the documentation about events tracked by Meltano when Anonymous Usage Data tracking is enabled.
+- [#1228](https://gitlab.com/meltano/meltano/issues/1228) Add preselections of the first column and aggregate of base table to initialize Analyze with data by default.
 
 ### Changes
 
