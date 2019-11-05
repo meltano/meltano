@@ -14,8 +14,11 @@ For this tutorial, our goal will be to get [https://gitlab.com/meltano/tap-googl
 
 ## Video Walkthrough
 
-<p></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/AwZ5rRvqzf8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br />
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe
+  width="560" height="315" src="https://www.youtube.com/embed/AwZ5rRvqzf8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
 ## Meltano Setup
 
@@ -43,7 +46,7 @@ In order to access your Google Analytics data, `tap-google-analytics` needs:
 
    At the moment, `tap-google-analytics` supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
 
-   In order for `tap-google-analytics` to access your Google Analytics Account, it needs the Analytics Reporting API *and* the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
+   In order for `tap-google-analytics` to access your Google Analytics Account, it needs the Analytics Reporting API _and_ the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
 
 3. A way to authenticate when accessing the Analytics APIs
 
@@ -81,7 +84,6 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
-
 #### Enable the APIs
 
 1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the `Create credentials` step is selected.
@@ -93,7 +95,6 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 2. Visit the [Google Analytics API](https://console.developers.google.com/apis/api/analytics.googleapis.com/overview) dashboard, make sure that the project you used in the `Create credentials` step is selected and enable the API for your account.
 
    ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
-
 
 ## Setup the Google Analytics Extractor
 
@@ -108,9 +109,9 @@ You should see now see the Extractors page, which contains various options for c
 
 ![Screenshot of Meltano UI with all extractors not installed and Google Analytics highlighted](/images/google-analytics-tutorial/01-ga-extractor-selection.png)
 
-Let's install `tap-google-analytics` by clicking on the `Install` button inside its card. 
+Let's install `tap-google-analytics` by clicking on the `Install` button inside its card.
 
-On the configuration modal enter the View ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/) and the start date you want to extract data for. If you leave the end date empty, `tap-google-analytics` sets it to yesterday. 
+On the configuration modal enter the View ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/) and the start date you want to extract data for. If you leave the end date empty, `tap-google-analytics` sets it to yesterday.
 
 ![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
 
@@ -138,7 +139,7 @@ With our extractor and loader configured, you should now see the following page:
 
 ![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-run-selected.png)
 
-This page allows you to apply transformations to your data. We want to run the default transforms that come pre-bundled with Meltano for data fetched from Google Analytics, so we are going to select `Run` and then click `Save`. 
+This page allows you to apply transformations to your data. We want to run the default transforms that come pre-bundled with Meltano for data fetched from Google Analytics, so we are going to select `Run` and then click `Save`.
 
 If you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
 
@@ -158,7 +159,7 @@ In the current form, you will see:
 - Whether the **transform** step should be applied, which should be `run`
 - The **interval** at which the pipeline should be run, which is set by default to be `@once`
 
-All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. 
+All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data.
 
 You should see a spinning icon that indicates that the pipeline is not completed. Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
@@ -208,7 +209,6 @@ And, finally, switch the graph to an area chart:
 
 ![Screenshot of area chart for Google Analytics Website data](/images/google-analytics-tutorial/11-ga-website-overview-area-diagram.png)
 
-
 ## Save a report
 
 When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
@@ -235,13 +235,12 @@ Once we click `Create`, we can now verify that the our report has been added to 
 
 ![Dashboard page with new dashboard and the associated Report](/images/google-analytics-tutorial/16-ga-dashboard-page.png)
 
-
 ## Next steps
 
 And with that, you have now setup a complete end-to-end data solution for Google Analytics with Meltano! 🎉
 
 You can now check the rest of the pre-bundled Models for Device, Location, Traffic Source Stats and more.
 
-Don't forget to save the reports that you find useful and add reports to your dashboards. 
+Don't forget to save the reports that you find useful and add reports to your dashboards.
 
 This is only a starting point: Google Analytics' API provides access to [hundreds of dimensions and metrics](https://ga-dev-tools.appspot.com/dimensions-metrics-explorer/). We are going to add an Advanced Tutorial soon with how to setup the Google Analytics Extractor to generate any report you may want, add custom Transforms for the extracted data and Custom Models to analyze the end results.
