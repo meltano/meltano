@@ -18,12 +18,12 @@ class ProjectAddCustomService:
     def add(self, plugin_type: PluginType, plugin_name: str):
         namespace = click.prompt(
             "The `namespace` refers to the data source name.\n"
-            "It is used to infer compatibilty between components.\n\n"
+            "It is used to infer compatibility between components.\n\n"
             "(namespace)",
             type=str,
         )
         pip_url = click.prompt(
-            "The `pip URL` refers to the pip installation specification.\n"
+            "\nThe `pip URL` refers to the pip installation specification.\n"
             "You may provide any pip-compatible entry:\n"
             "\tfrom VCS: git+https://gitlab.com/meltano/tap-carbon-intensity.git\n"
             "\tfrom PyPI: tap-something\n"
@@ -32,7 +32,7 @@ class ProjectAddCustomService:
             type=str,
         )
         executable = click.prompt(
-            "The `executable` refers to the entrypoint of the plugin.\n"
+            "\nThe `executable` refers to the entry point of the plugin.\n"
             "By convention, plugins should use their package name as executable, "
             "but it might be useful to override it to have multiple flavors of the same "
             "plugin installed.\n\n"
@@ -40,7 +40,7 @@ class ProjectAddCustomService:
             default=plugin_name,
         )
         capabilities = click.prompt(
-            "The `capabilities` refer to the optional features the executable supports.\n"
+            "\nThe `capabilities` refer to the optional features the executable supports.\n"
             "Possible capabilities of extractors (taps) are:\n"
             "\t`catalog`: supports the `--catalog` flag\n"
             "\t`discover`: supports the `--discover` flag\n"
