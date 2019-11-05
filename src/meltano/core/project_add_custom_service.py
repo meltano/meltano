@@ -48,9 +48,9 @@ class ProjectAddCustomService:
             "\t`state`: supports the `--state` flag\n"
             "Multiple capabilities can be specified using a comma-separated string.\n\n"
             "(capabilities)",
-            type=set,
-            default=set(),
-            value_proc=lambda value: set(c.strip() for c in value.split(",")),
+            type=list,
+            default=[],
+            value_proc=lambda value: [c.strip() for c in value.split(",")],
         )
 
         # manually create the generic PluginInstall to save it
