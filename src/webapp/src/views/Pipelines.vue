@@ -85,7 +85,7 @@ export default {
             >
               Extract
             </button>
-            <p>Connect to Data</p>
+            <p>Pull Raw Data from Source</p>
           </div>
         </div>
         <div
@@ -105,7 +105,7 @@ export default {
             >
               Load
             </button>
-            <p>Store Selected Data</p>
+            <p>Push Raw Data to Destination</p>
           </div>
         </div>
         <div
@@ -125,7 +125,7 @@ export default {
             >
               Transform
             </button>
-            <p>Transform Loaded Data</p>
+            <p>Transform Raw Data for Analytics</p>
           </div>
         </div>
         <div
@@ -145,7 +145,7 @@ export default {
             >
               Schedule
             </button>
-            <p>Schedule Data Pipelines</p>
+            <p>Automate Extract, Load, & Transform</p>
           </div>
         </div>
 
