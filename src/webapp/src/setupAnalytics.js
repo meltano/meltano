@@ -4,10 +4,16 @@ import VueAnalytics from 'vue-analytics'
 
 import router from './router'
 
-export default function setup() {
+export default function setupAnalytics() {
+  const enabled = Vue.prototype.$flask.isSendAnonymousUsageStats
+
   Vue.use(VueAnalytics, {
     id: 'UA-132758957-2',
     router,
+    debug: {
+      enabled: !enabled,
+      sendHitTask: enabled
+    },
     set: [
       {
         // Unfortunately custom dimensions don't allow a useful alias, dimension1 is projectId

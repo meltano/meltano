@@ -47,10 +47,8 @@ axios.defaults.headers.common['X-JSON-SCHEME'] = 'camel'
 // Flask context
 Vue.prototype.$flask = flaskContext()
 
-// Conditional analytics using flask context
-if (Vue.prototype.$flask.isSendAnonymousUsageStats) {
-  setupAnalytics()
-}
+// Setup Analytics and Tracking
+setupAnalytics()
 
 /* eslint-disable no-new */
 new Vue({

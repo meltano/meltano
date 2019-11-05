@@ -115,10 +115,11 @@ def create_app(config={}):
         appUrl = urlsplit(request.host_url)
         g.jsContext = {"appUrl": appUrl.geturl()[:-1]}
 
-        if tracker.send_anonymous_usage_stats:
-            g.jsContext["isSendAnonymousUsageStats"] = True
-            g.jsContext["projectId"] = tracker.project_id
+        # GA Tracking
+        g.jsContext["isSendAnonymousUsageStats"] = tracker.send_anonymous_usage_stats
+        g.jsContext["projectId"] = tracker.project_id
 
+        # Meltano version
         g.jsContext["version"] = meltano.__version__
 
         # setup the airflowUrl

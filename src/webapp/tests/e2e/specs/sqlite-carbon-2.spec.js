@@ -17,6 +17,10 @@ describe('Configuration', () => {
 
     cy.visit('/pipeline/schedule')
     cy.wait('@modelsApi')
+
+    // TODO: make a Pipeline task that waits for a certain ELT to be completed
+    // for now we expect the `sqlite-carbon-1.spec.js` to have triggered a
+    // pipeline.
     cy.get('.tag-running-pipelines').should('have.length', 0)
     cy.visit('/model')
     cy.wait('@modelsApi')
