@@ -124,6 +124,14 @@ export default {
     ]),
     ...mapMutations('designs', ['setIsAutoRunQuery']),
 
+    aggregateSelected(aggregate) {
+      this.$store.dispatch('designs/toggleAggregate', aggregate)
+    },
+
+    columnSelected(column) {
+      this.$store.dispatch('designs/toggleColumn', column)
+    },
+
     goToDashboard(dashboard) {
       this.$router.push({ name: 'dashboard', params: dashboard })
     },
@@ -151,6 +159,11 @@ export default {
         // don't use the setter here not to update the user's preferences
         this.$store.commit('designs/setLoader', defaultLoader)
 
+        // preselect if not loading a report
+        if (!slug && this.isAutoRunQuery) {
+          this.preselectAttributes()
+        }
+
         // validate initialization so UI can display while removing the loading bar
         this.isInitialized = true
       })
@@ -166,56 +179,12 @@ export default {
       }
     },
 
-    toggleActiveReportInDashboard(dashboard) {
-      const methodName = this.isActiveReportInDashboard(dashboard)
-        ? 'removeReportFromDashboard'
-        : 'addReportToDashboard'
-      this.$store.dispatch(`dashboards/${methodName}`, {
-        reportId: this.activeReport.id,
-        dashboardId: dashboard.id
-      })
-    },
-
     jumpToFilters() {
       utils.scrollToTop()
       this.$refs['filter-dropdown'].open()
     },
 
-    setChartType(chartType) {
-      this.$store.dispatch('designs/setChartType', chartType)
-    },
-
-    setReportName(name) {
-      this.$store.dispatch('designs/updateSaveReportSettings', name)
-    },
-
-    tableRowClicked(relatedTable) {
-      this.$store.dispatch('designs/expandRow', relatedTable)
-    },
-
-    joinRowClicked(join) {
-      this.$store.dispatch('designs/expandJoinRow', join)
-    },
-
-    columnSelected(column) {
-      this.$store.dispatch('designs/toggleColumn', column)
-    },
-
-    timeframeSelected(timeframe) {
-      if (!this.canToggleTimeframe) {
-        return
-      }
-      this.$store.dispatch('designs/toggleTimeframe', timeframe)
-    },
-
-    timeframePeriodSelected(timeframe, period) {
-      this.$store.dispatch('designs/toggleTimeframePeriod', {
-        timeframe,
-        period
-      })
-    },
-
-    aggregateSelected(aggregate) {
+    joinAggregateSelected(join, aggregate) {
       this.$store.dispatch('designs/toggleAggregate', aggregate)
     },
 
@@ -223,8 +192,8 @@ export default {
       this.$store.dispatch('designs/toggleColumn', column)
     },
 
-    joinAggregateSelected(join, aggregate) {
-      this.$store.dispatch('designs/toggleAggregate', aggregate)
+    joinRowClicked(join) {
+      this.$store.dispatch('designs/expandJoinRow', join)
     },
 
     loadReport(report) {
@@ -233,6 +202,25 @@ export default {
         .then(() => {
           this.$router.push({ name: 'report', params: report })
         })
+    },
+
+    preselectAttributes() {
+      const finder = collectionName =>
+        this.design.relatedTable[collectionName].find(
+          attribute => !attribute.hidden
+        )
+      const column = finder('columns')
+      if (column) {
+        this.columnSelected(column)
+      }
+      const aggregate = finder('aggregates')
+      if (aggregate) {
+        this.columnSelected(aggregate)
+      }
+
+      if (column || aggregate) {
+        this.runQuery()
+      }
     },
 
     saveReport() {
@@ -247,14 +235,50 @@ export default {
         })
     },
 
-    updateReport() {
-      this.$store.dispatch('designs/updateReport').then(() => {
-        Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
+    setChartType(chartType) {
+      this.$store.dispatch('designs/setChartType', chartType)
+    },
+
+    setReportName(name) {
+      this.$store.dispatch('designs/updateSaveReportSettings', name)
+    },
+
+    tableRowClicked(relatedTable) {
+      this.$store.dispatch('designs/expandRow', relatedTable)
+    },
+
+    timeframePeriodSelected(timeframe, period) {
+      this.$store.dispatch('designs/toggleTimeframePeriod', {
+        timeframe,
+        period
+      })
+    },
+
+    timeframeSelected(timeframe) {
+      if (!this.canToggleTimeframe) {
+        return
+      }
+      this.$store.dispatch('designs/toggleTimeframe', timeframe)
+    },
+
+    toggleActiveReportInDashboard(dashboard) {
+      const methodName = this.isActiveReportInDashboard(dashboard)
+        ? 'removeReportFromDashboard'
+        : 'addReportToDashboard'
+      this.$store.dispatch(`dashboards/${methodName}`, {
+        reportId: this.activeReport.id,
+        dashboardId: dashboard.id
       })
     },
 
     toggleNewDashboardModal() {
       this.isNewDashboardModalOpen = !this.isNewDashboardModalOpen
+    },
+
+    updateReport() {
+      this.$store.dispatch('designs/updateReport').then(() => {
+        Vue.toasted.global.success(`Report Updated - ${this.activeReport.name}`)
+      })
     }
   }
 }
