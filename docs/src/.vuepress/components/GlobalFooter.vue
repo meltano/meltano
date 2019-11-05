@@ -6,12 +6,10 @@ export default {
 
 <template>
   <footer class="footer">
-    <div>
-      <slot></slot>
-      <a href="https://meltano.com/docs/contributing.html" target="_blank"
-        >Contribute to the project! <OutboundLink
-      /></a>
-    </div>
+    <slot></slot>
+    <a href="https://meltano.com/docs/contributing.html" target="_blank"
+      >Contribute to the project! <OutboundLink
+    /></a>
     <a
       href="https://about.gitlab.com/handbook/marketing/corporate-marketing/#gitlab-trademark--logo-guidelines"
       >Meltano is a trademark of GitLab, Inc.</a
@@ -22,7 +20,7 @@ export default {
 <style scoped>
 .footer {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 2rem 1.5rem;
   text-align: center;
   color: white;
@@ -32,5 +30,6 @@ export default {
 .footer a {
   color: white;
   font-weight: 500;
+  margin: .5rem;
 }
 </style>

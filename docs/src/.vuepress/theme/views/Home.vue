@@ -464,7 +464,6 @@
         target="_blank"
         >{{ $site.themeConfig.editLinkText }} <OutboundLink
       /></a>
-      |
     </GlobalFooter>
   </div>
 </template>
@@ -700,7 +699,7 @@ export default {
   font-size: 1.2rem;
   padding-right: 20px;
   padding-bottom: 10px;
-  color: #474C4F; 
+  color: #474C4F;
 }
 
 .hero-header {
