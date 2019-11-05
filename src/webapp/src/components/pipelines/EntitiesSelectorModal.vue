@@ -126,7 +126,9 @@ export default {
       this.$store.dispatch('configuration/selectEntities').then(() => {
         this.$router.push({ name: 'loaders' })
         const message = !this.hasEntities
-          ? `Auto Advance - No Entities for ${this.extractorName}`
+          ? `Auto Advance - Custom selection not supported. All data selected for ${
+              this.extractorName
+            }.`
           : `Entities Saved - ${this.extractorName}`
         Vue.toasted.global.success(message)
       })

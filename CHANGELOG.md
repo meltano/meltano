@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
+- [#1201](https://gitlab.com/meltano/meltano/issues/1201) Improved "Auto Advance" messaging regarding Entity Selection. We also doubled the default toast time to improve likelihood of reading feedback.
 
 ### Fixes
 
