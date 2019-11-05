@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1019](https://gitlab.com/meltano/meltano/issues/1019) Automatically update package.json file versions
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
 
 ### Fixes
@@ -76,7 +77,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1213](https://gitlab.com/meltano/meltano/issues/1213) Add VuePress use and benefits to documentation
 - [#922](https://gitlab.com/meltano/meltano/issues/922) Document the importance of transformations and how to get started
 - [#1167](https://gitlab.com/meltano/meltano/issues/1167) Iterate on docs to improve readability and content updates
-- [#1019](https://gitlab.com/meltano/meltano/issues/1019) Automatically update package.json file versions
 
 ### Fixes
 
