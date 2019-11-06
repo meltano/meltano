@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Load Salesforce data into Postgres
+description: Learn how to use Meltano to load Salesforce data into a Postgres database.
 ---
 
 # Tutorial: Salesforce API + Postgres

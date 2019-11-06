@@ -1,3 +1,8 @@
+---
+metaTitle: Configuring Meltano Environment Variables
+description: Manage a Meltano configuration globally with environment variables. 
+---
+
 # Environment Variables
 
 For each Meltano installation, if you need to customize environment variables, this is done with the `.env` file that is created with each new installation.

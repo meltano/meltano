@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Salesforce
+description: Use Meltano to extract raw data from Salesforce and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Salesforce

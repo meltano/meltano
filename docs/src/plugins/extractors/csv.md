@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from CSV
+description: Use Meltano to extract raw data from any CSV and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Comma Separated Values (CSV)

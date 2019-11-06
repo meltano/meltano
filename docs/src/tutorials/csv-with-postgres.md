@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Load a CSV into Postgres
+description: Learn how to use Meltano to load multiple CSV files into a Postgres database.
 ---
 
 # Tutorial: Loading CSV Files to a Postgres Database

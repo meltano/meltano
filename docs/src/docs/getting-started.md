@@ -1,3 +1,8 @@
+---
+metaTitle: Getting Started With Data Analysis
+description: Create your first data analysis project, build a pipeline, and analyze your data after installing Meltano.
+---
+
 # Getting Started
 
 Now that you have successfully installed Meltano [locally](/docs/installation.html) or [in the cloud](/docs/deployment.html), you're ready to start create your first project, connect data sources, build pipelines, perform analysis and create dashboards.

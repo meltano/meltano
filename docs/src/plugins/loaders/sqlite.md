@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Load Data into a SQLite database with Meltano
+description: Use Meltano to load data from numerous sources and insert it into a SQLite database for easy analysis.
 ---
 
 # SQLite Database

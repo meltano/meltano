@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Load GitLab commit history into Postgres
+description: Learn how to use Meltano to analyze your GitLab data by automatically loading it into Postgres.
 ---
 
 # Tutorial: GitLab API + Postgres

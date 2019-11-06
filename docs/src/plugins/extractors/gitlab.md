@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from GitLab
+description: Use Meltano to extract raw data from GitLab and insert it into Postgres, Snowflake, and more.
 ---
 
 # GitLab

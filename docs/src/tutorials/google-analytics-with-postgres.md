@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Load Google Analytics data into Postgres
+description: Learn how to use Meltano to load Google Analytics data into a Postgres database.
 ---
 
 # Tutorial: Google Analytics API + Postgres

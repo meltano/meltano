@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Load Data into a CSV with Meltano
+description: Use Meltano to load data from numerous sources and insert it into a CSV for easy analysis.
 ---
 
 # Comma Separated Values (CSV)
