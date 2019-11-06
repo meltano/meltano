@@ -125,7 +125,9 @@ export default {
             params: { extractor: this.extractor.name }
           })
           const message = this.extractorLacksConfigSettings
-            ? `Auto Advance - No Configuration for ${this.extractor.name}`
+            ? `Auto Advance - No Configuration needed for ${
+                this.extractor.name
+              }`
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })

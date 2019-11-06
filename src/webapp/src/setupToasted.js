@@ -74,7 +74,6 @@ export default function setup() {
     'success',
     message => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
-      duration: 4000,
       type: 'success'
     })
   )
@@ -84,7 +83,6 @@ export default function setup() {
     'error',
     message => message,
     Object.assign(lodash.cloneDeep(toastedOptions), {
-      duration: 5000,
       type: 'error'
     })
   )
