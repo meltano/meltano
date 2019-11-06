@@ -6,6 +6,10 @@ include:
   - "/docker/build-ci.yml"
   - template: SAST.gitlab-ci.yml
 
+sast:
+  variables:
+    SAST_EXCLUDED_PATHS=cloud,docker,docs,model,scripts,tests
+
 stages:
   - docs
   - build-base
