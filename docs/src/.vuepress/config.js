@@ -140,6 +140,12 @@ module.exports = {
         before: '<div class="custom-block info">',
         after: '</div>'
       }
+    ],
+    [
+      'vuepress-plugin-sitemap',
+      {
+        hostname: 'https://meltano.com'
+      }
     ]
   ]
 }
