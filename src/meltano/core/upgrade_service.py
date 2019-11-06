@@ -4,11 +4,12 @@ import psutil
 import meltano
 import subprocess
 import signal
+import shutil
 from typing import Optional
 
 from meltano.core.project import Project
 from meltano.core.migration_service import MigrationService
-import meltano.core.bundle
+import meltano.core.bundle as bundle
 
 
 class UpgradeError(Exception):
@@ -35,21 +36,7 @@ class UpgradeService:
         except Exception as ex:
             logging.error(f"Cannot restart from `{pid_file_path}`: {ex}")
 
-    def upgrade_files(self):
-        """
-        Update the files managed by Meltano inside the current project.
-        """
-        files_map = {
-            self.project.root_dir("orchestration/dags/meltano.py"): bundle.find("dags/meltano.py"),
-            self.project.root_dir("transform/profile/profiles.yml"): bundle.find("transform/profile/profiles.yml"),
-        }
-
-        for dst, src in files_map.items():
-            src.copy(dst)
-            logging.info(f"{dst} has been updated.")
-
-
-    def upgrade(self, pip_url: Optional[str] = None, force=False):
+    def upgrade_package(self, pip_url: Optional[str] = None, force=False):
         # we need to find out if the `meltano` module is installed as editable
         editable = meltano.__file__.endswith("src/meltano/__init__.py")
         editable = editable and not force
@@ -69,5 +56,21 @@ class UpgradeService:
             if run.returncode != 0:
                 raise UpgradeError(f"Failed to upgrade `meltano`.", run)
 
+    def upgrade_files(self):
+        """
+        Update the files managed by Meltano inside the current project.
+        """
+        files_map = {
+            bundle.find("dags/meltano.py"): self.project.root_dir("orchestrate/dags/meltano.py"),
+            bundle.find("transform/profile/profiles.yml"): self.project.root_dir("transform/profile/profiles.yml"),
+        }
+
+        for src, dst in files_map.items():
+            shutil.copy(src, dst)
+            logging.info(f"{dst} has been updated.")
+
+    def upgrade(self, **kwargs):
+        self.upgrade_package(**kwargs)
+        self.upgrade_files()
         self.migration_service.upgrade()
         self.migration_service.seed(self.project)
