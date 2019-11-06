@@ -26,7 +26,7 @@ In order to access your Google Analytics data, you will need:
 
    When you create a service account Google gives you a json file with that service account's credentials called the `client_secrets.json`, and that's all you need to pass to this tap.
 
-### Creating service account credentials
+### Creating Service Account Credentials
 
 ::: tip
 If you have a valid `client_secrets.json` for a service account, you can skip this section.
@@ -48,7 +48,7 @@ As a first step, you need to create or use an existing project in the Google Dev
 
 Your new public/private key pair is generated and downloaded to your machine; it serves as the only copy of this key. You are responsible for storing it securely.
 
-### Add service account to the Google Analytics account
+### Linking Credentials to Google Analytics
 
 The newly created service account will have an email address that looks similar to:
 
@@ -61,7 +61,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
 
-### Enable the APIs
+### Enabling the APIs
 
 1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.
 
@@ -73,9 +73,41 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
    ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
 
-## Meltano Installation
+## Installation in Meltano
 
-From within the 
+### Prerequisites
+
+* [Running instance of Meltano](/docs/getting-started.html)
+
+### Configure the Extractor
+
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should see now see the Extractors page, which contains various options for connecting your data source.
+
+![Screenshot of Meltano UI with all extractors not installed and Google Analytics highlighted](/images/google-analytics-tutorial/01-ga-extractor-selection.png)
+
+Let's install `tap-google-analytics` by clicking on the `Install` button inside its card.
+
+On the configuration modal enter the View ID you retrieved using [Google Analytics Account Explorer](https://ga-dev-tools.appspot.com/account-explorer/) and the start date you want to extract data for. If you leave the end date empty, `tap-google-analytics` sets it to yesterday.
+
+![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
+
+Click `Save` to finish configuring the extractor and progress to the next step: "Entity Selection".
+
+### Select Entities
+
+Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. As you can see on your screen, all of the entities are currently selected by default for `tap-google-analytics`.
+
+![Screenshot of Google Analytics Extractor Entity Selection](/images/google-analytics-tutorial/03-ga-entity-selection.png)
+
+We want to select all the default Entities (reports in the case of Google Analytics) that Meltano extracts, so click `Save` to finish configuring our extractor.
+
+::: tip
+
+**Ready to do more with data from Google Analytics?** 
+
+Check out our [Google Analytics API + Postgres tutorial](http://localhost:8080/tutorials/google-analytics-with-postgres.html#select-a-data-model) to learn how you can create an analytics database from within Meltano, and start analyzing your Google Analytics data.
+
+:::
 
 ## Advanced: Command Line Installation
 
