@@ -105,7 +105,7 @@ We want to select all the default Entities (reports in the case of Google Analyt
 
 **Ready to do more with data from Google Analytics?** 
 
-Check out our [Google Analytics API + Postgres tutorial](http://localhost:8080/tutorials/google-analytics-with-postgres.html#select-a-data-model) to learn how you can create an analytics database from within Meltano, and start analyzing your Google Analytics data.
+Check out our [Google Analytics API + Postgres tutorial](/tutorials/google-analytics-with-postgres.html#select-a-data-model) to learn how you can create an analytics database from within Meltano, and start analyzing your Google Analytics data.
 
 :::
 

@@ -16,7 +16,7 @@ For this tutorial, our goal will be to get the [Google Analytics Extractor](http
 
 For this tutorial, you can use a new or existing Meltano project. 
 
-If you need help getting started, we recommend reviewing the [Installation documentation](http://localhost:8080/docs/installation.html) and [Getting Started Guide](http://localhost:8080/docs/getting-started.html) to set up your first project. 
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
 If this is your first time using Google Analytics with Meltano, you will also need to enable Google API access by following the instructions found in the [Google Analytics Extractor documentation](/plugins/extractors/google-analytics.html#google-analytics-setup). 
 
