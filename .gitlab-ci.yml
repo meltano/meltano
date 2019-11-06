@@ -8,7 +8,7 @@ include:
 
 sast:
   variables:
-    SAST_EXCLUDED_PATHS=cloud,docker,docs,model,scripts,tests
+    SAST_EXCLUDED_PATHS: cloud,docker,docs,model,scripts,tests
 
 stages:
   - docs
