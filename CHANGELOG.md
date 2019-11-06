@@ -9,6 +9,8 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### New
 
+- [#1222](https://gitlab.com/meltano/meltano/issues/1222) Include static application security testing (SAST) in the pipeline
+
 ### Changes
 
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
