@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Load Data into a Postgres with Meltano
+description: Use Meltano to load data from numerous sources and insert it into a Postgres database for easy analysis.
 ---
 
 # PostgreSQL Database

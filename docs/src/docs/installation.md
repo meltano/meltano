@@ -1,3 +1,8 @@
+---
+metaTitle: How to Install Meltano
+description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services. 
+---
+
 # Installation
 
 ::: info

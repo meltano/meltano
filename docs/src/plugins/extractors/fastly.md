@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Fastly
+description: Use Meltano to extract raw data from Fastly and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Fastly

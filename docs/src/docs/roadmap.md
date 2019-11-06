@@ -1,3 +1,8 @@
+---
+metaTitle: Meltano Roadmap, Mission, and Vision
+description: Meltano's work plan and release schedule are publicly available at all times.
+---
+
 # Roadmap
 
 Meltano is an end-to-end data pipeline and dashboarding tool. We offer a free open source alternative to expensive business intelligence software with an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.

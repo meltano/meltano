@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Extract Data from Great Britain's Carbon Emissions API
+description: Use Meltano to extract raw data from Great Britain's Carbon Emissions API and insert it into Postgres, Snowflake, and more. 
 ---
 
 # Carbon Intensity

@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano Tutorial - Using Jupyter Notebooks with Meltano
+description: Learn how to use a Jupyter Notebook as a part of a Meltano analysis workflow.
 ---
 
 # Using Jupyter Notebooks
