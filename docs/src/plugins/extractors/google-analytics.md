@@ -73,7 +73,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
    ![Screenshot of Google Analytics API](/images/tap-google-analytics/05-ga-api.png)
 
-## Installation in Meltano
+## Meltano Setup
 
 ### Prerequisites
 

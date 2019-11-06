@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
 - [#1201](https://gitlab.com/meltano/meltano/issues/1201) Improved "Auto Advance" messaging regarding Entity Selection. We also doubled the default toast time to improve likelihood of reading feedback.
+- [#1191](https://gitlab.com/meltano/meltano/issues/1191) update Google Analytics extractor documentation to explain how to set up the Google Analytics API, and remove duplicate instructions from the [Google Analytics API + Postgres tutorial](http://meltano.com/tutorials/google-analytics-with-postgres.html#prerequisites)
 
 ### Fixes
 
