@@ -52,8 +52,8 @@ extractors:
       - ['api_url', 'private_token', 'projects', 'start_date']
     settings:
       - name: api_url
-        label: GitLab API
-        value: 'https://gitlab.com/api/v4'
+        label: GitLab Instance
+        value: 'https://gitlab.com'
         protected: true
       - name: private_token
         kind: password
