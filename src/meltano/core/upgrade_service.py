@@ -61,13 +61,20 @@ class UpgradeService:
         Update the files managed by Meltano inside the current project.
         """
         files_map = {
-            bundle.find("dags/meltano.py"): self.project.root_dir("orchestrate/dags/meltano.py"),
-            bundle.find("transform/profile/profiles.yml"): self.project.root_dir("transform/profile/profiles.yml"),
+            bundle.find("dags/meltano.py"): self.project.root_dir(
+                "orchestrate/dags/meltano.py"
+            ),
+            bundle.find("transform/profile/profiles.yml"): self.project.root_dir(
+                "transform/profile/profiles.yml"
+            ),
         }
 
         for src, dst in files_map.items():
-            shutil.copy(src, dst)
-            logging.info(f"{dst} has been updated.")
+            try:
+                shutil.copy(src, dst)
+                logging.info(f"{dst} has been updated.")
+            except Exception as err:
+                logging.error(f"Meltano could not update {dst}: {err}")
 
     def upgrade(self, **kwargs):
         self.upgrade_package(**kwargs)

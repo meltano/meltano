@@ -37,13 +37,13 @@ for schedule in schedule_service.schedules():
         args["start_date"] = coerce_datetime(schedule.start_date)
 
     if schedule.interval == "@once":
-        logging.info(f"No DAG created for schedule '{schedule.name}' because it is set to `@once`.")
+        logging.info(
+            f"No DAG created for schedule '{schedule.name}' because it is set to `@once`."
+        )
         continue
 
     dag_id = f"meltano_{schedule.name}"
-    dag = DAG(
-        dag_id, default_args=args, schedule_interval=schedule.interval
-    )
+    dag = DAG(dag_id, default_args=args, schedule_interval=schedule.interval)
 
     elt = BashOperator(
         task_id="extract_load",
