@@ -44,9 +44,9 @@ With our extractor and loader configured, you should now see the following page:
 
 ![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-run-selected.png)
 
-This page allows you to apply transformations to your data. We want to run the default transforms that come pre-bundled with Meltano for data fetched from Google Analytics, so we are going to select `Run` and then click `Save`.
+This page allows you to apply transformations to your data. We want to run the default transformations that come pre-bundled with Meltano for data fetched from Google Analytics, so we are going to select `Run` and then click `Save`.
 
-If you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
+If you'd like to learn more about how transformations work in Meltano, check out our documentation on [Meltano Transformations](/docs/architecture.html#meltano-transformations).
 
 ## Create a pipeline schedule
 
