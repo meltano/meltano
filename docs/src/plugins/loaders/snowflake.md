@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Load Data into Snowflake with Meltano
+description: Use Meltano to load data from numerous sources and insert it into Snowflake for easy analysis.
 ---
 
 # Snowflake Data Warehouse

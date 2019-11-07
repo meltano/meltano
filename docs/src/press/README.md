@@ -1,5 +1,7 @@
 ---
 sidebar: auto
+metaTitle: Meltano in the News
+description: See news about meltano, as well as Meltano logo downloads and contact information for the team.
 ---
 
 # Meltano Press

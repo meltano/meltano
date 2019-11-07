@@ -1,5 +1,7 @@
 ---
 sidebarDepth: 1
+metaTitle: Using the Meltano CLI
+description: The Meltano command line interface makes it easy to develop, run, and debug every step of the data analysis lifecycle.
 ---
 
 # Command Line Interface

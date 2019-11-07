@@ -1,3 +1,8 @@
+---
+metaTitle: Meltano Security and Privacy
+description: Security and privacy are important considerations with any data analysis software, including Meltano. 
+---
+
 # Security & Privacy
 
 ## Introduction

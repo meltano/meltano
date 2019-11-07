@@ -1,5 +1,7 @@
 ---
 prev: /plugins/
+metaTitle: Extracting Data with Meltano
+description: Use Meltano to extract raw data from numerous sources including CSV, Google Analytics, Stripe, and more. 
 ---
 
 # Extractors

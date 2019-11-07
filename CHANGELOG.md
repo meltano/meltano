@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ## Unreleased
 
 - [#1272](https://gitlab.com/meltano/meltano/issues/1272) Add Vuepress plugin to generate a sitemap on website build
+- [meltano-marketing#89](https://gitlab.com/meltano/meltano-marketing/issues/89) Adds basic title and meta descriptions to all public-facing website & documentation pages.
 
 ---
 
