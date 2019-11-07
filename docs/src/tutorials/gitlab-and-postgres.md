@@ -6,111 +6,39 @@ description: Learn how to use Meltano to analyze your GitLab data by automatical
 
 # Tutorial: GitLab API + Postgres
 
-For this tutorial, our goal will be to Extract data from GitLab using Meltano, Load the extracted data to a Postgres database, Transform the data and Analyze the final results.
+In this tutorial we'll explain how to get the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project to pull your GitLab data and load it into a Postgres analytics database.
 
-We'll use [tap-gitlab](/plugins/extractors/gitlab.html) and demonstrate how to integrate it with your Meltano project.
+<br />
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe
+  width="560" height="315" src="https://www.youtube.com/embed/QLETNl_9bpc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
 ## Prerequisites
 
-- Meltano
-- GitLab account
-- Basic command line knowledge
+For this tutorial, you can use a new or existing Meltano project. 
 
-## Video Walkthrough
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
-<p></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/QLETNl_9bpc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-## Setup Meltano
-
-Let's start by initializing a new project! Navigate to your desired directory and run:
-
-```bash
-# Start a new Meltano project called gitlab-tutorial
-meltano init gitlab-tutorial
-
-# Once the setup is complete, navigate into your project
-cd gitlab-tutorial
-
-# Start Meltano UI
-meltano ui
-```
-
-Meltano is now running and should open a new tab at [http://localhost:5000](http://localhost:5000).
+If this is your first time using GitLab with Meltano, you will need to enable access to GitLab's API and get your GitLab Private Token by following the instructions found in the [GitLab Extractor documentation](/plugins/extractors/gitlab.html#gitlab-api-token). 
 
 ## Setup the GitLab Extractor
 
-You should see now see the Extractors page, which contains various options for connecting your data source.
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
 
 ![Screenshot of Meltano UI with all extractors not installed and GitLab Extractor highlighted](/images/gitlab-tutorial/01-gitlab-extractor-selection.png)
 
 Let's install `tap-gitlab` by clicking on the `Install` button inside its card. 
 
-On the configuration modal we want to enter the Private Token `tap-gitlab` will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from. 
+On the configuration modal we want to enter the Private Token that Gitlab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
 
 ![Screenshot of GitLab Extractor Configuration](/images/gitlab-tutorial/02-gitlab-configuration.png)
 
-The following sections explain how to obtain and fill that information.
+For this tutorial, we will scope our data sample to only include the Meltano project to make things faster. 
 
-### GitLab API Token
-
-In order to access GitLab's API to fetch data, we must get a personal access token that will authenticate you with the server. This is very simple to do:
-
-<video controls style="max-width: 100%">
-  <source src="/screenshots/personal-access-token.mov">
-</video>
-
-1. Navigate to your [profile's access tokens](https://gitlab.com/profile/personal_access_tokens).
-
-2. Fill out the personal access token form with the following properties:
-
-- **Name:** meltano-gitlab-tutorial
-- **Expires:** _leave blank unless you have a specific reason to expire the token_
-- **Scopes:**
-  - api
-
-3. Click on `Create personal access token` to submit your request.
-
-4. You should see your token appear at the top of your screen.
-
-5. Copy and paste the token into the `Private Token` field. It should look something like this: `I8vxHsiVAaDnAX3hA`
-
-### Projects
-
-This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
-
-If you want to configure this, the format for it is `group/project`. Here are a couple examples:
-
-- `meltano/meltano` - The core [Meltano project](https://gitlab.com/meltano/)
-- `meltano/tap-gitlab` - The project for the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab)
-
-For this tutorial, we will scope our data sample to only include the Meltano project to make things faster. So we will now populate the `Projects` field as follows: `meltano/meltano`
-
-### Groups
-
-This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repository's URL. If this is left blank, you have to at least provide a project.
-
-For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `Meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
-
-![Group ID verification example](/screenshots/group-header-example.png)
-
-For this tutorial, we will also scope the data to reduce the size of data being fetched. So we will configure the field `Groups` with the Meltano group: `meltano`
-
-:::tip Configuration options for Groups and projects
-
-- Either groups or projects need to be provided
-- Filling in 'groups' but leaving 'projects' empty will sync all the projects for the provided group(s).
-- Filling in 'projects' but leaving 'groups' empty will sync the specified projects.
-- Filling in 'groups' and 'projects' will sync only the specified projects in those groups.
-
-:::
-
-### Start Date
-
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try to fetch the entire history of the groups or projects specified.
-
-Similar to the previous examples, we will limit the scope of data being fetched in order to shorten the download time, so let's configure the start date to the beginning of last month, for example: `01/10/2019`
-
+- Populate `Groups` with the Meltano group: `meltano`
+- Populate `Projects` with the Meltano project: `meltano/meltano`
+- Set the `Start Date` to the beginning of last month, for example: `01/10/2019`
 
 ## Setup the Postgres Loader
 
