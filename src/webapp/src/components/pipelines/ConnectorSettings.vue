@@ -76,21 +76,33 @@ export default {
         this.snowflakeHelper(newVal)
       },
       deep: true
+    },
+    'configSettings.profileInFocusIndex': {
+      handler(newVal, oldVal) {
+        this.refocusInput(newVal, oldVal)
+      }
     }
   },
   mounted() {
-    this.$nextTick(this.focusInputIntelligently)
+    this.focusInputIntelligently()
   },
   methods: {
     findLabel(setting) {
       return setting.options.find(item => item.value === setting.value).label
     },
     focusInputIntelligently() {
-      const inputs = Array.from(this.$el.getElementsByTagName('input'))
-      if (inputs.length) {
-        const firstEmptyInput = inputs.find(el => !el.value)
-        const targetInput = firstEmptyInput || inputs[0]
-        targetInput.focus()
+      this.$nextTick(() => {
+        const inputs = Array.from(this.$el.getElementsByTagName('input'))
+        if (inputs.length) {
+          const firstEmptyInput = inputs.find(el => !el.value)
+          const targetInput = firstEmptyInput || inputs[0]
+          targetInput.focus()
+        }
+      })
+    },
+    refocusInput(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.focusInputIntelligently()
       }
     },
     snowflakeHelper(newVal) {
