@@ -36,7 +36,7 @@ for schedule in schedule_service.schedules():
     if schedule.start_date:
         args["start_date"] = coerce_datetime(schedule.start_date)
 
-    if schedule.interval == "@manual":
+    if schedule.interval == "@once":
         logging.info(f"No DAG created for schedule '{schedule.name}' because it is set to `@once`.")
         continue
 
