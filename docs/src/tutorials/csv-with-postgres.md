@@ -8,19 +8,21 @@ description: Learn how to use Meltano to load multiple CSV files into a Postgres
 
 This tutorial explains how to load data stored in multiple CSV files to a Postgres Database and then use Custom Transforms and Models to combine them together and analyze the results.
 
-We are going to use [tap-csv](https://gitlab.com/meltano/tap-csv) to extract the data from the CSV files and [target-postgres](https://github.com/meltano/target-postgres) to load the extracted data to Postgres.
+We are going to use the [CSV Extractor](https://gitlab.com/meltano/tap-csv) to extract the data from the CSV files and the [Postgres Loader](https://github.com/meltano/target-postgres) to load the extracted data to Postgres.
 
 ## Prerequisites
 
-- Meltano's minimum and [optional requirements](/docs/installation.html#requirements) installed
-- A Postgres Database installed and running
-- Understanding how Transforms and Models work in Meltano and [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html).
+In contrast to loading data from an API, the attributes (schema) of the data included in a CSV file differ for each CSV file loaded.
+
+That means that Meltano can not include pre-bundled Transforms and Models for data loaded from CSV files. To make the most of your data and be able to run analyses, you have to add custom Transforms and Models. 
+
+You can check how [Transforms](/docs/architecture.html#meltano-transformations) and [Models](/docs/architecture.html#meltano-model) work in Meltano and the Tutorial on [how to add Custom Transforms and Models](/tutorials/create-custom-transforms-and-models.html) if you want more information on those topics.
 
 ## Motivation and Running example
 
-We have all the data for our very successful startup GitFlix, a git based video streaming service, in CSV files.
+As a running example, we'll use GitFlix, a fictional git based video streaming service. 
 
-We export our user data from our CRM, the episode information from our CMS and the streaming data from our own custom streaming system.
+We have all our data for GitFlix in CSV files: We export our user data from our CRM, the episode information from our CMS and the streaming data from our own custom streaming system.
 
 It's time for us to move all our data to a Postgres Database, so that we can have everything together, run some advanced analysis and compare the results.
 
@@ -57,7 +59,7 @@ For episodes, we store their number (e.g. '304' for episode 4 of season 3), titl
   7 | 306 | Homecoming          | The Wire     |    8.9 | $764.37
 ```
 
-Finally, for each episode streamed by each user, we keep track how many minutes the user has streamed each day (not all users view the full length of all episodes at one sitting).
+Finally, for each episode streamed by each user, we keep track of how many minutes the user has streamed each day (not all users view the full length of all episodes at one sitting).
 
 **[GitFlixStreams.csv](/files/GitFlixStreams.csv)**
 
@@ -90,103 +92,128 @@ Finally, for each episode streamed by each user, we keep track how many minutes 
 
 We'll use Meltano to:
 
-- Load the data to our Postgres DB.
+- Load the data to our Postgres database.
 - Use custom transforms to clean and normalize the data.
-- Create a custom Meltano Model so that we can explore the transformed data and generate meaningful reports.
+- Create a custom Meltano Model to explore the transformed data and generate meaningful reports.
 
 ## Initialize Your Project
 
-To get started, navigate to a directory, in your terminal, where you want your Meltano project to be installed and run the following commands:
+For this tutorial, you can use a new or existing Meltano project. Throughout the rest of this tutorial, we'll assume that your Meltano project is called `csv-project`.
 
-::: tip Remember
-Run `source venv/bin/activate` to leverage the `meltano` installed in your virtual environment (`venv`) if you haven't already.
-:::
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
-```bash# Initialize a new project with a folder called csv-project
-meltano init csv-project
-# Change directory into your new csv-project project
-cd csv-project
-```
-
-If you haven't already done so, download the example CSV files to your newly created project directory (i.e. csv-project):
+To speed up the process, download the example CSV files to the `extract/` directory of your Meltano project (e.g. `csv-project/extract/`):
 
 - [GitFlixUsers.csv](/files/GitFlixUsers.csv)
 - [GitFlixEpisodes.csv](/files/GitFlixEpisodes.csv)
 - [GitFlixStreams.csv](/files/GitFlixStreams.csv)
 
 ::: tip Note on CSV files
-Each input CSV file used with [tap-csv](https://gitlab.com/meltano/tap-csv) must be a traditionally-delimited CSV (commas separated columns, newlines indicate new rows, double quoted values) as defined by the defaults to the python csv library. The first row is the header defining the attribute name for that column and will result to a column of the same name in the database. You can check the downloaded files as an example of valid CSV files (they were generated by exporting Google Sheets to CSV).
+Each input CSV file used with the [CSV Extractor](https://gitlab.com/meltano/tap-csv) must be a traditionally-delimited CSV (comma separated columns, newlines indicate new rows, double quoted values).
+
+The first row is the header defining the attribute name for that column and will result to a column of the same name in the database. It must have a valid format with no spaces or special characters (like for example `!` or `@`, etc).
+
+You can check the downloaded files as an example of valid CSV files (they were generated by exporting Google Sheets to CSV).
 :::
 
-## Set Your Credentials
+We'll also need to download the following definition file in the same directory:
 
-Create a .env file in your project directory (i.e. csv-project) with your Postgres DB credentials and the file you are going to use to describe the CSV files to be loaded.
-
-**.env**
-
-```bash
-export PG_DATABASE=warehouse
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_PORT=5432
-
-export TAP_CSV_FILES_DEFINITION="csv_files.json"
-```
-
-You should replace the example `warehouse` value as the name of the database, the user and password with your own Postgres credentials and change the address and port if the Postgres is not running locally and on the default Port.
-
-TAP_CSV_FILES_DEFINITION (`csv_files.json` in the example) is a json file with all the CSV files to be loaded.
-
-Finally, create the `csv_files.json` file in your project directory:
-
-**csv_files.json**
+**[files-def.json](/files/files-def.json)**
 
 ```json
 [
-  { "entity": "users", "file": "GitFlixUsers.csv", "keys": ["id"] },
-  { "entity": "episodes", "file": "GitFlixEpisodes.csv", "keys": ["id"] },
-  { "entity": "streams", "file": "GitFlixStreams.csv", "keys": ["id"] }
+  { "entity": "users", "file": "extract/GitFlixUsers.csv", "keys": ["id"] },
+  { "entity": "episodes", "file": "extract/GitFlixEpisodes.csv", "keys": ["id"] },
+  { "entity": "streams", "file": "extract/GitFlixStreams.csv", "keys": ["id"] }
 ]
 ```
 
-Description of available options:
+This file allows us to define the CSV files that the CSV Extractor is going to extract data from. The available options are as follows:
 
 - entity: The entity name, used as the table name for the data loaded from that CSV.
-- file: Local path (relative to the project's root) to the file to be ingested.
+- file: Local path (relative to the project's root) of the file to be loaded.
 - keys: The names of the columns that constitute the unique keys for that entity.
 
-## Load the CSV files to Postgres
+### Configure the Extractor
 
-Run the Extract > Load pipeline:
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
 
-```bash
-meltano elt tap-csv target-postgres
-```
+![Screenshot of Meltano UI with all extractors not installed and the CSV Extractor highlighted](/images/csv-tutorial/01-csv-extractor-selection.png)
 
-The extracted data will be available to the `tap_csv` Postgres schema.
+Let's install `tap-csv` by clicking on the `Install` button inside its card.
+
+On the configuration modal leave the default value for the CSV files definition location (`extract/files-def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
+
+![Screenshot of the CSV Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
+
+## Setup the Postgres Loader
+
+Once your Extractor configuration is finished, you should be greeted with the Loaders page. Click to `Install` Postgres and set the credentials for your local Postgres.
+
+![Screenshot of Postgres Loader Configuration](/images/meltano-ui/target-postgres-configuration.png)
+
+Information on how to install a Postgres Database on your local machine and configure the Postgres Loader can be found on [PostgresQL Database Tutorials](/plugins/loaders/postgres.html).
+
+## Apply transformations as desired
+
+With our extractor and loader configured, you should now see the following page:
+
+![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-skip-selected.png)
+
+This page allows you to apply transformations to your data. There are no default transforms that come pre-bundled with Meltano for data fetched using the CSV Extractor, so we are going to select `Skip` and then click `Save`.
+
+## Create a pipeline schedule
+
+You should now be greeted with the Schedules page with a modal to create your first pipeline!
+
+![Create pipeline modal for the CSV Extractor](/images/csv-tutorial/03-csv-create-new-pipeline.png)
+
+Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
+
+In the current form, you will see:
+
+- A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
+- The **extractor** the pipeline will use, which should be `tap-csv`
+- The **loader** the pipeline will use, which should be `target-postgres`
+- Whether the **transform** step should be applied, which should be `skip`
+- The **interval** at which the pipeline should be run, which is set by default to be `@once`
+
+All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data.
+
+You should see a spinning icon that indicates that the pipeline is not completed. Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
+
+![Screenshot of run log of a completed pipeline for the CSV Extractor](/images/csv-tutorial/04-csv-log-of-completed-el-pipeline.png)
+
+The extracted data will be available in the `tap_csv` schema in your Postgres database.
 
 Using our running example, tables `users`, `episodes` and `streams` will be available in the `tap_csv` schema, with all the data from the original CSV files loaded as records.
 
 ## Motivation for transforming the raw extracted data
 
-So all the records in our CSV files were loaded successfully to our Database, but we are still having some issues:
+All the records in our CSV files were loaded successfully to our Database, but we are still having some issues:
 
 - Everything is a string in a CSV, so all values were loaded as `character varying` to our Postgres DB. Strings are not very useful for calculating aggregates, so we want to convert all numerical measures to floats or integers accordingly.
 - Similarly, we want to run more complex value transformations; for example, convert a value like `$2,638,765.21` to `2638765.21` by removing the `$` and commas and converting the result to a float.
 - Column names like `clv` (short for customer lifetime value), `avg_logins` (short for average logins per day) or `ad_rev` (short for expected ad revenue per minute on ad supported plans) can be part of raw formatting but are not very useful to a high level user. We want to provide proper, descriptive, attribute names.
 - Some of our columns have errors like `#DIV/0!` (division by zero), which we want to clean and convert to NULL values or 0s (depending on the business logic).
 
-We are going to add some simple custom transforms in order to clean and normalize the data.
+We are going to add some simple custom transforms and run them to clean and normalize the data.
 
 ## Add Custom Transforms
 
 Let's start by adding the base transforms that will clean the loaded data and fix the issues described in the previous section.
 
+::: tip
+You can download all the files in this and the following Sections by clicking the name of the file above its contents.
+
+You should select to download the file in the directory indicated before its name.
+
+For example, `transform/dbt_project.yml` should be downloaded to the `csv-project/transform/` directory if your project is called `csv-project`
+:::
+
 First step is to enable the option to run Custom Transforms for our project and set the results of the transforms to be stored as materialized tables:
 
-**transform/dbt_project.yml**
-
+**[transform/dbt_project.yml](/files/gitflix/dbt_project.yml)**
 ```bash
 ... ... ...
 models:
@@ -203,8 +230,7 @@ The name of each Transform's file will be the name of the final table in the `an
 - `gitflix_episodes.sql`
 - `gitflix_streams.sql`
 
-**transform/models/my_meltano_project/gitflix_users.sql**
-
+**[transform/models/my_meltano_project/gitflix_users.sql](/files/gitflix/gitflix_users.sql)**
 ```sql
 with source as (
 
@@ -273,8 +299,7 @@ renamed as (
 select * from renamed
 ```
 
-**transform/models/my_meltano_project/gitflix_episodes.sql**
-
+**[transform/models/my_meltano_project/gitflix_episodes.sql](/files/gitflix/gitflix_episodes.sql)**
 ```sql
 with source as (
 
@@ -317,8 +342,7 @@ renamed as (
 select * from renamed
 ```
 
-**transform/models/my_meltano_project/gitflix_streams.sql**
-
+**[transform/models/my_meltano_project/gitflix_streams.sql](/files/gitflix/gitflix_streams.sql)**
 ```sql
 with source as (
 
@@ -356,23 +380,31 @@ renamed as (
 select * from renamed
 ```
 
-In the transforms above we could have hard coded the schema the raw tables reside inside (in this example `tap_csv`), but we make use of the fact that it is defined by the environmental variable `MELTANO_LOAD_SCHEMA` and use that instead. That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
+::: tip
+In the transforms above we could have hard coded the schema the raw tables reside inside (in this example `tap_csv`), but we make use of the fact that it is defined by the environmental variable `MELTANO_LOAD_SCHEMA` and use that instead.
+
+That means that even if you change the configuration and load the data to a different schema, the Transforms will not have to change.
+:::
 
 ## Run the Custom Transforms
 
-You are ready to run the custom transforms:
+We are now ready to run the custom transforms!
 
-```bash
-meltano elt tap-csv target-postgres --transform only
-```
+Go back to your Meltano instance, select "Pipelines" in the top navigation bar and click the "Transform" option. You should now see the Transform page.
 
-Or in general, if you want to extract and load more data first you can run all the ELT steps together:
+![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-only-selected.png)
 
-```bash
-meltano elt tap-csv target-postgres --transform run
-```
+We have already loaded the data, so we want to run only the transforms that we just added: we are going to select `Only` and then click `Save`.
 
-The result will be three new tables in your `analytics` schema with the transformed schema and data, following the transforms defined in the previous section:
+You'll be presented with a new pipeline ready to run, with the **Transform** step set to `Only`. 
+
+![Create pipeline modal for the CSV Extractor](/images/csv-tutorial/05-csv-create-new-pipeline-transform-only.png)
+
+Meltano remembers the configuration for the Extractor and Loader, so there is nothing else required on our part; we can click `Save` and wait for the transform to run successfully: 
+
+![Screenshot of run log of a completed pipeline for the CSV Extractor](/images/csv-tutorial/06-csv-log-of-completed-transform-only-pipeline.png)
+
+The result will be three new tables in the `analytics` schema of your Postgres database. They have the transformed schema and data, following the transforms defined in the previous section:
 
 - `analytics.gitflix_users`
 - `analytics.gitflix_episodes`
@@ -380,15 +412,16 @@ The result will be three new tables in your `analytics` schema with the transfor
 
 ## Add Custom Meltano Models
 
-In order to access the newly transformed data in Meltano UI, 2 additional types of files must be created:
+The final step is to make our transformed data available in Meltano Analyze as Models.
+
+We have to add 2 types of files:
 
 - Three table.m5o files, which define the available columns and aggregates for each table created during the Transform step.
 - A topic.m5o file, which represents the connections between tables, i.e. what they can be joined on.
 
-These files must be added as .m5o files under the `csv-project/model/` directory.
+These files must be added under the `csv-project/model/` directory.
 
-**gitflix_users.table.m5o**
-
+**[model/gitflix_users.table.m5o](/files/gitflix/gitflix_users.table.m5o)**
 ```bash
 {
   version = 1
@@ -467,8 +500,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 }
 ```
 
-**gitflix_episodes.table.m5o**
-
+**[model/gitflix_episodes.table.m5o](/files/gitflix/gitflix_episodes.table.m5o)**
 ```bash
 {
   version = 1
@@ -529,8 +561,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 }
 ```
 
-**gitflix_streams.table.m5o**
-
+**[model/gitflix_streams.table.m5o](/files/gitflix/gitflix_streams.table.m5o)**
 ```bash
 {
   version = 1
@@ -597,8 +628,7 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 }
 ```
 
-**gitflix.topic.m5o**
-
+**[model/gitflix.topic.m5o](/files/gitflix/gitflix.topic.m5o)**
 ```bash
 {
   version = 1
@@ -641,23 +671,78 @@ These files must be added as .m5o files under the `csv-project/model/` directory
 
 With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
 
-Start Meltano UI:
+Go back to your Meltano instance and click on the `Model` option on the header of the page. This should bring us to the "Analyze: Models" page:
 
-```
-meltano ui
-```
+![Screenshot of Analyze: Model page for the CSV Extractor](/images/csv-tutorial/07-csv-model-page.png)
 
-You can now go to the `Analyze` tab and select one of the three Designs we have created:
+Meltano Models provide a starting point to explore and analyze data for specific use cases. They are similar to templates with only what is relevant for each use case included. As you can see in the right column, the models we created for Gitflix are already there.
 
-![](/screenshots/gitflix_analyze.png)
+Let's move on to the next step by clicking `Analyze` in the `Gitflix stats per user` card to move on to the next step.
 
-For example, you can check the high level Gitflix stats per Gender or Age group:
+## Analyze the data
 
-![](/screenshots/gitflix_user_stats_per_gender.png)
+The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
 
-Or generate in depth reports on the streaming data:
+![Screenshot of Analyze page for the CSV Extractor](/images/csv-tutorial/08-csv-analyze-page.png)
 
-![](/screenshots/gitflix_stats_per_gender_series.png)
+Now, let's explore and analyze our CSV data by selecting the following attributes in the left column:
+
+- **GitFlix Users**
+  - User Gender
+  - Average User Age
+  - Average Customer Lifetime Value
+- **GitFlix Streams**
+  - Total Streams
+  - Total Minutes Streamed
+  - Average Minutes Streamed
+- **GitFlix Episodes**
+  - TV Series
+  - Average IMDB Rating
+  - Average Ad Revenue per Minute
+
+![Screenshot of selected attributes for the CSV Extractor](/images/csv-tutorial/09-csv-data-selected-attributes.png)
+
+And with that, the big moment is upon us, it's time to click `Run` to run our query!
+
+![Screenshot of bar graph for CSV data](/images/csv-tutorial/10-csv-data-bar-graph.png)
+
+You should now see a beautiful data visualization and a table below to see the data in detail!
+
+Let's order the data by Total Minutes Streamed descending:
+
+![Screenshot of data and ordering for CSV data](/images/csv-tutorial/11-csv-data-ordering.png)
+
+From that Table we can see that the most streamed TV show in GitFlix is "Breaking Bad". Also, it's clear that while the most valuable user segment based on their CLV are men watching "The Wire", the average ad revenue for that segment is pretty low.
+
+Finally, lets remove all the selected attributes and then select the Stream Day, Month and Year and the Total Minutes Streamed and Average Ad Revenue per Minute. Click `Run` and switch the graph to an area chart to check an interesting correlation in our data set:
+
+![Screenshot of area chart for CSV data](/images/csv-tutorial/12-csv-data-area-diagram.png)
+
+## Save a report
+
+When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
+
+![Save Report dialogue for naming the report you want to save](/images/csv-tutorial/13-csv-data-save-report-dialogue.png)
+
+Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
+
+![Saved report with a designated report name](/images/csv-tutorial/14-csv-data-saved-report.png)
+
+And with that, our analysis has been saved!
+
+## Add a report to a dashboard
+
+As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
+
+![Dropdown menu for adding report to dashboard](/images/csv-tutorial/15-csv-data-add-to-dashboard-dropdown.png)
+
+Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
+
+![New dashboard dialog for configuring the dashboard](/images/csv-tutorial/16-csv-data-new-dashboard-dialog.png)
+
+Once we click `Create`, we can now verify that the our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu. We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard and the associated Report.
+
+![Dashboard page with new dashboard and the associated Report](/images/csv-tutorial/17-csv-dashboard-page.png)
 
 ## Next steps
 
@@ -665,8 +750,8 @@ You should now be able to follow the same steps to import your own CSV files and
 
 - Prepare your CSV files so that they have a header in the first line with the attribute names.
 
-- Update `csv_files.json` to link your CSV files and use the proper entity name and key(s) for each.
+- Update `files-def.json` to link your CSV files and use the proper entity name and key(s) for each.
 
 - Import and check the raw data
 
-- Add custom Transforms and Models by following the Gitflix example or any other Transforms and Models provided by Meltano. You can check the [Meltano Group](https://gitlab.com/meltano/) for projects that define default [transforms](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=dbt-) or [models](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=model-) for various supported APIs if you want to see real world examples.
+- Add custom Transforms and Models by following the Gitflix example or any other Transforms and Models provided by Meltano. You can check the [Meltano Group](https://gitlab.com/meltano/) for projects that define default [transforms](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=dbt-) or [models](https://gitlab.com/meltano?utf8=%E2%9C%93&filter=model-) for various supported APIs if you want to check real world examples.
