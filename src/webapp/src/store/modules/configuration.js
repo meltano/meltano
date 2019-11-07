@@ -313,12 +313,13 @@ const mutations = {
   setInFocusConfiguration(state, { configuration, target }) {
     configuration.settings.forEach(setting => {
       const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
-      const isDefaultNeeded =
-        configuration.config.hasOwnProperty(setting.name) &&
-        configuration.config[setting.name] === null
-      if (isIso8601Date && isDefaultNeeded) {
-        configuration.config[setting.name] = utils.getFirstOfMonthAsIso8601()
-      }
+      configuration.profiles.forEach(profile => {
+        const isDefaultNeeded =
+          profile.hasOwnProperty(setting.name) && profile[setting.name] === null
+        if (isIso8601Date && isDefaultNeeded) {
+          profile[setting.name] = utils.getFirstOfMonthAsIso8601()
+        }
+      })
     })
     state[target] = configuration
   },
