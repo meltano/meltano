@@ -7,7 +7,6 @@ import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  connectionInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   loaderInFocusConfiguration: {},
   pipelinePollers: [],
@@ -94,19 +93,6 @@ const actions = {
     })
   },
 
-  // eslint-disable-next-line no-shadow
-  getConnectionConfiguration({ commit, dispatch }, connection) {
-    return dispatch('getPluginConfiguration', {
-      name: connection,
-      type: 'connections'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'connectionInFocusConfiguration'
-      })
-    })
-  },
-
   getExtractorConfiguration({ commit, dispatch }, extractor) {
     return dispatch('getPluginConfiguration', {
       name: extractor,
@@ -185,9 +171,6 @@ const actions = {
       }
     })
   },
-
-  resetConnectionInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'connectionInFocusConfiguration'),
 
   resetExtractorInFocusConfiguration: ({ commit }) =>
     commit('reset', 'extractorInFocusConfiguration'),
