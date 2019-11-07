@@ -21,8 +21,6 @@ Meltano's mission aligns with the GitLab mission, which is "to change all creati
 
 Our contribution to this progress comes through the democratization of data throughout organizations. We help our customers integrate a wide range of data sets to create a single source of truth.
 
-Meltano develops powerful open source software enabling the creation of data pipelines and dashboards. By offering an integrated end-to-end solution leveraging best-in-class open source solutions, we deliver tools that are affordable for any company and easy to use at all levels of technical know-how.
-
 ## Strategy
 
 ### Path to v1.0
@@ -42,34 +40,6 @@ There is a lot more to build. A few key areas we know we need to invest more tim
 - One-click deployment to popular hosting solutions (e.g. Amazon AMI marketplace, DigitalOcean droplets, etc.)
 - Creating and managing databases and warehouses
 - Ongoing inclusion of more pre-built taps, targets, and default transforms for popular data sources
-
-## Release Schedule
-
-Meltano currently follows a weekly release schedule on Mondays.
-
-For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
-
-You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
-
-| Release Date | Release Owner | Speedrun Owner | Shadow |
-| ------------ | ------------- | -------------- | ------ |
-| 2019-10-07   | Ben H.        | Ben H.         |        |
-| 2019-10-14   | Derek K.      | Derek K.       |        |
-| 2019-10-21   | Ben H.        | Ben H.         |        |
-| 2019-10-28   | Micael B.     | Micael B.      |        |
-| 2019-11-04   | Derek K.      | Derek K.       |        |
-| 2019-11-11   | Yannis R.     | Yannis R.      |        |
-| 2019-11-18   | Douwe M.      | Douwe M.       |        |
-| 2019-11-25   | Ben H.        | Ben H.         |        |
-| 2019-12-02   | Micael B.     | Micael B.      |        |
-| 2019-12-09   | Derek K.      | Derek K.       |        |
-| 2019-12-16   | Yannis R.     | Yannis R.      |        |
-| 2019-12-23   | Ben H.        | Ben H.         |        |
-| 2019-12-30   | Ben H.        | Ben H.         |        |
-
-:::tip Can't make your scheduled release?
-If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
-:::
 
 ## Focus
 
@@ -134,4 +104,32 @@ There are other personas we are **explicitly NOT building Meltano for** who may 
 * Data Engineers
 * Machine Learning Engineers
 
- 
+ ## Cadence
+
+ ### Release Schedule
+
+Meltano currently follows a weekly release schedule on Mondays.
+
+For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md#unreleased).
+
+You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
+
+| Release Date | Release Owner | Speedrun Owner | Shadow |
+| ------------ | ------------- | -------------- | ------ |
+| 2019-10-07   | Ben H.        | Ben H.         |        |
+| 2019-10-14   | Derek K.      | Derek K.       |        |
+| 2019-10-21   | Ben H.        | Ben H.         |        |
+| 2019-10-28   | Micael B.     | Micael B.      |        |
+| 2019-11-04   | Derek K.      | Derek K.       |        |
+| 2019-11-11   | Yannis R.     | Yannis R.      |        |
+| 2019-11-18   | Douwe M.      | Douwe M.       |        |
+| 2019-11-25   | Ben H.        | Ben H.         |        |
+| 2019-12-02   | Micael B.     | Micael B.      |        |
+| 2019-12-09   | Derek K.      | Derek K.       |        |
+| 2019-12-16   | Yannis R.     | Yannis R.      |        |
+| 2019-12-23   | Ben H.        | Ben H.         |        |
+| 2019-12-30   | Ben H.        | Ben H.         |        |
+
+:::tip Can't make your scheduled release?
+If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
+:::
