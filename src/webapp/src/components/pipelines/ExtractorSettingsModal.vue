@@ -159,7 +159,9 @@ export default {
         </div>
 
         <template v-if="!isLoadingConfigSettings">
-          <ConnectorSettingsDropdown></ConnectorSettingsDropdown>
+          <ConnectorSettingsDropdown
+            :connector="extractor"
+          ></ConnectorSettingsDropdown>
 
           <ConnectorSettings
             v-if="!extractorLacksConfigSettings"
