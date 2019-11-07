@@ -6,20 +6,26 @@ export default {
   components: {
     Dropdown
   },
-  props: {},
+  props: {
+    connector: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data() {
     return {
-      addConfigurationSettings: { name: null },
+      addProfileSettings: { name: null },
       profiles: [] // TEMP replace with proper passed props
     }
   },
   methods: {
-    addConfiguration() {
-      this.profiles.push(Object.assign({}, this.addConfigurationSettings))
-      this.addConfigurationSettings = { name: null }
+    addProfile() {
+      this.profiles.push(Object.assign({}, this.addProfileSettings))
+      this.addProfileSettings = { name: null }
     },
-    setConfigurationName(name) {
-      this.addConfigurationSettings.name = name
+    setProfileName(name) {
+      this.addProfileSettings.name = name
+      // TODO likely auto swap to this newly created profile
     },
     switchProfile(profile) {
       console.log('swap profile: ', profile.name)
@@ -31,7 +37,7 @@ export default {
 <template>
   <div class="level">
     <div class="level-item">
-      <p>Editing configuration named:</p>
+      <p>Current profile:</p>
       <Dropdown
         label="Default"
         button-classes="is-small ml-05r"
@@ -43,11 +49,11 @@ export default {
             <div class="field">
               <div class="control">
                 <input
-                  :value="addConfigurationSettings.name"
+                  :value="addProfileSettings.name"
                   class="input"
                   type="text"
-                  placeholder="Name your configuration"
-                  @input="setConfigurationName($event.target.value)"
+                  placeholder="Name new profile"
+                  @input="setProfileName($event.target.value)"
                 />
               </div>
             </div>
@@ -58,9 +64,9 @@ export default {
               <button
                 data-test-id="button-save-report"
                 class="button"
-                :disabled="!addConfigurationSettings.name"
+                :disabled="!addProfileSettings.name"
                 data-dropdown-auto-close
-                @click="addConfiguration"
+                @click="addProfile"
               >
                 Add
               </button>
@@ -80,6 +86,16 @@ export default {
           </template>
         </div>
       </Dropdown>
+      <span
+        class="icon has-text-grey-light tooltip is-tooltip-multiline"
+        :data-tooltip="
+          `Profiles enable a single connector (${
+            connector.name
+          } for example) to be reused with different configuration settings and/or accounts.`
+        "
+      >
+        <font-awesome-icon icon="info-circle"></font-awesome-icon>
+      </span>
     </div>
   </div>
 </template>
