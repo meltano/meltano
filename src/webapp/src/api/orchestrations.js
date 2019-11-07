@@ -2,6 +2,13 @@ import axios from 'axios'
 import utils from '@/utils/utils'
 
 export default {
+  addConfigurationProfile({ type, name, profile }) {
+    return axios.put(
+      utils.apiUrl('orchestrations', `${type}/${name}/configuration/profile`),
+      profile
+    )
+  },
+
   extract(extractor) {
     return axios.post(utils.apiUrl('orchestrations', `extract/${extractor}`))
   },

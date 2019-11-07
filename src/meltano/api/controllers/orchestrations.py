@@ -132,6 +132,20 @@ def get_plugin_configuration(plugin_ref) -> Response:
     )
 
 
+@orchestrationsBP.route(
+    "/<plugin_ref:plugin_ref>/configuration/profile", methods=["PUT"]
+)
+def add_plugin_configuration_profile(plugin_ref) -> Response:
+    """
+    endpoint for adding a plugin configuration profile
+    """
+    payload = request.get_json()
+
+    # TODO persit profile
+
+    return jsonify({"success": True})
+
+
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])
 def save_plugin_configuration(plugin_ref) -> Response:
     """
@@ -175,7 +189,7 @@ def selectEntities() -> Response:
                 attributes_filter = attribute["name"]
                 select_service.select(entities_filter, attributes_filter)
 
-    return jsonify("winning")
+    return jsonify({"success": True})
 
 
 @orchestrationsBP.route("/entities/<extractor_name>", methods=["POST"])
