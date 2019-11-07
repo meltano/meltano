@@ -171,6 +171,7 @@ export default {
           <ConnectorSettingsDropdown
             v-if="!extractorLacksConfigSettings"
             :connector="extractor"
+            plugin-type="extractors"
             :config-settings="localConfiguration"
           ></ConnectorSettingsDropdown>
 

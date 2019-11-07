@@ -81,6 +81,12 @@ const getters = {
 }
 
 const actions = {
+  addConfigurationProfile(_, profile) {
+    return orchestrationsApi.addConfigurationProfile(profile).catch(error => {
+      Vue.toasted.global.error(error)
+    })
+  },
+
   getAllPipelineSchedules({ commit, dispatch }) {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)

@@ -1,4 +1,7 @@
 <script>
+import { mapActions } from 'vuex'
+import Vue from 'vue'
+
 import Dropdown from '@/components/generic/Dropdown'
 
 export default {
@@ -16,6 +19,10 @@ export default {
       type: Object,
       required: true,
       default: () => {}
+    },
+    pluginType: {
+      type: String,
+      required: true
     }
   },
   data() {
@@ -24,15 +31,26 @@ export default {
     }
   },
   methods: {
+    ...mapActions('configuration', ['addConfigurationProfile']),
     addProfile() {
-      this.configSettings.profiles.push(
-        Object.assign({}, this.addProfileSettings)
+      const profile = Object.assign(
+        { config: { groups: 'tester' } },
+        this.addProfileSettings
       )
+      this.configSettings.profiles.push(profile)
+      this.switchProfile(profile.name)
 
+      const payload = {
+        name: this.connector.name,
+        type: this.pluginType,
+        profile
+      }
+      this.addConfigurationProfile(payload).then(() =>
+        Vue.toasted.global.success(`New Profile Added - ${profile.name}`)
+      )
       // TODO generate profile with proper defaults akin to setInFocusConfiguration() (likely abstract it out so both this and setInFocusConfiguration can use its internal logic)
 
       this.addProfileSettings = { name: null }
-      // TODO likely auto swap to this newly created profile
     },
     setProfileName(name) {
       this.addProfileSettings.name = name
