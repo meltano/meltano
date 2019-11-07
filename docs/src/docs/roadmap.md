@@ -71,11 +71,17 @@ A week is measured from Sunday to Saturday.
 Every improvement we make should be optimized by that.
 This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
 
-## Metrics
+### MAUI
 
-### MAU
+Meltano's primary KPI is Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
 
-We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
+<img src="https://meltano.com/blog/wp-content/uploads/2019/11/Meltano-MAUI-Growth_-Actual-vs.-10-WoW-Goal.png">
+
+
+
+### Other Metrics
+
+We track the leading indicators upstream of MAUI in the funnel to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
 1. [Meltano.com Website](https://meltano.com)
 2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)
@@ -85,14 +91,6 @@ Internal metrics:
 
 - [Google Analytics for CLI MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192718180p188392047/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 - [Google Analytics for Meltano.com Website MAU](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192515807p188274549/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D)
-
-### MAUI
-
-We also track the Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
-
-Internal metrics:
-
-- [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 
 ## Monetization
 
