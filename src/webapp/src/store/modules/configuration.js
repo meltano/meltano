@@ -7,7 +7,6 @@ import poller from '@/utils/poller'
 import utils from '@/utils/utils'
 
 const defaultState = utils.deepFreeze({
-  connectionInFocusConfiguration: {},
   extractorInFocusConfiguration: {},
   extractorInFocusEntities: null,
   loaderInFocusConfiguration: {},
@@ -92,19 +91,6 @@ const actions = {
     orchestrationsApi.getAllPipelineSchedules().then(response => {
       commit('setPipelines', response.data)
       dispatch('rehydratePollers')
-    })
-  },
-
-  // eslint-disable-next-line no-shadow
-  getConnectionConfiguration({ commit, dispatch }, connection) {
-    return dispatch('getPluginConfiguration', {
-      name: connection,
-      type: 'connections'
-    }).then(response => {
-      commit('setInFocusConfiguration', {
-        configuration: response.data,
-        target: 'connectionInFocusConfiguration'
-      })
     })
   },
 
@@ -194,9 +180,6 @@ const actions = {
       }
     })
   },
-
-  resetConnectionInFocusConfiguration: ({ commit }) =>
-    commit('reset', 'connectionInFocusConfiguration'),
 
   resetExtractorInFocusConfiguration: ({ commit }) =>
     commit('reset', 'extractorInFocusConfiguration'),
