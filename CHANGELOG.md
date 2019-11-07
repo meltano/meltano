@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1191](https://gitlab.com/meltano/meltano/issues/1191) update Google Analytics extractor documentation to explain how to set up the Google Analytics API, and remove duplicate instructions from the [Google Analytics API + Postgres tutorial](http://meltano.com/tutorials/google-analytics-with-postgres.html#prerequisites)
 - [#1199](https://gitlab.com/meltano/meltano/issues/1199) Add example and sample CSV files to the CSV extractor documentation
 - [#1247](https://gitlab.com/meltano/meltano/issues/1247) Update the [Loading CSV Files to a Postgres Database](https://www.meltano.com/tutorials/csv-with-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results. Also provide all the files used in the tutorial (transformations, models, etc) as downloadable files.
+- [#1134](https://gitlab.com/meltano/meltano/issues/1134) Update the Tutorial for extracting data from Gitlab and loading the extracted data to Postgres. The whole end to end flow goes through the Meltano UI.
 
 ### Fixes
 
@@ -53,7 +54,6 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1185](https://gitlab.com/meltano/meltano/issues/1185) Remove majority of unimplemented placeholder UI buttons
 - [#1166](https://gitlab.com/meltano/meltano/issues/1166) Clarify in documentation that plugin configuration is stored in the `.meltano` directory, which is in `.gitignore`.
 - [#1200](https://gitlab.com/meltano/meltano/issues/1200) Link to new Getting Help documentation section instead of issue tracker where appropriate
-- [#1134](https://gitlab.com/meltano/meltano/issues/1134) Update the Tutorial for extracting data from Gitlab and loading the extracted data to Postgres. The whole end to end flow goes through the Meltano UI.
 
 - [#1227](https://gitlab.com/meltano/meltano/issues/1227) Update Notebook `MainNav` link to jump to our Jupyter Notebook docs
 
@@ -70,6 +70,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 - [#1229](https://gitlab.com/meltano/meltano/issues/1229) Improve extractor schema autodiscovery error messages and don't attempt autodiscovery when it is known to not be supported, like in the case of tap-gitlab
 - [#1207](https://gitlab.com/meltano/meltano/issues/1207) Updated all screenshots in Getting Started Guide to reflect the most current UI
+
 
 ## 1.3.0 - (2019-10-28)
 
