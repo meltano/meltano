@@ -115,11 +115,17 @@ def get_plugin_configuration(plugin_ref) -> Response:
         settings.as_config(db.session, plugin_ref, redacted=True), reducer="dot"
     )
 
+    # TEMP, TODO proper Profile model
+    defaultProfile = {"name": "Temp 1", "config": freeze_keys(config)}
+    config["groups"] = ""
+    config["projects"] = ""
+    testProfile = {"name": "Temp 2", "config": freeze_keys(config)}
+
     return jsonify(
         {
             # freeze the keys because they are used for lookups
             "config": freeze_keys(config),
-            "profiles": [freeze_keys(config)],
+            "profiles": [defaultProfile, testProfile],
             "settings": settings.get_definition(plugin_ref).settings,
         }
     )

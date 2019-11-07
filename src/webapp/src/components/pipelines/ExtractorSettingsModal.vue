@@ -47,15 +47,24 @@ export default {
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
         this.localConfiguration,
-        'config'
+        'profiles'
       )
     },
     isSaveable() {
+      if (this.isLoadingConfigSettings) {
+        return
+      }
+      const configSettings = {
+        config: this.localConfiguration.profiles[
+          this.localConfiguration.profileInFocusIndex
+        ].config,
+        settings: this.localConfiguration.settings
+      }
       const isValid = this.getHasValidConfigSettings(
-        this.localConfiguration,
+        configSettings,
         this.extractor.settingsGroupValidation
       )
-      return !this.isInstalling && this.isInstalled && isValid
+      return this.isInstalled && isValid
     }
   },
   created() {

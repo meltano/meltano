@@ -102,7 +102,8 @@ export default {
        * when/if we add UX helpers like this for more connectors
        * TODO: Need to add a loader indicator to show something is "processing"
        */
-      const accountInput = newVal.profiles[newVal.profileInFocusIndex].account
+      const accountInput =
+        newVal.profiles[newVal.profileInFocusIndex].config.account
       if (accountInput) {
         const parsedAccountId = utils.snowflakeAccountParser(accountInput)
 
@@ -117,7 +118,7 @@ export default {
         } else {
           this.configSettings.profiles[
             this.configSettings.profileInFocusIndex
-          ].account = newVal.profiles[newVal.profileInFocusIndex].account
+          ].account = newVal.profiles[newVal.profileInFocusIndex].config.account
         }
       }
     }
@@ -153,9 +154,8 @@ export default {
                 v-if="getIsOfKindBoolean(setting.kind)"
                 :id="getFormFieldForId(setting)"
                 v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex][
-                    setting.name
-                  ]
+                  configSettings.profiles[configSettings.profileInFocusIndex]
+                    .config[setting.name]
                 "
                 class="checkbox"
                 :class="successClass(setting)"
@@ -166,9 +166,8 @@ export default {
               <InputDateIso8601
                 v-else-if="getIsOfKindDate(setting.kind)"
                 v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex][
-                    setting.name
-                  ]
+                  configSettings.profiles[configSettings.profileInFocusIndex]
+                    .config[setting.name]
                 "
                 :name="setting.name"
                 :for-id="getFormFieldForId(setting)"
@@ -183,9 +182,8 @@ export default {
                 <select
                   :id="`${setting.name}-select-menu`"
                   v-model="
-                    configSettings.profiles[configSettings.profileInFocusIndex][
-                      setting.name
-                    ]
+                    configSettings.profiles[configSettings.profileInFocusIndex]
+                      .config[setting.name]
                   "
                   :name="`${setting.name}-options`"
                   :class="successClass(setting)"
@@ -206,9 +204,8 @@ export default {
                 v-else-if="getIsOfKindTextBased(setting.kind)"
                 :id="getFormFieldForId(setting)"
                 v-model="
-                  configSettings.profiles[configSettings.profileInFocusIndex][
-                    setting.name
-                  ]
+                  configSettings.profiles[configSettings.profileInFocusIndex]
+                    .config[setting.name]
                 "
                 :class="['input', fieldClass, successClass(setting)]"
                 :type="getTextBasedInputType(setting)"
