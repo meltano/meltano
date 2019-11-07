@@ -77,7 +77,7 @@ With our extractor and loader configured, you should now see the following page:
 
 ![Screenshot of Transform page on Meltano webapp](/images/getting-started-guide/gsg-06.png)
 
-This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
+This page allows you to apply transformations to your data. This is not necessary for our current setup, but if you'd like to learn more about how transformations work in Meltano, check out our documentation on [Meltano Transformations](/docs/architecture.html#meltano-transformations).
 
 By default, the Transform step is set to `Skip`, so all we need to is click `Save`.
 
