@@ -13,6 +13,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### New
 
 - [#1222](https://gitlab.com/meltano/meltano/issues/1222) Include static application security testing (SAST) in the pipeline
+- [#1164](https://gitlab.com/meltano/meltano/issues/1164) Add "transform limitations" message to Transform UI
 
 ### Changes
 
