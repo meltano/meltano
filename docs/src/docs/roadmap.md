@@ -46,10 +46,6 @@ You can track our weekly progress and forward-looking plans in greater detail th
 
 | Release Date | Release Owner | Speedrun Owner | Shadow |
 | ------------ | ------------- | -------------- | ------ |
-| 2019-10-07   | Ben H.        | Ben H.         |        |
-| 2019-10-14   | Derek K.      | Derek K.       |        |
-| 2019-10-21   | Ben H.        | Ben H.         |        |
-| 2019-10-28   | Micael B.     | Micael B.      |        |
 | 2019-11-04   | Derek K.      | Derek K.       |        |
 | 2019-11-11   | Yannis R.     | Yannis R.      |        |
 | 2019-11-18   | Douwe M.      | Douwe M.       |        |
