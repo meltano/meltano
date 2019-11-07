@@ -7,8 +7,14 @@ export default {
     Dropdown
   },
   props: {
+    configSettings: {
+      type: Object,
+      required: true,
+      default: () => {}
+    },
     connector: {
       type: Object,
+      required: true,
       default: () => {}
     }
   },
@@ -91,7 +97,7 @@ export default {
         :data-tooltip="
           `Profiles enable a single connector (${
             connector.name
-          } for example) to be reused with different configuration settings and/or accounts.`
+          } for example) to be reused with multiple accounts or configurations.`
         "
       >
         <font-awesome-icon icon="info-circle"></font-awesome-icon>

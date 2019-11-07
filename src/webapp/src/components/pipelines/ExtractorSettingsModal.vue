@@ -100,7 +100,7 @@ export default {
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
-        {},
+        { profileInFocusIndex: 0 },
         lodash.cloneDeep(this.extractorInFocusConfiguration)
       )
     },
@@ -160,7 +160,9 @@ export default {
 
         <template v-if="!isLoadingConfigSettings">
           <ConnectorSettingsDropdown
+            v-if="!extractorLacksConfigSettings"
             :connector="extractor"
+            :config-settings="localConfiguration"
           ></ConnectorSettingsDropdown>
 
           <ConnectorSettings
