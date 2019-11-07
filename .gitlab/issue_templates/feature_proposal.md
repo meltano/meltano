@@ -5,8 +5,8 @@
 ### Target audience
 (For whom are we doing this? Include a persona if possible.)
 
-<!--- [Eric (Data Engineer)](https://meltano.com/docs/roadmap.html#eric-data-engineer)-->
-<!--- [Allie (Data Analyst)](https://meltano.com/docs/roadmap.html#allie-data-analyst)-->
+<!--* [Eric (Data Engineer)](https://meltano.com/docs/roadmap.html#eric-data-engineer)-->
+<!--* [Allie (Data Analyst)](https://meltano.com/docs/roadmap.html#allie-data-analyst)-->
 
 <!-- Personas are described at https://meltano.com/docs/roadmap.html#personas -->
 
