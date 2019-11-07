@@ -5,15 +5,11 @@ description: Meltano's work plan and release schedule are publicly available at 
 
 # Roadmap
 
-Meltano is an end-to-end data pipeline and dashboarding tool. We offer a free open source alternative to expensive business intelligence software with an integrated workflow for modeling, extracting, loading, transforming, analyzing, notebooking, and orchestrating your data.
-
-Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) by the GitLab Data & Analytics team, and is now an internal startup within GitLab.
+Meltano enables anyone with access to SaaS APIs and spreadsheets to generate dashboards summarizing the status of their business operations.
 
 ## Mission
 
-Meltano enables anyone with access to SaaS APIs and spreadsheets to generate dashboards summarizing the status of their business operations.
-
-We provide a simple way to connect data source(s) and generate reports in minutes. The unique value of Meltano is in its all-in-one bundled solution, which is optimized for [breadth over depth](https://about.gitlab.com/company/strategy/#breadth-over-depth) to offer basic functionality at each step of the data pipeline.
+Provide a simple way to connect data source(s) and generate reports in minutes. through an all-in-one bundled solution, which is optimized for [breadth over depth](https://about.gitlab.com/company/strategy/#breadth-over-depth) to offer basic functionality at each step of the data pipeline.
 
 ## Vision
 
@@ -21,25 +17,30 @@ Meltano's mission aligns with the GitLab mission, which is "to change all creati
 
 Our contribution to this progress comes through the democratization of data throughout organizations. We help our customers integrate a wide range of data sets to create a single source of truth.
 
-## Strategy
+## Persona
 
-### Path to v1.0
+Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on a serving a single person.
 
-Meltano is approaching its v1 release. The criteria we have chosen for validating that we have achieved v1 are:
+### Target Persona Type: Founder
 
-- Users can successfully run Meltano end-to-end
-- Users can do everything from the UI (without having to run any commands on the command line)
-- Users have clear documentation, including indication of all limitations to existing taps and targets
-- Meltano core team is prepared to support backward compatibility to v1 (no breaking changes to architecture) until v2 version
+Our target persona has the following traits:
+*  One busy person at a startup *using Meltano in single player mode*
+*  They have access to all systems and data across the company
+*  New to data (does not write code, queries, etc.)
+*  Need to do analysis to run the business 
+*  Needs to do both engineering tasks and analyst tasks because there is nobody else
 
-### Beyond v1.0
+What they are **not**:
+*  **Don't have "analyst" in their job title.** They perform that function because they have to, and likely are CEO/founder running a department that has a lot of SaaS tools and data, likes sales or marketing. They are setting up the foundational systems in the company.
+*  **Don't have technical know-how or the time** for setting up a server, using the command line, writing code, creating custom taps, targets, transforms or models. They are running their company, and have a thousand other things to do.
 
-There is a lot more to build. A few key areas we know we need to invest more time after V1 are:
+### Other Persona Types
 
-- Data Analysis: adopt open source solution so we can bring in many more features without building from scratch
-- One-click deployment to popular hosting solutions (e.g. Amazon AMI marketplace, DigitalOcean droplets, etc.)
-- Creating and managing databases and warehouses
-- Ongoing inclusion of more pre-built taps, targets, and default transforms for popular data sources
+There are other personas we are **explicitly NOT building Meltano for** who may discover our tools and become users or contributors:
+
+* Data Analysts
+* Data Engineers
+* Machine Learning Engineers
 
 ## Focus
 
@@ -71,38 +72,9 @@ Internal metrics:
 
 - [Google Analytics for MAUI](https://analytics.google.com/analytics/web/?utm_source=marketingplatform.google.com&utm_medium=et&utm_campaign=marketingplatform.google.com%2Fabout%2Fanalytics%2F#/report/visitors-actives/a132758957w192645310p188384771/_u.date00=20190209&_u.date01=20190308&active_users.metricKeys=%5B0,1,2,3%5D/)
 
-## Monetization
+## Business Model
 
-We are building Meltano to solve a problem that software companies share: How to acquire the highest-value customers at the lowest cost of acquisition?
-
-We are solving this problem by incorporating what we learn along the way into a product that delivers practical and quantifiable value to our customers. Next, we will focus on building a community around Meltano with more users and regular contributors to the code base.
-
-Right now Meltano is open source. In the future we'll introduce proprietary features to have a sustainable business model to do quality control, marketing, security, dependency upgrades, and performance improvements. An example of a proprietary/source available feature is fine grained access controls. We'll always be good [stewards similar to GitLab](https://about.gitlab.com/stewardship/).
-
-## Personas
-
-Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on a serving a single person.
-
-### Target Persona Type: Founder
-
-Our target persona has the following traits:
-*  One busy person at a startup *using Meltano in single player mode*
-*  They have access to all systems and data across the company
-*  New to data (does not write code, queries, etc.)
-*  Need to do analysis to run the business 
-*  Needs to do both engineering tasks and analyst tasks because there is nobody else
-
-What they are **not**:
-*  **Don't have "analyst" in their job title.** They perform that function because they have to, and likely are CEO/founder running a department that has a lot of SaaS tools and data, likes sales or marketing. They are setting up the foundational systems in the company.
-*  **Don't have technical know-how or the time** for setting up a server, using the command line, writing code, creating custom taps, targets, transforms or models. They are running their company, and have a thousand other things to do.
-
-### Other Persona Types
-
-There are other personas we are **explicitly NOT building Meltano for** who may discover our tools and become users or contributors:
-
-* Data Analysts
-* Data Engineers
-* Machine Learning Engineers
+Meltano is a free and open source project, and the team is employed by GitLab. In the future, we are likely to introduce proprietary features as we work toward a sustainable business model. At this time, we do not have specific plans in that regard.
 
  ## Cadence
 
@@ -133,3 +105,7 @@ You can track our weekly progress and forward-looking plans in greater detail th
 :::tip Can't make your scheduled release?
 If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
 :::
+
+### History
+
+Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-data-teams-we-are-working-on-a-tool-just-for-you/) by the GitLab Data & Analytics team, and is now an internal startup within GitLab.
