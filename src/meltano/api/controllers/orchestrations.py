@@ -141,9 +141,22 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     """
     payload = request.get_json()
 
-    # TODO persit profile
+    # TEMP, TODO proper profile implementation and persistance
+    profile = {
+        "name": payload["name"],
+        "config": freeze_keys(
+            {
+                "api_url": "https://gitlab.com",
+                "groups": None,
+                "private_token": None,
+                "projects": "tester",
+                "start_date": None,
+                "ultimate_license": False,
+            }
+        ),
+    }
 
-    return jsonify({"success": True})
+    return jsonify(profile)
 
 
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["PUT"])

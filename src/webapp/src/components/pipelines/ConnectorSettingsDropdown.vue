@@ -3,6 +3,7 @@ import { mapActions } from 'vuex'
 import Vue from 'vue'
 
 import Dropdown from '@/components/generic/Dropdown'
+import utils from '@/utils/utils'
 
 export default {
   name: 'ExtractorSettingsModal',
@@ -33,24 +34,31 @@ export default {
   methods: {
     ...mapActions('configuration', ['addConfigurationProfile']),
     addProfile() {
-      const profile = Object.assign(
-        { config: { groups: 'tester' } },
-        this.addProfileSettings
-      )
-      this.configSettings.profiles.push(profile)
-      this.switchProfile(profile.name)
-
       const payload = {
         name: this.connector.name,
         type: this.pluginType,
-        profile
+        profile: Object.assign({ config: {} }, this.addProfileSettings)
       }
-      this.addConfigurationProfile(payload).then(() =>
+      this.addConfigurationProfile(payload).then(response => {
+        const profile = this.setAddedProfileDefaults(response.data)
+        this.configSettings.profiles.push(profile)
+        this.switchProfile(profile.name)
         Vue.toasted.global.success(`New Profile Added - ${profile.name}`)
-      )
-      // TODO generate profile with proper defaults akin to setInFocusConfiguration() (likely abstract it out so both this and setInFocusConfiguration can use its internal logic)
 
-      this.addProfileSettings = { name: null }
+        this.addProfileSettings = { name: null }
+      })
+    },
+    setAddedProfileDefaults(profile) {
+      const config = profile.config
+      this.configSettings.settings.forEach(setting => {
+        const isIso8601Date = setting.kind && setting.kind === 'date_iso8601'
+        const isDefaultNeeded =
+          config.hasOwnProperty(setting.name) && config[setting.name] === null
+        if (isIso8601Date && isDefaultNeeded) {
+          config[setting.name] = utils.getFirstOfMonthAsIso8601()
+        }
+      })
+      return profile
     },
     setProfileName(name) {
       this.addProfileSettings.name = name
@@ -74,8 +82,7 @@ export default {
         :label="
           configSettings.profiles[configSettings.profileInFocusIndex].name
         "
-        button-classes="is-small ml-05r"
-        menu-classes="dropdown-menu-300"
+        button-classes="ml-05r"
         is-right-aligned
       >
         <div class="dropdown-content is-unselectable">
@@ -86,7 +93,7 @@ export default {
                   :value="addProfileSettings.name"
                   class="input"
                   type="text"
-                  placeholder="Name new profile"
+                  placeholder="Name profile"
                   @input="setProfileName($event.target.value)"
                 />
               </div>

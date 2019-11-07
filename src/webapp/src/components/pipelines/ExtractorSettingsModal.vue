@@ -120,8 +120,6 @@ export default {
       )
     },
     saveConfigAndBeginEntitySelection() {
-      console.log(this.localConfiguration)
-
       this.$store
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
