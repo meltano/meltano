@@ -109,7 +109,7 @@ To speed up the process, download the example CSV files to the `extract/` direct
 - [GitFlixStreams.csv](/files/GitFlixStreams.csv)
 
 ::: tip Note on CSV files
-Each input CSV file used with the [CSV Extractor](https://gitlab.com/meltano/tap-csv) must be a traditionally-delimited CSV (commas separated columns, newlines indicate new rows, double quoted values).
+Each input CSV file used with the [CSV Extractor](https://gitlab.com/meltano/tap-csv) must be a traditionally-delimited CSV (comma separated columns, newlines indicate new rows, double quoted values).
 
 The first row is the header defining the attribute name for that column and will result to a column of the same name in the database. It must have a valid format with no spaces or special characters (like for example `!` or `@`, etc).
 
@@ -144,7 +144,7 @@ Let's install `tap-csv` by clicking on the `Install` button inside its card.
 
 On the configuration modal leave the default value for the CSV files definition location (`extract/files-def.json`) and click `Save` to finish configuring the extractor and progress to the next step.
 
-![Screenshot of the CSV Extractor Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
+![Screenshot of the CSV Extractor Configuration](/images/csv-tutorial/02-csv-configuration.png)
 
 ## Setup the Postgres Loader
 
