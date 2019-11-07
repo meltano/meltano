@@ -6,12 +6,14 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 
 export default {
   name: 'ExtractorSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    ConnectorSettingsDropdown
   },
   data() {
     return {
@@ -157,6 +159,8 @@ export default {
         </div>
 
         <template v-if="!isLoadingConfigSettings">
+          <ConnectorSettingsDropdown></ConnectorSettingsDropdown>
+
           <ConnectorSettings
             v-if="!extractorLacksConfigSettings"
             field-class="is-small"
