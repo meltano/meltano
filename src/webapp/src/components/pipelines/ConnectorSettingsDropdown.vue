@@ -82,7 +82,7 @@ export default {
         :label="
           configSettings.profiles[configSettings.profileInFocusIndex].name
         "
-        button-classes="ml-05r"
+        button-classes="is-small ml-05r"
         is-right-aligned
       >
         <div class="dropdown-content is-unselectable">
