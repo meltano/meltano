@@ -20,21 +20,29 @@ export default {
   },
   data() {
     return {
-      addProfileSettings: { name: null },
-      profiles: [] // TEMP replace with proper passed props
+      addProfileSettings: { name: null }
     }
   },
   methods: {
     addProfile() {
-      this.profiles.push(Object.assign({}, this.addProfileSettings))
+      this.configSettings.profiles.push(
+        Object.assign({}, this.addProfileSettings)
+      )
+
+      // TODO generate profile with proper defaults akin to setInFocusConfiguration() (likely abstract it out so both this and setInFocusConfiguration can use its internal logic)
+
       this.addProfileSettings = { name: null }
+      // TODO likely auto swap to this newly created profile
     },
     setProfileName(name) {
       this.addProfileSettings.name = name
-      // TODO likely auto swap to this newly created profile
     },
-    switchProfile(profile) {
-      console.log('swap profile: ', profile.name)
+    switchProfile(name) {
+      const targetProfile = this.configSettings.profiles.find(
+        profile => profile.name === name
+      )
+      const idx = this.configSettings.profiles.indexOf(targetProfile)
+      this.configSettings.profileInFocusIndex = idx
     }
   }
 }
@@ -45,7 +53,9 @@ export default {
     <div class="level-item">
       <p>Current profile:</p>
       <Dropdown
-        label="Default"
+        :label="
+          configSettings.profiles[configSettings.profileInFocusIndex].name
+        "
         button-classes="is-small ml-05r"
         menu-classes="dropdown-menu-300"
         is-right-aligned
@@ -78,14 +88,14 @@ export default {
               </button>
             </div>
           </div>
-          <template v-if="profiles.length">
+          <template v-if="configSettings.profiles.length">
             <div class="dropdown-divider"></div>
             <a
-              v-for="profile in profiles"
+              v-for="profile in configSettings.profiles"
               :key="profile.name"
               class="dropdown-item"
               data-dropdown-auto-close
-              @click="switchProfile(profile)"
+              @click="switchProfile(profile.name)"
             >
               {{ profile.name }}
             </a>
