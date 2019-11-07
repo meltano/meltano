@@ -11,11 +11,13 @@ Meltano was [launched in August 2018](https://about.gitlab.com/2018/08/01/hey-da
 
 ## Mission
 
-Meltano's mission aligns with the GitLab mission, which is "to change all creative work from read-only to read-write so that everyone can contribute."
+Meltano enables anyone with access to SaaS APIs and spreadsheets to generate dashboards summarizing the status of their business operations.
 
-When everyone can contribute, consumers become contributors and we greatly increase the rate of human progress.
+We provide a simple way to connect data source(s) and generate reports in minutes. The unique value of Meltano is in its all-in-one bundled solution, which is optimized for [breadth over depth](https://about.gitlab.com/company/strategy/#breadth-over-depth) to offer basic functionality at each step of the data pipeline.
 
 ## Vision
+
+Meltano's mission aligns with the GitLab mission, which is "to change all creative work from read-only to read-write so that everyone can contribute". When everyone can contribute, consumers become contributors and we greatly increase the rate of human progress.
 
 Our contribution to this progress comes through the democratization of data throughout organizations. We help our customers integrate a wide range of data sets to create a single source of truth.
 
@@ -109,59 +111,27 @@ Right now Meltano is open source. In the future we'll introduce proprietary feat
 
 ## Personas
 
-Meltano provides tools to help data teams manage their end-to-end pipeline. This process usually involves collaboration between software engineers and data analysts. In the personas below, we have begun to capture our insights revealed from user interviews.
+Meltano is a small startup within GitLab, and in order to be successful we have chosen to ruthlessly focus on a serving a single person.
 
-Ultimately, we are looking to help Meltano users successfully complete a wide range of user stories. To help users onboard quickly, we have created some [simple user stories](https://docs.google.com/document/d/1axKIKtC65Zf9yAV6pApwbZD6Hml-EPh7HEg7W-fPbg0/edit) and we are working to support them through our tutorials.
+### Target Persona Type: Founder
 
-### Eric (Data Engineer)
+Our target persona has the following traits:
+*  One busy person at a startup *using Meltano in single player mode*
+*  They have access to all systems and data across the company
+*  New to data (does not write code, queries, etc.)
+*  Need to do analysis to run the business 
+*  Needs to do both engineering tasks and analyst tasks because there is nobody else
 
-Alternative Job Titles: Business Intelligence Engineer, Software Developer
+What they are **not**:
+*  **Don't have "analyst" in their job title.** They perform that function because they have to, and likely are CEO/founder running a department that has a lot of SaaS tools and data, likes sales or marketing. They are setting up the foundational systems in the company.
+*  **Don't have technical know-how or the time** for setting up a server, using the command line, writing code, creating custom taps, targets, transforms or models. They are running their company, and have a thousand other things to do.
 
-#### Demographics
+### Other Persona Types
 
-- Age: 38
-- Location: Albany, NY
-- Family: Married, two young kids
+There are other personas we are **explicitly NOT building Meltano for** who may discover our tools and become users or contributors:
 
-#### Job Summary
+* Data Analysts
+* Data Engineers
+* Machine Learning Engineers
 
-I am responsible for designing, constructing, installing, testing, and maintaining highly scalable data management systems. I improve data foundational procedures, guidelines, and standards. I work on integrating new data management technologies and software engineering tools into existing structures. I also create custom software components and analytics applications.
-
-#### Motivations
-
-- When I build data pipelines, I want to know the uptime, so I make sure they are well crafted.
-- When I share data, it should be usable, so the data analyst can be integrated.
-- When I don’t have to build custom solutions and instead use reliable solutions I can be more proactive.
-- When all of my solutions are flexible, I can easily adapt them to the changing needs of the business.
-
-#### Frustrations
-
-- I’m frustrated when the tools are not reliable because this means the data does not move consistently.
-- It is hard for me to maintain the management system when there is a problem with the foundation.
-
-### Allie (Data Analyst)
-
-Alternative Job Titles: Data Scientist - Analytics, Business Intelligence Engineer, Full Stack Data Analyst, Business Analyst
-
-#### Demographics
-
-- Age: 32
-- Location: NYC, NY
-- Family: Married, no children
-
-#### Job Summary
-
-I am responsible for retrieving and gathering data from the data warehouse, organizing it and making the data collected insightful and easy to understand. My goal is to help stakeholders make informed decisions for their business.
-
-#### Motivations
-
-- When collaborating with others, I want to receive and create clear requirements so I am able to execute and deliver a precise presentation.
-- When I ask the right questions, I am more effective in communicating usable data.
-- When I develop automated and reusable routines, I am confident in the quality of my pipelines and be more effective in my role.
-- When I create meaningful reports, management has insights about new trends as well as areas the company may need to improve upon.
-
-#### Frustrations
-
-- I’m frustrated when I have to educate stakeholders on the meaning of data in their business expertise because it’s a symptom of lack of data adoption from an organization.
-- I’m frustrated when data integrity is compromised because data becomes fragmented and full of holes and stakeholders no longer trust my analysis.
-- It is hard to interpret data when I may not have the right data because I am unable to support my conclusions.
+ 
