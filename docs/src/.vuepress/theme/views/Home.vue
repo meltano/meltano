@@ -9,7 +9,7 @@
           >Meltano is now available as a
           <a
             style="color:white; text-decoration:underline;"
-            :href="$site.themeConfig.data.digitalOceanUrl"
+            href="https://marketplace.digitalocean.com/apps/meltano"
             >1-Click App in the DigitalOcean Marketplace</a
           >
         </span>
