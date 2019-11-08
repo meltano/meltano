@@ -78,7 +78,7 @@ def elt(project, extractor, loader, dry, transform, job_id):
         except Exception as err:
             logging.error(f"ELT could not complete, an error happened during the process: {err}")
             raise click.Abort()
-
+        finally:
             session.close()
     # fmt: on
 
