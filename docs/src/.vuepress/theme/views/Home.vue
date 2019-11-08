@@ -3,9 +3,9 @@
     <div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header">Free data dashboards<br/><strong>for startup founders</strong></h2>
+          <h2 class="hero-header" style="border-bottom:0px;">Free data dashboards<br/><strong>for startup founders</strong></h2>
           <p class="hero-tagline">
-            Data analysis software to visualize business operations data.
+            Open source software to visualize business operations data
           </p>
 
           <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
@@ -16,11 +16,80 @@
 
         <div class="hero-right">
           <img
-            src="../assets/meltano-sketch.svg"
+            src="../assets/meltano-founder.jpg"
             alt="Happy Meltano User Says Hi"
             width="500px"
           />
         </div>
+      </div>
+    </div>
+
+    <div class="feature-section-wrapper">
+      <div class="content-width-wide" style="background-color:#fffbe4; padding-top:20px; padding-bottom:20px;">
+
+        <p class="description">
+          Connect popular data sources and reporting database formats.
+        </p>
+
+        <div class="plugin-logos">
+          <a href="/plugins/extractors/gitlab.html"
+            ><img src="../assets/logo-gitlab.png" alt="GitLab Logo"
+          /></a>
+
+          <a href="/plugins/extractors/stripe.html"
+            ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
+          /></a>
+
+          <a href="/plugins/csv.html"
+            ><img src="../assets/logo-csv.png" alt="CSV Logo"
+          /></a>
+
+          <a href="/plugins/extractors/salesforce.html"
+            ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
+          /></a>
+
+          <a href="/plugins/loaders/sqlite.html"
+            ><img src="../assets/logo-sqlite.png" alt="SQLite Logo"
+          /></a>
+
+          <a href="/plugins/extractors/zendesk.html"
+            ><img src="../assets/logo-zendesk.png" alt="Zendesk Logo"
+          /></a>
+
+          <a href="/plugins/extractors/marketo.html"
+            ><img src="../assets/logo-marketo.png" alt="Marketo Logo"
+          /></a>
+          <a href="/plugins/extractors/carbon-intensity.html"
+            ><img src="../assets/logo-nationalgrid.png" alt="National Grid ESO"
+          /></a>
+
+          <a href="/plugins/extractors/fastly.html"
+            ><img src="../assets/logo-fastly.png" alt="Fastly Logo"
+          /></a>
+
+          <a href="/plugins/extractors/mongodb.html"
+            ><img src="../assets/logo-mongodb.png" alt="MongoDB Logo"
+          /></a>
+
+          <a href="/plugins/loaders/snowflake.html">
+            <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
+          </a>
+          <a href="/plugins/extractors/google-analytics.html"
+            ><img
+              src="../assets/logo-googleanalytics.png"
+              alt="Google Analytics Logo"
+            />
+          </a>
+        </div>
+
+        <p class="description ta-c">
+          For more information, check out our
+          <a href="/plugins/">plugins documentation</a>
+        </p>
+
+        <p style="text-align:center; font-size:12px;">
+          <em>All trademarks and logos are owned by their respective owners.</em>
+        </p>
       </div>
     </div>
 
@@ -275,76 +344,7 @@
       </div>
     </div>
 
-    <div class="feature-section-wrapper">
-      <div class="content-width-wide">
-        <h2 class="section-title ta-c">Plugins to Extract & Load Data</h2>
-
-        <p class="description">
-          Meltano works with a growing number of data sources and reporting
-          database formats.
-        </p>
-
-        <div class="plugin-logos">
-          <a href="/plugins/extractors/gitlab.html"
-            ><img src="../assets/logo-gitlab.png" alt="GitLab Logo"
-          /></a>
-
-          <a href="/plugins/extractors/stripe.html"
-            ><img src="../assets/logo-stripe.png" alt="Stripe Logo"
-          /></a>
-
-          <a href="/plugins/csv.html"
-            ><img src="../assets/logo-csv.png" alt="CSV Logo"
-          /></a>
-
-          <a href="/plugins/extractors/salesforce.html"
-            ><img src="../assets/logo-salesforce.png" alt="Salesforce Logo"
-          /></a>
-
-          <a href="/plugins/loaders/sqlite.html"
-            ><img src="../assets/logo-sqlite.png" alt="SQLite Logo"
-          /></a>
-
-          <a href="/plugins/extractors/zendesk.html"
-            ><img src="../assets/logo-zendesk.png" alt="Zendesk Logo"
-          /></a>
-
-          <a href="/plugins/extractors/marketo.html"
-            ><img src="../assets/logo-marketo.png" alt="Marketo Logo"
-          /></a>
-          <a href="/plugins/extractors/carbon-intensity.html"
-            ><img src="../assets/logo-nationalgrid.png" alt="National Grid ESO"
-          /></a>
-
-          <a href="/plugins/extractors/fastly.html"
-            ><img src="../assets/logo-fastly.png" alt="Fastly Logo"
-          /></a>
-
-          <a href="/plugins/extractors/mongodb.html"
-            ><img src="../assets/logo-mongodb.png" alt="MongoDB Logo"
-          /></a>
-
-          <a href="/plugins/loaders/snowflake.html">
-            <img src="../assets/logo-snowflake.png" alt="Snowflake Logo" />
-          </a>
-          <a href="/plugins/extractors/google-analytics.html"
-            ><img
-              src="../assets/logo-googleanalytics.png"
-              alt="Google Analytics Logo"
-            />
-          </a>
-        </div>
-
-        <p class="description ta-c">
-          For more information, check out our
-          <a href="/plugins/">plugins documentation</a>
-        </p>
-
-        <p style="text-align:center; font-size:12px;">
-          <em>All trademarks and logos are owned by their respective owners.</em>
-        </p>
-      </div>
-    </div>
+    
 
     <div class="feature-section-wrapper is-white">
       <div class="content-width-wide">
@@ -391,12 +391,7 @@
 
     <div class="feature-section-wrapper is-shorter is-white">
       <section class="section">
-        <h2 class="section__title">Communicate with the team!</h2>
-        <p class="section__text">
-          Got questions, want to chat with the team, or learn more about what
-          we're up to? You can find us in the Meltano Slack channel, watch our
-          videos on YouTube, and more:
-        </p>
+        <h2 class="section__title" style="padding-bottom:20px;">We'd Love to Hear From You</h2>
         <a
           :href="$site.themeConfig.data.slackChannelUrl"
           class="button"
@@ -421,7 +416,7 @@
 
         <p class="description ta-c">
           If you're looking for help with a problem, check out
-          <a href="/docs/getting-help.html">Getting Help</a>!
+          <a href="/docs/getting-help.html">Getting Help</a>
         </p>
       </section>
     </div>
@@ -638,8 +633,9 @@ export default {
 }
 
 .feature-section-wrapper {
-  background-color: #eee;
-  padding: 6rem 0;
+  background-color: white;
+  padding-top: 0rem;
+  padding-bottom: 4rem;
 
   &.is-shorter {
     padding: 3rem 0;
