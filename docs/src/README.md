@@ -1,8 +1,10 @@
 ---
 home: true
 heroImage: /meltano-logo.svg
-actionText: Get started
+actionText: Install Locally
 actionLink: /docs/installation.html
+doText: Install on DigitalOcean
+doLink: https://marketplace.digitalocean.com/apps/meltano
 contributeText: Contribute
 contributeLink: /docs/contributing.html
 metaTitle: Meltano is an open source data dashboarding tool from GitLab

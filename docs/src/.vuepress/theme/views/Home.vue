@@ -16,16 +16,14 @@
       </div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
-          <h2 class="hero-header">Open source<br/><strong>data dashboarding</strong></h2>
+          <h2 class="hero-header">Free data dashboards<br/><strong>for startup founders</strong></h2>
           <p class="hero-tagline">
-            Meltano is a free alternative to expensive SaaS tools. We provide an
-            integrated workflow for modeling, extracting, loading, transforming,
-            analyzing, notebooking, and orchestrating your data.
+            Meltano enables anyone with access to SaaS APIs and spreadsheets to generate dashboards summarizing the status of their business operations.
           </p>
 
           <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
             <NavLink class="action-button" :item="actionLink" />
-            <NavLink class="action-button secondary" :item="contributeLink" />
+            <NavLink class="action-button secondary" :item="doLink" />
           </p>
         </div>
 
