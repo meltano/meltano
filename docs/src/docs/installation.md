@@ -410,13 +410,27 @@ docker run -v $(pwd):/project \
 
 ## Upgrading Meltano
 
-We release new versions of Meltano weekly. To update Meltano to the latest version, run the following command in your terminal:
+We release a new version of Meltano every week. To keep tabs on the latest releases, follow along on the [Meltano blog](https://meltano.com/blog/), or have a look at our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
+
+### Using Meltano UI
+
+When an update is available, you will be informed of this automatically through a shiny blue button in the top right corner of Meltano UI:
+
+![](/screenshots/update-available.png)
+
+Clicking this button will show more information and give you the option to install the update right away:
+
+![](/screenshots/update-available-popup.png)
+
+The Meltano UI will refresh automatically once installation is complete.
+
+### Using the command line
+
+If you're not using Meltano UI, you can update Meltano to the latest version by running the following command in your terminal:
 
 ```
 pip3 install --upgrade meltano
 ```
-
-Follow along on the [Meltano blog](https://meltano.com/blog/) to keep tabs on the latest releases, or visit our [CHANGELOG](https://gitlab.com/meltano/meltano/blob/master/CHANGELOG.md).
 
 ## Troubleshooting
 
