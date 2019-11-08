@@ -6,12 +6,14 @@ import lodash from 'lodash'
 
 import ConnectorLogo from '@/components/generic/ConnectorLogo'
 import ConnectorSettings from '@/components/pipelines/ConnectorSettings'
+import ConnectorSettingsDropdown from '@/components/pipelines/ConnectorSettingsDropdown'
 
 export default {
   name: 'LoaderSettingsModal',
   components: {
     ConnectorLogo,
-    ConnectorSettings
+    ConnectorSettings,
+    ConnectorSettingsDropdown
   },
   data() {
     return {
@@ -36,15 +38,24 @@ export default {
     isLoadingConfigSettings() {
       return !Object.prototype.hasOwnProperty.call(
         this.localConfiguration,
-        'config'
+        'profiles'
       )
     },
     isSaveable() {
+      if (this.isLoadingConfigSettings) {
+        return
+      }
+      const configSettings = {
+        config: this.localConfiguration.profiles[
+          this.localConfiguration.profileInFocusIndex
+        ].config,
+        settings: this.localConfiguration.settings
+      }
       const isValid = this.getHasValidConfigSettings(
-        this.localConfiguration,
+        configSettings,
         this.loader.settingsGroupValidation
       )
-      return !this.isInstalling && this.isInstalled && isValid
+      return this.isInstalled && isValid
     },
     loader() {
       return this.getInstalledPlugin('loaders', this.loaderName)
@@ -82,7 +93,7 @@ export default {
     },
     createEditableConfiguration() {
       this.localConfiguration = Object.assign(
-        {},
+        { profileInFocusIndex: 0 },
         lodash.cloneDeep(this.loaderInFocusConfiguration)
       )
     },
@@ -143,6 +154,11 @@ export default {
               <a :href="loader.signupUrl" target="_blank">sign up here</a>.
             </p>
           </div>
+          <ConnectorSettingsDropdown
+            :connector="loader"
+            plugin-type="loaders"
+            :config-settings="localConfiguration"
+          ></ConnectorSettingsDropdown>
           <ConnectorSettings
             field-class="is-small"
             :config-settings="localConfiguration"
