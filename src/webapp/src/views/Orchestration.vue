@@ -23,6 +23,10 @@ export default {
       return this.getIsInstallingPlugin('orchestrators', 'airflow')
     }
   },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
   beforeRouteEnter: (to, from, next) => {
     // force refresh unless the Flask context has Airflow set
     const { airflowUrl } = flaskContext()
