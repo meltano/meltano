@@ -192,6 +192,12 @@ We do not have a double click installer at this time, but [it is in our roadmap]
 
 Before you install Meltano, make sure you have the following requirements installed and up to date.
 
+#### Unix-like environment
+
+Recent versions of Linux and macOS are both fully supported, but Windows is not.
+
+If you'd like to run Meltano on Windows, you can install it inside the [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about). You may also try [installing Meltano on Docker](#installing-on-docker), although Docker on Windows is known to have [some idiosyncrasies](https://gitlab.com/meltano/meltano/issues/1261#note_240256080) that might hinder Meltano's ability to function.
+
 #### Python 3+
 
 - [Python 3.6.1+](https://realpython.com/installing-python/)
@@ -233,21 +239,13 @@ Your local environment may use a different version of Python or other dependenci
 
 ##### Recommended Virtual Environment Setup
 
-We suggest you create a directory where you want your virtual environments to be saved, e.g.:
-
-- **Linux, macOS**: `~/virtualenvs`
-- **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
+We suggest you create a directory where you want your virtual environments to be saved, e.g. `~/virtualenvs`.
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-# Linux, macOS
 mkdir ~/virtualenvs
 python -m venv ~/virtualenvs/meltano
-
-# Windows
-mkdir %ALLUSERSPROFILE%\\virtualenvs
-python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 ```
 
 ##### Activating Your Virtual Environment
@@ -255,11 +253,7 @@ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 Activate the virtual environment using:
 
 ```bash
-# Linux, macOS
 source ~/virtualenvs/meltano/bin/activate
-
-# Windows
-%HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
