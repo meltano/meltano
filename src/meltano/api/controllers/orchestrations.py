@@ -117,7 +117,11 @@ def get_plugin_configuration(plugin_ref) -> Response:
     )
 
     # TEMP, TODO proper Profile model
-    defaultProfile = {"name": "Temp 1", "config": freeze_keys(config)}
+    defaultProfile = {
+        "name": "temp-1",
+        "label": "Temp 1",
+        "config": freeze_keys(config),
+    }
     config["groups"] = ""
     config["projects"] = ""
     testProfile = {"name": "Temp 2", "config": freeze_keys(config)}
@@ -145,26 +149,26 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     profile = {
         "name": payload["name"],
         # TEMP Extractor Test
-        # "config": freeze_keys(
-        #     {
-        #         "api_url": "https://gitlab.com",
-        #         "groups": None,
-        #         "private_token": None,
-        #         "projects": "tester",
-        #         "start_date": None,
-        #         "ultimate_license": False,
-        #     }
-        # ),
-        # TEMP Loader Test
         "config": freeze_keys(
             {
-                "dbname": "dogfooding",
-                "host": "localhost",
-                "password": "",
-                "port": "5432",
-                "user": "meltano_user",
+                "api_url": "https://gitlab.com",
+                "groups": None,
+                "private_token": None,
+                "projects": "tester",
+                "start_date": None,
+                "ultimate_license": False,
             }
         ),
+        # TEMP Loader Test
+        # "config": freeze_keys(
+        #     {
+        #         "dbname": "dogfooding",
+        #         "host": "localhost",
+        #         "password": "",
+        #         "port": "5432",
+        #         "user": "meltano_user",
+        #     }
+        # ),
     }
 
     return jsonify(profile)

@@ -31,6 +31,11 @@ export default {
       addProfileSettings: { name: null }
     }
   },
+  computed: {
+    displayName() {
+      return profile => profile.label || profile.name
+    }
+  },
   methods: {
     ...mapActions('configuration', ['addConfigurationProfile']),
     addProfile() {
@@ -80,7 +85,9 @@ export default {
       <p>Current profile:</p>
       <Dropdown
         :label="
-          configSettings.profiles[configSettings.profileInFocusIndex].name
+          displayName(
+            configSettings.profiles[configSettings.profileInFocusIndex]
+          )
         "
         button-classes="is-small ml-05r"
         is-right-aligned
@@ -122,7 +129,7 @@ export default {
               data-dropdown-auto-close
               @click="switchProfile(profile.name)"
             >
-              {{ profile.name }}
+              {{ displayName(profile) }}
             </a>
           </template>
         </div>
