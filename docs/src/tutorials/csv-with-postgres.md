@@ -168,7 +168,8 @@ You should now be greeted with the Schedules page with a modal to create your fi
 
 ![Create pipeline modal for the CSV Extractor](/images/csv-tutorial/03-csv-create-new-pipeline.png)
 
-Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
+Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
+For example, you may want a recurring task that updates the database at the end of every business day.
 
 In the current form, you will see:
 
