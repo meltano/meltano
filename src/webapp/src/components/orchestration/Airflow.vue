@@ -1,10 +1,5 @@
 <script>
-import Message from '@/components/generic/Message'
-
 export default {
-  components: {
-    Message
-  },
   data() {
     return {
       refreshUrl: '',
@@ -44,27 +39,25 @@ export default {
   <section>
     <div class="columns">
       <div class="column">
-        <Message>
-          <div class="level">
-            <div class="level-left">
-              <a
-                class="button"
-                :class="{ 'is-loading': isRefreshing }"
-                @click="refreshAirflow"
-                >Refresh Airflow</a
-              >
-            </div>
-            <div class="level-right">
-              <p>
-                You are now looking at the Airflow UI. See the
-                <a target="_blank" href="https://airflow.apache.org/ui.html"
-                  >documentation</a
-                >
-                for more details.
-              </p>
-            </div>
+        <div class="level">
+          <div class="level-left">
+            <a
+              class="button"
+              :class="{ 'is-loading': isRefreshing }"
+              @click="refreshAirflow"
+              >Refresh Airflow</a
+            >
           </div>
-        </Message>
+          <div class="level-right">
+            <p>
+              You are now looking at the Airflow UI. See the
+              <a target="_blank" href="https://airflow.apache.org/ui.html"
+                >documentation</a
+              >
+              for more details.
+            </p>
+          </div>
+        </div>
 
         <div class="proxy-container">
           <iframe class="proxy" :src="targetUrl" />
