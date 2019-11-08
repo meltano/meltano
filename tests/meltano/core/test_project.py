@@ -45,7 +45,7 @@ class ProjectReader(IndefiniteThread):
 
     def do(self):
         assert self.project.meltano
-        time.sleep(50/1000)  # 50ms
+        time.sleep(50 / 1000)  # 50ms
 
 
 class TestProject:
