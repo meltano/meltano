@@ -28,6 +28,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#95](https://gitlab.com/meltano/meltano-marketing/issues/95) Update the DigitalOcean CTA to go to the public directory page for the Meltano droplet
 - [#1270](https://gitlab.com/meltano/meltano/issues/1270) Main navigation "Pipeline" to "Pipelines" to reinforce multiple vs. singular (conflicts a bit with the verb approach of the other navigation items but we think it's worth it for now)
 - [#1240](https://gitlab.com/meltano/meltano/issues/1240) Provide clarity around how Airflow can be used directly in documentation and UI
+- [#1263](https://gitlab.com/meltano/meltano/issues/1263) Document lack of Windows support and suggest WSL, Docker
 
 ### Fixes
 
