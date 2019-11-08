@@ -48,6 +48,10 @@ class OutputLogger(object):
         click.secho = functools.partial(click.secho, color=FORCE_COLOR)
 
     def __exit__(self, exc_type, exc_value, tb):
+        # log any Exception that caused this OutputLogger to exit prematurely
+        if isinstance(exc_value, Exception):
+            logging.exception(exc_value)
+
         sys.stdout.flush()
         sys.stderr.flush()
 
