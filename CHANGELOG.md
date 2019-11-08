@@ -5,15 +5,14 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ## Unreleased
 
-- [#1272](https://gitlab.com/meltano/meltano/issues/1272) Add Vuepress plugin to generate a sitemap on website build
-- [meltano-marketing#89](https://gitlab.com/meltano/meltano-marketing/issues/89) Adds basic title and meta descriptions to all public-facing website & documentation pages.
-
 ---
 
 ### New
 
 - [#1222](https://gitlab.com/meltano/meltano/issues/1222) Include static application security testing (SAST) in the pipeline
 - [#1164](https://gitlab.com/meltano/meltano/issues/1164) Add "transform limitations" message to Transform UI
+- [#1272](https://gitlab.com/meltano/meltano/issues/1272) Add Vuepress plugin to generate a sitemap on website build
+- [meltano-marketing#89](https://gitlab.com/meltano/meltano-marketing/issues/89) Adds basic title and meta descriptions to all public-facing website & documentation pages.
 
 ### Changes
 
@@ -24,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1191](https://gitlab.com/meltano/meltano/issues/1191) update Google Analytics extractor documentation to explain how to set up the Google Analytics API, and remove duplicate instructions from the [Google Analytics API + Postgres tutorial](http://meltano.com/tutorials/google-analytics-with-postgres.html#prerequisites)
 - [#1199](https://gitlab.com/meltano/meltano/issues/1199) Add example and sample CSV files to the CSV extractor documentation
 - [#1247](https://gitlab.com/meltano/meltano/issues/1247) Update the [Loading CSV Files to a Postgres Database](https://www.meltano.com/tutorials/csv-with-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results. Also provide all the files used in the tutorial (transformations, models, etc) as downloadable files.
+- [#1240](https://gitlab.com/meltano/meltano/issues/1240) Provide clarity around how Airflow can be used directly in documentation and UI
 
 ### Fixes
 
