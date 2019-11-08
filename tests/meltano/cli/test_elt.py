@@ -1,5 +1,6 @@
 import pytest
 import os
+import logging
 from unittest.mock import patch
 from functools import partial
 
@@ -9,6 +10,7 @@ from meltano.core.runner.singer import SingerRunner
 from meltano.core.runner.dbt import DbtRunner
 from meltano.core.dbt_service import DbtService
 from meltano.core.tracking import GoogleAnalyticsTracker
+from meltano.core.job import Job
 
 
 @pytest.mark.backend("sqlite")
@@ -21,11 +23,12 @@ def test_elt(
     target,
     plugin_settings_service,
     plugin_discovery_service,
+    job_logging_service,
 ):
     result = cli_runner.invoke(cli, ["elt"])
     assert result.exit_code == 2
 
-    args = ["elt", tap.name, target.name]
+    args = ["elt", "--job_id", "pytest_test_elt", tap.name, target.name]
 
     # exit cleanly when everything is fine
     # fmt: off
@@ -42,9 +45,21 @@ def test_elt(
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
 
-    with patch.object(SingerRunner, "run", side_effect=Exception):
+    with patch.object(
+        SingerRunner, "run", side_effect=Exception("This is a grave danger.")
+    ), patch(
+        "meltano.core.elt_context.PluginDiscoveryService",
+        return_value=plugin_discovery_service,
+    ), patch(
+        "meltano.core.elt_context.PluginSettingsService",
+        return_value=plugin_settings_service,
+    ):
         result = cli_runner.invoke(cli, args)
         assert result.exit_code == 1
+
+        # ensure there is a log of this exception
+        log = job_logging_service.get_latest_log("pytest_test_elt")
+        assert "This is a grave danger.\n" in log
 
 
 @pytest.mark.backend("sqlite")

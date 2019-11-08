@@ -52,8 +52,8 @@ class ConfigService:
 
             plugin.profile = profile
             return plugin
-        except StopIteration:
-            raise PluginMissingError(name)
+        except StopIteration as stop:
+            raise PluginMissingError(name) from stop
 
     def get_extractors(self):
         return filter(lambda p: p.type == PluginType.EXTRACTORS, self.plugins())
