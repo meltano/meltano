@@ -51,8 +51,10 @@ export default {
           <div class="level-right">
             <p>
               You are now looking at the Airflow UI. See the
-              <a target="_blank" href="https://airflow.apache.org/ui.html"
-                >documentation</a
+              <a
+                target="_blank"
+                href="https://www.meltano.com/docs/orchestration.html"
+                >Orchestration documentation</a
               >
               for more details.
             </p>
