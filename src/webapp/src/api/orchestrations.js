@@ -43,7 +43,7 @@ export default {
   },
 
   testPluginConfiguration({ type, name, config }) {
-    return axios.get(
+    return axios.post(
       utils.apiUrl('orchestrations', `${type}/${name}/configuration/test`),
       config
     )

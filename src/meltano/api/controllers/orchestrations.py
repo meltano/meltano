@@ -10,6 +10,7 @@ from meltano.core.plugin.settings_service import (
     PluginSettingValueSource,
 )
 from meltano.core.plugin_discovery_service import PluginDiscoveryService
+from meltano.core.plugin_invoker import invoker_factory
 from meltano.core.plugin_install_service import PluginInstallService
 from meltano.core.project import Project
 from meltano.core.project_add_service import ProjectAddService
@@ -147,17 +148,23 @@ def save_plugin_configuration(plugin_ref) -> Response:
     return jsonify(settings.as_config(db.session, plugin_ref, redacted=True))
 
 
-@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["GET"])
+@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["POST"])
 def test_plugin_configuration(plugin_ref) -> Response:
     """
     endpoint for testing a plugin configuration's valid connection
     """
     project = Project.find()
     payload = request.get_json()
+    success = True
 
-    # TODO
+    # TODO proper impelementation of tap test, maybe leverage https://github.com/singer-io/singer-tools#checking-output-of-a-tap
+    try:
+        invoker = invoker_factory(project, plugin_ref)
+        invoker.invoke()
+    except Exception as err:
+        success = False
 
-    return jsonify({"success": True})
+    return jsonify({"success": success})
 
 
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
