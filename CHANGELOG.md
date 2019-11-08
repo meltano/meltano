@@ -29,6 +29,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Fixes
 
+- [#1183](https://gitlab.com/meltano/meltano/issues/1183) Fix a race condition causing the `meltano.yml` to be empty in some occurence
 - [#1258](https://gitlab.com/meltano/meltano/issues/1258) Fix format of custom extractor's capabilities in meltano.yml
 - [#1215](https://gitlab.com/meltano/meltano/issues/1215) Fix intercom documentation footer overlap issue.
 - [#1215](https://gitlab.com/meltano/meltano/issues/1215) Fix YouTube iframes to be responsive (resolves unwanted side-effect of horizontal scrollbar at mobile/tablet media queries)
