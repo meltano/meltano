@@ -164,7 +164,7 @@ export default {
               :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
               :disabled="!getIsStepScheduleMinimallyValidated"
               tag="button"
-              >Run</router-link
+              >Schedule</router-link
             >
           </div>
         </div>
