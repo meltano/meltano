@@ -239,21 +239,13 @@ Your local environment may use a different version of Python or other dependenci
 
 ##### Recommended Virtual Environment Setup
 
-We suggest you create a directory where you want your virtual environments to be saved, e.g.:
-
-- **Linux, macOS**: `~/virtualenvs`
-- **Windows**: `%ALLUSERSPROFILE%\\virtualenvs`
+We suggest you create a directory where you want your virtual environments to be saved, e.g. `~/virtualenvs`.
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-# Linux, macOS
 mkdir ~/virtualenvs
 python -m venv ~/virtualenvs/meltano
-
-# Windows
-mkdir %ALLUSERSPROFILE%\\virtualenvs
-python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 ```
 
 ##### Activating Your Virtual Environment
@@ -261,11 +253,7 @@ python -m venv %ALLUSERSPROFILE%\\virtualenvs\\meltano
 Activate the virtual environment using:
 
 ```bash
-# Linux, macOS
 source ~/virtualenvs/meltano/bin/activate
-
-# Windows
-%HOME%\\virtualenvs\\meltano\\Scripts\\activate.bat
 ```
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
