@@ -15,6 +15,7 @@ export default {
   },
   data() {
     return {
+      isTesting: false,
       localConfiguration: {}
     }
   },
@@ -140,13 +141,23 @@ export default {
       })
     },
     testConnection() {
+      this.isTesting = true
       this.testPluginConfiguration({
         name: this.extractor.name,
         type: 'extractors',
         config: this.localConfiguration.config
       })
-        .then(response => console.log('textConnection response', response))
-        .catch(error => console.log('textConnection error', error))
+        .then(() =>
+          Vue.toasted.global.success(
+            `Valid Connection - ${this.extractor.name}`
+          )
+        )
+        .catch(() =>
+          Vue.toasted.global.error(
+            `Invalid Connection - ${this.extractor.name}`
+          )
+        )
+        .finally(() => (this.isTesting = false))
     }
   }
 }
@@ -201,6 +212,7 @@ export default {
           <div class="control">
             <button
               class="button"
+              :class="{ 'is-loading': isTesting }"
               :disabled="!isSaveable"
               @click="testConnection"
             >
