@@ -429,7 +429,7 @@ The Meltano UI will refresh automatically once installation is complete.
 If you're not using Meltano UI, you can update Meltano to the latest version by running the following command in your terminal:
 
 ```
-pip3 install --upgrade meltano
+meltano upgrade
 ```
 
 ## Troubleshooting
