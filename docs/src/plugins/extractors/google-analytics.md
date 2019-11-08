@@ -83,7 +83,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 ### Configure the Extractor
 
-Open your Meltano instance and click "Pipelines" in the top navigation bar. You should see now see the Extractors page, which contains various options for connecting your data source.
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data source.
 
 ![Screenshot of Meltano UI with all extractors not installed and Google Analytics highlighted](/images/google-analytics-tutorial/01-ga-extractor-selection.png)
 
