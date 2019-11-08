@@ -43,29 +43,29 @@ def elt(project, extractor, loader, dry, transform, job_id):
     loader_name: Which loader should be used in this extraction
     """
 
-    install_missing_plugins(project, extractor, loader, transform)
-
     _, Session = project_engine(project)
+    session = Session()
+    job_logging_service = JobLoggingService(project)
     job = Job(
         job_id=job_id or f'job_{datetime.datetime.now().strftime("%Y%m%d-%H:%M:%S.%f")}'
     )
 
-    try:
-        session = Session()
-        elt_context = (
-            ELTContextBuilder(project)
-            .with_job(job)
-            .with_extractor(extractor)
-            .with_loader(loader)
-            .context(session)
-        )
+    # fmt: off
+    with job.run(session), \
+        job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
+        OutputLogger(log_file):
 
-        job_logging_service = JobLoggingService(project)
+        try:
+            install_missing_plugins(project, extractor, loader, transform)
 
-        # fmt: off
-        with job.run(session), \
-            job_logging_service.create_log(job.job_id, job.run_id) as log_file, \
-            OutputLogger(log_file):
+            elt_context = (
+                ELTContextBuilder(project)
+                .with_job(job)
+                .with_extractor(extractor)
+                .with_loader(loader)
+                .context(session)
+            )
+
             if transform != "only":
                 run_extract_load(elt_context, session, dry_run=dry)
             else:
@@ -75,16 +75,12 @@ def elt(project, extractor, loader, dry, transform, job_id):
                 run_transform(elt_context, session, dry_run=dry, models=extractor)
             else:
                 click.secho("Transformation skipped.", fg="yellow")
-        # fmt: on
-    except Exception as err:
-        click.secho(
-            f"ELT could not complete, an error happened during the process.", fg="red"
-        )
-        logging.exception(err)
-        click.secho(str(err), err=True)
-        raise click.Abort()
-    finally:
-        session.close()
+        except Exception as err:
+            logging.error(f"ELT could not complete, an error happened during the process: {err}")
+            raise click.Abort()
+        finally:
+            session.close()
+    # fmt: on
 
     tracker = GoogleAnalyticsTracker(project)
     tracker.track_meltano_elt(extractor=extractor, loader=loader, transform=transform)
