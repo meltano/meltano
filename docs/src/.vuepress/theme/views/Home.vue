@@ -1,19 +1,6 @@
 <template>
   <div class="home">
     <div>
-      <div
-        class="promobar"
-        style="background-color:#0168ff; color:white; text-align:center; padding: 10px; font-size:14px;"
-      >
-        <span
-          >Meltano is now available as a
-          <a
-            style="color:white; text-decoration:underline;"
-            href="https://marketplace.digitalocean.com/apps/meltano"
-            >1-Click App in the DigitalOcean Marketplace</a
-          >
-        </span>
-      </div>
       <div class="hero homepage-cta feature-section-wrapper">
         <div class="hero-left">
           <h2 class="hero-header">Free data dashboards<br/><strong>for startup founders</strong></h2>
@@ -23,7 +10,7 @@
 
           <p class="action" v-if="data.actionText && data.actionLink && data.contributeLink && data.contributeText">
             <NavLink class="action-button" :item="actionLink" />
-            <NavLink class="action-button secondary" :item="doLink" />
+            <NavLink class="action-button secondary" :item="contributeLink" />
           </p>
         </div>
 
