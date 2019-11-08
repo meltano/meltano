@@ -46,11 +46,10 @@
         </div>
         <div class="feature-right">
           <h2 class="section-title">
-            Analyze your data with dynamically generated SQL queries
+            No queries required
           </h2>
           <p class="hero-tagline">
-            Meltano makes it easy for you to analyze your data with a user
-            interface that allows you to generate SQL with a few clicks so you
+            Meltano automatically generates SQL with a few clicks, so you
             can get the insights you need.
           </p>
         </div>
