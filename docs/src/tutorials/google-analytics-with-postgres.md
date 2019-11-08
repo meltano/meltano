@@ -6,7 +6,7 @@ description: Learn how to use Meltano to load Google Analytics data into a Postg
 
 # Tutorial: Google Analytics API + Postgres
 
-For this tutorial, our goal will be to get the [Google Analytics Extractor](https://gitlab.com/meltano/tap-google-analytics) integrated with your Meltano project to pull your Google Analytics data and load it into a Postgres analytics database.
+In this tutorial we'll explain how to get the [Google Analytics Extractor](https://gitlab.com/meltano/tap-google-analytics) integrated with your Meltano project to pull your Google Analytics data and load it into a Postgres analytics database.
 
 <br />
 <div class="embed-responsive embed-responsive-16by9">
