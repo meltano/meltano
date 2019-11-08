@@ -6,178 +6,165 @@ description: Learn how to use Meltano to analyze your GitLab data by automatical
 
 # Tutorial: GitLab API + Postgres
 
-For this tutorial, our goal will be to get [tap-gitlab](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project.
+In this tutorial we'll explain how to get the [GitLab Extractor](https://gitlab.com/meltano/tap-gitlab) integrated with your Meltano project to pull your GitLab data and load it into a Postgres analytics database.
+
+<br />
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe
+  width="560" height="315" src="https://www.youtube.com/embed/QLETNl_9bpc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
 
 ## Prerequisites
 
-- Meltano
-- GitLab account
-- Basic command line knowledge
+For this tutorial, you can use a new or existing Meltano project. 
 
-## Setup
+If you need help getting started, we recommend reviewing the [Installation documentation](/docs/installation.html) and [Getting Started Guide](/docs/getting-started.html) to set up your first project. 
 
-Let's start by initializing a new project! Navigate to your desired directory and run:
+If this is your first time using GitLab with Meltano, you will need to enable access to GitLab's API and get your GitLab Private Token by following the instructions found in the [GitLab Extractor documentation](/plugins/extractors/gitlab.html#gitlab-api-token). 
 
-```bash
-# Start a new Meltano project called tutorial-tap-gitlab
-meltano init tutorial-tap-gitlab
+## Setup the GitLab Extractor
 
-# Once the setup is complete, navigate into your project
-cd tutorial-tap-gitlab
-```
+Open your Meltano instance and click "Pipelines" in the top navigation bar. You should now see the Extractors page, which contains various options for connecting your data sources.
 
-### Add Loader
+![Screenshot of Meltano UI with all extractors not installed and GitLab Extractor highlighted](/images/gitlab-tutorial/01-gitlab-extractor-selection.png)
 
-Next, we will be configuring the warehouse where your data will live.
+Let's install `tap-gitlab` by clicking on the `Install` button inside its card. 
 
-```bash
-# Add target-postgres to your project
-meltano add loader target-postgres
-```
+On the configuration modal we want to enter the Private Token that Gitlab extractor will use to connect to GitLab, the Groups and Projects we are going to extract from and the Start Date we want the extracted data set to start from.
 
-If you check your `.env` file, you should see the following configuration already populated:
+![Screenshot of GitLab Extractor Configuration](/images/gitlab-tutorial/02-gitlab-configuration.png)
 
-:::tip Looking for a database?
-To quickly get started, you can use `docker-compose up warehouse_db` to spin up a PostgreSQL instance ready for Meltano.
-:::
+For this tutorial, we will scope our data sample to only include the Meltano project to make things faster. 
 
-```bash
-export PG_PASSWORD=warehouse
-export PG_USERNAME=warehouse
-export PG_ADDRESS=localhost
-export PG_PORT=5502
-export PG_DATABASE=warehouse
-```
+- Populate `Groups` with the Meltano group: `meltano`
+- Populate `Projects` with the Meltano project: `meltano/meltano`
+- Set the `Start Date` to the beginning of last month, for example: `01/10/2019`
 
-:::tip Let's validate!
-You can use `meltano config target-postgres` to validate the current configuration.
-:::
+## Setup the Postgres Loader
 
-Once you verify that your database is setup correctly, it's time to start working with `tap-gitlab`!
+Click `Save` to finish configuring the extractor and progress to the next step, the Loaders page.
 
-### Add Extractor
+Click to `Install` Postgres and set the credentials for your local Postgres.
 
-Adding `tap-gitlab` to your project is just as easy as the loader.
+![Screenshot of Postgres Loader Configuration](/images/meltano-ui/target-postgres-configuration.png)
 
-```bash
-meltano add extractor tap-gitlab
-```
+Information on how to install a Postgres Database on your local machine and configure the Postgres Loader can be found on [PostgresQL Database Tutorials](/plugins/loaders/postgres.html).
 
-Once the installation is successful, you need to open your `.env` file and add the following to it:
+## Apply transformations as desired
 
-```bash
-export GITLAB_API_URL='https://gitlab.com/api/v4'
-export GITLAB_API_TOKEN=
-export GITLAB_API_PROJECTS=
-export GITLAB_API_GROUPS=
-export GITLAB_API_START_DATE=
-```
+With our extractor and loader configured, you should now see the following page:
 
-Next, we will start configuring your extractor so you can fetch data!
+![Screenshot of Transform page on Meltano webapp](/images/meltano-ui/transform-run-selected.png)
 
-## Configuration
+This page allows you to apply transformations to your data. We want to run the default transforms that come pre-bundled with Meltano for data fetched from GitLab, so we are going to select `Run` and then click `Save`. 
 
-### GitLab API Token
+If you'd like to learn more about how transforms work in Meltano, check out our [docs on Meltano transform](/docs/architecture.html#meltano-transform).
 
-In order to access GitLab's API to fetch data, we must get a personal access token that will authenticate you with the server. This is very simple to do:
+## Create a pipeline schedule
 
-<video controls style="max-width: 100%">
-  <source src="/screenshots/personal-access-token.mov">
-</video>
+You should now be greeted with the Schedules page with a modal to create your first pipeline!
 
-1. Navigate to your [profile's access tokens](https://gitlab.com/profile/personal_access_tokens).
+![Create pipeline modal for GitLab Extractor](/images/gitlab-tutorial/03-gitlab-create-new-pipeline.png)
 
-2. Fill out the personal access token form with the following properties:
+Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
 
-- **Name:** tap-gitlab-tutorial
-- **Expires:** _leave blank unless you have a specific reason to expire the token_
-- **Scopes:**
-  - api
+In the current form, you will see:
 
-3. Click on `Create personal access token` to submit your request.
+- A pipeline **name** which has a default name that is dynamically generated, but can be easily changed if desired
+- The **extractor** the pipeline will use, which should be `tap-gitlab`
+- The **loader** the pipeline will use, which should be `target-postgres`
+- Whether the **transform** step should be applied, which should be `run`
+- The **interval** at which the pipeline should be run, which is set by default to be `@once`
 
-4. You should see your token appear at the top of your screen.
+All we need to do is click `Save` to start our new pipeline! The pipeline's log opens automatically and you can check the pipeline running and what Meltano does behind the scenes to extract and load the data. 
 
-5. Copy and paste the token into your `.env` file under the property `GITLAB_API_TOKEN`. It should look something like this:
+You should see a spinning icon that indicates that the pipeline is not completed. Once it's complete, the indicator will disappear and you should be able to see the final results of the extraction:
 
-```bash
-...
-export GITLAB_API_TOKEN='I8vxHsiVAaDnAX3hA'
-...
-```
+![Screenshot of run log of a completed pipeline for GitLab Extractor](/images/gitlab-tutorial/04-gitlab-log-of-completed-pipeline.png)
 
-### Projects
+Congratulations! Now that you have connected to GitLab, configured the Postgres Loader, and run a successful pipeline for the dataset, we are now ready to analyze the data!
 
-This property allows you to scope the project that the service fetches, but it is completely optional. If this is left blank, the extractor will try to fetch all projects that it can grab.
+## Select a data model
 
-If you want to configure this, the format for it is `group/project`. Here are a couple examples:
+Let's start by closing the Run Log for the pipeline and click on the `Model` option on the header of the page. This should bring us to the "Analyze: Models" page:
 
-- `meltano/meltano` - https://gitlab.com/meltano/
-- `meltano/tap-salesforce` - https://gitlab.com/meltano/tap-salesforce
+![Screenshot of Analyze: Model page for GitLab](/images/gitlab-tutorial/05-gitlab-model-page.png)
 
-For this tutorial, we will scope our data sample to only include the Meltano project to make things faster. So now we will populate the `GITLAB_API_PROJECTS` property as follows:
+Meltano Models provide a starting point to explore and analyze data for specific use cases. They are similar to templates with only what is relevant for each use case included. As you can see in the right column, `Gitlab` already has the required models installed.
 
-```bash
-...
-export GITLAB_API_PROJECTS='meltano/meltano'
-...
-```
+Let's move on to the next step by clicking `Analyze` in the `Gitlab Issues` card to move on to the next step.
 
-### Groups
+## Analyze the data
 
-This property allows you to scope data that the extractor fetches to only the desired group(s). The group name can generally be found at the root of a repo URL. If this is left blank, the extractor will try to fetch all groups within GitLab.
+The Analyze page contains an interactive user interface to allow you to dynamically build queries and visualize your data.
 
-For example, `https://www.gitlab.com/meltano/tap-gitlab` has a group of `Meltano`. This can be confirmed as well by visiting `https://gitlab.com/meltano` and noting the Group ID below the header.
+![Screenshot of Analyze page for GitLab Issues](/images/gitlab-tutorial/06-gitlab-issues-analyze-page.png)
 
-![Group ID verification example](/screenshots/group-header-example.png)
+Now, let's explore and analyze our GitLab Issues data by selecting the following attributes in the left column:
 
-For this tutorial, we will also scope the data to reduce the size of data being fetched. So we will configure the property `GITLAB_API_GROUPS` with the Meltano group.
+- **Columns**
+  - Created Year
+  - Created Quarter
+- **Aggregates**
+  - Total Issues
+  - Average Days to Close
 
-```bash
-...
-export GITLAB_API_GROUPS='meltano'
-...
-```
+![Screenshot of selected attributes for GitLab Issues](/images/gitlab-tutorial/07-gitlab-issues-selected-attributes.png)
 
-### Start Date
+And with that, the big moment is upon us, it's time to click `Run` to run our query!
 
-This property allows you to configure where you want your data set to start from. Otherwise, if left blank, it will try fetch the entire history of the groups or projects if they are defined.
+![Screenshot of bar graph for GitLab Issues data](/images/gitlab-tutorial/08-gitlab-issues-bar-graph.png)
 
-Similar to the previous examples, we will limit the scope of data being fetched in order to shorten the download time, so let's configure the start date to the beginning of last month.
+You should now see a bar chart visualization and a table below to see the data in detail!
 
-```bash
-...
-# The date format is ISO-8601
-export GITLAB_API_START_DATE='2019-05-01T00:00:00Z'
-...
-```
+Let's order the data by Year and Quarter ascending:
 
-:::tip Let's validate!
-You can use `meltano config tap-gitlab` to validate the current configuration.
-:::
+![Screenshot of data and ordering for GitLab Issues data](/images/gitlab-tutorial/09-gitlab-issues-ordering.png)
 
-## Run ELT (extract, load, transform)
+We can also filter the results to only include bugs. Select the `Filters` dropdown menu at the top of the Query pane and add a filter to only keep issues with the `bug` label:
 
-Now that everything is setup, we can run the full Extract > Load > Transform pipeline with the following command:
+`Labels (for filtering)` --> `Like` --> `%bug%`
 
-```bash
-meltano elt tap-gitlab target-postgres --transform run
-```
+We add the percentages around the `bug` cause issues may have multiple labels and the `bug` label can be anywhere in that field.
 
-Depending on the group(s) and project(s) you chose, the aforementioned command may take from a couple minutes to a couple hours. That's why we propose to set the `GITLAB_API_START_DATE` not too far in the past for your first test.
+![Screenshot of data and ordering for GitLab Issues data](/images/gitlab-tutorial/10-gitlab-issues-filter.png)
 
-You should now see the data being fetched and your Postgres database properly populated once it is complete. Congratulations!
+And, finally, switch the graph to an area chart:
 
-## Add Model
+![Screenshot of area chart for GitLab Issues data](/images/gitlab-tutorial/11-gitlab-issues-area-diagram.png)
 
-Now, you can add the model so that you'll be able to visualize the transformed data in the UI:
 
-```bash
-meltano add model model-gitlab
-```
+## Save a report
 
-## Interact with Your Data in The Web App
+When we find an analysis that we want to reference in the future, we can easily do this by creating a report. This can be accomplished by clicking on the `Save Report` dropdown in the Analyze toolbar. This will open a dropdown with a default report name that is dynamically populated, but can be easily changed.
 
-With the previous step done, you are set to explore your data using Meltano UI and generate ad-hoc reports.
+![Save Report dialogue for naming the report you want to save](/images/gitlab-tutorial/12-gitlab-issues-save-report-dialogue.png)
 
-All you need to do is start Meltano UI, set up a connection to your Postgres, and start exploring!
+Once we click `Save`, we should see the upper left "Untitled Report" change to our new report name.
+
+![Saved report with a designated report name](/images/gitlab-tutorial/13-gitlab-issues-saved-report.png)
+
+And with that, our analysis has been saved!
+
+## Add a report to a dashboard
+
+As you acquire more reports, you will probably want to organize them via dashboards. This can be done by clicking on the new `Add to Dashboard` dropdown in the toolbar.
+
+![Dropdown menu for adding report to dashboard](/images/gitlab-tutorial/14-gitlab-issues-add-to-dashboard-dropdown.png)
+
+Since we have never created a dashboard, click on `New Dashboard`, which will trigger a modal that contains a dynamically generated dashboard name that can be customized as desired.
+
+![New dashboard dialog for configuring the dashboard](/images/gitlab-tutorial/15-gitlab-issues-new-dashboard-dialog.png)
+
+Once we click `Create`, we can now verify that the our report has been added to the Dashboard by clicking on the `Add to Dashboard` menu. We can also visit the Dashboard directly by clicking on the `Dashboard` navigation item in the header, which shows our newly created Dashboard and the associated Report.
+
+![Dashboard page with new dashboard and the associated Report](/images/gitlab-tutorial/16-gitlab-dashboard-page.png)
+
+
+## Next steps
+
+And with that, you have now setup a complete end-to-end data solution for extracting and analyzing GitLab data with Meltano! 🎉
+
+You can now check the rest of the pre-bundled Models for Projects, Merge Requests, Users and more.
+
+Don't forget to save the reports that you find useful and add reports to your dashboards. 

@@ -6,7 +6,7 @@ description: Learn how to use Meltano to load Google Analytics data into a Postg
 
 # Tutorial: Google Analytics API + Postgres
 
-For this tutorial, our goal will be to get the [Google Analytics Extractor](https://gitlab.com/meltano/tap-google-analytics) integrated with your Meltano project to pull your Google Analytics data and load it into a Postgres analytics database.
+In this tutorial we'll explain how to get the [Google Analytics Extractor](https://gitlab.com/meltano/tap-google-analytics) integrated with your Meltano project to pull your Google Analytics data and load it into a Postgres analytics database.
 
 <br />
 <div class="embed-responsive embed-responsive-16by9">
@@ -54,7 +54,8 @@ You should now be greeted with the Schedules page with a modal to create your fi
 
 ![Create pipeline modal for Google Analytics](/images/google-analytics-tutorial/04-ga-create-new-pipeline.png)
 
-Pipelines allow you to create scheduled tasks through Apache Airflow. For example, you may want a recurring task that updates the database at the end of every business day.
+Meltano provides [Orchestration](/docs/orchestration.html) using Apache Airflow, which allows you to create scheduled tasks to run pipelines automatically.
+For example, you may want a recurring task that updates the database at the end of every business day.
 
 In the current form, you will see:
 

@@ -1,12 +1,14 @@
 ## Orchestration
 
-If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using Apache Airflow, which is automatically installed when the Meltano UI is launched for the first time.
+If you're using SaaS tools to manage support, sales, marketing, revenue and other business functions you know your data is constantly changing. To keep your dashboards up to date, Meltano provides Orchestration using [Apache Airflow](https://apache.airflow.org).
 
-When a new pipeline schedule is created, a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
+When a new pipeline schedule is created using the [UI](/docs/getting-started.html#create-a-pipeline-schedule) or [CLI](/docs/command-line-interface.html#schedule), a [DAG](https://airflow.apache.org/concepts.html#dags) is automatically created in Airflow as well, which represents "a collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies".
 
-Meltano uses [Airflow](https://apache.airflow.org) to schedule jobs.
+Airflow is automatically installed when the Meltano UI is launched for the first time, and automatically runs in the background while Meltano UI is running.
 
 ### Installing Airflow
+
+If you're not using Meltano UI, you'll need to install Airflow manually:
 
 Change directories so that you are inside your Meltano project, and then run the following command to make Airflow available to use via `meltano invoke`
 
@@ -14,15 +16,11 @@ Change directories so that you are inside your Meltano project, and then run the
 meltano add orchestrator airflow
 ```
 
-If you are already in the Meltano UI, you will need to kill it, and re-start it with `meltano ui` to activate the Orchestration tab.
-
 Now you have Airflow installed, let's create a simple example schedule to confirm everything is working correctly.
-
-Meltano ships out-of-the-box with a dynamic DAG, which is a DAG generator for your current project located at `orchestrate/dags/meltano.py` .
 
 ### Create a Schedule
 
-To regularly schedule your ELT to run, do the following
+To regularly schedule your ELT to run, use the ["Pipeline" interface in the UI](/docs/getting-started.html#create-a-pipeline-schedule), or the following command:
 
 ```bash
 meltano schedule [SCHEDULE_NAME] [EXTRACTOR_NAME] [TARGET_NAME] [INTERVAL]
@@ -34,15 +32,19 @@ Example:
 meltano schedule carbon__sqlite tap-carbon-intensity target-sqlite @daily
 ```
 
-Now that you've scheduled your first DAG, you can refresh the "Orchestration" page and you will see your DAG.
+Now that you've scheduled your first DAG, you can load the "Pipeline" page in the UI and see it show up. You can also refresh the "Orchestrate" page and see your DAG show up in the Airflow interface.
 
-::: tip
-IMPORTANT: Your schedule is now created, but it will not be enabled until you toggle the "ON" button. Refresh the page and click the "Refresh" icon under "Links" to see that your DAG is fully running.
-:::
+### Using Airflow directly
 
-To learn more about orchestration functionality, check out the [Apache Airflow documentation](https://apache.airflow.org).
+You are free to interact with Airflow directly through the "Orchestrate" page in the Meltano UI. 
 
-#### Other Things You Can Do With Airflow
+By default, you'll only see Meltano's pipeline DAGs here, which are created automatically using the dynamic DAG generator included with every Meltano project, located at `orchestrate/dags/meltano.py`.
+
+You can use the bundled Airflow with custom DAGs by putting them inside the `orchestrate/dags` directory, where they'll be picked up by Airflow automatically. To learn more, check out the [Apache Airflow documentation](https://apache.airflow.org). 
+
+Meltano's use of Airflow will be unaffected by other usage of Airflow as long as `orchestrate/dags/meltano.py` remains untouched and pipelines are managed through the dedicated interface.
+
+#### Other things you can do with Airflow
 
 Currently, `meltano invoke` gives you raw access to the underlying plugin after any configuration hooks.
 
@@ -58,13 +60,13 @@ Manually trigger a task to run:
 meltano invoke airflow run --raw meltano extract_load $(date -I)
 ```
 
-Start the airflow ui - currently starts in a separate browser:
+Start the Airflow UI, if you're not already running Meltano UI: (will start in a separate browser)
 
 ```bash
 meltano invoke airflow webserver -D
 ```
 
-Start the airflow scheduler, enabling background job processing:
+Start the Airflow scheduler, enabling background job processing if you're not already running Meltano UI:
 
 ```bash
 meltano invoke airflow scheduler -D

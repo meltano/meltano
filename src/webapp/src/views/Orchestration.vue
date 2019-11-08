@@ -23,6 +23,10 @@ export default {
       return this.getIsInstallingPlugin('orchestrators', 'airflow')
     }
   },
+  created() {
+    this.$store.dispatch('plugins/getAllPlugins')
+    this.$store.dispatch('plugins/getInstalledPlugins')
+  },
   beforeRouteEnter: (to, from, next) => {
     // force refresh unless the Flask context has Airflow set
     const { airflowUrl } = flaskContext()
@@ -46,14 +50,13 @@ export default {
             <div class="content">
               <template v-if="getIsInstallingAirflow">
                 <p>
-                  Airflow is Meltano's current orchestrator. Learn what's
-                  possible in the
+                  Meltano provides Orchestration using Apache Airflow. Learn
+                  what's possible in the
                   <a
                     target="_blank"
-                    href="https://www.meltano.com/docs/command-line-interface.html#orchestration"
-                    >Meltano Airflow</a
-                  >
-                  documentation.
+                    href="https://www.meltano.com/docs/orchestration.html"
+                    >documentation</a
+                  >.
                 </p>
                 <hr />
                 <p class="is-italic has-text-centered">

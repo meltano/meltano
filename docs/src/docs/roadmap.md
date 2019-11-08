@@ -49,11 +49,20 @@ A week is measured from Sunday to Saturday.
 Every improvement we make should be optimized by that.
 This means sometimes we should prioritize promotion (blog, twitter, video, talk) and usability (docs, UX) over new features.
 
-## Metrics
+### MAUI
 
-### MAU
+Meltano's primary KPI is Monthly Active UI Users (MAUI). MAUI is pronounced like [the island](https://en.wikipedia.org/wiki/Maui).
 
-We track the Monthly Active Users (MAU) of three things to understand the health of our user adoption funnel from first impression to fully onboarded user:
+The graph below shows our MAUI growth progress at the end of October 2019. At the target pace (in red) we will have 1,000 MAUI by the end of 2019. While we experienced significant month-over-month growth of MAUI relative to September (+90%), we are still behind pace.
+
+<img src="https://meltano.com/blog/wp-content/uploads/2019/11/Meltano-MAUI-Growth_-Actual-vs.-10-WoW-Goal.png">
+
+Read the [October 2019 recap post on the Meltano blog](https://meltano.com/blog/2019/11/04/meltano-month-in-review-october-2019/).
+
+
+### Other Metrics
+
+We track the leading indicators upstream of MAUI in the funnel to understand the health of our user adoption funnel from first impression to fully onboarded user:
 
 1. [Meltano.com Website](https://meltano.com)
 2. [Meltano Command Line Interface - CLI](https://meltano.com/docs/command-line-interface.html)

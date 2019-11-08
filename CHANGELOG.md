@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1239](https://gitlab.com/meltano/meltano/issues/1239) Update header buttons layout on small viewports
 - [#1019](https://gitlab.com/meltano/meltano/issues/1019) Automatically update package.json file versions
 - [#1253](https://gitlab.com/meltano/meltano/issues/1253) Do not allow `meltano` command invocation without any argument
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
@@ -24,6 +25,11 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1199](https://gitlab.com/meltano/meltano/issues/1199) Add example and sample CSV files to the CSV extractor documentation
 - [#1247](https://gitlab.com/meltano/meltano/issues/1247) Update the [Loading CSV Files to a Postgres Database](https://www.meltano.com/tutorials/csv-with-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results. Also provide all the files used in the tutorial (transformations, models, etc) as downloadable files.
 - [#1279] Revise ["Roadmap" section](https://meltano.com/docs/roadmap.html) of the docs with clarified persona, mission, vision, and re-order content
+- [#1134](https://gitlab.com/meltano/meltano/issues/1134) Update the [GitLab API + Postgres](https://www.meltano.com/tutorials/gitlab-and-postgres.html). Include video walk-through and update the end to end flow to only use Meltano UI.
+- [#95](https://gitlab.com/meltano/meltano-marketing/issues/95) Update the DigitalOcean CTA to go to the public directory page for the Meltano droplet
+- [#1270](https://gitlab.com/meltano/meltano/issues/1270) Main navigation "Pipeline" to "Pipelines" to reinforce multiple vs. singular (conflicts a bit with the verb approach of the other navigation items but we think it's worth it for now)
+- [#1240](https://gitlab.com/meltano/meltano/issues/1240) Provide clarity around how Airflow can be used directly in documentation and UI
+- [#1263](https://gitlab.com/meltano/meltano/issues/1263) Document lack of Windows support and suggest WSL, Docker
 
 ### Fixes
 
@@ -47,6 +53,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 ### Changes
 
 - [#1244](https://gitlab.com/meltano/meltano/issues/1244) Add instructions on how to deactivate a virtual environment
+- [#1082](https://gitlab.com/meltano/meltano/issues/1082) Meltano will now enable automatically DAGs created in Airflow
 - [#1126](https://gitlab.com/meltano/meltano/issues/1126) Minor UI updates to improve clarity around Schedule step and Manual vs Orchestrated runs
 - [#1210](https://gitlab.com/meltano/meltano/issues/1210) Improved SQLite loader configuration context (name and description)
 - [#1185](https://gitlab.com/meltano/meltano/issues/1185) Remove majority of unimplemented placeholder UI buttons
