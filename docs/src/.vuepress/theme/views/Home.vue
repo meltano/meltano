@@ -762,6 +762,7 @@ export default {
       letter-spacing 0.1rem
       box-sizing border-box
       margin-right: 0.4rem;
+      margin-bottom: 1rem;
       &.secondary
         background none
         box-shadow inset 0 0 0 2px #464ACB

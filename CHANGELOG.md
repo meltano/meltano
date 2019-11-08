@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 
 ### Changes
 
+- [#1239](https://gitlab.com/meltano/meltano/issues/1239) Update header buttons layout on small viewports
 - [#1019](https://gitlab.com/meltano/meltano/issues/1019) Automatically update package.json file versions
 - [#1253](https://gitlab.com/meltano/meltano/issues/1253) Do not allow `meltano` command invocation without any argument
 - [#1192](https://gitlab.com/meltano/meltano/issues/1192) Improve helper notes associated with each Extract, Load, and Transform step to better communicate the purpose of each
