@@ -119,7 +119,7 @@ export default {
               <span class="icon is-small" :class="getIconColor('/pipeline')">
                 <font-awesome-icon icon="stream"></font-awesome-icon>
               </span>
-              <span>Pipeline</span>
+              <span>Pipelines</span>
               <span
                 v-if="getRunningPipelines.length > 0"
                 class="tag tag-running-pipelines is-rounded is-info"
@@ -164,7 +164,7 @@ export default {
               :class="{ 'is-active': getIsCurrentPath('/pipeline/schedule') }"
               :disabled="!getIsStepScheduleMinimallyValidated"
               tag="button"
-              >Run</router-link
+              >Schedule</router-link
             >
           </div>
         </div>
