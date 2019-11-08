@@ -147,6 +147,19 @@ def save_plugin_configuration(plugin_ref) -> Response:
     return jsonify(settings.as_config(db.session, plugin_ref, redacted=True))
 
 
+@orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration/test", methods=["GET"])
+def test_plugin_configuration(plugin_ref) -> Response:
+    """
+    endpoint for testing a plugin configuration's valid connection
+    """
+    project = Project.find()
+    payload = request.get_json()
+
+    # TODO
+
+    return jsonify({"success": True})
+
+
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
 def get_pipeline_schedules():
     """

@@ -84,6 +84,11 @@ export default {
   },
   methods: {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
+    ...mapActions('configuration', [
+      'savePluginConfiguration',
+      'testPluginConfiguration',
+      'updateRecentELTSelections'
+    ]),
     tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
         this.saveConfigAndGoToLoaders()
@@ -128,6 +133,20 @@ export default {
             : `Connection Saved - ${this.extractor.name}`
           Vue.toasted.global.success(message)
         })
+        const message = this.extractorLacksConfigSettings
+          ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
+          : `Connection Saved - ${this.extractor.name}`
+        Vue.toasted.global.success(message)
+      })
+    },
+    testConnection() {
+      this.testPluginConfiguration({
+        name: this.extractor.name,
+        type: 'extractors',
+        config: this.localConfiguration.config
+      })
+        .then(response => console.log('textConnection response', response))
+        .catch(error => console.log('textConnection error', error))
     }
   }
 }
@@ -176,15 +195,28 @@ export default {
           </div>
         </template>
       </section>
-      <footer class="modal-card-foot buttons is-right">
+      <footer class="modal-card-foot field is-grouped is-grouped-right">
         <button class="button" @click="close">Cancel</button>
-        <button
-          class="button is-interactive-primary"
-          :disabled="!isSaveable"
-          @click="saveConfigAndGoToLoaders"
-        >
-          Save
-        </button>
+        <div class="field has-addons">
+          <div class="control">
+            <button
+              class="button"
+              :disabled="!isSaveable"
+              @click="testConnection"
+            >
+              Test Connection
+            </button>
+          </div>
+          <div class="control">
+            <button
+              class="button is-interactive-primary"
+              :disabled="!isSaveable"
+              @click="saveConfigAndGoToLoaders"
+            >
+              Save
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   </div>
