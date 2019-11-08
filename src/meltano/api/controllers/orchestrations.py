@@ -107,7 +107,7 @@ def run():
 @orchestrationsBP.route("/<plugin_ref:plugin_ref>/configuration", methods=["GET"])
 def get_plugin_configuration(plugin_ref) -> Response:
     """
-    endpoint for getting a plugin's configuration
+    endpoint for getting a plugin's configuration profiles
     """
     project = Project.find()
     settings = PluginSettingsService(project)
@@ -115,7 +115,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
         settings.as_config(db.session, plugin_ref, redacted=True), reducer="dot"
     )
 
-    # TEMP, TODO proper Profile model
+    # TEMP, TODO proper Profile model and collection setup
     defaultProfile = {
         "name": "temp-1",
         "label": "Temp 1",
@@ -124,12 +124,12 @@ def get_plugin_configuration(plugin_ref) -> Response:
     config["groups"] = ""
     config["projects"] = ""
     testProfile = {"name": "Temp 2", "config": freeze_keys(config)}
+    profiles = [defaultProfile, testProfile]
 
     return jsonify(
         {
             # freeze the keys because they are used for lookups
-            "config": freeze_keys(config),
-            "profiles": [defaultProfile, testProfile],
+            "profiles": profiles,
             "settings": settings.get_definition(plugin_ref).settings,
         }
     )
@@ -140,7 +140,7 @@ def get_plugin_configuration(plugin_ref) -> Response:
 )
 def add_plugin_configuration_profile(plugin_ref) -> Response:
     """
-    endpoint for adding a plugin configuration profile
+    endpoint for adding a configuration profile to a plugin
     """
     payload = request.get_json()
 
@@ -180,6 +180,8 @@ def save_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
+
+    # TODO iterate pipelines and save each, also set this connector's profile (reuse `pipelineInFocusIndex`?)
 
     settings = PluginSettingsService(project)
     for name, value in payload.items():
