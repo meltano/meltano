@@ -143,14 +143,25 @@ def add_plugin_configuration_profile(plugin_ref) -> Response:
     # TEMP, TODO proper profile implementation and persistance
     profile = {
         "name": payload["name"],
+        # TEMP Extractor Test
+        # "config": freeze_keys(
+        #     {
+        #         "api_url": "https://gitlab.com",
+        #         "groups": None,
+        #         "private_token": None,
+        #         "projects": "tester",
+        #         "start_date": None,
+        #         "ultimate_license": False,
+        #     }
+        # ),
+        # TEMP Loader Test
         "config": freeze_keys(
             {
-                "api_url": "https://gitlab.com",
-                "groups": None,
-                "private_token": None,
-                "projects": "tester",
-                "start_date": None,
-                "ultimate_license": False,
+                "dbname": "dogfooding",
+                "host": "localhost",
+                "password": "",
+                "port": "5432",
+                "user": "meltano_user",
             }
         ),
     }
