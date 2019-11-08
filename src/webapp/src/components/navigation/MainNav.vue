@@ -384,20 +384,6 @@ export default {
                 </div>
               </Dropdown>
             </div>
-            <div class="level-item">
-              <a
-                class="button has-background-light tooltip is-tooltip-warning is-tooltip-left"
-                data-tooltip="Help shape this feature by contributing your ideas"
-                target="_blank"
-                href="https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&search=permission"
-              >
-                <font-awesome-icon
-                  :icon="'user'"
-                  :style="{ color: '#0F3B66' }"
-                  title="Login currently disabled"
-                ></font-awesome-icon>
-              </a>
-            </div>
           </div>
         </div>
       </div>
