@@ -24,6 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/) and [Keep a Ch
 - [#1199](https://gitlab.com/meltano/meltano/issues/1199) Add example and sample CSV files to the CSV extractor documentation
 - [#1247](https://gitlab.com/meltano/meltano/issues/1247) Update the [Loading CSV Files to a Postgres Database](https://www.meltano.com/tutorials/csv-with-postgres.html) Tutorial to use Meltano UI for setting up the Extractor and Loader, running the ELT pipeline and analyzing the results. Also provide all the files used in the tutorial (transformations, models, etc) as downloadable files.
 - [#1134](https://gitlab.com/meltano/meltano/issues/1134) Update the [GitLab API + Postgres](https://www.meltano.com/tutorials/gitlab-and-postgres.html). Include video walk-through and update the end to end flow to only use Meltano UI.
+- [#95](https://gitlab.com/meltano/meltano-marketing/issues/95) Update the DigitalOcean CTA to go to the public directory page for the Meltano droplet
 
 ### Fixes
 
