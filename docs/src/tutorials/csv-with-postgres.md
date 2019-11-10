@@ -10,6 +10,12 @@ This tutorial explains how to load data stored in multiple CSV files to a Postgr
 
 We are going to use the [CSV Extractor](https://gitlab.com/meltano/tap-csv) to extract the data from the CSV files and the [Postgres Loader](https://github.com/meltano/target-postgres) to load the extracted data to Postgres.
 
+<br />
+<div class="embed-responsive embed-responsive-16by9">
+  <iframe
+  width="560" height="315" src="https://www.youtube.com/embed/QJfrPmnSwRc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
 ## Prerequisites
 
 In contrast to loading data from an API, the attributes (schema) of the data included in a CSV file differ for each CSV file loaded.
