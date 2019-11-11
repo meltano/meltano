@@ -75,6 +75,7 @@ export default {
           <div class="control">
             <button
               class="button is-interactive-primary"
+              data-cy="create-pipeline-button"
               @click="goToCreatePipeline()"
             >
               <span>Create</span>

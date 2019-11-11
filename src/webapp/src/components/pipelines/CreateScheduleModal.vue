@@ -222,6 +222,7 @@ export default {
           class="button is-interactive-primary"
           :class="{ 'is-loading': isSaving }"
           :disabled="!isSaveable"
+          data-cy="save-pipeline-button"
           @click="save"
         >
           Save

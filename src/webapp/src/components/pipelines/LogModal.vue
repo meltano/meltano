@@ -109,6 +109,7 @@ export default {
           icon-close="caret-down"
           is-right-aligned
           is-up
+          data-cy="analyze-button"
         >
           <div class="dropdown-content is-unselectable">
             <div
