@@ -96,15 +96,6 @@ export OAUTH_GITLAB_SECRET = ""
 
 For more information on how to get these from your GitLab application, check out the [integration docs from GitLab](https://docs.gitlab.com/ee/integration/gitlab.html).
 
-## Log Path
-
-To change the directory where Meltano logs will be generated, update your `.env` in your project directory with the following configuration:
-
-```bash
-# The directory where the Meltano logs will be generated
-export MELTANO_LOG_PATH = ""
-```
-
 ## Service Listen Configuration
 
 By default, the API and Airflow services listen with following host/port combinations.
