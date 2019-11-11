@@ -25,18 +25,9 @@ describe('tap-carbon-intensity + target-sqlite', () => {
       timeout: 60000
     })
     cy.wait('@carbonEntitiesApi')
-    cy.get('.modal-card-foot').within(() => {
-      cy.get('.button')
-        .contains('Save')
-        .click({ force: true })
-    })
   })
 
   it('A user can install target-sqlite', () => {
-    cy.route('POST', '/api/v1/orchestrations/save/configuration').as(
-      'saveConfigurationApi'
-    )
-
     cy.visit('/pipeline/load')
     cy.wait('@installedPluginsApi')
     cy.get('[data-cy="target-sqlite-loader-card"]').within(() => {
@@ -54,7 +45,6 @@ describe('tap-carbon-intensity + target-sqlite', () => {
         .contains('Save')
         .click({ force: true })
     })
-    cy.wait('@saveConfigurationApi')
   })
 
   it('A user can skip the transform step', () => {
@@ -65,20 +55,22 @@ describe('tap-carbon-intensity + target-sqlite', () => {
   })
 
   it('A user can schedule a new pipeline', () => {
-    cy.route('POST', '/api/v1/orchestrations/job/state').as('jobStateApi')
+    cy.route('POST', '/api/v1/orchestrations/pipeline_schedules').as(
+      'pipelineSchedulesApi'
+    )
+    cy.route('POST', '/api/v1/orchestrations/run').as('runOrchestrationsApi')
 
     cy.visit('/pipeline/schedule')
     cy.get('[data-cy="create-pipeline-button"]').click({ force: true })
     cy.wait('@installedPluginsApi')
     cy.get('[data-cy="save-pipeline-button"]').click()
-    cy.wait('@jobStateApi', {
-      timeout: 30000
-    })
+    cy.wait('@pipelineSchedulesApi')
+    cy.wait('@runOrchestrationsApi')
     cy.contains('button', 'Analyze', {
-      timeout: 30000
+      timeout: 60000
     })
       .should('not.be.disabled')
-      .click()
+      .click({ force: true })
   })
 
   it('A user can analyze the data', () => {
@@ -109,9 +101,6 @@ describe('tap-carbon-intensity + target-sqlite', () => {
         .click()
     })
     cy.wait('@reportsApi')
-    cy.get('[data-cy="column-name"]').click()
-    cy.get('[data-cy="aggregate-count"]').click()
-    cy.get('[data-cy="run-query-button"]').click()
     cy.wait('@getChartApi')
     cy.get('canvas').should('be.visible')
     cy.get('[data-cy="dropdown-save-report"]').click()
@@ -124,7 +113,6 @@ describe('tap-carbon-intensity + target-sqlite', () => {
     cy.wait('@addReportToDashboardApi')
     cy.visit('/dashboard')
     cy.get('[data-cy="dashboard-link"]:first-child').click()
-    cy.wait('@dashboardReportsApi')
     cy.get('canvas').should('be.visible')
   })
 })
