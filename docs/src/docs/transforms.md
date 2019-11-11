@@ -10,7 +10,7 @@ As an example, assume that the following command runs:
 meltano elt tap-carbon-intensity target-postgres --transform run
 ```
 
-After the Extract and Load steps are successfuly completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs.
+After the Extract and Load steps are successfully completed and data have been extracted from the [Carbon Intensity API](https://api.carbonintensity.org.uk/) and loaded to a Postgres DB, the dbt transform runs.
 
 Meltano uses the convention that the transform has the same name as the extractor it is for. Transforms are automatically added the first time an elt operation that requires them runs, but they can also be discovered and added to a Meltano project manually:
 
