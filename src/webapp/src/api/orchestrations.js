@@ -10,10 +10,6 @@ export default {
     return axios.get(utils.apiUrl('orchestrations', 'pipeline_schedules'))
   },
 
-  getExtractorInFocusEntities(extractor) {
-    return axios.post(utils.apiUrl('orchestrations', `entities/${extractor}`))
-  },
-
   getJobLog({ jobId }) {
     return axios.get(utils.apiUrl('orchestrations', `jobs/${jobId}/log`))
   },

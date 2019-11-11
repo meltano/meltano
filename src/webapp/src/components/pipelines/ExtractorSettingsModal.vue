@@ -86,7 +86,7 @@ export default {
     ...mapActions('plugins', ['addPlugin', 'installPlugin']),
     tryAutoAdvance() {
       if (this.extractorLacksConfigSettings) {
-        this.saveConfigAndBeginEntitySelection()
+        this.saveConfigAndGoToLoaders()
       }
     },
     close() {
@@ -108,7 +108,7 @@ export default {
         this.extractorName
       )
     },
-    saveConfigAndBeginEntitySelection() {
+    saveConfigAndGoToLoaders() {
       this.$store
         .dispatch('configuration/savePluginConfiguration', {
           name: this.extractor.name,
@@ -181,7 +181,7 @@ export default {
         <button
           class="button is-interactive-primary"
           :disabled="!isSaveable"
-          @click="saveConfigAndBeginEntitySelection"
+          @click="saveConfigAndGoToLoaders"
         >
           Save
         </button>
