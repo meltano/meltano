@@ -120,10 +120,7 @@ export default {
             type: 'extractor',
             value: this.extractor
           })
-          this.$router.push({
-            name: 'extractorEntities',
-            params: { extractor: this.extractor.name }
-          })
+          this.$router.push({ name: 'loaders' })
           const message = this.extractorLacksConfigSettings
             ? `Auto Advance - No Configuration needed for ${
                 this.extractor.name

@@ -44,12 +44,5 @@ export default {
       utils.apiUrl('orchestrations', `${type}/${name}/configuration`),
       config
     )
-  },
-
-  selectEntities(extractorEntities) {
-    return axios.post(
-      utils.apiUrl('orchestrations', 'select-entities'),
-      extractorEntities
-    )
   }
 }

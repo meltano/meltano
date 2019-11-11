@@ -220,14 +220,6 @@ const actions = {
     orchestrationsApi.savePluginConfiguration(configPayload)
   },
 
-  selectEntities({ state }) {
-    orchestrationsApi
-      .selectEntities(state.extractorInFocusEntities)
-      .then(() => {
-        // TODO confirm success or handle error in UI
-      })
-  },
-
   toggleAllEntityGroupsOff({ commit, dispatch, state }) {
     state.extractorInFocusEntities.entityGroups.forEach(entityGroup => {
       if (entityGroup.selected) {
