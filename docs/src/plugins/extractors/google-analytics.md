@@ -1,7 +1,7 @@
 ---
 sidebar: auto
 metaTitle: Extract Data from Google Analytics
-description: Use Meltano to extract raw data from Google Analytics and insert it into Postgres, Snowflake, and more. 
+description: Use Meltano to extract raw data from Google Analytics and insert it into Postgres, Snowflake, and more.
 ---
 
 # Google Analytics
@@ -22,7 +22,7 @@ In order to access your Google Analytics data, you will need:
 
    This extractor supports service account based authorization, where an administrator manually creates a service account with the appropriate permissions to view the account, property, and view you wish to fetch data from.
 
-   To access your Google Analytics Account, it needs the Analytics Reporting API *and* the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
+   To access your Google Analytics Account, it needs the Analytics Reporting API _and_ the Analytics API enabled. These need to be enabled for a project inside the same organization as your Google Analytics account (check the next section for more details).
 
 3. A way to authenticate when accessing the Analytics APIs
 
@@ -62,7 +62,6 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 ![Screenshot of Google Analytics Add User](/images/tap-google-analytics/03-ga-add-user.png)
 
-
 ### Enabling the APIs
 
 1. Visit the [Google Analytics Reporting API](https://console.developers.google.com/apis/api/analyticsreporting.googleapis.com/overview) dashboard and make sure that the project you used in the previous step is selected.
@@ -79,7 +78,7 @@ Use this email address to [add a user](https://support.google.com/analytics/answ
 
 ### Prerequisites
 
-* [Running instance of Meltano](/docs/getting-started.html)
+- [Running instance of Meltano](/docs/getting-started.html)
 
 ### Configure the Extractor
 
@@ -93,19 +92,11 @@ On the configuration modal enter the View ID you retrieved using [Google Analyti
 
 ![Screenshot of Google Analytics Extractor Configuration](/images/google-analytics-tutorial/02-ga-configuration.png)
 
-Click `Save` to finish configuring the extractor and progress to the next step: "Entity Selection".
-
-### Select Entities
-
-Data sources can contain a lot of different entities. As a result, you might not want Meltano to pull every data source into your dashboard. As you can see on your screen, all of the entities are currently selected by default for `tap-google-analytics`.
-
-![Screenshot of Google Analytics Extractor Entity Selection](/images/google-analytics-tutorial/03-ga-entity-selection.png)
-
-We want to select all the default Entities (reports in the case of Google Analytics) that Meltano extracts, so click `Save` to finish configuring our extractor.
+Click `Save` to finish configuring the extractor and progress to the next step: "Configure the Loader".
 
 ::: tip
 
-**Ready to do more with data from Google Analytics?** 
+**Ready to do more with data from Google Analytics?**
 
 Check out our [Google Analytics API + Postgres tutorial](/tutorials/google-analytics-with-postgres.html#select-a-data-model) to learn how you can create an analytics database from within Meltano, and start analyzing your Google Analytics data.
 

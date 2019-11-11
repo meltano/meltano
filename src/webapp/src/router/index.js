@@ -2,7 +2,6 @@ import Router from 'vue-router'
 
 import CreateScheduleModal from '@/components/pipelines/CreateScheduleModal'
 import Design from '@/components/analyze/Design'
-import EntitiesSelectorModal from '@/components/pipelines/EntitiesSelectorModal'
 import Extractors from '@/components/pipelines/Extractors'
 import ExtractorSettingsModal from '@/components/pipelines/ExtractorSettingsModal'
 import Loaders from '@/components/pipelines/Loaders'
@@ -60,18 +59,6 @@ const router = new Router({
           meta: {
             isModal: true,
             title: 'Meltano: Pipeline - Extractor Configuration'
-          }
-        },
-        {
-          path: 'extract/:extractor/select',
-          name: 'extractorEntities',
-          components: {
-            default: Extractors,
-            extractorEntities: EntitiesSelectorModal
-          },
-          meta: {
-            isModal: true,
-            title: 'Meltano: Pipeline - Extractor Entities'
           }
         },
         {
