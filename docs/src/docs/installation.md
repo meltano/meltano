@@ -1,6 +1,6 @@
 ---
 metaTitle: How to Install Meltano
-description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services. 
+description: Meltano is easy to install on your local machine or in the cloud, including on AWS, Digital Ocean, and other cloud services.
 ---
 
 # Installation
@@ -239,13 +239,13 @@ Your local environment may use a different version of Python or other dependenci
 
 ##### Recommended Virtual Environment Setup
 
-We suggest you create a directory where you want your virtual environments to be saved, e.g. `~/virtualenvs`.
+We suggest you create a directory where you want your virtual environments to be saved (e.g. `/venv`). This can be any directory in your environment, but we recommend saving it in your Meltano project to make it easier to keep track of.
 
 Then create a new virtual environment inside that directory:
 
 ```bash
-mkdir ~/virtualenvs
-python -m venv ~/virtualenvs/meltano
+mkdir venv
+python -m venv /venv/meltano
 ```
 
 ##### Activating Your Virtual Environment
@@ -253,7 +253,7 @@ python -m venv ~/virtualenvs/meltano
 Activate the virtual environment using:
 
 ```bash
-source ~/virtualenvs/meltano/bin/activate
+source /venv/meltano/bin/activate
 ```
 
 If the virtual environment was activated successfully, you'll see a `(meltano)` indicator added to your prompt.
@@ -265,7 +265,7 @@ To streamline this process, you can define a [shell alias](https://shapeshed.com
 
 ```bash
 # Add to `~/.bashrc`, `~/.zshrc`, etc, depending on the shell you use:
-alias meltano!="source ~/virtualenvs/meltano/bin/activate"
+alias meltano!="source $MELTANO_PROJECT_PATH/venv/meltano/bin/activate"
 
 # Use as follows, after creating a new shell:
 meltano!
