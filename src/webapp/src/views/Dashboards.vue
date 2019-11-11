@@ -109,7 +109,7 @@ export default {
                   <a
                     v-for="dashboard in dashboards"
                     :key="dashboard.id"
-                    data-test-id="dashboard-link"
+                    data-cy="dashboard-link"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': isActive(dashboard) }"
                     @click="goToDashboard(dashboard)"

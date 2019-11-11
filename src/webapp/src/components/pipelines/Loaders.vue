@@ -68,7 +68,7 @@ export default {
       <div
         v-for="(loader, index) in sortedLoaders"
         :key="`${loader.name}-${index}`"
-        :data-test-id="`${loader.name}-loader-card`"
+        :data-cy="`${loader.name}-loader-card`"
         class="tile is-parent is-3 is-relative"
       >
         <div class="tile level is-child box">

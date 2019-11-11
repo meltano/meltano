@@ -14,13 +14,11 @@ describe('tap-carbon-intensity + target-sqlite', () => {
 
     cy.visit('/')
     cy.wait('@installedPluginsApi')
-    cy.get('[data-test-id="tap-carbon-intensity-extractor-card"]').within(
-      () => {
-        cy.get('.button')
-          .contains('Install')
-          .click({ force: true })
-      }
-    )
+    cy.get('[data-cy="tap-carbon-intensity-extractor-card"]').within(() => {
+      cy.get('.button')
+        .contains('Install')
+        .click({ force: true })
+    })
     cy.wait('@installedPluginsApi')
     cy.wait('@addPluginsApi')
     cy.wait('@installPluginApi', {
@@ -41,7 +39,7 @@ describe('tap-carbon-intensity + target-sqlite', () => {
 
     cy.visit('/pipeline/load')
     cy.wait('@installedPluginsApi')
-    cy.get('[data-test-id="target-sqlite-loader-card"]').within(() => {
+    cy.get('[data-cy="target-sqlite-loader-card"]').within(() => {
       cy.get('.button')
         .contains('Install')
         .click({ force: true })
@@ -61,7 +59,7 @@ describe('tap-carbon-intensity + target-sqlite', () => {
 
   it('A user can skip the transform step', () => {
     cy.visit('/pipeline/transform')
-    cy.get('[data-test-id="save-transform"]')
+    cy.get('[data-cy="save-transform"]')
       .contains('Save')
       .click({ force: true })
   })
@@ -104,28 +102,28 @@ describe('tap-carbon-intensity + target-sqlite', () => {
     cy.wait('@modelsApi')
     cy.get('.tag-running-pipelines').should('have.length', 0)
     cy.get(
-      '[data-test-id="model-carbon-intensity-sqlite-carbon-model-card"]'
+      '[data-cy="model-carbon-intensity-sqlite-carbon-model-card"]'
     ).within(() => {
       cy.get('.button')
         .contains('Analyze')
         .click()
     })
     cy.wait('@reportsApi')
-    cy.get('[data-test-id="column-name"]').click()
-    cy.get('[data-test-id="aggregate-count"]').click()
-    cy.get('[data-test-id="run-query-button"]').click()
+    cy.get('[data-cy="column-name"]').click()
+    cy.get('[data-cy="aggregate-count"]').click()
+    cy.get('[data-cy="run-query-button"]').click()
     cy.wait('@getChartApi')
     cy.get('canvas').should('be.visible')
-    cy.get('[data-test-id="dropdown-save-report"]').click()
-    cy.get('[data-test-id="button-save-report"]').click()
+    cy.get('[data-cy="dropdown-save-report"]').click()
+    cy.get('[data-cy="button-save-report"]').click()
     cy.wait('@saveReportsApi')
-    cy.get('[data-test-id="dropdown-add-to-dashboard"]').click()
-    cy.get('[data-test-id="button-new-dashboard"]').click()
-    cy.get('[data-test-id="button-create-dashboard"]').click()
+    cy.get('[data-cy="dropdown-add-to-dashboard"]').click()
+    cy.get('[data-cy="button-new-dashboard"]').click()
+    cy.get('[data-cy="button-create-dashboard"]').click()
     cy.wait('@saveDashboardApi')
     cy.wait('@addReportToDashboardApi')
     cy.visit('/dashboard')
-    cy.get('[data-test-id="dashboard-link"]:first-child').click()
+    cy.get('[data-cy="dashboard-link"]:first-child').click()
     cy.wait('@dashboardReportsApi')
     cy.get('canvas').should('be.visible')
   })

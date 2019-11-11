@@ -306,13 +306,13 @@ export default {
           <p
             v-if="hasActiveReport"
             class="control"
-            data-test-id="dropdown-add-to-dashboard"
+            data-cy="dropdown-add-to-dashboard"
             @click="getDashboards"
           >
             <Dropdown label="Add to Dashboard" is-right-aligned>
               <div class="dropdown-content">
                 <a
-                  data-test-id="button-new-dashboard"
+                  data-cy="button-new-dashboard"
                   class="dropdown-item"
                   data-dropdown-auto-close
                   @click="toggleNewDashboardModal()"
@@ -361,7 +361,7 @@ export default {
           <div
             class="control field"
             :class="{ 'has-addons': hasActiveReport }"
-            data-test-id="dropdown-save-report"
+            data-cy="dropdown-save-report"
           >
             <p class="control">
               <button
@@ -400,7 +400,7 @@ export default {
                         Cancel
                       </button>
                       <button
-                        data-test-id="button-save-report"
+                        data-cy="button-save-report"
                         class="button"
                         :disabled="!saveReportSettings.name"
                         data-dropdown-auto-close
@@ -488,7 +488,7 @@ export default {
                   <div class="field has-addons">
                     <div class="control">
                       <button
-                        data-test-id="run-query-button"
+                        data-cy="run-query-button"
                         class="button is-success"
                         :class="{ 'is-loading': isLoadingQuery }"
                         :disabled="!currentSQL"
@@ -636,7 +636,7 @@ export default {
                   <a
                     v-if="!column.hidden"
                     :key="column.label"
-                    :data-test-id="`column-${column.label}`.toLowerCase()"
+                    :data-cy="`column-${column.label}`.toLowerCase()"
                     class="panel-block space-between has-text-weight-medium"
                     :class="{ 'is-active': column.selected }"
                     @click="columnSelected(column)"
@@ -675,7 +675,7 @@ export default {
                 <a
                   v-for="aggregate in design.relatedTable.aggregates"
                   :key="aggregate.label"
-                  :data-test-id="`aggregate-${aggregate.label}`.toLowerCase()"
+                  :data-cy="`aggregate-${aggregate.label}`.toLowerCase()"
                   class="panel-block space-between has-text-weight-medium"
                   :class="{ 'is-active': aggregate.selected }"
                   @click="aggregateSelected(aggregate)"

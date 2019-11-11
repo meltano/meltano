@@ -139,7 +139,7 @@ export default {
           <div
             v-for="(v, model) in models"
             :key="`${model}-panel`"
-            :data-test-id="`${model}-model-card`.replace('/', '-')"
+            :data-cy="`${model}-model-card`.replace('/', '-')"
             class="box"
           >
             <div class="content">

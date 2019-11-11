@@ -157,7 +157,7 @@ export default {
                 </div>
                 <div class="control">
                   <a
-                    data-test-id="save-transform"
+                    data-cy="save-transform"
                     class="button is-interactive-primary"
                     @click="saveTransformAndGoToSchedules"
                     >Save</a
