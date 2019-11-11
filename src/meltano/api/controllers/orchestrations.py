@@ -179,7 +179,6 @@ def test_plugin_configuration(plugin_ref) -> Response:
             success = await print_stream(process.stdout)
             process.kill()
         except Exception as err:
-            logging.exception(err)
             success = False
 
     loop = asyncio.get_event_loop()
