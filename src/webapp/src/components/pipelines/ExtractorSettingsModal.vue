@@ -138,7 +138,6 @@ export default {
           ? `Auto Advance - No Configuration needed for ${this.extractor.name}`
           : `Connection Saved - ${this.extractor.name}`
         Vue.toasted.global.success(message)
-      })
     },
     testConnection() {
       this.isTesting = true
@@ -149,12 +148,12 @@ export default {
       })
         .then(() =>
           Vue.toasted.global.success(
-            `Valid Connection - ${this.extractor.name}`
+            `Valid Extractor Connection - ${this.extractor.name}`
           )
         )
         .catch(() =>
           Vue.toasted.global.error(
-            `Invalid Connection - ${this.extractor.name}`
+            `Invalid Extractor Connection - ${this.extractor.name}`
           )
         )
         .finally(() => (this.isTesting = false))
@@ -222,7 +221,7 @@ export default {
           <div class="control">
             <button
               class="button is-interactive-primary"
-              :disabled="!isSaveable"
+              :disabled="!isSaveable || isTesting"
               @click="saveConfigAndGoToLoaders"
             >
               Save

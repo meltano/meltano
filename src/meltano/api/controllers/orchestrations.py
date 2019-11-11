@@ -1,3 +1,5 @@
+import asyncio
+import json
 import logging
 
 from flask import Blueprint, request, url_for, jsonify, make_response, Response
@@ -155,16 +157,38 @@ def test_plugin_configuration(plugin_ref) -> Response:
     """
     project = Project.find()
     payload = request.get_json()
-    success = True
+    config_service = ConfigService(project)
+    plugin = config_service.find_plugin(plugin_ref.name, plugin_ref.type)
+    success = False
 
-    # TODO proper impelementation of tap test, maybe leverage https://github.com/singer-io/singer-tools#checking-output-of-a-tap
-    try:
-        invoker = invoker_factory(project, plugin_ref)
-        invoker.invoke()
-    except Exception as err:
-        success = False
+    async def print_stream(tap_stream) -> bool:
+        while not tap_stream.at_eof():
+            message = await tap_stream.readline()
+            json_dict = json.loads(message)
+            resp = json_dict["type"] == "RECORD"
+            if resp:
+                return True
+        return False
 
-    return jsonify({"success": success})
+    async def test_extractor(config={}):
+        try:
+            invoker = invoker_factory(project, plugin, prepare_with_session=db.session)
+            invoker.plugin_config = config
+            invoker.prepare(db.session)
+            process = await invoker.invoke_async(stdout=asyncio.subprocess.PIPE)
+            success = await print_stream(process.stdout)
+            process.kill()
+        except Exception as err:
+            logging.exception(err)
+            success = False
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test_extractor(payload))
+
+    if success:
+        return jsonify({"success": success}), 202
+    else:
+        return jsonify({"success": success}), 404
 
 
 @orchestrationsBP.route("/pipeline_schedules", methods=["GET"])
