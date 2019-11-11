@@ -1,13 +1,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex'
 
+import Dropdown from '@/components/generic/Dropdown'
 import ScheduleTableHead from '@/components/pipelines/ScheduleTableHead'
-
 import utils from '@/utils/utils'
 
 export default {
   name: 'PipelineSchedules',
   components: {
+    Dropdown,
     ScheduleTableHead
   },
   computed: {
@@ -170,6 +171,40 @@ export default {
                     :to="{ name: 'model' }"
                     >Model</router-link
                   >
+                  <Dropdown
+                    button-classes="is-small"
+                    menu-classes="dropdown-menu-300"
+                    icon-open="trash-alt"
+                    icon-close="caret-up"
+                    is-right-aligned
+                  >
+                    <div class="dropdown-content is-unselectable">
+                      <div class="dropdown-item">
+                        <div class="content">
+                          <p>
+                            Please confirm deletion of pipeline:<br /><em>{{
+                              pipeline.name
+                            }}</em
+                            >.
+                          </p>
+                        </div>
+                        <div class="buttons is-right">
+                          <button
+                            class="button is-text"
+                            data-dropdown-auto-close
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            class="button is-danger"
+                            data-dropdown-auto-close
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Dropdown>
                 </div>
               </td>
             </tr>

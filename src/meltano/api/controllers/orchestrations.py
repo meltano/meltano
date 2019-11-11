@@ -188,3 +188,11 @@ def save_pipeline_schedule() -> Response:
         return jsonify(schedule._asdict()), 201
     except ScheduleAlreadyExistsError as e:
         raise ScheduleAlreadyExistsError(e.schedule)
+
+
+@orchestrationsBP.route("/pipeline_schedules", methods=["DELETE"])
+def delete_pipeline_schedule() -> Response:
+    """
+    endpoint for persisting a pipeline schedule
+    """
+    incoming = request.get_json()
