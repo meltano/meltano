@@ -347,7 +347,7 @@ git fetch origin
 
 Meltano uses tags to create its artifacts. Pushing a new tag to the repository will publish it as docker images and a PyPI package.
 
-1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano install and run the following command to install all development dependencies:
+1. Meltano has a number of dependencies for the release toolchain that are required when performing a release. If you haven't already, please navigate to your meltano installation and run the following command to install all development dependencies:
 
    ```bash
    # activate your virtualenv
@@ -383,8 +383,9 @@ Meltano uses tags to create its artifacts. Pushing a new tag to the repository w
 You can use `make type=patch release` to force a patch release. This is useful when we need to release hotfixes.
 :::
 
-1. Create a merge request from `release-next` targeting `master` and make sure to check `delete the source branch when the changes are merged`.
+1. Create a merge request from `release-next` targeting `master` and use the `release` template.
 1. Add the pipeline link (the one that does the actual deployment) to the merge request. Go to the commit's pipelines tab and select the one that has the **publish** stage.
+1. Make sure to check `delete the source branch when the changes are merged`.
 1. When the **publish** pipeline succeeds, the release is publicly available on [PyPI](https://pypi.org/project/meltano/).
 1. Follow the [Digital Ocean publish process](#digitalocean-marketplace)
 1. If a non-patch release, record and distribute the [Speedrun Video](#speedruns):
@@ -411,12 +412,12 @@ The _digitalocean_marketplace_ job is only available on pipelines running off `m
 Then, head to the DigitalOcean vendor portal at <https://marketplace.digitalocean.com/vendorportal> to edit the Meltano listing.
 
 :::tip Don't see the Meltano listing?
-You'll have to be granted access to the DigitalOcean vendor portal. Please ask access to your manager.
+You'll have to be granted access to the DigitalOcean vendor portal. Please ask your manager for access.
 :::
 
 1. Once inside the listing, update the following entries:
-   - **System Image** to the new image (match the aforementioned snapshot string)
    - **Version** to the latest Meltano version
+   - **System Image** to the new image (match the aforementioned snapshot string)
    - **Meltano Package Version** inside the _Software Included Entry_
 1. Submit it for review to finish the process.
 
