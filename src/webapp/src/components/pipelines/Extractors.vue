@@ -61,7 +61,7 @@ export default {
       <div
         v-for="(extractor, index) in plugins.extractors"
         :key="`${extractor.name}-${index}`"
-        :data-cy="`${extractor}-extractor-card`"
+        :data-cy="`${extractor.name}-extractor-card`"
         class="tile is-parent is-3 is-relative"
       >
         <SpeedRunIcon v-if="extractor.name === speedRunExtractor" />
