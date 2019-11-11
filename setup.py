@@ -10,6 +10,7 @@ with open("VERSION") as version_file:
 requires = [
     'aiohttp==3.4.4',
     'alembic==1.0.11',
+    'atomicwrites==1.2.1',
     'authlib==0.10',
     'backoff==1.8.0',
     'bcrypt==3.1.6',

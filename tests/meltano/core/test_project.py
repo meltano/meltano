@@ -3,6 +3,7 @@ import yaml
 import os
 import shutil
 import threading
+import time
 
 from meltano.core.project import Project, ProjectNotFound
 from meltano.core.behavior.versioned import IncompatibleVersionError
@@ -22,6 +23,29 @@ def update(payload):
 
     with project.meltano_update() as meltano:
         meltano.update(payload)
+
+
+class IndefiniteThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self._stop_event = threading.Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    def run(self, *args, **kwargs):
+        while not self._stop_event.is_set():
+            self.do(*args, **kwargs)
+
+
+class ProjectReader(IndefiniteThread):
+    def __init__(self, project):
+        self.project = project
+        super().__init__()
+
+    def do(self):
+        assert self.project.meltano
+        time.sleep(50 / 1000)  # 50ms
 
 
 class TestProject:
@@ -68,11 +92,16 @@ class TestProject:
     def test_meltano_concurrency(self, project, concurrency):
         payloads = [{f"test_{i}": i} for i in range(concurrency["cases"])]
 
+        reader = ProjectReader(project)
+        reader.start()
+
         workers = Pool(concurrency["processes"])
         workers.map(update, payloads)
 
+        reader.stop()
+        reader.join()
+
         for key, val in ((k, v) for payload in payloads for k, v in payload.items()):
-            print(project.meltano)
             assert project.meltano[key] == val, str(project.meltano)
 
 
