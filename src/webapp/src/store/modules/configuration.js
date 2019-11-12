@@ -82,7 +82,14 @@ const getters = {
 
 const actions = {
   deletePipelineSchedule({ commit }, pipeline) {
+    let status = {
+      pipeline,
+      isRunning: pipeline.isRunning,
+      isDeleting: true
+    }
+    commit('setPipelineStatus', status)
     return orchestrationsApi.deletePipelineSchedule(pipeline).then(() => {
+      commit('setPipelineStatus', Object.assign({ isDeleting: false }, status))
       commit('deletePipeline', pipeline)
     })
   },
@@ -258,9 +265,13 @@ const mutations = {
     state[target] = configuration
   },
 
-  setPipelineStatus(_, { pipeline, isRunning, hasError = false }) {
+  setPipelineStatus(
+    _,
+    { pipeline, isRunning, isDeleting = false, hasError = false }
+  ) {
     Vue.set(pipeline, 'isRunning', isRunning)
     Vue.set(pipeline, 'hasError', hasError)
+    Vue.set(pipeline, 'isDeleting', isDeleting)
   },
 
   setPipelineJobId(_, { pipeline, jobId }) {

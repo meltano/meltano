@@ -183,7 +183,12 @@ export default {
                     >Model</router-link
                   >
                   <Dropdown
-                    button-classes="is-small is-danger is-outlined"
+                    :button-classes="
+                      `is-small is-danger is-outlined ${
+                        pipeline.isDeleting ? 'is-loading' : ''
+                      }`
+                    "
+                    :disabled="pipeline.isRunning"
                     menu-classes="dropdown-menu-300"
                     icon-open="trash-alt"
                     icon-close="caret-up"
