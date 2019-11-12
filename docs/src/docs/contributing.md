@@ -15,7 +15,7 @@ In order to contribute to Meltano, you will need the following:
 
 ## Where to start?
 
-We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests](https://gitlab.com/meltano/meltano/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=Accepting%20Merge%20Requests) if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
+We welcome contributions, idea submissions, and improvements. In fact we may already have open issues labeled [Accepting Merge Requests] if you don't know where to start. Please see the contribution guidelines below for source code related contributions.
 
 ```bash
 # Clone the Meltano repo
@@ -274,7 +274,7 @@ Here is a technical breakdown:
 ## Merge Requests
 
 :::tip Searching for something to work on?
-Start off by looking at our [~"Accepting Merge Request"](https://gitlab.com/meltano/meltano/issues?label_name=Accepting+Merge+Requests) label.
+Start off by looking at our [~"Accepting Merge Requests"][Accepting Merge Requests] label.
 
 Keep in mind that this is only a suggestion: all improvements are welcome.
 :::
@@ -571,3 +571,5 @@ MELTANO_VENV=.venv tmuxinator local
 ### Resources
 
 - [Tmux Cheat Sheet & Quick Reference](https://tmuxcheatsheet.com/)
+
+[Accepting Merge Requests]: https://gitlab.com/groups/meltano/-/issues?label_name[]=Accepting%20Merge%20Requests
