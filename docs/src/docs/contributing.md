@@ -61,7 +61,7 @@ As you contribute to Meltano, you may want to disable [metrics tracking](/docs/e
 export MELTANO_DISABLE_TRACKING=True
 ```
 
-## Meltano API Development
+## API Development
 
 For all changes that do not involve working on Meltano UI (front-end) itself, run the following command:
 
@@ -78,7 +78,7 @@ If you run into `/bin/sh: yarn: command not found`, double check that you've got
 On macOS, this can be solved by running `brew install yarn`.
 :::
 
-## Meltano UI Development
+## UI Development
 
 In the event you are contributing to Meltano UI and want to work with all of the frontend tooling (i.e., hot module reloading, etc.), you will need to run the following commands:
 
@@ -106,7 +106,7 @@ If you need to change the URL of your development environment, you can do this b
 export MELTANO_UI_URL = ""
 ```
 
-## Meltano System Database
+## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
 
