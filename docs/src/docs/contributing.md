@@ -106,6 +106,27 @@ If you need to change the URL of your development environment, you can do this b
 export MELTANO_UI_URL = ""
 ```
 
+## Taps & Targets Development
+
+### For existing taps/targets
+
+We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
+
+1. Fork (using Meltano organization)
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Modify and submits PRs
+1. If there is resistance, fork as our tap (2)
+
+### For taps/targets we create
+
+1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
+1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
+1. Use a separate repo (meltano/target|tap-x) in GitLab
+   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
+1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
+1. Publish PyPI packages of these package (not for now)
+1. We could mirror this repo on GitHub if we want (not for now)
+
 ## System Database
 
 Meltano API and CLI are both supported by a database that is managed using Alembic migrations.
@@ -492,50 +513,6 @@ meltano ui
 8. Assuming there are no conflicts on the port, you can now open your Meltano instance at http://localhost:5000.
 
 9. Run through `tap-gitlab` + `tap-postgres` workflow as quickly as possible with some narration, but don't pause mid-action to explain something.
-
-## Taps & Targets Workflow
-
-### For existing taps/targets
-
-We should be good citizen about these, and use the default workflow to contribute. Most of these are on GitHub so:
-
-1. Fork (using Meltano organization)
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Modify and submits PRs
-1. If there is resistance, fork as our tap (2)
-
-### For taps/targets we create
-
-1. For tap development please use the [tap cookiecutter template](https://github.com/singer-io/singer-tap-template).
-1. For target development please use the [target cookiecutter template](https://github.com/singer-io/singer-target-template).
-1. Use a separate repo (meltano/target|tap-x) in GitLab
-   e.g. Snowflake: https://gitlab.com/meltano/target-snowflake
-1. Add a [webhook](https://docs.gitlab.com/ee/ci/triggers/#triggering-a-pipeline-from-a-webhook) to trigger the `meltano/meltano` pipeline.
-1. Publish PyPI packages of these package (not for now)
-1. We could mirror this repo on GitHub if we want (not for now)
-
-### Discoverability
-
-We maintain a curated list of taps/targets that are expected to work out of the box with Meltano. Meltano also helps the CLI user find components via a `discover` command.
-
-Get a list of extractors:
-
-```bash
-meltano discover extract
-tap-demo==...
-tap-zendesk==1.3.0
-tap-marketo==...
-...
-```
-
-Or a list of loaders
-
-```bash
-$ meltano discover load
-target-demo==...
-target-snowflake==git+https://gitlab.com/meltano/target-snowflake@master.git
-target-postgres==...
-```
 
 ## Tmuxinator
 
