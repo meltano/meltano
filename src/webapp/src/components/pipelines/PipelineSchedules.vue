@@ -189,6 +189,10 @@ export default {
                       }`
                     "
                     :disabled="pipeline.isRunning"
+                    :tooltip="{
+                      classes: 'is-tooltip-left',
+                      message: 'Delete this ELT Pipeline'
+                    }"
                     menu-classes="dropdown-menu-300"
                     icon-open="trash-alt"
                     icon-close="caret-up"
