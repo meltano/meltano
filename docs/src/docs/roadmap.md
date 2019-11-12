@@ -95,25 +95,7 @@ For our recent changes, you can check [our CHANGELOG](https://gitlab.com/meltano
 
 You can track our weekly progress and forward-looking plans in greater detail through [our milestones](https://gitlab.com/groups/meltano/-/milestones).
 
-| Release Date | Release Owner | Speedrun Owner | Shadow |
-| ------------ | ------------- | -------------- | ------ |
-| 2019-10-07   | Ben H.        | Ben H.         |        |
-| 2019-10-14   | Derek K.      | Derek K.       |        |
-| 2019-10-21   | Ben H.        | Ben H.         |        |
-| 2019-10-28   | Micael B.     | Micael B.      |        |
-| 2019-11-04   | Derek K.      | Derek K.       |        |
-| 2019-11-11   | Yannis R.     | Yannis R.      |        |
-| 2019-11-18   | Douwe M.      | Douwe M.       |        |
-| 2019-11-25   | Ben H.        | Ben H.         |        |
-| 2019-12-02   | Micael B.     | Micael B.      |        |
-| 2019-12-09   | Derek K.      | Derek K.       |        |
-| 2019-12-16   | Yannis R.     | Yannis R.      |        |
-| 2019-12-23   | Ben H.        | Ben H.         |        |
-| 2019-12-30   | Ben H.        | Ben H.         |        |
-
-:::tip Can't make your scheduled release?
-If you are unable to cover an assigned week, please find someone to cover for you and submit an MR to this page with the new owner.
-:::
+The release process is covered in more detail in [the Handbook](https://about.gitlab.com/handbook/meltano/engineering/#release-process).
 
 ### History
 
